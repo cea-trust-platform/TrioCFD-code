@@ -353,6 +353,8 @@ Entree& Navier_Stokes_FT_Disc::readOn(Entree& is)
 void Navier_Stokes_FT_Disc::set_param(Param& param)
 {
   Navier_Stokes_Turbulent::set_param(param);
+  param.ajouter_flag("boussinesq_approximation",&variables_internes().is_boussinesq_);
+  param.ajouter_flag("historical_mass_source",&variables_internes().historical_mass_source_);
   param.ajouter_flag("matrice_pression_invariante",&variables_internes().matrice_pression_invariante);
   param.ajouter_non_std("equation_interfaces_vitesse_imposee",(this) );
   param.ajouter_non_std("equations_interfaces_vitesse_imposee",(this) );
@@ -367,6 +369,7 @@ void Navier_Stokes_FT_Disc::set_param(Param& param)
   param.ajouter_flag("mpoint_inactif_sur_qdm",&variables_internes().mpoint_inactif);
   param.ajouter_flag("mpoint_vapeur_inactif_sur_qdm",&variables_internes().mpointv_inactif);
   param.ajouter("correction_courbure_ordre", &variables_internes().correction_courbure_ordre_);
+  param.ajouter_non_std("interpol_indic_pour_dI_dt", (this));
 }
 
 int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -563,7 +566,51 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
           Cerr << "Erreur a la lecture des parametres de la penalisation du forcage " << finl;
           Cerr << "On attendait : " << accouverte << finl;
-          exit();
+          Process::exit();
+        }
+    }
+  else if (mot =="interpol_indic_pour_dI_dt")
+    {
+      Motcles motcles2(3);
+      motcles2[0] = "interp_standard";
+      motcles2[1] = "interp_modifiee";
+      motcles2[2] = "interp_ai_based";
+      Motcle motlu;
+      is >> motlu;
+      Cerr << mot << " " << motlu << finl;
+      Cout << "Setting the type of interpolation for calculer_dI_dt to " << motlu << "." << finl;
+      int rang = motcles2.search(motlu);
+      switch(rang)
+        {
+        case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way"
+                   << " where a mean value + upwind is used." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces"
+                   << " as defined by the interfacial transport option." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
+                   << " and on the normal to the interface." << finl;
+            return 1;
+          }
+        default:
+          Cerr << "Transport_Interfaces_FT_Disc::lire\n"
+               << "The options for methode_transport are :\n"
+               << motcles2;
+          Process::exit();
         }
     }
   else
@@ -1368,6 +1415,171 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     {
 
       gradient.calculer(indicatrice.valeurs(), gradient_i.valeurs());
+// #define PATCH_CORRECTION_GRADIENT_INDICATRICE_AT_CONTACT_LINE
+#if PATCH_CORRECTION_GRADIENT_INDICATRICE_AT_CONTACT_LINE // Patch GB. 8/01/2018
+      // Correction du gradient a la ligne de contact :
+      const DoubleTab& inco=indicatrice.valeurs();
+      DoubleTab& resu=gradient_i.valeurs();
+      //      assert_espace_virtuel_vect(inco);
+      const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+      const IntVect& orientation = zvdf.orientation();
+      //const Zone_VDF& zvdf = la_zone_vdf.valeur();
+      //      const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+      //      const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
+      const Zone_Cl_dis_base& zcldis = zone_Cl_dis().valeur();
+      const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zcldis);
+      //      const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+      const DoubleVect& face_surfaces = zvdf.face_surfaces();
+      const IntTab& elem_faces = zvdf.elem_faces();
+      const IntTab& face_voisins = zone_dis().valeur().face_voisins();
+
+      double coef;
+      int n0, n1;
+
+      // Boucle sur les bords pour traiter les conditions aux limites
+      int ndeb, nfin, num_face;
+      for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
+        {
+
+          // pour chaque Condition Limite on regarde son type
+          // Si face de Dirichlet ou de Symetrie on ne fait rien
+          // Si face de Neumann on calcule la contribution au terme source
+
+          const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
+          Cerr << que_suis_je() << "::calculer_gradient_indicatrice() correction du gradient a la CL : " <<  la_cl.valeur() << finl;
+          if ( sub_type(Neumann_sortie_libre,la_cl.valeur()) )
+            {
+              const Neumann_sortie_libre& la_cl_typee =
+                ref_cast(Neumann_sortie_libre, la_cl.valeur());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  double P_imp = la_cl_typee.flux_impose(num_face-ndeb);
+                  n0 = face_voisins(num_face,0);
+                  if (n0 != -1)
+                    {
+                      coef = face_surfaces(num_face);//*porosite_surf(num_face)*Option_VDF::coeff_P_neumann;
+                      resu(num_face) += (coef*(P_imp - inco(n0)))*0.;
+                    }
+                  else
+                    {
+                      n1 = face_voisins(num_face,1);
+                      coef = face_surfaces(num_face);//*porosite_surf(num_face)*Option_VDF::coeff_P_neumann;
+                      resu(num_face) += (coef*(inco(n1) - P_imp))*0.;
+                    }
+                }
+            }
+
+          // Correction periodicite :
+          else if (sub_type(Periodique,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  n0 = face_voisins(num_face,0);
+                  n1 = face_voisins(num_face,1);
+                  coef = face_surfaces(num_face);//*porosite_surf(num_face);
+                  resu(num_face) += (coef*(inco(n1) - inco(n0)))*0.;
+                }
+            }
+          else if (sub_type(Symetrie,la_cl.valeur()))
+            ;
+          else if ( (sub_type(Dirichlet,la_cl.valeur()))
+                    ||
+                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
+                  )
+            {
+              Cerr << " GB " << que_suis_je() << "CL : " <<  la_cl.valeur() << finl;
+              // ../IJK/src/FT/IJK_Interfaces.cpp~:              const int elem_voisin = faces_voisins(num_face, 0) + faces_voisins(num_face, 1) - elem;
+              //../IJK/src/FT/IJK_Interfaces.cpp~:3931:  const IntTab& elem_faces = zone_vf.elem_faces();
+              //const int num_face = elem_faces(elem, iface);
+              //../IJK/src/FT/Sonde_IJK.cpp:542:      const IntTab& elem_faces = zoneVF.elem_faces();
+
+              // do nothing
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+              const int dim=Objet_U::dimension;
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  n0 = face_voisins(num_face,0);
+                  n1 = face_voisins(num_face,1);
+                  int elem = max(n0, n1);
+                  Cerr << "Elem: " << n0 << " ou " << n1 << " : retenu Elem " << elem << finl;
+                  Cerr << "num_face = " << num_face << finl;
+                  int nb_faces=elem_faces.dimension(1) ;
+                  int fac=0;
+                  double sum_grad_I = 0.;
+                  int memorized_sign = 0;
+                  for (fac=0; fac<nb_faces; fac++)
+                    {
+                      int num_face_courant=elem_faces(elem,fac);
+                      int sign = pow(-1,orientation(num_face_courant));
+                      if (num_face_courant == num_face)
+                        {
+                          Cerr << "face_surface : " << face_surfaces(num_face_courant)
+                               << " orientation : " << orientation(num_face_courant) << finl;
+                          memorized_sign = sign;
+                          ; // break;
+                        }
+                      else
+                        {
+                          sum_grad_I += resu(num_face_courant)*sign*face_surfaces(num_face_courant);
+                          Cerr << "face_surface : " << face_surfaces(num_face_courant)
+                               << " orientation : " << orientation(num_face_courant) << finl;
+                        }
+                    }
+                  sum_grad_I /= memorized_sign;
+                  // La face d'en face :
+                  int num_face_den_face=elem_faces(elem,(fac+dim)%nb_faces);
+                  //    int face_visavi = elem_faces(voisin0, ori) + elem_faces(voisin0, ori+Objet_U::dimension) - i;
+                  Cerr << "Face : " << fac << " en face de " << (fac+dim)%nb_faces << " -> " << num_face_den_face << finl;
+                  const int elem_voisin = face_voisins(num_face_den_face, 0) + face_voisins(num_face_den_face, 1) - elem;
+                  Cerr << "Voisin par la face " << fac << " [num=" <<num_face_den_face  << "] " << elem_voisin <<  finl;
+
+                  //coef = face_surfaces(num_face);//*porosite_surf(num_face);
+                  //resu(num_face) += (coef*(inco(n1) - inco(n0)));
+                  const double theta = 45;
+                  const double deg_to_rad = M_PI / 180.;
+                  const double cos_theta = cos(theta * deg_to_rad);
+
+                  REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+                  const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
+                  const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
+                  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+                  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
+                  const ArrOfInt& index_elem = intersections.index_elem();
+
+                  double surface_totale = 0.;
+                  {
+                    int index = index_elem[elem];
+                    // Boucle sur les faces qui traversent l'element:
+                    while (index >= 0)
+                      {
+                        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+                        surface_totale += data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+                        index = data.index_facette_suivante_;
+                      }
+                    Cerr << "Surface dans l'elem : " <<  surface_totale << finl;
+                    Cerr << "cos(theta) : " << cos_theta << finl;
+                    Cerr << "gradI en face : " << resu(num_face_den_face) << finl;
+                    Cerr << "sum_grad_I : " << sum_grad_I << finl;
+                  }
+
+                  //resu(num_face) = resu(num_face_den_face) + cos_theta*surface_totale ;
+                  resu(num_face) = -sum_grad_I;
+                }
+              Cerr << "Done" << finl;
+            }
+          // Fin de la boucle for
+        }
+
+#endif
 
     }
   else
@@ -1529,23 +1741,25 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                                                        int ordre)
 {
   //  static const Stat_Counter_Id count = statistiques().new_counter(1, "calculer_delta_u_interface", 0);
-
   //  statistiques().begin_count(count);
-
-  // GB : REMPLACEMENT TEMPORAIRE DE :
-  //   variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
-  //   const DoubleTab & mpoint = variables_internes().mpoint.valeur().valeurs();
-  // PAR  (voir un peu plus bas)
+  DoubleTab& u0 = champ_u0.valeurs();
+  const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
+  const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
+  const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+  const double rho_0 = tab_rho_phase_0(0,0);
+  const double rho_1 = tab_rho_phase_1(0,0);
+  //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
+  const double un_sur_rho_0 = 1. / rho_0;
+  const double un_sur_rho_1 = 1. / rho_1;
 
   REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
-  // Distance a l'interface discretisee aux elements:
-  const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
-  DoubleTab phi = calculer_div_normale_interface().valeurs();
 
-  // GB : debut de mon rajout pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface.
-  // GB : Pour ce faire, il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
-  const int nn = phi.dimension(0);
+  // Pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface,
+  // il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
+  const int nn = variables_internes().second_membre_projection.valeurs().dimension(0); // nombre d'elems
   DoubleTab mpoint;
   DoubleTab mpoint_vap;
   mpoint.resize(nn);
@@ -1570,22 +1784,10 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   if (variables_internes().ref_equation_mpoint_vap_.non_nul())
     mpoint +=mpoint_vap;
 
-  DoubleTab& u0 = champ_u0.valeurs();
-
+  // Distance a l'interface discretisee aux elements:
+  const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
+  DoubleTab phi = calculer_div_normale_interface().valeurs();
   {
-    const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
-    const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
-    const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
-    const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-    const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
-    const double rho_0 = tab_rho_phase_0(0,0);
-    const double rho_1 = tab_rho_phase_1(0,0);
-    //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
-    const double un_sur_rho_0 = 1. / rho_0;
-    const double un_sur_rho_1 = 1. / rho_1;
-    //const Zone_VF & zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-    //const DoubleTab & xp = zone_vf.xp();
-
     const int n = phi.dimension(0);
     for (int i = 0; i < n; i++)
       {
@@ -1910,9 +2112,121 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       //  (traitement special des CL de Dirichlet)
       if (nbdim1)
         {
+          const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
             gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
+
+          // Boussinesq Approximation in use :
+          if (variables_internes().is_boussinesq_)
+            {
+              REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+              if (!refeq_transport.non_nul())
+                {
+                  Cerr << "Trying to use Boussinesq approximation on a 2phase flow when the transport equation is not specified" << finl;
+                  Process::exit();
+                }
+              const DoubleTab& indicatrice = refeq_transport.valeur().get_update_indicatrice().valeurs();
+              const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
+
+              // First phase with temperature :
+              if (variables_internes().ref_equation_mpoint_.non_nul())
+                {
+                  const Convection_Diffusion_Temperature_FT_Disc& eq  =  variables_internes().ref_equation_mpoint_.valeur();
+                  const int phase_eq = eq.get_phase();
+                  const DoubleTab& temperature_eq = eq.inconnue().valeur().valeurs();
+                  const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
+                  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
+                  const double beta_th_phase_eq = tab_beta_th_phase_eq(0,0);
+                  if (phase_eq != 1)
+                    {
+                      Cerr << "phase " << eq.get_phase() << " is associated to the phase chi=0 whereas boussinesq approximation "
+                           << "assumes equation " << eq.le_nom() << " is associated to the indicator function chi = 1" << finl;
+                      Process::exit();
+                    }
+
+                  for (int face=0; face<n; face++)
+                    {
+                      const int elem0 = face_voisins(face, 0);
+                      const int elem1 = face_voisins(face, 1);
+                      double coef = 0.;
+                      if (elem0 >= 0)
+                        {
+                          double chi = indicatrice[elem0];
+                          double T_eq = temperature_eq[elem0];
+                          // On suppose la ref T0 egale a Tsat
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          //{
+                          // Pour les mailles monophasiques, on peut faire simplement l'hypothese que T = chi_k T_k
+                          coef = chi*T_eq * beta_th_phase_eq;
+                          //}
+                          //else
+                          //{
+                          // // Dans les mailles diphasiques, T = chi_k T_k est une hypothese discutable.
+                          // Pour les mailles diphasiques, on pourrait envisager une reconstruction plus precise de la
+                          // temperature monofluide a partir du gradient (cad de mpoint).
+                          // Neglected in first approximation.
+                          //}
+                        }
+                      if (elem1 >= 0)
+                        {
+                          double chi = indicatrice[elem1];
+                          double T_eq = temperature_eq[elem1];
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          coef += chi*T_eq * beta_th_phase_eq;
+                        }
+                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
+                        coef *= 0.5;
+                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
+                    }
+                }
+
+              // Second phase with temperature :
+              if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+                {
+                  const Convection_Diffusion_Temperature_FT_Disc& eqv =  variables_internes().ref_equation_mpoint_vap_.valeur();
+                  const int phase_eqv = eqv.get_phase();
+                  const DoubleTab& temperature_eqv = eqv.inconnue().valeur().valeurs();
+                  const Fluide_Incompressible& fluide_phase_eqv = fluide_dipha.fluide_phase(phase_eqv);
+                  const DoubleTab& tab_beta_th_phase_eqv = fluide_phase_eqv.beta_t().valeurs();
+                  const double beta_th_phase_eqv = tab_beta_th_phase_eqv(0,0);
+                  if (phase_eqv != 0)
+                    {
+                      Cerr << "phase " << eqv.get_phase() << " is associated to the phase chi=1 whereas boussinesq approximation "
+                           << "assumes equation " << eqv.le_nom() << " is associated to the indicator function chi = 0" << finl;
+                      Process::exit();
+                    }
+
+                  for (int face=0; face<n; face++)
+                    {
+                      const int elem0 = face_voisins(face, 0);
+                      const int elem1 = face_voisins(face, 1);
+                      double coef = 0.;
+                      if (elem0 >= 0)
+                        {
+                          double chi = 1.-indicatrice[elem0];
+                          double T_eqv = temperature_eqv[elem0];
+                          // On suppose la ref T0 egale a Tsat pour les 2 champs :
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          // on fait simplement l'hypothese que T = chi_k T_k
+                          coef = chi * T_eqv * beta_th_phase_eqv ;
+                          //}
+                        }
+                      if (elem1 >= 0)
+                        {
+                          double chi = 1.-indicatrice[elem1];
+                          double T_eqv  = temperature_eqv[elem1];
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          coef += chi * T_eqv * beta_th_phase_eqv;
+                        }
+                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
+                        coef *= 0.5;
+                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
+                    }
+                }
+              // The end of boussinesq force source term.
+            }
+          // End of if nbdim1 that is VDF.
         }
       else
         {
@@ -2252,7 +2566,12 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   du += vpoint;
   divergence.calculer(du, secmem);
   secmem *= -1;
-
+#if NS_VERBOSE
+  double int_sec_mem = 0;
+  for (int elem = 0; elem < secmem.dimension(0); elem++)
+    int_sec_mem +=secmem(elem);
+  Cerr << "Secmem before tcl= " << int_sec_mem << finl;
+#endif
   // Prise en compte des sources de constituant (terme source dans une equation concentration)
   // Pour ne pas faire figurer la source deux fois, je la mets uniquement dans l'equation
   // de concentration... elle produit alors un terme source de div_u dans Navier_Stokes:
@@ -2326,9 +2645,120 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
               secmem2(elem) = 0.;
             }
         }
+#if TCL_MODEL
+
+      double int_sec_mem2 = 0.;
+      double int_sec_mem = 0.;
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          int_sec_mem2 +=secmem2(elem);
+          int_sec_mem +=secmem(elem);
+        }
+      //   Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl;
+      //  Cerr << "Integral of secmem before TCL and /DT : " << int_sec_mem << finl;
+
+      // Now that the correction "corriger_mpoint" is performed directly into Convection_Diffusion_Temperature_FT_Disc,
+      // it is no longer required to compute it here. The correction should propagate to calculer_delta_vitesse (in the discreete sense),
+      // and subsequently to secmem2. So that in the end, the whole TCL contribution should be accounted for naturally.
+      // However, in the discretized version, It is still required to correct secmem2 even though mpoint was corrected itself.
+      // It is because of the way secmem is computed (as the div( delta u)) that is using part of cells not crossed by the interface
+      // (in the wall-normal direction). It results in an underestimation of the real TCL contribution...
+      if (probleme_ft().tcl().is_activated())
+        {
+          Cerr << "Contact line model is activated" << finl;
+          ArrOfInt elems_with_CL_contrib;
+          ArrOfDouble mpoint_from_CL;
+          ArrOfDouble Q_from_CL;
+          // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
+          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, mpoint_from_CL, Q_from_CL);
+          // For later is they aren't passed as arguments
+          //const ArrOfInt& elems_with_CL_contrib = tcl.elems();
+          //const ArrOfDouble& mpoint_from_CL = tcl.mp();
+          //const ArrOfDouble& Q_from_CL = tcl.Q();
+
+          // Correct the field mpoint in wall-adjacent cells to account for TCL model:
+          // ---> It's done before now!
+          // DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
+          // probleme_ft().tcl().corriger_mpoint(elems_with_CL_contrib,mpoint_from_CL,mpoint);
+
+          /*          const Fluide_Diphasique& fluide = fluide_diphasique();
+                    const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
+                    const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
+                    const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+                    const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+                    const double rho_phase_0 = tab_rho_phase_0(0,0);
+                    const double rho_phase_1 = tab_rho_phase_1(0,0);
+                    const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0; */
+          const double Lvap = fluide.chaleur_latente();
+          const double coef = jump_inv_rho/Lvap;
+          // Correct the secmem contribution due to TCL :
+          probleme_ft().tcl().corriger_secmem(coef, secmem2);
+          //  calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
+          //  divergence.calculer(variables_internes().delta_u_interface, secmem2);
+//          int_sec_mem2 = 0;
+//          int_sec_mem = 0;
+//          for (int elem = 0; elem < nb_elem; elem++)
+//            {
+//              int_sec_mem2 +=secmem2(elem);
+//              int_sec_mem +=secmem(elem);
+//            }
+//          Cerr << "Secmem2 after tcl= " << int_sec_mem2 << finl;
+//          Cerr << "Secmem after tcl= " << int_sec_mem << finl;
+          // One point to check still is that the CL contribution to mpoint (mpoint_from_CL) should gives the same secmem2 as
+          // corriger_secmem when corriger_secmem is given Q_from_CL (instead of
+          const int check_consistency = 1 ; // local option to check that secmem2 in near-wall cell is actually well calculated
+          if (check_consistency)
+            {
+              Cerr << "Verifying Contact line model consistency" << finl;
+              double error = 0.;
+              const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
+              for (int idx = 0; idx < nb_contact_line_contribution; idx++)
+                {
+                  const int elem = elems_with_CL_contrib[idx];
+                  const double sec = secmem2(elem);
+                  double Q = 0.;
+                  // Go through the list to find all occurences of elem;
+                  for (int idx2 = 0; idx2 < nb_contact_line_contribution; idx2++)
+                    {
+                      if (elem == elems_with_CL_contrib[idx2])
+                        {
+                          Q +=Q_from_CL[idx2];
+                        }
+                    }
+                  const double value = coef*Q;
+
+                  // sec and value should be the same:
+                  error +=fabs(sec - value);
+                  //    Cerr << "value = " << value << "sec= " << sec << finl;
+                  if (fabs(sec - value) > 1.e-12) // changed from 1.e-12 to 1.e-7 ---- for test
+                    {
+                      Cerr << "local difference sec-value=" << sec <<" - " << value << " = " << (sec - value) << finl;
+                    }
+                }
+
+              if (error > 1.e-7)// changed from 1.e-8 to 1.e-7 ---- for test
+                {
+                  Cerr << "Final error : " << error << " is fatal!" << finl;
+                  Process::exit();
+                }
+
+            }
+        }
+#endif
       secmem2 /= schema_temps().pas_de_temps();
       secmem += secmem2;
       secmem.echange_espace_virtuel();
+#if NS_VERBOSE
+      int_sec_mem2 = 0;
+      int_sec_mem = 0;
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          int_sec_mem2 +=secmem2(elem);
+          int_sec_mem +=secmem(elem);
+        }
+      Cerr << "Integral of secmem2 after TCL and /DT : " << int_sec_mem2 << finl;
+      Cerr << "Integral of secmem after TCL and /DT : " << int_sec_mem << finl;
+#endif
     }
 
   Champ_Fonc champ_rho_faces_modifie(champ_rho_faces_);
