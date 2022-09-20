@@ -102,7 +102,7 @@ public:
   Remaillage_FT&                          remaillage_interface();
   const Remaillage_FT&                    remaillage_interface() const;
   const Topologie_Maillage_FT&            topologie_interface() const;
-  virtual double calculer_integrale_indicatrice(const DoubleVect& indicatrice) const;
+  virtual double calculer_integrale_indicatrice(const DoubleVect& indicatrice, double& v_ph0) const;
 
   const Proprietes_part_vol&           proprietes_particules() const;
   const Maillage_FT_Disc&              maillage_inject() const;
@@ -258,6 +258,10 @@ public:
   void ramasse_miettes(const Maillage_FT_Disc& maillage,
                        DoubleVect& flux,
                        DoubleVect& valeurs);
+  void nettoyer_maillage()
+  {
+    maillage_interface().nettoyer_maillage();
+  };
 
 protected:
 
@@ -348,6 +352,9 @@ public:
   Transport_Interfaces_FT_Disc_interne() :
     indicatrice_cache_tag(-1),
     iterations_correction_volume(0),
+    VOFlike_correction_volume(0),
+    nb_lissage_correction_volume(0),
+    nb_iterations_correction_volume(0),
     volume_impose_phase_1(-1.),
     n_iterations_distance(3),
     n_iterations_interpolation_ibc(5),
@@ -366,7 +373,7 @@ public:
     seuil_uzawa(1.e-8),
     nb_iter_uzawa(30),
     vimp_regul(1),
-    indic_faces_modif(0),
+    type_indic_faces_(STANDARD),
     modified_indic_faces_position(0.),
     modified_indic_faces_thickness(1.),
     type_vitesse_imposee(UNIFORME),
@@ -403,12 +410,30 @@ public:
   Maillage_FT_Disc maillage_inject_;              //Ensemble de particules a injecter periodiquement
   Proprietes_part_vol proprietes_inject_;     //Proprietes physiques des particules injectees
 
+  // FORMER Keyword (obsolete):
   // Si iterations_correction_volume == 0, le maillage est transporte par le fluide
   // a l'aide du champ de vitesse L2 interpole (pas de conservation du volume).
   // Si iterations_correction_volume > 0, on calcule une correction de volume aux
   // sommets de l'interface et on l'etale par autant d'iterations d'un lisseur
   // Voir Transport_Interfaces_FT_Disc::mettre_a_jour
   int iterations_correction_volume;
+
+  // NEW Keywords/parameters for volume preserving correction in agreement with phase change :
+  int VOFlike_correction_volume;
+  // Si VOFlike_correction_volume == 0, le maillage est transporte par le fluide
+  // a l'aide du champ de vitesse L2 interpole (pas de conservation du volume).
+  // Si VOFlike_correction_volume > 0, on calcule une correction de volume aux
+  // sommets de l'interface et on l'etale par nb_lissage_correction_volume iterations d'un lisseur,
+  // Voir Transport_Interfaces_FT_Disc::mettre_a_jour
+  // pour eviter l'apparition de pic aux interfaces (ie, on lisse legement la correction de volume
+  // (uniquement s'il y en a une))
+  int nb_lissage_correction_volume;
+  // La correction est iterative car on ne corrige pas exactement du volume demande en deplacant les
+  // noeuds sequentiellement. On fait nb_iterations_correction_volume ou jusqu'a ce que l'erreur
+  // soit inferieure au seuil de correction de volume de Remaillage_FT
+  int nb_iterations_correction_volume;
+
+  // ADDITIONAL GLOBAL mass conservation with-out phase change:
   // Rustine introduite pour corriger les pertes de masse:
   // Si cette valeur est positive, on deplace toute l'interface d'une certaine distance
   // pour que le volume de la phase 1 reste toujours egal a la valeur prescrite
@@ -465,7 +490,9 @@ public:
   double seuil_uzawa ;
   int nb_iter_uzawa ;
   int vimp_regul ;
-  int indic_faces_modif ;
+
+  enum Type_indic_faces { STANDARD, MODIFIEE, AI_BASED };
+  Type_indic_faces type_indic_faces_;
   double modified_indic_faces_position ;
   double modified_indic_faces_thickness ;
 
