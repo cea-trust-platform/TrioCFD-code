@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,41 +12,35 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Rupture_Yao_Morel.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Rupture_Yao_Morel_included
-#define Rupture_Yao_Morel_included
-#include <Source_base.h>
-#include <math.h>
+#ifndef Rupture_bulles_1groupe_Yao_Morel_included
+#define Rupture_bulles_1groupe_Yao_Morel_included
 
-/*! @brief classe Rupture_Yao_Morel
+#include <TRUSTTabs_forward.h>
+#include <Rupture_bulles_1groupe_base.h>
+#include <TRUSTTab.h>
+
+/*! @brief
  *
  */
-class Rupture_Yao_Morel: public Source_base
-{
-  Declare_instanciable(Rupture_Yao_Morel);
-public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-protected:
+class Rupture_bulles_1groupe_Yao_Morel : public Rupture_bulles_1groupe_base
+{
+  Declare_instanciable(Rupture_bulles_1groupe_Yao_Morel);
+public:
+  void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                   const DoubleTab& rho, const DoubleTab& nu, const DoubleTab& sigma, double Dh,
+                   const DoubleTab& ndv, const DoubleTab& d_bulles,
+                   const DoubleTab& eps, const DoubleTab& k_turb,
+                   DoubleTab& coeff) const  override ;
+
+private:
+  int n_l = -1;
+
   double Kb1 = 1.6 ;
   double Kb2 = 0.42 ;
   double We_cr = 1.24 ;
+
 };
 
 #endif

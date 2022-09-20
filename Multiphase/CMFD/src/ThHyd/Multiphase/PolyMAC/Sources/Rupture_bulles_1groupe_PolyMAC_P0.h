@@ -14,27 +14,25 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Nucleation_paroi_PolyMAC_P0.h
+// File:        Rupture_Yao_Morel.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Nucleation_paroi_PolyMAC_P0_included
-#define Nucleation_paroi_PolyMAC_P0_included
+#ifndef Rupture_bulles_1groupe_PolyMAC_P0_included
+#define Rupture_bulles_1groupe_PolyMAC_P0_included
 #include <Source_base.h>
-#include <Ref_Source_base.h>
+#include <Correlation.h>
+#include <math.h>
 
-/*! @brief classe Nucleation_paroi_PolyMAC_P0
- *     forme pi * d_nuc**2 * N_nuc
- *     Terme source d'aire interfaciale
- *
+/*! @brief classe Rupture_bulles_1groupe_PolyMAC_P0
  *
  */
 
-class Nucleation_paroi_PolyMAC_P0: public Source_base
+class Rupture_bulles_1groupe_PolyMAC_P0: public Source_base
 {
-  Declare_instanciable(Nucleation_paroi_PolyMAC_P0);
+  Declare_instanciable(Rupture_bulles_1groupe_PolyMAC_P0);
 public :
   int has_interface_blocs() const override
   {
@@ -47,11 +45,11 @@ public :
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
-
 protected:
-  int n_l = -1 ; // liquid phase
+  Correlation correlation_; //correlation donnant le coeff de coalescence
 
-  REF(Source_base) src_flux_interfacial_ ; // pour aller cherche qpi
+  double beta_k_ = 0.09;
+  int n_l = -1 ; // liquid phase
 };
 
 #endif

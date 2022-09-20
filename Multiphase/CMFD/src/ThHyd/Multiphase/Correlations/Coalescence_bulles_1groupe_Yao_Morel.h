@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,46 +12,38 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Nucleation_paroi_PolyMAC_P0.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Nucleation_paroi_PolyMAC_P0_included
-#define Nucleation_paroi_PolyMAC_P0_included
-#include <Source_base.h>
-#include <Ref_Source_base.h>
+#ifndef Coalescence_bulles_1groupe_Yao_Morel_included
+#define Coalescence_bulles_1groupe_Yao_Morel_included
 
-/*! @brief classe Nucleation_paroi_PolyMAC_P0
- *     forme pi * d_nuc**2 * N_nuc
- *     Terme source d'aire interfaciale
- *
+#include <TRUSTTabs_forward.h>
+#include <Coalescence_bulles_1groupe_base.h>
+#include <TRUSTTab.h>
+
+/*! @brief
  *
  */
 
-class Nucleation_paroi_PolyMAC_P0: public Source_base
+class Coalescence_bulles_1groupe_Yao_Morel : public Coalescence_bulles_1groupe_base
 {
-  Declare_instanciable(Nucleation_paroi_PolyMAC_P0);
-public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
+  Declare_instanciable(Coalescence_bulles_1groupe_Yao_Morel);
+public:
+  void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                   const DoubleTab& rho, const DoubleTab& nu, const DoubleTab& sigma, double Dh,
+                   const DoubleTab& ndv, const DoubleTab& d_bulles,
+                   const DoubleTab& eps, const DoubleTab& k_turb,
+                   DoubleTab& coeff) const  override ;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
+private:
+  int n_l = -1;
 
-protected:
-  int n_l = -1 ; // liquid phase
+  double Kc1 = 2.86 ;
+  double Kc2 = 1.922 ;
+  double Kc3 = 1.017 ;
+  double alpha_max_1_3 = std::pow(M_PI/6., 1./3.) ;
+  double We_cr = 1.24 ;
 
-  REF(Source_base) src_flux_interfacial_ ; // pour aller cherche qpi
+
 };
 
 #endif

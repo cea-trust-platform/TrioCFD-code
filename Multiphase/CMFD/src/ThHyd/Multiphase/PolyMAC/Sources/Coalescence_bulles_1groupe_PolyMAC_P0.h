@@ -20,17 +20,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Coalescence_Yao_Morel_included
-#define Coalescence_Yao_Morel_included
+#ifndef Coalescence_bulles_1groupe_PolyMAC_P0_included
+#define Coalescence_bulles_1groupe_PolyMAC_P0_included
 #include <Source_base.h>
+#include <Correlation.h>
 #include <math.h>
 
-/*! @brief classe Variation_rho_Yao_Morel
+/*! @brief classe Coalescence_bulles_1groupe_PolyMAC_P0
  *
  */
-class Coalescence_Yao_Morel: public Source_base
+
+class Coalescence_bulles_1groupe_PolyMAC_P0: public Source_base
+
 {
-  Declare_instanciable(Coalescence_Yao_Morel);
+  Declare_instanciable(Coalescence_bulles_1groupe_PolyMAC_P0);
 public :
   int has_interface_blocs() const override
   {
@@ -44,11 +47,10 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
-  double Kc1 = 2.86 ;
-  double Kc2 = 1.922 ;
-  double Kc3 = 1.017 ;
-  double alpha_max_1_3 = std::pow(M_PI/6., 1./3.) ;
-  double We_cr = 1.24 ;
+  Correlation correlation_; //correlation donnant le coeff de coalescence
+
+  double beta_k_ = 0.09;
+  int n_l = -1 ; // liquid phase
 };
 
 #endif
