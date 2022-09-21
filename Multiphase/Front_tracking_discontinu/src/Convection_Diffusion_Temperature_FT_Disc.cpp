@@ -39,7 +39,7 @@
 #include <EChaine.h>
 #include <Interprete_bloc.h>
 #include <Zone_VDF.h>
-#define TCL_MODEL 0
+#include <stat_counters.h>
 
 static const double TSAT_CONSTANTE = 0.;
 
@@ -534,8 +534,8 @@ static void collect_into_unique_occurence(ArrOfInt& mixed_elems, ArrOfDouble& lo
 {
   const int nb_elem_with_duplicates = mixed_elems.size_array();
   int nb_elem = 0;
-  Cerr << "Algo may be optimized? It is in NxN = " << nb_elem_with_duplicates << " x "
-       << nb_elem_with_duplicates << " = " << nb_elem_with_duplicates*nb_elem_with_duplicates <<finl;
+  // Cerr << "Algo may be optimized? It is in NxN = " << nb_elem_with_duplicates << " x "
+  //     << nb_elem_with_duplicates << " = " << nb_elem_with_duplicates*nb_elem_with_duplicates <<finl;
   for (int i=0; i<nb_elem_with_duplicates; i++)
     {
       const int elemi =  mixed_elems[i];
@@ -893,29 +893,224 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
 
 DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(DoubleTab& derivee)
 {
-  // Application des deux operateurs: convection et diffusion
+  // We start the timestep by computing :
+  // STEP 1. Extend velocity and temperature (via calculer_grad_t which does a linear extrapolation
+  // from the values within "phase_")
+  static const Stat_Counter_Id count2 = statistiques().new_counter(1, "calculer_mpoint", 0);
+  statistiques().begin_count(count2);
+  calculer_mpoint();
+  statistiques().end_count(count2);
+
+  Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
+  // Emptying lists for new timestep.
+  mixed_elems_.resize_array(0);
+  lost_fluxes_.resize_array(0);
+
+  // STEP 2. Compute the continuous extension of velocity from phase_ into the other.
+  // This velocity will be usefull for the convection operator.
+  // Now, the step calculer_delta_u_interface calls get_mpoint instead of
+  // calculer_mpoint (which used to in turns call: calculer_grad_t)
+  // Therefore, it is important to have called explicitely the temperature
+  // extension before at the begining of the function.
+  static const Stat_Counter_Id count1 = statistiques().new_counter(1, "extend_ui", 0);
+  statistiques().begin_count(count1);
+  const Champ_Inc& vitesse_ns = ns.inconnue();
+  if (!divergence_free_velocity_extension_)
+    {
+      ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_);
+      vitesse_convection_.valeurs() += vitesse_ns.valeurs();
+    }
+  else
+    {
+      // With this approach, calculer_delta_u_interface is not called,
+      // so the velocity should be extended. We do:
+      vitesse_convection_.valeurs() = vitesse_ns.valeurs();
+      // Projection of the convective field :
+      //SolveurSys solveur_pression(ns.get_solveur_pression());
+      Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
+      solveur_masse_fictitious->set_name_of_coefficient_temporel("no_coeff");
+
+      //On utilise un operateur de divergence temporaire et pas celui porte par l equation
+      //pour ne pas modifier les flux_bords_ rempli au cours de ...::mettre_a_jour
+      Operateur_Div div_tmp;
+      div_tmp.associer_eqn(ns);// It's slightly tricky but associating it to (*this) is not OK, because we want to apply it to a velocity.
+      // As delta_u is not the unknown of this equation (no more than vitesse_convection_), we resort to ns to
+      // make it work. Basically, it also means that delta_u gets the BC from u_ns?
+      // Problem with div_tmp.typer() that get the type of equation to make a type.
+      // Hence, it will see a conv/diff equation for a scalar... and will type div_tmp badly (not for a vector velocity field!)
+      // Instead we associer_eqn to ns
+      div_tmp.typer();
+      Cerr << "[Conv_diff_FT_Disc] div_tmp recieved the type " << div_tmp.type() << finl;
+      Cerr << "[Conv_diff_FT_Disc] div_tmp que suis je " << div_tmp.que_suis_je() << finl;
+      if (0)
+        {
+          Equation_base& eqn=ref_eq_ns_.valeur();
+          Nom inut;
+          Nom nom_type=eqn.discretisation().get_name_of_type_for(ns.que_suis_je(),inut,ns);
+          //  const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
+          // ref_cast
+          //  DERIV(Operateur_Div_base)::typer(nom_type);
+          Cerr << "[Conv_diff_FT_Disc] Velocity correction. Construction of the divergence operator type : " << nom_type << finl;
+          //   Cerr << valeur().que_suis_je() << finl ;
+        }
+
+      div_tmp.l_op_base().associer_eqn(ns);//*this);
+      //div_tmp.typer();
+      div_tmp->completer();
+      // En VDF, la methode 'completer()' est surchargee et fait
+      //     1. Operateur_base::completer();
+      //     2. iter.completer_();
+      // donc si on fait juste :
+      //     div_tmp.l_op_base().associer(zone_dis(), zcl_fictitious_, vitesse_convection_);
+      // On rate l'etape 2 qui a ete faite avec le completer plus haut...
+
+      // WARNING : Si on prend les cl de l'ope de pression pour cette divergence, il y a une vitesse sur les sorties de NS
+      //           qui se trouve face a des conditions limites de symetrie dans zcl_fictitious...
+      //           Du coup, ca fait un gros div! Ce n'est pas ce qu'on veut.
+      //           PAR CONTRE, pour le calcul du gradient ci-dessous, c'est bien les cl de zcl_fictitious qu'on veut,
+      //           sinon, sortie libre va mettre un grad(P).n non nul au bord!!
+      //		   DONC EN CONCLUSION, ON VEUT UN MIX!
+      //
+
+      // RHS for this pressure solveur : div(delta_u)
+      // We need to create a table sized as temperature to store the rhs :
+      DoubleTab& secmem = divergence_delta_U.valeurs();
+      //secmem.copy(inconnue().valeurs(), Array_base::NOCOPY_NOINIT);
+      div_tmp->calculer(vitesse_convection_.valeurs(),secmem);
+
+      // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide
+      if (0) // Cela pourrait etre utile si on construisait le saut de vitesse delta u_0 mais
+        // cela semble presenter que peu d'interet...
+        {
+          const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+          const IntTab& face_voisins = zone_vf.face_voisins();
+          const IntTab& elem_faces = zone_vf.elem_faces();
+          const int nb_elem = secmem.size_array();
+          const int   nb_faces_elem = elem_faces.dimension(1);
+          const Transport_Interfaces_FT_Disc& eq_transport = ref_eq_interface_.valeur();
+          // Distance a l'interface discretisee aux elements:
+          const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
+          //     const int nb_elem = secmem2.dimension(0);
+          for (int elem = 0; elem < nb_elem; elem++)
+            {
+              const double dist = distance(elem);
+              int i_face = -1;
+              if (dist < -1e20)
+                {
+                  // Distance invalide: on est loin de l'interface
+                  // invalide ou voisin invalide, on supprime la div :
+                  secmem(elem) = 0.;
+                }
+              else
+                {
+                  // Y a-t-il un voisin pour lequel la distance est invalide
+                  for (i_face = 0; i_face < nb_faces_elem; i_face++)
+                    {
+                      const int face = elem_faces(elem, i_face);
+                      const int voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                      if (voisin >= 0)
+                        {
+                          const double d = distance(voisin);
+                          if (d < -1e20)
+                            {
+                              // invalide ou voisin invalide, on supprime la div :
+                              secmem(elem) = 0.;
+                              break; // Un voisin invalide
+                            }
+                        }
+                    }
+                }
+            }
+        }
+      // Correction du second membre d'apres les conditions aux limites :
+      assembleur_pression_.valeur().modifier_secmem(secmem);
+      // Ajout pour la sauvegarde au premier pas de temps si reprise
+      la_pression.changer_temps(schema_temps().temps_courant());
+
+      // Resolution du systeme en pression : calcul de la_pression
+      solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
+                                         secmem,
+                                         la_pression.valeurs()
+                                        );
+      assembleur_pression_.modifier_solution(la_pression.valeurs());
+      // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
+
+      DoubleTab& gradP = gradient_pression_.valeurs();
+      // Can I re-use a gradient from NS?
+      Operateur_Grad gradient_tmp;
+      gradient_tmp.associer_eqn(ns);//*this);
+      gradient_tmp.typer();
+      gradient_tmp.l_op_base().associer_eqn(ns);//*this);
+      gradient_tmp->completer();
+      // It is important to associate the gradient to the good BC via zcl,
+      // Otherwise a normal gradient appears at the outlet.
+      gradient_tmp.l_op_base().associer(zone_dis(), zcl_fictitious_, vitesse_convection_); // Quel champ inco pour le gradP? A quoi sert-elle?
+      gradient_tmp.calculer(la_pression.valeur().valeurs(), gradP);
+      // I don't wanna divide by rho_face :
+      solveur_masse_fictitious.appliquer(gradP); // divide by cell_volume
+
+      // Correction of vitesse : "+=" seems the good sign, though I don't understand why...
+      {
+        int i, j;
+        DoubleTab& vc = vitesse_convection_.valeurs();
+        const int n = vc.dimension(0);
+        if (vc.nb_dim() == 1)
+          {
+            // VDF
+            for (i = 0; i < n; i++)
+              vc(i) += gradP(i);
+          }
+        else
+          {
+            //VEF
+            const int m = vc.dimension(1);
+            for (i = 0; i < n; i++)
+              {
+                for (j = 0; j < m; j++)
+                  {
+                    vc(i,j) += gradP(i,j);
+                  }
+              }
+          }
+        vc.echange_espace_virtuel();
+      }
+    }
+  statistiques().end_count(count1);
+
+  // Application of 2 operators: convection & diffusion
   DoubleTab& temperature = inconnue().valeur().valeurs();
-
-  // Extrapolation lineaire de la temperature des mailles diphasiques a partir
-  // de la temperature des mailles de la "phase".
-  //  static const Stat_Counter_Id count = statistiques().new_counter(1, "ghost_T", 0);
-  //  statistiques().begin_count(count);
-  calculer_grad_t();
-  //  statistiques().end_count(count);
-
   derivee = 0.;
 
+  //GB: 2020.08.21 : Test updating the past temperature with the extension :
+  // 2022: Not conclusive I believe
+  if (0)
+    {
+      DoubleTab& temperature_passe = inconnue().passe();
+      temperature_passe = temperature;
+    }
+  // STEP 3: Diffusion operator
   //  static const Stat_Counter_Id count2 = statistiques().new_counter(1, "terme_diffusif_T", 0);
   //  statistiques().begin_count(count2);
   terme_diffusif.ajouter(temperature, derivee);
   //  statistiques().end_count(count2);
+  const int nb_diffu=mixed_elems_.size_array();
+  // const double temps = schema_temps().temps_courant();
+  lost_fluxes_diffu_.resize_array(nb_diffu);
+  mixed_elems_diffu_.resize_array(nb_diffu);
+  {
+    double total_flux_lost = 0.;
+    for (int nd=0 ; nd<nb_diffu ; nd++)
+      {
+        total_flux_lost += lost_fluxes_(nd);
+        lost_fluxes_diffu_(nd) = lost_fluxes_(nd);
+        mixed_elems_diffu_(nd) = mixed_elems_(nd);
+      }
+    total_flux_lost = mp_sum(total_flux_lost);
+    //  Cerr << "[Lost-fluxes-diffusif] Time= " << temps << " nb_faces= " << nb_diffu
+    //     << " Lost= " << total_flux_lost << finl;
+  }
 
-  // Calcul du champ de vitesse de convection dans la "phase_"
-  Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
-  ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_ /* ordre de la correction en courbure */);
-  const Champ_Inc& vitesse_ns = ns.inconnue();
-  vitesse_convection_.valeurs() += vitesse_ns.valeurs();
-
+  // STEP 4: Convection operator
   //  static const Stat_Counter_Id count3 = statistiques().new_counter(1, "convection_T", 0);
   //  statistiques().begin_count(count3);
   {
@@ -925,6 +1120,24 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
     terme_convectif.ajouter(temperature, derivee_tmp);
     derivee_tmp *= rhoCp;
     derivee += derivee_tmp;
+#if TCL_MODEL
+    const int nb_conv=mixed_elems_.size_array()-nb_diffu;
+    lost_fluxes_conv_.resize_array(nb_conv);
+    mixed_elems_conv_.resize_array(nb_conv);
+    double total_flux_conv_lost = 0.;
+    for (int nd=0 ; nd<nb_conv ; nd++)
+      {
+        const int elem = mixed_elems_(nb_diffu+nd);
+        const double flux = lost_fluxes_(nb_diffu+nd)*rhoCp[elem];
+        total_flux_conv_lost += flux;
+        lost_fluxes_conv_(nd) = flux;
+        mixed_elems_conv_(nd) = elem;
+      }
+
+    total_flux_conv_lost = mp_sum(total_flux_conv_lost);
+    // Cerr << "[Lost-fluxes-convection] Time= " << temps << " nb_faces= " << nb_conv
+    //    << " Lost= " << total_flux_conv_lost << finl;
+#endif
   }
   //  statistiques().end_count(count3);
 
@@ -945,6 +1158,71 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
     //  Cerr << "[Lost-fluxes-conv+diff] Time= " << temps << " nb_faces= " << nb
     //     << " Lost= " << total_flux_lost << finl;
   }
+
+  // STEP 5: (OPTIONNAL?) Attempt to correct mpoint to reach an energy conservation.
+  // Apply a correction to mpoint in order to locally satisfy the energy balance in mixed cells (consistency between incoming fluxes that are lost
+  // and the phase change mp*ai, all with regards to the liquid energy evolution in the cell: d(rho*cp*chi*T)/dt.
+  {
+    mpoint_uncorrected_.valeur().valeurs() = mpoint_.valeur().valeurs();
+    DoubleTab& mp = mpoint_.valeur().valeurs();
+    const DoubleTab& ai = ns.get_interfacial_area();
+    const double temps = schema_temps().temps_courant();
+    const int nb_elemi = mixed_elems_.size_array();
+    double mp_sum_before_corr = 0.;
+    double int_ai_before = 0.;
+    for (int nd=0 ; nd<nb_elemi ; nd++)
+      {
+        const int elembi = mixed_elems_[nd];
+        int_ai_before += ai[elembi];
+        //     total_flux_lost -= lost_fluxes_(nd)*rhocp; // multiplied by rhocp (vp)  // "-" because depends on convention (GB)
+        //     total_derivee_energy += derivee_energy_(nd)*volume[nd];
+        //     mpai_tot += mp[elemb]*ai[elemb]*Lvap;// multiplied by Lvap (vp)
+        //    Cerr << " ai= " << ai[elembi] << " int_ai= " << int_ai_before << finl;
+        mp_sum_before_corr += mp[elembi]*ai[elembi];
+      }
+    if (int_ai_before>DMINFLOAT)
+      {
+        const double mean_mp_before_corr = mp_sum_before_corr/int_ai_before;
+        Cerr << " mp_sum_before_corr= " << mp_sum_before_corr << " mean_mp_before_corr= " << mean_mp_before_corr << " time= " << temps << finl;
+      }
+    if ((!is_prescribed_mpoint_) && (correction_mpoint_diff_conv_energy_.size_array()) && (max_array(correction_mpoint_diff_conv_energy_)))
+      correct_mpoint();
+  }
+
+#if TCL_MODEL
+  const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
+  const Triple_Line_Model_FT_Disc& tcl = pb.tcl();
+  // const double max_val_before = max_array(temperature);
+  // const double min_val_before = min_array(temperature);
+  if (tcl.is_activated())
+    {
+      // No need to recompute TCL here, it should be up-to-date.
+#ifdef DEBUG
+      {
+        const Transport_Interfaces_FT_Disc& eq_transport = ref_eq_interface_.valeur();
+        const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
+        assert(tcl.tag_tcl() == maillage.get_mesh_tag());
+        toto ce code n est pas lu
+      }
+#endif
+      //assert(tcl.tag_tcl() != ref_eq_interface_.valeur().maillage_interface().get_mesh_tag());
+
+      // We are late enough within the timestep for the correction not to affect the velocities reconstructions (delta_u)
+      // because we expect it has been done before. Nonetheless, we need to do it before the post-pro to see our corrected fields
+      // in the lata
+      //
+      // Correct the field mpoint in wall-adjacent cells to account for TCL model:
+      // ---> It cannot be done before because it would disturbs the solution via delta u!
+      tcl.corriger_mpoint(mpoint_.valeurs());
+
+      // Correct the phase-change in wall adjacent cells:
+      // The mean cell-temperature is simply derived from the TCL solution.
+      tcl.set_wall_adjacent_temperature_according_to_TCL_model(temperature);
+    }
+  // Cerr << "[temperature] max before/after TCL model: " << max_val_before << " / " << max_array(temperature) << finl;
+  // Cerr << "[temperature] min before/after TCL model: " << min_val_before << " / " << min_array(temperature) << finl;
+  temperature.echange_espace_virtuel();
+#endif
 
   return derivee;
 }
@@ -1035,6 +1313,33 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
   dis.discretiser_champ("vitesse", une_zone_dis, nom, "m/s", -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps, vitesse_convection_);
   champs_compris.add(vitesse_convection_.valeur());
   champs_compris_.ajoute_champ(vitesse_convection_);
+
+  // TODO: I'd like the flag to work... But it is not updated yet. Please Help me, at Adrien Bruneton
+  if (1 || divergence_free_velocity_extension_) // Problem for ABN : On n'a pas encore lu le param.ajouter qui passe mon flag a 1.
+    {
+      Cerr << "Fake Pressure gradient discretization" << finl;
+      nom = Nom("gradient_pression_") + le_nom();
+      dis.discretiser_champ("vitesse", une_zone_dis,
+                            nom, "",
+                            -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps,
+                            gradient_pression_);
+      champs_compris.add(gradient_pression_.valeur());
+      champs_compris_.ajoute_champ(gradient_pression_);
+
+      Cerr << "Fake Pressure discretization" << finl;
+      nom = Nom("fake_pressure_") + le_nom();
+      dis.discretiser_champ("pression",une_zone_dis,nom,"Pa.m3/kg",1,1,temps,la_pression);
+      champs_compris.add(la_pression.valeur());
+      champs_compris_.ajoute_champ(la_pression);
+
+      Cerr << "Velocity (delta_u) divergence discretization" << finl;
+      nom = Nom("divergence_delta_U_") + le_nom();
+      dis.discretiser_champ("divergence_vitesse" /*directive */,une_zone_dis, nom, "m3/s", 1,1,temps,divergence_delta_U);
+      champs_compris.add(divergence_delta_U.valeur());
+      champs_compris_.ajoute_champ(divergence_delta_U);
+
+      discretiser_assembleur_pression();
+    }
   Equation_base::discretiser();
 }
 

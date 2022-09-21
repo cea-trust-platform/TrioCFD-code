@@ -1,0 +1,6 @@
+#!/bin/bash
+ko=0
+grep Volume_phase_0  FTD_Boiling_bubble.err | awk '{print $4, $2}' > vol.txt
+diff --brief vol.txt vol_ref.txt
+[ $? -ne 0 ] && ko=1 && echo "Il y a des difference sur l'evolution temporelle du volume de bulle" && echo "Comparison can be viewed by:" && echo gnuplot -e \'plot \"vol.txt\" u 1:2 w lp, \"vol_ref.txt\" u 1:2 w lp\; pause -1\'
+exit $ko

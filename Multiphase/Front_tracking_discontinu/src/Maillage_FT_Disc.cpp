@@ -36,7 +36,7 @@
 #include <Comm_Group.h>
 #include <SFichier.h>
 #include <LecFicDistribue.h>
-#include <Probleme_base.h>
+#include <Probleme_FT_Disc_gen.h>
 #include <Dirichlet_entree_fluide.h>
 #include <Dirichlet_homogene.h>
 #include <Debog.h>
@@ -44,14 +44,13 @@
 #include <Param.h>
 #include <stat_counters.h>
 
-#define TCL_MODEL 0
+#if TCL_MODEL
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Probleme_FT_Disc_gen.h>
-#include <Triple_Line_Model_FT_Disc.h>
 #include <Schema_Temps_base.h>
+#endif
 //#define PATCH_HYSTERESIS_V2
 //#define PATCH_HYSTERESIS_V3
 #include<ArrOfBit.h>

@@ -43,6 +43,7 @@
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc.h>
 #include <Param.h>
+#include <Vecteur3.h>
 #include <Zone_Cl_VDF.h>
 
 
@@ -1761,28 +1762,22 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   // il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
   const int nn = variables_internes().second_membre_projection.valeurs().dimension(0); // nombre d'elems
   DoubleTab mpoint;
-  DoubleTab mpoint_vap;
   mpoint.resize(nn);
-  mpoint_vap.resize(nn);
   mpoint=0.; //pour initialiser
-  mpoint_vap=0.; //pour initialiser
   if (variables_internes().ref_equation_mpoint_.non_nul())
     {
-      variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
+      const DoubleTab& mp = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
       // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
       if (!variables_internes().mpoint_inactif)
-        mpoint = variables_internes().mpoint.valeur().valeurs();
+        mpoint = mp;
     }
   if (variables_internes().ref_equation_mpoint_vap_.non_nul())
     {
-      variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
+      const DoubleTab& mpv = variables_internes().ref_equation_mpoint_vap_.valeur().get_mpoint();
       // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
       if (!variables_internes().mpointv_inactif)
-        mpoint_vap = variables_internes().mpoint_vap.valeur().valeurs();
+        mpoint +=mpv;
     }
-  // GB : fin de mon rajout
-  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
-    mpoint +=mpoint_vap;
 
   // Distance a l'interface discretisee aux elements:
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
@@ -1903,28 +1898,39 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
 
   const DoubleTab& tab_vitesse = inconnue().valeurs();
   const IntTab& face_voisins = zone_dis().valeur().face_voisins();
-  const DoubleTab& indic = variables_internes().ref_eq_interf_proprietes_fluide.valeur().inconnue().valeur().valeurs();
-  DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses
+  const DoubleTab& indicatrice = variables_internes().ref_eq_interf_proprietes_fluide.valeur().inconnue().valeur().valeurs();
+  DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses de ns
   const int dim = tab_vitesse.line_size();
   const int n = tab_vitesse.dimension(0);
-  for (int i = 0; i < n; i++)
+
+  switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
     {
-      const int elem0 = face_voisins(i, 0);
-      const int elem1 = face_voisins(i, 1);
-      double indic_0 = (elem0 >= 0) ? indic[elem0] : indic[elem1];
-      double indic_1 = (elem1 >= 0) ? indic[elem1] : indic[elem0];
-      // Decentrage : si la face est adjacente a une face monophasique,
-      //  prendre la phase pure pour toute la face:
-      if (indic_0 == 0. || indic_0 == 1.)
-        indic_1 = indic_0;
-      if (indic_1 == 0. || indic_1 == 1.)
-        indic_0 = indic_1;
-      const double indic_face = (indic_0 + indic_1) * 0.5;
-      const double x = rho_0_sur_delta_rho - indic_face;
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
+      {
+        for (int i = 0; i < n; i++)
+          {
+            const int elem0 = face_voisins(i, 0);
+            const int elem1 = face_voisins(i, 1);
+            double indic_0 = (elem0 >= 0) ? indicatrice[elem0] : indicatrice[elem1];
+            double indic_1 = (elem1 >= 0) ? indicatrice[elem1] : indicatrice[elem0];
+            // Decentrage : si la face est adjacente a une face monophasique,
+            //  prendre la phase pure pour toute la face:
+            if (indic_0 == 0. || indic_0 == 1.)
+              indic_1 = indic_0;
+            if (indic_1 == 0. || indic_1 == 1.)
+              indic_0 = indic_1;
+            const double indic_face = (indic_0 + indic_1) * 0.5;
+            const double x = rho_0_sur_delta_rho - indic_face;
+            for (int j = 0; j < dim; j++)
+              tmp(i,j) *= x;
+          }
+        break;
+      }
 
-      for (int j = 0; j < dim; j++)
-        tmp(i,j) *= x;
-
+    default:
+      Cerr << " Navier_Stokes_FT_Disc::calculer_dI_dt \n"
+           << " unknown case?" << finl;
+      Process::exit();
     }
 
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
@@ -1958,6 +1964,94 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
   // Les valeurs aux elements sont au debut du tableau resu.
   if(tab_vitesse.line_size() > 1) // i.e. VEF
     dI_dt *= dimension;
+
+}
+
+// Description:
+//  Compute in one Eulerian cell, the average of Front properties in it :
+//  normale, bary_facettes_dans_elem and surface_tot are area-weighted averages in the given cell.
+//  Warning : normale is not a UNIT vector!
+void compute_normale_barycenter_area_in_cell(const int elem,
+                                             const  Maillage_FT_Disc& mesh,
+                                             Vecteur3& normale,
+                                             Vecteur3& bary_facettes_dans_elem,
+                                             double& surface_tot)
+{
+  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
+  const IntTab& facettes = mesh.facettes();
+  const DoubleTab& sommets = mesh.sommets();
+  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
+  const DoubleTab& normale_facettes = mesh.get_update_normale_facettes();
+
+  surface_tot = 0.;
+  normale = 0.;
+  bary_facettes_dans_elem = 0.;
+  // Get the begining index defining the position in the list index_elem that contains information
+  // relative to the current element :
+  int index=intersections.index_elem()[elem];
+  if (index < 0)
+    return; // No facette in this element.
+
+  // Loop over the facettes crossing the element
+  int count = 0;
+  while (index >= 0)
+    {
+      // Accessing the structure containing all the relevant information for facette number fa7
+      // Beware, fraction_surface_intersection_ gives the fraction of the facette that is within the current element.
+      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+      const int fa7 = data.numero_facette_;
+      const double surface_facette = surface_facettes[fa7];
+      const double surf = data.fraction_surface_intersection_ * surface_facette;
+      // We compute the (real) coordinates of barycenter of the fraction of facette within the elem
+      //    from the Barycentric Coordinates stored in data.barycentre_
+      //    (see the web for more information on Barycentric or Areal coordinates)
+      //    coord_barycentre_fraction will contain real coordinates (x,y,z) of the barycenter
+      Vecteur3 coord_barycentre_fraction(0., 0., 0.) ;
+      for (int dir = 0; dir< 3; dir++)
+        {
+          const double nx = normale_facettes(fa7,dir);
+          normale[dir] += nx * surf;
+        }
+      for (int isom = 0; isom< 3; isom++)
+        {
+          const int num_som = facettes(fa7, isom); // numero du sommet dans le tableau sommets
+          const double bary_som = data.barycentre_[isom];
+          for (int dir = 0; dir< 3; dir++)
+            coord_barycentre_fraction[dir] += bary_som * sommets(num_som,dir);
+
+        }
+      coord_barycentre_fraction *= surf;
+      surface_tot +=surf;
+      bary_facettes_dans_elem += coord_barycentre_fraction; // This is done for all the 3 components.
+
+      index = data.index_facette_suivante_;
+      count++;
+    }
+
+  if (surface_tot > 0.)
+    {
+      normale *= 1./surface_tot;
+      bary_facettes_dans_elem *= 1./surface_tot;
+    }
+  else
+    {
+      normale = 0.;
+      Cerr << " Error in compute_normale_barycenter_area_in_cell (Navier_Stokes_FT_Disc.cpp)." << finl;
+      Cerr << "The element " << elem << " only contains facettes of surface=0, so that surface_totale is zero!" << finl;
+      Cerr << "What a mess for the barycentre? ..." << finl;
+      //    assert(0);
+      Process::exit();
+      bary_facettes_dans_elem = 0.;
+    }
+#if NS_VERBOSE
+  const double norm =  normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2];
+  if (norm<0.9)
+    {
+      Cerr << " In Navier_Stokes_FT_Disc.cpp compute_normale_barycenter_area_in_cell." << finl;
+      Cerr << "Small normal : " << count << " facettes dans l'element " << elem
+           << ". surface_tot = "<< surface_tot << "Norm**2 = " << norm << finl;
+    }
+#endif
 
 }
 
@@ -2558,6 +2652,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  prise en compte des conditions aux limites de pression/vitesse
 
   DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
+  DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+  const int nb_elem = secmem2.dimension(0);
   const double dt = schema_temps().pas_de_temps();
   const DoubleTab& inco = inconnue().valeur().valeurs();
   // secmem = div(U/dt+vpoint) = div(U(n+1)/dt)
@@ -2611,10 +2707,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
       // Distance a l'interface discretisee aux elements:
       const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
-      DoubleTab secmem2(secmem);
+      secmem2 = secmem;
       divergence.calculer(variables_internes().delta_u_interface->valeurs(), secmem2);
       // On ne conserve que la divergence des elements traverses par l'interface
-      const int nb_elem = secmem2.dimension(0);
+      if (nb_elem != secmem2.dimension(0)) Process::exit();
       for (int elem = 0; elem < nb_elem; elem++)
         {
           const double dist = distance(elem);
@@ -2823,7 +2919,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                                                 ? ref_cast(Matrice_Morse_Sym, (ref_cast(Matrice_Bloc, matrice_pression_.valeur())).get_bloc(0,0).valeur()) // VDF (1)
                                                 : ref_cast(Matrice_Morse_Sym, matrice_pression_.valeur())) ;                                              // VEF (>1)
           DoubleTab& pressu = la_pression.valeurs();
-          const int nb_elem = champ_rho_elem_.valeur().valeurs().dimension(0);
+          if (nb_elem != secmem2.dimension(0)) Process::exit();
           const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
           const Zone& ma_zone = zone_dis().zone ();
           const IntTab& elem_faces = zone_vf.elem_faces();

@@ -33,7 +33,7 @@
 class Param;
 class Parcours_interface;
 class Equation_base;
-//class Convection_Diffusion_Temperature_FT_Disc;
+#define TCL_MODEL 0
 
 /////////////////////////////////////////////////////////////////////////////
 //
