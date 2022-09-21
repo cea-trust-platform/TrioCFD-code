@@ -1929,6 +1929,77 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
     }
 }
 
+
+// Description:
+//  Interpolation uni-lineaire d'un champ de vitesse VDF aux faces en un point
+//  de coordonnees coord_som. Le point coord_som est suppose se trouver dans
+//  l'element "element". Contrairement a la methode interpoler_vitesse_point_vdf
+//  dont elle s'inspire, cette methode n'interpole chaque composante que dans sa propre
+//  direction
+//  Pour chaque composante, on cherche le cube contenant coord_som et dont
+//  les sommets sont des noeuds de vitesse pour cette composante et on
+//  interpole lineairement dans ce cube. Au bord du domaine, la vitesse
+//  tangentielle dans le demi-element colle a la paroi est la vitesse
+//  discrete de l'element (la condition aux limites n'est PAS utilisee).
+void interpoler_simple_vitesse_point_vdf(const Champ_base& champ_vitesse,
+                                         const FTd_vecteur3& coord_som,
+                                         const int element,
+                                         FTd_vecteur3& vitesse)
+{
+  const DoubleTab& valeurs_v = champ_vitesse.valeurs();
+  const Zone_VF& zone_vf = ref_cast(Zone_VF, champ_vitesse.zone_dis_base());
+  const IntTab& elem_faces = zone_vf.elem_faces();
+  const DoubleTab& xv = zone_vf.xv();
+
+  // Chaque composante de vitesse est la moyenne ponderee des 2 vitesses
+  // aux faces de l'element qui encadrent le sommet.
+  // On designe par i,j,k l'une des 8 faces, avec 0<=i<=1, 0<=j<=1, 0<=k<=1.
+  // La composante vitesse au sommet est
+  //  vitesse = SOMME(vitesse(face_i,j,k)*coef[0]*coef[1]*coef[2]);
+  // Exemple : interpolation de la composante horizontale de vitesse
+  //  pour le sommet "x". On fait une interpolation bilineaire
+  //  entre les DEUX composantes horizontales de vitesses v.
+  //  Pas besoin des voisins!
+  //   --------
+  //  |     x  |
+  //  |  v0    | v1
+  //  |-->     |-->
+  //  |        |
+  //  |        |
+  //   --------
+
+  // Boucle sur les 2 ou 3 composantes de la vitesse
+  int compo;
+  const int dim = Objet_U::dimension;
+  for (compo = 0; compo < dim; compo++)
+    {
+      // ****
+      // Calcul d'un unique coefficient de ponderation coef
+      // ****
+      double coef;
+
+      // Boucle sur les 2 ou 3 dimensions du cube dans lequel on interpole la valeur
+      int direction = compo;
+      // Coordonnee du point ou il faut interpoler la vitesse
+      const double x = coord_som[direction];
+      // Dans la direction de la composante traitee on interpole
+      // entre les deux faces opposees de l'element. Coordonnees
+      // de ces faces :
+      const int face_inf_compo = elem_faces(element, compo);
+      const int face_sup_compo = elem_faces(element, compo + dim);
+      const double xmin = xv(face_inf_compo, direction);
+      const double xmax = xv(face_sup_compo, direction);
+      coef = (xmax - x) / (xmax - xmin); // Le coef d'interpolation dans la direction
+
+      if (coef < 0.)
+        coef = 0.;
+      if (coef > 1.)
+        coef = 1.;
+
+      vitesse[compo] = coef * valeurs_v(face_inf_compo) + (1.-coef) * valeurs_v(face_sup_compo);
+    }
+}
+
 double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const DoubleVect& indicatrice, double& integrale_ph0) const
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
@@ -6538,6 +6609,42 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
   maillage.changer_temps(temps);
 }
 
+void Transport_Interfaces_FT_Disc::ajouter_contribution_saut_vitesse(DoubleTab& deplacement) const
+{
+  const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
+  const Champ_base *u0_ptr = 0;
+
+  if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
+    {
+      // On recupere le saut de vitesse a l'interface (changement de phase)
+      const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+      u0_ptr = ns.get_delta_vitesse_interface();
+      if (u0_ptr)
+        {
+          const Champ_base& u0 = *u0_ptr;
+          DoubleTabFT d2(deplacement);
+          // If ns.get_new_mass_source() == 0, we use a standard multi-linear interpolation.
+          // If ns.get_new_mass_source() == 1, we use the new method (1D-interpolation of each velocity component in its direction)
+          calculer_vitesse_transport_interpolee(u0,
+                                                maillage_interface(),
+                                                d2, 1 /* recalculer le champ de vitesse L2 */);// ,
+          // 1-ns.get_new_mass_source());
+
+          const int n = d2.dimension(0);
+          const int dim = d2.line_size();
+          for (int i = 0; i < n; i++)
+            {
+              for (int j = 0; j < dim; j++)
+                {
+                  const double depl2 = d2(i,j);
+                  deplacement(i,j) -= depl2;
+                }
+            }
+        }
+    }
+
+}
+
 int Transport_Interfaces_FT_Disc::calculer_composantes_connexes_pour_suppression(IntVect& num_compo)
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
@@ -7270,7 +7377,10 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
-                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit, 0);
+                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
+                                                      0);
+                // Pour ajouter le saut de vitesse a l'interface :
+                ajouter_contribution_saut_vitesse(vit); // ici, l'interpolation depend de ns.get_new_mass_source()
                 const int nb_noeuds = vit.dimension(0);
                 const int nb_compo = vit.line_size();
                 ftab->resize(nb_noeuds, nb_compo);
@@ -7303,7 +7413,10 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
-                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit, 0);
+                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
+                                                      0);
+                // Pour ajouter le saut de vitesse a l'interface :
+                ajouter_contribution_saut_vitesse(vit);// ici, l'interpolation depend de ns.get_new_mass_source()
                 calculer_vitesse_repere_local( maillage_interface_pour_post(), vit,Positions,Vitesses);
 
                 const int nb_noeuds = vit.dimension(0);

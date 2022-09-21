@@ -171,6 +171,11 @@ public:
                                        DoubleTab& champ, DoubleTab& gradient,
                                        const double t, const double dt ) ;
 
+  void interpoler_simple_vitesse_face(const DoubleTab& distance_interface,
+                                      const int phase, const int stencil_width,
+                                      DoubleTab& champ, DoubleTab& gradient,
+                                      const double t, const double dt ) ;
+
   virtual void calcul_nb_traverse(  const DoubleTab& xe, const double dx,
                                     const int dim, const int ori,
                                     Maillage_FT_Disc& maillage, int elem,
@@ -272,6 +277,7 @@ protected:
                                                   DoubleTab& vitesses,
                                                   DoubleTab& positions) const;
 
+  void ajouter_contribution_saut_vitesse(DoubleTab& deplacement) const;
   virtual void deplacer_maillage_ft_v_fluide(const double temps);
 
   virtual void calculer_distance_interface(const Maillage_FT_Disc& maillage,
