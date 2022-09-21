@@ -170,7 +170,7 @@ void Paroi_frottante_loi::me_calculer()
         }
     }
 
-  for (n=1 ; n<N ; n++) 
+  for (n=1 ; n<N ; n++)
     for (int f =0 ; f < nf ; f++)
       {
         valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries

@@ -201,7 +201,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
       for (int n = 0; n < N; n++) nut_l(n) = is_turb    ? nut(e,n) : 0;
       for (int n = 0; n <Nk; n++) k_l(n)   = (k_turb)   ? (*k_turb)(e,0) : 0;
       for (int n = 0; n < N; n++) d_b_l(n) = d_bulles(e,n) ;
-      for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
+      for (int n = 0; n < N; n++)
+        for (int k = 0; k < N; k++)
+          if (milc.has_interface(n,k))
             {
               Interface_base& sat = milc.get_interface(n, k);
               sigma_l(n,k) = sat.sigma(temp(e,n),press(e,n * (Np > 1)));
