@@ -2034,7 +2034,8 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
   const Champ_base&        champ_vitesse,
   const Maillage_FT_Disc& maillage,
   DoubleTab&             vitesse_noeuds,
-  int                   nv_calc) const
+  int                   nv_calc,
+  int standard) const
 {
 
   switch(variables_internes_->methode_interpolation_v)
@@ -2147,7 +2148,16 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
                 int j;
                 for (j = 0; j < dim; j++)
                   coord[j] = pos(i,j);
-                interpoler_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                if (standard)
+                  {
+                    // Interpolation M-lineaire dans toutes les M-directions pour chaque compo
+                    interpoler_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                  }
+                else
+                  {
+                    // Interpolation uni-lineaire dans chaque direction de chaque compo :
+                    interpoler_simple_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                  }
                 for (j = 0; j < dim; j++)
                   vitesse_noeuds(i,j) = vitesse[j];
               }
@@ -6336,41 +6346,69 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local(const Maillage_
 void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double temps)
 {
   DoubleTab& deplacement = variables_internes_->deplacement_sommets;
-  const Champ_base *u0_ptr = 0;
   const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
   const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
   Maillage_FT_Disc& maillage = maillage_interface();
   // Calcul de la vitesse de deplacement des sommets par interpolation
   // (deplacement contient en fait la vitesse en m/s)
-  calculer_vitesse_transport_interpolee(champ_vitesse,
-                                        maillage,
-                                        deplacement, 1 /* recalculer le champ de vitesse L2 */);
-
+  int flag = 1;
   if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
     {
-      // On recupere le saut de vitesse a l'interface (changement de phase)
       const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
-      u0_ptr = ns.get_delta_vitesse_interface();
-      if (u0_ptr)
-        {
-          const Champ_base& u0 = *u0_ptr;
-          DoubleTabFT d2(deplacement);
-          calculer_vitesse_transport_interpolee(u0,
-                                                maillage,
-                                                d2, 1 /* recalculer le champ de vitesse L2 */);
-
-          const int n = d2.dimension(0);
-          const int dim = d2.line_size();
-          for (int i = 0; i < n; i++)
-            {
-              for (int j = 0; j < dim; j++)
-                {
-                  const double depl2 = d2(i,j);
-                  deplacement(i,j) -= depl2;
-                }
-            }
-        }
+      if (ns.get_delta_vitesse_interface())
+        flag=0;
     }
+  calculer_vitesse_transport_interpolee(champ_vitesse,
+                                        maillage,
+                                        deplacement, 1 /* recalculer le champ de vitesse L2 */,
+                                        flag /* Interpolation Multi-lineaire en VDF */);
+
+#if DEBUG_CONSERV_VOLUME
+  int n = maillage.nb_sommets();
+  double dmin=0.;
+  double dmax=0.;
+  double dmean = 0.;
+  DoubleTab norm_deplacement(n);
+  if (n>0)
+    {
+      for (int i=0; i<n; i++)
+        {
+          double x = 0.;
+          for (int j=0; j<deplacement.dimension(1); j++)
+            x += deplacement(i,j)*deplacement(i,j);
+          norm_deplacement[i]  = sqrt(x);
+          dmean +=sqrt(x);
+        }
+      dmean /=n;
+      dmin = min_array(norm_deplacement);
+      dmax = max_array(norm_deplacement);
+    }
+#endif
+  // On recupere et ajoute a deplacement le saut de vitesse a l'interface si changement de phase
+  ajouter_contribution_saut_vitesse(deplacement);
+
+#if DEBUG_CONSERV_VOLUME
+  if (n>0)
+    {
+      double dmean_wpch = 0.;
+      for (int i=0; i<n; i++)
+        {
+          double x = 0.;
+          for (int j=0; j<deplacement.dimension(1); j++)
+            x += deplacement(i,j)*deplacement(i,j);
+          norm_deplacement[i]  = sqrt(x);
+          dmean_wpch +=sqrt(x);
+        }
+      dmean_wpch /=n;
+      double dmin_wpch = min_array(norm_deplacement);
+      double dmax_wpch = max_array(norm_deplacement);
+      Cerr << "Interfacial_velocity before/after pch [min/mean/max]. Time: "
+           << schema_temps().temps_courant()
+           << " Without-pch: " << dmin << " " << dmean<< " "  << dmax
+           << " With-pch: "  << dmin_wpch << " " << dmean_wpch << " "  << dmax_wpch
+           << " [Warning, values invalid in //] " << finl;
+    }
+#endif
 
   if (interpolation_repere_local_)
     {
@@ -6627,8 +6665,8 @@ void Transport_Interfaces_FT_Disc::ajouter_contribution_saut_vitesse(DoubleTab& 
           // If ns.get_new_mass_source() == 1, we use the new method (1D-interpolation of each velocity component in its direction)
           calculer_vitesse_transport_interpolee(u0,
                                                 maillage_interface(),
-                                                d2, 1 /* recalculer le champ de vitesse L2 */);// ,
-          // 1-ns.get_new_mass_source());
+                                                d2, 1 /* recalculer le champ de vitesse L2 */,
+                                                1-ns.get_new_mass_source());
 
           const int n = d2.dimension(0);
           const int dim = d2.line_size();
@@ -7377,8 +7415,17 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+                int flag = 1;
+                if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
+                  {
+                    const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+                    if (ns.get_delta_vitesse_interface())
+                      flag=0;
+                  }
                 calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
-                                                      0);
+                                                      0 /* ne pas recalculer le champ de vitesse L2 */,  // GB 2020/03/20 -> Je suis surpris par cette option 0 en desaccord avec le moment du calcul
+                                                      // mais je ne prends pas la responsabilite de changer car je ne sais pas trop ce que ca represente (c'est du VEF uniquement?)
+                                                      flag /* Interpolation Multi-lineaire en VDF */);
                 // Pour ajouter le saut de vitesse a l'interface :
                 ajouter_contribution_saut_vitesse(vit); // ici, l'interpolation depend de ns.get_new_mass_source()
                 const int nb_noeuds = vit.dimension(0);
@@ -7414,7 +7461,9 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
                 calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
-                                                      0);
+                                                      0 /* ne pas recalculer le champ de vitesse L2 */,  // GB 2020/03/20 -> Je suis surpris par cette option 0 en desaccord avec le moment du calcul
+                                                      // mais je ne prends pas la responsabilite de changer car je ne sais pas trop ce que ca represente (c'est du VEF uniquement?)
+                                                      1 /* Interpolation Multi-lineaire en VDF */);
                 // Pour ajouter le saut de vitesse a l'interface :
                 ajouter_contribution_saut_vitesse(vit);// ici, l'interpolation depend de ns.get_new_mass_source()
                 calculer_vitesse_repere_local( maillage_interface_pour_post(), vit,Positions,Vitesses);

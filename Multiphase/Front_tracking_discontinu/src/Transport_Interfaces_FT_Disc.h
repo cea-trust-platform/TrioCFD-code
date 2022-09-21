@@ -111,9 +111,18 @@ public:
   void nettoyer_proprietes_particules(const ArrOfInt& som_utilises);
 
   virtual void calculer_vitesse_transport_interpolee(const Champ_base& champ_vitesse,
+                                                     const Maillage_FT_Disc& m,
+                                                     DoubleTab& vitesse_noeuds,
+                                                     int nv_calc) const
+  {
+    calculer_vitesse_transport_interpolee(champ_vitesse, m, vitesse_noeuds, nv_calc, 1);
+  };
+
+  virtual void calculer_vitesse_transport_interpolee(const Champ_base& champ_vitesse,
                                                      const Maillage_FT_Disc&,
                                                      DoubleTab& vitesse_noeuds,
-                                                     int nv_calc) const;
+                                                     int nv_calc,
+                                                     int standard) const;
   void calculer_scalaire_interpole(const Champ_base& ch_scal,
                                    const Maillage_FT_Disc&,
                                    DoubleTab& ch_scal_noeuds,
