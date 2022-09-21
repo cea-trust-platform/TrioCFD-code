@@ -62,9 +62,9 @@ public:
   int is_terme_gravite_rhog() const;
   const Champ_Fonc& champ_rho_faces() const;
 
-  virtual void calculer_dI_dt(DoubleVect& dI_dt) const;
+  virtual void calculer_dI_dt(DoubleVect& dI_dt); // const;
   const int& get_is_penalized() const;
-  const int& get_historical_mass_source() const;
+  const int& get_new_mass_source() const;
   const DoubleTab& get_interfacial_area() const;
   DoubleTab& get_set_interfacial_area();  // Open access  in write-mode..
   const DoubleTab& get_mpoint() const;

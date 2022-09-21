@@ -6345,7 +6345,11 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
       // champ de vitesse eulerien :
       ArrOfDoubleFT var_volume;
       {
-        const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+        // Desole pour le ref_cast_non_const, il y a probablement plus propre mais je ne sais pas faire.
+        // En l'etat, 'ns' doit etre non-const car il fait appel a get_update...normale et get_compute_indicatrice_faces
+        // qui modifient l'objet Transport_... dans lequel nous sommes!
+        Navier_Stokes_FT_Disc& ns = ref_cast_non_const(Navier_Stokes_FT_Disc, eqn_hydraulique);
+
         DoubleVect dI_dt;
         zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
