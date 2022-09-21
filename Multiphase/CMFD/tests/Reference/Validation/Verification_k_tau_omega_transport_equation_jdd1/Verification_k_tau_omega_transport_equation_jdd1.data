@@ -46,7 +46,8 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-	nb_pas_dt_max 0
+	nb_pas_dt_max 1
+    dt_max 1.e-16
     solveur ice
     {
         criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e-5 omega 1. }
@@ -143,7 +144,7 @@ liquide_eau Fluide_Incompressible
         }
 	sources
 	{
-	Production_energie_cin_turb ,
+	Production_energie_cin_turb { } ,
 	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 	}
     }
@@ -210,11 +211,11 @@ liquide_eau Fluide_Incompressible
 							               }
 					}
 		sondes			{
-					vitesseX	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					vitesseX	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
 					vitesseY	vitesseY		periode 1 position_like vitesseX
 					vitesseZ	vitesseZ		periode 1 position_like vitesseX
 
-					k		k			periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
 					tau		tau			periode 1 position_like k
 					epsilon	epsilon		periode 1 position_like k
 					nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
@@ -232,11 +233,11 @@ liquide_eau Fluide_Incompressible
 
 					grad_v		gradient_vitesse_liquide_eau periode 1 position_like tau
 					
-					vitesseX_bord	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					vitesseX_bord	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
 					vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
 					vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
 
-					k_bord		k			periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
 					tau_bord	tau			periode 1 position_like k_bord
 					epsilon_bord	epsilon		periode 1 position_like k_bord
 					nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
