@@ -1865,6 +1865,24 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
             + (1.-ci) * cj      * valeurs_v(f10)
             + ci      * (1.-cj) * valeurs_v(f01)
             + (1.-ci) * (1.-cj) * valeurs_v(f11);
+          if (Objet_U::bidim_axi && (compo==0) && (ci>Objet_U::precision_geom) && (ci<1.-Objet_U::precision_geom)
+              && (xv(f00,0) <DMINFLOAT)
+              && ((fabs(valeurs_v(f00)-valeurs_v(f10))>DMINFLOAT) || (fabs(valeurs_v(f01)-valeurs_v(f11))>DMINFLOAT)))
+            {
+              Cerr << "In bidim_axi, when interpolating u_r within the first cell, we use the value on the symetry axis u_r(r=0)=0." << finl;
+              Cerr << "We take a simple mean on that and the value at the other face. But for a divergence-free field, neglecting dv/dy, " << finl;
+              Cerr << "it would be better to assume a velocity as u(x) = x_1/x * u_1 (if x!=0). GB 2020/03/05." << finl;
+              const double x = coord_som[0];
+              Cerr << "Here, the difference is "<< (1.-ci) << " vs. " << xv(f10, 0)/x << finl;
+              Cerr << "u1= " << valeurs_v(f10) << " direction1 : " << direction1 << finl;
+              Cerr << "interpoler_vitesse_point_vdf of Transport_Interface..cpp not exiting but interpolation is adapted" << finl;
+              Cerr << "Former: " << vitesse[compo];
+              vitesse[compo] = xv(f10, 0)/x * (
+                                 cj      * valeurs_v(f10)
+                                 + (1.-cj) * valeurs_v(f11));
+              Cerr << " New: " << vitesse[compo] << finl;
+              //Process::exit();
+            }
         }
       else if (dim == 3)
         {
