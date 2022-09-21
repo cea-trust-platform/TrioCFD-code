@@ -65,7 +65,8 @@ void Production_energie_cin_turb_PolyMAC_P0::completer()
   for (int e = 0 ; e < fac_.dimension_tot(0) ; e++)
     for (int n = 0 ; n < fac_.dimension_tot(1) ; n++) fac_(e, n, 1) = 0. ; // 0 derivative by default
 
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, equation().probleme()).get_correlation("Loi_paroi");
+  if (ref_cast(Pb_Multiphase, equation().probleme()).has_correlation("Loi_paroi"))
+    correlation_loi_paroi_ = ref_cast(Pb_Multiphase, equation().probleme()).get_correlation("Loi_paroi");
 }
 
 void Production_energie_cin_turb_PolyMAC_P0::mettre_a_jour(double tps)
@@ -74,29 +75,34 @@ void Production_energie_cin_turb_PolyMAC_P0::mettre_a_jour(double tps)
 }
 void Production_energie_cin_turb_PolyMAC_P0::calculer_fac()
 {
-  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins();
+  if (correlation_loi_paroi_.non_nul())
+    {
+      const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+      const IntTab& f_e = zone.face_voisins();
 
-  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau");
-  const DoubleTab& tab_k = equation().probleme().get_champ("k").passe();
+      Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
+      DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau");
+      const DoubleTab& tab_k = equation().probleme().get_champ("k").passe();
 
-  int nf = zone.nb_faces(), N = tab_k.line_size() ;
+      int nf = zone.nb_faces(), N = tab_k.line_size() ;
 
-  fac_ = 1.;
+      fac_ = 1.;
+      for (int e = 0 ; e < fac_.dimension_tot(0) ; e++)
+        for (int n = 0 ; n < fac_.dimension_tot(1) ; n++) fac_(e, n, 1) = 0. ; // 0 derivative by default
 
-  for(int f = 0 ; f < nf ; f++)
-    for (int n = 0 ; n < N ; n++)
-      if (corr_loi_paroi.a_calculer(f))
-        if (u_tau(f, n) > 1.e-6)
-          {
-            int e = f_e(f, 0) ;
+      for(int f = 0 ; f < nf ; f++)
+        for (int n = 0 ; n < N ; n++)
+          if (corr_loi_paroi.a_calculer(f))
+            if (u_tau(f, n) > 1.e-6)
+              {
+                int e = f_e(f, 0) ;
 
-            double kp = tab_k(e, n) / (u_tau(f, n)*u_tau(f, n));
-            if ( (kp-3.33) > 1. ) fac_(e, n, 0) = 1. - limiter_prod_ ;
-            else if ( (kp-3.33) < 0. ) fac_(e, n, 0) = 1. ;
-            else fac_(e, n, 0) = 1. - limiter_prod_*(kp-3.33), fac_(e, n, 1) = - limiter_prod_  / (u_tau(f, n)*u_tau(f, n)) ;
-          }
+                double kp = tab_k(e, n) / (u_tau(f, n)*u_tau(f, n));
+                if ( (kp-3.33) > 1. ) fac_(e, n, 0) = 1. - limiter_prod_ ;
+                else if ( (kp-3.33) < 0. ) fac_(e, n, 0) = 1. ;
+                else fac_(e, n, 0) = 1. - limiter_prod_*(kp-3.33), fac_(e, n, 1) = - limiter_prod_  / (u_tau(f, n)*u_tau(f, n)) ;
+              }
+    }
 }
 
 void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
@@ -140,8 +146,9 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
         secmem_en *= pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) * nut(e, n) ;
 //        secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
 
-        secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
+//        secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
+        secmem(e, n) += std::max(secmem_en, 0.);
 
-        if (mat) (*mat)(N * e + n, N * e + n) -= fac_(e, n, 1) * std::max(secmem_en, 0.);
+        if (mat) (*mat)(N * e + n, N * e + n) -= 0.;//fac_(e, n, 1) * std::max(secmem_en, 0.);
       }
 }

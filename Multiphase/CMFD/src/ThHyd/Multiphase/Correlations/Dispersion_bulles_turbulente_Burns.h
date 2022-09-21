@@ -25,7 +25,7 @@
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
 
-/*! @brief classe Dispersion_bulles_turbulente_Burns 
+/*! @brief classe Dispersion_bulles_turbulente_Burns
  *     coefficients de dispersion selon le modele Burns et al 2004
  *
  */

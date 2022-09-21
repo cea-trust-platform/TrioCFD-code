@@ -169,7 +169,9 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
 
                 // Ici test linearisations
 
-                double deriv = -std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * 2. * tab_pdiss(e, n) );
+                double deriv = 0. ;
+                if (pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) > 0. )
+                  deriv = - pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * 2. * tab_pdiss(e, n);
                 mat(N * e + n, N * e + n) -= deriv;
               }
         }

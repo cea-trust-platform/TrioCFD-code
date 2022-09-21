@@ -183,13 +183,6 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                 secmem(f, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
                 secmem(f, n_l) -= fac * coeff(n_l, k, 0) * sum_alphag_wall;
 
-//                if (mat) for (int j = 0; j < 2; j++)
-//                    {
-//                      (*mat)(N * f + k, N * f + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) * ddv(k, n_l, 3);
-//                      (*mat)(N * f + k, N * f + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(k, n_l, 3) ;
-//                      (*mat)(N * f+n_l, N * f + (j ? n_l : k)) += fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) * ddv(n_l, k, 3);
-//                      (*mat)(N * f+n_l, N * f + (j ? n_l : k)) += fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(n_l, k, 3) ;
-//                    }
               }
       }
 
@@ -231,13 +224,6 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                 secmem(i, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
                 secmem(i, n_l) -= fac * coeff(n_l, k, 0) * sum_alphag_wall * n_y_elem(e, d);
 
-//                if (mat) for (int j = 0; j < 2; j++)
-//                    {
-//                      (*mat)(N * i + k, N * i + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * ddv(k, n_l, 3);
-//                      (*mat)(N * i + k, N * i + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(k, n_l, 3) ;
-//                      (*mat)(N * i+n_l, N * i + (j ? n_l : k)) += fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * ddv(n_l, k, 3);
-//                      (*mat)(N * i+n_l, N * i + (j ? n_l : k)) += fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(n_l, k, 3) ;
-//                    }
               }
     }
 
@@ -261,6 +247,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
         for (int n = 0; n < N; n++) T_l(n)   =  temp(e, n);
         for (int n = 0; n < N; n++) rho_l(n) =   rho(!cR * e, n);
         for (int n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
+        for (int n = 0; n <Nk; n++) k_l(n)   = (k_turb)   ? (*k_turb)(e,0) : 0;
+        for (int n = 0; n < N; n++) d_b_l(n) = d_bulles(e,n) ;
+
         for (int n = 0; n < N; n++)
           {
             for (int k = 0; k < N; k++)
@@ -273,7 +262,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 
         for (int k = 0; k < N; k++)
           for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
-        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dv, e, coeff);
+        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, k_l, d_b_l, dv, e, coeff);
 
         if (D==2)
           {
