@@ -119,20 +119,26 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = zone.nb_elem(), D = dimension, nf_tot = zone.nb_faces_tot() ;
   int N = equation().inconnue()->valeurs().line_size();
 
-  DoubleTrav Rij(0, Nph, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
-  visc_turb.reynolds_stress(Rij);
+//  DoubleTrav Rij(0, Nph, D, D);
+// MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
+//  visc_turb.reynolds_stress(Rij);
+
+  DoubleTrav nut(0, Nph);
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in reynolds_stress()
+  visc_turb.eddy_viscosity(nut);
 
   Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
 
   for(int e = 0 ; e < nb_elem ; e++)
     for(int n = 0; n<N ; n++)
       {
-        double secmem_en = 0;
+        double secmem_en = 0.;
         for (int d_U = 0; d_U < D; d_U++)
           for (int d_X = 0; d_X < D; d_X++)
-            secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-        secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
+            secmem_en += ( tab_grad(nf_tot + d_U + e * D , D * n + d_X) + tab_grad(nf_tot + d_X + e * D , D * n + d_U) ) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+//            secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+        secmem_en *= pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) * nut(e, n) ;
+//        secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
 
         secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
 

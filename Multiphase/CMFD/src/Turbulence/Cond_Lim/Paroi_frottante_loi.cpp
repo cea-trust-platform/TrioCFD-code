@@ -188,7 +188,7 @@ void Paroi_frottante_loi::me_calculer()
         valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;
         valeurs_coeff_grad_(f, n) = valeurs_coeff_grad_(f, n) ;
       }
-    
+
   valeurs_coeff_.echange_espace_virtuel();
   valeurs_coeff_grad_.echange_espace_virtuel();
 }

@@ -45,7 +45,7 @@ public:
 private:
   double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k / omega, 0.01 * limiter_)
   double sigma_ = 1.;
-
+  double beta_k_ = 0.09;
 };
 
 #endif
