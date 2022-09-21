@@ -27,12 +27,9 @@
 #include <Dirichlet_loi_paroi.h>
 #include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Cond_lim_tau_omega_simple_demi
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Cond_lim_tau_omega_simple_demi
+ *
+ */
 class Cond_lim_k_simple_transition_constante_Dirichlet : public Dirichlet_loi_paroi
 {
 

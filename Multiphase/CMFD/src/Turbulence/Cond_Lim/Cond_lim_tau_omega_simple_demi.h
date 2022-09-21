@@ -28,12 +28,9 @@
 #include <Cond_lim_base.h>
 #include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Cond_lim_tau_omega_simple_demi
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Cond_lim_tau_omega_simple_demi
+ *
+ */
 class Cond_lim_tau_omega_simple_demi : public Echange_global_impose
 {
 

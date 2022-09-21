@@ -25,13 +25,11 @@
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Dispersion_bulles_turbulente_LLB
-//      coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Dispersion_bulles_turbulente_LLB coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
+ *
+ *
+ *
+ */
 class Dispersion_bulles_turbulente_LLB : public Dispersion_bulles_base
 {
   Declare_instanciable(Dispersion_bulles_turbulente_LLB);

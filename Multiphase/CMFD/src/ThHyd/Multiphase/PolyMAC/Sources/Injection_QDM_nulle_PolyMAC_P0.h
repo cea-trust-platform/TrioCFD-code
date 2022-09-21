@@ -24,15 +24,13 @@
 #define Injection_QDM_nulle_PolyMAC_P0_included
 #include <Source_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Injection_QDM_nulle_PolyMAC_P0
-//      Correction de la QDM d'un fluide de l'écoulement quand on en injecte
-//        un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Injection_QDM_nulle_PolyMAC_P0 Correction de la QDM d'un fluide de l'écoulement quand on en injecte
+ *
+ *         un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
+ *
+ *
+ *
+ */
 class Injection_QDM_nulle_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Injection_QDM_nulle_PolyMAC_P0);

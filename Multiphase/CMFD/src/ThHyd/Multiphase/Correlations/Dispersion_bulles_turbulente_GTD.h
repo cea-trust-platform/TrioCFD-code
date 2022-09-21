@@ -25,13 +25,11 @@
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Dispersion_bulles_turbulente_GTD
-//      coefficients de dispersion turbulente de bulles slon le modele Lavieville et al 2017
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Dispersion_bulles_turbulente_GTD coefficients de dispersion turbulente de bulles slon le modele Lavieville et al 2017
+ *
+ *
+ *
+ */
 class Dispersion_bulles_turbulente_GTD : public Dispersion_bulles_base
 {
   Declare_instanciable(Dispersion_bulles_turbulente_GTD);

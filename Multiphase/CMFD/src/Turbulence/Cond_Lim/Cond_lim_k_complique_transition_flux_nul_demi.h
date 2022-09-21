@@ -27,11 +27,9 @@
 #include <Ref_Correlation.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Cond_lim_k_complique_transition_flux_nul_demi:
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Cond_lim_k_complique_transition_flux_nul_demi:
+ *
+ */
 class Cond_lim_k_complique_transition_flux_nul_demi  : public Echange_global_impose
 {
 
