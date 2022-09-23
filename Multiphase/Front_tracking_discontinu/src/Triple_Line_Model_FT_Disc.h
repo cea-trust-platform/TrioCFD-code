@@ -33,7 +33,7 @@
 class Param;
 class Parcours_interface;
 class Equation_base;
-#define TCL_MODEL 0
+#define TCL_MODEL 1
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -87,6 +87,11 @@ public :
   {
     return activated_;
   };
+  const int& is_capillary_activated() const
+  {
+    return capillary_effect_on_theta_activated_;
+  };
+
   const int& tag_tcl() const
   {
     return tag_tcl_;
@@ -132,6 +137,7 @@ public :
 protected :
 
   bool activated_;
+  int capillary_effect_on_theta_activated_;
   int TCL_energy_correction_;
   int tag_tcl_;
   double coeffa_; //

@@ -5260,6 +5260,31 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
 
   // Cette classe sert pour promener les sommets sur le bord du domaine.
   const Parcours_interface& parcours = refparcours_interface_.valeur();
+#if TCL_MODEL
+  const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+  const Probleme_base& pb = eq_interfaces.get_probleme_base();
+  Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+  Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+  // interfacial velocity
+  FloatTab vit(nsom, dim);
+  if (tcl.is_activated() && tcl.is_capillary_activated())
+    {
+      Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
+      Motcle nom_du_champ = "vitesse";
+      Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
+      Process::exit();
+      // Useless init to 0:
+      // for (int ii=0; ii< nsom; ii++)
+      //  for (int jj=0; jj< dim; jj++)
+      //    vit(ii,jj) = 0.;
+      eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
+
+      //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
+      // It relies on the classical assumption in the FT module that the first equation is NS.
+    }
+  const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+  //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
+#endif
 
   for (facette = 0; facette < nfaces; facette++)
     {
@@ -5867,7 +5892,93 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                     continue;
 
                   double costheta = tab_cos_theta(som[i2], 0);
+#if TCL_MODEL
+                  // Modification of the value of costheta based on
+                  // the effect of CL velocity. Stored in tcl.set_theta_app
+                  // (but maybe unused there). Value used locally here afterward.
+                  // If the TCL model is activated and we're not on a virtual node :
+                  if ((sommet_elem_[som[i2]]>0) && tcl.is_activated()
+                      && tcl.is_capillary_activated())
+                    {
+                      const double t=temps_physique_;
+                      int face_loc;
+                      const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
+                      const Nom& bc_name = type_cl.frontiere_dis().le_nom();
+                      // For each BC, we check its type to see if it's a wall:
+                      //   Cerr << "TCL boundary condition is " << type_cl << " for BC " << bc_name;
+                      if ( sub_type(Dirichlet_paroi_fixe,type_cl)
+                           || sub_type(Dirichlet_paroi_defilante,type_cl) )
+                        {
+                          Cerr << "  -> for this BC [" <<
+                               bc_name <<"], we compute a specific contact angle at TCL." << finl;
+                        }
+                      else
+                        {
+                          Cerr << "  -> no modification of contact angle for this BC [" << bc_name <<"] at TCL." << finl;
+                          // We're on the symmetry axis, or something else but not at the wall...
+                          continue;
+                        }
+                      FTd_vecteur3 nface = {0., 0., 0.} ;
+                      parcours.calculer_normale_face_bord(face, sommets_(som[i2],0), sommets_(som[i2],1), 0., nface[0], nface[1], nface[2]) ;
+                      // The other som of the facette is som[1-i2] :
+                      // Cerr << " sommet-1 x= " << sommets_(som[1-i2],0) << " y= " << sommets_(som[1-i2],1) << " time_sommet= " << t << finl;
+                      // if(dt != 0.) double cl_v = (sommets_(som[i2],0) - x_cl_)/dt;
 
+                      const int isom1 = som[1-i2];
+                      // The second vertex of the segment should not be a contact line
+                      // so we compute its tangential velocity:
+                      const int nb_compo = vit.dimension(1);
+
+                      double norm_vit_som1 = 0.;
+                      double vn = 0.;
+                      double v_cl = 0.;
+                      double v_comp = 0.;
+                      // Component of the velocity is calculated along the direction of wall as vw = v - (v.n)n where n is the wall face normal
+                      // and v is the velocity vector of the node under consideration.
+                      for (int k=0 ; k<nb_compo ; k++)
+                        {
+                          const double vk = (double) vit(isom1,k);
+                          vn += vk*nface[k];
+                          Cerr << "Estimated TCL velocity[som=" << isom1
+                               << ", compo["<< k<<"]= " << vk << "m/s)" << " face-normal= " << nface[k] <<  finl;
+                          Cerr << "Vn= " << vn << finl;
+                          norm_vit_som1 += vk*vk;
+                        }
+                      nface[0] = vn*nface[0];
+                      nface[1] = vn*nface[1];
+                      nface[2] = vn*nface[2];
+                      for (int k=0 ; k<nb_compo ; k++)
+                        {
+                          v_comp = vit(isom1,k) - nface[k];
+                          v_cl += v_comp*v_comp;
+                        }
+                      v_cl = sqrt(v_cl);
+                      Cerr << "v_cl= " << v_cl << " time_v_cl= " << t << finl;
+
+                      // And we assume as a best guess that the contact line
+                      // velocity should be approximately that of the first
+                      // marker that is not a contact line. We use it
+                      // directly to build the Capilary number Ca.
+                      const double theta = acos(costheta);
+                      Cerr << "theta=" << theta << " time_theta= " << t << finl;
+                      const double bubble_center = 0.;
+                      const double W = (sommets_(i2, 0) - bubble_center)/(2*2.71*2.71);
+                      const double Ca = 2.8e-4*v_cl/5.89e-2;
+                      Cerr << "Capillary_number = " << Ca << " time = " << t << finl;
+                      double l_v = tcl.get_lv();
+                      double theta_app = pow((theta),3) - 9. * Ca * log(std::max(W, 1.e-20)/l_v);
+                      theta_app = pow(std::max(theta_app, 0.),1./3.);
+                      Cerr << "theta_after " << theta_app << " time_theta_after= " << t << finl;
+                      // We store the apparent contact angle in costheta for
+                      // later use in the calculation of the curvature
+                      // (it is through this mean that we will consider
+                      //  it and try to indirectly satisfy it).
+                      costheta = cos(theta_app);
+                      tcl.set_theta_app(theta_app);
+                      Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
+                           << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
+                    }
+#endif
                   // Normale unitaire au bord
                   double nfx, nfy, nfz;
                   parcours.calculer_normale_face_bord(face,

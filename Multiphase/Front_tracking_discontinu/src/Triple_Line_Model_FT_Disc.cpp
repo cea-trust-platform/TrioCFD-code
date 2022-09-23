@@ -39,6 +39,7 @@ Implemente_instanciable_sans_constructeur( Triple_Line_Model_FT_Disc, "Triple_Li
 Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   // Values initialized:
   activated_(false),
+  capillary_effect_on_theta_activated_(0),
   TCL_energy_correction_(0),
   tag_tcl_(-1),
   coeffa_(0),
@@ -102,6 +103,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("sm", &sm_,Param::REQUIRED);
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_);
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
+  p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
 }
 
 void Triple_Line_Model_FT_Disc::associer_eq_temperature(const Convection_Diffusion_Temperature_FT_Disc& eq_temp)
