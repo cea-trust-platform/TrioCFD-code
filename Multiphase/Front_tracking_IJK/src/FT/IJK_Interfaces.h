@@ -35,41 +35,17 @@
 #include <SFichier.h>
 #include <Vecteur3.h>
 #include <Linear_algebra_tools_impl.h>
-#include <medcoupling++.h>
-#ifdef MEDCOUPLING_
-#include <MEDCouplingCMesh.hxx>
-#include <MEDCouplingFieldDouble.hxx>
-#include <MEDCouplingUMesh.hxx>
-#include <MEDLoader.hxx>
-//#include <DataArrayDouble.hxx>
-//#include <DataArrayInt.hxx>
-#include <MCAuto.hxx>
-using MEDCoupling::DataArrayDouble;
-using MEDCoupling::DataArrayIdType;
-using MEDCoupling::DataArrayInt;
-using MEDCoupling::MCAuto;
-using MEDCoupling::MEDCouplingCMesh;
-using MEDCoupling::MEDCouplingFieldDouble;
-using MEDCoupling::MEDCouplingUMesh;
-using DAI = MCAuto<DataArrayInt>;
-using DAD = MCAuto<DataArrayDouble>;
-using MCT = MCAuto<DataArrayIdType>;
-using MCC = MCAuto<MEDCouplingCMesh>;
-using MCU = MCAuto<MEDCouplingUMesh>;
-using MCF = MCAuto<MEDCouplingFieldDouble>;
-#endif
+#include <SurfaceVapeurIJKComputation.h>
 
 #define VERIF_INDIC 0
 // #define SMOOTHING_RHO
-static const int max_authorized_nb_of_groups_ = 3;
-static const int max_authorized_nb_of_components_ = 5;
-static const double EPS_ = 1.e-12;
+// static const double EPS_ = 1.e-12;
 
-void get_coo_to_keep(const int d, std::vector<int>& COO2KEEP);
-void get_coo_inv_to_keep(const int d, std::array<int, 3>& COOINV);
-void print_int_med(const DataArrayIdType *data);
-void print_double_med(const DataArrayDouble *data);
-void print_umesh_conn(const DataArrayIdType *data);
+// void get_coo_to_keep(const int d, std::vector<int>& COO2KEEP);
+// void get_coo_inv_to_keep(const int d, std::array<int, 3>& COOINV);
+// void print_int_med(const DataArrayIdType *data);
+// void print_double_med(const DataArrayDouble *data);
+// void print_umesh_conn(const DataArrayIdType *data);
 
 /*! @brief : class IJK_Interfaces
  *
@@ -555,12 +531,14 @@ public :
     const int itstep,
     const bool parcourir = true
   );
-  void set_compute_surfaces_mouillees() { compute_surf_mouillees_ = true; }
+  void set_compute_surfaces_mouillees() { surface_vapeur_par_face_computation_.set_compute_surfaces_mouillees(); }
 
 protected:
-  // Met à jour les valeurs de surface_vapeur_par_face_ et
+  // Met à jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
+  SurfaceVapeurIJKComputation surface_vapeur_par_face_computation_;
   // barycentre_vapeur_par_face_.
-  void compute_surf_and_barys();
+  // void compute_surf_and_barys();
+  // void rempli_surface_vapeur_par_face_interieur_bulles();
   // Calcul des tableau de surface, normal et bary par compo
   void calculer_moyennes_interface_element_pour_compo(
     const int num_compo,
@@ -633,9 +611,6 @@ protected:
   int update_indicatrice(IJK_Field_double& indic);
 
 
-  // Cette methode appelle la methode statique get_maillage_MED_from_IJK_FT sur
-  // ses propres membres. Elle met donc a jour le maillage maillage_bulles_med_.
-
   // TODO: utiliser le allocate de allocate_velocity dans IJK_Navier_Stokes_tools.cpp utiliser le pslitting de NS, pas le FT
 
   void calculer_vmoy_composantes_connexes(const Maillage_FT_IJK& maillage,
@@ -664,83 +639,6 @@ protected:
                                               DoubleTab& v_closer,
                                               const double distmax);
 
-  // Cette methode appelle la methode statique get_maillage_MED_from_IJK_FT sur ses propres membres. Elle met donc a jour le maillage maillage_bulles_med_.
-  void set_maillage_MED();
-
-  // TODO: ecrire dans un fichier pour voir ce que ça donne. Utiliser nom_du_cas
-  // ou toto.med Methode qui calcule les faces mouillees du maillage IJK par la
-  // phase vapeur à l'aide de MEDCoupling. Les faces mouillees sont ensuite
-  // utilisees pour faire des operations d'operateur discret de FT dans la
-  // thermique principalement. surfaces: une vecteur comme celui de la vitesse
-  // qui porte non pas les composantes x,y,z de la vitesse mais les surfaces des
-  // faces I,J,K mouillees par la phase vapeur. barycentres: un vecteur qui
-  // porte les valeurs sur les 3 faces I,J,K un vecteur de 3 composantes
-  // rapporte à une cellule. Ces 3 composantes sont les coordonnees du
-  // barycentre de la phase vapeur.
-  void
-  calculer_surfaces_et_barys_faces_mouillees_vapeur(FixedVector<IJK_Field_double, 3>& surfaces,
-                                                    FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentres);
-
-  // Cette methode calcule le vecteur que va d'un barycentre à l'autre entre
-  // deux sous-cellules d'une cellule du maillage IJ. Params:
-  //- barycentre: le tableau des barycentre pour le maillage merge
-  //    (indice par les elements du maillage merge)
-  //- ids_diph: le tableau des indices des sub-volumes pour chaque volume
-  // diphasique
-  //    (indice de la meme manière que le tableau qui donne la correspondance
-  //    avec l'indice de l'element dans le maillage IJ).
-  // Returns:
-  //- le vecteur dont il est question, un tableau de taille egale au nombre de
-  // cellules
-  //    du mesh2d.
-  void get_vect_from_sub_cells_tuple(const int dim, const DataArrayDouble *bary0,
-                                     const DataArrayIdType *cIcellsIdinMesh0, const DataArrayIdType *cellsIdinMesh0,
-                                     DataArrayDouble *vect) const;
-
-  // Slice the bubble.
-  // Params:
-  //     intersect_pt : la coordonnee d'intersection
-  //     dim: la direction normale à laquelle on fait la coupe
-  // MEDCouplingUMesh* slice_bubble(const double intersect_pt, const int dim,
-  // DataArrayIdType* cutcellsid, bool& plan_cut_some_bubble) const;
-  void slice_bubble(const double intersect_pt, const int dim, DataArrayIdType *cutcellsid, bool& plan_cut_some_bubble,
-                    MCU& mesh1dfil) const;
-
-  // Cette methode trouve les doublons dans mesh_merge et leurs id.
-  // Params:
-  //    mesh_merge:
-  //        le tableau de conversion qui donne l'indice old pour les indices new
-  //        (donc new to old).
-  //    n_tot_mesh2d:
-  //        le nombre de maille du maillage IJ.
-  // Returns:
-  //    un tableau avec les indices des 2 cellules du maillage diphasique en
-  //    couple et un tableau avec les cellules du maillage non decoupe
-  //    correspondantes.
-  void findCommonTuples(const DataArrayIdType *mesh_merge, const int n_tot_mesh2d, DataArrayIdType *tab_id_subcells,
-                        DataArrayIdType *tab_id_cut_cells) const;
-
-  // Cette methode ordonne les noeuds par ordre croissant cellule par cellule
-  static void order_elem_mesh_filaire(MEDCouplingUMesh *mesh1D);
-
-  // Cette methode permet de recuperer les indices IJK en partant des
-  // informations concernant la geometrie IJK et le plan de coupe que l'on est
-  // en train de parcourir. Elle renvoie les coordonnees IJK correspondant, dans
-  // le bon ordre.
-  void get_IJK_ind_from_ind2d(const int dim, const int i_plan, const int i_2d, const int nx,
-                              std::array<int, 3>& ijk_coo) const;
-
-  // Cette methode verifie si les subcells sont dans le bon sens (vapeur ->
-  // liquide) et les echange sinon. Params:
-  //- vector: TODO
-  //- orthoprojected: TODO
-  //- ids_diph: TODO
-  //- ids_IJ_cell_from_diph: TODO.
-  // Returns:
-  //- TODO
-  void check_if_vect_is_from_liquid2vapor(const DataArrayDouble *vector, const int dim, const int i_plan, const int nx,
-                                          const DataArrayIdType *ids_diph,
-                                          DataArrayIdType *ids_IJ_cell_from_diph) const;
 
   void calculer_normale_et_bary_element_pour_compo(const int icompo,
                                                    const int elem,
@@ -868,19 +766,17 @@ protected:
   bool compute_surf_mouillees_; // active seulement dans le cas
   // ou il y a des champs thermique ou d energie.
   // attention, ca desactive seulement le calcul, pas l'allocation.
-  bool desactive_med_;
   int n_faces_mouilles_;
 
   bool is_diphasique_;
 
-  // Maillage au format MEDCouplingUMesh
-  MCU maillage_bulles_med_;
-
   // Surfaces vapeur des faces du maillage IJK
   FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_;
+  // FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_ns_;
 
   // Barycentres vapeur des faces du maillage IJK
   FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_;
+  // FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_ns_;
 
   /////////////////////////////////////
   // indicatrice et var moy par cell //
