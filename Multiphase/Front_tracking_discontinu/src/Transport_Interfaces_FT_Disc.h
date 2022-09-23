@@ -369,7 +369,7 @@ public:
     iterations_correction_volume(0),
     VOFlike_correction_volume(0),
     nb_lissage_correction_volume(0),
-    nb_iterations_correction_volume(0),
+    nb_iterations_correction_volume(3),
     volume_impose_phase_1(-1.),
     n_iterations_distance(3),
     n_iterations_interpolation_ibc(5),

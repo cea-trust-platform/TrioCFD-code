@@ -81,6 +81,10 @@ public:
                                     const double coeff,
                                     ArrOfDouble& dvolume) const;
 
+  int get_nb_iter_bary_volume_seul()
+  {
+    return nb_iter_bary_volume_seul_;
+  };
 #if DEBUG_CONSERV_VOLUME
   double calculer_volume_mesh(const Maillage_FT_Disc& mesh) const;
   double calculer_somme_dvolume(const Maillage_FT_Disc&, const ArrOfDouble&) const;

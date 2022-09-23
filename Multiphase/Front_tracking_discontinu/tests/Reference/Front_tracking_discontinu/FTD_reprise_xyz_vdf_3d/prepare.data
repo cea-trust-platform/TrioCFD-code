@@ -113,7 +113,9 @@ interf
 		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
 		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
         }
-        iterations_correction_volume 1
+        VOFlike_correction_volume 1
+	nb_lissage_correction_volume 1
+	nb_iterations_correction_volume 3
         n_iterations_distance 2
 	remaillage {
 		pas 0.000001

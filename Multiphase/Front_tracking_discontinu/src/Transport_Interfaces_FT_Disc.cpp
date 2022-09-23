@@ -451,6 +451,7 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
       if (n>0)
         variables_internes_->VOFlike_correction_volume = 1;
       variables_internes_->nb_lissage_correction_volume = n; // Historical behavior was to set it to the same value as the nb of iterations
+      int m = remaillage_interface().get_nb_iter_bary_volume_seul();
       variables_internes_->nb_iterations_correction_volume = n;
       if (Process::je_suis_maitre())
         {
@@ -458,7 +459,8 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
           Cerr << "For future compatibility, it is recommended to switch to the new syntax : " << finl;
           Cerr << "   VOFlike_correction_volume 1 # a flag (0 or 1) for activation #" << finl;
           Cerr << "   nb_lissage_correction_volume " << n << " # Select 0 or N the number of smothing to apply to avoid potential spikes due to volume correction. #" << finl;
-          Cerr << "   nb_iterations_correction_volume " << n << " # to iterate on the volume correction until seuil is reached. #" << finl;
+          Cerr << "   nb_iterations_correction_volume " << m << " # to iterate on the volume correction until seuil is reached. #" << finl;
+          Cerr << "The value of is read nb_iterations_correction_volume from bloc remaillage at keyword: nb_iter_correction_volume" << finl;
         }
       return 1;
     }
@@ -6598,14 +6600,23 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
           }
         }
       // Correction de volume :
+      // GB. 2019.05.13. Pourquoi utiliser iterations_correction_volume pour le nombre de lissage de dvol?
+      // remaillage_interface().lisser_dvolume(maillage, var_volume,
+      //                                      variables_internes_->iterations_correction_volume);
+      // 2019.05.13. Nouveau code :
       remaillage_interface().lisser_dvolume(maillage, var_volume,
-                                            variables_internes_->iterations_correction_volume);
+                                            variables_internes_->nb_lissage_correction_volume);
+
 #if DEBUG_CONSERV_VOLUME
       double  volume_before = remaillage_interface().calculer_volume_mesh(maillage);
       double dvol_total_before = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);
       Cerr << " dvol_error_before= " << dvol_total_before << " Volume_before= " << volume_before << " time " << temps << finl;
 #endif
-      remaillage_interface().corriger_volume(maillage, var_volume);
+      // GB. 2019.05.13. Pourquoi utiliser nb_iter_bary_volume_seul_ plutot que iterations_correction_volume?
+      //remaillage_interface().corriger_volume(maillage, var_volume);
+      // 2019.05.13. Nouveau code :
+      remaillage_interface().corriger_volume_(maillage, var_volume,
+                                              variables_internes_->nb_iterations_correction_volume);
 #if DEBUG_CONSERV_VOLUME
       double  volume_after = remaillage_interface().calculer_volume_mesh(maillage);
       double dvol_total_after = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);

@@ -91,7 +91,10 @@ interf
 		fonction 0.0016*0.0016-((x-0.005)*(x-0.005)/1.21+(y-0.005)*(y-0.005)*1.21+(z-0.005)*(z-0.005))
         }
 	methode_transport vitesse_interpolee hydraulique
-        iterations_correction_volume 2
+        # iterations_correction_volume 2 #
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 2
+        nb_iterations_correction_volume 1 # taken from nb_iter_correction_volume in remaillage { ... } #
         n_iterations_distance 2
 	remaillage {
                 pas 1e-8

@@ -136,7 +136,9 @@ interf
 
         }
 	methode_transport vitesse_interpolee hydraulique
-        iterations_correction_volume 2
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 2
+        nb_iterations_correction_volume 1 # taken from nb_iter_correction_volume in remaillage { ... } #
 	# injecteur_interfaces ./bulle.dat #
         n_iterations_distance 2
 	remaillage {
