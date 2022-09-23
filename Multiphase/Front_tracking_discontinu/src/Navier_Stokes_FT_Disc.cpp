@@ -1740,7 +1740,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
 
 // Description:
 //  Calcul du saut de vitesse a l'interface du au changement de phase
-//  phase_pilote = -1: u+u0 = champ de vitesse de deplacement de l'interface
+//  phase_pilote = -1: u-u0 = champ de vitesse de deplacement de l'interface
 //  phase_pilote = 0 : u+u0 = champ de vitesse de la phase 0
 //  phase_pilote = 1 : u+u0 = champ de vitesse de la phase 1
 //  ordre = 0 : pas de prise en compte de la correction en courbure
@@ -1990,13 +1990,13 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 if (d < 0)
                   p = 0.; // dans la phase 0
                 else
-                  p *= (un_sur_rho_1 - un_sur_rho_0);
+                  p *= (un_sur_rho_0 - un_sur_rho_1); // GB BugFix 2020/10/09
                 break;
               case 1:
                 // Champ de vitesse tel que u + u0 soit continu et
                 // u+u0 = la vitesse de la phase 1 dans la phase 1
                 if (d < 0)
-                  p *= (un_sur_rho_0 - un_sur_rho_1);
+                  p *= (un_sur_rho_1 - un_sur_rho_0); // GB BugFix 2020/10/09
                 else
                   p = 0.; // dans la phase 1
                 break;
