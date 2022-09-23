@@ -38,14 +38,6 @@
 #include <SurfaceVapeurIJKComputation.h>
 
 #define VERIF_INDIC 0
-// #define SMOOTHING_RHO
-// static const double EPS_ = 1.e-12;
-
-// void get_coo_to_keep(const int d, std::vector<int>& COO2KEEP);
-// void get_coo_inv_to_keep(const int d, std::array<int, 3>& COOINV);
-// void print_int_med(const DataArrayIdType *data);
-// void print_double_med(const DataArrayDouble *data);
-// void print_umesh_conn(const DataArrayIdType *data);
 
 /*! @brief : class IJK_Interfaces
  *
@@ -610,6 +602,9 @@ protected:
   // prealable
   int update_indicatrice(IJK_Field_double& indic);
 
+
+  // Cette methode appelle la methode statique get_maillage_MED_from_IJK_FT sur
+  // ses propres membres. Elle met donc a jour le maillage maillage_bulles_med_.
 
   // TODO: utiliser le allocate de allocate_velocity dans IJK_Navier_Stokes_tools.cpp utiliser le pslitting de NS, pas le FT
 
