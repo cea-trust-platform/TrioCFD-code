@@ -329,16 +329,24 @@ public :
                                            const Maillage_FT_IJK& maillage_bulles_ft_ijk);
 
   // Getter des surfaces par face
-  const FixedVector<IJK_Field_double, 3>& get_surface_vapeur_par_face() const
+  const FixedVector<IJK_Field_double, 3>& get_surface_vapeur_par_face_ft() const
   {
     return surface_vapeur_par_face_[old()];
+  }
+  const FixedVector<IJK_Field_double, 3>& get_surface_vapeur_par_face() const
+  {
+    return surface_vapeur_par_face_ns_[old()];
   }
   // Getter des surfaces par face
   // void get_surface_vapeur_par_face_ns(FixedVector<IJK_Field_double, 3> &surfs) const ;
   // Getter des barycentres par face
-  const FixedVector<FixedVector<IJK_Field_double, 3>, 3>& get_barycentre_vapeur_par_face() const
+  const FixedVector<FixedVector<IJK_Field_double, 3>, 3>& get_barycentre_vapeur_par_face_ft() const
   {
     return barycentre_vapeur_par_face_[old()];
+  }
+  const FixedVector<FixedVector<IJK_Field_double, 3>, 3>& get_barycentre_vapeur_par_face() const
+  {
+    return barycentre_vapeur_par_face_ns_[old()];
   }
 
   int get_nb_face_mouillees() const { return n_faces_mouilles_; }
@@ -496,13 +504,13 @@ public :
   // Surface de la vapeur sur la face dans la direction compo de la cellule ijk
   const double& Sf(const int compo, const int i, const int j, const int k) const
   {
-    return surface_vapeur_par_face_[old()][compo](i, j, k);
+    return surface_vapeur_par_face_ns_[old()][compo](i, j, k);
   }
   // Surface de la vapeur sur la face dans la direction compo de la cellule ijk
   // au temps n+1
   const double& Sfn(const int compo, const int i, const int j, const int k) const
   {
-    return surface_vapeur_par_face_[next()][compo](i, j, k);
+    return surface_vapeur_par_face_ns_[next()][compo](i, j, k);
   }
   // Surface de la vapeur sur la face dans la direction compo de la cellule ijk
   // moyennee entre n et n+1.
@@ -510,7 +518,7 @@ public :
   // faisant la moyenne sur plusieurs petits pas.
   double Sfm(const int compo, const int i, const int j, const int k) const
   {
-    return (surface_vapeur_par_face_[old()][compo](i, j, k) + surface_vapeur_par_face_[next()][compo](i, j, k)) * 0.5;
+    return (surface_vapeur_par_face_ns_[old()][compo](i, j, k) + surface_vapeur_par_face_ns_[next()][compo](i, j, k)) * 0.5;
   }
 
   void switch_indicatrice_next_old();
@@ -767,11 +775,11 @@ protected:
 
   // Surfaces vapeur des faces du maillage IJK
   FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_;
-  // FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_ns_;
+  FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_ns_;
 
   // Barycentres vapeur des faces du maillage IJK
   FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_;
-  // FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_ns_;
+  FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_ns_;
 
   /////////////////////////////////////
   // indicatrice et var moy par cell //

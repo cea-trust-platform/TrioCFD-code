@@ -486,9 +486,6 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   allocate_cell_vector(groups_indicatrice_ns_[old()], splitting_NS, 1);
   allocate_cell_vector(groups_indicatrice_ns_[next()], splitting_NS, 1);
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
-  // indicatrice_ns_0_.allocate(splitting_NS, IJK_Splitting::ELEM, 1);
-  // indicatrice_ns_0_.data() = 1.;
-  // indicatrice_ns_0_.echange_espace_virtuel(indicatrice_ns_0_.ghost());
   indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 1);
   indicatrice_ns_[next()].data() = 1.;
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
@@ -527,12 +524,18 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
     }
   allocate_velocity(surface_vapeur_par_face_[old()], splitting_FT, 1);
   allocate_velocity(surface_vapeur_par_face_[next()], splitting_FT, 1);
+  allocate_velocity(surface_vapeur_par_face_ns_[old()], splitting_NS, 1);
+  allocate_velocity(surface_vapeur_par_face_ns_[next()], splitting_NS, 1);
   for (int d = 0; d < 3; d++)
     {
       surface_vapeur_par_face_[old()][d].data() = 0.;
       surface_vapeur_par_face_[next()][d].data() = 0.;
       allocate_velocity(barycentre_vapeur_par_face_[old()][d], splitting_FT, 1);
       allocate_velocity(barycentre_vapeur_par_face_[next()][d], splitting_FT, 1);
+      surface_vapeur_par_face_ns_[old()][d].data() = 0.;
+      surface_vapeur_par_face_ns_[next()][d].data() = 0.;
+      allocate_velocity(barycentre_vapeur_par_face_ns_[old()][d], splitting_NS, 1);
+      allocate_velocity(barycentre_vapeur_par_face_ns_[next()][d], splitting_NS, 1);
     }
 
   if (!is_diphasique_)
@@ -5642,7 +5645,21 @@ void IJK_Interfaces::calculer_indicatrice_next(
 
   // Aux faces mouillees
   n_faces_mouilles_ = surface_vapeur_par_face_computation_.compute_surf_and_barys(
-                        maillage_ft_ijk_, indicatrice_ft_[next()], normale_par_compo_[next()], surface_vapeur_par_face_[next()], barycentre_vapeur_par_face_[next()]);
+                        maillage_ft_ijk_,
+                        indicatrice_ft_[next()],
+                        normale_par_compo_[next()],
+                        surface_vapeur_par_face_[next()],
+                        barycentre_vapeur_par_face_[next()]);
+  // Passage au domaine NS
+  ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+    surface_vapeur_par_face_[next()],
+    surface_vapeur_par_face_ns_[next()]);
+  for (int c=0; c<3; c++)
+    ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+      barycentre_vapeur_par_face_[next()][c],
+      barycentre_vapeur_par_face_ns_[next()][c]);
+
+
   // Aux cellules diphasiques, calcule toutes les moyennes de l'interface
   // dans les cellules pour chaque compo. Le but est de le faire une fois
   // pour toute de manière synchronisee (et pas au moment ou on calcule la
@@ -5720,8 +5737,12 @@ void IJK_Interfaces::switch_indicatrice_next_old()
   surface_par_compo_[old()].echange_espace_virtuel();
 
   surface_vapeur_par_face_[old()].echange_espace_virtuel();
+  surface_vapeur_par_face_ns_[old()].echange_espace_virtuel();
   for (int c = 0; c < 3; c++)
-    barycentre_vapeur_par_face_[old()][c].echange_espace_virtuel();
+    {
+      barycentre_vapeur_par_face_[old()][c].echange_espace_virtuel();
+      barycentre_vapeur_par_face_ns_[old()][c].echange_espace_virtuel();
+    }
 
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
   groups_indicatrice_ns_[old()].echange_espace_virtuel();
@@ -6343,8 +6364,3 @@ void IJK_Interfaces::calculer_moy_field_fa7_par_compo(
         }
   field_par_compo.echange_espace_virtuel();
 }
-
-// void IJK_Interfaces::get_surface_vapeur_par_face_ns(
-//     FixedVector<IJK_Field_double, 3> &surfs) const {
-//   ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(surface_vapeur_par_face_[old()], surfs);
-// }
