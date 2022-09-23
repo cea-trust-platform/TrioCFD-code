@@ -81,7 +81,7 @@ void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_
   const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
   const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   const int nb_elem = zone.nb_elem(), N = diss.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
   const int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;

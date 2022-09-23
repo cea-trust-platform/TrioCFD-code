@@ -93,7 +93,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   const DoubleTab& vitesse_au_sommets=dom_ale.vitesse();
   DoubleTab vitesse_face_absolue=dom_ale.vitesse_faces();
   vitesse_face_absolue *=-1;
-  const DoubleVect& porosite_face = zone_VEF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   int marq=opConvVEFbase.phi_u_transportant(equation());
   DoubleTab transporte_face_;
@@ -218,7 +218,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  const DoubleVect& porosite_elem = zone_VEF.porosite_elem();
+  const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
   double psc;
   int poly,face_adj,fa7,i,j,n_bord;
   int num_face, rang;

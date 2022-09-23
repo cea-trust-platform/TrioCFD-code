@@ -81,7 +81,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
   const IntVect& orientation = la_zone->orientation();
   const DoubleVect& volumes_entrelaces = la_zone->volumes_entrelaces();
   DoubleVect porosite_surf ;          // porosites surfaciques
-  porosite_surf.ref(la_zone->porosite_face());
+  porosite_surf.ref(equation().milieu().porosite_face());
   Navier_Stokes_phase_field& eq_NS_PF = ref_cast_non_const(Navier_Stokes_phase_field, equation());
   const DoubleVect& g = eq_NS_PF.get_g_();
 

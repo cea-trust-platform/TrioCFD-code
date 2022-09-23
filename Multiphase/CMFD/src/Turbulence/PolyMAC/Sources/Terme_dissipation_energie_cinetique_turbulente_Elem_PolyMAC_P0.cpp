@@ -112,7 +112,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
   const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff 		= ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   const DoubleTab&                      nu 		  		= equation().probleme().get_champ("viscosite_cinematique").passe();
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)

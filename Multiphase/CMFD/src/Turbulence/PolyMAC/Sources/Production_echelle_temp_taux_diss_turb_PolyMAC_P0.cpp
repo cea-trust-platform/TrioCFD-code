@@ -89,7 +89,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   const DoubleTab&                        tab_k = ref_cast(Champ_Elem_PolyMAC_P0, pb.get_champ("k")).valeurs();
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
   int N = tab_diss.line_size();

@@ -61,7 +61,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(), &g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
@@ -114,7 +114,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_dyn = fluide.viscosite_dynamique();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
-  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const int nb_elem_tot = zone_VDF.nb_elem_tot(), nb_elem = zone_VDF.nb_elem();
 
   //Calcul des fonctions F1 et F2

@@ -190,7 +190,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   enum type_operateur { amont, muscl, centre };
 
   const DoubleTab& vitesse_face_absolue=velocity.valeurs();
-  const DoubleVect& porosite_face = zone_VEF.porosite_face();
+  const DoubleVect& porosite_face = la_zcl_vef->equation().milieu().porosite_face();
 
   int marq=opConvVEFbase.phi_u_transportant(equation());
   DoubleTab transporte_face_;
@@ -315,7 +315,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  const DoubleVect& porosite_elem = zone_VEF.porosite_elem();
+  const DoubleVect& porosite_elem = la_zcl_vef->equation().milieu().porosite_elem();
   double psc;
   int poly,face_adj,fa7,i,j,n_bord;
   int num_face, rang;

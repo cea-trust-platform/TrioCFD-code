@@ -94,7 +94,7 @@ void Source_Transport_Realisable_VEF_Face_base::contribuer_a_avec(const DoubleTa
   if (is_visco_const) visco = std::max(tab_visco(0, 0), DMINFLOAT);
 
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const DoubleVect& porosite_face = zone_VEF.porosite_face(), &volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const DoubleVect& porosite_face = fluide.porosite_face(), &volumes_entrelaces = zone_VEF.volumes_entrelaces();
   for (int face = 0; face < size; face++)
     {
       if (!is_visco_const)

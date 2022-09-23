@@ -66,7 +66,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = zone.nb_elem(), D = dimension, nf_tot = zone.nb_faces_tot() ;
   int N = equation().inconnue()->valeurs().line_size();
