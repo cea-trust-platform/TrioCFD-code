@@ -133,23 +133,26 @@ void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, Doubl
   for (e = 0; e < zone.nb_elem(); e++)
     {
 
-      for (n = 0; n < N; n++) a_l(n)   = alpha_p(e, n);
-      for (n = 0; n < N; n++) p_l(n)   = press_p(e, n * (Np > 1));
-      for (n = 0; n < N; n++) T_l(n)   =  temp_p(e, n);
-      for (n = 0; n < N; n++) rho_l(n) =   rho_p(!cR * e, n);
-      for (n = 0; n < N; n++) nu_l(n)  =    nu_p(!cM * e, n);
       for (n = 0; n < N; n++)
         {
+          a_l(n)   = alpha_p(e, n);
+          p_l(n)   = press_p(e, n * (Np > 1));
+          T_l(n)   =  temp_p(e, n);
+          rho_l(n) =   rho_p(!cR * e, n);
+          nu_l(n)  =    nu_p(!cM * e, n);
           for (k = 0; k < N; k++)
             if(milc.has_interface(n, k))
               {
                 Interface_base& sat = milc.get_interface(n, k);
                 sigma_l(n,k) = sat.sigma(temp_p(e,n), press_p(e,n * (Np > 1)));
               }
+          d_bulles_l(n) = d_bulles_p(e,n);
         }
-      for (n = 0; n < N; n++) d_bulles_l(n) = d_bulles_p(e,n);
-      for (n = 0; n <Nk; n++) eps_l(n) =epsilon(e, n) ;
-      for (n = 0; n <Nk; n++) k_l(n)   = (tab_k_p)   ? (*tab_k_p)(e,0) : 0;
+      for (n = 0; n < Nk; n++)
+        {
+          eps_l(n) =epsilon(e, n) ;
+          k_l(n)   = (tab_k_p)   ? (*tab_k_p)(e,n) : 0;
+        }
 
       correlation_rupt.coefficient(a_l, p_l, T_l, rho_l, nu_l, sigma_l, dh, dv, d_bulles_l, eps_l, k_l, coeff); // Explicit coeff
 
