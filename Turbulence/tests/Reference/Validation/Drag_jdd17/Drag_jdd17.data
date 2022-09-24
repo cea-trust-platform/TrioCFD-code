@@ -51,20 +51,19 @@ Read mon_schema
 }
 
 # Je definis un milieu #
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu  Champ_Uniforme 1 0.00002
-	rho Champ_Uniforme 1 1.2
-}
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.00002
+   	rho Champ_Uniforme 1 1.2
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { } 
 		convection { muscl }
@@ -79,6 +78,7 @@ Read pb
 			Sortie 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
 			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
 		}
+ 
 
                modele_turbulence K_Epsilon {
                      Transport_K_Epsilon

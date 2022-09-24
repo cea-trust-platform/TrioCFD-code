@@ -45,22 +45,21 @@ Read sch
         facsec_max 4 
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 	{
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme	1 2.84e-5
+   	rho Champ_Uniforme	1 0.0976
+   }
+   
+   	Navier_Stokes_Turbulent
 		{
                 solveur_pression Gcp { precond ssor { omega 1.5 }
                                         seuil 1.e-08
@@ -113,3 +112,4 @@ Read pb
 EcritureLectureSpecial 0
 Solve pb
 End
+ 

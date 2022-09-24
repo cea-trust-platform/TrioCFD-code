@@ -93,34 +93,32 @@ Read sch
 }
 
 # Definition des proprietes du fluide (air) #
-Fluide_Quasi_Compressible fluide
-Read fluide
-{
-	sutherland pb mu0 1.716e-5 T0 273.15 Slambda 194.4 C 110.6
-	pression 100000.
-	loi_etat gaz_parfait_qc
-	{ 
-	      Prandtl 0.72 Cp 1006. gamma 1.4
-	      rho_constant_pour_debug champ_uniforme 1 1.1766
-	} 
-	traitement_pth constant	
-}
 
 # Prise en compte de la gravite #
-Champ_uniforme gravite
-Read gravite 3 0. 0. -9.81
 
 # Association des differents objets au probleme #
-Associate fluide gravite
 Associate pb dom_pb
 Associate pb sch
-Associate pb fluide
 Discretize pb dis
 
 # Definition des parametres du probleme traite #
 Read pb
 {
-	Navier_Stokes_Turbulent_QC
+   
+   fluide_quasi_compressible {
+   
+        gravite champ_uniforme 3 0. 0. -9.81
+   	sutherland pb mu0 1.716e-5 T0 273.15 Slambda 194.4 C 110.6
+   	pression 100000.
+   	loi_etat gaz_parfait_qc
+   	{ 
+   	      Prandtl 0.72 Cp 1006. gamma 1.4
+   	      rho_constant_pour_debug champ_uniforme 1 1.1766
+   	} 
+   	traitement_pth constant	
+   }
+   
+   	Navier_Stokes_Turbulent_QC
 	{
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-6 impr }	
 		methode_calcul_pression_initiale avec_sources_et_operateurs	
@@ -198,3 +196,4 @@ Read pb
 Solve pb
 End
 
+ 

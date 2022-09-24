@@ -94,8 +94,14 @@ Lire sch
 	nb_pas_dt_max 2
 }
 
-Fluide_Incompressible fluide
-Lire fluide
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+	{
+	
+Fluide_Incompressible
 {
 	mu Champ_Uniforme	1 2.84e-5
 	rho Champ_Uniforme	1 0.0976
@@ -103,16 +109,6 @@ Lire fluide
 	lambda Champ_Uniforme	1 4e-5
 	beta_th Champ_Uniforme	1 1
 }
-
-
-Associate pb dom
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-
-Lire pb
-	{
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP

@@ -55,34 +55,32 @@ Lire sch
         seuil_statio 1.e-8
 }
 
-Fluide_Quasi_Compressible fluide
-Lire fluide
-{
-        mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
-        lambda champ_fonc_fonction pb temperature 1 (1.93198026315789000e-3*(val^1.5)/(val+111.))
-        pression 100000.
-        loi_etat gaz_parfait_qc 	{
-                		Prandtl 0.76
-                		Cp 1005
-                		gamma 1.4
-        			}
-	traitement_pth conservation_masse
-	Traitement_rho_gravite moins_rho_moyen
-}
 
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. -9.81
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Lire pb
 {
-        Navier_Stokes_Turbulent_QC
+   
+   fluide_quasi_compressible {
+   
+        gravite champ_uniforme 3 0. 0. -9.81
+           mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
+           lambda champ_fonc_fonction pb temperature 1 (1.93198026315789000e-3*(val^1.5)/(val+111.))
+           pression 100000.
+           loi_etat gaz_parfait_qc 	{
+                   		Prandtl 0.76
+                   		Cp 1005
+                   		gamma 1.4
+           			}
+   	traitement_pth conservation_masse
+   	Traitement_rho_gravite moins_rho_moyen
+   }
+   
+           Navier_Stokes_Turbulent_QC
         {
                 solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-5 impr }
                 convection { centre }
@@ -147,3 +145,4 @@ Lire pb
 Solve pb
 Fin
 
+ 

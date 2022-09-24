@@ -85,8 +85,14 @@ Lire sch
 	}
 }
 
-Fluide_Quasi_Compressible fluide
-Lire fluide
+Associate pb dom
+Associate pb sch
+
+Discretize pb dis
+# Debog pb seq faces 1.e-5 0 #
+Lire pb
+{
+Fluide_Quasi_Compressible
 {
         mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
         pression 100000.
@@ -98,20 +104,8 @@ Lire fluide
         			}
 	traitement_pth conservation_masse
 	Traitement_rho_gravite moins_rho_moyen
+	gravite Champ_Uniforme 3 0. -9.81 0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. -9.81 0.
-
-Associate fluide gravite
-Associate pb dom
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-# Debog pb seq faces 1.e-5 0 #
-Lire pb
-{
         Navier_Stokes_turbulent_QC
         {
                 # solveur_pression petsc cholesky { } #

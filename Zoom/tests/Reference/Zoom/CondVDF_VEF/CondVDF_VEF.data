@@ -114,30 +114,8 @@ Pb_MG pbMG_global
 VDF dis
 VEFPrep1B dis2
 
-
-Solide sol1
-Read sol1
-{
-	rho Champ_Uniforme 1 2
-        lambda Champ_Uniforme 1 1.    
-	Cp Champ_Uniforme 1 0.5
-}
-
-Solide sol2
-Read sol2
-{
-	rho Champ_Uniforme 1 2
-        lambda Champ_Uniforme 1 1.    
-	Cp Champ_Uniforme 1 0.5
-}
-
-
-
-
-
 # association pour le probleme grossier #
 Associate pb1 dom1
-Associate pb1 sol1
 Associate pb1 sch1
 
 Discretize pb1 dis
@@ -145,7 +123,6 @@ Discretize pb1 dis
 # association pour le probleme End #
 Associate pb2 dom2
 Associate pb2 sch2
-Associate pb2 sol2
 
 Discretize pb2 dis2
 
@@ -169,6 +146,13 @@ Associer_algo pbMG_global algo
 
 Read pb1
 {
+Solide
+{
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 1.    
+	Cp Champ_Uniforme 1 0.5
+}
+
         Conduction
         {
                 diffusion { }
@@ -203,6 +187,13 @@ Read pb1
 
 Read pb2
 {
+Solide
+{
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 1.    
+	Cp Champ_Uniforme 1 0.5
+}
+
         Conduction
         {
                 diffusion { }

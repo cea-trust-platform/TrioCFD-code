@@ -59,18 +59,18 @@ Read sch
         seuil_statio 1.e-8
 }
 
-# Definition des proprietes du fluide #
-Fluide_Incompressible fluid_ic
-Read fluid_ic
+
+
+
+# Association des differents objets au probleme #
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+# Definition des parametres du probleme traite #
+Read pb
 {
-        mu      Champ_Uniforme 1 0.0000182
-        rho     Champ_Uniforme 1 1.205
-        lambda  Champ_Uniforme 1 0.0258
-        Cp      Champ_Uniforme 1 1005.
-        beta_th Champ_Uniforme 1 0.
-}
-Fluide_Quasi_Compressible fluid_qc
-Read fluid_qc
+Fluide_Quasi_Compressible
 {
         sutherland pb mu0 1.716e-5 T0 273.15 Slambda 110.4 C 110.4
         pression 100000.
@@ -82,20 +82,6 @@ Read fluid_qc
         }
         traitement_pth conservation_masse 
 }
-
-# Champ_Uniforme gravity
-Read gravity 2 0. 0.
-Associate  fluid_ic gravity #
-
-# Association des differents objets au probleme #
-Associate  pb dom
-Associate  pb sch
-Associate  pb fluid_qc
-Discretize pb dis
-
-# Definition des parametres du probleme traite #
-Read pb
-{
         Navier_Stokes_Turbulent_QC
         {
                 solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 impr }

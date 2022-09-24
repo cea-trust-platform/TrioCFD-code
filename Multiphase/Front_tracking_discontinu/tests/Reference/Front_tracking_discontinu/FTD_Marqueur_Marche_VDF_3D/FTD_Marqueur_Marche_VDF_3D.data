@@ -68,11 +68,8 @@ Lire liquide
 {
 	mu Champ_Uniforme 1 5e-05
 	rho Champ_Uniforme 1 2
+	gravite Champ_Uniforme 3 0. -9.81 0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc          hydraulique
 Transport_Marqueur_FT	       transport_marqueur

@@ -23,16 +23,18 @@ VDF dis
 
 Read_file schema.data ;
 
-Read_file fluide.data ;
-
 Associate pb DOM
 Associate pb sch
-Associate pb liquide
 
 Discretize pb dis
 
 Lire pb
 {
+Fluide_Incompressible
+{
+	mu  Champ_Uniforme 1 10
+ 	rho Champ_Uniforme 1 1000.
+}
 	Navier_Stokes_Standard
 	{
 	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-12 impr }

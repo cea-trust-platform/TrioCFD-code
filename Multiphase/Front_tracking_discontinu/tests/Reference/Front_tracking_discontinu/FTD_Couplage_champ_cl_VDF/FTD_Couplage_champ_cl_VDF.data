@@ -132,7 +132,6 @@ Associate pb_bulle DOM
 Associate pb_bulle fluide
 
 Associate pb_THI THI
-Associate pb_THI liquide
 
 Probleme_Couple pb_couplage
 Associate pb_couplage pb_THI
@@ -143,6 +142,15 @@ Discretize pb_couplage dis
 
 Lire pb_THI
 {
+Fluide_Incompressible
+{
+ mu Champ_Uniforme 1 65.16e-6
+ rho Champ_Uniforme 1 574.3
+ lambda Champ_Uniforme 1 0.447
+ cp Champ_Uniforme 1 10.11e3
+ beta_th Champ_Uniforme 1 0.
+gravite Champ_Uniforme 3 0 0 -5.e-5
+}
  Navier_Stokes_Turbulent
 {
  modele_turbulence sous_maille_wale

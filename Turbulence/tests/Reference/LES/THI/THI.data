@@ -61,22 +61,21 @@ Lire sch
 	nb_pas_dt_max 50
 }
 
-Fluide_Incompressible air
-Lire air
-{
-	mu Champ_Uniforme 1 2e-20
-	rho Champ_Uniforme 1 2
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb air
 
 Discretize pb dis
 
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 2e-20
+   	rho Champ_Uniforme 1 2
+   }
+   
+   	Navier_Stokes_Turbulent
 
 	{
 		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-8 }
@@ -176,3 +175,4 @@ Transfert_pres_xxxxx & Transfert du au terme de pression au temps xxxx
 ---------------------------------------------------------------------------------------------------------------------
 Transfert_tot_xxxxx  & Transfert total au temps xxxx
 ---------------------------------------------------------------------------------------------------------------------
+ 

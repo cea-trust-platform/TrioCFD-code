@@ -66,27 +66,25 @@ Read sch
 	diffusion_implicite 1
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 0.0002
-	rho Champ_Uniforme 1 2
-}
 
 
-Champ_Uniforme gravite
-Read gravite 3 0 -9.81 0
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-        Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 -9.81 0
+   	mu Champ_Uniforme 1 0.0002
+   	rho Champ_Uniforme 1 2
+   }
+   
+           Navier_Stokes_turbulent
         {
                 solveur_pression GCP { precond ssor { omega 1.65 } seuil 1.e-8 impr }       
                 convection { Amont }
@@ -121,3 +119,4 @@ Read pb
 
 Solve pb
 End
+ 

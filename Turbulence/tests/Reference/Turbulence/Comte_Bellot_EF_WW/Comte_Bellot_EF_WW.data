@@ -66,26 +66,25 @@ Read sch
 }
 
 
-Fluide_Incompressible fluid
 
-Read fluid
-{
-    mu  Champ_Uniforme 1 1.812e-5
-    rho Champ_Uniforme 1 1.208
-    lambda  Champ_Uniforme 1 1.0e-3
-    Cp      Champ_Uniforme 1 1000.0
-    beta_th Champ_Uniforme 1 1.0e-3
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluid
 
 Discretiser pb dis
 
 Read pb
 {
-    Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+        mu  Champ_Uniforme 1 1.812e-5
+       rho Champ_Uniforme 1 1.208
+       lambda  Champ_Uniforme 1 1.0e-3
+       Cp      Champ_Uniforme 1 1000.0
+       beta_th Champ_Uniforme 1 1.0e-3
+   }
+   
+       Navier_Stokes_Turbulent
     {
         modele_turbulence combinaison {
                 nb_var 0
@@ -157,3 +156,4 @@ Read pb
 }
 resoudre pb
 fin
+ 

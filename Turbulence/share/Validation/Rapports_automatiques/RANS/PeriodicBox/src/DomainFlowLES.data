@@ -36,48 +36,9 @@ Read sch
 	facsec 3
 }
 
-# Water defined in the box #
-Fluide_Incompressible water_box
-Read water_box
-{
-	# Dynamic viscosity #
-	mu  Champ_Uniforme 1 1.90e-5
-	# Volumic mass #
- 	rho Champ_Uniforme 1 1.205
-	# Thermal conductivity #
-	lambda Champ_Uniforme 1 0.6
-	# Heat capacity #
-	cp Champ_Uniforme 1 4185
-	# Thermal expanson coefficient #
-	beta_th Champ_Uniforme 1 0.0034
-}
-# Water defined in the domain #
-Fluide_Incompressible water_dom
-Read water_dom
-{
-	# Dynamic viscosity #
-	mu  Champ_Uniforme 1 1.90e-5
-	# Volumic mass #
- 	rho Champ_Uniforme 1 1.205
-	# Thermal conductivity #
-	lambda Champ_Uniforme 1 0.6
-	# Heat capacity #
-	cp Champ_Uniforme 1 4185
-	# Thermal expanson coefficient #
-	beta_th Champ_Uniforme 1 0.0034
-}
-
-# Gravity field #
-Champ_Uniforme gravity
-Read gravity 3 0 -9.81 0
-
 # Objects linked #
-Associate water_box gravity
-Associate water_dom gravity
 Associate pb_box box
 Associate pb_dom dom
-Associate pb_box water_box
-Associate pb_dom water_dom
 
 # Coupling problem which solves the two previous problems #
 Probleme_Couple pb		
@@ -89,6 +50,23 @@ Discretize pb dis
 # Read the first problem #
 Read pb_box
 {
+# Water defined in the box #
+Fluide_Incompressible
+{
+	# Dynamic viscosity #
+	mu  Champ_Uniforme 1 1.90e-5
+	# Volumic mass #
+ 	rho Champ_Uniforme 1 1.205
+	# Thermal conductivity #
+	lambda Champ_Uniforme 1 0.6
+	# Heat capacity #
+	cp Champ_Uniforme 1 4185
+	# Thermal expanson coefficient #
+	beta_th Champ_Uniforme 1 0.0034
+	# Gravity field #
+	gravity Champ_Uniforme 3 0 -9.81 0
+}
+
 	Navier_Stokes_Turbulent
 	{
 		# Direct method to solve pressure linear system #
@@ -171,6 +149,24 @@ Read pb_box
 # Read the second problem #
 Read pb_dom
 {
+
+# Water defined in the domain #
+Fluide_Incompressible
+{
+	# Dynamic viscosity #
+	mu  Champ_Uniforme 1 1.90e-5
+	# Volumic mass #
+ 	rho Champ_Uniforme 1 1.205
+	# Thermal conductivity #
+	lambda Champ_Uniforme 1 0.6
+	# Heat capacity #
+	cp Champ_Uniforme 1 4185
+	# Thermal expanson coefficient #
+	beta_th Champ_Uniforme 1 0.0034
+	# Gravity field #
+	gravity Champ_Uniforme 3 0 -9.81 0
+}
+
 	Navier_Stokes_Turbulent	
 	{
 		# Method to solve pressure linear system #

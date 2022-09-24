@@ -57,27 +57,23 @@ Lire sch
 	seuil_statio 1.e-3
 }
 
-Fluide_Incompressible eau
-Lire eau
-{
-	mu Champ_Uniforme 1 1.
-	rho Champ_Uniforme 1 1.
-	cp Champ_uniforme 1 1000.
-	lambda champ_uniforme 1 10.
-	beta_th champ_uniforme 1 0.
-	porosites_champ champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
-}
-
-Champ_Uniforme gravite
-Lire gravite 2 0 0
 Associate pb dom
 Associate pb sch
-Associate pb eau
 Discretize pb dis
 # Debog pb seq faces 1.e-6 0 #
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 1.
+   	rho Champ_Uniforme 1 1.
+   	cp Champ_uniforme 1 1000.
+   	lambda champ_uniforme 1 10.
+   	beta_th champ_uniforme 1 0.
+   	porosites_champ champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 solveur_pression GCP  { precond ssor { omega 1.5 } seuil 1e-08 }
 
@@ -135,3 +131,4 @@ Solve pb
 Fin
 Fin
 Entree frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 1.
+ 

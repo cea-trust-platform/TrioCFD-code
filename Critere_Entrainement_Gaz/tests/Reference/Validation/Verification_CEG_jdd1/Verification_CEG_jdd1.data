@@ -21,18 +21,8 @@ Lire mon_schema
 }
 
 # A fluid is defined #
-Fluide_Incompressible milieu
-Lire milieu
-{
-	mu  Champ_Uniforme 1 0.01
-	rho Champ_Uniforme 1 2.
-}
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -9.81
-Associate milieu gravite
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 VerifierCoin dom { } 
 Discretize pb ma_discretisation
 
@@ -41,7 +31,15 @@ Extraire_surface { Domaine surface_libre Probleme pb avec_certains_bords 1 Surfa
 
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 -9.81
+   	mu  Champ_Uniforme 1 0.01
+   	rho Champ_Uniforme 1 2.
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		equation_non_resolue 0
 		solveur_pression gcp { precond_nul seuil 1e30 impr }
@@ -174,3 +172,4 @@ Lire pb
 }
 Solve pb
 
+ 

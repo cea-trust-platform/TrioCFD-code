@@ -30,29 +30,27 @@ Read sch
 	   
 }
 
-Fluide_Incompressible sodium
-Read sodium
-{
-	mu Champ_Uniforme       1 2.484e-4
- 	rho Champ_Uniforme      1 900.
-        lambda Champ_Uniforme   1 80.
-        Cp Champ_Uniforme       1 1370.
-        beta_th Champ_Uniforme  1 0.
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
  
-Associate sodium gravite
 Associate pb dom01234
 Associate pb sch
-Associate pb sodium
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme       1 2.484e-4
+    	rho Champ_Uniforme      1 900.
+           lambda Champ_Uniforme   1 80.
+           Cp Champ_Uniforme       1 1370.
+           beta_th Champ_Uniforme  1 0.
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{	       		
 		solveur_pression petsc cholesky { }  
 		convection { muscl }
@@ -137,3 +135,4 @@ EcritureLectureSpecial 0
 Solve pb
 End
 
+ 

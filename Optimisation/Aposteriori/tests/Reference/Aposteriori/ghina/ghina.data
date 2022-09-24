@@ -51,26 +51,26 @@ Read mon_schema
     solveur implicite { solveur gmres { diag seuil 1e-20 nb_it_max 3 } }
 }
 # I define a medium #
-fluide_incompressible milieu 
-Read milieu
-{
-    mu champ_uniforme         1 0.01
-    rho champ_uniforme        1 1
-	# freefem : nu=mu/rho=1/Re viscosite cinematique #
-}
+
 # Problem definition #
 Pb_hydraulique_Aposteriori pb
 /* Pb_ThermoHydraulique pb */ 
 # Association between the different objects #
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 
 # Problem description #
 Read pb
 {
-	Navier_Stokes_Aposteriori
+   
+   fluide_incompressible {
+        mu champ_uniforme         1 0.01
+       rho champ_uniforme        1 1
+   	# freefem : nu=mu/rho=1/Re viscosite cinematique #
+   }
+   
+   	Navier_Stokes_Aposteriori
 	{
 		# Pressure matrix solved with #
 		solveur_pression PETSc Cholesky {  }
@@ -121,3 +121,4 @@ Read pb
 Solve pb
 # Not necessary keyword to finish #
 End
+ 

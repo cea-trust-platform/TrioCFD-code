@@ -50,22 +50,22 @@ vdf dis
 pb_thermohydraulique_turbulent pb 
 Associate pb dom
 Associate pb sch
-fluide_incompressible eau 
-champ_uniforme gravite 
-Read gravite 2 0.0 0.0
-Associate eau gravite
-Read eau
-  { 
-    beta_th champ_uniforme  1 0.0002
-    mu champ_uniforme  1 8.951e-05
-    rho champ_uniforme  1 725.735
-    cp champ_uniforme  1 5483.0
-    lambda champ_uniforme  1 0.02495
-  }
-Associate pb eau
+
+
 Discretize pb dis
 Read pb
-  { 
+  {    
+   fluide_incompressible   { 
+        gravite champ_uniforme 2 0.0 0.0
+   
+       beta_th champ_uniforme  1 0.0002
+       mu champ_uniforme  1 8.951e-05
+       rho champ_uniforme  1 725.735
+       cp champ_uniforme  1 5483.0
+       lambda champ_uniforme  1 0.02495
+     }
+   
+   
     navier_stokes_turbulent 
       { 
         modele_turbulence k_epsilon 
@@ -198,3 +198,4 @@ Read pb
 }
 Solve pb
 End 
+ 

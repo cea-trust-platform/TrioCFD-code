@@ -40,9 +40,12 @@ END SCATTER #
 Read_file schema.data ;
 VDF dis
 
-
-
-Read_file fluide.data ;
+Fluide_Incompressible liquide
+read liquide
+{
+	mu  Champ_Uniforme 1 10
+ 	rho Champ_Uniforme 1 1000.
+}
 
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       body

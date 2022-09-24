@@ -77,22 +77,21 @@ Read schImpl
 
 
 
-Fluide_Incompressible air
-Read air
-{
-  mu Champ_Uniforme 1 1.e-20
-  rho Champ_Uniforme 1 1.0
-}
 
 Associate pb dom
 Associate pb schRK
-Associate pb air
 
 Discretize pb dis
 
 Read pb
 {
-  Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+      mu Champ_Uniforme 1 1.e-20
+     rho Champ_Uniforme 1 1.0
+   }
+   
+     Navier_Stokes_Turbulent
 
   {
     solveur_pression Gcp
@@ -141,3 +140,4 @@ sauvegarde_simple binaire calcul_pb.sauv
 
 Solve pb
 End
+ 

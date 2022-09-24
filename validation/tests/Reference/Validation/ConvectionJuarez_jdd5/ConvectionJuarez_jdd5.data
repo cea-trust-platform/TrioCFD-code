@@ -44,25 +44,14 @@ Read sch
 }
 
 # I define a medium #
-Fluide_Quasi_Compressible milieu 
-Read milieu
-{ 
-        sutherland pb mu0 1.716e-5 T0 273.15 Slambda 1.4579e-6 C 110.4
-        pression 100000
-        loi_etat gaz_parfait_qc { Prandtl 0.70999966608084363884 Cp 1004.5 gamma 1.4 }
-        traitement_pth constant
-}
+
 
 # Gravity is mandatory here: #
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81
 
 # Association between the different objects #
 Pb_Thermohydraulique_QC pb 
-Associate milieu gravite
 Associate pb dom
 Associate pb sch
-Associate pb milieu
 Discretize pb dis
 
 # definition d'un domaine pour le Nusselt #
@@ -75,7 +64,17 @@ Extraire_Surface {
 
 Read pb
 {
-    navier_stokes_QC
+   
+   fluide_quasi_compressible { 
+        gravite champ_uniforme 2 0 -9.81
+   
+           sutherland pb mu0 1.716e-5 T0 273.15 Slambda 1.4579e-6 C 110.4
+           pression 100000
+           loi_etat gaz_parfait_qc { Prandtl 0.70999966608084363884 Cp 1004.5 gamma 1.4 }
+           traitement_pth constant
+   }
+   
+       navier_stokes_QC
       { 
         solveur_pression petsc cholesky { impr }
         convection { centre }
@@ -169,3 +168,4 @@ Read pb
 Solve pb
 # Not necessary keyword to finish #
 End 
+ 

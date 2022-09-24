@@ -94,17 +94,9 @@ Read sch1
 
 
 
-Solide sol
-Read sol
-{
-        rho Champ_Uniforme 1 7854.
-        lambda Champ_Uniforme 1 17.9    
-        Cp Champ_Uniforme 1 532.
-}
 
 
 Associate pb1 dom1
-Associate pb1 sol
 Associate pb1 sch1
 
 Discretize pb1 dis
@@ -112,7 +104,14 @@ Discretize pb1 dis
 
 Read pb1
 {
-        Conduction
+   
+   solide {
+            rho Champ_Uniforme 1 7854.
+           lambda Champ_Uniforme 1 17.9    
+           Cp Champ_Uniforme 1 532.
+   }
+   
+           Conduction
         {
                 diffusion { }
                 conditions_initiales {
@@ -189,3 +188,4 @@ Read pb1
 
 Solve pb1
 End
+ 

@@ -47,29 +47,27 @@ Read sch
 	seuil_statio 1.e-12
 }
 
-Fluide_Incompressible water
-Read water
-{       
-        mu Champ_Uniforme 1 0.0008	 
-	rho Champ_Uniforme 1 995.0
-	lambda Champ_Uniforme 1 0.6
-        Cp Champ_Uniforme 1 4179.0
-	beta_th Champ_Uniforme 1 2.8e-4
-}
 
-Champ_Uniforme gravite
-Read gravite 2  0. -9.81 
 
-Associate water gravite
+
 Associate pb dom
 Associate pb sch
-Associate pb water
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible { 
+        gravite champ_uniforme 2  0. -9.81       
+           mu Champ_Uniforme 1 0.0008	 
+   	rho Champ_Uniforme 1 995.0
+   	lambda Champ_Uniforme 1 0.6
+           Cp Champ_Uniforme 1 4179.0
+   	beta_th Champ_Uniforme 1 2.8e-4
+   }
+   
+   	Navier_Stokes_standard
 	{
 		solveur_pression Cholesky { }
 		convection { amont }
@@ -144,3 +142,4 @@ Read pb
 }
 Solve pb
 End
+ 

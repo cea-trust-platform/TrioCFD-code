@@ -46,29 +46,27 @@ Read sch
            }
 }
 
-Fluide_incompressible fluide
-Read fluide
-{
-	mu	Champ_Uniforme	1 	3.4753e-5
-	rho	Champ_Uniforme	1	3.824
-	lambda	Champ_Uniforme	1 	0.256389
-	Cp	Champ_Uniforme	1	5193.
-        beta_th	Champ_Uniforme	1	0.
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu	Champ_Uniforme	1 	3.4753e-5
+   	rho	Champ_Uniforme	1	3.824
+   	lambda	Champ_Uniforme	1 	0.256389
+   	Cp	Champ_Uniforme	1	5193.
+           beta_th	Champ_Uniforme	1	0.
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-8 }
 		convection { EF_stab { } }
@@ -158,3 +156,4 @@ Read pb
 Solve pb
 End
 
+ 

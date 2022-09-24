@@ -105,42 +105,14 @@ Pb_MG pbMG_global
 
 VDF dis
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1 0.002
-	rho Champ_Uniforme 1 2
-        lambda Champ_Uniforme 1 1.0 
-	Cp Champ_Uniforme 1 500
-        beta_th Champ_Uniforme 1 0.0001
-}
-
-Solide sol
-Lire sol
-{
-        rho Champ_Uniforme 1 1000.
-        lambda Champ_Uniforme 1 250.    
-	Cp Champ_Uniforme 1 100.
-}
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
-Associate sol gravite
-Associate fluide gravite
-
-
-
-
 # association pour le probleme grossier #
 Associate pb1 dom_solide
-Associate pb1 sol
 Associate pb1 sch1
 
 Discretize pb1 dis
 
 # association pour le probleme fin #
 Associate pb2 dom_fluide
-Associate pb2 fluide
 Associate pb2 sch2
 
 Discretize pb2 dis
@@ -165,6 +137,12 @@ Associer_algo pbMG_global algo
 
 Lire pb1
 {
+Solide
+{
+        rho Champ_Uniforme 1 1000.
+        lambda Champ_Uniforme 1 250.    
+	Cp Champ_Uniforme 1 100.
+}
         Conduction
         {
                 diffusion { }
@@ -210,6 +188,16 @@ Lire pb1
 
 Lire pb2
 {
+Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 0.002
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 1.0 
+	Cp Champ_Uniforme 1 500
+        beta_th Champ_Uniforme 1 0.0001
+        gravite Champ_Uniforme 2 0 -9.81
+}
+
         Navier_Stokes_standard
         {
                 solveur_pression GCP { 

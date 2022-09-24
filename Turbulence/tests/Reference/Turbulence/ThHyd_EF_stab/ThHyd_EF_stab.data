@@ -22,25 +22,13 @@ END SCATTER #
 
 Pb_ThermoHydraulique_turbulent pb1
 
-Champ_Uniforme gravite
 
-Read gravite 3  0. 0. -9.81 
 
-Fluide_Incompressible sodium
 
-Read sodium
-{
-   mu 	   Champ_Uniforme 1 3.85e-4
-   lambda  Champ_Uniforme 1 77.
-   Cp      Champ_Uniforme 1 1324.
-   rho     Champ_Uniforme 1 890.
-   beta_th Champ_Uniforme 1 2.53E-4
-}
 
-Associate sodium gravite
+
 
 Associate pb1 dom
-Associate pb1 sodium
 
 Scheme_euler_explicit sch
 
@@ -63,7 +51,17 @@ VEFPreP1B dis
 Discretize pb1 dis
 
 Read pb1
-{ 
+{    
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3  0. 0. -9.81    mu 	   Champ_Uniforme 1 3.85e-4
+      lambda  Champ_Uniforme 1 77.
+      Cp      Champ_Uniforme 1 1324.
+      rho     Champ_Uniforme 1 890.
+      beta_th Champ_Uniforme 1 2.53E-4
+   }
+   
+   
    Navier_Stokes_turbulent
         {
                 solveur_pression Gcp 
@@ -174,3 +172,4 @@ Read pb1
 
 Solve pb1
 End
+ 

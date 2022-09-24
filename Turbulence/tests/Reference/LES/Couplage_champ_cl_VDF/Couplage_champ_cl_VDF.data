@@ -99,35 +99,8 @@ Lire sch
  nb_pas_dt_max 10
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
- mu Champ_Uniforme 1 65.16e-6
- rho Champ_Uniforme 1 574.3
- lambda Champ_Uniforme 1 0.447
- cp Champ_Uniforme 1 10.11e3
- beta_th Champ_Uniforme 1 0.
-}
-
-Fluide_Incompressible gaz
-Lire gaz
-{
- mu Champ_Uniforme 1 23.73e-6
- rho Champ_Uniforme 1 113.6
- lambda Champ_Uniforme 1 0.138
- cp Champ_Uniforme 1 17.15e3
- beta_th Champ_Uniforme 1 0.
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -9.81
-Associate gaz gravite
-
 Associate pb_turb DOM
-Associate pb_turb gaz
-
 Associate pb_THI THI
-Associate pb_THI liquide
 
 Probleme_Couple pb_couplage
 Associate pb_couplage pb_THI
@@ -138,6 +111,14 @@ Discretize pb_couplage dis
 
 Lire pb_THI
 {
+Fluide_Incompressible
+{
+ mu Champ_Uniforme 1 65.16e-6
+ rho Champ_Uniforme 1 574.3
+ lambda Champ_Uniforme 1 0.447
+ cp Champ_Uniforme 1 10.11e3
+ beta_th Champ_Uniforme 1 0.
+}
  Navier_Stokes_Turbulent
  {
   solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-10 impr }
@@ -214,6 +195,15 @@ Postraitements {
 
 Lire pb_turb
 {
+Fluide_Incompressible
+{
+ mu Champ_Uniforme 1 23.73e-6
+ rho Champ_Uniforme 1 113.6
+ lambda Champ_Uniforme 1 0.138
+ cp Champ_Uniforme 1 17.15e3
+ beta_th Champ_Uniforme 1 0.
+ gravite Champ_Uniforme 3 0 0 -9.81
+}
  Navier_Stokes_Turbulent
  { 
   solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }

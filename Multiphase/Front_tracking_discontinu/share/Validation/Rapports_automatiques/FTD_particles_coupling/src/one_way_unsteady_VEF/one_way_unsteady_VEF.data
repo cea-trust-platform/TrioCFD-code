@@ -81,11 +81,9 @@ Read liquide
 {
 	mu  Champ_Uniforme 1 3.7e-05
  	rho Champ_Uniforme 1 2
+ 	gravite Champ_Uniforme 3  0. 0. -9.81
 }
 
-Champ_Uniforme gravite
-Read gravite 3  0. 0. -9.81
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc          hydraulique
 Transport_Marqueur_FT	       marqueurs

@@ -83,8 +83,18 @@ Read sch
 
 VDF cubes
 
-Fluide_Incompressible He
-Read He
+Associate pb_solide dom_pb1
+Associate pbf dom_pb2
+Probleme_couple pbc
+Associate pbc pbf 
+Associate pbc pb_solide 
+Associate pbc sch
+
+Discretize pbc cubes
+
+Read pbf
+{
+Fluide_Incompressible
 {
         mu Champ_Uniforme 1 4.4e-05 
         rho Champ_Uniforme 1 4.4
@@ -93,33 +103,6 @@ Read He
         beta_th Champ_Uniforme 1 0.0014285714
 }
 
-
-Solide ceramique    
-Read ceramique  
-{
-
-        rho Champ_Uniforme 1 2225.
-        lambda Champ_Uniforme 1 60     
-        Cp Champ_Uniforme 1 6
-}
-
-Associate pb_solide dom_pb1
-Associate pb_solide ceramique     
-
-Associate pbf dom_pb2
-Associate pbf He     
-
-
-Probleme_couple pbc
-Associate pbc pbf 
-Associate pbc pb_solide 
-Associate pbc sch
-
-Discretize pbc cubes
-
-
-Read pbf
-{
         Navier_Stokes_turbulent
         {
                 solveur_pression Cholesky { }
@@ -178,6 +161,14 @@ Read pbf
 
 Read pb_solide
 {
+Solide    
+{
+
+        rho Champ_Uniforme 1 2225.
+        lambda Champ_Uniforme 1 60     
+        Cp Champ_Uniforme 1 6
+}
+
         Conduction
         {
                 diffusion { }

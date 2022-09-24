@@ -122,9 +122,22 @@ Lire mon_schema
                 solveur gmres { diag seuil 1.e-13 nb_it_max 5 impr }
                           }
 }
-# I define a medium #
-fluide_Quasi_compressible milieu 
-Lire milieu
+
+
+# Association between the different objects #
+Pb_Thermohydraulique_Especes_Turbulent_QC pb 
+Associer pb dom
+Associer pb mon_schema
+discretiser pb dis
+
+# Extraction de la surface injection #
+domaine sinj
+
+Lire pb
+  { 
+  
+  # I define a medium #
+fluide_Quasi_compressible 
   { 
         pression 100000.
 	loi_etat multi_gaz_parfait_qc {
@@ -133,25 +146,10 @@ Lire milieu
 		 ignore_check_fraction
 		 }
         Traitement_pth constant
+        gravite Champ_Uniforme 2 0 -9.81
   }
-
-# Gravity is mandatory here: #
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81
-
-# Association between the different objects #
-Pb_Thermohydraulique_Especes_Turbulent_QC pb 
-Associer milieu gravite
-Associer pb dom
-Associer pb mon_schema
-Associer pb milieu
-discretiser pb dis
-
-# Extraction de la surface injection #
-domaine sinj
-
-Lire pb
-  { navier_stokes_Turbulent_QC 
+  
+  navier_stokes_Turbulent_QC 
       { 
         solveur_pression petsc cholesky { }
         convection    { ef_stab { alpha 1.0 } }

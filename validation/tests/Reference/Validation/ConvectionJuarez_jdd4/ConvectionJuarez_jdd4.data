@@ -44,26 +44,14 @@ Read sch
 }
 
 # I define a medium #
-Fluide_Incompressible milieu 
-Read milieu
-{ 
-        mu Champ_Uniforme 1 3.01635e-5
-        rho Champ_Uniforme 1 0.5807
-        cp Champ_Uniforme 1 1004.5
-        lambda Champ_Uniforme 1 0.042675
-        beta_th Champ_Uniforme 1 0.0016667
-}
+
 
 # Gravity is mandatory here: #
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81
 
 # Association between the different objects #
 Pb_Thermohydraulique pb 
-Associate milieu gravite
 Associate pb dom
 Associate pb sch
-Associate pb milieu
 Discretize pb dis
 
 # definition d'un domaine pour le Nusselt #
@@ -76,7 +64,18 @@ Extraire_Surface {
 
 Read pb
 {
-    navier_stokes_standard 
+   
+   fluide_incompressible { 
+        gravite champ_uniforme 2 0 -9.81
+   
+           mu Champ_Uniforme 1 3.01635e-5
+           rho Champ_Uniforme 1 0.5807
+           cp Champ_Uniforme 1 1004.5
+           lambda Champ_Uniforme 1 0.042675
+           beta_th Champ_Uniforme 1 0.0016667
+   }
+   
+       navier_stokes_standard 
       { 
         solveur_pression petsc cholesky { impr }
         convection { centre }
@@ -171,3 +170,4 @@ Read pb
 Solve pb
 # Not necessary keyword to finish #
 End 
+ 

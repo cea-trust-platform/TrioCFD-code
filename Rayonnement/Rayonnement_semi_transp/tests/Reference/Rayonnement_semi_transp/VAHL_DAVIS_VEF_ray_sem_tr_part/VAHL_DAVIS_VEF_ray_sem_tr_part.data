@@ -2,7 +2,7 @@
 # PARALLEL OK #
 dimension 2
 Pb_Rayo_Thermohydraulique pb
-Pb_conduction pb_partition
+Pb_Rayo_conduction pb_partition
 
 Domaine dom_fluide
 Domaine dom_solide

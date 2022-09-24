@@ -30,36 +30,34 @@ Read sch
 }
 
 # Water defined #
-Fluide_Incompressible water
-Read water
-{
-	# Dynamic viscosity #
-	mu  Champ_Uniforme 1 1.90e-5
-	# Volumic mass #
- 	rho Champ_Uniforme 1 1.205
-	# Thermal conductivity #
-	lambda Champ_Uniforme 1 0.6
-	# Heat capacity #
-	cp Champ_Uniforme 1 4185	
-	# Thermal expanson coefficient #
-	beta_th Champ_Uniforme 1 0.0034
-}
 
 # Gravity field #
-Champ_Uniforme gravity
-Read gravity 3 0 -9.81 0
 
 # Objects linked #
-Associate water gravity
 Associate pb box
 Associate pb sch
-Associate pb water
 Discretize pb dis
 
 # Read the problem #
 Read pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 -9.81 0
+   	# Dynamic viscosity #
+   	mu  Champ_Uniforme 1 1.90e-5
+   	# Volumic mass #
+    	rho Champ_Uniforme 1 1.205
+   	# Thermal conductivity #
+   	lambda Champ_Uniforme 1 0.6
+   	# Heat capacity #
+   	cp Champ_Uniforme 1 4185	
+   	# Thermal expanson coefficient #
+   	beta_th Champ_Uniforme 1 0.0034
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		# Direct method to solve pressure linear system #
 		solveur_pression petsc Cholesky { } 
@@ -139,3 +137,4 @@ Read pb
 }
 # Solve the problem #
 Solve pb
+ 

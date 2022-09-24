@@ -106,16 +106,19 @@ END SCATTER #
 
 VDF dis
 
-Solide sol
-Read sol
-{
-	rho champ_uniforme 1 2700.
-	lambda Champ_Fonc_xyz dom_solide 1 400
-	Cp champ_uniforme 1 400.
-}
+Associate Coppec dom_fluide
+Associate pb_solide dom_solide
 
-Fluide_Incompressible air
-Read air
+Probleme_couple pbc
+Associate pbc Coppec
+Associate pbc pb_solide
+
+Associate pbc sch
+Discretize pbc dis
+
+Read Coppec
+{
+Fluide_Incompressible
 {
 	mu champ_fonc_tabule { Coppec Temperature } 1 
 		{
@@ -135,29 +138,8 @@ Read air
 	Cp champ_Uniforme 1 1005
 	
 	Beta_th Champ_uniforme 1 3.19e-3
+ 	gravite Champ_Uniforme 2 -9.81 0
 }
-		
-Champ_Uniforme gravite
-Read gravite 2 -9.81 0
-
-Associate air gravite
-Associate sol gravite
-
-Associate Coppec dom_fluide
-Associate Coppec air
- 
-Associate pb_solide dom_solide
-Associate pb_solide sol
-
-Probleme_couple pbc
-Associate pbc Coppec
-Associate pbc pb_solide
-
-Associate pbc sch
-Discretize pbc dis
-
-Read Coppec
-{
 	Navier_Stokes_Turbulent
 	{
 	solveur_pression cholesky { }
@@ -256,13 +238,17 @@ Post_processing
 	conductivite som
 	}
 }
-
-
 	
 }
 
 Read pb_solide
 {
+Solide
+{
+	rho champ_uniforme 1 2700.
+	lambda Champ_Fonc_xyz dom_solide 1 400
+	Cp champ_uniforme 1 400.
+}
 	Conduction
 	{
 	diffusion { }
