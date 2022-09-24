@@ -170,10 +170,10 @@ Lire pb2
                 convection { amont }
                 boundary_conditions 
                 {	
-		 	Droit Paroi_contact pb1 Droit
+		 	Droit Paroi_contact_rayo pb1 Droit TRANSP
                         Haut paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
-                        Gauche  Paroi_contact pb1 Gauche
+                        Gauche  Paroi_contact_rayo pb1 Gauche TRANSP
                         Bas paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
 			Avant  paroi_flux_impose
@@ -208,13 +208,13 @@ Lire pb1
                 diffusion { }
                 conditions_initiales { Temperature Champ_fonc_xyz dom_solide 1 ((x<0.025)*423.236957+(x>0.0025)*323.236957) }
                 boundary_conditions {
-                        Droit Paroi_contact pb2 Droit
+                        Droit Paroi_contact_rayo pb2 Droit TRANSP
                         Droit_Droit Paroi_temperature_imposee Champ_Front_Uniforme 1 323.15 
 			Bas_Droit paroi_adiabatique
 			Haut_Droit paroi_adiabatique
 			Avant_Droit paroi_adiabatique
 			Arriere_Droit paroi_adiabatique
-			Gauche Paroi_contact pb2 Gauche
+			Gauche Paroi_contact_rayo pb2 Gauche TRANSP
                         Gauche_Gauche Paroi_flux_impose Champ_front_Uniforme 1 400.
                         Bas_Gauche paroi_adiabatique
 			Haut_Gauche paroi_adiabatique

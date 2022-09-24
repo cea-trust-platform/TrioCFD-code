@@ -194,10 +194,10 @@ Read pb2
                 convection { negligeable  }
                 boundary_conditions 
                 {	
-		 	Droit paroi_contact pb1 Droit
+		 	Droit paroi_contact_rayo pb1 Droit transp
                         Haut Paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
-                        Gauche paroi_contact  pb1 Gauche
+                        Gauche paroi_contact_rayo  pb1 Gauche transp
                         Bas Paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
                 }
@@ -229,12 +229,12 @@ Read pb1
                 diffusion {  }
                 conditions_initiales { temperature Champ_Uniforme 1 379.15 }
                 boundary_conditions {
-                        Droit paroi_contact pb2 Droit
+                        Droit paroi_contact_rayo pb2 Droit  transp
                         Droit_Droit paroi_temperature_imposee
 				 Champ_Front_Uniforme 1 323.15
 			Bas_Droit paroi_adiabatique
 			Haut_Droit paroi_adiabatique
-			Gauche paroi_contact  pb2 Gauche
+			Gauche paroi_contact_rayo  pb2 Gauche transp
                         Gauche_Gauche Paroi_flux_impose Champ_front_Uniforme 1 400.
                         Bas_Gauche paroi_adiabatique
 			Haut_Gauche paroi_adiabatique

@@ -227,7 +227,7 @@ Lire pb1
 	boundary_conditions
 	{
 		Gauche_FG	paroi_temperature_imposee Champ_Front_Uniforme 1 300.
-		Racc1		paroi_contact pb2 Racc1
+		Racc1		paroi_contact_rayo pb2 Racc1 TRANSP
 		Bas_FG		paroi_adiabatique
 		Haut_FG		paroi_adiabatique
 	}
@@ -254,8 +254,8 @@ Lire pb2
 	conditions_initiales { temperature Champ_Uniforme 1 400. }
 	boundary_conditions
 	{
-		Racc1	paroi_contact pb1 Racc1  
-		Gauche	paroi_contact pb3 Gauche
+		Racc1	paroi_contact_rayo pb1 Racc1  TRANSP
+		Gauche	paroi_contact_rayo pb3 Gauche TRANSP
 		Bas_SG	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
 		Haut_SG	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
 	}
@@ -295,9 +295,9 @@ Lire pb3
 	convection { amont }
 	boundary_conditions
 	{
-		Droit	Paroi_contact pb4 Droit
+		Droit	Paroi_contact_rayo pb4 Droit TRANSP
 		Haut	paroi_adiabatique
-		Gauche	Paroi_contact pb2 Gauche
+		Gauche	Paroi_contact_rayo pb2 Gauche TRANSP
 		Bas	paroi_adiabatique
 	}
 	conditions_initiales { Temperature Champ_Uniforme 1 200. }
@@ -323,7 +323,7 @@ Lire pb4
 	conditions_initiales { temperature Champ_Uniforme 1 200. }
 	boundary_conditions
 	{
-                Droit		Paroi_contact pb3 Droit
+                Droit		Paroi_contact_rayo pb3 Droit TRANSP
                 Droit_SD	paroi_temperature_imposee Champ_Front_Uniforme 1 200.
                 Bas_SD		paroi_adiabatique
                 Haut_SD		paroi_adiabatique

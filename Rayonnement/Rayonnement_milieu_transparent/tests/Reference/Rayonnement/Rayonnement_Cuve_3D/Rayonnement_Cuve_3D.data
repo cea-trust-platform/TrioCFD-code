@@ -180,7 +180,7 @@ Lire pb1
 	{
 		SNA	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 50.
 		SREDAN	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
-		SCUVE	paroi_contact pb2 SCUVE
+		SCUVE	paroi_contact_rayo pb2 SCUVE TRANSP
 	}
 	conditions_initiales { Temperature Champ_Uniforme 1 395. }
    }
@@ -235,8 +235,8 @@ Lire pb2
 	conditions_initiales { temperature Champ_Uniforme 1 400. }
 	boundary_conditions
 	{
-		SCUVE	paroi_contact pb1 SCUVE  
-		SCUVEE	paroi_contact pb3 SCUVEE
+		SCUVE	paroi_contact_rayo pb1 SCUVE   TRANSP
+		SCUVEE	paroi_contact_rayo pb3 SCUVEE TRANSP
 		STOP	paroi_adiabatique
 	}
    }
@@ -279,8 +279,8 @@ Lire pb3
 	convection { amont }
 	boundary_conditions
 	{
-		SCUVEE	Paroi_contact pb2 SCUVEE
-		SEXARG	Paroi_contact pb4 SEXARG
+		SCUVEE	Paroi_contact_rayo pb2 SCUVEE TRANSP
+		SEXARG	Paroi_contact_rayo pb4 SEXARG TRANSP
 		SSUP	paroi_adiabatique
 	}
 	conditions_initiales { Temperature Champ_Uniforme 1 200. }
@@ -309,7 +309,7 @@ Lire pb4
 	conditions_initiales { temperature Champ_Uniforme 1 30. }
 	boundary_conditions
 	{
-		SEXARG	paroi_contact pb3 SEXARG      
+		SEXARG	paroi_contact_rayo pb3 SEXARG    TRANSP   
 		SEXCS	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 30.
 		SSCS	paroi_adiabatique
 	}

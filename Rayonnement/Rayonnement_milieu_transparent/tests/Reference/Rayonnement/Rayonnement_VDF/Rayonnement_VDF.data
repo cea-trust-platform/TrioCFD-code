@@ -168,7 +168,7 @@ Lire pb2
                                 Champ_front_Uniforme 1 -0.1
                         Bas1 paroi_temperature_imposee 
                                  Champ_Front_Uniforme 1 200.
-                        Droit1 paroi_contact pb1 Droit1
+                        Droit1 paroi_contact_rayo pb1 Droit1 TRANSP
 			            Arriere1 symetrie
                         Avant1 symetrie
                 }
@@ -206,7 +206,7 @@ Lire pb1
                 boundary_conditions {
                         Gauche paroi_temperature_imposee
                                 Champ_Front_Uniforme 1 400.
-                        Droit1 paroi_contact pb2 Droit1
+                        Droit1 paroi_contact_rayo pb2 Droit1 TRANSP
                         Haut paroi_temperature_imposee
                                 Champ_Front_Uniforme 1 400.
                         Bas paroi_temperature_imposee

@@ -232,14 +232,14 @@ Lire pb
 			Gauche1 paroi_temperature_imposee
 					 Champ_Front_Uniforme 1 296.6
 			Bas1 paroi_adiabatique
-			Droit1_haut Paroi_contact pb_partition Droit1_haut
-			Droit1_bas Paroi_contact pb_partition Droit1_bas
-			Haut2 Paroi_contact pb_partition Haut2
-			Bas2 Paroi_contact pb_partition Bas2
+			Droit1_haut Paroi_contact_rayo pb_partition Droit1_haut SEMI_TRANSP
+			Droit1_bas Paroi_contact_rayo pb_partition Droit1_bas SEMI_TRANSP
+			Haut2 Paroi_contact_rayo pb_partition Haut2 SEMI_TRANSP
+			Bas2 Paroi_contact_rayo pb_partition Bas2 SEMI_TRANSP
 			Haut3 paroi_adiabatique
 			Bas3 paroi_adiabatique
-			Gauche3_haut Paroi_contact pb_partition Gauche3_haut
-			Gauche3_bas Paroi_contact pb_partition Gauche3_bas
+			Gauche3_haut Paroi_contact_rayo pb_partition Gauche3_haut SEMI_TRANSP
+			Gauche3_bas Paroi_contact_rayo pb_partition Gauche3_bas SEMI_TRANSP
 			Droit3 paroi_temperature_imposee
 					Champ_Front_Uniforme 1 312.1
 			}
@@ -270,13 +270,13 @@ Lire pb_partition
 		conditions_initiales { temperature Champ_Uniforme 1 304.35 }
 		boundary_conditions 
 		{
-		Droit1_haut Paroi_contact pb Droit1_haut
-		Haut2 Paroi_contact pb Haut2
-		Gauche3_haut Paroi_contact pb Gauche3_haut
+		Droit1_haut Paroi_contact_rayo pb Droit1_haut SEMI_TRANSP
+		Haut2 Paroi_contact_rayo pb Haut2 SEMI_TRANSP
+		Gauche3_haut Paroi_contact_rayo pb Gauche3_haut SEMI_TRANSP
 		Haut_Part_Haut paroi_adiabatique
-		Droit1_bas Paroi_contact pb Droit1_bas
-		Bas2 Paroi_contact pb Bas2
-		Gauche3_bas Paroi_contact pb Gauche3_bas
+		Droit1_bas Paroi_contact_rayo pb Droit1_bas SEMI_TRANSP
+		Bas2 Paroi_contact_rayo pb Bas2 SEMI_TRANSP
+		Gauche3_bas Paroi_contact_rayo pb Gauche3_bas SEMI_TRANSP
 		Bas_Part_Bas paroi_adiabatique
 		}
 	}
