@@ -57,7 +57,7 @@ public:
   Intersection_Interface_ijk() {};
   virtual ~Intersection_Interface_ijk() {};
 
-  virtual int initialize(const IJK_Splitting& splitting_ft,
+  virtual int initialize(const IJK_Splitting& splitting,
                          const IJK_Interfaces& interfaces) = 0;
 
   // Cette méthode permet de récupérer à partir des postions projetées sur
@@ -93,7 +93,7 @@ protected:
   // Intersection_Interface_ijk_face n'est pas propriétaire de ces objets, pas
   // de gestion de la mémoire.
   const IJK_Interfaces *interfaces_;
-  const IJK_Splitting *splitting_ft_;
+  const IJK_Splitting *splitting_;
 
   // Le nombre de cellules diphasiques.
   int n_diph_;
@@ -119,7 +119,7 @@ public:
   Intersection_Interface_ijk_face() {};
   ~Intersection_Interface_ijk_face() {};
 
-  int initialize(const IJK_Splitting& splitting_ft,
+  int initialize(const IJK_Splitting& splitting,
                  const IJK_Interfaces& interfaces) override;
 
   const int& operator()(int i_diph) const { return ijkf_interfaces_(i_diph); }
@@ -159,7 +159,7 @@ public:
   Intersection_Interface_ijk_cell() {};
   ~Intersection_Interface_ijk_cell() {};
 
-  int initialize(const IJK_Splitting& splitting_ft,
+  int initialize(const IJK_Splitting& splitting,
                  const IJK_Interfaces& interfaces) override;
 
   // int& operator()(const int i,const int j,const int k);
@@ -168,7 +168,7 @@ public:
   const int& operator()(int i, int j, int k) const { return idiph_ijk_(i, j, k); }
 
   void
-  maj_interpolation_coo_on_interfaces(const IJK_Field_double& indicatrice_ft);
+  maj_interpolation_coo_on_interfaces(const IJK_Field_double& indicatrice);
 
 protected:
   // Le tableau qui donne pour chaque face coupée par l'interface :
@@ -183,7 +183,7 @@ protected:
   // sur l'interface.
   // L'interface est construite par moyenne sur la cellule
   void
-  calcul_projection_centre_sur_interface_moy(const IJK_Field_double& indicatrice_ft,
+  calcul_projection_centre_sur_interface_moy(const IJK_Field_double& indicatrice,
                                              DoubleTab& positions, IntTab& indices,
                                              DoubleTab& normales_de_la_proj,
                                              DoubleTab& distance_centre_interface);

@@ -41,7 +41,7 @@
 #include <Param.h>
 #include <stat_counters.h>
 
-int Corrige_flux_FT::initialize(const IJK_Splitting& splitting_ft,
+int Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
                                 const IJK_Field_double& field,
                                 const IJK_Interfaces& interfaces,
                                 const IJK_FT_double& ijk_ft)
@@ -51,7 +51,7 @@ int Corrige_flux_FT::initialize(const IJK_Splitting& splitting_ft,
   // les mettre à jour.
   interfaces_ = &interfaces;
   field_ = &field;
-  splitting_ = &splitting_ft;
+  splitting_ = &splitting;
   ref_ijk_ft_ = ijk_ft;
   return 1;
 }

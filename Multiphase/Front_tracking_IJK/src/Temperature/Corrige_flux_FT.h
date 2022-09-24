@@ -121,7 +121,7 @@ class Corrige_flux_FT // : public Objet_U
 public:
   Corrige_flux_FT() {};
   virtual ~Corrige_flux_FT() {};
-  int initialize(const IJK_Splitting& splitting_ft,
+  int initialize(const IJK_Splitting& splitting,
                  const IJK_Field_double& field,
                  const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft);
   // On va calculer sur la grille IJ de la layer k tous les flux a proximite de

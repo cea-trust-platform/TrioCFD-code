@@ -474,6 +474,7 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   ref_splitting_ = splitting_FT;
 
   surface_vapeur_par_face_computation_.initialize(splitting_FT);
+  val_par_compo_in_cell_computation_.initialize(splitting_FT, maillage_ft_ijk_);
 
   indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
   indicatrice_ft_[old()].data() = 1.;
@@ -2664,62 +2665,6 @@ void IJK_Interfaces::deplacer_bulle_perio(const ArrOfInt& masque_deplacement_par
 }
 
 #if 0
-// Moyennes des normales ponderees par leur fraction de surface presente dans l'element.
-// Attention, la normale obtenue n'est pas unitaire
-static void calculer_normale_element_pour_compo(const int icompo,
-                                                const int elem,
-                                                const  Maillage_FT_IJK& maillage,
-                                                Vecteur3& normale)
-{
-  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
-  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
-  const ArrOfInt& compo_connexe = maillage.compo_connexe_facettes();
-
-  double surface_tot = 0.;
-  int index=intersections.index_elem()[elem];
-  normale = 0.;
-  if (index < 0)
-    return; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  int count = 0;
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int num_compo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          const double surface_facette = surface_facettes[fa7];
-          const double surf = data.fraction_surface_intersection_ * surface_facette;
-          for (int dir = 0; dir< 3; dir++)
-            {
-              const double nx = normale_facettes(fa7,dir);
-              normale[dir] += nx * surf;
-            }
-          surface_tot +=surf;
-        }
-      index = data.index_facette_suivante_;
-      count++;
-    }
-
-  if (surface_tot > 0.)
-    {
-      normale *= 1./surface_tot;
-    }
-  else
-    normale = 0.;
-
-  const double norm =  normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2];
-  if (norm<0.9)
-    Cerr << "Petite : " << count << " facettes dans l'element " << elem
-         << ". surface_tot = "<< surface_tot << "Norm**2 = " << norm << finl;
-
-}
-#endif
-
-#if 0
 
 // 3 Versions de code pour marquer l'interieur des bulles :
 //    v1 : Version la plus ancienne : Boucle facette et composante maximale de la normale
@@ -2922,210 +2867,6 @@ static int check_somme_drapeau(const ArrOfInt& drapeau_liquide)
 //          0., 0., 0.);
 //
 //
-// Attention : elem ne doit pas etre un element virtuel :
-int IJK_Interfaces::compute_list_compo_connex_in_element(const Maillage_FT_IJK& mesh,
-                                                         const int elem,
-                                                         ArrOfInt& liste_composantes_connexes_dans_element) const
-{
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const ArrOfInt& index_elem = intersections.index_elem();
-  const ArrOfInt& compo_connexe_facettes = mesh.compo_connexe_facettes();
-
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  liste_composantes_connexes_dans_element.resize_array(0);
-
-  // L'element, est-il traverse par une interface ?
-  int index_next_facette = index_elem[elem];
-  while (index_next_facette >= 0)
-    {
-      // Oui. Par quelles composantes connexes est-il traverse ?
-      // On boucle sur les faces qui traversent l'interface, on marque
-      // les composantes deja vues au fur et a mesure:
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index_next_facette);
-      if (data.fraction_surface_intersection_ == 0.)
-        {
-#ifdef GB_VERBOSE
-          Cerr << "compute_list_compo_connex_in_element : elem= " << elem
-               << " Intersection issue du parcours : numero_facette_= " << data.numero_facette_
-               << " numero_element_= " << data.numero_element_ << " fraction= " << data.fraction_surface_intersection_
-               << finl;
-#endif
-          // Si on a une facette de fraction_surface_intersection nulle,
-          // c'est qu'en realite elle n'intersecte pas.
-          // On ne la traite pas.
-        }
-      else
-        {
-          int compo = compo_connexe_facettes[data.numero_facette_];
-          // Cherche si cette composante est deja dans la liste
-          int ii;
-          const int nmax = liste_composantes_connexes_dans_element.size_array();
-          for (ii = 0; ii < nmax; ii++)
-            {
-              if (liste_composantes_connexes_dans_element[ii] == compo)
-                break; // sort de la boucle for, on aura ii < nmax
-            }
-          if (ii == nmax) // vrai si on n'a pas trouve compo dans
-            // liste_composantes_connexes_dans_element
-            liste_composantes_connexes_dans_element.append_array(compo);
-        }
-      index_next_facette = data.index_facette_suivante_;
-    }
-
-  const int nb_compo_traversantes = liste_composantes_connexes_dans_element.size_array();
-  return nb_compo_traversantes;
-}
-#if 0
-// Rempli le tableau drapeaux avec 0 lorsque c'est une bulle.
-// On suppose que le tableau drapeau_vapeur est dimensionne a nb_compo_in_num_compo_.
-// Besoin d'etre dans la classe si on veut avoir la ref au zone_VF (pour le calcul // et
-// la determination du numero voisin dans ce cas...)
-void IJK_Interfaces::compute_drapeaux_vapeur_v3(const Maillage_FT_IJK& mesh,
-                                                const IJK_Splitting& split,
-                                                const IntVect& vecteur_composantes,
-                                                ArrOfInt& drapeau_vapeur) const
-{
-  const IJK_Grid_Geometry& geom = split.get_grid_geometry() ;
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-
-  drapeau_vapeur = 1; // Initialise a 1
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-
-  // Et on cree l'espace virtuel pour index_elem pour savoir si les elem contiennent des facettes?
-  IntVect index_elem_with_ghost;
-  const ArrOfInt& index_elem = maillage_ft_ijk_.intersections_elem_facettes().index_elem();
-  convert_to_IntVect(index_elem, index_elem_with_ghost);
-
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_voisins = zone_vf.face_voisins();
-
-  // Boucle sur les elements:
-  const int nb_elem_local = split.get_nb_elem_local(DIRECTION_I)
-                            * split.get_nb_elem_local(DIRECTION_J)
-                            * split.get_nb_elem_local(DIRECTION_K); // nombre d'elements eulerien par proc.
-  for (int elem = 0; elem < nb_elem_local; elem++)
-    {
-      // Anciennement la methode etait portee par le mesh :
-      //      Int3 ijk_elem = mesh.convert_packed_to_ijk_cell(elem);
-      // A present, elle est dans le splitting :
-      assert(maillage_ft_ijk_.ref_splitting_.valeur() == split);
-      Int3 ijk_elem = split.convert_packed_to_ijk_cell(elem);
-      // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-      const int nb_compo_traversantes = compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-
-      // On boucle sur les composantes connexes trouvees dans l'element
-      for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-        {
-          const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-
-          // Calcul de la normale moyenne dans l'element :
-          Vecteur3 normale;
-          calculer_normale_element_pour_compo(num_compo, elem, mesh, normale);
-
-          Int3 ijk_voisin = ijk_elem;
-          double norm = normale[0]*normale[0] + normale[1]*normale[1] + normale[2]*normale[2];
-          bool zap = false;
-          if (norm< 0.5)
-            {
-              Cerr << "IJK_Interfaces.cpp : compute_drapeaux_vapeur_v3. "
-                   << "Normale trouvee trop petite... Etrange, non?" << finl;
-              //    Process::exit();
-              zap = true;
-            }
-
-          // Est-on sur une maille de bord? On ne souhaite pas s'embeter
-          // car on risque de tomber sur un voisin perio ou sur un mur.
-          // On fait simple, on ne les traite pas. C'est Ok si on suppose qu'on va trouver
-          // ailleurs un endroit ou marquer la compo en question...
-          for (int dir = 0; dir< 3; dir++)
-            {
-              const int offset = split.get_offset_local(dir);
-              const int ndir = geom.get_nb_elem_tot(dir);
-              int idir_global = ijk_elem[dir] + offset;
-              //    const bool perio = geom.get_periodic_flag(direction);
-              // On ne s'embete pas avec les mailles proche des bords (parois ou perio)
-              if ((idir_global == 0) || (idir_global == ndir-1))
-                {
-                  zap = true; // On zappe les mailles de bords pour pas se poser la question de si on sort
-                  break;
-                }
-              // On prend l'oppose de la normale pour pointer vers la vapeur et eviter
-              // de tomber sur une autre interface connexe.
-              // normale_vapeur = -normale.
-              // alpha est l'angle entre la normale_vapeur et l'axe coordonnee ((Ox) si dir==0)
-              double cos_alpha = -normale[dir]/norm;
-              // Entre -30 et 30, on va a droite. Puis de 30 a 60, en diagonale
-              // puis de 60 a 120, vers le haut...
-              if (cos_alpha>0.5)
-                ijk_voisin[dir] += 1;
-              else if (cos_alpha<-0.5)
-                ijk_voisin[dir] -= 1;
-            }
-          if (zap)
-            break;
-          // L'element voisin ainsi trouve est-il traverse par une interface?
-
-          bool mine = true;
-          for (int dir=0; dir<3; dir++)
-            {
-              if  ((ijk_voisin[dir]<0) || (ijk_voisin[dir]>=split.get_nb_elem_local(dir)))
-                mine = false; // le voisin est virtuel.
-            }
-
-          // Le voisin m'appartient-il?
-          int index_next_facette_voisin, elem_voisin;
-          if (mine)
-            {
-              // On est sur un elem reel
-              elem_voisin = split.convert_ijk_cell_to_packed(ijk_voisin[0], ijk_voisin[1], ijk_voisin[2]);
-              index_next_facette_voisin = intersections.index_elem()[elem_voisin];
-
-            }
-          else
-            {
-              // On est sur un elem virtuel
-              // On cherche le elem_voisin (qui est un ghost) en se baladant face par face :
-              int iface_voisine = -1;
-              int tmp_elem = elem;
-              for (int dir = 0; dir < 3; dir++)
-                {
-                  if (ijk_voisin[dir] != ijk_elem[dir])
-                    {
-                      if (ijk_voisin[dir] < ijk_elem[dir])
-                        {
-                          iface_voisine = dir;
-                        }
-
-                      if (ijk_voisin[dir] > ijk_elem[dir])
-                        {
-                          iface_voisine = dir+3;
-                        }
-                      const int num_face = elem_faces(tmp_elem, iface_voisine);
-                      tmp_elem = faces_voisins(num_face, 0) + faces_voisins(num_face, 1) - tmp_elem;
-
-                    }
-                }
-              elem_voisin = tmp_elem;
-              // Pour enfin obtenir l'indice de debut :
-              index_next_facette_voisin = index_elem_with_ghost[elem_voisin];
-            }
-
-          if (index_next_facette_voisin < 0)
-            {
-              // il n'y a aucune interface dans l'elem_voisin
-              // On marque la compo globale de l'elem_voisin comme vapeur :
-              const int computed_global_compo = vecteur_composantes[elem_voisin];
-              drapeau_vapeur[computed_global_compo] = 0;
-            }
-        }
-    }
-
-  // Synchroniser les marqueurs sur tous les processeurs
-  mp_min_for_each_item(drapeau_vapeur);
-}
-#endif
 
 // The method have to recieve the extended field indic_ft because
 // the splitting and the conversion "num_elem = s.convert_ijk_cell_to_packed(i,
@@ -3728,67 +3469,6 @@ int IJK_Interfaces::update_indicatrice(IJK_Field_double& indic)
   while (continuer);
 
   return 0;
-}
-
-// static int calculer_phi_et_indic_element_pour_compo(
-int IJK_Interfaces::calculer_indic_elem_pour_compo(const int icompo,
-                                                   const int elem,
-                                                   double& indic) const
-{
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const IntTab& facettes = mesh.facettes();
-  const DoubleTab& sommets = mesh.sommets();
-  const ArrOfInt& compo_connexe = mesh.compo_connexe_facettes();
-
-  indic = -1.; // valeur invalide.
-  double somme_contrib = 0.;
-  int index = intersections.index_elem()[elem];
-  if (index < 0)
-    return 0; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int num_compo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          // Calcul du potentiel au centre de l'intersection
-          // Les coordonnees du barycentre de la fraction de facette :
-          Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-          for (int isom = 0; isom < 3; isom++)
-            {
-              const int num_som = facettes(fa7, isom); // numero du sommet dans le tableau sommets
-              // Coordonnees barycentriques du centre de gravite de l'intersection
-              // par rapport aux trois sommets de la facette.
-              const double bary_som = data.barycentre_[isom];
-              for (int dir = 0; dir < 3; dir++)
-                coord_barycentre_fraction[dir] += bary_som * sommets(num_som, dir);
-            }
-          // On ne somme la contribution que de la composante icompo :
-          somme_contrib += data.contrib_volume_phase1_;
-        }
-      index = data.index_facette_suivante_;
-    }
-
-  // retour entre 0 et 1 :
-  while (somme_contrib > 1.)
-    somme_contrib -= 1.;
-  while (somme_contrib < 0.)
-    somme_contrib += 1.;
-
-  if (somme_contrib == 0.)
-    {
-      Cerr << "calculer_indicatrice ne fait rien dans la boucle while... "
-           "pourquoi? "
-           << finl;
-      // Process::exit();
-    }
-
-  indic = somme_contrib;
-  return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5624,7 +5304,8 @@ void IJK_Interfaces::calculer_indicatrice_next(
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
 
   // Calcul de l'indicatrice sur le domaine NS :
-  ref_ijk_ft_->redistrib_from_ft_elem().redistribute(indicatrice_ft_[next()], indicatrice_ns_[next()]);
+  ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+      indicatrice_ft_[next()], indicatrice_ns_[next()]);
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
   // Calcul des indicatrices s'il y a des groupes :
@@ -5664,9 +5345,41 @@ void IJK_Interfaces::calculer_indicatrice_next(
   // dans les cellules pour chaque compo. Le but est de le faire une fois
   // pour toute de manière synchronisee (et pas au moment ou on calcule la
   // force par exemple).
-  calculer_valeur_par_compo(field_repulsion, gravite, delta_rho, sigma, time, itstep);
+  val_par_compo_in_cell_computation_.calculer_valeur_par_compo(
+#ifdef SMOOTHING_RHO
+    delta_rho,
+#endif
+    time, itstep,
+    nb_compo_traversante_[next()],
+    compos_traversantes_[next()],
+    normale_par_compo_[next()],
+    bary_par_compo_[next()],
+    indicatrice_par_compo_[next()],
+    surface_par_compo_[next()],
+    courbure_par_compo_[next()]);
+
+  // calcul de la force de repulsion
+  calculer_phi_repuls_par_compo(
+    phi_par_compo_[next()],
+    repuls_par_compo_[next()],
+    field_repulsion,
+    gravite,
+    delta_rho,
+    sigma,
+    time,
+    itstep
+  );
 
 #if VERIF_INDIC
+  verif_indic();
+#endif
+
+  statistiques().end_count(calculer_indicatrice_next_counter_);
+}
+
+
+#if VERIF_INDIC
+void IJK_Interfaces::verif_indic() {
   calculer_indicatrice(indicatrice_ft_test_);
   indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost());
   SChaine indic;
@@ -5711,11 +5424,8 @@ void IJK_Interfaces::calculer_indicatrice_next(
            << finl;
       Process::exit();
     }
-
-#endif
-
-  statistiques().end_count(calculer_indicatrice_next_counter_);
 }
+#endif
 
 void IJK_Interfaces::switch_indicatrice_next_old()
 {
@@ -5748,206 +5458,6 @@ void IJK_Interfaces::switch_indicatrice_next_old()
   groups_indicatrice_ns_[old()].echange_espace_virtuel();
 }
 
-// Pour remplacer calculer_normale_et_bary_element_par_compo
-void IJK_Interfaces::calculer_moyennes_interface_element_pour_compo(
-  const int num_compo,
-  const int elem,
-  double& surface_tot,
-  Vecteur3& normale,
-  Vecteur3& bary
-) const
-{
-  const Maillage_FT_IJK& maillage = maillage_ft_ijk_;
-  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
-  const IntTab& facettes = maillage.facettes();
-  const DoubleTab& sommets = maillage.sommets();
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
-  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
-  const ArrOfInt& compo_connexe = maillage.compo_connexe_facettes();
-
-  int index = intersections.index_elem()[elem];
-  surface_tot = 0.;
-  normale = 0.;
-  bary = 0.;
-
-  if (index < 0)
-    return; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  int count = 0;
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int icompo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          const double surface_facette = surface_facettes[fa7];
-          const double surf = data.fraction_surface_intersection_ * surface_facette;
-          // Les coordonnees du barycentre de la fraction de facette :
-          Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-          for (int dir = 0; dir < 3; dir++)
-            {
-              const double nx = normale_facettes(fa7, dir);
-              normale[dir] += nx * surf;
-            }
-          for (int isom = 0; isom < 3; isom++)
-            {
-              // numero du sommet dans le tableau sommets
-              const int num_som = facettes(fa7, isom);
-              // Coordonnees barycentriques du centre de gravite de l'intersection
-              // par rapport aux trois sommets de la facette.
-              const double bary_som = data.barycentre_[isom];
-              // pour avoir la courbure au centre du triangle
-              for (int dir = 0; dir < 3; dir++)
-                coord_barycentre_fraction[dir] += bary_som * sommets(num_som, dir);
-            }
-          coord_barycentre_fraction *= surf;
-          bary += coord_barycentre_fraction;
-          surface_tot += surf;
-        }
-      index = data.index_facette_suivante_;
-      count++;
-    }
-
-  if (surface_tot > 0.)
-    {
-      normale *= 1. / surface_tot;
-      bary *= 1. / surface_tot;
-    }
-  else
-    {
-      Cerr << " Erreur dans "
-           "IJK_Interfaces::calculer_normale_et_bary_element_pour_compo."
-           << finl;
-      Cerr << "L'element " << elem << " contient des facettes de surface totale nulle!" << finl;
-      Cerr << "Que mettre pour le barycentre? ..." << finl;
-      assert(0);
-      Process::exit();
-    }
-
-  const double norm = normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2];
-  if (norm < 0.9)
-    {
-      Cerr << " Dans calculer_normale_et_bary_element_pour_compo." << finl;
-      Cerr << "Petite : " << count << " facettes dans l'element " << elem << ". surface_tot = " << surface_tot
-           << "Norm**2 = " << norm << finl;
-    }
-}
-
-void IJK_Interfaces::calculer_moy_par_compo(
-  IJK_Field_int& nb_compo_traversante,
-  FixedVector<IJK_Field_int, max_authorized_nb_of_components_>& compos_traversantes,
-  FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& normale_par_compo,
-  FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& bary_par_compo,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& indic_par_compo,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& surface_par_compo
-) const
-{
-
-  Cout << "Calcul moyennes de l'interface dans chaque cellule par compo" << finl;
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-
-  // Initialisation a NUM_COMPO_INVALID signifie aucune compo presente.
-  nb_compo_traversante.data() = NUM_COMPO_INVALID;
-  // Peut-etre pas necessaire
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    {
-      // TODO: AYM verifier l'init
-      compos_traversantes[c].data() = NUM_COMPO_INVALID;
-      surface_par_compo[c].data() = 0.;
-      for (int compo = 0; compo < 3; compo++)
-        {
-          normale_par_compo[3 * c + compo].data() = 0.;
-          bary_par_compo[3 * c + compo].data() = 0.;
-        }
-    }
-
-  // Boucle sur les elements:
-  const int ni = ref_splitting_->get_nb_elem_local(DIRECTION_I);
-  const int nj = ref_splitting_->get_nb_elem_local(DIRECTION_J);
-  const int nk = ref_splitting_->get_nb_elem_local(DIRECTION_K);
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(maillage_ft_ijk_.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          // (seules les surfaces non-nulles sont comptees)
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          if (nb_compo_traversantes > max_authorized_nb_of_components_)
-            {
-              Cerr << "IJK_Interfaces::ajouter_terme_source_interfaces. Trop de "
-                   "compo connexes dans "
-                   << "l'element " << elem << "[ " << i << " " << j << " " << k << " "
-                   << " ]" << finl;
-              Cerr << "Augmenter la taille max_authorized_nb_of_components_." << finl;
-              assert(0);
-            }
-
-          nb_compo_traversante(i, j, k) = nb_compo_traversantes;
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              compos_traversantes[i_compo](i, j, k) = num_compo;
-
-              double indic;
-              calculer_indic_elem_pour_compo(num_compo, elem, indic);
-
-              double surface;
-              Vecteur3 normale;
-              Vecteur3 bary_facettes_dans_elem;
-              calculer_moyennes_interface_element_pour_compo(num_compo, elem, surface, normale, bary_facettes_dans_elem);
-
-              indic_par_compo[i_compo](i, j, k) = indic;
-              surface_par_compo[i_compo](i, j, k) = surface;
-              for (int dir = 0; dir < 3; dir++)
-                {
-                  const int idx = i_compo * 3 + dir;
-                  normale_par_compo[idx](i, j, k) = normale[dir];
-                  bary_par_compo[idx](i, j, k) = bary_facettes_dans_elem[dir];
-                }
-            }
-        }
-
-#ifdef SMOOTHING_RHO
-  if (smooth_density)
-    {
-      for (int icompo = 0; icompo < max_authorized_nb_of_components_; icompo++)
-        {
-          const int nx = indic_par_compo[icompo].ni();
-          const int ny = indic_par_compo[icompo].nj();
-          const int nz = indic_par_compo[icompo].nk();
-          // Attention, rho n'est pas par compo, donc ca ne marche pas en
-          // multi-bulles.
-          for (int k = 0; k < nz; k++)
-            for (int j = 0; j < ny; j++)
-              for (int i = 0; i < nx; i++)
-                {
-                  //      double rho = smooth_rho(i,j,k);
-                  double rho = rho_field(i, j, k);
-                  indic_par_compo[icompo](i, j, k) = (rho - rho_v) / delta_rho;
-                }
-        }
-    }
-#endif
-
-  // Mise a jour des espaces virtuels :
-  nb_compo_traversante.echange_espace_virtuel(nb_compo_traversante.ghost());
-  compos_traversantes.echange_espace_virtuel();
-  surface_par_compo.echange_espace_virtuel();
-  indic_par_compo.echange_espace_virtuel();
-  normale_par_compo.echange_espace_virtuel();
-  bary_par_compo.echange_espace_virtuel();
-}
-
 
 void IJK_Interfaces::calculer_phi_repuls_par_compo(
   FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& phi_par_compo,
@@ -5965,8 +5475,10 @@ void IJK_Interfaces::calculer_phi_repuls_par_compo(
   ArrOfDouble potentiels_sommets;
   ArrOfDouble repulsions_sommets;
   calculer_phi_repuls_sommet(potentiels_sommets, repulsions_sommets, gravite, delta_rho, sigma, time, itstep);
-  calculer_moy_field_sommet_par_compo(potentiels_sommets, phi_par_compo);
-  calculer_moy_field_sommet_par_compo(repulsions_sommets, repuls_par_compo);
+  val_par_compo_in_cell_computation_.calculer_moy_field_sommet_par_compo(
+    potentiels_sommets, phi_par_compo);
+  val_par_compo_in_cell_computation_.calculer_moy_field_sommet_par_compo(
+    repulsions_sommets, repuls_par_compo);
 
   const IJK_Splitting& split = ref_splitting_;
   const int ni = split.get_nb_elem_local(DIRECTION_I);
@@ -6174,193 +5686,4 @@ void IJK_Interfaces::calculer_phi_repuls_sommet(
   Cerr << "Test de la taille de maille eulerienne : lg_lagrange=" << lg_lagrange << " > (lg_euler=" << lg_euler
        << ")*1.7320... ? " << (ok ? "ok" : "ko") << " (ratio : " << lg_lagrange / (lg_euler * sqrt_3)
        << (ok ? " >" : " <") << "1 )" << finl;
-}
-
-
-void IJK_Interfaces::calculer_valeur_par_compo(
-  IJK_Field_double& field_repulsion,
-  const ArrOfDouble& gravite,
-  const double delta_rho,
-  const double sigma,
-  const double time,
-  const int itstep)
-{
-
-  calculer_moy_par_compo(
-    nb_compo_traversante_[next()],
-    compos_traversantes_[next()],
-    normale_par_compo_[next()],
-    bary_par_compo_[next()],
-    indicatrice_par_compo_[next()],
-    surface_par_compo_[next()]
-  );
-  // calcul courbure
-  calculer_moy_field_sommet_par_compo(
-    maillage_ft_ijk_.get_update_courbure_sommets(),
-    courbure_par_compo_[next()]);
-  calculer_phi_repuls_par_compo(
-    phi_par_compo_[next()],
-    repuls_par_compo_[next()],
-    field_repulsion,
-    gravite,
-    delta_rho,
-    sigma,
-    time,
-    itstep
-  );
-}
-
-void IJK_Interfaces::calculer_moy_field_sommet_par_compo(
-  const ArrOfDouble& val_on_sommet,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo) const
-{
-
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const ArrOfInt& compo_connexe = maillage_ft_ijk_.compo_connexe_facettes();
-  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const IntTab& facettes = mesh.facettes();
-
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    field_par_compo[c].data() = 0.;
-
-  // Boucle sur les elements:
-  const int ni = field_par_compo[0].ni();
-  const int nj = field_par_compo[0].nj();
-  const int nk = field_par_compo[0].nk();
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  liste_composantes_connexes_dans_element = 0;
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(mesh.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          assert(nb_compo_traversantes < max_authorized_nb_of_components_);
-
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              // Calcul de la moyenne de field dans l'element :
-              double moy_field = 0.;
-              int index = intersections.index_elem()[elem];
-              assert(index >= 0); // Aucune facette dans cet element.
-
-              double surface = 0.;
-
-              // Boucle sur les facettes qui traversent l'element elem :
-              while (index >= 0)
-                {
-                  const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-                  const int fa7 = data.numero_facette_;
-                  const int icompo = compo_connexe[fa7];
-                  double moy_field_fa7 = 0.;
-                  if (icompo == num_compo)
-                    {
-                      const double surface_facette = surface_facettes[fa7];
-                      const double surf = data.fraction_surface_intersection_ * surface_facette;
-                      Cerr << "Surf " << surf << finl;
-                      // Les coordonnees du barycentre de la fraction de facette :
-                      Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-                      for (int isom = 0; isom < 3; isom++)
-                        {
-                          // numero du sommet dans le tableau sommets
-                          const int num_som = facettes(fa7, isom);
-                          const double val = val_on_sommet[num_som];
-                          // Coordonnees barycentriques du centre de gravite de
-                          // l'intersection par rapport aux trois sommets de la facette.
-                          const double bary_som = data.barycentre_[isom];
-                          // pour avoir la moyenne du champ au centre du triangle
-                          moy_field_fa7 += bary_som * val;
-                        }
-                      surface += surf;
-                      moy_field += moy_field_fa7 * surf;
-                    }
-                  index = data.index_facette_suivante_;
-                }
-
-              assert(surface > 0.);
-              moy_field *= 1. / surface;
-
-              field_par_compo[i_compo](i, j, k) = moy_field;
-            }
-        }
-
-  // Mise a jour des espaces virtuels :
-  field_par_compo.echange_espace_virtuel();
-}
-
-void IJK_Interfaces::calculer_moy_field_fa7_par_compo(
-  const ArrOfDouble& val_on_fa7,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo) const
-{
-
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const ArrOfInt& compo_connexe = maillage_ft_ijk_.compo_connexe_facettes();
-  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    field_par_compo[c].data() = 0.;
-
-  // Boucle sur les elements:
-  const int ni = field_par_compo[0].ni();
-  const int nj = field_par_compo[0].nj();
-  const int nk = field_par_compo[0].nk();
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(mesh.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          assert(nb_compo_traversantes > max_authorized_nb_of_components_);
-
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              // Calcul de la moyenne de field dans l'element :
-              double moy_field = 0.;
-              int index = intersections.index_elem()[elem];
-              assert(index >= 0); // Aucune facette dans cet element.
-
-              double surface = 0.;
-
-              // Boucle sur les facettes qui traversent l'element elem :
-              while (index >= 0)
-                {
-                  const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-                  const int fa7 = data.numero_facette_;
-                  const int icompo = compo_connexe[fa7];
-                  if (icompo == num_compo)
-                    {
-                      const double surface_facette = surface_facettes[fa7];
-                      const double surf = data.fraction_surface_intersection_ * surface_facette;
-                      const double moy_field_fa7 = val_on_fa7[fa7];
-                      surface += surf;
-                      moy_field += moy_field_fa7 * surf;
-                    }
-                  index = data.index_facette_suivante_;
-                }
-
-              assert(surface > 0.);
-              moy_field *= 1. / surface;
-              field_par_compo[i_compo](i, j, k) = moy_field;
-            }
-        }
-  field_par_compo.echange_espace_virtuel();
 }

@@ -86,7 +86,7 @@ void Intersection_Interface_ijk::get_position_interpolation_normal_interf(
 void Intersection_Interface_ijk::get_mean_interface_cell(
   const int elem, Vecteur3& normale, Vecteur3& bary) const
 {
-  Int3 ijk = splitting_ft_->convert_packed_to_ijk_cell(elem);
+  Int3 ijk = splitting_->convert_packed_to_ijk_cell(elem);
   bool no_pb = false;
   normale = interfaces_->nI(ijk[0], ijk[1], ijk[2]);
   bary = interfaces_->xI(ijk[0], ijk[1], ijk[2]);
@@ -101,18 +101,18 @@ void Intersection_Interface_ijk::get_mean_interface_cell(
 }
 
 int Intersection_Interface_ijk_face::initialize(
-  const IJK_Splitting& splitting_ft, const IJK_Interfaces& interfaces)
+  const IJK_Splitting& splitting, const IJK_Interfaces& interfaces)
 {
   // TODO: est-ce que les pointeurs restent bien toujours les meme ?
   // Si oui je peux ne les initialiser qu'une fois, sinon il faudra
   // les mettre à jour.
   interfaces_ = &interfaces;
-  splitting_ft_ = &splitting_ft;
+  splitting_ = &splitting;
   champ_face_mouillees_a_jour_ = false;
   n_diph_ = 1;
-  idiph_ijk_[0].allocate(splitting_ft, IJK_Splitting::FACES_I, 2);
-  idiph_ijk_[1].allocate(splitting_ft, IJK_Splitting::FACES_J, 2);
-  idiph_ijk_[2].allocate(splitting_ft, IJK_Splitting::FACES_K, 2);
+  idiph_ijk_[0].allocate(splitting, IJK_Splitting::FACES_I, 2);
+  idiph_ijk_[1].allocate(splitting, IJK_Splitting::FACES_J, 2);
+  idiph_ijk_[2].allocate(splitting, IJK_Splitting::FACES_K, 2);
   return 1;
 }
 
@@ -122,17 +122,17 @@ void Intersection_Interface_ijk_face::compute_mean_interface_face(
 {
   Vecteur3 bary_facettes_dans_elem0;
   Vecteur3 normale0;
-  const int elem0 = splitting_ft_->convert_ijk_cell_to_packed(i, j, k);
+  const int elem0 = splitting_->convert_ijk_cell_to_packed(i, j, k);
   get_mean_interface_cell(elem0, normale0, bary_facettes_dans_elem0);
 
   int elem1;
   assert((dir >= 0) && (dir < 3));
   if (dir == 0)
-    elem1 = splitting_ft_->convert_ijk_cell_to_packed(i + 1, j, k);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i + 1, j, k);
   else if (dir == 1)
-    elem1 = splitting_ft_->convert_ijk_cell_to_packed(i, j + 1, k);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i, j + 1, k);
   else
-    elem1 = splitting_ft_->convert_ijk_cell_to_packed(i, j, k + 1);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i, j, k + 1);
 
   Vecteur3 bary_facettes_dans_elem1;
   Vecteur3 normale1;
@@ -160,9 +160,6 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
   const int nj = surfaces[0].nj();
   const int nk = surfaces[0].nk();
   const double eps = 1.e-6;
-  // ArrOfInt liste_composantes_connexes_dans_element;
-  // liste_composantes_connexes_dans_element.set_smart_resize(1);
-  // const auto &mesh = interfaces_->maillage_ft_ijk();
   Vecteur3 bary_vap {0., 0., .0};
   Vecteur3 bary_liqu {0., 0., .0};
   Vecteur3 bary_cell {0., 0., .0};
@@ -177,28 +174,6 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
   indices.resize(2 * n_diph, 5);
   normales_de_la_proj.resize(2 * n_diph, 3);
 
-  // Cerr << "Surface vapeur : " << finl;
-  // for (int dir=0; dir < 3; dir++)
-  //   {
-  //     Cerr << "Direction : " << dir << finl;
-  //     Cerr << "[ ";
-  //     for (int i=0; i < ni; i++)
-  //       {
-  //         Cerr << "[ ";
-  //         for (int j=0; j < nj; j++)
-  //           {
-  //             Cerr << "[ ";
-  //             for (int k=0; k < nk; k++)
-  //               {
-  //                 Cerr << surfaces[dir](i,j,k) << " ";
-  //               }
-  //             Cerr << "]" << finl;
-  //           }
-  //         Cerr << "]" << finl;
-  //       }
-  //     Cerr << "]" << finl;
-  //   }
-
   for (int dir = 0; dir < 3; dir++)
     {
       double surf_cell = 1.;
@@ -206,7 +181,7 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
         {
           if (c != dir)
             {
-              surf_cell *= splitting_ft_->get_grid_geometry().get_constant_delta(c);
+              surf_cell *= splitting_->get_grid_geometry().get_constant_delta(c);
             }
         }
       for (int i = 0; i < ni; i++)
@@ -214,9 +189,11 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
           for (int k = 0; k < nk; k++)
             {
               // S'il y a une face traversée par l'interface
+              // Attention, je ne trouve visiblement aucune interface...
               surf_vap = surfaces[dir](i, j, k);
-              if ((surf_vap > eps * surf_cell) &&
-                  (surf_vap < (1. - eps) * surf_cell))
+              if ((surf_vap/surf_cell > 0.) and (surf_vap/surf_cell < 1.))
+                Cerr << "frac surf vap " << surf_vap / surf_cell << finl;
+              if ((surf_vap > eps * surf_cell) and (surf_vap < (1. - eps) * surf_cell))
                 {
                   // On renseigne le numéro de cette face dans le tableau des faces
                   // diphasiques
@@ -226,7 +203,7 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
                   // TODO: l'assert ne passe pas, il faut trouver pourquoi ma surface
                   // est trop grande. On a dans un test surf_vap = dx et surf_cell =
                   // dx^2.
-                  assert(surf_liqu > -1.e-12);
+                  assert(surf_liqu > 0.);
                   // Je calcule l'équation de l'interface moyenne entre les
                   // deux cellules (de chaque coté de la face).
                   compute_mean_interface_face(i, j, k, dir, normale, bary);
@@ -273,6 +250,8 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
                 idiph_ijk_[dir](i, j, k) = -1;
             }
     }
+  if (i_diph <2)
+    Cerr << "Aucune face coupee rencontree" << finl;
 }
 
 void Intersection_Interface_ijk_face::maj_interpolation_coo_on_interfaces()
@@ -283,24 +262,24 @@ void Intersection_Interface_ijk_face::maj_interpolation_coo_on_interfaces()
 }
 
 int Intersection_Interface_ijk_cell::initialize(
-  const IJK_Splitting& splitting_ft, const IJK_Interfaces& interfaces)
+  const IJK_Splitting& splitting, const IJK_Interfaces& interfaces)
 {
   // TODO: est-ce que les pointeurs restent bien toujours les meme ?
   // Si oui je peux ne les initialiser qu'une fois, sinon il faudra
   // les mettre à jour.
   interfaces_ = &interfaces;
-  splitting_ft_ = &splitting_ft;
+  splitting_ = &splitting;
   champ_face_mouillees_a_jour_ = false;
   // TODO: attention, tant qu on ne passe pas dans la boucle
   // calcul_projection_centre_...
   // n_diph_ n est pas initialise
   n_diph_ = 1;
-  idiph_ijk_.allocate(splitting_ft, IJK_Splitting::ELEM, 2);
+  idiph_ijk_.allocate(splitting, IJK_Splitting::ELEM, 2);
   return 1;
 }
 
 void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy(
-  const IJK_Field_double& indicatrice_ft,
+  const IJK_Field_double& indicatrice,
   DoubleTab& positions,
   IntTab& indices,
   DoubleTab& normales_de_la_proj,
@@ -308,9 +287,9 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
 {
   // TODO: peut être verifier que la methode d'acces est judicieuse
   // const auto& barys = interfaces_->get_barycentre_vapeur_par_face();
-  const int ni = indicatrice_ft.ni();
-  const int nj = indicatrice_ft.nj();
-  const int nk = indicatrice_ft.nk();
+  const int ni = indicatrice.ni();
+  const int nj = indicatrice.nj();
+  const int nk = indicatrice.nk();
   const double eps = 1.e-12;
   // ArrOfInt liste_composantes_connexes_dans_element;
   // liste_composantes_connexes_dans_element.set_smart_resize(1);
@@ -327,7 +306,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
     for (int j = 0; j < nj; j++)
       for (int k = 0; k < nk; k++)
         {
-          if (indicatrice_ft(i, j, k) * (1. - indicatrice_ft(i, j, k)) > eps)
+          if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > eps)
             n_diph_++;
         }
   positions.resize(n_diph_, 3);
@@ -340,7 +319,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
       for (int k = 0; k < nk; k++)
         {
           // S'il y a une cellule traversée par l'interface
-          if (indicatrice_ft(i, j, k) * (1. - indicatrice_ft(i, j, k)) > eps)
+          if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > eps)
             {
               // On renseigne le numéro de cette cellule dans le tableau des
               // cellules diphasiques
@@ -348,7 +327,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
 
               // Je calcule l'équation de l'interface moyenne entre les
               // deux cellules (de chaque coté de la face).
-              const int elem = splitting_ft_->convert_ijk_cell_to_packed(i, j, k);
+              const int elem = splitting_->convert_ijk_cell_to_packed(i, j, k);
               get_mean_interface_cell(elem, normale_interf, bary_interf);
               // on copie normale dans le tableau final, c'etait peut etre pas
               // absolument necessaire d'avoir recours a une copie mais tant pis.
@@ -365,7 +344,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
 
               // Je calcule la projection du centre sur l'interface.
               centre =
-                splitting_ft_->get_coords_of_dof(i, j, k, IJK_Splitting::ELEM);
+                splitting_->get_coords_of_dof(i, j, k, IJK_Splitting::ELEM);
               projete_interface(normale_interf, bary_interf, centre, position);
               distance_point_point(position, centre, distance_centre_interface(i_diph, 0));
               for (int c = 0; c < 3; c++)
@@ -379,10 +358,10 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
 }
 
 void Intersection_Interface_ijk_cell::maj_interpolation_coo_on_interfaces(
-  const IJK_Field_double& indicatrice_ft)
+  const IJK_Field_double& indicatrice)
 {
   calcul_projection_centre_sur_interface_moy(
-    indicatrice_ft,
+    indicatrice,
     postions_on_interf_,
     ijk_interfaces_,
     normal_on_interf_,

@@ -36,6 +36,7 @@
 #include <Vecteur3.h>
 #include <Linear_algebra_tools_impl.h>
 #include <SurfaceVapeurIJKComputation.h>
+#include <ComputeValParCompoInCell.h>
 
 #define VERIF_INDIC 0
 
@@ -533,31 +534,18 @@ public :
   );
   void set_compute_surfaces_mouillees() { surface_vapeur_par_face_computation_.set_compute_surfaces_mouillees(); }
 
+  const int& nb_compo_traversantes(const int i, const int j, const int k) const
+  {
+    return nb_compo_traversante_[next()](i,j,k);
+  }
+
 protected:
   // Met à jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
   SurfaceVapeurIJKComputation surface_vapeur_par_face_computation_;
-  // barycentre_vapeur_par_face_.
-  // void compute_surf_and_barys();
-  // void rempli_surface_vapeur_par_face_interieur_bulles();
-  // Calcul des tableau de surface, normal et bary par compo
-  void calculer_moyennes_interface_element_pour_compo(
-    const int num_compo,
-    const int elem,
-    double& surface,
-    Vecteur3& normale,
-    Vecteur3& bary
-  ) const;
 
-  int calculer_indic_elem_pour_compo(const int icompo, const int elem, double& indic) const;
+  ComputeValParCompoInCell val_par_compo_in_cell_computation_;
 
-  void calculer_valeur_par_compo(
-    IJK_Field_double& field_repulsion,
-    const ArrOfDouble& gravite,
-    const double delta_rho,
-    const double sigma,
-    const double time,
-    const int itstep
-  );
+  void verif_indic() ;
 
   void calculer_phi_repuls_sommet(
     ArrOfDouble& potentiels_sommets,
@@ -579,25 +567,6 @@ protected:
     const double time,
     const int itstep
   );
-
-  void calculer_moy_par_compo(
-    IJK_Field_int& nb_compo_traversante,
-    FixedVector<IJK_Field_int, max_authorized_nb_of_components_>& compos_traversantes,
-    FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& normale_par_compo,
-    FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& bary_par_compo,
-    FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& indic_par_compo,
-    FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& surface_par_compo
-  ) const;
-  void calculer_moy_field_sommet_par_compo(
-    const ArrOfDouble& val_on_sommet,
-    FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo
-  ) const;
-  void calculer_moy_field_fa7_par_compo(
-    const ArrOfDouble& val_on_fa7,
-    FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo
-  ) const;
-
-  void calculer_bary_surface_normale_par_compo();
 
   void calculer_indicatrice(IJK_Field_double& indic);
   void calculer_indicatrice_optim(IJK_Field_double& indic);
@@ -641,13 +610,6 @@ protected:
                                               ArrOfDouble& distance,
                                               DoubleTab& v_closer,
                                               const double distmax);
-
-
-  void calculer_normale_et_bary_element_pour_compo(const int icompo,
-                                                   const int elem,
-                                                   const  Maillage_FT_IJK& maillage,
-                                                   Vecteur3& normale,
-                                                   Vecteur3& bary_facettes_dans_elem) const;
 
 // reference vers le splitting_ft_ pour les interfaces :
   REF(IJK_Splitting) ref_splitting_;

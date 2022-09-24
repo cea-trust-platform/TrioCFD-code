@@ -2389,8 +2389,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   //const double delta[3] = {dx,dy,dz};
 
   int nbsom = 0;
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
+  // ArrOfInt liste_composantes_connexes_dans_element;
+  // liste_composantes_connexes_dans_element.set_smart_resize(1);
   DoubleTab positions_liq(2*nbsom,3); // Table of coordinates where interpolation needs to be computed
   DoubleTab positions_vap(2*nbsom,3);
   IntTab crossed_cells(nbsom,3); // Table to store i,j,k of cells crossed by the interface.
@@ -2585,7 +2585,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
       const int j = crossed_cells(icell,1);
       const int k = crossed_cells(icell,2);
       const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
-      const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
+      // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
+      const int nb_compo_traversantes = interfaces_.nb_compo_traversantes(i,j,k);
       if (nb_compo_traversantes !=1)
         {
           extended_pv_ft_(i,j,k) = 1.e20;
