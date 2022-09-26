@@ -19,12 +19,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <IJK_FT.h>
 #include <SurfaceVapeurIJKComputation.h>
-#include <IJK_Navier_Stokes_tools.h>
-#include <Linear_algebra_tools.h>
-#include <stat_counters.h>
-#include <vector>
 
 
 void SurfaceVapeurIJKComputation::initialize(const IJK_Splitting& splitting)
@@ -343,7 +338,7 @@ void SurfaceVapeurIJKComputation::get_IJK_ind_from_ind2d(const int i_dim, const 
 }
 
 void SurfaceVapeurIJKComputation::check_if_vect_is_from_liquid2vapor(
-  const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+  const FixedVector<IJK_Field_double, 3>& normale_of_interf,
   const DataArrayDouble *vector,
   const int dim, const int i_plan,
   const int nx, const DataArrayIdType *ids_old,
@@ -379,23 +374,23 @@ void SurfaceVapeurIJKComputation::check_if_vect_is_from_liquid2vapor(
           // gauches pour avoir le vecteur de la normale a la face. Dans le cas ou
           // il ya plusieurs compos connexes je ne sais pas trop comment gérer la
           // situation.
-          // TODO: PB!!! je vais chercher dans le field normale_par_compo l'element
+          // TODO: PB!!! je vais chercher dans le field normale_of_interf l'element
           // 0,0,0 qui visiblement n'existe pas. bizarrement il y a un talbeau non
           // initialisé dans les tableaux suivants lors du tt premier passage à
           // chaque pas de temps. Je vais chercher la valeur pour la premiere compo
           // connexe dans l'element et j'espere qu'il s'agit bien de la mm dans
           // l'element d'à coté
-          const double normale_par_compo_cell = normale_par_compo[coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2]);
-          double normale_par_compo_next_cell;
+          const double normale_of_interf_cell = normale_of_interf[coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2]);
+          double normale_of_interf_next_cell;
           if (dim == 0)
-            normale_par_compo_next_cell = normale_par_compo[coo2keep[c]](coo_ijk[0] + 1, coo_ijk[1], coo_ijk[2]);
+            normale_of_interf_next_cell = normale_of_interf[coo2keep[c]](coo_ijk[0] + 1, coo_ijk[1], coo_ijk[2]);
           else if (dim == 1)
-            normale_par_compo_next_cell = normale_par_compo[coo2keep[c]](coo_ijk[0], coo_ijk[1] + 1, coo_ijk[2]);
+            normale_of_interf_next_cell = normale_of_interf[coo2keep[c]](coo_ijk[0], coo_ijk[1] + 1, coo_ijk[2]);
           else
-            normale_par_compo_next_cell = normale_par_compo[coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2] + 1);
+            normale_of_interf_next_cell = normale_of_interf[coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2] + 1);
 
-          const double normale_par_compo_moy = (normale_par_compo_cell + normale_par_compo_next_cell) / 2.;
-          const double scal_prod_compo = vector_ptr[n_compo_v * i_diph + c] * normale_par_compo_moy;
+          const double normale_of_interf_moy = (normale_of_interf_cell + normale_of_interf_next_cell) / 2.;
+          const double scal_prod_compo = vector_ptr[n_compo_v * i_diph + c] * normale_of_interf_moy;
           scal_prod += scal_prod_compo;
         }
       if (scal_prod < 0.)
@@ -467,7 +462,7 @@ void SurfaceVapeurIJKComputation::get_vect_from_sub_cells_tuple(const int dim, c
 
 void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vapeur(
   const Maillage_FT_IJK& maillage_ft_ijk,
-  const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+  const FixedVector<IJK_Field_double, 3>& normale_of_interf,
   FixedVector<IJK_Field_double, 3>& surfaces,
   FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentres)
 {
@@ -697,10 +692,10 @@ void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vap
 
               // Get ortho from 2d mesh of the bubble
               // get_ortho_per_cell(orthoProjected, N[X1]-1, N[Y1]-1, xmin, ymin,
-              //         dx, dy, normale_par_compo_[old()]);
+              //         dx, dy, normale_of_interf_[old()]);
 
               // Check if orientation is Ok or switches it
-              check_if_vect_is_from_liquid2vapor(normale_par_compo, vect0, d, i_plan, N[X1], cIcellsIdinMesh0, cellsIdinMesh0);
+              check_if_vect_is_from_liquid2vapor(normale_of_interf, vect0, d, i_plan, N[X1], cIcellsIdinMesh0, cellsIdinMesh0);
               // cIcellsIdinMesh1 = check_if_vect_is_from_liquid2vapor(vect1,
               // orthoPerCell,
               //                                                       cIcellsIdinMesh1,
@@ -770,7 +765,7 @@ void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vap
 int SurfaceVapeurIJKComputation::compute_surf_and_barys(
   const Maillage_FT_IJK& maillage_ft_ijk,
   const IJK_Field_double& indicatrice_ft,
-  const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+  const FixedVector<IJK_Field_double, 3>& normale_of_interf,
   FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face,
   FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentre_vapeur_par_face) //next()
 {
@@ -782,7 +777,7 @@ int SurfaceVapeurIJKComputation::compute_surf_and_barys(
       Cout << "Calcul surfaces et barys" << finl;
       calculer_surfaces_et_barys_faces_mouillees_vapeur(
         maillage_ft_ijk,
-        normale_par_compo,
+        normale_of_interf,
         surface_vapeur_par_face,
         barycentre_vapeur_par_face);
       Cerr << "Le calcul des surfaces et barys est fini" << finl;
@@ -791,11 +786,14 @@ int SurfaceVapeurIJKComputation::compute_surf_and_barys(
   return nb_surface_mouillees;
 }
 
-int SurfaceVapeurIJKComputation::rempli_surface_vapeur_par_face_interieur_bulles(FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face, const IJK_Field_double& indicatrice_ft) // next()
+int SurfaceVapeurIJKComputation::rempli_surface_vapeur_par_face_interieur_bulles(
+  FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face,
+  const IJK_Field_double& indicatrice_ft) // next()
 {
   const int ni = surface_vapeur_par_face[0].ni();
   const int nj = surface_vapeur_par_face[0].nj();
   const int nk = surface_vapeur_par_face[0].nk();
+  const double eps_diph = 10.e-6;
   int n_faces_mouilles = 0;
   double surf_cell = 1.;
   for (int dir = 0; dir < 3; dir++)
@@ -810,9 +808,9 @@ int SurfaceVapeurIJKComputation::rempli_surface_vapeur_par_face_interieur_bulles
         for (int j = 0; j < nj; j++)
           for (int k = 0; k < nk; k++)
             {
-              if (surface_vapeur_par_face[dir](i, j, k) *
-                  (surf_cell - surface_vapeur_par_face[dir](i, j, k)) >
-                  EPS_ * surf_cell * surf_cell)
+              double& surf_vap = surface_vapeur_par_face[dir](i, j, k);
+              if (    (surf_vap / surf_cell > eps_diph)
+                      and (surf_vap / surf_cell < 1. - eps_diph))
                 {
                   n_faces_mouilles++;
                   // Cerr << "Cette face est diphasique ; dir " << dir << " i " << i
@@ -829,7 +827,7 @@ int SurfaceVapeurIJKComputation::rempli_surface_vapeur_par_face_interieur_bulles
                     mean_indic = (indicatrice_ft(i, j, k - 1) + indicatrice_ft(i, j, k)) / 2.;
                   bool test = (mean_indic < 0.5);
                   // Alors on met la surface de la face comme vapeur pure
-                  surface_vapeur_par_face[dir](i, j, k) = (test ? surf_cell : 0.);
+                  surf_vap = (test ? surf_cell : 0.);
                 }
             }
     }

@@ -72,7 +72,7 @@ public:
   int compute_surf_and_barys(
     const Maillage_FT_IJK& maillage_ft_ijk,
     const IJK_Field_double& indicatrice_ft,
-    const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+    const FixedVector<IJK_Field_double, 3>& normale_of_interf,
     FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face,
     FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentre_vapeur_par_face
   );
@@ -115,7 +115,7 @@ protected:
   // barycentre de la phase vapeur.
   void calculer_surfaces_et_barys_faces_mouillees_vapeur(
     const Maillage_FT_IJK& maillage_ft_ijk,
-    const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+    const FixedVector<IJK_Field_double, 3>& normale_of_interf,
     FixedVector<IJK_Field_double, 3>& surfaces,
     FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentres);
 
@@ -177,7 +177,7 @@ protected:
   // Returns:
   //- TODO
   void check_if_vect_is_from_liquid2vapor(
-    const FixedVector<IJK_Field_double, 3*max_authorized_nb_of_components_>& normale_par_compo,
+    const FixedVector<IJK_Field_double, 3>& normale_of_interf,
     const DataArrayDouble *vector,
     const int dim, const int i_plan, const int nx,
     const DataArrayIdType *ids_diph,
@@ -186,7 +186,7 @@ protected:
   // Maillage au format MEDCouplingUMesh
   MCU maillage_bulles_med_;
   // Ref to maillage_ft_ijk
-  // const FixedVector<IJK_Field_double, 3> normale_par_compo_;
+  // const FixedVector<IJK_Field_double, 3> normale_of_interf_;
   REF(IJK_Splitting) ref_splitting_;
   bool desactive_med_;
   bool compute_surf_mouillees_;

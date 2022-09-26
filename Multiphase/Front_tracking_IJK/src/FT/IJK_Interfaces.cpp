@@ -523,6 +523,16 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           bary_par_compo_[next()][idx].allocate(splitting_FT, IJK_Splitting::ELEM, 1);
         }
     }
+  allocate_velocity(normal_of_interf_[old()], splitting_FT, 1);
+  allocate_velocity(normal_of_interf_[next()], splitting_FT, 1);
+  allocate_velocity(normal_of_interf_ns_[old()], splitting_NS, 1);
+  allocate_velocity(normal_of_interf_ns_[next()], splitting_NS, 1);
+
+  allocate_velocity(bary_of_interf_[old()], splitting_FT, 1);
+  allocate_velocity(bary_of_interf_[next()], splitting_FT, 1);
+  allocate_velocity(bary_of_interf_ns_[old()], splitting_NS, 1);
+  allocate_velocity(bary_of_interf_ns_[next()], splitting_NS, 1);
+
   allocate_velocity(surface_vapeur_par_face_[old()], splitting_FT, 1);
   allocate_velocity(surface_vapeur_par_face_[next()], splitting_FT, 1);
   allocate_velocity(surface_vapeur_par_face_ns_[old()], splitting_NS, 1);
@@ -5305,7 +5315,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
 
   // Calcul de l'indicatrice sur le domaine NS :
   ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
-      indicatrice_ft_[next()], indicatrice_ns_[next()]);
+    indicatrice_ft_[next()], indicatrice_ns_[next()]);
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
   // Calcul des indicatrices s'il y a des groupes :
@@ -5323,23 +5333,6 @@ void IJK_Interfaces::calculer_indicatrice_next(
       ref_ijk_ft_->redistrib_from_ft_elem().redistribute(groups_indicatrice_ft_[next()], groups_indicatrice_ns_[next()]);
       groups_indicatrice_ns_[next()].echange_espace_virtuel();
     }
-
-  // Aux faces mouillees
-  n_faces_mouilles_ = surface_vapeur_par_face_computation_.compute_surf_and_barys(
-                        maillage_ft_ijk_,
-                        indicatrice_ft_[next()],
-                        normale_par_compo_[next()],
-                        surface_vapeur_par_face_[next()],
-                        barycentre_vapeur_par_face_[next()]);
-  // Passage au domaine NS
-  ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
-    surface_vapeur_par_face_[next()],
-    surface_vapeur_par_face_ns_[next()]);
-  for (int c=0; c<3; c++)
-    ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
-      barycentre_vapeur_par_face_[next()][c],
-      barycentre_vapeur_par_face_ns_[next()][c]);
-
 
   // Aux cellules diphasiques, calcule toutes les moyennes de l'interface
   // dans les cellules pour chaque compo. Le but est de le faire une fois
@@ -5374,12 +5367,43 @@ void IJK_Interfaces::calculer_indicatrice_next(
   verif_indic();
 #endif
 
+  // Calcul normale_of_interf_ bary_of_interf_ et passage à NS
+  mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], normal_of_interf_[next()]);
+  mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], bary_of_interf_[next()]);
+
+  for (int c=0; c < 3; c++)
+    {
+      ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+        normal_of_interf_[next()][c],
+        normal_of_interf_ns_[next()][c]);
+      ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+        bary_of_interf_[next()][c],
+        bary_of_interf_ns_[next()][c]);
+    }
+
+  // Aux faces mouillees
+  n_faces_mouilles_[next()] = surface_vapeur_par_face_computation_.compute_surf_and_barys(
+                                maillage_ft_ijk_,
+                                indicatrice_ft_[next()],
+                                normal_of_interf_[next()],
+                                surface_vapeur_par_face_[next()],
+                                barycentre_vapeur_par_face_[next()]);
+  // Passage au domaine NS
+  ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+    surface_vapeur_par_face_[next()],
+    surface_vapeur_par_face_ns_[next()]);
+  for (int c=0; c<3; c++)
+    ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+      barycentre_vapeur_par_face_[next()][c],
+      barycentre_vapeur_par_face_ns_[next()][c]);
+
   statistiques().end_count(calculer_indicatrice_next_counter_);
 }
 
 
 #if VERIF_INDIC
-void IJK_Interfaces::verif_indic() {
+void IJK_Interfaces::verif_indic()
+{
   calculer_indicatrice(indicatrice_ft_test_);
   indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost());
   SChaine indic;
@@ -5445,6 +5469,11 @@ void IJK_Interfaces::switch_indicatrice_next_old()
   normale_par_compo_[old()].echange_espace_virtuel();
   bary_par_compo_[old()].echange_espace_virtuel();
   surface_par_compo_[old()].echange_espace_virtuel();
+
+  normal_of_interf_[old()].echange_espace_virtuel();
+  bary_of_interf_[old()].echange_espace_virtuel();
+  normal_of_interf_ns_[old()].echange_espace_virtuel();
+  bary_of_interf_ns_[old()].echange_espace_virtuel();
 
   surface_vapeur_par_face_[old()].echange_espace_virtuel();
   surface_vapeur_par_face_ns_[old()].echange_espace_virtuel();

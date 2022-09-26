@@ -125,14 +125,15 @@ void Intersection_Interface_ijk_face::compute_mean_interface_face(
   const int elem0 = splitting_->convert_ijk_cell_to_packed(i, j, k);
   get_mean_interface_cell(elem0, normale0, bary_facettes_dans_elem0);
 
+  // elem1 est l'element avant elem0 dans la direction dir
   int elem1;
   assert((dir >= 0) && (dir < 3));
   if (dir == 0)
-    elem1 = splitting_->convert_ijk_cell_to_packed(i + 1, j, k);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i - 1, j, k);
   else if (dir == 1)
-    elem1 = splitting_->convert_ijk_cell_to_packed(i, j + 1, k);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i, j - 1, k);
   else
-    elem1 = splitting_->convert_ijk_cell_to_packed(i, j, k + 1);
+    elem1 = splitting_->convert_ijk_cell_to_packed(i, j, k - 1);
 
   Vecteur3 bary_facettes_dans_elem1;
   Vecteur3 normale1;
@@ -151,7 +152,8 @@ void Intersection_Interface_ijk_face::compute_mean_interface_face(
 void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_interface_moy(
   DoubleTab& positions,
   IntTab& indices,
-  DoubleTab& normales_de_la_proj
+  DoubleTab& normales_de_la_proj,
+  DoubleTab& distance_barys_interface
 )
 {
   const auto& surfaces = interfaces_->get_surface_vapeur_par_face();
@@ -173,6 +175,7 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
   positions.resize(2 * n_diph, 3);
   indices.resize(2 * n_diph, 5);
   normales_de_la_proj.resize(2 * n_diph, 3);
+  distance_barys_interface.resize(2*n_diph,1);
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -241,9 +244,11 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
                   projete_interface(normale, bary, bary_vap, position);
                   for (int c = 0; c < 3; c++)
                     positions(i_diph, c) = position[c];
+                  distance_point_point(position, bary_vap, distance_barys_interface(i_diph, 0));
                   projete_interface(normale, bary, bary_liqu, position);
                   for (int c = 0; c < 3; c++)
                     positions(i_diph + 1, c) = position[c];
+                  distance_point_point(position, bary_liqu, distance_barys_interface(i_diph+1, 0));
                   i_diph += 2;
                 }
               else
@@ -257,8 +262,9 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
 void Intersection_Interface_ijk_face::maj_interpolation_coo_on_interfaces()
 {
   calcul_projection_bary_face_mouillee_interface_moy(
-    postions_on_interf_, ijkf_interfaces_, normal_on_interf_);
+    postions_on_interf_, ijkf_interfaces_, normal_on_interf_, dist_to_interf_);
   champ_face_mouillees_a_jour_ = true;
+  //TODO: maj de dist_interf_
 }
 
 int Intersection_Interface_ijk_cell::initialize(

@@ -350,7 +350,7 @@ public :
     return barycentre_vapeur_par_face_ns_[old()];
   }
 
-  int get_nb_face_mouillees() const { return n_faces_mouilles_; }
+  int get_nb_face_mouillees() const { return n_faces_mouilles_[old()]; }
 
   // TODO: utiliser le allocate de allocate_velociter dans
   // IJK_Navier_Stockes_tools.cpp utiliser le pslitting de NS, pas le FT
@@ -378,6 +378,35 @@ public :
       return 0.;
   }
 
+  static void mean_over_compo(
+    const FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& field_for_compo,
+    const IJK_Field_int& nb_compo_traversante,
+    FixedVector<IJK_Field_double, 3>& mean_par_compo_field
+  )
+  {
+    const int ni = nb_compo_traversante.ni();
+    const int nj = nb_compo_traversante.nj();
+    const int nk = nb_compo_traversante.nk();
+    for (int dir=0; dir < 3; dir ++)
+      for (int i=0; i < ni; i++)
+        for (int j=0; j < nj; j++)
+          for (int k=0; k < nk; k++)
+            {
+              double res = 0.;
+              for (int compo = 0; compo <= nb_compo_traversante(i, j, k); compo++)
+                {
+                  int idx = 3 * compo + dir;
+                  const double last_val = field_for_compo[idx](i, j, k);
+                  res += last_val;
+                }
+              if (nb_compo_traversante(i,j,k) > 0)
+                res = res / nb_compo_traversante(i, j, k);
+              else
+                res = 0.;
+              mean_par_compo_field[dir](i,j,k) = res;
+            }
+  }
+
   static double mean_over_compo(
     const FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& field_for_compo,
     const IJK_Field_int& nb_compo_traversante,
@@ -403,15 +432,18 @@ public :
   int old() const { return 1 - old_en_premier_; }
   int next() const { return old_en_premier_; }
 
-  const FixedVector<IJK_Field_double, max_authorized_nb_of_components_ * 3>& get_bary_itfc_in_cell() const
+  // TODO: retirer l'acces a FT
+  const FixedVector<IJK_Field_double, max_authorized_nb_of_components_ * 3>& get_bary_par_compo_itfc_in_cell_ft() const
   {
     return bary_par_compo_[old()];
   }
-  const FixedVector<IJK_Field_double, max_authorized_nb_of_components_ * 3>& get_norm_itfc_in_cell() const
+  // TODO: retirer l'acces a FT
+  const FixedVector<IJK_Field_double, max_authorized_nb_of_components_ * 3>& get_norm_par_compo_itfc_in_cell_ft() const
   {
     return normale_par_compo_[old()];
   }
 
+  // TODO: retirer l'acces a FT
   const IJK_Field_double& I_ft() const { return indicatrice_ft_[old()]; }
   const double& I_ft(const int i, const int j, const int k) const { return indicatrice_ft_[old()](i, j, k); }
   const IJK_Field_double& In_ft() const { return indicatrice_ft_[next()]; }
@@ -460,24 +492,24 @@ public :
   // (c) de bulle dans le maille (compo = max_nb_of_compo_ * c + dir)
   const double& nI(const int compo, const int i, const int j, const int k) const
   {
-    return normale_par_compo_[old()][compo](i, j, k);
+    return normal_of_interf_ns_[old()][compo](i, j, k);
   }
   Vecteur3 nI(const int i, const int j, const int k) const
   {
-    const Vecteur3 res(mean_over_compo(normale_par_compo_[old()], nb_compo_traversante_[old()], 0, i, j, k),
-                       mean_over_compo(normale_par_compo_[old()], nb_compo_traversante_[old()], 1, i, j, k),
-                       mean_over_compo(normale_par_compo_[old()], nb_compo_traversante_[old()], 2, i, j, k));
+    const Vecteur3 res(normal_of_interf_ns_[old()][0](i, j, k),
+                       normal_of_interf_ns_[old()][1](i, j, k),
+                       normal_of_interf_ns_[old()][2](i, j, k));
     return res;
   }
   const double& nIn(const int compo, const int i, const int j, const int k) const
   {
-    return normale_par_compo_[next()][compo](i, j, k);
+    return normal_of_interf_ns_[next()][compo](i, j, k);
   }
   Vecteur3 nIn(const int i, const int j, const int k) const
   {
-    const Vecteur3 res(mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], 0, i, j, k),
-                       mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], 1, i, j, k),
-                       mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], 2, i, j, k));
+    const Vecteur3 res(normal_of_interf_ns_[next()][0](i, j, k),
+                       normal_of_interf_ns_[next()][1](i, j, k),
+                       normal_of_interf_ns_[next()][2](i, j, k));
     return res;
   }
 
@@ -485,20 +517,20 @@ public :
   // comnnexe (c) de bulle dans le maille (compo = max_nb_of_compo_ * c + dir)
   const double& xI(const int compo, const int i, const int j, const int k) const
   {
-    return bary_par_compo_[old()][compo](i, j, k);
+    return bary_of_interf_ns_[old()][compo](i, j, k);
   }
   Vecteur3 xIn(const int i, const int j, const int k) const
   {
-    const Vecteur3 res(mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], 0, i, j, k),
-                       mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], 1, i, j, k),
-                       mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], 2, i, j, k));
+    const Vecteur3 res(bary_of_interf_ns_[next()][0](i, j, k),
+                       bary_of_interf_ns_[next()][1](i, j, k),
+                       bary_of_interf_ns_[next()][2](i, j, k));
     return res;
   }
   Vecteur3 xI(const int i, const int j, const int k) const
   {
-    const Vecteur3 res(mean_over_compo(bary_par_compo_[old()], nb_compo_traversante_[old()], 0, i, j, k),
-                       mean_over_compo(bary_par_compo_[old()], nb_compo_traversante_[old()], 1, i, j, k),
-                       mean_over_compo(bary_par_compo_[old()], nb_compo_traversante_[old()], 2, i, j, k));
+    const Vecteur3 res(bary_of_interf_ns_[old()][0](i, j, k),
+                       bary_of_interf_ns_[old()][1](i, j, k),
+                       bary_of_interf_ns_[old()][2](i, j, k));
     return res;
   }
 
@@ -731,13 +763,20 @@ protected:
   bool compute_surf_mouillees_; // active seulement dans le cas
   // ou il y a des champs thermique ou d energie.
   // attention, ca desactive seulement le calcul, pas l'allocation.
-  int n_faces_mouilles_;
+  FixedVector<int,2> n_faces_mouilles_;
 
   bool is_diphasique_;
 
   // Surfaces vapeur des faces du maillage IJK
   FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_;
   FixedVector<FixedVector<IJK_Field_double, 3>, 2> surface_vapeur_par_face_ns_;
+
+  // Normale de l'interface par maille ijk sur domaine NS
+  FixedVector<FixedVector<IJK_Field_double, 3>, 2> normal_of_interf_;
+  FixedVector<FixedVector<IJK_Field_double, 3>, 2> normal_of_interf_ns_;
+  // Barycentre de l'interface par maille ijk sur domaine NS
+  FixedVector<FixedVector<IJK_Field_double, 3>, 2> bary_of_interf_;
+  FixedVector<FixedVector<IJK_Field_double, 3>, 2> bary_of_interf_ns_;
 
   // Barycentres vapeur des faces du maillage IJK
   FixedVector<FixedVector<FixedVector<IJK_Field_double, 3>, 3>, 2> barycentre_vapeur_par_face_;

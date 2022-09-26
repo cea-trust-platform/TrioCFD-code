@@ -41,10 +41,10 @@
 #include <Param.h>
 #include <stat_counters.h>
 
-int Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
-                                const IJK_Field_double& field,
-                                const IJK_Interfaces& interfaces,
-                                const IJK_FT_double& ijk_ft)
+void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
+                                 const IJK_Field_double& field,
+                                 const IJK_Interfaces& interfaces,
+                                 const IJK_FT_double& ijk_ft)
 {
   // TODO: est-ce que les pointeurs restent bien toujours les meme ?
   // Si oui je peux ne les initialiser qu'une fois, sinon il faudra
@@ -53,10 +53,9 @@ int Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
   field_ = &field;
   splitting_ = &splitting;
   ref_ijk_ft_ = ijk_ft;
-  return 1;
 }
 
-int Corrige_flux_FT_temperature_conv::initialize(
+void Corrige_flux_FT_temperature_conv::initialize(
   const IJK_Splitting& splitting, const IJK_Field_double& field,
   const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft,
   const double rhocpl, const double rhocpv, const double ldal,
@@ -64,41 +63,54 @@ int Corrige_flux_FT_temperature_conv::initialize(
 {
   Corrige_flux_FT::initialize(splitting, field, interfaces, ijk_ft);
   intersection_ijk_face_.initialize(splitting, interfaces);
-  temp_interface_.set_smart_resize(1);
-  temp_vap1_.set_smart_resize(1);
-  temp_liqu1_.set_smart_resize(1);
+  intersection_ijk_cell_.initialize(splitting, interfaces);
+  temp_interface_face_.set_smart_resize(1);
+  temp_interface_cell_.set_smart_resize(1);
   temperature_barys_.set_smart_resize(1);
-  temp_interface_.resize(intersection_ijk_face_.n());
+  temperature_ghost_.set_smart_resize(1);
+  temp_interface_face_.resize(intersection_ijk_face_.n());
+  temp_interface_cell_.resize(intersection_ijk_cell_.n());
   temperature_barys_.resize(intersection_ijk_face_.n(), 2);
-  temp_liqu1_.resize(intersection_ijk_face_.n());
-  temp_vap1_.resize(intersection_ijk_face_.n());
+  temperature_ghost_.resize(intersection_ijk_cell_.n(), 2);
   rhocp_l_ = rhocpl;
   rhocp_v_ = rhocpv;
   lda_l_ = ldal;
   lda_v_ = ldav;
   rho_cp_.initialize(rhocpl, rhocpv);
   lda_.initialize(ldal, ldav);
-  intersection_ijk_cell_.initialize(splitting, interfaces);
-  temperature_ghost_.set_smart_resize(1);
-  return 1;
 }
 
 void Corrige_flux_FT_temperature_conv::update()
 {
 
+  ArrOfDouble temp_vap, temp_liqu;
+  temp_vap.set_smart_resize(1);
+  temp_liqu.set_smart_resize(1);
+
   // On commence par calculer les temperatures aux faces mouillées
   intersection_ijk_face_.maj_interpolation_coo_on_interfaces();
 
+  temp_vap.resize(intersection_ijk_face_.n());
+  temp_liqu.resize(intersection_ijk_face_.n());
+
   // On lance l'interpolation sur l'interface,
-  calcul_temp_flux_interf();
+  calcul_temp_flux_interf_pour_bary_face(temp_vap, temp_liqu);
 
   // puis l'interpolation retour au bary de la face mouillée.
-  interp_back_to_bary_faces();
+  interp_back_to_bary_faces(temp_vap, temp_liqu);
 
   // Puis des températures ghost pour les flux à proximité de l'interface
   intersection_ijk_cell_.maj_interpolation_coo_on_interfaces(
     ref_ijk_ft_->itfce().I());
-  update_temperature_ghost();
+
+  temp_vap.resize(intersection_ijk_cell_.n());
+  temp_liqu.resize(intersection_ijk_cell_.n());
+
+  // On lance l'interpolation sur l'interface,
+  calcul_temp_flux_interf_pour_bary_cell(temp_vap, temp_liqu);
+
+  // puis l'interpolation retour au bary de la face mouillée.
+  update_temperature_ghost(temp_vap, temp_liqu);
 }
 
 double Corrige_flux_FT_temperature_conv::quick(
@@ -189,8 +201,8 @@ double Corrige_flux_FT_temperature_conv::extrapolation_amont_1_depuis_l_interfac
   // TODO: attention c'est completement faux, la température à l'interface dans le
   // tableau correspond aux températures d'interface aux projection des barycentre
   // des faces mouillées.
-  const double Ti = temp_interface_(i_diph);
-  const double qi = q_interface_(i_diph);
+  const double Ti = temp_interface_cell_(i_diph);
+  const double qi = q_interface_cell_(i_diph);
   const double d = 1.;
   const double signe = 1.;
   return Ti + qi * d * signe;
@@ -409,7 +421,7 @@ void Corrige_flux_FT_temperature_conv::remplace_flux_par_somme_rhocpf_Tf_v_Sf(
                       rhocp_v_ * temperature_barys_(i_diph, 1) * (1. - frac_liquide)) * velocity * s_face ;
 }
 
-void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf()
+void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_face(ArrOfDouble& temp_vap, ArrOfDouble& temp_liqu)
 {
   const double ldal = lda_l_;
   const double ldav = lda_v_;
@@ -424,8 +436,8 @@ void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf()
 
   calcul_temperature_flux_interface(
     *field_, ldal, ldav, dist, intersection_ijk_face_.pos_interf(),
-    intersection_ijk_face_.norm_interf(), temp_interface_, q_interface_,
-    temp_liqu1_, temp_vap1_, coo_liqu1, coo_vap1);
+    intersection_ijk_face_.norm_interf(), temp_interface_face_, q_interface_face_,
+    temp_liqu, temp_vap, coo_liqu1, coo_vap1);
 }
 
 void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
@@ -462,15 +474,16 @@ void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
       if (temp_liqu(i_diph) > 1.e9)
         {
           Cerr << "Problem temperature interface" << finl;
+          temp_liqu(i_diph) = 1.e9;
         }
       temperature_interp(i_diph) = Ti;
       flux_normal_interp(i_diph) = ldav * (Ti - temp_vap(i_diph)) / dist;
     }
 }
 
-void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces()
+void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu)
 {
-  const int n_diph = temp_interface_.size_array();
+  const int n_diph = temp_interface_face_.size_array();
   const auto& geom = splitting_->get_grid_geometry();
   const double d1 = 1.52 * (std::pow(geom.get_constant_delta(0), 2.) +
                             std::pow(geom.get_constant_delta(1), 2.) +
@@ -490,18 +503,16 @@ void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces()
       const double d1_inv = 1. / (d1 - di + 1.e-10);
       const double di_inv = 1. / (di + 1.e-10);
       temperature_barys_(i_diph, 1) =
-        (temp_interface_(i_diph) * di_inv + temp_vap1_(i_diph) * d1_inv) /
+        (temp_interface_face_(i_diph) * di_inv + temp_vap(i_diph) * d1_inv) /
         (di_inv + d1_inv);
       temperature_barys_(i_diph, 0) =
-        (temp_interface_(i_diph) * di_inv + temp_liqu1_(i_diph) * d1_inv) /
+        (temp_interface_face_(i_diph) * di_inv + temp_liqu(i_diph) * d1_inv) /
         (di_inv + d1_inv);
     }
 }
 
-void Corrige_flux_FT_temperature_conv::update_temperature_ghost()
+void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_cell(ArrOfDouble& temp_vap, ArrOfDouble& temp_liqu)
 {
-  intersection_ijk_cell_.maj_interpolation_coo_on_interfaces(
-    ref_ijk_ft_->itfce().I());
   const double ldal = lda_l_;
   const double ldav = lda_v_;
   const auto& geom = splitting_->get_grid_geometry();
@@ -509,13 +520,20 @@ void Corrige_flux_FT_temperature_conv::update_temperature_ghost()
                               std::pow(geom.get_constant_delta(1), 2.) +
                               std::pow(geom.get_constant_delta(2), 2.));
   DoubleTab coord_vap, coord_liqu;
-  ArrOfDouble temp_liqu, temp_vap;
-  ArrOfDouble temp_int, q_int;
   calcul_temperature_flux_interface(
     *field_, ldal, ldav, dist, intersection_ijk_cell_.pos_interf(),
-    intersection_ijk_cell_.norm_interf(), temp_int, q_int, temp_liqu,
+    intersection_ijk_cell_.norm_interf(), temp_interface_cell_, q_interface_cell_, temp_liqu,
     temp_vap, coord_liqu, coord_vap);
-  const int n_diph = temp_int.size_array();
+}
+
+
+void Corrige_flux_FT_temperature_conv::update_temperature_ghost(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu)
+{
+  // intersection_ijk_cell_.maj_interpolation_coo_on_interfaces(
+  //   ref_ijk_ft_->itfce().I());
+  const double ldal = lda_l_;
+  const double ldav = lda_v_;
+  const int n_diph = temp_interface_cell_.size_array();
   temperature_ghost_.resize(n_diph, 2);
   // On réalise une interpolation proportionelle a la distance entre la
   // temperature d'interface au centre de la cellule diph avec tantot le
@@ -524,8 +542,8 @@ void Corrige_flux_FT_temperature_conv::update_temperature_ghost()
     {
       const double di = intersection_ijk_cell_.dist_interf()(i_diph);
       temperature_ghost_(i_diph, 0) =
-        temp_int(i_diph) + di * q_int(i_diph) / ldav;
+        temp_interface_cell_(i_diph) + di * q_interface_cell_(i_diph) / ldav;
       temperature_ghost_(i_diph, 1) =
-        temp_int(i_diph) + di * q_int(i_diph) / ldal;
+        temp_interface_cell_(i_diph) + di * q_interface_cell_(i_diph) / ldal;
     }
 }

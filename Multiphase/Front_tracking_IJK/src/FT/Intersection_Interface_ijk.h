@@ -112,7 +112,6 @@ protected:
   void get_mean_interface_cell(const int elem, Vecteur3& normale, Vecteur3& bary) const;
 };
 
-
 class Intersection_Interface_ijk_face : public Intersection_Interface_ijk
 {
 public:
@@ -145,7 +144,7 @@ protected:
   // L'interface est construite par moyenne sur les deux cellules qui
   // correspondent à la face.
   void calcul_projection_bary_face_mouillee_interface_moy(
-    DoubleTab& positions, IntTab& indices, DoubleTab& normales_de_la_proj);
+    DoubleTab& positions, IntTab& indices, DoubleTab& normales_de_la_proj, DoubleTab& distance_barys_interface);
 
   // La on moyenne les deux interfaces des cellules mitoyennes de la face.
   // Cette face doit être traversée par l'interface.
