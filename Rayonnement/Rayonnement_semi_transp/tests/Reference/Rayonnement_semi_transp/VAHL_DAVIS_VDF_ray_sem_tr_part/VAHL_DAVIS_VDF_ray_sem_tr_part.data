@@ -1,8 +1,8 @@
 # Thermohydraulique 2D VDF Boussinesq et rayonnement semi transparent #
 # PARALLEL OK #
 dimension 2
-Pb_Thermohydraulique pb
-Pb_conduction pb_partition
+Pb_Rayo_Thermohydraulique pb
+Pb_Rayo_conduction pb_partition
 
 Domaine dom_fluide
 Domaine dom_solide
@@ -124,6 +124,7 @@ Lire fluide
 	Cp Champ_Uniforme 1 275.15
 	beta_th Champ_Uniforme 1 1.8231e-2
 	indice Champ_Uniforme 1 1.
+	gravite Champ_Uniforme  2 0 -9.81
 	kappa Champ_Uniforme 1 1.
 }
 
@@ -136,18 +137,11 @@ Lire solide
 	Cp Champ_Uniforme 1 500.
 }
 
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
-
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo dom_fluide
-Associate solide gravite
 Associate pb_partition dom_solide
 Associate pb_partition solide
 
-Associate fluide gravite
 Associate pb dom_fluide
 Associate pb fluide
 

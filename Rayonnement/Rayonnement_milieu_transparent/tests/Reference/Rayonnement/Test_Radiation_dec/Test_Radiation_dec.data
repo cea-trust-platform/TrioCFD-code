@@ -18,7 +18,7 @@ Lire sch
 }
 
 
-Pb_Thermohydraulique pb2
+Pb_Rayo_Thermohydraulique pb2
 
 
 Domaine dom_fluide
@@ -58,15 +58,8 @@ Lire fluide
         lambda Champ_Uniforme 1 0.2
 	Cp Champ_Uniforme 1 500
         beta_th Champ_Uniforme 1 0.
+        gravite Champ_Uniforme 2 0 -9.81
 }
-
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81 
-
-Associate fluide gravite
-
 
 
 Associate pb2 dom_fluide

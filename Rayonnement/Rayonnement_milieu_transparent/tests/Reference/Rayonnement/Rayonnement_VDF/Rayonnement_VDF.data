@@ -14,8 +14,8 @@ Lire sch
 	facsec 0.4
 }
 
-Pb_conduction pb1
-Pb_Thermohydraulique pb2
+Pb_Rayo_conduction pb1
+Pb_Rayo_Thermohydraulique pb2
 
 Domaine dom_solide
 Domaine dom_fluide
@@ -92,6 +92,7 @@ Lire fluide
         lambda Champ_Uniforme 1 1.0 
 	Cp Champ_Uniforme 1 500
         beta_th Champ_Uniforme 1 0.0001
+        gravite Champ_Uniforme 3 0 -9.81 0
 }
 
 Solide sol
@@ -101,11 +102,6 @@ Lire sol
         lambda Champ_Uniforme 1 250.    
 	Cp Champ_Uniforme 1 100
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0 -9.81 0
-Associate sol gravite
-Associate fluide gravite
 
 Associate pb1 dom_solide
 Associate pb1 sol

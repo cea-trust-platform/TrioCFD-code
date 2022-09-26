@@ -14,7 +14,7 @@ Lire sch
 	facsec 0.4
 }
 
-Pb_Thermohydraulique pb
+Pb_Rayo_Thermohydraulique pb
 
 Domaine dom_fluide
 
@@ -65,13 +65,9 @@ Lire fluide
 	rho Champ_Uniforme 1 2
         lambda Champ_Uniforme 1 1.0 
 	Cp Champ_Uniforme 1 500
+	gravite Champ_Uniforme 3 0 -9.81 0
         beta_th Champ_Uniforme 1 0.0001
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0 -9.81 0
-Associate fluide gravite
-
 
 Associate pb dom_fluide
 Associate pb fluide

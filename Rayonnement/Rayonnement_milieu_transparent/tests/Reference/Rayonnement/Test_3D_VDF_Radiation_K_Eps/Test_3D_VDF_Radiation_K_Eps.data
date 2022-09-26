@@ -14,8 +14,8 @@ Lire sch
 	nb_pas_dt_max 100
 }
 
-Pb_conduction pb1
-Pb_Thermohydraulique_turbulent pb2
+Pb_Rayo_conduction pb1
+Pb_Rayo_Thermohydraulique_turbulent pb2
 
 Domaine dom_solide
 Domaine dom_fluide
@@ -104,6 +104,7 @@ Lire fluide
         lambda	Champ_Uniforme 1 0.2
 	Cp	Champ_Uniforme 1 500
         beta_th	Champ_Uniforme 1 0.
+        gravite Champ_Uniforme 3 0 -9.81 0
 }
 
 Solide sol
@@ -113,11 +114,6 @@ Lire sol
         lambda	Champ_Uniforme 1 46.    
 	Cp	Champ_Uniforme 1 1000
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. -9.81 0.
-Associate sol gravite
-Associate fluide gravite
 
 Associate pb1 dom_solide
 Associate pb1 sol

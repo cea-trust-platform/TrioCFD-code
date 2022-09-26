@@ -2,10 +2,10 @@
 # PARALLEL OK #
 dimension 2 
 
-Pb_Thermohydraulique_Turbulent pb1
-Pb_conduction                  pb2
-Pb_Thermohydraulique           pb3
-Pb_conduction                  pb4
+Pb_Rayo_Thermohydraulique_Turbulent pb1
+Pb_Rayo_conduction                  pb2
+Pb_Rayo_Thermohydraulique           pb3
+Pb_Rayo_conduction                  pb4
   
 Domaine dom1
 Domaine dom2
@@ -124,6 +124,7 @@ Lire sodium
 	lambda	Champ_Uniforme	1 68. 
 	Cp	Champ_Uniforme	1 1250
 	beta_th	Champ_Uniforme	1 2.809e-4
+	gravite Champ_Uniforme 2 0 -9.81
 }
 
 Solide acier1
@@ -142,6 +143,7 @@ Lire argon
 	lambda	Champ_Uniforme	1 2.24e-2 
 	Cp	Champ_Uniforme	1 520.
 	beta_th	Champ_Uniforme	1 2.681e-3
+	gravite Champ_Uniforme 2 0 -9.81
 }
 
 Solide acier2
@@ -151,14 +153,6 @@ Lire acier2
 	lambda Champ_Uniforme	1 18.    
 	Cp Champ_Uniforme	1 500.
 }
-
-Champ_Uniforme gravite
-Lire gravite 2  0.  -9.81
-
-Associate sodium gravite
-Associate acier1 gravite
-Associate argon  gravite
-Associate acier2 gravite
 
 Associate pb1 dom1
 Associate pb1 sodium

@@ -1,7 +1,7 @@
 # Thermohydraulique 2D VEF Boussinesq + rayonnement semi transparent #
 # PARALLEL OK #
 dimension 2
-Pb_Thermohydraulique pb
+Pb_Rayo_Thermohydraulique pb
 Pb_conduction pb_partition
 
 Domaine dom_fluide
