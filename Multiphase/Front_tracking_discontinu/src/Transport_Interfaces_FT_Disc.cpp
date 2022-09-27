@@ -6919,7 +6919,7 @@ const Algorithmes_Transport_FT_Disc& Transport_Interfaces_FT_Disc::algorithmes_t
  *    qu'il existe).
  *
  */
-int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
+int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab) const
 {
   int res = 1;
 
@@ -6979,7 +6979,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             const int n = valeurs.size_array();
             ftab->resize(n,1);
             for (int ii = 0; ii < n; ii++)
-              (*ftab)(ii,0) = (float)valeurs[ii]; // downcast to float
+              (*ftab)(ii,0) = valeurs[ii];
             break;
           }
         case 2:
@@ -6998,12 +6998,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
@@ -7033,12 +7029,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
@@ -7059,12 +7051,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             ftab->resize(nb_fa7, nb_compo);
             int fa7,k;
             for (fa7=0 ; fa7<nb_fa7 ; fa7++)
-              {
-                for (k=0 ; k<nb_compo ; k++)
-                  {
-                    (*ftab)(fa7,k) = (float) valeurs(fa7,k);
-                  }
-              }
+              for (k=0 ; k<nb_compo ; k++)
+                (*ftab)(fa7,k) = valeurs(fa7,k);
             break;
           }
         default:

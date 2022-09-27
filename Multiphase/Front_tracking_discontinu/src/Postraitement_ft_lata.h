@@ -22,7 +22,7 @@
 #ifndef Postraitement_ft_lata_included
 #define Postraitement_ft_lata_included
 
-#include <Postraitement_lata.h>
+#include <Postraitement.h>
 #include <Ref_Transport_Interfaces_FT_Disc.h>
 
 class Motcle;
@@ -30,24 +30,32 @@ class Maillage_FT_Disc;
 class Fichier_Lata;
 class Comm_Group;
 
-class Postraitement_ft_lata : public Postraitement_lata
+class Postraitement_ft_lata : public Postraitement
 {
-  Declare_instanciable_sans_constructeur(Postraitement_ft_lata);
+  Declare_instanciable(Postraitement_ft_lata);
+
 public:
-  Postraitement_ft_lata();
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void postraiter(int forcer) override;
+
+  int write_extra_mesh() override;
+  void postprocess_field_values() override;
+
 protected:
   void lire_champ_interface(Entree&);
-  void ecrire_maillage(Fichier_Lata&, const Maillage_FT_Disc&,
-                       int fichiers_multiples) const;
+//  void ecrire_maillage(Fichier_Lata&, const Maillage_FT_Disc&, int fichiers_multiples) const;
+
+  int ecrire_maillage_ft_disc();
+
 
   // L'equation de transport contenant les interfaces a postraiter
   REF(Transport_Interfaces_FT_Disc) refequation_interfaces;
   // Quels champs d'interface faut-il postraiter ?
   Motcles liste_champs_i_aux_sommets;
   Motcles liste_champs_i_aux_elements;
+
+  Nom id_domaine_;  // INTERFACES or PARTICULES - computed in ecrire_maillage_ft_disc()
+
 };
 
 #endif
