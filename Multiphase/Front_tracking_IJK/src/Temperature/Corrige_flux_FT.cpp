@@ -68,7 +68,7 @@ void Corrige_flux_FT_temperature_conv::initialize(
   temp_interface_cell_.set_smart_resize(1);
   temperature_barys_.set_smart_resize(1);
   temperature_ghost_.set_smart_resize(1);
-  temp_interface_face_.resize(intersection_ijk_face_.n());
+  temp_interface_face_.resize(2*intersection_ijk_face_.n());
   temp_interface_cell_.resize(intersection_ijk_cell_.n());
   temperature_barys_.resize(intersection_ijk_face_.n(), 2);
   temperature_ghost_.resize(intersection_ijk_cell_.n(), 2);
@@ -175,7 +175,7 @@ void Corrige_flux_FT_temperature_conv::remplace_flux_par_quick_ghost_amont_1(
   const bool le_flux_est_juste_aval_interface = is_flux_upwind_from_interface(decal);
   if (le_flux_est_juste_aval_interface)
     {
-      T_interp = extrapolation_amont_1_depuis_l_interface(decal);
+      T_interp = extrapolation_amont_1_depuis_l_interface(frac_liquide, decal);
     }
   else
     {
@@ -191,6 +191,7 @@ bool Corrige_flux_FT_temperature_conv::is_flux_upwind_from_interface(const doubl
 }
 
 double Corrige_flux_FT_temperature_conv::extrapolation_amont_1_depuis_l_interface(
+    const double frac_liquide,
   const double decal) const
 {
   const FixedVector<int, 3> elem = parcours_.elem(1 + (int)decal);
@@ -203,9 +204,12 @@ double Corrige_flux_FT_temperature_conv::extrapolation_amont_1_depuis_l_interfac
   // des faces mouillées.
   const double Ti = temp_interface_cell_(i_diph);
   const double qi = q_interface_cell_(i_diph);
-  const double d = 1.;
-  const double signe = 1.;
-  return Ti + qi * d * signe;
+  // const double d = intersection_ijk_cell_.dist_interf()(i_diph);
+  const double d = 0.5 * splitting_->get_grid_geometry().get_constant_delta(parcours_.face());
+  const Vecteur3 norm_interf {intersection_ijk_cell_.norm_interf()(i_diph, 0), intersection_ijk_cell_.norm_interf()(i_diph, 1), intersection_ijk_cell_.norm_interf()(i_diph, 2)} ;
+  const Vecteur3 norm_face {(double)parcours_.get_normale_vec()[0], (double)parcours_.get_normale_vec()[1], (double)parcours_.get_normale_vec()[2]};
+  const double lda = frac_liquide * lda_l_ + (1.-frac_liquide) * lda_v_;
+  return Ti + qi/lda * d * Vecteur3::produit_scalaire(norm_face, norm_interf);
 }
 
 
@@ -383,20 +387,22 @@ void Corrige_flux_FT_temperature_conv::corrige_flux_faceIJ(
         const double frac_vapeur = s_vap / s_face;
         const double frac_liquide = 1.- frac_vapeur;
 
-        // const bool face_monophasique = frac_liquide * frac_vapeur < EPS_;
-        // const bool stencil_liquide = test_if_stencil_inclut_bout_interface_liquide();
-        // const bool stencil_vapeur = test_if_stencil_inclut_bout_interface_vapeur();
-        // const bool stencil_inclut_interface = stencil_liquide & stencil_vapeur;
+        const bool face_monophasique = frac_liquide * frac_vapeur < EPS_;
+        const bool stencil_liquide = test_if_stencil_inclut_bout_interface_liquide();
+        const bool stencil_vapeur = test_if_stencil_inclut_bout_interface_vapeur();
+        const bool stencil_inclut_interface = stencil_liquide & stencil_vapeur;
 
-        // if ((face_monophasique) && (not stencil_inclut_interface)) {
+        multiplie_par_rho_cp_de_la_face_monophasique(frac_liquide, flux);
+        // if ((face_monophasique) && (not stencil_inclut_interface))
+        //   {
         //     multiplie_par_rho_cp_de_la_face_monophasique(frac_liquide, flux);
-        // }
+        //   }
         // else if (face_monophasique) {
         //   remplace_flux_par_quick_ghost_amont_1(frac_liquide, s_face, flux);
         // } else {
         //   remplace_flux_par_somme_rhocpf_Tf_v_Sf(frac_liquide, s_face, flux);
         // }
-        remplace_flux_par_somme_rhocpf_Tf_v_Sf(frac_liquide, s_face, flux);
+        // // remplace_flux_par_somme_rhocpf_Tf_v_Sf(frac_liquide, s_face, flux);
       }
 }
 
@@ -408,7 +414,7 @@ void Corrige_flux_FT_temperature_conv::remplace_flux_par_somme_rhocpf_Tf_v_Sf(
   // La je suis bien en train de regarder une face mouillee.
   // On remet a 0 le flux, puis on ajoute les valeurs sur chaque partie
   // trouvée.
-  Cerr << "Cet elem est diphasique" << endl;
+  // Cerr << "Cet elem est diphasique" << endl;
   const int& i = parcours_.i();
   const int& j = parcours_.j();
   const int& k_layer = parcours_.k();
@@ -426,10 +432,10 @@ void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_face(Ar
   const double ldal = lda_l_;
   const double ldav = lda_v_;
   const auto& geom = splitting_->get_grid_geometry();
-  const double dist = 1.52 * (
-                        std::pow(geom.get_constant_delta(0), 2.) +
-                        std::pow(geom.get_constant_delta(1), 2.) +
-                        std::pow(geom.get_constant_delta(2), 2.));
+  const double dist = 1.52 * std::pow((
+                                        std::pow(geom.get_constant_delta(0), 2.) +
+                                        std::pow(geom.get_constant_delta(1), 2.) +
+                                        std::pow(geom.get_constant_delta(2), 2.)), 0.5);
 
   DoubleTab coo_liqu1;
   DoubleTab coo_vap1;
@@ -457,37 +463,41 @@ void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
   ijk_interpolate_skip_unknown_points(temperature, coo_liqu, temp_liqu, 1.e10);
   temp_vap.resize(coo_vap.dimension(0));
   ijk_interpolate_skip_unknown_points(temperature, coo_vap, temp_vap, 1.e10);
-  const int n_diph = positions.dimension(0);
-  temperature_interp.resize_array(n_diph);
-  flux_normal_interp.resize_array(n_diph);
-  for (int i_diph = 0; i_diph < n_diph; i_diph++)
+  const int n_point_interp = positions.dimension(0);
+  temperature_interp.resize_array(n_point_interp);
+  flux_normal_interp.resize_array(n_point_interp);
+  for (int i_point_interp = 0; i_point_interp < n_point_interp; i_point_interp++)
     {
       const double Ti =
-        (temp_liqu(i_diph) * ldal + temp_vap(i_diph) * ldav) / (ldal + ldav);
-      // Cerr << "Position liqu : " << coo_liqu(i_diph, 0) << ", " <<
-      // coo_liqu(i_diph, 1) << ", " << coo_liqu(i_diph, 2) << finl; Cerr <<
-      // "Position vap : " << coo_vap(i_diph, 0) << ", " << coo_vap(i_diph, 1) <<
-      // ", " << coo_vap(i_diph, 2) << finl; Cerr << "Position interface : " <<
-      // positions(i_diph, 0) << ", " << positions(i_diph, 1) << ", " <<
-      // positions(i_diph, 2) << finl; Cerr << "Tl : " << temp_liqu(i_diph) << ",
-      // Tv : " << temp_vap(i_diph) << ", Ti : " << Ti << finl;
-      if (temp_liqu(i_diph) > 1.e9)
+        (temp_liqu(i_point_interp) * ldal + temp_vap(i_point_interp) * ldav) / (ldal + ldav);
+      // Cerr << "Position liqu : " << coo_liqu(i_point_interp, 0) << ", " <<
+      // coo_liqu(i_point_interp, 1) << ", " << coo_liqu(i_point_interp, 2) << finl; Cerr <<
+      // "Position vap : " << coo_vap(i_point_interp, 0) << ", " << coo_vap(i_point_interp, 1) <<
+      // ", " << coo_vap(i_point_interp, 2) << finl; Cerr << "Position interface : " <<
+      // positions(i_point_interp, 0) << ", " << positions(i_point_interp, 1) << ", " <<
+      // positions(i_point_interp, 2) << finl; Cerr << "Tl : " << temp_liqu(i_point_interp) << ",
+      // Tv : " << temp_vap(i_point_interp) << ", Ti : " << Ti << finl;
+      if (temp_liqu(i_point_interp) > 1.e9)
         {
           Cerr << "Problem temperature interface" << finl;
-          temp_liqu(i_diph) = 1.e9;
+          temp_liqu(i_point_interp) = 1.e9;
         }
-      temperature_interp(i_diph) = Ti;
-      flux_normal_interp(i_diph) = ldav * (Ti - temp_vap(i_diph)) / dist;
+      temperature_interp(i_point_interp) = Ti;
+      flux_normal_interp(i_point_interp) = ldav * (Ti - temp_vap(i_point_interp)) / dist;
     }
 }
 
 void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu)
 {
-  const int n_diph = temp_interface_face_.size_array();
+  const int n_diph = intersection_ijk_face_.n();
+  const int n_point_interp = temp_vap.size_array();
+  Cerr << "N diph " << n_diph << "n point inter = 2*n_diph " << n_point_interp << finl;
+  assert(2*n_diph == n_point_interp);
   const auto& geom = splitting_->get_grid_geometry();
-  const double d1 = 1.52 * (std::pow(geom.get_constant_delta(0), 2.) +
-                            std::pow(geom.get_constant_delta(1), 2.) +
-                            std::pow(geom.get_constant_delta(2), 2.));
+  const double d1 = 1.52 * std::pow((
+                                      std::pow(geom.get_constant_delta(0), 2.) +
+                                      std::pow(geom.get_constant_delta(1), 2.) +
+                                      std::pow(geom.get_constant_delta(2), 2.)), 0.5);
   temperature_barys_.resize(n_diph, 2);
   // On réalise une interpolation proportionelle a la distance entre la
   // tempertaure d'interface et la température de la mm phase qui est au
@@ -495,19 +505,24 @@ void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDoub
   // d'interface.
   for (int i_diph = 0; i_diph < n_diph; i_diph++)
     {
-      const double di = std::abs(intersection_ijk_face_.dist_interf()(i_diph));
-      assert(d1 - di > 0.);
+      const double di_vap = std::abs(intersection_ijk_face_.dist_interf()(2*i_diph));
+      const double di_liqu = std::abs(intersection_ijk_face_.dist_interf()(2*i_diph+1));
+      assert(d1 - di_vap > 0.);
+      assert(d1 - di_liqu > 0.);
       // La distance entre le point a l'interface et le point d'interpolation de
       // la temperature monophasique vaut bien d1 - di. Aucun cas n'est censé
       // donner une valeur négative.
-      const double d1_inv = 1. / (d1 - di + 1.e-10);
-      const double di_inv = 1. / (di + 1.e-10);
+      const double d1_vap_inv = 1. / (d1 - di_vap + EPS_);
+      const double di_vap_inv = 1. / (di_vap + EPS_);
+      const double d1_liqu_inv = 1. / (d1 - di_liqu + EPS_);
+      const double di_liqu_inv = 1. / (di_liqu + EPS_);
       temperature_barys_(i_diph, 1) =
-        (temp_interface_face_(i_diph) * di_inv + temp_vap(i_diph) * d1_inv) /
-        (di_inv + d1_inv);
+        (temp_interface_face_(2*i_diph) * di_vap_inv + temp_vap(2*i_diph) * d1_vap_inv) /
+        (di_vap_inv + d1_vap_inv);
+      // liquide
       temperature_barys_(i_diph, 0) =
-        (temp_interface_face_(i_diph) * di_inv + temp_liqu(i_diph) * d1_inv) /
-        (di_inv + d1_inv);
+        (temp_interface_face_(2*i_diph+1) * di_vap_inv + temp_liqu(2*i_diph+1) * d1_vap_inv) /
+        (di_vap_inv + d1_vap_inv);
     }
 }
 
@@ -516,9 +531,10 @@ void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_cell(Ar
   const double ldal = lda_l_;
   const double ldav = lda_v_;
   const auto& geom = splitting_->get_grid_geometry();
-  const double dist = 1.52 * (std::pow(geom.get_constant_delta(0), 2.) +
-                              std::pow(geom.get_constant_delta(1), 2.) +
-                              std::pow(geom.get_constant_delta(2), 2.));
+  const double dist = 1.52 * std::pow((
+                                        std::pow(geom.get_constant_delta(0), 2.) +
+                                        std::pow(geom.get_constant_delta(1), 2.) +
+                                        std::pow(geom.get_constant_delta(2), 2.)), 0.5);
   DoubleTab coord_vap, coord_liqu;
   calcul_temperature_flux_interface(
     *field_, ldal, ldav, dist, intersection_ijk_cell_.pos_interf(),
@@ -534,6 +550,7 @@ void Corrige_flux_FT_temperature_conv::update_temperature_ghost(const ArrOfDoubl
   const double ldal = lda_l_;
   const double ldav = lda_v_;
   const int n_diph = temp_interface_cell_.size_array();
+  assert(n_diph == intersection_ijk_cell_.n());
   temperature_ghost_.resize(n_diph, 2);
   // On réalise une interpolation proportionelle a la distance entre la
   // temperature d'interface au centre de la cellule diph avec tantot le

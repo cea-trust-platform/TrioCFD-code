@@ -482,12 +482,12 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
   indicatrice_ft_[next()].data() = 1.;
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
-  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 1);
+  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[old()].data() = 1.;
   allocate_cell_vector(groups_indicatrice_ns_[old()], splitting_NS, 1);
   allocate_cell_vector(groups_indicatrice_ns_[next()], splitting_NS, 1);
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
-  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 1);
+  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[next()].data() = 1.;
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
   allocate_cell_vector(groups_indicatrice_ft_[old()], splitting_FT, 1);

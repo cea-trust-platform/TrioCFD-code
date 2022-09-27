@@ -85,7 +85,8 @@ public:
     j_ = j;
     k_ = k;
   }
-  const ArrOfInt& get_indices_to_keep() { return indices_to_keep_;}
+  const ArrOfInt& get_indices_to_keep() const { return indices_to_keep_;}
+  const ArrOfInt& get_normale_vec() const {return next_elem_;}
 
   double calculer_surface_face(const IJK_Grid_Geometry& geom) const
   {
@@ -256,7 +257,8 @@ protected:
   const double& get_ghost_temp_if_cell_is_diph(
     const FixedVector<int, 3>& elem,
     const bool from_liqu_phase) const ;
-  double extrapolation_amont_1_depuis_l_interface(const double decal) const ;
+  double extrapolation_amont_1_depuis_l_interface(
+      const double frac_liquide, const double decal) const ;
   double interpolation_quick_avec_1_ghost(
     const double frac_liquide,
     const double decal) const ;

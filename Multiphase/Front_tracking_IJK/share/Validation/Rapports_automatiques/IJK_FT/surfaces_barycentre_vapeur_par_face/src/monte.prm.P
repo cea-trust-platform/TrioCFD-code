@@ -1,0 +1,229 @@
+Parametres {
+	Titre "Ascension gravitaire mono et multi-bulles periodique front-tracking en IJK"
+	Description "Cette fiche verifie pas mal de choses dont : " <<EOF
+o La force de gravite
+o La periodicite 
+o Les sauvegarde/reprise
+o La repulsion
+EOF
+	Auteur "G.B."
+	CasTest . pre_run.data
+	CasTest . ijkft_monte_seq.data
+	CasTest . ijkft_monte_slow_seq.data
+	CasTest . ijkft_monte_multi_seq.data
+	CasTest . ijkft_monte_multi_repr_seq.data
+	CasTest . ijkft_monte_par8.data 8
+	CasTest . ijkft_monte_multi_par8.data 8
+	CasTest . test_IJK_switch.data
+	CasTest . test_IJK_switch_par8.data 8
+}
+Chapitre {
+	Titre "Maillage généré par cree_multi_bulles.sh"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh init_multi.lata FTMESH
+		pseudocolor init_multi.lata FTMESH COMPO_CONNEXE ELEM
+	}
+}
+
+#Pmacro VISU(_titre_,_timestep_, _fichier_, _interf_,_var_,_pos_)
+	visu {
+		titre _titre_
+		cycles _timestep_
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        _fichier_.lata DOM
+		mesh        _fichier_.lata _interf_
+		pseudocolor _fichier_.lata _interf_ _var_ _pos_
+	}
+
+#Pendmacro(VISU)
+
+#Pmacro VISU2(_titre_,_timestep_, _fichier_, _mesh_,_var_,_pos_)
+	visu {
+		titre _titre_
+		cycles _timestep_
+		pseudocolor _fichier_.lata _mesh_ _var_ _pos_
+		Operator Slice2D_z 0. 0. 1.5e-3
+	}
+
+#Pendmacro(VISU2)
+
+#Pmacro FIGURE(_titre_,_fics_,_cols_)
+	figure {
+		titre _titre_	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+#Pforeach _fichier_(_fics_)
+#Pforeach _COL_(_cols_)
+		Courbe {
+		   fichier _fichier__bulles_centre_x.out
+		     colonnes ($1) ($_COL_)
+		     Legende "_fichier_ col_COL_ ori"
+		}
+		Courbe {
+		   fichier _fichier__bulles_centre_x.out
+		     colonnes ($1) (($_COL_)+0.006)
+		     Legende "_fichier_ col_COL_ translate"
+		     }
+#Pendforeach(_COL_)
+#Pendforeach(_fichier_)
+	}
+#Pendmacro(FIGURE)
+
+Chapitre {
+	Titre "Mono-bulle"
+	Description "Calcul pre_run pour avancer la bulle au bout du domaine." <<EOF
+Puis dans le calcul ijkft_monte_slow_seq il y a inversion de la bulle reelle et ghost.
+La pression reagit au pas de temps suivant. 
+EOF
+	
+#Pusemacro(VISU)("Fin du pre_run mono-bulle",-1,pre_run,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("avant l'inversion",41,ijkft_monte_slow_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("inversion",42,ijkft_monte_slow_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("apres l'inversion",43,ijkft_monte_slow_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+
+#Pusemacro(VISU2)("avant l'inversion",41,ijkft_monte_slow_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("inversion",42,ijkft_monte_slow_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("apres l'inversion",43,ijkft_monte_slow_seq,DOM,PRESSURE,ELEM)
+
+	Description "La vitesse de montee de bulle est bien continue au changement de cote." <<EOF
+Apres la mise en regime du pre_run, la vitesse de montee est constante. 
+EOF
+
+#Pusemacro(FIGURE)("Position des bulles en x",pre_run ijkft_monte_slow_seq ijkft_monte_seq,2)
+
+}
+
+
+Chapitre {
+	Titre "Multi-bulles"
+	Description "Calcul multi-bulle." <<EOF
+Meme si plusieurs portions connexes d'interface sont dans la meme maille, 
+l'inversion se passe bien.
+EOF
+	
+#Pusemacro(VISU)("avant les inversions",11,ijkft_monte_multi_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("inversion d'une compo",12,ijkft_monte_multi_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("suite",13,ijkft_monte_multi_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("inversion d'une autre compo",14,ijkft_monte_multi_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+	
+#Pusemacro(VISU2)("avant les inversions",11,ijkft_monte_multi_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("inversion d'une compo",12,ijkft_monte_multi_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("suite",13,ijkft_monte_multi_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("inversion d'une autre compo",14,ijkft_monte_multi_seq,DOM,PRESSURE,ELEM)
+
+#Pusemacro(FIGURE)("Position des bulles en x",ijkft_monte_multi_seq ijkft_monte_multi_repr_seq,2 3 4)
+
+	Description "La vitesse de montee des bulles est bien continue au changement de cote." <<EOF
+A la fin de ijkft_monte_multi_seq, 2 bulles sont pretes a collisionner. 
+EOF
+}
+
+Chapitre {
+	Titre "Multi-bulles repulsion"
+	Description Le fichier ijkft_monte_multi_repr_seq poursuit le calcul avec une force de repulsion...  <<EOF
+    portee_force_repulsion 0.003
+    delta_p_max_repulsion 1
+EOF
+
+#Pusemacro(VISU)("avant la repulsion",0,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",1,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",2,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",3,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",4,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",5,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",6,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",7,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",8,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",9,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",10,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",11,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+#Pusemacro(VISU)("repulsion",12,ijkft_monte_multi_repr_seq,INTERFACES,DISTANCE_AUTRES_INTERFACES,SOM)
+
+}
+
+
+Chapitre {
+	Titre "Comparaison sequentiel / parallele mono-bulle "
+	
+#Pusemacro(VISU)("avant l'inversion",0,ijkft_monte_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("apres l'inversion",1,ijkft_monte_seq,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU2)("avant l'inversion",0,ijkft_monte_seq,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("apres l'inversion",1,ijkft_monte_seq,DOM,PRESSURE,ELEM)
+
+#Pusemacro(VISU)("avant l'inversion",0,ijkft_monte_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("apres l'inversion",1,ijkft_monte_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+
+#Pusemacro(VISU2)("avant l'inversion",0,ijkft_monte_par8,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("apres l'inversion",1,ijkft_monte_par8,DOM,PRESSURE,ELEM)
+
+#Pusemacro(FIGURE)("Position des bulles en x",ijkft_monte_seq ijkft_monte_par8,2)
+
+}
+
+
+Chapitre {
+	Titre "Comparaison sequentiel / parallele multi-bulle "
+	
+#Pusemacro(VISU)("avant les inversions",11,ijkft_monte_multi_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("inversion d'une compo",12,ijkft_monte_multi_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("suite",13,ijkft_monte_multi_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU)("inversion d'une autre compo",14,ijkft_monte_multi_par8,INTERFACES,COMPO_CONNEXE,ELEM)
+	
+#Pusemacro(VISU2)("avant les inversions",11,ijkft_monte_multi_par8,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("inversion d'une compo",12,ijkft_monte_multi_par8,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("suite",13,ijkft_monte_multi_par8,DOM,PRESSURE,ELEM)
+#Pusemacro(VISU2)("inversion d'une autre compo",14,ijkft_monte_multi_par8,DOM,PRESSURE,ELEM)
+
+#Pusemacro(FIGURE)("Position des bulles en x",ijkft_monte_multi_seq ijkft_monte_multi_par8,2)
+
+}
+
+
+Chapitre {
+	Titre "Validation d'IJK_switch : Pour interpoler la vitesse et reporter le maillage interfacial."
+	Description "Test couvrant uniquement le cas d'un probleme IJK_FT."
+
+	visu {
+		titre "Sauvegarde initiale pre_run.sauv.lata"
+		Normal3d 0 1 0
+		Up3D 0 0 1
+		zoom3D 0 0 1.
+		mesh pre_run.sauv.lata INTERFACES
+		pseudocolor pre_run.sauv.lata DOM_dual VELOCITY_X FACES
+		Operator_to_all slice2D_y 0. 1.5e-3 0. 
+	}
+	visu {
+		titre "Interpolation sur un maillage 2 fois plus fin dans pre_run_fine.sauv.lata"
+		Normal3d 0 1 0
+		Up3D 0 0 1
+		zoom3D 0 0 1.
+		mesh pre_run_fine.sauv.lata INTERFACES
+		pseudocolor pre_run_fine.sauv.lata DOM_NEW_dual VELOCITY_X FACES
+		Operator_to_all slice2D_y 0. 1.5e-3 0. 
+	}
+	visu {
+		titre "Interpolation en parallel pre_run_fine_par8.sauv.lata"
+		Normal3d 0 1 0
+		Up3D 0 0 1
+		zoom3D 0 0 1.
+		mesh pre_run_fine_par8.sauv.lata INTERFACES
+		pseudocolor pre_run_fine_par8.sauv.lata DOM_NEW_dual VELOCITY_X FACES
+		Operator_to_all slice2D_y 0. 1.5e-3 0. 
+	}
+}

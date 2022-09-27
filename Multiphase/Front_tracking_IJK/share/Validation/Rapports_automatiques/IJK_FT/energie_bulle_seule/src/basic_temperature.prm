@@ -1,0 +1,12 @@
+Parametres {
+	Titre "Test cases: Single bubble and thermal diffusion and convection, test of the post treatment of the temperature at the interface"
+
+
+	Auteur "A.S."
+
+	CasTest . basic_temperature.data 1
+	# CasTest . basic_temperature_multi_proc.data 8 #
+}
+
+
+

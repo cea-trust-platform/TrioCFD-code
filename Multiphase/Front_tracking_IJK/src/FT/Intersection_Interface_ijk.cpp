@@ -34,9 +34,6 @@
 
 #include <Intersection_Interface_ijk.h>
 
-//TODO: aym reorganiser cette classe avec la classe IJK_Interface (qu'il
-// faudrait alleger un peu)
-
 void Intersection_Interface_ijk::projete_interface(
   const Vecteur3& normale,
   const Vecteur3& bary,
@@ -162,20 +159,14 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
   const int nj = surfaces[0].nj();
   const int nk = surfaces[0].nk();
   const double eps = 1.e-6;
-  Vecteur3 bary_vap {0., 0., .0};
-  Vecteur3 bary_liqu {0., 0., .0};
-  Vecteur3 bary_cell {0., 0., .0};
-  Vecteur3 bary {0., 0., .0};
-  Vecteur3 normale {0., 0., .0};
-  Vecteur3 position {0., 0., .0};
   double surf_vap;
   double surf_liqu;
   int i_diph = 0;
-  int n_diph = interfaces_->get_nb_face_mouillees();
-  positions.resize(2 * n_diph, 3);
-  indices.resize(2 * n_diph, 5);
-  normales_de_la_proj.resize(2 * n_diph, 3);
-  distance_barys_interface.resize(2*n_diph,1);
+  n_diph_ = interfaces_->get_nb_face_mouillees();
+  positions.resize(2 * n_diph_, 3);
+  indices.resize(2 * n_diph_, 5);
+  normales_de_la_proj.resize(2 * n_diph_, 3);
+  distance_barys_interface.resize(2*n_diph_,1);
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -209,6 +200,8 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
                   assert(surf_liqu > 0.);
                   // Je calcule l'équation de l'interface moyenne entre les
                   // deux cellules (de chaque coté de la face).
+                  Vecteur3 bary {0., 0., .0};
+                  Vecteur3 normale {0., 0., .0};
                   compute_mean_interface_face(i, j, k, dir, normale, bary);
                   // on copie normale dans le tableau final, c'etait peut etre pas
                   // absolument necessaire d'avoir recours a une copie mais tant pis.
@@ -235,12 +228,24 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
                     }
 
                   // Je calcule la projection du bary vapeur sur l'interface.
-                  bary_vap = {barys[0][dir](i, j, k), barys[1][dir](i, j, k),
-                              barys[2][dir](i, j, k)
-                             };
-                  bary_liqu = bary_cell - bary_vap;
+                  const Vecteur3 bary_vap
+                  {
+                    barys[0][dir](i, j, k), barys[1][dir](i, j, k),
+                          barys[2][dir](i, j, k)
+                  };
+                  Vecteur3 bary_face;
+                  if (dir == 0)
+                    bary_face = splitting_->get_coords_of_dof(i,j,k, IJK_Splitting::FACES_I);
+                  else if (dir == 1)
+                    bary_face = splitting_->get_coords_of_dof(i,j,k, IJK_Splitting::FACES_J);
+                  else if (dir == 2)
+                    bary_face = splitting_->get_coords_of_dof(i,j,k, IJK_Splitting::FACES_K);
+                  else
+                    Process::exit();
+                  Vecteur3 bary_liqu = bary_face - bary_vap;
                   bary_liqu *= (surf_vap / surf_liqu);
-                  bary_liqu += bary_cell;
+                  bary_liqu += bary_face;
+                  Vecteur3 position;
                   projete_interface(normale, bary, bary_vap, position);
                   for (int c = 0; c < 3; c++)
                     positions(i_diph, c) = position[c];

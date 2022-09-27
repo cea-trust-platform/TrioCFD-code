@@ -1,0 +1,12 @@
+LATA_V2.1
+titi
+Trio_U
+Format LITTLE_ENDIAN,C_INDEXING,C_ORDERING,F_MARKERS_NO,INT32,REAL32
+TEMPS 0
+Geom INTERFACES type_elem=TRIANGLE_3D
+Champ SOMMETS pre_run.lata.INTERFACES.SOMMETS geometrie=INTERFACES size=442 composantes=3
+Champ ELEMENTS pre_run.lata.INTERFACES.ELEMENTS geometrie=INTERFACES size=880 composantes=3 format=INT32
+Champ FACETTE_PE_LOCAL pre_run.lata.INTERFACES.FACETTE_PE_LOCAL geometrie=INTERFACES size=880 composantes=1 format=INT32 localisation=ELEM
+Champ FACETTE_PE_OWNER pre_run.lata.INTERFACES.FACETTE_PE_OWNER geometrie=INTERFACES size=880 composantes=1 format=INT32 localisation=ELEM
+Champ INDEX_SOMMET_REEL pre_run.lata.INTERFACES.INDEX_SOMMET_REEL geometrie=INTERFACES size=442 composantes=1 format=INT32 localisation=SOM
+Champ COMPO_CONNEXE pre_run.lata.INTERFACES.COMPO_CONNEXE geometrie=INTERFACES size=880 composantes=1 format=INT32,NO_INDEXING localisation=ELEM
