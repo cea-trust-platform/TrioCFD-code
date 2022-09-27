@@ -79,11 +79,11 @@ public:
     set_next_elem();
     set_indices_to_keep();
   }
-  void set_elem(const int i, const int j, const int k)
+  void set_elem(const int i1, const int j1, const int k1)
   {
-    i_ = i;
-    j_ = j;
-    k_ = k;
+    i_ = i1;
+    j_ = j1;
+    k_ = k1;
   }
   const ArrOfInt& get_indices_to_keep() { return indices_to_keep_;}
 

@@ -6572,8 +6572,8 @@ void IJK_Interfaces::calculer_indicatrice_next(
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
   // Calcul des indicatrices s'il y a des groupes :
-  const int nb_groups = IJK_Interfaces::nb_groups();
-  if (nb_groups > 1)
+  const int nb_grps = IJK_Interfaces::nb_groups();
+  if (nb_grps > 1)
     {
       if (get_recompute_indicator())
         calculer_indicatrices(groups_indicatrice_ft_[next()]);
@@ -6599,7 +6599,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
   calculer_indicatrice(indicatrice_ft_test_);
   indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost());
   SChaine indic;
-  if (nb_groups > 1)
+  if (nb_grps > 1)
     {
       calculer_indicatrices(groups_indicatrice_ft_test_);
       groups_indicatrice_ft_test_.echange_espace_virtuel();
@@ -6621,7 +6621,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
               indic << "(" << i << "," << j << "," << k << ") : " << indicatrice_ft_[next()](i, j, k) << " VS "
                     << indicatrice_ft_test_(i, j, k) << finl;
             }
-          for (int igroup = 0; igroup < nb_groups; igroup++)
+          for (int igroup = 0; igroup < nb_grps; igroup++)
             {
               if (groups_indicatrice_ft_[next()][igroup](i, j, k) != groups_indicatrice_ft_test_[igroup](i, j, k))
                 {

@@ -274,7 +274,6 @@ Entity Champ_Generique_Morceau_Equation::get_localisation(const int index) const
   return loc;
 }
 
-//Description
 //Nomme le champ en tant que source par defaut
 //nom_eq + "_" + type_morceau + "_" + type_option
 void Champ_Generique_Morceau_Equation::nommer_source()
@@ -339,7 +338,6 @@ void Champ_Generique_Morceau_Equation::nommer_source()
 
 }
 
-//Description
 //Rend le morceau d equation considere pour ce Champ_Generique
 //Actuellement seul type de morceau considere : les operateurs
 //Pour considerer  d autres morceaux d equation il faudra tester type_morceau_
