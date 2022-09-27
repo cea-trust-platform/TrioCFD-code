@@ -54,7 +54,7 @@ Entree& Postraitement_ft_lata::readOn(Entree& is)
     }
 
   Postraitement::readOn(is);
-  if (format_post.valeur().que_suis_je() != "Format_Post_Lata_V2")
+  if (format_post.valeur().que_suis_je() != "Format_Post_Lata")
     Process::exit("ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'.");
 
   return is;
@@ -218,6 +218,8 @@ void Postraitement_ft_lata::postprocess_field_values()
   Postraitement::postprocess_field_values();
 
   // Now specific FT fields:
+  if(!refequation_interfaces.non_nul()) return;
+
   double temps_courant = mon_probleme->schema_temps().temps_courant();
 
   const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_interfaces.valeur();
@@ -271,7 +273,7 @@ void Postraitement_ft_lata::postprocess_field_values()
 
           const int nb_noeuds = dtab.dimension(0);
           const int nb_noeuds_attendus = loc == SOMMETS ? nb_sommets_local : nb_facettes_local;
-          const int nb_compo = (dtab.nb_dim() == 1 ? 1 : dtab.dimension(1));
+          const int nb_compo = (dtab.nb_dim() == 1 ? 0 : dtab.dimension(1));
           if (nb_noeuds != nb_noeuds_attendus)
             {
               Cerr << "Error for Postraitement_ft_lata::ecrire_maillage" << finl;
@@ -290,7 +292,8 @@ void Postraitement_ft_lata::postprocess_field_values()
           Domaine dummy_dom;
           dummy_dom.nommer(id_domaine_);
           Nom nature = nb_compo == 1 ? "scalar" : "vectorial";
-          postraiter_tableau(dummy_dom, unites, noms_compo, nb_compo, temps_courant, nom_du_champ, som_elem, nature, dtab);
+          const int component_to_process = -1; // meaning that we always want all components
+          postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature, dtab);
         }
     }
 }
