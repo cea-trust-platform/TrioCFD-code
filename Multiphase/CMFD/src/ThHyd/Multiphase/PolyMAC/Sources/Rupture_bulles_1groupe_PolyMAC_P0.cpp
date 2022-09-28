@@ -116,7 +116,7 @@ void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, Doubl
   const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff 		= ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().probleme().equation(0).operateur(0).l_op_base());
   const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   visc_turb.eps(epsilon); // Epsilon is in the past
-  double limiter = visc_turb.limiteur();
+  double limiter = visc_turb.limiteur(), dh = 0;
 
   Matrice_Morse  *Ma = matrices.count("alpha") ? matrices.at("alpha") : NULL,
                   *Mk = matrices.count("k") ? matrices.at("k") : NULL,
@@ -126,7 +126,6 @@ void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, Doubl
 
   int cR = (rho_p.dimension_tot(0) == 1), cM = (nu_p.dimension_tot(0) == 1), n, k, e;
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), nu_l(N), sigma_l(N,N), dv(N, N), d_bulles_l(N), eps_l(Nk), k_l(Nk), coeff(N, N); //arguments pour coeff
-  double dh;
   const Rupture_bulles_1groupe_base& correlation_rupt = ref_cast(Rupture_bulles_1groupe_base, correlation_.valeur());
 
   /* elements */

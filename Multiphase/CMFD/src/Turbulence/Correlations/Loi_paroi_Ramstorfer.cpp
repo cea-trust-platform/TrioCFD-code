@@ -198,7 +198,7 @@ double Loi_paroi_Ramstorfer::u_plus_de_y_plus(double u_tau, double nu, double y,
   for (int i = 1 ; i < pbm.nb_phases() ; i++) kr_p += d_bulles[i]*alpha[i];
   kr_p *= u_tau/nu ;
 
-  return log_law - (kr_p<11.3) ? 0 : std::log(1+C_kr_*kr_p)/von_karman_;
+  return log_law - (kr_p < 11.3 ? 0 : std::log(1+C_kr_*kr_p)/von_karman_);
 }
 
 double Loi_paroi_Ramstorfer::deriv_u_plus_de_y_plus(double u_tau, double nu, double y, const double *d_bulles, const double *alpha) // Ramstorfer model
@@ -211,5 +211,5 @@ double Loi_paroi_Ramstorfer::deriv_u_plus_de_y_plus(double u_tau, double nu, dou
   for (int i = 1 ; i < pbm.nb_phases() ; i++) kr += d_bulles[i]*alpha[i];
   double kr_p = kr * u_tau/nu ;
 
-  return d_log_law - (kr_p<11.3) ? 0 : (C_kr_*kr/y)/((1+C_kr_*y_p*kr/y)/von_karman_);
+  return d_log_law - (kr_p < 11.3 ? 0 : (C_kr_*kr/y)/((1+C_kr_*y_p*kr/y)/von_karman_));
 }
