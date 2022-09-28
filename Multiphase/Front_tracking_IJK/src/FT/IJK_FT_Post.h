@@ -296,6 +296,7 @@ protected:
   //  FixedVector<IJK_Field_double, 3> cell_source_interface_totale_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> cell_grad_p_;
   FixedVector<IJK_Field_double, 3> cell_source_interface_; // toujours en _ns_
+  FixedVector<IJK_Field_double, 3> cell_repulsion_interface_; // toujours en _ns_
 
 
   int sondes_demande_;
@@ -313,6 +314,7 @@ protected:
   FixedVector<IJK_Field_double, 3> source_spectrale_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_interface_ft_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_interface_ns_;   // non-const because some echange_espace_virtuel()
+  FixedVector<IJK_Field_double, 3> repulsion_interface_ns_;   // non-const because some echange_espace_virtuel()
   const FixedVector<IJK_Field_double, 3>& d_velocity_;
 
   IJK_Splitting& splitting_;

@@ -453,6 +453,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     {
       source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+    {
+      repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
+    }
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);
@@ -864,6 +868,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     {
       interpolate_to_center(cell_source_interface_,source_interface_ns_);
       n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
+    }
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+    {
+      interpolate_to_center(cell_repulsion_interface_,repulsion_interface_ns_);
+      n--,dumplata_cellvector(lata_name,"CELL_SHIELD_REPULSION" /* AT CELL-CENTER */, cell_repulsion_interface_, latastep);
     }
   //
   if (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
@@ -1583,6 +1592,34 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_source_interface_[2];
     }
+
+  if (nom== "CELL_SHIELD_REPULSION_X")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[0];
+    }
+  if (nom== "CELL_SHIELD_REPULSION_Y")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[1];
+    }
+  if (nom== "CELL_SHIELD_REPULSION_Z")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[2];
+    }
   //
 
   if (nom.debute_par("dU"))
@@ -1987,6 +2024,11 @@ int IJK_FT_Post::alloc_fields()
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
       allocate_cell_vector(cell_source_interface_,splitting_, 0);
+      nalloc +=3;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+    {
+      allocate_cell_vector(cell_repulsion_interface_,splitting_, 0);
       nalloc +=3;
     }
   return nalloc;
