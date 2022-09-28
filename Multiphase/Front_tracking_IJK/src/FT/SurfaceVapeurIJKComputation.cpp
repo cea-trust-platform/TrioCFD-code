@@ -25,14 +25,14 @@
 void SurfaceVapeurIJKComputation::initialize(const IJK_Splitting& splitting)
 {
   maillage_bulles_med_ = MEDCouplingUMesh::New("bubbles_surf_mesh", 2);
-  desactive_med_ = false;
+  desactive_med_ = true;
   compute_surf_mouillees_ = false;
   ref_splitting_ = splitting;
 }
 
-
-void SurfaceVapeurIJKComputation::get_maillage_MED_from_IJK_FT(MEDCouplingUMesh *maillage_bulles_mcu,
-                                                               const Maillage_FT_IJK& maillage_bulles_ft_ijk)
+void SurfaceVapeurIJKComputation::get_maillage_MED_from_IJK_FT(
+  MEDCouplingUMesh *maillage_bulles_mcu,
+  const Maillage_FT_IJK& maillage_bulles_ft_ijk)
 {
   const int nbOfNodes = maillage_bulles_ft_ijk.nb_sommets();
   // Cerr << "nbre de sommet : " << nbOfNodes << finl;
@@ -110,8 +110,12 @@ void SurfaceVapeurIJKComputation::set_maillage_MED(const Maillage_FT_IJK& mailla
   // Cout << "Le maillage a probablement ete ecrit qq part" << finl;
 }
 
-void SurfaceVapeurIJKComputation::slice_bubble(const double intersect_pt, const int dim, DataArrayIdType *cutcellsid,
-                                               bool& plan_cut_some_bubble, MCU& mesh1dfil) const
+void SurfaceVapeurIJKComputation::slice_bubble(
+  const double intersect_pt,
+  const int dim,
+  DataArrayIdType *cutcellsid,
+  bool& plan_cut_some_bubble,
+  MCU& mesh1dfil) const
 {
   double intersect[3] = {0., 0., 0.};
   double vect_norm[3] = {0., 0., 0.};
@@ -175,11 +179,11 @@ void SurfaceVapeurIJKComputation::slice_bubble(const double intersect_pt, const 
   // return mesh1dfil;
 }
 
-// DONE: plusieurs bulles (plus que 1) peuvent être présente dans la cellule,
-// auquel cas il faut le prendre en compte. Donc on doit retenir les n+1 phases
-// dans une cellule qui a n compo connexes différentes.
-void SurfaceVapeurIJKComputation::findCommonTuples(const DataArrayIdType *new_to_old_id, const int n_tot_mesh2d,
-                                                   DataArrayIdType *tab_id_subcells, DataArrayIdType *tab_id_cut_cell) const
+void SurfaceVapeurIJKComputation::findCommonTuples(
+  const DataArrayIdType *new_to_old_id,
+  const int n_tot_mesh2d,
+  DataArrayIdType *tab_id_subcells,
+  DataArrayIdType *tab_id_cut_cell) const
 {
   // temp est un tableau temporaire qui fait la taille du nbre de cellules old
   // et qui est initialement rempli de -1. Il sert à identifier les cellules
@@ -313,8 +317,12 @@ void get_coo_inv_to_keep(int d, std::array<int, 3>& COOINV)
     }
 }
 
-void SurfaceVapeurIJKComputation::get_IJK_ind_from_ind2d(const int i_dim, const int i_plan, const int i_2d, const int nx,
-                                                         std::array<int, 3>& ijk_coo) const
+void SurfaceVapeurIJKComputation::get_IJK_ind_from_ind2d(
+  const int i_dim,
+  const int i_plan,
+  const int i_2d,
+  const int nx,
+  std::array<int, 3>& ijk_coo) const
 {
   std::vector<int> COO2KEEP(2);
   std::array<int, 3> COOINV;
@@ -406,10 +414,12 @@ void SurfaceVapeurIJKComputation::check_if_vect_is_from_liquid2vapor(
     }
 }
 
-void SurfaceVapeurIJKComputation::get_vect_from_sub_cells_tuple(const int dim, const DataArrayDouble *bary0,
-                                                                const DataArrayIdType *cIcellsIdinMesh0,
-                                                                const DataArrayIdType *cellsIdinMesh0,
-                                                                DataArrayDouble *vect) const
+void SurfaceVapeurIJKComputation::get_vect_from_sub_cells_tuple(
+  const int dim,
+  const DataArrayDouble *bary0,
+  const DataArrayIdType *cIcellsIdinMesh0,
+  const DataArrayIdType *cellsIdinMesh0,
+  DataArrayDouble *vect) const
 {
   // vect est de la taille du nombre de cellules diphasiques, on ne regarde vect
   // que quand la face est coupée.
@@ -767,7 +777,7 @@ int SurfaceVapeurIJKComputation::compute_surf_and_barys(
   const IJK_Field_double& indicatrice_ft,
   const FixedVector<IJK_Field_double, 3>& normale_of_interf,
   FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face,
-  FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentre_vapeur_par_face) //next()
+  FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentre_vapeur_par_face)
 {
   for (int dir = 0; dir < 3; dir++)
     surface_vapeur_par_face[dir].data() = 0.;
@@ -788,7 +798,7 @@ int SurfaceVapeurIJKComputation::compute_surf_and_barys(
 
 int SurfaceVapeurIJKComputation::rempli_surface_vapeur_par_face_interieur_bulles(
   FixedVector<IJK_Field_double, 3>& surface_vapeur_par_face,
-  const IJK_Field_double& indicatrice_ft) // next()
+  const IJK_Field_double& indicatrice_ft)
 {
   const int ni = surface_vapeur_par_face[0].ni();
   const int nj = surface_vapeur_par_face[0].nj();
