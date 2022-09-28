@@ -410,6 +410,31 @@ void IJK_FT_Post::init_indicatrice_non_perturbe()
 }
 
 // GAB
+static void interpolate_to_center(FixedVector<IJK_Field_double, 3>& cell_center_field, const FixedVector<IJK_Field_double, 3>& face_field)
+{
+  /* Interpole le champ face_field aux centres des elements et le stocke dans cell_center_field */
+  const int kmax = cell_center_field[0].nk();
+  const int jmax = cell_center_field[0].nj();
+  const int imax = cell_center_field[0].ni();
+  for (int k = 0; k < kmax; k++)
+    for (int j = 0; j < jmax; j++)
+      for (int i = 0; i < imax; i++)
+        {
+          double& ccf0 = cell_center_field[0](i,j,k);
+          double& ccf1 = cell_center_field[1](i,j,k);
+          double& ccf2 = cell_center_field[2](i,j,k);
+          // Passage par references
+          ccf0 = (face_field[0](i,j,k) + face_field[0](i+1, j, k)) * 0.5;
+          ccf1 = (face_field[1](i,j,k) + face_field[1](i, j+1, k)) * 0.5;
+          ccf2 = (face_field[2](i,j,k) + face_field[2](i, j, k+1)) * 0.5;
+
+          Cout << "face_field[2]("<<i<<","<<j<<","<<k<<") = "<<face_field[2](i,j,k)<<finl;
+          Cout << "cell_center_field[2]("<<i<<","<<j<<","<<k<<") = "<<ccf2<<finl;
+        }
+}
+//
+
+// GAB
 void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double current_time, int time_iteration)
 {
   statistiques().begin_count(postraitement_counter_);
@@ -419,6 +444,14 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if ((liste_post_instantanes_.contient_("FORCE_PH")) or (liste_post_instantanes_.contient_("CELL_FORCE_PH")))
     {
       source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
+    }
+  if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
+    {
+      source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+    {
+      source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
   if (liste_post_instantanes_.contient_("TOUS"))
     {
@@ -773,77 +806,20 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
   if (liste_post_instantanes_.contient_("CELL_VELOCITY"))
     {
-      const int kmax = cell_velocity_[0].nk();
-      const int jmax = cell_velocity_[0].nj();
-      const int imax = cell_velocity_[0].ni();
-      for (int k = 0; k < kmax; k++)
-        for (int j = 0; j < jmax; j++)
-          for (int i = 0; i < imax; i++)
-            {
-              double u = (velocity_[0](i,j,k) + velocity_[0](i+1, j, k)) * 0.5;
-              double v = (velocity_[1](i,j,k) + velocity_[1](i, j+1, k)) * 0.5;
-              double w = (velocity_[2](i,j,k) + velocity_[2](i, j, k+1)) * 0.5;
-              cell_velocity_[0](i,j,k) = u;
-              cell_velocity_[1](i,j,k) = v;
-              cell_velocity_[2](i,j,k) = w;
-            }
+      interpolate_to_center(cell_velocity_,velocity_);
       n--,dumplata_cellvector(lata_name,"VELOCITY" /* AT CELL-CENTER */, cell_velocity_, latastep);
     }
   // GAB
   if (liste_post_instantanes_.contient_("CELL_FORCE_PH"))
     {
-      const int kmax = cell_source_spectrale_[0].nk();
-      const int jmax = cell_source_spectrale_[0].nj();
-      const int imax = cell_source_spectrale_[0].ni();
-      for (int k = 0; k < kmax; k++)
-        for (int j = 0; j < jmax; j++)
-          for (int i = 0; i < imax; i++)
-            {
-              double f;
-              double g;
-              double h;
-
-              {
-                // Interpolation d'ordre 1 des vitesses aux centres des elements
-                f = (source_spectrale_[0](i,j,k) + source_spectrale_[0](i+1, j, k)) * 0.5;
-                g = (source_spectrale_[1](i,j,k) + source_spectrale_[1](i, j+1, k)) * 0.5;
-                h = (source_spectrale_[2](i,j,k) + source_spectrale_[2](i, j, k+1)) * 0.5;
-
-              }
-
-              cell_source_spectrale_[0](i,j,k) = f;
-              cell_source_spectrale_[1](i,j,k) = g;
-              cell_source_spectrale_[2](i,j,k) = h;
-            }
+      interpolate_to_center(cell_source_spectrale_,source_spectrale_);
       n--,dumplata_cellvector(lata_name,"FORCE_PH" /* AT CELL-CENTER */, cell_source_spectrale_, latastep);
     }
   //
   // GAB
   if (liste_post_instantanes_.contient_("CELL_GRAD_P"))
     {
-      const int kmax = cell_grad_p_[0].nk();
-      const int jmax = cell_grad_p_[0].nj();
-      const int imax = cell_grad_p_[0].ni();
-      for (int k = 0; k < kmax; k++)
-        for (int j = 0; j < jmax; j++)
-          for (int i = 0; i < imax; i++)
-            {
-              double p;
-              double q;
-              double r;
-
-              {
-                // Interpolation d'ordre 1 des vitesses aux centres des elements
-                p = (grad_P_[0](i,j,k) + grad_P_[0](i+1, j, k)) * 0.5;
-                q = (grad_P_[1](i,j,k) + grad_P_[1](i, j+1, k)) * 0.5;
-                r = (grad_P_[2](i,j,k) + grad_P_[2](i, j, k+1)) * 0.5;
-
-              }
-
-              cell_grad_p_[0](i,j,k) = p;
-              cell_grad_p_[1](i,j,k) = q;
-              cell_grad_p_[2](i,j,k) = r;
-            }
+      interpolate_to_center(cell_grad_p_,grad_P_);
       n--,dumplata_cellvector(lata_name,"GRAD_P" /* AT CELL-CENTER */, cell_grad_p_, latastep);
     }
   //
@@ -880,11 +856,16 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
     n--,dumplata_vector(lata_name,"VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
-    n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ft_[0],
-                        ref_ijk_ft_.terme_source_interfaces_ft_[1],
-                        ref_ijk_ft_.terme_source_interfaces_ft_[2], latastep);
+    n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", source_interface_ft_[0],
+                        source_interface_ft_[1],
+                        source_interface_ft_[2], latastep);
+  // GAB
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
-    n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ns_, latastep);
+    {
+      interpolate_to_center(cell_source_interface_,source_interface_ns_);
+      n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
+    }
+  //
   if (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
     n--,dumplata_vector(lata_name,"GRAD_INDICATRICE_FT", grad_I_ft_[0],grad_I_ft_[1],grad_I_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("REBUILT_INDICATRICE_FT"))
@@ -1574,6 +1555,36 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     }
   //
 
+  // GAB
+  if (nom== "CELL_SOURCE_QDM_INTERF_X")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[0];
+    }
+  if (nom== "CELL_SOURCE_QDM_INTERF_Y")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[1];
+    }
+  if (nom== "CELL_SOURCE_QDM_INTERF_Z")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Process::exit();
+        }
+      return cell_source_interface_[2];
+    }
+  //
+
   if (nom.debute_par("dU"))
     {
       const FixedVector<IJK_Field_double, 3>& gradU = statistiques_FT_.get_IJK_vector_field("gradU");
@@ -1971,6 +1982,11 @@ int IJK_FT_Post::alloc_fields()
   if (liste_post_instantanes_.contient_("CELL_GRAD_P"))
     {
       allocate_cell_vector(cell_grad_p_,splitting_, 0);
+      nalloc +=3;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+    {
+      allocate_cell_vector(cell_source_interface_,splitting_, 0);
       nalloc +=3;
     }
   return nalloc;
