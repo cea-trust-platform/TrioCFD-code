@@ -191,7 +191,7 @@ bool Corrige_flux_FT_temperature_conv::is_flux_upwind_from_interface(const doubl
 }
 
 double Corrige_flux_FT_temperature_conv::extrapolation_amont_1_depuis_l_interface(
-    const double frac_liquide,
+  const double frac_liquide,
   const double decal) const
 {
   const FixedVector<int, 3> elem = parcours_.elem(1 + (int)decal);
@@ -448,10 +448,13 @@ void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_face(Ar
 
 void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
   const IJK_Field_double& temperature, const double ldal, const double ldav,
-  const double dist, const DoubleTab& positions,
-  const DoubleTab& normal_on_interf, ArrOfDouble& temperature_interp,
-  ArrOfDouble& flux_normal_interp, ArrOfDouble& temp_liqu,
-  ArrOfDouble& temp_vap, DoubleTab& coo_liqu, DoubleTab& coo_vap)
+  const double dist, const DoubleTab& positions, const DoubleTab& normal_on_interf,
+  ArrOfDouble& temperature_interp,
+  ArrOfDouble& flux_normal_interp,
+  ArrOfDouble& temp_liqu,
+  ArrOfDouble& temp_vap,
+  DoubleTab& coo_liqu,
+  DoubleTab& coo_vap)
 {
   Intersection_Interface_ijk_face::get_position_interpolation_normal_interf(
     positions, normal_on_interf, dist, coo_liqu);
@@ -541,7 +544,6 @@ void Corrige_flux_FT_temperature_conv::calcul_temp_flux_interf_pour_bary_cell(Ar
     intersection_ijk_cell_.norm_interf(), temp_interface_cell_, q_interface_cell_, temp_liqu,
     temp_vap, coord_liqu, coord_vap);
 }
-
 
 void Corrige_flux_FT_temperature_conv::update_temperature_ghost(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu)
 {

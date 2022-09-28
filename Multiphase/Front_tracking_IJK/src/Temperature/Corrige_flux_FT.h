@@ -258,7 +258,7 @@ protected:
     const FixedVector<int, 3>& elem,
     const bool from_liqu_phase) const ;
   double extrapolation_amont_1_depuis_l_interface(
-      const double frac_liquide, const double decal) const ;
+    const double frac_liquide, const double decal) const ;
   double interpolation_quick_avec_1_ghost(
     const double frac_liquide,
     const double decal) const ;
