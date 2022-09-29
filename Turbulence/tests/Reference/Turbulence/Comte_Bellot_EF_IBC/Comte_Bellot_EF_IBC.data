@@ -68,9 +68,6 @@ Read sch
     facsec 2.5
 }
 
-
-
-
 Associer pb dom
 Associer pb sch
 
@@ -147,7 +144,7 @@ Read pb
                                                              field TRUST_SALOME_correspondance 
                                                              last_time 
                                                              }
-		    impr
+		    impr nb_histo_boxes_impr 5
                 }
             } 
         }
@@ -207,4 +204,3 @@ Read pb
 }
 resoudre pb
 fin
- 
