@@ -867,12 +867,12 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
       interpolate_to_center(cell_source_interface_,source_interface_ns_);
-      n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
+      n--,dumplata_cellvector(lata_name,"SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
       interpolate_to_center(cell_repulsion_interface_,repulsion_interface_ns_);
-      n--,dumplata_cellvector(lata_name,"CELL_SHIELD_REPULSION" /* AT CELL-CENTER */, cell_repulsion_interface_, latastep);
+      n--,dumplata_cellvector(lata_name,"SHIELD_REPULSION" /* AT CELL-CENTER */, cell_repulsion_interface_, latastep);
     }
   //
   if (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
