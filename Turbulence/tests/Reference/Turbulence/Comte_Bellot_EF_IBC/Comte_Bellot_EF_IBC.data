@@ -147,7 +147,7 @@ Read pb
                                                              field TRUST_SALOME_correspondance 
                                                              last_time 
                                                              }
-		    impr
+		    impr nb_histo_boxes_impr 5
                 }
             } 
         }
