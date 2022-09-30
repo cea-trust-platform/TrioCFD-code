@@ -91,7 +91,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
   const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
   const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &n_f = zone.face_normales();
-  const DoubleTab& inco = ch.valeurs(), &pvit = ch.passe(),
+  const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                      &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
@@ -106,7 +106,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
-  int N = inco.line_size() , Np = press.line_size(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
+  int N = pvit.line_size() , Np = press.line_size(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
 
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), ddv(N, N, 4), ddv_c(4);
 
@@ -245,120 +245,132 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
   /* elements */
   int f;
   for (int e = 0; e < zone.nb_elem_tot(); e++)
-    for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-      {
-        /* arguments de coeff */
-        for (int n = 0; n < N; n++)
-          {
-            a_l(n)   = alpha(e, n);
-            p_l(n)   = press(e, n * (Np > 1));
-            T_l(n)   =  temp(e, n);
-            rho_l(n) =   rho(!cR * e, n);
-            mu_l(n)  =    mu(!cM * e, n);
-            d_b_l(n) = d_bulles(e,n) ;
+    {
+      /* arguments de coeff */
+      for (int n = 0; n < N; n++)
+        {
+          a_l(n)   = alpha(e, n);
+          p_l(n)   = press(e, n * (Np > 1));
+          T_l(n)   =  temp(e, n);
+          rho_l(n) =   rho(!cR * e, n);
+          mu_l(n)  =    mu(!cM * e, n);
+          d_b_l(n) = d_bulles(e,n) ;
 
-            for (int k = 0; k < N; k++)
-              if(milc.has_interface(n, k))
-                {
-                  Interface_base& sat = milc.get_interface(n, k);
-                  sigma_l(n,k) = sat.sigma(temp(e,n), press(e,n * (Np > 1)));
-                }
+          for (int k = 0; k < N; k++)
+            if(milc.has_interface(n, k))
+              {
+                Interface_base& sat = milc.get_interface(n, k);
+                sigma_l(n,k) = sat.sigma(temp(e,n), press(e,n * (Np > 1)));
+              }
 
-            for (int k = 0; k < N; k++)
-              dv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, NULL, &ddv(k, n, 0));
-          }
+          for (int k = 0; k < N; k++)
+            dv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, NULL, &ddv(k, n, 0));
+        }
 
-        for (int n = 0; n <Nk; n++)   k_l(n)   = (k_turb)   ? (*k_turb)(e,0) : 0;
+      for (int n = 0; n <Nk; n++)   k_l(n)   = (k_turb)   ? (*k_turb)(e,0) : 0;
 
 
-        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, k_l, d_b_l, dv, e, coeff);
+      correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, k_l, d_b_l, dv, e, coeff);
+      double fac_e = beta_*pe(e) * ve(e);
+      int i = nf_tot + D * e;
 
-        if (D==2)
-          {
-            for (int k = 0; k < N; k++)
-              if (k!= n_l) // gas phase
-                {
-                  double fac_e = beta_*pe(e) * ve(e);
+      // Experimentation sur la portance
+      DoubleTrav vr_l(N,D);
+      vr_l = 0 ;
+      double vl_norm = 0;
+      DoubleTrav scal_ur(N) ;
+      scal_ur = 0 ;
+      for (int d = 0 ; d < D ; d++) vl_norm += pvit(i+d, n_l)*pvit(i+d, n_l);
+      vl_norm = std::sqrt(vl_norm);
+      if (vl_norm > 1.e-6)
+        {
+          for (int k = 0; k < N; k++)
+            for (int d = 0 ; d < D ; d++) scal_ur(k) += pvit(i+d, n_l)/vl_norm * (pvit(i+d, k) -pvit(i+d, n_l));
+          for (int k = 0; k < N; k++)
+            for (int d = 0 ; d < D ; d++) vr_l(k, d)  = pvit(i+d, n_l)/vl_norm * scal_ur(k) ;
+        }
+      else for (int k=0 ; k<N ; k++)
+          for (int d=0 ; d<D ; d++) vr_l(k, d) = pvit(i+d, k) -pvit(i+d, n_l) ;
 
-                  // Damping of the lift force close to the wall;
-                  if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
-                  if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
-                  else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+      if (D==2)
+        {
+          for (int k = 0; k < N; k++)
+            if (k!= n_l) // gas phase
+              {
+                // Damping of the lift force close to the wall;
+                if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
+                else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
+                else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                  int i = nf_tot + D * e;
-                  secmem(i, n_l) += fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                  secmem(i+1,n_l)-= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                  secmem(i+1, k )+= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                } // 100% explicit
+                secmem(i, n_l) += fac_e * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                secmem(i,  k ) -= fac_e * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                secmem(i+1,n_l)-= fac_e * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                secmem(i+1, k )+= fac_e * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+              } // 100% explicit
+          for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
+            if (f<zone.nb_faces())
+              if (fcl(f, 0) < 2)
 
-            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-              if (f<zone.nb_faces())
-                if (fcl(f, 0) < 2)
+                for (int k = 0; k < N; k++)
+                  if (k!= n_l) // gas phase
+                    {
+                      int c = (e == f_e(f, 0)) ? 0 : 1 ;
+                      double fac_f = beta_*pf(f) * vf_dir(f, c);  // Coherence with portance_interfaciale that calculates the correlation at the element
 
-                  for (int k = 0; k < N; k++)
-                    if (k!= n_l) // gas phase
-                      {
-                        double fac_f = beta_*pf(f) * vf(f);  // Coherence with portance_interfaciale that calculates the correlation at the element
-                        if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
-                        if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
-                        else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+                      if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
+                      else if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
+                      else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                        int c = (e == f_e(f, 0)) ? 0 : 1 ;
-                        int i = nf_tot + D * e;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                        secmem(f, n_l) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                        secmem(f,  k ) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                      } // 100% explicit
+                      secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                      secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                      secmem(f, n_l) -= fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                      secmem(f,  k ) += fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                    } // 100% explicit
 
-          }
+        }
 
-        if (D==3)
-          {
-            for (int k = 0; k < N; k++)
-              if (k!= n_l) // gas phase
-                {
-                  double fac_e = beta_*pe(e) * ve(e);
+      if (D==3)
+        {
+          for (int k = 0; k < N; k++)
+            if (k!= n_l) // gas phase
+              {
+                // Damping of the lift force close to the wall;
+                if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
+                else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
+                else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                  // Damping of the lift force close to the wall;
-                  if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
-                  if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
-                  else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+                secmem(i, n_l) += fac_e * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                secmem(i,  k ) -= fac_e * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                secmem(i+1, k )-= fac_e * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                secmem(i+2, k )-= fac_e * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+              } // 100% explicit
 
-                  int i = nf_tot + D * e;
-                  secmem(i, n_l) += fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
-                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
-                  secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
-                  secmem(i+1, k )-= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
-                  secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
-                  secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
-                } // 100% explicit
+          for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
+            if (f<zone.nb_faces())
+              if (fcl(f, 0) < 2)
+                for (int k = 0; k < N; k++)
+                  if (k!= n_l) // gas phase
+                    {
+                      int c = (e == f_e(f, 0)) ? 0 : 1 ;
+                      double fac_f = beta_*pf(f) * vf_dir(f, c);
 
-            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-              if (f<zone.nb_faces())
-                if (fcl(f, 0) < 2)
-                  for (int k = 0; k < N; k++)
-                    if (k!= n_l) // gas phase
-                      {
-                        double fac_f = beta_*pf(f) * vf(f);
-                        if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
-                        if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
-                        else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+                      if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
+                      else if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
+                      else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                        int c = (e == f_e(f, 0)) ? 0 : 1 ;
-                        int i = nf_tot + D * e;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
-                      } // 100% explicit
+                      secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                      secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                      secmem(f, n_l) += fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                      secmem(f,  k ) -= fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                      secmem(f, n_l) += fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                      secmem(f,  k ) -= fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                    } // 100% explicit
 
-          }
+        }
 
-      }
+    }
 
 
 }
