@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Maillage_FT_Disc.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/35
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Maillage_FT_Disc.h>
 #include <Deriv_Maillage_FT_Disc.h>

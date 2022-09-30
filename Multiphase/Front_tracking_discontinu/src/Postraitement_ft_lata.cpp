@@ -12,13 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Postraitement_ft_lata.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/23
-//
-//////////////////////////////////////////////////////////////////////////////
+
 #include <Postraitement_ft_lata.h>
 #include <Probleme_FT_Disc_gen.h>
 #include <Transport_Marqueur_FT.h>
@@ -54,7 +48,7 @@ Entree& Postraitement_ft_lata::readOn(Entree& is)
     }
 
   Postraitement::readOn(is);
-  if (format_post.valeur().que_suis_je() != "Format_Post_Lata")
+  if (!sub_type(Format_Post_Lata, format_post.valeur()))
     Process::exit("ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'.");
 
   return is;
@@ -85,7 +79,7 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
           Cerr<<" Only one transport interface equation name can be specified "<<finl;
           Cerr<<" for a Postraitement_ft_lata post-process."<<finl;
-          Cerr<<" The "<<Motcle(refequation_interfaces->le_nom())<<" has already been readen for the post-process "<<(*this).le_nom()<<finl;
+          Cerr<<" The "<<Motcle(refequation_interfaces->le_nom())<<" has already been read for the post-process "<<(*this).le_nom()<<finl;
           Cerr<<" Please, create a new Postraitement_ft_lata post-process"<<finl;
           Cerr<<" for the "<<motlu<<" transport interface equation."<<finl;
           exit();
@@ -116,6 +110,12 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
           exit();
         }
       is >> motlu;
+      if (motlu == "no_virtuals")
+        {
+          if (Process::nproc() > 1)
+            no_virtuals_ = true;
+          is >> motlu;
+        }
       if (motlu != "{")
         {
           Cerr << " Postraitement_ft_lata::lire_champ\n";
@@ -173,6 +173,44 @@ void Postraitement_ft_lata::lire_champ_interface(Entree& is)
     }
 }
 
+/*! @brief Build a reduced version of the facettes array, excluding virtual ones
+ * Also update the internal renumbering array for later usage when writing out field values.
+ */
+int Postraitement_ft_lata::filter_out_virtual_fa7(IntTab& new_fa7)
+{
+  const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
+  const IntTab& fa7 = mesh.facettes();
+  int nl=fa7.dimension(0), nc=fa7.dimension(1), cnt=0;
+  new_fa7.resize(0, nc);
+  int sz = 0;
+
+  // Reset renumbering
+  renum_.clear();
+
+  for(int i = 0; i < nl; i++)
+    {
+      if (!mesh.facette_virtuelle(i))
+        {
+          sz++;
+          new_fa7.resize(sz, nc);
+          renum_.push_back(i);
+          for(int j = 0; j < nc; j++)
+            new_fa7(sz-1, j) = fa7(i, j);
+        }
+    }
+  return sz;
+}
+
+void Postraitement_ft_lata::filter_out_array(const DoubleTab& dtab, DoubleTab& new_dtab) const
+{
+  int nl = (int)renum_.size(), nc = dtab.dimension(1);
+  new_dtab.resize(nl, nc);
+
+  for(int i = 0; i < nl; i++)
+    for(int j = 0; j < nc; j++)
+      new_dtab(i, j) = dtab(renum_[i], j);
+}
+
 /*! @brief Write the Maillage_FT_Disc object into a LATA file in V2 format.
  *
  */
@@ -190,13 +228,20 @@ int Postraitement_ft_lata::ecrire_maillage_ft_disc()
     }
   const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
   const DoubleTab& sommets = mesh.sommets();
-  const IntTab& elements = mesh.facettes();
+  const IntTab& fa7 = mesh.facettes();
   int dim = mesh.sommets().dimension(1);
   Motcle type_elem = dim == 2 ? "Segment" : "Triangle";
 
-  Format_Post_Lata& forma_post_lata = ref_cast(Format_Post_Lata, format_post.valeur());  // this is check above
-
-  return forma_post_lata.ecrire_domaine_low_level(id_domaine_, sommets, elements, type_elem);
+  Format_Post_Lata& fpl = ref_cast(Format_Post_Lata, format_post.valeur());  // this is check above
+  if (no_virtuals_)
+    {
+      IntTab real_fa7;
+      real_fa7.set_smart_resize(1);
+      filter_out_virtual_fa7(real_fa7);
+      return fpl.ecrire_domaine_low_level(id_domaine_, sommets, real_fa7, type_elem);
+    }
+  else
+    return  fpl.ecrire_domaine_low_level(id_domaine_, sommets, fa7, type_elem);
 }
 
 /*! @brief Override. Add the interfaces to the LATA output
@@ -271,14 +316,15 @@ void Postraitement_ft_lata::postprocess_field_values()
               exit();
             }
 
-          const int nb_noeuds = dtab.dimension(0);
-          const int nb_noeuds_attendus = loc == SOMMETS ? nb_sommets_local : nb_facettes_local;
+          const int nb_items = dtab.dimension(0);
+          const int nb_items_attendus = loc == SOMMETS ? nb_sommets_local : nb_facettes_local;
+          const char * msg = loc == SOMMETS ? " nb_noeuds " : " nb_facettes ";
           const int nb_compo = (dtab.nb_dim() == 1 ? 0 : dtab.dimension(1));
-          if (nb_noeuds != nb_noeuds_attendus)
+          if (nb_items != nb_items_attendus)
             {
               Cerr << "Error for Postraitement_ft_lata::ecrire_maillage" << finl;
-              Cerr << " nb_noeuds = " << nb_noeuds << finl;
-              Cerr << " nb_noeuds expected = " << nb_noeuds_attendus << finl;
+              Cerr << msg << "= " << nb_items << finl;
+              Cerr << msg << "expected = " << nb_items_attendus << finl;
               exit();
             }
           // [ABN] should I really bother with this?:
@@ -293,7 +339,17 @@ void Postraitement_ft_lata::postprocess_field_values()
           dummy_dom.nommer(id_domaine_);
           Nom nature = nb_compo == 1 ? "scalar" : "vectorial";
           const int component_to_process = -1; // meaning that we always want all components
-          postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature, dtab);
+          // For ELEMENT processing, we need to filter out virtual facettes (if requested):
+          if (loc == ELEMENTS && no_virtuals_)
+            {
+              DoubleTab new_dtab;
+              filter_out_array(dtab, new_dtab);
+              postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature,
+                                 new_dtab);
+            }
+          else
+            postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature,
+                               dtab);
         }
     }
 }
