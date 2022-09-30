@@ -178,15 +178,16 @@ void Paroi_frottante_loi::me_calculer()
   for (n=1 ; n<N ; n++)
     for (int f =0 ; f < nf ; f++)
       {
-        /*        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
-                valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
-                */
+        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+        valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
 
-        // Test : faire frotter un peu quand même
-        int f_zone = f + f1; // number of the face in the zone
-        int e = f_e(f_zone,0);
-        valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;
-        valeurs_coeff_grad_(f, n) = valeurs_coeff_grad_(f, n) ;
+        /*
+                // Test : faire frotter un peu quand même
+                int f_zone = f + f1; // number of the face in the zone
+                int e = f_e(f_zone,0);
+                valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;
+                valeurs_coeff_grad_(f, n) = valeurs_coeff_grad_(f, n) ;
+        */
       }
 
   valeurs_coeff_.echange_espace_virtuel();
