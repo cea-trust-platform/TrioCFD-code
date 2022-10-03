@@ -504,7 +504,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_);
   param.ajouter_flag("diffusion_alternative", &diffusion_alternative_);
   param.ajouter_flag("suppression_rejetons", &suppression_rejetons_);
-  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_);
+  // param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_);
   param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_);
   // GAB; qdm
   param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan);
@@ -547,14 +547,14 @@ Entree& IJK_FT_double::interpreter(Entree& is)
       Process::exit();
     }
 
-  if ((correction_bilan_qdm_<0) || (correction_bilan_qdm_>4))
-    {
-      Cerr << "Invalid value of correction_bilan_qdm : " << correction_bilan_qdm_  << ". " << finl;
-      Cerr << "Please use 0, 1, or 2 for no_correction, geometric_mean or arithmetic_mean respectively" << finl;
-      Cerr << "Or 3 to anhilate the residual deviation... " << finl;
-      Cerr << "Or 4 to anhilate the residual deviation (except along z)... " << finl;
-      Process::exit();
-    }
+//  if ((correction_bilan_qdm_<0) || (correction_bilan_qdm_>4))
+//    {
+//      Cerr << "Invalid value of correction_bilan_qdm : " << correction_bilan_qdm_  << ". " << finl;
+//      Cerr << "Please use 0, 1, or 2 for no_correction, geometric_mean or arithmetic_mean respectively" << finl;
+//      Cerr << "Or 3 to anhilate the residual deviation... " << finl;
+//      Cerr << "Or 4 to anhilate the residual deviation (except along z)... " << finl;
+//      Process::exit();
+//    }
 
   // Si on utilise un seul groupe et qu'on impose un volume unique a toutes les bulles,
   if (vol_bulle_monodisperse_>=0.)
@@ -1922,6 +1922,7 @@ void IJK_FT_double::run()
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
       // Seulement pour le calcul du bilan de forces :
       allocate_velocity(terme_source_interfaces_ns_, splitting_, 1);
+      allocate_velocity(terme_SigCou_div_par_rho_, splitting_, 1);
       // Seulement pour le calcul des statistiques :
       allocate_velocity(terme_repulsion_interfaces_ns_, splitting_, 1);
       allocate_velocity(terme_repulsion_interfaces_ft_, splitting_ft_, 1);
@@ -2541,75 +2542,76 @@ void IJK_FT_double::run()
 
       static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
       statistiques().begin_count(bilanQdM_counter_);
-      if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
-        {
-
-#ifndef VARIABLE_DZ
-          double volume = 1.;
-          for (int i = 0; i < 3; i++)
-            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-#endif
-
-          for (int dir = 0; dir < 3; dir++)
-            {
-              if ((dir == 2) && (correction_bilan_qdm_ == 4))
-                {
-                  // passe, on ne traite pas z...
-                }
-              else
-                {
-#ifndef VARIABLE_DZ
-                  const double x = volume * integrated_residu_[dir];
-                  psi_velocity_[dir].data() = x;
-#endif
-                  const int kmax = psi_velocity_[dir].nk();
-                  for (int k = 0; k < kmax; k++)
-                    {
-#ifdef VARIABLE_DZ
-                      const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
-                      const double x = volume*integrated_residu_[dir];
-                      psi_velocity_[dir].data() = x;
-#endif
-                      if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-                        {
-                          Cerr
-                              << "Verifier que inv_rho_field soit valide et a jour ici ... "
-                              << finl;
-                          Process::exit();
-                          mass_solver_with_inv_rho(psi_velocity_[dir],
-                                                   inv_rho_field_, delta_z_local_, k);
-                        }
-                      else
-                        {
-                          mass_solver_with_rho(psi_velocity_[dir], rho_field_,
-                                               delta_z_local_, k);
-                        }
-                      const int imax = velocity_[dir].ni();
-                      const int jmax = velocity_[dir].nj();
-                      for (int j = 0; j < jmax; j++)
-                        {
-                          for (int i = 0; i < imax; i++)
-                            {
-                              velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
-                                                                            j, k);
-                            }
-                        }
-                    }
-                  velocity_[dir].echange_espace_virtuel(
-                    velocity_[dir].ghost());
-                  //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
-                }
-            }
-          // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
-          for (int dir = 0; dir < 3; dir++)
-            {
-              store_rhov_moy_[dir] -= integrated_residu_[dir];
-            }
-
-          // Remise a zero du residu integre puisqu'il a ete corrige :
-          integrated_residu_ = 0.;
-
-        }
+//       68 following lines commented by gr262753 on 30.09 : correction_bilan_qdm_ is not used anymore
+//       if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
+//         {
+//
+// #ifndef VARIABLE_DZ
+//           double volume = 1.;
+//           for (int i = 0; i < 3; i++)
+//             volume *= splitting_.get_grid_geometry().get_constant_delta(i);
+// #endif
+//
+//           for (int dir = 0; dir < 3; dir++)
+//             {
+//               if ((dir == 2) && (correction_bilan_qdm_ == 4))
+//                 {
+//                   // passe, on ne traite pas z...
+//                 }
+//               else
+//                 {
+// #ifndef VARIABLE_DZ
+//                   const double x = volume * integrated_residu_[dir];
+//                   psi_velocity_[dir].data() = x;
+// #endif
+//                   const int kmax = psi_velocity_[dir].nk();
+//                   for (int k = 0; k < kmax; k++)
+//                     {
+// #ifdef VARIABLE_DZ
+//                       const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
+//                       const double x = volume*integrated_residu_[dir];
+//                       psi_velocity_[dir].data() = x;
+// #endif
+//                       if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+//                         {
+//                           Cerr
+//                               << "Verifier que inv_rho_field soit valide et a jour ici ... "
+//                               << finl;
+//                           Process::exit();
+//                           mass_solver_with_inv_rho(psi_velocity_[dir],
+//                                                    inv_rho_field_, delta_z_local_, k);
+//                         }
+//                       else
+//                         {
+//                           mass_solver_with_rho(psi_velocity_[dir], rho_field_,
+//                                                delta_z_local_, k);
+//                         }
+//                       const int imax = velocity_[dir].ni();
+//                       const int jmax = velocity_[dir].nj();
+//                       for (int j = 0; j < jmax; j++)
+//                         {
+//                           for (int i = 0; i < imax; i++)
+//                             {
+//                               velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
+//                                                                             j, k);
+//                             }
+//                         }
+//                     }
+//                   velocity_[dir].echange_espace_virtuel(
+//                     velocity_[dir].ghost());
+//                   //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
+//                 }
+//             }
+//           // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
+//           for (int dir = 0; dir < 3; dir++)
+//             {
+//               store_rhov_moy_[dir] -= integrated_residu_[dir];
+//             }
+//
+//           // Remise a zero du residu integre puisqu'il a ete corrige :
+//           integrated_residu_ = 0.;
+//
+//         }
       statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
@@ -3224,6 +3226,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
     }
 
   // Calcul du terme source aux interfaces pour l'ajouter a dv :
+  // ATTENZIONE : Questa è una bugia. I termini di interfaccia vengono aggiunti direttamente a velocity_!
   if (!disable_diphasique_)
     {
       for (int dir = 0; dir < 3; dir++)
@@ -3298,18 +3301,20 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                           }
                         else
                           {
-                            mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                            // mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                            // gr262753 : on arrete de modifier la dimension (de puissance vol. a acceleration vol.) du terme_source_interfaces_ns_.
+                            champ1_divise_par_vcell_et_par_champ2(terme_source_interfaces_ns_[dir], rho_field_, terme_SigCou_div_par_rho_[dir], delta_z_local_, k);
                           }
                         // puis
                         // comme euler_explicit_update mais avec un pas de temps partiel :
                         const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
-                        const int imax = terme_source_interfaces_ns_[dir].ni();
-                        const int jmax = terme_source_interfaces_ns_[dir].nj();
+                        const int imax = terme_SigCou_div_par_rho_[dir].ni();
+                        const int jmax = terme_SigCou_div_par_rho_[dir].nj();
                         for (int j = 0; j < jmax; j++)
                           {
                             for (int i = 0; i < imax; i++)
                               {
-                                double x = terme_source_interfaces_ns_[dir](i,j,k);
+                                double x = terme_SigCou_div_par_rho_[dir](i,j,k);
                                 velocity_[dir](i,j,k) += x * delta_t;
                               }
                           }
