@@ -27,6 +27,7 @@
 #include <Source_Transport_proto.h>
 #include <Ref_Zone_Cl_VDF.h>
 #include <Ref_Zone_VDF.h>
+#include <Zone_Cl_VDF.h>
 #include <Zone_VDF.h>
 
 class Source_Transport_VDF_Elem_base : public Source_base, public Calcul_Production_K_VDF, public Source_Transport_proto

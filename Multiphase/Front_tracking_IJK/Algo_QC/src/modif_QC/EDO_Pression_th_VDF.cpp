@@ -264,7 +264,7 @@ void  EDO_Pression_th_VDF::calculer_grad(const DoubleTab& inco, DoubleTab& resu)
   double coef;
   IntTab& face_voisins = la_zone->face_voisins();
   IntVect& orientation = la_zone->orientation();
-  DoubleVect& porosite_surf = la_zone->porosite_face();
+  DoubleVect& porosite_surf = le_fluide().porosite_face();
   DoubleTab& xp = la_zone->xp();
   DoubleVect& volume_entrelaces = la_zone->volumes_entrelaces();
 

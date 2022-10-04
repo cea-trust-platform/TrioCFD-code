@@ -39,30 +39,28 @@ Read sch
 
 
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme	1 1.
-	rho Champ_Uniforme	1 1186.78
-	lambda Champ_Uniforme	1 1.
-	Cp Champ_Uniforme	1 0.71
-	beta_th Champ_Uniforme	1 1.
-}
 
 
-Champ_Uniforme gravite
-Read gravite 2 0 -1.  
+ 
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 	{
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0 -1. 	mu Champ_Uniforme	1 1.
+   	rho Champ_Uniforme	1 1186.78
+   	lambda Champ_Uniforme	1 1.
+   	Cp Champ_Uniforme	1 0.71
+   	beta_th Champ_Uniforme	1 1.
+   }
+   
+   	Navier_Stokes_standard
 		{
 		solveur_pression GCP
 			{
@@ -135,3 +133,4 @@ Read pb
 Solve pb
 End
 ##########################################################################################################################
+ 

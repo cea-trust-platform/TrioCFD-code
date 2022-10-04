@@ -64,29 +64,27 @@ nb_pas_dt_max 10
     periode_sauvegarde_securite_en_heures 5
 }
 
-Fluide_Incompressible fluide
 /* H2o T=297K et P=1e5Pa */
-Read fluide
-{
-    mu Champ_Uniforme 1  0.00089
-    rho Champ_Uniforme 1 997.05
-    lambda Champ_Uniforme 1 0.6071
-    Cp Champ_Uniforme 1 4181.6
-    beta_th Champ_Uniforme 1 0.000257
-}
 
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0
 
-Associate fluide gravite
 Associate pb_fluide dom_fluide
-Associate pb_fluide fluide
 Associate  pb_fluide sch
 Discretize pb_fluide dis
 
 Read pb_fluide
 {
-    Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3  0. -9.81 0
+       mu Champ_Uniforme 1  0.00089
+       rho Champ_Uniforme 1 997.05
+       lambda Champ_Uniforme 1 0.6071
+       Cp Champ_Uniforme 1 4181.6
+       beta_th Champ_Uniforme 1 0.000257
+   }
+   
+       Navier_Stokes_Turbulent
     {
        solveur_pression petsc Cholesky { }                 
         parametre_equation parametre_diffusion_implicite { solveur petsc gcp { precond diag { } rtol 1.e-10 impr } }
@@ -160,3 +158,4 @@ Read pb_fluide
 # EcritureLectureSpecial EcrFicPartageBin #
 Solve pb_fluide
 
+ 

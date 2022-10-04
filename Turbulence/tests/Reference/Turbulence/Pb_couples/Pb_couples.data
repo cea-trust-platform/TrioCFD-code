@@ -67,60 +67,10 @@ Scatter SOL3.Zones solide3
 Scatter SOL4.Zones solide4
 END SCATTER #
 
-Champ_Uniforme gravite
-
-Read gravite 3  0. 0. -9.81 
-
-Fluide_Incompressible sodium1
-Read sodium1
-{
-   mu 	   Champ_Uniforme 1  2.3e-4
-   lambda  Champ_Uniforme 1 67.
-   Cp      Champ_Uniforme 1 1262.
-   rho     Champ_Uniforme 1 832.
-   beta_th Champ_Uniforme 1 2.8E-4
-}
-
-Fluide_Incompressible sodium2
-Read sodium2
-{
-   mu 	   Champ_Uniforme 1  2.3e-4
-   lambda  Champ_Uniforme 1 67.
-   Cp      Champ_Uniforme 1 1262.
-   rho     Champ_Uniforme 1 832.
-   beta_th Champ_Uniforme 1 2.8E-4
-}
-
-Solide acier_cloison
-Read acier_cloison
-{
-	rho Champ_Uniforme 1 7900.
-	lambda Champ_Uniforme 1 20.
-	Cp Champ_Uniforme 1 554.
-}
-
-Solide acier_paroi
-Read acier_paroi
-{
-	rho Champ_Uniforme 1 7900
-	lambda Champ_Uniforme 1 40
-	Cp Champ_Uniforme 1 277
-}
-
-Associate sodium1 gravite
-Associate sodium2 gravite
-
 Associate pb1 liquide1
-Associate pb1 sodium1
-
 Associate pb2 liquide2
-Associate pb2 sodium2
-
 Associate pb3 solide3
-Associate pb3 acier_cloison
-
 Associate pb4 solide4
-Associate pb4 acier_paroi
 
 Associate pbc pb1
 Associate pbc pb2
@@ -149,7 +99,15 @@ Discretize pbc dis
 
 Read pb1
 { 
- 
+ Fluide_Incompressible
+{
+   mu 	   Champ_Uniforme 1  2.3e-4
+   lambda  Champ_Uniforme 1 67.
+   Cp      Champ_Uniforme 1 1262.
+   rho     Champ_Uniforme 1 832.
+   beta_th Champ_Uniforme 1 2.8E-4
+ 	gravite Champ_Uniforme 3  0. 0. -9.81 
+}
    Navier_Stokes_turbulent
         {
                 solveur_pression Gcp 
@@ -280,7 +238,15 @@ Read pb1
 
 Read pb2
 { 
- 
+ Fluide_Incompressible
+{
+   mu 	   Champ_Uniforme 1  2.3e-4
+   lambda  Champ_Uniforme 1 67.
+   Cp      Champ_Uniforme 1 1262.
+   rho     Champ_Uniforme 1 832.
+   beta_th Champ_Uniforme 1 2.8E-4
+   gravite Champ_Uniforme 3  0. 0. -9.81
+}
    Navier_Stokes_turbulent
         {
                 solveur_pression Gcp 
@@ -380,6 +346,12 @@ Read pb2
 
 Read pb3
 {
+Solide
+{
+	rho Champ_Uniforme 1 7900.
+	lambda Champ_Uniforme 1 20.
+	Cp Champ_Uniforme 1 554.
+}
 	Conduction
 	{
 		diffusion { }
@@ -419,6 +391,12 @@ Read pb3
 
 Read pb4
 {
+Solide
+{
+	rho Champ_Uniforme 1 7900
+	lambda Champ_Uniforme 1 40
+	Cp Champ_Uniforme 1 277
+}
 	Conduction
 	{
 		diffusion { }

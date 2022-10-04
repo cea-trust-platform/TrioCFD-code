@@ -66,40 +66,29 @@ Read sch
              }                     
 }
 
-# air à 20 °C 1.0 bar #
-# He à 20 °C 1.0 bar rho = 0.164 kg/m3 #
-
-Fluide_Incompressible air
-
-Read air           
-{
-     mu         Champ_Uniforme 1 1.7894e-5
-     rho        Champ_Uniforme 1 1.225 
-     Beta_co    Champ_Uniforme 1 0.864
-}
-
-# Wasserdampf in Luft #
-
-Constituant Helium
-Read Helium           
-{
-     Coefficient_diffusion Champ_Uniforme 1 7.3e-5
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0 0. -9.81
-
-Associate air gravite
-
 Associate pb1 dom
-Associate pb1 air
-Associate pb1 Helium
-
 Associate pb1 sch                          
 Discretize pb1 dis                       
 
 Read pb1
 {
+
+# air à 20 °C 1.0 bar #
+# He à 20 °C 1.0 bar rho = 0.164 kg/m3 #
+Fluide_Incompressible
+{
+     mu         Champ_Uniforme 1 1.7894e-5
+     rho        Champ_Uniforme 1 1.225 
+     Beta_co    Champ_Uniforme 1 0.864
+     gravite Champ_Uniforme 3  0. 0. -9.81
+}
+
+# Wasserdampf in Luft #
+Constituant
+{
+     Coefficient_diffusion Champ_Uniforme 1 7.3e-5
+}
+
         Navier_Stokes_turbulent
         {
                 solveur_pression Petsc Cholesky { }

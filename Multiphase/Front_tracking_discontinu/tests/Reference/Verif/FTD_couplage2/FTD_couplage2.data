@@ -104,14 +104,6 @@ Lire fluide
   chaleur_latente Champ_Uniforme 1    -100.
 }
 
-Solide sol
-Read sol
-{
-	rho Uniform_Field 1 1000.
-	lambda Champ_Uniforme 1 0.125    
-	Cp Champ_Uniforme 1 11.e3
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -139,7 +131,6 @@ Associate pb1 interf
 Associate pb1 fluide
 
 Associate pb2 dom_solide
-Associate pb2 sol
 
 Probleme_Couple pbc
 Associate pbc pb1
@@ -301,6 +292,12 @@ liste_postraitements
 
 Read pb2
 {
+Solide
+{
+	rho Uniform_Field 1 1000.
+	lambda Champ_Uniforme 1 0.125    
+	Cp Champ_Uniforme 1 11.e3
+}
 	Conduction
 	{
 		diffusion { }

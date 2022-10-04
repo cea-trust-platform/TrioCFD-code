@@ -30,8 +30,8 @@ Read sch2
         seuil_statio -1.e-5
 }
 
-Pb_conduction pb1
-Pb_Thermohydraulique pb2
+Pb_Rayo_conduction pb1
+Pb_Rayo_Thermohydraulique pb2
 
 Domaine dom_solide
 Domaine dom_fluide
@@ -131,6 +131,7 @@ Read fluide
         lambda Champ_Uniforme 1 0.2
         Cp Champ_Uniforme 1 1000.
         beta_th Champ_Uniforme 1 0.
+		gravite Champ_Uniforme 2 0 -9.81 
 }
 
 Solide sol
@@ -140,11 +141,6 @@ Read sol
         lambda Champ_Uniforme 1 46.    
         Cp Champ_Uniforme 1 100.
 }
-
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81 
-Associate sol gravite
-Associate fluide gravite
 
 Associate pb1 dom_solide
 Associate pb1 sol
@@ -192,10 +188,10 @@ Read pb2
                 convection { negligeable  }
                 boundary_conditions 
                 {	
-		 	Droit paroi_contact pb1 Droit
+		 	Droit paroi_contact_rayo pb1 Droit transp
                         Haut Paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
-                        Gauche paroi_contact  pb1 Gauche
+                        Gauche paroi_contact_rayo  pb1 Gauche transp
                         Bas Paroi_flux_impose
                                 Champ_front_Uniforme 1 0.
                 }
@@ -227,12 +223,12 @@ Read pb1
                 diffusion {  }
                 conditions_initiales { temperature Champ_Uniforme 1 379.15 }
                 boundary_conditions {
-                        Droit paroi_contact pb2 Droit
+                        Droit paroi_contact_rayo pb2 Droit  transp
                         Droit_Droit paroi_temperature_imposee
 				 Champ_Front_Uniforme 1 323.15
 			Bas_Droit paroi_adiabatique
 			Haut_Droit paroi_adiabatique
-			Gauche paroi_contact  pb2 Gauche
+			Gauche paroi_contact_rayo  pb2 Gauche transp
                         Gauche_Gauche Paroi_flux_impose Champ_front_Uniforme 1 400.
                         Bas_Gauche paroi_adiabatique
 			Haut_Gauche paroi_adiabatique

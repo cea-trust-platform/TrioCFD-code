@@ -60,25 +60,24 @@ solveur implicite  { solveur gmres { diag seuil -1 nb_it_max 5 }
 facsec 100.
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 	1 2.e-5
- 	rho Champ_Uniforme 	1 6.
-        lambda Champ_Uniforme	1 8.e-2
-	Cp Champ_Uniforme	1 4000.
-	beta_th Champ_Uniforme	1 0.
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 	1 2.e-5
+    	rho Champ_Uniforme 	1 6.
+           lambda Champ_Uniforme	1 8.e-2
+   	Cp Champ_Uniforme	1 4000.
+   	beta_th Champ_Uniforme	1 0.
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 	      equation_non_resolue 1
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e8 impr }	
@@ -180,3 +179,4 @@ End
 reprise formatte SANS_LP_pb.sauv
 
 
+ 

@@ -122,7 +122,7 @@ void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(ma
   const Op_Diff_Turbulent_PolyMAC_P0_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Elem, eq.operateur(0).l_op_base());
   const DoubleTab&                       mu_tot = Op_diff_loc.nu(), &xp = zone.xp(), &xv = zone.xv();
 
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
 
   int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
 

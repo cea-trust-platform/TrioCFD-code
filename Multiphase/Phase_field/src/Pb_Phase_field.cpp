@@ -132,6 +132,25 @@ void Pb_Phase_field::associer_milieu_base(const Milieu_base& mil)
     }
 }
 
+void Pb_Phase_field::typer_lire_milieu(Entree& is)
+{
+  const int nb_milieu = 2;
+  le_milieu_.resize(nb_milieu);
+  for (int i = 0; i < nb_milieu; i++)
+    {
+      is >> le_milieu_[i]; // On commence par la lecture du milieu
+      associer_milieu_base(le_milieu_[i].valeur()); // On l'associe a chaque equations (methode virtuelle pour chaque pb ...)
+    }
+
+  Probleme_base::discretiser_equations();
+
+  // remontee de l'inconnue vers le milieu
+  for (int i = 0; i < nombre_d_equations(); i++)
+    {
+      equation(i).associer_milieu_equation();
+      equation(i).milieu().discretiser((*this), la_discretisation.valeur());
+    }
+}
 
 /*! @brief Teste la compatibilite des equations de convection-diffusion et de l'hydraulique.
  *

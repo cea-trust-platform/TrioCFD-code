@@ -120,36 +120,8 @@ Read sch {
 	}
 
 
-
-Fluide_Incompressible fluide
-Read fluide {
-	MU Champ_Uniforme 1 1.
-	RHO Champ_Uniforme 1 1000.
-	LAMBDA Champ_Uniforme 1 5.
-	CP Champ_Uniforme 1 5.
-	beta_th Champ_Uniforme 1 1.
-}
-
-Solide solide
-Read solide
-{
-	rho champ_uniforme 1 4.
-	lambda champ_uniforme 1 3.   
-	cp champ_uniforme 1 0.5
-}
-
-
-Champ_Uniforme gravite
-Read gravite 3   0.  0. -9.81 
-Associate fluide gravite
-Associate solide gravite
-
-
 Associate pb1 DOMF
-Associate pb1 fluide
-
 Associate pb2 DOMS
-Associate pb2 solide
 
 Probleme_Couple pbc
 Associate pbc pb1
@@ -159,6 +131,16 @@ Discretize pbc dis
 
 Read pb1
 { 
+Fluide_Incompressible
+{
+	MU Champ_Uniforme 1 1.
+	RHO Champ_Uniforme 1 1000.
+	LAMBDA Champ_Uniforme 1 5.
+	CP Champ_Uniforme 1 5.
+	beta_th Champ_Uniforme 1 1.
+ 	gravite Champ_Uniforme 3   0.  0. -9.81 
+}
+
  Navier_Stokes_turbulent
  { 
        solveur_pression Gcp { precond ssor { omega 1.5 } 
@@ -277,6 +259,13 @@ sauvegarde binaire fluide.sauv
 
 Read pb2
 {
+
+Solide
+{
+	rho champ_uniforme 1 4.
+	lambda champ_uniforme 1 3.   
+	cp champ_uniforme 1 0.5
+}
 	Conduction
 	{
 		parametre_equation parametre_implicite

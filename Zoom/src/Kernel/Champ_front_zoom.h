@@ -78,6 +78,8 @@ protected :
   REF(Champ_Inc_base) l_inconnue;
   //  Nom dirichlet_ou_neumann;
   Nom nom_bord;
+  Nom nom_pbMG_, nom_pbG_, nom_pbF_, bord_;
+  Motcle nom_inco_;
 };
 
 #endif

@@ -64,25 +64,8 @@ END PARTITION #
 
 VEFPreP1B dis
 
-Fluide_Incompressible etat
-Read etat
-{
-        mu Champ_Uniforme 1 0.001
-        rho Champ_Uniforme 1 1.
-}
-
-Fluide_Incompressible sensibilite
-Read sensibilite
-{
-        mu Champ_Uniforme 1 0.001
-        rho Champ_Uniforme 1 1.
-}
-
 Associate pb_etat dom
-Associate pb_etat etat
-
 Associate pb_sensibilite dom
-Associate pb_sensibilite sensibilite
 
 Probleme_Couple pbc
 Associate pbc pb_etat
@@ -90,9 +73,15 @@ Associate pbc pb_sensibilite
 Associate pbc mon_schema
 Discretize pbc dis
 
-
 Read pb_etat
 {
+Fluide_Incompressible
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+
         Navier_Stokes_standard
         {       
 		
@@ -139,6 +128,13 @@ Read pb_etat
 
 Read pb_sensibilite
 {
+Fluide_Incompressible
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+
         Navier_Stokes_standard_sensibility
         {       
                 uncertain_variable { vitesse } # choice between vitesse and viscosity #

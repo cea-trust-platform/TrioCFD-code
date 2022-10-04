@@ -120,7 +120,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
   const Conds_lim&                          cls = zcl.les_conditions_limites();
   const Op_Diff_Turbulent_PolyMAC_P0_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Elem, eq.operateur(0).l_op_base());
   const DoubleTab&                       mu_tot = Op_diff_loc.nu(), &xp = zone.xp(), &xv = zone.xv();
-  const DoubleVect& fs = zone.face_surfaces(), &ve = zone.volumes(), &pe = zone.porosite_elem();
+  const DoubleVect& fs = zone.face_surfaces(), &ve = zone.volumes(), &pe = equation().milieu().porosite_elem();
 //  const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
 //  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.correlation().valeur());
 //  const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();

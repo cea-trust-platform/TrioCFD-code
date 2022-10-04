@@ -42,22 +42,21 @@ Read sch
 	}
 }
 
-Fluide_incompressible fluide
 
-Read fluide
-{	mu Champ_Uniforme  1 0.000029922
-	rho Champ_uniforme 1 1.
-}
  
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {	 mu Champ_Uniforme  1 0.000029922
+   	rho Champ_uniforme 1 1.
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc Cholesky { }
 		convection { quick }
@@ -163,3 +162,4 @@ GCP {
 # reprise formatte first_job_modified.sauv #
 # dt_impr_ustar 100. #
 	nut_max 0.01
+ 

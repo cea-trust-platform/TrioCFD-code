@@ -59,24 +59,11 @@ Read sch
 }
 
 
-Fluide_Incompressible air
-Read air
-{
-	mu Champ_Uniforme 1 0.0001108
-	rho Champ_Uniforme 1 2
-	lambda Champ_Uniforme 1 0.2589
-	Cp Champ_Uniforme 1 1635.5
-	beta_th Champ_Uniforme 1 1.
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
  
-Associate air gravite
 
 Associate pb dom
 Associate pb sch
-Associate pb air
 
 Discretize pb dis
 # Pour avoir un calcul turbulent, placer en lieu de vitesse champ_uniforme 3 50. 0. 0. #
@@ -85,7 +72,18 @@ Discretize pb dis
 # pour les cas de non regression est impossible a cause du tirage aleatoire utilise pour le bruit #
 Read pb
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme 1 0.0001108
+   	rho Champ_Uniforme 1 2
+   	lambda Champ_Uniforme 1 0.2589
+   	Cp Champ_Uniforme 1 1635.5
+   	beta_th Champ_Uniforme 1 1.
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{
 		solveur_pression petsc cholesky { }
 		convection { Centre  }
@@ -164,3 +162,4 @@ perioz periodique
 
 Solve pb
 End
+ 

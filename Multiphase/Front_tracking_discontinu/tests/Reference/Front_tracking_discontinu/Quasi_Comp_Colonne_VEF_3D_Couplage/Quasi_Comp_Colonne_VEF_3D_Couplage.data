@@ -72,8 +72,18 @@ Lire sch
     nb_pas_dt_max 5
   }
   
-fluide_quasi_compressible eau 
-Lire eau
+
+
+
+Pb_Thermohydraulique_Especes_QC pb 
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+  { 
+  fluide_quasi_compressible 
   { 
     pression 171428.571429
     loi_etat gaz_parfait_qc 
@@ -86,22 +96,8 @@ Lire eau
     traitement_pth conservation_masse
     traitement_rho_gravite standard
     mu champ_uniforme  1 3.7e-5
+ gravite champ_uniforme 3 0. 0. -9.81
   }
-
-  
-champ_uniforme gravite 
-Lire gravite 3 0. 0. -9.81
-
-Pb_Thermohydraulique_Especes_QC pb 
-
-Associate eau gravite
-Associate pb dom
-Associate pb sch
-Associate pb eau
-Discretize pb dis
-
-Lire pb
-  { 
     navier_stokes_qc 
       { 
         solveur_pression gcp  { precond ssor { omega 1.65 } seuil 1e-8 }

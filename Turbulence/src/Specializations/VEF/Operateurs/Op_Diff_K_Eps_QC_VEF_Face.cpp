@@ -50,7 +50,7 @@ Entree& Op_Diff_K_Eps_QC_VEF_Face::readOn(Entree& s )
 
 // Fonction utile visc
 // mu <Si, Sj> / |K|
-static double viscA_QC(const Zone_VEF& la_zone,int num_face,int num2,int dimension,
+static double viscA_QC(const Zone_VEF& la_zone,const Zone_Cl_VEF& zone_Cl_VEF, int num_face,int num2,int dimension,
                        int num_elem,double diffu)
 {
   double pscal;
@@ -63,9 +63,9 @@ static double viscA_QC(const Zone_VEF& la_zone,int num_face,int num2,int dimensi
 
   if ( (la_zone.face_voisins(num_face,0) == la_zone.face_voisins(num2,0)) ||
        (la_zone.face_voisins(num_face,1) == la_zone.face_voisins(num2,1)))
-    return -(pscal*diffu)/(la_zone.volumes(num_elem)*la_zone.porosite_elem(num_elem));
+    return -(pscal*diffu)/(la_zone.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
   else
-    return (pscal*diffu)/(la_zone.volumes(num_elem)*la_zone.porosite_elem(num_elem));
+    return (pscal*diffu)/(la_zone.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
 
 }
 
@@ -137,7 +137,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
                 {
                   if ( ( (j= elem_faces(elem1,i)) > num_face ))
                     {
-                      double valAp = viscA_QC(zone_VEF,num_face,j,dimension,elem1,d_mu);
+                      double valAp = viscA_QC(zone_VEF,zone_Cl_VEF,num_face,j,dimension,elem1,d_mu);
                       int fac_loc=0;
                       while ((fac_loc<nb_faces_elem) && (elem_faces(elem1,fac_loc)!=num_face)) fac_loc++;
                       if (fac_loc==nb_faces_elem)
@@ -164,7 +164,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
                 {
                   if ( ( (j= elem_faces(elem2,i)) > num_face ))
                     {
-                      double valAp = viscA_QC(zone_VEF,num_face,j,dimension,elem2,d_mu);
+                      double valAp = viscA_QC(zone_VEF,zone_Cl_VEF,num_face,j,dimension,elem2,d_mu);
                       int fac_loc=0;
                       while ((fac_loc<nb_faces_elem) && (elem_faces(elem2,fac_loc)!=num_face)) fac_loc++;
                       if (fac_loc==nb_faces_elem)
@@ -197,7 +197,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      double valAp = viscA_QC(zone_VEF,num_face,j,dimension,elem,d_mu);
+                      double valAp = viscA_QC(zone_VEF,zone_Cl_VEF,num_face,j,dimension,elem,d_mu);
                       for ( nc0=0; nc0<nb_comp; nc0++)
                         {
                           int n0=num_face*nb_comp+nc0;
@@ -228,7 +228,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
             {
               if ( (j= elem_faces(elem,i)) > num_face )
                 {
-                  double valAp = viscA_QC(zone_VEF,num_face,j,dimension,elem,d_mu);
+                  double valAp = viscA_QC(zone_VEF,zone_Cl_VEF,num_face,j,dimension,elem,d_mu);
                   for ( nc0=0; nc0<nb_comp; nc0++)
                     {
                       double valA=valAp/Prdt[nc0];

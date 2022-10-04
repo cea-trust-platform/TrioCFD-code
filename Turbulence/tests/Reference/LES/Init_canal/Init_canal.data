@@ -109,26 +109,6 @@ Lire sch
 	nb_pas_dt_max 5
 	}
 
-Fluide_Incompressible fluide1
-Lire fluide1
-{
-	mu Champ_Uniforme 1 2e-05
-	rho Champ_Uniforme 1 2
-}
-Fluide_Incompressible fluide2
-Lire fluide2
-{
-	mu Champ_Uniforme 1 2e-05
-	rho Champ_Uniforme 1 2
-}
-Fluide_Incompressible fluide3
-Lire fluide3
-{
-	mu Champ_Uniforme 1 2e-05
-	rho Champ_Uniforme 1 2
-}
-
-
 Pb_Hydraulique_Turbulent pb1
 Pb_Hydraulique_Turbulent pb2
 Pb_Hydraulique_Turbulent pb3
@@ -136,10 +116,6 @@ Pb_Hydraulique_Turbulent pb3
 Associate pb1 canal0
 Associate pb2 canal1
 Associate pb3 canal2
-
-Associate pb1 fluide1
-Associate pb2 fluide2
-Associate pb3 fluide3
 
 Probleme_Couple pb
 
@@ -154,6 +130,11 @@ Discretize pb dis
 
 Lire pb1
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 2e-05
+	rho Champ_Uniforme 1 2
+}
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP
@@ -216,6 +197,11 @@ Sauvegarde formatte pb1.sauv
 
 Lire pb2
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 2e-05
+	rho Champ_Uniforme 1 2
+}
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP
@@ -280,6 +266,11 @@ Sauvegarde formatte pb2.sauv
 
 Lire pb3
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 2e-05
+	rho Champ_Uniforme 1 2
+}
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP

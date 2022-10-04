@@ -59,33 +59,8 @@ Mailler dom_fluide
 
 VDF dis
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 4.8e-5
-	rho Champ_Uniforme 1 27.
-	lambda Champ_Uniforme 1 0.14 
-	Cp Champ_Uniforme 1 1.
-	beta_th Champ_Uniforme 1 7.8e-4
-}
-Champ_uniforme gravite
-Read gravite 2 0. -9.81
-Associate fluide gravite
 Associate pb_fluide  dom_fluide
-Associate pb_fluide fluide
-
-Solide acier
-Read acier
-{
-	rho Champ_Uniforme 1 1.
-	lambda Champ_Uniforme 1 15.    
-	Cp Champ_Uniforme 1 1.
-}
-
-# Associate acier gravite #
-
 Associate pb_acier dom_acier
-Associate pb_acier acier
 
 Probleme_Couple Conduccouplethermoh
 Associate Conduccouplethermoh pb_fluide
@@ -99,6 +74,12 @@ Discretize Conduccouplethermoh dis
 
 Read pb_acier
 {
+Solide
+{
+	rho Champ_Uniforme 1 1.
+	lambda Champ_Uniforme 1 15.    
+	Cp Champ_Uniforme 1 1.
+}
 	Conduction
 	{
 		diffusion { }
@@ -137,6 +118,15 @@ Read pb_acier
 
 Read pb_fluide
 {
+Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 4.8e-5
+	rho Champ_Uniforme 1 27.
+	lambda Champ_Uniforme 1 0.14 
+	Cp Champ_Uniforme 1 1.
+	beta_th Champ_Uniforme 1 7.8e-4
+ 	gravite Champ_uniforme 2 0. -9.81
+}
 	Navier_Stokes_standard
 	{
 		solveur_pression Cholesky { impr } 

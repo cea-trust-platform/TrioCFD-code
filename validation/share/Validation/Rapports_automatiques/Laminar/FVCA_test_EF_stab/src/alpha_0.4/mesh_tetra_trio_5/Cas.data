@@ -18,22 +18,21 @@ Lire sch
 	seuil_statio 1e-7
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu champ_uniforme 1 0.001
- 	rho champ_uniforme 1 1
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 0.001
+    	rho champ_uniforme 1 1
+   }
+   
+   	Navier_Stokes_standard
 	{
 		Solveur_pression	PETSC Cholesky { impr }
 		Convection		{ EF_stab { alpha 0.4 } }
@@ -297,3 +296,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

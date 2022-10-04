@@ -19,13 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Diff_K_Eps_VEF_Face_Q1.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Op_Diff_K_Eps_VEF_Face_Q1.h>
+#include <Neumann_paroi.h>
+#include <Zone_Cl_VEF.h>
+#include <Milieu_base.h>
+#include <Periodique.h>
 #include <Champ_Q1NC.h>
 #include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
-#include <Periodique.h>
-#include <Neumann_paroi.h>
 
 Implemente_instanciable(Op_Diff_K_Eps_VEF_Face_Q1,"Op_Diff_K_Eps_VEF_Q1NC",Op_Diff_K_Eps_VEF_base);
 
@@ -112,7 +113,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
 
-  const DoubleVect& porosite_face = zone_VEF.porosite_face();
+  const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();
 
@@ -269,7 +270,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
 
-  const DoubleVect& porosite_face = zone_VEF.porosite_face();
+  const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();
 

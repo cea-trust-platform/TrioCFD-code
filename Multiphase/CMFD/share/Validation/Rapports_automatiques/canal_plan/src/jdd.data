@@ -79,22 +79,8 @@ Read sch
     }
 }
 
-Fluide_Incompressible eau_liquide
-Read eau_liquide /* 20 degrees */
-{
-	mu champ_uniforme      1 $mu
- 	rho champ_uniforme     1 $rho
-	lambda Champ_Uniforme  1 1
-        Cp Champ_Uniforme      1 1e3
-        beta_th Champ_Uniforme 1 0
-}
-
 Pb_Multiphase pb
 
-phases pb
-{
-    liquide { eau }
-}
 
 associate  pb dom
 
@@ -104,6 +90,17 @@ Discretize pb dis
 
 Lire pb
 {
+	Milieu_composite
+	{
+liquide_eau Fluide_Incompressible
+{
+	mu champ_uniforme      1 $mu
+ 	rho champ_uniforme     1 $rho
+	lambda Champ_Uniforme  1 1
+        Cp Champ_Uniforme      1 1e3
+        beta_th Champ_Uniforme 1 0
+}
+	}
     correlations
     {
     	loi_paroi adaptative

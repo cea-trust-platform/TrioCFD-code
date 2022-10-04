@@ -3,7 +3,7 @@
 mkdir 2D_H 2D_T 3D_H 3D_T
 
 cd 2D_H
-sed -e "/#/d" -e "s?facsec	10?facsec	1?g" -e "s?Read gravite 3 0 -9.81 0?Read gravite 2 0 -9.81?g" -e "s?pb dom_3D?pb dom_2D?g" -e "s?vitesse Champ_Uniforme 3 0. 0. 0.?vitesse Champ_Uniforme 2 0. 0.?g" -e "s?champ_front_Uniforme 3 0. 0.0415 0.?champ_front_Uniforme 2 0. 0.0415?g" -e "/symetrie/d" -e "s?segment 30 0.1875 0.  0.	  0.1875 0.55 0.?segment 30 0.1875 0.	  0.1875 0.55?g" -e "s?segment 30 0.375  0.  0.	  0.375  0.62 0.?segment 30 0.375  0.	  0.375  0.62?g" -e "s?segment 30 0.5625 0.  0.	  0.5625 0.68 0.?segment 30 0.5625 0.	  0.5625 0.68?g" -e "s?segment 30 0.725  0.  0.	  0.725  0.75 0.?segment 30 0.725  0.	  0.725  0.75?g" -e "s?segment 10 0.    -0.2 0.	  0.05  -0.2  0.?segment 10 0.    -0.2	  0.05  -0.2?g" ../Plenum.data > Plenum.data
+sed -e "/#/d" -e "s?facsec	10?facsec	1?g" -e "s?champ_uniforme 3 0 -9.81 0?champ_uniforme 2 0 -9.81?g" -e "s?pb dom_3D?pb dom_2D?g" -e "s?vitesse Champ_Uniforme 3 0. 0. 0.?vitesse Champ_Uniforme 2 0. 0.?g" -e "s?champ_front_Uniforme 3 0. 0.0415 0.?champ_front_Uniforme 2 0. 0.0415?g" -e "/symetrie/d" -e "s?segment 30 0.1875 0.  0.	  0.1875 0.55 0.?segment 30 0.1875 0.	  0.1875 0.55?g" -e "s?segment 30 0.375  0.  0.	  0.375  0.62 0.?segment 30 0.375  0.	  0.375  0.62?g" -e "s?segment 30 0.5625 0.  0.	  0.5625 0.68 0.?segment 30 0.5625 0.	  0.5625 0.68?g" -e "s?segment 30 0.725  0.  0.	  0.725  0.75 0.?segment 30 0.725  0.	  0.725  0.75?g" -e "s?segment 10 0.    -0.2 0.	  0.05  -0.2  0.?segment 10 0.    -0.2	  0.05  -0.2?g" ../Plenum.data > Plenum.data
 cp ../post_run .
 
 cd ../2D_T

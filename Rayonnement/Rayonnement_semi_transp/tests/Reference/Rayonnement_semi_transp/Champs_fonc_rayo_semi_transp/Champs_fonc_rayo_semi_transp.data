@@ -4,7 +4,7 @@
 
 dimension 3
 
-Pb_Thermohydraulique_Turbulent pb
+Pb_Rayo_Thermohydraulique_Turbulent pb
 
 Domaine DOM_DOM
 # BEGIN MESH #
@@ -73,15 +73,11 @@ Lire fluide
 	beta_th Champ_Uniforme 1 9.105209E-4
 	indice Champ_Uniforme 1 1.
 	kappa Champ_Uniforme 1 10.
+	gravite Champ_Uniforme  3 0 -9.81 0
 }
-
-
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0.
 
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo DOM_DOM
-Associate fluide gravite
 Associate pb DOM_DOM
 Associate pb fluide
 

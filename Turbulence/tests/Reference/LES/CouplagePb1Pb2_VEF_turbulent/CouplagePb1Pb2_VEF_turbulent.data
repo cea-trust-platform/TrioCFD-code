@@ -50,40 +50,12 @@ Lire sch
 
 # mu=2.938831e-5  rho=
 #
-Fluide_Incompressible fluide_assemblage
-Lire fluide_assemblage
-{
-	mu Champ_Uniforme 1 .0000295249
-	rho Champ_Uniforme 1 6.215604
-	lambda Champ_Uniforme 1 .226226
-	Cp champ_Uniforme 1 5193
-	Beta_th Champ_uniforme 1 0.0018761
-}
-
-Fluide_Incompressible fluide_jeux
-Lire fluide_jeux
-{
-	mu Champ_Uniforme 1 .0000295249
-	rho Champ_Uniforme 1 6.215604
-	lambda Champ_Uniforme 1 .226226
-	Cp champ_Uniforme 1 5193
-	Beta_th Champ_uniforme 1 0.0018761
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -9.81
-
-Associate fluide_assemblage gravite
-Associate fluide_jeux gravite
 
 Pb_Thermohydraulique_Turbulent pb_jeux
 Pb_Thermohydraulique_Turbulent pb_assemblages
 
 Associate pb_assemblages dom_ass
-Associate pb_assemblages fluide_assemblage
-
 Associate pb_jeux dom_jeux
-Associate pb_jeux fluide_jeux	
 
 Probleme_couple pbc
 
@@ -95,6 +67,16 @@ Discretize pbc dis
 
 Lire pb_assemblages
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 .0000295249
+	rho Champ_Uniforme 1 6.215604
+	lambda Champ_Uniforme 1 .226226
+	Cp champ_Uniforme 1 5193
+	Beta_th Champ_uniforme 1 0.0018761
+	gravite Champ_Uniforme 3 0 0 -9.81
+}
+	
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP
@@ -197,6 +179,16 @@ verifier diametre hydraulique
 
 Lire pb_jeux
 	{
+	
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 .0000295249
+	rho Champ_Uniforme 1 6.215604
+	lambda Champ_Uniforme 1 .226226
+	Cp champ_Uniforme 1 5193
+	Beta_th Champ_uniforme 1 0.0018761
+	gravite Champ_Uniforme 3 0 0 -9.81
+}
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP

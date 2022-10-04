@@ -41,22 +41,21 @@ Read sch
 	precision_impr 8
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme   1 1.
-	rho Champ_Uniforme  1 1.
-}
 
 Pb_Hydraulique pb
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme   1 1.
+   	rho Champ_Uniforme  1 1.
+   }
+   
+   	Navier_Stokes_standard
 	{
 		Solveur_pression PETSC Cholesky { }
 		Convection { amont }
@@ -166,3 +165,4 @@ Read pb
 }
 Solve pb
 End
+ 

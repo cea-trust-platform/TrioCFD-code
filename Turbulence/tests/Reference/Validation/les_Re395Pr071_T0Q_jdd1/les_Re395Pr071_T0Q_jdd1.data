@@ -41,29 +41,27 @@ Read sch
 	seuil_statio 1.e-8
 }
 
-Fluide_Incompressible air
-Read air
-{
-	mu Champ_Uniforme       1 2.84e-5
- 	rho Champ_Uniforme      1 0.011928
-        lambda Champ_Uniforme   1 20.772e-2
-        Cp Champ_Uniforme       1 5193.
-        beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
  
-Associate air gravite
 Associate pb dom
 Associate pb sch
-Associate pb air
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme       1 2.84e-5
+    	rho Champ_Uniforme      1 0.011928
+           lambda Champ_Uniforme   1 20.772e-2
+           Cp Champ_Uniforme       1 5193.
+           beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{
 		solveur_pression petsc Cholesky { }	
 		convection { Centre  }
@@ -141,3 +139,4 @@ Read pb
 Solve pb
 Fin
 
+ 

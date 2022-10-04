@@ -21,6 +21,7 @@
 
 #include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
 #include <Source_Transport_Eps_Realisable_VDF_Elem.h>
+#include <Milieu_base.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_VDF_Elem,"Source_Transport_Eps_Realisable_VDF_P0_VDF",Source_Transport_Realisable_VDF_Elem_base);
@@ -58,7 +59,7 @@ void Source_Transport_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_visco
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence());
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
 
   for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)

@@ -67,29 +67,27 @@ Read sch_imp
 
 # proprietes physiques de l'eau a 20$^{\circ}$C #
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 1.0017e-3
- 	rho Champ_Uniforme 1 998.2
-	lambda Champ_Uniforme 1 0.6034
-	Cp  Champ_Uniforme 1 4184.1 
-	beta_th  Champ_Uniforme 1 2.e-4
-}
 
-Champ_Uniforme gravite
-Read gravite 2  0. -9.81
 
 Associate pb dom
 Associate pb sch_imp
-Associate fluide gravite
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2  0. -9.81
+   	mu Champ_Uniforme 1 1.0017e-3
+    	rho Champ_Uniforme 1 998.2
+   	lambda Champ_Uniforme 1 0.6034
+   	Cp  Champ_Uniforme 1 4184.1 
+   	beta_th  Champ_Uniforme 1 2.e-4
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-9 }	
 		convection { EF_stab { } }
@@ -212,3 +210,4 @@ Solveur
 		seuil_convergence_solveur 1.e-8 relax_pression 0.1
 		relax_pression 0.01
 	   }
+ 

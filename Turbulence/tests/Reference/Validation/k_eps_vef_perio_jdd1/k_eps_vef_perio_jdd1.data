@@ -42,21 +42,23 @@ Read sch
         facsec 0.5
 } 
 
-Fluide_Incompressible air 
-Read air 
-{ 
-        mu Champ_Uniforme 1 0.00257 
-        rho Champ_Uniforme 1 1. 
-} 
+
+
 
 Associate pb dom0
 Associate pb sch 
-Associate pb air 
+
 
 Discretize pb dis 
 
 Read pb 
-{ 
+{    
+   fluide_incompressible 
+   {  
+           mu Champ_Uniforme 1 0.00257 
+           rho Champ_Uniforme 1 1. 
+   } 
+   
  Navier_Stokes_Turbulent 
  { 
        solveur_pression Cholesky { }
@@ -123,3 +125,4 @@ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 }
 	solveur_bar Gcp { precond ssor { omega 1.5 } seuil 1.e-12 }
        solveur_pression  gcp  { precond ssor { omega 1.5 } seuil 1.e-6 impr }
   Canal_perio { direction_ecoulement 0 u_etoile 0. coeff 1. }  
+ 

@@ -49,22 +49,9 @@ Lire sch
 }
 
 # EAU 320 K #
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu	Champ_Uniforme 1 5.86e-4
-	rho	Champ_Uniforme 1 991.3
-	lambda	Champ_Uniforme 1 0.555
-	Cp	Champ_Uniforme 1 4172.
-	beta_th	Champ_Uniforme 1 2.74e-4
-}
 
-Champ_Uniforme gravite
-Lire gravite 3 0 -9.81 0
 
-Associer fluide gravite
 Associer pb dom_Walton
-Associer pb fluide
 Associer pb sch
 
 Discretiser pb dis
@@ -75,7 +62,18 @@ Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 -9.81 0
+   	mu	Champ_Uniforme 1 5.86e-4
+   	rho	Champ_Uniforme 1 991.3
+   	lambda	Champ_Uniforme 1 0.555
+   	Cp	Champ_Uniforme 1 4172.
+   	beta_th	Champ_Uniforme 1 2.74e-4
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		solveur_pression petsc Cholesky { }
 		# Schema de convection teste : Muscl, Ef_stab { alpha 0.2 }, Ef_stab { alpha 1. } #
@@ -192,3 +190,4 @@ Lire pb
 
 Resoudre pb
 fin
+ 

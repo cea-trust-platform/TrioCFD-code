@@ -57,22 +57,21 @@ Lire sch
 	seuil_statio 1.e-8
 }
 
-Fluide_Incompressible oel
-Lire oel
-{
-	mu Champ_Uniforme 1 0.0002
-	rho Champ_Uniforme 1 2
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb oel
 
 Discretize pb dis
 
 Lire pb
 {
-    Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 0.0002
+   	rho Champ_Uniforme 1 2
+   }
+   
+       Navier_Stokes_Turbulent
     {
 	solveur_pression cholesky { } 
 	convection { amont }
@@ -113,3 +112,4 @@ Lire pb
 
 Solve pb
 Fin
+ 

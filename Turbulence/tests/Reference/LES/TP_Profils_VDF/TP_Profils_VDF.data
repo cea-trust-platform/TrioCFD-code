@@ -53,23 +53,10 @@ Lire sch
         seuil_statio 1.e-8
 	}
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-	lambda Champ_Uniforme	1 20.772e-2
-	Cp Champ_Uniforme	1 5193.
-	beta_th Champ_Uniforme	1 1.9954e-3
-}
 
-Champ_Uniforme gravite
-Lire gravite 3 0 0 0
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
@@ -77,7 +64,18 @@ Discretize pb dis
 # Sinon mettre Ampli_bruit 0.1 #
 Lire pb
 	{
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme	1 2.84e-5
+   	rho Champ_Uniforme	1 0.0976
+   	lambda Champ_Uniforme	1 20.772e-2
+   	Cp Champ_Uniforme	1 5193.
+   	beta_th Champ_Uniforme	1 1.9954e-3
+   }
+   
+   	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP
 			{
@@ -160,3 +158,4 @@ Solve pb
 Fin
 
 
+ 
