@@ -121,7 +121,6 @@ void calculer_rho_harmonic_v(const IJK_Field_double & rho,
 double get_channel_control_volume(IJK_Field_double & field, int local_k_layer, const ArrOfDouble_with_ghost & delta_z_local);
 
 void mass_solver_with_rho(IJK_Field_double & velocity, const IJK_Field_double & rho, const ArrOfDouble_with_ghost & delta_z_local, const int k);
-void champ1_divise_par_vcell_et_par_champ2(const IJK_Field_double & champ1, const IJK_Field_double & champ2, IJK_Field_double & champ_out, const ArrOfDouble_with_ghost & delta_z_local, const int k);
 void mass_solver_with_inv_rho(IJK_Field_double & velocity, const IJK_Field_double & inv_rho, const ArrOfDouble_with_ghost & delta_z_local, const int k);
 
 void mass_solver_scalar(IJK_Field_double & dv, const ArrOfDouble_with_ghost & delta_z_local, int k_index);

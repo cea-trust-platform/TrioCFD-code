@@ -1217,27 +1217,6 @@ void mass_solver_with_rho(IJK_Field_ST & velocity, const IJK_Field_ST & rho, con
   }
 }
 
-
-// Division de toutes les valeurs stockees dans champ1 AUX_FACES par le volume du "volume de controle"
-//  et par champ2 au noeud de champ1.
-// (meme moyenne que pour calculer_rho_v)
-void champ1_divise_par_vcell_et_par_champ2(const IJK_Field_double & champ1, const IJK_Field_double & champ2, IJK_Field_double & champ_out, const ArrOfDouble_with_ghost & delta_z_local, const int k       )
-{
-  // champ1 : champ de valeurs AUX FACES, champ a diviser
-  // champ2 : champ de valeurs AUX CENTRES, champ qui divise
-  // champ_out : champ de valeurs AUX FACES, sortie
-  // Si champ3 contenait qqch,maintenant il contient champ1.
-  champ_out = champ1;
-  const double volume = get_channel_control_volume(champ_out, k, delta_z_local);
-  switch(champ_out.get_localisation()) {
-  case IJK_Splitting::FACES_I: mass_solver_with_rho_x(champ2, champ_out, volume, k); break;
-  case IJK_Splitting::FACES_J: mass_solver_with_rho_y(champ2, champ_out, volume, k); break;
-  case IJK_Splitting::FACES_K: mass_solver_with_rho_z(champ2, champ_out, volume, k); break;
-  default:Process::exit();
-  }
-}
-
-
 // Au lieu de diviser par rho, on multiplie par inv_rho
 // C'est mieux car en discret : inv_rho = 1/rho_l * chi_l + 1/rho_v * (1-chi_l)
 void mass_solver_with_inv_rho(IJK_Field_ST & velocity, const IJK_Field_ST & inv_rho, const ArrOfDouble_with_ghost & delta_z_local, const int k)
