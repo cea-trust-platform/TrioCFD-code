@@ -1922,7 +1922,6 @@ void IJK_FT_double::run()
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
       // Seulement pour le calcul du bilan de forces :
       allocate_velocity(terme_source_interfaces_ns_, splitting_, 1);
-      allocate_velocity(terme_SigCou_div_par_rho_, splitting_, 1);
       // Seulement pour le calcul des statistiques :
       allocate_velocity(terme_repulsion_interfaces_ns_, splitting_, 1);
       allocate_velocity(terme_repulsion_interfaces_ft_, splitting_ft_, 1);
@@ -2170,7 +2169,8 @@ void IJK_FT_double::run()
   if ((!disable_diphasique_) && (post_.get_liste_post_instantanes().contient_("VI")
                                  || post_.get_liste_post_instantanes().contient_("TOUS")))
     interfaces_.compute_vinterp();
-// Preparer le fichier de postraitement et postraiter la condition initiale:
+
+  // Preparer le fichier de postraitement et postraiter la condition initiale:
   Nom lata_name = nom_du_cas();
   if (fichier_post_ != "??")
     {
@@ -3284,37 +3284,46 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
             compute_correction_for_momentum_balance(rk_step);
             for (int dir = 0; dir < 3; dir++)
               {
-                if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
+                // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
+                // Utilisation directe du terme source interf pour l'ajouter a velocity_.
+                // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
+                const int kmax = terme_source_interfaces_ns_[dir].nk();
+                for (int k = 0; k < kmax; k++)
                   {
-                    // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
-                    // Utilisation directe du terme source interf pour l'ajouter a velocity_.
-                    // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
-                    const int kmax = terme_source_interfaces_ns_[dir].nk();
-                    for (int k = 0; k < kmax; k++)
+                    // division par le produit (volume * rho_face)
+                    if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
                       {
-                        // division par le produit (volume * rho_face)
-                        if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                        Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
+                        Process::exit();
+                        // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                      }
+                    else
+                      {
+                        // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
+                        mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                        if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
+                            post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
                           {
-                            Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
-                            Process::exit();
-                            // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                            redistribute_from_splitting_ft_faces_[dir].redistribute(terme_repulsion_interfaces_ft_[dir],
+                                                                                    terme_repulsion_interfaces_ns_[dir]);
+                            // Division de terme_repulsion_interfaces_ns_ par rho_field_ et par volume cellule
+                            mass_solver_with_rho(terme_repulsion_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
                           }
-                        else
-                          {
-                            // mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-                            // gr262753 : on arrete de modifier la dimension (de puissance vol. a acceleration vol.) du terme_source_interfaces_ns_.
-                            champ1_divise_par_vcell_et_par_champ2(terme_source_interfaces_ns_[dir], rho_field_, terme_SigCou_div_par_rho_[dir], delta_z_local_, k);
-                          }
+                        // Egalite aux dimensions :
+                        // [terme_source_interfaces_ns_]=[terme_repulsion_interfaces_ns_]=[du/dt / Vcell] = m/s^2/m^3
+                      }
+                    if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
+                      {
                         // puis
                         // comme euler_explicit_update mais avec un pas de temps partiel :
                         const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
-                        const int imax = terme_SigCou_div_par_rho_[dir].ni();
-                        const int jmax = terme_SigCou_div_par_rho_[dir].nj();
+                        const int imax = terme_source_interfaces_ns_[dir].ni();
+                        const int jmax = terme_source_interfaces_ns_[dir].nj();
                         for (int j = 0; j < jmax; j++)
                           {
                             for (int i = 0; i < imax; i++)
                               {
-                                double x = terme_SigCou_div_par_rho_[dir](i,j,k);
+                                double x = terme_source_interfaces_ns_[dir](i,j,k);
                                 velocity_[dir](i,j,k) += x * delta_t;
                               }
                           }
