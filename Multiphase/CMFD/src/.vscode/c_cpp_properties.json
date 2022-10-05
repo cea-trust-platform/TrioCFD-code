@@ -4,8 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/volatile/catB/cr268029/trust-code/src/**",
-                "/volatile/catB/cr268029/trust-code/lib/src/LIBMEDCOUPLING/install/include/**"
+                "${env:TRUST_ROOT}/src/**",
+                "${env:TRUST_ROOT}/lib/src/LIBMEDCOUPLING/install/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
