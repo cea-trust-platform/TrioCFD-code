@@ -85,6 +85,7 @@ protected:
   DoubleVect coeff_auto_diffusion;
   double temperature;
   double molarVolume;
+  double prefactor;
   double alpha_ref;
   double angle_alphaMatrix;
   double diagonal_coeff;
@@ -118,6 +119,7 @@ protected:
   void calculer_div_alpha_rho_gradC(DoubleTab&) const;
   void calculer_div_alpha_gradC(DoubleTab&) const;
   void calculer_pression_thermo(DoubleTab&) const;
+  void calculer_mutilde_demi(DoubleTab&, DoubleTab&) const;
   //const DoubleTab& get_terme_non_lineaire(DoubleTab&);
   virtual void assembler_matrice_point_fixe(Matrice_Morse&);
   virtual void calculer_point_fixe(const DoubleTab&, const DoubleTab&, const Matrice_Morse&, DoubleTab&, DoubleTab&);
@@ -183,8 +185,8 @@ inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 
 inline double Source_Con_Phase_field::dWdc_defaut(const double c) const
 {
-  return (4*c*(c+0.5)*(c-0.5));
-  //return 2*(c-0.12)*(c-0.65)*(2*c-0.12-0.65);
+  //return (4*c*(c+0.5)*(c-0.5));
+  return 2*(c-0)*(c-0.68)*(2*c-0-0.68);
 
 }
 
@@ -208,9 +210,11 @@ inline DoubleTab Source_Con_Phase_field::dWdc_naire_analytique_ternaire(const Do
   dWdc_=0;
   DoubleTab P(c.dimension(0),2);
   P = 0;
-  DoubleTab dPdx0(P);
-  DoubleTab dPdx1(P);
+  DoubleTab dPdxU(P);
+  DoubleTab dPdxZr(P);
 
+
+  //here j defines oxide and metal
   for (int j=0; j<2; j++)
     {
       for (int i=0; i<c.dimension(0); i++)
@@ -218,18 +222,20 @@ inline DoubleTab Source_Con_Phase_field::dWdc_naire_analytique_ternaire(const Do
           P(i,j) = pow(((cos(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+sin(psi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j)))/(aUEq(j))),2)+pow(((-sin(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+cos(psi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j)))/(aZrEq(j))),2) ;
         }
     }
+
+  //here j defines oxide and metal
   for (int j=0; j<2; j++)
     {
       for (int i=0; i<c.dimension(0); i++)
         {
-          dPdx0(i,j) = 2*(c(i,0)-cUEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)))+ 2*(c(i,1)-cZrEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)));
-          dPdx1(i,j) = 2*(c(i,0)-cUEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)));
+          dPdxU(i,j) = 2*(c(i,0)-cUEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)))+ 2*(c(i,1)-cZrEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)));
+          dPdxZr(i,j) = 2*(c(i,0)-cUEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)));
         }
     }
   for (int i=0; i<c.dimension(0); i++)
     {
-      dWdc_(i,0)=P(i,0)*dPdx0(i,1)+P(i,1)*dPdx0(i,0); //+muUeq a rajouter
-      dWdc_(i,1)=P(i,0)*dPdx1(i,1)+P(i,1)*dPdx1(i,0);//+muZrEq a rajouter
+      dWdc_(i,0)=P(i,0)*dPdxU(i,1)+P(i,1)*dPdxU(i,0); //mutildeU *** ///// +muUeq a rajouter ??
+      dWdc_(i,1)=P(i,0)*dPdxZr(i,1)+P(i,1)*dPdxZr(i,0);//mutildeZr **** //// +muZrEq a rajouter ??
     }
 
   return dWdc_;

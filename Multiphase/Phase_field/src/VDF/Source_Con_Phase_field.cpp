@@ -231,15 +231,15 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                     Cerr<< finl;
                     exit();
                   }
-                  if(cpt0 != 4)
-                    {
-                      Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                      Cerr << "You should specify all these parameters: " << les_mots << finl;
-                      exit();
-                    }
+
                 }
               is >>motlu;
-
+            }
+          if(cpt0 != 5)
+            {
+              Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+              Cerr << "You should specify all these parameters: " << les_mots << finl;
+              exit();
             }
         }
       else if (temp_systeme_naire=="oui")
@@ -317,14 +317,15 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                       Cerr << "We are expecting a keyword among " << param_alpha << finl;
                                       exit();
                                     }
-                                    if(cpt1 != 3)
-                                      {
-                                        Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                                        Cerr << "You should specify all these parameters: " << param_alpha << finl;
-                                        exit();
-                                      }
+
                                   }
                                 is>> motlu;
+                              }
+                            if(cpt1 != 3)
+                              {
+                                Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                                Cerr << "You should specify all these parameters: " << param_alpha << finl;
+                                exit();
                               }
                             double coeff_mult;
                             coeff_mult = alpha_ref/(2*pow(cos(angle_alphaMatrix* PI / 180.0),2)+diagonal_coeff*pow(sin(angle_alphaMatrix* PI / 180.0),2));
@@ -424,14 +425,14 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                   Cerr << "We are expecting a keyword among " << param_potentiel_chimique << finl;
                                   exit();
                                 }
-                                if(cpt1 != 2)
-                                  {
-                                    Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                                    Cerr << "You should specify all these parameters: " << param_potentiel_chimique << finl;
-                                    exit();
-                                  }
                               }
                             is>> motlu;
+                          }
+                        if(cpt1 != 2)
+                          {
+                            Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                            Cerr << "You should specify all these parameters: " << param_potentiel_chimique << finl;
+                            exit();
                           }
                         dWdc_naire=&Source_Con_Phase_field::dWdc_naire_defaut;
                       }
@@ -511,14 +512,14 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                       Cerr << "We are expecting a keyword among " << param_potentiel_analytique_ternaire << finl;
                                       exit();
                                     }
-                                    if(cpt1 != 5)
-                                      {
-                                        Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                                        Cerr << "You should specify all these parameters: " << param_potentiel_analytique_ternaire << finl;
-                                        exit();
-                                      }
                                   }
                                 is>> motlu;
+                              }
+                            if(cpt1 != 5)
+                              {
+                                Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                                Cerr << "You should specify all these parameters: " << param_potentiel_analytique_ternaire << finl;
+                                exit();
                               }
                             dWdc_naire_analytique_ter=&Source_Con_Phase_field::dWdc_naire_analytique_ternaire;
                           }
@@ -626,14 +627,14 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                       Cerr << "We are expecting a keyword among " << param_potentiel_analytique_quaternaire << finl;
                                       exit();
                                     }
-                                    if(cpt1 != 8)
-                                      {
-                                        Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                                        Cerr << "You should specify all these parameters: " << param_potentiel_analytique_quaternaire << finl;
-                                        exit();
-                                      }
                                   }
                                 is>> motlu;
+                              }
+                            if(cpt1 != 8)
+                              {
+                                Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                                Cerr << "You should specify all these parameters: " << param_potentiel_analytique_quaternaire << finl;
+                                exit();
                               }
                             dWdc_naire_analytique_quater=&Source_Con_Phase_field::dWdc_naire_analytique_quaternaire;
                           }
@@ -644,6 +645,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
                         const int& nb_comp =eq_c.constituant().nb_constituants();
                         Cerr << "nb_comp = "<<nb_comp<<finl;
+                        Cerr <<"not implemented for systeme naire in case of potentiel chimique=fonction "<<finl;
                         potentiel_chimique_expr_.lire_f(is,nb_comp);
                         dWdc=&Source_Con_Phase_field::dWdc_general;
                       }
@@ -696,10 +698,11 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                           }
                         is >> motlu;
                         int cpt1=0;
-                        Motcles param_mobilite(3);
+                        Motcles param_mobilite(4);
                         param_mobilite(0)="coefficient_auto_diffusion";
                         param_mobilite(1)="temperature";
                         param_mobilite(2)="volume_molaire";
+                        param_mobilite(3)="prefacteur_a";
                         while(motlu!="}")
                           {
                             int rang0 = param_mobilite.search(motlu);
@@ -717,13 +720,19 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                               case 1:
                                 {
                                   cpt1++;
-                                  is >> temperature;
+                                  is >> temperature; //temperature en Kelvin
                                   break;
                                 }
                               case 2:
                                 {
                                   cpt1++;
                                   is >> molarVolume;
+                                  break;
+                                }
+                              case 3:
+                                {
+                                  cpt1++;
+                                  is >> prefactor;
                                   break;
                                 }
                               default :
@@ -733,16 +742,16 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                   Cerr << "We are expecting a keyword among " << param_mobilite << finl;
                                   exit();
                                 }
-                                if(cpt1 != 3)
-                                  {
-                                    Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                                    Cerr << "You should specify all these parameters: " << param_mobilite << finl;
-                                    exit();
-                                  }
+
                               }
                             is>> motlu;
                           }
-                        //is >> motlu;
+                        if(cpt1 != 4)
+                          {
+                            Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                            Cerr << "You should specify all these parameters: " << param_mobilite << finl;
+                            exit();
+                          }
                         kappaMatrix_func_c=&Source_Con_Phase_field::kappa_func_auto_diffusion;
                       }
                     else if (motlu=="non")
@@ -789,15 +798,14 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 
                     break; //test break
                   }
-                  if(cpt0 != 7)
-                    {
-                      Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                      Cerr << "You should specify all these parameters: " << les_mots << finl;
-                      exit();
-                    }
                 }
-
               is >> motlu;
+            }
+          if(cpt0 != 7)
+            {
+              Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+              Cerr << "You should specify all these parameters: " << les_mots << finl;
+              exit();
             }
         }
     }
@@ -821,7 +829,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
         case 6:
           {
             cpt++;
-
             Motcle temp_kappa_moy_;
             is >> temp_kappa_moy_;
             if(temp_kappa_moy_=="arithmetique")
@@ -943,7 +950,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
           }
         }
       is >>motlu;
-
     }
   if(cpt != 13)
     {
@@ -951,14 +957,12 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
       Cerr << "You should specify all these parameters: " << les_mots << finl;
       exit();
     }
-
-  if (type_systeme_naire_==0)
+  /*if (type_systeme_naire_==0)
     if(kappa>0)
       {
         Cerr <<" theoretical time step = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
-      }
+      }*/
   return is ;
-
 }
 
 void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
@@ -968,7 +972,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   rho0 = eq_ns.rho0();
   drhodc_ = eq_ns.drhodc();
-  // Dans le modele cette derivee est constante - On la calcule au debut.
+  // Dans le modele binaire cette derivee est constante - On la calcule au debut selon que l'approx boussi soit utilisée ou non.
 
   boussi_=eq_ns.get_boussi_();
   if (boussi_!=1 && boussi_!=0)
@@ -977,6 +981,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       exit();
     }
 
+  // diff_boussi==1 si la viscosite dynamique n'est pas constante (variation de la viscosite en fonction de la concentration c)
   diff_boussi_=eq_ns.get_diff_boussi_();
   if (diff_boussi_!=1 && diff_boussi_!=0)
     {
@@ -986,6 +991,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 
   g_=eq_ns.get_g_();
 
+  // mutype==1 si c'est avec energie cinetique (dans l'expression du potentiel chimique generalise)
   mutype_=eq_c.get_mutype_();
   if (mutype_!=0 && mutype_!=1)
     {
@@ -1009,6 +1015,8 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       Cerr<<"================================================="<<finl;
       exit();
     }
+
+  // kappa_ind==1 si c'est mobilite degeneree (==0 si mobilite constante)
   if (type_systeme_naire_==0)
     {
       if(type_kappa_==1)
@@ -1042,6 +1050,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
         }
     }
 
+  //choix de la methode de calcul de la moyenne des mobilites vis a vis du gradient de mutilde dans le cas implicite
   if(implicitation_==1)
     {
       if(kappa_moy_!=0 && kappa_moy_!=1 && kappa_moy_!=2)
@@ -1157,7 +1166,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       mobilite_variable="non";
     }
 
-  if (type_systeme_naire_==0) //implicitation ??
+  if (type_systeme_naire_==0)
     {
       if(kappa_moy_==0)
         {
@@ -1266,24 +1275,28 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   const Operateur_Div& opdiv=eq_ns.operateur_divergence();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  //const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
-
-  DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-  if (prov_face.size()==0)
-    prov_face=eq_ns.inconnue().valeurs();
-  prov_face=0.;
+  //const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  //const IntTab& face_voisins = zone_VDF.face_voisins();
+  //const DoubleVect& volumes = zone_VDF.volumes();
   resu=0.;
+
+
 
   if (type_systeme_naire_==0)
     {
+      // Dans cette partie, le laplacien est obtenu comme div.(grad F) avec
+      // une application du solveur masse entre l'étape de gradient et de divergence
+
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
       // Grad(F)
       opgrad.calculer(F,prov_face);
+      /*
       // M*Grad(F)
       int ndeb=zone_VDF.premiere_face_int();
       int nbfaces=zone_VDF.nb_faces();
@@ -1297,7 +1310,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
           vol1=volumes(el1);
           cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
           prov_face(fac)=mobilite(cface)*prov_face(fac);
-        }
+        }*/
       //   int taille=prov_face.size();
       //   Cerr << "taille : " << taille << finl;
       //   for (int i=0;i<taille;i++)
@@ -1307,12 +1320,49 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
       //   Cerr << "Fin multiplication mobilite" << finl;
       // Application solveur masse
       eq_ns.solv_masse().appliquer(prov_face);
+      //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
 
       // Div(M*Grad(F))
       opdiv.calculer(prov_face,resu);
+      //Cerr <<"laplacien"<<resu<<finl;
     }
   else if (type_systeme_naire_==1)
     {
+      // Dans cette partie, le laplacien s'obtient comme div(grad F) où F est un DoubleTab avec nb_comp colonnes.
+      // On introduit des fonctions temporaires (temp) pour le calcul de chaque colonne avant de les regrouper dans un DoubleTab a la fin
+
+      /*DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
+      if (temp_prov_face.size()==0)
+        temp_prov_face=eq_ns.inconnue().valeurs();
+      temp_prov_face=0.;
+
+      DoubleTab prov_face(temp_prov_face.dimension_tot(0),F.line_size());
+      prov_face = 0;
+      DoubleTab temp_F(F.dimension_tot(0),1);
+      temp_F=0;
+      for (int j=0; j<F.line_size(); j++)
+        {
+          for (int i=0; i<temp_F.dimension(0); i++)
+            {
+              temp_F(i,0)=F(i,j);
+            }
+          // Grad(F)
+          opgrad.calculer(temp_F,temp_prov_face);
+
+          for (int k=0; k<temp_prov_face.dimension_tot(0); k++)
+            {
+              prov_face(k,j)=temp_prov_face(k,0);
+            }
+        }
+      eq_ns.solv_masse().appliquer(prov_face);
+      //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
+
+      // Div(alpha*Grad(F))
+      opdiv.calculer(prov_face,resu);*/
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
       // Grad(F)
       DoubleTab temp_resu(resu.dimension_tot(0),1);
       temp_resu=0;
@@ -1336,7 +1386,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
               resu(i,j)=temp_resu(i,0);
             }
         }
-
+      //Cerr <<"laplacien"<<resu<<finl;
     }
   return resu;
 
@@ -1390,6 +1440,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
 
       // Div(Kappa*Grad(F))
       opdiv.calculer(prov_face,resu);
+      //Cerr <<"div_kappa_grad"<<resu<<finl;
 
     }
   else if (type_systeme_naire_==1)
@@ -1464,6 +1515,8 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
               resu(i,j)=temp_resu(i,0);
             }
         }
+      //Cerr <<"div_kappa_grad"<<resu<<finl;
+
     }
 
   return resu;
@@ -1509,6 +1562,7 @@ void Source_Con_Phase_field::premier_demi_dt()
   DoubleTab& mutilde=eq_c.set_mutilde_().valeurs();
   DoubleTab& mutilde_demi=eq_c.set_mutilde_demi();
   DoubleTab& c_demi=eq_c.set_c_demi();
+
 
   // Utilise dans l'ancien modele de Didier Jamet
 
@@ -1867,12 +1921,17 @@ void Source_Con_Phase_field::premier_demi_dt()
                   mutilde_demi.echange_espace_virtuel();*/
             }
           else
+            //Cerr<<"c_demi avant non_lin_gmres"<<c_demi<<finl;
+            //Cerr<<"c avant non_lin gmres"<<c<<finl;
+
             non_lin_gmres(c, mutilde, matrice_diffusion_CH, c_demi, mutilde_demi);
           //---------------
 
           const double theta=0.6;
           // On stocke les nouveaux c et mutilde
 
+          //Cerr<<"c_demi apres non_lin_gmres"<<c_demi<<finl;
+          //Cerr<<"c apres non_lin gmres"<<c<<finl;
 
           if (type_systeme_naire_==0)
             {
@@ -1889,9 +1948,19 @@ void Source_Con_Phase_field::premier_demi_dt()
                   //----------------
                   //               mutilde_demi(n_elem)=x1(n_elem+nb_elem);
                   //----------------
-                  mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
-                  mutilde_demi(n_elem)/=theta;
+                  //c=c_demi;
+
+                  //---------- Calcul de mutilde_demi = dw/dc (c_demi)-div_alpha_gradC(c_demi) ------------
+                  //calculer_mutilde_demi(mutilde_demi, c_demi);
+                  //calculer_mutilde(mutilde_demi);
+                  //mutilde=mutilde_demi;
+                  //mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
+                  //mutilde_demi(n_elem)/=theta;
                 }
+              calculer_mutilde_demi(mutilde_demi, c_demi);
+              mutilde_demi.echange_espace_virtuel();
+              //Cerr<<"c_demi -(1-theta)cn/theta"<<c_demi<<finl;
+
             }
           else if (type_systeme_naire_==1)
             {
@@ -1910,13 +1979,27 @@ void Source_Con_Phase_field::premier_demi_dt()
                       //----------------
                       //               mutilde_demi(n_elem)=x1(n_elem+nb_elem);
                       //----------------
-                      mutilde_demi(n_elem,j)-=(1-theta)*mutilde(n_elem,j);
-                      mutilde_demi(n_elem,j)/=theta;
+                      //c=c_demi;
+                      //calculer_mutilde_demi(mutilde_demi, c_demi);
+                      //calculer_mutilde(mutilde_demi);
+                      //mutilde=mutilde_demi;
+                      //mutilde_demi(n_elem,j)-=(1-theta)*mutilde(n_elem,j);
+                      //mutilde_demi(n_elem,j)/=theta;
                     }
                 }
+              calculer_mutilde_demi(mutilde_demi, c_demi);
+              mutilde_demi.echange_espace_virtuel();
+
             }
-          //Cerr <<"c_demi after 1-theta/theta = "<<c_demi<<finl;
+
+          c_demi.echange_espace_virtuel();
+          c.echange_espace_virtuel();
+          mutilde.echange_espace_virtuel();
+
           //Cerr <<"mutilde_demi after 1-theta/theta = "<<mutilde_demi<<finl;
+          //Cerr <<"mutilde after mutilde n+1/4 = "<<mutilde_demi<<finl;
+          //Cerr <<"c_demi after 1-theta/theta = "<<c_demi<<finl;
+          //Cerr <<"c = "<<c<<finl;
 
         }
 
@@ -1944,6 +2027,8 @@ void Source_Con_Phase_field::premier_demi_dt()
       // Calcul de l'accroissement entre n et n+1/2
       // Utile pour pouvoir utiliser n'importe quel dt
       accr=0.;
+      //Cerr<<"c_demi avant } fin implicitation ==1"<<c_demi<<finl;
+
     }
   else if(implicitation_==0)
     {
@@ -2010,7 +2095,7 @@ void Source_Con_Phase_field::premier_demi_dt()
               //kappaMatrix_variable=0.;
               kappaMatrix_variable = (this->*kappaMatrix_func_c)(c, coeff_auto_diffusion);
               double R=8.314;
-              kappaMatrix_variable *= molarVolume/(R*temperature);
+              kappaMatrix_variable *= molarVolume/(prefactor*R*temperature);
               //Cerr <<"kappaMatrix_variable (1/RT)"<<kappaMatrix_variable<<finl;
 
               //Div_kappa_grad
@@ -2031,6 +2116,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
       // Utile pour pouvoir utiliser n'importe quel dt - voir Schema_Phase_Field
       c_demi=c;
+      //Cerr <<"c_demi"<<c_demi<<finl;
     }
   else
     {
@@ -2050,9 +2136,13 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
 
+  //const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
+  //const DoubleTab& c=eq_c.inconnue().valeurs();
+  const int nb_comp = eq_c.constituant().nb_constituants();
+
   if (type_systeme_naire_==0)
     {
-      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
         prov_face=eq_ns.inconnue().valeurs();
       prov_face=0.;
@@ -2065,74 +2155,131 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
       // Div(alpha*Grad(c))
       opdiv.calculer(prov_face,div_alpha_gradC);
       eq_c.solv_masse().appliquer(div_alpha_gradC);
+      //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
+
     }
   else if (type_systeme_naire_==1)
     {
-      DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
-      if (temp_prov_face.size()==0)
-        temp_prov_face=eq_ns.inconnue().valeurs();
-      temp_prov_face=0.;
-
-      DoubleTab prov_face(temp_prov_face.dimension_tot(0),c.line_size());
-      prov_face = 0;
-      DoubleTab temp_c(c.dimension_tot(0),1);
-      temp_c=0;
       /*
-            for (int j=0; j<c.line_size(); j++)
-              {
-                for (int i=0; i<c.dimension(0); i++)
-                  {
-                    temp_c(i,0)=c(i,j);
-                    // Grad(C)
-                    opgrad.calculer(temp_c,temp_prov_face);
-                    for (int k=0; k<temp_prov_face.dimension(0); k++)
-                      {
-                        prov_face(k,j)=temp_prov_face(k,0);
-                      }
-                  }
-              }*/
+       DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
+       if (temp_prov_face.size()==0)
+         temp_prov_face=eq_ns.inconnue().valeurs();
+       temp_prov_face=0.;
 
-      for (int j=0; j<c.line_size(); j++)
+       DoubleTab prov_face(temp_prov_face.dimension_tot(0),c.line_size());
+       prov_face = 0;
+       DoubleTab temp_c(c.dimension_tot(0),1);
+       temp_c=0;
+
+       for (int j=0; j<c.line_size(); j++)
+         {
+           for (int i=0; i<c.dimension(0); i++)
+             {
+               temp_c(i,0)=c(i,j);
+               // Grad(C)
+               opgrad.calculer(temp_c,temp_prov_face);
+               for (int k=0; k<temp_prov_face.dimension(0); k++)
+                 {
+                   prov_face(k,j)=temp_prov_face(k,0);
+                 }
+             }
+         }
+
+       for (int j=0; j<c.line_size(); j++)
+         {
+           for (int i=0; i<temp_c.dimension_tot(0); i++)
+             {
+               temp_c(i,0)=c(i,j);
+             }
+           // Grad(C)
+
+           opgrad.calculer(temp_c,temp_prov_face);
+
+           for (int k=0; k<temp_prov_face.dimension_tot(0); k++)
+             {
+               prov_face(k,j)=temp_prov_face(k,0);
+             }
+         }
+       eq_ns.solv_masse().appliquer(prov_face);
+
+       // alpha*Grad(C)
+       DoubleTab temp_prov_face2 = prov_face;
+       temp_prov_face2 = 0;
+       const int nb_comp =eq_c.constituant().nb_constituants(); //nb_equation_CH
+       for (int j=0; j<prov_face.line_size(); j++)
+         {
+           for (int i=0; i<prov_face.dimension(0); i++)
+             {
+               temp_prov_face(i,0)=prov_face(i,j);
+               for (int k=0; k<nb_comp; k++)
+                 {
+                   temp_prov_face2(i,k)+=temp_prov_face(i,0)*alphaMatrix(j+k*nb_comp);
+                 }
+             }
+         }
+       prov_face = temp_prov_face2;
+       //Cerr <<"alphaMatrix * (gradC apres solv_masse)"<< prov_face<<finl;
+
+       // Div(alpha*Grad(c))
+       opdiv.calculer(prov_face,div_alpha_gradC);
+       eq_c.solv_masse().appliquer(div_alpha_gradC);
+       //Cerr << "div_alpha_gradC apres solv_masse.appliquer "<<div_alpha_gradC<<finl;
+       Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
+      */
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
+      DoubleTab temp_prov_face2 (prov_face.dimension(0),nb_comp);
+      temp_prov_face2 = 0;
+      // Grad(c)
+      DoubleTab temp_resu(div_alpha_gradC.dimension_tot(0),1);
+      temp_resu=0;
+      DoubleTab temp_c(c.dimension_tot(0),1);
+      for (int j=0; j<nb_comp; j++)
         {
-          for (int i=0; i<temp_c.dimension_tot(0); i++)
+          prov_face=0.;
+          for (int i=0; i<temp_c.dimension(0); i++)
             {
               temp_c(i,0)=c(i,j);
             }
-          // Grad(C)
+          opgrad.calculer(temp_c,prov_face);
 
-          opgrad.calculer(temp_c,temp_prov_face);
+          // Application solveur masse
+          eq_ns.solv_masse().appliquer(prov_face);
 
-          for (int k=0; k<temp_prov_face.dimension_tot(0); k++)
-            {
-              prov_face(k,j)=temp_prov_face(k,0);
-            }
-        }
-      //eq_ns.solv_masse().appliquer(prov_face); a revoir..
+          // alpha*Grad(C)
 
-      // alpha*Grad(C)
-      DoubleTab temp_prov_face2 = prov_face;
-      temp_prov_face2 = 0;
-      const int nb_comp =eq_c.constituant().nb_constituants(); //nb_equation_CH
-      for (int j=0; j<prov_face.line_size(); j++)
-        {
+//          for (int j=0; j<prov_face.line_size(); j++)
+//          {
           for (int i=0; i<prov_face.dimension(0); i++)
             {
-              temp_prov_face(i,0)=prov_face(i,j);
+              //        		  temp_prov_face(i,0)=prov_face(i,j);
               for (int k=0; k<nb_comp; k++)
                 {
-                  temp_prov_face2(i,k)+=temp_prov_face(i,0)*alphaMatrix(j+k*nb_comp);
+                  //temp_prov_face2(i,k)+=temp_prov_face(i,0)*alphaMatrix(j+k*nb_comp);
+                  temp_prov_face2(i,k)+=prov_face(i)*alphaMatrix(j+k*nb_comp);
                 }
+              prov_face(i) = temp_prov_face2(i,j);
+            }
+//          }
+
+          //prov_face = temp_prov_face2;
+
+          // Div(Grad(c))
+          opdiv.calculer(prov_face,temp_resu);
+          //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
+          eq_c.solv_masse().appliquer(temp_resu);
+
+          for (int i=0; i<temp_resu.dimension(0); i++)
+            {
+              div_alpha_gradC(i,j)=temp_resu(i,0);
             }
         }
-      prov_face = temp_prov_face2;
-      //Cerr <<"alphaMatrix * (gradC apres solv_masse)"<< prov_face<<finl;
-
-      // Div(alpha*Grad(c))
-      opdiv.calculer(prov_face,div_alpha_gradC);
-      eq_c.solv_masse().appliquer(div_alpha_gradC);
-      //Cerr << "div_alpha_gradC apres solv_masse.appliquer "<<div_alpha_gradC<<finl;
+      //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
 
     }
+
 }
 
 /*! @brief Calcul de Div(alpha*rho*Grad((C)) au centre des elements
@@ -2554,9 +2701,9 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
       //   Cerr<<"==========================================="<<finl;
 
       // Test des tableaux
-      Cerr<<"coeff="<<coeff<<finl;
-      Cerr<<"tab1="<<tab1<<finl;
-      Cerr<<"tab2="<<tab2<<finl;
+      //Cerr<<"coeff="<<coeff<<finl;
+      //Cerr<<"tab1="<<tab1<<finl;
+      //Cerr<<"tab2="<<tab2<<finl;
 
     }
   else if (type_systeme_naire_==1)
@@ -2585,7 +2732,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           // Cerr << "---" << finl;
           kappa_Matrix_var= (this->*kappaMatrix_func_c)(c, coeff_auto_diffusion);
           double R=8.314;
-          kappa_Matrix_var *= molarVolume/(R*temperature);
+          kappa_Matrix_var *= molarVolume/(prefactor*R*temperature);
           //kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
           //}
         }
@@ -3242,7 +3389,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
             Ax1(n_elem+nb_elem) = Ax1_mutilde(n_elem);
           }
       }
-      Cerr <<"Ax1 = "<<Ax1<<finl;
+      //Cerr <<"Ax1 = "<<Ax1<<finl;
 
       //---------------
       //   // Ajouter par DJ pour Debog
@@ -3275,6 +3422,10 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
       DoubleTab Ax1(2*nb_elem_tot);
       DoubleTab terme_non_lin(c);
       DoubleTab x1_c(c);
+      /*DoubleVect second_membre(2*nb_equation_CH*nb_elem);
+      DoubleTab Ax1(2*nb_equation_CH*nb_elem);
+      DoubleTab terme_non_lin(c);
+      DoubleTab x1_c(c);*/
       for (int j=0; j<nb_equation_CH; j++)
         {
           for(int n_elem=0; n_elem<nb_elem; n_elem++)
@@ -3282,6 +3433,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
               x1_c(n_elem,j) = x1(n_elem+(j*nb_elem));
             }
         }
+      x1_c.echange_espace_virtuel();
 
 
       // Assemblage du second membre
@@ -3309,7 +3461,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
                 {
                   terme_non_lin(n_elem,j)*=betaMatrix(j);
                 }
-              second_membre(n_elem+nb_elem_tot+(j*nb_elem))=terme_non_lin(n_elem,j);
+              second_membre(nb_elem_tot+n_elem+(j*nb_elem))=terme_non_lin(n_elem,j);
             }
         }
       /* Cerr <<"c second_membre = "<<c<<finl;
@@ -3338,9 +3490,15 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
       // Modifie par DJ
       //---------------
       {
-        DoubleTab Ax1_c(c.size_totale());
-        DoubleTab Ax1_mutilde(c.size_totale());
+        //DoubleTab Ax1_c(c.size_totale());
+        //DoubleTab Ax1_mutilde(c.size_totale());
+        DoubleTab Ax1_c(nb_elem_tot);
+        DoubleTab Ax1_mutilde(nb_elem_tot);
+        /*DoubleTab Ax1_c(nb_equation_CH*c.dimension_tot(0));
+        DoubleTab Ax1_mutilde(nb_equation_CH*c.dimension_tot(0));*/
         for(int n_elem=0; n_elem<nb_elem_tot; n_elem++)
+          //for(int n_elem=0; n_elem<Ax1_c.dimension_tot(0); n_elem++)
+
           {
             Ax1_c(n_elem) = Ax1(n_elem);
             Ax1_mutilde(n_elem) = Ax1(n_elem+nb_elem_tot);
@@ -3350,6 +3508,8 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
         Ax1_mutilde.echange_espace_virtuel();
 
         for(int n_elem=0; n_elem<nb_elem_tot; n_elem++)
+          //for(int n_elem=0; n_elem<Ax1_c.dimension_tot(0); n_elem++)
+
           {
             Ax1(n_elem) = Ax1_c(n_elem);
             Ax1(n_elem+nb_elem_tot) = Ax1_mutilde(n_elem);
@@ -3375,6 +3535,8 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
 
       // Calcul de v0 = [A(xn) xn - bn]
       for(int n_elem=0; n_elem<2*nb_elem_tot; n_elem++)
+        //for(int n_elem=0; n_elem<2*Ax1.dimension_tot(0); n_elem++)
+
         {
           v0(n_elem)=(Ax1(n_elem)-second_membre(n_elem));
         }
@@ -3708,8 +3870,8 @@ l5:
               //         return 1;
               Cerr << "Number of iterations to reach convergence : " << it+1 << finl;
               Cerr << "" << finl;
-              Cerr <<"c_demi = "<<c_demi<<finl;
-              Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
+              //Cerr <<"c_demi = "<<c_demi<<finl;
+              //Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
 
               return it;
             }
@@ -3726,8 +3888,8 @@ l5:
               //--------------
               Cerr << "Stopped before convergence" << finl;
               Cerr << "" << finl;
-              Cerr <<"c_demi = "<<c_demi<<finl;
-              Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
+              //Cerr <<"c_demi = "<<c_demi<<finl;
+              //Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
 
             }
         }
@@ -3826,11 +3988,11 @@ l5:
       // Modifie par DJ
       //---------------
       //   for (ii=0; ii<ns;ii++) res += v0(ii) * v0(ii) ;
-      /*
-      		for (ii=0; ii<c.size(); ii++) res += v0(ii) * v0(ii) ;
-      		for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) res += v0(ii) * v0(ii) ;
-      */
-      for (ii=0; ii<ns; ii++) res += v0(ii) * v0(ii) ;
+
+      for (ii=0; ii<c.size(); ii++) res += v0(ii) * v0(ii) ;
+      for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) res += v0(ii) * v0(ii) ;
+
+      //for (ii=0; ii<ns; ii++) res += v0(ii) * v0(ii) ;
 
       //---------------
       res=mp_sum(res);
@@ -3901,10 +4063,10 @@ l5:
               for(i=0; i<=j; i++)
                 {
                   //               for (ii=0; ii<ns;ii++) h(i,j) += v0(ii) * v(ii,i);
-                  /*for (ii=0; ii<c.size(); ii++) h(i,j) += v0(ii) * v(ii,i);
+                  for (ii=0; ii<c.size(); ii++) h(i,j) += v0(ii) * v(ii,i);
                   for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) h(i,j) += v0(ii) * v(ii,i);
-                  */
-                  for (ii=0; ii<ns; ii++) h(i,j) += v0(ii) * v(ii,i);
+
+                  //for (ii=0; ii<ns; ii++) h(i,j) += v0(ii) * v(ii,i);
 
                   h(i,j)=mp_sum(h(i,j));
                   //               Debog::verifier("GMRES Non Lineaire h(i,j) : ",h(i,j));
@@ -3927,13 +4089,13 @@ l5:
               // Modifie par DJ
               //---------------
               //           for (ii=0; ii<ns;ii++) tem += v0(ii) * v0(ii) ;
-              /*
 
-              				for (ii=0; ii<c.size(); ii++) tem += v0(ii) * v0(ii) ;
-              				for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) tem += v0(ii) * v0(ii) ;
 
-              */
-              for (ii=0; ii<ns; ii++) tem += v0(ii) * v0(ii) ;
+              for (ii=0; ii<c.size(); ii++) tem += v0(ii) * v0(ii) ;
+              for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) tem += v0(ii) * v0(ii) ;
+
+
+              //for (ii=0; ii<ns; ii++) tem += v0(ii) * v0(ii) ;
 
               //---------------
               tem=mp_sum(tem);
@@ -4006,11 +4168,11 @@ l5naire:
           // Modifie par DJ
           //---------------
           //   for (ii=0; ii<ns;ii++) res += v0(ii) * v0(ii) ;
-          /*
-          			for (ii=0; ii<c.size(); ii++) res += v0(ii) * v0(ii) ;
-          			for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) res += v0(ii) * v0(ii) ;
-          */
-          for (ii=0; ii<ns; ii++) res += v0(ii) * v0(ii) ;
+
+          for (ii=0; ii<c.size(); ii++) res += v0(ii) * v0(ii) ;
+          for (ii=c.size_totale(); ii<c.size_totale()+c.size(); ii++) res += v0(ii) * v0(ii) ;
+
+          //for (ii=0; ii<ns; ii++) res += v0(ii) * v0(ii) ;
 
           //---------------
           res=mp_sum(res);
@@ -4153,9 +4315,223 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 }
 
 
-/*! @brief Calcul de u2 au centre des elements
- *
- */
+void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, DoubleTab& c_demi) const
+{
+  const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
+  const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
+  const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
+  const Operateur_Div& opdiv= eq_ns.operateur_divergence();
+
+  //DoubleTab div_alpha_gradC_demi(mutilde_demi);
+  mutilde_demi=0;
+  //div_alpha_gradC_demi = 0;
+
+  const int nb_comp = eq_c.constituant().nb_constituants();
+
+  if (type_systeme_naire_==0)
+    {
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
+
+      // Grad(C)
+      opgrad.calculer(c_demi,prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
+      prov_face *= alpha;
+
+      // Div(alpha*Grad(c))
+      opdiv.calculer(prov_face,mutilde_demi);
+      eq_c.solv_masse().appliquer(mutilde_demi);
+      //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
+
+      mutilde_demi *= -1.;
+
+      const int taille=mutilde_demi.size();
+      for (int i=0; i<taille; i++)
+        {
+          mutilde_demi(i)+=beta*(this->*dWdc)(c_demi(i));
+          if(mutype_==1) //avec Ec
+            {
+              mutilde_demi(i)+=(0.5*u_carre_(i))*drhodc(i);
+            }
+        }
+    }
+  else if (type_systeme_naire_==1)
+    {
+      DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
+      DoubleTab temp_prov_face2 (prov_face.dimension(0),nb_comp);
+      temp_prov_face2 = 0;
+      // Grad(c)
+      DoubleTab temp_resu(mutilde_demi.dimension_tot(0),1);
+      temp_resu=0;
+      DoubleTab temp_c(c_demi.dimension_tot(0),1);
+      for (int j=0; j<nb_comp; j++)
+        {
+          prov_face=0.;
+          for (int i=0; i<temp_c.dimension(0); i++)
+            {
+              temp_c(i,0)=c_demi(i,j);
+            }
+          opgrad.calculer(temp_c,prov_face);
+
+          // Application solveur masse
+          eq_ns.solv_masse().appliquer(prov_face);
+
+          // alpha*Grad(C)
+
+//          for (int j=0; j<prov_face.line_size(); j++)
+//          {
+          for (int i=0; i<prov_face.dimension(0); i++)
+            {
+              //        		  temp_prov_face(i,0)=prov_face(i,j);
+              for (int k=0; k<nb_comp; k++)
+                {
+                  //temp_prov_face2(i,k)+=temp_prov_face(i,0)*alphaMatrix(j+k*nb_comp);
+                  temp_prov_face2(i,k)+=prov_face(i)*alphaMatrix(j+k*nb_comp);
+                }
+              prov_face(i) = temp_prov_face2(i,j);
+            }
+//          }
+
+          //prov_face = temp_prov_face2;
+
+          // Div(Grad(c))
+          opdiv.calculer(prov_face,temp_resu);
+          //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
+          eq_c.solv_masse().appliquer(temp_resu);
+
+          for (int i=0; i<temp_resu.dimension(0); i++)
+            {
+              mutilde_demi(i,j)=temp_resu(i,0);
+            }
+        }
+      //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
+
+
+      mutilde_demi *= -1.;
+
+      DoubleTab potent_chimique(mutilde_demi);
+
+      if (type_potentiel_analytique_==1)
+        {
+          if (nb_equation_CH==2)
+            {
+              potent_chimique= (this->*dWdc_naire_analytique_ter) (c_demi,angle_psi,x0Eq,x1Eq,a0Eq,a1Eq);
+            }
+          else if (nb_equation_CH==3)
+            {
+              potent_chimique= (this->*dWdc_naire_analytique_quater) (c_demi,angle_psi,angle_phi,x0Eq,x1Eq,x2Eq,a0Eq,a1Eq,a2Eq);
+            }
+          else
+            {
+              Cerr <<"potentiel analytique for nb_equation>3 not yet implemented. Use defaut potentiel chimique"<<finl;
+            }
+        }
+      else if (type_potentiel_analytique_==0)
+        {
+          potent_chimique=(this->*dWdc_naire) (c_demi,eq1,eq2);
+
+          for (int j=0; j<c_demi.line_size(); j++)
+            {
+              for (int i=0; i<c_demi.dimension(0); i++)
+                {
+                  potent_chimique(i,j)*=betaMatrix(j);
+                }
+            }
+
+        }
+      //Cerr <<"potentiel_chimique"<<potent_chimique<<finl;
+
+      for (int j=0; j<mutilde_demi.line_size(); j++)
+        {
+          for (int i=0; i<mutilde_demi.dimension(0); i++)
+            {
+              mutilde_demi(i,j)+= potent_chimique(i,j);
+              if (mutype_==1) //avec Ec, n'est pas implemente pour le cas multicomposant
+                {
+                  Cerr << "potentiel_chimique_generalisee avec_energie_cinetique not implemented for multicomponent system"<<finl;
+                  //mutilde(i,j)+=(0.5*u_carre_(i)*drhodc(i));
+                }
+            }
+        }
+    }
+
+  /*// Calcul de mutilde
+
+  mutilde_demi *= -1.;
+
+  //Cerr << "mutilde  = -div_alpha_gradC " << mutilde << finl;
+
+  if (type_systeme_naire_==0)
+    {
+      const int taille=mutilde_demi.size();
+      for (int i=0; i<taille; i++)
+        {
+          mutilde_demi(i)+=beta*(this->*dWdc)(c_demi(i));
+          if(mutype_==1) //avec Ec
+            {
+              mutilde_demi(i)+=(0.5*u_carre_(i))*drhodc(i);
+            }
+        }
+    }
+  else if (type_systeme_naire_==1)
+    {
+      DoubleTab potent_chimique(mutilde_demi);
+
+      if (type_potentiel_analytique_==1)
+        {
+          if (nb_equation_CH==2)
+            {
+              potent_chimique= (this->*dWdc_naire_analytique_ter) (c_demi,angle_psi,x0Eq,x1Eq,a0Eq,a1Eq);
+            }
+          else if (nb_equation_CH==3)
+            {
+              potent_chimique= (this->*dWdc_naire_analytique_quater) (c_demi,angle_psi,angle_phi,x0Eq,x1Eq,x2Eq,a0Eq,a1Eq,a2Eq);
+            }
+          else
+            {
+              Cerr <<"potentiel analytique for nb_equation>3 not yet implemented. Use defaut potentiel chimique"<<finl;
+            }
+        }
+      else if (type_potentiel_analytique_==0)
+        {
+          potent_chimique=(this->*dWdc_naire) (c_demi,eq1,eq2);
+
+          for (int j=0; j<c_demi.line_size(); j++)
+            {
+              for (int i=0; i<c_demi.dimension(0); i++)
+                {
+                  potent_chimique(i,j)*=betaMatrix(j);
+                }
+            }
+
+        }
+      //Cerr <<"potentiel_chimique"<<potent_chimique<<finl;
+
+      for (int j=0; j<mutilde_demi.line_size(); j++)
+        {
+          for (int i=0; i<mutilde_demi.dimension(0); i++)
+            {
+              mutilde_demi(i,j)+= potent_chimique(i,j);
+              if (mutype_==1) //avec Ec, n'est pas implemente pour le cas multicomposant
+                {
+                  Cerr << "potentiel_chimique_generalisee avec_energie_cinetique not implemented for multicomponent system"<<finl;
+                  //mutilde(i,j)+=(0.5*u_carre_(i)*drhodc(i));
+                }
+            }
+        }
+    }*/
+  //Cerr << "c = " << c << finl;
+  //Cerr << "mutilde = " << mutilde << finl;
+
+// L'espace virtuel n'est pas a jour
+  assert_invalide_items_non_calcules(mutilde_demi);
+}
+
 void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 {
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));

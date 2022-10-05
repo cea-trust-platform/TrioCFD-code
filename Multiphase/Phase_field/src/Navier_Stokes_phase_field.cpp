@@ -463,7 +463,7 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
           rhoTab=c;
           tab_multiply_any_shape(rhoTab, drhodcTab);
           rhoTab+=rho0_;
-          Cerr << "c = "<< c<<finl;
+          //Cerr << "c = "<< c<<finl;
 
         }
       else if (type_systeme_naire==1)

@@ -395,10 +395,12 @@ int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
   sch2.valeur().set_dt()=pas_de_temps();
 
   present=eq_c.get_c_demi();
+  //Cerr << "present = "<<present<<finl;
 
   sch2.valeur().faire_un_pas_de_temps_eqn_base(eq_c);
   set_stationnaire_atteint()=sch2.valeur().isStationary();
   present=intermediaire;
+  //Cerr << "present apres = "<<present<<finl;
 
   return 1;
 }
