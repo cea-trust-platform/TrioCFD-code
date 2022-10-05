@@ -90,7 +90,7 @@ void Rupture_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, 
 void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
                    &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),

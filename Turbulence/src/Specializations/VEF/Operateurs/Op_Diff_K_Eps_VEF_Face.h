@@ -84,7 +84,7 @@ inline double Op_Diff_K_Eps_VEF_Face::viscA(int num_face, int num2, int num_elem
   if (Objet_U::dimension == 3)
     pscal += face_normales(num_face,2)*face_normales(num2,2);
 
-  // *zone.porosite_elem(num_elem));
+  // *equation().milieu().porosite_elem(num_elem));
   if ( (face_voisins(num_face,0) == face_voisins(num2,0)) ||
        (face_voisins(num_face,1) == face_voisins(num2,1)) )
     return -(pscal*diffu)*inverse_volumes(num_elem);
