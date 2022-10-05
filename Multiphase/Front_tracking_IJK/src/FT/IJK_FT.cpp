@@ -1756,7 +1756,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
 
       if (qdm_corrections_.is_type_gb())
         {
-          //Cout << "get_time_scheme" << get_time_scheme() << finl;
+          // calcul de terme_source_acceleration_ et de terme_source_acceleration_
+
           // ON NE VEUT PAS METTRE A JOUR TERME_SOURCE_ACCELERATION_ AVEC CETTE METHODE
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
@@ -2391,10 +2392,13 @@ void IJK_FT_double::run()
                   }
             }
           */
-          if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()))
+          if (!(qdm_corrections_.is_type_none()))
             {
               set_time_for_corrections();
-              compute_and_add_qdm_corrections();
+              if (disable_diphasique_)
+                compute_and_add_qdm_corrections_monophasic();
+              else
+                compute_and_add_qdm_corrections();
               //compute_and_add_source_qdm_gr(0.6,0.2, 0.6, 0.1);
             }
 
@@ -2519,10 +2523,13 @@ void IJK_FT_double::run()
                   u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                 }
             }
-          if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()) )
+          if (!(qdm_corrections_.is_type_none()) )
             {
               set_time_for_corrections();
-              compute_and_add_qdm_corrections();
+              if (disable_diphasique_)
+                compute_and_add_qdm_corrections_monophasic();
+              else
+                compute_and_add_qdm_corrections();
             }
         }
       else
@@ -4749,3 +4756,49 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
     }
   Cout << "AF : compute_and_add_qdm_corrections" << finl;
 }
+
+
+void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
+{
+  /* For monophasic corrections only */
+  /*
+   * Corrections to comply with the momentum budget
+   * u_corrected = u - u_correction
+   * u_corrected and u_corrrection are computed in the qdm_corrections_ object.
+   * */
+  double alpha_l = 1.; // calculer_v_moyen(interfaces_.I())
+  double rho_moyen = rho_liquide_; // calculer_v_moyen(rho_field_)
+  qdm_corrections_.set_rho_moyen_alpha_l(rho_moyen,alpha_l);
+  qdm_corrections_.set_rho_liquide(rho_liquide_);
+  for (int dir=0; dir<3; dir++)
+    {
+      IJK_Field_double& vel = velocity_[dir];
+      double rho_vel_moyen = calculer_v_moyen(rho_v_[dir]);
+      qdm_corrections_.set_rho_vel_moyen(dir,rho_vel_moyen);
+      Cout << "qdm_corrections_.get_need_for_vitesse_relative("<<dir<<")" << qdm_corrections_.get_need_for_vitesse_relative(dir)<< finl;
+      if (qdm_corrections_.get_need_for_vitesse_relative(dir))
+        {
+          double vel_rel = calculer_true_moyenne_de_phase_liq(vel); // - calculer_true_moyenne_de_phase_vap(vel);
+          qdm_corrections_.set_vitesse_relative(dir, vel_rel);
+        }
+      // TODO : Demander de l'aide a Guillaume :
+      /* Pour moyenne glissante, je fais appel a des ArrOfDouble. En utilisation sequentielle, j'en
+       * suis satisfait disons. En utilisation parallele, je ne sais pas vraiment comment sont gerees
+       * mes listes. Sont-t-elles dupliquees ? Decoupees ? En tout cas la simu plante pour une liste
+       * plus de 10 doubles, sur un maillage a 40^3 mailles, une seule bulle... */
+      if (qdm_corrections_.get_need_to_compute_correction_value_one_direction(dir))
+        qdm_corrections_.compute_correction_value_one_direction(dir);
+      //TODO : coder le get_correction_value_one_direction(dir);
+      //double correction_value_one_direction = qdm_corrections_.get_correction_value_one_direction(dir);
+      for (int k=0; k<vel.nk(); k++)
+        for (int j=0; j<vel.nj(); j++)
+          for (int i=0; i<vel.ni(); i++)
+            {
+              qdm_corrections_.compute_correct_velocity_one_direction(dir, vel(i,j,k));
+              velocity_[dir](i,j,k) = qdm_corrections_.get_correct_velocitiy_one_direction(dir);
+            }
+    }
+  Cout << "AF : compute_and_add_qdm_corrections_monophasic" << finl;
+}
+
+
