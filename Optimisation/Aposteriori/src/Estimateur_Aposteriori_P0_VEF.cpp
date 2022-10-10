@@ -14,9 +14,12 @@
 *****************************************************************************/
 
 #include <Estimateur_Aposteriori_P0_VEF.h>
+#include <Navier_Stokes_Aposteriori.h>
+#include <Terme_Source_Qdm_VEF_Face.h>
 #include <Champ_P1_isoP1Bulle.h>
 #include <Champ_P1NC.h>
 #include <Champ_Don.h>
+#include <Source.h>
 
 Implemente_instanciable( Estimateur_Aposteriori_P0_VEF, "Estimateur_Aposteriori_P0_VEF", Champ_Fonc_P0_VEF ) ;
 
@@ -67,6 +70,26 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   cout << "Estimateur_Aposteriori_P0_VEF ici " << endl;
   DoubleTab le_terme_source(vitesse_.valeur().valeurs());
   cout << "Estimateur_Aposteriori_P0_VEF la " << endl;
+
+  const Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
+  const Sources& sources_eq =  eq.sources();
+
+
+  if (sources_eq.size() !=1 && sources_eq(0)->que_suis_je() != "Source_Qdm_VEF_P1NC")
+    {
+      Cerr << "TODO : now only for Source_Qdm_VEF_P1NC " << finl;
+      Process::exit();
+    }
+
+  const DoubleTab& source_qdm = ref_cast(Terme_Source_Qdm_VEF_Face,sources_eq(0).valeur()).get_source_values();
+
+
+
+
+  Cerr << source_qdm  << finl;
+
+//  exit();
+
   le_terme_source = 0.;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
