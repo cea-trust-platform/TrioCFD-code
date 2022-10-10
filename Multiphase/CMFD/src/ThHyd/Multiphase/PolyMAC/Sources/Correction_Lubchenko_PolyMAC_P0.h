@@ -48,11 +48,15 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
+  void ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+  void ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+
   int n_l = -1; //phase liquide
   int is_turb = 0;
   REF(Correlation) correlation_lift_;
   REF(Correlation) correlation_dispersion_;
-  double beta_ =  1. ; // To adjust the force in .data
+  double beta_lift_ =  1. ; // To adjust the force in .data
+  double beta_disp_ =  1. ; // To adjust the force in .data
 };
 
 #endif
