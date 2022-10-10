@@ -3245,85 +3245,81 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                 }
             }
 
-          {
-            for (int dir = 0; dir < 3; dir++)
-              {
-                redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
-                                                                        terme_source_interfaces_ns_[dir]);
-                // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
-                //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
-//                if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
-                if (test_etapes_et_bilan)
-                  {
-                    terme_interfaces_bf_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                    terme_interfaces_bf_mass_solver_bis[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
-                  }
-//                else
-//                  {
-//                    terme_interfaces_bf_mass_solver[dir] += calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-//                    terme_interfaces_bf_mass_solver_bis[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
-//                  }
-              }
-            //statistiques().end_count(cnt_SourceInterf);
-            // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
-            compute_correction_for_momentum_balance(rk_step);
-            for (int dir = 0; dir < 3; dir++)
-              {
-                // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
-                // Utilisation directe du terme source interf pour l'ajouter a velocity_.
-                // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
-                const int kmax = terme_source_interfaces_ns_[dir].nk();
-                for (int k = 0; k < kmax; k++)
-                  {
-                    // division par le produit (volume * rho_face)
-                    if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-                      {
-                        Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
-                        Process::exit();
-                        // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
-                      }
-                    else
-                      {
-                        // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
-                        mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-                        if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
-                            post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
-                          {
-                            redistribute_from_splitting_ft_faces_[dir].redistribute(terme_repulsion_interfaces_ft_[dir],
-                                                                                    terme_repulsion_interfaces_ns_[dir]);
-                            // Division de terme_repulsion_interfaces_ns_ par rho_field_ et par volume cellule
-                            mass_solver_with_rho(terme_repulsion_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-                          }
-                        // Egalite aux dimensions :
-                        // [terme_source_interfaces_ns_]=[terme_repulsion_interfaces_ns_]=[du/dt / Vcell] = m/s^2/m^3
-                      }
-                    if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
-                      {
-                        // puis
-                        // comme euler_explicit_update mais avec un pas de temps partiel :
-                        const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
-                        const int imax = terme_source_interfaces_ns_[dir].ni();
-                        const int jmax = terme_source_interfaces_ns_[dir].nj();
-                        for (int j = 0; j < jmax; j++)
-                          {
-                            for (int i = 0; i < imax; i++)
-                              {
-                                double x = terme_source_interfaces_ns_[dir](i,j,k);
-                                velocity_[dir](i,j,k) += x * delta_t;
-                              }
-                          }
-                      }
-                    // On est dans une boucle sur les directions la, c ok
-                    // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
-                    if (test_etapes_et_bilan)
-                      {
-                        // Cout << "BF terme_interfaces_af_mass_solver" << finl;
-                        terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                        // Cout << "AF terme_interfaces_af_mass_solver" << finl;
-                      }
-                  }
-              }
-          }
+          for (int dir = 0; dir < 3; dir++)
+            {
+              redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
+                                                                      terme_source_interfaces_ns_[dir]);
+              // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
+              //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
+              if (test_etapes_et_bilan)
+                {
+                  terme_interfaces_bf_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                  terme_interfaces_bf_mass_solver_bis[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
+                }
+            }
+          // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
+          compute_correction_for_momentum_balance(rk_step);
+          for (int dir = 0; dir < 3; dir++)
+            {
+              // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
+              // Utilisation directe du terme source interf pour l'ajouter a velocity_.
+              // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
+              if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
+                  post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
+                {
+                  redistribute_from_splitting_ft_faces_[dir].redistribute(
+                    terme_repulsion_interfaces_ft_[dir],
+                    terme_repulsion_interfaces_ns_[dir]);
+                }
+              const int kmax = terme_source_interfaces_ns_[dir].nk();
+              for (int k = 0; k < kmax; k++)
+                {
+                  // division par le produit (volume * rho_face)
+                  if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                    {
+                      Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
+                      Process::exit();
+                      // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                    }
+                  else
+                    {
+                      // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
+                      mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                      if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
+                          post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
+                        {
+                          // Division de terme_repulsion_interfaces_ns_ par rho_field_ et par volume cellule
+                          mass_solver_with_rho(terme_repulsion_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                        }
+                      // Egalite aux dimensions :
+                      // [terme_source_interfaces_ns_]=[terme_repulsion_interfaces_ns_]=[du/dt / Vcell] = m/s^2/m^3
+                    }
+                  if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
+                    {
+                      // puis
+                      // comme euler_explicit_update mais avec un pas de temps partiel :
+                      const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
+                      const int imax = terme_source_interfaces_ns_[dir].ni();
+                      const int jmax = terme_source_interfaces_ns_[dir].nj();
+                      for (int j = 0; j < jmax; j++)
+                        {
+                          for (int i = 0; i < imax; i++)
+                            {
+                              double x = terme_source_interfaces_ns_[dir](i,j,k);
+                              velocity_[dir](i,j,k) += x * delta_t;
+                            }
+                        }
+                    }
+                  // On est dans une boucle sur les directions la, c ok
+                  // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
+                  if (test_etapes_et_bilan)
+                    {
+                      // Cout << "BF terme_interfaces_af_mass_solver" << finl;
+                      terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                      // Cout << "AF terme_interfaces_af_mass_solver" << finl;
+                    }
+                }
+            }
         }
     }
 
