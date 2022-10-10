@@ -71,24 +71,14 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   DoubleTab le_terme_source(vitesse_.valeur().valeurs());
   cout << "Estimateur_Aposteriori_P0_VEF la " << endl;
 
-  const Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
+  Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
   const Sources& sources_eq =  eq.sources();
 
+  Champ espace_stockage;
+  const Champ_base& ch_bs = eq.get_champ_source().get_champ(espace_stockage);
+  const DoubleTab& src = ch_bs.valeurs();
 
-  if (sources_eq.size() !=1 && sources_eq(0)->que_suis_je() != "Source_Qdm_VEF_P1NC")
-    {
-      Cerr << "TODO : now only for Source_Qdm_VEF_P1NC " << finl;
-      Process::exit();
-    }
-
-  const DoubleTab& source_qdm = ref_cast(Terme_Source_Qdm_VEF_Face,sources_eq(0).valeur()).get_source_values();
-
-
-
-
-  Cerr << source_qdm  << finl;
-
-//  exit();
+  Cerr << src << finl;
 
   le_terme_source = 0.;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
