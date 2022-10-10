@@ -70,7 +70,7 @@ void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const // Renvo
     for (n = 0; n < N; n++)
       {
         double sum_diag = 0.;
-        double nut_loc = std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) ;
+        double nut_loc = n < Nk ? std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0 ;
         for (d = 0; d < D; d++) sum_diag += gu(i, d, D * n + d) ;
         for (d = 0; d < D; d++)
           for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k

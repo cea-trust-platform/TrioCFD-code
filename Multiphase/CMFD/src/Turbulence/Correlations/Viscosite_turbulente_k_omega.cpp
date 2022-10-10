@@ -70,7 +70,7 @@ void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Ren
     for (n = 0; n < N; n++)
       {
         double sum_diag = 0.;
-        double nut_loc = (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ;
+        double nut_loc = n < Nk ? (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) : 0 ;
         for (d = 0; d < D; d++) sum_diag += gu(i, d, D * n + d) ;
         for (d = 0; d < D; d++)
           for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
