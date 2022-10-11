@@ -152,7 +152,7 @@ void IJK_Field_local_float::allocate(int Ni, int Nj, int Nk, int ghosts, int add
   ghost_size_ = ghosts;
   nb_compo_ = nb_compos;
   j_stride_ = ni_ + 2 * ghosts;
-  while (j_stride_ % Simd_float::size() != 0)
+   while (j_stride_ % Simd_float::size() != 0)
     j_stride_++;
   compo_stride_ = j_stride_ * (nj_ + 2 * ghosts);
   offset_ = ghost_size_ * (1 + j_stride_ + compo_stride_ * nb_compo_);
@@ -484,7 +484,7 @@ void IJK_Field_local_double::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
   ghost_size_ = ghosts;
   nb_compo_ = nb_compos;
   j_stride_ = ni_ + 2 * ghosts;
-  while (j_stride_ % Simd_double::size() != 0)
+   while (j_stride_ % Simd_double::size() != 0)
     j_stride_++;
   compo_stride_ = j_stride_ * (nj_ + 2 * ghosts);
   offset_ = ghost_size_ * (1 + j_stride_ + compo_stride_ * nb_compo_);
@@ -830,7 +830,8 @@ void IJK_Field_local_int::allocate(int Ni, int Nj, int Nk, int ghosts, int addit
   ghost_size_ = ghosts;
   nb_compo_ = nb_compos;
   j_stride_ = ni_ + 2 * ghosts;
-  while (j_stride_ % Simd_int::size() != 0)
+   //Simd_int suits both int and long
+   while (j_stride_ % Simd_int::size() != 0)
     j_stride_++;
   compo_stride_ = j_stride_ * (nj_ + 2 * ghosts);
   offset_ = ghost_size_ * (1 + j_stride_ + compo_stride_ * nb_compo_);

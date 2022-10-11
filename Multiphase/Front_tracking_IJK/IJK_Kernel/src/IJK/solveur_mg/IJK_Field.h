@@ -633,6 +633,9 @@ double somme_ijk(const IJK_Field_int & residu);
 typedef IJK_Field_local_double IJK_Field_local;
 typedef IJK_Field_double IJK_Field;
 typedef VECT(IJK_Field_double) VECT(IJK_Field);
+#ifdef INT_is_64_
+using IJK_Field_int = IJK_Field_long;
+#endif
 
 // .Description
 //  This class describes an IJ plane of an IJK_Field_local.
