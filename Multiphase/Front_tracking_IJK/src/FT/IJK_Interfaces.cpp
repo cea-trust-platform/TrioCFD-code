@@ -5709,7 +5709,7 @@ void IJK_Interfaces::slice_bubble(const double intersect_pt, const int dim, Data
       MCT do_not_use = mesh1dfil->zipCoordsTraducer();
       MCT do_not_use2 = mesh1dfil->zipConnectivityTraducer(0);
       DataArrayDouble *coord = mesh1dfil->getCoords();
-      std::vector<long unsigned int> COO2KEEPLONG(begin(COO2KEEP), end(COO2KEEP));
+      std::vector<unsigned long> COO2KEEPLONG(begin(COO2KEEP), end(COO2KEEP));
       DAD coords = coord->keepSelectedComponents(COO2KEEPLONG);
       mesh1dfil->setCoords(coords);
     }
