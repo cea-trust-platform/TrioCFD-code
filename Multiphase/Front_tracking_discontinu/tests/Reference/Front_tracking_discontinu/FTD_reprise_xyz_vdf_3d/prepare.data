@@ -168,15 +168,23 @@ body
 }
 liste_postraitements {
   postraitement_ft_lata post1 { 
-	nom_fichier prepare1
-	interfaces  interf { } 
-	champs elements { indicatrice_body indicatrice_interf pression }
-	champs faces { vitesse } 
-  }
+    format Lata 
+    fichier prepare1 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+        indicatrice_interf elem 
+        pression elem 
+        vitesse faces 
+    } 
+    interfaces interf { 
+    } 
+}
   postraitement_ft_lata post2 { 
-	nom_fichier prepare2
-	interfaces  body { } 
-  }
+    format Lata 
+    fichier prepare2 
+    interfaces body { 
+    } 
+}
 }
 
 Sauvegarde xyz prepare.xyz
@@ -184,3 +192,4 @@ Sauvegarde xyz prepare.xyz
 
 Solve pb
 Fin
+ 

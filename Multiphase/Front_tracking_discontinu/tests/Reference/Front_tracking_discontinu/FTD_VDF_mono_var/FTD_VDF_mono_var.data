@@ -178,24 +178,19 @@ Postraitement
        {
 	
 	
-	Postraitement_ft_lata post_therm_vdf
-	{	
-		
-		dt_post 0.01
-		format binaire
-		print
-                champs elements
-                {
-                        vitesse
-                        pression
-                        Divergence_U
-                        temperature
-                        Puissance_volumique
-                }
-               		
-	}
+	postraitement_ft_lata post_therm_vdf { 
+    format Lata 
+    champs dt_post 0.01 { 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+        temperature elem 
+        Puissance_volumique elem 
+    } 
+}
     } 
 }
 
 Solve pb
 Fin
+ 

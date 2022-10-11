@@ -179,21 +179,19 @@ Read pb
 	}
 liste_postraitements
 {	
-        Postraitement_ft_lata marqueurs
-        {
-                dt_post 0.05
-		format ascii
-                nom_fichier marqueurs
-                print
-                champs sommets
-                {
-                        vitesse
-                }
-                interfaces marqueurs { }
-        }	
+        postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    champs dt_post 0.05 { 
+        vitesse som 
+    } 
+    interfaces marqueurs { 
+    } 
+}	
 }
 }
 
 Solve pb
 End
 
+ 

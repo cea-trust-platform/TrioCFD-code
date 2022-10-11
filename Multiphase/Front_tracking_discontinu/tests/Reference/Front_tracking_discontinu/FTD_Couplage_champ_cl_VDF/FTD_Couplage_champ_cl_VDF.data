@@ -194,17 +194,16 @@ Convection_Diffusion_Temperature_Turbulent
 
 liste_postraitements
 {
- Postraitement_lata post
+ Postraitement post
  {
-  dt_post 6.e-6
-  nom_fichier post_THI
-  format binaire
-  print
-  champs elements
+  
+  fichier post_THI
+  
+  champs dt_post 6.e-6
   {
-   pression
-   vitesse
-   temperature
+   pression  elem
+   vitesse  elem
+   temperature  elem
   }
  }
 
@@ -313,39 +312,26 @@ postraitement
 
 liste_postraitements
 {
- Postraitement_ft_lata post2
- {
-  dt_post 6.e-6
-  nom_fichier post
-  format binaire
-  print
-  champs elements
-  {
-   distance_interface_elem_interf
-   normale_interface_interf
-   surface_interface_interf
-   indicatrice_interf
-   temperature_temp
-   temperature_mpoint
-   temperature_grad_temp
-   vitesse
-   pression
-  }
-  champs faces
-  {
-   vitesse_delta_interface
-   vitesse
-  }
-  interfaces interf {
-   champs sommets {
-    pe
-    courbure
-   }
-   champs elements {
-    pe
-   }
-  }
- }
+ postraitement_ft_lata post2 { 
+    format Lata 
+    fichier post 
+    champs dt_post 6.e-6 { 
+        distance_interface_elem_interf elem 
+        normale_interface_interf elem 
+        surface_interface_interf elem 
+        indicatrice_interf elem 
+        temperature_temp elem 
+        temperature_mpoint elem 
+        temperature_grad_temp elem 
+        vitesse faces 
+        pression elem 
+        vitesse_delta_interface faces 
+    } 
+    interfaces interf { 
+        pe elem 
+        courbure som 
+    } 
+}
 
 }
 Sauvegarde binaire sauvegarde_DOM.sauv
@@ -353,3 +339,4 @@ Sauvegarde binaire sauvegarde_DOM.sauv
 
 Solve pb_couplage
 Fin
+ 

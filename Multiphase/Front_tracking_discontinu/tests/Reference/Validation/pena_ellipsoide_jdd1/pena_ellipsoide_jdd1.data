@@ -209,27 +209,23 @@ Postraitement
 	       }	
 	}
 
-    liste_de_postraitements
+    liste_postraitements
     {
-	    ancre Postraitement_ft_lata 
-            {
-                    dt_post .06250000000000000000
-                    nom_fichier lata/ancre
-                    print
-                    champs elements
-                    {
-                        indicatrice_agit
-                        vitesse
-                        pression
-                        Divergence_U
-                    }
-                    interfaces agit {
-                            champs sommets {
-                                    courbure
-                            }
-                    }
-            }
+	     postraitement_ft_lata ancre { 
+    format Lata 
+    fichier lata/ancre 
+    champs dt_post .06250000000000000000 { 
+        indicatrice_agit elem 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+    } 
+    interfaces agit { 
+        courbure som 
+    } 
+}
 	}
 }
 Solve pb
 End
+ 

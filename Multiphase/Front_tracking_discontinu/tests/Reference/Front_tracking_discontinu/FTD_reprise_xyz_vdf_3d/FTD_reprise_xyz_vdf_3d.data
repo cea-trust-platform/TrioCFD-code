@@ -170,15 +170,23 @@ Postraitement {
 }
 liste_postraitements {
   postraitement_ft_lata post1 { 
-	nom_fichier post1
-	interfaces  interf { } 
-	champs elements { indicatrice_body indicatrice_interf pression }
-	champs faces { vitesse } 
-  }
+    format Lata 
+    fichier post1 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+        indicatrice_interf elem 
+        pression elem 
+        vitesse faces 
+    } 
+    interfaces interf { 
+    } 
+}
   postraitement_ft_lata post2 { 
-	nom_fichier post2
-	interfaces  body { } 
-  }
+    format Lata 
+    fichier post2 
+    interfaces body { 
+    } 
+}
 }
 Reprise xyz prepare.xyz
 Sauvegarde xyz bidon.xyz
@@ -187,3 +195,4 @@ Sauvegarde xyz bidon.xyz
 Solve pb
 Fin
 
+ 

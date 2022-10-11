@@ -170,38 +170,24 @@ Postraitement
 
 liste_postraitements
 {
-	Postraitement_ft_lata post1
-	{
-		dt_post 0.002
-		nom_fichier lata/post1
-		format binaire
-		print
-		champs sommets
-		{
-			vitesse
-		}
-		champs elements
-		{
-			distance_interface_elem_interf
-			indicatrice_interf
-			pression
-			vitesse
-		}
-		interfaces interf {
-			champs sommets {
-				courbure
-			}
-			champs sommets {
-				pe
-			}
-			champs elements {
-				pe
-			}
-		}
-	}
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post1 
+    champs dt_post 0.002 { 
+        vitesse elem 
+        distance_interface_elem_interf elem 
+        indicatrice_interf elem 
+        pression elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        pe elem 
+    } 
+}
 }
 
 }
 
 Solve pb
 Fin
+ 

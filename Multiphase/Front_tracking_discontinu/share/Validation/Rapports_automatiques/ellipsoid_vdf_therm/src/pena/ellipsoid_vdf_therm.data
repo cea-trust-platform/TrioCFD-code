@@ -287,63 +287,37 @@ Postraitement
        {
 	
 	
-	Postraitement_ft_lata post_therm_vdf
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_therm_vdf
-		format binaire
-		print
-                champs elements
-                {
-                        vitesse
-                        pression
-                        Divergence_U
-                        temperature
-			indicatrice_agit
-			indicatrice_internes
-                        indicatrice_cuve
-                        Puissance_volumique
-                }
-		interfaces agit
-		{
-		champs sommets
-			{
-			courbure
-			}
-		}	
-               		
-	}
-        Postraitement_ft_lata post_internes
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_internes
-		format binaire
-		print
-                interfaces internes
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
-        Postraitement_ft_lata post_cuve
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_cuve
-		format binaire
-		print
-                interfaces cuve
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
+	postraitement_ft_lata post_therm_vdf { 
+    format Lata 
+    fichier lata/post_therm_vdf 
+    champs dt_post 0.01 { 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+        temperature elem 
+        indicatrice_agit elem 
+        indicatrice_internes elem 
+        indicatrice_cuve elem 
+        Puissance_volumique elem 
+    } 
+    interfaces agit { 
+        courbure som 
+    } 
+}
+        postraitement_ft_lata post_internes { 
+    format Lata 
+    fichier lata/post_internes 
+    interfaces internes { 
+        courbure som 
+    } 
+}
+        postraitement_ft_lata post_cuve { 
+    format Lata 
+    fichier lata/post_cuve 
+    interfaces cuve { 
+        courbure som 
+    } 
+}
     } 
 
 }
@@ -351,3 +325,4 @@ Postraitement
 Solve pb
 End
 
+ 

@@ -203,19 +203,17 @@ Lire pb
      
   liste_postraitements
   {
-        Postraitement_ft_lata post1
-        {
-                dt_post 0.05
-                format binaire
-                nom_fichier post1
-		 champs sommets
-                 {
-                  vitesse
-                 }
-        }
+        postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.05 { 
+        vitesse som 
+    } 
+}
   }
 }
 
 Solve pb
 fin 
 
+ 

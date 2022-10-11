@@ -127,18 +127,16 @@ postraitement  {
 	}
 }	
 liste_postraitements {
-	postraitement_ft_lata post1 {
-                dt_post 0.002
-                nom_fichier lata/post
-                format binaire
-                print
-		champs elements {
-			indicatrice_interf
-		}
-		interfaces interf {
-			champs sommets { courbure }
-		}
-        }
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.002 { 
+        indicatrice_interf elem 
+    } 
+    interfaces interf { 
+        courbure som 
+    } 
+}
 }	
 sauvegarde binaire Oscillation_bulle3.rep
 }
@@ -161,25 +159,18 @@ postraitement {
 }
 
 liste_postraitements {
-	postraitement_ft_lata post1 {
-                dt_post 0.002
-                nom_fichier lata/post2DVDF
-                format binaire
-                print
-		champs elements {
-			indicatrice_interf
-		}
-		champs sommets {
-			pression
-		}
-		champs faces {
-			vitesse
-		}
-                interfaces interf {
-                        champs sommets {
-                                pe
-				courbure
-                        }
-                }
-        }
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post2DVDF 
+    champs dt_post 0.002 { 
+        indicatrice_interf elem 
+        pression som 
+        vitesse faces 
+    } 
+    interfaces interf { 
+        pe som 
+        courbure som 
+    } 
 }
+}
+ 

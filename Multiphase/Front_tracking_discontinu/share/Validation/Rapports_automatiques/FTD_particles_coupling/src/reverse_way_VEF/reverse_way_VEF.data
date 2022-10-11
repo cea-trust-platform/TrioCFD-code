@@ -182,21 +182,24 @@ Read pb
 	}
 liste_postraitements
 {	
-        Postraitement_ft_lata marqueurs
-        {
-                dt_post 0.05
-		format ascii
-                nom_fichier marqueurs
-                print
-                champs sommets
-                {
-                        vitesse
-                }
-                interfaces marqueurs { champs sommets { vitesse volume diametre temperature masse_volumique } }
-        }	
+        postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    champs dt_post 0.05 { 
+        vitesse som 
+    } 
+    interfaces marqueurs { 
+        vitesse som 
+        volume som 
+        diametre som 
+        temperature som 
+        masse_volumique som 
+    } 
+}	
 }
 }
 
 Solve pb
 End
 
+ 

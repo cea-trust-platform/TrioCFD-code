@@ -161,14 +161,17 @@ interf
 		}
 	}
 liste_postraitements {
-	postraitement_ft_lata post1 {
-                dt_post 0.01
-                nom_fichier lata/post
-                format binaire
-		champs elements { indicatrice_interf }
-		champs faces { vitesse }
-                interfaces interf { champs sommets { courbure } }
-	}
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.01 { 
+        indicatrice_interf elem 
+        vitesse faces 
+    } 
+    interfaces interf { 
+        courbure som 
+    } 
+}
 }
 
 sauvegarde binaire Oscillation_bulle3.rep
@@ -176,3 +179,4 @@ sauvegarde binaire Oscillation_bulle3.rep
 
 Solve pb1
 Fin
+ 

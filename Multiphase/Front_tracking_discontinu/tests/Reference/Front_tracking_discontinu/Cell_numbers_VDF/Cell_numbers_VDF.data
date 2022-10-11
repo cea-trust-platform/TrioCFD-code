@@ -239,19 +239,16 @@ Lire pb
 				reynolds_maille		elem
                     }	    
 	    }             
-	    Postraitement_ft_lata ancre
-            {
-                    dt_post .06250000000000000000
-                    nom_fichier ancre
-                    print
-                    interfaces agit {
-                            champs sommets {
-                                    courbure
-                            }
-                    }
-            }
+	    postraitement_ft_lata ancre { 
+    format Lata 
+    fichier ancre 
+    interfaces agit { 
+        courbure som 
+    } 
+}
 
     }
 }
 Solve pb
 Fin
+ 
