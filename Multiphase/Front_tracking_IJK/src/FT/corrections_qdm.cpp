@@ -664,7 +664,7 @@ Sortie& corrections_qdm::printOn( Sortie& os ) const
   os  << "{\n";
   if (get_type_()==GR) os << "type " << " gr" << "\n";
   if (get_type_()==GB) os << "type " << " gb" << "\n";
-  if (get_type_()==NONE) os << "type " << " none" << "\n";
+  if (get_type_()==NONE_IJK) os << "type " << " none" << "\n";
   os   << " correction_x " << correction_x_ << "\n"
        << " correction_y " << correction_y_ << "\n"
        << " correction_z " << correction_z_ << "\n";
@@ -680,7 +680,7 @@ Entree& corrections_qdm::readOn( Entree& is )
   param.ajouter("type",&type_);
   param.dictionnaire("gb",GB);
   param.dictionnaire("gr",GR);
-  param.dictionnaire("none",NONE);
+  param.dictionnaire("none",NONE_IJK);
   param.ajouter("correction_x",&correction_x_ );
   param.ajouter("correction_y",&correction_y_ );
   param.ajouter("correction_z",&correction_z_ );
@@ -912,7 +912,7 @@ int corrections_qdm::is_type_gr() const
 
 int corrections_qdm::is_type_none() const
 {
-  if (type_ == NONE)
+  if (type_ == NONE_IJK)
     return 1;
   else
     return 0;
