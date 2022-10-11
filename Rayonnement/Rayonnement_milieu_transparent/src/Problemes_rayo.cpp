@@ -15,6 +15,14 @@
 
 #include <Problemes_rayo.h>
 
+// XD Pb_Rayo_Conduction Pb_Conduction Pb_Rayo_Conduction -1 Resolution of the heat equation with rayonnement.
+// XD Pb_Rayo_Hydraulique pb_hydraulique Pb_Rayo_Hydraulique -1 Resolution of the Navier-Stokes equations with rayonnement.
+// XD Pb_Rayo_Thermohydraulique pb_thermohydraulique Pb_Rayo_Thermohydraulique -1 Resolution of pb_thermohydraulique with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_QC pb_thermohydraulique_QC Pb_Rayo_Thermohydraulique_QC -1 Resolution of pb_thermohydraulique_QC with rayonnement.
+// XD Pb_Rayo_Hydraulique_Turbulent pb_hydraulique_turbulent Pb_Rayo_Hydraulique_Turbulent -1 Resolution of pb_hydraulique_turbulent with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_Turbulent pb_thermohydraulique_turbulent Pb_Rayo_Thermohydraulique_Turbulent -1 Resolution of pb_thermohydraulique_turbulent with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_Turbulent_QC pb_thermohydraulique_turbulent_QC Pb_Rayo_Thermohydraulique_Turbulent_QC -1 Resolution of pb_thermohydraulique_turbulent_qc with rayonnement.
+
 Implemente_instanciable(Pb_Rayo_Conduction,"Pb_Rayo_Conduction",Pb_Conduction);
 Implemente_instanciable(Pb_Rayo_Hydraulique,"Pb_Rayo_Hydraulique",Pb_Hydraulique);
 Implemente_instanciable(Pb_Rayo_Thermohydraulique,"Pb_Rayo_Thermohydraulique",Pb_Thermohydraulique);
@@ -34,7 +42,6 @@ Entree& Pb_Rayo_Thermohydraulique::readOn(Entree& is) { return Pb_Thermohydrauli
 
 Sortie& Pb_Rayo_Thermohydraulique_QC::printOn(Sortie& os) const { return Pb_Thermohydraulique_QC::printOn(os); }
 Entree& Pb_Rayo_Thermohydraulique_QC::readOn(Entree& is) { return Pb_Thermohydraulique_QC::readOn(is); }
-
 
 Sortie& Pb_Rayo_Hydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Hydraulique_Turbulent::printOn(os); }
 Entree& Pb_Rayo_Hydraulique_Turbulent::readOn(Entree& is) { return Pb_Hydraulique_Turbulent::readOn(is); }
