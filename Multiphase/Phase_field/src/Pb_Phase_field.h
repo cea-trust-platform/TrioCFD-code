@@ -54,7 +54,6 @@ public:
   Equation_base& equation(int) override;
   void associer_milieu_base(const Milieu_base& ) override;
   int verifier() override;
-  void discretiser_equations() override { /* on discretise plus tard */ }
 
 protected:
   Navier_Stokes_phase_field eq_hydraulique;
