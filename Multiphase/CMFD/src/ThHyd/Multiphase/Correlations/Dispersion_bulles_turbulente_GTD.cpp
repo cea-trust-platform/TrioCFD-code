@@ -46,8 +46,8 @@ Entree& Dispersion_bulles_turbulente_GTD::readOn(Entree& is)
   if (pbm->has_correlation("frottement_interfacial")) correlation_drag_ = pbm->get_correlation("frottement_interfacial"); //correlation fournie par le bloc correlation
   else correlation_drag_.typer_lire(*pbm, "frottement_interfacial", is); //sinon -> on la lit
 
-  if (pbm->has_correlation("masse_ajoutee")) correlation_drag_ = pbm->get_correlation("masse_ajoutee"); //correlation fournie par le bloc correlation
-  else correlation_drag_.typer_lire(*pbm, "masse_ajoutee", is); //sinon -> on la lit
+  if (pbm->has_correlation("masse_ajoutee")) correlation_MA_ = pbm->get_correlation("masse_ajoutee"); //correlation fournie par le bloc correlation
+  else correlation_MA_.typer_lire(*pbm, "masse_ajoutee", is); //sinon -> on la lit
 
   return is;
 }
@@ -72,7 +72,7 @@ void Dispersion_bulles_turbulente_GTD::coefficient( const DoubleTab& alpha, cons
     if (k!=n_l)
       for (int i = 0 ; i<2 ; i++) // k gas phase
         {
-          double f_D = 3./4.*coeff_CD(k, n_l)*ndv(n_l,k)/d_bulles(k);
+          double f_D = 3./4.*coeff_CD(k, n_l)*std::max(ndv(n_l,k), 1.e-6)/d_bulles(k);
           double t_12_f = 1/f_D * (rho(k)/rho(n_l) + coeff_MA(k)) ;
           double t_12_t = 3./2. * nut(n_l)/k_turb(n_l) * std::pow(1+2.7 * ndv(n_l,k)*ndv(n_l,k)/k_turb(n_l), .5);
           double b = rho(n_l) * (1+coeff_MA(k)) / (rho(k) + coeff_MA(k)*rho(n_l));
