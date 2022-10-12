@@ -1339,18 +1339,14 @@ const DoubleTab& Transport_Marqueur_FT::calculer_valeurs_volumes(DoubleTab& val_
 }
 
 // Methode de travail de remplissage d'une FloatTab par un DoubleTabFT
-inline void remplissage(const DoubleTab& tab, FloatTab *ftab)
+inline void remplissage(const DoubleTab& tab, DoubleTab *ftab)
 {
   const int nb_noeuds = tab.dimension(0);
   const int nb_compo = tab.dimension(1);
   ftab->resize(nb_noeuds, nb_compo);
   for (int som=0 ; som<nb_noeuds ; som++)
-    {
-      for (int k=0 ; k<nb_compo ; k++)
-        {
-          (*ftab)(som,k) = (float) tab(som,k);
-        }
-    }
+    for (int k=0 ; k<nb_compo ; k++)
+      (*ftab)(som,k) = tab(som,k);
 }
 /*! @brief Cherche le champ discret aux interfaces dont le nom est "champ", et verifie qu'il peut etre postraite a la localisation demandee (loc).
  *
@@ -1362,7 +1358,7 @@ inline void remplissage(const DoubleTab& tab, FloatTab *ftab)
  *    qu'il existe).
  *
  */
-int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
+int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab) const
 {
   int res = 1;
 

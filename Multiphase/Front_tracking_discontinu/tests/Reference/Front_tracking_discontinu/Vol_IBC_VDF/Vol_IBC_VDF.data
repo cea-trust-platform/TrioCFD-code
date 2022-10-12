@@ -152,30 +152,30 @@ Lire pb
      }
      liste_postraitements
      {
-	    Postraitement_ft_lata corps
-	    {
-		    dt_post 0.01
-		    nom_fichier corps
-		    format binaire
-		    champs elements { vitesse }
-		    interfaces corps { }
-	    } 
-	    Postraitement_ft_lata aile_gauche
-	    {
-		    dt_post 0.01
-		    nom_fichier aile_gauche
-		    format binaire
-		    interfaces aile_gauche { }
-	    } 
-	    Postraitement_ft_lata aile_droite
-	    {
-		    dt_post 0.01
-		    nom_fichier aile_droite
-		    format binaire
-		    interfaces aile_droite { }
-	    } 	    
+	    postraitement_ft_lata corps { 
+    format Lata 
+    fichier corps 
+    champs dt_post 0.01 { 
+        vitesse elem 
+    } 
+    interfaces corps { 
+    } 
+} 
+	    postraitement_ft_lata aile_gauche { 
+    format Lata 
+    fichier aile_gauche 
+    interfaces aile_gauche { 
+    } 
+} 
+	    postraitement_ft_lata aile_droite { 
+    format Lata 
+    fichier aile_droite 
+    interfaces aile_droite { 
+    } 
+} 	    
      }
 }
 
 Solve pb
 Fin
+ 

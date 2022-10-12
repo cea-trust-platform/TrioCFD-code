@@ -213,28 +213,20 @@ Lire pb
 liste_postraitements
 {
 	
-   Postraitement_ft_lata post1
-   {
-	dt_post 5e-3
-	nom_fichier lata/post
- 	champs elements
-  	      {
-  		 
-  		 indicatrice_interf
-		 vitesse
-		 pression
-		 NORMALE_INTERFACE_interf
-  	      }
-	      
-		
-	interfaces interf
-	      {  
-		champs sommets { courbure }
-		champs elements { normale_unitaire } 
-
-              }
-
-    }
+   postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 5e-3 { 
+        indicatrice_interf elem 
+        vitesse elem 
+        pression elem 
+        NORMALE_INTERFACE_interf elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        normale_unitaire elem 
+    } 
+}
     }
 # Resume_last_time xyz ../../../Theta85_120/@fold@/SEQ/equil_hysteresis_fin_pb.xyz #
 }
@@ -243,3 +235,4 @@ Solve pb
 FIN
 
 			     
+ 

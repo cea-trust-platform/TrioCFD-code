@@ -133,27 +133,19 @@ postraitement {
 	}
 }
 liste_postraitements {
-	postraitement_ft_lata post1 {
-                dt_post 0.00005
-                nom_fichier lata/post
-                format binaire
-                print
-		champs elements {
-			indicatrice_interf
-		}
-		champs sommets {
-			pression
-		}
-		champs faces {
-			vitesse
-		}
-                interfaces interf {
-                        champs sommets {
-                                pe
-				courbure
-                        }
-                }
-        }
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.00005 { 
+        indicatrice_interf elem 
+        pression som 
+        vitesse faces 
+    } 
+    interfaces interf { 
+        pe som 
+        courbure som 
+    } 
+}
 }
 
 Reprise xyz PAR_prepare.xyz
@@ -162,3 +154,4 @@ Reprise xyz PAR_prepare.xyz
 
 Solve pb
 Fin
+ 

@@ -151,17 +151,16 @@ Lire pb
 	}
 liste_postraitements
 {	
-        Postraitement_ft_lata marqueurs
-        {
-                dt_post 0.05
-                nom_fichier marqueurs
-                print
-                champs sommets
-                {
-                        vitesse
-                }
-                interfaces marqueurs { champs sommets { vitesse } }
-        }	
+        postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    champs dt_post 0.05 { 
+        vitesse som 
+    } 
+    interfaces marqueurs { 
+        vitesse som 
+    } 
+}	
 }
 }
 
@@ -182,3 +181,4 @@ boundary_conditions
 			Sortie Paroi_FT_disc symetrie
 			Entree Paroi_FT_disc symetrie
 		}
+ 

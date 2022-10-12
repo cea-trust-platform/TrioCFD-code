@@ -249,75 +249,43 @@ Read pb
         	vitesse elem
            }
         }
-        liste_de_postraitements
+        liste_postraitements
 	{	        
-            post_dom Postraitement_ft_lata 
-            {
-		dt_post 0.01
-        	nom_fichier lata/post_dom
-	        format binaire
-		print
-       		champs elements
-        	{
-	        	vitesse
-		        pression
-		        divergence_u
-        		indicatrice_cylind_1
-	        	indicatrice_cylind_2
-       		}
-        	champs Faces
-	        {
-		        vitesse
-        		indicatrice_faces_cylind_1
-	        	indicatrice_faces_cylind_2
-                        vitesse_imp_interp_cylind_1
-                        vitesse_imp_interp_cylind_2
-        	}
-	        interfaces cylind_2 
-                {
-                        champs sommets 
-                        {
-			        pe
-			        courbure
-			}
-			champs elements
-                        {
-			        pe
-			}
-		}
-           }
-	   post_cylind_1 Postraitement_ft_lata 
-           {
-		dt_post 0.01
-        	nom_fichier lata/post_cylind_1
-	        format binaire
-		print
-        	champs elements
-	        {
-		       	vitesse
-		        pression
-	        	indicatrice_cylind_1
-		       	indicatrice_cylind_2
-        	}
-	        champs Faces
-		{
-		        vitesse
-	        	indicatrice_faces_cylind_1
-		       	indicatrice_faces_cylind_2
-	        }
-	        interfaces cylind_1 
-                {
-		        champs sommets 
-                        {
-			        pe
-			        courbure
-			}
-			champs elements
-                        {
-			       pe
-			}
-		}
-	  }
+             postraitement_ft_lata post_dom { 
+    format Lata 
+    fichier lata/post_dom 
+    champs dt_post 0.01 { 
+        vitesse faces 
+        pression elem 
+        divergence_u elem 
+        indicatrice_cylind_1 elem 
+        indicatrice_cylind_2 elem 
+        indicatrice_faces_cylind_1 faces 
+        indicatrice_faces_cylind_2 faces 
+        vitesse_imp_interp_cylind_1 faces 
+        vitesse_imp_interp_cylind_2 faces 
+    } 
+    interfaces cylind_2 { 
+        pe elem 
+        courbure som 
+    } 
+}
+	    postraitement_ft_lata post_cylind_1 { 
+    format Lata 
+    fichier lata/post_cylind_1 
+    champs dt_post 0.01 { 
+        vitesse faces 
+        pression elem 
+        indicatrice_cylind_1 elem 
+        indicatrice_cylind_2 elem 
+        indicatrice_faces_cylind_1 faces 
+        indicatrice_faces_cylind_2 faces 
+    } 
+    interfaces cylind_1 { 
+        pe elem 
+        courbure som 
+    } 
+}
        }
 }
 
@@ -327,3 +295,4 @@ Calculer_moments DOM centre_de_gravite 2.0 2.0
 Solve pb
 
 End
+ 

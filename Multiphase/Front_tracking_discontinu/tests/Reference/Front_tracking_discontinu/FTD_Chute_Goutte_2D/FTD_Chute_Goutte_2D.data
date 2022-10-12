@@ -169,16 +169,12 @@ Lire pb
 	}
 	liste_postraitements
 	{
-		Postraitement_ft_lata post2
-		{
-			dt_post 0.001
-			nom_fichier plot
-			format ascii
-			print
-			interfaces interf
-			{
-			}
-		}
+		postraitement_ft_lata post2 { 
+    format Lata 
+    fichier plot 
+    interfaces interf { 
+    } 
+}
 	}
 }
 Solve pb
@@ -223,3 +219,4 @@ Fin
 			critere_longueur_fixe		0.003
 			nb_iter_correction_volume	3
 			seuil_dvolume_residuel		1e-12
+ 

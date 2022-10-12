@@ -122,8 +122,8 @@ public:
   virtual void remailler_interface();
 
   //methodes utilisees pour le post-traitement
-  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab = 0) const;
-  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab   *itab = 0) const;
+  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *dtab = 0) const;
+  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab    *itab = 0) const;
   virtual const Maillage_FT_Disc& maillage_interface_pour_post() const;
   int get_mesh_tag() const override
   {

@@ -165,17 +165,19 @@ Lire pb
 	}
 	liste_postraitements
 	{	
-		Postraitement_ft_lata interface
-        	{
-                	dt_post 1
-                	nom_fichier interface
-                	print
-                	champs sommets {  vitesse }
-                	interfaces interf { }
-        	}	
+		postraitement_ft_lata interface { 
+    format Lata 
+    fichier interface 
+    champs dt_post 1 { 
+        vitesse som 
+    } 
+    interfaces interf { 
+    } 
+}	
 	}
 }
 
 Solve pb
 Fin
 
+ 

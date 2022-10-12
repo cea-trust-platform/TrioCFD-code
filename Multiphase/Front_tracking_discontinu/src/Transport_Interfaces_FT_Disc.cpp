@@ -45,7 +45,7 @@
 #include <Sauvegarde_Reprise_Maillage_FT.h>
 #include <SFichier.h>
 #include <Debog.h>
-#include <Format_Post_Lata_V1.h>
+#include <Format_Post_Lata.h>
 #include <Connex_components.h>
 #include <Connex_components_FT.h>
 #include <Loi_horaire.h>
@@ -1105,29 +1105,32 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   if (lata_file != "??")
     {
       Cerr << "Writing lata file" << finl;
+      Format_Post_Lata lata;
       const Domaine& un_dom = zone_vf.zone().domaine();
-      Format_Post_Lata_V1 lata;
-      const double temps = 0.;
-      lata.initialize_lata(lata_file, Format_Post_Lata::BINAIRE, Format_Post_Lata::SINGLE_FILE);
-      lata.ecrire_entete(temps, 0 /*reprise*/, 1 /*premier post*/);
-      lata.ecrire_domaine(un_dom, 1/*premier_post*/);
-      lata.ecrire_temps(temps);
+      constexpr double TEMPS = 0.;
+      constexpr int FIRST_POST = 1;
+      lata.initialize(lata_file, Format_Post_Lata::BINAIRE, "SIMPLE");
+      lata.ecrire_entete(TEMPS, 0 /*reprise*/, FIRST_POST);
+      lata.ecrire_domaine(un_dom, FIRST_POST);
+      lata.ecrire_temps(TEMPS);
       DoubleTab data(nb_elem);
       for (int i = 0; i < nb_elem; i++)
         data(i) = num_compo(i);
       Noms unites;
       unites.add("-");
       Noms noms_compo;
-      Nom nom_champ("connex_component");
+      noms_compo.add("");
       Nom nom_dom(un_dom.le_nom());
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", data);
+
+      Nom nom_champ("connex_component");
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        data);
       nom_champ = "indicatrice";
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", indic);
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        indic);
       nom_champ = "distance";
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", get_update_distance_interface().valeurs());
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        get_update_distance_interface().valeurs());
     }
 
   if (phase_of_component.size_array() > 0 && min_array(phase_of_component) < 0)
@@ -6919,7 +6922,7 @@ const Algorithmes_Transport_FT_Disc& Transport_Interfaces_FT_Disc::algorithmes_t
  *    qu'il existe).
  *
  */
-int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
+int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab) const
 {
   int res = 1;
 
@@ -6979,7 +6982,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             const int n = valeurs.size_array();
             ftab->resize(n,1);
             for (int ii = 0; ii < n; ii++)
-              (*ftab)(ii,0) = (float)valeurs[ii]; // downcast to float
+              (*ftab)(ii,0) = valeurs[ii];
             break;
           }
         case 2:
@@ -6998,12 +7001,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
@@ -7033,12 +7032,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
@@ -7059,12 +7054,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             ftab->resize(nb_fa7, nb_compo);
             int fa7,k;
             for (fa7=0 ; fa7<nb_fa7 ; fa7++)
-              {
-                for (k=0 ; k<nb_compo ; k++)
-                  {
-                    (*ftab)(fa7,k) = (float) valeurs(fa7,k);
-                  }
-              }
+              for (k=0 ; k<nb_compo ; k++)
+                (*ftab)(fa7,k) = valeurs(fa7,k);
             break;
           }
         default:

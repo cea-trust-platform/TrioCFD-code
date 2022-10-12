@@ -153,16 +153,12 @@ Lire pb
 
 	liste_postraitements
 	{
-		Postraitement_ft_lata post2
-		{
-			dt_post 1.
-			nom_fichier plot
-			format ascii
-			print
-			interfaces interf
-			{
-			}
-		}
+		postraitement_ft_lata post2 { 
+    format Lata 
+    fichier plot 
+    interfaces interf { 
+    } 
+}
 	}
 	
 }
@@ -175,3 +171,4 @@ boundary_conditions
 			Axe 	paroi_fixe
 			Haut	paroi_fixe
 		}
+ 

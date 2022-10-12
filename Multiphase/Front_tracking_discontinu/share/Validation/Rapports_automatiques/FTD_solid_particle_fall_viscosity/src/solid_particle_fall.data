@@ -182,20 +182,22 @@ Lire pb
 	
 	liste_postraitements
 	{
-		Postraitement_ft_lata post2
-		{
-			dt_post 5e-5
-			nom_fichier lata/post_dom
-			format binaire
-			print
-			champs sommets { indicatrice_interf vitesse pression masse_volumique }
-			champs elements { indicatrice_interf }
-			interfaces interf
-			{
-			champs sommets { courbure vitesse }
-			}
-		}
+		postraitement_ft_lata post2 { 
+    format Lata 
+    fichier lata/post_dom 
+    champs dt_post 5e-5 { 
+        indicatrice_interf elem 
+        vitesse som 
+        pression som 
+        masse_volumique som 
+    } 
+    interfaces interf { 
+        courbure som 
+        vitesse som 
+    } 
+}
 	}
 }
 Solve pb
 Fin
+ 

@@ -218,14 +218,12 @@ Transport_Interfaces_FT_Disc
       }
 liste_postraitements
     {
-        Postraitement_ft_lata post1
-        {
-                dt_post 0.05
-                nom_fichier post1
-                format binaire
-                interfaces interf {
-                }
-        }
+        postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    interfaces interf { 
+    } 
+}
     }
 boundary_conditions
 		{
@@ -236,3 +234,4 @@ boundary_conditions
 		   Avant   Paroi_FT_disc symetrie
 		   Arriere Paroi_FT_disc symetrie 
 		}
+ 

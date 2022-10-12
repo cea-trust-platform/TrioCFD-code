@@ -231,13 +231,12 @@ Lire pb
       
 liste_postraitements
     {
-        Postraitement_ft_lata post1
-        {
-                dt_post 0.05
-                nom_fichier post1
-                format binaire
-                interfaces  pbTransport_Interfaces_FT_Disc0 { }
-        }
+        postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    interfaces pbtransport_interfaces_ft_disc0 { 
+    } 
+}
     }    
 }
 
@@ -250,3 +249,4 @@ boundary_conditions
 		    Sortie Paroi_FT_disc symetrie
 		    Bas    Paroi_FT_disc symetrie 
 		}
+ 

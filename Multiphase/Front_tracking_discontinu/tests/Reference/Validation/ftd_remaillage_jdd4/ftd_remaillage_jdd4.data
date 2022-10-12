@@ -98,20 +98,18 @@ postraitement {
 	champs dt_post 1. { indicatrice_interf elem }
 }
 liste_postraitements {
-	postraitement_ft_lata post1 {
-                dt_post 0.00005
-                nom_fichier lata/par_post
-                format binaire
-                interfaces interf {
-                        champs sommets {
-                                pe
-				courbure
-                        }
-                }
-        }
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/par_post 
+    interfaces interf { 
+        pe som 
+        courbure som 
+    } 
+}
 }
 
 }
 
 Solve pb
 Fin
+ 

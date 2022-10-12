@@ -111,16 +111,18 @@ Lire pb
      }
      liste_postraitements
      {
-	    Postraitement_ft_lata sphere
-	    {
-		    dt_post 0.2
-		    nom_fichier post1
-		    format binaire
-		    champs elements { vitesse }
-		    interfaces balle { }
-	    } 
+	    postraitement_ft_lata sphere { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.2 { 
+        vitesse elem 
+    } 
+    interfaces balle { 
+    } 
+} 
      }
 }
 
 Solve pb
 Fin
+ 

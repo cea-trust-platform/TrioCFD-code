@@ -271,24 +271,29 @@ Lire pb
     }
      liste_postraitements
      {
-	    Postraitement_ft_lata agit
-	    {
-		    dt_post 0.1
-		    nom_fichier post1
-		    format binaire
-		    champs elements { vitesse }
-		    interfaces agit { }
-	    } 
-	   Postraitement_ft_lata interf
-            {
-                    dt_post 0.1 
-                    nom_fichier post2
-                    format binaire
-                    champs elements { vitesse indicatrice_interf }
-                    interfaces interf { champs sommets { courbure } }
-            }
+	    postraitement_ft_lata agit { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.1 { 
+        vitesse elem 
+    } 
+    interfaces agit { 
+    } 
+} 
+	   postraitement_ft_lata interf { 
+    format Lata 
+    fichier post2 
+    champs dt_post 0.1 { 
+        vitesse elem 
+        indicatrice_interf elem 
+    } 
+    interfaces interf { 
+        courbure som 
+    } 
+}
      }
 }
 
 Solve pb
 Fin
+ 
