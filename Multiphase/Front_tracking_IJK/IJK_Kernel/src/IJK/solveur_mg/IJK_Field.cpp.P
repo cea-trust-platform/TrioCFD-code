@@ -133,7 +133,11 @@ void IJK_Field_local__TYPE_::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
   ghost_size_ = ghosts;
   nb_compo_ = nb_compos;
   j_stride_ = ni_ + 2 * ghosts;
-  while (j_stride_ % Simd__TYPE_::size() != 0)
+#Pif("_TYPE_"=="int")   //Simd_int suits both int and long
+   while (j_stride_ % Simd_int::size() != 0)
+#Pelse
+   while (j_stride_ % Simd__TYPE_::size() != 0)
+#Pendif
     j_stride_++;
   compo_stride_ = j_stride_ * (nj_ + 2 * ghosts);
   offset_ = ghost_size_ * (1 + j_stride_ + compo_stride_ * nb_compo_);
