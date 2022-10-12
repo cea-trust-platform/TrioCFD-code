@@ -38,6 +38,8 @@
 #include <Matrix_tools.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
+#include <Pb_Multiphase.h>
+
 
 Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0,"Production_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_base);
 
@@ -59,19 +61,27 @@ Entree& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is)
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = equation().inconnue().valeurs().line_size();
+  assert(Nk == 1); // si plus d'une phase turbulente, il vaut mieux iterer sur les id_composites des phases turbulentes modelisees par un modele k-tau
 
-  for (auto &&i_m : matrices)
-    if (i_m.first == "k")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
       {
-        Matrice_Morse mat;
-        IntTrav stencil(0, 2);
-        stencil.set_smart_resize(1);
-        for (int e = 0; e < ne; e++)
-          for(int n = 0; n<N ; n++) stencil.append_line(N * e + n, N * e + n);
-        tableau_trier_retirer_doublons(stencil);
-        Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
-        i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
+        Matrice_Morse& mat = *n_m.second, mat2;
+        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
+        int nc = dep.dimension_tot(0),
+            M  = dep.line_size();
+        IntTrav sten(0, 2);
+        sten.set_smart_resize(1);
+        if (n_m.first == "alpha" || n_m.first == "temperature")
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < Nk; n++)
+              if (n < M) sten.append_line(Nk * e + n, M * e + n);
+        if (n_m.first == "pression" )
+          for (int e = 0; e < ne; e++)
+            for (int n = 0, m = 0; n < Nk; n++, m+=(M>1)) sten.append_line(Nk * e + n, M * e + m);
+        Matrix_tools::allocate_morse_matrix(Nk * ne_tot, M * nc, sten, mat2);
+        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
 }
 
@@ -82,153 +92,59 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const grad_Champ_Face_PolyMAC_P0&        grad = ref_cast(grad_Champ_Face_PolyMAC_P0, eq_qdm.get_champ("gradient_vitesse"));
   const DoubleTab&                     tab_grad = grad.valeurs();
-  const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
   const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
-  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
-  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = domaine.nb_faces_tot(), ne = domaine.nb_elem(), D = dimension ;
-  int N = tab_diss.line_size();
+  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
+  const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
+  const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
-  DoubleTrav Rij(0, Nph, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
-  visc_turb.reynolds_stress(Rij);
-  assert((ne == Rij.dimension(0)));
+  int nf_tot = domaine.nb_faces_tot(), ne = domaine.nb_elem(), D = dimension ;
+  int N = equation().inconnue()->valeurs().line_size(),
+      Np = equation().probleme().get_champ("pression").valeurs().line_size(),
+      Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
+      Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
+  int e, n, mp;
 
   std::string Type_diss = ""; // omega or tau dissipation
   if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
   else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
-  if (Type_diss == "") abort();
-
-  DoubleTrav prod_scal(Rij.dimension_tot(0), Nph);
-  for (int e = 0; e < ne; e++)
-    for(int n = 0; n<N ; n++)
-      {
-        prod_scal(e, n) = 0;
-        for (int d_U = 0; d_U < D; d_U++)
-          for (int d_X = 0; d_X < D; d_X++)
-            prod_scal(e, n) += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-      }
-
-  DoubleTrav prod_scal_gu_omega(ne, Nph);
-  DoubleTrav trace_gu_omega(ne, Nph);
-  for (int e = 0; e < ne; e++)
-    for(int n = 0; n<N ; n++)
-      {
-        prod_scal_gu_omega(e, n) = 0;
-        trace_gu_omega(e, n) = 0;
-        for (int d_U = 0; d_U < D; d_U++)
-          {
-            trace_gu_omega(e, n) += tab_grad(nf_tot + d_U + e * D , D * n + d_U) ;
-            for (int d_X = 0; d_X < D; d_X++)
-              prod_scal_gu_omega(e, n) +=  tab_grad(nf_tot + d_X + e * D , D * n + d_U) * (tab_grad(nf_tot + d_X + e * D , D * n + d_U) + tab_grad(nf_tot + d_U + e * D , D * n + d_X) ) ;
-          }
-      }
+  if (Type_diss == "") Process::exit(que_suis_je() + " : you must have tau or omega dissipation ! ");
 
   // Second membre
-  for(int e = 0 ; e < ne ; e++)
-    for(int n = 0; n<N ; n++)
+  for(e = 0 ; e < ne ; e++)
+    for(n = 0, mp = 0; n<N ; n++, mp += (Np > 1))
       {
-        double secmem_en = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n); // So the production is always negative for tau and positive for omega
+        double grad_grad = 0.;
+        for (int d_U = 0; d_U < D; d_U++)
+          for (int d_X = 0; d_X < D; d_X++)
+            grad_grad += ( tab_grad(nf_tot + d_U + e * D , D * n + d_X) + tab_grad(nf_tot + d_X + e * D , D * n + d_U) ) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+
+        double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) * alpha_omega_ ;
+
         if (Type_diss == "tau")
-          secmem_en = -std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) );
-//          secmem_en *=       tab_diss(e, n)*tab_diss(e, n)/std::max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
-
+          {
+            secmem(e, n) -= fac * alpha_rho(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ; // tau has negative production
+            for (auto &&i_m : matrices)
+              {
+                Matrice_Morse& mat = *i_m.second;
+                if (i_m.first == "tau")         mat(N * e + n, N  * e + n) += fac *  2 *                                 tab_pdiss(e, n) * alpha_rho(e, n) ;
+                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) += fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );		   // derivee par rapport au taux de vide
+                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) += fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
+                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)+= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, n) : 0 );	 // derivee par rapport a la pression
+              }
+          }
         else if (Type_diss == "omega")
-          secmem_en =  std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) );
-//          secmem_en = std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( prod_scal_gu_omega(e, n)  - 2/3. * tab_diss(e, n) * trace_gu_omega(e, n) ) );
-
-// Court-circuitage du calcul de la viscosite turbulente dans la production de omega => forme directe
-        /*        secmem_en *= (-1)* ((tab_diss(e, n) <= 0) ? 0 : 1/(std::max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
-                  secmem_en *= (-1) * tab_diss(e, n) * 1/tab_pk(e,n) * (1 - (tab_k(e, n) - tab_pk(e,n))/tab_pk(e,n) ) ; */
-
-        secmem(e, n) += secmem_en;
-
+          {
+            secmem(e, n) +=   fac * alpha_rho(e, n);
+            for (auto &&i_m : matrices)
+              {
+                Matrice_Morse& mat = *i_m.second;
+                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) += fac * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );		   // derivee par rapport au taux de vide
+                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) += fac * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
+                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)+= fac * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, n) : 0 );	 // derivee par rapport a la pression
+              }
+          }
       }
-
-  // Derivees
-  for (auto &&i_m : matrices)
-    {
-      if (i_m.first == "tau")
-        {
-          Matrice_Morse& mat = *i_m.second;
-          for (int e = 0; e < ne; e++)
-            for(int n = 0; n<N ; n++)
-              {
-//                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-//                if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-//                  deriv *=    pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
-//                else deriv *= pe(e) * ve(e) * (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
-//                mat(N * e + n, N * e + n) += deriv;
-
-                // Ici test linearisations
-
-                double deriv = 0. ;
-                if (pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) > 0. )
-                  deriv = - pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * 2. * tab_pdiss(e, n);
-                mat(N * e + n, N * e + n) -= deriv;
-              }
-        }
-
-      /*      else if (i_m.first == "omega")
-              {
-                Matrice_Morse& mat = *i_m.second;
-                for (int e = 0; e < ne; e++)
-                  for(int n = 0; n<N ; n++)
-                    {
-                                      double deriv = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) ; // So the production is always negative for tau and positive for omega
-
-                                      if (tab_diss(e, n) <= 0) deriv *= 0 ;
-                                      else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                                      else deriv *= 1/tab_pk(e,n) * (2 - tab_k(e, n)/tab_pk(e,n) ) ;
-
-                                      mat(N * e + n, N * e + n) += deriv;
-
-                                      // test linearisation
-                                                     mat(N * e + n, N * e + n) += deriv ;
-
-                      if ( (pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( prod_scal_gu_omega(e, n)  - 2/D * tab_diss(e, n) * trace_gu_omega(e, n) ) )       >   0.)
-                        mat(N * e + n, N * e + n)  -= pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( - 2/D * trace_gu_omega(e, n) ) ;
-
-                    }
-              }
-      */
-
-// Court-circuitage du calcul de la viscosite turbulente dans la production de omega et tau => pas de derivee en k
-      /*
-            else if (i_m.first == "k")
-              {
-                Matrice_Morse& mat = *i_m.second;
-                if (Type_diss == "tau")
-                  {
-                    for (int e = 0; e < ne; e++)
-                      for(int n = 0; n<N ; n++)
-                        {
-                          double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-                          if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-                            deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
-                          else deriv *= 0;
-                          mat(N * e + n, N * e + n) += deriv;
-                        }
-                  }
-
-      // Court-circuitage du calcul de la viscosite turbulente dans la production de omega => pas de derivee en k
-                          else if (Type_diss == "omega")
-                            for (int e = 0; e < ne; e++)
-                              for(int n = 0; n<N ; n++)
-                                {
-                                  double deriv = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) ; // So the production is always negative for tau and positive for omega
-                                                    if (tab_diss(e, n) <= 0) deriv *= 0 ;
-                                                    else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                                                    else deriv *= pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
-
-                                  // test linearisation
-                                  mat(N * e + n, N * e + n) += 0.  * deriv * tab_diss(e, n) * (-1.)/(tab_pk(e,n) * tab_pk(e,n)) ;
-                                }
-              }
-      */
-    }
 }

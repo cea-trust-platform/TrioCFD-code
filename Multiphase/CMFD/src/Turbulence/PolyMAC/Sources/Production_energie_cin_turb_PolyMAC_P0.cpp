@@ -109,8 +109,6 @@ void Production_energie_cin_turb_PolyMAC_P0::calculer_fac()
 
 void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-// empty : no derivative for the turbulent kinetic energy production to add in the blocks
-
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab& k 	 = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
@@ -185,14 +183,10 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
       Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
   int e, n, mp;
 
-//  DoubleTrav Rij(0, Nph, D, D);
-// MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
-//  visc_turb.reynolds_stress(Rij);
-
   if (Type_diss == "")
     {
       DoubleTrav nut(0, Nph);
-      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in reynolds_stress()
+      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
 
       Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
@@ -204,12 +198,9 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 secmem_en += ( tab_grad(nf_tot + d_U + e * D , D * n + d_X) + tab_grad(nf_tot + d_X + e * D , D * n + d_U) ) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-//            secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
             secmem_en *= pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) * nut(e, n) ;
-//        secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
 
-//        secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
-            secmem(e, n) += std::max(secmem_en, 0.);
+            secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
 
             if (mat) (*mat)(N * e + n, N * e + n) -= 0.;//fac_(e, n, 1) * std::max(secmem_en, 0.);
           }
@@ -235,9 +226,9 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
             for (auto &&i_m : matrices)
               {
                 Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
+                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
                 if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= fac * nut_l * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, n) : 0 );		  // derivee par rapport a la pression
+                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, n) : 0 );		  // derivee par rapport a la pression
               }
 
             if ( (Type_diss == "tau") && ((k(e, n)*(*diss)(e, n)) > (limiter_*nu(e, n))) )
