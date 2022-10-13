@@ -1,6 +1,9 @@
 Dimension 3
 Domaine dom
-Lire_med family_names_from_group_names dom mesh_tetra_5 mesh_tetra_5.med
+Lire_MED { 
+   domain dom 
+   file mesh_tetra_5.med 
+}
 
 VerifierCoin dom { }
 

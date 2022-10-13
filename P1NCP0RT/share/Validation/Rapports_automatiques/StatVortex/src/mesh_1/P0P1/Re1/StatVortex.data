@@ -4,7 +4,10 @@ Dimension 3
 Domaine dom
 
 # BEGIN MESH #
-Read_med family_names_from_group_names dom mesh_tetra_1 mesh_tetra_1.med
+Lire_MED { 
+   domain dom 
+   file mesh_tetra_1.med 
+}
 VerifierCoin dom { }
 # END MESH #
 

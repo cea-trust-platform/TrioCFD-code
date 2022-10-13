@@ -9,7 +9,10 @@ Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare.med
+Lire_MED { 
+   domain dom 
+   file MeshWithSquare.med 
+}
 # END MESH #
 
 # BEGIN PARTITION

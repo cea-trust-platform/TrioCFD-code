@@ -89,7 +89,10 @@ Associate pb fluide
 
 Discretize pb dis
 Domaine mes_interfs 
-read_med mes_interfs INTERFACES reprise_xyz_ijk.med
+Lire_MED { 
+   domain mes_interfs 
+   file reprise_xyz_ijk.med 
+}
 Lire pb
 {
    hydraulique

@@ -8,7 +8,10 @@ Pb_hydraulique pb
 
 Domaine dom
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh_tetra_6 mesh_tetra_6.med
+Lire_MED { 
+   domain dom 
+   file mesh_tetra_6.med 
+}
 
 VerifierCoin dom { }
 

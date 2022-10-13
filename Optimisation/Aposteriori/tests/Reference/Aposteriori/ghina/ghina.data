@@ -2,7 +2,10 @@
 dimension 2
 Domaine dom
 # BEGIN MESH #
-Read_med family_names_from_group_names dom ghina_modif_02 ghina_modif_03.med
+Lire_MED { 
+   domain dom 
+   file ghina_modif_03.med 
+}
 VerifierCoin dom { }
 # END MESH #
 

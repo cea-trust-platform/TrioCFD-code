@@ -26,11 +26,20 @@ Mailler DOM
 Transformer DOM 0.1*x 0.1*y z
 
 domaine tmp
-lire_med family_names_from_group_names tmp aile1 aile1.med
+Lire_MED { 
+   domain tmp 
+   file aile1.med 
+}
 ecrire_fichier_formatte tmp aile1.geom
-lire_med family_names_from_group_names tmp aile2 aile2.med
+Lire_MED { 
+   domain tmp 
+   file aile2.med 
+}
 ecrire_fichier_formatte tmp aile2.geom
-lire_med family_names_from_group_names tmp corps corps.med
+Lire_MED { 
+   domain tmp 
+   file corps.med 
+}
 ecrire_fichier_formatte tmp corps.geom
 
 

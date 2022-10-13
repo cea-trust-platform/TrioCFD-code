@@ -14,10 +14,22 @@ Domaine solide4
 
 # Lecture de fichiers MED 3D : on garde meme si au final on lit des .geom #
 # BEGIN MESH #
-lire_med liquide1 LIQUIDE_GAUCHE liquide_gauche.med
-lire_med liquide2 LIQUIDE_DROIT liquide_droit.med
-lire_med solide3 CLOISON cloison.med
-lire_med solide4 PARO paro.med
+Lire_MED { 
+   domain liquide1 
+   file liquide_gauche.med 
+}
+Lire_MED { 
+   domain liquide2 
+   file liquide_droit.med 
+}
+Lire_MED { 
+   domain solide3 
+   file cloison.med 
+}
+Lire_MED { 
+   domain solide4 
+   file paro.med 
+}
 Read_file liquide1 liquide_gauche.geom
 Read_file liquide2 liquide_droit.geom
 Read_file solide3 cloison.geom

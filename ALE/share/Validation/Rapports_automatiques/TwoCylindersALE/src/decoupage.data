@@ -5,7 +5,10 @@ dimension 2
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom MeshWithTwoCylinders MeshWithTwoCylinders.med
+Lire_MED { 
+   domain dom 
+   file MeshWithTwoCylinders.med 
+}
 # END MESH #
 
 # BEGIN PARTITION #

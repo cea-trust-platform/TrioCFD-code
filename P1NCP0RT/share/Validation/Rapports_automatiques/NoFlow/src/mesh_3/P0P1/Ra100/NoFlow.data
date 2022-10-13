@@ -4,7 +4,10 @@ Dimension 2
 Domaine dom
 
 # BEGIN MESH #
-Read_med family_names_from_group_names dom Square_h3 Square_h3.med
+Lire_MED { 
+   domain dom 
+   file Square_h3.med 
+}
 # END MESH #
 
 # BEGIN PARTITION

@@ -2,7 +2,10 @@ Dimension 3
 Pb_hydraulique pb
 
 Domaine dom
-Lire_med family_names_from_group_names dom mesh_tetra_3 mesh_tetra_3.med
+Lire_MED { 
+   domain dom 
+   file mesh_tetra_3.med 
+}
 
 VerifierCoin dom { }
 

@@ -19,7 +19,10 @@ Dilate DOM 0.0001
 Ecrire_fichier_bin DOM cylindre_bin.geom
 
 Domaine dom_surface
-lire_med dom_surface Mesh_1 halteres.med
+Lire_MED { 
+   domain dom_surface 
+   file halteres.med 
+}
 Dilate dom_surface 0.1
 Transformer dom_surface x z y+0.03
 

@@ -6,7 +6,10 @@ Pb_hydraulique_Turbulent pb
 # BEGIN MESH #
 dimension 2
 Domaine dom_2D
-Lire_MED family_names_from_group_names dom_2D bundle2D bundle2D.med
+Lire_MED { 
+   domain dom_2D 
+   file bundle2D.med 
+}
 extruder_en3 { domaine 1 dom_2D nb_tranches 4 direction 0. 0. 0.0180133 }
 RegroupeBord dom_2D perio { devant derriere }
 
