@@ -37,7 +37,7 @@ for Discr in $Discretization ; do
              
         DataFile="StatVortex_"$Discr"_"$Re".data"
         cp  $DataFile $fold/StatVortex.data
-        sed -i "s/ mesh_tetra_0 mesh_tetra_0.med/ $MeshFile $MeshFile.med/" $fold/StatVortex.data
+        sed -i "s/mesh_tetra_0/$MeshFile/" $fold/StatVortex.data
     done
   done
 done

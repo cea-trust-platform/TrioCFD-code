@@ -8,10 +8,27 @@ Pb_conduction pb2
 Domaine dom
 
 # BEGIN MESH #
-Lire_MED { 
+Lire_med {
    domain dom 
-   file __DIS__ 
+   file __MAILLAGE__.med
+   mesh __MAILLAGE__
 }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partition_tool metis { nb_parts 2  }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+__DIS__
 
 Schema_Euler_explicite sch1
 Lire sch1

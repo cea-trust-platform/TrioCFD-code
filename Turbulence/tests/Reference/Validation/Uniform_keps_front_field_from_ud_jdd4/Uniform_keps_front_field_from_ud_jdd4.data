@@ -10,6 +10,8 @@ domaine boundary_entrance
 Lire_MED { 
    domain dom 
    file downcomer.med 
+   mesh Fluid_domain
+   no_family_names_from_group_names
 }
 
  tetraedriser_homogene_compact dom

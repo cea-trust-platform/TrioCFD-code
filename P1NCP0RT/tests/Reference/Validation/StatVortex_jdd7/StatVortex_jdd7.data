@@ -7,6 +7,7 @@ Domaine dom
 Lire_MED { 
    domain dom 
    file mesh_tetra_0.med 
+   mesh mesh_tetra_0 
 }
 VerifierCoin dom { }
 # END MESH #
