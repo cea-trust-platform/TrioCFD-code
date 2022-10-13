@@ -178,11 +178,11 @@ void Equation_rayonnement_base::set_param(Param& param)
 
 int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
+  int retval = 1;
   if (mot=="conditions_limites|boundary_conditions")
     {
       lire_cl(is);
       verif_Cl();
-      return 1;
     }
   else if (mot=="solveur")
     {
@@ -195,14 +195,10 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
       solveur.typer(nom_solveur);
       is >> solveur.valeur();
       solveur.nommer("solveur_irradiance");
-      return 1;
     }
-  else
-    {
-      Cerr << mot << " is not a keyword understood by " << que_suis_je() << " in lire_motcle_non_standard"<< finl;
-      exit();
-    }
-  return -1;
+  else retval = -1;
+
+  return retval;
 }
 
 /*! @brief Associe un milieu physique a l'equation
