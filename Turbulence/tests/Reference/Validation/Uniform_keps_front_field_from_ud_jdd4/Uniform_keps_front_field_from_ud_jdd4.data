@@ -7,7 +7,12 @@ domaine dom
 domaine boundary_entrance
 
 # BEGIN MESH #  
-lire_med dom Fluid_domain downcomer.med
+Lire_MED { 
+   domain dom 
+   file downcomer.med 
+   mesh Fluid_domain
+   no_family_names_from_group_names
+}
 
  tetraedriser_homogene_compact dom
 /* rotation of angle theta : */

@@ -5,7 +5,10 @@ dimension 2
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom TwoOscillatingCylinders TwoOscillatingCylinders.med
+Lire_MED { 
+   domain dom 
+   file TwoOscillatingCylinders.med 
+}
 # END MESH #
 
 # BEGIN PARTITION #

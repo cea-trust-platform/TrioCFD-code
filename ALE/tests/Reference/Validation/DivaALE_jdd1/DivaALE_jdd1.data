@@ -9,7 +9,10 @@ Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_med family_names_from_group_names dom Mesh_1 MeshDIVA_1.med
+ Lire_MED { 
+   domain dom 
+   file MeshDIVA_1.med 
+} 
 # END MESH #
 
 VerifierCoin dom {  }

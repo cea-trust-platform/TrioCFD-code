@@ -5,7 +5,10 @@ dimension 2
 Pb_Hydraulique pb
 Domaine dom
 # BEGIN MESH #
-lire_med family_names_from_group_names dom cavite_avec_disque cavite_avec_disque.med
+Lire_MED { 
+   domain dom 
+   file cavite_avec_disque.med 
+}
 VerifierCoin dom { }
 # END MESH #
 

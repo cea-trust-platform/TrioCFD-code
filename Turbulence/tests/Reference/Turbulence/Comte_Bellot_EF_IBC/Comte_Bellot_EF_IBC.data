@@ -14,7 +14,10 @@ Pb_Thermohydraulique_Turbulent pb
 Domaine dom
 
 # DEBUT MAILLAGE #
-read_MED short_family_names dom domain_mesh res_domain_mesh_80_pl_mesh_1.med
+Lire_MED { 
+   domain dom 
+   file res_domain_mesh_80_pl_mesh_1.med 
+}
 
 regroupebord dom Wall { TOP BOTTOM }
 regroupebord dom Postpro { IN OUT }

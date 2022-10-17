@@ -4,7 +4,10 @@ dimension 2
 
 Domaine dom
 # BEGIN MESH #
- Read_MED family_names_from_group_names dom FinerMeshSquare_T FinerMeshSquare_T.med
+ Lire_MED { 
+   domain dom 
+   file FinerMeshSquare_T.med 
+}
 # END MESH #
 
 

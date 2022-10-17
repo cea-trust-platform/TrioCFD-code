@@ -8,7 +8,11 @@ Pb_conduction pb2
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom __MAILLAGE__
+Lire_med {
+   domain dom 
+   file __MAILLAGE__.med
+   mesh __MAILLAGE__
+}
 # END MESH #
 # BEGIN PARTITION
 Partition dom

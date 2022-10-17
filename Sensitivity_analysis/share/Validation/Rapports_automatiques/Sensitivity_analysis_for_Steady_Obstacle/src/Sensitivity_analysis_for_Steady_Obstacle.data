@@ -43,7 +43,11 @@ Pb_Hydraulique_sensibility pb_sensibilite
 Domaine dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare1.med 
+Lire_MED { 
+   domain dom 
+   file MeshWithSquare1.med 
+}
+
 # END MESH #
 
 # BEGIN PARTITION

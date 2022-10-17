@@ -1,7 +1,10 @@
 dimension 3
 Pb_Hydraulique_Turbulent pb
 domaine dom
-Lire_med family_names_from_group_names dom Mesh_1 cube_vortex_medium.med
+Lire_MED { 
+   domain dom 
+   file cube_vortex_medium.med 
+}
 
 # Je choisis une discretisation #
 VEFPreP1B ma_discretisation

@@ -5,7 +5,11 @@ Pb_Hydraulique pb
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom square square.med 
+Lire_MED { 
+   domain dom 
+   file square.med 
+}
+
 # END MESH #
 
 # BEGIN PARTITION

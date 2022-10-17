@@ -8,7 +8,10 @@ Pb_hydraulique_turbulent pb
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom forme forme.med
+Lire_MED { 
+   domain dom 
+   file forme.med 
+}
 VerifierCoin dom { }
 Dilate dom 0.3
 # END MESH #

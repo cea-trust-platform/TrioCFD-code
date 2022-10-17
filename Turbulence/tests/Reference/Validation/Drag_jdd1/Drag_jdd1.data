@@ -1,7 +1,10 @@
 # Lecture du 1/2 maillage #
 dimension 2
 Domaine dom1
-Lire_med family_names_from_group_names dom1 forme forme.med
+Lire_MED { 
+   domain dom1 
+   file forme.med 
+}
 VerifierCoin dom1 { }
 Ecrire_fichier_bin dom1 forme_bin.geom
 # Hydraulique 2D, fluide air #
