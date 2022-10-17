@@ -1,4 +1,4 @@
-[ "$TRUST_IN_COPIE_CAS_TEST" = "1" ] && echo on modifie le maillage &&  sed -i "s/mesh_tetra_6 mesh_tetra_6.med/mesh_tetra_0 mesh_tetra_0.med/" Navier_Stokes_3d_steady.data 
+[ "$TRUST_IN_COPIE_CAS_TEST" = "1" ] && echo on modifie le maillage &&  sed -i "s/file mesh_tetra_6.med/file mesh_tetra_0.med/" Navier_Stokes_3d_steady.data 
 
 # Creation des repertoires de calcul #
 mkdir -p Amont Muscl EF_stab_alpha_0.2 

@@ -9,10 +9,10 @@ Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
-Lire_MED { 
+ Lire_MED { 
    domain dom 
    file MeshDIVA_1.med 
-}
+} 
 # END MESH #
 
 VerifierCoin dom {  }
