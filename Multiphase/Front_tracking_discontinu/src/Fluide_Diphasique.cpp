@@ -59,7 +59,7 @@ void Fluide_Diphasique::set_param(Param& param)
   param.ajouter_non_std("fluide1",(this),Param::REQUIRED); // XD_ADD_P chaine second phase fluid
   param.ajouter("chaleur_latente",&chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
   param.ajouter("formule_mu",&formule_mu_); // XD_ADD_P chaine (into=[standard,arithmetic,harmonic]) formula used to calculate average
-  Milieu_base::set_param_porosite(param);
+  Milieu_base::set_additional_params(param);
 }
 
 int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -170,7 +170,7 @@ void Fluide_Diphasique::discretiser(const Probleme_base& pb, const  Discretisati
   phase0_.discretiser(pb,dis);
   phase1_.discretiser(pb,dis);
   discretiser_porosite(pb,dis);
-  //Milieu_base::discretiser(pb,dis);
+  discretiser_diametre_hydro(pb, dis);
 }
 
 
