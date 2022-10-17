@@ -58,7 +58,7 @@ void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, co
   int N = ndv.dimension(0);
 
   DoubleTrav coeff_drag(N, N, 2);
-  corr.coefficient( alpha, p, T, rho, mu, sigma, 0, ndv, d_bulles, coeff_drag);
+  corr.coefficient( alpha, p, T, rho, mu, sigma, 0., ndv, d_bulles, coeff_drag);
 
   coeff = 0;
 
@@ -66,7 +66,7 @@ void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, co
     if (k!=n_l)
       for (int i = 0 ; i<2 ; i++) // k gas phase
         {
-          coeff(k, n_l, i) = (alpha(k) > 1.e-6) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, i)/alpha(k)  : 0 ;
-          coeff(n_l, k, i) = (alpha(n_l)>1.e-6) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, i)/alpha(n_l): 0 ;
+          coeff(k, n_l, i) = (alpha(k)  >1.e-4) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, i)/alpha(k)  : nut(n_l)/Prt_ * coeff_drag(k, n_l, i)*alpha(k)  *1.e8 ;
+          coeff(n_l, k, i) = (alpha(n_l)>1.e-4) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, i)/alpha(n_l): nut(n_l)/Prt_ * coeff_drag(n_l, k, i)*alpha(n_l)*1.e8 ;
         }
 }

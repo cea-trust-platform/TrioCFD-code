@@ -14,52 +14,36 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Loi_paroi_adaptative.h
-// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
+// File:        Dispersion_bulles_turbulente_GTD.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Loi_paroi_adaptative_included
-#define Loi_paroi_adaptative_included
-#include <TRUSTTab.h>
-#include <TRUSTTab.h>
-#include <Correlation_base.h>
-#include <Loi_paroi_base.h>
-#include <vector>
-#include <map>
-#include <string>
+#ifndef Dispersion_bulles_turbulente_GTD_included
+#define Dispersion_bulles_turbulente_GTD_included
+#include <Dispersion_bulles_base.h>
+#include <Correlation.h>
 
-/*! @brief classe Loi_paroi_adaptative correlation pour une loi de paroi adaptative qui calcule u_tau et du y_plus
+/*! @brief classe Dispersion_bulles_turbulente_GTD coefficients de dispersion turbulente de bulles slon le modele Lavieville et al 2017
  *
- *     Methodes implementees :
  *
  *
  */
-class Loi_paroi_adaptative : public Loi_paroi_base
+class Dispersion_bulles_turbulente_GTD : public Dispersion_bulles_base
 {
-  Declare_instanciable(Loi_paroi_adaptative);
+  Declare_instanciable(Dispersion_bulles_turbulente_GTD);
 public:
-  void calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
-  void completer() override;
-  void mettre_a_jour(double temps) override;
-  DoubleTab get_tab(std::string str) {return valeurs_loi_paroi_[str];};
-  double get_y(int f) const {return valeurs_loi_paroi_.at("y")(f,0);};
-  double get_utau(int f) const { return valeurs_loi_paroi_.at("u_tau")(f,0);};
-  double get_dyp_u_plus(int f) const { return valeurs_loi_paroi_.at("dyp_u_plus")(f,0);};
+  void coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
+                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
+                    const DoubleTab& ndv, DoubleTab& coeff) const override;
 
 protected:
-  double calc_u_tau_loc(double u_par, double nu, double y);
-  double u_plus_de_y_plus(double y_p); // Blended Reichardt model
-  double deriv_u_plus_de_y_plus(double y_p);
-  double to_zero(double u_tau, double u_par, double nu, double y); // fonction for which we are looking for the root
-  double d_to_zero(double u_tau, double u_par, double nu, double y);
-
-  double von_karman_ = 0.41;
-  double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
-
-  IntTab Faces_a_calculer_;
-  std::map<std::string, DoubleTab> valeurs_loi_paroi_; // contient "y_plus", "u_plus", "dyp_u_plus", "u_tau" pour toutes les faces
+  Correlation correlation_drag_;
+  Correlation correlation_MA_;
+  int n_l = -1; //phase liquide
+  double Prt_ = .9 ; // Turbulent Prandtl number
 };
 
 #endif

@@ -77,16 +77,18 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matri
 
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Zone_PolyMAC_P0&                   zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
-  const Navier_Stokes_std&                  eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const grad_Champ_Face_PolyMAC_P0&           grad = ref_cast(grad_Champ_Face_PolyMAC_P0, eq_qdm.get_champ("gradient_vitesse"));
-  const DoubleTab&                     tab_grad = grad.passe();
+  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
+  const grad_Champ_Face_PolyMAC_P0&        grad = ref_cast(grad_Champ_Face_PolyMAC_P0, eq_qdm.get_champ("gradient_vitesse"));
+  const DoubleTab&                     tab_grad = grad.valeurs();
   const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
   const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
+  const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        tab_k = ref_cast(Champ_Elem_PolyMAC_P0, pb.get_champ("k")).valeurs();
+//  const DoubleTab&                       tab_pk = ref_cast(Champ_Elem_PolyMAC_P0, pb.get_champ("k")).passe();
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
@@ -114,6 +116,42 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
             prod_scal(e, n) += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
       }
 
+  DoubleTrav prod_scal_gu_omega(ne, Nph);
+  DoubleTrav trace_gu_omega(ne, Nph);
+  for (int e = 0; e < ne; e++)
+    for(int n = 0; n<N ; n++)
+      {
+        prod_scal_gu_omega(e, n) = 0;
+        trace_gu_omega(e, n) = 0;
+        for (int d_U = 0; d_U < D; d_U++)
+          {
+            trace_gu_omega(e, n) += tab_grad(nf_tot + d_U + e * D , D * n + d_U) ;
+            for (int d_X = 0; d_X < D; d_X++)
+              prod_scal_gu_omega(e, n) +=  tab_grad(nf_tot + d_X + e * D , D * n + d_U) * (tab_grad(nf_tot + d_X + e * D , D * n + d_U) + tab_grad(nf_tot + d_U + e * D , D * n + d_X) ) ;
+          }
+      }
+
+  // Second membre
+  for(int e = 0 ; e < ne ; e++)
+    for(int n = 0; n<N ; n++)
+      {
+        double secmem_en = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n); // So the production is always negative for tau and positive for omega
+        if (Type_diss == "tau")
+          secmem_en = -std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) );
+//          secmem_en *=       tab_diss(e, n)*tab_diss(e, n)/std::max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
+
+        else if (Type_diss == "omega")
+          secmem_en =  std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) );
+//          secmem_en = std::max( 0.    , pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( prod_scal_gu_omega(e, n)  - 2/3. * tab_diss(e, n) * trace_gu_omega(e, n) ) );
+
+// Court-circuitage du calcul de la viscosite turbulente dans la production de omega => forme directe
+        /*        secmem_en *= (-1)* ((tab_diss(e, n) <= 0) ? 0 : 1/(std::max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
+                  secmem_en *= (-1) * tab_diss(e, n) * 1/tab_pk(e,n) * (1 - (tab_k(e, n) - tab_pk(e,n))/tab_pk(e,n) ) ; */
+
+        secmem(e, n) += secmem_en;
+
+      }
+
   // Derivees
   for (auto &&i_m : matrices)
     {
@@ -123,67 +161,77 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           for (int e = 0; e < ne; e++)
             for(int n = 0; n<N ; n++)
               {
-                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-                if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-                  deriv *=    pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
-                else deriv *= pe(e) * ve(e) * (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
-                mat(N * e + n, N * e + n) += deriv;
+//                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
+//                if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
+//                  deriv *=    pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
+//                else deriv *= pe(e) * ve(e) * (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
+//                mat(N * e + n, N * e + n) += deriv;
+
+                // Ici test linearisations
+
+                double deriv = 0. ;
+                if (pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) > 0. )
+                  deriv = - pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * prod_scal_gu_omega(e, n) * 2. * tab_pdiss(e, n);
+                mat(N * e + n, N * e + n) -= deriv;
               }
         }
 
-      else if (i_m.first == "omega")
-        {
-          Matrice_Morse& mat = *i_m.second;
-          for (int e = 0; e < ne; e++)
-            for(int n = 0; n<N ; n++)
+      /*      else if (i_m.first == "omega")
               {
-                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-                if (tab_diss(e, n) <= 0) deriv *= 0 ;
-                else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                else deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) / tab_k(e, n) ;
-                mat(N * e + n, N * e + n) += deriv;
+                Matrice_Morse& mat = *i_m.second;
+                for (int e = 0; e < ne; e++)
+                  for(int n = 0; n<N ; n++)
+                    {
+                                      double deriv = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) ; // So the production is always negative for tau and positive for omega
+
+                                      if (tab_diss(e, n) <= 0) deriv *= 0 ;
+                                      else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
+                                      else deriv *= 1/tab_pk(e,n) * (2 - tab_k(e, n)/tab_pk(e,n) ) ;
+
+                                      mat(N * e + n, N * e + n) += deriv;
+
+                                      // test linearisation
+                                                     mat(N * e + n, N * e + n) += deriv ;
+
+                      if ( (pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( prod_scal_gu_omega(e, n)  - 2/D * tab_diss(e, n) * trace_gu_omega(e, n) ) )       >   0.)
+                        mat(N * e + n, N * e + n)  -= pe(e) * ve(e) * alpha_omega_ * tab_alp(e, n) * tab_rho(e, n) * ( - 2/D * trace_gu_omega(e, n) ) ;
+
+                    }
               }
-        }
+      */
 
-      else if (i_m.first == "k")
-        {
-          Matrice_Morse& mat = *i_m.second;
-          if (Type_diss == "tau")
-            {
-              for (int e = 0; e < ne; e++)
-                for(int n = 0; n<N ; n++)
+// Court-circuitage du calcul de la viscosite turbulente dans la production de omega et tau => pas de derivee en k
+      /*
+            else if (i_m.first == "k")
+              {
+                Matrice_Morse& mat = *i_m.second;
+                if (Type_diss == "tau")
                   {
-                    double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-                    if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-                      deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
-                    else deriv *= 0;
-                    mat(N * e + n, N * e + n) += deriv;
+                    for (int e = 0; e < ne; e++)
+                      for(int n = 0; n<N ; n++)
+                        {
+                          double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
+                          if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
+                            deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
+                          else deriv *= 0;
+                          mat(N * e + n, N * e + n) += deriv;
+                        }
                   }
-            }
-          else if (Type_diss == "omega")
-            for (int e = 0; e < ne; e++)
-              for(int n = 0; n<N ; n++)
-                {
-                  double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-                  if (tab_diss(e, n) <= 0) deriv *= 0 ;
-                  else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                  else deriv *= pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
-                  mat(N * e + n, N * e + n) += deriv;
-                }
 
+      // Court-circuitage du calcul de la viscosite turbulente dans la production de omega => pas de derivee en k
+                          else if (Type_diss == "omega")
+                            for (int e = 0; e < ne; e++)
+                              for(int n = 0; n<N ; n++)
+                                {
+                                  double deriv = std::min(prod_scal(e, n),0.) * pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) ; // So the production is always negative for tau and positive for omega
+                                                    if (tab_diss(e, n) <= 0) deriv *= 0 ;
+                                                    else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
+                                                    else deriv *= pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
 
-        }
+                                  // test linearisation
+                                  mat(N * e + n, N * e + n) += 0.  * deriv * tab_diss(e, n) * (-1.)/(tab_pk(e,n) * tab_pk(e,n)) ;
+                                }
+              }
+      */
     }
-
-  // Second membre
-  for(int e = 0 ; e < ne ; e++)
-    for(int n = 0; n<N ; n++)
-      {
-        double secmem_en = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
-        if (Type_diss == "tau")
-          secmem_en *= pe(e) * ve(e) *      alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/std::max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
-        else if (Type_diss == "omega")
-          secmem_en *= pe(e) * ve(e) * (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : 1/(std::max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
-        secmem(e, n) += secmem_en;
-      }
 }

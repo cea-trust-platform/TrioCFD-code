@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,45 +12,35 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Flux_parietal_adaptatif.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Flux_parietal_adaptatif_included
-#define Flux_parietal_adaptatif_included
+#ifndef Rupture_bulles_1groupe_Yao_Morel_included
+#define Rupture_bulles_1groupe_Yao_Morel_included
+
+#include <TRUSTTabs_forward.h>
+#include <Rupture_bulles_1groupe_base.h>
 #include <TRUSTTab.h>
-#include <Flux_parietal_base.h>
-#include <Ref_Correlation.h>
 
-/*! @brief classe Flux_parietal_adaptatif classe qui implemente une correlation de flux parietal monophasique
- *
- *       pour un ecoulement turbulent avec une loi de paroi adaptative
- *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
- *
- *
+/*! @brief
  *
  */
-class Flux_parietal_adaptatif : public Flux_parietal_base
+
+class Rupture_bulles_1groupe_Yao_Morel : public Rupture_bulles_1groupe_base
 {
-  Declare_instanciable(Flux_parietal_adaptatif);
+  Declare_instanciable(Rupture_bulles_1groupe_Yao_Morel);
 public:
-  virtual void qp(int N, int f, double D_h, double D_ch,
-                  const double *alpha, const double *T, const double p, const double *v, const double Tp,
-                  const double *lambda, const double *mu, const double *rho, const double *Cp,
-                  DoubleTab *qpk, DoubleTab *da_qpk, DoubleTab *dp_qpk, DoubleTab *dv_qpk, DoubleTab *dTf_qpk, DoubleTab *dTp_qpk,
-                  DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi,
-                  DoubleTab *d_nuc, int& nonlinear) const override;
+  void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                   const DoubleTab& rho, const DoubleTab& nu, const DoubleTab& sigma, double Dh,
+                   const DoubleTab& ndv, const DoubleTab& d_bulles,
+                   const DoubleTab& eps, const DoubleTab& k_turb,
+                   DoubleTab& coeff) const  override ;
 
-  virtual void completer() override;
+private:
+  int n_l = -1;
 
-protected :
-  double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;
+  double Kb1 = 1.6 ;
+  double Kb2 = 0.42 ;
+  double We_cr = 1.24 ;
 
-  REF(Correlation) correlation_loi_paroi_;
 };
 
 #endif

@@ -81,7 +81,7 @@ Lire pb
 	
     correlations
     {
-    	loi_paroi adaptative
+    	loi_paroi adaptative { }
 	flux_parietal adaptatif
     }
     QDM_Multiphase

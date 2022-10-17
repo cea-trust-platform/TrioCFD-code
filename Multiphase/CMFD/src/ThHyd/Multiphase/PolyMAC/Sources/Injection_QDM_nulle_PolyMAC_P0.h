@@ -14,23 +14,26 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Rupture_Yao_Morel.h
+// File:        Correction_Lubchenko_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Rupture_Yao_Morel_included
-#define Rupture_Yao_Morel_included
+#ifndef Injection_QDM_nulle_PolyMAC_P0_included
+#define Injection_QDM_nulle_PolyMAC_P0_included
 #include <Source_base.h>
-#include <math.h>
 
-/*! @brief classe Rupture_Yao_Morel
+/*! @brief classe Injection_QDM_nulle_PolyMAC_P0 Correction de la QDM d'un fluide de l'écoulement quand on en injecte
+ *
+ *         un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
+ *
+ *
  *
  */
-class Rupture_Yao_Morel: public Source_base
+class Injection_QDM_nulle_PolyMAC_P0: public Source_base
 {
-  Declare_instanciable(Rupture_Yao_Morel);
+  Declare_instanciable(Injection_QDM_nulle_PolyMAC_P0);
 public :
   int has_interface_blocs() const override
   {
@@ -39,14 +42,13 @@ public :
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void check_multiphase_compatibility() const override {}; //of course
+  void completer() override;
 
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
+
 protected:
-  double Kb1 = 1.6 ;
-  double Kb2 = 0.42 ;
-  double We_cr = 1.24 ;
 };
 
 #endif

@@ -27,9 +27,11 @@
 #include <Zone_Poly_base.h>
 #include <TRUSTTrav.h>
 #include <Neumann_loi_paroi.h>
+#include <Dirichlet_loi_paroi.h>
 #include <Paroi_frottante_loi.h>
 #include <Echange_impose_base.h>
 #include <Cond_lim_base.h>
+#include <Param.h>
 #include <math.h>
 #include <Nom.h>
 #include <Motcle.h>
@@ -45,6 +47,10 @@ Sortie& Loi_paroi_adaptative::printOn(Sortie& os) const
 
 Entree& Loi_paroi_adaptative::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("eps_u_tau", &eps_u_tau_);
+  param.lire_avec_accolades_depuis(is);
+
   return is;
 }
 
@@ -73,6 +79,8 @@ void Loi_paroi_adaptative::completer()
         Cond_lim& cond_lim_loc = pb_.valeur().equation(i).zone_Cl_dis()->les_conditions_limites(j);
         if sub_type(Neumann_loi_paroi, cond_lim_loc.valeur())
           ref_cast(Neumann_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+        if sub_type(Dirichlet_loi_paroi, cond_lim_loc.valeur())
+          ref_cast(Dirichlet_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         else if sub_type(Paroi_frottante_loi, cond_lim_loc.valeur())
           ref_cast(Paroi_frottante_loi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         else if sub_type(Echange_impose_base, cond_lim_loc.valeur())
@@ -139,8 +147,8 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
 double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)
 {
-  double eps = 1.e-6;
-  int iter_max = 50;
+  double eps = eps_u_tau_;
+  int iter_max = 60;
   int n_iter = 0;
 
   double u_tau_1 = 1. ;

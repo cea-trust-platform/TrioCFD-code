@@ -14,30 +14,30 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_k_simple.cpp
+// File:        Cond_lim_k_complique_transition_flux_nul_demi.cpp
 // Directory:   $TRUST_ROOT/src/ThSol
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Cond_lim_k_simple.h>
+#include <Cond_lim_k_complique_transition_flux_nul_demi.h>
 #include <Energie_cinetique_turbulente.h>
 #include <Loi_paroi_adaptative.h>
 #include <Frontiere_dis_base.h>
 #include <Pb_Multiphase.h>
-#include <Zone_VF.h>
+#include <Zone_Poly_base.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
 
-Implemente_instanciable(Cond_lim_k_simple,"Cond_lim_k_simple",Echange_global_impose);
+Implemente_instanciable(Cond_lim_k_complique_transition_flux_nul_demi,"Cond_lim_k_complique_transition_flux_nul_demi",Echange_global_impose);
 
 
-Sortie& Cond_lim_k_simple::printOn(Sortie& s ) const
+Sortie& Cond_lim_k_complique_transition_flux_nul_demi::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-Entree& Cond_lim_k_simple::readOn(Entree& s )
+Entree& Cond_lim_k_complique_transition_flux_nul_demi::readOn(Entree& s )
 {
   h_imp_.typer("Champ_front_vide");
   le_champ_front.typer("Champ_front_vide");
@@ -45,13 +45,13 @@ Entree& Cond_lim_k_simple::readOn(Entree& s )
   return s;
 }
 
-void Cond_lim_k_simple::completer()
+void Cond_lim_k_complique_transition_flux_nul_demi::completer()
 {
   if (!sub_type(Energie_cinetique_turbulente, zone_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
   if (zone_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
-void Cond_lim_k_simple::liste_faces_loi_paroi(IntTab& tab)
+void Cond_lim_k_complique_transition_flux_nul_demi::liste_faces_loi_paroi(IntTab& tab)
 {
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
   int N = tab.line_size();
@@ -61,7 +61,7 @@ void Cond_lim_k_simple::liste_faces_loi_paroi(IntTab& tab)
       tab(f + f1, n) |= 1;
 }
 
-int Cond_lim_k_simple::compatible_avec_eqn(const Equation_base& eqn) const
+int Cond_lim_k_complique_transition_flux_nul_demi::compatible_avec_eqn(const Equation_base& eqn) const
 {
   Motcle dom_app=eqn.domaine_application();
   Motcle Turbulence="Turbulence";
@@ -72,10 +72,13 @@ int Cond_lim_k_simple::compatible_avec_eqn(const Equation_base& eqn) const
   return 0;
 }
 
-int Cond_lim_k_simple::initialiser(double temps)
+int Cond_lim_k_complique_transition_flux_nul_demi::initialiser(double temps)
 {
   h_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
+
+  h_grad_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
 
   K_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(K_);
@@ -88,53 +91,100 @@ int Cond_lim_k_simple::initialiser(double temps)
   return 1;
 }
 
-double Cond_lim_k_simple::T_ext(int i) const
+double Cond_lim_k_complique_transition_flux_nul_demi::T_ext(int i) const
 {
   return K_(i,0);
 }
 
-double Cond_lim_k_simple::T_ext(int i, int j) const
+double Cond_lim_k_complique_transition_flux_nul_demi::T_ext(int i, int j) const
 {
   return K_(i,j);
 }
 
-double Cond_lim_k_simple::h_imp(int i) const
+double Cond_lim_k_complique_transition_flux_nul_demi::h_imp(int i) const
 {
   return h_(i,0);
 }
 
-double Cond_lim_k_simple::h_imp(int i, int j) const
+double Cond_lim_k_complique_transition_flux_nul_demi::h_imp(int i, int j) const
 {
   return h_(i,j);
 }
 
-void Cond_lim_k_simple::mettre_a_jour(double tps)
+double Cond_lim_k_complique_transition_flux_nul_demi::h_imp_grad(int i) const
+{
+  return h_grad_(i,0);
+}
+
+double Cond_lim_k_complique_transition_flux_nul_demi::h_imp_grad(int i, int j) const
+{
+  return h_grad_(i,j);
+}
+
+void Cond_lim_k_complique_transition_flux_nul_demi::mettre_a_jour(double tps)
 {
   if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
 }
 
-void Cond_lim_k_simple::me_calculer()
+void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_VF& zone = ref_cast(Zone_VF, zone_Cl_dis().equation().zone_dis().valeur());
-  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
+  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().zone_dis().valeur());
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
+                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu(),
+                             &nu_visc = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs(),
+                              &vit = zone_Cl_dis().equation().probleme().get_champ("vitesse").valeurs();
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
+  int D = dimension, nb_faces_tot = zone.nb_faces_tot() ;
+  const DoubleTab& n_f = zone.face_normales();
+  const DoubleVect& fs = zone.face_surfaces();
   const IntTab& f_e = zone.face_voisins();
 
   if (mu.nb_dim() >= 3) Process::exit("Cond_lim_k_simple : transport of k must be SGDH !");
+
+  int n = 0 ; // Carrying phase is 0 for turbulent flows
 
   for (int f =0 ; f < nf ; f++)
     {
       int f_zone = f + f1; // number of the face in the zone
       int e_zone = f_e(f_zone,0);
 
-      h_(f, 0) = mu(e_zone, 0) / y(f_zone) * (1-std::tanh( std::pow(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)/20.,2))); // Coeff d'echange de mu/y
+      double u_orth = 0 ;
+      for (int d = 0; d <D ; d++) u_orth -= vit(nb_faces_tot + e_zone * D+d, n)*n_f(f_zone,d)/fs(f_zone); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+
+      DoubleTrav u_parallel(D);
+      for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nb_faces_tot + e_zone * D + d, n) - u_orth*(-n_f(f_zone,d))/fs(f_zone) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+      double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
+
+      double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_zone, 0), y(f_zone, 0)/2.);
+      double y_p = y(f_zone, 0) * norm_u_parallel / nu_visc(e_zone, 0);
+
+      h_(f, 0) = 2.*mu(e_zone, 0)/y(f_zone, 0)   * ( 1 - std::tanh(  std::pow( y_p/600.,3)  ) );
+      h_grad_(f, 0) = 2./y(f_zone, 0)            * ( 1 - std::tanh(  std::pow( y_p/600.,3)  ) );
+      K_(f, 0) = calc_k(y(f_zone, 0)/2., u_tau_demi, nu_visc(e_zone, 0));
+
     }
 
   h_.echange_espace_virtuel();
+  h_grad_.echange_espace_virtuel();
+  K_.echange_espace_virtuel();
+}
+
+double Cond_lim_k_complique_transition_flux_nul_demi::calc_k(double y, double u_tau, double visc)
+{
+  double y_p = y * u_tau / visc;
+
+  double  f1 = (y_p-1) *(y_p-1)*(y_p-1)/30 ;
+
+  double  f2 = 1/std::sqrt(beta_k_)-.08* std::pow(     std::abs(4.6 - std::log(y_p))    , 3 ) ;
+
+  double  b1 = std::tanh(  std::pow(y_p/4.,10)  ) ;
+
+  double  b2 = std::tanh(  std::pow(y_p/2500.,1.4)  ) ;
+
+  double  f3 = 1/std::sqrt(beta_k_)*.25 ;
+
+  return u_tau*u_tau*(std::max((1-b1)*f1 + b1*f2, 0.)*(1-b2)+b2*f3) ;
 }

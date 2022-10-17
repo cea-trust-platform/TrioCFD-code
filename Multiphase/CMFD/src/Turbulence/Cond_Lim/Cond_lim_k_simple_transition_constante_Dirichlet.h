@@ -14,41 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Coalescence_Yao_Morel.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Cond_lim_k_simple_transition_constante_Dirichlet.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
+// Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Coalescence_Yao_Morel_included
-#define Coalescence_Yao_Morel_included
-#include <Source_base.h>
-#include <math.h>
+#ifndef Cond_lim_k_simple_transition_constante_Dirichlet_included
+#define Cond_lim_k_simple_transition_constante_Dirichlet_included
 
-/*! @brief classe Variation_rho_Yao_Morel
+#include <TRUSTTab.h>
+#include <Dirichlet_loi_paroi.h>
+#include <Ref_Correlation.h>
+
+/*! @brief Classe Cond_lim_tau_omega_simple_demi
  *
  */
-class Coalescence_Yao_Morel: public Source_base
+class Cond_lim_k_simple_transition_constante_Dirichlet : public Dirichlet_loi_paroi
 {
-  Declare_instanciable(Coalescence_Yao_Morel);
-public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-protected:
-  double Kc1 = 2.86 ;
-  double Kc2 = 1.922 ;
-  double Kc3 = 1.017 ;
-  double alpha_max_1_3 = std::pow(M_PI/6., 1./3.) ;
-  double We_cr = 1.24 ;
+  Declare_instanciable(Cond_lim_k_simple_transition_constante_Dirichlet);
+
+public :
+  int compatible_avec_eqn(const Equation_base&) const override;
+  virtual int initialiser(double temps) override;
+  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps) override;
+  double calc_k(double y, double u_tau, double visc);
+  virtual void liste_faces_loi_paroi(IntTab&) override;
+  virtual void completer() override;
+
+  virtual double val_imp(int i) const override {return d_(i,0);};
+  virtual double val_imp(int i, int j) const override {return d_(i,j);};
+  virtual double val_imp_au_temps(double temps, int i) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
+  virtual double val_imp_au_temps(double temps, int i, int j) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
+
+protected :
+  void me_calculer();
+
+  DoubleTab d_;
+
+  double von_karman_ = 0.41 ;
+  double beta_k_ = 0.09;
 };
 
 #endif
