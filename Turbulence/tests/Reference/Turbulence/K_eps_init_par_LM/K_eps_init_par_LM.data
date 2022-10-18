@@ -106,7 +106,11 @@ Read pb
 					bas      paroi
                          }
                          initial_conditions {
-			    k_Eps Champ_fonc_med last_time init_K_eps.med dom K_eps_from_nut elem 0
+			    k_Eps Champ_Fonc_MED { domain dom 
+                                 file init_K_eps.med 
+                                 field K_eps_from_nut 
+                                 last_time 
+                                 }
                                 }
 			}
 			turbulence_paroi loi_standard_hydr
