@@ -54,7 +54,12 @@ Read pb
 		convection { Amont }
 		diffusion { }
 		initial_conditions {
-			vitesse Champ_fonc_med last_time grossier.med dom vitesse som 0.
+			vitesse Champ_Fonc_MED { domain dom 
+                               file grossier.med 
+                               field vitesse 
+                               loc som 
+                               last_time 
+                               }
 			}
 		boundary_conditions {
 			 Haut1 Paroi_Fixe
@@ -88,7 +93,11 @@ Read pb
 		      			SortieHaute frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
 			   	}
 			   	initial_conditions {
-			      		k_Eps Champ_fonc_med last_time grossier.med dom K_EPS elem 0.
+			      		k_Eps Champ_Fonc_MED { domain dom 
+                                       file grossier.med 
+                                       field K_EPS 
+                                       last_time 
+                                       }
 			  	}
 			 }
 			 Prandtl_K 1
