@@ -149,7 +149,7 @@ void Loi_paroi_Ramstorfer::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
         y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
         y_p(nf_tot+D*e, n) = y_p(f, n);
         y(f,n) = y_loc;
-        if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n), nu_visc(e, n), y_loc, &d_bulles(e, 0), &alpha(e, 0))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n), nu_visc(e, n), y_loc, &d_bulles(e, 0), &alpha(e, 0))));
+        if ( std::fabs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n), nu_visc(e, n), y_loc, &d_bulles(e, 0), &alpha(e, 0))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n), nu_visc(e, n), y_loc, &d_bulles(e, 0), &alpha(e, 0))));
         u_p(f, n) = norm_u_parallel/u_t(f, n);
         d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n), nu_visc(e, n), y_loc, &d_bulles(e, 0), &alpha(e, 0));
       }
@@ -171,7 +171,7 @@ double Loi_paroi_Ramstorfer::calc_u_tau_loc(double u_par, double nu, double y, c
   eps *= u_tau_0;
 
   /* Implementing Dichotomic method */
-  while ((abs(u_tau_1-u_tau_0)>eps) and (n_iter <= iter_max))
+  while ((std::fabs(u_tau_1-u_tau_0)>eps) and (n_iter <= iter_max))
     {
       double f_0 = to_zero( (u_tau_0+u_tau_1)/2, u_par, nu, y, d_bulles, alpha);
       if (f_0 > 0) u_tau_1 -= (u_tau_1-u_tau_0)/2 ;
