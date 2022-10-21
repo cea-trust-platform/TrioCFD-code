@@ -114,7 +114,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
   int N = pvit.line_size() , Np = press.line_size(), Nk = (k_turb) ? (*k_turb).dimension(1) : 1, D = dimension,
       nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot(),
       cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
-  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), nut_l(N), k_l(Nk), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
+  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), nut_l(N), k_l(Nk), d_b_l(N), coeff(N, N); //arguments pour coeff
 
   DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
   if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
@@ -175,10 +175,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
                 for (int d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
 
                 fac *= beta_disp_*pf(f) * vf(f) ;
-                secmem(f, k)   += fac * coeff(k, n_l, 0) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
-                secmem(f, k)   += fac * coeff(n_l, k, 0) * 1/y_faces(f) * sum_alphag_wall;
-                secmem(f, n_l) -= fac * coeff(k, n_l, 0) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
-                secmem(f, n_l) -= fac * coeff(n_l, k, 0) * 1/y_faces(f) * sum_alphag_wall;
+                secmem(f, k)   += fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
+                secmem(f, k)   += fac * coeff(n_l, k) * 1/y_faces(f) * sum_alphag_wall;
+                secmem(f, n_l) -= fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
+                secmem(f, n_l) -= fac * coeff(n_l, k) * 1/y_faces(f) * sum_alphag_wall;
               }
       }
 
@@ -220,10 +220,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
               {
                 double fac = beta_disp_*pe(e) * ve(e);
 
-                secmem(i, k)   += fac * coeff(k, n_l, 0) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
-                secmem(i, k)   += fac * coeff(n_l, k, 0) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
-                secmem(i, n_l) -= fac * coeff(k, n_l, 0) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
-                secmem(i, n_l) -= fac * coeff(n_l, k, 0) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
+                secmem(i, k)   += fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
+                secmem(i, k)   += fac * coeff(n_l, k) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
+                secmem(i, n_l) -= fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
+                secmem(i, n_l) -= fac * coeff(n_l, k) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
               }
     }
 }
