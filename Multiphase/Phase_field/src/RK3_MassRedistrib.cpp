@@ -12,145 +12,24 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        RK3_MassRedistrib.cpp
-// Directory:   $TRUST_ROOT/src/Kernel/Schemas_Temps
-// Version:     /main/29
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#include "RK3_MassRedistrib.h"
-
-#include <Equation.h>
 #include <Mass_Redistribution_Phase_Field.h>
 #include <Convection_Diffusion_Phase_field.h>
 #include <Source_Con_Phase_field.h>
+#include <RK3_MassRedistrib.h>
+#include <Equation.h>
 
+Implemente_instanciable(RK3_MassRedistrib,"Runge_Kutta_ordre_3_MassRedistrib",RK3);
 
-Implemente_instanciable(RK3_MassRedistrib,"Runge_Kutta_ordre_3_MassRedistrib",Schema_Temps_base);
+Sortie& RK3_MassRedistrib::printOn(Sortie& s) const { return  RK3::printOn(s); }
+Entree& RK3_MassRedistrib::readOn(Entree& s) { return RK3::readOn(s) ; }
 
-
-// Description:
-//    Simple appel a: Schema_Temps_base::printOn(Sortie& )
-//    Ecrit le schema en temps sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-Sortie& RK3_MassRedistrib::printOn(Sortie& s) const
-{
-  return  Schema_Temps_base::printOn(s);
-}
-
-
-// Description:
-//    Lit le schema en temps a partir d'un flot d'entree.
-//    Simple appel a: Schema_Temps_base::readOn(Entree& )
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-Entree& RK3_MassRedistrib::readOn(Entree& s)
-{
-  return Schema_Temps_base::readOn(s) ;
-}
-
-
-////////////////////////////////
-//                            //
-// Caracteristiques du schema //
-//                            //
-////////////////////////////////
-
-
-// Description:
-//    Renvoie le nombre de valeurs temporelles a conserver.
-//    Ici : n et n+1, donc 2.
-int RK3_MassRedistrib::nb_valeurs_temporelles() const
-{
-  return 2 ;
-}
-
-// Description:
-//    Renvoie le nombre de valeurs temporelles futures.
-//    Ici : n+1, donc 1.
-int RK3_MassRedistrib::nb_valeurs_futures() const
-{
-  return 1 ;
-}
-
-// Description:
-//    Renvoie le le temps a la i-eme valeur future.
-//    Ici : t(n+1)
-double RK3_MassRedistrib::temps_futur(int i) const
-{
-  assert(i==1);
-  return temps_courant()+pas_de_temps();
-}
-
-// Description:
-//    Renvoie le temps que doivent rendre les champs a
-//    l'appel de valeurs()
-//    Ici : t(n+1)
-double RK3_MassRedistrib::temps_defaut() const
-{
-  return temps_courant()+pas_de_temps();
-}
-
-/////////////////////////////////////////
-//                                     //
-// Fin des caracteristiques du schema  //
-//                                     //
-/////////////////////////////////////////
-
-
-// Description:
-//    Time step with Runge Kutta order 3,
-//    on the equation eqn.
-//    Runge Kutta order 3
-//     (Williamson version, case 7) is written:
-//     q1 = h f(x0)
-//     x1 = x0 + b1 q1
-//     q2 = h f(x1) + a2 q1
-//     x2 = x1 + b2 q2
-//     q3 = h f(x2) + a3 q2
-//     x3 = x2 + b3 q3
-//     with a1=0, a2=-5/9, a3=-153/128
-//          b1=1/3, b2=15/16, b3=8/15
 int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
+  if ( nb_pas_dt()>=0 && nb_pas_dt()<=100 && facsec_ == 1 ) print_warning(100);
 
-  // Warning sur les 100 premiers pas de temps si facsec est egal a 1
-  // pour faire reflechir l'utilisateur
-  int nw = 100;
-  if ( nb_pas_dt()>=0 && nb_pas_dt()<=nw && facsec_ == 1 )
-    {
-      Cerr << finl << "**** Advice (printed only on the first " << nw << " time steps)****" << finl;
-      Cerr << "You are using Runge Kutta schema order 3 so if you wish to increase the time step, try facsec between 1 and 3." << finl;
-    }
-
-  double a2=-5./9.;
-  double a3=-153./128.;
-  double b1=1./3.;
-  double b2=15./16.;
-  double b3=8./15.;
+  const double a2 = -5. / 9., a3 = -153. / 128.;
+  const double b1 = 1. / 3., b2 = 15. / 16., b3 = 8. / 15.;
 
   DoubleTab& xi=eqn.inconnue().valeurs();
   DoubleTab& xipls1=eqn.inconnue().futur();
@@ -219,14 +98,9 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   eqn.zone_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   xipls1.echange_espace_virtuel();
 
-
   /*  Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);*/
-
 
   // xi = x0;
   xi = present;
-
-
   return 1;
 }
-
