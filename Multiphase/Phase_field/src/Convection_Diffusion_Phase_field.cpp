@@ -49,22 +49,12 @@ Convection_Diffusion_Phase_field::Convection_Diffusion_Phase_field()
     nom[0]="potentiel_chimique_generalise";
   */
 }
-/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
- *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
+
 Sortie& Convection_Diffusion_Phase_field::printOn(Sortie& is) const
 {
   return Convection_Diffusion_Concentration::printOn(is);
 }
 
-
-/*! @brief cf Convection_Diffusion_Concentration::readOn(is)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
- */
 Entree& Convection_Diffusion_Phase_field::readOn(Entree& is)
 {
   Convection_Diffusion_Concentration::readOn(is);

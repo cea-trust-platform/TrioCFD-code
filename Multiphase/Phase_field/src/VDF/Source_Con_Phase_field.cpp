@@ -37,7 +37,7 @@
 #include <SolveurSys.h>
 #include <EChaine.h>
 #include <MD_Vector_composite.h>
-#include <ConstDoubleTab_parts.h>
+#include <TRUSTTab_parts.h>
 
 Implemente_instanciable(Source_Con_Phase_field,"Source_Con_Phase_field_VDF_P0_VDF",Source_Con_Phase_field_base);
 // XD source_con_phase_field source_base source_con_phase_field 1 Keyword to define the source term of the Cahn-Hilliard equation.
@@ -2489,7 +2489,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                       dvar2=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
                       if(kappa_moy_==2)
                         {
-                          kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
+                          kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
                         }
                       else if(kappa_moy_==1)
                         {
@@ -2510,7 +2510,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                   // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
                   if (voisin>old_tri)
                     {
-                      min_tri=min(min_tri,voisin);
+                      min_tri=std::min(min_tri,voisin);
                       if(min_tri==voisin)
                         {
                           dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -2518,7 +2518,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                     }
                 }
 
-              //Cerr <<" min_tri = min(min_tri,voisin) if voisin>old_tri ====== "<<min_tri<<finl;
+              //Cerr <<" min_tri = std::min(min_tri,voisin) if voisin>old_tri ====== "<<min_tri<<finl;
               // Si l'ancien minimum est inferieur a elem et le nouveau superieur, il faut traiter elem juste avant le nouveau voisin
               if (old_tri<elem && min_tri>elem)
                 {
@@ -2531,7 +2531,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               // On complete les tableaux avec les valeurs dans les voisins non aux bords du domaine
               if (kappa_moy_==2)
                 {
-                  kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
+                  kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
                 }
               else if(kappa_moy_==1)
                 {
@@ -2614,7 +2614,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                   // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
                   if (voisin>old_tri)
                     {
-                      min_tri=min(min_tri,voisin);
+                      min_tri=std::min(min_tri,voisin);
                       if(min_tri==voisin)
                         {
                           dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -2862,7 +2862,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                               dvar2=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
                               if(kappa_moy_==2)
                                 {
-                                  kappa_naire_interpolee=pow(dabs(kappa_Matrix_var(elem,j)*kappa_Matrix_var(voisin,j)),0.5);    // Moyenne geometrique
+                                  kappa_naire_interpolee=pow(std::fabs(kappa_Matrix_var(elem,j)*kappa_Matrix_var(voisin,j)),0.5);    // Moyenne geometrique
                                 }
                               else if(kappa_moy_==1)
                                 {
@@ -2883,7 +2883,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                           // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
                           if (voisin>old_tri)
                             {
-                              min_tri=min(min_tri,voisin);
+                              min_tri=std::min(min_tri,voisin);
                               if(min_tri==voisin)
                                 {
                                   dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -2903,7 +2903,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                       // On complete les tableaux avec les valeurs dans les voisins non aux bords du domaine
                       if (kappa_moy_==2)
                         {
-                          kappa_naire_interpolee=pow(dabs(kappa_Matrix_var(elem,j)*kappa_Matrix_var(min_tri,j)),0.5);    // Moyenne geometrique
+                          kappa_naire_interpolee=pow(std::fabs(kappa_Matrix_var(elem,j)*kappa_Matrix_var(min_tri,j)),0.5);    // Moyenne geometrique
                         }
                       else if(kappa_moy_==1)
                         {
@@ -3018,7 +3018,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                           // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
                           if (voisin>old_tri)
                             {
-                              min_tri=min(min_tri,voisin);
+                              min_tri=std::min(min_tri,voisin);
                               if(min_tri==voisin)
                                 {
                                   dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -3117,7 +3117,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                           // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
                           if (voisin>old_tri)
                             {
-                              min_tri=min(min_tri,voisin);
+                              min_tri=std::min(min_tri,voisin);
                               if(min_tri==voisin)
                                 {
                                   dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
