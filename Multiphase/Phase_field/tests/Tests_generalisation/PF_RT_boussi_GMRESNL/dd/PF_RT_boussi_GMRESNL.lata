@@ -1,0 +1,30 @@
+LATA_V2.1 Trio_U Version1.6 or later
+PF_RT_boussi_GMRESNL
+Trio_U verbosity=0
+Format BINAIRE,LITTLE_ENDIAN,INT32,F_INDEXING,C_ORDERING,F_MARKERS_SINGLE,REAL32
+GEOM dom type_elem=RECTANGLE
+CHAMP SOMMETS PF_RT_boussi_GMRESNL.lata.dom.0.0 geometrie=dom size=2304 composantes=2
+CHAMP ELEMENTS PF_RT_boussi_GMRESNL.lata.dom.0.0.elem geometrie=dom size=2209 composantes=4 format=INT32
+GEOM dom_boundaries_Gauche type_elem=SEGMENT
+CHAMP SOMMETS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Gauche.0.0 geometrie=dom_boundaries_Gauche size=48 composantes=2
+CHAMP ELEMENTS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Gauche.0.0.elem geometrie=dom_boundaries_Gauche size=47 composantes=2 format=INT32
+GEOM dom_boundaries_Haut type_elem=SEGMENT
+CHAMP SOMMETS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Haut.0.0 geometrie=dom_boundaries_Haut size=48 composantes=2
+CHAMP ELEMENTS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Haut.0.0.elem geometrie=dom_boundaries_Haut size=47 composantes=2 format=INT32
+GEOM dom_boundaries_Bas type_elem=SEGMENT
+CHAMP SOMMETS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Bas.0.0 geometrie=dom_boundaries_Bas size=48 composantes=2
+CHAMP ELEMENTS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Bas.0.0.elem geometrie=dom_boundaries_Bas size=47 composantes=2 format=INT32
+GEOM dom_boundaries_Droit type_elem=SEGMENT
+CHAMP SOMMETS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Droit.0.0 geometrie=dom_boundaries_Droit size=48 composantes=2
+CHAMP ELEMENTS PF_RT_boussi_GMRESNL.lata.dom_boundaries_Droit.0.0.elem geometrie=dom_boundaries_Droit size=47 composantes=2 format=INT32
+TEMPS 0.00000000e+00
+Champ VITESSE PF_RT_boussi_GMRESNL.lata.VITESSE.ELEM.dom.0.0000000000 geometrie=dom localisation=ELEM size=2209 nature=vector noms_compo=vitesseX_elem_dom,vitesseY_elem_dom composantes=2
+Champ CONCENTRATION PF_RT_boussi_GMRESNL.lata.CONCENTRATION.ELEM.dom.0.0000000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=CONCENTRATION_ELEM_dom0 composantes=1
+Champ MASSE_VOLUMIQUE PF_RT_boussi_GMRESNL.lata.MASSE_VOLUMIQUE.ELEM.dom.0.0000000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=MASSE_VOLUMIQUE_ELEM_dom0 composantes=1
+Champ VISCOSITE_DYNAMIQUE PF_RT_boussi_GMRESNL.lata.VISCOSITE_DYNAMIQUE.ELEM.dom.0.0000000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=VISCOSITE_DYNAMIQUE_ELEM_dom0 composantes=1
+TEMPS 7.00000000e-03
+Champ VITESSE PF_RT_boussi_GMRESNL.lata.VITESSE.ELEM.dom.0.0070000000 geometrie=dom localisation=ELEM size=2209 nature=vector noms_compo=vitesseX_elem_dom,vitesseY_elem_dom composantes=2
+Champ CONCENTRATION PF_RT_boussi_GMRESNL.lata.CONCENTRATION.ELEM.dom.0.0070000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=CONCENTRATION_ELEM_dom0 composantes=1
+Champ MASSE_VOLUMIQUE PF_RT_boussi_GMRESNL.lata.MASSE_VOLUMIQUE.ELEM.dom.0.0070000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=MASSE_VOLUMIQUE_ELEM_dom0 composantes=1
+Champ VISCOSITE_DYNAMIQUE PF_RT_boussi_GMRESNL.lata.VISCOSITE_DYNAMIQUE.ELEM.dom.0.0070000000 geometrie=dom localisation=ELEM size=2209 nature=scalar noms_compo=VISCOSITE_DYNAMIQUE_ELEM_dom0 composantes=1
+FIN

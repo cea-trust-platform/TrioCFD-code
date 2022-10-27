@@ -1,0 +1,220 @@
+# Instabilite de Rayleigh-Taylor par une methode phase field avec masse volumique variable #
+# PARALLEL OK #
+
+# Aide sur le parametrage a la fin de ce fichier #
+
+dimension 2
+
+Pb_Phase_field pb
+Domaine dom
+
+# BEGIN MESH #
+
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine -0.025 -0.025
+		Nombre_de_Noeuds 48 48
+		Longueurs 0.05 0.05
+		}
+		{
+		Bord Gauche X = -0.025  -0.025 <= Y <= 0.025
+		Bord Haut   Y =  0.025  -0.025 <= X <= 0.025
+		Bord Bas    Y = -0.025  -0.025 <= X <= 0.025
+		Bord Droit  X =  0.025  -0.025 <= Y <= 0.025
+		}
+}
+
+# END MESH #
+
+# BEGIN PARTITION
+
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Phase_field sch 
+Lire sch
+{
+	nb_pas_dt_max 10
+	tinit 0
+	tmax 10.0e-5
+	dt_min 0.1e-5
+	dt_max 0.1e-5
+	dt_impr 0.001
+	dt_sauv 100
+	schema_CH Runge_Kutta_ordre_3 { }	
+	schema_NS Runge_Kutta_ordre_3 { }
+}
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+{
+   Constituant 
+{
+	coefficient_diffusion Champ_Uniforme 1 0.0
+}
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0. 0.981
+   	mu Champ_Uniforme 1 1.e-1
+   	rho Champ_Uniforme 1 1000.
+   	beta_co Champ_Fonc_Fonction pb concentration 1 1.0
+   #	beta_co Champ_Uniforme 1 1. #
+   }
+   
+   	Navier_Stokes_phase_field
+	{
+		solveur_pression GCP {
+				precond ssor { omega 1.5 }
+				seuil 1.e-15
+		}
+		convection { quick }
+		approximation_de_boussinesq		   oui { }
+		diffusion { }
+                sources {
+ 			Source_Qdm_Phase_field {
+				forme_du_terme_source	   2
+			}
+		}
+		gravite					   2 0. -0.981
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+		}
+		boundary_conditions {
+			Haut paroi_fixe
+			Droit paroi_fixe
+			Bas paroi_fixe
+			Gauche paroi_fixe
+		}
+	}
+ 	Convection_diffusion_Phase_field {
+		diffusion { negligeable }
+		convection { quick }
+	        sources { 
+			Source_Con_Phase_field {
+				Systeme_naire non  {
+					alpha                      .1406250000e-3
+					potentiel_chimique         { fonction (4.*val*(val+0.5)*(val-0.5)) }
+					beta                       115.2000000
+					kappa                      20.e-7
+					kappa_variable             { fonction (val+0.5)*(0.5-val) }
+				} 
+				Temps_d_affichage	   0
+				moyenne_de_kappa           harmonique
+				multiplicateur_de_kappa    6.
+				couplage_NS_CH             mutilde(n+1/2)
+				implicitation_CH           non
+				gmres_non_lineaire         non
+				seuil_cv_iterations_ptfixe 1.e-2
+				seuil_residu_ptfixe        1.e-2 
+				seuil_residu_gmresnl       1.e-10
+				dimension_espace_de_krylov 2
+				nb_iterations_gmresnl      10
+				residu_min_gmresnl         1.e-10
+				residu_max_gmresnl         1.e-4
+			}
+		}
+		potentiel_chimique_generalise 		   sans_energie_cinetique
+		boundary_conditions {
+			Haut paroi
+			Droit paroi
+			Bas paroi
+			Gauche paroi
+		}
+		conditions_initiales { 
+			concentration Champ_fonc_xyz dom 1 0.5*TANH(640.*(y+0.0125-0.01666666667*EXP(-0.2304e6*(x+0.025)*(x+0.025))))
+		}
+	}
+	Postraitement
+	{
+	 	format lata
+		Champs dt_post 1.e-5
+		{
+			vitesse elem
+			concentration elem
+			masse_volumique elem
+			viscosite_dynamique elem
+		}
+	}
+}
+
+Solve pb
+lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+
+Fin
+
+
+# Aide au parametrage - Bien respecter la syntaxe !!!
+
+- forme_du_terme_source
+	1 -> c grad(mutilde)
+	2 -> c grad(laplacien(c))
+	3 -> c grad(laplacien(c))-div((grad(c))^2)/2
+	4 -> -laplacien(c) grad(c)
+- approximation_de_boussinesq
+	non -> utilisationdu modele a rho variable
+	oui -> rho constant sauf dans le terme de gravite
+- gravite
+	intensite du champ de gravitation
+- alpha & beta
+	parametres de l'interface (=> epaisseur, tension ...)
+- kappa
+	valeur de la mobilite (cas constant)
+- kappa_variable
+	non -> on utilise kappa constant
+	oui -> on considere kappa variable (formule basee sur la valeur de kappa constant et c)
+- moyenne_de_kappa
+	arithmetique -> interpolation arithmetique (+) de kappa aux faces
+	harmonique -> interpolation harmonique (/) de kappa aux faces
+	geometrique -> interpolation geometrique (*) de kappa aux faces
+- multiplicateur_de_kappa
+	constante multiplicative de kappa variable pour garder une integrale constante
+- couplage_NS_CH
+	mutilde(n) -> on utilise mutilde(n) dans NS
+	mutilde(n+1/2) ->  on utilise mutilde(n+1/2) dans NS
+- implicitation_CH
+	non -> utilisation du schema explicite
+	oui -> utilisation de l'implicitation (point fixe ou gmres)
+- gmres_non_lineaire
+	non -> utilisation de l'algorithme du point fixe
+	oui -> utilisation de l'algorithme du gmres non lineaire
+- seuil_cv_iterations_ptfixe
+	seuil de convergence de (x(n+1)-x(n)) (x : vecteur solution du systeme implicite)
+- seuil_residu_ptfixe
+	seuil de l'inversion matricielle utilisee par l'algorithme du point fixe
+- seuil_residu_gmresnl
+	seuil de l'inversion de l'algorithme du gmres non lineaire
+- dimension_espace_de_krylov
+	dimension de l'espace de Krylov utilise dans le gmres non lineaire
+- nb_iterations_gmresnl
+	nombre d'iterations maximal par pas de temps pour l'algorithme du gmres non lineaire
+- residu_min_gmresnl
+	seuil minimum de convergence de l'algorithme du gmres non lineaire
+- residu_max_gmresnl
+	seuil maximum de convergence de l'algorithme du gmres non lineaire
+- rho_1
+	masse volumique de la phase 1
+- rho_2
+	masse volumique de la phase 2
+- potentiel_chimique_generalise
+	sans_energie_cinetique -> potentiel chimique generalise classique
+	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u^2/2 drho/dphi
+
+#
+ 

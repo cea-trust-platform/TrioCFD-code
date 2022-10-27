@@ -287,25 +287,41 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
 
   // on calcule Grad(div_alpha_rho_gradC)
   //-------------------------------------
-
-  const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
-  DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
-  if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
-  grad_div_alpha_rho_gradC=0.;
-  const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-  opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
-
-  DoubleTab rhoPF=eq_ns.rho().valeurs();
-  double rho_face;
-
-  // Division par rho0 necessaire dans le cas incompressible
-  //--------------------------------------------------------
-  if (boussi_==1)
+  if (type_systeme_naire==0)
     {
-      if(compressible==0) grad_div_alpha_rho_gradC /= rho0; // Cas approximation de Boussinesq
-    }
-  else if (boussi_==0)
-    {
+      const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
+      DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
+      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
+      grad_div_alpha_rho_gradC=0.;
+      const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
+      opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
+
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      double rho_face;
+
+      // Division par rho0 necessaire dans le cas incompressible
+      //--------------------------------------------------------
+      if (boussi_==1)
+        {
+          if(compressible==0) grad_div_alpha_rho_gradC /= rho0; // Cas approximation de Boussinesq
+        }
+      else if (boussi_==0)
+        {
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
+
+              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
+              grad_div_alpha_rho_gradC(fac) /= rho_face;
+            }
+        }
+
+      // on interpole c et on calcule la source
+      //------------------------------------------------
+
       for (int fac=ndeb; fac<nbfaces; fac++)
         {
           el0=face_voisins(fac,0);
@@ -313,30 +329,16 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
           vol0=volumes(el0);
           vol1=volumes(el1);
 
-          rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-          grad_div_alpha_rho_gradC(fac) /= rho_face;
-        }
-    }
-
-  // on interpole c et on calcule la source
-  //------------------------------------------------
-
-  for (int fac=ndeb; fac<nbfaces; fac++)
-    {
-      el0=face_voisins(fac,0);
-      el1=face_voisins(fac,1);
-      vol0=volumes(el0);
-      vol1=volumes(el1);
-
-      cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-      if (boussi_==1)
-        {
-          resu(fac) += cface*grad_div_alpha_rho_gradC(fac) / rho0; // Cas approximation de Boussinesq
-        }
-      else if (boussi_==0)
-        {
-          rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-          resu(fac) += cface*grad_div_alpha_rho_gradC(fac) / rho_face;
+          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+          if (boussi_==1)
+            {
+              resu(fac) += cface*grad_div_alpha_rho_gradC(fac) / rho0; // Cas approximation de Boussinesq
+            }
+          else if (boussi_==0)
+            {
+              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
+              resu(fac) += cface*grad_div_alpha_rho_gradC(fac) / rho_face;
+            }
         }
     }
   //===========================================================
@@ -366,85 +368,87 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 
   // on calcule Grad(div_alpha_rho_gradC)
   //-------------------------------------
-
-  const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
-  DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
-  if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
-  grad_div_alpha_rho_gradC=0.;
-  const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-  opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
-
-  DoubleTab rhoPF=eq_ns.rho().valeurs();
-  double rho_face;
-
-  // Division par rho0 necessaire dans le cas incompressible
-  //--------------------------------------------------------
-  if (boussi_==1)
+  if (type_systeme_naire==0)
     {
-      if(compressible==0) grad_div_alpha_rho_gradC /= rho0; // Cas approximation de Boussinesq
-    }
-  else if (boussi_==0)
-    {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+      const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
+      DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
+      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
+      grad_div_alpha_rho_gradC=0.;
+      const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
+      opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
+
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      double rho_face;
+
+      // Division par rho0 necessaire dans le cas incompressible
+      //--------------------------------------------------------
+      if (boussi_==1)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
-
-          rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-          grad_div_alpha_rho_gradC(fac) /= rho_face;
+          if(compressible==0) grad_div_alpha_rho_gradC /= rho0; // Cas approximation de Boussinesq
         }
-    }
-
-  // on calcule Grad(alpha_gradC_carre)
-  //-----------------------------------
-
-  const DoubleTab& alpha_gradC_carre=eq_c.get_alpha_gradC_carre();
-  DoubleTab& grad_alpha_gradC_carre=ref_cast_non_const(DoubleTab,  grad_alpha_gradC_carre_);
-  if (grad_alpha_gradC_carre.size()==0) grad_alpha_gradC_carre=eq_ns.inconnue().valeurs();
-  grad_alpha_gradC_carre=0.;
-  opgrad.calculer(alpha_gradC_carre,grad_alpha_gradC_carre);
-
-  // on interpole c et on calcule la source
-  //------------------------------------------------
-
-  if((compressible==0 && boussi_==1) || boussi_==0)
-    {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+      else if (boussi_==0)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
-
-          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-          rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-
-          if (boussi_==1)
+          for (int fac=ndeb; fac<nbfaces; fac++)
             {
-              resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - grad_alpha_gradC_carre(fac)/2.) / rho0; // Incompressible - Cas approximation de Boussinesq
-            }
-          else if (boussi_==0)
-            {
-              resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - grad_alpha_gradC_carre(fac)/2.) / rho_face;
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
+
+              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
+              grad_div_alpha_rho_gradC(fac) /= rho_face;
             }
         }
-    }
-  else if (compressible==1 && boussi_==1)
-    {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+
+      // on calcule Grad(alpha_gradC_carre)
+      //-----------------------------------
+
+      const DoubleTab& alpha_gradC_carre=eq_c.get_alpha_gradC_carre();
+      DoubleTab& grad_alpha_gradC_carre=ref_cast_non_const(DoubleTab,  grad_alpha_gradC_carre_);
+      if (grad_alpha_gradC_carre.size()==0) grad_alpha_gradC_carre=eq_ns.inconnue().valeurs();
+      grad_alpha_gradC_carre=0.;
+      opgrad.calculer(alpha_gradC_carre,grad_alpha_gradC_carre);
+
+      // on interpole c et on calcule la source
+      //------------------------------------------------
+
+      if((compressible==0 && boussi_==1) || boussi_==0)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
 
-          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+              cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
 
-          // Quasi-compressible
-          //-------------------
-          resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - rho0*grad_alpha_gradC_carre(fac)/2.); // Cas approximation de Boussinesq
+              if (boussi_==1)
+                {
+                  resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - grad_alpha_gradC_carre(fac)/2.) / rho0; // Incompressible - Cas approximation de Boussinesq
+                }
+              else if (boussi_==0)
+                {
+                  resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - grad_alpha_gradC_carre(fac)/2.) / rho_face;
+                }
+            }
+        }
+      else if (compressible==1 && boussi_==1)
+        {
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
+
+              cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+
+              // Quasi-compressible
+              //-------------------
+              resu(fac) += (cface*grad_div_alpha_rho_gradC(fac) - rho0*grad_alpha_gradC_carre(fac)/2.); // Cas approximation de Boussinesq
+            }
         }
     }
   //===============================================================================================
@@ -474,57 +478,60 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
 
   // on calcule Grad(C)
   //-------------------
-  DoubleTab& gradC=ref_cast_non_const(DoubleTab,  gradC_);
-  if (gradC.size()==0) gradC=eq_ns.inconnue().valeurs();
-  gradC=0.;
-  const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-  opgrad.calculer(c,gradC);
-  const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
-  double div_alpha_rho_gradCface;
-
-  DoubleTab rhoPF=eq_ns.rho().valeurs();
-  double rho_face;
-
-  if((compressible==0 && boussi_==1) || boussi_==0)
+  if (type_systeme_naire==0)
     {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+      DoubleTab& gradC=ref_cast_non_const(DoubleTab,  gradC_);
+      if (gradC.size()==0) gradC=eq_ns.inconnue().valeurs();
+      gradC=0.;
+      const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
+      opgrad.calculer(c,gradC);
+      const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
+      double div_alpha_rho_gradCface;
+
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      double rho_face;
+
+      if((compressible==0 && boussi_==1) || boussi_==0)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
-
-          div_alpha_rho_gradCface=(vol0*div_alpha_rho_gradC(el0)+vol1*div_alpha_rho_gradC(el1))/(vol0+vol1);
-
-          // Division par rho0 necessaire dans le cas incompressible
-          //--------------------------------------------------------
-          if (boussi_==1)
+          for (int fac=ndeb; fac<nbfaces; fac++)
             {
-              div_alpha_rho_gradCface /= rho0;
-              resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho0; // Cas approximation de Boussinesq
-            }
-          else if (boussi_==0)
-            {
-              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-              div_alpha_rho_gradCface /= rho_face;
-              resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho_face;
-            }
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
 
+              div_alpha_rho_gradCface=(vol0*div_alpha_rho_gradC(el0)+vol1*div_alpha_rho_gradC(el1))/(vol0+vol1);
+
+              // Division par rho0 necessaire dans le cas incompressible
+              //--------------------------------------------------------
+              if (boussi_==1)
+                {
+                  div_alpha_rho_gradCface /= rho0;
+                  resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho0; // Cas approximation de Boussinesq
+                }
+              else if (boussi_==0)
+                {
+                  rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
+                  div_alpha_rho_gradCface /= rho_face;
+                  resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho_face;
+                }
+
+            }
         }
-    }
-  else if (compressible==1 && boussi_==1)
-    {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+      else if (compressible==1 && boussi_==1)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
 
-          div_alpha_rho_gradCface=(vol0*div_alpha_rho_gradC(el0)+vol1*div_alpha_rho_gradC(el1))/(vol0+vol1);
+              div_alpha_rho_gradCface=(vol0*div_alpha_rho_gradC(el0)+vol1*div_alpha_rho_gradC(el1))/(vol0+vol1);
 
-          resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho0; // Cas approximation de Boussinesq
+              resu(fac) -= div_alpha_rho_gradCface*gradC(fac) / rho0; // Cas approximation de Boussinesq
 
+            }
         }
     }
   //=====================================================================

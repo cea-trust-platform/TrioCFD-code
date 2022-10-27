@@ -229,7 +229,9 @@ inline DoubleTab Source_Con_Phase_field::dWdc_naire_analytique_ternaire(const Do
       for (int i=0; i<c.dimension(0); i++)
         {
           dPdxU(i,j) = 2*(c(i,0)-cUEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)))+ 2*(c(i,1)-cZrEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)));
-          dPdxZr(i,j) = 2*(c(i,0)-cUEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)));
+          //dPdxZr(i,j) = 2*(c(i,0)-cUEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)));
+          dPdxZr(i,j) = 2*(-(c(i,0) - cUEq(j))*sin(psi_(j)* PI / 180.0) + (c(i,1) - cZrEq(j))*cos(psi_(j)* PI / 180.0))*cos(psi_(j)* PI / 180.0)/pow(aZrEq(j),2) + 2*((c(i,0) - cUEq(j))*cos(psi_(j)* PI / 180.0) + (c(i,1) - cZrEq(j))*sin(psi_(j)* PI / 180.0))*sin(psi_(j)* PI / 180.0)/pow(aUEq(j),2);
+
         }
     }
   for (int i=0; i<c.dimension(0); i++)
