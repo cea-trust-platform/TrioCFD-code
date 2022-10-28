@@ -316,8 +316,6 @@ DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const D
     }
   else if(temps_!=tps) // update qSpeed_ only once per time step!
     {
-      Cout<<" temps_ "<<temps_<<" tps = "<<tps<<" force = "<<fluidForce<<finl;
-      getchar();
       temps_=tps;
       if(timeScheme_)
         return NewmarkSchemeMA(dt, fluidForce);

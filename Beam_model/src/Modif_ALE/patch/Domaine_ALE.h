@@ -110,7 +110,6 @@ protected:
   Champs_front_ALE_projection field_ALE_projection_;
   Noms name_ALE_boundary_projection_;
   bool associate_eq;
-  bool re_start;
   double tempsComputeForceOnBeam;
 };
 

@@ -45,7 +45,7 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false), re_start(false), tempsComputeForceOnBeam(0.)
+Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
 {
   beam = new Beam_model();
 }
@@ -341,7 +341,6 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
   //End of initializing Ch_front_input_ALE
-  re_start=false;
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
@@ -932,7 +931,6 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   tempsComputeForceOnBeam=0.;
   if(Restart_file_name!="none")
     {
-      re_start=true;
       beam->readRestartFile(Restart_file_name);
       tempsComputeForceOnBeam=beam->getTime();
 
@@ -1090,7 +1088,7 @@ const int& Domaine_ALE::getBeamDirection() const
 }
 DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
 {
-  if(abs(tps-tempsComputeForceOnBeam)>1.e-9 && dt!=0.)
+  if(tps!=tempsComputeForceOnBeam && dt!=0.)
     {
       computeFluidForceOnBeam();
       tempsComputeForceOnBeam = tps;
