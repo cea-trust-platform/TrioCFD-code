@@ -29,7 +29,9 @@
 // .DESCRIPTION : class Projection_ALE_boundary
 //
 // <Description of class Projection_ALE_boundary>
-//
+// This class represents the projection of a function defined on a boundary in case of ALE calculation
+// In general it is the modal deformation
+// The fluid force is project on this function. For the modal deformation it results in the modal fluid force acting on a ALE boundary
 /////////////////////////////////////////////////////////////////////////////
 
 class Projection_ALE_boundary : Interprete_geometrique_base

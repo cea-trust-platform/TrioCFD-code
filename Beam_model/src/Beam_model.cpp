@@ -125,9 +125,6 @@ void Beam_model::readInputAbscFiles(Nom& absc_file_name)
   ifstream monFlux(nomFichier.c_str());
   if(monFlux)
     {
-      /*string line;  // read the first line
-      getline(monFlux, line);
-      monFlux.ignore();*/
       double abscissa;
       int i=0;
       while(monFlux)
@@ -263,7 +260,7 @@ void Beam_model::initialization(double velocity)
   qAcceleration_=0.;
   qDisplacement_=velocity;
 }
-
+//Solve the beam dynamics. Time intergation scheme: Newmark finite differences
 DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce)
 {
   double halfDt=dt/2.;
@@ -285,7 +282,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
 
   return qSpeed_;
 }
-
+//Solve the beam dynamics. Time intergation scheme: Newmark mean acceleration
 DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce)
 {
   double halfDt=dt/2;

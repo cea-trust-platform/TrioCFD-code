@@ -30,7 +30,7 @@ Declare_vect(Champ_front_ALE_projection);
 // .DESCRIPTION : class Champs_front_ALE_projection
 //
 // <Description of class Champs_front_ALE_projection>
-//
+// This class represents a collection of Champ_front_ALE_projection. See Champ_front_ALE_projection for details
 /////////////////////////////////////////////////////////////////////////////
 
 class Champs_front_ALE_projection : public VECT(Champ_front_ALE_projection)

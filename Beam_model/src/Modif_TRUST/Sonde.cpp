@@ -1289,7 +1289,6 @@ void Sonde::mettre_a_jour(double un_temps, double tinit)
       ma_source.valeur().mettre_a_jour(un_temps);
 
       // Si le maillage est deformable il faut reconstruire les sondes
-
       /* if (mon_post->probleme().domaine().deformable())
         {
           // Fait desormais dans ::initialiser:
@@ -1583,3 +1582,4 @@ void Sonde::mettre_a_jour_bords()
         }
     }
 }
+

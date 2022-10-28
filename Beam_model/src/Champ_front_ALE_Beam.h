@@ -30,7 +30,7 @@
 // .DESCRIPTION : class Champ_front_ALE_Beam
 //
 // <Description of class Champ_front_ALE_Beam>
-//
+// This class represents a field on a boundary modeled as a Beam in case of ALE calculation.
 /////////////////////////////////////////////////////////////////////////////
 
 class Champ_front_ALE_Beam : public Champ_front_ALE

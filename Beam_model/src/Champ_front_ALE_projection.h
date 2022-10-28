@@ -31,7 +31,9 @@
 // .DESCRIPTION : class Champ_front_ALE_projection
 //
 // <Description of class Champ_front_ALE_projection>
-//
+// This class represents a function defined on a boundary in case of ALE calculation
+// In general it is the modal deformation
+// The fluid force is project on this function. For the modal deformation it results in the modal fluid force acting on a ALE boundary
 /////////////////////////////////////////////////////////////////////////////
 
 class Champ_front_ALE_projection : public Ch_front_var_instationnaire_dep

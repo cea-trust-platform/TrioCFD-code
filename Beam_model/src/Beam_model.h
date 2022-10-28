@@ -35,8 +35,8 @@ Declare_liste(DoubleTab);
 //
 // <Description of class Beam_model>
 // Fluid-structure interaction model.
-// Reduced mechanical model: a beam model.
-// Resolution based on a modal analysis
+// Reduced mechanical model: a beam model (1d).
+// Resolution based on a modal analysis.
 // Temporal discretization: Newmark
 // ALE coupling with the reduced beam model
 /////////////////////////////////////////////////////////////////////////////
@@ -92,21 +92,21 @@ protected :
   int direction_; //x=0, y=1, z=2
   double young_; // Young module
   double rho_; // solid density
-  DoubleVect mass_;
-  DoubleVect stiffness_;
-  DoubleVect damping_;
-  DoubleVect abscissa_;
-  LIST(DoubleTab) u_;
-  LIST(DoubleTab) R_;
-  DoubleVect qSpeed_;
-  DoubleVect qHalfSpeed_;
-  DoubleVect qAcceleration_;
-  DoubleVect qDisplacement_;
-  bool timeScheme_;
+  DoubleVect mass_; //diagonal modal mass matrix
+  DoubleVect stiffness_; //diagonal modal stiffness_ matrix
+  DoubleVect damping_; //diagonal modal damping_ matrix
+  DoubleVect abscissa_; // coordinates of the Beam
+  LIST(DoubleTab) u_;  // Beam modal displacement constituting the modal shape
+  LIST(DoubleTab) R_; // Beam modal rotation constituting the modal shape
+  DoubleVect qSpeed_; // Beam 1d speed
+  DoubleVect qHalfSpeed_; // Beam 1d speed at dt/2
+  DoubleVect qAcceleration_; //Beam 1d acceleration
+  DoubleVect qDisplacement_; //Beam 1d displacement
+  bool timeScheme_; // Time discretization scheme
   //DoubleTab phi3D_;
   double temps_;
-  DoubleVect output_position_1D_;
-  DoubleTab output_position_3D_;
+  DoubleVect output_position_1D_; //post-treatment of the 1d position of the points (points on the Beam)
+  DoubleTab output_position_3D_; // post-treatment of the 3d position of the points (points on the 3d surface)
 
 };
 inline const int& Beam_model::getNbModes() const

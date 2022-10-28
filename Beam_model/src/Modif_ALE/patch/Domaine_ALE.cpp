@@ -786,7 +786,6 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 //Read the mechanical beam model parameters. See the Beam class for details
 void Domaine_ALE::reading_beam_model(Entree& is)
 {
-  beam->setActivate(true);
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   Motcle motlu;
