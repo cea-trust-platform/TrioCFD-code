@@ -171,7 +171,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
     }
 }
-//compute the fluid force projected within the requested boundaries
+//Compute the fluid force projected within the requested boundaries
 void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
 {
   Cerr<<"update_ALE_projection "<<finl;
@@ -211,7 +211,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
     }
   mp_sum(modalForce);
-  if (je_suis_maitre())
+  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName.txt file
     {
       std::string nom="ModalForce_";
       nom += name_ALE_boundary_projection;
@@ -226,7 +226,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
       ofs_1.close();
     }
 }
-//compute the fluid force projected within the requested boundaries
+//Compute the fluid force projected within the requested boundaries
 void  Domaine_ALE::update_ALE_projection(const double temps)
 {
 
@@ -275,7 +275,7 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 
   mp_sum_for_each_item(modalForce);
-  if (je_suis_maitre())
+  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName_[i].txt file
     {
       for(int i=0; i<size_projection_boundaries; i++)
         {
@@ -721,7 +721,7 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
       compteur++;
     }
 }
-
+//Read the projection boundary
 void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
 {
   Motcle accolade_ouverte("{");
@@ -782,6 +782,8 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
     }
 }
 
+
+//Read the mechanical beam model parameters. See the Beam class for details
 void Domaine_ALE::reading_beam_model(Entree& is)
 {
   beam->setActivate(true);
@@ -1061,7 +1063,7 @@ void Domaine_ALE::initializationBeam (double velocity)
 double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
 {
 
-  double dt = 0;
+  double dt = 0.;
   const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
   const DoubleVect& surfaces = zone_VEF.face_surfaces();
   double minSurf = mp_min_vect(surfaces);
@@ -1088,10 +1090,11 @@ const int& Domaine_ALE::getBeamDirection() const
 }
 DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
 {
+  //if tps=tempsComputeForceOnBeam then the dynamics of the beam has already been solved. We only solve once per time step.
   if(tps!=tempsComputeForceOnBeam && dt!=0.)
     {
       computeFluidForceOnBeam();
-      tempsComputeForceOnBeam = tps;
+      tempsComputeForceOnBeam = tps; // update the variable tempsComputeForceOnBeam after computing the fluid force
     }
   return beam->getVelocity(tps, dt, fluidForceOnBeam);
 }
@@ -1110,6 +1113,7 @@ Equation_base& Domaine_ALE::getEquation()
 {
   return eq;
 }
+//Compute the modal fluid force acting on the Beam: sum of a pressure (op_grad.flux_bords) and a viscous term (op_diff.flux_bords) projected on the 3D modal deformation
 void  Domaine_ALE::computeFluidForceOnBeam()
 {
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
@@ -1145,7 +1149,7 @@ void  Domaine_ALE::computeFluidForceOnBeam()
                 {
                   const DoubleTab& u=getBeamDisplacement(nbmodes);
                   const DoubleTab& R=getBeamRotation(nbmodes);
-                  phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
+                  phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R); //compute the 3D modal deformation
                   for(int comp=0; comp<3; comp++)
                     {
                       fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
@@ -1156,7 +1160,7 @@ void  Domaine_ALE::computeFluidForceOnBeam()
         }
     }
   mp_sum_for_each_item(fluidForceOnBeam);
-  if (je_suis_maitre())
+  if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
     {
       std::ofstream ofs_1;
       ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
