@@ -49,7 +49,6 @@ Beam_model::Beam_model()
   direction_=0;
   young_=200.e+9;
   rho_ = 8100.;
-  activate_=false;
   timeScheme_=true;
   temps_ =0.;
   output_position_1D_.resize(0);

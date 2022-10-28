@@ -34,7 +34,11 @@ Declare_liste(DoubleTab);
 // .DESCRIPTION : class Beam_model
 //
 // <Description of class Beam_model>
-//
+// Fluid-structure interaction model.
+// Reduced mechanical model: a beam model.
+// Resolution based on a modal analysis
+// Temporal discretization: Newmark
+// ALE coupling with the reduced beam model
 /////////////////////////////////////////////////////////////////////////////
 
 class Beam_model : public Interprete_geometrique_base
@@ -59,8 +63,6 @@ public :
   inline void setBeamName(const Nom&) ;
   inline const Nom& getFileName() const;
   inline void setFileName(const Nom&) ;
-  inline const bool& getActivate() const;
-  inline void setActivate(const bool&) ;
   inline const bool& getTimeScheme() const;
   inline void setTimeScheme(const bool&) ;
   inline void setOutputPosition1D(const DoubleVect&) ;
@@ -90,7 +92,6 @@ protected :
   int direction_; //x=0, y=1, z=2
   double young_; // Young module
   double rho_; // solid density
-  bool activate_;
   DoubleVect mass_;
   DoubleVect stiffness_;
   DoubleVect damping_;
@@ -145,14 +146,6 @@ inline void Beam_model::setRhoBeam(const double& rho)
   rho_=rho;
 }
 
-inline const bool& Beam_model::getActivate() const
-{
-  return activate_;
-}
-inline void Beam_model::setActivate(const bool& activate)
-{
-  activate_=activate;
-}
 inline const bool& Beam_model::getTimeScheme() const
 {
   return timeScheme_;
