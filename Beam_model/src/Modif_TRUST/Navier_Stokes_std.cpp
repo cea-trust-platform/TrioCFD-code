@@ -435,7 +435,6 @@ void Navier_Stokes_std::completer()
       for (int e = 0 ; e < zone.nb_elem() ; e++) distance_paroi_globale->valeurs()(e, 0) = dist_calc(e);
       distance_paroi_globale->valeurs().echange_espace_virtuel();
     }
-
 }
 
 int Navier_Stokes_std::verif_Cl() const
@@ -886,6 +885,7 @@ Entree& Navier_Stokes_std::lire_cond_init(Entree& is)
           exit();
         }
     }
+
   return is;
 }
 
@@ -1246,6 +1246,7 @@ int Navier_Stokes_std::preparer_calcul()
   gradient_P.changer_temps(temps);
 
 
+
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression av projeter", la_pression.valeurs());
 
   int proj_fait=0;
@@ -1472,6 +1473,14 @@ void Navier_Stokes_std::abortTimeStep()
 
 bool Navier_Stokes_std::initTimeStep(double dt)
 {
+
+  //Resumption: The flux_bords are zero during the first time step following a resumption of calculation
+  //and are updated only at the end of this time step. The call to the "ajouter" function is used to update flux_bords variables.
+  DoubleTab resu=la_vitesse.valeurs();
+  resu=0.;
+  terme_diffusif.ajouter(la_vitesse.valeurs(),resu);
+  //end resumption
+
   P_n=pression()->valeurs();
 
   // needed by ALE method and we don't want domaine_ale object in TRUST

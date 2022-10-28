@@ -41,6 +41,8 @@
 #include <Operateur_Grad.h>
 #include <communications.h>
 
+
+
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
 Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false), re_start(false), tempsComputeForceOnBeam(0.)
@@ -66,7 +68,6 @@ Entree& Domaine_ALE::readOn(Entree& is)
 
 void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
 {
-
   zone(0).invalide_octree();
   //Modification des coordonnees du maillage
   int N_som=nb_som_tot();
@@ -623,7 +624,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
-
           for (int face=num1; face<num2; face++)
             {
               for(int isom=0; isom<dimension; isom++)
@@ -1088,9 +1088,9 @@ const int& Domaine_ALE::getBeamDirection() const
 {
   return beam->getDirection();
 }
-DoubleVect&  Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
+DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
 {
-  if(tps!=tempsComputeForceOnBeam && !re_start)
+  if(abs(tps-tempsComputeForceOnBeam)>1.e-9 && dt!=0.)
     {
       computeFluidForceOnBeam();
       tempsComputeForceOnBeam = tps;
@@ -1123,6 +1123,13 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
   const int nbModes=fluidForceOnBeam.size();
 
+  if (flux_bords_grad.size()==0)
+    {
+      //The flux_bords are zero during the first time step following a resumption of calculation
+      //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
+      SFichier os("toto_grad.txt");
+      op_grad.impr(os);
+    }
 
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
@@ -1149,8 +1156,6 @@ void  Domaine_ALE::computeFluidForceOnBeam()
             }
 
         }
-
-
     }
   mp_sum_for_each_item(fluidForceOnBeam);
   if (je_suis_maitre())

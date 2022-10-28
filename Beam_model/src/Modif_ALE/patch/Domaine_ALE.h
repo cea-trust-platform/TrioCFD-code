@@ -87,7 +87,7 @@ public :
   const int& getBeamNbModes();
   void computeFluidForceOnBeam();
   const DoubleVect& getFluidForceOnBeam();
-  Equation_base& getEquation();
+  Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
 protected:
 

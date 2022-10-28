@@ -81,7 +81,7 @@ public :
   inline  double getStiffness(int i);
   inline  const DoubleTab& getDisplacement(int i) const;
   inline  const DoubleTab& getRotation(int i) const;
-  void saveBeamForRestart(const DoubleVect&) const;
+  void saveBeamForRestart() const;
   void printOutputPosition1D() const;
   void printOutputPosition3D() const;
 

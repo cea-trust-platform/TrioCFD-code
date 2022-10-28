@@ -280,7 +280,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
     }
 
 
-  saveBeamForRestart(fluidForce);
+  saveBeamForRestart();
   if(output_position_1D_.size()>0) printOutputPosition1D();
   if(output_position_3D_.size()>0) printOutputPosition3D();
 
@@ -301,7 +301,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
 
-  saveBeamForRestart(fluidForce);
+  saveBeamForRestart();
   if(output_position_1D_.size()>0) printOutputPosition1D();
   if(output_position_3D_.size()>0) printOutputPosition3D();
 
@@ -310,23 +310,25 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
 
 DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
-
   if(dt == 0.)
     {
-      temps_=0.;
       return qSpeed_;
     }
   else if(temps_!=tps) // update qSpeed_ only once per time step!
     {
+      Cout<<" temps_ "<<temps_<<" tps = "<<tps<<" force = "<<fluidForce<<finl;
+      getchar();
       temps_=tps;
       if(timeScheme_)
         return NewmarkSchemeMA(dt, fluidForce);
       else
         return NewmarkSchemeFD(dt, fluidForce);
+
     }
   else
-    return qSpeed_;
-
+    {
+      return qSpeed_;
+    }
 }
 
 DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
@@ -489,16 +491,17 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
 }*/
 
 
-void Beam_model::saveBeamForRestart(const DoubleVect& fluidForce) const
+void Beam_model::saveBeamForRestart() const
 {
 
   if (je_suis_maitre())
     {
       std::ofstream ofs_sauve;
       ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
+      ofs_sauve.precision(32);
       for(int j=0; j < nbModes_; j++)
         {
-          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
+          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<endl;
         }
       ofs_sauve.close();
     }
