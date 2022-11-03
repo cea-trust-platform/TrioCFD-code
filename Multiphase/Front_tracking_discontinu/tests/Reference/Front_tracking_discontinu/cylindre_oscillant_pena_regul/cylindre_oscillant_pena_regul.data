@@ -137,7 +137,7 @@ Lire pb
 		distance_projete_faces simplifiee
                 methode_transport vitesse_imposee 2.*pi*0.125*sin(2.*pi*t) -0.
                 vitesse_imposee_regularisee 1
-		indic_faces_modifiee
+		type_indic_faces modifiee
 		{ 
 		  position -1.0
 		  thickness 0.9

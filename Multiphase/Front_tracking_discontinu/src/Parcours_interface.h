@@ -102,6 +102,12 @@ protected:
                           double x0, double y0, double x1, double y1,
                           double epsilon) const;
 
+  // New function to get phase-barycenter in 2D or 2D-axi calculations.
+  // 3D equivalent not yet available (2020/10/26)
+  double volume_barycentre_rectangle(const Zone_VF& zone_vf, int num_element,
+                                     double x0, double y0, double x1, double y1,
+                                     double epsilon, double liquid_barycentre[3]) const;
+
   double volume_triangle(const Zone_VF& zone_vf, int num_element,
                          double x0, double y0, double x1, double y1,
                          int plan_coupe0, int plan_coupe1) const;

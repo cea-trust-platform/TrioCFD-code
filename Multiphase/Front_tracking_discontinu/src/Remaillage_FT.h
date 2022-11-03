@@ -80,6 +80,10 @@ public:
                                     const double coeff,
                                     ArrOfDouble& dvolume) const;
 
+  int get_nb_iter_bary_volume_seul()
+  {
+    return nb_iter_bary_volume_seul_;
+  };
 #if DEBUG_CONSERV_VOLUME
   double calculer_volume_mesh(const Maillage_FT_Disc& mesh) const;
   double calculer_somme_dvolume(const Maillage_FT_Disc&, const ArrOfDouble&) const;
@@ -107,8 +111,10 @@ protected:
                                             DoubleTab& barycentres) const;
 
   int calculer_connectivites_sommetFacettes(const Maillage_FT_Disc& maillage,ArrOfInt& fa7VoisinesSom_index, IntTab& fa7VoisinesSom_data) const;
+#if 0
+  // Unused method:
   int calculer_correction_deplacement(DoubleTab& deplacement,const ArrOfDouble& varVolume,const DoubleTab& deplacement_varVolume, const ArrOfDouble& norme2_deplacement_varVolume) const;
-
+#endif
   int calculer_differentielle_volume(const Maillage_FT_Disc& maillage,
                                      DoubleTab& differentielle_volume) const;
 

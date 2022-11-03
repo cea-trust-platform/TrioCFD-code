@@ -62,8 +62,16 @@ public:
   int is_terme_gravite_rhog() const;
   const Champ_Fonc& champ_rho_faces() const;
 
-  virtual void calculer_dI_dt(DoubleVect& dI_dt) const;
+  virtual void calculer_dI_dt(DoubleVect& dI_dt); // const;
   const int& get_is_penalized() const;
+  const int& get_new_mass_source() const;
+  const DoubleTab& get_interfacial_area() const;
+  DoubleTab& get_set_interfacial_area();  // Open access  in write-mode..
+  const DoubleTab& get_mpoint() const;
+  DoubleTab& get_set_mpoint(); // Open access to mpoint in write-mode...
+  //void corriger_mpoint(); // Apply correction based on TCL model
+
+  const SolveurSys& get_solveur_pression() const;
 
 protected:
   // Methode surchargee de Navier_Stokes_std :
@@ -77,7 +85,7 @@ protected:
                                                     const Champ_base& gradient_indicatrice,
                                                     Champ_base& potentiel_elements,
                                                     Champ_base& potentiel_faces,
-                                                    Champ_base& champ) const;
+                                                    Champ_base& champ);
   virtual void calculer_gradient_indicatrice(const Champ_base& indicatrice,
                                              const DoubleTab& distance_interface_sommets,
                                              Champ_base& gradient_i);
