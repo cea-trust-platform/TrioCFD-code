@@ -21,7 +21,7 @@
 // XD Pb_Rayo_Thermohydraulique_QC pb_thermohydraulique_QC Pb_Rayo_Thermohydraulique_QC -1 Resolution of pb_thermohydraulique_QC with rayonnement.
 // XD Pb_Rayo_Hydraulique_Turbulent pb_hydraulique_turbulent Pb_Rayo_Hydraulique_Turbulent -1 Resolution of pb_hydraulique_turbulent with rayonnement.
 // XD Pb_Rayo_Thermohydraulique_Turbulent pb_thermohydraulique_turbulent Pb_Rayo_Thermohydraulique_Turbulent -1 Resolution of pb_thermohydraulique_turbulent with rayonnement.
-// XD Pb_Rayo_Thermohydraulique_Turbulent_QC pb_thermohydraulique_turbulent_QC Pb_Rayo_Thermohydraulique_Turbulent_QC -1 Resolution of pb_thermohydraulique_turbulent_qc with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_Turbulent_QC pb_thermohydraulique_turbulent_qc Pb_Rayo_Thermohydraulique_Turbulent_QC -1 Resolution of pb_thermohydraulique_turbulent_qc with rayonnement.
 
 Implemente_instanciable(Pb_Rayo_Conduction,"Pb_Rayo_Conduction",Pb_Conduction);
 Implemente_instanciable(Pb_Rayo_Hydraulique,"Pb_Rayo_Hydraulique",Pb_Hydraulique);
