@@ -6363,7 +6363,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local(const Maillage_
           deplacement(som, 0) = nx * prodscal + Vitesses(compo, 0);
           deplacement(som, 1) = ny * prodscal + Vitesses(compo, 1);
           if (dim3)
-            deplacement(som, 2) = nz * prodscal + Vitesses(compo, 1);
+            deplacement(som, 2) = nz * prodscal + Vitesses(compo, 2); // BugFix reported from baltik TCL on 2020/10/26
         }
     }
 }
