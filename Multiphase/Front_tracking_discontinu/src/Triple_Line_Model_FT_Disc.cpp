@@ -395,7 +395,7 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const in
           //            if(coord_sommet[0] < rface_dis && coord_sommet[0] > lface_dis &&
           //                coord_sommet[1] < tface_dis && coord_sommet[1] >= bface_dis)
           if(coord_sommet[0] < rface_dis && coord_sommet[0] > lface_dis &&
-              coord_sommet[1] < tface_dis && fabs(coord_sommet[1]) >= bface_dis)
+              coord_sommet[1] < tface_dis && std::fabs(coord_sommet[1]) >= bface_dis)
             {
               //  Cerr << " This node lies inside the element #" << elem << finl;
               inner_nodes += 1;
@@ -449,10 +449,10 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const in
               //           if(coord_sommet[0] < rface_dis && coord_sommet[0] > lface_dis &&
               //             coord_sommet[1] < tface_dis && coord_sommet[1] >= bface_dis)
               if(coord_sommet[0] < rface_dis && coord_sommet[0] > lface_dis &&
-                  coord_sommet[1] < tface_dis && fabs(coord_sommet[1]) >= bface_dis)
+                  coord_sommet[1] < tface_dis && std::fabs(coord_sommet[1]) >= bface_dis)
                 {
                   // Cerr << " sng_node = " << sng_node << finl;
-                  //   if(abs(coord_sommet[0]-rface_dis) > abs(coord_sommet[0]-lface_dis))
+                  //   if(std::abs(coord_sommet[0]-rface_dis) > std::abs(coord_sommet[0]-lface_dis))
                   //  {
                   //    Cerr << " This node is closer to the left-face and therefore we check for "
                   //    		"the intersection with left or bottom face " << finl;
@@ -604,7 +604,7 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const in
               //       Cerr << "intersection is at the top-face" << finl;
               nint += 1;
             }
-          else if(fabs(xtest-lface_dis) < eps || fabs(xtest-rface_dis) < eps)
+          else if(std::fabs(xtest-lface_dis) < eps || std::fabs(xtest-rface_dis) < eps)
             {
               xint[nint] = xtest;
               yint[nint] = ytest;
@@ -624,7 +624,7 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const in
               //        Cerr << "intersection is at the left-face" << finl;
               nint += 1;
             }
-          else if(fabs(ytest-tface_dis) < eps || fabs(ytest-bface_dis) < eps)
+          else if(std::fabs(ytest-tface_dis) < eps || std::fabs(ytest-bface_dis) < eps)
             {
               xint[nint] = xtest;
               yint[nint] = ytest;
@@ -644,7 +644,7 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const in
               //          Cerr << "intersection is at the right-face" << finl;
               nint += 1;
             }
-          else if(fabs(ytest-tface_dis) < eps || fabs(ytest-bface_dis) < eps)
+          else if(std::fabs(ytest-tface_dis) < eps || std::fabs(ytest-bface_dis) < eps)
             {
               xint[nint] = xtest;
               yint[nint] = ytest;
@@ -1313,7 +1313,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     const double s_meso_assessed = (surface_tot-S_micro)/(Maillage_FT_Disc::angle_bidim_axi()*rm);
                     Cerr.precision(16);
                     Cerr << "[Assessment-S_meso] t= "<< integration_time_ << " elem= " << elem << " LR= " ;
-                    Cerr << s_meso <<  " Ameso/2pir= " << s_meso_assessed << " err(%)= " << 50.*abs(s_meso_assessed-s_meso)/(s_meso_assessed+s_meso) << finl;
+                    Cerr << s_meso <<  " Ameso/2pir= " << s_meso_assessed << " err(%)= " << 50.*std::abs(s_meso_assessed-s_meso)/(s_meso_assessed+s_meso) << finl;
                     Cerr.precision(7);
                   }
               }
@@ -1436,9 +1436,9 @@ void Triple_Line_Model_FT_Disc::corriger_secmem(const double coef, DoubleTab& se
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
       const int elem = elems_[idx];
-      const double Q = Q_[idx];
+      const double Q_val = Q_[idx];
 //      const double v = volumes[elem];
-      const double value = coef*Q;
+      const double value = coef*Q_val;
       secmem2(elem) += value; // '+=' or '='? - VP
     }
 // Cerr << "[secmem2] max before/after TCL model: " << max_val_before << " / " << max_array(secmem2) << finl;

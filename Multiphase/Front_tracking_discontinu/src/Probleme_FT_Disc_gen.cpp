@@ -92,11 +92,11 @@ void Probleme_FT_Disc_gen::associer_equation(Equation_base& eq)
   equations_.add(eq);
 }
 
-void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl)
+void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1)
 {
   // TODO: A verifier. Working fine?
   // tcl.initialize(); // ca ne marche pas, apres le '=' ci-dessous, le tcl_.elems_.smart_resize_ est toujours a 0!!!
-  tcl_ = tcl;
+  tcl_ = tcl_1;
   tcl_.initialize();
 }
 

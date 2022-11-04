@@ -454,11 +454,11 @@ static void extrapoler_champ_elem(const Zone_VF&    zone_vf,
  */
 void Convection_Diffusion_Temperature_FT_Disc::calculer_grad_t()
 {
-  Transport_Interfaces_FT_Disc& eq_interface = ref_eq_interface_.valeur();
+  Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
 
-  const DoubleTab& indicatrice = eq_interface.get_update_indicatrice().valeurs();
-  const DoubleTab& distance_interface = eq_interface.get_update_distance_interface().valeurs();
-  const DoubleTab& normale_interface = eq_interface.get_update_normale_interface().valeurs();
+  const DoubleTab& indicatrice = eq_interface_.get_update_indicatrice().valeurs();
+  const DoubleTab& distance_interface = eq_interface_.get_update_distance_interface().valeurs();
+  const DoubleTab& normale_interface = eq_interface_.get_update_normale_interface().valeurs();
   //GB : Augmenter la constante de l'epaisseur
   //GB : const int stencil_width = 8;
   const int stencil_width = stencil_width_;
@@ -584,11 +584,11 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
       Cerr << "You need at least 2 positions to the wheel... Contact TRUST support. " << finl;
       Process::exit();
     }
-  Transport_Interfaces_FT_Disc& eq_interface = ref_eq_interface_.valeur();
-  //const Champ_base& ch_indic = ref_cast(Champ_Inc,eq_interface.get_update_indicatrice());
+  Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
+  //const Champ_base& ch_indic = ref_cast(Champ_Inc,eq_interface_.get_update_indicatrice());
   //const DoubleTab& indicatrice = ch_indic.valeurs();
-  const DoubleTab& indicatrice = eq_interface.inconnue().valeurs();
-  const DoubleTab& indicatrice_passe = eq_interface.inconnue().passe();
+  const DoubleTab& indicatrice = eq_interface_.inconnue().valeurs();
+  const DoubleTab& indicatrice_passe = eq_interface_.inconnue().passe();
   const double& dt = schema_temps().pas_de_temps();
   //const DoubleTab& indicatrice_passe = ch_indic.passe();
   DoubleTab& temperature = inconnue().valeur().valeurs();
@@ -890,7 +890,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
       mmax = Process::mp_max(mmax);
       //  Cerr << "[Maximum-mp] Time= " << temps << " max(abs(mp))= " << mmax << finl;
       const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-      const DoubleTab& distance_interface = eq_interface.get_update_distance_interface().valeurs();
+      const DoubleTab& distance_interface = eq_interface_.get_update_distance_interface().valeurs();
       extrapolate(zone_vf, ai, stencil_width_, distance_interface, mp);
     }
 }
@@ -1244,8 +1244,8 @@ void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
       const Domaine& dom = zone_vf.zone().domaine();
       const Sous_Zone& ss_zone = dom.ss_zone(nom_sous_zone);
 
-      Transport_Interfaces_FT_Disc& eq_interface = ref_eq_interface_.valeur();
-      const DoubleTab& indicatrice = eq_interface.get_update_indicatrice().valeurs();
+      Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
+      const DoubleTab& indicatrice = eq_interface_.get_update_indicatrice().valeurs();
       DoubleTab& temperature = inconnue().valeur().valeurs();
       const DoubleVect& volume = ref_cast(Zone_VF, zone_dis().valeur()).volumes();
       const int nb_elem = zone_vf.zone().nb_elem();

@@ -58,7 +58,7 @@ public:
   //
   // Methodes nouvelles de Probleme_FT_Disc_gen
   //
-  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl);
+  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
   const Triple_Line_Model_FT_Disc& tcl() const
   {
     return tcl_ ;

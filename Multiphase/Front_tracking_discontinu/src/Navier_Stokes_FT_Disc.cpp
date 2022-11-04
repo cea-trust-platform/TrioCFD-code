@@ -3163,9 +3163,9 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // depending on the option, either historical or new, the calculation may be based on the values filled in secmem2
       calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
 
-      const Fluide_Diphasique& fluide = fluide_diphasique();
-      const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
-      const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
+      const Fluide_Diphasique& fluide_diph = fluide_diphasique();
+      const Fluide_Incompressible& phase_0 = fluide_diph.fluide_phase(0);
+      const Fluide_Incompressible& phase_1 = fluide_diph.fluide_phase(1);
       const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
       const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
       const double rho_phase_0 = tab_rho_phase_0(0,0);
@@ -3280,7 +3280,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           // DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
           // probleme_ft().tcl().corriger_mpoint(elems_with_CL_contrib,mpoint_from_CL,mpoint);
 
-          const double Lvap = fluide.chaleur_latente();
+          const double Lvap = fluide_diph.chaleur_latente();
           const double coef = jump_inv_rho/Lvap;
           // Correct the secmem contribution due to TCL :
           probleme_ft().tcl().corriger_secmem(coef, secmem2);
