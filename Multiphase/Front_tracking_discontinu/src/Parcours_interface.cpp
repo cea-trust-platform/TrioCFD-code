@@ -1249,7 +1249,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
   double normale[3];
   const double surface_facette = maillage.calcul_normale_3D(num_facette, normale);
   double barycentre_phase1[3] = {0.,0.,0.};
-  if (correction_parcours_thomas_ || (surface * surface_facette > 5. * Erreur_max_coordonnees_))
+  if (correction_parcours_thomas_ || (sqrt(surface) > 5. * Erreur_max_coordonnees_))
     {
       //normalisation du centre de gravite
       if (sup_strict(surface,0.))
