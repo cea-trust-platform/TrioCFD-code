@@ -786,9 +786,8 @@ double Remaillage_FT::calculer_variation_volume(const Maillage_FT_Disc& maillage
   return dvolume_total;
 }
 
-#if 0
-// Unused method:
 /*! @brief Cette fonction calcule une correction sur un deplacement liee a une variation de volume imposee
+ *  Utile pour IJK
  *
  * @param (deplacement) delacement a corriger
  * @param (varVolume) la variation de volume
@@ -889,7 +888,6 @@ int Remaillage_FT::calculer_correction_deplacement(DoubleTab& deplacement,
 
   return res;
 }
-#endif
 
 /*! @brief Cette fonction calcule pour chaque sommet le barycentre de l'ensemble des facettes voisines du sommet.
  *
@@ -1711,7 +1709,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
                   ps +=  v4[direction]*normale_facettes(fa7,direction);
                 }
               const double tol = 1.e-10;
-              if (1. - fabs(ps)> tol)
+              if (1. - std::fabs(ps)> tol)
                 {
                   // facette et face_bord ne sont pas coplanaires, on conserve la facette!
                 }
@@ -2471,7 +2469,7 @@ True_int fct_compare_tab_aretes(const void *pt1, const void *pt2)
   const int index1 = *(const int *) pt1;
   const int index2 = *(const int *) pt2;
 
-  int x = FTd_compare_sommets_global((*static_tab_sort)(index1,0), (*static_tab_sort)(index1,1), (*static_tab_sort)(index2,0), (*static_tab_sort)(index2,1));
+  True_int x = FTd_compare_sommets_global((*static_tab_sort)(index1,0), (*static_tab_sort)(index1,1), (*static_tab_sort)(index2,0), (*static_tab_sort)(index2,1));
   if (x==0)
     {
       x = FTd_compare_sommets_global((*static_tab_sort)(index1,2), (*static_tab_sort)(index1,3), (*static_tab_sort)(index2,2), (*static_tab_sort)(index2,3));
