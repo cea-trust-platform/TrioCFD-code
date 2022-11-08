@@ -32,7 +32,7 @@
  *
  *     equations de Navier-Stokes.
  *
- * @sa Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps 
+ * @sa Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps
  */
 class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
 {

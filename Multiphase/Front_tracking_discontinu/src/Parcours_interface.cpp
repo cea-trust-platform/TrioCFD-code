@@ -31,6 +31,7 @@
 //#define EXTENSION_TRIANGLE_POUR_CALCUL_INDIC_AVEC_CONSERVATION_FACETTE_COIN
 Implemente_instanciable_sans_constructeur(Parcours_interface,"Parcours_interface",Objet_U);
 
+static int flag_warning_code_missing=1;
 Implemente_ref(Parcours_interface);
 Implemente_deriv(Parcours_interface);
 
@@ -612,6 +613,9 @@ int Parcours_interface::calcul_intersection_facelem_2D(
   if (inf_strict(surface,0.)) surface = 0.;
   // Contribution de volume :
   double volume = 0.;
+  // Computation of barycenter in phase 1 :
+  double barycentre_phase1[3] = {0.,0.,0.};
+
   // Si on passe par un coin, on ne veut pas faire de calcul de contribution,
   // il risque d'etre faux. Une erreur relative a chaque extremite. On ajoute
   // Un facteur 2.5 pour etre sur.
@@ -625,17 +629,23 @@ int Parcours_interface::calcul_intersection_facelem_2D(
       switch(type_element_)
         {
         case RECTANGLE:
-          volume = volume_rectangle(zone_vf, num_element,
-                                    ix0, iy0, ix1, iy1,
-                                    Erreur_max_coordonnees_);
+          volume = volume_barycentre_rectangle(zone_vf, num_element,
+                                               ix0, iy0, ix1, iy1,
+                                               Erreur_max_coordonnees_,
+                                               barycentre_phase1);
           break;
         case TRIANGLE:
+          if (flag_warning_code_missing)
+            {
+              Cerr << "WARNING : barycentre_phase1 not filled properly!!" << finl;
+              Cerr << "WARNING : Calculation of barycentre_phase1 not implemented yet." << finl;
+            }
           volume = volume_triangle(zone_vf, num_element,
                                    ix0, iy0, ix1, iy1,
                                    plan_coupe0, plan_coupe1);
           break;
         default:
-          exit();// qu'est-ce qu'on fout la ?
+          Process::exit();// qu'est-ce qu'on fout la ?
           break;
         }
     }
@@ -645,6 +655,7 @@ int Parcours_interface::calcul_intersection_facelem_2D(
                                                             num_element,
                                                             surface,
                                                             volume,
+                                                            barycentre_phase1,
                                                             u_centre,
                                                             1. - u_centre,
                                                             0.);
@@ -757,6 +768,136 @@ inline double Parcours_interface::volume_rectangle(const Zone_VF& zone_vf,
  *  Le point 2                                   (0,1,0)
  *
  */
+// Comme volume_rectangle, cette methode calcul le barycentre
+// It is identical to volume, but with multiplication by x or y when needed to obtain the barycenter...
+double Parcours_interface::volume_barycentre_rectangle(const Zone_VF& zone_vf,
+                                                       int num_element,
+                                                       double x0, double y0,
+                                                       double x1, double y1,
+                                                       double epsilon,
+                                                       double bary[3]) const
+{
+  const double angle_bidim_axi = bidim_axi ? Maillage_FT_Disc::angle_bidim_axi() : 0.;
+  const double un_tiers = 1. / 3.;
+
+  // Conventions TRUST VDF :
+  static const int NUM_FACE_GAUCHE = 0;
+  static const int NUM_FACE_BAS = 1;
+  static const int NUM_FACE_HAUT = 3;
+  static const int NUM_FACE_DROITE = 2;
+  int face_bas = zone_vf.elem_faces(num_element, NUM_FACE_BAS);
+  int face_gauche = zone_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
+  int face_droite = zone_vf.elem_faces(num_element, NUM_FACE_DROITE);
+  int face_haut = zone_vf.elem_faces(num_element, NUM_FACE_HAUT);
+  double y_bas = zone_vf.xv(face_bas, 1);
+  double x_gauche = zone_vf.xv(face_gauche, 0);
+  double x_droite = zone_vf.xv(face_droite, 0);
+  double y_haut = zone_vf.xv(face_haut, 1);
+
+  // Volume de l'element
+  double v_elem = (x_droite - x_gauche) * (y_haut - y_bas);
+  if (bidim_axi)
+    v_elem *= (x_droite + x_gauche) * 0.5 * angle_bidim_axi;
+
+  // Volume de la partie A (avec signe)
+  double v = (x0 - x1) * ((y0 + y1) * 0.5 - y_bas);
+  bary[0] = (x0 - x1) * ((y0 + y1) * 0.5 - y_bas);
+  bary[1] = (x0 - x1) * ((y0 + y1) * 0.5 - y_bas);
+  // Integral(2pi*r**2 dr) / Integral(2pi*r**2 dr) between r0 and r1
+  if (bidim_axi)
+    {
+      double s0 = (x1 - x0) * (y0 - y_bas);
+      double s1 = (x1 - x0) * (y1 - y_bas);
+      if (s0 + s1 != 0)
+        v *= ((x0 + x0 + x1) * s0 + (x0 + x1 + x1) * s1) / (s0 + s1);
+      v *= un_tiers * angle_bidim_axi;
+      double xx1 = x1*x1;
+      double xx0 = x0*x0;
+      if (fabs(xx1-xx0)>DMINFLOAT)
+        bary[0] =  2.*un_tiers*(xx1*x1-xx0*x0)/(xx1-xx0);
+      else
+        bary[0] = x0;
+    }
+  else
+    bary[0] =  (x0 + x1) *0.5;
+
+  bary[1] = ((y0 + y1) * 0.5 + y_bas) * 0.5;
+
+  // Ajout du volume de B si on touche le bord haut
+  double v2 = 0.;
+  double bary2[2] = {0.,0.};
+  if (y0 > y_haut - epsilon)
+    {
+      v2 = (x_droite - x0) * (y_haut - y_bas);
+      if (bidim_axi)
+        v2 *= (x_droite + x0) * 0.5 * angle_bidim_axi;
+    }
+  else if (y1 > y_haut - epsilon)
+    {
+      v2 = (x1 - x_gauche) * (y_haut - y_bas);
+      if (bidim_axi)
+        v2 *= (x1 + x_gauche) * 0.5 * angle_bidim_axi;
+    }
+  else if (x1 > x0)
+    {
+      v2 = v_elem;
+    }
+
+  if (y0 > y_haut - epsilon)
+    {
+      if (bidim_axi)
+        {
+          double xx1 = x_droite*x_droite;
+          double xx0 = x0*x0;
+          if (fabs(xx1-xx0)>DMINFLOAT)
+            bary2[0] =  2.*un_tiers*(xx1*x_droite-xx0*x0)/(xx1-xx0);
+        }
+      else
+        bary2[0] = (x_droite + x0) * 0.5;
+
+      bary2[1] = (y_haut + y_bas) * 0.5;
+    }
+  else if (y1 > y_haut - epsilon)
+    {
+      if (bidim_axi)
+        {
+          double xx1 = x1*x1;
+          double xx0 = x_gauche*x_gauche;
+          if (fabs(xx1-xx0)>DMINFLOAT)
+            bary2[0] =  2.*un_tiers*(xx0*x_gauche-xx1*x1)/(xx0-xx1);
+        }
+      else
+        bary2[0] = (x_gauche + x0) * 0.5;
+
+      bary2[1] = (y_haut + y_bas) * 0.5;
+
+    }
+  else if (x1 > x0)
+    {
+      bary2[0] = (x_gauche + x_droite) * 0.5;
+      if (bidim_axi)
+        if (fabs(x_gauche-x_droite)>DMINFLOAT)
+          bary2[0] = 2.*un_tiers*(x_droite*x_droite*x_droite-x_gauche*x_gauche*x_gauche)/(x_droite*x_droite-x_gauche*x_gauche);
+      bary2[1] = (y_haut + y_bas) * 0.5;
+    }
+
+  if ((v+v2)>DMINFLOAT)
+    for (int i=0; i<2; i++)
+      bary[i] = (bary[i]*v + bary2[i]*v2) / (v+v2);
+
+  bary[2] = 0.; // In 2D, nothing on z.
+  v = (v + v2) / v_elem;
+
+// On force la valeur entre 0 et 1 strictement.
+  if (v < Erreur_relative_maxi_)
+    v = Erreur_relative_maxi_;
+  else if (v > 1. - Erreur_relative_maxi_)
+    v = 1. - Erreur_relative_maxi_;
+
+  return v;
+}
+
+// Description:
 inline void Parcours_interface::matrice_triangle(int num_element,
                                                  FTd_vecteur2& origine,
                                                  FTd_matrice22& matrice,
@@ -1105,6 +1246,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
   //  Modif BM 9/9/2004 : calcul d'une surface reelle et non d'une fraction!
   double normale[3];
   const double surface_facette = maillage.calcul_normale_3D(num_facette, normale);
+  double barycentre_phase1[3] = {0.,0.,0.};
   if (correction_parcours_thomas_ || (surface * surface_facette > 5. * Erreur_max_coordonnees_))
     {
       //normalisation du centre de gravite
@@ -1147,6 +1289,12 @@ int Parcours_interface::calcul_intersection_facelem_3D(
       switch(type_element_)
         {
         case TETRA:
+          if (flag_warning_code_missing)
+            {
+              Cerr << "WARNING : barycentre_phase1 not filled properly!!" << finl;
+              Cerr << "WARNING : Calculation of barycentre_phase1 not implemented yet for TETRA." << finl;
+              flag_warning_code_missing=0;
+            }
           volume = volume_tetraedre(zone_vf, num_element,num_facette,
                                     maillage,
                                     poly_reelles_,
@@ -1154,6 +1302,12 @@ int Parcours_interface::calcul_intersection_facelem_3D(
                                     Erreur_max_coordonnees_);
           break;
         case HEXA:
+          if (flag_warning_code_missing)
+            {
+              Cerr << "WARNING : barycentre_phase1 not filled properly!!" << finl;
+              Cerr << "WARNING : Calculation of barycentre_phase1 not implemented yet for HEXA." << finl;
+              flag_warning_code_missing=0;
+            }
           maillage.calcul_normale_3D(num_facette,norme);
           volume = volume_hexaedre(zone_vf, num_element,
                                    poly_reelles_,
@@ -1163,7 +1317,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
           break;
         default:
           // qu'est-ce qu'on fout la ?
-          exit();
+          Process::exit();
           break;
         }
       // "surface" contient la surface du polygone d'intersection dans le triangle
@@ -1173,6 +1327,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
                                                                 num_element,
                                                                 surface * 2.,
                                                                 volume,
+                                                                barycentre_phase1,
                                                                 u_centre,
                                                                 v_centre,
                                                                 1. - u_centre - v_centre);
@@ -1185,6 +1340,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
                                                                 num_element,
                                                                 0.,
                                                                 0.,
+                                                                barycentre_phase1,
                                                                 0., 0., 0.);
     }
 

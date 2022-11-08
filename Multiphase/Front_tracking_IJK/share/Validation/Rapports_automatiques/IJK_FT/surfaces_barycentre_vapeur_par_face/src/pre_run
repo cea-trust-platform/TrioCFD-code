@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ $1 == "test_IJK_switch" ]
+then
+sed -e '/statistiques_FT/i\}' \
+    -e '/statistiques_FT/,$d' \
+     pre_run.sauv > pre_run_noStats.sauv
+else 
+   echo "$0 does nothing for case $1"
+fi

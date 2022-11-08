@@ -1,0 +1,71 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 3 bulles  :
+# 0.134 0.131 0.151 bulle3.msh
+# 0.201 0.271 0.152 bulle3.msh
+cat >deplacements.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+cat >deplacements3.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+0.0045867 0.0010343 0.00155486 bulle3.msh
+0.0055337 0.0029443 0.00155486 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+# !!! On n'utilise pas le lissage car les bulles ne sont pas dans le domaine. 
+# 
+
+# Creation d'un JDD de reprise suite au pre_run : 
+echo "JDD pour Preparation du calcul en avancant la bulle au bout du domaine..."
+sed -e "s/timestep .*/  timestep 0.0001655/g"      \
+    -e "s/pre_run\.sauv/init/g"                    \
+    -e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+    -e "/timestep_reprise_vitesse/d"               \
+    -e "/fichier_reprise_vitesse/d"  ijkft_monte_seq.data > pre_run.data
+    # -e "s/dt_post .*/   dt_post 459/g"             \
+    # -e "s/dt_sauvegarde .*/   dt_sauvegarde 459/g" \
+    # -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 459/g" \
+
+
+# Creation d'un JDD de reprise suite au pre_run (zoom sur l'instant du switch) : 
+# echo "JDD pour calcul reprise avec un tout petit dt..."
+# sed -e "s/timestep .*/  timestep 3.31e-6/g"      \
+#     -e "s/dt_post .*/   dt_post 1/g"             \
+#     -e "s/dt_sauvegarde .*/   dt_sauvegarde 50/g" \
+#     -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 50/g" ijkft_monte_seq.data > ijkft_monte_slow_seq.data
+
+
+# Generation du cas test multi-bulles : 
+echo "JDD pour calcul multi-bulles..."
+sed -e "s/pre_run\.sauv/init_multi/g" \
+    -e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+    -e "/timestep_reprise_vitesse/d"  \
+    -e "/fichier_reprise_vitesse/d"  ijkft_monte_seq.data > ijkft_monte_multi_seq.data
+    # -e "s/dt_post .*/   dt_post 10/g"             \
+    # -e "s/dt_sauvegarde .*/   dt_sauvegarde 250/g" \
+    # -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 390/g" \
+
+# Generation du cas test multi-bulles reprise (avec repulsion) : 
+echo "JDD pour calcul multi-bulles reprise (avec repulsion) ..."
+sed -e "s/init_multi/ijkft_monte_multi_seq\.sauv/g" \
+    -e "/lata_meshname/d" \
+    -e "s/remaillage_ft_ijk/portee_force_repulsion 0.00025 \n delta_p_max_repulsion 100.\n remaillage_ft_ijk/" \
+    -e "s/expression_vz_init 0./&\n  fichier_reprise_vitesse ijkft_monte_multi_seq.sauv.lata\n timestep_reprise_vitesse 1/"  ijkft_monte_multi_seq.data > ijkft_monte_multi_repr_seq.data
+    # -e "s/dt_post .*/   dt_post 5/g"             \
+    # -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 100/g" \
+    
+# Generation des cas tests paralleles
+echo "JDD pour calcul paralleles ..."
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;s/monte/monte_par8/' ijkft_monte_seq.data >ijkft_monte_par8.data
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;s/monte/monte_par8/' ijkft_monte_multi_seq.data >ijkft_monte_multi_par8.data
+# sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;s/pre_run_fine/pre_run_fine_par8/' test_IJK_switch.data >test_IJK_switch_par8.data

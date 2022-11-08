@@ -174,7 +174,9 @@ interf
 		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
         }
 	# Options for the meshing algorithm #
-        iterations_correction_volume 1
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 1
+        nb_iterations_correction_volume 3 # taken from nb_iter_correction_volume in remaillage { ... } #
         n_iterations_distance 2
 	remaillage {
 		pas 0.000001

@@ -4,9 +4,9 @@ if [  -e $project_directory/archives/libC3.tar.gz ]; then
   cat > $project_directory/project.cfg <<EOF
 # description section (required)
 [description] 
-name       : CMFD        
-author     : TrioCFD
-executable : CMFD        
+name       : CMFD
+author     : Corentin Reiss, Antoine Gerschenfeld, Yannick Gorsse
+executable : CMFD
 
 [prerequisite1]
 name : libC3
@@ -18,9 +18,10 @@ else
   cat > $project_directory/project.cfg <<EOF
 # description section (required)
 [description] 
-name       : CMFD        
-author     : TrioCFD
-executable : CMFD        
+name       : CMFD
+author     : Corentin Reiss, Antoine Gerschenfeld, Yannick Gorsse
+executable : CMFD
+
 EOF
   sed 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
 fi

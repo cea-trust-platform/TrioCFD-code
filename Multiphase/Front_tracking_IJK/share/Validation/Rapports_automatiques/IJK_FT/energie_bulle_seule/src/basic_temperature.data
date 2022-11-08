@@ -1,0 +1,306 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 32
+  nbelem_j 16
+  nbelem_k 16
+  uniform_domain_size_i 0.005
+  uniform_domain_size_j 0.0025
+  uniform_domain_size_k 0.0025
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 5
+  vol_bulle_monodisperse 4.188790204786391e-9 # r=1mm #
+  timestep 1
+  cfl 1.
+  fo 1.
+  timestep_facsec 0.5 # a diminuer #
+  dt_post 10
+  Boundary_Conditions 
+  {
+  	bctype_kmin Perio
+    bctype_kmax Perio
+  }
+  champs_a_postraiter 8 TEMPERATURE INTERFACES VELOCITY INDICATRICE INTERFACE_TEMPERATURE INTERFACE_PHIN SURFACE_VAPEUR_PAR_FACE COMPO_CONNEXE
+  check_stop_file stop.txt
+
+  dt_sauvegarde 1000000
+  tinit 0
+  nb_pas_dt_max 1000 # nb time-step air-water (t_end=0.016 s) #
+  time_scheme euler_explicit
+    
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+      # Coarsen_Operator_Uniform { } #
+      # Coarsen_Operator_Uniform { } #
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    impr
+  }
+
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface pre_run.lata
+    timestep_reprise_interface       1
+    # lata_meshname   FTMESH #
+    # Bary et lissage # 
+    remaillage_ft_ijk {
+     pas_remaillage 2.5e7
+     nb_iter_barycentrage 0
+     relax_barycentrage 0
+     critere_arete 3.49999999999999978e-01
+     seuil_dvolume_residuel 0.00000000000000000e+00
+     nb_iter_correction_volume 0
+     nb_iter_remaillage 0
+     facteur_longueur_ideale 0.75
+     equilateral 1
+     lissage_courbure_coeff -2.5e-02
+     lissage_courbure_iterations_systematique 0   # TESTER 20? #
+     lissage_courbure_iterations_si_remaillage 0
+     }
+     terme_gravite rho_g
+  }
+
+  disable_convection_qdm
+  disable_diffusion_qdm
+  disable_solveur_poisson
+
+  gravite 3 0. 0. 0.
+  # Properties from Panda et al. #
+  # water #
+  rho_liquide 10.0
+  mu_liquide 1. 
+
+  # air #
+  rho_vapeur 10.
+  mu_vapeur 1.  
+  sigma 0.0
+  
+  # Pour creer le fichier des reprises #
+  # reprise #
+  # REPRISE #
+  # nom_reprise #
+  
+  expression_vx_init 1.0
+  expression_vy_init 0.0
+  expression_vz_init 0.0
+  
+  # fichier_reprise_vitesse pre_run.sauv.lata 
+  timestep_reprise_vitesse 1 #
+ 
+ # Initialisation of a temperature difference between each phase #
+
+ energie
+  { 
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+    diff_temp_negligible
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+    conv_temperature_negligible
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+
+    expression_T_init 293.0+x/0.005*80.
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+  }
+
+ thermique
+  { 
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+    diff_temp_negligible
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+    conv_temperature_negligible
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+
+    # expression_T_init 293.0+80.0*(1.-ff)+x/0.005*80.*ff #
+    expression_T_init 1.-ff        
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+     ,
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+
+    expression_T_init 293.0+x/0.005*80.
+
+    fo 1.
+
+    # reprise_T #
+   
+    cp_liquid 10.0
+    lambda_liquid 6.
+
+    cp_vapor 100.0
+    lambda_vapor 3.
+
+    }
+  }
+
+# Sondes
+ {
+    sonde_temp temperature_0 periode 1e-10 segment 96 0.005 0.005 0.005 0.01 0.005 0.005
+ } #
+}  
+# Lata_to_other lml NOM_DU_CAS NOM_DU_CAS #
+Fin

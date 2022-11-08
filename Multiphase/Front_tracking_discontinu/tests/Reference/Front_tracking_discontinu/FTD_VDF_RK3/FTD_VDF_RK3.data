@@ -135,7 +135,9 @@ interf
 		fonction ((x*y*z)-((x-0.0075)^2+(y-0.0045)^2+(z-0.0075)^2-(0.001775)^2))
         }
 	volume_impose_phase_1 2.3425e-8
-        iterations_correction_volume 1
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 1
+        nb_iterations_correction_volume 0
         n_iterations_distance 2
 	remaillage { 
 		pas 0.000001

@@ -10,5 +10,6 @@ plot "FTD_2D_Axi_VITESSE_reference.son" title "reference" w l,\
 "FTD_2D_Axi_VITESSE.son" title "version_actuelle" w l,\
 0.01*sin(29.8*x) title "periode theorique pour mu=0" w l
 END
-echo Pour voir le fichier resultat: gv compare_sonde.eps
-gv compare_sonde.eps
+echo Pour voir le fichier resultat: evince compare_sonde.pdf
+epstopdf compare_sonde.eps
+evince compare_sonde.pdf

@@ -27,6 +27,7 @@
 #include <Constituant.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Chimie.h>
+#include <Triple_Line_Model_FT_Disc.h>
 
 Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
 
@@ -68,6 +69,12 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
       la_chimie_=ref_cast(Chimie,ob);
       return 1;
     }
+  if (sub_type(Triple_Line_Model_FT_Disc,ob))
+    {
+      //tcl_=ref_cast(Triple_Line_Model_FT_Disc,ob);
+      associate_triple_line_model(ref_cast(Triple_Line_Model_FT_Disc,ob));
+      return 1;
+    }
   return Pb_Fluide_base::associer_(ob);
 }
 
@@ -78,10 +85,19 @@ void Probleme_FT_Disc_gen::associer_equation(Equation_base& eq)
   if (equations_.size()==1)
     if (!sub_type(Navier_Stokes_FT_Disc,equation(0)))
       {
-        Cerr<<"L'equation d'hydraulique n'a pas ete associee comme premiere equation"<<finl;
-        exit();
+        Cerr<<"WARNING!!! L'equation d'hydraulique n'a pas ete associee comme premiere equation"<<finl;
+        Cerr<<"WARNING! considered as ERROR, exiting... "<<finl;
+        Process::exit();
       }
   equations_.add(eq);
+}
+
+void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1)
+{
+  // TODO: A verifier. Working fine?
+  // tcl.initialize(); // ca ne marche pas, apres le '=' ci-dessous, le tcl_.elems_.smart_resize_ est toujours a 0!!!
+  tcl_ = tcl_1;
+  tcl_.initialize();
 }
 
 /*! @brief Verifie que le milieu est de type Fluide_Diphasique et associe le milieu aux equations.
@@ -324,6 +340,22 @@ void Probleme_FT_Disc_gen::completer(void)
   Pb_Fluide_base::completer();
   if (la_chimie_.non_nul())
     la_chimie_.valeur().completer(*this);
+
+  if (tcl_.is_activated())
+    tcl_.completer();
+
+  // TODO : A activer peut-etre?
+  /*
+    // CLEANER, but how usefull?
+    // Un premier nettoyage des noeuds initiaux si besoin:
+    const int nb_eqn = nombre_d_equations();
+    for (int i=2; i<nb_eqn; i++)
+      if (sub_type(Transport_Interfaces_FT_Disc,equation(i)))
+        {
+          Transport_Interfaces_FT_Disc& transport = ref_cast(Transport_Interfaces_FT_Disc,equation(i));
+          transport.nettoyer_maillage();
+        }
+  */
 }
 
 int Probleme_FT_Disc_gen::verifier(void)

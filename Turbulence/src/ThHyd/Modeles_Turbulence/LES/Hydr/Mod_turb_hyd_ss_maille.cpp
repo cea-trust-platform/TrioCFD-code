@@ -35,8 +35,8 @@ Mod_turb_hyd_ss_maille::Mod_turb_hyd_ss_maille()
 }
 /*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
  *
- * @param (Sortie& is) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Mod_turb_hyd_ss_maille::printOn(Sortie& is) const
 {
@@ -46,8 +46,8 @@ Sortie& Mod_turb_hyd_ss_maille::printOn(Sortie& is) const
 
 /*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& Mod_turb_hyd_ss_maille::readOn(Entree& is)
 {

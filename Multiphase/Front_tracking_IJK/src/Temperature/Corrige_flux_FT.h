@@ -85,7 +85,8 @@ public:
     j_ = j1;
     k_ = k1;
   }
-  const ArrOfInt& get_indices_to_keep() { return indices_to_keep_;}
+  const ArrOfInt& get_indices_to_keep() const { return indices_to_keep_;}
+  const ArrOfInt& get_normale_vec() const {return next_elem_;}
 
   double calculer_surface_face(const IJK_Grid_Geometry& geom) const
   {
@@ -121,9 +122,9 @@ class Corrige_flux_FT // : public Objet_U
 public:
   Corrige_flux_FT() {};
   virtual ~Corrige_flux_FT() {};
-  int initialize(const IJK_Splitting& splitting_ft,
-                 const IJK_Field_double& field,
-                 const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft);
+  void initialize(const IJK_Splitting& splitting,
+                  const IJK_Field_double& field,
+                  const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft);
   // On va calculer sur la grille IJ de la layer k tous les flux a proximite de
   // l'interface. On remplace les flux donnes en entree par ces flux la.
   virtual void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
@@ -154,10 +155,10 @@ public:
   Corrige_flux_FT_temperature_conv() {};
   virtual ~Corrige_flux_FT_temperature_conv() {};
 
-  int initialize(const IJK_Splitting& splitting, const IJK_Field_double& field,
-                 const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft,
-                 const double rhocp_l, const double rhocp_v, const double lda_l,
-                 const double lda_v);
+  void initialize(const IJK_Splitting& splitting, const IJK_Field_double& field,
+                  const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft,
+                  const double rhocp_l, const double rhocp_v, const double lda_l,
+                  const double lda_v);
 
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
                            const int k_layer, const int dir) override;
@@ -179,14 +180,21 @@ public:
 protected:
   // Calcule effectivement sur les points a l'interface les valeurs de temp et
   // flux. Met a jour les tableaux temp_interface_ et q_interface_.
-  void calcul_temp_flux_interf();
+  void calcul_temp_flux_interf_pour_bary_face(ArrOfDouble& temp_vap, ArrOfDouble& temp_liqu);
+
+  // Calcule effectivement sur les points a l'interface les valeurs de temp et
+  // flux. Met a jour les tableaux temp_interface_ et q_interface_.
+  void calcul_temp_flux_interf_pour_bary_cell(ArrOfDouble& temp_vap, ArrOfDouble& temp_liqu);
 
   // Ici on suppose que les methodes d interpolation de la temperature ont deja
   // ete executees a ce pas de temps et on interpole dans l autre sens pour
   // recuperer la valeur aux barycentres des faces. Dans cette methode pas
   // besoin de faire comme pour la premiere partie qui sert aussi au post
   // traitement. Ici on ne s'en sert strictement que dans l'operateur.
-  void interp_back_to_bary_faces();
+  void interp_back_to_bary_faces(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu);
+
+  // Méthode qui met à jour temperature_ghost_.
+  void update_temperature_ghost(const ArrOfDouble& temp_vap, const ArrOfDouble& temp_liqu);
 
   // Comme ca on ne peut plus utiliser par erreur l'init de la classe abstraite
   // en cas de polymorphisme.
@@ -206,14 +214,14 @@ protected:
   Intersection_Interface_ijk_face intersection_ijk_face_;
   // Les tableaux pour stocker les valeurs aux points de part et d'autre de
   // l'interface.
-  ArrOfDouble temp_vap1_, temp_liqu1_;
+  // ArrOfDouble temp_vap1_, temp_liqu1_;
   // On prepare des tableaux pour les coordonnees des points d'interpolation et
   // des valeurs. Ces valeurs sont stockées pour éventuel post-traitement.
-  ArrOfDouble temp_interface_;
-  ArrOfDouble q_interface_;
+  ArrOfDouble temp_interface_face_;
+  ArrOfDouble q_interface_face_;
 
-  ArrOfDouble temp_interface_centre_;
-  ArrOfDouble q_interface_centre_;
+  ArrOfDouble temp_interface_cell_;
+  ArrOfDouble q_interface_cell_;
   // Ce tableau est de taille (n_diph, 2)
   // La premiere compo donne la température de la phase liquide et la deuxième
   // celle de la phase vapeur.
@@ -225,10 +233,6 @@ protected:
   // Dans ce tableau on stocke les température liquid et vapeur ghost des cell
   // diph.
   DoubleTab temperature_ghost_;
-  // Méthode qui met à jour temperature_ghost_.
-  void update_temperature_ghost();
-
-
 
   void multiplie_par_rho_cp_de_la_face_monophasique(
     const double frac_liquide,
@@ -253,7 +257,8 @@ protected:
   const double& get_ghost_temp_if_cell_is_diph(
     const FixedVector<int, 3>& elem,
     const bool from_liqu_phase) const ;
-  double extrapolation_amont_1_depuis_l_interface(const double decal) const ;
+  double extrapolation_amont_1_depuis_l_interface(
+    const double frac_liquide, const double decal) const ;
   double interpolation_quick_avec_1_ghost(
     const double frac_liquide,
     const double decal) const ;
