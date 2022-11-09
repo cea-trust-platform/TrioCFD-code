@@ -138,6 +138,9 @@ public:
   virtual const DoubleTab& get_update_normale_facettes() const;
   virtual const ArrOfDouble& get_update_courbure_sommets() const;
 
+  virtual const ArrOfDouble& get_surface_facettes() const;
+  virtual const DoubleTab& get_normale_facettes() const;
+
   inline int set_niveau_plot(int niv);
 
 

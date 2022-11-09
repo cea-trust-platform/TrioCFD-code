@@ -1578,6 +1578,18 @@ const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
   return data_cache.normale_facettes_;
 }
 
+const ArrOfDouble& Maillage_FT_Disc::get_surface_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.surface_facettes_;
+}
+
+const DoubleTab& Maillage_FT_Disc::get_normale_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.normale_facettes_;
+}
+
 /*! @brief Calcule la grandeur demandee, stocke le resultat dans un tableau interne a la classe et renvoie le resultat.
  *
  * Si le maillage
@@ -5236,29 +5248,36 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
   // Cette classe sert pour promener les sommets sur le bord du domaine.
   const Parcours_interface& parcours = refparcours_interface_.valeur();
 #if TCL_MODEL
-  const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
-  const Probleme_base& pb = eq_interfaces.get_probleme_base();
-  Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
-  Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+  int flag_tcl = 0;
+  double l_v = 0.;
   // interfacial velocity
   DoubleTab vit(nsom, dim);
-  if (tcl.is_activated() && tcl.is_capillary_activated())
+  if (refequation_transport_.non_nul())
     {
-      Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
-      Motcle nom_du_champ = "vitesse";
-      Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
-      Process::exit();
-      // Useless init to 0:
-      // for (int ii=0; ii< nsom; ii++)
-      //  for (int jj=0; jj< dim; jj++)
-      //    vit(ii,jj) = 0.;
-      eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
+      const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+      const Probleme_base& pb = eq_interfaces.get_probleme_base();
+      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+      Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+      if (tcl.is_activated() && tcl.is_capillary_activated())
+        {
+          flag_tcl = 1;
+          l_v = tcl.get_lv();
+          Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
+          Motcle nom_du_champ = "vitesse";
+          Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
+          Process::exit();
+          // Useless init to 0:
+          // for (int ii=0; ii< nsom; ii++)
+          //  for (int jj=0; jj< dim; jj++)
+          //    vit(ii,jj) = 0.;
+          eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
 
-      //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
-      // It relies on the classical assumption in the FT module that the first equation is NS.
+          //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
+          // It relies on the classical assumption in the FT module that the first equation is NS.
+        }
+      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+      //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
     }
-  const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
-  //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
 #endif
 
   for (facette = 0; facette < nfaces; facette++)
@@ -5872,11 +5891,11 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                   // the effect of CL velocity. Stored in tcl.set_theta_app
                   // (but maybe unused there). Value used locally here afterward.
                   // If the TCL model is activated and we're not on a virtual node :
-                  if ((sommet_elem_[som[i2]]>0) && tcl.is_activated()
-                      && tcl.is_capillary_activated())
+                  if ((sommet_elem_[som[i2]]>0) && flag_tcl)
                     {
                       const double t=temps_physique_;
                       int face_loc;
+                      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
                       const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
                       const Nom& bc_name = type_cl.frontiere_dis().le_nom();
                       // For each BC, we check its type to see if it's a wall:
@@ -5898,12 +5917,11 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       // The other som of the facette is som[1-i2] :
                       // Cerr << " sommet-1 x= " << sommets_(som[1-i2],0) << " y= " << sommets_(som[1-i2],1) << " time_sommet= " << t << finl;
                       // if(dt != 0.) double cl_v = (sommets_(som[i2],0) - x_cl_)/dt;
-
                       const int isom1 = som[1-i2];
                       // The second vertex of the segment should not be a contact line
                       // so we compute its tangential velocity:
-                      const int nb_compo = vit.dimension(1);
 
+                      const int nb_compo = vit.dimension(1);
                       double norm_vit_som1 = 0.;
                       double vn = 0.;
                       double v_cl = 0.;
@@ -5940,7 +5958,6 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       const double W = (sommets_(i2, 0) - bubble_center)/(2*2.71*2.71);
                       const double Ca = 2.8e-4*v_cl/5.89e-2;
                       Cerr << "Capillary_number = " << Ca << " time = " << t << finl;
-                      double l_v = tcl.get_lv();
                       double theta_app = pow((theta),3) - 9. * Ca * log(std::max(W, 1.e-20)/l_v);
                       theta_app = pow(std::max(theta_app, 0.),1./3.);
                       Cerr << "theta_after " << theta_app << " time_theta_after= " << t << finl;
@@ -5949,7 +5966,8 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       // (it is through this mean that we will consider
                       //  it and try to indirectly satisfy it).
                       costheta = cos(theta_app);
-                      tcl.set_theta_app(theta_app);
+                      // unused?
+                      //tcl.set_theta_app(theta_app);
                       Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
                            << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
                     }
