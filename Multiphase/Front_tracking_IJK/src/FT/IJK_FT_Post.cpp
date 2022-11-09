@@ -68,13 +68,15 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   dt_post_stats_bulles_ = 1;
   //poisson_solver_post_ = xxxx;
   postraiter_sous_pas_de_temps_ = 0;
-
+  post_par_paires_ = 0;
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
   param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
   param.ajouter_flag("postraiter_sous_pas_de_temps", &postraiter_sous_pas_de_temps_);
+  // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
+  param.ajouter_flag("post_par_paires", &post_par_paires_);
 
   expression_vitesse_analytique_.dimensionner_force(3);
   param.ajouter("expression_vx_ana", &expression_vitesse_analytique_[0]);
@@ -2145,6 +2147,13 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
+  // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
+  if ((post_par_paires_ == 1 && tstep % dt_post_ == dt_post_-0) || stop)
+    {
+      Cout << "tstep : " << tstep << finl;
+      posttraiter_champs_instantanes(lata_name, current_time, tstep);
+    }
+  // --
   if (tstep % dt_post_stats_bulles_ == dt_post_stats_bulles_ - 1 || stop)
     {
       ecrire_statistiques_bulles(0, nom_cas, gravite, current_time);
