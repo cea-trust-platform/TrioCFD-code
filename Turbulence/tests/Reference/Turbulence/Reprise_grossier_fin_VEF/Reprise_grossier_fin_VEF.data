@@ -4,7 +4,10 @@ dimension 2
 Pb_thermoHydraulique_Turbulent pb
 Domaine dom
 # BEGIN MESH #
-Lire_med dom dom grossier.med
+Lire_MED { 
+   domain dom 
+   file grossier.med 
+}
 Raffiner_isotrope dom
 # END MESH #
 # BEGIN PARTITION
@@ -33,31 +36,42 @@ Read sch
 	dt_sauv 1000.
 	seuil_statio 1.e-8
 }
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu      Champ_Fonc_MED last_time grossier.med dom viscosite_dynamique elem 0.
-	rho     Champ_Uniforme 1 2        
-	lambda  Champ_Fonc_MED last_time grossier.med dom conductivite elem 0.
-        Cp      Champ_Uniforme 1 100.
-        beta_th Champ_Uniforme 1 0.
-}
-Champ_Uniforme gravite
-Read gravite 2 0. -9.81
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 Discretize pb dis
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0. -9.81
+   	mu      Champ_Fonc_MED { domain dom 
+                              file grossier.med 
+                              field viscosite_dynamique 
+                              last_time 
+                              }
+   	rho     Champ_Uniforme 1 2        
+   	lambda  Champ_Fonc_MED { domain dom 
+                              file grossier.med 
+                              field conductivite 
+                              last_time 
+                              }
+           Cp      Champ_Uniforme 1 100.
+           beta_th Champ_Uniforme 1 0.
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { }
 		convection { Amont }
 		diffusion { }
 		initial_conditions {
-			vitesse Champ_fonc_med last_time grossier.med dom vitesse som 0.
+			vitesse Champ_Fonc_MED { domain dom 
+                               file grossier.med 
+                               field vitesse 
+                               loc som 
+                               last_time 
+                               }
 			}
 		boundary_conditions {
 			 Haut1 Paroi_Fixe
@@ -89,7 +103,11 @@ Read pb
 		      			SortieHaute frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
 			   	}
 			   	initial_conditions {
-			      		k_Eps Champ_fonc_med last_time grossier.med dom K_EPS elem 0.
+			      		k_Eps Champ_Fonc_MED { domain dom 
+                                       file grossier.med 
+                                       field K_EPS 
+                                       last_time 
+                                       }
 			  	}
 			 }
 			 turbulence_paroi loi_standard_hydr
@@ -112,7 +130,12 @@ Read pb
 			 SortieHaute frontiere_ouverte t_ext champ_front_uniforme 1 20
 			 Entree frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 30
                 }
-                initial_conditions { Temperature Champ_fonc_med last_time grossier.med dom temperature elem 0. }
+                initial_conditions { Temperature Champ_Fonc_MED { domain dom 
+                                                                  file grossier.med 
+                                                                  field temperature 
+                                                                  last_time 
+                                                                  }
+}
 		modele_turbulence Prandtl {
                         turbulence_paroi loi_standard_hydr_scalaire
                 }
@@ -143,3 +166,4 @@ Read pb
 Solve pb
 End
 
+ 

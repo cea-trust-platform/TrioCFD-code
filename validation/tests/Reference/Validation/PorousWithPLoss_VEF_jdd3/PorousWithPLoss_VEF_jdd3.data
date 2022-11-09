@@ -58,26 +58,25 @@ Read sch
     seuil_statio 1.e-5
 }
 
-Fluide_Incompressible eau
-Read eau
-{
-    mu Champ_Uniforme 1 1.
-    rho Champ_Uniforme 1 800.
-    cp Champ_uniforme 1 1000.
-    lambda champ_uniforme 1 10.
-    beta_th champ_uniforme 1 0.
-}
-
 Champ_Uniforme gravite
 Read gravite 2 0 0
 Associate pb dom
 Associate pb sch
-Associate pb eau
 Discretize pb dis
 # Debog pb seq faces 1.e-6 0 #
-porosites_champ pb champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
 Read pb
 {
+
+    fluide_incompressible {
+        mu Champ_Uniforme 1 1.
+        rho Champ_Uniforme 1 800.
+        cp Champ_uniforme 1 1000.
+        lambda champ_uniforme 1 10.
+        beta_th champ_uniforme 1 0.
+        porosites_champ champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
+    }
+
+
     Navier_Stokes_standard
     {
 sources { Perte_charge_directionnelle { diam_hydr Champ_uniforme 1 0.2 lambda 1.00 direction Champ_uniforme 3 1. 0. 0. } }

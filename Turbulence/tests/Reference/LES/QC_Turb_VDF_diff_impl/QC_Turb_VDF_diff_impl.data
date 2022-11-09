@@ -62,34 +62,32 @@ Lire sch_ex
 	nb_pas_dt_max 20
 }
 
-Fluide_Quasi_Compressible fluide
-Lire fluide
-{
-        mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
-        pression 100000.
-        lambda champ_fonc_fonction pb temperature 1 (2.06803521126761000000e-3*(val^1.5)/(val+111.))
-        loi_etat gaz_parfait_qc 	{
-                		Prandtl 0.71
-                		Cp 1005
-                		gamma 1.4
-        			}
-	traitement_pth conservation_masse
-	Traitement_rho_gravite moins_rho_moyen
-}
 
-Champ_Uniforme gravite
-Lire gravite 3 0. -9.81 0.
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch_ex
-Associate pb fluide
 
 Discretize pb dis
 
 Lire pb
 {
-        Navier_Stokes_turbulent_QC
+   
+   fluide_quasi_compressible {
+   
+        gravite champ_uniforme 3 0. -9.81 0.
+           mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
+           pression 100000.
+           lambda champ_fonc_fonction pb temperature 1 (2.06803521126761000000e-3*(val^1.5)/(val+111.))
+           loi_etat gaz_parfait_qc 	{
+                   		Prandtl 0.71
+                   		Cp 1005
+                   		gamma 1.4
+           			}
+   	traitement_pth conservation_masse
+   	Traitement_rho_gravite moins_rho_moyen
+   }
+   
+           Navier_Stokes_turbulent_QC
         {
                 solveur_pression petsc cholesky { }
                 projection_initiale 1
@@ -160,3 +158,4 @@ Postraitement
 Solve pb
 Fin
 
+ 

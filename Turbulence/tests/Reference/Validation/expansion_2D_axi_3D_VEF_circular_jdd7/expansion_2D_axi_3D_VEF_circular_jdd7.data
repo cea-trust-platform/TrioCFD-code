@@ -43,19 +43,18 @@ Read sch
 }
 
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 0.00121
-	rho Champ_Uniforme 1 1000
-}
 Associate pb DOM_exc
 Associate pb sch
-Associate pb fluide
 Discretize pb dis
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 0.00121
+   	rho Champ_Uniforme 1 1000
+   }
+   
+   	Navier_Stokes_turbulent
 	{		
 			solveur_pression GCP { 
 			precond ssor { omega 1.500000 } 
@@ -133,3 +132,4 @@ Postraitement
 }
 Solve pb
 End
+ 

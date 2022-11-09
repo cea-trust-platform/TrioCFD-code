@@ -4,7 +4,10 @@ dimension 2
 
 Domaine dom
 # BEGIN MESH #
- Read_MED family_names_from_group_names dom FinerMeshSquare_T ../FinerMeshSquare_T.med
+ Lire_MED { 
+   domain dom 
+   file ../FinerMeshSquare_T.med 
+}
 # END MESH #
 
 
@@ -41,37 +44,8 @@ Read sch
 	seuil_statio 1.e-6
 }
 
-Fluide_Incompressible etat
-Read etat
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho Champ_Uniforme 1 1.17
-	lambda Champ_Uniforme 1 0.0262 
-	Cp Champ_Uniforme 1 1006
-	beta_th Champ_Uniforme 1 3.6e-3
-}
-
-Fluide_Incompressible sensibilite
-Read sensibilite
-{
-        mu Champ_Uniforme 1 1.85e-5
-	rho Champ_Uniforme 1 1.17
-        lambda Champ_Uniforme 1 0.0262 
-	Cp Champ_Uniforme 1 1006
-	beta_th Champ_Uniforme 1 3.6e-3
-}
-
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81
-
-Associate etat gravite
-Associate sensibilite gravite
-
 Associate pb_etat dom
-Associate pb_etat etat
-
 Associate pb_sensibilite dom
-Associate pb_sensibilite sensibilite
 
 Probleme_Couple pbc
 Associate pbc pb_etat
@@ -79,9 +53,18 @@ Associate pbc pb_sensibilite
 Associate pbc sch
 Discretize pbc dis
 
-
 Read pb_etat
 {
+Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+	lambda Champ_Uniforme 1 0.0262 
+	Cp Champ_Uniforme 1 1006
+	beta_th Champ_Uniforme 1 3.6e-3
+	gravite Champ_Uniforme 2 0 -9.81
+}
+
 	Navier_Stokes_standard
 	{
 		solveur_pression GCP { 
@@ -157,6 +140,16 @@ Read pb_etat
 
 Read pb_sensibilite
 {
+Fluide_Incompressible
+{
+        mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+        lambda Champ_Uniforme 1 0.0262 
+	Cp Champ_Uniforme 1 1006
+	beta_th Champ_Uniforme 1 3.6e-3
+	gravite Champ_Uniforme 2 0 -9.81
+}
+
         Navier_Stokes_standard_sensibility
         {       
                 uncertain_variable { vitesse }

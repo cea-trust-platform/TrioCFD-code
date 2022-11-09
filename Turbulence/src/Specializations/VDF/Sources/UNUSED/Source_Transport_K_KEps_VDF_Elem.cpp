@@ -53,7 +53,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
   const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const int nbcouches = mon_eq_transport_K_Eps->get_nbcouches();

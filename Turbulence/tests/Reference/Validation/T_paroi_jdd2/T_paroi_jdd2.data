@@ -37,25 +37,25 @@ Read sch
 
 VEFPreP1B cubes
 
-Fluide_Incompressible He
-Read He
-{
-        mu Champ_Uniforme 1 4.4e-05 
-        rho Champ_Uniforme 1 4.4
-        lambda Champ_Uniforme 1 0.34   
-        Cp Champ_Uniforme 1 5193.
-        beta_th Champ_Uniforme 1 0.0014285714
-}
 
 Associate pbf dom_pb2
-Associate pbf He     
+    
 Associate pbf sch
 
 Discretize pbf cubes
 
 Read pbf
 {
-        Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+            mu Champ_Uniforme 1 4.4e-05 
+           rho Champ_Uniforme 1 4.4
+           lambda Champ_Uniforme 1 0.34   
+           Cp Champ_Uniforme 1 5193.
+           beta_th Champ_Uniforme 1 0.0014285714
+   }
+   
+           Navier_Stokes_turbulent
         {
                 solveur_pression Cholesky  { }
 		convection { negligeable }
@@ -111,3 +111,4 @@ EcritureLectureSpecial 0
 Imprimer_flux  dom_pb2 { interface } 
 Solve pbf
 End
+ 

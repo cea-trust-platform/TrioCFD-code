@@ -29,22 +29,21 @@ Lire sch
 	nb_pas_dt_max 0
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu champ_uniforme 1 0.001
- 	rho champ_uniforme 1 1000
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 0.001
+    	rho champ_uniforme 1 1000
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		equation_non_resolue	(t>0)
 		solveur_pression	GCP { precond_nul seuil 1e-10 }
@@ -121,3 +120,4 @@ EcritureLectureSpecial EcrFicPartageBin
 Resoudre pb
 
 Fin
+ 

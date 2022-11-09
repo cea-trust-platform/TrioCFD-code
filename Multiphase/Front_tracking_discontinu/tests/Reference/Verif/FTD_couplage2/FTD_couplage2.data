@@ -104,14 +104,6 @@ Lire fluide
   chaleur_latente Champ_Uniforme 1    -100.
 }
 
-Solide sol
-Read sol
-{
-	rho Uniform_Field 1 1000.
-	lambda Champ_Uniforme 1 0.125    
-	Cp Champ_Uniforme 1 11.e3
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -139,7 +131,6 @@ Associate pb1 interf
 Associate pb1 fluide
 
 Associate pb2 dom_solide
-Associate pb2 sol
 
 Probleme_Couple pbc
 Associate pbc pb1
@@ -265,42 +256,43 @@ Lire pb1
 liste_postraitements
 {
 	
-   Postraitement_ft_lata post1
-   {
-	dt_post 1.e-8
-	nom_fichier lata_fluide
- 	champs elements
-             {
-          indicatrice_interf
-	  distance_interface_elem_interf
-	  normale_interface_interf
-	  SURFACE_INTERFACE_interf
-	  temperature_grad_thermique
-	  temperature_grad_thermique_vapeur
-          temperature_thermique
-	  temperature_thermique_vapeur
-          vitesse
-	  vitesse_delta_interface
-	  pression_laplacien_d
-          pression
-          temperature_mpoint
-          temperature_mpointv
-	     }
-
-	      
-	interfaces interf
-	      {  
-		champs sommets { courbure }
-		champs elements { PE PE_LOCAL COMPO_CONNEXE }
-
-              }
-
-    }
+   postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata_fluide 
+    champs dt_post 1.e-8 { 
+        indicatrice_interf elem 
+        distance_interface_elem_interf elem 
+        normale_interface_interf elem 
+        SURFACE_INTERFACE_interf elem 
+        temperature_grad_thermique elem 
+        temperature_grad_thermique_vapeur elem 
+        temperature_thermique elem 
+        temperature_thermique_vapeur elem 
+        vitesse elem 
+        vitesse_delta_interface elem 
+        pression_laplacien_d elem 
+        pression elem 
+        temperature_mpoint elem 
+        temperature_mpointv elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        PE elem 
+        PE_LOCAL elem 
+        COMPO_CONNEXE elem 
+    } 
+}
     }
 }
 
 Read pb2
 {
+Solide
+{
+	rho Uniform_Field 1 1000.
+	lambda Champ_Uniforme 1 0.125    
+	Cp Champ_Uniforme 1 11.e3
+}
 	Conduction
 	{
 		diffusion { }
@@ -346,3 +338,4 @@ ecriturelecturespecial 0
 
 Solve pbc
 FIN		     
+ 

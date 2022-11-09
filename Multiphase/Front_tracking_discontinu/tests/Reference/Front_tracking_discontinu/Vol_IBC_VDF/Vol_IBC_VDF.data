@@ -26,11 +26,20 @@ Mailler DOM
 Transformer DOM 0.1*x 0.1*y z
 
 domaine tmp
-lire_med family_names_from_group_names tmp aile1 aile1.med
+Lire_MED { 
+   domain tmp 
+   file aile1.med 
+}
 ecrire_fichier_formatte tmp aile1.geom
-lire_med family_names_from_group_names tmp aile2 aile2.med
+Lire_MED { 
+   domain tmp 
+   file aile2.med 
+}
 ecrire_fichier_formatte tmp aile2.geom
-lire_med family_names_from_group_names tmp corps corps.med
+Lire_MED { 
+   domain tmp 
+   file corps.med 
+}
 ecrire_fichier_formatte tmp corps.geom
 
 
@@ -152,30 +161,30 @@ Lire pb
      }
      liste_postraitements
      {
-	    Postraitement_ft_lata corps
-	    {
-		    dt_post 0.01
-		    nom_fichier corps
-		    format binaire
-		    champs elements { vitesse }
-		    interfaces corps { }
-	    } 
-	    Postraitement_ft_lata aile_gauche
-	    {
-		    dt_post 0.01
-		    nom_fichier aile_gauche
-		    format binaire
-		    interfaces aile_gauche { }
-	    } 
-	    Postraitement_ft_lata aile_droite
-	    {
-		    dt_post 0.01
-		    nom_fichier aile_droite
-		    format binaire
-		    interfaces aile_droite { }
-	    } 	    
+	    postraitement_ft_lata corps { 
+    format Lata 
+    fichier corps 
+    champs dt_post 0.01 { 
+        vitesse elem 
+    } 
+    interfaces corps { 
+    } 
+} 
+	    postraitement_ft_lata aile_gauche { 
+    format Lata 
+    fichier aile_gauche 
+    interfaces aile_gauche { 
+    } 
+} 
+	    postraitement_ft_lata aile_droite { 
+    format Lata 
+    fichier aile_droite 
+    interfaces aile_droite { 
+    } 
+} 	    
      }
 }
 
 Solve pb
 Fin
+ 

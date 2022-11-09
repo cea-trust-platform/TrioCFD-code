@@ -57,7 +57,7 @@ Lire sch
         seuil_statio 1.e-5	
 }
 
-Pb_Thermohydraulique pb
+Pb_Rayo_Thermohydraulique pb
 VEFPreP1B dis
 Fluide_Incompressible fluide
 Lire fluide
@@ -67,11 +67,8 @@ Lire fluide
         lambda Champ_Uniforme 1 0.2
 	Cp Champ_Uniforme 1 500
         beta_th Champ_Uniforme 1 0.
+        gravite Champ_Uniforme 3 0 -9.81  0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. -9.81 0.
-Associate fluide gravite
 
 Associate pb dom_tetra
 Associate pb fluide

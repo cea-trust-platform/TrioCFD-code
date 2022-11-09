@@ -151,7 +151,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::calculer_Prod_utet
   int face;
   const IntTab& face_voisins = zone_VDF.face_voisins();
   uteta_T = 0;
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
   // on calcul tout d'abord le gradient de temperature par faces.
   // Traitement des faces internes
 
@@ -248,7 +248,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   const Transport_Flux_Chaleur_Turbulente& mon_eq_transport_Flux_Chaleur_Turb =  modele_Flux_Chaleur.equation_Chaleur();
   const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb.inconnue().valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const DoubleTab& g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   int nb_elem = zone_VDF.nb_elem();
@@ -256,7 +256,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   //  int nb_face = zone_VDF.nb_faces();
   //   const IntTab& face_voisins = zone_VDF.face_voisins();
   //   const IntVect& orientation = zone_VDF.orientation();
-  const DoubleVect& porosite_surf = zone_VDF.porosite_face();
+  const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   //   const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
   DoubleTrav uteta_T(nb_elem_tot);
   DoubleTrav P(nb_elem_tot);

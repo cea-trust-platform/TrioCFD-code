@@ -50,34 +50,33 @@ Read sch
 # T0 273.15,P0= 101325.  Pr = 0.72 #
 # mu0 1.716e-5      C = 110.6 #
 # lambda0= 2.414e-2 Slambda 194.4 #
-Fluide_Quasi_Compressible air
-Read air
-{
-        pression   92665.5
-        mu Champ_Uniforme  1  1.983e-5
-
-        loi_etat gaz_parfait_qc {
-                Prandtl 0.72
-                Cp 1006.
-                gamma 1.4
-        }
-	traitement_pth constant
-}
 
 # Champ_Uniforme gravite #
 # Read gravite 2  0. -9.81 0. #
-Champ_Uniforme gravite
-Read gravite 3  0. 0. 0. 
 
-Associate air gravite
+
 Associate pb dom
 Associate pb sch 
-Associate pb air 
+
 
 Discretize pb dis 
 
 Read pb 
-{ 
+{    
+   fluide_quasi_compressible {
+   
+        gravite champ_uniforme 3  0. 0. 0.         pression   92665.5
+           mu Champ_Uniforme  1  1.983e-5
+   
+           loi_etat gaz_parfait_qc {
+                   Prandtl 0.72
+                   Cp 1006.
+                   gamma 1.4
+           }
+   	traitement_pth constant
+   }
+   
+   
  Navier_Stokes_QC 
  { 
      solveur_pression petsc cholesky { }
@@ -263,4 +262,5 @@ Read pb
 }
 Solve pb
 End
+ 
  

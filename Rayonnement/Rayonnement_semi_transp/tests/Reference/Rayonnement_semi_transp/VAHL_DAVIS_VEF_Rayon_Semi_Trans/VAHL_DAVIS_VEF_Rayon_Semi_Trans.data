@@ -1,7 +1,7 @@
 # Thermohydraulique 2D VEF Boussinesq + Rayonnement semi transparent #
 # PARALLEL OK #
 dimension 2
-Pb_Thermohydraulique pb
+Pb_Rayo_Thermohydraulique pb
 Domaine dom
 # BEGIN MESH #
 Mailler dom
@@ -63,14 +63,11 @@ Lire fluide
 	beta_th Champ_Uniforme 1 3.822e-3
 	indice Champ_Uniforme 1 1.
 	kappa Champ_Uniforme 1 10.
+	gravite Champ_Uniforme  2 0 -9.81
 }
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
 
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo dom
-Associate fluide gravite
 Associate pb dom
 Associate pb fluide
 

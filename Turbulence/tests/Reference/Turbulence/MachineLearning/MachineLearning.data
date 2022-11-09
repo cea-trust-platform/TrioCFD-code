@@ -78,22 +78,21 @@ Lire sch
         nb_pas_dt_max 5
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu champ_uniforme 1 0.001
- 	rho champ_uniforme 1 1000
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 0.001
+    	rho champ_uniforme 1 1000
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		Solveur_pression	PETSC Cholesky { }
 		Convection		{ amont }
@@ -160,3 +159,4 @@ EcritureLectureSpecial EcrFicPartageBin
 Resoudre pb
 Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 Fin
+ 

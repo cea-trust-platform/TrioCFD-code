@@ -8,7 +8,10 @@ Pb_hydraulique_turbulent pb
 Domaine dom
 # BEGIN MESH #
 
-Lire_med family_names_from_group_names dom dom marche_2D.med
+Lire_MED { 
+   domain dom 
+   file marche_2D.med 
+}
 
 VerifierCoin dom { }
 
@@ -48,22 +51,21 @@ Lire sch
         seuil_statio 1.e-8
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu	champ_uniforme 1 1.186666667
-	rho	champ_uniforme 1 1000
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu	champ_uniforme 1 1.186666667
+   	rho	champ_uniforme 1 1000
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression	PETSC Cholesky { }
 		convection		{ amont }
@@ -151,3 +153,4 @@ Lire pb
 Resoudre pb
 
 Fin
+ 

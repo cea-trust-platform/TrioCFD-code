@@ -53,16 +53,9 @@ Lire sch
 	facsec 1.
 }
 
-Fluide_Incompressible air
-Lire air
-{
-	mu Champ_Uniforme 1 0.00622
-	rho Champ_Uniforme 1 2
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb air
 
 Discretize pb dis
 
@@ -71,7 +64,13 @@ et en parallele. En effet il est impossible d'avoir les memes resultats pour ce 
 non regression avec un tirage aleatoire pour le bruit #
 Lire pb
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 0.00622
+   	rho Champ_Uniforme 1 2
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{
 		solveur_pression Petsc Cholesky { }	
 		convection { Centre  }
@@ -106,3 +105,4 @@ Solve pb
 Fin
 dt_impr 0.1
                 
+ 

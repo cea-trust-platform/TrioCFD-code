@@ -36,27 +36,25 @@ Lire sch
 	seuil_statio	-1
 }
 
-Fluide_Incompressible eau
-Lire eau
-{
-	mu  Champ_Uniforme 1 1.e-3
- 	rho Champ_Uniforme 1 998.2
-}
 
 
-Champ_Uniforme gravite
-Lire gravite 2 0. -9.81
-Associate eau gravite
 
 Associate pb dom2D
 Associate pb sch
-Associate pb eau
 
 Discretize pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0. -9.81
+   	mu  Champ_Uniforme 1 1.e-3
+    	rho Champ_Uniforme 1 998.2
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 	        solveur_pression Gcp { precond ssor { omega 1.5 } seuil 1.e-8 } 
                 convection { ef_stab { alpha 1.0 } }
@@ -95,3 +93,4 @@ Lire pb
 
 Solve pb
 Fin
+ 

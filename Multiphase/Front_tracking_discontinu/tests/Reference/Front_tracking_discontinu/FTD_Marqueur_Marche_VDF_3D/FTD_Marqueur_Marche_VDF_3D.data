@@ -68,11 +68,8 @@ Lire liquide
 {
 	mu Champ_Uniforme 1 5e-05
 	rho Champ_Uniforme 1 2
+	gravite Champ_Uniforme 3 0. -9.81 0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc          hydraulique
 Transport_Marqueur_FT	       transport_marqueur
@@ -158,13 +155,13 @@ Lire pb
 	}
 	liste_postraitements
 	{
-	       Postraitement_ft_lata marqueurs
-	       {
-		       dt_post 0.05
-		       nom_fichier transport_marqueur
-		       print
-		       interfaces transport_marqueur { champs sommets { vitesse } }
-	       }	
+	       postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier transport_marqueur 
+    interfaces transport_marqueur { 
+        vitesse som 
+    } 
+}	
 	}
 }
 Solve pb
@@ -192,3 +189,4 @@ boundary_conditions
 		 SortieHaute Paroi_FT_disc symetrie
 		 Entree Paroi_FT_disc symetrie	
 		}
+ 

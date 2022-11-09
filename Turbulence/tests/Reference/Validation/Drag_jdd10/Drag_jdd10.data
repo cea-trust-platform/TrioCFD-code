@@ -1,7 +1,10 @@
 # Lecture du 1/2 maillage #
 dimension 2
 Domaine dom1
-Lire_med family_names_from_group_names dom1 forme forme.med
+Lire_MED { 
+   domain dom1 
+   file forme.med 
+}
 VerifierCoin dom1 { }
 Ecrire_fichier_bin dom1 forme_bin.geom
 # Hydraulique 2D, fluide air #
@@ -51,20 +54,19 @@ Read mon_schema
 }
 
 # Je definis un milieu #
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu  Champ_Uniforme 1 0.00002
-	rho Champ_Uniforme 1 1.2
-}
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.00002
+   	rho Champ_Uniforme 1 1.2
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { } 
 		convection { muscl }
@@ -79,6 +81,7 @@ Read pb
 			Sortie 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
 			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
 		}
+ 
 
 	       modele_turbulence longueur_melange { dmax 1000 fichier dom_Wall_length.xyz turbulence_paroi loi_standard_hydr }
         }

@@ -59,8 +59,18 @@ Lire sch
     nb_pas_dt_max 5
   }
   
-fluide_quasi_compressible eau 
-Lire eau
+
+  
+
+Pb_Thermohydraulique_Especes_QC pb 
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+  { 
+  fluide_quasi_compressible 
   { 
     pression 171428.571429
     loi_etat gaz_parfait_qc 
@@ -75,18 +85,6 @@ Lire eau
     mu champ_uniforme  1 2.0
   }
   
-champ_uniforme gravite 
-Lire gravite 3 0. 0.0 0.0
-
-Pb_Thermohydraulique_Especes_QC pb 
-
-Associate pb dom
-Associate pb sch
-Associate pb eau
-Discretize pb dis
-
-Lire pb
-  { 
     navier_stokes_qc 
       { 
         solveur_pression gcp 
@@ -199,19 +197,17 @@ Lire pb
      
     liste_postraitements
      {
-        Postraitement_ft_lata post1
-        {
-                dt_post 0.05
-                nom_fichier post1
-	        format binaire
-		champs sommets
-                 {
-                  vitesse
-                 }
-        }
+        postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.05 { 
+        vitesse som 
+    } 
+}
 
      }
 }
 
 Solve pb
 fin 
+ 

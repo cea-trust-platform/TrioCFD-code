@@ -15,7 +15,7 @@ Lire sch
 	nb_pas_dt_max 1000
 }
 
-Pb_Thermohydraulique pb2
+Pb_Rayo_Thermohydraulique pb2
 
 Domaine dom_fluide
 # BEGIN MESH #
@@ -59,13 +59,9 @@ Lire fluide
 	rho Champ_Uniforme 1 2
         lambda Champ_Uniforme 1 0.02
 	Cp Champ_Uniforme 1 500
+	gravite Champ_Uniforme 2 0 -9.81
         beta_th Champ_Uniforme 1 0.
 }
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81 
-Associate fluide gravite
 
 Associate pb2 dom_fluide
 Associate pb2 fluide

@@ -56,11 +56,8 @@ Lire liquide
 {
 	mu  Champ_Uniforme 1 0.282e-3
  	rho Champ_Uniforme 1 1000.
+ 	gravite Champ_Uniforme 2 0. -9.81
 }
-
-Champ_Uniforme gravite
-Lire gravite 2 0. -9.81
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       balle
@@ -116,16 +113,18 @@ Lire pb
      }
      liste_postraitements
      {
-	    Postraitement_ft_lata sphere
-	    {
-		    dt_post 0.2
-		    nom_fichier post1
-		    format binaire
-		    champs elements { vitesse }
-		    interfaces balle { }
-	    } 
+	    postraitement_ft_lata sphere { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.2 { 
+        vitesse elem 
+    } 
+    interfaces balle { 
+    } 
+} 
      }
 }
 
 Solve pb
 Fin
+ 

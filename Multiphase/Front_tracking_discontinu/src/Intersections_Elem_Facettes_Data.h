@@ -43,6 +43,10 @@ public:
   // En 2D, on a barycentre_[2] = 0.;
   double barycentre_[3];
 
+  // Coordinate of the barycenter of phase 1 in the cell
+  // En 2D, on a barycentre_phase1_[2] = 0.;
+  double barycentre_phase1_[3];
+
   int index_element_suivant_;  // -1 si dernier element de la liste
   int index_facette_suivante_; // idem.
   int numero_facette_;
@@ -86,6 +90,7 @@ public:
                            int num_element,
                            double surface_intersection,
                            double contrib_volume_phase1,
+                           double barycentre_phase1[3],
                            double barycentre_u,
                            double barycentre_v,
                            double barycentre_w);

@@ -5,7 +5,10 @@ dimension 3
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom Poutre Poutre.med
+Lire_MED { 
+   domain dom 
+   file Poutre.med 
+}
 # END MESH #
 
 # BEGIN PARTITION #

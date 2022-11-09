@@ -36,6 +36,7 @@
 #include <Champ_Fonc_Face.h>
 #include <Matrice_Morse_Sym.h>
 #include <Navier_Stokes_phase_field.h>
+#include <Milieu_base.h>
 
 Implemente_instanciable_sans_constructeur(AssembleurPVDF_PF,"Assembleur_P_VDF_Phase_Field",Assembleur_P_VDF);
 
@@ -293,7 +294,7 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
   const IntTab& face_voisins = zone_vdf.face_voisins();
   const DoubleVect& face_surfaces = zone_vdf.face_surfaces();
   const DoubleVect& volumes_entrelaces = zone_vdf.volumes_entrelaces();
-  const DoubleVect& porosite_face = zone_vdf.porosite_face();
+  const DoubleVect& porosite_face = la_zone_Cl_VDF->equation().milieu().porosite_face();
 
 
   const DoubleVect * valeurs_rho = 0;

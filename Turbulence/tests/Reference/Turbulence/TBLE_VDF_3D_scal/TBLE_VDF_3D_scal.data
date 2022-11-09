@@ -56,23 +56,10 @@ Read sch
 }
 
 
-Fluide_Incompressible air
-Read air
-{
-	mu Champ_Uniforme 1 0.0019862
-	rho Champ_Uniforme 1 2
-	lambda Champ_Uniforme 1 7.2636
-	Cp Champ_Uniforme 1 2596.5
-	beta_th Champ_Uniforme 1 1.
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
 
-Associate air gravite
 
 Associate pbGros dom_pbGros
-Associate pbGros air
 Associate pbGros sch
 
 Discretize pbGros dis
@@ -82,7 +69,18 @@ Discretize pbGros dis
 # definition du probleme grossier #
  Read pbGros
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme 1 0.0019862
+   	rho Champ_Uniforme 1 2
+   	lambda Champ_Uniforme 1 7.2636
+   	Cp Champ_Uniforme 1 2596.5
+   	beta_th Champ_Uniforme 1 1.
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{
 		solveur_pression petsc cholesky { }	
 		convection { centre }
@@ -143,3 +141,4 @@ Solve pbGros
 End
 
 
+ 

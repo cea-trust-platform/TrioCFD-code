@@ -1,7 +1,7 @@
 # Thermohydraulique 2D : vahl davis quasi compressible gaz parfait VDF #
 # PARALLEL OK 8 #
 dimension 2
-Pb_Thermohydraulique_QC pb
+Pb_Rayo_Thermohydraulique_QC pb
 Domaine dom
 # BEGIN MESH #
 Mailler dom
@@ -66,14 +66,11 @@ Lire fluide
 	Traitement_pth conservation_masse
 	indice Champ_Uniforme 1 1.	
 	kappa Champ_Uniforme 1 10.
+	gravite Champ_Uniforme  2 0 -9.81
 }
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
 
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo dom
-Associate fluide gravite
 Associate pb dom
 Associate pb fluide
 

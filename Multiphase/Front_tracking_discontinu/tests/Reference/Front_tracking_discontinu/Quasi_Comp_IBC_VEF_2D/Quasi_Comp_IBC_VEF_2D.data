@@ -75,8 +75,17 @@ Lire sch
     nb_pas_dt_max 100
   }
   
-fluide_quasi_compressible eau 
-Lire eau
+
+
+Pb_Thermohydraulique_Especes_QC pb 
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+  { 
+  fluide_quasi_compressible 
   { 
     pression 171428.571429
     loi_etat gaz_parfait_qc 
@@ -90,25 +99,7 @@ Lire eau
     traitement_rho_gravite moins_rho_moyen
     mu champ_uniforme  1 2.0
   }
-# Marqueur_FT marqueur
-Lire marqueur
-{
- ensemble_points { sous_zones 1 zone1 aleatoire 400 } 
-} #
   
-champ_uniforme gravite 
-Lire gravite 2 0.0 0.0
-# Associate eau marqueur #
-
-Pb_Thermohydraulique_Especes_QC pb 
-
-Associate pb dom
-Associate pb sch
-Associate pb eau
-Discretize pb dis
-
-Lire pb
-  { 
     navier_stokes_qc 
       { 
         solveur_pression gcp 
@@ -240,13 +231,12 @@ Lire pb
       
 liste_postraitements
     {
-        Postraitement_ft_lata post1
-        {
-                dt_post 0.05
-                nom_fichier post1
-                format binaire
-                interfaces  pbTransport_Interfaces_FT_Disc0 { }
-        }
+        postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    interfaces pbtransport_interfaces_ft_disc0 { 
+    } 
+}
     }    
 }
 
@@ -259,3 +249,4 @@ boundary_conditions
 		    Sortie Paroi_FT_disc symetrie
 		    Bas    Paroi_FT_disc symetrie 
 		}
+ 

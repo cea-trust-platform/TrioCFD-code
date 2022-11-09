@@ -24,8 +24,10 @@
 #include <EFichier.h>
 #include <SFichier.h>
 #include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
+
 class Maillage_FT_Disc;
+
+
 /*! @brief : class DebogIJK
  *
  *  <Description of class DebogIJK>

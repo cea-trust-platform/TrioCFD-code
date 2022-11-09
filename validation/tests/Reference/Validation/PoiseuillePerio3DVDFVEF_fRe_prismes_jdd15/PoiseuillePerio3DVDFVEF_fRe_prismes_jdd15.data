@@ -36,25 +36,24 @@ Corriger_frontiere_periodique { Domaine DOM_BODY Bord PERIO }
 
 VEFpreP1b cubesregu
 
-Fluide_Incompressible He
-Read He
-{
-	    mu      Champ_Uniforme  1 3.56e-5
-	    rho     Champ_Uniforme  1 3.85
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0. 0. 0
-Associate He gravite
 Associate pb1 DOM_BODY
-Associate pb1 He  
+ 
 Associate pb1 sch
 
 Discretize pb1 cubesregu
 
 Read pb1
 {
-        Navier_Stokes_standard
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0. 0. 0
+   	    mu      Champ_Uniforme  1 3.56e-5
+   	    rho     Champ_Uniforme  1 3.85
+   }
+   
+           Navier_Stokes_standard
         {
 		solveur_pression petsc cholesky  { }
 		convection { Muscl }
@@ -98,3 +97,4 @@ solveur_pression GCP {
 
 #
 
+ 

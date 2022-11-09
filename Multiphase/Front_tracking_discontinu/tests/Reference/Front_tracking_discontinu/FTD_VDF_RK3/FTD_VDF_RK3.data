@@ -135,7 +135,9 @@ interf
 		fonction ((x*y*z)-((x-0.0075)^2+(y-0.0045)^2+(z-0.0075)^2-(0.001775)^2))
         }
 	volume_impose_phase_1 2.3425e-8
-        iterations_correction_volume 1
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 1
+        nb_iterations_correction_volume 0
         n_iterations_distance 2
 	remaillage { 
 		pas 0.000001
@@ -189,53 +191,29 @@ Postraitement
 	}
 liste_postraitements
 {
-	Postraitement_ft_lata post
-	{	
-		dt_post 0.005
-		nom_fichier lata/post
-		format binaire
-		print
-                champs elements
-		{
-			indicatrice_interf
-			pression
-			vitesse
-		}
-		champs sommets
-		{
-		}
-                interfaces interf {
-                        champs sommets {
-                                pe
-				courbure
-                        }
-                        champs elements {
-                                pe
-                        }
-                }
-	}
-	Postraitement_ft_lata post2
-	{	
-		dt_post 0.005
-		nom_fichier lata/post2
-		format binaire
-		print
-                champs elements
-		{
-		}
-		champs sommets
-		{
-		}
-                interfaces interf {
-                        champs sommets {
-				courbure
-                        }
-                        champs elements {
-                        }
-                }
-	}
+	postraitement_ft_lata post { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.005 { 
+        indicatrice_interf elem 
+        pression elem 
+        vitesse elem 
+    } 
+    interfaces interf { 
+        pe elem 
+        courbure som 
+    } 
+}
+	postraitement_ft_lata post2 { 
+    format Lata 
+    fichier lata/post2 
+    interfaces interf { 
+        courbure som 
+    } 
+}
 }
 }
 
 Solve pb
 Fin
+ 

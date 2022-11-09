@@ -137,7 +137,7 @@ Lire pb
 		distance_projete_faces simplifiee
                 methode_transport vitesse_imposee 2.*pi*0.125*sin(2.*pi*t) -0.
                 vitesse_imposee_regularisee 1
-		indic_faces_modifiee
+		type_indic_faces modifiee
 		{ 
 		  position -1.0
 		  thickness 0.9
@@ -163,43 +163,24 @@ Lire pb
 
 	liste_postraitements
 	{	        
-                Postraitement_ft_lata post_dom
-                {
-		        dt_post 0.5
-        		nom_fichier lata/post_dom
-	        	format binaire
-		        print
-                	champs sommets
-	        	{
-			        Vorticite
-		        	Critere_Q
-        		}
-        		champs elements
-	        	{
-		        	vitesse
-			        pression
-                                Divergence_U
-	        		indicatrice_cylindre
-        		}
-	        	champs Faces
-		        {
-			        vitesse
-                                gradient_pression
-	        		indicatrice_faces_cylindre
-	        	}
-		        interfaces cylindre
-                        {
-			        champs sommets 
-                                {
-				        pe
-				        courbure
-			        }
-			        champs elements
-                                {
-				        pe
-			        }
-		        }
-                }        
+                postraitement_ft_lata post_dom { 
+    format Lata 
+    fichier lata/post_dom 
+    champs dt_post 0.5 { 
+        Vorticite som 
+        Critere_Q som 
+        vitesse faces 
+        pression elem 
+        Divergence_U elem 
+        indicatrice_cylindre elem 
+        gradient_pression faces 
+        indicatrice_faces_cylindre faces 
+    } 
+    interfaces cylindre { 
+        pe elem 
+        courbure som 
+    } 
+}        
 	}
 }
 
@@ -207,3 +188,4 @@ Solve pb
 
 Fin
 
+ 

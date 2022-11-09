@@ -53,28 +53,26 @@ Read sch
 
 
 # So here, change water to sodium caracteristics #
-Fluide_Incompressible Na
-Read Na
-{
-        mu  Champ_Uniforme 1 2.7e-4 	# Uniform dynamic viscosity #
-        rho Champ_Uniforme 1 838.	# Uniform density #
-        lambda Champ_Uniforme 1 68.18 
-        Cp Champ_Uniforme 1 1268.15 
-	beta_th champ_uniforme 1 0.0002
-}
-Champ_Uniforme gravite
-Read gravite 3 0 0 -9.81
-Associate Na gravite
  
 # Association between TRUST objects #
 Associate pbF DOM_DOM
-Associate pbF Na
 Associate pbF sch
 Discretize pbF dis
 
 Read pbF
 {
-   Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 -9.81
+           mu  Champ_Uniforme 1 2.7e-4 	# Uniform dynamic viscosity #
+           rho Champ_Uniforme 1 838.	# Uniform density #
+           lambda Champ_Uniforme 1 68.18 
+           Cp Champ_Uniforme 1 1268.15 
+   	beta_th champ_uniforme 1 0.0002
+   }
+   
+      Navier_Stokes_turbulent
         {
 		solveur_pression petsc cholesky { }  
 		# On this test case, alpha 0.2 diverges #
@@ -135,3 +133,4 @@ Read pbF
 
 Solve pbF
 End
+ 

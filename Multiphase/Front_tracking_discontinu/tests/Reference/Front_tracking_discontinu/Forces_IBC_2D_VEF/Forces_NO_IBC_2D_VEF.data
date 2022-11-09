@@ -5,7 +5,10 @@ dimension 2
 Pb_Hydraulique pb
 Domaine dom
 # BEGIN MESH #
-lire_med family_names_from_group_names dom cavite_avec_disque cavite_avec_disque.med
+Lire_MED { 
+   domain dom 
+   file cavite_avec_disque.med 
+}
 VerifierCoin dom { }
 # END MESH #
 
@@ -35,26 +38,18 @@ Lire sch
 	dt_impr 1.e-3  
 }
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1 1.e-5
-	rho Champ_Uniforme 1 1.
-}
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
-
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 
 Lire pb
 {
+Fluide_Incompressible
+{
+	mu Champ_Uniforme 1 1.e-5
+	rho Champ_Uniforme 1 1.
+	gravite Champ_Uniforme 2 0 -9.81
+}
 	Navier_Stokes_standard
 	{
 		solveur_pression cholesky { }

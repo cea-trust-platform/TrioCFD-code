@@ -20,7 +20,7 @@ solveur piso {
 facsec 100.
 }
 
-Pb_Thermohydraulique pb2
+Pb_Rayo_Thermohydraulique pb2
 
 Domaine dom_fluide
 # BEGIN MESH #
@@ -54,11 +54,8 @@ Read fluide
         lambda Champ_Uniforme 1 0.2
         Cp Champ_Uniforme 1 1000.
         beta_th Champ_Uniforme 1 0.
+        gravite Champ_Uniforme 3 0 -9.81  0
 }
-
-Champ_Uniforme gravite
-Read gravite 3 0. -9.81 0.
-Associate fluide gravite
 
 Associate pb2 dom_fluide
 Associate pb2 fluide

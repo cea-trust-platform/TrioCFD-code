@@ -77,26 +77,25 @@ Read sch
 
 VEFpreP1b cubesregu
 
-Fluide_Incompressible He
-Read He
-{
 
-	    mu Champ_Uniforme  1 1e-5
-	    rho Champ_Uniforme  1 1.0
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0. 0. 0
-Associate He gravite
 Associate pb1 dom_pb1
-Associate pb1 He  
+ 
 Associate pb1 sch
 
 Discretize pb1 cubesregu
 
 Read pb1
 {
-        Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0. 0. 0
+   
+   	    mu Champ_Uniforme  1 1e-5
+   	    rho Champ_Uniforme  1 1.0
+   }
+   
+           Navier_Stokes_Turbulent
         {
                 solveur_pression petsc Cholesky { } 
 		
@@ -184,3 +183,4 @@ Read pb1
 
 Solve pb1
 End
+ 

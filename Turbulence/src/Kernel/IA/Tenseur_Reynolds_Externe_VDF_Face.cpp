@@ -176,7 +176,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
   const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntVect& orientation = zone_VDF.orientation();
-  const DoubleVect& porosite_surf = zone_VDF.porosite_face();
+  const DoubleVect& porosite_surf = zone_Cl_VDF.equation().milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
 
   int ndeb,nfin,ncomp,num_face,elem1,elem2;

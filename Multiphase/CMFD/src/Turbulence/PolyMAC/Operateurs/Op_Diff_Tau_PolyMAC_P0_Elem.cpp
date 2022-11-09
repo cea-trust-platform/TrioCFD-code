@@ -91,7 +91,7 @@ double Op_Diff_Tau_PolyMAC_P0_Elem::calculer_dt_stab() const
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe() : NULL,
                     &diffu = diffusivite_pour_pas_de_temps().valeurs(), &lambda = diffusivite().valeurs();
   const DoubleTab& tau = equation().probleme().get_champ("tau").passe();
-  const DoubleVect& pe = zone.porosite_elem(), &vf = zone.volumes_entrelaces(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &vf = zone.volumes_entrelaces(), &ve = zone.volumes();
   update_nu();
   int i, d, e, f, n, N = equation().inconnue().valeurs().dimension(1), cD = diffu.dimension(0) == 1, cL = lambda.dimension(0) == 1, D = dimension;
 

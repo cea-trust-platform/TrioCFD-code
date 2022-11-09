@@ -78,11 +78,8 @@ Read huile
 {
 	rho Champ_Uniforme 1 973
 	mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
+	gravite Champ_Uniforme 3 0. 0. -9.81
 }
-
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-Associate huile gravite
 
 Navier_Stokes_FT_Disc eq_hydraulique
 Transport_Interfaces_FT_Disc agit
@@ -210,27 +207,23 @@ Postraitement
 	       }	
 	}
 
-    liste_de_postraitements
+    liste_postraitements
     {
-	    ancre Postraitement_ft_lata 
-            {
-                    dt_post .06250000000000000000
-                    nom_fichier lata/ancre
-                    print
-                    champs elements
-                    {
-                        indicatrice_agit
-                        vitesse
-                        pression
-                        Divergence_U
-                    }
-                    interfaces agit {
-                            champs sommets {
-                                    courbure
-                            }
-                    }
-            }
+	     postraitement_ft_lata ancre { 
+    format Lata 
+    fichier lata/ancre 
+    champs dt_post .06250000000000000000 { 
+        indicatrice_agit elem 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+    } 
+    interfaces agit { 
+        courbure som 
+    } 
+}
 	}
 }
 Solve pb
 End
+ 

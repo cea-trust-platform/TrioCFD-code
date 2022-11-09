@@ -12,13 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Postraitement_ft_lata.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/23
-//
-//////////////////////////////////////////////////////////////////////////////
+
 #include <Postraitement_ft_lata.h>
 #include <Probleme_FT_Disc_gen.h>
 #include <Transport_Marqueur_FT.h>
@@ -31,19 +25,10 @@
 #include <communications.h>
 #include <SFichier.h>
 #include <Param.h>
+#include <Format_Post_Lata.h>
 
-Implemente_instanciable_sans_constructeur(Postraitement_ft_lata,"Postraitement_ft_lata",Postraitement_lata);
+Implemente_instanciable(Postraitement_ft_lata,"Postraitement_ft_lata",Postraitement);
 
-/*! @brief Constructeur par defaut
- *
- */
-Postraitement_ft_lata::Postraitement_ft_lata()
-{
-}
-
-/*! @brief Appel a Postraitement_lata::readOn
- *
- */
 Entree& Postraitement_ft_lata::readOn(Entree& is)
 {
   // Verification du type du probleme
@@ -62,7 +47,10 @@ Entree& Postraitement_ft_lata::readOn(Entree& is)
       exit();
     }
 
-  Postraitement_lata::readOn(is);
+  Postraitement::readOn(is);
+  if (!sub_type(Format_Post_Lata, format_post.valeur()))
+    Process::exit("ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'.");
+
   return is;
 }
 
@@ -73,12 +61,16 @@ Sortie& Postraitement_ft_lata::printOn(Sortie& os) const
 
 void Postraitement_ft_lata::set_param(Param& param)
 {
-  Postraitement_lata::set_param(param);
+  Postraitement::set_param(param);
   param.ajouter_non_std("interfaces",(this));
 }
 
 int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
+  int ret_val = Postraitement::lire_motcle_non_standard(mot, is);
+  if (ret_val != -1) // all good we've hit standard postprocessing keywords
+    return ret_val;
+
   Motcle motlu;
   if (mot=="interfaces")
     {
@@ -87,7 +79,7 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
           Cerr<<" Only one transport interface equation name can be specified "<<finl;
           Cerr<<" for a Postraitement_ft_lata post-process."<<finl;
-          Cerr<<" The "<<Motcle(refequation_interfaces->le_nom())<<" has already been readen for the post-process "<<(*this).le_nom()<<finl;
+          Cerr<<" The "<<Motcle(refequation_interfaces->le_nom())<<" has already been read for the post-process "<<(*this).le_nom()<<finl;
           Cerr<<" Please, create a new Postraitement_ft_lata post-process"<<finl;
           Cerr<<" for the "<<motlu<<" transport interface equation."<<finl;
           exit();
@@ -118,6 +110,12 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
           exit();
         }
       is >> motlu;
+      if (motlu == "no_virtuals")
+        {
+          if (Process::nproc() > 1)
+            no_virtuals_ = true;
+          is >> motlu;
+        }
       if (motlu != "{")
         {
           Cerr << " Postraitement_ft_lata::lire_champ\n";
@@ -126,336 +124,234 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
           exit();
         }
 
-      while (1)
-        {
-          is >> motlu;
-          if (motlu == "champs")
-            lire_champ_interface(is);
-          else if (motlu == "}")
-            break;
-          else
-            {
-              Cerr << "Postraitement_ft_lata::lire_champ\n";
-              Cerr << "The keyword champs was expected.";
-              Cerr << "It has been found " << motlu << finl;
-              exit();
-            }
-        }
+      lire_champ_interface(is);
       return 1;
     }
   else
-    return Postraitement_lata::lire_motcle_non_standard(mot,is);
-  return 1;
+    return -11;
 }
 
 /*! @brief lecture de la liste de champs aux interfaces a postraiter
- *
  */
 void Postraitement_ft_lata::lire_champ_interface(Entree& is)
 {
-  Motcle motcle;
-  is >> motcle;
-  Localisation loc = SOMMETS;
-  if (motcle == "sommets")
-    loc = SOMMETS;
-  else if (motcle == "elements")
-    loc = ELEMENTS;
-  else
-    {
-      Cerr << "Error for Postraitement_ft_lata::lire_champ_interface :\n";
-      Cerr << motcle <<" has been readen. "<< finl;
-      Cerr << " Kewords sommets or elements were expected after the keyword champs " << finl;
-      exit();
-    }
-  Motcles& liste =
-    (loc == SOMMETS) ? liste_champs_i_aux_sommets : liste_champs_i_aux_elements;
-
-  is >> motcle;
-  if (motcle != "{")
-    {
-
-      Cerr << "Error for Postraitement_ft_lata::lire_champ_interface  :\n";
-      Cerr << motcle << " has been readen. "<<finl;
-      Cerr << " { was expected after sommets/elements." << finl;
-
-      exit();
-    }
+  Motcle nom_champ, loc_lu;
   const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_interfaces.valeur();
 
   while (1)
     {
-      is >> motcle;
-      if (motcle == "}")
-        break;
-      if (! eq_interfaces.get_champ_post_FT(motcle, loc, (FloatTab*) 0))
+      is >> nom_champ;
+      if (nom_champ == "}")  break;
+
+      is >> loc_lu;
+      Localisation loc = SOMMETS;
+      if (loc_lu == "som")
+        loc = SOMMETS;
+      else if (loc_lu == "elem")
+        loc = ELEMENTS;
+      else
         {
-          if (! eq_interfaces.get_champ_post_FT(motcle, loc, (IntTab*) 0))
-            {
-              Cerr << "Error for Postraitement_ft_lata::lire_champ_interface :\n";
-              Cerr << " The field " << motcle;
-              Cerr << " is not understood for the " << (eq_interfaces.que_suis_je()=="Transport_Marqueur_FT"?"particules":"interfaces") << " or not authorized at ";
-              Nom tmp = ((loc == SOMMETS) ? "sommets" : "elements");
-              Cerr << tmp <<finl;
-              eq_interfaces.get_champ_post_FT(demande_description, loc, (FloatTab*) 0);
-              eq_interfaces.get_champ_post_FT(demande_description, loc, (IntTab*) 0);
-              exit();
-            }
+          Cerr << "Error for Postraitement_ft_lata::lire_champ_interface :\n";
+          Cerr << loc_lu <<" has been readen. "<< finl;
+          Cerr << " Keywords 'som' or 'elem' were expected after the field name '" << nom_champ << "'" << finl;
+          exit();
         }
-      if (!liste.contient_(motcle))
-        liste.add(motcle);
+
+      if (!eq_interfaces.get_champ_post_FT(nom_champ, loc, (DoubleTab*) 0) && !eq_interfaces.get_champ_post_FT(nom_champ, loc, (IntTab*) 0))
+        {
+          Cerr << "Error for Postraitement_ft_lata::lire_champ_interface :\n";
+          Cerr << " The field '" << nom_champ << "' is not understood for the " << (eq_interfaces.que_suis_je()=="Transport_Marqueur_FT"?"particules":"interfaces") << " or not authorized at localisation '";
+          Nom tmp = ((loc == SOMMETS) ? "sommets" : "elements");
+          Cerr << tmp << "'" << finl;
+          eq_interfaces.get_champ_post_FT(demande_description, loc, (DoubleTab*) 0);
+          eq_interfaces.get_champ_post_FT(demande_description, loc, (IntTab*) 0);
+          exit();
+        }
+      Motcles& liste = loc == SOMMETS ? liste_champs_i_aux_sommets : liste_champs_i_aux_elements;
+      if (!liste.contient_(nom_champ))
+        liste.add(nom_champ);
     }
 }
 
-/*! @brief Appel a Postraitement_lata (on ecrit l'entete la premiere fois et on postraite les champs euleriens),
- *
- *   puis ecriture des interfaces et des champs aux interfaces.
- *   Voir aussi Postraitement_base
+/*! @brief Build a reduced version of the facettes array, excluding virtual ones
+ * Also update the internal renumbering array for later usage when writing out field values.
+ */
+int Postraitement_ft_lata::filter_out_virtual_fa7(IntTab& new_fa7)
+{
+  const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
+  const IntTab& fa7 = mesh.facettes();
+  int nl=fa7.dimension(0), nc=fa7.dimension(1), cnt=0;
+  new_fa7.resize(0, nc);
+  int sz = 0;
+
+  // Reset renumbering
+  renum_.clear();
+
+  for(int i = 0; i < nl; i++)
+    {
+      if (!mesh.facette_virtuelle(i))
+        {
+          sz++;
+          new_fa7.resize(sz, nc);
+          renum_.push_back(i);
+          for(int j = 0; j < nc; j++)
+            new_fa7(sz-1, j) = fa7(i, j);
+        }
+    }
+  return sz;
+}
+
+void Postraitement_ft_lata::filter_out_array(const DoubleTab& dtab, DoubleTab& new_dtab) const
+{
+  int nl = (int)renum_.size(), nc = dtab.dimension(1);
+  new_dtab.resize(nl, nc);
+
+  for(int i = 0; i < nl; i++)
+    for(int j = 0; j < nc; j++)
+      new_dtab(i, j) = dtab(renum_[i], j);
+}
+
+/*! @brief Write the Maillage_FT_Disc object into a LATA file in V2 format.
  *
  */
-void Postraitement_ft_lata::postraiter(int forcer)
+int Postraitement_ft_lata::ecrire_maillage_ft_disc()
 {
-  const double temps_dernier_post_before = temps_dernier_post_;
-  Postraitement_lata::postraiter(forcer);
-
-  Format_Post_Lata::Options_Para option;
-  if (fichiers_multiples_ == 0)
-    option = Format_Post_Lata::SINGLE_FILE;
-  else
-    option = Format_Post_Lata::MULTIPLE_FILES;
-
-  Format_Post_Lata::Format fmt;
-  if (format_ == ASCII)
-    fmt = Format_Post_Lata::ASCII;
-  else
-    fmt = Format_Post_Lata::BINAIRE;
-
-  if (! forcer)
-    if (! dt_post_ecoule(dt_post_, temps_dernier_post_before))
-      // L'intervalle de temps entre postraitements n'est pas ecoule
-      return;
-  if (Process::je_suis_maitre())
-    Cerr << "Postraitement_ft_lata::postraiter time =" << temps_ << finl;
-
-  // Pour eviter un plantage si l'utilisateur specifie un Postraitement_ft_lata
-  // sans interfaces specifiees
-  if (!refequation_interfaces.non_nul())
-    return;
-
-  const Maillage_FT_Disc& maillage =
-    refequation_interfaces.valeur().maillage_interface_pour_post();
-
-  // Determination du type de maillage en fonction du type de l equation
-  Nom type_maillage;
+  // Determining mesh type according to equation type:
   if (sub_type(Transport_Marqueur_FT,refequation_interfaces.valeur()))
-    type_maillage = "PARTICULES";
+    id_domaine_ = "PARTICULES";
   else if (sub_type(Transport_Interfaces_FT_Disc,refequation_interfaces.valeur()))
-    type_maillage = "INTERFACES";
+    id_domaine_ = "INTERFACES";
   else
     {
       Cerr<<"Type "<<refequation_interfaces.valeur().que_suis_je()<<" not recognized"<<finl;
       exit();
     }
+  const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
+  const DoubleTab& sommets = mesh.sommets();
+  const IntTab& fa7 = mesh.facettes();
+  int dim = mesh.sommets().dimension(1);
+  Motcle type_elem = dim == 2 ? "Segment" : "Triangle";
 
-  // Ouverture du fichier lata
-  Nom filename_interfaces;
-  {
-    char str_temps[100] = "0.0";
-    if (temps_ >= 0.)
-      sprintf(str_temps, "%.10f", temps_);
-
-    Nom basename_interf(lata_basename_);
-    Nom extension_interf(".lata.");
-    extension_interf+=type_maillage+".";
-    const Probleme_base& pb = mon_probleme.valeur();
-    extension_interf += pb.domaine().le_nom();
-    extension_interf += ".";
-    extension_interf += pb.le_nom();
-    extension_interf += ".";
-    extension_interf += str_temps;
-
-    Fichier_Lata fichier_interf(basename_interf, extension_interf,
-                                Fichier_Lata::ERASE, fmt, option);
-
-    filename_interfaces = fichier_interf.get_filename();
-
-    ecrire_maillage(fichier_interf, maillage, fichiers_multiples_);
-  }
-
-  Fichier_Lata_maitre fichier(lata_basename_, extension_lata(),
-                              Fichier_Lata::APPEND, option);
-
-  if (fichier.is_master())
+  Format_Post_Lata& fpl = ref_cast(Format_Post_Lata, format_post.valeur());  // this is check above
+  if (no_virtuals_)
     {
-      fichier.get_SFichier() << "Champ " << type_maillage << " "
-                             << remove_path(filename_interfaces)
-                             << finl;
+      IntTab real_fa7;
+      real_fa7.set_smart_resize(1);
+      filter_out_virtual_fa7(real_fa7);
+      return fpl.ecrire_domaine_low_level(id_domaine_, sommets, real_fa7, type_elem);
     }
-  fichier.syncfile();
+  else
+    return  fpl.ecrire_domaine_low_level(id_domaine_, sommets, fa7, type_elem);
 }
 
-// Format lata pour le maillage :
-// Si fichiers_multiples_==1, on sort un fichier par processeur, avec la numerotation locale,
-// sinon:
-//  nb_sommets dimension
-//                (nombre total de sommets sur l'ensemble des procs)
-//  x y (z)
-//  x y (z)       tous les sommets du proc 1, puis du proc 2, ...
-//  ...
-//  nb_faces dimension         nombre total de faces
-//  sommet1 sommet2 (sommet3)
-//  sommet1 sommet2 (sommet3)  toutes les faces...
-//  ...
-//     (les sommets sont numerotes a partir de zero,
-//      numerotation globale dans l'ordre d'apparition des sommets)
-//  som 1 drapeau
-//  drapeau
-//  drapeau         les drapeaux des sommets
-//  ...
-//  som 1 num_pe
-//  pe
-//  pe              les numeros des pe de chaque sommet
-//  ...              (0,0,...,0,1,1,  ...  ,nproc-1)
-
-void Postraitement_ft_lata::ecrire_maillage(Fichier_Lata& file,
-                                            const Maillage_FT_Disc& mesh,
-                                            int fichiers_multiples) const
+/*! @brief Override. Add the interfaces to the LATA output
+ *
+ */
+int Postraitement_ft_lata::write_extra_mesh()
 {
-  SFichier& sfichier = file.get_SFichier();
+  if (refequation_interfaces.non_nul())
+    {
+      ecrire_maillage_ft_disc();
+      return 1;
+    }
+  return -1;
+}
 
-  const DoubleTab& sommets = mesh.sommets();
-  const IntTab& facettes = mesh.facettes();
+void Postraitement_ft_lata::postprocess_field_values()
+{
+  // The standard fields
+  Postraitement::postprocess_field_values();
 
-  // Quelques calculs impliquant des communications
-  const int nb_sommets_local = sommets.dimension(0);
-  const int nb_sommets_total =
-    fichiers_multiples ? nb_sommets_local : mp_sum(nb_sommets_local);
-  const int nb_facettes_local = facettes.dimension(0);
-  const int nb_facettes_total =
-    fichiers_multiples ? nb_facettes_local : mp_sum(nb_facettes_local);
-  const int offset_sommets =
-    fichiers_multiples ? 0 : mppartial_sum(nb_sommets_local);
+  // Now specific FT fields:
+  if(!refequation_interfaces.non_nul()) return;
 
-  // Ecriture des sommets sur tous les processeurs
-  if (file.is_master())
-    sfichier << sommets.dimension(1) << space << nb_sommets_total << finl;
-  {
-    float data[3];
-    const int n = sommets.dimension(0);
-    const int m = sommets.dimension(1);
-    for (int i = 0; i < n; i++)
-      {
-        for (int j = 0; j < m; j++)
-          data[j] = (float)sommets(i,j); // downcast to float ...
-        sfichier.put(data, m, m+1);
-      }
-  }
-  file.syncfile();
+  double temps_courant = mon_probleme->schema_temps().temps_courant();
 
-  // Ecriture des facettes (on ajoute un offset aux numeros de sommets
-  // pour obtenir la numerotation globale: offset = somme des nombres
-  // de noeuds sur les processeurs precedents)
-  if (file.is_master())
-    sfichier << facettes.dimension(1) << space << nb_facettes_total << finl;
-
-  {
-    IntTab facettes_renum(facettes);
-    facettes_renum += offset_sommets;
-    sfichier.put(facettes_renum.addr(),
-                 facettes_renum.size_array(), facettes_renum.dimension(1));
-  }
-  file.syncfile();
-
-  // Ecriture des champs
-  const Transport_Interfaces_FT_Disc& eq_interfaces =
-    refequation_interfaces.valeur();
+  const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_interfaces.valeur();
+  const Maillage_FT_Disc& mesh = eq_interfaces.maillage_interface_pour_post();
+  const int nb_sommets_local = mesh.sommets().dimension(0);
+  const int nb_facettes_local = mesh.facettes().dimension(0);
+  const IntTab& elements = mesh.facettes();
 
   for (int num_loc = 0; num_loc < 2; num_loc++)
     {
       Localisation loc = SOMMETS;
-      switch(num_loc)
-        {
-        case 0:
-          loc=SOMMETS;
-          break;
-        case 1:
-          loc=ELEMENTS;
-          break;
-        }
-
-      const Motcles& liste = (loc == SOMMETS
-                              ? liste_champs_i_aux_sommets
-                              : liste_champs_i_aux_elements);
-
-      const char * som_elem = (loc == SOMMETS ? "SOM" : "ELEM");
+      if (num_loc == 1) loc = ELEMENTS;
+      const Motcles& liste = loc == SOMMETS ? liste_champs_i_aux_sommets : liste_champs_i_aux_elements;
 
       const int nb_champs = liste.size();
-      if (nb_champs == 0)
-        return;
+      if (nb_champs == 0) continue;
 
-      FloatTab ftab;
+      const char * som_elem =  loc == SOMMETS ? "SOM" : "ELEM";
+
+      DoubleTab dtab;
       IntTab itab;
 
-      int i;
-      for (i = 0; i < nb_champs; i++)
+      for (int i = 0; i < nb_champs; i++)
         {
           const Motcle& nom_du_champ = liste[i];
-
-          if (eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &ftab))
+          if (eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &dtab))
             {
               // ok, le champ est dans ftab
             }
           else if (eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &itab))
             {
-              // copie du champ dans ftab
+              const int n = itab.dimension(0);
+              const int m = itab.nb_dim() == 1 ? 1 : itab.dimension(1);
+              dtab.resize(n, m);
+              // copie du champ dans dtab
               if (itab.nb_dim() == 1)
-                {
-                  const int n = itab.dimension(0);
-                  ftab.resize(n,1);
-                  for (int j = 0; j < n; j++)
-                    ftab(j,0) = (float)itab(j);
-                }
+                for (int j = 0; j < n; j++)
+                  dtab(j,0) = (double)itab(j);
               else
-                {
-                  const int n = itab.dimension(0);
-                  const int m = itab.dimension(1);
-                  ftab.resize(n, m);
-                  for (int j = 0; j < n; j++)
-                    for (int k = 0; k < m; k++)
-                      ftab(j,k) = (float)itab(j,k);
-                }
+                for (int j = 0; j < n; j++)
+                  for (int k = 0; k < m; k++)
+                    dtab(j,k) = (double)itab(j,k);
             }
           else
             {
-              // Normalement on aurait deja du detecter cette erreur a la lecture
-              // du postraitement :
-
+              // Normalement on aurait deja du detecter cette erreur a la lecture du postraitement :
               Cerr << "Error for Postraitement_ft_lata::ecrire_maillage" << finl;
               Cerr << "Unknown field : " << nom_du_champ << finl;
               exit();
             }
 
-          const int nb_noeuds = ftab.dimension(0);
-          const int nb_compo = (ftab.nb_dim() == 1 ? 1 : ftab.dimension(1));
-          const int nb_noeuds_attendus =
-            (loc == SOMMETS ? nb_sommets_local : nb_facettes_local);
-          if (nb_noeuds != nb_noeuds_attendus)
+          const int nb_items = dtab.dimension(0);
+          const int nb_items_attendus = loc == SOMMETS ? nb_sommets_local : nb_facettes_local;
+          const char * msg = loc == SOMMETS ? " nb_noeuds " : " nb_facettes ";
+          const int nb_compo = (dtab.nb_dim() == 1 ? 0 : dtab.dimension(1));
+          if (nb_items != nb_items_attendus)
             {
               Cerr << "Error for Postraitement_ft_lata::ecrire_maillage" << finl;
-              Cerr << " nb_noeuds = " << nb_noeuds << finl;
-              Cerr << " nb_noeuds expected = " << nb_noeuds_attendus << finl;
+              Cerr << msg << "= " << nb_items << finl;
+              Cerr << msg << "expected = " << nb_items_attendus << finl;
               exit();
             }
-
-          if (file.is_master())
+          // [ABN] should I really bother with this?:
+          Noms unites(nb_compo), noms_compo;
+          std::string cp[3] = {"X", "Y", "Z"};
+          for(int nc=0; nc<nb_compo; nc++)
             {
-              sfichier << som_elem << finl;
-              sfichier << nb_compo << finl;
-              sfichier << nom_du_champ << finl;
+              unites.add("");
+              noms_compo.add(nc < 3 ? cp[nc] : Nom(nc));
             }
-          sfichier.put(ftab.addr(), nb_noeuds * nb_compo, nb_compo);
-          file.syncfile();
-
+          Domaine dummy_dom;
+          dummy_dom.nommer(id_domaine_);
+          Nom nature = nb_compo == 1 ? "scalar" : "vectorial";
+          const int component_to_process = -1; // meaning that we always want all components
+          // For ELEMENT processing, we need to filter out virtual facettes (if requested):
+          if (loc == ELEMENTS && no_virtuals_)
+            {
+              DoubleTab new_dtab;
+              filter_out_array(dtab, new_dtab);
+              postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature,
+                                 new_dtab);
+            }
+          else
+            postraiter_tableau(dummy_dom, unites, noms_compo, component_to_process, temps_courant, nom_du_champ, som_elem, nature,
+                               dtab);
         }
     }
 }
+
 

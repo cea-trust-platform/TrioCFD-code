@@ -45,7 +45,8 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-    nb_pas_dt_max 0
+    nb_pas_dt_max 1
+    dt_max 1.e-16
     solveur ice
     {
         criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e-5 omega 1. }
@@ -55,21 +56,7 @@ Read sch
     }
 }
 
-Fluide_Incompressible eau_liquide
-Read eau_liquide
-{
-	mu champ_uniforme 1 0.001
- 	rho champ_uniforme 1 1000
-	lambda Champ_Uniforme  1 1.
-        Cp Champ_Uniforme      1 1.
-        beta_th Champ_Uniforme 1 0.
-}
 Pb_Multiphase pb
-
-phases pb
-{
-    liquide { eau }
-}
 
 associate  pb dom
 Associate  pb sch
@@ -77,6 +64,18 @@ Discretize pb dis
 
 Lire pb
 {
+	Milieu_composite
+	{
+liquide_eau Fluide_Incompressible
+{
+	mu champ_uniforme 1 0.001
+ 	rho champ_uniforme 1 1000
+	lambda Champ_Uniforme  1 1.
+        Cp Champ_Uniforme      1 1.
+        beta_th Champ_Uniforme 1 0.
+}
+
+	}
     correlations
     {
     }
@@ -142,7 +141,7 @@ Lire pb
         }
 	sources
 	{
-	Production_energie_cin_turb ,
+	Production_energie_cin_turb { } ,
 	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 	}
     }
@@ -209,11 +208,11 @@ Lire pb
 							               }
 					}
 		sondes			{
-					vitesseX	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					vitesseX	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
 					vitesseY	vitesseY		periode 1 position_like vitesseX
 					vitesseZ	vitesseZ		periode 1 position_like vitesseX
 
-					k		k			periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
 					omega		omega			periode 1 position_like k
 					epsilon	epsilon		periode 1 position_like k
 					nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
@@ -229,11 +228,11 @@ Lire pb
 					conv_omega 	conv_omega 		periode 1 position_like omega
 					diff_crois_omega diff_crois_omega		periode 1 position_like omega
 					
-					vitesseX_bord	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					vitesseX_bord	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
 					vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
 					vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
 
-					k_bord		k			periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
 					omega_bord	omega			periode 1 position_like k_bord
 					epsilon_bord	epsilon		periode 1 position_like k_bord
 					nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord

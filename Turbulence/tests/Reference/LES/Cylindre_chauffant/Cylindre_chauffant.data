@@ -57,32 +57,9 @@ Lire mon_schema
 	diffusion_implicite 1
 }
 
-# Je definis un milieu #
-Fluide_Incompressible milieu
-Lire milieu
-{
-	mu  Champ_Uniforme 1 0.01
-	rho Champ_Uniforme 1 2.
-        lambda Champ_Uniforme 1 2
-        Cp Champ_Uniforme 1 100.
-        beta_th Champ_Uniforme 1 0.	
-}
-
-# Je definis le colis #
-Solide solide
-Lire solide
-{
-	rho Champ_Uniforme 1 1000.
-	lambda Champ_Uniforme 1 250.    
-	Cp Champ_Uniforme 1 100.
-}
-
 # Associations #
 Associate pb_colis colis
-Associate pb_colis solide
-
 Associate pb dom
-Associate pb milieu
 
 Probleme_Couple pbc
 Associate pbc pb
@@ -95,6 +72,15 @@ Domaine Cylindre
 # que l'on maintient ensuite constant au cours du temps avec equation_non_resolue #
 Lire pb
 {
+Fluide_Incompressible
+{
+	mu  Champ_Uniforme 1 0.01
+	rho Champ_Uniforme 1 2.
+        lambda Champ_Uniforme 1 2
+        Cp Champ_Uniforme 1 100.
+        beta_th Champ_Uniforme 1 0.	
+}
+
 	Navier_Stokes_Turbulent
 	{
 		equation_non_resolue 1
@@ -186,6 +172,13 @@ Lire pb
 # 50 Watts par Cylindre_haut #
 Lire pb_colis
 {
+Solide
+{
+	rho Champ_Uniforme 1 1000.
+	lambda Champ_Uniforme 1 250.    
+	Cp Champ_Uniforme 1 100.
+}
+
 	Conduction
 	{
 		diffusion { }

@@ -36,22 +36,21 @@ Lire sch
 	nb_pas_dt_max 5
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu	champ_uniforme 1 0.001
-	rho	champ_uniforme 1 1000
-}
 
 Associer pb dom
-Associer pb fluide
 Associer pb sch
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu	champ_uniforme 1 0.001
+   	rho	champ_uniforme 1 1000
+   }
+   
+   	Navier_Stokes_standard
 	{
 		solveur_pression	petsc GCP { precond_nul seuil 1 }
 		convection		{ negligeable }
@@ -93,3 +92,4 @@ EcritureLectureSpecial 0
 Resoudre pb
 
 Fin
+ 

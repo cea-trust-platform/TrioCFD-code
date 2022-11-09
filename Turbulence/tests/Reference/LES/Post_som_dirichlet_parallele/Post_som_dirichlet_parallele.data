@@ -64,18 +64,11 @@ Lire sch
 
 # Proprietes du fluide #
 
-Fluide_Incompressible fluide_2
-Lire fluide_2
-{
-	mu Champ_Uniforme 1 1.845e-05
-	rho Champ_Uniforme 1 1.185
-}
 
 # Associate et coupler les problemes, domaines et fluides #
 
 
 Associate pb2 dom2
-Associate pb2 fluide_2
 Associate pb2 sch
 
 Discretize pb2 dis
@@ -85,7 +78,13 @@ Discretize pb2 dis
 
 Lire pb2
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 1.845e-05
+   	rho Champ_Uniforme 1 1.185
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression Gcp { precond ssor { omega 1.5 } seuil 1.e-12 }
 		convection { muscl }
@@ -126,3 +125,4 @@ Lire pb2
 }
 
 Solve pb2
+ 

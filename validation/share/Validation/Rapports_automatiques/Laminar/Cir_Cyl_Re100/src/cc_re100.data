@@ -22,19 +22,12 @@ Read sch
         diffusion_implicite 1
 }
 
-Fluide_Incompressible air
-Read air
-{
-	mu  Champ_Uniforme 1 1.00e-5
-	rho Champ_Uniforme 1 1.33
-}
 #
 	nu = mu/rho = 7.518e-6
 	Reynolds 100 
 #
 Associate pb dom
 Associate pb sch
-Associate pb air
 
 Discretize pb dis
 
@@ -42,7 +35,13 @@ Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_standard 
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 1.00e-5
+   	rho Champ_Uniforme 1 1.33
+   }
+   
+   	Navier_Stokes_standard 
 	{
 		solveur_pression Gcp { precond ssor { omega 1.6 }
                                        seuil 1.e-9
@@ -116,3 +115,4 @@ Gcp { precond ssor { omega 1.5 }
                                      } 		
 
 GCP_ssor { omega 1.65 seuil 1.e-6 impr }
+ 

@@ -157,37 +157,22 @@ Read pb
 	pression elem
 	}	
 	}
-	liste_de_postraitements
+	liste_postraitements
 	{
-	post1 Postraitement_ft_lata 
-        {
-		dt_post 0.1
-		nom_fichier lata/post1
-		format binaire
-		print
-		champs elements
-		{
-			vitesse
-			pression
-			indicatrice_agit
-                        Divergence_U
-		}
-		champs Faces
-		{
-			vitesse
-		}
-		interfaces agit {
-			champs sommets {
-				pe
-				courbure
-			}
-			champs elements {
-				pe
-			}
-		}
-		
-		
-	}
+	 postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post1 
+    champs dt_post 0.1 { 
+        vitesse faces 
+        pression elem 
+        indicatrice_agit elem 
+        Divergence_U elem 
+    } 
+    interfaces agit { 
+        pe elem 
+        courbure som 
+    } 
+}
 	
 	}
 	
@@ -200,3 +185,4 @@ End
 #
                         entree Frontiere_ouverte_vitesse_imposee Champ_front_fonc_XYZ 2 (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.) (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.)
 #
+ 

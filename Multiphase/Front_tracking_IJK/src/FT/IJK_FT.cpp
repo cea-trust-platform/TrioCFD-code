@@ -1476,7 +1476,29 @@ int IJK_FT_double::initialise()
   LIST_CURSEUR(IJK_Energie) curseur_en2(energie_);
   LIST_CURSEUR(IJK_Thermique) curseur2(thermique_);
   if ((curseur2) or (curseur_en2))
-    interfaces_.set_compute_surfaces_mouillees();
+    {
+      interfaces_.set_compute_surfaces_mouillees();
+      for (int i=0; i<2; i++)
+        {
+          interfaces_.switch_indicatrice_next_old();
+          interfaces_.calculer_indicatrice_next(
+            post_.potentiel(),
+            gravite_,
+            delta_rho,
+            sigma_,
+            /*Pour post-traitement : post_.rebuilt_indic()
+            */
+#ifdef SMOOTHING_RHO
+            /* Pour le smoothing : */
+            rho_field_ft_,
+            rho_vapeur_,
+            smooth_density_,
+#endif
+            current_time_, tstep_
+          );
+        }
+    }
+
   return nalloc;
 }
 /*

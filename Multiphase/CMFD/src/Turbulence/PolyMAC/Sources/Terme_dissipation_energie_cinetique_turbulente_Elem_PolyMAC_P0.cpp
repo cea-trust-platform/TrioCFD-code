@@ -102,8 +102,8 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionne
 
 void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Zone_PolyMAC_P0& 					zone 		= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const Champ_Elem_PolyMAC_P0& 				ch_k	= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());		// Champ k
+  const Zone_PolyMAC_P0& 	         zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Champ_Elem_PolyMAC_P0&     ch_k = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());		// Champ k
   const DoubleTab& 						      k 	= ch_k.valeurs();
   const Champ_Inc_base& ch_alpha_rho_k 	= equation().champ_conserve();
   const DoubleTab& 				alpha_rho_k		= ch_alpha_rho_k.valeurs();
@@ -112,7 +112,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
   const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff 		= ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   const DoubleTab&                      nu 		  		= equation().probleme().get_champ("viscosite_cinematique").passe();
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -121,9 +121,8 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
       else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
   if (Type_diss == "") abort();
-  const Champ_Elem_PolyMAC_P0& 			ch_diss 	= ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ(Nom(Type_diss.c_str()))); // Champ tau ou omega
-  const DoubleTab& 					      	diss	= ch_diss.valeurs() ;
-
+  const Champ_Elem_PolyMAC_P0& ch_diss = ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ(Nom(Type_diss.c_str()))); // Champ tau ou omega
+  const DoubleTab&                diss = ch_diss.valeurs() ;
 
   const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = zone.nb_elem();
 

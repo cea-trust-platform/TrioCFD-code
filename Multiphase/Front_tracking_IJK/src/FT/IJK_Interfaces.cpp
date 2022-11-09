@@ -468,12 +468,13 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
 {
   Cerr << "Entree dans IJK_Interfaces::initialize" << finl;
 
-  desactive_med_ = true;
   // normale_par_compo_is_set_ = false;
-  compute_surf_mouillees_ = false;
   set_recompute_indicator(CLASSIC_METHOD);
 
   ref_splitting_ = splitting_FT;
+
+  surface_vapeur_par_face_computation_.initialize(splitting_FT);
+  val_par_compo_in_cell_computation_.initialize(splitting_FT, maillage_ft_ijk_);
 
   indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
   indicatrice_ft_[old()].data() = 1.;
@@ -481,15 +482,12 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
   indicatrice_ft_[next()].data() = 1.;
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
-  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 1);
+  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[old()].data() = 1.;
   allocate_cell_vector(groups_indicatrice_ns_[old()], splitting_NS, 1);
   allocate_cell_vector(groups_indicatrice_ns_[next()], splitting_NS, 1);
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
-  // indicatrice_ns_0_.allocate(splitting_NS, IJK_Splitting::ELEM, 1);
-  // indicatrice_ns_0_.data() = 1.;
-  // indicatrice_ns_0_.echange_espace_virtuel(indicatrice_ns_0_.ghost());
-  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 1);
+  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[next()].data() = 1.;
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
   allocate_cell_vector(groups_indicatrice_ft_[old()], splitting_FT, 1);
@@ -525,15 +523,30 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           bary_par_compo_[next()][idx].allocate(splitting_FT, IJK_Splitting::ELEM, 1);
         }
     }
-  maillage_bulles_med_ = MEDCouplingUMesh::New("bubbles_surf_mesh", 2);
+  allocate_velocity(normal_of_interf_[old()], splitting_FT, 1);
+  allocate_velocity(normal_of_interf_[next()], splitting_FT, 1);
+  allocate_velocity(normal_of_interf_ns_[old()], splitting_NS, 1);
+  allocate_velocity(normal_of_interf_ns_[next()], splitting_NS, 1);
+
+  allocate_velocity(bary_of_interf_[old()], splitting_FT, 1);
+  allocate_velocity(bary_of_interf_[next()], splitting_FT, 1);
+  allocate_velocity(bary_of_interf_ns_[old()], splitting_NS, 1);
+  allocate_velocity(bary_of_interf_ns_[next()], splitting_NS, 1);
+
   allocate_velocity(surface_vapeur_par_face_[old()], splitting_FT, 1);
   allocate_velocity(surface_vapeur_par_face_[next()], splitting_FT, 1);
+  allocate_velocity(surface_vapeur_par_face_ns_[old()], splitting_NS, 1);
+  allocate_velocity(surface_vapeur_par_face_ns_[next()], splitting_NS, 1);
   for (int d = 0; d < 3; d++)
     {
       surface_vapeur_par_face_[old()][d].data() = 0.;
       surface_vapeur_par_face_[next()][d].data() = 0.;
       allocate_velocity(barycentre_vapeur_par_face_[old()][d], splitting_FT, 1);
       allocate_velocity(barycentre_vapeur_par_face_[next()][d], splitting_FT, 1);
+      surface_vapeur_par_face_ns_[old()][d].data() = 0.;
+      surface_vapeur_par_face_ns_[next()][d].data() = 0.;
+      allocate_velocity(barycentre_vapeur_par_face_ns_[old()][d], splitting_NS, 1);
+      allocate_velocity(barycentre_vapeur_par_face_ns_[next()][d], splitting_NS, 1);
     }
 
   if (!is_diphasique_)
@@ -2662,62 +2675,6 @@ void IJK_Interfaces::deplacer_bulle_perio(const ArrOfInt& masque_deplacement_par
 }
 
 #if 0
-// Moyennes des normales ponderees par leur fraction de surface presente dans l'element.
-// Attention, la normale obtenue n'est pas unitaire
-static void calculer_normale_element_pour_compo(const int icompo,
-                                                const int elem,
-                                                const  Maillage_FT_IJK& maillage,
-                                                Vecteur3& normale)
-{
-  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
-  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
-  const ArrOfInt& compo_connexe = maillage.compo_connexe_facettes();
-
-  double surface_tot = 0.;
-  int index=intersections.index_elem()[elem];
-  normale = 0.;
-  if (index < 0)
-    return; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  int count = 0;
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int num_compo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          const double surface_facette = surface_facettes[fa7];
-          const double surf = data.fraction_surface_intersection_ * surface_facette;
-          for (int dir = 0; dir< 3; dir++)
-            {
-              const double nx = normale_facettes(fa7,dir);
-              normale[dir] += nx * surf;
-            }
-          surface_tot +=surf;
-        }
-      index = data.index_facette_suivante_;
-      count++;
-    }
-
-  if (surface_tot > 0.)
-    {
-      normale *= 1./surface_tot;
-    }
-  else
-    normale = 0.;
-
-  const double norm =  normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2];
-  if (norm<0.9)
-    Cerr << "Petite : " << count << " facettes dans l'element " << elem
-         << ". surface_tot = "<< surface_tot << "Norm**2 = " << norm << finl;
-
-}
-#endif
-
-#if 0
 
 // 3 Versions de code pour marquer l'interieur des bulles :
 //    v1 : Version la plus ancienne : Boucle facette et composante maximale de la normale
@@ -2920,210 +2877,6 @@ static int check_somme_drapeau(const ArrOfInt& drapeau_liquide)
 //          0., 0., 0.);
 //
 //
-// Attention : elem ne doit pas etre un element virtuel :
-int IJK_Interfaces::compute_list_compo_connex_in_element(const Maillage_FT_IJK& mesh,
-                                                         const int elem,
-                                                         ArrOfInt& liste_composantes_connexes_dans_element) const
-{
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const ArrOfInt& index_elem = intersections.index_elem();
-  const ArrOfInt& compo_connexe_facettes = mesh.compo_connexe_facettes();
-
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  liste_composantes_connexes_dans_element.resize_array(0);
-
-  // L'element, est-il traverse par une interface ?
-  int index_next_facette = index_elem[elem];
-  while (index_next_facette >= 0)
-    {
-      // Oui. Par quelles composantes connexes est-il traverse ?
-      // On boucle sur les faces qui traversent l'interface, on marque
-      // les composantes deja vues au fur et a mesure:
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index_next_facette);
-      if (data.fraction_surface_intersection_ == 0.)
-        {
-#ifdef GB_VERBOSE
-          Cerr << "compute_list_compo_connex_in_element : elem= " << elem
-               << " Intersection issue du parcours : numero_facette_= " << data.numero_facette_
-               << " numero_element_= " << data.numero_element_ << " fraction= " << data.fraction_surface_intersection_
-               << finl;
-#endif
-          // Si on a une facette de fraction_surface_intersection nulle,
-          // c'est qu'en realite elle n'intersecte pas.
-          // On ne la traite pas.
-        }
-      else
-        {
-          int compo = compo_connexe_facettes[data.numero_facette_];
-          // Cherche si cette composante est deja dans la liste
-          int ii;
-          const int nmax = liste_composantes_connexes_dans_element.size_array();
-          for (ii = 0; ii < nmax; ii++)
-            {
-              if (liste_composantes_connexes_dans_element[ii] == compo)
-                break; // sort de la boucle for, on aura ii < nmax
-            }
-          if (ii == nmax) // vrai si on n'a pas trouve compo dans
-            // liste_composantes_connexes_dans_element
-            liste_composantes_connexes_dans_element.append_array(compo);
-        }
-      index_next_facette = data.index_facette_suivante_;
-    }
-
-  const int nb_compo_traversantes = liste_composantes_connexes_dans_element.size_array();
-  return nb_compo_traversantes;
-}
-#if 0
-// Rempli le tableau drapeaux avec 0 lorsque c'est une bulle.
-// On suppose que le tableau drapeau_vapeur est dimensionne a nb_compo_in_num_compo_.
-// Besoin d'etre dans la classe si on veut avoir la ref au zone_VF (pour le calcul // et
-// la determination du numero voisin dans ce cas...)
-void IJK_Interfaces::compute_drapeaux_vapeur_v3(const Maillage_FT_IJK& mesh,
-                                                const IJK_Splitting& split,
-                                                const IntVect& vecteur_composantes,
-                                                ArrOfInt& drapeau_vapeur) const
-{
-  const IJK_Grid_Geometry& geom = split.get_grid_geometry() ;
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-
-  drapeau_vapeur = 1; // Initialise a 1
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-
-  // Et on cree l'espace virtuel pour index_elem pour savoir si les elem contiennent des facettes?
-  IntVect index_elem_with_ghost;
-  const ArrOfInt& index_elem = maillage_ft_ijk_.intersections_elem_facettes().index_elem();
-  convert_to_IntVect(index_elem, index_elem_with_ghost);
-
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_voisins = zone_vf.face_voisins();
-
-  // Boucle sur les elements:
-  const int nb_elem_local = split.get_nb_elem_local(DIRECTION_I)
-                            * split.get_nb_elem_local(DIRECTION_J)
-                            * split.get_nb_elem_local(DIRECTION_K); // nombre d'elements eulerien par proc.
-  for (int elem = 0; elem < nb_elem_local; elem++)
-    {
-      // Anciennement la methode etait portee par le mesh :
-      //      Int3 ijk_elem = mesh.convert_packed_to_ijk_cell(elem);
-      // A present, elle est dans le splitting :
-      assert(maillage_ft_ijk_.ref_splitting_.valeur() == split);
-      Int3 ijk_elem = split.convert_packed_to_ijk_cell(elem);
-      // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-      const int nb_compo_traversantes = compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-
-      // On boucle sur les composantes connexes trouvees dans l'element
-      for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-        {
-          const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-
-          // Calcul de la normale moyenne dans l'element :
-          Vecteur3 normale;
-          calculer_normale_element_pour_compo(num_compo, elem, mesh, normale);
-
-          Int3 ijk_voisin = ijk_elem;
-          double norm = normale[0]*normale[0] + normale[1]*normale[1] + normale[2]*normale[2];
-          bool zap = false;
-          if (norm< 0.5)
-            {
-              Cerr << "IJK_Interfaces.cpp : compute_drapeaux_vapeur_v3. "
-                   << "Normale trouvee trop petite... Etrange, non?" << finl;
-              //    Process::exit();
-              zap = true;
-            }
-
-          // Est-on sur une maille de bord? On ne souhaite pas s'embeter
-          // car on risque de tomber sur un voisin perio ou sur un mur.
-          // On fait simple, on ne les traite pas. C'est Ok si on suppose qu'on va trouver
-          // ailleurs un endroit ou marquer la compo en question...
-          for (int dir = 0; dir< 3; dir++)
-            {
-              const int offset = split.get_offset_local(dir);
-              const int ndir = geom.get_nb_elem_tot(dir);
-              int idir_global = ijk_elem[dir] + offset;
-              //    const bool perio = geom.get_periodic_flag(direction);
-              // On ne s'embete pas avec les mailles proche des bords (parois ou perio)
-              if ((idir_global == 0) || (idir_global == ndir-1))
-                {
-                  zap = true; // On zappe les mailles de bords pour pas se poser la question de si on sort
-                  break;
-                }
-              // On prend l'oppose de la normale pour pointer vers la vapeur et eviter
-              // de tomber sur une autre interface connexe.
-              // normale_vapeur = -normale.
-              // alpha est l'angle entre la normale_vapeur et l'axe coordonnee ((Ox) si dir==0)
-              double cos_alpha = -normale[dir]/norm;
-              // Entre -30 et 30, on va a droite. Puis de 30 a 60, en diagonale
-              // puis de 60 a 120, vers le haut...
-              if (cos_alpha>0.5)
-                ijk_voisin[dir] += 1;
-              else if (cos_alpha<-0.5)
-                ijk_voisin[dir] -= 1;
-            }
-          if (zap)
-            break;
-          // L'element voisin ainsi trouve est-il traverse par une interface?
-
-          bool mine = true;
-          for (int dir=0; dir<3; dir++)
-            {
-              if  ((ijk_voisin[dir]<0) || (ijk_voisin[dir]>=split.get_nb_elem_local(dir)))
-                mine = false; // le voisin est virtuel.
-            }
-
-          // Le voisin m'appartient-il?
-          int index_next_facette_voisin, elem_voisin;
-          if (mine)
-            {
-              // On est sur un elem reel
-              elem_voisin = split.convert_ijk_cell_to_packed(ijk_voisin[0], ijk_voisin[1], ijk_voisin[2]);
-              index_next_facette_voisin = intersections.index_elem()[elem_voisin];
-
-            }
-          else
-            {
-              // On est sur un elem virtuel
-              // On cherche le elem_voisin (qui est un ghost) en se baladant face par face :
-              int iface_voisine = -1;
-              int tmp_elem = elem;
-              for (int dir = 0; dir < 3; dir++)
-                {
-                  if (ijk_voisin[dir] != ijk_elem[dir])
-                    {
-                      if (ijk_voisin[dir] < ijk_elem[dir])
-                        {
-                          iface_voisine = dir;
-                        }
-
-                      if (ijk_voisin[dir] > ijk_elem[dir])
-                        {
-                          iface_voisine = dir+3;
-                        }
-                      const int num_face = elem_faces(tmp_elem, iface_voisine);
-                      tmp_elem = faces_voisins(num_face, 0) + faces_voisins(num_face, 1) - tmp_elem;
-
-                    }
-                }
-              elem_voisin = tmp_elem;
-              // Pour enfin obtenir l'indice de debut :
-              index_next_facette_voisin = index_elem_with_ghost[elem_voisin];
-            }
-
-          if (index_next_facette_voisin < 0)
-            {
-              // il n'y a aucune interface dans l'elem_voisin
-              // On marque la compo globale de l'elem_voisin comme vapeur :
-              const int computed_global_compo = vecteur_composantes[elem_voisin];
-              drapeau_vapeur[computed_global_compo] = 0;
-            }
-        }
-    }
-
-  // Synchroniser les marqueurs sur tous les processeurs
-  mp_min_for_each_item(drapeau_vapeur);
-}
-#endif
 
 // The method have to recieve the extended field indic_ft because
 // the splitting and the conversion "num_elem = s.convert_ijk_cell_to_packed(i,
@@ -3726,67 +3479,6 @@ int IJK_Interfaces::update_indicatrice(IJK_Field_double& indic)
   while (continuer);
 
   return 0;
-}
-
-// static int calculer_phi_et_indic_element_pour_compo(
-int IJK_Interfaces::calculer_indic_elem_pour_compo(const int icompo,
-                                                   const int elem,
-                                                   double& indic) const
-{
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const IntTab& facettes = mesh.facettes();
-  const DoubleTab& sommets = mesh.sommets();
-  const ArrOfInt& compo_connexe = mesh.compo_connexe_facettes();
-
-  indic = -1.; // valeur invalide.
-  double somme_contrib = 0.;
-  int index = intersections.index_elem()[elem];
-  if (index < 0)
-    return 0; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int num_compo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          // Calcul du potentiel au centre de l'intersection
-          // Les coordonnees du barycentre de la fraction de facette :
-          Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-          for (int isom = 0; isom < 3; isom++)
-            {
-              const int num_som = facettes(fa7, isom); // numero du sommet dans le tableau sommets
-              // Coordonnees barycentriques du centre de gravite de l'intersection
-              // par rapport aux trois sommets de la facette.
-              const double bary_som = data.barycentre_[isom];
-              for (int dir = 0; dir < 3; dir++)
-                coord_barycentre_fraction[dir] += bary_som * sommets(num_som, dir);
-            }
-          // On ne somme la contribution que de la composante icompo :
-          somme_contrib += data.contrib_volume_phase1_;
-        }
-      index = data.index_facette_suivante_;
-    }
-
-  // retour entre 0 et 1 :
-  while (somme_contrib > 1.)
-    somme_contrib -= 1.;
-  while (somme_contrib < 0.)
-    somme_contrib += 1.;
-
-  if (somme_contrib == 0.)
-    {
-      Cerr << "calculer_indicatrice ne fait rien dans la boucle while... "
-           "pourquoi? "
-           << finl;
-      // Process::exit();
-    }
-
-  indic = somme_contrib;
-  return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5572,952 +5264,6 @@ void IJK_Interfaces::compute_indicatrice_non_perturbe(IJK_Field_double& indic_np
   set_field_data(indic_np, nom_indicatrices_np, indic, 0. /* could be time... */ );
 }
 
-void IJK_Interfaces::get_maillage_MED_from_IJK_FT(MEDCouplingUMesh *maillage_bulles_mcu,
-                                                  const Maillage_FT_IJK& maillage_bulles_ft_ijk)
-{
-  const int nbOfNodes = maillage_bulles_ft_ijk.nb_sommets();
-  // Cerr << "nbre de sommet : " << nbOfNodes << finl;
-
-  // Setting nodes coordinates of maillage_bulles_mcu
-  auto coo_ptr = maillage_bulles_ft_ijk.sommets().addr();
-  DAD coordsArr = DataArrayDouble::New();
-  coordsArr->useArray(coo_ptr, false, MEDCoupling::DeallocType::CPP_DEALLOC, nbOfNodes, 3);
-  maillage_bulles_mcu->setCoords(coordsArr);
-
-  // Setting connectivity of maillage_bulles_mcu
-  // getting connectivity from facettes
-  const auto nbFacettes = maillage_bulles_ft_ijk.nb_facettes();
-  const auto connectivity = maillage_bulles_ft_ijk.facettes();
-  MCT mcu_connectivity = DataArrayIdType::New();
-  mcu_connectivity->alloc(4 * nbFacettes, 1);
-  auto mcu_connectivity_ptr = mcu_connectivity->getPointer();
-  MCT mc_conn_idx = DataArrayIdType::New();
-  mc_conn_idx->alloc(nbFacettes + 1, 1);
-  auto mc_conn_idx_ptr = mc_conn_idx->getPointer();
-  for (int ifa7 = 0; ifa7 < nbFacettes; ifa7++)
-    {
-      mcu_connectivity_ptr[4 * ifa7] = 3;
-      mcu_connectivity_ptr[4 * ifa7 + 1] = connectivity(ifa7, 0);
-      mcu_connectivity_ptr[4 * ifa7 + 2] = connectivity(ifa7, 1);
-      mcu_connectivity_ptr[4 * ifa7 + 3] = connectivity(ifa7, 2);
-      mc_conn_idx_ptr[ifa7] = 4 * ifa7;
-    }
-  mc_conn_idx_ptr[nbFacettes] = 4 * nbFacettes;
-  maillage_bulles_mcu->setConnectivity(mcu_connectivity, mc_conn_idx, true);
-  MCT no_use3 = maillage_bulles_mcu->zipConnectivityTraducer(0);
-  MCT do_not_use5 = maillage_bulles_mcu->zipCoordsTraducer();
-}
-
-void IJK_Interfaces::set_maillage_MED()
-{
-  get_maillage_MED_from_IJK_FT(maillage_bulles_med_, maillage_ft_ijk_);
-  // const char fileName[] = "testExample_MEDCouplingFieldDouble_WriteVTK.vtk";
-  // test sur le maillage
-  Cerr << "Le maillage MED est de taille " << maillage_bulles_med_->getNumberOfNodes() << finl;
-  const auto coords = maillage_bulles_med_->getCoords();
-  for (int x = 0; x < 3; x++)
-    {
-      double mini = 100000000;
-      double maxi = -100000000;
-      for (int c = 0; c < coords->getNumberOfTuples(); c++)
-        {
-          const auto val = coords->getIJ(c, x);
-          if (val < mini)
-            mini = val;
-          if (val > maxi)
-            maxi = val;
-        }
-      Cout << "coord min dans la direction " << x << " : " << mini << finl;
-      Cout << "coord max dans la direction " << x << " : " << maxi << finl;
-    }
-  MCT do_not_use = maillage_bulles_med_->convertDegeneratedCellsAndRemoveFlatOnes();
-  auto connectivity = maillage_bulles_med_->getNodalConnectivity();
-  const int nb_compo = static_cast<int>(connectivity->getNumberOfComponents());
-  Cerr << "Connectivity mesh bulles : " << finl;
-  Cerr << "Nb nodes : " << connectivity->getNumberOfTuples() << finl;
-  Cerr << "Nb compo : " << nb_compo << finl;
-  print_umesh_conn(connectivity);
-  // Cerr << "Connectivity bis" << finl;
-  // for (unsigned int comp = 0; comp < static_cast<int>(connectivity->getNumberOfComponents());
-  //      comp++) {
-  //   Cerr  << " [ ";
-  //   for (int c = 0; c < connectivity->getNumberOfTuples(); c++) {
-  //     Cerr << connectivity->getIJ(c, comp) << ", ";
-  //   }
-  //   Cerr << "]" << finl;
-  // }
-  maillage_bulles_med_->checkConsistencyLight();
-  // maillage_bulles_med_->writeVTK(fileName, true);
-  // Cout << "Le maillage a probablement ete ecrit qq part" << finl;
-}
-
-void IJK_Interfaces::slice_bubble(const double intersect_pt, const int dim, DataArrayIdType *cutcellsid,
-                                  bool& plan_cut_some_bubble, MCU& mesh1dfil) const
-{
-  double intersect[3] = {0., 0., 0.};
-  double vect_norm[3] = {0., 0., 0.};
-  intersect[dim] = intersect_pt;
-  vect_norm[dim] = 1.;
-  std::vector<int> COO2KEEP(2);
-  get_coo_to_keep(dim, COO2KEEP);
-
-  // Création du maillage filaire coupé
-  std::vector<int> selected_dims {dim};
-  // MEDCouplingUMesh * mesh1dfil;
-  try
-    {
-      mesh1dfil = maillage_bulles_med_->buildSlice3DSurf(intersect, vect_norm, 10.e-8, cutcellsid);
-      mesh1dfil->checkConsistencyLight();
-      const DataArrayDouble *coords = mesh1dfil->getCoords();
-      for (int x = 0; x < 3; x++)
-        {
-          double mini = 10000;
-          double maxi = -10000;
-          // Cout << "Coords fil compo : " << x << finl;
-          // Cout << "[ ";
-          for (int c = 0; c < coords->getNumberOfTuples(); c++)
-            {
-              const auto val = coords->getIJ(c, x);
-              // Cout << val << ", ";
-              if (val < mini)
-                mini = val;
-              if (val > maxi)
-                maxi = val;
-            }
-          // Cout << "]" << finl;
-          Cout << "coord fil min dans la direction " << x << " : " << mini << finl;
-          Cout << "coord fil max dans la direction " << x << " : " << maxi << finl;
-        }
-      const auto connectivity = mesh1dfil->getNodalConnectivity();
-      const int nb_compo = static_cast<int>(connectivity->getNumberOfComponents());
-      Cout << "Connectivity fil : " << finl;
-      Cout << "Nb nodes : " << connectivity->getNumberOfTuples() << finl;
-      Cout << "Nb compo : " << nb_compo << finl;
-      print_umesh_conn(connectivity);
-      Cout << "Youpi la coupe marche" << finl;
-    }
-  catch (INTERP_KERNEL::Exception& e)
-    {
-      mesh1dfil = MEDCouplingUMesh::New();
-      plan_cut_some_bubble = false;
-    }
-  if (plan_cut_some_bubble)
-    {
-      mcIdType nbOfNodes;
-      bool areNodesMerged;
-      MCT oldNodes = mesh1dfil->mergeNodes(EPS_, areNodesMerged, nbOfNodes);
-      MCT do_not_use = mesh1dfil->zipCoordsTraducer();
-      MCT do_not_use2 = mesh1dfil->zipConnectivityTraducer(0);
-      DataArrayDouble *coord = mesh1dfil->getCoords();
-      std::vector<long unsigned int> COO2KEEPLONG(begin(COO2KEEP), end(COO2KEEP));
-      DAD coords = coord->keepSelectedComponents(COO2KEEPLONG);
-      mesh1dfil->setCoords(coords);
-    }
-  // return mesh1dfil;
-}
-
-// DONE: plusieurs bulles (plus que 1) peuvent être présente dans la cellule,
-// auquel cas il faut le prendre en compte. Donc on doit retenir les n+1 phases
-// dans une cellule qui a n compo connexes différentes.
-void IJK_Interfaces::findCommonTuples(const DataArrayIdType *new_to_old_id, const int n_tot_mesh2d,
-                                      DataArrayIdType *tab_id_subcells, DataArrayIdType *tab_id_cut_cell) const
-{
-  // temp est un tableau temporaire qui fait la taille du nbre de cellules old
-  // et qui est initialement rempli de -1. Il sert à identifier les cellules
-  // diphasiques (une cellule qui a déjà été renseignée dans old et sur laquelle
-  // on retombe en parcourant new_to_old est une cellule diphasique qu'il faut
-  // donc renseigner dans tab_id_cut_cell et tab_id_subcells Son deuxieme indice
-  // permet de savoir en quelle position était le tuple diphasique
-  const auto n_new_to_old = new_to_old_id->getNumberOfTuples();
-  const auto new_to_old_id_ptr = new_to_old_id->getConstPointer();
-
-  DAI temp = DataArrayInt::New();
-  temp->alloc(n_tot_mesh2d, 2);
-  temp->fillWithValue(-1.);
-  int *temp_ptr = temp->getPointer();
-  // n_cut n'est pas le bon nombre ! Mais comme je n'ai aucune;
-  // idée de sa valeur je prend la différence entre new et old qui me
-  // donne le bon résultat si toutes les surfaces ne sont coupées que par une
-  // bulle; n_cut est censé correspondre au nbre de cellules du maillage IJ;
-  // traversée par l'interface de la bulle. Je reduis la taille du;
-  // tableau ensuite.;
-  auto n_cut = n_new_to_old - n_tot_mesh2d;
-  assert(n_cut > 0);
-  // tab_id_cut_cell est un tableau qui renvoie la correspondance entre l'indice
-  // de la maille diphasique dans tab_id_subcells et son id deja defini DAI
-  // tab_id_cut_cell = DataArrayInt::New();
-  tab_id_cut_cell->alloc(n_cut, 1);
-  tab_id_cut_cell->fillWithValue(-1);
-  int *tab_id_cut_cell_ptr = tab_id_cut_cell->getPointer();
-  // tab_id_subcells est un tableau de tuple des ids des bouts de cellules qui
-  // sont en fait dans la meme cellule. La taille de ce tuple est celle du nbre
-  // max de compo connexe plus 1 (la phase liquide). Le tuple est rempli au fur
-  // et à mesure et complété par des -1 deja defini mais pas encore alloué
-  tab_id_subcells->alloc(n_cut, max_authorized_nb_of_components_ + 1);
-  tab_id_subcells->fillWithValue(-1);
-  int *tab_id_subcells_ptr = tab_id_subcells->getPointer();
-  int ind = 0;
-  // ind est l'indice du dernier doublon qui avance au fur et à mesure de la
-  // découverte d'un nouveau doublon
-  for (int i_new = 0; i_new < n_new_to_old; i_new++)
-    {
-      const auto i_old = new_to_old_id_ptr[i_new];
-      assert(i_old < n_tot_mesh2d);
-      if (temp_ptr[2 * i_old] == -1)
-        temp_ptr[2 * i_old] = i_new;
-      else
-        {
-          // TODO: est-ce que c'est ind ou i_old ?
-          if (tab_id_subcells_ptr[(max_authorized_nb_of_components_ + 1) * ind] == -1)
-            {
-              // la cellule n'est pas encore marquee comme diphasique, on ajoute les
-              // deux subcells identifies pour le moment et on augmente le nbre de
-              // cellule diph
-              tab_id_cut_cell_ptr[ind] = i_old;
-              tab_id_subcells_ptr[(max_authorized_nb_of_components_ + 1) * ind] = temp_ptr[2 * i_old];
-              tab_id_subcells_ptr[(max_authorized_nb_of_components_ + 1) * ind + 1] = i_new;
-              // On garde une trace du fait que ce tuple est a la ind eme position
-              // dans tab_id
-              temp_ptr[2 * i_old + 1] = ind;
-              // on a effectivement un doublon de plus, si on vient de remplir le
-              // tuple 0, maintenant ind doit valeur 1, soit le nbre de cellules
-              // diphasiques trouvées
-              ind += 1;
-            }
-          else
-            {
-              // la cellule avait deja été marquee comme diphasique, on va juste
-              // modifier le bon tuple des subcells
-              const int ind_tuple = temp_ptr[2 * i_old + 1];
-              assert(ind_tuple >= 0);
-              int last_compo_remplie = 1;
-              // ca plante si on a plus de compo dans une cellule que nb_max_compo + 1
-              for (int i_compo = 1; tab_id_subcells_ptr[(max_authorized_nb_of_components_ + 1) * ind_tuple + i_compo] > -1;
-                   i_compo++)
-                {
-                  last_compo_remplie = i_compo;
-                }
-              assert(last_compo_remplie > 0);
-              tab_id_subcells_ptr[(max_authorized_nb_of_components_ + 1) * ind_tuple + last_compo_remplie + 1] = i_new;
-            }
-        }
-    }
-  // {
-
-  tab_id_cut_cell->reAlloc(ind);
-  tab_id_subcells->reAlloc(ind);
-}
-
-void get_coo_to_keep(int d, std::vector<int>& COO2KEEP)
-{
-  if (d == 0)
-    {
-      COO2KEEP[0] = 1;
-      COO2KEEP[1] = 2;
-    }
-  else if (d == 1)
-    {
-      COO2KEEP[0] = 2;
-      COO2KEEP[1] = 0;
-    }
-  else if (d == 2)
-    {
-      COO2KEEP[0] = 0;
-      COO2KEEP[1] = 1;
-    }
-  else
-    {
-      Cerr << "La dimension renseignée est trop grande" << finl;
-    }
-}
-
-void get_coo_inv_to_keep(int d, std::array<int, 3>& COOINV)
-{
-  assert((d >= 0) && (d < 3));
-  if (d == 0)
-    {
-      COOINV[0] = 2;
-      COOINV[1] = 0;
-      COOINV[2] = 1;
-    }
-  else if (d == 1)
-    {
-      COOINV[0] = 1;
-      COOINV[1] = 2;
-      COOINV[2] = 0;
-    }
-  else
-    {
-      COOINV[0] = 0;
-      COOINV[1] = 1;
-      COOINV[2] = 2;
-    }
-}
-
-void IJK_Interfaces::get_IJK_ind_from_ind2d(const int i_dim, const int i_plan, const int i_2d, const int nx,
-                                            std::array<int, 3>& ijk_coo) const
-{
-  std::vector<int> COO2KEEP(2);
-  std::array<int, 3> COOINV;
-  get_coo_to_keep(i_dim, COO2KEEP);
-  get_coo_inv_to_keep(i_dim, COOINV);
-  // renvoie les coordonnees x et y correspondant au numero de la
-  // cellule du maillage cartesien du plan XY
-  // Pour rappel mon tableau est de taille un peu supérieur car
-  // il représente un chmap aux faces et non au centre des cellules.
-  const int y = i_2d / (nx - 1);
-  const int x = i_2d - (nx - 1) * y;
-
-  // On remet dans l'ordre ijk les indices selon la direction normale
-  // au plan de coupe.
-  // TODO: vérifier avec std::array<int, 3> coo {x, y, i_plan};
-  std::array<int, 3> coo {x, y, i_plan};
-  for (int c = 0; c < 3; c++)
-    {
-      ijk_coo[c] = coo[COOINV[c]];
-    }
-}
-
-void IJK_Interfaces::check_if_vect_is_from_liquid2vapor(const DataArrayDouble *vector, const int dim, const int i_plan,
-                                                        const int nx, const DataArrayIdType *ids_old,
-                                                        DataArrayIdType *ids_new) const
-{
-  const int *ids_old_ptr = ids_old->getConstPointer();
-  int *ids_new_ptr = ids_new->getPointer();
-  const double *vector_ptr = vector->getConstPointer();
-  const int n_compo_ids_IJ = static_cast<int>(ids_new->getNumberOfComponents());
-  const int n_compo_v = static_cast<int>(vector->getNumberOfComponents());
-  const int n_tup_v = vector->getNumberOfTuples();
-  std::vector<int> coo2keep(2);
-  get_coo_to_keep(dim, coo2keep);
-
-  // {
-  //   // debug part
-  //   Cerr << "vector : " << finl;
-  //   print_double_med(vector);
-  // }
-
-  for (int i_diph = 0; i_diph < n_tup_v; i_diph++)
-    {
-      std::array<int, 3> coo_ijk = {0, 0, 0};
-      get_IJK_ind_from_ind2d(dim, i_plan, ids_old_ptr[i_diph], nx, coo_ijk);
-      // debut debug
-      // Cerr << "coo_ijk : { " << static_cast<int>(coo_ijk[0]) << ", " <<
-      // static_cast<int>(coo_ijk[1]) << ", " << static_cast<int>(coo_ijk[2]) << "
-      // }" << finl; fin debug
-      double scal_prod = 0.;
-      for (int c = 0; c < 2; c++)
-        {
-          // Je fais la moyenne de deux vecteurs normaux des cellules droites et
-          // gauches pour avoir le vecteur de la normale a la face. Dans le cas ou
-          // il ya plusieurs compos connexes je ne sais pas trop comment gérer la
-          // situation.
-          // TODO: PB!!! je vais chercher dans le field normale_par_compo l'element
-          // 0,0,0 qui visiblement n'existe pas. bizarrement il y a un talbeau non
-          // initialisé dans les tableaux suivants lors du tt premier passage à
-          // chaque pas de temps. Je vais chercher la valeur pour la premiere compo
-          // connexe dans l'element et j'espere qu'il s'agit bien de la mm dans
-          // l'element d'à coté
-          const double normale_par_compo_cell = normale_par_compo_[old()][coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2]);
-          double normale_par_compo_next_cell;
-          if (dim == 0)
-            normale_par_compo_next_cell = normale_par_compo_[old()][coo2keep[c]](coo_ijk[0] + 1, coo_ijk[1], coo_ijk[2]);
-          else if (dim == 1)
-            normale_par_compo_next_cell = normale_par_compo_[old()][coo2keep[c]](coo_ijk[0], coo_ijk[1] + 1, coo_ijk[2]);
-          else
-            normale_par_compo_next_cell = normale_par_compo_[old()][coo2keep[c]](coo_ijk[0], coo_ijk[1], coo_ijk[2] + 1);
-
-          const double normale_par_compo_moy = (normale_par_compo_cell + normale_par_compo_next_cell) / 2.;
-          const double scal_prod_compo = vector_ptr[n_compo_v * i_diph + c] * normale_par_compo_moy;
-          scal_prod += scal_prod_compo;
-        }
-      if (scal_prod < 0.)
-        {
-          // En fait on n'a plus besoin de la valeur de la premiere cellule si le
-          // vecteur n'est pas dans le bon sens c'est que c'est la valeur de la
-          // phase liquide ou que plusieurs compos connexes sont dans la cellule,
-          // auquel cas on laisse tomber la rigueur du calcul dans la mesure ou on
-          // ne prendra pas en compte cette complexite dans un operateur. int interm
-          // = ids_IJ_cell_from_diph->getIJ(i_diph, 0);
-          ids_new_ptr[n_compo_ids_IJ * i_diph] = ids_new_ptr[n_compo_ids_IJ * i_diph + 1];
-        }
-    }
-}
-
-void IJK_Interfaces::get_vect_from_sub_cells_tuple(const int dim, const DataArrayDouble *bary0,
-                                                   const DataArrayIdType *cIcellsIdinMesh0,
-                                                   const DataArrayIdType *cellsIdinMesh0,
-                                                   DataArrayDouble *vect) const
-{
-  // vect est de la taille du nombre de cellules diphasiques, on ne regarde vect
-  // que quand la face est coupée.
-  const int n_vect = cIcellsIdinMesh0->getNumberOfTuples();
-  vect->alloc(n_vect, 2);
-  double *vect_ptr = vect->getPointer();
-  // const int n_diph = bary0->getNumberOfTuples();
-  // const int dim_bary0 = static_cast<int>(bary0->getNumberOfComponents());
-  std::vector<int> coo_to_keep(2);
-  get_coo_to_keep(dim, coo_to_keep);
-  const int *cellsIdinMesh0_ptr = cellsIdinMesh0->getConstPointer();
-  // const int* cIcellsIdinMesh0_ptr = cIcellsIdinMesh0->getConstPointer();
-  const int n_cIcellsIdinMesh0 = cIcellsIdinMesh0->getNumberOfTuples();
-
-  // {
-  //   // debug part
-  //   Cerr << "cellsIdinMesh0 : " << finl;
-  //   print_int_med(cellsIdinMesh0);
-  //   Cerr << "cIcellsIdinMesh0 : " << finl;
-  //   print_int_med(cIcellsIdinMesh0);
-  //   // end of the debug
-  // }
-
-  for (int c = 0; c < n_cIcellsIdinMesh0; c++)
-    {
-      // on considere arbitrairement les 2 premiers, je ne vois pas comment on
-      // pourrait faire dans le cas ou il y en a plus.
-      const int ind_phase0 = cellsIdinMesh0_ptr[(max_authorized_nb_of_components_ + 1) * c];
-      assert(ind_phase0 >= 0);
-      assert(ind_phase0 < bary0->getNumberOfTuples());
-      const int ind_phase1 = cellsIdinMesh0_ptr[(max_authorized_nb_of_components_ + 1) * c + 1];
-      assert(ind_phase1 >= 0);
-      assert(ind_phase1 < bary0->getNumberOfTuples());
-      // const int ind_maillage_2d_cart = cIcellsIdinMesh0_ptr[c];
-      // Cerr << "Ind old : " << ind_maillage_2d_cart << finl;
-      // Cerr << "Ind phase : " << ind_phase0 << ", " << ind_phase1 << finl;
-      for (int dir = 0; dir < 2; dir++)
-        {
-          // const int coo_kept = coo_to_keep[dir];
-          // assert(coo_kept <= dim_bary0);
-          // Cerr << "Coo to keep : " << coo_kept << finl;
-          // const double compo = bary0->getIJ(ind_phase1, coo_kept) -
-          // bary0->getIJ(ind_phase0, coo_kept);
-          const double compo = bary0->getIJ(ind_phase1, dir) - bary0->getIJ(ind_phase0, dir);
-          // c plutot que ind_maillage_2d_cart
-          vect_ptr[2 * c + dir] = compo;
-        }
-    }
-}
-
-void IJK_Interfaces::calculer_surfaces_et_barys_faces_mouillees_vapeur(
-  FixedVector<IJK_Field_double, 3>& surfaces, FixedVector<FixedVector<IJK_Field_double, 3>, 3>& barycentres)
-{
-  // Lors de l'appel de cette méthode (une fois à chaque passage dans la boucle
-  // principale en temps), on convertit le maillage au format MED.
-  set_maillage_MED();
-
-  // Pass through 3 dimensions to cut the mesh of the bubble with multiple plans
-  const auto& geom = surfaces[0].get_splitting().get_grid_geometry();
-  const auto& splitting = surfaces[0].get_splitting();
-  std::vector<int> N = {splitting.get_nb_elem_local(0) + 1, splitting.get_nb_elem_local(1) + 1,
-                        splitting.get_nb_elem_local(2) + 1
-                       };
-  Cerr << "Dimensions du cas : ";
-  for (int c = 0; c < 3; c++)
-    Cerr << ", " << N[c];
-  Cerr << finl;
-
-  // std::vector<int> L_min = {geom.get_origin(0), geom.get_origin(1),
-  // geom.get_origin(2)} std::vector<int> L_max = {geom.get_origin,
-  // geom.get_origin(1), geom.get_origin(2)}
-
-  // Dans chaque direction on va parcourir tous les plans pour découper les
-  // bulles en tranches.
-  std::vector<int> COO2KEEP(2);
-  std::array<int, 3> COOINV;
-
-  for (int d = 0; d < 3; d++)
-    {
-      get_coo_to_keep(d, COO2KEEP);
-      get_coo_inv_to_keep(d, COOINV);
-
-      // debut debug
-      // Cerr << "COOINV : { " << static_cast<int>(COOINV[0]) << ", " <<
-      // static_cast<int>(COOINV[1]) << ", " << static_cast<int>(COOINV[2]) << "
-      // }" << finl; fin debug
-
-      // Building plan mesh
-      const auto X1 = COO2KEEP[0];
-      DAD xarr = DataArrayDouble::New();
-      xarr->alloc(N[X1], 1);
-      xarr->iota();
-      const auto dx = geom.get_constant_delta(X1);
-      const auto xmin = geom.get_origin(X1) + dx * splitting.get_offset_local(X1);
-      // Marche si le forecasting marche
-      // xarr = xarr * dx + xmin;
-      auto xarr_ptr = xarr->getPointer();
-      for (int c = 0; c < xarr->getNumberOfTuples(); c++)
-        {
-          xarr_ptr[c] *= dx;
-          xarr_ptr[c] += xmin;
-        }
-
-      const int X2 = COO2KEEP[1];
-      DAD yarr = DataArrayDouble::New();
-      yarr->alloc(N[X2], 1);
-      yarr->iota();
-      const auto dy = geom.get_constant_delta(X2);
-      const auto ymin = geom.get_origin(X2) + dy * splitting.get_offset_local(X2);
-      // yarr = yarr * dy + ymin;
-      auto yarr_ptr = yarr->getPointer();
-      for (int c = 0; c < yarr->getNumberOfTuples(); c++)
-        {
-          yarr_ptr[c] *= dy;
-          yarr_ptr[c] += ymin;
-        }
-
-      MCC cmesh = MEDCouplingCMesh::New();
-      cmesh->setCoords(xarr, yarr);
-      MCU mesh = cmesh->buildUnstructured();
-      mesh->setName("Plan_IJ_IK_JK");
-
-      // Orient correctly grid
-      mesh->changeSpaceDimension(3);
-      const double vect[3] = {0., 0., -1.};
-      mesh->orientCorrectly2DCells(vect, false);
-      mesh->changeSpaceDimension(2);
-      MCT do_not_use3 = mesh->zipCoordsTraducer();
-      const int n_cell_tot = mesh->getNumberOfCells();
-      if (Process::je_suis_maitre())
-        MEDCoupling::WriteUMesh("mesh.med", mesh, true);
-
-      DAD zarr = DataArrayDouble::New();
-      zarr->alloc(N[d], 1);
-      zarr->iota();
-      const auto dz = geom.get_constant_delta(d);
-      const auto zmin = geom.get_origin(d) + dz * splitting.get_offset_local(d);
-      // Marche si le forecasting marche, sinon il faut parcourir en boucle
-      auto zarr_ptr = zarr->getPointer();
-      const int n_tup_zarr = zarr->getNumberOfTuples();
-      for (int c = 0; c < n_tup_zarr; c++)
-        {
-          zarr_ptr[c] *= dz;
-          zarr_ptr[c] += zmin;
-        }
-
-      // For each plan cut through the bubble mesh and compute the surfaces
-      // and barycenters of the cut faces
-      if (Process::je_suis_maitre())
-        MEDCoupling::WriteUMesh("mesh_bulles.med", maillage_bulles_med_, true);
-      for (int i_plan = 0; i_plan < N[d]; i_plan++)
-        {
-          MCT cellId = DataArrayIdType::New();
-          bool plan_cut_some_bubble = true;
-          MCU mesh1D = MEDCouplingUMesh::New();
-          slice_bubble(zarr_ptr[i_plan], d, cellId, plan_cut_some_bubble, mesh1D);
-
-          // Si on ne coupe pas de bulles, pas la peine de faire tout ça, la surface
-          // vapeur reste nulle il n'y a que du liquide sur toutes ces faces. En
-          // fait ça fait gagner en temps de calcul.
-          if (plan_cut_some_bubble)
-            {
-              Cerr << finl;
-              Cerr << "Point d'intersection : " << zarr_ptr[i_plan] << finl;
-              Cerr << "Direction : " << d << finl;
-              Cerr << finl;
-
-              Cerr << "Mesh 1D coordinates : " << finl;
-              print_double_med(mesh1D->getCoords());
-              Cerr << "Mesh 1D connectivity" << finl;
-              print_umesh_conn(mesh1D->getNodalConnectivity());
-              // Cerr << "Mesh 1D connectivity bis" << finl;
-              // for (unsigned int comp = 0; comp <
-              // mesh1D->static_cast<int>(getNodalConnectivity()->getNumberOfComponents());
-              //      comp++) {
-              //   Cerr  << " [ ";
-              //   for (int c = 0; c <
-              //   mesh1D->getNodalConnectivity()->getNumberOfTuples(); c++) {
-              //     Cerr << mesh1D->getNodalConnectivity()->getIJ(c, comp) << ", ";
-              //   }
-              //   Cerr << "]" << finl;
-              // }
-              MCT do_not_use4 = mesh1D->zipCoordsTraducer();
-              MCT no_use1 = mesh1D->zipConnectivityTraducer(2);
-              if (Process::je_suis_maitre())
-                MEDCoupling::WriteUMesh("mesh1d.med", mesh1D, true);
-              // récupérer le bon champ
-              // auto cellId_ptr = cellId->getPointer();
-              // const auto n_cell_diph = cellId->getNumberOfTuples();
-              // MCU orthoProjected =
-              // maillage_bulles_med_->buildPartOfMySelf(cellId_ptr,
-              // cellId_ptr+n_cell_diph, true);
-
-              MCT cellOrder = mesh1D->orderConsecutiveCells1D();
-
-              // debut debug
-              // Cerr << "Reordering mesh1D : " <<finl;
-              // print_int_med(cellOrder);
-              // fin debug
-
-              MCU mesh1D_ordered = mesh1D->buildPartOfMySelf(cellOrder->begin(), cellOrder->end(), false);
-              MCT no_use2 = mesh1D_ordered->zipConnectivityTraducer(2);
-              MCT do_not_use6 = mesh1D_ordered->zipCoordsTraducer();
-              Cerr << "Mesh 1D connectivity cell ordered" << finl;
-              print_umesh_conn(mesh1D_ordered->getNodalConnectivity());
-              // Cerr << "Mesh 1D connectivity index ordered" << finl;
-              // print_int_med(mesh1D_ordered->getNodalConnectivityIndex());
-              order_elem_mesh_filaire(mesh1D_ordered);
-              Cerr << "Mesh 1D connectivity nodes ordered" << finl;
-              print_umesh_conn(mesh1D_ordered->getNodalConnectivity());
-              mesh1D_ordered->checkConsistencyLight();
-
-              // MCU mesh1D_f = mesh1D_ordered->sortCellsInMEDFileFrmt();
-              // DONE with false as 3rd arg: mesh1D_ordered->zipCoords();
-
-              // debut debug
-              // Cerr << "Coordonnees mesh1D ordered : " <<finl;
-              // const auto coo = mesh1D_ordered->getCoords();
-              // print_double_med(coo);
-              // fin debug
-
-              if (Process::je_suis_maitre())
-                MEDCoupling::WriteUMesh("mesh1d_ordered.med", mesh1D_ordered, true);
-
-              // {
-              //   const auto connectivity = mesh1D_ordered->getNodalConnectivity();
-              //   const int nb_compo = static_cast<int>(connectivity->getNumberOfComponents());
-              //   Cerr << "Connectivity fil : " << finl;
-              //   Cerr << "Nb nodes : " << connectivity->getNumberOfTuples() << finl;
-              //   Cerr << "Nb compo : " << nb_compo << finl;
-              //   print_umesh_conn(connectivity);
-              // }
-
-              // Compute the merge mesh and stock it
-              MCU merge0, mesh_filaire_decoupe0;
-              MCT cellIdInMesh2d0, mesh1dmergeId0;
-              {
-                MEDCouplingUMesh *merge0Ptr(0), *meshFilDecoupePtr(0);
-                DataArrayIdType *cellIdInMesh2d0Ptr(0), *mesh1dmergeId0Ptr(0);
-
-                MEDCouplingUMesh::Intersect2DMeshWith1DLine(mesh, mesh1D_ordered, EPS_, merge0Ptr, meshFilDecoupePtr,
-                                                            cellIdInMesh2d0Ptr, mesh1dmergeId0Ptr);
-                merge0 = merge0Ptr;
-                mesh_filaire_decoupe0 = meshFilDecoupePtr;
-                cellIdInMesh2d0 = cellIdInMesh2d0Ptr;
-                mesh1dmergeId0 = mesh1dmergeId0Ptr;
-              }
-              if (Process::je_suis_maitre())
-                {
-                  // MCT otn = merge0->sortCellsInMEDFileFrmt();
-                  merge0->setName("Merge0");
-                  MEDCoupling::WriteUMesh("merge0.med", merge0, true);
-                }
-
-              // Compute surf and bary
-              DAD bary0 = merge0->computeCellCenterOfMass();
-              DAD surf0 = merge0->getMeasureField(false)->getArray(); // ->getValueOnMulti(bary0->getConstPointer(),
-              // bary0->getNumberOfTuples());
-
-              // Compute the table of cut cells in mesh2d
-              MCT cellsIdinMesh0 = DataArrayIdType::New();
-              MCT cIcellsIdinMesh0 = DataArrayIdType::New();
-              findCommonTuples(cellIdInMesh2d0, n_cell_tot, cellsIdinMesh0, cIcellsIdinMesh0);
-              // cellsIdinMesh1, cIcellsIdinMesh1 = findCommonTuples(cellIdInMesh2d1,;
-              //     n_cell_tot);
-
-              // Compute the vect from sub_cell0 to sub_cell1 in diph cells and check
-              // if it goes from vapour to liquid-> If not switches sub_cell0 and
-              // sub_cell1 ids->
-              DAD vect0 = DataArrayDouble::New();
-              // TODO la methode rempli le vecteur a partir des barycentres des deux
-              // premieres sous cellules de chaque cellule diphasique.
-              get_vect_from_sub_cells_tuple(d, bary0, cIcellsIdinMesh0, cellsIdinMesh0, vect0);
-
-              // vect1 = get_vect_from_sub_cells_tuple(bary1, cIcellsIdinMesh1,
-              //         cellsIdinMesh1, n_cell_tot);
-
-              // Get ortho from 2d mesh of the bubble
-              // get_ortho_per_cell(orthoProjected, N[X1]-1, N[Y1]-1, xmin, ymin,
-              //         dx, dy, normale_par_compo_[old()]);
-
-              // Check if orientation is Ok or switches it
-              check_if_vect_is_from_liquid2vapor(vect0, d, i_plan, N[X1], cIcellsIdinMesh0, cellsIdinMesh0);
-              // cIcellsIdinMesh1 = check_if_vect_is_from_liquid2vapor(vect1,
-              // orthoPerCell,
-              //                                                       cIcellsIdinMesh1,
-              //                                                       cellsIdinMesh1);
-
-              // Select values from the barys of the vapor phase and set it in the res
-              // array
-              // auto surf_ptr = surf0->getPointer();
-              // const int len_surf =
-              //     surf0->getNumberOfTuples() * static_cast<int>(surf0->getNumberOfComponents());
-              // for (int c = 0; c < len_surf; c++)
-              //   surf_ptr[c] /= (dx * dy);
-
-              // // debug surf0
-              // Cerr << "Surf0 : " << finl;
-              // print_double_med(surf0);
-              // //
-              // // debug bary0
-              // Cerr << "bary0 : " << finl;
-              // print_double_med(bary0);
-
-              // Cette boucle est un parcours des cellules diphasiques seulement.
-              // Elle permet de remplir de manière efficace les tableaux surfaces et
-              // barycentres
-              const int n_diph = cellsIdinMesh0->getNumberOfTuples();
-              const int n_compo_subcell = static_cast<int>(cellsIdinMesh0->getNumberOfComponents());
-              const int *subcellPtr = cellsIdinMesh0->getConstPointer();
-              const int *cIPtr = cIcellsIdinMesh0->getConstPointer();
-              const double *surf0Ptr = surf0->getConstPointer();
-              const double *bary0Ptr = bary0->getConstPointer();
-              const int n_compo_bary = static_cast<int>(bary0->getNumberOfComponents());
-
-              for (int c = 0; c < n_diph; c++)
-                {
-                  // TODO renvoie les coordonnees x et y correspondant au numero de la
-                  // cellule du maillage cartesien du plan XY
-                  const int i_cell_cart = cIPtr[c];
-                  // On prend le premier de la ligne parce que pour rappel on les a
-                  // réordonné afin d'avoir le premier qui correspond à la subcell
-                  // vapeur
-                  const int i_subcell = subcellPtr[c * n_compo_subcell];
-                  std::array<int, 3> coo_inv {0, 0, 0};
-                  get_IJK_ind_from_ind2d(d, i_plan, i_cell_cart, N[X1], coo_inv);
-
-                  // J'attribue à la face d de la maille i,j,k
-                  // la premiere surface de la sous cellule X1 X2
-                  const double surf_vap = surf0Ptr[i_subcell];
-                  surfaces[d](coo_inv[0], coo_inv[1], coo_inv[2]) = surf_vap;
-                  // je dois remettre dans le bon ordre les deux autres composantes
-                  const double bary_x1 = bary0Ptr[i_subcell * n_compo_bary];
-                  barycentres[X1][d](coo_inv[0], coo_inv[1], coo_inv[2]) = bary_x1;
-                  const double bary_x2 = bary0Ptr[i_subcell * n_compo_bary + 1];
-                  barycentres[X2][d](coo_inv[0], coo_inv[1], coo_inv[2]) = bary_x2;
-                  barycentres[d][d](coo_inv[0], coo_inv[1], coo_inv[2]) = zarr_ptr[i_plan];
-                }
-            }
-        }
-    }
-  for (int c = 0; c < 3; c++)
-    {
-      for (int cc = 0; cc < 3; cc++)
-        barycentres[c][cc].echange_espace_virtuel(barycentres[0][0].ghost());
-      surfaces[c].echange_espace_virtuel(surfaces[0].ghost());
-    }
-}
-
-void IJK_Interfaces::compute_surf_and_barys()
-{
-  for (int dir = 0; dir < 3; dir++)
-    surface_vapeur_par_face_[next()][dir].data() = 0.;
-
-  if ((!desactive_med_) and compute_surf_mouillees_)
-    {
-      Cout << "Calcul surfaces et barys" << finl;
-      calculer_surfaces_et_barys_faces_mouillees_vapeur(surface_vapeur_par_face_[next()],
-                                                        barycentre_vapeur_par_face_[next()]);
-      Cerr << "Le calcul des surfaces et barys est fini" << finl;
-    }
-  const int ni = surface_vapeur_par_face_[next()][0].ni();
-  const int nj = surface_vapeur_par_face_[next()][0].nj();
-  const int nk = surface_vapeur_par_face_[next()][0].nk();
-  n_faces_mouilles_ = 0;
-  double surf_cell = 1.;
-  for (int dir = 0; dir < 3; dir++)
-    {
-      surf_cell = 1.;
-      for (int c = 0; c < 3; c++)
-        {
-          if (c != dir)
-            surf_cell *= ref_splitting_->get_grid_geometry().get_constant_delta(c);
-        }
-      for (int i = 0; i < ni; i++)
-        for (int j = 0; j < nj; j++)
-          for (int k = 0; k < nk; k++)
-            {
-              if (surface_vapeur_par_face_[next()][dir](i, j, k) *
-                  (surf_cell - surface_vapeur_par_face_[next()][dir](i, j, k)) >
-                  EPS_ * surf_cell * surf_cell)
-                {
-                  n_faces_mouilles_++;
-                  // Cerr << "Cette face est diphasique ; dir " << dir << " i " << i
-                  // << ", j " << j << ", k " << k << finl;
-                }
-              else
-                {
-                  double mean_indic = 0.;
-                  if (dir == 0)
-                    mean_indic = (indicatrice_ft_[next()](i - 1, j, k) + indicatrice_ft_[next()](i, j, k)) / 2.;
-                  if (dir == 1)
-                    mean_indic = (indicatrice_ft_[next()](i, j - 1, k) + indicatrice_ft_[next()](i, j, k)) / 2.;
-                  if (dir == 2)
-                    mean_indic = (indicatrice_ft_[next()](i, j, k - 1) + indicatrice_ft_[next()](i, j, k)) / 2.;
-                  bool test = (mean_indic < 0.5);
-                  // Alors on met la surface de la face comme vapeur pure
-                  surface_vapeur_par_face_[next()][dir](i, j, k) = (test ? surf_cell : 0.);
-                }
-            }
-    }
-}
-
-void IJK_Interfaces::order_elem_mesh_filaire(MEDCouplingUMesh *mesh1D)
-{
-  DataArrayIdType *n = mesh1D->getNodalConnectivity();
-  int *n_ptr = n->getPointer();
-  DataArrayIdType *nI = mesh1D->getNodalConnectivityIndex();
-  const int *nI_ptr = nI->getConstPointer();
-  int n_cells = mesh1D->getNumberOfCells();
-  Cerr << "Coordonnees de mesh1D : " << finl;
-  print_double_med(mesh1D->getCoords());
-  if (n_cells > 1)
-    {
-      int last_node, second_node;
-      last_node = -1;
-      int node0, node1, node2, node3;
-
-      for (int i_cell = 0; i_cell < n_cells; i_cell++)
-        {
-          // Dans ce cas là on traite un debut de boucle par exemple.
-          // Pour changer de boucle il faut atteindre à nouveau le
-          // premier noeud (qui est donc le last_node).
-          if (last_node == -1)
-            {
-              assert(i_cell + 1 < n_cells);
-              node0 = n_ptr[nI_ptr[i_cell] + 1];
-              node1 = n_ptr[nI_ptr[i_cell] + 2];
-              node2 = n_ptr[nI_ptr[i_cell + 1] + 1];
-              node3 = n_ptr[nI_ptr[i_cell + 1] + 2];
-              if ((node0 == node2) || (node0 == node3))
-                {
-                  last_node = node1;
-                  second_node = node0;
-                  n_ptr[nI_ptr[i_cell] + 1] = last_node;
-                  n_ptr[nI_ptr[i_cell] + 2] = second_node;
-                }
-              else if ((node1 == node2) || (node1 == node3))
-                {
-                  last_node = node0;
-                  second_node = node1;
-                }
-              else
-                throw "Erreur au debut d'une boucle deux element ne se suivent pas";
-            }
-          // Dans ce cas là on est dans un boucle, et on traite
-          // l'élément suivant qu'on ordonne dans le mm sens que
-          // le précédent.
-          else
-            {
-              node0 = n_ptr[nI_ptr[i_cell] + 1];
-              node1 = n_ptr[nI_ptr[i_cell] + 2];
-              // Si c'est node1 qui est égal au second noeud de l'elem precedent
-              // on inverse les noeuds 0 et 1.
-              if (node1 == second_node)
-                {
-                  n_ptr[nI_ptr[i_cell] + 1] = node1;
-                  n_ptr[nI_ptr[i_cell] + 2] = node0;
-                  second_node = node0;
-                }
-              else if (node0 == second_node)
-                {
-                  second_node = node1;
-                }
-              // Si aucun des 2 noeud n'est dans l'element precedent c'est qu on a
-              // fini un arc brise et qu on commence une nouvelle boucle.
-              // On va retraiter cet element comme un debut de boucle.
-              else
-                {
-                  // throw "Erreur les cellules ne sont pas faites avec des noeuds "
-                  //       "consecutifs";
-                  i_cell--;
-                  last_node = -1;
-                }
-              // On a fini la boucle sur cet element, le prochain est dans une
-              // nouvelle boucle.
-              if (second_node == last_node)
-                last_node = -1;
-            }
-        }
-    }
-
-  // double x1 = coords[n_compo_coo * node1];
-  // double y1 = coords[n_compo_coo * node1 + 1];
-  // double cellNormX = norms2D[n_compo_coo * cellNumber];
-  // double cellNormY = norms2D[n_compo_coo * cellNumber + 1];
-  // if ((cellNormX * (x1 - centerX) + cellNormY * ( y1-centerY ) ) < 0)
-  // {
-  //   n[nI[cellNumber] + 1] = node2;
-  //   n[nI[cellNumber] + 2] = node1;
-  // }
-}
-
-void print_int_med(const DataArrayIdType *data)
-{
-  const int n_tup = data->getNumberOfTuples();
-  const int n_compo = static_cast<int>(data->getNumberOfComponents());
-  const int *dataPtr = data->getConstPointer();
-  if (n_compo == 1)
-    {
-      Cerr << "[ ";
-      for (int i = 0; i < n_tup; i++)
-        Cerr << dataPtr[i] << ", ";
-      Cerr << "]" << finl;
-    }
-  else
-    {
-      for (int i = 0; i < n_tup; i++)
-        {
-          for (int j = 0; j < n_compo; j++)
-            Cerr << dataPtr[i * n_compo + j] << ", ";
-          Cerr << finl;
-        }
-    }
-}
-
-void print_double_med(const DataArrayDouble *data)
-{
-  const int n_tup = data->getNumberOfTuples();
-  const int n_compo = static_cast<int>(data->getNumberOfComponents());
-  const double *dataPtr = data->getConstPointer();
-  if (n_compo == 1)
-    {
-      Cerr << "[ ";
-      for (int i = 0; i < n_tup; i++)
-        Cerr << dataPtr[i] << ", ";
-      Cerr << "]" << finl;
-    }
-  else
-    {
-      for (int i = 0; i < n_tup; i++)
-        {
-          for (int j = 0; j < n_compo; j++)
-            Cerr << dataPtr[i * n_compo + j] << ", ";
-          Cerr << finl;
-        }
-    }
-}
-
-void print_umesh_conn(const DataArrayIdType *data)
-{
-  const int n_tup = data->getNumberOfTuples();
-  const int n_compo = static_cast<int>(data->getNumberOfComponents());
-  const int *dataPtr = data->getConstPointer();
-  if (n_compo == 1)
-    {
-      // Cerr << "[ ";
-      int i = 0;
-      while (i < n_tup)
-        {
-          int elem_type = dataPtr[i];
-          if (elem_type == 1)
-            elem_type++;
-          for (int j = 0; j < elem_type; j++)
-            {
-              Cerr << dataPtr[i + 1] << " ";
-              i++;
-            }
-          i++;
-          Cerr << ", ";
-        }
-      Cerr << finl;
-      // Cerr << "]" << finl;
-    }
-  else
-    {
-      Cerr << "Attention on ne plot pas le tableau des connectivites" << finl;
-    }
-}
-
 // Dans cette méthode on calcule l'indicatrice_next_ en fonction de
 // la variable interfaces_.
 // /!\ Si l'interface n'a pas ete deplacee on recalcule la mm chose.
@@ -6568,12 +5314,13 @@ void IJK_Interfaces::calculer_indicatrice_next(
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
 
   // Calcul de l'indicatrice sur le domaine NS :
-  ref_ijk_ft_->redistrib_from_ft_elem().redistribute(indicatrice_ft_[next()], indicatrice_ns_[next()]);
+  ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+    indicatrice_ft_[next()], indicatrice_ns_[next()]);
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
   // Calcul des indicatrices s'il y a des groupes :
-  const int nb_groups = IJK_Interfaces::nb_groups();
-  if (nb_groups > 1)
+  const int nb_grps = IJK_Interfaces::nb_groups();
+  if (nb_grps > 1)
     {
       if (get_recompute_indicator())
         calculer_indicatrices(groups_indicatrice_ft_[next()]);
@@ -6587,19 +5334,80 @@ void IJK_Interfaces::calculer_indicatrice_next(
       groups_indicatrice_ns_[next()].echange_espace_virtuel();
     }
 
-  // Aux faces mouillees
-  compute_surf_and_barys();
   // Aux cellules diphasiques, calcule toutes les moyennes de l'interface
   // dans les cellules pour chaque compo. Le but est de le faire une fois
   // pour toute de manière synchronisee (et pas au moment ou on calcule la
   // force par exemple).
-  calculer_valeur_par_compo(field_repulsion, gravite, delta_rho, sigma, time, itstep);
+  val_par_compo_in_cell_computation_.calculer_valeur_par_compo(
+#ifdef SMOOTHING_RHO
+    delta_rho,
+#endif
+    time, itstep,
+    nb_compo_traversante_[next()],
+    compos_traversantes_[next()],
+    normale_par_compo_[next()],
+    bary_par_compo_[next()],
+    indicatrice_par_compo_[next()],
+    surface_par_compo_[next()],
+    courbure_par_compo_[next()]);
+
+  // calcul de la force de repulsion
+  calculer_phi_repuls_par_compo(
+    phi_par_compo_[next()],
+    repuls_par_compo_[next()],
+    field_repulsion,
+    gravite,
+    delta_rho,
+    sigma,
+    time,
+    itstep
+  );
 
 #if VERIF_INDIC
+  verif_indic();
+#endif
+
+  // Calcul normale_of_interf_ bary_of_interf_ et passage à NS
+  mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], normal_of_interf_[next()]);
+  mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], bary_of_interf_[next()]);
+
+  for (int c=0; c < 3; c++)
+    {
+      ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+        normal_of_interf_[next()][c],
+        normal_of_interf_ns_[next()][c]);
+      ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
+        bary_of_interf_[next()][c],
+        bary_of_interf_ns_[next()][c]);
+    }
+
+  // Aux faces mouillees
+  n_faces_mouilles_[next()] = surface_vapeur_par_face_computation_.compute_surf_and_barys(
+                                maillage_ft_ijk_,
+                                indicatrice_ft_[next()],
+                                normal_of_interf_[next()],
+                                surface_vapeur_par_face_[next()],
+                                barycentre_vapeur_par_face_[next()]);
+  // Passage au domaine NS
+  ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+    surface_vapeur_par_face_[next()],
+    surface_vapeur_par_face_ns_[next()]);
+  for (int c=0; c<3; c++)
+    ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(
+      barycentre_vapeur_par_face_[next()][c],
+      barycentre_vapeur_par_face_ns_[next()][c]);
+
+  statistiques().end_count(calculer_indicatrice_next_counter_);
+}
+
+
+#if VERIF_INDIC
+void IJK_Interfaces::verif_indic()
+{
   calculer_indicatrice(indicatrice_ft_test_);
   indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost());
   SChaine indic;
-  if (nb_groups > 1)
+  if (nb_grps > 1)
     {
       calculer_indicatrices(groups_indicatrice_ft_test_);
       groups_indicatrice_ft_test_.echange_espace_virtuel();
@@ -6621,7 +5429,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
               indic << "(" << i << "," << j << "," << k << ") : " << indicatrice_ft_[next()](i, j, k) << " VS "
                     << indicatrice_ft_test_(i, j, k) << finl;
             }
-          for (int igroup = 0; igroup < nb_groups; igroup++)
+          for (int igroup = 0; igroup < nb_grps; igroup++)
             {
               if (groups_indicatrice_ft_[next()][igroup](i, j, k) != groups_indicatrice_ft_test_[igroup](i, j, k))
                 {
@@ -6640,11 +5448,8 @@ void IJK_Interfaces::calculer_indicatrice_next(
            << finl;
       Process::exit();
     }
-
-#endif
-
-  statistiques().end_count(calculer_indicatrice_next_counter_);
 }
+#endif
 
 void IJK_Interfaces::switch_indicatrice_next_old()
 {
@@ -6665,212 +5470,21 @@ void IJK_Interfaces::switch_indicatrice_next_old()
   bary_par_compo_[old()].echange_espace_virtuel();
   surface_par_compo_[old()].echange_espace_virtuel();
 
+  normal_of_interf_[old()].echange_espace_virtuel();
+  bary_of_interf_[old()].echange_espace_virtuel();
+  normal_of_interf_ns_[old()].echange_espace_virtuel();
+  bary_of_interf_ns_[old()].echange_espace_virtuel();
+
   surface_vapeur_par_face_[old()].echange_espace_virtuel();
+  surface_vapeur_par_face_ns_[old()].echange_espace_virtuel();
   for (int c = 0; c < 3; c++)
-    barycentre_vapeur_par_face_[old()][c].echange_espace_virtuel();
+    {
+      barycentre_vapeur_par_face_[old()][c].echange_espace_virtuel();
+      barycentre_vapeur_par_face_ns_[old()][c].echange_espace_virtuel();
+    }
 
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
   groups_indicatrice_ns_[old()].echange_espace_virtuel();
-}
-
-// Pour remplacer calculer_normale_et_bary_element_par_compo
-void IJK_Interfaces::calculer_moyennes_interface_element_pour_compo(
-  const int num_compo,
-  const int elem,
-  double& surface_tot,
-  Vecteur3& normale,
-  Vecteur3& bary
-) const
-{
-  const Maillage_FT_IJK& maillage = maillage_ft_ijk_;
-  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
-  const IntTab& facettes = maillage.facettes();
-  const DoubleTab& sommets = maillage.sommets();
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
-  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
-  const ArrOfInt& compo_connexe = maillage.compo_connexe_facettes();
-
-  int index = intersections.index_elem()[elem];
-  surface_tot = 0.;
-  normale = 0.;
-  bary = 0.;
-
-  if (index < 0)
-    return; // Aucune facette dans cet element.
-
-  // Boucle sur les facettes qui traversent l'element elem :
-  int count = 0;
-  while (index >= 0)
-    {
-      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
-      const int icompo = compo_connexe[fa7];
-      if (icompo == num_compo)
-        {
-          const double surface_facette = surface_facettes[fa7];
-          const double surf = data.fraction_surface_intersection_ * surface_facette;
-          // Les coordonnees du barycentre de la fraction de facette :
-          Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-          for (int dir = 0; dir < 3; dir++)
-            {
-              const double nx = normale_facettes(fa7, dir);
-              normale[dir] += nx * surf;
-            }
-          for (int isom = 0; isom < 3; isom++)
-            {
-              // numero du sommet dans le tableau sommets
-              const int num_som = facettes(fa7, isom);
-              // Coordonnees barycentriques du centre de gravite de l'intersection
-              // par rapport aux trois sommets de la facette.
-              const double bary_som = data.barycentre_[isom];
-              // pour avoir la courbure au centre du triangle
-              for (int dir = 0; dir < 3; dir++)
-                coord_barycentre_fraction[dir] += bary_som * sommets(num_som, dir);
-            }
-          coord_barycentre_fraction *= surf;
-          bary += coord_barycentre_fraction;
-          surface_tot += surf;
-        }
-      index = data.index_facette_suivante_;
-      count++;
-    }
-
-  if (surface_tot > 0.)
-    {
-      normale *= 1. / surface_tot;
-      bary *= 1. / surface_tot;
-    }
-  else
-    {
-      Cerr << " Erreur dans "
-           "IJK_Interfaces::calculer_normale_et_bary_element_pour_compo."
-           << finl;
-      Cerr << "L'element " << elem << " contient des facettes de surface totale nulle!" << finl;
-      Cerr << "Que mettre pour le barycentre? ..." << finl;
-      assert(0);
-      Process::exit();
-    }
-
-  const double norm = normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2];
-  if (norm < 0.9)
-    {
-      Cerr << " Dans calculer_normale_et_bary_element_pour_compo." << finl;
-      Cerr << "Petite : " << count << " facettes dans l'element " << elem << ". surface_tot = " << surface_tot
-           << "Norm**2 = " << norm << finl;
-    }
-}
-
-void IJK_Interfaces::calculer_moy_par_compo(
-  IJK_Field_int& nb_compo_traversante,
-  FixedVector<IJK_Field_int, max_authorized_nb_of_components_>& compos_traversantes,
-  FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& normale_par_compo,
-  FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>& bary_par_compo,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& indic_par_compo,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& surface_par_compo
-) const
-{
-
-  Cout << "Calcul moyennes de l'interface dans chaque cellule par compo" << finl;
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-
-  // Initialisation a NUM_COMPO_INVALID signifie aucune compo presente.
-  nb_compo_traversante.data() = NUM_COMPO_INVALID;
-  // Peut-etre pas necessaire
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    {
-      // TODO: AYM verifier l'init
-      compos_traversantes[c].data() = NUM_COMPO_INVALID;
-      surface_par_compo[c].data() = 0.;
-      for (int compo = 0; compo < 3; compo++)
-        {
-          normale_par_compo[3 * c + compo].data() = 0.;
-          bary_par_compo[3 * c + compo].data() = 0.;
-        }
-    }
-
-  // Boucle sur les elements:
-  const int ni = ref_splitting_->get_nb_elem_local(DIRECTION_I);
-  const int nj = ref_splitting_->get_nb_elem_local(DIRECTION_J);
-  const int nk = ref_splitting_->get_nb_elem_local(DIRECTION_K);
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(maillage_ft_ijk_.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          // (seules les surfaces non-nulles sont comptees)
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          if (nb_compo_traversantes > max_authorized_nb_of_components_)
-            {
-              Cerr << "IJK_Interfaces::ajouter_terme_source_interfaces. Trop de "
-                   "compo connexes dans "
-                   << "l'element " << elem << "[ " << i << " " << j << " " << k << " "
-                   << " ]" << finl;
-              Cerr << "Augmenter la taille max_authorized_nb_of_components_." << finl;
-              assert(0);
-            }
-
-          nb_compo_traversante(i, j, k) = nb_compo_traversantes;
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              compos_traversantes[i_compo](i, j, k) = num_compo;
-
-              double indic;
-              calculer_indic_elem_pour_compo(num_compo, elem, indic);
-
-              double surface;
-              Vecteur3 normale;
-              Vecteur3 bary_facettes_dans_elem;
-              calculer_moyennes_interface_element_pour_compo(num_compo, elem, surface, normale, bary_facettes_dans_elem);
-
-              indic_par_compo[i_compo](i, j, k) = indic;
-              surface_par_compo[i_compo](i, j, k) = surface;
-              for (int dir = 0; dir < 3; dir++)
-                {
-                  const int idx = i_compo * 3 + dir;
-                  normale_par_compo[idx](i, j, k) = normale[dir];
-                  bary_par_compo[idx](i, j, k) = bary_facettes_dans_elem[dir];
-                }
-            }
-        }
-
-#ifdef SMOOTHING_RHO
-  if (smooth_density)
-    {
-      for (int icompo = 0; icompo < max_authorized_nb_of_components_; icompo++)
-        {
-          const int nx = indic_par_compo[icompo].ni();
-          const int ny = indic_par_compo[icompo].nj();
-          const int nz = indic_par_compo[icompo].nk();
-          // Attention, rho n'est pas par compo, donc ca ne marche pas en
-          // multi-bulles.
-          for (int k = 0; k < nz; k++)
-            for (int j = 0; j < ny; j++)
-              for (int i = 0; i < nx; i++)
-                {
-                  //      double rho = smooth_rho(i,j,k);
-                  double rho = rho_field(i, j, k);
-                  indic_par_compo[icompo](i, j, k) = (rho - rho_v) / delta_rho;
-                }
-        }
-    }
-#endif
-
-  // Mise a jour des espaces virtuels :
-  nb_compo_traversante.echange_espace_virtuel(nb_compo_traversante.ghost());
-  compos_traversantes.echange_espace_virtuel();
-  surface_par_compo.echange_espace_virtuel();
-  indic_par_compo.echange_espace_virtuel();
-  normale_par_compo.echange_espace_virtuel();
-  bary_par_compo.echange_espace_virtuel();
 }
 
 
@@ -6890,8 +5504,10 @@ void IJK_Interfaces::calculer_phi_repuls_par_compo(
   ArrOfDouble potentiels_sommets;
   ArrOfDouble repulsions_sommets;
   calculer_phi_repuls_sommet(potentiels_sommets, repulsions_sommets, gravite, delta_rho, sigma, time, itstep);
-  calculer_moy_field_sommet_par_compo(potentiels_sommets, phi_par_compo);
-  calculer_moy_field_sommet_par_compo(repulsions_sommets, repuls_par_compo);
+  val_par_compo_in_cell_computation_.calculer_moy_field_sommet_par_compo(
+    potentiels_sommets, phi_par_compo);
+  val_par_compo_in_cell_computation_.calculer_moy_field_sommet_par_compo(
+    repulsions_sommets, repuls_par_compo);
 
   const IJK_Splitting& split = ref_splitting_;
   const int ni = split.get_nb_elem_local(DIRECTION_I);
@@ -7100,197 +5716,3 @@ void IJK_Interfaces::calculer_phi_repuls_sommet(
        << ")*1.7320... ? " << (ok ? "ok" : "ko") << " (ratio : " << lg_lagrange / (lg_euler * sqrt_3)
        << (ok ? " >" : " <") << "1 )" << finl;
 }
-
-
-void IJK_Interfaces::calculer_valeur_par_compo(
-  IJK_Field_double& field_repulsion,
-  const ArrOfDouble& gravite,
-  const double delta_rho,
-  const double sigma,
-  const double time,
-  const int itstep)
-{
-
-  calculer_moy_par_compo(
-    nb_compo_traversante_[next()],
-    compos_traversantes_[next()],
-    normale_par_compo_[next()],
-    bary_par_compo_[next()],
-    indicatrice_par_compo_[next()],
-    surface_par_compo_[next()]
-  );
-  // calcul courbure
-  calculer_moy_field_sommet_par_compo(
-    maillage_ft_ijk_.get_update_courbure_sommets(),
-    courbure_par_compo_[next()]);
-  calculer_phi_repuls_par_compo(
-    phi_par_compo_[next()],
-    repuls_par_compo_[next()],
-    field_repulsion,
-    gravite,
-    delta_rho,
-    sigma,
-    time,
-    itstep
-  );
-}
-
-void IJK_Interfaces::calculer_moy_field_sommet_par_compo(
-  const ArrOfDouble& val_on_sommet,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo) const
-{
-
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const ArrOfInt& compo_connexe = maillage_ft_ijk_.compo_connexe_facettes();
-  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-  const IntTab& facettes = mesh.facettes();
-
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    field_par_compo[c].data() = 0.;
-
-  // Boucle sur les elements:
-  const int ni = field_par_compo[0].ni();
-  const int nj = field_par_compo[0].nj();
-  const int nk = field_par_compo[0].nk();
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  liste_composantes_connexes_dans_element = 0;
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(mesh.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          assert(nb_compo_traversantes < max_authorized_nb_of_components_);
-
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              // Calcul de la moyenne de field dans l'element :
-              double moy_field = 0.;
-              int index = intersections.index_elem()[elem];
-              assert(index >= 0); // Aucune facette dans cet element.
-
-              double surface = 0.;
-
-              // Boucle sur les facettes qui traversent l'element elem :
-              while (index >= 0)
-                {
-                  const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-                  const int fa7 = data.numero_facette_;
-                  const int icompo = compo_connexe[fa7];
-                  double moy_field_fa7 = 0.;
-                  if (icompo == num_compo)
-                    {
-                      const double surface_facette = surface_facettes[fa7];
-                      const double surf = data.fraction_surface_intersection_ * surface_facette;
-                      Cerr << "Surf " << surf << finl;
-                      // Les coordonnees du barycentre de la fraction de facette :
-                      Vecteur3 coord_barycentre_fraction(0., 0., 0.);
-                      for (int isom = 0; isom < 3; isom++)
-                        {
-                          // numero du sommet dans le tableau sommets
-                          const int num_som = facettes(fa7, isom);
-                          const double val = val_on_sommet[num_som];
-                          // Coordonnees barycentriques du centre de gravite de
-                          // l'intersection par rapport aux trois sommets de la facette.
-                          const double bary_som = data.barycentre_[isom];
-                          // pour avoir la moyenne du champ au centre du triangle
-                          moy_field_fa7 += bary_som * val;
-                        }
-                      surface += surf;
-                      moy_field += moy_field_fa7 * surf;
-                    }
-                  index = data.index_facette_suivante_;
-                }
-
-              assert(surface > 0.);
-              moy_field *= 1. / surface;
-
-              field_par_compo[i_compo](i, j, k) = moy_field;
-            }
-        }
-
-  // Mise a jour des espaces virtuels :
-  field_par_compo.echange_espace_virtuel();
-}
-
-void IJK_Interfaces::calculer_moy_field_fa7_par_compo(
-  const ArrOfDouble& val_on_fa7,
-  FixedVector<IJK_Field_double, max_authorized_nb_of_components_>& field_par_compo) const
-{
-
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const ArrOfInt& compo_connexe = maillage_ft_ijk_.compo_connexe_facettes();
-  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
-
-  for (int c = 0; c < max_authorized_nb_of_components_; c++)
-    field_par_compo[c].data() = 0.;
-
-  // Boucle sur les elements:
-  const int ni = field_par_compo[0].ni();
-  const int nj = field_par_compo[0].nj();
-  const int nk = field_par_compo[0].nk();
-
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        {
-          assert(mesh.ref_splitting() == ref_splitting_);
-          // A present, elle est dans le splitting :
-          const int elem = ref_splitting_->convert_ijk_cell_to_packed(i, j, k);
-          const int nb_compo_traversantes =
-            compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-          // Pour chaque element, est-il traverse par une ou plusieurs interface ?
-          assert(nb_compo_traversantes > max_authorized_nb_of_components_);
-
-          // On boucle sur les composantes connexes trouvees dans l'element
-          for (int i_compo = 0; i_compo < nb_compo_traversantes; i_compo++)
-            {
-              const int num_compo = liste_composantes_connexes_dans_element[i_compo];
-              // Calcul de la moyenne de field dans l'element :
-              double moy_field = 0.;
-              int index = intersections.index_elem()[elem];
-              assert(index >= 0); // Aucune facette dans cet element.
-
-              double surface = 0.;
-
-              // Boucle sur les facettes qui traversent l'element elem :
-              while (index >= 0)
-                {
-                  const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-                  const int fa7 = data.numero_facette_;
-                  const int icompo = compo_connexe[fa7];
-                  if (icompo == num_compo)
-                    {
-                      const double surface_facette = surface_facettes[fa7];
-                      const double surf = data.fraction_surface_intersection_ * surface_facette;
-                      const double moy_field_fa7 = val_on_fa7[fa7];
-                      surface += surf;
-                      moy_field += moy_field_fa7 * surf;
-                    }
-                  index = data.index_facette_suivante_;
-                }
-
-              assert(surface > 0.);
-              moy_field *= 1. / surface;
-              field_par_compo[i_compo](i, j, k) = moy_field;
-            }
-        }
-  field_par_compo.echange_espace_virtuel();
-}
-
-// void IJK_Interfaces::get_surface_vapeur_par_face_ns(
-//     FixedVector<IJK_Field_double, 3> &surfs) const {
-//   ref_ijk_ft_->get_redistribute_from_splitting_ft_faces(surface_vapeur_par_face_[old()], surfs);
-// }

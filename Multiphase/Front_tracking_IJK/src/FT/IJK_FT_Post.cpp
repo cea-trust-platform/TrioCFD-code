@@ -68,13 +68,15 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   dt_post_stats_bulles_ = 1;
   //poisson_solver_post_ = xxxx;
   postraiter_sous_pas_de_temps_ = 0;
-
+  post_par_paires_ = 0;
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
   param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
   param.ajouter_flag("postraiter_sous_pas_de_temps", &postraiter_sous_pas_de_temps_);
+  // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
+  param.ajouter_flag("post_par_paires", &post_par_paires_);
 
   expression_vitesse_analytique_.dimensionner_force(3);
   param.ajouter("expression_vx_ana", &expression_vitesse_analytique_[0]);
@@ -2145,6 +2147,13 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
+  // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
+  if ((post_par_paires_ == 1 && tstep % dt_post_ == dt_post_-0) || stop)
+    {
+      Cout << "tstep : " << tstep << finl;
+      posttraiter_champs_instantanes(lata_name, current_time, tstep);
+    }
+  // --
   if (tstep % dt_post_stats_bulles_ == dt_post_stats_bulles_ - 1 || stop)
     {
       ecrire_statistiques_bulles(0, nom_cas, gravite, current_time);
@@ -2447,8 +2456,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   //const double delta[3] = {dx,dy,dz};
 
   int nbsom = 0;
-  ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
+  // ArrOfInt liste_composantes_connexes_dans_element;
+  // liste_composantes_connexes_dans_element.set_smart_resize(1);
   DoubleTab positions_liq(2*nbsom,3); // Table of coordinates where interpolation needs to be computed
   DoubleTab positions_vap(2*nbsom,3);
   IntTab crossed_cells(nbsom,3); // Table to store i,j,k of cells crossed by the interface.
@@ -2532,8 +2541,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                   //   }
                   for (int c=0; c < 3; c++)
                     {
-                      normale[c] = interfaces_.get_norm_itfc_in_cell()[c](i,j,k);
-                      bary_facettes_dans_elem[c] = interfaces_.get_bary_itfc_in_cell()[c](i,j,k);
+                      normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i,j,k);
+                      bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i,j,k);
                     }
                   norm =  sqrt(normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2]);
                   //if (norm<0.95)
@@ -2643,7 +2652,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
       const int j = crossed_cells(icell,1);
       const int k = crossed_cells(icell,2);
       const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
-      const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
+      // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
+      const int nb_compo_traversantes = interfaces_.nb_compo_traversantes(i,j,k);
       if (nb_compo_traversantes !=1)
         {
           extended_pv_ft_(i,j,k) = 1.e20;

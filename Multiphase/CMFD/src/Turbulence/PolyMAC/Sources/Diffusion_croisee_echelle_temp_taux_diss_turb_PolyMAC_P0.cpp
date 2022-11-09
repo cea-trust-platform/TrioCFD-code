@@ -99,16 +99,17 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_bloc
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& 		 zone 				= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const Champ_Elem_PolyMAC_P0& 	ch_k 				= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
+  const Zone_PolyMAC_P0& 		 zone 			= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Champ_Elem_PolyMAC_P0& 	ch_k 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
   const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = zone.xp(), &xv = zone.xv();
   const Conds_lim&          cls_k 			= ch_k.zone_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
   const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
 
-  const Champ_Elem_PolyMAC_P0& 	ch_diss 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau ou omega
+  const Champ_Elem_PolyMAC_P0& 	ch_diss	= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau ou omega
   const DoubleTab& 			diss_passe			= ch_diss.passe();
   const DoubleTab& 			      diss			= ch_diss.valeurs();
+
   const Conds_lim& 		   	cls_diss			= ch_diss.zone_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
   const IntTab&				   fcl_diss 			= ch_diss.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
@@ -120,6 +121,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") abort();
 
+//  Cerr <<"lol !! " ;
 
   assert(N == 1 || k_passe.line_size() == 1); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes decrites par un modele k-tau dans le calcul de grad_f_k et dans le remplissage des matrices
 
@@ -190,7 +192,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
           for (int d = 0; d < D; d++)
             {
               grad_diss[d] += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_diss(f, n);
-              grad_k[d]   += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_k(f, n);
+              grad_k[d]    += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_k(f, n);
             }
         for (int d = 0 ; d < D ; d++) grad_f_diss_dot_grad_f_k(e, n) += grad_diss[d] * grad_k[d]; // produit scalaire
       }
@@ -212,26 +214,26 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
             const tabs_t& 			der_alpha_rho_tau 	= ch_alpha_rho_tau.derivees(); // dictionnaire des derivees
             double secmem_en = pe(e) * ve(e) * sigma_d * alpha_rho_tau(e, n) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.);
             secmem(e, n) += secmem_en;
-            if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
+            if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("alpha")       ? der_alpha_rho_tau.at("alpha")(e,n) : 0 )       * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
             if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
-            if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
+            if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("tau")         ? der_alpha_rho_tau.at("tau")(e,n) : 0 )         * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
             for (int mp = 0; mp<Np; mp++)
               if (!(Mp==nullptr))
                 (*Mp)(N * e + n, Np * e + mp)     	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
           }
         else if (Type_diss == "omega")
           {
-            const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
-            const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
-            const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
+            const Champ_base&  ch_alpha_rho	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
+            const DoubleTab& 	    alpha_rho = ch_alpha_rho.valeurs();
+            const tabs_t&     der_alpha_rho	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
             if (diss(e,n)>1.e-8) // Else everything = 0
               {
                 secmem(e, n) += pe(e) * ve(e) * sigma_d * alpha_rho(e, n) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
-                if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
+                if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("alpha")       ? der_alpha_rho.at("alpha")(e,n) : 0 )       / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
                 if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
-                for (int mp = 0; mp<Np; mp++)
-                  if (!(Mp==nullptr))
+                if (!(Mp==nullptr))
+                  for (int mp = 0; mp<Np; mp++)
                     (*Mp)(N * e + n, Np * e + mp)     	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
                 if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= pe(e) * ve(e) * sigma_d * alpha_rho(e, n) * (-1/(diss(e,n)*diss(e,n))) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
               }

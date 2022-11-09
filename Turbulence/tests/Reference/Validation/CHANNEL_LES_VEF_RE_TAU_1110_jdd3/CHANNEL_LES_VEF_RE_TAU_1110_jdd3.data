@@ -81,27 +81,26 @@ Read sch
 } 
 --Impli #
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
 
-Associate fluide gravite 
+
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 	{
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu Champ_Uniforme	1 2.84e-5
+   	rho Champ_Uniforme	1 0.0976
+   }
+   
+   	Navier_Stokes_Turbulent
 		{
 		solveur_pression Gcp { precond ssor { omega 1.5 } seuil 1.e-08 }
                 convection { EF_stab { volumes_etendus alpha 0.2 }  }
@@ -156,4 +155,5 @@ sauvegarde_simple formatte lm_3D_reprise.sauv
 	}
 Solve pb
 End
+ 
  

@@ -156,7 +156,7 @@ public:
   /////////////////////////////////////////////////////
 
   //methodes utilisees pour le post-traitement des quantites lagrangiennes
-  int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab = 0) const override;
+  int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab = 0) const override;
   int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab = 0) const override;
 
   const DoubleTab& calculer_valeurs_densite(DoubleTab& val_densite) const;

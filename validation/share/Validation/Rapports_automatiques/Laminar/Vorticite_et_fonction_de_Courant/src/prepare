@@ -8,9 +8,9 @@ mkdir -p $cas
 cp $mail $cas
 sed "s/_DIS_/CART/g;s/_SIZE_/sizeVDF/g" post_run > $cas/post_run
 
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VDF dis/g" Cas1_base.data > $cas/Cas1.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VDF dis/g" Cas1_base.data > $cas/Cas1.data
 
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VDF dis/g" Cas2_base.data > $cas/Cas2.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VDF dis/g" Cas2_base.data > $cas/Cas2.data
 done
 
 for mail in `ls Maillages/mesh_quad*med`
@@ -20,8 +20,8 @@ mkdir -p $cas
 cp $mail $cas
 sed "s/_DIS_/QUAD/g;s/_SIZE_/sizeVEF/g"  post_run > $cas/post_run
 
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VEFPreP1B dis Lire dis { P0 }/g" Cas1_base.data > $cas/Cas1.data
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VEFPreP1B dis Lire dis { P0 }/g" Cas2_base.data > $cas/Cas2.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VEFPreP1B dis Lire dis { P0 }/g" Cas1_base.data > $cas/Cas1.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VEFPreP1B dis Lire dis { P0 }/g" Cas2_base.data > $cas/Cas2.data
 
 done
 for mail in `ls Maillages/mesh_tri*med`
@@ -31,8 +31,8 @@ mkdir -p $cas
 cp $mail $cas
 sed "s/_DIS_/TRI/g;s/_SIZE_/sizeVEF/g"  post_run > $cas/post_run
 
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VEFPreP1B dis/g" Cas1_base.data > $cas/Cas1.data
-sed "s/__MAILLAGE__/$cas $cas.med/g;s/__DIS__/VEFPreP1B dis/g" Cas2_base.data > $cas/Cas2.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VEFPreP1B dis/g" Cas1_base.data > $cas/Cas1.data
+sed "s/__MAILLAGE__/$cas/g;s/__DIS__/VEFPreP1B dis/g" Cas2_base.data > $cas/Cas2.data
 
 done
 

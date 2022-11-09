@@ -51,14 +51,9 @@ Sortie& Champ_front_zoom::printOn(Sortie& os) const
 Entree& Champ_front_zoom::readOn(Entree& is)
 {
   //Cerr << "Dans Champ_front_zoom::readOn(Entree& is) " << finl;
-  Nom nom_pbMG;
-  Nom nom_pbG;
-  Nom nom_pbF;
-  Nom bord;
-  Motcle nom_inco;
   Nom nature;
-  is >>  nom_pbMG >> nom_pbG >>  nom_pbF >> bord >> nom_inco ;
-  creer(nom_pbMG,nom_pbG,nom_pbF, bord,nom_inco);
+  is >>  nom_pbMG_ >> nom_pbG_ >>  nom_pbF_ >> bord_ >> nom_inco_ ;
+  fixer_nb_comp(1); // sinon boom !
   return is;
 }
 
@@ -157,7 +152,7 @@ Champ_front_base& Champ_front_zoom::affecter_(const Champ_front_base& ch)
 
 int Champ_front_zoom::initialiser(double temps, const Champ_Inc_base& inco)
 {
-
+  creer(nom_pbMG_,nom_pbG_,nom_pbF_, bord_,nom_inco_);
   Ch_front_var_instationnaire_dep::initialiser(temps, inco);
 
   // Dimensionnement des tableaux

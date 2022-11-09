@@ -59,9 +59,16 @@ Read sch
         seuil_convergence_implicite 1e30
     }
 }
+Pb_Multiphase pb
+Associate pb dom
+Associate pb sch
+Discretize pb dis
 
-Fluide_Incompressible eau_liquide
-Read eau_liquide
+Read pb
+{
+	Milieu_composite
+	{
+liquide_eau Fluide_Incompressible
 {
 	mu Champ_Uniforme 1 3.7e-05
 	rho Champ_Uniforme 1 2
@@ -70,19 +77,8 @@ Read eau_liquide
         Cp Champ_Uniforme      1 1.
         beta_th Champ_Uniforme 1 0.
 }
+	}
 
-Pb_Multiphase pb
-phases pb
-{
-    liquide { eau }
-}
-
-Associate pb dom
-Associate pb sch
-Discretize pb dis
-
-Read pb
-{
     correlations {    }
     QDM_Multiphase
     {
@@ -132,7 +128,7 @@ Read pb
         }
 	sources
 	{
-	Production_energie_cin_turb ,
+	Production_energie_cin_turb { } ,
 	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 	}
     }

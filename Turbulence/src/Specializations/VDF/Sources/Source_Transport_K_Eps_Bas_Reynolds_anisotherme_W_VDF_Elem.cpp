@@ -58,7 +58,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter_blocs(m
   const Transport_Fluctuation_Temperature_W& monEqFluctu = modele_Fluctu.equation_Fluctu();
   const DoubleTab& Fluctu_Temperature = monEqFluctu.inconnue().valeurs(), &g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& volumes = zone_VDF.volumes(), &porosite_vol = eq_hydraulique->milieu().porosite_elem();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
@@ -276,7 +276,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   const int nb_elem = zone_VDF.nb_elem(), nb_faces = zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT
@@ -323,7 +323,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
   // G(elem) = beta(elem) alpha_t(elem) G . gradT(elem)
   const int nb_elem = zone_VDF.nb_elem(), nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT

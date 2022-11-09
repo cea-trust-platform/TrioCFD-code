@@ -129,7 +129,9 @@ interf
 		fonction x^2+y^2+(z-0.016)^2-(0.012)^2 ,
 		fonction_ignorer_collision ajout_phase0 x^2+y^2+(z-0.042)^2-(0.012)^2
         }
-        iterations_correction_volume 2
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 2
+        nb_iterations_correction_volume 4 # taken from nb_iter_correction_volume in remaillage { ... } #
         n_iterations_distance 2
 	remaillage {
 		pas 0.000001
@@ -170,38 +172,24 @@ Postraitement
 
 liste_postraitements
 {
-	Postraitement_ft_lata post1
-	{
-		dt_post 0.002
-		nom_fichier lata/post1
-		format binaire
-		print
-		champs sommets
-		{
-			vitesse
-		}
-		champs elements
-		{
-			distance_interface_elem_interf
-			indicatrice_interf
-			pression
-			vitesse
-		}
-		interfaces interf {
-			champs sommets {
-				courbure
-			}
-			champs sommets {
-				pe
-			}
-			champs elements {
-				pe
-			}
-		}
-	}
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post1 
+    champs dt_post 0.002 { 
+        vitesse elem 
+        distance_interface_elem_interf elem 
+        indicatrice_interf elem 
+        pression elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        pe elem 
+    } 
+}
 }
 
 }
 
 Solve pb
 Fin
+ 

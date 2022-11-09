@@ -6,7 +6,10 @@ Pb_hydraulique_Turbulent pb
 # BEGIN MESH #
 dimension 2
 Domaine dom_2D
-Lire_MED family_names_from_group_names dom_2D bundle2D bundle2D.med
+Lire_MED { 
+   domain dom_2D 
+   file bundle2D.med 
+}
 extruder_en3 { domaine 1 dom_2D nb_tranches 4 direction 0. 0. 0.0180133 }
 RegroupeBord dom_2D perio { devant derriere }
 
@@ -55,21 +58,20 @@ Read mon_schema
 	solveur implicite { solveur gmres { diag nb_it_max 5 seuil 1.e-20 impr } }
 }
 
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu  Champ_Uniforme 1 0.0000185
-	rho Champ_Uniforme 1 1.177
-}
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.0000185
+   	rho Champ_Uniforme 1 1.177
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { }
 		convection { ef_stab { } }
@@ -175,3 +177,4 @@ Solve pb
 
 Fin
 
+ 

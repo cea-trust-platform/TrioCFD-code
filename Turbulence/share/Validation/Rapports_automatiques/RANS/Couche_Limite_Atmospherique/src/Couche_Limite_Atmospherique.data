@@ -41,22 +41,21 @@ Read sch
 	}
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu	Champ_Uniforme 1 1.823e-5
-	rho	Champ_Uniforme 1 1.189
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu	Champ_Uniforme 1 1.823e-5
+   	rho	Champ_Uniforme 1 1.189
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression Cholesky { }
 		convection { Ef_stab { alpha 0.2 } }
@@ -127,3 +126,4 @@ End
 
 #			Sol Paroi_fixe = Sol Paroi_Rugueuse { Erugu 9.11 } #
 
+ 

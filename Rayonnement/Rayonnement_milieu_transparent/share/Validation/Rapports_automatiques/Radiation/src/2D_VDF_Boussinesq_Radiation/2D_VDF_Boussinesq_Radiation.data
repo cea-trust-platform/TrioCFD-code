@@ -13,7 +13,7 @@ Read sch
         seuil_statio 1.e-5
 }
 
-Pb_Thermohydraulique pb2
+Pb_Rayo_Thermohydraulique pb2
 
 Domaine dom_fluide
 # BEGIN MESH #
@@ -58,12 +58,8 @@ Read fluide
         lambda Champ_Uniforme 1 0.0262
         Cp Champ_Uniforme 1 1006.
         beta_th Champ_Uniforme 1 0.0033
+        gravite Champ_Uniforme 2 0 -9.81 
 }
-
-
-Champ_Uniforme gravite
-Read gravite 2 0 -9.81 
-Associate fluide gravite
 
 Associate pb2 dom_fluide
 Associate pb2 fluide

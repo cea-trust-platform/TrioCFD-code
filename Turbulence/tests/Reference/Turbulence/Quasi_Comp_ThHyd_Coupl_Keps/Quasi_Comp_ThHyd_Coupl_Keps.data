@@ -38,51 +38,9 @@ Dilate dom_lame 0.001
 
 VDF cubesregu
 
-# Fluide_Incompressible helium #
-Fluide_Quasi_Compressible helium
-Read helium
-{
-        mu Champ_Uniforme 1 4.e-5 
-	pression 70.e5	
-	lambda Champ_Uniforme 1 0.325
-        loi_etat gaz_parfait_qc {
-                Prandtl 0.63876923076923086686
-                Cp 5190.
-                gamma 1.7
-        }   
-	Traitement_Pth constant                                                                                                                                            	 
-}
-
-Solide combustible    
-Read combustible
-{
-	rho Champ_Uniforme 1 8000.
-	lambda champ_fonc_fonction pb_combustible temperature 1 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
-	Cp Champ_Uniforme 1 2296.
-}
-
-Solide revetement
-Read revetement
-{
-	rho Champ_Uniforme 1 8000.
-	lambda Champ_Uniforme 1 20.     
-	Cp Champ_Uniforme 1 1.
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-
-Associate helium gravite
-
 Associate pb_revetement dom_revetement
 Associate pb_combustible dom_combustible
 Associate pb_lame dom_lame  
-
-
-Associate pb_combustible combustible
-Associate pb_revetement revetement
-Associate pb_lame helium
-
 
 Probleme_Couple Conduccouplethermoh
 
@@ -95,6 +53,20 @@ Discretize Conduccouplethermoh cubesregu
 
 Read pb_lame
 {
+# Fluide_Incompressible helium #
+Fluide_Quasi_Compressible
+{
+        mu Champ_Uniforme 1 4.e-5 
+	pression 70.e5	
+	lambda Champ_Uniforme 1 0.325
+        loi_etat gaz_parfait_qc {
+                Prandtl 0.63876923076923086686
+                Cp 5190.
+                gamma 1.7
+        }   
+	Traitement_Pth constant      
+ 	gravite Champ_Uniforme 3 0. 0. -9.81                                                                                                                             	 
+}
 	Navier_Stokes_Turbulent_QC
 	{
 		solveur_pression GCP { 
@@ -173,6 +145,12 @@ Read pb_lame
 
 Read pb_combustible
 {
+Solide    
+{
+	rho Champ_Uniforme 1 8000.
+	lambda champ_fonc_fonction pb_combustible temperature 1 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
+	Cp Champ_Uniforme 1 2296.
+}
 	Conduction
 	{
 		diffusion { }
@@ -202,6 +180,12 @@ Read pb_combustible
 
 Read pb_revetement
 {
+Solide
+{
+	rho Champ_Uniforme 1 8000.
+	lambda Champ_Uniforme 1 20.     
+	Cp Champ_Uniforme 1 1.
+}
 	Conduction
 	{
 		diffusion { }

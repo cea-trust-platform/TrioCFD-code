@@ -2,7 +2,10 @@ Dimension 3
 Pb_hydraulique pb
 
 Domaine dom
-Lire_med family_names_from_group_names dom mesh_tetra_2 mesh_tetra_2.med
+Lire_MED { 
+   domain dom 
+   file mesh_tetra_2.med 
+}
 
 VerifierCoin dom { }
 
@@ -23,22 +26,21 @@ Lire sch
 	seuil_statio 1e-6
 }
 
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu champ_uniforme 1 1
- 	rho champ_uniforme 1 1
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 1
+    	rho champ_uniforme 1 1
+   }
+   
+   	Navier_Stokes_standard
 	{
 		Solveur_pression	PETSC Cholesky { impr }
 		Convection		{ negligeable }
@@ -311,3 +313,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

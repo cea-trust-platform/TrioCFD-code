@@ -119,36 +119,11 @@ Read sch
         facsec 1
 	}
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-	lambda Champ_Uniforme	1 20.772e-2
-	Cp Champ_Uniforme	1 5193
-	beta_th Champ_Uniforme	1 1.
-}
-
-Solide cuivre
-Read cuivre
-{
-        rho     Champ_Uniforme 1 1000.
-        Cp      Champ_Uniforme 1 0.507
-        lambda  Champ_Uniforme 1 20.78e-2
-}
-
-Champ_Uniforme gravite
-Read gravite 2 0 0
-
-Associate fluide gravite
-
 Pb_Conduction pb1
 Associate pb1 parois
-Associate pb1 cuivre
 
 Pb_Thermohydraulique_Turbulent pb2
 Associate pb2 dom
-Associate pb2 fluide
 
 Probleme_Couple pb_couplage
 Associate pb_couplage pb2
@@ -160,6 +135,16 @@ Discretize pb_couplage dis
 # Debog pb_couplage pb2 seq faces 1.e-6 0 #
 Read pb2
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 20.772e-2
+	Cp Champ_Uniforme	1 5193
+	beta_th Champ_Uniforme	1 1.
+ 	gravite Champ_Uniforme 2 0 0
+}
+
 	Navier_Stokes_Turbulent
 		{
 		solveur_bar Gcp { precond ssor { omega 1.5 } seuil 1.e-12 }
@@ -227,6 +212,12 @@ Sauvegarde formatte pb2_VEF.sauv
 
 Read pb1
         {
+        Solide
+{
+        rho     Champ_Uniforme 1 1000.
+        Cp      Champ_Uniforme 1 0.507
+        lambda  Champ_Uniforme 1 20.78e-2
+}
         Conduction
                 {
                 diffusion { }

@@ -29,22 +29,9 @@ Read sch
 VEFPreP1b dis
 
 
-Fluide_Incompressible He
-Read He
-{
-        mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-	lambda Champ_Uniforme	1 1.e-18
-	Cp Champ_Uniforme	1 5193.
-	beta_th Champ_Uniforme	1 1.9954e-3
-	   
-}
 
-Champ_Uniforme gravite
-Read gravite 2 0. 0.
-Associate He gravite
 Associate pb2 DISQUE
-Associate pb2 He  
+ 
 
 
 
@@ -54,7 +41,19 @@ Discretize pb2 dis
 
 Read pb2
 {
-        Navier_Stokes_standard
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0. 0.
+           mu Champ_Uniforme	1 2.84e-5
+   	rho Champ_Uniforme	1 0.0976
+   	lambda Champ_Uniforme	1 1.e-18
+   	Cp Champ_Uniforme	1 5193.
+   	beta_th Champ_Uniforme	1 1.9954e-3
+   	   
+   }
+   
+           Navier_Stokes_standard
         {
                 solveur_pression GCP { 
                         precond ssor { omega 2.500000 } 
@@ -107,3 +106,4 @@ EcritureLectureSpecial 0
 
 Solve pb2
 End
+ 

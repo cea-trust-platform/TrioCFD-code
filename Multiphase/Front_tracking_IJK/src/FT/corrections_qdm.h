@@ -370,7 +370,7 @@ public :
   int get_need_for_vitesse_relative(int direction);
   int get_need_to_compute_correction_value_one_direction(int direction);
 
-  enum type_dict_ { GB, GR, NONE };
+  enum type_dict_ { GB, GR, NONE_IJK };
   type_dict_ get_type_() const;
 
   int is_type_gb() const;

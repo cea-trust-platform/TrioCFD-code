@@ -47,11 +47,8 @@
  */
 class Pb_Phase_field : public Pb_Fluide_base
 {
-
   Declare_instanciable(Pb_Phase_field);
-
 public:
-
   int nombre_d_equations() const override;
   const Equation_base& equation(int) const override ;
   Equation_base& equation(int) override;
@@ -59,10 +56,10 @@ public:
   int verifier() override;
 
 protected:
-
   Navier_Stokes_phase_field eq_hydraulique;
   Convection_Diffusion_Phase_field eq_concentration;
 
+  void typer_lire_milieu(Entree& is) override;
 };
 
 

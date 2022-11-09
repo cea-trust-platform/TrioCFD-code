@@ -66,22 +66,21 @@ Read sch {
            }
 	}
 
-Fluide_Incompressible liquide
-Read liquide
-{
-	mu  Champ_Uniforme 1 0.001
- 	rho Champ_Uniforme 1 1000
-}
 
 
 Associate pb1 DOM1
-Associate pb1 liquide
 Associate pb1 sch
 Discretize pb1 dis
 
 
 Read pb1
-{ 
+{    
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.001
+    	rho Champ_Uniforme 1 1000
+   }
+   
+   
 Navier_Stokes_Turbulent 
 { 
 	solveur_pression Gcp
@@ -154,3 +153,4 @@ sauvegarde binaire box.sauv
 Solve pb1
 End
 
+ 

@@ -94,36 +94,11 @@ Lire sch
         seuil_statio 1.e-8
 	}
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme	1 2.84e-5
-	rho Champ_Uniforme	1 0.0976
-	lambda Champ_Uniforme	1 20.772e-2
-	Cp Champ_Uniforme	1 5193.
-	beta_th Champ_Uniforme	1 1.
-}
-
-Solide cuivre
-Lire cuivre
-{
-        rho     Champ_Uniforme 1 1000.
-        Cp      Champ_Uniforme 1 5.067
-        lambda  Champ_Uniforme 1 2.0776
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0 0 0
-
-Associate fluide gravite
-
 Pb_Conduction pbs
 Associate pbs parois
-Associate pbs cuivre
 
 Pb_Thermohydraulique_Turbulent pbf
 Associate pbf dom
-Associate pbf fluide
 
 Probleme_Couple pb_couplage
 Associate pb_couplage pbf
@@ -136,6 +111,15 @@ Discretize pb_couplage dis
 # Sinon mettre Ampli_bruit 0.5 #
 Lire pbf
 	{
+	Fluide_Incompressible
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 20.772e-2
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.
+ 	gravite Champ_Uniforme 3 0 0 0
+}
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP
@@ -206,6 +190,12 @@ Sauvegarde formatte pbf.sauv
 
 Lire pbs
         {
+        Solide
+{
+        rho     Champ_Uniforme 1 1000.
+        Cp      Champ_Uniforme 1 5.067
+        lambda  Champ_Uniforme 1 2.0776
+}
         Conduction
                 {
                 diffusion { }

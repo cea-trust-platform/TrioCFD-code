@@ -46,16 +46,19 @@ Read sch
 
 
 
-Champ_Uniforme gravite
-Read gravite 3  0.  0. -9.81
 
+Associate pb_plenum dom
+Associate pb_plenum sch 
 
+Discretize pb_plenum dis 
+# Debog pb_plenum seq faces 1.e-6 0 #
 
-Fluide_Quasi_Compressible heliumQC_plenum
+Read pb_plenum {
+ 
+Fluide_Quasi_Compressible
 # Coefficients Sutherland recuperes chez stagiaire Berthoux : a creuser #
 # Traitement Pth constant a creuser #
 # beta=1/T #
-Read heliumQC_plenum
 { 
         pression 7000000.
         Sutherland pb_plenum mu0 1.6E-5 T0 273.15 Slambda 235. C 235.
@@ -66,18 +69,9 @@ Read heliumQC_plenum
           gamma 1.666
          }
         traitement_pth constant
+         gravite Champ_Uniforme 3 0. 0. -9.81
+
 }
-
-Associate heliumQC_plenum gravite
-Associate pb_plenum dom
-Associate pb_plenum sch 
-Associate pb_plenum heliumQC_plenum
-
-Discretize pb_plenum dis 
-# Debog pb_plenum seq faces 1.e-6 0 #
-
-Read pb_plenum {
- 
  Navier_Stokes_turbulent_QC 
  { 
 

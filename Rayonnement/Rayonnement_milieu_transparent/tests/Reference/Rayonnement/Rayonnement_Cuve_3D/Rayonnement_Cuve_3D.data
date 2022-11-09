@@ -2,10 +2,10 @@
 # PARALLEL RUNS #
 dimension 3 
 
-Pb_Thermohydraulique_Turbulent pb1
-Pb_conduction                  pb2
-Pb_Thermohydraulique           pb3
-Pb_conduction                  pb4
+Pb_Rayo_Thermohydraulique_Turbulent pb1
+Pb_Rayo_conduction                  pb2
+Pb_Rayo_Thermohydraulique           pb3
+Pb_Rayo_conduction                  pb4
   
 Domaine dom1
 Domaine dom2
@@ -77,6 +77,7 @@ Lire sodium
 	lambda	Champ_Uniforme	1 68. 
 	Cp	Champ_Uniforme	1 1250
 	beta_th	Champ_Uniforme	1 2.809e-4
+	gravite Champ_Uniforme 3 0 0 -9.81
 }
 
 Solide acier1
@@ -95,6 +96,7 @@ Lire argon
 	lambda	Champ_Uniforme	1 2.24e-2 
 	Cp	Champ_Uniforme	1 520.
 	beta_th	Champ_Uniforme	1 2.681e-3
+	gravite Champ_Uniforme 3 0 0 -9.81
 }
 
 Solide acier2
@@ -104,14 +106,6 @@ Lire acier2
 	lambda Champ_Uniforme	1 18.    
 	Cp Champ_Uniforme	1 500.
 }
-
-Champ_Uniforme gravite
-Lire gravite 3  0.  0. -9.81
-
-Associate sodium gravite
-Associate acier1 gravite
-Associate argon  gravite
-Associate acier2 gravite
 
 Associate pb1 dom1
 Associate pb1 sodium
@@ -180,7 +174,7 @@ Lire pb1
 	{
 		SNA	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 50.
 		SREDAN	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
-		SCUVE	paroi_contact pb2 SCUVE
+		SCUVE	paroi_contact_rayo pb2 SCUVE TRANSP
 	}
 	conditions_initiales { Temperature Champ_Uniforme 1 395. }
    }
@@ -235,8 +229,8 @@ Lire pb2
 	conditions_initiales { temperature Champ_Uniforme 1 400. }
 	boundary_conditions
 	{
-		SCUVE	paroi_contact pb1 SCUVE  
-		SCUVEE	paroi_contact pb3 SCUVEE
+		SCUVE	paroi_contact_rayo pb1 SCUVE   TRANSP
+		SCUVEE	paroi_contact_rayo pb3 SCUVEE TRANSP
 		STOP	paroi_adiabatique
 	}
    }
@@ -279,8 +273,8 @@ Lire pb3
 	convection { amont }
 	boundary_conditions
 	{
-		SCUVEE	Paroi_contact pb2 SCUVEE
-		SEXARG	Paroi_contact pb4 SEXARG
+		SCUVEE	Paroi_contact_rayo pb2 SCUVEE TRANSP
+		SEXARG	Paroi_contact_rayo pb4 SEXARG TRANSP
 		SSUP	paroi_adiabatique
 	}
 	conditions_initiales { Temperature Champ_Uniforme 1 200. }
@@ -309,7 +303,7 @@ Lire pb4
 	conditions_initiales { temperature Champ_Uniforme 1 30. }
 	boundary_conditions
 	{
-		SEXARG	paroi_contact pb3 SEXARG      
+		SEXARG	paroi_contact_rayo pb3 SEXARG    TRANSP   
 		SEXCS	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 30.
 		SSCS	paroi_adiabatique
 	}

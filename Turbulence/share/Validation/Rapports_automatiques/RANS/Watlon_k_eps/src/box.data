@@ -51,22 +51,21 @@ Lire sch
 }
 
 # EAU 320 K #
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu	Champ_Uniforme 1 5.86e-4
-	rho	Champ_Uniforme 1 991.3
-}
 
 Associer pb box
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu	Champ_Uniforme 1 5.86e-4
+   	rho	Champ_Uniforme 1 991.3
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		solveur_pression petsc Cholesky { } 
 		convection { $SCHEME }
@@ -120,3 +119,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

@@ -58,21 +58,10 @@ VDF cubesregu
 
 # Proprietes He vers 700°C #
 # Prandtl = 0.672 #
-Fluide_Incompressible He
-Read He
-{
-        mu Champ_Uniforme 1 4.46437e-05 
-        rho Champ_Uniforme 1 4.40684
-        lambda Champ_Uniforme 1 0.344964     
-        Cp Champ_Uniforme 1 5193.
-        beta_th Champ_Uniforme 1 0.0014285714
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0. 0 0 
-Associate He gravite
+
 Associate pb2 dom_pb2
-Associate pb2 He  
+ 
 
 
 
@@ -81,7 +70,17 @@ Discretize pb2 cubesregu
 
 Read pb2
 {
-        Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0. 0 0         mu Champ_Uniforme 1 4.46437e-05 
+           rho Champ_Uniforme 1 4.40684
+           lambda Champ_Uniforme 1 0.344964     
+           Cp Champ_Uniforme 1 5193.
+           beta_th Champ_Uniforme 1 0.0014285714
+   }
+   
+           Navier_Stokes_turbulent
         {
                 solveur_pression petsc Cholesky { }
 		convection { amont }
@@ -151,3 +150,4 @@ Read pb2
 
 Solve pb2
 End
+ 

@@ -30,16 +30,9 @@ VEFPreP1B dis
 
 Schema_Euler_Explicite sch
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu      Champ_Uniforme 1 1.983e-5
-   	rho     Champ_Uniforme 1 1.177
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Lire sch
 {
@@ -56,7 +49,13 @@ Lire sch
 Discretize pb dis
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu      Champ_Uniforme 1 1.983e-5
+      	rho     Champ_Uniforme 1 1.177
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		Solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-10 impr }
 		Convection { EF_stab { alpha 0.2 } }
@@ -126,3 +125,4 @@ Lire pb
 
 Solve pb
 Fin
+ 

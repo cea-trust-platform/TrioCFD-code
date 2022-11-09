@@ -8,7 +8,11 @@ Pb_conduction pb2
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh_cart_1 mesh_cart_1.med
+Lire_med {
+   domain dom 
+   file mesh_cart_1.med
+   mesh mesh_cart_1
+}
 # END MESH #
 # BEGIN PARTITION
 Partition dom
@@ -53,33 +57,22 @@ Lire sch2
 	seuil_statio 1e-9
 }
 
-Fluide_incompressible fluide
-Lire fluide
+Associer pb1 dom
+Associer pb1 sch1
+Discretiser pb1 dis
+
+Associer pb2 dom
+Associer pb2 sch2
+Discretiser pb2 dis
+
+Lire pb1
+{
+Fluide_incompressible
 {
 	mu champ_uniforme 1 0.01
  	rho champ_uniforme 1 1
 }
 
-Solide sol
-Lire sol
-{
- 	rho champ_uniforme 1 1
-	lambda champ_uniforme 1 1
-	Cp champ_uniforme 1 1
-}
-
-Associer pb1 dom
-Associer pb1 sch1
-Associer pb1 fluide
-Discretiser pb1 dis
-
-Associer pb2 dom
-Associer pb2 sch2
-Associer pb2 sol
-Discretiser pb2 dis
-
-Lire pb1
-{
 	Navier_Stokes_standard
 	{
 		Projection_initiale	0
@@ -190,7 +183,14 @@ lata_to_med Vorticite1.lata Vorticite1.med
 
 Lire pb2
 {
-	Conduction
+   
+   solide {
+     	rho champ_uniforme 1 1
+   	lambda champ_uniforme 1 1
+   	Cp champ_uniforme 1 1
+   }
+   
+   	Conduction
 	{
 		Diffusion		{ }
 		Conditions_initiales	{
@@ -202,7 +202,13 @@ Lire pb2
 					Bas	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
 					Haut	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
 					}
-		Sources			{ puissance_thermique champ_fonc_med use_existing_domain last_time Vorticite1_0000.med dom vorticite elem 0 }
+		Sources			{ puissance_thermique Champ_Fonc_MED { domain dom 
+                                                        file Vorticite1_0000.med 
+                                                        field vorticite 
+                                                        use_existing_domain 
+                                                        last_time 
+                                                        }
+}
 	}
 	Postraitement
 	{
@@ -226,3 +232,4 @@ Lire pb2
 Resoudre pb2
 
 Fin
+ 

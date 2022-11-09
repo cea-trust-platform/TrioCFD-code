@@ -388,7 +388,6 @@ int Remaillage_FT::calculer_differentielle_volume(
   const Maillage_FT_Disc& maillage,
   DoubleTab& differentielle_volume) const
 {
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
   const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
   const int nb_sommets = maillage.nb_sommets();
   const int nb_facettes = maillage.nb_facettes();
@@ -411,6 +410,7 @@ int Remaillage_FT::calculer_differentielle_volume(
   // est :
   if (!bidim_axi)
     {
+      const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
       //  normale_unitaire * surface / nb_sommets_par_facette
       double normale[3] = { 0., 0., 0. };
       for (fa7 = 0; fa7 < nb_facettes; fa7++)
@@ -526,7 +526,7 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
       coord_som_opp[0] = sommets(som1,0);
       coord_som_opp[1] = sommets(som1,1);
     }
-  double v1 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp) * 0.5;
+  double v1 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp);
   if (bidim_axi)
     // x_G : x coordinate of the centre of gravity is located at a third of the position of all vertex.
     // Guldin's Theorem :
@@ -551,7 +551,7 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
       coord_som_opp[0] = sommets(som0,0);
       coord_som_opp[1] = sommets(som0,1);
     }
-  double v2 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp) * 0.5;
+  double v2 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp);
   if (bidim_axi)
     v2 *= (coord_som0[0] + coord_som1[0] + coord_som_opp[0]) * un_tiers * angle_bidim_axi;
 #if DEBUG_CONSERV_VOLUME
@@ -611,7 +611,6 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
     }
 #endif
 #endif
-
   return v1 + v2;
 }
 
@@ -671,7 +670,6 @@ double Remaillage_FT::calculer_variation_volume_facette_3D(int fa7, const Mailla
       facette[i] = facettes(fa7, i);
   }
   const DoubleTab& position_finale = maillage.sommets();
-
 #ifdef ALGO_NON_PARALLELE
   int ordre_sommets[3] = { 0, 1, 2 };
   // Calcul de l'ordre dans lequel on va construire les 3 tetraedres (ordre croissant des indices globaux
@@ -789,6 +787,7 @@ double Remaillage_FT::calculer_variation_volume(const Maillage_FT_Disc& maillage
 }
 
 /*! @brief Cette fonction calcule une correction sur un deplacement liee a une variation de volume imposee
+ *  Utile pour IJK
  *
  * @param (deplacement) delacement a corriger
  * @param (varVolume) la variation de volume
@@ -1212,6 +1211,7 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
 }
 
 /*! @brief deplacement des sommets se sorte a produire la variation de volume prescrite a chaque sommet.
+ *Precondition: pas de facettes virtuelles
  *
  */
 void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
@@ -1234,6 +1234,7 @@ void Remaillage_FT::corriger_volume_(Maillage_FT_Disc& maillage, ArrOfDouble& va
 /*! @brief applique barycentrage, lissage et correction de volume.
  *
  * On applique le nombre d'iterations de lissage systematique.
+ * Precondition: pas de facettes virtuelles
  *
  */
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
@@ -1245,7 +1246,8 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
   temps_dernier_lissage_ = temps;
   ArrOfDoubleFT var_volume(maillage.nb_sommets());
   var_volume = 0.;
-  regulariser_maillage(maillage, var_volume,
+  regulariser_maillage(maillage,
+                       var_volume,
                        relax_barycentrage_,
                        lissage_courbure_coeff_,
                        nb_iter_barycentrage_,
@@ -1258,6 +1260,8 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
 }
 
 /*! @brief idem mais avec le nombre d'iterations de lissage si remaillage
+ *
+ * Precondition: pas d'elements virtuels (on doit avoir appele nettoyer_elements_virtuels())
  *
  */
 void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
@@ -1705,7 +1709,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
                   ps +=  v4[direction]*normale_facettes(fa7,direction);
                 }
               const double tol = 1.e-10;
-              if (1. - fabs(ps)> tol)
+              if (1. - std::fabs(ps)> tol)
                 {
                   // facette et face_bord ne sont pas coplanaires, on conserve la facette!
                 }
@@ -2465,7 +2469,7 @@ True_int fct_compare_tab_aretes(const void *pt1, const void *pt2)
   const int index1 = *(const int *) pt1;
   const int index2 = *(const int *) pt2;
 
-  int x = FTd_compare_sommets_global((*static_tab_sort)(index1,0), (*static_tab_sort)(index1,1), (*static_tab_sort)(index2,0), (*static_tab_sort)(index2,1));
+  True_int x = FTd_compare_sommets_global((*static_tab_sort)(index1,0), (*static_tab_sort)(index1,1), (*static_tab_sort)(index2,0), (*static_tab_sort)(index2,1));
   if (x==0)
     {
       x = FTd_compare_sommets_global((*static_tab_sort)(index1,2), (*static_tab_sort)(index1,3), (*static_tab_sort)(index2,2), (*static_tab_sort)(index2,3));

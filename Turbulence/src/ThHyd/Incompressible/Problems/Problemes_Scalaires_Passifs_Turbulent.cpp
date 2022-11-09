@@ -20,8 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Problemes_Scalaires_Passifs_Turbulent.h>
-implemente_pb_eq_sup(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Turbulent_Scalaires_Passifs",Pb_Thermohydraulique_Turbulent,2)
-implemente_pb_eq_sup(Pb_Thermohydraulique_Especes_Turbulent_QC,"Pb_Thermohydraulique_Especes_Turbulent_QC",Pb_Thermohydraulique_Turbulent_QC,2)
 
-implemente_pb_eq_sup(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs",Pb_Hydraulique_Concentration_Turbulent,2)
-implemente_pb_eq_sup(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs",Pb_Thermohydraulique_Concentration_Turbulent,3)
+
+Implemente_instanciable(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Turbulent_Scalaires_Passifs",TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent>);
+Sortie& Pb_Thermohydraulique_Turbulent_Scalaires_Passifs::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent>::printOn(os); }
+Entree& Pb_Thermohydraulique_Turbulent_Scalaires_Passifs::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent>::readOn(is); }
+
+Implemente_instanciable(Pb_Thermohydraulique_Especes_Turbulent_QC,"Pb_Thermohydraulique_Especes_Turbulent_QC",TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent_QC>);
+Sortie& Pb_Thermohydraulique_Especes_Turbulent_QC::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent_QC>::printOn(os); }
+Entree& Pb_Thermohydraulique_Especes_Turbulent_QC::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent_QC>::readOn(is); }
+
+Implemente_instanciable(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs",TRUSTProblem_sup_eqns<Pb_Hydraulique_Concentration_Turbulent>);
+Sortie& Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Hydraulique_Concentration_Turbulent>::printOn(os); }
+Entree& Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Hydraulique_Concentration_Turbulent>::readOn(is); }
+
+Implemente_instanciable(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs",TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Concentration_Turbulent>);
+Sortie& Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Concentration_Turbulent>::printOn(os); }
+Entree& Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Concentration_Turbulent>::readOn(is); }
