@@ -16,8 +16,10 @@
 #ifndef Problemes_rayo_included
 #define Problemes_rayo_included
 
+#include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
 #include <Pb_Hydraulique_Turbulent.h>
+#include <Pb_Thermohydraulique_QC.h>
 #include <Pb_Thermohydraulique.h>
 #include <Pb_Hydraulique.h>
 #include <Pb_Conduction.h>
@@ -40,6 +42,11 @@ class Pb_Rayo_Thermohydraulique : public Pb_Thermohydraulique
   Declare_instanciable(Pb_Rayo_Thermohydraulique);
 };
 
+class Pb_Rayo_Thermohydraulique_QC : public Pb_Thermohydraulique_QC
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique_QC);
+};
+
 class Pb_Rayo_Hydraulique_Turbulent : public Pb_Hydraulique_Turbulent
 {
   Declare_instanciable(Pb_Rayo_Hydraulique_Turbulent);
@@ -48,6 +55,11 @@ class Pb_Rayo_Hydraulique_Turbulent : public Pb_Hydraulique_Turbulent
 class Pb_Rayo_Thermohydraulique_Turbulent : public Pb_Thermohydraulique_Turbulent
 {
   Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent);
+};
+
+class Pb_Rayo_Thermohydraulique_Turbulent_QC : public Pb_Thermohydraulique_Turbulent_QC
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent_QC);
 };
 
 #endif /* Problemes_rayo_included */
