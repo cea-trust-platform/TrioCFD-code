@@ -1211,8 +1211,8 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
 }
 
 /*! @brief deplacement des sommets se sorte a produire la variation de volume prescrite a chaque sommet.
- *Precondition: pas de facettes virtuelles
  *
+ * Precondition: pas de facettes virtuelles
  */
 void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
 {
@@ -1234,8 +1234,8 @@ void Remaillage_FT::corriger_volume_(Maillage_FT_Disc& maillage, ArrOfDouble& va
 /*! @brief applique barycentrage, lissage et correction de volume.
  *
  * On applique le nombre d'iterations de lissage systematique.
- * Precondition: pas de facettes virtuelles
  *
+ * Precondition: pas de facettes virtuelles
  */
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
 {
@@ -2125,6 +2125,9 @@ int Remaillage_FT::supprimer_petites_aretes(Maillage_FT_Disc& maillage,
  * Lorsque 2 facettes se trouvent avoir 3 de leur sommets en commun,
  *      il faut supprimer les 2 facettes?
  *     Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
+ *
+ * Precondition:
+ *    Le maillage doit verifier la propriete "proprietaire facette = premier sommet"
  *
  * @param (maillage) maillage a remailler
  * @return (int) Le nombre de facettes supprimees

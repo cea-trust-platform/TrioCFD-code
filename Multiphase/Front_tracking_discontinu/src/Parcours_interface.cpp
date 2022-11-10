@@ -1011,6 +1011,8 @@ inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
 
 /*! @brief Cette methode permet de calculer l'intersection entre une facette et un element du maillage eulerien
  *
+ * Precondition: dimension = 3
+ *
  * @param (zone_vf) zone du calcul
  * @param (maillage) description du maillage de l'interface
  * @param (num_facette) indice de la facette intersectant
@@ -1358,6 +1360,8 @@ int Parcours_interface::calcul_intersection_facelem_3D(
 
 /*! @brief Cette methode (statique) permet d'inverser une matrice 3x3
  *
+ * Precondition: des denominateurs non nuls
+ *
  * @param (matrice) matrice 3x3 a inverser
  * @param (matrice_inv) inverse de la matrice 3x3
  * @return (rien)
@@ -1434,6 +1438,8 @@ void Parcours_interface::calcul_produit_matrice33_vecteur(const FTd_matrice33& m
  *
  * C'est une fraction du volume de l'element
  *    comprise entre epsilon et 1.-epsilon
+ *
+ * Precondition: dimension = 3
  *
  * @param (zone_vf) zone du calcul
  * @param (num_element) indice de l'element intersecte
@@ -1542,6 +1548,8 @@ double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
 /*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans le tetraedre de reference.
  *
  *    Dans ce tetraedre, on utilise le plan OXZ comme plan de projection (projection selon OY donc)
+ *
+ * Precondition: la surface doit etre un triangle (nb_sommets_poly==3)
  *
  * @param (poly_reelles_ref) coordonnees (reelles) des sommets l'element de reference
  * @param (norme) normale a la surface, dans l'element de reference
@@ -1778,6 +1786,8 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
  *
  * C'est une fraction du volume de l'element
  *    comprise entre epsilon et 1.-epsilon
+ *
+ * Precondition: dimension = 3
  *
  * @param (zone_vf) zone du calcul
  * @param (num_element) indice de l'element intersecte
