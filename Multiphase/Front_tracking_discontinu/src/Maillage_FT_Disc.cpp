@@ -575,10 +575,9 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   return is;
 }
 
-/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.
+/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
  *
- * comm_group_ et desc_facettes_.comm_group_
- *
+ * Precondition: la zone_dis de l'equation doit etre complete (joints)
  */
 void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation)
 {
@@ -816,6 +815,7 @@ void Maillage_FT_Disc::ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int
  *
  * Le statut passe a PARCOURU.
  *
+ * Precondition: statut >= MINIMAL
  */
 void Maillage_FT_Disc::parcourir_maillage()
 {
@@ -842,6 +842,7 @@ void Maillage_FT_Disc::parcourir_maillage()
  *
  * Le statut passe a COMPLET.
  *
+ * Precondition: statut >= MINIMAL
  */
 void Maillage_FT_Disc::completer_maillage()
 {
@@ -867,7 +868,9 @@ void Maillage_FT_Disc::completer_maillage()
  *  Les autres elements sont remplis par une methode heuristique utilisant
  *  l'indicatrice_precedente.
  *
- *
+ * Precondition: statut >= PARCOURU
+ *  Attention, l'algorithme est concu de sorte que l'on puisse utiliser le
+ * meme tableau "indicatrice" et "indicatrice_precedente".
  */
 void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
                                           const DoubleVect& indicatrice_precedente)
@@ -2191,6 +2194,16 @@ int Maillage_FT_Disc::copier_sommet_interne(int som)
  *  sommet virtuel sur ce processeur).  Parmi les sommets de la liste_sommets,
  *  seuls ceux qui ne sont pas encore dans l'espace virtuel sont crees.
  *
+ * Precondition: Les membres suivants doivent etre valides:
+ * * sommets_,
+ * * desc_sommets_,
+ * * drapeaux_sommets_,
+ * * sommet_elem_,
+ * * sommet_PE_owner_,
+ * * sommet_num_owner_
+ *
+ * Postcondition: Les memes tableaux sont valides a la sortie de la fonction.
+ *
  * @param (liste_sommets) une liste de numeros de sommets REELS qui peut contenir des doublons.
  * @param (liste_pe) une liste de meme taille que liste_sommets contenant le numero du processeur sur lequel il faut creer un noeud virtuel. Le processeur ne doit pas etre moi.
  * @param (comm) un schema de comm valide, dans lequel send_pe_list contient au moins les processeurs cites dans liste_pe.
@@ -2390,6 +2403,15 @@ void Maillage_FT_Disc::creer_sommets_virtuels_numowner(const ArrOfInt& request_s
  *  fraichement arrives sur le domaine, ainsi que le deplacement restant pour
  *  chacun de ces sommets (tableau a 3 colonnes (meme en dimension 2 !), de taille
  *  le nombre de nouveaux sommets).
+ *
+ * Precondition:
+ * Les membres suivants doivent etre valides a l'entree de la fonction:
+ *  (Meme liste que pour creer_sommets_virtuels(...) )
+ * Postcondition:
+ *  Les memes membres sont valides a la sortie.
+ *  Attention: on ne met PAS a jour les facettes, la regle de propriete des
+ *            facettes n'est donc pas verifiee au retour de la fonction.
+ *            Il faut appeler corriger_proprietaire_facettes.
  *
  */
 void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
@@ -2628,7 +2650,16 @@ static void ordonner_sommets_facettes(IntTab& facettes,
  *  Cette methode est utilisee lors de l'algorithme Marching-Cubes, du transport
  *  et du remaillage pour amener le maillage dans son etat conforme aux conventions.
  *
- *
+ * Precondition:
+ *  Les membres suivants doivent etre valides :
+ *  - Memes membres que creer_facettes_virtuelles
+ *  - desc_facettes_ (remarque)
+ *(remarque) desc_facettes_ doit etre un descripteur valide (correspondance entre
+ *           elements distants et elements virtuels). En revanche, on suppose que
+ *           la facette peut etre reelle sur n'importe quel processeur (pas forcement
+ *           le proprietaire du premier sommet).
+ * Postcondition:
+ *  - Toutes les conditions qui definissent l'etat MINIMAL sont remplies.
  */
 void Maillage_FT_Disc::corriger_proprietaires_facettes()
 {
@@ -2983,6 +3014,13 @@ void Maillage_FT_Disc::creer_facettes_virtuelles(const ArrOfInt& liste_facettes,
  *    converti en numero local d'un element reel sur ce processeur.
  *  Cette methode est essentiellement utilisee dans le parcours de l'interface.
  *
+ * Precondition: Le maillage doit etre dans l'etat minimal (en particulier,
+ *  il doit respecter la convention "proprietaire facette=proprietaire 1er sommet").
+ *
+ * Trois categories de processeurs vont se parler:
+ *  le processeur A qui connait le numero de la facette a envoyer,
+ *  le processeur B qui possede la facette,
+ *  le processeur C a qui on veut envoyer la facette.
  *
  * @param (liste_facettes) un tableau contenant des numeros de facettes reelles ou virtuelles, eventuellement avec doublons.
  * @param (liste_elem_arrivee) tableau de taille identique a liste_facettes, contenant pour chacune un numero d'element virtuel.

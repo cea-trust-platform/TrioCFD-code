@@ -102,6 +102,7 @@ void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc
 
 /*! @brief Verifie que le milieu est de type Fluide_Diphasique et associe le milieu aux equations.
  *
+ * Precondition: Toutes les equations doivent avoir ete associees.
  */
 void Probleme_FT_Disc_gen::associer_milieu_base(const Milieu_base& un_milieu)
 {
