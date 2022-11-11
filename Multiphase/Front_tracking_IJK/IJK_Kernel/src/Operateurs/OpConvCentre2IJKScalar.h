@@ -13,16 +13,15 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickScalar_include
-#define OpConvIJKQuickScalar_include
+#ifndef OpConvCentre2IJKScalar_include
+#define OpConvCentre2IJKScalar_include
 
 #include <OpConvIJKElemCommon.h>
 
-class OpConvIJKQuickScalar_double : public OpConvIJKElemCommon_double
+class OpConvCentre2IJKScalar_double : public OpConvIJKElemCommon_double
 {
 public:
-  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { }
-
+  OpConvCentre2IJKScalar_double() : OpConvIJKElemCommon_double() { }
 protected:
 
   inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
@@ -44,6 +43,6 @@ private:
 
 };
 
-#include <OpConvIJKQuickScalar.tpp>
+#include <OpConvCentre2IJKScalar.tpp>
 
 #endif
