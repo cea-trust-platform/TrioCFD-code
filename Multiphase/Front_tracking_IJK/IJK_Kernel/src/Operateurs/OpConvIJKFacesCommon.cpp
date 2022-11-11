@@ -13,12 +13,50 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKQuickSharp.h>
+#include <OpConvIJKFacesCommon.h>
 
-void OpConvIJKQuickSharp_double::initialize(const IJK_Splitting& splitting)
+void OpConvIJKFacesCommon_double::initialize(const IJK_Splitting& splitting)
 {
-  OpConvIJKFacesCommon_double::initialize(splitting);
-  delta_x_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_I);
-  delta_y_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_J);
-  delta_z_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_K);
+  channel_data_.initialize(splitting);
+  perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
+}
+
+void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
+
+  compute_set(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  statistiques().end_count(convection_counter_);
+
+}
+
+void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
+
+  compute_add(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  statistiques().end_count(convection_counter_);
+
 }
