@@ -80,8 +80,8 @@ class Operateur_IJK_elem_base_double
 public:
   virtual ~Operateur_IJK_elem_base_double() {};
 protected:
-  void compute_set(IJK_Field_double& dx);
-  void compute_add(IJK_Field_double& dx);
+  virtual void compute_set(IJK_Field_double& dx);
+  virtual void compute_add(IJK_Field_double& dx);
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
   virtual void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) = 0;

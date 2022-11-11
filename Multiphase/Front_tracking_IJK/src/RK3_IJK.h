@@ -147,7 +147,7 @@ protected:
   IJK_Field_double pressure_rhs_;
   // Operators and pressure solver
   OpDiffIJK_double velocity_diffusion_op_;
-  OpConvQuickSharpIJK_double velocity_convection_op_;
+  OpConvIJKQuickSharp_double velocity_convection_op_;
   OpConvIJKQuickScalar_double scalar_convection_op_;
 
   Multigrille_Adrien poisson_solver_;

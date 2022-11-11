@@ -465,7 +465,7 @@ protected :
   	  	  	  	  	  	  	  	  	 * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
   	  	  	  	  	  	  	  	  	 *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
   	  	  	  	  	  	  	  	  	 */
-  OpConvQuickSharpIJK_double velocity_convection_op_sharp_;
+  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
   OpConvCentre4IJK_double velocity_convection_op_centre_;
   OpConvAmontIJK_double velocity_convection_op_amont_;
 
