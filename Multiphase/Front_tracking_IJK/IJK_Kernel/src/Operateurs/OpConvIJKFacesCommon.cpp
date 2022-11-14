@@ -13,37 +13,50 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickScalar_include
-#define OpConvIJKQuickScalar_include
+#include <OpConvIJKFacesCommon.h>
 
-#include <OpConvIJKElemCommon.h>
-
-class OpConvIJKQuickScalar_double : public OpConvIJKElemCommon_double
+void OpConvIJKFacesCommon_double::initialize(const IJK_Splitting& splitting)
 {
-public:
-  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { }
+  channel_data_.initialize(splitting);
+  perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
+}
 
-protected:
+void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(convection_counter_);
 
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
 
-private:
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
+  compute_set(dvx, dvy, dvz);
 
-};
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  statistiques().end_count(convection_counter_);
 
-#include <OpConvIJKQuickScalar.tpp>
+}
 
-#endif
+void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
+
+  compute_add(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  statistiques().end_count(convection_counter_);
+
+}

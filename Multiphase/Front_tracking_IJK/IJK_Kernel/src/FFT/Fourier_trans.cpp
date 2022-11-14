@@ -12,12 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : Fourier_trans.cpp
-// Directory : $NEW_ALGO_QC_ROOT/src
-//
-/////////////////////////////////////////////////////////////////////////////
+
 #include <Fourier_trans.h>
 #include <IJK_Grid_Geometry.h>
 #include <TRUSTTab.h>

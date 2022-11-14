@@ -12,12 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : Operateur_IJK_data_channel.h
-// Directory : $IJK_ROOT/src/IJK/OpVDF
-//
-/////////////////////////////////////////////////////////////////////////////
+
 #ifndef Operateur_IJK_data_channel_h
 #define Operateur_IJK_data_channel_h
 #include <IJK_Field.h>
