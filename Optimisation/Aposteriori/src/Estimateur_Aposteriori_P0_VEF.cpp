@@ -67,9 +67,9 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   const DoubleVect& inverse_volumes = zone_VEF.inverse_volumes();
   DoubleTab la_vitesse = vitesse_.valeur().valeurs();
   DoubleTab la_pression = pression_p1isop1b_.valeur().valeurs();
-  cout << "Estimateur_Aposteriori_P0_VEF ici " << endl;
+
   DoubleTab le_terme_source(vitesse_.valeur().valeurs());
-  cout << "Estimateur_Aposteriori_P0_VEF la " << endl;
+
 
   Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
   const Sources& sources_eq =  eq.sources();
@@ -78,9 +78,9 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   const Champ_base& ch_bs = eq.get_champ_source().get_champ(espace_stockage);
   const DoubleTab& src = ch_bs.valeurs();
 
-  Cerr << src << finl;
+  //Cerr << src << finl;
 
-  le_terme_source = 0.;
+  le_terme_source = src;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
   const DoubleTab tabnu=viscosite_cinematique_.valeur().valeurs();
