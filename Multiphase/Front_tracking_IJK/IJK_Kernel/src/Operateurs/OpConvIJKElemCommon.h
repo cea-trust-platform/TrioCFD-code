@@ -1,4 +1,3 @@
-//TRUST_NO_INDENT
 /****************************************************************************
 * Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
@@ -13,59 +12,75 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : OpConvDiscIJKQuickScalar.h
-// Directory : $IJK_ROOT/src/IJK/OpVDF
-//
-/////////////////////////////////////////////////////////////////////////////
-#ifndef OpConvDiscIJKQuickScalar_include
-#define OpConvDiscIJKQuickScalar_include
+
+#ifndef OpConvIJKElemCommon_include
+#define OpConvIJKElemCommon_include
 
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
-#include <Operateur_IJK_data_channel.h>
 
-#Pmacro DEF_Op(ST,_OP_NAME_)
-
-class _OP_NAME__ST : public Operateur_IJK_elem_base_ST
+class OpConvIJKElemCommon_double : public Operateur_IJK_elem_base_double
 {
- public:
-  _OP_NAME__ST() { stored_curv_fram_layer_z_ = -1000; }
-  void initialize(const IJK_Splitting & splitting);
-  void calculer(const IJK_Field_ST & field, const IJK_Field & ref_ijk,
-		const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
-		IJK_Field_ST & result);
-  void ajouter(const IJK_Field_ST & field, const IJK_Field_ST & ref_ijk,
-	       const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
-	       IJK_Field_ST & result);
- protected:
-  
-#Pforeach DIR (x y z)
-  void compute_curv_fram_DIR(int k_layer);
-  void compute_flux_DIR(IJK_Field_local_ST & resu, const int k_layer) override;
-#Pendforeach(DIR)
+public:
+  OpConvIJKElemCommon_double() { stored_curv_fram_layer_z_ = -1000; }
+  void initialize(const IJK_Splitting& splitting);
+  void calculer(const IJK_Field_double& field,
+                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                IJK_Field_double& result);
+
+  void ajouter(const IJK_Field_double& field,
+               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+               IJK_Field_double& result);
+protected:
+
+  void compute_curv_fram(DIRECTION _DIR_, int k_layer);
+  void shift_curv_fram(IJK_Field_local_double& tmp_curv_fram);
+  inline const IJK_Field_local_double& get_input_velocity(DIRECTION _DIR_)
+  {
+    switch(_DIR_)
+      {
+      case DIRECTION::X:
+        return *input_velocity_x_;
+        break;
+      case DIRECTION::Y:
+        return *input_velocity_y_;
+        break;
+      case DIRECTION::Z:
+        return *input_velocity_z_;
+        break;
+      default:
+        Cerr << "Error in OpConvDiscIJKQuickScalar::get_input_velocity: wrong direction..." << finl;
+        Process::exit();
+      }
+    //for compilation only...
+    return *input_velocity_x_;
+  }
 
   Operateur_IJK_data_channel channel_data_;
 
   // Pointers to input data (set by calculer, used by compute_flux_...)
-  const IJK_Field_local_ST *input_field_;
-  const IJK_Field_local_ST *input_velocity_x_;
-  const IJK_Field_local_ST *input_velocity_y_;
-  const IJK_Field_local_ST *input_velocity_z_;
-  const IJK_Field_local_ST *input_indicatrice_;
+  const IJK_Field_local_double *input_field_;
+  const IJK_Field_local_double *input_velocity_x_;
+  const IJK_Field_local_double *input_velocity_y_;
+  const IJK_Field_local_double *input_velocity_z_;
   bool perio_k_ ;
 
   // Temporary array to store curvature and fram coefficients
   // for the current computed flux.
   // layer k=0 and k=1 are used for "curv", k=2 and k=3 are used for "fram".
   // layer k=0 and k=2 store the previous values computed in direction "k" (which is used 2 times)
-  IJK_Field_local_ST tmp_curv_fram_;
+  IJK_Field_local_double tmp_curv_fram_;
   int stored_curv_fram_layer_z_; // which (local) layer is currently stored in layer 0 of the tmp array ?
-  
-};
-#Pendmacro(DEF_Op)
-#Pusemacro(DEF_Op)(double,OpConvDiscIJKQuickScalar)
 
+private:
+
+  void compute_curv_fram_loop_(DIRECTION _DIR_, int iter, double factor12, double factor01, const ConstIJK_double_ptr& input_field, IJK_double_ptr& curv_values, IJK_double_ptr& fram_values );
+
+};
+
+inline Simd_double operator/(const Simd_double& x, const Simd_double& y)
+{
+  return SimdDivideMed(x, y);
+}
 
 #endif

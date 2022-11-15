@@ -575,10 +575,9 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   return is;
 }
 
-/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.
+/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
  *
- * comm_group_ et desc_facettes_.comm_group_
- *
+ * Precondition: la zone_dis de l'equation doit etre complete (joints)
  */
 void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation)
 {
@@ -816,6 +815,7 @@ void Maillage_FT_Disc::ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int
  *
  * Le statut passe a PARCOURU.
  *
+ * Precondition: statut >= MINIMAL
  */
 void Maillage_FT_Disc::parcourir_maillage()
 {
@@ -842,6 +842,7 @@ void Maillage_FT_Disc::parcourir_maillage()
  *
  * Le statut passe a COMPLET.
  *
+ * Precondition: statut >= MINIMAL
  */
 void Maillage_FT_Disc::completer_maillage()
 {
@@ -867,7 +868,9 @@ void Maillage_FT_Disc::completer_maillage()
  *  Les autres elements sont remplis par une methode heuristique utilisant
  *  l'indicatrice_precedente.
  *
- *
+ * Precondition: statut >= PARCOURU
+ *  Attention, l'algorithme est concu de sorte que l'on puisse utiliser le
+ * meme tableau "indicatrice" et "indicatrice_precedente".
  */
 void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
                                           const DoubleVect& indicatrice_precedente)
@@ -1578,6 +1581,18 @@ const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
   return data_cache.normale_facettes_;
 }
 
+const ArrOfDouble& Maillage_FT_Disc::get_surface_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.surface_facettes_;
+}
+
+const DoubleTab& Maillage_FT_Disc::get_normale_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.normale_facettes_;
+}
+
 /*! @brief Calcule la grandeur demandee, stocke le resultat dans un tableau interne a la classe et renvoie le resultat.
  *
  * Si le maillage
@@ -2179,6 +2194,16 @@ int Maillage_FT_Disc::copier_sommet_interne(int som)
  *  sommet virtuel sur ce processeur).  Parmi les sommets de la liste_sommets,
  *  seuls ceux qui ne sont pas encore dans l'espace virtuel sont crees.
  *
+ * Precondition: Les membres suivants doivent etre valides:
+ * * sommets_,
+ * * desc_sommets_,
+ * * drapeaux_sommets_,
+ * * sommet_elem_,
+ * * sommet_PE_owner_,
+ * * sommet_num_owner_
+ *
+ * Postcondition: Les memes tableaux sont valides a la sortie de la fonction.
+ *
  * @param (liste_sommets) une liste de numeros de sommets REELS qui peut contenir des doublons.
  * @param (liste_pe) une liste de meme taille que liste_sommets contenant le numero du processeur sur lequel il faut creer un noeud virtuel. Le processeur ne doit pas etre moi.
  * @param (comm) un schema de comm valide, dans lequel send_pe_list contient au moins les processeurs cites dans liste_pe.
@@ -2378,6 +2403,15 @@ void Maillage_FT_Disc::creer_sommets_virtuels_numowner(const ArrOfInt& request_s
  *  fraichement arrives sur le domaine, ainsi que le deplacement restant pour
  *  chacun de ces sommets (tableau a 3 colonnes (meme en dimension 2 !), de taille
  *  le nombre de nouveaux sommets).
+ *
+ * Precondition:
+ * Les membres suivants doivent etre valides a l'entree de la fonction:
+ *  (Meme liste que pour creer_sommets_virtuels(...) )
+ * Postcondition:
+ *  Les memes membres sont valides a la sortie.
+ *  Attention: on ne met PAS a jour les facettes, la regle de propriete des
+ *            facettes n'est donc pas verifiee au retour de la fonction.
+ *            Il faut appeler corriger_proprietaire_facettes.
  *
  */
 void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
@@ -2616,7 +2650,16 @@ static void ordonner_sommets_facettes(IntTab& facettes,
  *  Cette methode est utilisee lors de l'algorithme Marching-Cubes, du transport
  *  et du remaillage pour amener le maillage dans son etat conforme aux conventions.
  *
- *
+ * Precondition:
+ *  Les membres suivants doivent etre valides :
+ *  - Memes membres que creer_facettes_virtuelles
+ *  - desc_facettes_ (remarque)
+ *(remarque) desc_facettes_ doit etre un descripteur valide (correspondance entre
+ *           elements distants et elements virtuels). En revanche, on suppose que
+ *           la facette peut etre reelle sur n'importe quel processeur (pas forcement
+ *           le proprietaire du premier sommet).
+ * Postcondition:
+ *  - Toutes les conditions qui definissent l'etat MINIMAL sont remplies.
  */
 void Maillage_FT_Disc::corriger_proprietaires_facettes()
 {
@@ -2971,6 +3014,13 @@ void Maillage_FT_Disc::creer_facettes_virtuelles(const ArrOfInt& liste_facettes,
  *    converti en numero local d'un element reel sur ce processeur.
  *  Cette methode est essentiellement utilisee dans le parcours de l'interface.
  *
+ * Precondition: Le maillage doit etre dans l'etat minimal (en particulier,
+ *  il doit respecter la convention "proprietaire facette=proprietaire 1er sommet").
+ *
+ * Trois categories de processeurs vont se parler:
+ *  le processeur A qui connait le numero de la facette a envoyer,
+ *  le processeur B qui possede la facette,
+ *  le processeur C a qui on veut envoyer la facette.
  *
  * @param (liste_facettes) un tableau contenant des numeros de facettes reelles ou virtuelles, eventuellement avec doublons.
  * @param (liste_elem_arrivee) tableau de taille identique a liste_facettes, contenant pour chacune un numero d'element virtuel.
@@ -5236,29 +5286,36 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
   // Cette classe sert pour promener les sommets sur le bord du domaine.
   const Parcours_interface& parcours = refparcours_interface_.valeur();
 #if TCL_MODEL
-  const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
-  const Probleme_base& pb = eq_interfaces.get_probleme_base();
-  Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
-  Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+  int flag_tcl = 0;
+  double l_v = 0.;
   // interfacial velocity
   DoubleTab vit(nsom, dim);
-  if (tcl.is_activated() && tcl.is_capillary_activated())
+  if (refequation_transport_.non_nul())
     {
-      Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
-      Motcle nom_du_champ = "vitesse";
-      Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
-      Process::exit();
-      // Useless init to 0:
-      // for (int ii=0; ii< nsom; ii++)
-      //  for (int jj=0; jj< dim; jj++)
-      //    vit(ii,jj) = 0.;
-      eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
+      const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+      const Probleme_base& pb = eq_interfaces.get_probleme_base();
+      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+      Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+      if (tcl.is_activated() && tcl.is_capillary_activated())
+        {
+          flag_tcl = 1;
+          l_v = tcl.get_lv();
+          Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
+          Motcle nom_du_champ = "vitesse";
+          Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
+          Process::exit();
+          // Useless init to 0:
+          // for (int ii=0; ii< nsom; ii++)
+          //  for (int jj=0; jj< dim; jj++)
+          //    vit(ii,jj) = 0.;
+          eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
 
-      //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
-      // It relies on the classical assumption in the FT module that the first equation is NS.
+          //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
+          // It relies on the classical assumption in the FT module that the first equation is NS.
+        }
+      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+      //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
     }
-  const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
-  //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
 #endif
 
   for (facette = 0; facette < nfaces; facette++)
@@ -5375,7 +5432,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       s2s1[0] = sommets_(s1,0) - sommets_(s2,0);
                       s2s1[1] = sommets_(s1,1) - sommets_(s2,1);
                       s2s1[2] = sommets_(s1,2) - sommets_(s2,2);
-                      // On calcul la courbure partout de la meme maniere
+                      // On calcule la courbure partout de la meme maniere
                       // meme si on est sur une ligne de contact (ie dans un premier temps, sans tenir compte de
                       // l'effet de la ligne de contact). On corrige l'effet de la ligne de contact par la suite...
                       d_surface(s0,0) += s2s1[1] * n[2] - s2s1[2] * n[1];
@@ -5872,11 +5929,11 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                   // the effect of CL velocity. Stored in tcl.set_theta_app
                   // (but maybe unused there). Value used locally here afterward.
                   // If the TCL model is activated and we're not on a virtual node :
-                  if ((sommet_elem_[som[i2]]>0) && tcl.is_activated()
-                      && tcl.is_capillary_activated())
+                  if ((sommet_elem_[som[i2]]>0) && flag_tcl)
                     {
                       const double t=temps_physique_;
                       int face_loc;
+                      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
                       const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
                       const Nom& bc_name = type_cl.frontiere_dis().le_nom();
                       // For each BC, we check its type to see if it's a wall:
@@ -5898,12 +5955,11 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       // The other som of the facette is som[1-i2] :
                       // Cerr << " sommet-1 x= " << sommets_(som[1-i2],0) << " y= " << sommets_(som[1-i2],1) << " time_sommet= " << t << finl;
                       // if(dt != 0.) double cl_v = (sommets_(som[i2],0) - x_cl_)/dt;
-
                       const int isom1 = som[1-i2];
                       // The second vertex of the segment should not be a contact line
                       // so we compute its tangential velocity:
-                      const int nb_compo = vit.dimension(1);
 
+                      const int nb_compo = vit.dimension(1);
                       double norm_vit_som1 = 0.;
                       double vn = 0.;
                       double v_cl = 0.;
@@ -5940,7 +5996,6 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       const double W = (sommets_(i2, 0) - bubble_center)/(2*2.71*2.71);
                       const double Ca = 2.8e-4*v_cl/5.89e-2;
                       Cerr << "Capillary_number = " << Ca << " time = " << t << finl;
-                      double l_v = tcl.get_lv();
                       double theta_app = pow((theta),3) - 9. * Ca * log(std::max(W, 1.e-20)/l_v);
                       theta_app = pow(std::max(theta_app, 0.),1./3.);
                       Cerr << "theta_after " << theta_app << " time_theta_after= " << t << finl;
@@ -5949,7 +6004,8 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       // (it is through this mean that we will consider
                       //  it and try to indirectly satisfy it).
                       costheta = cos(theta_app);
-                      tcl.set_theta_app(theta_app);
+                      // unused?
+                      //tcl.set_theta_app(theta_app);
                       Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
                            << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
                     }

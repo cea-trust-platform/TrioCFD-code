@@ -1,4 +1,3 @@
-//TRUST_NO_INDENT
 /****************************************************************************
 * Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
@@ -13,14 +12,9 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : OpConvIJKQuickSharp.h
-// Directory : $IJK_ROOT/src/IJK/OpVDF
-//
-/////////////////////////////////////////////////////////////////////////////
-#ifndef OpConvIJKQuickSharp_H
-#define OpConvIJKQuickSharp_H
+
+#ifndef OpConvIJKFacesCommon
+#define OpConvIJKFacesCommon
 #include <IJK_Field.h>
 #include <IJK_Field_simd_tools.h>
 #include <TRUSTTab.h>
@@ -28,39 +22,72 @@
 #include <Operateur_IJK_base.h>
 #include <Operateur_IJK_data_channel.h>
 
-#Pmacro DEF_OpConvDiffH(ST)
 
-class OpConvQuickSharpIJK_ST : public Operateur_IJK_faces_base_ST
+class OpConvIJKFacesCommon_double : public Operateur_IJK_faces_base_double
 {
- public:
-  void initialize(const IJK_Splitting & splitting);
-  void calculer(const IJK_Field_ST & inputx, const IJK_Field_ST & inputy, const IJK_Field_ST & inputz, 
-		const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
-		IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
-  void ajouter(const IJK_Field_ST & inputx, const IJK_Field_ST & inputy, const IJK_Field_ST & inputz, 
-	       const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
-	       IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
- protected:
-#Pforeach DIR (x y z)
-#Pforeach COMPO (x y z)
-  void compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer) override;
-#Pendforeach(COMPO)
-#Pendforeach(DIR)
+public:
+  void initialize(const IJK_Splitting& splitting);
+  void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
+  void ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
+protected:
 
   Operateur_IJK_data_channel channel_data_;
-  bool perio_k_;
 
   // Pointers to input velocity field
-  const IJK_Field_local_ST *vx_;
-  const IJK_Field_local_ST *vy_;
-  const IJK_Field_local_ST *vz_;
+  const IJK_Field_double *vx_;
+  const IJK_Field_double *vy_;
+  const IJK_Field_double *vz_;
+  bool perio_k_ ;
   // Pointers to input convected field
-  const IJK_Field_local_ST *inputx_;
-  const IJK_Field_local_ST *inputy_;
-  const IJK_Field_local_ST *inputz_;
+  const IJK_Field_double *inputx_;
+  const IJK_Field_double *inputy_;
+  const IJK_Field_double *inputz_;
 
-  double delta_x_, delta_y_, delta_z_; // coded for uniform mesh
+  inline const IJK_Field_double& get_input(DIRECTION _DIR_)
+  {
+    switch(_DIR_)
+      {
+      case DIRECTION::X:
+        return *inputx_;
+        break;
+      case DIRECTION::Y:
+        return *inputy_;
+        break;
+      case DIRECTION::Z:
+        return *inputz_;
+        break;
+      default:
+        Cerr << "Error in OpConvIJKFacesCommon::get_input: wrong direction..." << finl;
+        Process::exit();
+      }
+    // for compilation only...
+    return *inputx_;
+  }
+
+  inline const IJK_Field_double& get_v(DIRECTION _DIR_)
+  {
+    switch(_DIR_)
+      {
+      case DIRECTION::X:
+        return *vx_;
+        break;
+      case DIRECTION::Y:
+        return *vy_;
+        break;
+      case DIRECTION::Z:
+        return *vz_;
+        break;
+      default:
+        Cerr << "Error in OpConvIJKFacesCommon::get_v: wrong direction..." << finl;
+        Process::exit();
+      }
+    // for compilation only...
+    return *vx_;
+  }
 };
-#Pendmacro(DEF_OpConvDiffH)
-#Pusemacro(DEF_OpConvDiffH)(double)
+
 #endif

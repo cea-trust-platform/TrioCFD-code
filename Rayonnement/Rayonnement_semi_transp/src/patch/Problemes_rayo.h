@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,37 +13,53 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickScalar_include
-#define OpConvIJKQuickScalar_include
+#ifndef Problemes_rayo_included
+#define Problemes_rayo_included
 
-#include <OpConvIJKElemCommon.h>
+#include <Pb_Thermohydraulique_Turbulent_QC.h>
+#include <Pb_Thermohydraulique_Turbulent.h>
+#include <Pb_Hydraulique_Turbulent.h>
+#include <Pb_Thermohydraulique_QC.h>
+#include <Pb_Thermohydraulique.h>
+#include <Pb_Hydraulique.h>
+#include <Pb_Conduction.h>
 
-class OpConvIJKQuickScalar_double : public OpConvIJKElemCommon_double
+//class Problemes_rayo
+//{ };
+
+class Pb_Rayo_Conduction : public Pb_Conduction
 {
-public:
-  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { }
-
-protected:
-
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
-
-private:
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
-
+  Declare_instanciable(Pb_Rayo_Conduction);
 };
 
-#include <OpConvIJKQuickScalar.tpp>
+class Pb_Rayo_Hydraulique : public Pb_Hydraulique
+{
+  Declare_instanciable(Pb_Rayo_Hydraulique);
+};
 
-#endif
+class Pb_Rayo_Thermohydraulique : public Pb_Thermohydraulique
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique);
+};
+
+class Pb_Rayo_Thermohydraulique_QC : public Pb_Thermohydraulique_QC
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique_QC);
+};
+
+class Pb_Rayo_Hydraulique_Turbulent : public Pb_Hydraulique_Turbulent
+{
+  Declare_instanciable(Pb_Rayo_Hydraulique_Turbulent);
+};
+
+class Pb_Rayo_Thermohydraulique_Turbulent : public Pb_Thermohydraulique_Turbulent
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent);
+};
+
+class Pb_Rayo_Thermohydraulique_Turbulent_QC : public Pb_Thermohydraulique_Turbulent_QC
+{
+  Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent_QC);
+};
+
+#endif /* Problemes_rayo_included */

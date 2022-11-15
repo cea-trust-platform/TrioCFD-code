@@ -18,14 +18,18 @@
 // XD Pb_Rayo_Conduction Pb_Conduction Pb_Rayo_Conduction -1 Resolution of the heat equation with rayonnement.
 // XD Pb_Rayo_Hydraulique pb_hydraulique Pb_Rayo_Hydraulique -1 Resolution of the Navier-Stokes equations with rayonnement.
 // XD Pb_Rayo_Thermohydraulique pb_thermohydraulique Pb_Rayo_Thermohydraulique -1 Resolution of pb_thermohydraulique with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_QC pb_thermohydraulique_QC Pb_Rayo_Thermohydraulique_QC -1 Resolution of pb_thermohydraulique_QC with rayonnement.
 // XD Pb_Rayo_Hydraulique_Turbulent pb_hydraulique_turbulent Pb_Rayo_Hydraulique_Turbulent -1 Resolution of pb_hydraulique_turbulent with rayonnement.
 // XD Pb_Rayo_Thermohydraulique_Turbulent pb_thermohydraulique_turbulent Pb_Rayo_Thermohydraulique_Turbulent -1 Resolution of pb_thermohydraulique_turbulent with rayonnement.
+// XD Pb_Rayo_Thermohydraulique_Turbulent_QC pb_thermohydraulique_turbulent_qc Pb_Rayo_Thermohydraulique_Turbulent_QC -1 Resolution of pb_thermohydraulique_turbulent_qc with rayonnement.
 
 Implemente_instanciable(Pb_Rayo_Conduction,"Pb_Rayo_Conduction",Pb_Conduction);
 Implemente_instanciable(Pb_Rayo_Hydraulique,"Pb_Rayo_Hydraulique",Pb_Hydraulique);
 Implemente_instanciable(Pb_Rayo_Thermohydraulique,"Pb_Rayo_Thermohydraulique",Pb_Thermohydraulique);
+Implemente_instanciable(Pb_Rayo_Thermohydraulique_QC,"Pb_Rayo_Thermohydraulique_QC",Pb_Thermohydraulique_QC);
 Implemente_instanciable(Pb_Rayo_Hydraulique_Turbulent,"Pb_Rayo_Hydraulique_Turbulent",Pb_Hydraulique_Turbulent);
 Implemente_instanciable(Pb_Rayo_Thermohydraulique_Turbulent,"Pb_Rayo_Thermohydraulique_Turbulent",Pb_Thermohydraulique_Turbulent);
+Implemente_instanciable(Pb_Rayo_Thermohydraulique_Turbulent_QC,"Pb_Rayo_Thermohydraulique_Turbulent_QC",Pb_Thermohydraulique_Turbulent_QC);
 
 Sortie& Pb_Rayo_Conduction::printOn(Sortie& os) const { return Pb_Conduction::printOn(os); }
 Entree& Pb_Rayo_Conduction::readOn(Entree& is) { return Pb_Conduction::readOn(is); }
@@ -36,8 +40,14 @@ Entree& Pb_Rayo_Hydraulique::readOn(Entree& is) { return Pb_Hydraulique::readOn(
 Sortie& Pb_Rayo_Thermohydraulique::printOn(Sortie& os) const { return Pb_Thermohydraulique::printOn(os); }
 Entree& Pb_Rayo_Thermohydraulique::readOn(Entree& is) { return Pb_Thermohydraulique::readOn(is); }
 
+Sortie& Pb_Rayo_Thermohydraulique_QC::printOn(Sortie& os) const { return Pb_Thermohydraulique_QC::printOn(os); }
+Entree& Pb_Rayo_Thermohydraulique_QC::readOn(Entree& is) { return Pb_Thermohydraulique_QC::readOn(is); }
+
 Sortie& Pb_Rayo_Hydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Hydraulique_Turbulent::printOn(os); }
 Entree& Pb_Rayo_Hydraulique_Turbulent::readOn(Entree& is) { return Pb_Hydraulique_Turbulent::readOn(is); }
 
 Sortie& Pb_Rayo_Thermohydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Thermohydraulique_Turbulent::printOn(os); }
 Entree& Pb_Rayo_Thermohydraulique_Turbulent::readOn(Entree& is) { return Pb_Thermohydraulique_Turbulent::readOn(is); }
+
+Sortie& Pb_Rayo_Thermohydraulique_Turbulent_QC::printOn(Sortie& os) const { return Pb_Thermohydraulique_Turbulent_QC::printOn(os); }
+Entree& Pb_Rayo_Thermohydraulique_Turbulent_QC::readOn(Entree& is) { return Pb_Thermohydraulique_Turbulent_QC::readOn(is); }

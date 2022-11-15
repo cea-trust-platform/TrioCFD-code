@@ -38,7 +38,7 @@
 #include <IJK_Field.h>
 #include <IJK_Splitting.h>
 #include <Objet_U.h>
-//#include <Interprete.h>
+#include <IJK_Field_forward.h>
 #include <IJK_Interfaces.h>
 
 /*! @brief : class Interface_ijk_face
@@ -49,7 +49,7 @@
  *
  *
  */
-class IJK_Field_double;
+
 
 class Intersection_Interface_ijk
 {
