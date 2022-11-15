@@ -1,6 +1,8 @@
 postraitement_ft_lata postraitement_base postraitement_ft_lata 0 not_set
   attr bloc chaine bloc 0 not_set
 rk3_ft runge_kutta_ordre_3 rk3_ft -1 Keyword for Runge Kutta time scheme for Front_Tracking calculation.
+paroi_ft_disc_deriv objet_lecture paroi_ft_disc_deriv 0 not_set
+paroi_ft_disc_symetrie paroi_ft_disc_deriv symetrie 0 Symetrie condition in the case of two-phase flows
 paroi_ft_disc condlim_base paroi_ft_disc 0 Boundary condition for Front-Tracking problem in the discontinuous version.
   attr type paroi_ft_disc_deriv type 0 Symetrie condition.
 paroi_ft_disc_constant paroi_ft_disc_deriv constant 0 condition contact angle fidex. The angle is measured between the wall and the interface in the phase 0.
