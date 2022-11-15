@@ -6555,7 +6555,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
       // Si volume de phase_1 imposee : on calcule une deuxieme correction
       if (variables_internes_->volume_impose_phase_1 > 0.)
         {
-          DoubleVect values(2);
+          DoubleVect values(3);
           values=0.;
 //        volume_phase_1     ->   values(0)
 //        volume_sous_zone   ->   values(1)
