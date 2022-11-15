@@ -337,23 +337,23 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
   double zs=z;
   if (direction_== 0)
     {
-      s = x;
+      s = xs;
       xs=0.;
     }
   else if (direction_== 1)
     {
-      s = y;
+      s = ys;
       ys=0.;
     }
 
   else
     {
-      s = z;
+      s = zs;
       zs=0.;
     }
 
   int i, j ;
-  i = s/h;
+  i = int(s/h);
   if((i+1) < abscissa_size)
     {
       j= i+1;
@@ -520,9 +520,9 @@ void Beam_model::printOutputPosition1D() const
             {
               for(int i=0; i<3; i++)
                 {
-                  displacement(k, i) += qDisplacement_[j]*u(output_position_1D_[k],i);
-                  velocity(k, i) += qSpeed_[j]*u(output_position_1D_[k],i);
-                  acceleration(k, i) += qAcceleration_[j]*u(output_position_1D_[k],i);
+                  displacement(k, i) += qDisplacement_[j]*u(int(output_position_1D_[k]),i);
+                  velocity(k, i) += qSpeed_[j]*u(int(output_position_1D_[k]),i);
+                  acceleration(k, i) += qAcceleration_[j]*u(int(output_position_1D_[k]),i);
                 }
             }
         }
