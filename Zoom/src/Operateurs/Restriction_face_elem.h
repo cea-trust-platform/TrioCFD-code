@@ -30,11 +30,9 @@
 #include <Connectivites.h>
 #include <Restriction_base.h>
 
-//
-// .DESCRIPTION class Restriction_elem_elem
-//
-// .SECTION voir aussi
-
+/*! @brief class Restriction_elem_elem
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

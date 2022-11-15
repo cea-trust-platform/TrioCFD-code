@@ -32,14 +32,12 @@ class Zone_dis_base;
 class Zone_Cl_dis_base;
 
 
-//.DESCRIPTION
-//
-// CLASS: LoiParoiHybride_VEF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: LoiParoiHybride_VEF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class LoiParoiHybride_VEF : public Paroi_hyd_base_VEF, LoiParoiHybride
 {
 

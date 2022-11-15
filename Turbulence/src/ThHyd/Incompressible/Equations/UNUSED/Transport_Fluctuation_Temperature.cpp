@@ -46,8 +46,9 @@ Sortie& Transport_Fluctuation_Temperature::printOn(Sortie& s ) const
   return s << que_suis_je() << "\n";
 }
 
-// Description:
-//  cf Convection_Diffusion_std::readOn(is)
+/*! @brief cf Convection_Diffusion_std::readOn(is)
+ *
+ */
 Entree& Transport_Fluctuation_Temperature::readOn(Entree& is )
 {
   Convection_Diffusion_std::readOn(is);
@@ -110,17 +111,21 @@ void Transport_Fluctuation_Temperature::completer()
   //la_zone_Cl_dis->completer(zone_dis());
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le nombre d'operateurs.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le nombre d'operateurs.
+ *
+ */
 int Transport_Fluctuation_Temperature::nombre_d_operateurs() const
 {
   return 2;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 const Operateur& Transport_Fluctuation_Temperature::operateur(int i) const
 {
   assert(i>=0);
@@ -147,9 +152,11 @@ const Operateur& Transport_Fluctuation_Temperature::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 Operateur& Transport_Fluctuation_Temperature::operateur(int i)
 {
   assert(i>=0);
@@ -176,9 +183,11 @@ Operateur& Transport_Fluctuation_Temperature::operateur(int i)
   return terme_diffusif;
 }
 
-// Description:
-// association entre  Transport_Fluctuation_Temperature et Milieu_base.
-// affecte le_Milieu_base.
+/*! @brief association entre  Transport_Fluctuation_Temperature et Milieu_base.
+ *
+ * affecte le_Milieu_base.
+ *
+ */
 void Transport_Fluctuation_Temperature::associer_milieu_base(const Milieu_base& un_milieu)
 {
   le_fluide = ref_cast(Fluide_base, un_milieu) ;

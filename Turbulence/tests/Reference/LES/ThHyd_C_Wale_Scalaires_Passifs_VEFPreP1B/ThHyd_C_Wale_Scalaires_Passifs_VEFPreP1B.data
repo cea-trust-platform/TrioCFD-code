@@ -44,9 +44,14 @@ Lire sch
 	diffusion_implicite 1
 }
 
-Fluide_Incompressible fluide
+Associate pb dom_pb1
+Associate pb sch
+Discretize pb dis
 
-Lire fluide
+
+Lire pb
+{
+Fluide_Incompressible
 {
    mu      Champ_Uniforme 1 0.0001683
    lambda  Champ_Uniforme 1 0.6797
@@ -54,31 +59,13 @@ Lire fluide
    rho     Champ_Uniforme 1 906.
    beta_th Champ_Uniforme 1 0.9859
    beta_co Champ_Uniforme 1 0.
+	gravite Champ_Uniforme 3  0. 0. -9.89
 }
 
-Constituant c1
-Lire c1
+Constituant
 {
         coefficient_diffusion Champ_Uniforme 1 2.147E-7
 }
-
-
-Champ_Uniforme gravite
-Lire gravite 3  0. 0. -9.89
-
-Associate fluide gravite
-
-Associate pb dom_pb1
-Associate pb sch
-Associate pb fluide
-Associate pb c1
-
-
-Discretize pb dis
-
-
-Lire pb
-{
 	Navier_Stokes_turbulent
 	{
 		solveur_pression Gcp { precond ssor { omega 1.4 }

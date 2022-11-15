@@ -26,41 +26,22 @@ Implemente_deriv(Prolongement_base);
 Implemente_instanciable(Prolongement,"Prolongement",DERIV(Prolongement_base));
 
 
-// Description:
-//    Surcharge Objet_U::printOn(Sortie&)
-//    Impression du Prolongement sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Surcharge Objet_U::printOn(Sortie&) Impression du Prolongement sur un flot de sortie.
+ *
+ * @param (Sortie& os) le flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Prolongement::printOn(Sortie& os) const
 {
   return DERIV(Prolongement_base)::printOn(os);
 }
 
 
-// Description:
-//    Lecture du Prolongement sur un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture du Prolongement sur un flot d'entree.
+ *
+ * @param (Entree& is) le flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Prolongement::readOn(Entree& is)
 {
   return DERIV(Prolongement_base)::readOn(is);

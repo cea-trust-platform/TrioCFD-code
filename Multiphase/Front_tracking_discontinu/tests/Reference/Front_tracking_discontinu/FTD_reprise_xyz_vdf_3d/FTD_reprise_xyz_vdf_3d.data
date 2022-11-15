@@ -130,7 +130,9 @@ interf
 		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
 		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
         }
-        iterations_correction_volume 0
+	VOFlike_correction_volume 0
+	nb_lissage_correction_volume 0
+        nb_iterations_correction_volume 3
         n_iterations_distance 2
 	remaillage {
 		pas -1
@@ -150,6 +152,9 @@ body
 		pas -1e8
 		pas_lissage -1
 	}
+	VOFlike_correction_volume 0
+	nb_lissage_correction_volume 0
+        nb_iterations_correction_volume 3
 	boundary_conditions
 	{
 		haut  Paroi_FT_disc symetrie
@@ -170,15 +175,23 @@ Postraitement {
 }
 liste_postraitements {
   postraitement_ft_lata post1 { 
-	nom_fichier post1
-	interfaces  interf { } 
-	champs elements { indicatrice_body indicatrice_interf pression }
-	champs faces { vitesse } 
-  }
+    format Lata 
+    fichier post1 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+        indicatrice_interf elem 
+        pression elem 
+        vitesse faces 
+    } 
+    interfaces interf { 
+    } 
+}
   postraitement_ft_lata post2 { 
-	nom_fichier post2
-	interfaces  body { } 
-  }
+    format Lata 
+    fichier post2 
+    interfaces body { 
+    } 
+}
 }
 Reprise xyz prepare.xyz
 Sauvegarde xyz bidon.xyz
@@ -187,3 +200,4 @@ Sauvegarde xyz bidon.xyz
 Solve pb
 Fin
 
+ 

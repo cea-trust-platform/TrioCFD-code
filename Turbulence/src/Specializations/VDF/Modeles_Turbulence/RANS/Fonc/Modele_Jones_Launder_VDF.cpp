@@ -33,6 +33,7 @@
 #include <Neumann_homogene.h>
 #include <Champ_Face.h>
 #include <Champ_Uniforme.h>
+#include <Milieu_base.h>
 
 Implemente_instanciable(Modele_Jones_Launder_VDF,"Modele_Jones_Launder_VDF",Modele_Fonc_Bas_Reynolds_Base);
 // XD Jones_Launder modele_fonction_bas_reynolds_base Jones_Launder -1 Model described in ' Jones, W. P. and Launder, B. E. (1972), The prediction of laminarization with a two-equation model of turbulence, Int. J. of Heat and Mass transfer, Vol. 15, pp. 301-314.'
@@ -97,7 +98,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
   D = 0;
   //  return D;
   //  const DoubleVect& volumes = la_zone.volumes();
-  const DoubleVect& porosite_surf = la_zone.porosite_face();
+  const DoubleVect& porosite_surf = zone_Cl_dis->equation().milieu().porosite_face();
   const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
   //  int nb_elem = la_zone.nb_elem();
   int nb_elem_tot = la_zone.nb_elem_tot();
@@ -1350,7 +1351,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
   D = 0;
   //  return D;
   //  const DoubleVect& volumes = la_zone.volumes();
-  const DoubleVect& porosite_surf = la_zone.porosite_face();
+  const DoubleVect& porosite_surf = zone_Cl_dis->equation().milieu().porosite_face();
   const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
   //  int nb_elem = la_zone.nb_elem();
   int nb_elem_tot = la_zone.nb_elem_tot();

@@ -83,10 +83,11 @@ int Transport_K_Eps_Realisable::nombre_d_operateurs() const
   return 2;
 }
 
-// Description:
-// renvoie terme_diffusif si i=0
-// renvoie terme_convectif si i=1
-// exit si i>1
+/*! @brief renvoie terme_diffusif si i=0 renvoie terme_convectif si i=1
+ *
+ *  exit si i>1
+ *
+ */
 const Operateur& Transport_K_Eps_Realisable::operateur(int i) const
 {
   switch(i)
@@ -105,10 +106,11 @@ const Operateur& Transport_K_Eps_Realisable::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-// renvoie terme_diffusif si i=0
-// renvoie terme_convectif si i=1
-// exit si i>1
+/*! @brief renvoie terme_diffusif si i=0 renvoie terme_convectif si i=1
+ *
+ *  exit si i>1
+ *
+ */
 Operateur& Transport_K_Eps_Realisable::operateur(int i)
 {
   switch(i)

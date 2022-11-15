@@ -38,11 +38,10 @@
 
 class Comm_Group;
 
-// .DESCRIPTION        : class Descripteur_FT
-//   Descripteur_FT stocke pour chaque PE une liste de numeros d'elements.
-// .SECTION voir aussi
-//   Desc_Structure_FT
-
+/*! @brief : class Descripteur_FT Descripteur_FT stocke pour chaque PE une liste de numeros d'elements.
+ *
+ * @sa Desc_Structure_FT
+ */
 class Descripteur_FT : public Objet_U
 {
   Declare_instanciable_sans_constructeur(Descripteur_FT);
@@ -104,26 +103,25 @@ private:
   enum Status { BAD=1, OK=2 } status_;
 };
 
-// ******************************************************************************
-
-// .DESCRIPTION        : class Desc_Structure_FT
-//
-// Desc_Structure_FT est un descripteur adapte aux maillages lagrangiens des
-// interfaces. Il contient un tableau d'elements et non une serie d'intervalles
-// (le plus souvent, les elements distants et virtuels ne sont pas contigus dans
-// les tableaux). De plus, l'allocation memoire est specialisee (les tableaux
-// croissent geometriquement mais ne decroissent jamais, leur taille est
-// generalement superieure au nombre d'elements qu'ils contiennent).
-//
-// Definition de la correspondance:
-// Pour deux processeurs numerotes A et B quelconques et un indice i,
-// on considere les deux numeros suivants
-// nA = (Sur processeur A, espace_distant.elements(B) [i])
-// nB = (Sur processeur B, espace_virtuel.elements(A) [i])
-// On dit que l'espace distant et l'espace virtuel sont en correspondance
-// si l'element nA sur le processeur A et l'element nB sur le processeur B
-// representent le meme element (sommet ou facette ...)
-
+/*! @brief : class Desc_Structure_FT
+ *
+ *  Desc_Structure_FT est un descripteur adapte aux maillages lagrangiens des
+ *  interfaces. Il contient un tableau d'elements et non une serie d'intervalles
+ *  (le plus souvent, les elements distants et virtuels ne sont pas contigus dans
+ *  les tableaux). De plus, l'allocation memoire est specialisee (les tableaux
+ *  croissent geometriquement mais ne decroissent jamais, leur taille est
+ *  generalement superieure au nombre d'elements qu'ils contiennent).
+ *
+ *  Definition de la correspondance:
+ *  Pour deux processeurs numerotes A et B quelconques et un indice i,
+ *  on considere les deux numeros suivants
+ *  nA = (Sur processeur A, espace_distant.elements(B) [i])
+ *  nB = (Sur processeur B, espace_virtuel.elements(A) [i])
+ *  On dit que l'espace distant et l'espace virtuel sont en correspondance
+ *  si l'element nA sur le processeur A et l'element nB sur le processeur B
+ *  representent le meme element (sommet ou facette ...)
+ *
+ */
 class Desc_Structure_FT : public Objet_U
 {
   Declare_instanciable_sans_constructeur(Desc_Structure_FT);
@@ -183,17 +181,18 @@ protected:
   Schema_Comm_FT schema_comm_inverse_;
 };
 
-// Description:
-// Renvoie la liste des PE pour lesquels la liste d'elements est non vide,
-// dans l'ordre croissant des numeros de PE.
+/*! @brief Renvoie la liste des PE pour lesquels la liste d'elements est non vide, dans l'ordre croissant des numeros de PE.
+ *
+ */
 inline const ArrOfInt& Descripteur_FT::pe_voisins() const
 {
   assert(status_ == OK);
   return pe_voisins_;
 }
 
-// Description:
-// Renvoie la liste des elements distants/virtuels du pe en parametre.
+/*! @brief Renvoie la liste des elements distants/virtuels du pe en parametre.
+ *
+ */
 inline const ArrOfInt& Descripteur_FT::elements(int pe_voisin) const
 {
   return elements_[pe_voisin];

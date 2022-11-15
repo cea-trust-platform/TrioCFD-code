@@ -19,6 +19,52 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#ifndef consigne_initiale_included
+#define consigne_initiale_included
+
+#include <FixedVector.h>
+#include <IJK_Field.h>
+#include <Objet_U.h>
+#include <string>
+#include <iostream>
+#include <math.h>
+
+/*! @brief : class consigne_initiale
+ *
+ *  <  S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
+ *                 qdm_cible = qdm_du_premier_pas_de_temps
+ *                 TODO v_cible_ : est-ce que je le sort ?
+ *  >
+ *
+ *
+ *
+ */
+class consigne_initiale : public Objet_U
+{
+
+  Declare_instanciable_sans_constructeur( consigne_initiale ) ;
+
+public :
+  consigne_initiale();
+  void initialise();
+  void set_time(int time_iteration) {time_iteration_ = time_iteration;};
+  double get_qdm_cible() {return qdm_cible_;};
+  void compute_qdm_cible(double qdm_initiale);
+
+  int get_need_for_vl_vv() {return 0;};
+  int get_need_for_rho_l() {return 0;};
+protected :
+  int time_iteration_;
+  double qdm_cible_;
+};
+
+#endif /* consigne_initiale_included */
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef cible_donnee_included
 #define cible_donnee_included
 
@@ -29,17 +75,16 @@
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class cible_donnee
-//
-// <  S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
-//                qdm_cible = alpha_l rho_l v_cible_
-//                v_cible_ : constante utilisateur ou .sauv
-// >
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class cible_donnee
+ *
+ *  <  S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
+ *                 qdm_cible = alpha_l rho_l v_cible_
+ *                 v_cible_ : constante utilisateur ou .sauv
+ *  >
+ *
+ *
+ *
+ */
 class cible_donnee : public Objet_U
 {
 
@@ -77,22 +122,21 @@ protected :
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class moyenne_par_morceaux
-//
-// <S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
-//  qdm_cible = alpha_l rho_l v_cible_
-//  Pour (n-1)*duree_morceaux < t < (n)*duree_morceaux :
-//	  v_cible_ = 1/duree_morceau sum_{morceau_precedent} v_liq-v_vap
-//    qdm_cible_ = 1/duree_morceau sum_{morceau_precedent} a_l rho_l * (v_liq-v_vap)
-//  Pour t = n*duree_morceaux
-//    n <-- n+1 ...
-//  ATTENTION AUX DIMENSION : v_cible_ vaut alpha_l*v_liq (03.03.22)
-//  >
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class moyenne_par_morceaux
+ *
+ *  <S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
+ *   qdm_cible = alpha_l rho_l v_cible_
+ *   Pour (n-1)*duree_morceaux < t < (n)*duree_morceaux :
+ * 	  v_cible_ = 1/duree_morceau sum_{morceau_precedent} v_liq-v_vap
+ *     qdm_cible_ = 1/duree_morceau sum_{morceau_precedent} a_l rho_l * (v_liq-v_vap)
+ *   Pour t = n*duree_morceaux
+ *     n <-- n+1 ...
+ *   ATTENTION AUX DIMENSION : v_cible_ vaut alpha_l*v_liq (03.03.22)
+ *   >
+ *
+ *
+ *
+ */
 class moyenne_par_morceaux : public Objet_U
 {
 
@@ -141,21 +185,20 @@ protected :
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class moyenne_glissante
-//
-// < S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
-//   qdm_cible = alpha_l rho_l v_cible_
-//   Pour t < duree_demandee_morceau_glissant_ :
-//		  v_cible_ = 1/t sum_{t} v_liq-v_vap
-//	 Pour t >= duree_demandee_morceau_glissant_ :
-//        v_cible_ = 1/(t-tm) sum_{tm;t} v_liq-v_vap
-//	      tm = duree_effective_morceau_glissant_
-//  ATTENTION AUX DIMENSIONS : v_cible_ = \ol{u}^liq - \ol{u}^vap
-//  >
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class moyenne_glissante
+ *
+ *  < S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
+ *    qdm_cible = alpha_l rho_l v_cible_
+ *    Pour t < duree_demandee_morceau_glissant_ :
+ * 		  v_cible_ = 1/t sum_{t} v_liq-v_vap
+ * 	 Pour t >= duree_demandee_morceau_glissant_ :
+ *         v_cible_ = 1/(t-tm) sum_{tm;t} v_liq-v_vap
+ * 	      tm = duree_effective_morceau_glissant_
+ *   ATTENTION AUX DIMENSIONS : v_cible_ = \ol{u}^liq - \ol{u}^vap
+ *   >
+ *
+ *
+ */
 class moyenne_glissante : public Objet_U
 {
 
@@ -165,7 +208,7 @@ public :
 
   moyenne_glissante();
   void initialise();
-  void set_time(double time, double time_step, double time_iteration);
+  void set_time(double time, double time_step, int time_iteration);
   void set_rho_l(double rho_liq) {rho_liq_ = rho_liq;};
   double compute_v_cible();
   double get_qdm_cible() {return qdm_cible_;};
@@ -209,22 +252,21 @@ protected :
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class correction_one_direction
-//
-// < Correction : "vitesse_corrigee_ = vitesse - vitesse_correction_"
-//
-//   A partir de qdm_cible, calcule vitesse_correction_ et vitesse_corrigee_ pour une direction
-//
-//                u_i * = u_i - {u_correction}_i
-//                correct_velocity_ = vel_ijk_t - value_correction_
-//				  value_correction_= ({rho u}_i _moyen - qdm_cible)  /  rho_moyen
-//
-//   qdm_cible : calculee par une des sous-classes.
-//  >
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class correction_one_direction
+ *
+ *  < Correction : "vitesse_corrigee_ = vitesse - vitesse_correction_"
+ *
+ *    A partir de qdm_cible, calcule vitesse_correction_ et vitesse_corrigee_ pour une direction
+ *
+ *                 u_i * = u_i - {u_correction}_i
+ *                 correct_velocity_ = vel_ijk_t - value_correction_
+ * 				  value_correction_= ({rho u}_i _moyen - qdm_cible)  /  rho_moyen
+ *
+ *    qdm_cible : calculee par une des sous-classes.
+ *   >
+ *
+ *
+ */
 class correction_one_direction : public Objet_U
 {
 
@@ -235,7 +277,7 @@ public :
   void set_correction(correction_one_direction& correction_in);
 //  initialise_perp_g();
 //  Entree& interpreter(Entree&);
-  enum type_correction { CIBLE_CONSTANTE, MOYENNE_PAR_MORCEAUX, MOYENNE_GLISSANTE, REGIME_ETABLI };
+  enum type_correction { CIBLE_CONSTANTE, MOYENNE_PAR_MORCEAUX, MOYENNE_GLISSANTE, REGIME_ETABLI, CONSIGNE_INITIALE };
   type_correction get_type_corr() const;
   double get_value() {return value_correction_;};
   void set_time_for_correction(double time, double time_step, int time_iteration);
@@ -246,15 +288,19 @@ public :
   void compute_correct_velocity(double vel_ijk_t);
   double get_correct_velocity() {return correct_velocity_;};
   double get_velocity_correction() {return value_correction_;};
+  double get_correction_value() {return qdm_cible_;};
 
   int get_need_for_rho_liq();
   int get_need_for_vit_rel();
+  int get_need_to_compute_correction_value();
+
   void set_rho_liq(double rho_liquide);
   void set_vl_vv(double vl_vv);
 
   cible_donnee get_cible_constante() const;
   moyenne_par_morceaux get_moyenne_par_morceaux() const;
   moyenne_glissante get_moyenne_glissante() const;
+  consigne_initiale get_consigne_initiale() const;
 
 protected :
   double value_correction_;
@@ -272,6 +318,7 @@ protected :
   cible_donnee parametres_cible_constante_;
   moyenne_par_morceaux parametres_moyenne_par_morceaux_;
   moyenne_glissante parametres_moyenne_glissante_;
+  consigne_initiale parametres_consigne_initiale_;
 }
 ;
 
@@ -291,14 +338,13 @@ protected :
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class corrections_qdm
-//
-// <Corrections to comply with the mean momentum budget in the three directions.>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class corrections_qdm
+ *
+ *  <Corrections to comply with the mean momentum budget in the three directions.>
+ *
+ *
+ *
+ */
 class corrections_qdm : public Objet_U
 {
 
@@ -317,15 +363,19 @@ public :
   void set_mean_values_for_corrections(double rho_vel_moyen, double rho_moyen, double alpha_l);
   void compute_correction_value_one_direction(int dir);
   void compute_correct_velocity_one_direction(int dir, double vel_ijk_t);
-  Vecteur3 get_correct_velocities();
+  Vecteur3 get_correct_velocities();    // u - v_corr
+  Vecteur3 get_velocity_corrections();  // mean(rho u) - qdm_cible / mean(rho)
+  Vecteur3 get_correction_values();     // qdm_cible
   double get_correct_velocitiy_one_direction(int dir);
   int get_need_for_vitesse_relative(int direction);
+  int get_need_to_compute_correction_value_one_direction(int direction);
 
-  enum type_dict_ { GB, GR };
+  enum type_dict_ { GB, GR, NONE_IJK };
   type_dict_ get_type_() const;
 
   int is_type_gb() const;
   int is_type_gr() const;
+  int is_type_none() const;
 protected :
   int type_;
   correction_one_direction correction_x_;

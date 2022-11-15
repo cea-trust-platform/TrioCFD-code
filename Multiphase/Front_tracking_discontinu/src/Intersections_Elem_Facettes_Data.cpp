@@ -22,17 +22,18 @@
 
 #include <Intersections_Elem_Facettes_Data.h>
 
-// ===========================================================================
-// Description:
-// Ajoute une entree a la liste doublement chainee d'intersections entre
-// la facette d'interface num_facette et l'element eulerien num_element.
-// Le numero d'element doit verifier 0 <= num_element < zone.nb_elem()
-// Si le numero de facette est superieur a la taille de l'index des facettes,
-// on agrandit l'index.
+/*! @brief Ajoute une entree a la liste doublement chainee d'intersections entre la facette d'interface num_facette et l'element eulerien num_element.
+ *
+ *  Le numero d'element doit verifier 0 <= num_element < zone.nb_elem()
+ *  Si le numero de facette est superieur a la taille de l'index des facettes,
+ *  on agrandit l'index.
+ *
+ */
 void Intersections_Elem_Facettes::ajoute_intersection(int num_facette,
                                                       int num_element,
                                                       double fraction_surface_intersection,
                                                       double contrib_volume_phase1,
+                                                      double barycentre_phase1[3],
                                                       double barycentre_u,
                                                       double barycentre_v,
                                                       double barycentre_w)
@@ -79,6 +80,9 @@ void Intersections_Elem_Facettes::ajoute_intersection(int num_facette,
     new_entry.fraction_surface_intersection_ = fraction_surface_intersection;
 #endif
     new_entry.contrib_volume_phase1_ = contrib_volume_phase1;
+    new_entry.barycentre_phase1_[0] = barycentre_phase1[0];
+    new_entry.barycentre_phase1_[1] = barycentre_phase1[1];
+    new_entry.barycentre_phase1_[2] = barycentre_phase1[2];
     new_entry.barycentre_[0] = barycentre_u;
     new_entry.barycentre_[1] = barycentre_v;
     new_entry.barycentre_[2] = barycentre_w;
@@ -139,29 +143,33 @@ void Intersections_Elem_Facettes::get_liste_facettes_traversantes(int num_elemen
     }
 }
 
-// Description:
-// Renvoie un tableau de taille zone.nb_elem():
-//  pour un element 0 <= elem < zone.nb_elem(),
-//  index_elem()[elem] est l'indice de la premiere intersection entre l'element
-//  et les facettes du maillage lagrangien (voir description de la classe)
+/*! @brief Renvoie un tableau de taille zone.
+ *
+ * nb_elem(): pour un element 0 <= elem < zone.nb_elem(),
+ *   index_elem()[elem] est l'indice de la premiere intersection entre l'element
+ *   et les facettes du maillage lagrangien (voir description de la classe)
+ *
+ */
 const ArrOfInt& Intersections_Elem_Facettes::index_elem() const
 {
   return index_elem_facette_;
 }
 
-// Description:
-// Renvoie un tableau de taille "nombre de facettes de l'interface"
-//  pour un element 0 <= facette < nb_facettes,
-//  index_facette()[facette] est l'indice de la premiere intersection entre
-//  la facette et les elements du maillage lagrangien
-//  (voir description de la classe)
+/*! @brief Renvoie un tableau de taille "nombre de facettes de l'interface" pour un element 0 <= facette < nb_facettes,
+ *
+ *   index_facette()[facette] est l'indice de la premiere intersection entre
+ *   la facette et les elements du maillage lagrangien
+ *   (voir description de la classe)
+ *
+ */
 const ArrOfInt& Intersections_Elem_Facettes::index_facette() const
 {
   return index_facette_element_;
 }
 
-// Description:
-//operateur de copie
+/*! @brief operateur de copie
+ *
+ */
 const Intersections_Elem_Facettes& Intersections_Elem_Facettes::operator=(const Intersections_Elem_Facettes& ief)
 {
   if (&ief != this)

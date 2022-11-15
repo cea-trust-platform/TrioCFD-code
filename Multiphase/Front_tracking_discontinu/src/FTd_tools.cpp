@@ -24,20 +24,11 @@
 #include <math.h>
 #include <TRUSTTabFT.h>
 
-// Description:
-//    Cette fonction calcule le max de la norme d'un ensemble de vecteurs
-// Precondition:
-// Parametre: vecteurs
-//    Signification: vecteurs a mesurer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: le max du deplacement
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule le max de la norme d'un ensemble de vecteurs
+ *
+ * @param (vecteurs) vecteurs a mesurer
+ * @return (double) le max du deplacement
+ */
 double FTd_calculer_max_norme_vecteurs(const DoubleTab& vecteurs)
 {
   int som,k;
@@ -58,6 +49,8 @@ double FTd_calculer_max_norme_vecteurs(const DoubleTab& vecteurs)
 
   return sqrt(norme2max);
 }
+
+// The area of a triangle is half of the cross-product!
 double FTd_calculer_aire_triangle(const FTd_vecteur2& coord_som0,
                                   const FTd_vecteur2& coord_som1,
                                   const FTd_vecteur2& coord_som2)
@@ -71,7 +64,7 @@ double FTd_calculer_aire_triangle(const FTd_vecteur2& coord_som0,
   double x2 = coord_som2[0];
   double y2 = coord_som2[1];
 
-  double aire_tr = (x1-x0) * (y2-y0) - (y1-y0) * (x2-x0);
+  double aire_tr = 0.5*((x1-x0) * (y2-y0) - (y1-y0) * (x2-x0));
 
   return aire_tr;
 }

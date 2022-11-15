@@ -43,37 +43,30 @@ Lire sch
 	diffusion_implicite 1
 }
 
-Fluide_Incompressible fluide
 
-Lire fluide
-{
-   mu      Champ_Uniforme 1 0.0001683
-   lambda  Champ_Uniforme 1 0.6797
-   Cp      Champ_Uniforme 1 4342.
-   rho     Champ_Uniforme 1 906.
-}
 
-Constituant c
-Lire c
-{
-        coefficient_diffusion Champ_Uniforme 6 2.147E-7  2.147E-7 2.147E-7 2.147E-7 2.147E-7 2.147E-7 
-}
-
-Champ_Uniforme gravite
-Lire gravite 3  0. 0. -9.89
-
-Associate fluide gravite
 Associate pb dom_pb1
 Associate pb sch
-Associate pb fluide
-Associate pb c
-
-
 Discretize pb dis
 
 
 Lire pb
 {
+Fluide_Incompressible
+{
+   mu      Champ_Uniforme 1 0.0001683
+   lambda  Champ_Uniforme 1 0.6797
+   Cp      Champ_Uniforme 1 4342.
+   rho     Champ_Uniforme 1 906.
+   gravite Champ_Uniforme 3  0. 0. -9.89
+}
+
+Constituant
+{
+        coefficient_diffusion Champ_Uniforme 6 2.147E-7  2.147E-7 2.147E-7 2.147E-7 2.147E-7 2.147E-7 
+}
+
+
 	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { }

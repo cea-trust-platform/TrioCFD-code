@@ -29,14 +29,14 @@
 #include <Ref_Zone_VEF.h>
 #include <Ref_Zone_Cl_VEF.h>
 
-// .DESCRIPTION classe Mod_turb_hyd_ss_maille_VEF
-// Cette classe correspond a la mise en oeuvre des modeles sous
-// maille en VEF
-//
-
-// .SECTION  voir aussi
-// Mod_turb_hyd_ss_maille
-
+/*! @brief classe Mod_turb_hyd_ss_maille_VEF Cette classe correspond a la mise en oeuvre des modeles sous
+ *
+ *  maille en VEF
+ *
+ *  .SECTION  voir aussi
+ *  Mod_turb_hyd_ss_maille
+ *
+ */
 class Mod_turb_hyd_ss_maille_VEF : public Mod_turb_hyd_ss_maille
 {
 

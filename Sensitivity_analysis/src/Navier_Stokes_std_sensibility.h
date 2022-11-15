@@ -24,14 +24,13 @@
 
 #include <Navier_Stokes_std.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Navier_Stokes_std_sensibility
-//
-// <Description of class Navier_Stokes_std_sensibility>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Navier_Stokes_std_sensibility
+ *
+ *  <Description of class Navier_Stokes_std_sensibility>
+ *
+ *
+ *
+ */
 class Navier_Stokes_std_sensibility : public Navier_Stokes_std
 {
 

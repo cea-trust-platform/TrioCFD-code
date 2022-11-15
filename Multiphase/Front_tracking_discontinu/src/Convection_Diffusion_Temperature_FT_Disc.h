@@ -28,6 +28,8 @@
 #include <Ref_Transport_Interfaces_FT_Disc.h>
 #include <Ref_Navier_Stokes_std.h>
 #include <Ref_Fluide_Diphasique.h>
+#include <Assembleur.h>
+#include <Assembleur_base.h>
 
 ////Declare_liste(REF(Champ_base));
 
@@ -43,9 +45,13 @@ public:
   virtual void corriger_pas_de_temps(double dt);
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
   void         mettre_a_jour(double temps) override;
-
-  void         calculer_grad_t();
-  void         calculer_mpoint(Champ_base& mpoint);
+  int preparer_calcul() override;
+  double get_flux_to_face(const int num_face, const double distance_wall_interface) const;
+  double get_Twall_at_face(const int num_face) const;
+  double get_Twall_at_elem(const int elem) const;
+  void get_flux_and_Twall(const int num_face, const double distance_wall_interface,
+                          double& flux, double& Twall) const;
+  double get_Twall(const int num_face) const;
   virtual void suppression_interfaces(const IntVect& num_compo, const ArrOfInt& flags_compo_a_supprimer, int nouvelle_phase);
   void                associer_milieu_base(const Milieu_base& milieu) override;
   Milieu_base&        milieu() override;
@@ -53,7 +59,37 @@ public:
   const Champ_base& vitesse_pour_transport() const override;
   void    discretiser(void) override;
 
+  int get_phase() const;
+  void discretiser_assembleur_pression();
+  void completer() override;
+
+  const DoubleTab& get_mpoint() const
+  {
+    return mpoint_.valeur().valeurs();
+  };
+
+  const Transport_Interfaces_FT_Disc& get_eq_interface() const
+  {
+    return ref_eq_interface_.valeur();
+  };
+  Transport_Interfaces_FT_Disc& eq_interface()
+  {
+    return ref_eq_interface_.valeur();
+  };
+
+  ArrOfInt& mixed_elems()
+  {
+    return mixed_elems_;
+  };
+  ArrOfDouble& lost_fluxes()
+  {
+    return lost_fluxes_;
+  }
+  void calculer_grad_t();
+  void calculer_mpoint(Champ_base& mpoint);
+  void calculer_mpoint();
 protected:
+  void correct_mpoint();
   // Quelle phase cette equation concerne-t-elle ? 0 ou 1
   int phase_;
   //GB : Ajout de variables :
@@ -62,6 +98,9 @@ protected:
   Nom nom_sous_zone_;
   double temp_moy_ini_;
   bool maintien_temperature_;
+  bool is_prescribed_mpoint_;
+  double prescribed_mpoint_;
+  ArrOfInt correction_mpoint_diff_conv_energy_ ; // on attend trois flags 0 ou 1
 
   REF(Fluide_Diphasique) fluide_dipha_;
 
@@ -77,6 +116,27 @@ protected:
   // (grad T scalaire normale a l'interface, normale dirigee
   //  vers la phase 1)
   Champ_Fonc grad_t_;
+  Champ_Fonc mpoint_;
+  Champ_Fonc mpoint_uncorrected_;
   Champ_Inc vitesse_convection_;
+
+  // To make a divergence-free velocity extension :
+  int divergence_free_velocity_extension_;
+  Assembleur assembleur_pression_;
+  Champ_Inc la_pression; // Of course, it's a fake :D
+  Champ_Inc gradient_pression_;
+  Champ_Inc divergence_delta_U;
+  SolveurSys solveur_pression_;
+  Matrice matrice_pression_;
+  Zone_Cl_dis zcl_fictitious_;
+  Noms name_bc_opening_pressure_; // Liste de noms pour laisser sortir la source de div(delta u)
+
+  ArrOfInt mixed_elems_;
+  ArrOfDouble lost_fluxes_;
+  ArrOfDouble derivee_energy_;
+  ArrOfInt mixed_elems_diffu_;
+  ArrOfDouble lost_fluxes_diffu_;
+  ArrOfInt mixed_elems_conv_;
+  ArrOfDouble lost_fluxes_conv_;
 };
 #endif

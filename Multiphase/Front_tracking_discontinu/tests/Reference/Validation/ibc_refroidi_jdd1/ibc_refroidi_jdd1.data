@@ -185,30 +185,20 @@ Postraitement
        {
 	
 	
-	Postraitement_ft_lata post_cylindre_refroidi
-	{	
-		
-		dt_post 3.0
-		nom_fichier lata/post_cylindre_refroidi
-		format binaire
-		print
-                champs elements
-                {
-                        vitesse
-                        pression
-                        Divergence_U
-                        temperature
-                        indicatrice_cylindre
-                }
-		interfaces cylindre
-		{
-		champs sommets
-			{
-			courbure
-			}
-		}	
-               		
-	}
+	postraitement_ft_lata post_cylindre_refroidi { 
+    format Lata 
+    fichier lata/post_cylindre_refroidi 
+    champs dt_post 3.0 { 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+        temperature elem 
+        indicatrice_cylindre elem 
+    } 
+    interfaces cylindre { 
+        courbure som 
+    } 
+}
     } 
 
 }
@@ -216,3 +206,4 @@ Postraitement
 Solve pb
 End
 
+ 

@@ -200,38 +200,33 @@ remaillage {
 liste_postraitements
 {
 
-    Postraitement_ft_lata post1
-    {
-     dt_post 1.e-8
-     nom_fichier lata/post
-      champs elements
-             {
-          indicatrice_interf
-          indicatrice_cache_interf
-          vitesse_filtree_interf
-	  distance_interface_elem_interf
-	  normale_interface_interf
-	  SURFACE_INTERFACE_interf
-          temperature_thermique
-	  temperature_thermique_vapeur
-	  temperature_grad_thermique
-          vitesse
-	  vitesse_delta_interface
-	  pression_laplacien_d
-          pression
-          temperature_mpoint
-          temperature_mpointv
-	     }
-
-
-     interfaces interf
-           {
-         champs sommets { courbure }
-         champs elements { PE PE_LOCAL COMPO_CONNEXE }
-
-               }
-
-     }
+    postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 1.e-8 { 
+        indicatrice_interf elem 
+        indicatrice_cache_interf elem 
+        vitesse_filtree_interf elem 
+        distance_interface_elem_interf elem 
+        normale_interface_interf elem 
+        SURFACE_INTERFACE_interf elem 
+        temperature_thermique elem 
+        temperature_thermique_vapeur elem 
+        temperature_grad_thermique elem 
+        vitesse elem 
+        vitesse_delta_interface elem 
+        pression_laplacien_d elem 
+        pression elem 
+        temperature_mpoint elem 
+        temperature_mpointv elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        PE elem 
+        PE_LOCAL elem 
+        COMPO_CONNEXE elem 
+    } 
+}
 
 }
 # Resume_last_time binaire SAUV1/FTD_Boiling_bubble_pb.sauv #
@@ -240,3 +235,4 @@ liste_postraitements
 Solve pb
 FIN
 
+ 

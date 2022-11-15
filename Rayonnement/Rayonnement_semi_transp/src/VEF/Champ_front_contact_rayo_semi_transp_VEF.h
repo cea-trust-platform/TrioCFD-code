@@ -27,13 +27,12 @@
 #include <Ref_Modele_rayo_semi_transp.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Champ_front_contact_rayo_semi_transp_VEF
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Champ_front_contact_rayo_semi_transp_VEF
+ *
+ *  .SECTION
+ *
+ *
+ */
 class Champ_front_contact_rayo_semi_transp_VEF: public Champ_front_contact_VEF
 {
   Declare_instanciable(Champ_front_contact_rayo_semi_transp_VEF);

@@ -23,13 +23,14 @@
 #ifndef Nucleation_paroi_PolyMAC_P0_included
 #define Nucleation_paroi_PolyMAC_P0_included
 #include <Source_base.h>
+#include <Ref_Source_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Nucleation_paroi_PolyMAC_P0
-//      forme pi * d_nuc**2 * N_nuc
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Nucleation_paroi_PolyMAC_P0
+ *     forme pi * d_nuc**2 * N_nuc
+ *     Terme source d'aire interfaciale
+ *
+ *
+ */
 
 class Nucleation_paroi_PolyMAC_P0: public Source_base
 {
@@ -49,6 +50,8 @@ public :
 
 protected:
   int n_l = -1 ; // liquid phase
+
+  REF(Source_base) src_flux_interfacial_ ; // pour aller cherche qpi
 };
 
 #endif

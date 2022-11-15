@@ -44,21 +44,9 @@ Entree& Prolongement_face_face::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement de l'inconnue grossiere sur la frontiere fine
-//    pour inconnue VITESSE
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue VITESSE
+ *
+ */
 void Prolongement_face_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                                        const Frontiere& frontF,
                                        IntVect& connect,

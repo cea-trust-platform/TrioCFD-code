@@ -26,17 +26,13 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffu_laminaire
-//    Calsse derivant de la classe Diffu_totale_hyd__base et specifiant la valeur
-//    de la diffusivite_totale comme etant egale uniquement a la viscosite moleculaire
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Diffu_laminaire Calsse derivant de la classe Diffu_totale_hyd__base et specifiant la valeur
+ *
+ *     de la diffusivite_totale comme etant egale uniquement a la viscosite moleculaire
+ *
+ *
+ *
+ */
 class Diffu_laminaire : public Diffu_totale_hyd_base
 {
   Declare_instanciable(Diffu_laminaire);

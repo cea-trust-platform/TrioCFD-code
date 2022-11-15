@@ -35,13 +35,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Param;
 
-//.DESCRIPTION
-//
-// CLASS: ParoiVEF_TBLE
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: ParoiVEF_TBLE
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class ParoiVEF_TBLE : public Paroi_hyd_base_VEF, public Paroi_TBLE_QDM, public Paroi_log_QDM
 {
   Declare_instanciable_sans_constructeur(ParoiVEF_TBLE);

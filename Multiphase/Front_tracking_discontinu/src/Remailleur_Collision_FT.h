@@ -26,17 +26,13 @@
 #include <Remailleur_Collision_FT_base.h>
 #include <Deriv.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Remailleur_Collision_FT
-//     Cette classe represente un objet de remaillage generique pour des interfaces
-//     entrees en collision, et derive de de la classe Remailleur_Collision_FT_base
-//
-// .SECTION voir aussi
-//     Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Remailleur_Collision_FT Cette classe represente un objet de remaillage generique pour des interfaces
+ *
+ *      entrees en collision, et derive de de la classe Remailleur_Collision_FT_base
+ *
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
+ */
 Declare_deriv(Remailleur_Collision_FT_base);
 
 class Remailleur_Collision_FT : public DERIV(Remailleur_Collision_FT_base)

@@ -52,9 +52,9 @@ const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport() const
   return fluide().viscosite_dynamique();
 }
 
-// Description:
-//   appel Navier_Stokes_Turbulent::mettre_a_jour
-//  et Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour_modele
+/*! @brief appel Navier_Stokes_Turbulent::mettre_a_jour et Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour_modele
+ *
+ */
 void Navier_Stokes_Turbulent_QC::mettre_a_jour(double temps)
 {
   Navier_Stokes_Turbulent::mettre_a_jour(temps);
@@ -85,22 +85,11 @@ void Navier_Stokes_Turbulent_QC::discretiser()
   rho_la_vitesse_.valeur().nommer("rho_u");
 }
 
-// Description:
-//    Appels successifs a:
-//      Navier_Stokes_std::completer()
-//      Mod_Turb_Hyd::completer() [sur le membre concerne]
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Appels successifs a: Navier_Stokes_std::completer()
+ *
+ *       Mod_Turb_Hyd::completer() [sur le membre concerne]
+ *
+ */
 void Navier_Stokes_Turbulent_QC::completer()
 {
   if (le_fluide->a_gravite())
@@ -130,22 +119,12 @@ void Navier_Stokes_Turbulent_QC::completer()
   Navier_Stokes_Turbulent::completer();
 }
 
-// Description:
-//     cf Equation_base::preparer_calcul()
-//     Assemblage du solveur pression et
-//     initialisation de la pression.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief cf Equation_base::preparer_calcul() Assemblage du solveur pression et
+ *
+ *      initialisation de la pression.
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Navier_Stokes_Turbulent_QC::preparer_calcul()
 {
   return Navier_Stokes_Turbulent::preparer_calcul();
@@ -199,23 +178,15 @@ const Champ_base& Navier_Stokes_Turbulent_QC::get_champ(const Motcle& nom) const
 }
 
 
-// Description:
-//    Calcule la derivee en temps de l'inconnue vitesse,
-//    i.e. l'acceleration dU/dt et la renvoie.
-//    Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
-//    Calcule egalement la pression.
-// Precondition:
-// Parametre: DoubleTab& vpoint
-//    Signification: le tableau des valeurs de l'acceleration dU/dt
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: DoubleTab&
-//    Signification: le tableau des valeurs de l'acceleration (derivee de la vitesse)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la derivee en temps de l'inconnue vitesse, i.
+ *
+ * e. l'acceleration dU/dt et la renvoie.
+ *     Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
+ *     Calcule egalement la pression.
+ *
+ * @param (DoubleTab& vpoint) le tableau des valeurs de l'acceleration dU/dt
+ * @return (DoubleTab&) le tableau des valeurs de l'acceleration (derivee de la vitesse)
+ */
 DoubleTab& Navier_Stokes_Turbulent_QC::derivee_en_temps_inco(DoubleTab& vpoint)
 {
   return Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(*this,vpoint);

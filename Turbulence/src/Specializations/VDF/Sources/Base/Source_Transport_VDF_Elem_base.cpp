@@ -19,103 +19,21 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>
-#include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Source_Transport_VDF_Elem_base.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
+#include <Source_Transport_VDF_Elem_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
-#include <Pb_Hydraulique_Turbulent.h>
-#include <Fluide_Dilatable_base.h>
 #include <Champ_Uniforme.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
 #include <Constituant.h>
 #include <Champ_Face.h>
-#include <Param.h>
 #include <Debog.h>
 
 Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Transport_VDF_Elem_base", Source_base);
 
 Sortie& Source_Transport_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
-
-Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is )
-{
-  Param param(que_suis_je());
-  param.ajouter("C1_eps", &C1);
-  param.ajouter("C2_eps", &C2);
-  param.lire_avec_accolades(is);
-  Cerr << "C1_eps = " << C1 << finl;
-  Cerr << "C2_eps = " << C2 << finl;
-  return is;
-}
-
-Entree& Source_Transport_VDF_Elem_base::readOn_nothing(Entree& is)
-{
-  Param param(que_suis_je());
-  param.lire_avec_accolades(is);
-  return is ;
-}
-
-Entree& Source_Transport_VDF_Elem_base::readOn_anisotherme(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("C1_eps", &C1);
-  param.ajouter("C2_eps", &C2);
-  param.ajouter("C3_eps", &C3);
-  param.lire_avec_accolades(is);
-  Cerr << "C1_eps = " << C1 << finl;
-  Cerr << "C2_eps = " << C2 << finl;
-  Cerr << "C3_eps = " << C3 << finl;
-  return is ;
-}
-
-Entree& Source_Transport_VDF_Elem_base::readOn_concen(Entree& is) { return readOn_anisotherme(is); }
-
-Entree& Source_Transport_VDF_Elem_base::readOn_anisotherme_concen(Entree& is) { return readOn_anisotherme(is); }
-
-void Source_Transport_VDF_Elem_base::verifier_pb_keps(const Probleme_base& pb, const Nom& nom)
-{
-  if (!sub_type(Pb_Hydraulique_Turbulent,pb) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,pb)) error_keps(nom,pb.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_anisotherme(const Probleme_base& pb, const Nom& nom)
-{
-  if (!sub_type(Pb_Thermohydraulique_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_concen(const Probleme_base& pb, const Nom& nom)
-{
-  if (!sub_type(Pb_Hydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_anisotherme_concen(const Probleme_base& pb, const Nom& nom)
-{
-  if (!sub_type(Pb_Thermohydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)
-{
-  const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique
-  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
-  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_milieu_concen(const Probleme_base& pb, const Nom& nom)
-{
-  const Milieu_base& milieu = pb.equation(0).milieu(); // XXX : Attention pas eq 1 car Constituant derive pas de Fluide_base ! donc eq hydro
-  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
-  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
-}
-
-void Source_Transport_VDF_Elem_base::verifier_milieu_anisotherme_concen(const Probleme_base& pb, const Nom& nom)
-{
-  const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique
-  if (pb.nombre_d_equations()<3) error_keps(nom,pb.que_suis_je());
-  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
-}
+Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
 void Source_Transport_VDF_Elem_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
 {
@@ -123,48 +41,7 @@ void Source_Transport_VDF_Elem_base::associer_zones(const Zone_dis& zone_dis, co
   la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
-void Source_Transport_VDF_Elem_base::associer_pb(const Probleme_base& pb)
-{
-  eq_hydraulique = pb.equation(0);
-}
-
-void Source_Transport_VDF_Elem_base::associer_pb_anisotherme(const Probleme_base& pb)
-{
-  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(1).milieu());
-  beta_t = fluide.beta_t();
-  gravite = fluide.gravite();
-  eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
-}
-
-void Source_Transport_VDF_Elem_base::associer_pb_concen(const Probleme_base& pb)
-{
-  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(0).milieu()); // XXX : Attention pas eq 1 car Constituant derive pas de Fluide_base !
-  verifier_beta_concen(fluide);
-  beta_c = fluide.beta_c();
-  gravite = fluide.gravite();
-  eq_concentration = ref_cast(Convection_Diffusion_Concentration,pb.equation(1));
-}
-
-void Source_Transport_VDF_Elem_base::associer_pb_anisotherme_concen(const Probleme_base& pb)
-{
-  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(1).milieu()); // a partir de l'eq thermique
-  verifier_beta_concen(fluide);
-  beta_t = fluide.beta_t();
-  beta_c = fluide.beta_c();
-  gravite = fluide.gravite();
-  eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
-  eq_concentration = ref_cast(Convection_Diffusion_Concentration,pb.equation(2));
-}
-
-void Source_Transport_VDF_Elem_base::verifier_beta_concen(const Fluide_base& fluide)
-{
-  if (!fluide.beta_c().non_nul())
-    {
-      Cerr << "You forgot to define beta_co field in the fluid. It is mandatory when using the K-Eps model (buoyancy effects)." << finl;
-      Cerr << "If you don't want buoyancy effects, then specify: beta_co champ_uniforme 1 0." << finl;
-      Process::exit();
-    }
-}
+void Source_Transport_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
 
 DoubleTab& Source_Transport_VDF_Elem_base::calculer(DoubleTab& resu) const
 {
@@ -225,7 +102,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeurs();
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
@@ -247,7 +124,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
   const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
-  const DoubleVect& g = gravite->valeurs(), &volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& g = gravite->valeurs(), &volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const int nb_consti = eq_concentration->constituant().nb_constituants();
 
   // Ajout d'un espace virtuel au tableau G
@@ -285,7 +162,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
   const DoubleTab& diffu_turb = le_modele_scal_co.conductivite_turbulente().valeurs(), &tab_beta_t = ch_beta_temper.valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scal_co.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem(), &g = gravite->valeurs();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem(), &g = gravite->valeurs();
   const int nb_consti = eq_concentration->constituant().nb_constituants();
 
   // Ajout d'un espace virtuel au tableaux Gt et Gc

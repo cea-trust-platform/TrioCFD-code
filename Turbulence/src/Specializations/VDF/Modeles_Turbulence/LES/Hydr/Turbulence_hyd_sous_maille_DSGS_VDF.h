@@ -27,14 +27,14 @@
 
 #include <Turbulence_hyd_sous_maille_Smago_VDF.h>
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_DSGS_VDF
-// Cette classe derivee de Turbulence_hyd_sous_maille_Smago_VDF
-// correspond a la mise en oeuvre du modele sous maille dynamique en VDF
-//
-
-// .SECTION  voir aussi
-// Turbulence_hyd_sous_maille_Smago_VDF
-
+/*! @brief classe Turbulence_hyd_sous_maille_DSGS_VDF Cette classe derivee de Turbulence_hyd_sous_maille_Smago_VDF
+ *
+ *  correspond a la mise en oeuvre du modele sous maille dynamique en VDF
+ *
+ *  .SECTION  voir aussi
+ *  Turbulence_hyd_sous_maille_Smago_VDF
+ *
+ */
 class Turbulence_hyd_sous_maille_DSGS_VDF : public Turbulence_hyd_sous_maille_Smago_VDF
 {
 

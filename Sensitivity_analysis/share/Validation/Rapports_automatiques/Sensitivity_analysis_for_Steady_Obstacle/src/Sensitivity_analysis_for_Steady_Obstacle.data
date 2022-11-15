@@ -43,7 +43,11 @@ Pb_Hydraulique_sensibility pb_sensibilite
 Domaine dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare1.med 
+Lire_MED { 
+   domain dom 
+   file MeshWithSquare1.med 
+}
+
 # END MESH #
 
 # BEGIN PARTITION
@@ -64,25 +68,8 @@ END PARTITION #
 
 VEFPreP1B dis
 
-Fluide_Incompressible etat
-Read etat
-{
-        mu Champ_Uniforme 1 0.001
-        rho Champ_Uniforme 1 1.
-}
-
-Fluide_Incompressible sensibilite
-Read sensibilite
-{
-        mu Champ_Uniforme 1 0.001
-        rho Champ_Uniforme 1 1.
-}
-
 Associate pb_etat dom
-Associate pb_etat etat
-
 Associate pb_sensibilite dom
-Associate pb_sensibilite sensibilite
 
 Probleme_Couple pbc
 Associate pbc pb_etat
@@ -90,9 +77,15 @@ Associate pbc pb_sensibilite
 Associate pbc mon_schema
 Discretize pbc dis
 
-
 Read pb_etat
 {
+Fluide_Incompressible
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+
         Navier_Stokes_standard
         {       
 		
@@ -139,6 +132,13 @@ Read pb_etat
 
 Read pb_sensibilite
 {
+Fluide_Incompressible
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+
         Navier_Stokes_standard_sensibility
         {       
                 uncertain_variable { vitesse } # choice between vitesse and viscosity #
@@ -160,6 +160,7 @@ Read pb_sensibilite
         }
 	Post_processing
 	{
+	  DeprecatedKeepDuplicatedProbes 1
 	  Probes {
 			  U_H2_sens nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
 		          P_H2_sens grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  

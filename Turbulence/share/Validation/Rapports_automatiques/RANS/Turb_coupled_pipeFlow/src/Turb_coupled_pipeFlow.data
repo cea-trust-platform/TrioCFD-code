@@ -36,36 +36,8 @@ Lire sch
 	max_iter_implicite 100
 }
 
-
-Fluide_Incompressible fluide
-Lire fluide {
-        rho     champ_uniforme 1 900.
-        cp      champ_uniforme 1 1370.
-        beta_th champ_uniforme 1 2.74e-4
-        lambda  champ_uniforme 1 80.
-        mu      champ_uniforme 1 2.484e-4
-}
-
-Solide solide
-Lire solide
-{
-        rho     champ_uniforme 1 7800.
-        cp      champ_uniforme 1 530.
-        lambda  champ_uniforme 1 18.   
-}
-
-
-Champ_Uniforme gravite
-Lire gravite 3   0.  0. -9.81 
-Associer fluide gravite
-associer solide gravite
-
-
 Associer pb_fluide dom_fluide
-Associer pb_fluide fluide
-
 Associer pb_solide dom_solide
-Associer pb_solide solide
 
 Probleme_Couple pbc
 Associer pbc pb_fluide
@@ -75,6 +47,16 @@ Discretiser pbc dis
 
 Lire pb_fluide
 { 
+Fluide_Incompressible
+ {
+        rho     champ_uniforme 1 900.
+        cp      champ_uniforme 1 1370.
+        beta_th champ_uniforme 1 2.74e-4
+        lambda  champ_uniforme 1 80.
+        mu      champ_uniforme 1 2.484e-4
+        gravite Champ_Uniforme 3   0.  0. -9.81 
+}
+
  	Navier_Stokes_turbulent
  	{ 
        		solveur_pression petsc cholesky { } 
@@ -168,6 +150,13 @@ Lire pb_fluide
 
 Lire pb_solide
 {
+Solide
+{
+        rho     champ_uniforme 1 7800.
+        cp      champ_uniforme 1 530.
+        lambda  champ_uniforme 1 18.   
+}
+
 	Conduction
 	{
 		# Important de bien resoudre dT/dt car temperature solide instationnaire donc seuil bas #

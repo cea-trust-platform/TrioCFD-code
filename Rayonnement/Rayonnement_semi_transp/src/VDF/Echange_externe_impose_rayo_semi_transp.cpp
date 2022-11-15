@@ -28,42 +28,24 @@ Implemente_instanciable(Echange_externe_impose_rayo_semi_transp,"Paroi_Echange_e
 
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Echange_externe_impose_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
 }
 
 
-// Description:
-//    Lecture des parametres de la condition Echange_impose
-//    Lecture de l'emissivite de la paroi
-//    Lecture du coefficient A
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture des parametres de la condition Echange_impose Lecture de l'emissivite de la paroi
+ *
+ *     Lecture du coefficient A
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Echange_externe_impose_rayo_semi_transp::readOn(Entree& is)
 {
   Motcle motlu;

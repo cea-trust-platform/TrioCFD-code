@@ -25,15 +25,11 @@
 #include <MuLambda_TBLE_base.h>
 #include <Parser_U.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe MuLambda_TBLE_Fcts_T
-//    Classe abstraite calculant Mu et Lambda suivant une fonction de T
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe MuLambda_TBLE_Fcts_T Classe abstraite calculant Mu et Lambda suivant une fonction de T
+ *
+ *
+ *
+ */
 class MuLambda_TBLE_Fcts_T : public MuLambda_TBLE_base
 {
   Declare_instanciable(MuLambda_TBLE_Fcts_T);

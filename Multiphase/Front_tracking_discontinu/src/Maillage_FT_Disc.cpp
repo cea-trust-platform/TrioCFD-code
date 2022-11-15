@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Maillage_FT_Disc.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/35
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Maillage_FT_Disc.h>
 #include <Deriv_Maillage_FT_Disc.h>
@@ -36,7 +29,7 @@
 #include <Comm_Group.h>
 #include <SFichier.h>
 #include <LecFicDistribue.h>
-#include <Probleme_base.h>
+#include <Probleme_FT_Disc_gen.h>
 #include <Dirichlet_entree_fluide.h>
 #include <Dirichlet_homogene.h>
 #include <Debog.h>
@@ -44,6 +37,13 @@
 #include <Param.h>
 #include <stat_counters.h>
 
+#if TCL_MODEL
+#include <Zone_VDF.h>
+#include <Zone_Cl_VDF.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Dirichlet_paroi_defilante.h>
+#include <Schema_Temps_base.h>
+#endif
 //#define PATCH_HYSTERESIS_V2
 //#define PATCH_HYSTERESIS_V3
 #include<ArrOfBit.h>
@@ -96,12 +96,13 @@ Implemente_instanciable_sans_constructeur(Maillage_FT_Disc,"Maillage_FT_Disc",En
 
 Implemente_deriv(Maillage_FT_Disc);
 
-// Description:
-//  Pour chaque sommet du maillage, s'il est sur un bord, on calcule
-//  costheta min et max (hysteresis) correspondant a la condition aux limites ou
-//  se trouve le sommet.
-//  L'angle est constant par face de bord... possibilite de faire mieux
-//  pour un champ xyz
+/*! @brief Pour chaque sommet du maillage, s'il est sur un bord, on calcule costheta min et max (hysteresis) correspondant a la condition aux limites ou
+ *
+ *   se trouve le sommet.
+ *   L'angle est constant par face de bord... possibilite de faire mieux
+ *   pour un champ xyz
+ *
+ */
 void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 {
   const Equation_base& eq = equation_transport();
@@ -179,14 +180,17 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
   desc_sommets_.echange_espace_virtuel(costheta);
 }
 
-// Description: renvoie l'angle solide qui sert a calculer les surfaces et
-//  les volumes en bidim_axi
+/*! @brief renvoie l'angle solide qui sert a calculer les surfaces et les volumes en bidim_axi
+ *
+ */
 double Maillage_FT_Disc::angle_bidim_axi()
 {
   return M_PI * 2.;
 }
 
-// Description: constructeur par defaut.
+/*! @brief constructeur par defaut.
+ *
+ */
 Maillage_FT_Disc::Maillage_FT_Disc() :
   statut_(RESET),
   mesh_state_tag_(0),
@@ -201,10 +205,13 @@ Maillage_FT_Disc::Maillage_FT_Disc() :
   mesh_data_cache_.typer("Maillage_FT_Disc_Data_Cache");
 }
 
-// Description: renvoie une ref non const au cache de valeurs calculees
-//  sur le maillage (courbure, surface, normale, ...)
-//  On fait un cast de l'objet en non const (voir commentaire sur
-//  mesh_data_cache_ dans Maillage_FT_Disc.h)
+/*! @brief renvoie une ref non const au cache de valeurs calculees sur le maillage (courbure, surface, normale, .
+ *
+ * ..)
+ *   On fait un cast de l'objet en non const (voir commentaire sur
+ *   mesh_data_cache_ dans Maillage_FT_Disc.h)
+ *
+ */
 Maillage_FT_Disc_Data_Cache& Maillage_FT_Disc::mesh_data_cache() const
 {
   const Maillage_FT_Disc_Data_Cache *ptr = &mesh_data_cache_.valeur();
@@ -212,13 +219,15 @@ Maillage_FT_Disc_Data_Cache& Maillage_FT_Disc::mesh_data_cache() const
   return *(Maillage_FT_Disc_Data_Cache *) ptr;
 }
 
-// Description:
-//  Cette methode change le statut du maillage et
-//  invalide le cache de valeurs calculees (surface, courbure, ...)
-//  Il faut l'appeler chaque fois que le maillage est modifie
-//  et avant le prochain appel a get_update_xxx.
-//  Cette methode est appelee par les methode publiques non constantes
-//  de Maillage_FT_Disc et par les methodes de Remaillage, ...
+/*! @brief Cette methode change le statut du maillage et invalide le cache de valeurs calculees (surface, courbure, .
+ *
+ * ..)
+ *   Il faut l'appeler chaque fois que le maillage est modifie
+ *   et avant le prochain appel a get_update_xxx.
+ *   Cette methode est appelee par les methode publiques non constantes
+ *   de Maillage_FT_Disc et par les methodes de Remaillage, ...
+ *
+ */
 void Maillage_FT_Disc::maillage_modifie(Statut_Maillage nouveau_statut)
 {
   //Process::Journal()<<"maillage_modifie de "<<statut_<<" a "<<nouveau_statut<<finl;
@@ -228,14 +237,18 @@ void Maillage_FT_Disc::maillage_modifie(Statut_Maillage nouveau_statut)
   mesh_state_tag_++;
 }
 
-// Description: La construction par copie est interdite !
+/*! @brief La construction par copie est interdite !
+ *
+ */
 Maillage_FT_Disc::Maillage_FT_Disc(const Maillage_FT_Disc&): Ensemble_Lagrange_base()
 {
   assert(0);
   exit();
 }
 
-// Description: L'operateur = est interdit !
+/*! @brief L'operateur = est interdit !
+ *
+ */
 const Maillage_FT_Disc& Maillage_FT_Disc::operator=(const Maillage_FT_Disc&)
 {
   assert(0);
@@ -535,20 +548,11 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
   fic.close();
 }
 
-// Description:
-//    Cette fonction permet de lire les parametres pour le maillage des interfaces
-// Precondition:
-// Parametre: is
-//    Signification: flot d'entree
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: Entree
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction permet de lire les parametres pour le maillage des interfaces
+ *
+ * @param (is) flot d'entree
+ * @return (Entree) le flot d'entree
+ */
 Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
 {
   Cerr<<"Lecture des parametres de remaillage (Remaillage_FT::lire_param_remaillage)"<<finl;
@@ -562,7 +566,7 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   param.dictionnaire("standard", (int)STANDARD);
   param.dictionnaire("mirror", (int)MIRROR);
   param.dictionnaire("improved", (int)IMPROVED);
-  param.dictionnaire("none", (int)none);
+  param.dictionnaire("none", (int)NONE);
   param.dictionnaire("weighted", (int)WEIGHTED);
   param.dictionnaire("hysteresis", (int)HYSTERESIS);
   param.ajouter("weight_CL",&weight_CL_);
@@ -571,10 +575,10 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   return is;
 }
 
-// Description: on remplit refequation_transport_, schema_comm_zone_
-//              desc_sommets_.comm_group_ et desc_facettes_.comm_group_
-// Precondition: la zone_dis de l'equation doit etre complete (joints)
-
+/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
+ *
+ * Precondition: la zone_dis de l'equation doit etre complete (joints)
+ */
 void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation)
 {
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc,equation);
@@ -605,7 +609,9 @@ void Maillage_FT_Disc::associer_zone_dis_parcours(const Zone_dis& zone_dis, cons
   schema_comm_zone_.set_send_recv_pe_list(pe_list, pe_list);
 }
 
-// Description: vide toutes les structures du maillage, le statut passe a RESET.
+/*! @brief vide toutes les structures du maillage, le statut passe a RESET.
+ *
+ */
 void Maillage_FT_Disc::reset()
 {
   sommets_.resize(0,dimension);
@@ -624,9 +630,11 @@ void Maillage_FT_Disc::reset()
   maillage_modifie(RESET);
 }
 
-// Description:
-//  Recopie une partie du maillage source dans *this.
-//  Si niveau_copie == MINIMAL, seuls les membres de l'etat minimal sont copies.
+/*! @brief Recopie une partie du maillage source dans *this.
+ *
+ * Si niveau_copie == MINIMAL, seuls les membres de l'etat minimal sont copies.
+ *
+ */
 void Maillage_FT_Disc::recopie(const Maillage_FT_Disc& source, Statut_Maillage niveau_copie)
 {
   reset();
@@ -803,9 +811,12 @@ void Maillage_FT_Disc::ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int
 
   check_mesh();
 }
-// Description: Remplit la structure intersections_elem_facettes_.
-// Le statut passe a PARCOURU.
-// Precondition: statut >= MINIMAL
+/*! @brief Remplit la structure intersections_elem_facettes_.
+ *
+ * Le statut passe a PARCOURU.
+ *
+ * Precondition: statut >= MINIMAL
+ */
 void Maillage_FT_Disc::parcourir_maillage()
 {
   if (statut_==RESET)
@@ -827,9 +838,12 @@ void Maillage_FT_Disc::parcourir_maillage()
 
 }
 
-// Description: Complete les structures de donnees du maillage.
-// Le statut passe a COMPLET.
-// Precondition: statut >= MINIMAL
+/*! @brief Complete les structures de donnees du maillage.
+ *
+ * Le statut passe a COMPLET.
+ *
+ * Precondition: statut >= MINIMAL
+ */
 void Maillage_FT_Disc::completer_maillage()
 {
   assert(statut_ != RESET);
@@ -845,19 +859,19 @@ void Maillage_FT_Disc::completer_maillage()
 }
 
 
-// Description:
-// Calcul de la fonction indicatrice (on suppose que "indicatrice"
-// a la structure d'un tableau de valeurs aux elements, on ne remplit
-// que les elements reels).
-// La fraction volumique de la phase 1 dans les elements traverses par
-// une interface est determinee a partir des donnees du parcours dans
-//  "intersections_elem_facettes_".
-// Les autres elements sont remplis par une methode heuristique utilisant
-// l'indicatrice_precedente.
-//
-// Precondition: statut >= PARCOURU
-// Attention, l'algorithme est concu de sorte que l'on puisse utiliser le
-// meme tableau "indicatrice" et "indicatrice_precedente".
+/*! @brief Calcul de la fonction indicatrice (on suppose que "indicatrice" a la structure d'un tableau de valeurs aux elements, on ne remplit
+ *
+ *  que les elements reels).
+ *  La fraction volumique de la phase 1 dans les elements traverses par
+ *  une interface est determinee a partir des donnees du parcours dans
+ *   "intersections_elem_facettes_".
+ *  Les autres elements sont remplis par une methode heuristique utilisant
+ *  l'indicatrice_precedente.
+ *
+ * Precondition: statut >= PARCOURU
+ *  Attention, l'algorithme est concu de sorte que l'on puisse utiliser le
+ * meme tableau "indicatrice" et "indicatrice_precedente".
+ */
 void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
                                           const DoubleVect& indicatrice_precedente)
 {
@@ -917,13 +931,14 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
                 const int face = elem_faces(i, j);
                 const int elem = face_voisins(face, 0) + face_voisins(face, 1) - i;
                 if (elem >= 0 && elem < nb_elem_tot)
-                  elements_calcules.clearbit(elem);
+                  elements_calcules.clearbit(elem); // Voisin d'une interf => considere comme non calcule.
               }
           }
       }
   }
 
   // Ajout des contributions de volume
+  // Les elements traverses par l'interface deviennent des elements_calcules
   {
     const ArrOfInt& index_elem =
       intersections_elem_facettes_.index_elem();
@@ -946,7 +961,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
           somme_contrib -= 1.;
         while (somme_contrib < 0.)
           somme_contrib += 1.;
-        if (somme_contrib > 0.)
+        if (somme_contrib > 0.) // Pour ne pas faire les elements pures
           {
             indicatrice[i] = somme_contrib;
             elements_calcules.setbit(i);
@@ -956,6 +971,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
   // Calcul de l'indicatrice au voisinage de l'interface a l'aide
   // de la fonction distance.
+  // Il reste dans elements_calcules[i] == 0 les voisins de l'interface
   {
     const DoubleTab& distance = equation_transport().get_update_distance_interface().valeurs();
     int i;
@@ -963,7 +979,6 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
     for (i = 0; i < nb_elem; i++)
       {
-
 
         if (elements_calcules[i] == 0)
           {
@@ -1025,11 +1040,16 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
             somme += indicatrice[elem_voisin];
             count++;
           }
+        // Bug fix Salim Hamidi 2019/25/02
         // Si count==1 l'algo etait considere non pertinent... pas toujours correction du bug
         // Correction testee en VDF mais deux cas test VEF ont fait des ecarts
         if(count == 1)
           {
-            elems_to_change.append_line(elem, somme);
+            // TODO: A investiguer
+            // Elem est une maille diphasique.
+            // Pourquoi lui met-on la valeur de somme qui vaut ici indicatrice[elem_voisin]
+            // qui est pure (indicatrice[elem_voisin] vaut 0 ou 1)
+            elems_to_change.append_line(elem, (int)std::lrint(somme));
           }
         if (count > 1)
           {
@@ -1066,14 +1086,12 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
   statistiques().end_count(stat_counter);
 }
 
-// Description:
-//  Deplace les sommets de l'interface d'un vecteur "deplacement" fourni,
-//  Change eventuellement les sommets de processeur, cree eventuellement
-//  des lignes de contact et detecte les collisions.
-// Parametre:     deplacement
-// Signification: un tableau de taille (nb_sommets(), Objet_U::dimension)
-//  contenant le vecteur deplacement de chaque sommet.
-//  Les deplacements des sommets virtuels sont ignores.
+/*! @brief Deplace les sommets de l'interface d'un vecteur "deplacement" fourni, Change eventuellement les sommets de processeur, cree eventuellement
+ *
+ *   des lignes de contact et detecte les collisions.
+ *
+ * @param (deplacement) un tableau de taille (nb_sommets(), Objet_U::dimension) contenant le vecteur deplacement de chaque sommet. Les deplacements des sommets virtuels sont ignores.
+ */
 void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
 {
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Transporter_maillage", "FrontTracking");
@@ -1268,7 +1286,7 @@ void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms
   if (nb_som_tot>chunk_size)
     {
       Cerr << "The maximum of particules that you can use in your datafile is equal to " << chunk_size/nbproc << " / processor" << finl;
-      Cerr << "If you want exceed this limitation, you must parallelize your calculation with an apropriate number of processor" << finl;
+      Cerr << "If you want to exceed this limitation, you must parallelize your calculation with an apropriate number of processor" << finl;
       exit();
     }
 
@@ -1517,13 +1535,15 @@ double Maillage_FT_Disc::calcul_normale_3D(int num_facette, double norme[3]) con
   return l*0.5;
 }
 
-// Description:
-//  Calcule la grandeur demandee, stocke le resultat dans un tableau
-//  interne a la classe et renvoie le resultat. Si le maillage
-//  n'a pas change depuis le dernier calcul (mesh_tag identique)
-//  alors on ne recalcule pas la valeur.
-//  Attention, cette methode doit etre appelee simultanement sur
-//  tous les processeurs.
+/*! @brief Calcule la grandeur demandee, stocke le resultat dans un tableau interne a la classe et renvoie le resultat.
+ *
+ * Si le maillage
+ *   n'a pas change depuis le dernier calcul (mesh_tag identique)
+ *   alors on ne recalcule pas la valeur.
+ *   Attention, cette methode doit etre appelee simultanement sur
+ *   tous les processeurs.
+ *
+ */
 const ArrOfDouble& Maillage_FT_Disc::get_update_surface_facettes() const
 {
   Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
@@ -1538,13 +1558,15 @@ const ArrOfDouble& Maillage_FT_Disc::get_update_surface_facettes() const
   return data_cache.surface_facettes_;
 }
 
-// Description:
-//  Calcule la grandeur demandee, stocke le resultat dans un tableau
-//  interne a la classe et renvoie le resultat. Si le maillage
-//  n'a pas change depuis le dernier calcul (mesh_tag identique)
-//  alors on ne recalcule pas la valeur.
-//  Attention, cette methode doit etre appelee simultanement sur
-//  tous les processeurs.
+/*! @brief Calcule la grandeur demandee, stocke le resultat dans un tableau interne a la classe et renvoie le resultat.
+ *
+ * Si le maillage
+ *   n'a pas change depuis le dernier calcul (mesh_tag identique)
+ *   alors on ne recalcule pas la valeur.
+ *   Attention, cette methode doit etre appelee simultanement sur
+ *   tous les processeurs.
+ *
+ */
 const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
 {
   Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
@@ -1559,13 +1581,27 @@ const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
   return data_cache.normale_facettes_;
 }
 
-// Description:
-//  Calcule la grandeur demandee, stocke le resultat dans un tableau
-//  interne a la classe et renvoie le resultat. Si le maillage
-//  n'a pas change depuis le dernier calcul (mesh_tag identique)
-//  alors on ne recalcule pas la valeur.
-//  Attention, cette methode doit etre appelee simultanement sur
-//  tous les processeurs.
+const ArrOfDouble& Maillage_FT_Disc::get_surface_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.surface_facettes_;
+}
+
+const DoubleTab& Maillage_FT_Disc::get_normale_facettes() const
+{
+  const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
+  return data_cache.normale_facettes_;
+}
+
+/*! @brief Calcule la grandeur demandee, stocke le resultat dans un tableau interne a la classe et renvoie le resultat.
+ *
+ * Si le maillage
+ *   n'a pas change depuis le dernier calcul (mesh_tag identique)
+ *   alors on ne recalcule pas la valeur.
+ *   Attention, cette methode doit etre appelee simultanement sur
+ *   tous les processeurs.
+ *
+ */
 const ArrOfDouble& Maillage_FT_Disc::get_update_courbure_sommets() const
 {
   Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
@@ -1584,9 +1620,11 @@ const ArrOfDouble& Maillage_FT_Disc::get_update_courbure_sommets() const
   return data_cache.courbure_sommets_;
 }
 
-// Description:
-//  Calcul de la surface et de la normale aux facettes du maillage.
-//  Stocke le resultat dans les tableaux en parametres.
+/*! @brief Calcul de la surface et de la normale aux facettes du maillage.
+ *
+ * Stocke le resultat dans les tableaux en parametres.
+ *
+ */
 void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& normale) const
 {
   assert(statut_ >= MINIMAL);
@@ -1597,7 +1635,6 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
   normale.resize(nbfacettes, dimension);
   if (dimension == 2)
     {
-      // On n'a pas encore decide de la definition de la surface en axi
       for (i = 0; i < nbfacettes; i++)
         {
           int s0 = facettes_(i,0);
@@ -1605,6 +1642,15 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
           double dx = sommets_(s1,0) - sommets_(s0,0);
           double dy = sommets_(s1,1) - sommets_(s0,1);
           double l = sqrt(dx * dx + dy * dy);
+          double inv_l;
+          if (l == 0.)
+            inv_l = 1.;
+          else
+            inv_l = 1. / l;
+
+          if (bidim_axi)
+            l *= angle_bidim_axi()*(sommets_(s1,0) + sommets_(s0,0))*0.5;
+
           surface[i] = l;
           if (l == 0.)
             {
@@ -1612,7 +1658,11 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
               dy = -1.;
               nfacettes_nulles++;
             }
-          double inv_l = 1. / l;
+          // GB. 2020/17/06. In order to create a unit "normale",
+          // it is necessary to have inv_l as 1./sqrt(dx * dx + dy * dy)
+          // and not as : 1. / l after the correction!
+          // That is why 'inv_l' is calculated before 'if (bidim_axi)'
+          // double inv_l = 1. / l;
           normale(i, 0) = - dy * inv_l;
           normale(i, 1) = dx * inv_l;
         }
@@ -1649,18 +1699,23 @@ void Maillage_FT_Disc::calculer_voisins()
   //assert(0);
 }
 
-// Description: renvoie le tableau des sommets (reels et virtuels)
-// dimension(0) = nombre de sommets,
-// dimension(1) = dimension du probleme (2 ou 3)
-// contenu = coordonnees des sommets
+/*! @brief renvoie le tableau des sommets (reels et virtuels) dimension(0) = nombre de sommets,
+ *
+ *  dimension(1) = dimension du probleme (2 ou 3)
+ *  contenu = coordonnees des sommets
+ *
+ */
 const DoubleTab& Maillage_FT_Disc::sommets() const
 {
   assert(statut_ >= MINIMAL);
   return sommets_;
 }
 
-// Description: renvoie le nombre de sommets (reels et virtuels)
-//  (egal a sommets().dimension(0))
+/*! @brief renvoie le nombre de sommets (reels et virtuels) (egal a sommets().
+ *
+ * dimension(0))
+ *
+ */
 int Maillage_FT_Disc::nb_sommets() const
 {
   if (statut_< MINIMAL)
@@ -1669,18 +1724,23 @@ int Maillage_FT_Disc::nb_sommets() const
   return sommets_.dimension(0);
 }
 
-// Description: renvoie le tableau des facettes (reelles et virtuelles)
-// dimension(0) = nombre de facettes,
-// dimension(1) = nombre de sommets par facette (2 en 2D, 3 en 3D)
-// contenu = numero des sommets de chaque facette dans le tableau des sommets
+/*! @brief renvoie le tableau des facettes (reelles et virtuelles) dimension(0) = nombre de facettes,
+ *
+ *  dimension(1) = nombre de sommets par facette (2 en 2D, 3 en 3D)
+ *  contenu = numero des sommets de chaque facette dans le tableau des sommets
+ *
+ */
 const IntTab& Maillage_FT_Disc::facettes() const
 {
   assert(statut_ >= MINIMAL);
   return facettes_;
 }
 
-// Description: renvoie le nombre de facettes (reelles et virtuelles)
-//  (egal a facettes().dimension(0))
+/*! @brief renvoie le nombre de facettes (reelles et virtuelles) (egal a facettes().
+ *
+ * dimension(0))
+ *
+ */
 int Maillage_FT_Disc::nb_facettes() const
 {
   if (statut_< MINIMAL)
@@ -1689,14 +1749,15 @@ int Maillage_FT_Disc::nb_facettes() const
   return facettes_.dimension(0);
 }
 
-// Description:
-//  Cette methode teste si les facettes sont voisines :
-//  Des facettes sont voisines si :
-//    -elles ont 1 sommet commun en 2D
-//    -elles ont 2 sommets communs en 3D
-//  La methode renvoie -1 si les facettes ne sont pas voisines.
-//  Elle renvoie l'indice (local) de l'arete (dans fa70) par laquelle les facettes sont voisines
-// A OPTIMISER eventuellement
+/*! @brief Cette methode teste si les facettes sont voisines : Des facettes sont voisines si :
+ *
+ *     -elles ont 1 sommet commun en 2D
+ *     -elles ont 2 sommets communs en 3D
+ *   La methode renvoie -1 si les facettes ne sont pas voisines.
+ *   Elle renvoie l'indice (local) de l'arete (dans fa70) par laquelle les facettes sont voisines
+ *  A OPTIMISER eventuellement
+ *
+ */
 int Maillage_FT_Disc::facettes_voisines(int fa70, int fa71,
                                         int& iarete0, int& iarete1) const
 {
@@ -1865,43 +1926,54 @@ int Maillage_FT_Disc::calculer_voisinage_facettes(IntTab& fa7Voisines,
   return res;
 }
 
-// Description:
-// Pour postraitement uniquement : la signification precise
-// des drapeaux est de la cuisine interne a la classe...
+/*! @brief Pour postraitement uniquement : la signification precise des drapeaux est de la cuisine interne a la classe.
+ *
+ * ..
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::drapeaux_sommets() const
 {
   assert(statut_ >= MINIMAL);
   return drapeaux_sommets_;
 }
 
-// Description: renvoie le descripteur des sommets (espace_distant/virtuel)
+/*! @brief renvoie le descripteur des sommets (espace_distant/virtuel)
+ *
+ */
 const Desc_Structure_FT& Maillage_FT_Disc::desc_sommets() const
 {
   assert(statut_ >= MINIMAL);
   return desc_sommets_;
 }
-// Description: renvoie le descripteur des facettes (espace_distant/virtuel)
+/*! @brief renvoie le descripteur des facettes (espace_distant/virtuel)
+ *
+ */
 const Desc_Structure_FT& Maillage_FT_Disc::desc_facettes() const
 {
   assert(statut_ >= MINIMAL);
   return desc_facettes_;
 }
 
-// Description: pour postraitement, renvoie le numero du PE proprietaire des sommets
+/*! @brief pour postraitement, renvoie le numero du PE proprietaire des sommets
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::sommet_PE_owner() const
 {
   assert(statut_ >= MINIMAL);
   return sommet_PE_owner_;
 }
-// Description: pour postraitement, renvoie le numero des sommets sur le PE proprietaire des sommets
+/*! @brief pour postraitement, renvoie le numero des sommets sur le PE proprietaire des sommets
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::sommet_num_owner() const
 {
   assert(statut_ >= MINIMAL);
   return sommet_num_owner_;
 }
 
-// Description: pour postraitement, remplit le tableau en parametre avec
-// le numero du PE proprietaire de chaque facette.
+/*! @brief pour postraitement, remplit le tableau en parametre avec le numero du PE proprietaire de chaque facette.
+ *
+ */
 void Maillage_FT_Disc::facette_PE_owner(ArrOfInt& facette_pe) const
 {
   assert(statut_ >= MINIMAL);
@@ -1909,45 +1981,54 @@ void Maillage_FT_Disc::facette_PE_owner(ArrOfInt& facette_pe) const
   desc_facettes_.remplir_element_pe(facette_pe);
 }
 
-// Description: pour postraitement, renvoie sommet_elem_
+/*! @brief pour postraitement, renvoie sommet_elem_
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::sommet_elem() const
 {
   assert(statut_ >= MINIMAL);
   return sommet_elem_;
 }
 
-// Description: pour postraitement, renvoie sommet_face_bord_
+/*! @brief pour postraitement, renvoie sommet_face_bord_
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::sommet_face_bord() const
 {
   assert(statut_ >= MINIMAL);
   return sommet_face_bord_;
 }
 
-// Description:
-//  return temps_physique_
-// (temps_physique_ ne sert a rien en interne...)
+/*! @brief return temps_physique_ (temps_physique_ ne sert a rien en interne.
+ *
+ * ..)
+ *
+ */
 double Maillage_FT_Disc::temps() const
 {
   return temps_physique_;
 }
 
-// Description:
-//  return temps_physique_ = t
+/*! @brief return temps_physique_ = t
+ *
+ */
 double Maillage_FT_Disc::changer_temps(double t)
 {
   temps_physique_ = t;
   return t;
 }
 
-// Description:
-//  return mesh_state_tag_
+/*! @brief return mesh_state_tag_
+ *
+ */
 int Maillage_FT_Disc::get_mesh_tag() const
 {
   return mesh_state_tag_;
 }
 
-// Description:
-//  return som_init_util_
+/*! @brief return som_init_util_
+ *
+ */
 const ArrOfInt& Maillage_FT_Disc::som_init_util() const
 {
   return som_init_util_;
@@ -1973,7 +2054,7 @@ int Maillage_FT_Disc::sauvegarder(Sortie& os) const
       // On augmente la precision d'ecriture du maillage Front Tracking
       // au moment de l'ecriture et on restaure l'ancienne apres
       // Probleme rencontre sur la FA819
-      int old_precision = os.get_ostream().precision(14);
+      int old_precision = (int)os.get_ostream().precision(14);
       os << sommets_;
       bytes += 8 * sommets_.size_array();
       os.precision(old_precision);
@@ -2056,9 +2137,9 @@ int Maillage_FT_Disc::reprendre(Entree& is)
   return 1;
 }
 
-// Description:
-//fonction qui cree un nouveau sommet par copie d'une existant
-//utilise dans Remailleur_Collision_FT_Collision_Seq
+/*! @brief fonction qui cree un nouveau sommet par copie d'une existant utilise dans Remailleur_Collision_FT_Collision_Seq
+ *
+ */
 int Maillage_FT_Disc::copier_sommet(int som)
 {
   maillage_modifie(MINIMAL);
@@ -2108,30 +2189,25 @@ int Maillage_FT_Disc::copier_sommet_interne(int som)
 }
 
 
-// Description:
-// Envoi des sommets dont le numero est donne dans liste_sommets
-// au processeur dont le numero est donne dans liste_pe (on cree un
-// sommet virtuel sur ce processeur).  Parmi les sommets de la liste_sommets,
-// seuls ceux qui ne sont pas encore dans l'espace virtuel sont crees.
-// Parametre:     liste_sommets
-// Signification: une liste de numeros de sommets REELS qui peut contenir
-//                des doublons.
-// Parametre:     liste_pe
-// Signification: une liste de meme taille que liste_sommets contenant
-//                le numero du processeur sur lequel il faut creer un noeud
-//                virtuel. Le processeur ne doit pas etre moi.
-// Parametre:     comm
-// Signification: un schema de comm valide, dans lequel send_pe_list contient
-//                au moins les processeurs cites dans liste_pe.
-// Precondition: Les membres suivants doivent etre valides:
-//  * sommets_,
-//  * desc_sommets_,
-//  * drapeaux_sommets_,
-//  * sommet_elem_,
-//  * sommet_PE_owner_,
-//  * sommet_num_owner_
-// Postcondition: Les memes tableaux sont valides a la sortie de la fonction.
-
+/*! @brief Envoi des sommets dont le numero est donne dans liste_sommets au processeur dont le numero est donne dans liste_pe (on cree un
+ *
+ *  sommet virtuel sur ce processeur).  Parmi les sommets de la liste_sommets,
+ *  seuls ceux qui ne sont pas encore dans l'espace virtuel sont crees.
+ *
+ * Precondition: Les membres suivants doivent etre valides:
+ * * sommets_,
+ * * desc_sommets_,
+ * * drapeaux_sommets_,
+ * * sommet_elem_,
+ * * sommet_PE_owner_,
+ * * sommet_num_owner_
+ *
+ * Postcondition: Les memes tableaux sont valides a la sortie de la fonction.
+ *
+ * @param (liste_sommets) une liste de numeros de sommets REELS qui peut contenir des doublons.
+ * @param (liste_pe) une liste de meme taille que liste_sommets contenant le numero du processeur sur lequel il faut creer un noeud virtuel. Le processeur ne doit pas etre moi.
+ * @param (comm) un schema de comm valide, dans lequel send_pe_list contient au moins les processeurs cites dans liste_pe.
+ */
 void Maillage_FT_Disc::creer_sommets_virtuels(const ArrOfInt& liste_sommets,
                                               const ArrOfInt& liste_pe,
                                               const Schema_Comm_FT& comm)
@@ -2215,20 +2291,16 @@ void Maillage_FT_Disc::creer_sommets_virtuels(const ArrOfInt& liste_sommets,
   if (Comm_Group::check_enabled()) check_sommets();
 }
 
-// Description:
-//  Cree chez moi les sommets virtuels specifies par le couple (pe,num)
-//  si le sommet n'existe pas encore.
-//  Le sommet est suppose etre reel sur "pe" et le sommet virtuel est cree sur "me()".
-//  (c'est l'inverse de "creer_sommets_virtuels" qui cree des sommets virtuels chez
-//   chez le pe demande).
-//  Fait appel a creer_sommets_virtuels, donc meme preconditions.
-// Parametre:     request_sommets_pe
-// Signification: une liste de numeros de processeurs DIFFERENTS de me()
-// Parametre:     request_sommets_num
-// Signification: une liste de numeros de sommets. Chaque couple pe[i],num[i]
-//                designe un sommet reel d'indice "num" sur le processeur "pe".
-//                Pour chaque sommet, on cree un sommet virtuel sur me() s'il
-//                n'existe pas deja.
+/*! @brief Cree chez moi les sommets virtuels specifies par le couple (pe,num) si le sommet n'existe pas encore.
+ *
+ *   Le sommet est suppose etre reel sur "pe" et le sommet virtuel est cree sur "me()".
+ *   (c'est l'inverse de "creer_sommets_virtuels" qui cree des sommets virtuels chez
+ *    chez le pe demande).
+ *   Fait appel a creer_sommets_virtuels, donc meme preconditions.
+ *
+ * @param (request_sommets_pe) une liste de numeros de processeurs DIFFERENTS de me()
+ * @param (request_sommets_num) une liste de numeros de sommets. Chaque couple pe[i],num[i] designe un sommet reel d'indice "num" sur le processeur "pe". Pour chaque sommet, on cree un sommet virtuel sur me() s'il n'existe pas deja.
+ */
 void Maillage_FT_Disc::creer_sommets_virtuels_numowner(const ArrOfInt& request_sommets_pe,
                                                        const ArrOfInt& request_sommets_num)
 {
@@ -2322,24 +2394,26 @@ void Maillage_FT_Disc::creer_sommets_virtuels_numowner(const ArrOfInt& request_s
   }
 }
 
-// Description:
-// Realise l'ensemble des echanges de noeuds specifies dans liste_sommets,
-//  liste_elem_virtuel_arrivee et deplacement.
-// Met a jour les sommets, facettes, espaces distants
-// et virtuels. Le maillage retourne a l'etat minimal. Le buffer d'echange est
-// reinitialise.
-// On stocke dans liste_nouveaux_sommets la liste des numeros des sommets reels
-// fraichement arrives sur le domaine, ainsi que le deplacement restant pour
-// chacun de ces sommets (tableau a 3 colonnes (meme en dimension 2 !), de taille
-// le nombre de nouveaux sommets).
-// Precondition:
-//  Les membres suivants doivent etre valides a l'entree de la fonction:
-//   (Meme liste que pour creer_sommets_virtuels(...) )
-// Postcondition:
-//  Les memes membres sont valides a la sortie.
-//  Attention: on ne met PAS a jour les facettes, la regle de propriete des
-//             facettes n'est donc pas verifiee au retour de la fonction.
-//             Il faut appeler corriger_proprietaire_facettes.
+/*! @brief Realise l'ensemble des echanges de noeuds specifies dans liste_sommets, liste_elem_virtuel_arrivee et deplacement.
+ *
+ *  Met a jour les sommets, facettes, espaces distants
+ *  et virtuels. Le maillage retourne a l'etat minimal. Le buffer d'echange est
+ *  reinitialise.
+ *  On stocke dans liste_nouveaux_sommets la liste des numeros des sommets reels
+ *  fraichement arrives sur le domaine, ainsi que le deplacement restant pour
+ *  chacun de ces sommets (tableau a 3 colonnes (meme en dimension 2 !), de taille
+ *  le nombre de nouveaux sommets).
+ *
+ * Precondition:
+ * Les membres suivants doivent etre valides a l'entree de la fonction:
+ *  (Meme liste que pour creer_sommets_virtuels(...) )
+ * Postcondition:
+ *  Les memes membres sont valides a la sortie.
+ *  Attention: on ne met PAS a jour les facettes, la regle de propriete des
+ *            facettes n'est donc pas verifiee au retour de la fonction.
+ *            Il faut appeler corriger_proprietaire_facettes.
+ *
+ */
 void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
                                            const ArrOfInt& liste_elem_virtuel_arrivee,
                                            const ArrOfInt& liste_face_virtuelle_arrivee,
@@ -2565,28 +2639,28 @@ static void ordonner_sommets_facettes(IntTab& facettes,
     }
 }
 
-// Description:
-// Sans changer les sommets existants ni la numerotation des facettes, on
-// change le proprietaire des facettes de sorte que ce soit aussi le proprietaire
-// du premier sommet de la facette. Pour cela on doit eventuellement creer des
-// sommets virtuels supplementaire et des facettes.
-// Aucune facette n'est supprimee.
-// Certaines facettes reelles sont creees,
-// Certaines facettes reelles deviennent virtuelles.
-// Le maillage retourne a l'etat minimal.
-// Cette methode est utilisee lors de l'algorithme Marching-Cubes, du transport
-// et du remaillage pour amener le maillage dans son etat conforme aux conventions.
-//
-// Precondition:
-//   Les membres suivants doivent etre valides :
-//   * Memes membres que creer_facettes_virtuelles
-//   * desc_facettes_ (remarque)
-// (remarque) desc_facettes_ doit etre un descripteur valide (correspondance entre
-//            elements distants et elements virtuels). En revanche, on suppose que
-//            la facette peut etre reelle sur n'importe quel processeur (pas forcement
-//            le proprietaire du premier sommet).
-// Postcondition:
-//   * Toutes les conditions qui definissent l'etat MINIMAL sont remplies.
+/*! @brief Sans changer les sommets existants ni la numerotation des facettes, on change le proprietaire des facettes de sorte que ce soit aussi le proprietaire
+ *
+ *  du premier sommet de la facette. Pour cela on doit eventuellement creer des
+ *  sommets virtuels supplementaire et des facettes.
+ *  Aucune facette n'est supprimee.
+ *  Certaines facettes reelles sont creees,
+ *  Certaines facettes reelles deviennent virtuelles.
+ *  Le maillage retourne a l'etat minimal.
+ *  Cette methode est utilisee lors de l'algorithme Marching-Cubes, du transport
+ *  et du remaillage pour amener le maillage dans son etat conforme aux conventions.
+ *
+ * Precondition:
+ *  Les membres suivants doivent etre valides :
+ *  - Memes membres que creer_facettes_virtuelles
+ *  - desc_facettes_ (remarque)
+ *(remarque) desc_facettes_ doit etre un descripteur valide (correspondance entre
+ *           elements distants et elements virtuels). En revanche, on suppose que
+ *           la facette peut etre reelle sur n'importe quel processeur (pas forcement
+ *           le proprietaire du premier sommet).
+ * Postcondition:
+ *  - Toutes les conditions qui definissent l'etat MINIMAL sont remplies.
+ */
 void Maillage_FT_Disc::corriger_proprietaires_facettes()
 {
   //Process::Journal()<<"Maillage_FT_Disc::corriger_proprietaires_facettes nb_som="<<nb_sommets()<<finl;
@@ -2669,23 +2743,24 @@ void Maillage_FT_Disc::corriger_proprietaires_facettes()
   //Process::Journal()<<"FIN Maillage_FT_Disc::corriger_proprietaires_facettes nb_som="<<nb_sommets()<<finl;
 }
 
-// Description:
-// Creation de facettes virtuelles sur le pe specifie.
-// liste_facettes = liste de numeros de facettes reelles a envoyer sur le
-//                  processeur distant (la liste peut comporter des doublons)
-//                  Le processeur distant ne doit pas etre moi !
-// liste_pe = numero du pe a qui il faut envoyer chaque facette
-// comm = un schema ou send_pe_list contient les PEs mentionnes dans la liste.
-//
-// Algo: Il faut d'abord creer les sommets des facettes, s'ils n'existent
-// pas encore, puis creer les facettes.
-// Cas general, le processeur A possede la facette (au sens du descripteur des
-// facettes), le processeur B possede un sommet 's' de la facette, on veut envoyer
-// la facette au processeur C. Il faut:
-// A envoie a B le numero du sommet 's' et le numero du processeur C
-// B cree sur C le sommet virtuel 's'
-// A envoie a C les numeros des sommets 's' de la facette, C peut maintenant creer la facette.
-
+/*! @brief Creation de facettes virtuelles sur le pe specifie.
+ *
+ * liste_facettes = liste de numeros de facettes reelles a envoyer sur le
+ *                   processeur distant (la liste peut comporter des doublons)
+ *                   Le processeur distant ne doit pas etre moi !
+ *  liste_pe = numero du pe a qui il faut envoyer chaque facette
+ *  comm = un schema ou send_pe_list contient les PEs mentionnes dans la liste.
+ *
+ *  Algo: Il faut d'abord creer les sommets des facettes, s'ils n'existent
+ *  pas encore, puis creer les facettes.
+ *  Cas general, le processeur A possede la facette (au sens du descripteur des
+ *  facettes), le processeur B possede un sommet 's' de la facette, on veut envoyer
+ *  la facette au processeur C. Il faut:
+ *  A envoie a B le numero du sommet 's' et le numero du processeur C
+ *  B cree sur C le sommet virtuel 's'
+ *  A envoie a C les numeros des sommets 's' de la facette, C peut maintenant creer la facette.
+ *
+ */
 void Maillage_FT_Disc::creer_facettes_virtuelles(const ArrOfInt& liste_facettes,
                                                  const ArrOfInt& liste_facettes_pe,
                                                  const ArrOfInt& facettes_send_pe_list,
@@ -2929,42 +3004,29 @@ void Maillage_FT_Disc::creer_facettes_virtuelles(const ArrOfInt& liste_facettes,
     Maillage_FT_Disc::check_mesh(1, 1 /* ne pas tester le proprietaire de la facette */);
 }
 
-// Description:
-// Echange des facettes dont les numeros sont fournis dans "liste_facettes" :
-// Pour chaque facette a ajouter,
-// * On determine le processeur destinataire de la facette (c'est le
-//   processeur qui possede l'element_arrivee)
-// * On ajoute la facette sur ce processeur si elle n'existe pas encore
-//   (creation d'une facette virtuelle et des sommets de la facette).
-// * On envoie a ce processeur le numero de l'element_arrivee. Le numero est
-//   converti en numero local d'un element reel sur ce processeur.
-// Cette methode est essentiellement utilisee dans le parcours de l'interface.
-//
-// Parametre: liste_facettes
-// Signification: un tableau contenant des numeros de facettes reelles ou
-//                virtuelles, eventuellement avec doublons.
-// Parametre: liste_elem_arrivee
-// Signification: tableau de taille identique a liste_facettes, contenant
-//                pour chacune un numero d'element virtuel.
-// Parametre: facettes_recues_numfacettes
-// Signification: tableau rempli lors de l'echange avec la liste des facettes
-//                qui ont ete recues (meme si elles existaient deja et avec
-//                les doublons eventuels).
-//                Le contenu initial du tableau est efface.
-//                Aliasing ave liste_facettes autorise.
-// Parametre: facettes_recues_numelement
-// Signification: tableau rempli lors de l'echange: pour chaque facette recue,
-//                numero de l'element d'arrivee (c'est la traduction du
-//                numero d'element virtuel "liste_elem_arrivee" en numero
-//                d'element reel sur le processeur qui a recu la facette.
-//                 Aliasing avec liste_elem_arrivee autorise.
-// Precondition: Le maillage doit etre dans l'etat minimal (en particulier,
-//  il doit respecter la convention "proprietaire facette=proprietaire 1er sommet").
-//
-// Trois categories de processeurs vont se parler:
-//  le processeur A qui connait le numero de la facette a envoyer,
-//  le processeur B qui possede la facette,
-//  le processeur C a qui on veut envoyer la facette.
+/*! @brief Echange des facettes dont les numeros sont fournis dans "liste_facettes" : Pour chaque facette a ajouter,
+ *
+ *  * On determine le processeur destinataire de la facette (c'est le
+ *    processeur qui possede l'element_arrivee)
+ *  * On ajoute la facette sur ce processeur si elle n'existe pas encore
+ *    (creation d'une facette virtuelle et des sommets de la facette).
+ *  * On envoie a ce processeur le numero de l'element_arrivee. Le numero est
+ *    converti en numero local d'un element reel sur ce processeur.
+ *  Cette methode est essentiellement utilisee dans le parcours de l'interface.
+ *
+ * Precondition: Le maillage doit etre dans l'etat minimal (en particulier,
+ *  il doit respecter la convention "proprietaire facette=proprietaire 1er sommet").
+ *
+ * Trois categories de processeurs vont se parler:
+ *  le processeur A qui connait le numero de la facette a envoyer,
+ *  le processeur B qui possede la facette,
+ *  le processeur C a qui on veut envoyer la facette.
+ *
+ * @param (liste_facettes) un tableau contenant des numeros de facettes reelles ou virtuelles, eventuellement avec doublons.
+ * @param (liste_elem_arrivee) tableau de taille identique a liste_facettes, contenant pour chacune un numero d'element virtuel.
+ * @param (facettes_recues_numfacettes) tableau rempli lors de l'echange avec la liste des facettes qui ont ete recues (meme si elles existaient deja et avec les doublons eventuels). Le contenu initial du tableau est efface. Aliasing ave liste_facettes autorise.
+ * @param (facettes_recues_numelement) tableau rempli lors de l'echange: pour chaque facette recue, numero de l'element d'arrivee (c'est la traduction du numero d'element virtuel "liste_elem_arrivee" en numero d'element reel sur le processeur qui a recu la facette. Aliasing avec liste_elem_arrivee autorise.
+ */
 void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
                                          const ArrOfInt& liste_elem_arrivee,
                                          ArrOfInt& facettes_recues_numfacettes,
@@ -3167,20 +3229,18 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
   if (Comm_Group::check_enabled()) check_mesh();
 }
 
-// Description:
-// Conversion des couples (numeros_distants, pe) en numeros_locaux.
-// Parametres:
-//  descripteur       = soit desc_sommets_, soit desc_facettes_, ou un autre
-//  element_num_owner = soit sommets_num_owner_, soit facettes_num_owner_, ou equivalent
-//  numeros_distants  = une liste de numeros de facettes ou sommets qui appartiennent au pe_distant
-//                     et qui sont virtuels chez moi. Le numero est le numero
-//                     de la facette ou du sommet sur le pe_distant
-//  pe_distant        = pour chaque numero de facette ou sommet, le pe proprietaire
-// Parametre:     numeros_locaux
-// Signification: tableau rempli par cette methode. Le contenu initial est efface.
-//                La taille est identique a celle de numeros_distants. On y met le numero local
-//                des elements (ce sont des numeros d'elements virtuels).
-//                Attention: numeros_locaux et numeros_distants peuvent referencer le meme tableau
+/*! @brief Conversion des couples (numeros_distants, pe) en numeros_locaux.
+ *
+ * Parametres:
+ *   descripteur       = soit desc_sommets_, soit desc_facettes_, ou un autre
+ *   element_num_owner = soit sommets_num_owner_, soit facettes_num_owner_, ou equivalent
+ *   numeros_distants  = une liste de numeros de facettes ou sommets qui appartiennent au pe_distant
+ *                      et qui sont virtuels chez moi. Le numero est le numero
+ *                      de la facette ou du sommet sur le pe_distant
+ *   pe_distant        = pour chaque numero de facette ou sommet, le pe proprietaire
+ *
+ * @param (numeros_locaux) tableau rempli par cette methode. Le contenu initial est efface. La taille est identique a celle de numeros_distants. On y met le numero local des elements (ce sont des numeros d'elements virtuels). Attention: numeros_locaux et numeros_distants peuvent referencer le meme tableau
+ */
 void Maillage_FT_Disc::convertir_numero_distant_local(const Desc_Structure_FT& descripteur,
                                                       const ArrOfInt& element_num_owner,
                                                       const ArrOfInt& numeros_distants,
@@ -3470,25 +3530,18 @@ int Maillage_FT_Disc::deplacer_un_sommet(double& x, double& y, double& z,
 }
 
 
-// Description:
-//  Applique un vecteur deplacement aux noeuds dont le numero est dans
-//  "liste_noeud", puis echange les espaces virtuels.
-//  Si un noeud traverse un joint, il change de proprietaire.
-//  Si un noeud rencontre une paroi, il s'arrete sur la paroi et on le
-//  transforme en noeud "ligne de contact".
-//  Si un noeud est sur une paroi (noeud "ligne de contact"), il longe
-//  la paroi (on deplace le noeud de face de bord en face de bord en
-//  minimisant la distance entre le noeud et le deplacement demande.
-// Parametre:      liste_sommets_initiale
-//  Signification: une liste non redondante de noeuds REELS a deplacer
-// Parametre:      deplacement_initial
-//  Signification: le vecteur deplacement des noeuds de "liste_noeuds"
-//                 ( dimension(0)==liste_noeuds.size_array()
-//                  et dimension(1)==dimension )
-// Postcondition: ATTENTION, on ne met pas a jour le proprietaire des
-//                facettes, il faut appeler corriger_proprietaire_facettes
-//                pour rendre le maillage conforme aux conventions.
-
+/*! @brief Applique un vecteur deplacement aux noeuds dont le numero est dans "liste_noeud", puis echange les espaces virtuels.
+ *
+ *   Si un noeud traverse un joint, il change de proprietaire.
+ *   Si un noeud rencontre une paroi, il s'arrete sur la paroi et on le
+ *   transforme en noeud "ligne de contact".
+ *   Si un noeud est sur une paroi (noeud "ligne de contact"), il longe
+ *   la paroi (on deplace le noeud de face de bord en face de bord en
+ *   minimisant la distance entre le noeud et le deplacement demande.
+ *
+ * @param (liste_sommets_initiale) une liste non redondante de noeuds REELS a deplacer
+ * @param (deplacement_initial) le vecteur deplacement des noeuds de "liste_noeuds" ( dimension(0)==liste_noeuds.size_array() et dimension(1)==dimension )
+ */
 void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
                                         const DoubleTab& deplacement_initial,
                                         ArrOfInt& liste_sommets_sortis,
@@ -4150,11 +4203,9 @@ int Maillage_FT_Disc::check_mesh(int error_is_fatal, int skip_facette_pe, int sk
   return return_code;
 }
 
-// Description:
-//  Retire toutes les facettes virtuelles et tous les sommets qui ne sont
-//  pas utilises.
-// Postcondition:
-//  Le maillage revient dans l'etat MINIMAL.
+/*! @brief Retire toutes les facettes virtuelles et tous les sommets qui ne sont pas utilises.
+ *
+ */
 void Maillage_FT_Disc::nettoyer_elements_virtuels()
 {
   //lance le nettoyage
@@ -4162,11 +4213,9 @@ void Maillage_FT_Disc::nettoyer_elements_virtuels()
   // maillage_modifie() est fait dans nettoyer_maillage
 }
 
-// Description:
-//  Retire toutes les facettes virtuelles, toutes les facettes invalides
-//  (sommet0 == sommet1) et tous les sommets qui ne sont pas utilises.
-// Postcondition:
-//  Le maillage revient dans l'etat MINIMAL.
+/*! @brief Retire toutes les facettes virtuelles, toutes les facettes invalides (sommet0 == sommet1) et tous les sommets qui ne sont pas utilises.
+ *
+ */
 void Maillage_FT_Disc::nettoyer_maillage()
 {
   assert(statut_ >= MINIMAL);
@@ -4422,9 +4471,11 @@ void Maillage_FT_Disc::nettoyer_maillage()
   if (Comm_Group::check_enabled()) check_mesh();
 }
 
-// Description:
-//  Supprime les facettes dont les indices locaux sont donnes en parametre.
-//  Le maillage est nettoye et retourne a l'etat MINIMAL.
+/*! @brief Supprime les facettes dont les indices locaux sont donnes en parametre.
+ *
+ * Le maillage est nettoye et retourne a l'etat MINIMAL.
+ *
+ */
 void Maillage_FT_Disc::supprimer_facettes(const ArrOfInt& liste_facettes)
 {
   const int n = liste_facettes.size_array();
@@ -5170,16 +5221,15 @@ static void normalize(ArrOfDouble& nprime)
 }
 #endif
 
-// Description:
-//  Calcul de la courbure discrete du maillage aux sommets.
-//  Methode de calcul : voir these B. Mathieu paragraphe 3.3.3 page 97
-//  La courbure est egale a la differentielle de la surface d'interface par rapport
-//   au deplacement des sommets, divisee par la differentielle du volume.
-//
-// Parametre:     courbure_sommets
-// Signification: Tableau dans lequel on veut stocker la courbure aux sommets.
-//                La valeur initiale du tableau est perdue.
-//                L'espace virtuel du tableau resultat est a jour.
+/*! @brief Calcul de la courbure discrete du maillage aux sommets.
+ *
+ * Methode de calcul : voir these B. Mathieu paragraphe 3.3.3 page 97
+ *   La courbure est egale a la differentielle de la surface d'interface par rapport
+ *    au deplacement des sommets, divisee par la differentielle du volume.
+ *
+ *
+ * @param (courbure_sommets) Tableau dans lequel on veut stocker la courbure aux sommets. La valeur initiale du tableau est perdue. L'espace virtuel du tableau resultat est a jour.
+ */
 void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, const int call) const
 {
   const DoubleTab& normale = get_update_normale_facettes();
@@ -5227,6 +5277,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
   const double un_tiers = 1. / 3.;
   const double un_sixieme = 1. / 6.;
 
+  // This is based on the angle given in the data file (that is the micros/Young contact angle)
   DoubleTabFT tab_cos_theta;
   calculer_costheta_minmax(tab_cos_theta);
 
@@ -5234,6 +5285,38 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
 
   // Cette classe sert pour promener les sommets sur le bord du domaine.
   const Parcours_interface& parcours = refparcours_interface_.valeur();
+#if TCL_MODEL
+  int flag_tcl = 0;
+  double l_v = 0.;
+  // interfacial velocity
+  DoubleTab vit(nsom, dim);
+  if (refequation_transport_.non_nul())
+    {
+      const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+      const Probleme_base& pb = eq_interfaces.get_probleme_base();
+      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+      Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+      if (tcl.is_activated() && tcl.is_capillary_activated())
+        {
+          flag_tcl = 1;
+          l_v = tcl.get_lv();
+          Postraitement_base::Localisation loc = Postraitement_base::SOMMETS;
+          Motcle nom_du_champ = "vitesse";
+          Cerr << "Validation and checking required in Maillage_FT_Disc::calcul_courbure_sommets" << finl;
+          Process::exit();
+          // Useless init to 0:
+          // for (int ii=0; ii< nsom; ii++)
+          //  for (int jj=0; jj< dim; jj++)
+          //    vit(ii,jj) = 0.;
+          eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
+
+          //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
+          // It relies on the classical assumption in the FT module that the first equation is NS.
+        }
+      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+      //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
+    }
+#endif
 
   for (facette = 0; facette < nfaces; facette++)
     {
@@ -5278,12 +5361,13 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                   // la phase 0
                   for (int i2 = 0; i2 < 2; i2++)
                     {
-                      const int face = sommet_face_bord_[som[i2]];
+                      const int isom2 = som[i2];
+                      const int face = sommet_face_bord_[isom2];
                       if (face < 0) // pas une face de bord
                         continue;
 
 #ifndef PATCH_HYSTERESIS_V2
-                      const double costheta = tab_cos_theta(som[i2], 0);
+                      const double costheta = tab_cos_theta(isom2, 0);
 #else
                       const double costheta0 = tab_cos_theta(som[i2], 0);
                       const double costheta1 = tab_cos_theta(som[i2], 1);
@@ -5799,12 +5883,9 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
             }
           else
             {
-              // Cas bidim_axi (calcul pour un angle de 1 radian,
-              // comme c'est un rapport surface/volume, l'angle n'a pas d'importance)
-              // Differentielle de volume:
-
-              // const double costheta = 0.;
-              // Attention: le terme n'est pas encore pris en compte en bidim_axi
+              // Case bidim_axi (calculation for a 1radian angle,
+              // As it is a ratio surface/volume, the angle as no effect.
+              // Volume differential:
 
               const int s1 = facettes_(facette, 0);
               const int s2 = facettes_(facette, 1);
@@ -5827,6 +5908,118 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
               d_surface(s1, 1) +=           0.5 * (r1 + r2) * (nx);
               d_surface(s2, 0) += 0.5 * L + 0.5 * (r1 + r2) * (ny);
               d_surface(s2, 1) +=           0.5 * (r1 + r2) * (-nx);
+
+              // GB 09/01/2018. Correction to account for the surface differencial
+              // from the boundary face wetted by phase 0
+              int som[2];
+              double r[2];
+              som[0] = facettes_(facette, 0);
+              som[1] = facettes_(facette, 1);
+              r[0] = sommets_(s1, 0);
+              r[1] = sommets_(s2, 0);
+              for (int i2 = 0; i2 < 2; i2++)
+                {
+                  const int face = sommet_face_bord_[som[i2]];
+                  if (face < 0) // pas une face de bord
+                    continue;
+
+                  double costheta = tab_cos_theta(som[i2], 0);
+#if TCL_MODEL
+                  // Modification of the value of costheta based on
+                  // the effect of CL velocity. Stored in tcl.set_theta_app
+                  // (but maybe unused there). Value used locally here afterward.
+                  // If the TCL model is activated and we're not on a virtual node :
+                  if ((sommet_elem_[som[i2]]>0) && flag_tcl)
+                    {
+                      const double t=temps_physique_;
+                      int face_loc;
+                      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+                      const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
+                      const Nom& bc_name = type_cl.frontiere_dis().le_nom();
+                      // For each BC, we check its type to see if it's a wall:
+                      //   Cerr << "TCL boundary condition is " << type_cl << " for BC " << bc_name;
+                      if ( sub_type(Dirichlet_paroi_fixe,type_cl)
+                           || sub_type(Dirichlet_paroi_defilante,type_cl) )
+                        {
+                          Cerr << "  -> for this BC [" <<
+                               bc_name <<"], we compute a specific contact angle at TCL." << finl;
+                        }
+                      else
+                        {
+                          Cerr << "  -> no modification of contact angle for this BC [" << bc_name <<"] at TCL." << finl;
+                          // We're on the symmetry axis, or something else but not at the wall...
+                          continue;
+                        }
+                      FTd_vecteur3 nface = {0., 0., 0.} ;
+                      parcours.calculer_normale_face_bord(face, sommets_(som[i2],0), sommets_(som[i2],1), 0., nface[0], nface[1], nface[2]) ;
+                      // The other som of the facette is som[1-i2] :
+                      // Cerr << " sommet-1 x= " << sommets_(som[1-i2],0) << " y= " << sommets_(som[1-i2],1) << " time_sommet= " << t << finl;
+                      // if(dt != 0.) double cl_v = (sommets_(som[i2],0) - x_cl_)/dt;
+                      const int isom1 = som[1-i2];
+                      // The second vertex of the segment should not be a contact line
+                      // so we compute its tangential velocity:
+
+                      const int nb_compo = vit.dimension(1);
+                      double norm_vit_som1 = 0.;
+                      double vn = 0.;
+                      double v_cl = 0.;
+                      double v_comp = 0.;
+                      // Component of the velocity is calculated along the direction of wall as vw = v - (v.n)n where n is the wall face normal
+                      // and v is the velocity vector of the node under consideration.
+                      for (int k=0 ; k<nb_compo ; k++)
+                        {
+                          const double vk = (double) vit(isom1,k);
+                          vn += vk*nface[k];
+                          Cerr << "Estimated TCL velocity[som=" << isom1
+                               << ", compo["<< k<<"]= " << vk << "m/s)" << " face-normal= " << nface[k] <<  finl;
+                          Cerr << "Vn= " << vn << finl;
+                          norm_vit_som1 += vk*vk;
+                        }
+                      nface[0] = vn*nface[0];
+                      nface[1] = vn*nface[1];
+                      nface[2] = vn*nface[2];
+                      for (int k=0 ; k<nb_compo ; k++)
+                        {
+                          v_comp = vit(isom1,k) - nface[k];
+                          v_cl += v_comp*v_comp;
+                        }
+                      v_cl = sqrt(v_cl);
+                      Cerr << "v_cl= " << v_cl << " time_v_cl= " << t << finl;
+
+                      // And we assume as a best guess that the contact line
+                      // velocity should be approximately that of the first
+                      // marker that is not a contact line. We use it
+                      // directly to build the Capilary number Ca.
+                      const double theta = acos(costheta);
+                      Cerr << "theta=" << theta << " time_theta= " << t << finl;
+                      const double bubble_center = 0.;
+                      const double W = (sommets_(i2, 0) - bubble_center)/(2*2.71*2.71);
+                      const double Ca = 2.8e-4*v_cl/5.89e-2;
+                      Cerr << "Capillary_number = " << Ca << " time = " << t << finl;
+                      double theta_app = pow((theta),3) - 9. * Ca * log(std::max(W, 1.e-20)/l_v);
+                      theta_app = pow(std::max(theta_app, 0.),1./3.);
+                      Cerr << "theta_after " << theta_app << " time_theta_after= " << t << finl;
+                      // We store the apparent contact angle in costheta for
+                      // later use in the calculation of the curvature
+                      // (it is through this mean that we will consider
+                      //  it and try to indirectly satisfy it).
+                      costheta = cos(theta_app);
+                      // unused?
+                      //tcl.set_theta_app(theta_app);
+                      Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
+                           << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
+                    }
+#endif
+                  // Normale unitaire au bord
+                  double nfx, nfy, nfz;
+                  parcours.calculer_normale_face_bord(face,
+                                                      sommets_(som[i2],0), sommets_(som[i2],1), 0.,
+                                                      nfx, nfy, nfz);
+                  // Ajout de la contribution de la surface:
+                  double signe = (i2==0) ? -1. : 1.;
+                  d_surface(som[i2], 0) +=  r[i2] * signe * nfy * costheta;
+                  d_surface(som[i2], 1) +=  r[i2] * signe * nfx * costheta;
+                }
             }
         }
     }
@@ -5924,7 +6117,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
       drapeau_angle_in_range = 1;
 #endif
       courbure_sommets[i] = c;
-      if (methode_calcul_courbure_contact_line_ == none)
+      if (methode_calcul_courbure_contact_line_ == NONE)
         {
           if ((call>1) && (sommet_face_bord_[i]>=0))
             //if (call>1)
@@ -5984,18 +6177,20 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
   desc_sommets().echange_espace_virtuel(courbure_sommets);
 }
 
-// Description:
-//  Prepare un tableau de donnees aux sommets ou aux facettes pour conserver
-//  les valeurs apres transport. Le transport modifie le descripteur et augmente
-//  le nombre de sommets ou de facettes. En general les tableaux qui contiennent
-//  des valeurs aux sommets ou aux facettes ne sont donc plus valables apres
-//  le transport. On peut les rendre valables comme suit
-//  (exemple avec le tableau courbure aux sommets) :
-//   preparer_tableau_avant_transport(courbure, desc_sommets());
-//   transporter(deplacement);
-//   update_tableau_apres_transport(courbure, desc_sommets());
-//  Attention, le tableau ne devient valable qu'apres avoir appele
-//   update_tableau_apres_transport.
+/*! @brief Prepare un tableau de donnees aux sommets ou aux facettes pour conserver les valeurs apres transport.
+ *
+ * Le transport modifie le descripteur et augmente
+ *   le nombre de sommets ou de facettes. En general les tableaux qui contiennent
+ *   des valeurs aux sommets ou aux facettes ne sont donc plus valables apres
+ *   le transport. On peut les rendre valables comme suit
+ *   (exemple avec le tableau courbure aux sommets) :
+ *    preparer_tableau_avant_transport(courbure, desc_sommets());
+ *    transporter(deplacement);
+ *    update_tableau_apres_transport(courbure, desc_sommets());
+ *   Attention, le tableau ne devient valable qu'apres avoir appele
+ *    update_tableau_apres_transport.
+ *
+ */
 void Maillage_FT_Disc::preparer_tableau_avant_transport(ArrOfDouble& tableau,
                                                         const Desc_Structure_FT& descripteur) const
 {
@@ -6039,8 +6234,9 @@ void Maillage_FT_Disc::preparer_tableau_avant_transport(ArrOfInt& tableau,
     }
 }
 
-// Description:
-//  Voir preparer_tableau_avant_transport
+/*! @brief Voir preparer_tableau_avant_transport
+ *
+ */
 void Maillage_FT_Disc::preparer_tableau_avant_transport(DoubleTab& tableau,
                                                         const Desc_Structure_FT& descripteur) const
 {
@@ -6063,8 +6259,9 @@ void Maillage_FT_Disc::preparer_tableau_avant_transport(DoubleTab& tableau,
     }
 }
 
-// Description:
-//  Voir preparer_tableau_avant_transport
+/*! @brief Voir preparer_tableau_avant_transport
+ *
+ */
 void Maillage_FT_Disc::update_tableau_apres_transport(ArrOfDouble& tableau,
                                                       int new_size,
                                                       const Desc_Structure_FT& descripteur) const
@@ -6105,8 +6302,9 @@ void Maillage_FT_Disc::update_tableau_apres_transport(ArrOfInt& tableau,
   descripteur.echange_espace_virtuel(tableau);
 }
 
-// Description:
-//  Voir preparer_tableau_avant_transport
+/*! @brief Voir preparer_tableau_avant_transport
+ *
+ */
 void Maillage_FT_Disc::update_tableau_apres_transport(DoubleTab& tableau,
                                                       int new_size,
                                                       const Desc_Structure_FT& descripteur) const
@@ -6161,16 +6359,18 @@ int Maillage_FT_Disc::type_statut() const
   return -1;
 }
 
-// Description: creation d'un tableau aux sommets du maillage
-//  Meme principe que Domaine::creer_tableau_sommets()
+/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_sommets()
+ *
+ */
 void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_Options opt) const
 {
   const MD_Vector& md = desc_sommets().get_md_vector();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
 }
 
-// Description: creation d'un tableau aux sommets du maillage
-//  Meme principe que Zone::creer_tableau_elements()
+/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Zone::creer_tableau_elements()
+ *
+ */
 void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, Array_base::Resize_Options opt) const
 {
   const MD_Vector& md = desc_facettes().get_md_vector();

@@ -28,7 +28,7 @@ Sortie& Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem::printOn(Sortie& s) c
 Entree& Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem::readOn(Entree& is)
 {
   Source_Transport_K_Eps_VDF_Elem::verifier_pb_keps_anisotherme_concen(mon_equation->probleme(),que_suis_je());
-  return Source_Transport_K_Eps_VDF_Elem::readOn_anisotherme_concen(is);
+  return Source_Transport_K_Eps_VDF_Elem::readOn_anisotherme_concen(is,que_suis_je());
 }
 
 void Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem::associer_pb(const Probleme_base& pb)

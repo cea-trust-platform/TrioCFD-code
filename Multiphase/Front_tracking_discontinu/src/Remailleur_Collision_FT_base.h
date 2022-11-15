@@ -29,15 +29,10 @@ class Maillage_FT_Disc;
 #include <TRUSTTabs_forward.h>
 class Champ_base;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Remailleur_Collision_FT_base
-//     Classe de base pour la hierarchie des remailleurs d'interfaces entrees en collision
-// .SECTION voir aussi
-//     Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Remailleur_Collision_FT_base Classe de base pour la hierarchie des remailleurs d'interfaces entrees en collision
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
+ */
 class Remailleur_Collision_FT_base : public Objet_U
 {
 

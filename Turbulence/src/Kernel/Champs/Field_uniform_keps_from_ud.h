@@ -27,15 +27,12 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Field_uniform_keps_from_ud
-//     Classe derivee de Champ_uniforme which is for uniform fields
-//     in space and time
-// .SECTION voir aussi
-//     Champ_uniforme
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Field_uniform_keps_from_ud Classe derivee de Champ_uniforme which is for uniform fields
+ *
+ *      in space and time
+ *
+ * @sa Champ_uniforme
+ */
 class Field_uniform_keps_from_ud : public Champ_Uniforme
 {
   Declare_instanciable(Field_uniform_keps_from_ud);

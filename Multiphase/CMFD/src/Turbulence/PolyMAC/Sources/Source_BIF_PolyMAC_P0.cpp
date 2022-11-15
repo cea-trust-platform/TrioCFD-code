@@ -66,7 +66,7 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
 
   const DoubleTab&                       vf_dir = zone.volumes_entrelaces_dir(), &xp = zone.xp(), &xv = zone.xv();
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
   const DoubleTab& normales_f = zone.face_normales();
   const IntTab& voisins_f = zone.face_voisins(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();
 

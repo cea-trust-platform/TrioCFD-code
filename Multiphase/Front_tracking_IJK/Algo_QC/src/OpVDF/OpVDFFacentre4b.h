@@ -27,21 +27,18 @@
 #include <ItVDFFa.h>
 #include <Evcentre4bVDFFa.h>
 
-//
-// .DESCRIPTION class Op_Conv_centre4b_VDF_Face
-//
-//  Cette classe represente l'operateur de convection associe a une equation de
-//  la quantite de mouvement.
-//  La discretisation est VDF
-//  Le champ convecte est de type Champ_Face
-//  Le schema de convection est du type centre4b (centre sur 4 points)
-//  L'iterateur associe est de type Iterateur_VDF_Face
-//  L'evaluateur associe est de type Eval_centre4b_VDF_Face
-
-//
-// .SECTION voir aussi
-//
-//
+/*! @brief class Op_Conv_centre4b_VDF_Face
+ *
+ *   Cette classe represente l'operateur de convection associe a une equation de
+ *   la quantite de mouvement.
+ *   La discretisation est VDF
+ *   Le champ convecte est de type Champ_Face
+ *   Le schema de convection est du type centre4b (centre sur 4 points)
+ *   L'iterateur associe est de type Iterateur_VDF_Face
+ *   L'evaluateur associe est de type Eval_centre4b_VDF_Face
+ * 
+ *
+ */
 declare_It_VDF_Face(Eval_centre4b_VDF_Face)
 
 //////////////////////////////////////////////////////////////////////////////
@@ -65,14 +62,9 @@ public:
   Champ_Inc_base& vitesse();
 };
 
-//
-// Fonctions inline de la classe Op_Conv_centre4b_VDF_Face
-//
-
-
-// Description:
-// associe le champ de vitesse a l'evaluateur
-
+/*! @brief associe le champ de vitesse a l'evaluateur
+ *
+ */
 inline void Op_Conv_centre4b_VDF_Face::associer_vitesse(const Champ_base& ch_vit)
 {
   const Champ_Face& vit = (Champ_Face&) ch_vit;

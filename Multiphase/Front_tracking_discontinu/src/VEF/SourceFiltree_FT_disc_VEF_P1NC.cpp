@@ -44,21 +44,10 @@ Sortie& SourceFiltree_FT_disc_VEF_P1NC::printOn(Sortie& os) const
   SourceFiltree_FT_disc_base::ecrire_donnees(os);
   return os << que_suis_je();
 }
-// Description:
-//    Lit les parametres du terme source a partir
-//    d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les parametres du terme source a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ */
 Entree& SourceFiltree_FT_disc_VEF_P1NC::lire(Entree& is)
 {
   return SourceFiltree_FT_disc_base::lire_donnees(is);
@@ -72,7 +61,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
   const DoubleTab& xv = zone_VEF.xv();
   const DoubleTab& Indicatrice = Indic_->valeurs();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-  const DoubleVect& porosite_surf = zone_VEF.porosite_face();
+  const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   const int nb_front_Cl = zone_VEF.nb_front_Cl();
 
   int n_bord,face, elem1,elem2,k, ndeb,nfin, offset;

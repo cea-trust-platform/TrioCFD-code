@@ -37,32 +37,25 @@ Lire sch
 }
 
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-   mu      Champ_Uniforme 1 1.00e-3
-   rho     Champ_Uniforme 1 1000.
-   beta_co champ_uniforme 1 0.
-}
-
-Constituant c1
-Lire c1
-{
-	coefficient_diffusion Champ_Uniforme 1 2.8e-10
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -9.81
-Associate fluide gravite
-
 Associer pb dom
 Associer pb sch
-Associer pb fluide
-Associer pb c1
 Discretiser pb dis
 
 Lire pb
 {
+Fluide_Incompressible
+{
+   mu      Champ_Uniforme 1 1.00e-3
+   rho     Champ_Uniforme 1 1000.
+   beta_co champ_uniforme 1 0.
+   gravite Champ_Uniforme 3 0 0 -9.81
+}
+
+Constituant
+{
+	coefficient_diffusion Champ_Uniforme 1 2.8e-10
+}
+
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression petsc cholesky { }

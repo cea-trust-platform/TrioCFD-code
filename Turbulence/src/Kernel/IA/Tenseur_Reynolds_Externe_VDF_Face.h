@@ -34,15 +34,12 @@
 #include <TBNN.h>
 class Probleme_base;
 
-//
-// .DESCRIPTION class Tenseur_Reynolds_Externe_VDF_Face
-//
-
-//
-// .SECTION voir aussi Source_base
-//
-//
-
+/*! @brief class Tenseur_Reynolds_Externe_VDF_Face
+ *
+ *
+ *
+ * @sa Source_base
+ */
 class Tenseur_Reynolds_Externe_VDF_Face : public Source_base, public Terme_Source_Qdm
 {
 

@@ -26,14 +26,13 @@
 #include <Ref_Zone_VEF.h>
 #include <Ref_Zone_Cl_VEF.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Operateur_Conv_sensibility_VEF
-//
-// <Description of class Operateur_Conv_sensibility_VEF>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Operateur_Conv_sensibility_VEF
+ *
+ *  <Description of class Operateur_Conv_sensibility_VEF>
+ *
+ *
+ *
+ */
 class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
 {
 

@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Maillage_FT_Disc.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/19
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #ifndef Maillage_FT_Disc_included
 #define Maillage_FT_Disc_included
@@ -31,24 +24,24 @@
 #include <Ref_Transport_Interfaces_FT_Disc.h>
 #include <Intersections_Elem_Facettes_Data.h>
 
+#include <TRUSTTabs_forward.h>
 class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;
 class Maillage_Echange;
-#include <TRUSTTabs_forward.h>
 class Zone_VF;
-#include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc_Data_Cache;
 Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 
-// ====================================================================
-// .DESCRIPTION        : class Maillage_FT_Disc
-//  Cette classe decrit un maillage:
-//   un tableau de coordonnees des sommets,
-//   un tableau de facettes,
-//   drapeaux,
-//   intersections facettes / elements
-//   ...
+/*! @brief : class Maillage_FT_Disc Cette classe decrit un maillage:
+ *
+ *    un tableau de coordonnees des sommets,
+ *    un tableau de facettes,
+ *    drapeaux,
+ *    intersections facettes / elements
+ *    ...
+ *
+ */
 class Maillage_FT_Disc : public Ensemble_Lagrange_base
 {
   Declare_instanciable_sans_constructeur(Maillage_FT_Disc);
@@ -144,6 +137,9 @@ public:
   virtual const ArrOfDouble& get_update_surface_facettes() const;
   virtual const DoubleTab& get_update_normale_facettes() const;
   virtual const ArrOfDouble& get_update_courbure_sommets() const;
+
+  virtual const ArrOfDouble& get_surface_facettes() const;
+  virtual const DoubleTab& get_normale_facettes() const;
 
   inline int set_niveau_plot(int niv);
 
@@ -481,9 +477,11 @@ inline int Maillage_FT_Disc::sommet_face_bord(int i) const
 
 
 
-// Description:
-//  Renvoie 0 si la facette m'appartient, 1 sinon.
-//  (le test est "le premier sommet de la facette m'appartient-t-il ?")
+/*! @brief Renvoie 0 si la facette m'appartient, 1 sinon.
+ *
+ * (le test est "le premier sommet de la facette m'appartient-t-il ?")
+ *
+ */
 inline int Maillage_FT_Disc::facette_virtuelle(int i) const
 {
   const int sommet = facettes_(i, 0);

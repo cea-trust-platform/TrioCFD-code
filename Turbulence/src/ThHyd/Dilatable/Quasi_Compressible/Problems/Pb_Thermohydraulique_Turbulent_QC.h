@@ -28,18 +28,14 @@
 #include <Pb_Dilatable_Proto.h>
 #include <Pb_QC_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Pb_Thermohydraulique_Turbulent
-//    Cette classe represente un probleme de thermohydraulique en fluide quasi compressible
-//    avec modelisation de la turbulence:
-//     - Equations de Navier_Stokes en regime turbulent
-//     - Equation d'energie en regime turbulent, sous forme generique (equation de la chaleur)
-// .SECTION voir aussi
-//    Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Pb_Thermohydraulique_Turbulent Cette classe represente un probleme de thermohydraulique en fluide quasi compressible
+ *
+ *     avec modelisation de la turbulence:
+ *      - Equations de Navier_Stokes en regime turbulent
+ *      - Equation d'energie en regime turbulent, sous forme generique (equation de la chaleur)
+ *
+ * @sa Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
+ */
 class Pb_Thermohydraulique_Turbulent_QC : public Pb_QC_base, public Pb_Dilatable_Proto
 {
   Declare_instanciable(Pb_Thermohydraulique_Turbulent_QC);

@@ -87,28 +87,27 @@ Read sch
 	seuil_statio 1.e-8
 	precision_impr 5
 }
-fluide_quasi_compressible fluide
-Read fluide
-{
-   mu      	Champ_Uniforme 1 1.983e-5
-  pression 100886  
-  loi_etat gaz_parfait_qc {
-   Prandtl 0.68
-   Cp 1000.
-   gamma 1.4
-   rho_constant_pour_debug Champ_uniforme 1 1.177
-  }
-  traitement_pth constant
-}
 
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 Discretize pb dis
 Read pb
 {
-	Navier_Stokes_Turbulent_QC
+   
+   fluide_quasi_compressible {
+       mu      	Champ_Uniforme 1 1.983e-5
+     pression 100886  
+     loi_etat gaz_parfait_qc {
+      Prandtl 0.68
+      Cp 1000.
+      gamma 1.4
+      rho_constant_pour_debug Champ_uniforme 1 1.177
+     }
+     traitement_pth constant
+   }
+   
+   	Navier_Stokes_Turbulent_QC
 	{
 		solveur_pression cholesky { }
 		convection { Amont }
@@ -190,3 +189,4 @@ SortieHaute frontiere_ouverte T_ext Champ_Front_Uniforme 1 300.
 }
 Solve pb
 End
+ 

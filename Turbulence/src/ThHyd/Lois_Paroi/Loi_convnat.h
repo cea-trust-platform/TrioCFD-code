@@ -25,13 +25,9 @@
 #include <Loi_2couches_base.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Loi_convnat
-//    Cette classe  represente les modeles 1 equation pour le modele a deux couches cale sur les ersultats de convection naturelle.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Loi_convnat Cette classe  represente les modeles 1 equation pour le modele a deux couches cale sur les ersultats de convection naturelle.
+ *
+ */
 class Loi_convnat : public Loi_2couches_base
 {
 

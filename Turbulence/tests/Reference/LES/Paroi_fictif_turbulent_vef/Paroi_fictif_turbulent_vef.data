@@ -78,45 +78,11 @@ Lire sch
 	nb_pas_dt_max 1000000
 }
 
-Fluide_Incompressible sodium1
-Lire sodium1
-{
-       mu Champ_Uniforme 1 .000245
-       rho Champ_Uniforme 1 840.
-       lambda Champ_Uniforme 1 66.
-       Cp champ_Uniforme 1 1270.
-       Beta_th Champ_uniforme 1 0.000276
-}
-
-Fluide_Incompressible sodium2
-Lire sodium2
-{
-       mu Champ_Uniforme 1 .000245
-       rho Champ_Uniforme 1 840.
-       lambda Champ_Uniforme 1 66.
-       Cp champ_Uniforme 1 1270.
-       Beta_th Champ_uniforme 1 0.000276
-}
-
-Solide acier
-Lire acier
-{
-        rho     Champ_Uniforme 1 7800.
-        Cp      Champ_Uniforme 1 500.
-        lambda  Champ_Uniforme 1 16.
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0 0 0
-
 Pb_thermohydraulique_Turbulent pb1
 Associate pb1 dom1
-Associate pb1 sodium1
 
 Pb_thermohydraulique_Turbulent pb2
 Associate pb2 dom2
-Associate pb2 sodium2
-
 
 Probleme_Couple pbc
 Associate pbc pb1
@@ -124,13 +90,19 @@ Associate pbc pb2
 Associate pbc sch
 Discretize pbc dis
 
-
-
 # Debog pb seq faces 1.e-6 0 #
-
 
 Lire pb1
 {
+Fluide_Incompressible
+{
+       mu Champ_Uniforme 1 .000245
+       rho Champ_Uniforme 1 840.
+       lambda Champ_Uniforme 1 66.
+       Cp champ_Uniforme 1 1270.
+       Beta_th Champ_uniforme 1 0.000276
+}
+
 	Navier_Stokes_Turbulent
 	{
 		solveur_pression GCP  { precond ssor { omega 1.5 } seuil 1e-8 impr }
@@ -197,6 +169,15 @@ Lire pb1
 
 Lire pb2
 {
+Fluide_Incompressible
+{
+       mu Champ_Uniforme 1 .000245
+       rho Champ_Uniforme 1 840.
+       lambda Champ_Uniforme 1 66.
+       Cp champ_Uniforme 1 1270.
+       Beta_th Champ_uniforme 1 0.000276
+}
+
 	Navier_Stokes_Turbulent
 	{
 		solveur_pression Cholesky { }

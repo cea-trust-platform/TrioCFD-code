@@ -32,13 +32,12 @@
 class Zone_dis;
 class Zone_dis_base;
 
-// ====================================================================
-// .DESCRIPTION        : class Remailleur_Collision_FT_Thomas
-//  Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
-//
-// .SECTION voir aussi
-//  Transport_Interfaces_FT_Disc Maillage_FT_Disc
-
+/*! @brief : class Remailleur_Collision_FT_Thomas Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
+ *
+ *
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
+ */
 class Remailleur_Collision_FT_Thomas : public Remailleur_Collision_FT_Juric
 {
   Declare_instanciable_sans_constructeur(Remailleur_Collision_FT_Thomas);

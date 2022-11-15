@@ -28,17 +28,12 @@
 #include <Ref_Zone_VEF.h>
 #include <Ref_Zone_Cl_VEF.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-// class SourceFiltree_FT_disc_VEF_P1NC
-// la Classe SourceFiltree permet d'ajouter un terme source agissant uniquement
-// sur une phase donnee
-// .SECTION voir aussi
-//     Probleme_FT_Disc_gen
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class SourceFiltree_FT_disc_VEF_P1NC la Classe SourceFiltree permet d'ajouter un terme source agissant uniquement
+ *
+ *  sur une phase donnee
+ *
+ * @sa Probleme_FT_Disc_gen
+ */
 class SourceFiltree_FT_disc_VEF_P1NC : public Source_base, public SourceFiltree_FT_disc_base
 {
 

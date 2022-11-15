@@ -5,7 +5,11 @@ Domaine dom
 # Lecture du maillage #
 # Read_file MeshWithCylinderInBigDomaine.med ; #
 
-Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med 
+Lire_MED { 
+   domain dom 
+   file MeshWithCylinderInBigDomaine.med 
+}
+
 
 # Creation des DOM_***.Zones #
 Partition dom

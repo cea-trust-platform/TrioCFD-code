@@ -12,23 +12,13 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Fluide_eau_c3_liquide.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Milieu
-// Version:     /main/13
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Fluide_eau_c3_liquide.h>
 #include <Lois_eau_c3.h>
 
 Implemente_instanciable(Fluide_eau_c3_liquide, "Fluide_eau_c3_liquide", Fluide_reel_base);
 
-Sortie& Fluide_eau_c3_liquide::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Fluide_eau_c3_liquide::printOn(Sortie& os) const { return os; }
 
 Entree& Fluide_eau_c3_liquide::readOn(Entree& is)
 {
@@ -40,115 +30,168 @@ Entree& Fluide_eau_c3_liquide::readOn(Entree& is)
   return is;
 }
 
-double Fluide_eau_c3_liquide::rho_(const double T, const double P) const
+#define ind std::distance(res.begin(), &val)
+
+void Fluide_eau_c3_liquide::rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return rhol;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  rhol;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::dT_rho_(const double T, const double P) const
+void Fluide_eau_c3_liquide::dP_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return dT_rhol;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  dP_rhol;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::dP_rho_(const double T, const double P) const
+void Fluide_eau_c3_liquide::dT_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return dP_rhol;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  dT_rhol;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::h_(const double T, const double P) const
+void Fluide_eau_c3_liquide::h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return hl;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  hl;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::dT_h_(const double T, const double P) const
+void Fluide_eau_c3_liquide::dP_h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return dT_hl;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  dP_hl;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::dP_h_(const double T, const double P) const
+void Fluide_eau_c3_liquide::dT_h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return dP_hl;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  dT_hl;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::cp_(const double T, const double P) const
+void Fluide_eau_c3_liquide::cp_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
-  F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-  return cpl;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
+      F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
+      val =  cpl;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::mu_(const double T, const double P) const
+void Fluide_eau_c3_liquide::beta_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
+  VectorD dT_rho___((int )res.size()), rho___((int )res.size());
+  dT_rho_(T,P,SpanD(dT_rho___),ncomp,id);
+  rho_(T,P,SpanD(rho___),ncomp,id);
+  for (auto& val : res) val = dT_rho___[ind] / rho___[ind];
+}
+
+void Fluide_eau_c3_liquide::mu_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
+{
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
-  F77NAME(FHLIQA)(&un, &P, &hl, &T, &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
-  return visc;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl = _h_(T[ind * ncomp + id], P[ind]), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
+      F77NAME(FHLIQA)(&un, &P[ind], &hl, &T[ind * ncomp + id], &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
+      val =  visc;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::lambda_(const double T, const double P) const
+void Fluide_eau_c3_liquide::lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
-  int un = 1;
-  double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
-  F77NAME(FHLIQA)(&un, &P, &hl, &T, &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
-  return cond;
+  /* calcul a saturation */
+  for (auto& val : res)
+    {
+      int un = 1;
+      double hl = _h_(T[ind * ncomp + id], P[ind]), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
+      F77NAME(FHLIQA)(&un, &P[ind], &hl, &T[ind * ncomp + id], &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
+      val =  cond;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_liquide::beta_(const double T, const double P) const
-{
-  return dT_rho_(T, P) / rho_(T, P);
-}
+#undef ind

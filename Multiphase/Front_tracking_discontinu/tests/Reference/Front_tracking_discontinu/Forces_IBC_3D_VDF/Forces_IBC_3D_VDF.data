@@ -42,7 +42,12 @@ VDF dis
 
 Read_file schema.data ;
 
-Read_file fluide.data ;
+Fluide_Incompressible liquide
+read liquide
+{
+	mu  Champ_Uniforme 1 10
+ 	rho Champ_Uniforme 1 1000.
+}
 
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       body
@@ -106,13 +111,20 @@ postraitement {
   }
 }
 liste_postraitements {
-   postraitement_ft_lata post1 {
-	interfaces body { champs sommets { courbure } } 
-	champs elements { indicatrice_body  pression } 
-	champs faces { vitesse }
-   }
+   postraitement_ft_lata post1 { 
+    format Lata 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+        pression elem 
+        vitesse faces 
+    } 
+    interfaces body { 
+        courbure som 
+    } 
+}
 }
 }
 
 Solve pb
 Fin
+ 

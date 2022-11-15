@@ -48,42 +48,22 @@ Convection_Diffusion_Chaleur_QC::Convection_Diffusion_Chaleur_QC():mode_convecti
 {
 }
 
-// Description:
-//    Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Convection_Diffusion_Chaleur_QC::printOn(Sortie& is) const
 {
   return Convection_Diffusion_std::printOn(is);
 }
 
 
-// Description:
-//    Verifie si l'equation a une inconnue et un fluide associe
-//    et appelle Convection_Diffusion_std::readOn(Entree&).
-// Precondition: l'objet a une inconnue associee
-// Precondition: l'objet a un fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& is
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (Entree& is) le flot d'entree modifie 
+ */
 Entree& Convection_Diffusion_Chaleur_QC::readOn(Entree& is)
 {
   assert(l_inco_ch.non_nul());
@@ -198,22 +178,11 @@ int Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(const Motcle& motl
   return 1;
 }
 
-// Description:
-//    Associe un milieu physique a l'equation,
-//    le milieu est en fait caste en Fluide_Incompressible ou en Fluide_Ostwald.
-// Precondition:
-// Parametre: Milieu_base& un_milieu
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//                 doit pourvoir etre force au type "Fluide_Incompressible"
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: les proprietes physiques du fluide ne sont pas toutes specifiees
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_Incompressible ou en Fluide_Ostwald.
+ *
+ * @param (Milieu_base& un_milieu)  
+ * @throws les proprietes physiques du fluide ne sont pas toutes specifiees 
+ */
 void Convection_Diffusion_Chaleur_QC::associer_milieu_base(const Milieu_base& un_milieu)
 {
   const Fluide_Quasi_Compressible& un_fluideQC = ref_cast(Fluide_Quasi_Compressible,un_milieu);
@@ -239,20 +208,9 @@ const Champ_base& Convection_Diffusion_Chaleur_QC::vitesse_pour_transport()
 }
 
 
-// Description:
-//    Discretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Discretise l'equation.
+ *
+ */
 void Convection_Diffusion_Chaleur_QC::discretiser()
 {
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
@@ -266,64 +224,38 @@ void Convection_Diffusion_Chaleur_QC::discretiser()
 }
 
 
-// Description:
-//    Renvoie le milieu physique de l'equation.
-//    (un Fluide_Incompressible upcaste en Milieu_base)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible upcaste en Milieu_base
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_Incompressible upcaste en Milieu_base)
+ *     (version const)
+ *
+ * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base 
+ */
 const Milieu_base& Convection_Diffusion_Chaleur_QC::milieu() const
 {
   return fluide();
 }
 
 
-// Description:
-//    Renvoie le milieu physique de l'equation.
-//    (un Fluide_Incompressible upcaste en Milieu_base)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible upcaste en Milieu_base
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_Incompressible upcaste en Milieu_base)
+ *
+ * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base 
+ */
 Milieu_base& Convection_Diffusion_Chaleur_QC::milieu()
 {
   return fluide();
 }
 
 
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_Incompressible&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes: reference constante
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le fluide incompressible associe a l'equation.
+ *
+ * (version const)
+ *
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ * @throws pas de fluide associe a l'eqaution 
+ */
 const Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide() const
 {
   if (!le_fluide.non_nul())
@@ -335,20 +267,11 @@ const Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide() const
 }
 
 
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_Incompressible&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes:
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le fluide incompressible associe a l'equation.
+ *
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ * @throws pas de fluide associe a l'eqaution 
+ */
 Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide()
 {
   assert(le_fluide.non_nul());
@@ -408,22 +331,14 @@ void Convection_Diffusion_Chaleur_QC::calculer_div_u_ou_div_rhou(DoubleTab& deri
 }
 
 
-// Description:
-//     Renvoie la derivee en temps de l'inconnue de l'equation.
-//     Le calcul est le suivant:
-//         d(inconnue)/dt = M^{-1} * (sources - somme(Op_{i}(inconnue))) / rho
-// Precondition:
-// Parametre: DoubleTab& derivee
-//    Signification: le tableau des valeurs de la derivee en temps du champ inconnu
-//    Valeurs par defaut:
-//    Contraintes: ce parametre est remis a zero des l'entree de la methode
-//    Acces: sortie
-// Retour: DoubleTab&
-//    Signification: le tableau des valeurs de la derivee en temps du champ inconnu
-//    Contraintes:
-// Exception:
-// Effets de bord: des communications (si version parallele) sont generees pas cet appel
-// Postcondition:
+/*! @brief Renvoie la derivee en temps de l'inconnue de l'equation.
+ *
+ * Le calcul est le suivant:
+ *          d(inconnue)/dt = M^{-1} * (sources - somme(Op_{i}(inconnue))) / rho
+ *
+ * @param (DoubleTab& derivee) le tableau des valeurs de la derivee en temps du champ inconnu 
+ * @return (DoubleTab&) le tableau des valeurs de la derivee en temps du champ inconnu 
+ */
 DoubleTab& Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco(DoubleTab& derivee)
 {
   derivee=0;
@@ -815,22 +730,15 @@ int Convection_Diffusion_Chaleur_QC::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-// Description:
-//     Effectue une reprise a partir d'un flot d'entree.
-//     Appelle Equation_base::reprendre()
-//     et reprend l'inconnue de la chaleur et la pression thermodynamique
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: la reprise a echoue, identificateur de la pression non trouve
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue une reprise a partir d'un flot d'entree.
+ *
+ * Appelle Equation_base::reprendre()
+ *      et reprend l'inconnue de la chaleur et la pression thermodynamique
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (int) renvoie toujours 1 
+ * @throws la reprise a echoue, identificateur de la pression non trouve 
+ */
 int Convection_Diffusion_Chaleur_QC::reprendre(Entree& is)
 {
   if (le_fluide->type_fluide() != "Gaz_Parfait")
@@ -861,42 +769,25 @@ int Convection_Diffusion_Chaleur_QC::reprendre(Entree& is)
 
 }
 
-// Description:
-//    Impression des flux sur les bords sur un flot de sortie.
-//    Appelle Equation_base::impr(Sortie&)
-// Precondition: Sortie&
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Impression des flux sur les bords sur un flot de sortie.
+ *
+ * Appelle Equation_base::impr(Sortie&)
+ *
+ * @param (Sortie& os) un flot de sortie 
+ * @return (int) code de retour propage 
+ */
 int Convection_Diffusion_Chaleur_QC::impr(Sortie& os) const
 {
   return Equation_base::impr(os);
 }
 
 
-// Description:
-//    Renvoie le nom du domaine d'application de l'equation.
-//    Ici "Thermique".
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Motcle&
-//    Signification: le nom du domaine d'application de l'equation
-//    Contraintes: toujours egal a "Thermique"
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nom du domaine d'application de l'equation.
+ *
+ * Ici "Thermique".
+ *
+ * @return (Motcle&) le nom du domaine d'application de l'equation 
+ */
 const Motcle& Convection_Diffusion_Chaleur_QC::domaine_application() const
 {
   static Motcle domaine = "Thermique_H";
@@ -907,20 +798,10 @@ const Motcle& Convection_Diffusion_Chaleur_QC::domaine_application() const
   return domaine;
 }
 
-// Description:
-//    Associe un fluide incompressible a l'equation.
-// Precondition:
-// Parametre: Fluide_Incompressible& un_fluide
-//    Signification: le milieu fluide incompressible a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation a un milieu associe
+/*! @brief Associe un fluide incompressible a l'equation.
+ *
+ * @param (Fluide_Incompressible& un_fluide) le milieu fluide incompressible a associer a l'equation 
+ */
 void Convection_Diffusion_Chaleur_QC::associer_fluide(const Fluide_Incompressible& un_fluide)
 {
   assert(sub_type(Fluide_Quasi_Compressible,un_fluide));

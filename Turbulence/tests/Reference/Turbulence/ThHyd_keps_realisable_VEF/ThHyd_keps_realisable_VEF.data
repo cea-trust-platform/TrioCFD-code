@@ -8,7 +8,10 @@ Pb_hydraulique_turbulent pb
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom forme forme.med
+Lire_MED { 
+   domain dom 
+   file forme.med 
+}
 VerifierCoin dom { }
 Dilate dom 0.3
 # END MESH #
@@ -48,20 +51,19 @@ Read mon_schema
 }
 
 # Je definis un milieu #
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu  Champ_Uniforme 1 0.00002
-	rho Champ_Uniforme 1 1.2
-}
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.00002
+   	rho Champ_Uniforme 1 1.2
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { } 
 		convection { muscl }
@@ -124,3 +126,4 @@ Read pb
 }
 Solve pb
 End
+ 

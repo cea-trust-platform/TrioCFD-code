@@ -192,28 +192,20 @@ Lire pb
 liste_postraitements
 {
 	
-   Postraitement_ft_lata post1
-   {
-	dt_post 0.005
-	nom_fichier lata/post
- 	champs elements
-  	      {
-  		 
-  		 indicatrice_interf
-  		 temperature_thermique
-		 vitesse
-		 pression
-		 temperature_mpoint
-  	      }
-	      
-		
-	interfaces interf
-	      {  
-		champs sommets { courbure }
-
-              }
-
-    }
+   postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.005 { 
+        indicatrice_interf elem 
+        temperature_thermique elem 
+        vitesse elem 
+        pression elem 
+        temperature_mpoint elem 
+    } 
+    interfaces interf { 
+        courbure som 
+    } 
+}
     }
 }
 
@@ -221,3 +213,4 @@ Solve pb
 FIN
 
 			     
+ 

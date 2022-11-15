@@ -44,7 +44,7 @@ Sortie& Sonde_IJK::printOn(Sortie& s ) const
 
 // Surcharge de la methode en remplacant la notion Pb.get_champ
 // par
-void Sonde_IJK::completer(const IJK_FT_double& ijk_ft)
+void Sonde_IJK::completer_IJK(const IJK_FT_double& ijk_ft)
 {
   const Nom bidon("bidon");
   //On devrait acceder au domaine par le champ generique
@@ -709,7 +709,7 @@ void Sonde_IJK::initialiser()
                 /*
                 // Meme aux elems, j'ai teste avec la pression, la sonde n'est pas placee a l'elem
                 // Je ne sais pas pourquoi..
-                if ((loc==IJK_Splitting::ELEM) && fabs(les_positions_(idx, i) - val)>delta[0]/10. ) {
+                if ((loc==IJK_Splitting::ELEM) && std::fabs(les_positions_(idx, i) - val)>delta[0]/10. ) {
                 Cerr << "Error in Sondes_IJK::: Sonde in element with confusing position... "  << endl;
                 Process::exit();
                 }
@@ -918,8 +918,8 @@ void Sonde_IJK::postraiter()
                   for(int i=0; i<nb_val; i++)
                     {
                       valeurs[participant[p][i]]=valeurs_pe(i);
-                      //           val_max = max(dabs(valeurs(i)),dabs(valeurs_pe(i)));
-                      //                   if(val_max==(dabs(valeurs_pe(i))))
+                      //           val_max = std::max(std::fabs(valeurs(i)),std::fabs(valeurs_pe(i)));
+                      //                   if(val_max==(std::fabs(valeurs_pe(i))))
                       //                     valeurs(i)=valeurs_pe(i);
                     }
                 }
@@ -932,8 +932,8 @@ void Sonde_IJK::postraiter()
                     for(k=0; k<nb_val2; k++)
                       {
                         valeurs(participant[p][i],k)=valeurs_pe(i,k);
-                        //  val_max = max(dabs(valeurs(i,k)),dabs(valeurs_pe(i,k)));
-                        //                     if(val_max==(dabs(valeurs_pe(i,k))))
+                        //  val_max = std::max(std::fabs(valeurs(i,k)),std::fabs(valeurs_pe(i,k)));
+                        //                     if(val_max==(std::fabs(valeurs_pe(i,k))))
                         //                       valeurs(i,k)=valeurs_pe(i,k);
                       }
                 }

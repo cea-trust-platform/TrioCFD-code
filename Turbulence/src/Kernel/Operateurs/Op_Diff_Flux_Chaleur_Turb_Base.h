@@ -31,16 +31,16 @@ class Champ_Fonc;
 class Champ_Don;
 #include <TRUSTTabs_forward.h>
 
-//.DESCRIPTION class Op_Diff_Flux_Chaleur_Turb_Base
-// Sert a modeliser le terme diffusif dans l'equation de transport
-// des fluctuations thermiques
-// On traite les deux equations de transport en une seule
-// equation vectorielle.
-// La viscosite_turbulente est a diviser par la constante Prdt_teta
-// pour la diffusion de K et par la constante Prdt_epsteta pour la
-// diffusion de Eps
-
-
+/*! @brief class Op_Diff_Flux_Chaleur_Turb_Base Sert a modeliser le terme diffusif dans l'equation de transport
+ *
+ *  des fluctuations thermiques
+ *  On traite les deux equations de transport en une seule
+ *  equation vectorielle.
+ *  La viscosite_turbulente est a diviser par la constante Prdt_teta
+ *  pour la diffusion de K et par la constante Prdt_epsteta pour la
+ *  diffusion de Eps
+ *
+ */
 class Op_Diff_Flux_Chaleur_Turb_Base : public Operateur_base
 {
   Declare_base(Op_Diff_Flux_Chaleur_Turb_Base);
@@ -119,18 +119,18 @@ inline DoubleTab& Op_Diff_Flux_Chaleur_Turb_negligeable::calculer(const DoubleTa
   return Operateur_negligeable::calculer(x,y);
 }
 
-//Description:
-//on assemble la matrice.
-
+/*! @brief on assemble la matrice.
+ *
+ */
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                      Matrice_Morse& matrice) const
 {
   ;
 }
 
-//Description:
-//on ajoute la contribution du second membre.
-
+/*! @brief on ajoute la contribution du second membre.
+ *
+ */
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
   ;
@@ -152,12 +152,9 @@ inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer_diffusivite_turbulen
   ;
 }
 
-///////////////////////////////////////////////////
-//  Fonctions inline de la classe Op_Diff_Flux_Chaleur_Turb
-///////////////////////////////////////////////////
-
-
-// Description:
+/*! @brief
+ *
+ */
 inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
 {
   if(!non_nul())
@@ -165,7 +162,9 @@ inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
   return valeur();
 }
 
-// Description:
+/*! @brief
+ *
+ */
 inline const Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base() const
 {
   if(!non_nul())

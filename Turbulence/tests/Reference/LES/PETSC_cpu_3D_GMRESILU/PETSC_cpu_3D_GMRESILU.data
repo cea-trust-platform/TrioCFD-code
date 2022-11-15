@@ -53,28 +53,22 @@ Lire sch
 	seuil_statio 1.e-8
 }
 
-Fluide_Incompressible fluide
-Lire fluide
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+{
+Fluide_Incompressible
 {
 	mu Champ_Uniforme 1 1.85e-5
 	rho Champ_Uniforme 1 1.17
 	lambda Champ_Uniforme 1 0.0262 
 	Cp Champ_Uniforme 1 1006
 	beta_th Champ_Uniforme 1 3.41e-3
+	gravite Champ_Uniforme 3 0. -9.81 0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0 -9.81 0
-
-Associate fluide gravite
-Associate pb dom
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-
-Lire pb
-{
 	Navier_Stokes_turbulent 
 	{
 		solveur_pression Petsc GMRES { 

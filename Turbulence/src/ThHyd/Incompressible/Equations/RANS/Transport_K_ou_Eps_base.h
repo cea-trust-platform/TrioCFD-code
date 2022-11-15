@@ -30,17 +30,11 @@
 #include <Ref_Mod_turb_hyd_RANS_Bicephale.h>
 #include <Ref_Champ_Inc_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Transport_K_ou_Eps_base
-//    Classe de base pour l'equation
-//    de transport des modeles k_Epsilon dans une approche ou K et Epsilon sont traites par deux equations differentes.
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
-
-
+/*! @brief Classe Transport_K_ou_Eps_base Classe de base pour l'equation
+ *
+ *     de transport des modeles k_Epsilon dans une approche ou K et Epsilon sont traites par deux equations differentes.
+ *
+ */
 class Transport_K_ou_Eps_base: public Equation_base
 {
 
@@ -85,63 +79,36 @@ protected:
 
   bool transporte_K_;
 };
-// Description:
-//    Renvoie le champ inconnue de l'equation.
-//    Un champ vecteur contenant K ou epsilon.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue de l'equation
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ inconnue de l'equation.
+ *
+ * Un champ vecteur contenant K ou epsilon.
+ *
+ * @return (Champ_Inc&) le champ inconnue de l'equation
+ */
 inline Champ_Inc& Transport_K_ou_Eps_base::inconnue()
 {
   return le_champ_;
 }
 
 
-// Description:
-//    Renvoie le champ inconnue de l'equation.
-//    Un champ vecteur contenant K ou epsilon.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue de l'equation
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ inconnue de l'equation.
+ *
+ * Un champ vecteur contenant K ou epsilon.
+ *     (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue de l'equation
+ */
 inline const Champ_Inc& Transport_K_ou_Eps_base::inconnue() const
 {
   return le_champ_;
 }
 
-// Description:
-//   Renvoie le modele de turbulence associe a l'equation.
-//   (version const)
-// Precondition: un modele de turbulence doit avoir ete associe
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Modele_turbulence_hyd_K_Eps&
-//    Signification: le modele de turbulence associe a l'equation
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le modele de turbulence associe a l'equation.
+ *
+ * (version const)
+ *
+ * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
+ */
 inline const Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbulence() const
 {
   assert(mon_modele.non_nul());
@@ -149,20 +116,10 @@ inline const Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbul
 }
 
 
-// Description:
-//   Renvoie le modele de turbulence associe a l'equation.
-// Precondition: un modele de turbulence doit avoir ete associe
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Modele_turbulence_hyd_K_Eps&
-//    Signification: le modele de turbulence associe a l'equation
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le modele de turbulence associe a l'equation.
+ *
+ * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
+ */
 inline Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbulence()
 {
   assert(mon_modele.non_nul());

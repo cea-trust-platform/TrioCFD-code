@@ -37,21 +37,20 @@ Read sch
 	facsec 1.
 }
 
-Fluide_Incompressible air
-Read air
-{
-	mu  Champ_Uniforme 1 0.00129
-	rho Champ_Uniforme 1 1000.
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb air
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 0.00129
+   	rho Champ_Uniforme 1 1000.
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		solveur_pression petsc cholesky { }
 		convection { amont }
@@ -109,3 +108,4 @@ Read pb
 
 Solve pb
 End
+ 

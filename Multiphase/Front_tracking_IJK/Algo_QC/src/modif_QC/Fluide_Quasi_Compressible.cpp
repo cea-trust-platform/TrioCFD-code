@@ -51,20 +51,11 @@ Fluide_Quasi_Compressible::Fluide_Quasi_Compressible()
   */
 }
 
-// Description:
-//    Ecrit les proprietes du fluide sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit les proprietes du fluide sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
 {
   os << que_suis_je() << finl;
@@ -73,32 +64,24 @@ Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
 }
 
 
-// Description:
-//   Lit les caracteristiques du fluide a partir d'un flot
-//   d'entree.
-//   Format:
-//     Fluide_Quasi_Compressible
-//     {
-//      Mu type_champ bloc de lecture de champ
-//      Rho type_champ bloc de lecture de champ
-//      [Cp type_champ bloc de lecture de champ]
-//      [Lambda type_champ bloc de lecture de champ]
-//      [Beta_th type_champ bloc de lecture de champ]
-//      [Beta_co type_champ bloc de lecture de champ]
-//     }
-// cd Fluide_Incompressible::readOn
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les caracteristiques du fluide a partir d'un flot d'entree.
+ *
+ *    Format:
+ *      Fluide_Quasi_Compressible
+ *      {
+ *       Mu type_champ bloc de lecture de champ
+ *       Rho type_champ bloc de lecture de champ
+ *       [Cp type_champ bloc de lecture de champ]
+ *       [Lambda type_champ bloc de lecture de champ]
+ *       [Beta_th type_champ bloc de lecture de champ]
+ *       [Beta_co type_champ bloc de lecture de champ]
+ *      }
+ *  cd Fluide_Incompressible::readOn
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (Entree&) le flot d'entree modifie 
+ * @throws accolade ouvrante attendue 
+ */
 Entree& Fluide_Quasi_Compressible::readOn(Entree& is)
 {
   Fluide_Incompressible::readOn(is);
@@ -247,21 +230,10 @@ int Fluide_Quasi_Compressible::lire_motcle_non_standard(const Motcle& mot, Entre
 
 }
 
-// Description:
-//    Complete le fluide avec les champs inconnus associes au probleme
-// Precondition:
-// Parametre: Pb_Thermohydraulique& pb
-//    Signification: le probleme a resoudre
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-// void Fluide_Quasi_Compressible::completer(const Pb_Thermohydraulique& pb)
+/*! @brief Complete le fluide avec les champs inconnus associes au probleme
+ *
+ * @param (Pb_Thermohydraulique& pb) le probleme a resoudre 
+ */
 void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 {
   Cerr<<"Fluide_Quasi_Compressible::completer Pth="<<Pth_<<finl;
@@ -299,20 +271,10 @@ void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
     }
 }
 
-// Description:
-//    Complete le fluide avec un Cp constant
-// Precondition:
-// Parametre: double Cp
-//    Signification: le cp du fluide
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Complete le fluide avec un Cp constant
+ *
+ * @param (double Cp) le cp du fluide 
+ */
 void Fluide_Quasi_Compressible::set_Cp(double Cp_)
 {
   Cp.typer("Champ_Uniforme");
@@ -324,39 +286,17 @@ void Fluide_Quasi_Compressible::set_Cp(double Cp_)
   //Cerr<<"Fluide_Quasi_Compressible : set Cp="<<tab_Cp(0,0)<<finl;
 }
 
-// Description:
-//    Renvoie le tableau des valeurs de le temperature
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le tableau des valeurs de le temperature
+ *
+ */
 const DoubleTab& Fluide_Quasi_Compressible::temperature() const
 {
   return ch_temperature().valeurs();
 }
 
-// Description:
-//    Renvoie le champ de le temperature
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ de le temperature
+ *
+ */
 const Champ_Don& Fluide_Quasi_Compressible::ch_temperature() const
 {
   return loi_etat_->ch_temperature();
@@ -366,20 +306,9 @@ Champ_Don& Fluide_Quasi_Compressible::ch_temperature()
   return loi_etat_->ch_temperature();
 }
 
-// Description:
-//    Prepare le pas de temps
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prepare le pas de temps
+ *
+ */
 void Fluide_Quasi_Compressible::preparer_pas_temps()
 {
   loi_etat_->mettre_a_jour(0);
@@ -439,20 +368,10 @@ void Fluide_Quasi_Compressible::discretiser(const Probleme_base& pb, const  Disc
   Fluide_Incompressible::discretiser(pb,dis);
 }
 
-// Description:
-//    Verifie que les champs lus l'ont ete correctement.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie
-// Effets de bord:
-// Postcondition:
+/*! @brief Verifie que les champs lus l'ont ete correctement.
+ *
+ * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie 
+ */
 void Fluide_Quasi_Compressible::verifier_coherence_champs(int& err,Nom& msg)
 {
   msg="";
@@ -556,24 +475,14 @@ void Fluide_Quasi_Compressible::creer_champs_non_lus()
     }
 }
 
-// Description:
-//    Effectue une mise a jour en temps du milieu,
-//    et donc de ses parametres caracteristiques.
-//    Les champs uniformes sont recalcules pour le
-//    nouveau temps specifie, les autres sont mis a
-//    par un appel a CLASSE_DU_CHAMP::mettre_a_jour(double temps).
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue une mise a jour en temps du milieu, et donc de ses parametres caracteristiques.
+ *
+ *     Les champs uniformes sont recalcules pour le
+ *     nouveau temps specifie, les autres sont mis a
+ *     par un appel a CLASSE_DU_CHAMP::mettre_a_jour(double temps).
+ *
+ * @param (double temps) le temps de mise a jour 
+ */
 void Fluide_Quasi_Compressible::mettre_a_jour(double temps)
 {
   rho.mettre_a_jour(temps);
@@ -599,20 +508,9 @@ void Fluide_Quasi_Compressible::mettre_a_jour(double temps)
     }
 }
 
-// Description:
-//    Initialise les parametres du fluide.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: les parametres du fluide sont initialises
+/*! @brief Initialise les parametres du fluide.
+ *
+ */
 int Fluide_Quasi_Compressible::initialiser(const double& temps)
 {
   Cerr << "Fluide_Quasi_Compressible::initialiser()" << finl;
@@ -646,20 +544,9 @@ int Fluide_Quasi_Compressible::initialiser(const double& temps)
   return 1;
 }
 
-// Description:
-//    Prepare le fluide au calcul.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prepare le fluide au calcul.
+ *
+ */
 void Fluide_Quasi_Compressible::preparer_calcul()
 {
   Cerr << "Fluide_Quasi_Compressible::preparer_calcul()" << finl;
@@ -671,20 +558,9 @@ void Fluide_Quasi_Compressible::preparer_calcul()
   pression_tot_.mettre_a_jour(0);
 }
 
-// Description:
-//    Calcule la pression totale : pression thermodynamique + pression hydrodynamique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la pression totale : pression thermodynamique + pression hydrodynamique
+ *
+ */
 void Fluide_Quasi_Compressible::calculer_pression_tot()
 {
   // Cerr<<"Fluide_Quasi_Compressible::calculer_pression_tot  -->Pth="<<Pth_<<finl;

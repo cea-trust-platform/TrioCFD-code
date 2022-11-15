@@ -68,11 +68,8 @@ Lire liquide
 {
 	mu Champ_Uniforme 1 5e-05
 	rho Champ_Uniforme 1 2
+	gravite Champ_Uniforme 3 0. -9.81 0
 }
-
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc          hydraulique
 Transport_Marqueur_FT	       marqueurs
@@ -174,14 +171,15 @@ Lire pb
 	}	
 	liste_postraitements
 	{
-	       Postraitement_ft_lata marqueurs
-	       {
-		       dt_post 0.05
-		       nom_fichier marqueurs
-		       print
-		       interfaces marqueurs { champs sommets { vitesse } }
-	       }	
+	       postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    interfaces marqueurs { 
+        vitesse som 
+    } 
+}	
 	}
 }
 Solve pb
 Fin
+ 

@@ -526,7 +526,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   const DoubleTab& tab_beta = ch_beta.valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
   int nb_elem = zone_VDF.nb_elem();
-  const DoubleVect& porosite_surf = zone_VDF.porosite_face();
+  const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
   int ori,ori1,num_face,elem1,elem2;
   double vol;

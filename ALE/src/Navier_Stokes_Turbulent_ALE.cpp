@@ -40,43 +40,27 @@ Implemente_instanciable(Navier_Stokes_Turbulent_ALE,"Navier_Stokes_Turbulent_ALE
 // XD  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
 
 
-// Description:
-//    Impression de l'equation sur un flot de sortie.
-//    Simple appel a Equation_base::printOn(Sortie&).
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Impression de l'equation sur un flot de sortie.
+ *
+ * Simple appel a Equation_base::printOn(Sortie&).
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Navier_Stokes_Turbulent_ALE::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
 
-// Description:
-//    Lit les specifications de l'equation de Navier Stokes a
-//    partir d'un flot d'entree.
-//    Simple appel a Navier_Stokes_std_ALE::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: pas de modele de turbulence speficie
-// Effets de bord:
-// Postcondition: un modele de turbulence doit avoir ete specifie
+/*! @brief Lit les specifications de l'equation de Navier Stokes a partir d'un flot d'entree.
+ *
+ *     Simple appel a Navier_Stokes_std_ALE::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws pas de modele de turbulence speficie
+ */
 Entree& Navier_Stokes_Turbulent_ALE::readOn(Entree& is)
 {
   Navier_Stokes_std_ALE::readOn(is);
@@ -245,22 +229,13 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
   return is;
 }
 
-// Description:
-//    Prepare le calcul.
-//    Simple appe a Mod_turb_hyd::preparer_caclul() sur
-//    le membre reprresentant la turbulence.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prepare le calcul.
+ *
+ * Simple appe a Mod_turb_hyd::preparer_caclul() sur
+ *     le membre reprresentant la turbulence.
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Navier_Stokes_Turbulent_ALE::preparer_calcul()
 {
 
@@ -282,21 +257,11 @@ bool Navier_Stokes_Turbulent_ALE::initTimeStep(double dt)
 
 
 
-// Description:
-//    Sauvegarde l'equation (et son modele de turbulence)
-//    sur un flot de sortie.
-// Precondition:
-// Parametre:Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Sauvegarde l'equation (et son modele de turbulence) sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) renvoie toujours 1
+ */
 int Navier_Stokes_Turbulent_ALE::sauvegarder(Sortie& os) const
 {
   int bytes=0;
@@ -308,21 +273,12 @@ int Navier_Stokes_Turbulent_ALE::sauvegarder(Sortie& os) const
 }
 
 
-// Description:
-//    Reprise de l'equation et de son modele de turbulence
-//    a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: fin de fichier rencontre pendant la reprise
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise de l'equation et de son modele de turbulence a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ * @throws fin de fichier rencontre pendant la reprise
+ */
 int Navier_Stokes_Turbulent_ALE::reprendre(Entree& is)
 {
   Navier_Stokes_std_ALE::reprendre(is);
@@ -338,22 +294,11 @@ int Navier_Stokes_Turbulent_ALE::reprendre(Entree& is)
 }
 
 
-// Description:
-//    Appels successifs a:
-//      Navier_Stokes_std_ALE::completer()
-//      Mod_Turb_Hyd::completer() [sur le membre concerne]
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Appels successifs a: Navier_Stokes_std_ALE::completer()
+ *
+ *       Mod_Turb_Hyd::completer() [sur le membre concerne]
+ *
+ */
 void Navier_Stokes_Turbulent_ALE::completer()
 {
   Navier_Stokes_std_ALE::completer();
@@ -361,20 +306,10 @@ void Navier_Stokes_Turbulent_ALE::completer()
 }
 
 
-// Description:
-//    Effecttue une mise a jour en temps de l'equation.
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Effecttue une mise a jour en temps de l'equation.
+ *
+ * @param (double temps) le temps de mise a jour
+ */
 void Navier_Stokes_Turbulent_ALE::mettre_a_jour(double temps)
 {
   Navier_Stokes_std_ALE::mettre_a_jour(temps);

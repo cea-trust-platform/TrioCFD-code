@@ -1,7 +1,7 @@
 # Rayonnement semi transparent 3D : calcul de l'irradiance #
 # PARALLEL OK 3 #
 dimension 3
-Pb_Thermohydraulique pb
+Pb_Rayo_Thermohydraulique pb
 Domaine dom
 
 # BEGIN MESH #
@@ -47,14 +47,11 @@ Lire fluide
 	beta_th Champ_Uniforme 1 3.822e-3
 	indice Champ_Uniforme 1 1.
 	kappa Champ_Uniforme 1 1.
+	gravite Champ_Uniforme  3 0 0 0 
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. 0.
 
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo dom
-Associate fluide gravite
 Associate pb dom
 Associate pb fluide
 

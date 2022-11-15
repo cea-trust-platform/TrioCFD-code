@@ -30,31 +30,25 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Pb_Phase_field
-//    Cette classe represente un probleme d'hydraulique avec transport
-//    d'un ou plusieurs constituants:
-//       - Equations de Navier_Stokes en regime laminaire
-//         pour un fluide incompressible
-//       - Equations de convection-diffusion en regime laminaire
-//         En fait si on transporte plusieurs constituants on utilisera une
-//         seule equation de convection-diffusion avec une inconnue vectorielle.
-//         En general, on couple les 2 equations par l'intermediaire du terme
-//         source des forces de volume de Navier_Stokes dans lequel on prend
-//         en compte de petites variations de la masse volumique en fonction
-//         du ou des constituants
-// .SECTION voir aussi
-//     Pb_Fluide_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Pb_Phase_field Cette classe represente un probleme d'hydraulique avec transport
+ *
+ *     d'un ou plusieurs constituants:
+ *        - Equations de Navier_Stokes en regime laminaire
+ *          pour un fluide incompressible
+ *        - Equations de convection-diffusion en regime laminaire
+ *          En fait si on transporte plusieurs constituants on utilisera une
+ *          seule equation de convection-diffusion avec une inconnue vectorielle.
+ *          En general, on couple les 2 equations par l'intermediaire du terme
+ *          source des forces de volume de Navier_Stokes dans lequel on prend
+ *          en compte de petites variations de la masse volumique en fonction
+ *          du ou des constituants
+ *
+ * @sa Pb_Fluide_base
+ */
 class Pb_Phase_field : public Pb_Fluide_base
 {
-
   Declare_instanciable(Pb_Phase_field);
-
 public:
-
   int nombre_d_equations() const override;
   const Equation_base& equation(int) const override ;
   Equation_base& equation(int) override;
@@ -62,10 +56,10 @@ public:
   int verifier() override;
 
 protected:
-
   Navier_Stokes_phase_field eq_hydraulique;
   Convection_Diffusion_Phase_field eq_concentration;
 
+  void typer_lire_milieu(Entree& is) override;
 };
 
 

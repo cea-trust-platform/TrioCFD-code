@@ -34,13 +34,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_ODVM_scal_VDF
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_ODVM_scal_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_ODVM_scal_VDF : public Paroi_scal_hyd_base_VDF
 {
   Declare_instanciable_sans_constructeur(Paroi_ODVM_scal_VDF);

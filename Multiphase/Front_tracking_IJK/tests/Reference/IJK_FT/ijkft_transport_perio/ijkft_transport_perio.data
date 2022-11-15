@@ -39,6 +39,7 @@ IJK_FT_double
   timestep_facsec 1
   dt_post 1000
   champs_a_postraiter 1 INDICATRICE
+  # champs_a_postraiter 3 INDICATRICE INTERFACES COURBURE #
   check_stop_file stop.txt
   dt_sauvegarde 1000
   nb_pas_dt_max 24

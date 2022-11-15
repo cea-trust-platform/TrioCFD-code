@@ -43,24 +43,13 @@ Entree& Prolongement_elem_elem_DWF::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement de l'inconnue grossiere sur la frontiere fine
-//    pour inconnue TEMPERATURE ou PRESSION
-// Dans ce prolongement, la frontiere fine ne repose pas sur une frontiere grossiere
-// !  chaque face fine de la frontiere fine est situee a l'interieur  d'un element grossier.
-// Les connectivites a passer sont du type elemF->elemG
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue TEMPERATURE ou PRESSION
+ *
+ *  Dans ce prolongement, la frontiere fine ne repose pas sur une frontiere grossiere
+ *  !  chaque face fine de la frontiere fine est situee a l'interieur  d'un element grossier.
+ *  Les connectivites a passer sont du type elemF->elemG
+ *
+ */
 void Prolongement_elem_elem_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,

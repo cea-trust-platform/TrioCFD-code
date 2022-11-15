@@ -39,9 +39,12 @@ Sortie& Remailleur_Collision_FT_Juric::printOn(Sortie& os) const
   return os;
 }
 
-// Description: Lecture du parametre Source_Isovaleur.
-//  Format attendu :
-//    { [ source_isovaleur indicatrice | fonction_distance ] }
+/*! @brief Lecture du parametre Source_Isovaleur.
+ *
+ * Format attendu :
+ *     { [ source_isovaleur indicatrice | fonction_distance ] }
+ *
+ */
 Entree& Remailleur_Collision_FT_Juric::readOn(Entree& is)
 {
   source_isovaleur_ = INDICATRICE;
@@ -109,10 +112,11 @@ static void calculer_iso_avec_indicatrice(const Domaine&     domaine,
   fonction_iso.echange_espace_virtuel();
 }
 
-// Description:
-//  Remaillage complet des interfaces par la methode de Juric:
-//  On calcule une fonction distance a l'interface evaluee aux sommets
-//  du maillage eulerien et on construit une isovaleur de cette fonction distance.
+/*! @brief Remaillage complet des interfaces par la methode de Juric: On calcule une fonction distance a l'interface evaluee aux sommets
+ *
+ *   du maillage eulerien et on construit une isovaleur de cette fonction distance.
+ *
+ */
 int Remailleur_Collision_FT_Juric::traite_RuptureCoalescenceInterfaces(
   Maillage_FT_Disc& maillage,
   Champ_base& indicatrice) const

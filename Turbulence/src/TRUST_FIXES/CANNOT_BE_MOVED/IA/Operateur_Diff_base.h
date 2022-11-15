@@ -20,22 +20,15 @@
 #include <Ref_Champ_base.h>
 #include <Support_Champ_Masse_Volumique.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Operateur_Diff_base
-//    Cette classe est la base de la hierarchie des operateurs representant
-//    un terme de diffusion dans une equation. Le choix du terme depend
-//    de la modelisation laminaire ou turbulente de l'ecoulement, de la
-//    discretisation et du type du champ de diffusivite. Ces variantes
-//    donneront lieu a des classes filles de Operateur_Diff_base.
-// .SECTION voir aussi
-//    Operateur_base Operateur_Diff
-//    Classe abstraite
-//    Methode abstraite
-//      void associer_diffusivite(const Champ_Don& )
-//      const Champ_Don_base& diffusivite() const
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Operateur_Diff_base Cette classe est la base de la hierarchie des operateurs representant
+ *
+ *     un terme de diffusion dans une equation. Le choix du terme depend
+ *     de la modelisation laminaire ou turbulente de l'ecoulement, de la
+ *     discretisation et du type du champ de diffusivite. Ces variantes
+ *     donneront lieu a des classes filles de Operateur_Diff_base.
+ *
+ * @sa Operateur_base Operateur_Diff, Classe abstraite, Methode abstraite, void associer_diffusivite(const Champ_Don& ), const Champ_Don_base& diffusivite() const
+ */
 class Operateur_Diff_base  : public Operateur_base,
   public Support_Champ_Masse_Volumique
 {
@@ -51,6 +44,7 @@ public:
 
   //liste d'Op_Diff de problemes resolus simultanement (thermique monolithique)
   mutable std::vector<const Operateur_Diff_base *> op_ext;
+  virtual void init_op_ext() const {}; //remplissage de op_ext (ne peut pas etre fait dans completer(), trop tot)
 
 protected:
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;

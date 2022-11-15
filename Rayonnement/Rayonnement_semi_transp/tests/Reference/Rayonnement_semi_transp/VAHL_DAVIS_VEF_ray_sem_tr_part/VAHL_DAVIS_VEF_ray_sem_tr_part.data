@@ -1,8 +1,8 @@
 # Thermohydraulique 2D VEF Boussinesq + rayonnement semi transparent #
 # PARALLEL OK #
 dimension 2
-Pb_Thermohydraulique pb
-Pb_conduction pb_partition
+Pb_Rayo_Thermohydraulique pb
+Pb_Rayo_conduction pb_partition
 
 Domaine dom_fluide
 Domaine dom_solide
@@ -128,8 +128,8 @@ Lire fluide
 	beta_th Champ_Uniforme 1 1.8231e-2
 	indice Champ_Uniforme 1 1.
 	kappa Champ_Uniforme 1 1.
+	gravite Champ_Uniforme 2 0 -9.81
 }
-
 
 Solide solide
 Lire solide
@@ -139,18 +139,11 @@ Lire solide
 	Cp Champ_Uniforme 1 500
 }
 
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
-
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo dom_fluide
-Associate solide gravite
 Associate pb_partition dom_solide
 Associate pb_partition solide
 
-Associate fluide gravite
 Associate pb dom_fluide
 Associate pb fluide
 
@@ -160,7 +153,6 @@ Associate pbc pb
 Associate pbc modele_rayo
 Associate pbc sch
 Discretize pbc dis
-
 
 Lire modele_rayo
 {
@@ -233,14 +225,14 @@ Lire pb
 			Haut1 paroi_adiabatique
 			Gauche1  Paroi_temperature_imposee Champ_Front_Uniforme 1 296.6
 			Bas1 paroi_adiabatique
-			Droit1_haut Paroi_contact pb_partition Droit1_haut 
-			Droit1_bas Paroi_contact pb_partition Droit1_bas
-			Haut2 Paroi_contact pb_partition Haut2 
-			Bas2 Paroi_contact pb_partition Bas2
+			Droit1_haut Paroi_contact_rayo pb_partition Droit1_haut  SEMI_TRANSP
+			Droit1_bas Paroi_contact_rayo pb_partition Droit1_bas SEMI_TRANSP
+			Haut2 Paroi_contact_rayo pb_partition Haut2  SEMI_TRANSP
+			Bas2 Paroi_contact_rayo pb_partition Bas2 SEMI_TRANSP
 			Haut3 paroi_adiabatique
 			Bas3 paroi_adiabatique
-			Gauche3_haut Paroi_contact pb_partition Gauche3_haut
-			Gauche3_bas Paroi_contact pb_partition Gauche3_bas
+			Gauche3_haut Paroi_contact_rayo pb_partition Gauche3_haut SEMI_TRANSP
+			Gauche3_bas Paroi_contact_rayo pb_partition Gauche3_bas SEMI_TRANSP
 			Droit3  Paroi_temperature_imposee Champ_Front_Uniforme 1 312.1
 			}
 		conditions_initiales { Temperature Champ_Uniforme 1 304.35 }
@@ -270,13 +262,13 @@ Lire pb_partition
 		conditions_initiales { temperature Champ_Uniforme 1 304.35 }
 		boundary_conditions 
 		{
-		Droit1_haut Paroi_contact pb Droit1_haut
-		Haut2 Paroi_contact pb Haut2
-		Gauche3_haut Paroi_contact pb Gauche3_haut
+		Droit1_haut Paroi_contact_rayo pb Droit1_haut SEMI_TRANSP
+		Haut2 Paroi_contact_rayo pb Haut2 SEMI_TRANSP
+		Gauche3_haut Paroi_contact_rayo pb Gauche3_haut SEMI_TRANSP
 		Haut_Part_Haut paroi_adiabatique
-		Droit1_bas Paroi_contact pb Droit1_bas
-		Bas2 Paroi_contact pb Bas2
-		Gauche3_bas Paroi_contact pb Gauche3_bas
+		Droit1_bas Paroi_contact_rayo pb Droit1_bas SEMI_TRANSP
+		Bas2 Paroi_contact_rayo pb Bas2 SEMI_TRANSP
+		Gauche3_bas Paroi_contact_rayo pb Gauche3_bas SEMI_TRANSP
 		Bas_Part_Bas paroi_adiabatique
 		}
 	}

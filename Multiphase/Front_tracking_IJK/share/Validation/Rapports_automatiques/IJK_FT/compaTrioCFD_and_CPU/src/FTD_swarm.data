@@ -101,7 +101,10 @@ Associate pb fluide
 
 Discretize pb dis
 Domaine mes_interfs 
-read_med mes_interfs INTERFACES diph_swarm.med
+Lire_MED { 
+   domain mes_interfs 
+   file diph_swarm.med 
+}
 Read pb
 {
 hydraulique

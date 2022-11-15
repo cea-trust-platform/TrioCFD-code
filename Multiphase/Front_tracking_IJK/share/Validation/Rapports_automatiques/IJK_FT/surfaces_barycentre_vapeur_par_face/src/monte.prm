@@ -1,0 +1,243 @@
+Parametres {
+	Titre "Ascension gravitaire mono et multi-bulles periodique front-tracking en IJK"
+	Description "Cette fiche verifie pas mal de choses dont : " <<EOF
+o La force de gravite
+o La periodicite 
+o Les sauvegarde/reprise
+o La repulsion
+EOF
+	Auteur "G.B."
+	CasTest . pre_run.data
+	CasTest . ijkft_monte_seq.data
+	# CasTest . ijkft_monte_multi_seq.data #
+	# CasTest . ijkft_monte_multi_repr_seq.data #
+	# CasTest . ijkft_monte_par8.data 8 #
+	# CasTest . ijkft_monte_multi_par8.data 8 #
+}
+
+
+Chapitre {
+	Titre "Maillage généré par cree_multi_bulles.sh"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh init_multi.lata FTMESH
+		pseudocolor init_multi.lata FTMESH COMPO_CONNEXE ELEM
+	}
+}
+
+
+Chapitre {
+	Titre "Mono-bulle"
+	Description "Calcul pre_run pour avancer la bulle au bout du domaine." <<EOF
+Puis dans le calcul ijkft_monte_slow_seq il y a inversion de la bulle reelle et ghost.
+La pression reagit au pas de temps suivant. 
+EOF
+	
+	visu {
+		titre "Fin du pre_run mono-bulle"
+		cycles -1
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        pre_run.lata DOM
+		mesh        pre_run.lata INTERFACES
+		pseudocolor pre_run.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+
+	Description "La vitesse de montee de bulle est bien continue au changement de cote." <<EOF
+Apres la mise en regime du pre_run, la vitesse de montee est constante. 
+EOF
+
+	figure {
+		titre "Position des bulles en x"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier pre_run_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "pre_run col2 ori"
+		}
+		Courbe {
+		   fichier pre_run_bulles_centre_x.out
+		     colonnes ($1) (($2)+0.006)
+		     Legende "pre_run col2 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_seq_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_monte_seq col2 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_seq_bulles_centre_x.out
+		     colonnes ($1) (($2)+0.006)
+		     Legende "ijkft_monte_seq col2 translate"
+		     }
+	}
+
+}
+
+Chapitre {
+	Titre "Multi-bulles"
+	Description "Calcul multi-bulle." <<EOF
+Meme si plusieurs portions connexes d'interface sont dans la meme maille, 
+l'inversion se passe bien.
+EOF
+	
+	visu {
+		titre "avant les inversions"
+		cycles 11
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_monte_multi_seq.lata DOM
+		mesh        ijkft_monte_multi_seq.lata INTERFACES
+		pseudocolor ijkft_monte_multi_seq.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+
+	visu {
+		titre "inversion d'une compo"
+		cycles 12
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_monte_multi_seq.lata DOM
+		mesh        ijkft_monte_multi_seq.lata INTERFACES
+		pseudocolor ijkft_monte_multi_seq.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+
+	visu {
+		titre "suite"
+		cycles 13
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_monte_multi_seq.lata DOM
+		mesh        ijkft_monte_multi_seq.lata INTERFACES
+		pseudocolor ijkft_monte_multi_seq.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+
+	visu {
+		titre "inversion d'une autre compo"
+		cycles 14
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_monte_multi_seq.lata DOM
+		mesh        ijkft_monte_multi_seq.lata INTERFACES
+		pseudocolor ijkft_monte_multi_seq.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+
+	
+	visu {
+		titre "avant les inversions"
+		cycles 11
+		pseudocolor ijkft_monte_multi_seq.lata DOM PRESSURE ELEM
+		Operator Slice2D_z 0. 0. 1.5e-3
+	}
+
+	visu {
+		titre "inversion d'une compo"
+		cycles 12
+		pseudocolor ijkft_monte_multi_seq.lata DOM PRESSURE ELEM
+		Operator Slice2D_z 0. 0. 1.5e-3
+	}
+
+	visu {
+		titre "suite"
+		cycles 13
+		pseudocolor ijkft_monte_multi_seq.lata DOM PRESSURE ELEM
+		Operator Slice2D_z 0. 0. 1.5e-3
+	}
+
+	visu {
+		titre "inversion d'une autre compo"
+		cycles 14
+		pseudocolor ijkft_monte_multi_seq.lata DOM PRESSURE ELEM
+		Operator Slice2D_z 0. 0. 1.5e-3
+	}
+
+
+	figure {
+		titre "Position des bulles en x"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_monte_multi_seq col2 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) (($2)+0.006)
+		     Legende "ijkft_monte_multi_seq col2 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) ($3)
+		     Legende "ijkft_monte_multi_seq col3 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) (($3)+0.006)
+		     Legende "ijkft_monte_multi_seq col3 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) ($4)
+		     Legende "ijkft_monte_multi_seq col4 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_seq_bulles_centre_x.out
+		     colonnes ($1) (($4)+0.006)
+		     Legende "ijkft_monte_multi_seq col4 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_monte_multi_repr_seq col2 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) (($2)+0.006)
+		     Legende "ijkft_monte_multi_repr_seq col2 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) ($3)
+		     Legende "ijkft_monte_multi_repr_seq col3 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) (($3)+0.006)
+		     Legende "ijkft_monte_multi_repr_seq col3 translate"
+		     }
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) ($4)
+		     Legende "ijkft_monte_multi_repr_seq col4 ori"
+		}
+		Courbe {
+		   fichier ijkft_monte_multi_repr_seq_bulles_centre_x.out
+		     colonnes ($1) (($4)+0.006)
+		     Legende "ijkft_monte_multi_repr_seq col4 translate"
+		     }
+	}
+
+	Description "La vitesse de montee des bulles est bien continue au changement de cote." <<EOF
+A la fin de ijkft_monte_multi_seq, 2 bulles sont pretes a collisionner. 
+EOF
+}

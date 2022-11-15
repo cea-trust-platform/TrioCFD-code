@@ -60,22 +60,21 @@ Read sch
 
 
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 0.00514
-	rho Champ_Uniforme 1 2
-}
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 	{
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 0.00514
+   	rho Champ_Uniforme 1 2
+   }
+   
+   	Navier_Stokes_Turbulent
 		{
                 solveur_pression Petsc GCP { precond ssor { omega 1.5 } seuil 1.e-08 impr }
 		solveur_bar Petsc GCP { precond pilut { level 20 epsilon 0.01 } seuil 1.e-08 impr } 		
@@ -124,3 +123,4 @@ Read pb
 Solve pb
 End
 
+ 

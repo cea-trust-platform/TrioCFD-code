@@ -40,11 +40,9 @@ class Pb_1G;
 #include <TRUSTTabs_forward.h>
 class Frontiere;
 class Probleme_base;
-//
-// .DESCRIPTION class Pb_2G
-//
-// .SECTION voir aussi
-
+/*! @brief class Pb_2G
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

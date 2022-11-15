@@ -29,6 +29,52 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+Implemente_instanciable_sans_constructeur( consigne_initiale, "consigne_initiale", Objet_U ) ;
+
+consigne_initiale::consigne_initiale()
+{
+  time_iteration_=0;
+  qdm_cible_=0;
+}
+
+Sortie& consigne_initiale::printOn( Sortie& os ) const
+{
+  Objet_U::printOn( os );
+  os  << "{\n"
+      << " qdm_cible " << qdm_cible_ << "\n";
+  os << " }\n" ;
+  return os;
+}
+
+Entree& consigne_initiale::readOn( Entree& is )
+{
+  Objet_U::readOn( is );
+  Param param(que_suis_je());
+  param.ajouter("qdm_cible",&qdm_cible_ );
+  param.lire_avec_accolades(is);
+  return is;
+}
+
+void consigne_initiale::initialise()
+{
+  time_iteration_=0;
+  qdm_cible_=0;
+}
+
+// TODO
+void consigne_initiale::compute_qdm_cible(double qdm_init)
+{
+  if (time_iteration_ == 0)
+    qdm_cible_ = qdm_init;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
 Implemente_instanciable_sans_constructeur( cible_donnee, "cible_donnee", Objet_U ) ;
 
 cible_donnee::cible_donnee():
@@ -44,7 +90,6 @@ Sortie& cible_donnee::printOn( Sortie& os ) const
   os  << "{\n"
       << " vitesse_cible " << v_cible_ << "\n";
   os << " }\n" ;
-  return os;
   return os;
 }
 
@@ -263,7 +308,7 @@ void moyenne_glissante::initialise()
   duree_effective_morceau_glissant_=0;
 }
 
-void moyenne_glissante::set_time(double time, double time_step, double time_iteration)
+void moyenne_glissante::set_time(double time, double time_step, int time_iteration)
 {
   time_ = time;
   tstep_ = time_iteration;
@@ -358,7 +403,7 @@ Implemente_instanciable_sans_constructeur( correction_one_direction, "correction
 correction_one_direction::correction_one_direction() :
   value_correction_(0),
   correct_velocity_(0),
-  type_corr_(CIBLE_CONSTANTE),
+  type_corr_(CONSIGNE_INITIALE), // plutot le mettre en consigne_initiale_ pour un usage par defaut
   i_need_vitesse_relative_(0),
   rho_vel_moyen_(0.),
   rho_moyen_(0.),
@@ -381,9 +426,12 @@ Sortie& correction_one_direction::printOn( Sortie& os ) const
   if ( get_type_corr()==CIBLE_CONSTANTE)    os << " type_correction " << "cible_constante" << "\n";
   if ( get_type_corr()==MOYENNE_PAR_MORCEAUX)    os << " type_correction " << "moyenne_par_morceaux" << "\n";
   if ( get_type_corr()==MOYENNE_GLISSANTE)    os << " type_correction " << "moyenne_glissante" << "\n";
+  if ( get_type_corr()==REGIME_ETABLI)    os << " type_correction " << "regime_etabli" << "\n";
+  if ( get_type_corr()==CONSIGNE_INITIALE)    os << " type_correction " << "consigne_initiale" << "\n";
   os << " parametres_cible_constante " << parametres_cible_constante_ << "\n"
      << " parametres_moyenne_par_morceaux " << parametres_moyenne_par_morceaux_ << "\n"
-     << " parametres_moyenne_glissante " << parametres_moyenne_glissante_ << "\n";
+     << " parametres_moyenne_glissante " << parametres_moyenne_glissante_ << "\n"
+     << " parametres_consigne_initiale " << parametres_consigne_initiale_ << "\n";
   os << " }\n" ;
   return os;
 
@@ -397,10 +445,12 @@ Entree& correction_one_direction::readOn( Entree& is )
   param.dictionnaire("cible_constante", CIBLE_CONSTANTE);
   param.dictionnaire("moyenne_par_morceaux", MOYENNE_PAR_MORCEAUX);
   param.dictionnaire("moyenne_glissante", MOYENNE_GLISSANTE);
-  param.dictionnaire("regime_etabli", REGIME_ETABLI);
+  param.dictionnaire("regime_etabli", REGIME_ETABLI); // unused (29/06/2022)
+  param.dictionnaire("consigne_initiale", CONSIGNE_INITIALE);
   param.ajouter("parametres_cible_constante",&parametres_cible_constante_);
   param.ajouter("parametres_moyenne_par_morceaux",&parametres_moyenne_par_morceaux_);
   param.ajouter("parametres_moyenne_glissante",&parametres_moyenne_glissante_);
+  param.ajouter("parametres_consigne_initiale",&parametres_consigne_initiale_);
   param.lire_avec_accolades(is);
   return is;
 }
@@ -411,6 +461,7 @@ void correction_one_direction::set_correction(correction_one_direction& correcti
   parametres_cible_constante_ = correction_in.get_cible_constante();
   parametres_moyenne_par_morceaux_ = correction_in.get_moyenne_par_morceaux();
   parametres_moyenne_glissante_ = correction_in.get_moyenne_glissante();
+  parametres_consigne_initiale_ = correction_in.get_consigne_initiale();
 }
 
 correction_one_direction::type_correction correction_one_direction::get_type_corr() const
@@ -424,6 +475,8 @@ moyenne_par_morceaux correction_one_direction::get_moyenne_par_morceaux() const
 {return parametres_moyenne_par_morceaux_;}
 moyenne_glissante correction_one_direction::get_moyenne_glissante() const
 {return parametres_moyenne_glissante_;}
+consigne_initiale correction_one_direction::get_consigne_initiale() const
+{return parametres_consigne_initiale_;}
 
 void correction_one_direction::set_time_for_correction(double time, double time_step, int time_iteration)
 {
@@ -439,6 +492,10 @@ void correction_one_direction::set_time_for_correction(double time, double time_
   else if ( get_type_corr()==MOYENNE_GLISSANTE)
     {
       parametres_moyenne_glissante_.set_time(time,time_step,time_iteration);
+    }
+  else if ( get_type_corr()==CONSIGNE_INITIALE)
+    {
+      parametres_consigne_initiale_.set_time(time_iteration);
     }
   else
     Cerr << "Error, unknown type_correction_ "<< (int)get_type_corr() <<" for correction_perp_g" << finl;
@@ -481,6 +538,11 @@ void correction_one_direction::compute_correction_value()
       parametres_moyenne_glissante_.compute_qdm_cible(vitesse_relative_);
       qdm_cible_ = parametres_moyenne_glissante_.get_qdm_cible();
     }
+  else if ( get_type_corr()==CONSIGNE_INITIALE)
+    {
+      parametres_consigne_initiale_.compute_qdm_cible(rho_vel_moyen_);
+      qdm_cible_ = parametres_consigne_initiale_.get_qdm_cible();
+    }
   else
     Cerr << "Error, unknown type_correction_ "<< (int)get_type_corr() <<" for correction_perp_g" << finl;
 
@@ -507,6 +569,10 @@ void correction_one_direction::set_rho_liq(double rho_l)
     {
       parametres_moyenne_glissante_.set_rho_l(rho_l);
     }
+  else if ( get_type_corr()==CONSIGNE_INITIALE)
+    {
+      // no need for rho_l ?;
+    }
   else
     Cerr << "Error, unknown type_correction_ "<< (int)get_type_corr() <<" for correction_perp_g" << finl;
 }
@@ -526,6 +592,10 @@ int correction_one_direction::get_need_for_vit_rel()
   else if ( get_type_corr()==MOYENNE_GLISSANTE)
     {
       need_to_compute_relative_velocity = parametres_moyenne_glissante_.get_need_for_vl_vv();
+    }
+  else if ( get_type_corr()==CONSIGNE_INITIALE)
+    {
+      need_to_compute_relative_velocity = parametres_consigne_initiale_.get_need_for_vl_vv();
     }
   else
     Cerr << "Error, unknown type_correction_ "<< (int)get_type_corr() <<" for correction_perp_g" << finl;
@@ -553,9 +623,27 @@ int correction_one_direction::get_need_for_rho_liq()
     {
       need_to_compute_relative_velocity = parametres_moyenne_glissante_.get_need_for_rho_l();
     }
+  else if ( get_type_corr()==CONSIGNE_INITIALE)
+    {
+      need_to_compute_relative_velocity = parametres_consigne_initiale_.get_need_for_rho_l();
+    }
   else
     Cerr << "Error, unknown type_correction_ "<< (int)get_type_corr() <<" for correction_perp_g" << finl;
   return need_to_compute_relative_velocity;
+}
+
+int correction_one_direction::get_need_to_compute_correction_value()
+{
+  // TODO : Si on  ne veux corriger que dans une direction de l'espace,
+  // pas besoin de definir les correction des autres directions
+  int need_to_compute_correction_value = 1;
+//	  // switch VOLONTAIREMENT NON UTILISE CAR FONCTIONNE SUR DES INT UNIQUEMENT, CE QUI DIMINUE LA LISIBILITE
+//	  if ( get_type_corr()==CONSIGNE_INITIALE)
+//	    {
+//		  need_to_compute_correction_value = parametres_consigne_initiale_.get_need_to_compute_correction_value();
+//	    }
+//
+  return need_to_compute_correction_value;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -565,17 +653,18 @@ int correction_one_direction::get_need_for_rho_liq()
 Implemente_instanciable_sans_constructeur( corrections_qdm, "corrections_qdm", Objet_U ) ;
 
 corrections_qdm::corrections_qdm() :
-  type_(1)
+  type_(2) // type_ mis a none (-> NONE) par defaut
 {
 }
 
 Sortie& corrections_qdm::printOn( Sortie& os ) const
 {
   //Objet_U::printOn( os );
-  // TODO : Help : j ene sais pas faire l'operation inverse de get_type
+  // TODO : Help : je ne sais pas faire l'operation inverse de get_type
   os  << "{\n";
   if (get_type_()==GR) os << "type " << " gr" << "\n";
   if (get_type_()==GB) os << "type " << " gb" << "\n";
+  if (get_type_()==NONE_IJK) os << "type " << " none" << "\n";
   os   << " correction_x " << correction_x_ << "\n"
        << " correction_y " << correction_y_ << "\n"
        << " correction_z " << correction_z_ << "\n";
@@ -591,6 +680,7 @@ Entree& corrections_qdm::readOn( Entree& is )
   param.ajouter("type",&type_);
   param.dictionnaire("gb",GB);
   param.dictionnaire("gr",GR);
+  param.dictionnaire("none",NONE_IJK);
   param.ajouter("correction_x",&correction_x_ );
   param.ajouter("correction_y",&correction_y_ );
   param.ajouter("correction_z",&correction_z_ );
@@ -696,6 +786,25 @@ Vecteur3 corrections_qdm::get_correct_velocities()
   return correct_velocities;
 }
 
+Vecteur3 corrections_qdm::get_velocity_corrections()
+{
+  Vecteur3 correct_velocities;
+  correct_velocities[0] = correction_x_.get_velocity_correction();
+  correct_velocities[1] = correction_y_.get_velocity_correction();
+  correct_velocities[2] = correction_z_.get_velocity_correction();
+  return correct_velocities;
+}
+
+Vecteur3 corrections_qdm::get_correction_values()
+{
+  Vecteur3 correct_velocities;
+  correct_velocities[0] = correction_x_.get_correction_value();
+  correct_velocities[1] = correction_y_.get_correction_value();
+  correct_velocities[2] = correction_z_.get_correction_value();
+  return correct_velocities;
+}
+
+
 double corrections_qdm::get_correct_velocitiy_one_direction(int dir)
 {
   switch(dir)
@@ -727,6 +836,25 @@ int corrections_qdm::get_need_for_vitesse_relative(int direction)
       break;
     case 2:
       return correction_z_.get_need_for_vit_rel();
+      break;
+    default:
+      return 0.;
+      Cerr << "In corrections_qdm::compute_correction_one_direction, dir " << direction << " Error." << finl;
+    };
+}
+
+int corrections_qdm::get_need_to_compute_correction_value_one_direction(int direction)
+{
+  switch(direction)
+    {
+    case 0:
+      return correction_x_.get_need_to_compute_correction_value();
+      break;
+    case 1:
+      return correction_y_.get_need_to_compute_correction_value();
+      break;
+    case 2:
+      return correction_z_.get_need_to_compute_correction_value();
       break;
     default:
       return 0.;
@@ -777,6 +905,14 @@ int corrections_qdm::is_type_gb() const
 int corrections_qdm::is_type_gr() const
 {
   if (type_ == GR)
+    return 1;
+  else
+    return 0;
+}
+
+int corrections_qdm::is_type_none() const
+{
+  if (type_ == NONE_IJK)
     return 1;
   else
     return 0;

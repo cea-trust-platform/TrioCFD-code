@@ -120,13 +120,19 @@ postraitement {
   }
 }
 liste_postraitements {
-   postraitement_ft_lata post1 {
-	interfaces body { champs sommets { courbure } } 
-	champs elements { indicatrice_body } 
-	champs faces { vitesse }
-   }
+   postraitement_ft_lata post1 { 
+    format Lata 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+        vitesse faces 
+    } 
+    interfaces body { 
+        courbure som 
+    } 
+}
 }
 }
 
 Solve pb
 Fin
+ 

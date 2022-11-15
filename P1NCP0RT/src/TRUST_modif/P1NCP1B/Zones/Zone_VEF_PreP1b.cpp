@@ -46,10 +46,12 @@ Entree& Zone_VEF_PreP1b::readOn(Entree& is )
   return Zone_VEF::readOn(is);
 }
 
-// Description:
-//  Les volumes calcules dans discretiser() ne tiennent pas compte de
-//  la periodicite. Pour les sommets periodiques, on fait la somme
-//  de tous les volumes des sommets "identiques" au sens de la periodicite.
+/*! @brief Les volumes calcules dans discretiser() ne tiennent pas compte de la periodicite.
+ *
+ * Pour les sommets periodiques, on fait la somme
+ *   de tous les volumes des sommets "identiques" au sens de la periodicite.
+ *
+ */
 void Zone_VEF_PreP1b::discretiser()
 {
   Zone_VEF::discretiser();
@@ -755,16 +757,15 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
 
   // Cerr << "Nombre de sommets non periodiques           = " << total_nb_sommets_non_periodiques << finl;
   // Cerr << "Nombre de sommets periodiques               =  " << nb_som_reel-total_nb_sommets_non_periodiques << finl;
-  int nb_aretes_periodiques=0;
-  int nb_aretes_perio_superflues=0;
+  //int nb_aretes_periodiques=0;
+  //int nb_aretes_perio_superflues=0;
   for (int i=0; i<nb_aretes_tot; i++)
     {
       if (renum_arete_perio[i]!=i)
         {
-          nb_aretes_periodiques++;
+          //nb_aretes_periodiques++;
           assert(ok_arete(i)==ok_arete(renum_arete_perio[i]));
-          if (!ok_arete(i))
-            nb_aretes_perio_superflues++;
+          //if (!ok_arete(i)) nb_aretes_perio_superflues++;
         }
     }
   // Cerr << "Nombre d'aretes non periodiques             = " << nb_aretes_tot-nb_aretes_periodiques << finl;

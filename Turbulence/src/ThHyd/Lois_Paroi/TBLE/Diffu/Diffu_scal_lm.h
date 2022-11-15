@@ -26,17 +26,13 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffu_scal_lm
-//    Calsse derivant de la classe Diffu_totale_base et specifiant la valeur
-//    de la diffusivite_totale
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Diffu_scal_lm Calsse derivant de la classe Diffu_totale_base et specifiant la valeur
+ *
+ *     de la diffusivite_totale
+ *
+ *
+ *
+ */
 class Diffu_scal_lm : public Diffu_totale_scal_base
 {
   Declare_instanciable(Diffu_scal_lm);

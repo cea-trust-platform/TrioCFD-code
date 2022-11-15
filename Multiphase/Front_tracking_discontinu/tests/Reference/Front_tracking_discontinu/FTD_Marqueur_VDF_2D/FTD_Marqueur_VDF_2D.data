@@ -243,57 +243,35 @@ Postraitement
 }
 liste_postraitements
 {
-	Postraitement_ft_lata post1
-	{
-		dt_post 0.05
-		nom_fichier post1
-		format binaire
-		print
-		champs sommets
-		{
-			vitesse
-		}
-		champs elements
-		{
-			distance_interface_elem_interf
-			
-			indicatrice_interf
-			pression
-			concentration
-			vitesse
-		}
-		interfaces interf {
-			champs sommets {
-				courbure
-			}
-			champs sommets {
-				pe
-			}
-			champs elements {
-				pe
-			}
-		}
-	}
-	Postraitement_ft_lata marqueurs
-	{
-		dt_post 0.05
-		nom_fichier marqueurs
-		print
-		champs sommets
-		{
-			vitesse
-		}
-		champs elements
-		{
-			distance_interface_elem_interf
-			
-			indicatrice_interf
-			pression
-			concentration
-			vitesse
-		}
-		interfaces marqueurs { champs sommets { vitesse } }
-	}	
+	postraitement_ft_lata post1 { 
+    format Lata 
+    fichier post1 
+    champs dt_post 0.05 { 
+        vitesse elem 
+        distance_interface_elem_interf elem 
+        indicatrice_interf elem 
+        pression elem 
+        concentration elem 
+    } 
+    interfaces interf { 
+        courbure som 
+        pe elem 
+    } 
+}
+	postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    champs dt_post 0.05 { 
+        vitesse elem 
+        distance_interface_elem_interf elem 
+        indicatrice_interf elem 
+        pression elem 
+        concentration elem 
+    } 
+    interfaces marqueurs { 
+        vitesse som 
+    } 
+}	
 }
 
 
@@ -301,3 +279,4 @@ liste_postraitements
 
 Solve pb
 Fin
+ 

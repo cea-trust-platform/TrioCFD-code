@@ -59,7 +59,10 @@ public:
                                double x, double y, double z) const;
 
   double get_erreur_geometrique() const;
-
+  int get_correction_parcours_thomas() const
+  {
+    return correction_parcours_thomas_ ;
+  };
   void projeter_vecteur_sur_face(const int num_face, double& x_, double& y_, double& z_) const;
 
   void calculer_normale_face_bord(int num_face, double x, double y, double z,
@@ -98,6 +101,12 @@ protected:
   double volume_rectangle(const Zone_VF& zone_vf, int num_element,
                           double x0, double y0, double x1, double y1,
                           double epsilon) const;
+
+  // New function to get phase-barycenter in 2D or 2D-axi calculations.
+  // 3D equivalent not yet available (2020/10/26)
+  double volume_barycentre_rectangle(const Zone_VF& zone_vf, int num_element,
+                                     double x0, double y0, double x1, double y1,
+                                     double epsilon, double liquid_barycentre[3]) const;
 
   double volume_triangle(const Zone_VF& zone_vf, int num_element,
                          double x0, double y0, double x1, double y1,

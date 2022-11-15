@@ -9,7 +9,7 @@ Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_med family_names_from_group_names dom Mesh_1 MeshDIVA_1.med
+Lire_MED { domain dom file MeshDIVA_1.med } 
 # END MESH #
 
 VerifierCoin dom {  }
@@ -77,12 +77,6 @@ Read mon_schema
 }
 
 # I define a medium #
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu Champ_Uniforme 1 1.007e-3
-	rho Champ_Uniforme 1 1000
-}
 
 # Gravity vector definition 
 Uniform_field my_gravity
@@ -91,12 +85,17 @@ Read my_gravity 2 0.0 0.0 #
 # Association between the different objects #
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 
 Read pb
 {
-	Navier_Stokes_standard_ALE
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 1.007e-3
+   	rho Champ_Uniforme 1 1000
+   }
+   
+   	Navier_Stokes_standard_ALE
 	{
 		# Pressure matrix solved with #
  		solveur_pression	PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr }
@@ -141,3 +140,4 @@ Solve pb
 
 # Not necessary keyword to finish #
 End
+ 

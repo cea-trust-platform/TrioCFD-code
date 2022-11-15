@@ -26,14 +26,14 @@
 #include <Paroi_scal_hyd_base_EF.h>
 
 
-//.DESCRIPTION classe Paroi_negligeable_scal_EF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_negligeable_EF
-
+/*! @brief classe Paroi_negligeable_scal_EF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_negligeable_EF
+ *
+ */
 class Paroi_negligeable_scal_EF : public Paroi_scal_hyd_base_EF
 {
 

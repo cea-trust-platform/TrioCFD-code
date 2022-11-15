@@ -21,13 +21,14 @@
 
 #include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
 #include <Source_Transport_K_Realisable_VDF_Elem.h>
+#include <Milieu_base.h>
 #include <Champ_Face.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_VDF_Elem,"Source_Transport_K_Realisable_VDF_P0_VDF",Source_Transport_Realisable_VDF_Elem_base);
 
 Sortie& Source_Transport_K_Realisable_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
-Entree& Source_Transport_K_Realisable_VDF_Elem::readOn(Entree& is ) { return Source_Transport_Realisable_VDF_Elem_base::readOn_nothing(is); }
+Entree& Source_Transport_K_Realisable_VDF_Elem::readOn(Entree& is ) { return Source_Transport_Realisable_VDF_Elem_base::readOn_nothing(is,que_suis_je()); }
 
 void Source_Transport_K_Realisable_VDF_Elem::associer_pb(const Probleme_base& pb )
 {
@@ -42,7 +43,7 @@ void Source_Transport_K_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, 
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
   const DoubleTab& visco_turb = eqn_k_Rea->modele_turbulence().viscosite_turbulente().valeurs();
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   DoubleTrav P(visco_turb);
 
   if (axi) calculer_terme_production_K_BiK_Axi(la_zone_VDF.valeur(),vitesse,P,K_Rea,visco_turb);

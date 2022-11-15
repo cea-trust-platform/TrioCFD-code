@@ -21,6 +21,7 @@
 
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Source_Transport_K_VDF_Elem.h>
+#include <Milieu_base.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Source_Transport_K_VDF_Elem,"Source_Transport_K_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
@@ -29,7 +30,7 @@ Sortie& Source_Transport_K_VDF_Elem::printOn(Sortie& s) const { return s << que_
 Entree& Source_Transport_K_VDF_Elem::readOn(Entree& is)
 {
   Source_Transport_VDF_Elem_base::verifier_pb_keps(mon_equation->probleme(),que_suis_je());
-  return Source_Transport_VDF_Elem_base::readOn_nothing(is);
+  return Source_Transport_VDF_Elem_base::readOn_nothing(is,que_suis_je());
 }
 
 void Source_Transport_K_VDF_Elem::associer_pb(const Probleme_base& pb)
@@ -73,7 +74,7 @@ void Source_Transport_K_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_ou
 
 void Source_Transport_K_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
   for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
     resu(elem) += (P(elem)-Eps(elem)-D(elem))*volumes(elem)*porosite_vol(elem);
@@ -81,7 +82,7 @@ void Source_Transport_K_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const D
 
 void Source_Transport_K_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& resu) const
 {
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
   for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
     resu(elem) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
@@ -96,7 +97,7 @@ void Source_Transport_K_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& 
   if(!mat) return;
 
   const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  const DoubleVect& porosite = la_zone_VDF->porosite_elem(), &volumes = la_zone_VDF->volumes();
+  const DoubleVect& porosite = la_zone_Cl_VDF->equation().milieu().porosite_elem(), &volumes = la_zone_VDF->volumes();
   const int size = K.dimension(0);
   // on implicite le -eps et le -eps^2/k
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();

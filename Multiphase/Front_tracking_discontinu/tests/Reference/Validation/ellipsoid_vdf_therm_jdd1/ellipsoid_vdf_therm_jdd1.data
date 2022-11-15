@@ -90,11 +90,9 @@ Read fluide
 #   mu       champ_fonc_fonction pb temperature 1 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0) #
    Cp       Champ_Uniforme 1 1500.0
    lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
-}
+gravite Champ_Uniforme 3 0. 0. -9.81
 
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-Associate fluide gravite
+}
 
 Navier_Stokes_FT_Disc eq_hydraulique
 Transport_Interfaces_FT_Disc agit
@@ -290,63 +288,37 @@ Postraitement
        {
 	
 	
-	Postraitement_ft_lata post_therm_vdf
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_therm_vdf
-		format binaire
-		print
-                champs elements
-                {
-                        vitesse
-                        pression
-                        Divergence_U
-                        temperature
-			indicatrice_agit
-			indicatrice_internes
-                        indicatrice_cuve
-                        Puissance_volumique
-                }
-		interfaces agit
-		{
-		champs sommets
-			{
-			courbure
-			}
-		}	
-               		
-	}
-        Postraitement_ft_lata post_internes
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_internes
-		format binaire
-		print
-                interfaces internes
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
-        Postraitement_ft_lata post_cuve
-	{	
-		
-		dt_post 0.01
-		nom_fichier lata/post_cuve
-		format binaire
-		print
-                interfaces cuve
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
+	postraitement_ft_lata post_therm_vdf { 
+    format Lata 
+    fichier lata/post_therm_vdf 
+    champs dt_post 0.01 { 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+        temperature elem 
+        indicatrice_agit elem 
+        indicatrice_internes elem 
+        indicatrice_cuve elem 
+        Puissance_volumique elem 
+    } 
+    interfaces agit { 
+        courbure som 
+    } 
+}
+        postraitement_ft_lata post_internes { 
+    format Lata 
+    fichier lata/post_internes 
+    interfaces internes { 
+        courbure som 
+    } 
+}
+        postraitement_ft_lata post_cuve { 
+    format Lata 
+    fichier lata/post_cuve 
+    interfaces cuve { 
+        courbure som 
+    } 
+}
     } 
 
 }
@@ -354,3 +326,4 @@ Postraitement
 Solve pb
 End
 
+ 

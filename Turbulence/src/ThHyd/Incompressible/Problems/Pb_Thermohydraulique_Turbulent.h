@@ -30,20 +30,17 @@ class Champ_Fonc;
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Pb_Thermohydraulique_Turbulent
-//    Cette classe represente un probleme de thermohydraulique
-//    avec modelisation de la turbulence:
-//     - Equations de Navier_Stokes en regime turbulent
-//       pour un fluide incompressible
-//     - Equation d'energie en regime turbulent
-//    L'hydraulique et la thermique sont couplees par des forces de volume
-//    (approximation de Boussinesq)
-// .SECTION voir aussi
-//    Pb_Fluide_base Pb_Thermohydraulique Terme_Boussinesq_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Pb_Thermohydraulique_Turbulent Cette classe represente un probleme de thermohydraulique
+ *
+ *     avec modelisation de la turbulence:
+ *      - Equations de Navier_Stokes en regime turbulent
+ *        pour un fluide incompressible
+ *      - Equation d'energie en regime turbulent
+ *     L'hydraulique et la thermique sont couplees par des forces de volume
+ *     (approximation de Boussinesq)
+ *
+ * @sa Pb_Fluide_base Pb_Thermohydraulique Terme_Boussinesq_base
+ */
 class Pb_Thermohydraulique_Turbulent : public Pb_Fluide_base
 {
 
@@ -66,20 +63,10 @@ protected:
 };
 
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la viscosite turbulente.
+ *
+ * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ */
 inline const Champ_Fonc& Pb_Thermohydraulique_Turbulent::viscosite_turbulente() const
 {
   return eq_hydraulique.viscosite_turbulente();

@@ -44,23 +44,22 @@ Read sch
         seuil_statio 1.e-8
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme  1 200.e-6
-	rho Champ_Uniforme 1 1.
-}
 
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme  1 200.e-6
+   	rho Champ_Uniforme 1 1.
+   }
+   
+   	Navier_Stokes_standard
 	{
 		solveur_pression Gcp { precond ssor { omega 1.5 }
                                        seuil 1.e-7
@@ -97,3 +96,4 @@ Read pb
 EcritureLectureSpecial 0
 Solve pb
 End
+ 

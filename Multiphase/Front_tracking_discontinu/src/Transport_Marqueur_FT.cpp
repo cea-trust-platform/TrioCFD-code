@@ -24,7 +24,6 @@
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Discretisation_base.h>
-#include <FloatTab.h>
 #include <TRUSTTab.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
@@ -62,30 +61,23 @@ Transport_Marqueur_FT::Transport_Marqueur_FT()
 }
 
 
-// Description:
-// Precondition: le flot doit etre ouvert
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Transport_Marqueur_FT::printOn(Sortie& os) const
 {
   return os;
 }
 
-// Description:
-//  Lecture d'une equation sur un flot d'entree.
-//  Voir Equation_base::readOn()
-//  Exception : le bloc de lecture des conditions limites doit etre vide
-//                Conditions_limites { }
-
+/*! @brief Lecture d'une equation sur un flot d'entree.
+ *
+ * Voir Equation_base::readOn()
+ *   Exception : le bloc de lecture des conditions limites doit etre vide
+ *                 Conditions_limites { }
+ *
+ */
 Entree& Transport_Marqueur_FT::readOn(Entree& is)
 {
   Equation_base::readOn(is);
@@ -224,15 +216,16 @@ int Transport_Marqueur_FT::lire_motcle_non_standard(const Motcle& mot, Entree& i
 }
 
 
-// Description:
-//     Lecture des conditions initiales dans un flot d'entree.
-//     Le format de lecture est le suivant:
-//     {
-//      ensemble_points { }                lecture de la positions des particules                   cf Maillage_FT_Disc::readOn
-//        [ proprietes_particules { } ]   lecture des proprietes materielles des particules cf Prprietes_part_vol::readOn
-//        [ t_debut_integration value ]
-//     }
-
+/*! @brief Lecture des conditions initiales dans un flot d'entree.
+ *
+ * Le format de lecture est le suivant:
+ *      {
+ *       ensemble_points { }                lecture de la positions des particules                   cf Maillage_FT_Disc::readOn
+ *         [ proprietes_particules { } ]   lecture des proprietes materielles des particules cf Prprietes_part_vol::readOn
+ *         [ t_debut_integration value ]
+ *      }
+ *
+ */
 Entree& Transport_Marqueur_FT::lire_cond_init(Entree& is)
 {
   Param param_init(que_suis_je());
@@ -327,11 +320,11 @@ void Transport_Marqueur_FT::discretiser(void)
   maillage_interface().associer_zone(zone);
 }
 
-// Description:
-//    Complete la construction (initialisation) des objets :
-//        maillage_interface et proprietes_particules_
-//        maillage_inject_ et proprietes_inject_
-
+/*! @brief Complete la construction (initialisation) des objets : maillage_interface et proprietes_particules_
+ *
+ *         maillage_inject_ et proprietes_inject_
+ *
+ */
 void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
@@ -438,8 +431,9 @@ void Transport_Marqueur_FT::mettre_a_jour(double temps)
   maillage_interface().nettoyer_noeuds_virtuels_et_frontieres();
 }
 
-// Description:
-
+/*! @brief
+ *
+ */
 int Transport_Marqueur_FT::sauvegarder(Sortie& os) const
 {
   return 0;
@@ -1345,29 +1339,26 @@ const DoubleTab& Transport_Marqueur_FT::calculer_valeurs_volumes(DoubleTab& val_
 }
 
 // Methode de travail de remplissage d'une FloatTab par un DoubleTabFT
-inline void remplissage(const DoubleTab& tab, FloatTab *ftab)
+inline void remplissage(const DoubleTab& tab, DoubleTab *ftab)
 {
   const int nb_noeuds = tab.dimension(0);
   const int nb_compo = tab.dimension(1);
   ftab->resize(nb_noeuds, nb_compo);
   for (int som=0 ; som<nb_noeuds ; som++)
-    {
-      for (int k=0 ; k<nb_compo ; k++)
-        {
-          (*ftab)(som,k) = (float) tab(som,k);
-        }
-    }
+    for (int k=0 ; k<nb_compo ; k++)
+      (*ftab)(som,k) = tab(som,k);
 }
-// Description:
-//  Cherche le champ discret aux interfaces dont le nom est "champ",
-//  et verifie qu'il peut etre postraite a la localisation demandee (loc).
-//  Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
-//  avec le champ demande.
-//  Si non, on renvoie 0.
-//  (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
-//   car on n'a pas besoin de la valeur du champ, on veut seulement verifier
-//   qu'il existe).
-int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
+/*! @brief Cherche le champ discret aux interfaces dont le nom est "champ", et verifie qu'il peut etre postraite a la localisation demandee (loc).
+ *
+ *   Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
+ *   avec le champ demande.
+ *   Si non, on renvoie 0.
+ *   (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
+ *    car on n'a pas besoin de la valeur du champ, on veut seulement verifier
+ *    qu'il existe).
+ *
+ */
+int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab) const
 {
   int res = 1;
 
@@ -1481,8 +1472,11 @@ int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_
 
   return res;
 }
-// Description:
-//  Voir l'autre get_champ_post_FT. Cette fonction est specifique aux champs d'entiers.
+/*! @brief Voir l'autre get_champ_post_FT.
+ *
+ * Cette fonction est specifique aux champs d'entiers.
+ *
+ */
 int Transport_Marqueur_FT::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab) const
 {
   return 0;

@@ -174,7 +174,9 @@ interf
 		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
         }
 	# Options for the meshing algorithm #
-        iterations_correction_volume 1
+	VOFlike_correction_volume 1
+	nb_lissage_correction_volume 1
+        nb_iterations_correction_volume 3 # taken from nb_iter_correction_volume in remaillage { ... } #
         n_iterations_distance 2
 	remaillage {
 		pas 0.000001
@@ -291,44 +293,26 @@ Post_processing
 liste_postraitements
 {
 	# Another keywords to post process FT results #
-	Postraitement_ft_lata liquid_gas
-	{
-		dt_post 0.05
-		nom_fichier liquid_gas
-		format binaire
-		print
-		fields sommets
-		{
-			vitesse
-		}
-		fields elements
-		{
-			distance_interface_elem_interf
-			distance_interface_elem_body
-			indicatrice_interf
-			pression
-			concentration
-			vitesse
-		}
-		# Post process the moving grid of the interface #
-		interfaces interf {
-			champs sommets { courbure vitesse }
-			champs elements { pe }
-		}
-	}
-	Postraitement_ft_lata body
-	{
-		dt_post 0.05
-		nom_fichier body
-		format binaire
-		print
-		interfaces body {
-			champs sommets { courbure }
-		}
-	}
+	postraitement_ft_lata liquid_gas { 
+    format Lata 
+    fichier liquid_gas 
+    interfaces interf { 
+        courbure som 
+        vitesse som 
+        pe elem 
+    } 
+}
+	postraitement_ft_lata body { 
+    format Lata 
+    fichier body 
+    interfaces body { 
+        courbure som 
+    } 
+}
 }
 
 }
 
 Solve pb
 End
+ 

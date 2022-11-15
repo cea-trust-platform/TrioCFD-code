@@ -112,32 +112,21 @@ interf
 }
 liste_postraitements
 {
-	Postraitement_ft_lata post
-	{	
-		dt_post 0.005
-		nom_fichier lata/post
-		format binaire
-		print
-                champs elements
-		{
-			indicatrice_interf
-			pression
-		}
-		champs sommets
-		{
-		}
-                interfaces interf {
-                        champs sommets {
-                                pe
-				courbure
-                        }
-                        champs elements {
-                                pe
-                        }
-                }
-	}
+	postraitement_ft_lata post { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 0.005 { 
+        indicatrice_interf elem 
+        pression elem 
+    } 
+    interfaces interf { 
+        pe elem 
+        courbure som 
+    } 
+}
 }
 }
 
 Solve pb
 End
+ 

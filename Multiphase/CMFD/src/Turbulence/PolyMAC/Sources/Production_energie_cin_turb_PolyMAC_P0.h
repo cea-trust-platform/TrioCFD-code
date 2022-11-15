@@ -26,16 +26,14 @@
 #include <Source_base.h>
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
+#include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Production_energie_cin_turb_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Production_energie_cin_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Production_energie_cin_turb_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Production_energie_cin_turb_PolyMAC_P0);
@@ -50,7 +48,17 @@ public :
 
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
+  void mettre_a_jour(double temps) override;
+  void completer() override ;
+  void calculer_fac() ;
+
+private :
+  REF(Correlation) correlation_loi_paroi_;
+
+  double mon_temps_ = 1.e-8;
+  double limiter_prod_ = 0. ;
+
+  DoubleTab fac_;
 };
 
 #endif

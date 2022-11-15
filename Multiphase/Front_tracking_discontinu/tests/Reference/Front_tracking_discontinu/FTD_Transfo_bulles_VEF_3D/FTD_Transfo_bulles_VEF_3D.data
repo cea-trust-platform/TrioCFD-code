@@ -226,25 +226,26 @@ Lire pb
 	}
 liste_postraitements
 {	
-        Postraitement_ft_lata marqueurs
-        {
-                dt_post 0.001
-                nom_fichier marqueurs
-                print
-                champs sommets
-                {
-                        vitesse
-                }
-                interfaces marqueurs { champs sommets { vitesse volume diametre temperature masse_volumique } }
-        }
-	Postraitement_ft_lata interface
-        {
-                dt_post 0.001
-                nom_fichier interface
-                print
-                
-                interfaces interf { }
-        }	
+        postraitement_ft_lata marqueurs { 
+    format Lata 
+    fichier marqueurs 
+    champs dt_post 0.001 { 
+        vitesse som 
+    } 
+    interfaces marqueurs { 
+        vitesse som 
+        volume som 
+        diametre som 
+        temperature som 
+        masse_volumique som 
+    } 
+}
+	postraitement_ft_lata interface { 
+    format Lata 
+    fichier interface 
+    interfaces interf { 
+    } 
+}	
 }
 }
 
@@ -291,3 +292,4 @@ boundary_conditions
 		Avant   Paroi_FT_disc symetrie
 		Arriere Paroi_FT_disc symetrie
 	}
+ 

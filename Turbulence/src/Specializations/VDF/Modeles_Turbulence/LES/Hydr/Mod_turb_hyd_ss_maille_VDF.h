@@ -29,14 +29,14 @@
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
 
-// .DESCRIPTION classe Mod_turb_hyd_ss_maille_VDF
-// Cette classe correspond a la mise en oeuvre des modeles sous
-// maille en VDF
-//
-
-// .SECTION  voir aussi
-// Mod_turb_hyd_ss_maille
-
+/*! @brief classe Mod_turb_hyd_ss_maille_VDF Cette classe correspond a la mise en oeuvre des modeles sous
+ *
+ *  maille en VDF
+ *
+ *  .SECTION  voir aussi
+ *  Mod_turb_hyd_ss_maille
+ *
+ */
 class Mod_turb_hyd_ss_maille_VDF : public Mod_turb_hyd_ss_maille
 {
 

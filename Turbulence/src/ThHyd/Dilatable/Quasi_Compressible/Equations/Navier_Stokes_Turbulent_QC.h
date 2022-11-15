@@ -26,17 +26,14 @@
 #include <Navier_Stokes_Fluide_Dilatable_Proto.h>
 class Champ_Fonc;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Navier_Stokes_Turbulent
-//     Cette classe represente l'equation de la dynamique pour un fluide
-//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
-//     modelisation de la turbulence.
-//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
-// .SECTION voir aussi
-//     Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Navier_Stokes_Turbulent Cette classe represente l'equation de la dynamique pour un fluide
+ *
+ *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
+ *      modelisation de la turbulence.
+ *      Un membre de type Mod_turb_hyd representera le modele de turbulence.
+ *
+ * @sa Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
+ */
 class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_Stokes_Fluide_Dilatable_Proto
 {
   Declare_instanciable(Navier_Stokes_Turbulent_QC);

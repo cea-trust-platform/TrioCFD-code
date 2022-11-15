@@ -25,13 +25,12 @@
 
 
 
-// .DESCRIPTION class Source_Portance
-//  Calcul de la force de portance (expression vectorielle) :
-//  Pas d expression codee actuellement
-
-// .SECTION voir aussi
-//  Source_Action_Particules
-
+/*! @brief class Source_Portance Calcul de la force de portance (expression vectorielle) :
+ *
+ *   Pas d expression codee actuellement
+ *
+ * @sa Source_Action_Particules
+ */
 #include <Source_Action_Particules.h>
 
 

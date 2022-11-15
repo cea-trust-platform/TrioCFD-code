@@ -20,15 +20,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-
-// .SECTION voir aussi
-//
-//
-///////////////////////////////////////////////////////////////////////////
-
+/*! @brief
+ *
+ */
 #ifndef Champ_Fonc_reprise_IJK_included
 #define Champ_Fonc_reprise_IJK_included
 
@@ -37,12 +31,10 @@
 #include <Champ_Fonc_base.h>
 #include <Champ_Inc.h>
 
-//.DESCRIPTION classe Champ_Fonc_reprise_IJK
-// Cette classe permet de relire un champ de vitesse SEULEMENT sauvegarde par IJK
-
-//.SECTION voir aussi
-// Champ_Fonc_P0
-
+/*! @brief classe Champ_Fonc_reprise_IJK Cette classe permet de relire un champ de vitesse SEULEMENT sauvegarde par IJK
+ *
+ * @sa Champ_Fonc_P0
+ */
 class Champ_Fonc_reprise_IJK: public Champ_Fonc_base
 {
 

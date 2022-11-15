@@ -59,35 +59,27 @@ Lire sch
 	schema_NS Runge_Kutta_ordre_3 { }
 }
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1 1.e-1
-	rho Champ_Uniforme 1 1000.
-	beta_co Champ_Fonc_Fonction pb concentration 1 1.0
-#	beta_co Champ_Uniforme 1 1. #
-}
-
-Champ_Uniforme gravite
-Lire gravite 2 0. 0.981
-
-Constituant c1
-Lire c1
-{
-	coefficient_diffusion Champ_Uniforme 1 0.0
-}
-
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
-Associate pb c1
-
 Discretize pb dis
 
 Lire pb
 {
-	Navier_Stokes_phase_field
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0. 0.981
+   	mu Champ_Uniforme 1 1.e-1
+   	rho Champ_Uniforme 1 1000.
+   	beta_co Champ_Fonc_Fonction pb concentration 1 1.0
+   # beta_co Champ_Uniforme 1 1. #
+   }
+   
+   Constituant
+{
+	coefficient_diffusion Champ_Uniforme 1 0.0
+}
+   	Navier_Stokes_phase_field
 	{
 		solveur_pression GCP {
 				precond ssor { omega 1.5 }
@@ -224,3 +216,4 @@ Fin
 	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u^2/2 drho/dphi
 
 #
+ 

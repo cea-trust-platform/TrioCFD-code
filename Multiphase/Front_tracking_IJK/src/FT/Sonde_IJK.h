@@ -28,15 +28,13 @@
 #include <Ref_IJK_Field_double.h>
 #include <Postraitement.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .NAME        : Sonde_IJK
-// .DESCRIPTION : class Sonde_IJK
-//
-// <Description of class Sonde_IJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Sonde_IJK
+ *
+ *  <Description of class Sonde_IJK>
+ *
+ *
+ *
+ */
 class Sonde_IJK : public Sonde
 {
 
@@ -44,13 +42,13 @@ class Sonde_IJK : public Sonde
 
 public :
   inline Sonde_IJK(const Nom& );
-  void completer(const IJK_FT_double& ijk_ft);
+  void completer_IJK(const IJK_FT_double& ijk_ft);
   void initialiser();
   void nommer(const Nom& nom) override
   {
     nom_=nom;
   }
-  void mettre_a_jour(const double temps, const double dt);
+  void mettre_a_jour(const double temps, const double dt) override;
   void postraiter();
 protected :
 

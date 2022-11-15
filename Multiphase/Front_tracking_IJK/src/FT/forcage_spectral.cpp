@@ -57,7 +57,8 @@ void forcage_spectral::fftw_org_multi_D_MPI_DFT_real_data()
   fftw_plan plan;
   double *rin;
   fftw_complex *c_out;
-  ptrdiff_t alloc_local, local_n0, local_0_start, i, j, k;
+  ptrdiff_t alloc_local, local_n0, local_0_start;
+  int i, j, k;
 
   // fftw_mpi_init();
 
@@ -92,7 +93,7 @@ void forcage_spectral::fftw_org_multi_D_MPI_DFT_real_data()
               compteur[2]+=1;
               // ux_f[][0] =
               // ux_f[][1] =
-              rin[(i*M + j) * (2*(N/2+1)) + k]= my_function_d_2(local_0_start+i, j, k);
+              rin[(i*M + j) * (2*(N/2+1)) + k]= my_function_d_2((int)local_0_start+i, j, k);
               // rin[(i*M + j) * (2*(N/2+1)) + k][1] = my_function_d_2(local_0_start+i, j, k);
             }
         }
@@ -114,11 +115,20 @@ void forcage_spectral::set_nk_kmin_kmax(const int number_k,
   k_min = kmin;
 }
 
+static int myPow(int x, unsigned int p)
+{
+  if (p == 0) return 1;
+  if (p == 1) return x;
+
+  int tmp = myPow(x, p/2);
+  if (p%2 == 0) return tmp * tmp;
+  else return x * tmp * tmp;
+}
 
 void forcage_spectral::set_spectral_domain()
 {
   int i,j,k,ind;
-  nk_tot = pow(nk,3)-1;
+  nk_tot = myPow(nk,3)-1;
   kx.resize_array(nk_tot);
   ky.resize_array(nk_tot);
   kz.resize_array(nk_tot);
@@ -141,7 +151,7 @@ void forcage_spectral::set_a_force()
 {
   const double pi(3.14159265358979);
   int i,j,k,ind;
-  nk_tot = pow(nk,3)-1;
+  nk_tot = myPow(nk,3)-1;
   fx.resize_array(nk_tot);
   fy.resize_array(nk_tot);
   fz.resize_array(nk_tot);
@@ -261,7 +271,8 @@ std::string fftw_org_real_data_MPI_transform()
   const ptrdiff_t L = 6, M = 9;
   fftw_plan plan;
   double *data;
-  ptrdiff_t alloc_local, local_n0, local_0_start, i, j;
+  ptrdiff_t alloc_local, local_n0, local_0_start;
+  int i, j;
 
   fftw_mpi_init();
   /* get local data size and allocate */
@@ -276,7 +287,7 @@ std::string fftw_org_real_data_MPI_transform()
   /* initialize data to some function my_function(x,y) */
   for (i = 0; i < local_n0; ++i)
     for (j = 0; j < M; ++j)
-      data[i*M + j] = my_function_d(local_0_start + i, j);
+      data[i*M + j] = my_function_d((int)local_0_start + i, j);
 
   /* compute transforms, in-place, as many times as desired */
   fftw_execute(plan);

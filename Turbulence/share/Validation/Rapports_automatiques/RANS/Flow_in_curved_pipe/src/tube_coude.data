@@ -25,22 +25,21 @@ Lire sch
 	}
 }
 
-Fluide_Incompressible fluide
 
-Lire fluide
-{
-	mu Champ_Uniforme       1 1.90e-5
- 	rho Champ_Uniforme      1 1.205
-}
 
 Associer pb dom_DOM
-Associer pb fluide
 Associer pb sch 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_Turbulent	
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme       1 1.90e-5
+    	rho Champ_Uniforme      1 1.205
+   }
+   
+   	Navier_Stokes_Turbulent	
 	{
 		solveur_pression petsc cholesky { } 
 		convection { muscl }
@@ -452,3 +451,4 @@ Resoudre pb
 Fin                                                                               
                                                                                   
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+ 

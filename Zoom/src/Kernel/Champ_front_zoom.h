@@ -37,18 +37,15 @@ class Zone_dis_base;
 class Zone_Cl_dis_base;
 class Champ_Inc_base;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Champ_front_zoom
-//     Classe derivee de Champ_front_var. Elle represente les
-//     champs a l interface d'un probleme deux grilles
-//     On distingue le probleme concerne par ce champ sur la frontiere et
-//     le probleme exterieure dont on veut prendre la trace de l'inconnue
-// .SECTION voir aussi
-//     Champ_front_var_instationnaire Champ_Inc
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Champ_front_zoom Classe derivee de Champ_front_var.
+ *
+ * Elle represente les
+ *      champs a l interface d'un probleme deux grilles
+ *      On distingue le probleme concerne par ce champ sur la frontiere et
+ *      le probleme exterieure dont on veut prendre la trace de l'inconnue
+ *
+ * @sa Champ_front_var_instationnaire Champ_Inc
+ */
 class Champ_front_zoom : public Ch_front_var_instationnaire_dep
 {
 
@@ -81,6 +78,8 @@ protected :
   REF(Champ_Inc_base) l_inconnue;
   //  Nom dirichlet_ou_neumann;
   Nom nom_bord;
+  Nom nom_pbMG_, nom_pbG_, nom_pbF_, bord_;
+  Motcle nom_inco_;
 };
 
 #endif

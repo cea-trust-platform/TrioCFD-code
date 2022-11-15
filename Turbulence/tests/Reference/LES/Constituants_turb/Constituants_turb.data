@@ -51,35 +51,26 @@ Lire sch
 	seuil_statio 1.e-8
 }
 
-Fluide_Incompressible fluide
-Lire fluide
+
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+{
+
+Fluide_Incompressible
 {
 	mu Champ_Uniforme 1 3.7e-05
 	rho Champ_Uniforme 1 2
 	beta_co Champ_Uniforme 12 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 
 }
 
-Constituant c
-Lire c
+Constituant
 {
 	coefficient_diffusion Champ_Uniforme 12 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01
 }
-
-#
-Champ_Uniforme gravite
-Lire gravite 2 0 0
-
-Associate fluide gravite
-#
-Associate pb dom
-Associate pb sch
-Associate pb fluide
-Associate pb c
-
-Discretize pb dis
-
-Lire pb
-{
 	Navier_Stokes_Turbulent
 	{
 		solveur_pression GCP { 

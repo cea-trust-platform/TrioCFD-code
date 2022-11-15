@@ -53,14 +53,8 @@ Read sch
         seuil_convergence_implicite 1e30
     }
 }
-
-stiffenedGas eau_liquide
-Read eau_liquide { gamma 2.35 pinf 4.0e8 Cv 1077.7 q -775269.0 }
-stiffenedGas eau_gaz
-Read eau_gaz { gamma 1.025 pinf 0.0 Cv 1956.45 q -237547.0  }
  
 Pb_HEM pb
-phases pb { liquide { eau } gaz { eau } }
 
 Associate  pb dom
 Associate  pb sch
@@ -68,6 +62,12 @@ Discretize pb dis
 
 Read pb
 {
+	Milieu_composite
+	{
+liquide_eau  stiffenedGas { gamma 2.35 pinf 4.0e8 Cv 1077.7 q -775269.0 }
+gaz_eau stiffenedGas { gamma 1.025 pinf 0.0 Cv 1956.45 q -237547.0  }
+	}
+
     QDM_Multiphase
     {
         solveur_pression petsc cholesky { quiet }

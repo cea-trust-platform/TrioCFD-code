@@ -32,47 +32,29 @@ Implemente_instanciable_sans_constructeur(Echange_contact_rayo_semi_transp_VDF,"
 
 Echange_contact_rayo_semi_transp_VDF::Echange_contact_rayo_semi_transp_VDF():num_premiere_face_dans_pb_fluide(-1) {}
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Echange_contact_rayo_semi_transp_VDF::printOn(Sortie& os) const
 {
   return os;
 }
 
 
-// Description:
-//    Lecture et construction du champ_front_calc T_autre_Pb qui servira
-//       pour calculer les conditions d'echange a la paroi
-//    Lecture de l'emissivite de la paroi
-//    Lecture du coefficient A
-//       typage et dimenssionnement du champ_front T_ext() qui contient
-//       les temperatures de paroi et qui est utilise lors du calcul des
-//       flux diffusifs.
-//
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture et construction du champ_front_calc T_autre_Pb qui servira pour calculer les conditions d'echange a la paroi
+ *
+ *     Lecture de l'emissivite de la paroi
+ *     Lecture du coefficient A
+ *        typage et dimenssionnement du champ_front T_ext() qui contient
+ *        les temperatures de paroi et qui est utilise lors du calcul des
+ *        flux diffusifs.
+ *
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Echange_contact_rayo_semi_transp_VDF::readOn(Entree& is)
 {
   return Echange_contact_VDF::readOn(is);
@@ -86,46 +68,24 @@ const Cond_lim_base& Echange_contact_rayo_semi_transp_VDF::la_cl() const
 
 
 
-// Description:
-//      Renvoie le Champ_front des temperatures de bord.
-//
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le Champ_front des temperatures de bord.
+ *
+ */
 Champ_front& Echange_contact_rayo_semi_transp_VDF::temperature_bord()
 {
   return T_ext();
 }
 
 
-// Description:
-//      la methode mettre_a_jour(temps) a pour role de remplire le tableau T_ext avec les temperatures
-//      de paroi.Ces temperatures de paroi sont utilisees pour imposer la condition a la limite du
-//      probleme de rayonnement.
-//      Les temperatures de paroi sont calculees en tenant compte du caractere rayonnant
-//      de la paroi.
-//
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief la methode mettre_a_jour(temps) a pour role de remplire le tableau T_ext avec les temperatures de paroi.
+ *
+ * Ces temperatures de paroi sont utilisees pour imposer la condition a la limite du
+ *       probleme de rayonnement.
+ *       Les temperatures de paroi sont calculees en tenant compte du caractere rayonnant
+ *       de la paroi.
+ *
+ *
+ */
 void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
 {
   if (T_autre_pb()->valeurs_au_temps(temps).size()==0)
@@ -151,26 +111,17 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temp
 }
 
 
-// Description:
-//      la methode mettre_a_jour(temps) a pour role de remplire le tableau T_ext avec les temperatures
-//      de paroi. T_ext sera utilise pour calculer le flux impose a la limite de chaque  domaine du
-//      probleme couple.
-//      Les temperatures de paroi sont calculees en tenant compte du caractere rayonnant
-//      de la paroi.
-//      Appel de la methode Echange_externe_impose::mettre_a_jour(temps);
-//
-// Precondition:
-// Parametre: double temps
-//    Signification: temps courant
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief la methode mettre_a_jour(temps) a pour role de remplire le tableau T_ext avec les temperatures de paroi.
+ *
+ * T_ext sera utilise pour calculer le flux impose a la limite de chaque  domaine du
+ *       probleme couple.
+ *       Les temperatures de paroi sont calculees en tenant compte du caractere rayonnant
+ *       de la paroi.
+ *       Appel de la methode Echange_externe_impose::mettre_a_jour(temps);
+ *
+ *
+ * @param (double temps) temps courant
+ */
 void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
 {
   //  Cerr<<"Echange_contact_rayo_semi_transp_VDF::mettre_a_jour : Debut"<<finl;
@@ -371,8 +322,9 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_e
 
 }
 
-// Description:
-// Renvoie la CL portee par le probleme de l'autre cote de la frontiere.
+/*! @brief Renvoie la CL portee par le probleme de l'autre cote de la frontiere.
+ *
+ */
 Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_Cl_opposee()
 {
   Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb().valeur());

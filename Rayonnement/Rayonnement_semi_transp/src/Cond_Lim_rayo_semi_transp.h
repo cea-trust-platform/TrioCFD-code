@@ -28,17 +28,10 @@
 #include <Neumann_sortie_libre.h>
 #include <Champ_front.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Cond_Lim_rayo_semi_transp
-//
-// .SECTION voir aussi
-//
-//     Ce n'est pas une classe de l'arbre TRUST a elle seule.
-//     Cette classe est faite etre une classe mere d'une classe
-//     qui heritera par ailleurs d'Objet_U
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Cond_Lim_rayo_semi_transp
+ *
+ * @sa Ce n'est pas une classe de l'arbre TRUST a elle seule., Cette classe est faite etre une classe mere d'une classe, qui heritera par ailleurs d'Objet_U
+ */
 class Cond_Lim_rayo_semi_transp
 {
 
@@ -67,22 +60,13 @@ protected :
 Cond_Lim_rayo_semi_transp::~Cond_Lim_rayo_semi_transp()
 {}
 
-// Description:
-//    Renvoie la reference sur le modele pointe par
-//    Cond_Lim_rayo_semi_transp::mon_modele.
-//    (version const)
-// Precondition: on doit avoir associe un modele
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Equation_base&
-//    Signification: le modele associe a l'objet
-//    Contraintes: reference constante
-// Exception: pas de modele associe
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la reference sur le modele pointe par Cond_Lim_rayo_semi_transp::mon_modele.
+ *
+ *     (version const)
+ *
+ * @return (Equation_base&) le modele associe a l'objet
+ * @throws pas de modele associe
+ */
 inline const Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele() const
 {
   assert (mon_modele.non_nul());
@@ -90,21 +74,11 @@ inline const Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele() const
 }
 
 
-// Description:
-//    Renvoie la reference sur le modele pointe par
-//    Cond_Lim_rayo_semi_transp::mon_modele.
-// Precondition: on doit avoir associe un modele
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Equation_base&
-//    Signification: le modele associe a l'objet
-//    Contraintes:
-// Exception: pas de modele associe
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la reference sur le modele pointe par Cond_Lim_rayo_semi_transp::mon_modele.
+ *
+ * @return (Equation_base&) le modele associe a l'objet
+ * @throws pas de modele associe
+ */
 inline Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele()
 {
   assert (mon_modele.non_nul());

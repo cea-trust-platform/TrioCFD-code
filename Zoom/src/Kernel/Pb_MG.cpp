@@ -29,19 +29,12 @@
 
 Implemente_instanciable(Pb_MG,"Pb_MG",Couplage_U);
 
-//////////////////////////////////////////////////
-//                                              //
-// Implementation de l'interface de Probleme_U  //
-//                                              //
-//////////////////////////////////////////////////
-
-
-
-// Description:
-//    Calcul des connectivites entre faces fines et faces grossieres,
-//    et entre elements fins et elements grossiers
-//    pour chaque probleme a 2 grilles
-//    Le calcul est delegue a l'algo.
+/*! @brief Calcul des connectivites entre faces fines et faces grossieres, et entre elements fins et elements grossiers
+ *
+ *     pour chaque probleme a 2 grilles
+ *     Le calcul est delegue a l'algo.
+ *
+ */
 void Pb_MG::initialize()
 {
   if (a_un_pb_grossier())
@@ -134,21 +127,13 @@ Entree& Pb_MG::readOn(Entree& s )
 }
 
 
-// Description:
-// Associe un algorithme de resolution au probleme.
-// Verifie que l'algorithme est derive de Algo_MG_base.
-// Precondition:
-// Parametre: un_algo
-//    Signification: l'algorithme a associer
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: 0 en cas d'erreur, 1 sinon.
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un algorithme de resolution au probleme.
+ *
+ * Verifie que l'algorithme est derive de Algo_MG_base.
+ *
+ * @param (un_algo) l'algorithme a associer
+ * @return (0 en cas d'erreur, 1 sinon.)
+ */
 int Pb_MG::associer_algo(const Algo_MG_base& un_algo)
 {
   mon_algo_=un_algo;
@@ -209,22 +194,9 @@ void Pb_MG::initialiser_champ_front_zoom()
 }
 
 
-// Description:
-//   Association du probleme multigrille
-//   avec son probleme grossier
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Association du probleme multigrille avec son probleme grossier
+ *
+ */
 void Pb_MG::associer_pbMG_pbGglobal_(Probleme_base& pb)
 {
   // Est-ce que cette ligne servait a quelque chose ???
@@ -237,9 +209,9 @@ void Pb_MG::associer_pbMG_pbG_(Probleme_base& pb)
 }
 
 
-// Description:
-//   Ajoute un probleme a la liste des problemes fins
-//   Met en place la reference du probleme fin vers this
+/*! @brief Ajoute un probleme a la liste des problemes fins Met en place la reference du probleme fin vers this
+ *
+ */
 void Pb_MG::associer_pbMG_pbFin_(Probleme_base& pbF)
 {
 
@@ -251,21 +223,9 @@ void Pb_MG::associer_pbMG_pbFin_(Probleme_base& pbF)
 }
 
 
-// Description:
-//   Association du probleme multigrille global
-//   avec un de ses problemes a 2 grilles
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Association du probleme multigrille global avec un de ses problemes a 2 grilles
+ *
+ */
 void Pb_MG::associer_pb_2G(const Pb_2G& pb2G)
 {
   problemes_2G.add(pb2G);

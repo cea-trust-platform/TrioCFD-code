@@ -30,17 +30,14 @@
 #include <Champ_Don.h>
 #include <Ref_Champ_Don.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Convection_Diffusion_Phase_field
-//     Cas particulier de Convection_Diffusion_Concentration
-//     pour un ou plusieurs constituants.
-//     Dans le cas de plusieurs constituants les champs
-//     concentration et diffusivite sont vectoriels.
-// .SECTION voir aussi
-//      Convection_Diffusion_Concentration
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Convection_Diffusion_Phase_field Cas particulier de Convection_Diffusion_Concentration
+ *
+ *      pour un ou plusieurs constituants.
+ *      Dans le cas de plusieurs constituants les champs
+ *      concentration et diffusivite sont vectoriels.
+ *
+ * @sa Convection_Diffusion_Concentration
+ */
 class Convection_Diffusion_Phase_field : public Convection_Diffusion_Concentration
 {
   Declare_instanciable_sans_constructeur(Convection_Diffusion_Phase_field);

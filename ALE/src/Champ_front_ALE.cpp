@@ -39,22 +39,13 @@ Implemente_instanciable(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instation
   MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
 }*/
 
-// Description:
-//    Impression sur un flot de sortie au format:
-//    taille
-//    valeur(0) ... valeur(i)  ... valeur(taille-1)
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Impression sur un flot de sortie au format: taille
+ *
+ *     valeur(0) ... valeur(i)  ... valeur(taille-1)
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Champ_front_ALE::printOn(Sortie& os) const
 {
   //   const DoubleTab& tab=valeurs();
@@ -67,24 +58,16 @@ Sortie& Champ_front_ALE::printOn(Sortie& os) const
 
 
 
-// Description:
-//    Lecture a partir d'un flot d'entree au format:
-//    nombre_de_composantes
-//    fonction dependant de xyzt pour chaque composante
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Exception: mot clef inconnu a cet endroit
-// Exception: accolade fermante attendue
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture a partir d'un flot d'entree au format: nombre_de_composantes
+ *
+ *     fonction dependant de xyzt pour chaque composante
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws mot clef inconnu a cet endroit
+ * @throws accolade fermante attendue
+ */
 Entree& Champ_front_ALE::readOn(Entree& is)
 {
   int dim;
@@ -116,20 +99,11 @@ Entree& Champ_front_ALE::readOn(Entree& is)
 }
 
 
-// Description:
-//    Pas code !!
-// Precondition:
-// Parametre: Champ_front_base& ch
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Retour: Champ_front_base&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Pas code !!
+ *
+ * @param (Champ_front_base& ch)
+ * @return (Champ_front_base&)
+ */
 Champ_front_base& Champ_front_ALE::affecter_(const Champ_front_base& ch)
 {
   return *this;
@@ -144,23 +118,14 @@ int Champ_front_ALE::initialiser(double temps, const Champ_Inc_base& inco)
   return 1;
 }
 
-// Description:
-//     Mise a jour du champ front et remplie un tableau de dimension
-//     egale au nombre total de sommets du domaine. Ce tableau a des
-//     valeurs nulles aux sommets qui n'appartiennent pas au bord ALE
-//     traite.
-// Precondition:
-// Parametre: double tps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Mise a jour du champ front et remplie un tableau de dimension egale au nombre total de sommets du domaine.
+ *
+ * Ce tableau a des
+ *      valeurs nulles aux sommets qui n'appartiennent pas au bord ALE
+ *      traite.
+ *
+ * @param (double tps) le temps de mise a jour
+ */
 void Champ_front_ALE::mettre_a_jour(double temps)
 {
   //Cerr << "Champ_front_ALE ::mettre_a_jour" << finl;

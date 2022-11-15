@@ -24,14 +24,13 @@
 
 #include <Echange_contact_VDF.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Echange_contact_VDF_FT_Disc
-//
-// <Description of class Echange_contact_VDF_FT_Disc>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Echange_contact_VDF_FT_Disc
+ *
+ *  <Description of class Echange_contact_VDF_FT_Disc>
+ *
+ *
+ *
+ */
 class Echange_contact_VDF_FT_Disc : public Echange_contact_VDF
 {
 
@@ -49,7 +48,7 @@ public :
 protected :
   Champ_front indicatrice_;
   double indicatrice_ref_;
-  Nom nom_champ_indicatrice_, nom_autre_pb_,nom_bord_oppose_;
+  Nom nom_champ_indicatrice_, nom_bord_oppose_;
 };
 
 #endif /* Echange_contact_VDF_FT_Disc_included */

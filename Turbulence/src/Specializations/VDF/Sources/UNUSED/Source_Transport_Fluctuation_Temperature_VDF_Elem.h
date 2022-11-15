@@ -24,11 +24,9 @@
 #define Source_Transport_Fluctuation_Temperature_VDF_Elem_included
 
 
-//
-// .DESCRIPTION class Source_Transport_Fluctuation_Temperature_VDF_Elem
-//
-// .SECTION voir aussi
-
+/*! @brief class Source_Transport_Fluctuation_Temperature_VDF_Elem
+ *
+ */
 #define Ca_DEFAULT 0.8   // Valeurs par defaut des constantes qui interviennent
 #define Cb_DEFAULT 2.0   // dans le calcul des termes sources des equations
 #define Cc_DEFAULT 1.96  // de transport des fluctuations thermiques.

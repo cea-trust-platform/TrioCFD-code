@@ -40,6 +40,9 @@ class IJK_Thermique;
 class List_IJK_Thermique;
 class list_curseurIJK_Thermique;
 class const_list_curseurIJK_Thermique;
+class List_IJK_Energie;
+class list_curseurIJK_Energie;
+class const_list_curseurIJK_Energie;
 /**
  * All the post-processing stuff of IJK_FT delegated into this helper class:
  */
@@ -56,7 +59,7 @@ public:
   int initialise_stats(IJK_Splitting& splitting, ArrOfDouble& vol_bulles, const double vol_bulle_monodisperse);
   void init_indicatrice_non_perturbe();
 
-  void posttraiter_champs_instantanes(const char * lata_name, double time);
+  void posttraiter_champs_instantanes(const char * lata_name, double time, int time_iteration);
   void posttraiter_statistiques_plans(double time);
   void ecrire_statistiques_bulles(int reset, const Nom& nom_cas, const ArrOfDouble& gravite, const double current_time) const;
   void update_stat_ft(const double dt);
@@ -129,14 +132,23 @@ public:
   void compute_extended_pressures(const Maillage_FT_IJK& mesh);
   //IJK_Field_double& extended_p);
   void posttraiter_tous_champs_thermique(Motcles& liste,  const int idx) const;
+  void posttraiter_tous_champs_energie(Motcles& liste,  const int idx) const;
   int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
                                                const char *lata_name,
                                                const int lata_step, const double current_time,
                                                LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
+  int posttraiter_champs_instantanes_energie(const Motcles& liste_post_instantanes,
+                                             const char *lata_name,
+                                             const int lata_step, const double current_time,
+                                             LIST_CURSEUR(IJK_Energie) curseur,  const int idx);
   int posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
                                                             const char *lata_name,
                                                             const int lata_step, const double current_time,
                                                             LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
+  int posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes,
+                                                          const char *lata_name,
+                                                          const int lata_step, const double current_time,
+                                                          LIST_CURSEUR(IJK_Energie) curseur,  const int idx);
   //CONST_LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
   /*  int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
                                                  const char *lata_name,
@@ -273,7 +285,6 @@ protected:
   FixedVector<IJK_Field_double, 3> ana_grad2Wc_; // contient les deriv croisees
 
   // GAB
-  FixedVector<IJK_Field_double, 3> source_spectrale_;
   IJK_Field_double IFd_source_spectraleX_;
   IJK_Field_double AOD_source_spectraleX_;
   IJK_Field_double source_spectraleY_;
@@ -281,6 +292,9 @@ protected:
   // Pour post-traitement :
   IJK_Field_double lambda2_, dudy_, dvdx_, dwdy_;
   FixedVector<IJK_Field_double, 3> cell_velocity_;
+  FixedVector<IJK_Field_double, 3> cell_source_spectrale_;
+  //  FixedVector<IJK_Field_double, 3> cell_source_interface_totale_;   // non-const because some echange_espace_virtuel()
+  FixedVector<IJK_Field_double, 3> cell_grad_p_;
 
 
   int sondes_demande_;
@@ -295,16 +309,14 @@ protected:
   const IJK_Interfaces& interfaces_;
   IJK_Field_double& pressure_;                   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3>& velocity_;   // non-const because some echange_espace_virtuel()
+  FixedVector<IJK_Field_double, 3> source_spectrale_;   // non-const because some echange_espace_virtuel()
+  // FixedVector<IJK_Field_double, 3> source_interface_totale_;   // non-const because some echange_espace_virtuel()
   const FixedVector<IJK_Field_double, 3>& d_velocity_;
-
-  IJK_Field_double& indicatrice_ns_;
-  IJK_Field_double& indicatrice_ft_;
-  FixedVector<IJK_Field_double, max_authorized_nb_of_groups_>& groups_indicatrice_ft_;
-  FixedVector<IJK_Field_double, max_authorized_nb_of_groups_>& groups_indicatrice_ns_;
 
   IJK_Splitting& splitting_;
   IJK_Splitting& splitting_ft_;
   LIST(IJK_Thermique)& thermique_;
+  LIST(IJK_Energie)& energie_;
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;
 

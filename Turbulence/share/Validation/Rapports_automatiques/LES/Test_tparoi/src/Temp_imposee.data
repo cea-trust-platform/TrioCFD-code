@@ -56,24 +56,26 @@ Read sch
 VEFPrep1B dis
 
 
-Fluide_incompressible fluide    
-Read fluide  
-{
-	mu Champ_Uniforme 1 1.e-5	
-	rho Champ_Uniforme 1 1000.
-        lambda Champ_Uniforme 1 10.    
-        Cp Champ_Uniforme 1 0.1
-	beta_th Champ_Uniforme 1 1.
-}
+   
 
 Associate pb dom_pb
-Associate pb fluide     
+    
 Associate pb sch
 Discretize pb dis 
 
 Read pb
 {
-        Navier_Stokes_turbulent
+   
+   fluide_incompressible  
+   {
+    	mu Champ_Uniforme 1 1.e-5	
+   	rho Champ_Uniforme 1 1000.
+           lambda Champ_Uniforme 1 10.    
+           Cp Champ_Uniforme 1 0.1
+   	beta_th Champ_Uniforme 1 1.
+   }
+   
+           Navier_Stokes_turbulent
         {
                 projection_initiale 0
 		solveur_pression Gcp { precond ssor { omega 2.5 } seuil 1.e+100 }
@@ -145,3 +147,4 @@ End
                          Turbulence_paroi   negligeable_scalaire 
                          Turbulence_paroi   Loi_standard_hydr_scalaire 
 
+ 

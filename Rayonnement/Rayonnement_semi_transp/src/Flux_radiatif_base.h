@@ -26,17 +26,13 @@
 #include <Neumann_paroi.h>
 class Equation_base;
 
-////////////////////////////////////////////////////////////////
-// File : Flux_radiatif_base.h
-// Directory :        $TRUST_ROOT/Rayonnement_semi_transp
-// .DESCRIPTION
-//  Decrire ici la classe Flux_radiatif_base
-//
-// .FINHTML
-// .FINEPS
-////////////////////////////////////////////////////////////////
-
-
+/*! @brief Decrire ici la classe Flux_radiatif_base
+ *
+ *  .FINHTML
+ *  .FINEPS
+ *
+ *
+ */
 class Flux_radiatif_base : public Neumann_paroi
 {
   Declare_base(Flux_radiatif_base);

@@ -28,16 +28,13 @@
 #include <Terme_Source_Qdm.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
-//class Probleme_base;
-//
-// .DESCRIPTION class Source_Qdm_VDF_Phase_field
-//
-//
-//
-// .SECTION voir aussi Source_base
-//
-//
-
+/*! @brief class Source_Qdm_VDF_Phase_field
+ *
+ *
+ *
+ *
+ * @sa Source_base
+ */
 class Source_Qdm_VDF_Phase_field : public Source_base, public Terme_Source_Qdm
 {
 

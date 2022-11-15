@@ -27,14 +27,12 @@
 #include <Champ_Don.h>
 #include <Parser_U.h>
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_UTAU_IMP_Impl
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_UTAU_IMP_Impl
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_UTAU_IMP_Impl
 {
 public:

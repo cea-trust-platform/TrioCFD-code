@@ -61,26 +61,24 @@ Read sch_RK3
 	periode_sauvegarde_securite_en_heures 11
 }
 
-Fluide_incompressible air
-Read air
-{
-	mu	champ_uniforme 1 2.84e-5
- 	rho	champ_uniforme 1 0.011928
-}
 
-Champ_uniforme gravite
-Read gravite 3 0 0 0
 
-Associate air gravite
 Associate pb dom
 Associate pb sch_RK3
-Associate pb air
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu	champ_uniforme 1 2.84e-5
+    	rho	champ_uniforme 1 0.011928
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		Solveur_pression	petsc Cholesky { }
 		Convection		{ Centre }
@@ -138,3 +136,4 @@ Read pb
 
 Solve pb
 End
+ 

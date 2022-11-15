@@ -50,23 +50,10 @@ Lire sch
 }
 
 # SODIUM 350°C #
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu	Champ_Uniforme 1 3.08e-4
-	rho	Champ_Uniforme 1 868.09
-	lambda	Champ_Uniforme 1 77.06 
-	Cp	Champ_Uniforme 1 1290.06
-	beta_th	Champ_Uniforme 1 2.74e-4
-}
 
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -9.81
 
-Associer fluide gravite
 Associer pb DOM
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
@@ -80,7 +67,18 @@ extraire_surface { domaine HOT probleme pb avec_certains_bords 1 CHAUD }
 
 Lire pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 -9.81
+   	mu	Champ_Uniforme 1 3.08e-4
+   	rho	Champ_Uniforme 1 868.09
+   	lambda	Champ_Uniforme 1 77.06 
+   	Cp	Champ_Uniforme 1 1290.06
+   	beta_th	Champ_Uniforme 1 2.74e-4
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-9 impr }
 		# Schema de convection teste : Muscl, Ef_stab { alpha 0.2 }, Ef_stab { alpha 1. } #
@@ -287,3 +285,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

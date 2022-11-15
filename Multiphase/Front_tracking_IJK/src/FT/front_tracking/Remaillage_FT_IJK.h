@@ -24,17 +24,16 @@
 
 #include <Remaillage_FT.h>
 #include <Maillage_FT_IJK.h>
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : Remaillage_FT_IJK
-// .DESCRIPTION : class Remaillage_FT_IJK
-//
-// <Description of class Remaillage_FT_IJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-// Pour initialiser la classe il faut:
-// - appeler le readOn pour lire les parametres (optionnels)
-// - appeler associer_zone()
-
+/*! @brief : class Remaillage_FT_IJK
+ *
+ *  <Description of class Remaillage_FT_IJK>
+ *
+ *
+ *  Pour initialiser la classe il faut:
+ *  - appeler le readOn pour lire les parametres (optionnels)
+ *  - appeler associer_zone()
+ *
+ */
 class Maillage_FT_Disc;
 
 class Remaillage_FT_IJK : public Remaillage_FT

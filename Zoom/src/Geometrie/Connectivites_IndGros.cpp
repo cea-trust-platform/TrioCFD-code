@@ -66,22 +66,13 @@ void Connectivites_IndGros::calculer_indice_gros(Zone_VF& zone_vfF,
 
 
 
-// Description:
-//    Calcul des connectivites entre elements et elements
-//    et entre face et face:
-//    (simple appel aux 2 methodes precedentes)
-// Precondition:
-// Parametre:Zone& zoneG, Zone& zoneF
-//    Signification: zone discretisee grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: da
-// Effets de bord:
-// Postcondition: connect_elemF_elemG et connect_face_face sont remplis
+/*! @brief Calcul des connectivites entre elements et elements et entre face et face:
+ *
+ *     (simple appel aux 2 methodes precedentes)
+ *
+ * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @throws da
+ */
 void Connectivites_IndGros::calculer_connectivites(Zone_VF& zonef,
                                                    Zone_VF& zoneg,
                                                    Domaine& domg)

@@ -28,7 +28,6 @@
 #include <Discret_Thyd.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VF.h>
-#include <FloatTab.h>
 #include <time.h>
 #include <Parser.h>
 #include <Zone_VF.h>
@@ -46,7 +45,7 @@
 #include <Sauvegarde_Reprise_Maillage_FT.h>
 #include <SFichier.h>
 #include <Debog.h>
-#include <Format_Post_Lata_V1.h>
+#include <Format_Post_Lata.h>
 #include <Connex_components.h>
 #include <Connex_components_FT.h>
 #include <Loi_horaire.h>
@@ -67,14 +66,13 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT
 
 Implemente_ref(Transport_Interfaces_FT_Disc);
 
-// Description:
-//  Classe outil ou on stocke tout le bazar qui sert au fonctionnement de l'equation
-//  de transport. Permet de sauvegarder/reprendre les donnees d'interface
-//  (probleme des reprises avec pas de temps multiples),
-//  et de reduire les dependances en n'incluant presque rien dans Transport_Interfaces_FT_Disc.h
-
-
-
+/*! @brief Classe outil ou on stocke tout le bazar qui sert au fonctionnement de l'equation de transport.
+ *
+ * Permet de sauvegarder/reprendre les donnees d'interface
+ *   (probleme des reprises avec pas de temps multiples),
+ *   et de reduire les dependances en n'incluant presque rien dans Transport_Interfaces_FT_Disc.h
+ *
+ */
 static void eval_vitesse(double x, double y, double z, double t,
                          Parser& px, Parser& py, Parser& pz,
                          double& vx, double& vy, double& vz)
@@ -176,12 +174,15 @@ static void normer_vecteurs(DoubleTab& tab)
 }
 #endif
 
-// Description: calcul du vecteur normal a l'interface, aux sommets
-//  du maillage d'interface. Le tableau "normale" est efface et resize.
-//  La normale est la moyenne des normales des facettes voisines, ponderees par
-//  la surface de la facette.
-//  La norme du vecteur normal n'est pas unitaire !
-//  L'espace virtuel n'est pas a jour !
+/*! @brief calcul du vecteur normal a l'interface, aux sommets du maillage d'interface.
+ *
+ * Le tableau "normale" est efface et resize.
+ *   La normale est la moyenne des normales des facettes voisines, ponderees par
+ *   la surface de la facette.
+ *   La norme du vecteur normal n'est pas unitaire !
+ *   L'espace virtuel n'est pas a jour !
+ *
+ */
 static void calculer_normale_sommets_interface(const Maillage_FT_Disc& maillage,
                                                DoubleTab& normale)
 {
@@ -274,7 +275,9 @@ int Transport_Interfaces_FT_Disc_interne::reprendre(Entree& is)
   return 1;
 }
 
-// Description: constructeur par defaut
+/*! @brief constructeur par defaut
+ *
+ */
 Transport_Interfaces_FT_Disc::Transport_Interfaces_FT_Disc()
 {
   variables_internes_ = new Transport_Interfaces_FT_Disc_interne;
@@ -293,7 +296,9 @@ Transport_Interfaces_FT_Disc::Transport_Interfaces_FT_Disc()
   moment_.resize((dimension==2?1:dimension));
 }
 
-// Description: le destructeur qui va avec
+/*! @brief le destructeur qui va avec
+ *
+ */
 Transport_Interfaces_FT_Disc::~Transport_Interfaces_FT_Disc()
 {
   delete variables_internes_;
@@ -332,7 +337,10 @@ void Transport_Interfaces_FT_Disc::set_param(Param& param)
   param.ajouter("collisions",&topologie_interface());
   param.ajouter_non_std("methode_transport",(this),Param::REQUIRED);
   param.ajouter_non_std("n_iterations_distance",(this));
-  param.ajouter_non_std("iterations_correction_volume",(this));
+  param.ajouter_non_std("iterations_correction_volume",(this)); // Former Keyword, Obsolete
+  param.ajouter("VOFlike_correction_volume",&variables_internes_->VOFlike_correction_volume); // a flag: 0 or 1.
+  param.ajouter("nb_lissage_correction_volume",&variables_internes_->nb_lissage_correction_volume);
+  param.ajouter("nb_iterations_correction_volume",&variables_internes_->nb_iterations_correction_volume);
   param.ajouter_non_std("volume_impose_phase_1",(this));
   param.ajouter_non_std("methode_interpolation_v",(this));
   param.ajouter("parcours_interface",&variables_internes_->parcours_interface_);
@@ -351,7 +359,8 @@ void Transport_Interfaces_FT_Disc::set_param(Param& param)
   param.ajouter("temps_debut",&temps_debut_);
   param.ajouter("vitesse_imposee_regularisee", &variables_internes_->vimp_regul) ;
   //param.ajouter("indic_faces_modifiee", &variables_internes_->indic_faces_modif) ;
-  param.ajouter_non_std("indic_faces_modifiee", (this)) ;
+  //param.ajouter_non_std("indic_faces_modifiee", (this)) ;
+  param.ajouter_non_std("type_indic_faces", (this)) ;
 }
 
 int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
@@ -426,7 +435,7 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
           Cerr << "Transport_Interfaces_FT_Disc::lire\n"
                << "The options for methode_transport are :\n"
                << motcles2;
-          exit();
+          Process::exit();
         }
       return 1;
     }
@@ -445,8 +454,20 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
       int n;
       is >> n;
       variables_internes_->iterations_correction_volume = n;
+      if (n>0)
+        variables_internes_->VOFlike_correction_volume = 1;
+      variables_internes_->nb_lissage_correction_volume = n; // Historical behavior was to set it to the same value as the nb of iterations
+      int m = remaillage_interface().get_nb_iter_bary_volume_seul();
+      variables_internes_->nb_iterations_correction_volume = n;
       if (Process::je_suis_maitre())
-        Cerr << "Iterations_correction_volume : " << n << finl;
+        {
+          Cerr << "Obsolete Keyword is read Iterations_correction_volume : " << n << finl;
+          Cerr << "For future compatibility, it is recommended to switch to the new syntax : " << finl;
+          Cerr << "   VOFlike_correction_volume 1 # a flag (0 or 1) for activation #" << finl;
+          Cerr << "   nb_lissage_correction_volume " << n << " # Select 0 or N the number of smothing to apply to avoid potential spikes due to volume correction. #" << finl;
+          Cerr << "   nb_iterations_correction_volume " << m << " # to iterate on the volume correction until seuil is reached. #" << finl;
+          Cerr << "The value of is read nb_iterations_correction_volume from bloc remaillage at keyword: nb_iter_correction_volume" << finl;
+        }
       return 1;
     }
   else if (un_mot=="volume_impose_phase_1")
@@ -683,77 +704,119 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
           Cerr << "Transport_Interfaces_FT_Disc::lire\n"
                << " les options de distance_projete_faces sont :\n"
                << motcles2;
-          exit();
+          Process::exit();
         }
     }
-  else if (un_mot=="indic_faces_modifiee")
+  else if (un_mot=="type_indic_faces")
     {
-      variables_internes_->indic_faces_modif = 1;
-      // modified_indic_faces_* : Valeurs de la position et de l epaisseur de l indicatrice modifiee,
-      // exprimees en multiples de taille de maille. Cette nouvelle indicatrice est calculee
-      // a partir de la distance a l interface. La position represente une iso-ligne
-      // de distance a l interface, et l epaisseur, la zone de variation lineaire vis a vis de la distance,
-      // qui fait passer l indicatrice de 0 a 1 (la zone est centree sur l iso-ligne representee par la position).
-      // Par defaut :
-      variables_internes_->modified_indic_faces_position = 0. ;
-      variables_internes_->modified_indic_faces_thickness= 1. ;
-      Motcles mots;
-      mots.add("position");
-      mots.add("thickness");
-
-      Motcle mot;
-      is >> mot;
-      Motcle accouverte = "{" , accfermee = "}" ;
-      if (mot == accouverte)
+      Motcles motcles2(3);
+      motcles2[0] = "standard";
+      motcles2[1] = "modifiee";
+      motcles2[2] = "ai_based";
+      Motcle motlu;
+      is >> motlu;
+      Cerr << un_mot << " " << motlu << finl;
+      int rang = motcles2.search(motlu);
+      switch(rang)
         {
-          is >> mot;
+        case Transport_Interfaces_FT_Disc_interne::STANDARD:
+          {
+            variables_internes_->type_indic_faces_ = Transport_Interfaces_FT_Disc_interne::STANDARD;
+            if (Process::je_suis_maitre())
+              Cerr << " Standard interpolation of indicatrice to faces." << finl;
+            return 1;
+            break;
+          }
+        case Transport_Interfaces_FT_Disc_interne::MODIFIEE:
+          {
+            if (Process::je_suis_maitre())
+              Cerr << " Transport velocity imposed : reading " << Objet_U::dimension
+                   << " analytical expressions vx(x,y,[z,]t) vy(...) [vz(...)]" << finl;
 
-          while (mot != accfermee)
-            {
-              int rang = mots.search(mot);
-              switch(rang)
-                {
-                case 0:
+            variables_internes_->type_indic_faces_ = Transport_Interfaces_FT_Disc_interne::MODIFIEE;
+            // modified_indic_faces_* : Valeurs de la position et de l epaisseur de l indicatrice modifiee,
+            // exprimees en multiples de taille de maille. Cette nouvelle indicatrice est calculee
+            // a partir de la distance a l interface. La position represente une iso-ligne
+            // de distance a l interface, et l epaisseur, la zone de variation lineaire vis a vis de la distance,
+            // qui fait passer l indicatrice de 0 a 1 (la zone est centree sur l iso-ligne representee par la position).
+            // Par defaut :
+            variables_internes_->modified_indic_faces_position = 0. ;
+            variables_internes_->modified_indic_faces_thickness= 1. ;
+            Motcles mots;
+            mots.add("position");
+            mots.add("thickness");
+
+            Motcle mot;
+            is >> mot;
+            Motcle accouverte = "{" , accfermee = "}" ;
+            if (mot == accouverte)
+              {
+                is >> mot;
+
+                while (mot != accfermee)
                   {
-                    is >> variables_internes_->modified_indic_faces_position ;
-                    Cerr << "Lecture de la position de l interface modifiee " << finl;
-                    break;
-                  }
-                case 1:
-                  {
-                    is >> variables_internes_->modified_indic_faces_thickness ;
-                    if ( variables_internes_->modified_indic_faces_thickness < 0.)
+                    int rang2 = mots.search(mot);
+                    switch(rang2)
                       {
-                        Cerr << "L epaisseur de l interface doit etre positive ou nulle!!" << finl;
-                        exit();
+                      case 0:
+                        {
+                          is >> variables_internes_->modified_indic_faces_position ;
+                          Cerr << "Lecture de la position de l interface modifiee " << finl;
+                          break;
+                        }
+                      case 1:
+                        {
+                          is >> variables_internes_->modified_indic_faces_thickness ;
+                          if ( variables_internes_->modified_indic_faces_thickness < 0.)
+                            {
+                              Cerr << "L epaisseur de l interface doit etre positive ou nulle!!" << finl;
+                              Process::exit();
+                            }
+                          Cerr << "Lecture de l epaisseur de l interface modifiee " << finl;
+                          break;
+                        }
                       }
-                    Cerr << "Lecture de l epaisseur de l interface modifiee " << finl;
-                    break;
+                    is >> mot;
                   }
-                }
-              is >> mot;
-            }
+              }
+            else
+              {
+                Cerr << "Erreur a la lecture des parametres de l'indicatrice modifiee " << finl;
+                Cerr << "On attendait : " << accouverte << finl;
+                exit();
+              }
+            if (Process::je_suis_maitre())
+              {
+                Cerr << "L indicatrice face sera calculee a partir de la distance. Position : d=" << variables_internes_->modified_indic_faces_position << "h ; Epaisseur : "<< variables_internes_->modified_indic_faces_thickness << "h" <<finl;
+              }
+            return 1;
+            break;
+          }
+        case Transport_Interfaces_FT_Disc_interne::AI_BASED:
+          {
+            variables_internes_->type_indic_faces_ = Transport_Interfaces_FT_Disc_interne::AI_BASED;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces is based on the interfacial area"
+                   << " and on the normal to the interface." << finl;
+            return 1;
+          }
+        default:
+          Cerr << "Transport_Interfaces_FT_Disc::lire\n"
+               << " les options de type_indic_faces sont :\n"
+               << motcles2;
+          Process::exit();
         }
-      else
-        {
-          Cerr << "Erreur a la lecture des parametres de l'indicatrice modifiee " << finl;
-          Cerr << "On attendait : " << accouverte << finl;
-          exit();
-        }
-      if (Process::je_suis_maitre())
-        {
-          Cerr << "L indicatrice face sera calculee a partir de la distance. Position : d=" << variables_internes_->modified_indic_faces_position << "h ; Epaisseur : "<< variables_internes_->modified_indic_faces_thickness << "h" <<finl;
-        }
-      return 1;
     }
   else
     return Transport_Interfaces_base::lire_motcle_non_standard(un_mot,is);
   return 1;
 }
 
-// Description: Methode appelee par Equation_base::readOn
-//  On verifie que toutes les cl sont de type Paroi_FT_disc.
-//  Fait exit() si erreur.
+/*! @brief Methode appelee par Equation_base::readOn On verifie que toutes les cl sont de type Paroi_FT_disc.
+ *
+ *   Fait exit() si erreur.
+ *
+ */
 int Transport_Interfaces_FT_Disc::verif_Cl() const
 {
   const Conds_lim& les_cl = la_zone_Cl_dis.valeur().les_conditions_limites();
@@ -1098,29 +1161,32 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   if (lata_file != "??")
     {
       Cerr << "Writing lata file" << finl;
+      Format_Post_Lata lata;
       const Domaine& un_dom = zone_vf.zone().domaine();
-      Format_Post_Lata_V1 lata;
-      const double temps = 0.;
-      lata.initialize_lata(lata_file, Format_Post_Lata::BINAIRE, Format_Post_Lata::SINGLE_FILE);
-      lata.ecrire_entete(temps, 0 /*reprise*/, 1 /*premier post*/);
-      lata.ecrire_domaine(un_dom, 1/*premier_post*/);
-      lata.ecrire_temps(temps);
+      constexpr double TEMPS = 0.;
+      constexpr int FIRST_POST = 1;
+      lata.initialize(lata_file, Format_Post_Lata::BINAIRE, "SIMPLE");
+      lata.ecrire_entete(TEMPS, 0 /*reprise*/, FIRST_POST);
+      lata.ecrire_domaine(un_dom, FIRST_POST);
+      lata.ecrire_temps(TEMPS);
       DoubleTab data(nb_elem);
       for (int i = 0; i < nb_elem; i++)
         data(i) = num_compo(i);
       Noms unites;
       unites.add("-");
       Noms noms_compo;
-      Nom nom_champ("connex_component");
+      noms_compo.add("");
       Nom nom_dom(un_dom.le_nom());
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", data);
+
+      Nom nom_champ("connex_component");
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        data);
       nom_champ = "indicatrice";
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", indic);
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        indic);
       nom_champ = "distance";
-      lata.ecrire_champ(un_dom, unites, noms_compo, 1, temps, temps,
-                        nom_champ, nom_dom, "elem", "scalar", get_update_distance_interface().valeurs());
+      lata.ecrire_champ(un_dom, unites, noms_compo, 1, TEMPS, nom_champ, nom_dom, "elem", "scalar",
+                        get_update_distance_interface().valeurs());
     }
 
   if (phase_of_component.size_array() > 0 && min_array(phase_of_component) < 0)
@@ -1134,13 +1200,15 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 }
 
 
-// Description:
-// Lecture des conditions initiales. On s'attend a trouver ceci :
-//   { fonction EXPRESSION }
-// ou expression depend de x, y et z et sera interpretee par le
-// parser de TRUST. L'expression est envoyee a Marching_Cubes
-// pour construire l'interface.
-// Voir aussi parser et Marching_Cubes.
+/*! @brief Lecture des conditions initiales.
+ *
+ * On s'attend a trouver ceci : { fonction EXPRESSION }
+ *  ou expression depend de x, y et z et sera interpretee par le
+ *  parser de TRUST. L'expression est envoyee a Marching_Cubes
+ *  pour construire l'interface.
+ *  Voir aussi parser et Marching_Cubes.
+ *
+ */
 Entree& Transport_Interfaces_FT_Disc::lire_cond_init(Entree& is)
 {
   if (Process::je_suis_maitre())
@@ -1295,10 +1363,11 @@ void Transport_Interfaces_FT_Disc::associer_pb_base(const Probleme_base& un_prob
   Equation_base::associer_pb_base(un_probleme);
 }
 
-// Description:
-// Discretisation des champs:
-// - indicatrice_ : champ scalaire discretise aux elements
-// - typage du maillage et de l'algorithme marching cubes
+/*! @brief Discretisation des champs: - indicatrice_ : champ scalaire discretise aux elements
+ *
+ *  - typage du maillage et de l'algorithme marching cubes
+ *
+ */
 void Transport_Interfaces_FT_Disc::discretiser(void)
 {
   // Le nom des differents champs est un identifiant (indicatrice, vitesse, ...)
@@ -1504,11 +1573,12 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   la_zone_Cl_dis->associer_inconnue(inconnue());
 }
 
-// Description:
-//  Remaillage de l'interface :
-//   - amelioration petites et grandes facettes,
-//   - barycentrage,
-//   - gestion des coalescences-fragmentations.
+/*! @brief Remaillage de l'interface : - amelioration petites et grandes facettes,
+ *
+ *    - barycentrage,
+ *    - gestion des coalescences-fragmentations.
+ *
+ */
 void Transport_Interfaces_FT_Disc::remailler_interface(void)
 {
   Journal() << "Transport_Interfaces_FT_Disc::remailler_interface " << le_nom() << finl;
@@ -1591,14 +1661,18 @@ void Transport_Interfaces_FT_Disc::preparer_pas_de_temps(void)
 
 double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
 {
+  // We should think of implementing it as in eq. 16 for instance:
+  // https://hal.archives-ouvertes.fr/hal-02304125/document
+  // and use the Lagrangian min edge length instead of Delta_x.
   return DMAXFLOAT;
 }
 
-// Description:
-//  Recalcul du champ variables_internes_->indicatrice_cache a partir de
-//  la position des interfaces.
-//  ATTENTION, ce n'est pas l'inconnue du probleme. L'inconnue est mise a jour
-//  a partir de ce champ dans mettre_a_jour.
+/*! @brief Recalcul du champ variables_internes_->indicatrice_cache a partir de la position des interfaces.
+ *
+ *   ATTENTION, ce n'est pas l'inconnue du probleme. L'inconnue est mise a jour
+ *   a partir de ce champ dans mettre_a_jour.
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
 {
   const int tag = maillage_interface().get_mesh_tag();
@@ -1613,15 +1687,17 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
   return variables_internes_->indicatrice_cache.valeur();
 }
 
-// Description:
-//  Interpolation lineaire d'un champ de vitesse VDF aux faces en un point
-//  de coordonnees coord_som. Le point coord_som est suppose se trouver dans
-//  l'element "element".
-//  Pour chaque composante, on cherche le cube contenant coord_som et dont
-//  les sommets sont des noeuds de vitesse pour cette composante et on
-//  interpole lineairement dans ce cube. Au bord du domaine, la vitesse
-//  tangentielle dans le demi-element colle a la paroi est la vitesse
-//  discrete de l'element (la condition aux limites n'est PAS utilisee).
+/*! @brief Interpolation lineaire d'un champ de vitesse VDF aux faces en un point de coordonnees coord_som.
+ *
+ * Le point coord_som est suppose se trouver dans
+ *   l'element "element".
+ *   Pour chaque composante, on cherche le cube contenant coord_som et dont
+ *   les sommets sont des noeuds de vitesse pour cette composante et on
+ *   interpole lineairement dans ce cube. Au bord du domaine, la vitesse
+ *   tangentielle dans le demi-element colle a la paroi est la vitesse
+ *   discrete de l'element (la condition aux limites n'est PAS utilisee).
+ *
+ */
 void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
                                   const FTd_vecteur3& coord_som,
                                   const int element,
@@ -1809,6 +1885,24 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
             + (1.-ci) * cj      * valeurs_v(f10)
             + ci      * (1.-cj) * valeurs_v(f01)
             + (1.-ci) * (1.-cj) * valeurs_v(f11);
+          if (Objet_U::bidim_axi && (compo==0) && (ci>Objet_U::precision_geom) && (ci<1.-Objet_U::precision_geom)
+              && (xv(f00,0) <DMINFLOAT)
+              && ((fabs(valeurs_v(f00)-valeurs_v(f10))>DMINFLOAT) || (fabs(valeurs_v(f01)-valeurs_v(f11))>DMINFLOAT)))
+            {
+              Cerr << "In bidim_axi, when interpolating u_r within the first cell, we use the value on the symetry axis u_r(r=0)=0." << finl;
+              Cerr << "We take a simple mean on that and the value at the other face. But for a divergence-free field, neglecting dv/dy, " << finl;
+              Cerr << "it would be better to assume a velocity as u(x) = x_1/x * u_1 (if x!=0). GB 2020/03/05." << finl;
+              const double x = coord_som[0];
+              Cerr << "Here, the difference is "<< (1.-ci) << " vs. " << xv(f10, 0)/x << finl;
+              Cerr << "u1= " << valeurs_v(f10) << " direction1 : " << direction1 << finl;
+              Cerr << "interpoler_vitesse_point_vdf of Transport_Interface..cpp not exiting but interpolation is adapted" << finl;
+              Cerr << "Former: " << vitesse[compo];
+              vitesse[compo] = xv(f10, 0)/x * (
+                                 cj      * valeurs_v(f10)
+                                 + (1.-cj) * valeurs_v(f11));
+              Cerr << " New: " << vitesse[compo] << finl;
+              //Process::exit();
+            }
         }
       else if (dim == 3)
         {
@@ -1855,7 +1949,78 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
     }
 }
 
-double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const DoubleVect& indicatrice) const
+
+// Description:
+//  Interpolation uni-lineaire d'un champ de vitesse VDF aux faces en un point
+//  de coordonnees coord_som. Le point coord_som est suppose se trouver dans
+//  l'element "element". Contrairement a la methode interpoler_vitesse_point_vdf
+//  dont elle s'inspire, cette methode n'interpole chaque composante que dans sa propre
+//  direction
+//  Pour chaque composante, on cherche le cube contenant coord_som et dont
+//  les sommets sont des noeuds de vitesse pour cette composante et on
+//  interpole lineairement dans ce cube. Au bord du domaine, la vitesse
+//  tangentielle dans le demi-element colle a la paroi est la vitesse
+//  discrete de l'element (la condition aux limites n'est PAS utilisee).
+void interpoler_simple_vitesse_point_vdf(const Champ_base& champ_vitesse,
+                                         const FTd_vecteur3& coord_som,
+                                         const int element,
+                                         FTd_vecteur3& vitesse)
+{
+  const DoubleTab& valeurs_v = champ_vitesse.valeurs();
+  const Zone_VF& zone_vf = ref_cast(Zone_VF, champ_vitesse.zone_dis_base());
+  const IntTab& elem_faces = zone_vf.elem_faces();
+  const DoubleTab& xv = zone_vf.xv();
+
+  // Chaque composante de vitesse est la moyenne ponderee des 2 vitesses
+  // aux faces de l'element qui encadrent le sommet.
+  // On designe par i,j,k l'une des 8 faces, avec 0<=i<=1, 0<=j<=1, 0<=k<=1.
+  // La composante vitesse au sommet est
+  //  vitesse = SOMME(vitesse(face_i,j,k)*coef[0]*coef[1]*coef[2]);
+  // Exemple : interpolation de la composante horizontale de vitesse
+  //  pour le sommet "x". On fait une interpolation bilineaire
+  //  entre les DEUX composantes horizontales de vitesses v.
+  //  Pas besoin des voisins!
+  //   --------
+  //  |     x  |
+  //  |  v0    | v1
+  //  |-->     |-->
+  //  |        |
+  //  |        |
+  //   --------
+
+  // Boucle sur les 2 ou 3 composantes de la vitesse
+  int compo;
+  const int dim = Objet_U::dimension;
+  for (compo = 0; compo < dim; compo++)
+    {
+      // ****
+      // Calcul d'un unique coefficient de ponderation coef
+      // ****
+      double coef;
+
+      // Boucle sur les 2 ou 3 dimensions du cube dans lequel on interpole la valeur
+      int direction = compo;
+      // Coordonnee du point ou il faut interpoler la vitesse
+      const double x = coord_som[direction];
+      // Dans la direction de la composante traitee on interpole
+      // entre les deux faces opposees de l'element. Coordonnees
+      // de ces faces :
+      const int face_inf_compo = elem_faces(element, compo);
+      const int face_sup_compo = elem_faces(element, compo + dim);
+      const double xmin = xv(face_inf_compo, direction);
+      const double xmax = xv(face_sup_compo, direction);
+      coef = (xmax - x) / (xmax - xmin); // Le coef d'interpolation dans la direction
+
+      if (coef < 0.)
+        coef = 0.;
+      if (coef > 1.)
+        coef = 1.;
+
+      vitesse[compo] = coef * valeurs_v(face_inf_compo) + (1.-coef) * valeurs_v(face_sup_compo);
+    }
+}
+
+double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const DoubleVect& indicatrice, double& integrale_ph0) const
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
   const DoubleVect& volumes = zone_vf.volumes();
@@ -1863,32 +2028,35 @@ double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const Double
   assert(nb_nd==zone_vf.nb_elem());
 
   double integrale = 0.;
+  integrale_ph0 = 0.;
   for (nd=0 ; nd<nb_nd ; nd++)
     {
       integrale += indicatrice(nd) * volumes(nd);
+      integrale_ph0 += (1 - indicatrice(nd))*volumes(nd);
     }
+  integrale_ph0 = mp_sum(integrale_ph0);
   integrale = mp_sum(integrale);
-
   return integrale;
 }
 
-// Description:
-//  Calcul de la vitesse de deplacement des noeuds du maillage a partir
-//  d'un champ eulerien par interpolation.
-//  Le deplacement fourni n'a aucune propriete particuliere de conservation
-//  du volume.
-//  Les lignes de contact sont deplacees avec une vitesse qui n'a pas de
-//  propriete particuliere non plus...
-//
-// ATTENTION : on evalue simplement la vitesse a l'endroit ou sont les sommets.
-//             pas de canne a peche ...~/vues/ft_disc/vobs/Pre_Post_TRUST/Outils/lata2dx/
-// Param nv_calc : si =1 : recalcule le champ eulerien de la vitesse par filtrage L2
-//   sinon, reutilise celui stocke dans variables_internes_
+/*! @brief Calcul de la vitesse de deplacement des noeuds du maillage a partir d'un champ eulerien par interpolation.
+ *
+ *   Le deplacement fourni n'a aucune propriete particuliere de conservation
+ *   du volume.
+ *   Les lignes de contact sont deplacees avec une vitesse qui n'a pas de
+ *   propriete particuliere non plus...
+ *
+ *  ATTENTION : on evalue simplement la vitesse a l'endroit ou sont les sommets.
+ *  Param nv_calc : si =1 : recalcule le champ eulerien de la vitesse par filtrage L2
+ *    sinon, reutilise celui stocke dans variables_internes_
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
   const Champ_base&        champ_vitesse,
   const Maillage_FT_Disc& maillage,
   DoubleTab&             vitesse_noeuds,
-  int                   nv_calc) const
+  int                   nv_calc,
+  int standard) const
 {
 
   switch(variables_internes_->methode_interpolation_v)
@@ -1983,7 +2151,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
             Cerr << "Error for the method Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee\n"
                  << "the interpolation VDF_LINEAIRE is valid only for a VDF discretization with a Champ_face field\n"
                  << " (type for the current field: " << champ_vitesse.que_suis_je() << finl;
-            exit();
+            Process::exit();
           }
         const DoubleTab& pos = maillage.sommets();
         const ArrOfInt& elem = maillage.sommet_elem();
@@ -2001,7 +2169,16 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
                 int j;
                 for (j = 0; j < dim; j++)
                   coord[j] = pos(i,j);
-                interpoler_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                if (standard)
+                  {
+                    // Interpolation M-lineaire dans toutes les M-directions pour chaque compo
+                    interpoler_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                  }
+                else
+                  {
+                    // Interpolation uni-lineaire dans chaque direction de chaque compo :
+                    interpoler_simple_vitesse_point_vdf(champ_vitesse, coord, element, vitesse);
+                  }
                 for (j = 0; j < dim; j++)
                   vitesse_noeuds(i,j) = vitesse[j];
               }
@@ -2013,7 +2190,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
       {
         Cerr << "Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee\n"
              << " interpolation method not developped" << finl;
-        exit();
+        Process::exit();
       }
     }
 }
@@ -2118,8 +2295,9 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
 }
 
 
-// Description:
-// Calcul de la derivee en temps de l'inconnue : zero.
+/*! @brief Calcul de la derivee en temps de l'inconnue : zero.
+ *
+ */
 DoubleTab& Transport_Interfaces_FT_Disc::derivee_en_temps_inco(DoubleTab& derivee)
 {
   derivee = 0.;
@@ -2317,29 +2495,175 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
       else if(indicatrice_faces(i) >= bmax) indicatrice_faces(i) = 1. ;
     }
 
-  // si on souhaite calculer l'indicatrice a partir de la distance :
-  if (variables_internes_->indic_faces_modif)
+  switch(variables_internes_->type_indic_faces_)
     {
+    case Transport_Interfaces_FT_Disc_interne::STANDARD:
+      {
+        // Does nothing more.
+        break;
+      }
+    case Transport_Interfaces_FT_Disc_interne::MODIFIEE:
+      {
+        // si on souhaite calculer l'indicatrice a partir de la distance :
+        const DoubleTab& dist_face = get_update_distance_interface_faces().valeurs();
+        const Zone_dis_base& zone_dis_base = zone_dis().valeur();
+        const Zone_VDF&   zone_vdf       = ref_cast(Zone_VDF, zone_dis_base);
+        const DoubleVect& face_surfaces = zone_vdf.face_surfaces();
+        const DoubleVect& volumes_entrelaces = zone_vdf.volumes_entrelaces();
+        double& position  = variables_internes_->modified_indic_faces_position;
+        double& thickness = variables_internes_->modified_indic_faces_thickness;
+        for (int i = 0; i < nfaces; i++)
+          {
+            double h=volumes_entrelaces(i)/face_surfaces(i);
+            if (dist_face(i) > (position+thickness/2.)*h || indicatrice_faces(i)==1.)
+              indicatrice_faces(i)=1.;
+            else if (dist_face(i) >= (position-thickness/2.)*h && thickness !=0.)
+              indicatrice_faces(i) = (dist_face(i) - position*h)/(thickness*h) + 0.5 ;
+            else
+              indicatrice_faces(i)=0.;
+          }
+        break;
+      }
+    case Transport_Interfaces_FT_Disc_interne::AI_BASED:
+      {
+        // This method should be very much like case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED in Navier_Stokes_FT_Disc::calculer_dI_dt
+        // (but just the part to compute indicatrices faces...
+        // WARNING : contrary to what is done in Navier_Stokes_FT_Disc::calculer_dI_dt, we compute chi_1 (ie same as indicatrice),
+        // not the opposite chi_0 = 1-chi_1
+        //
+        const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+        const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
+        if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
+          {
+            // On recupere le saut de vitesse a l'interface (changement de phase)
+            const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+            const DoubleTab& interfacial_area = ns.get_interfacial_area();
+            const DoubleTab& normale_elements = get_update_normale_interface().valeurs();
 
-      const DoubleTab& dist_face = get_update_distance_interface_faces().valeurs();
-      const Zone_dis_base& zone_dis_base = zone_dis().valeur();
-      const Zone_VDF&   zone_vdf       = ref_cast(Zone_VDF, zone_dis_base);
-      const DoubleVect& face_surfaces = zone_vdf.face_surfaces();
-      const DoubleVect& volumes_entrelaces = zone_vdf.volumes_entrelaces();
-      double& position  = variables_internes_->modified_indic_faces_position;
-      double& thickness = variables_internes_->modified_indic_faces_thickness;
+            const int vef = (ns.inconnue().valeurs().nb_dim() == 2);
+            if (vef)
+              {
+                Cerr << "Code never applied or checked in VEF. You should read the algo first and assess it!" << finl;
+                Process::exit();
+              }
+            const int dim = ns.inconnue().valeurs().line_size();
+            // On fait la moyenne des 2 valeurs calculees sur les voisins
+            // ATTENTION, ici on veut la valeur de chiv (cad chi_0) a la face.
+            for (int face = 0; face < nfaces; face++)
+              {
+                double indic_face = 0.;
+                int v;
+                for (v = 0; v < 2; v++)
+                  {
+                    const int elem = face_voisins(face, v);
+                    if (elem >=0)
+                      {
+                        // If a neighbour is pure, we use that value at the face and stop further calculation.
+                        const double indic = indicatrice[elem]; // This is the value of chi_1 (ie =1 in phase 1!)
+                        //if (indic == 0. || indic == 1.)
+                        if (indic <=5e-3 || indic >= 1.-5e-3)
+                          {
+                            indic_face = indic; // Obviously, We want chi of phase_1
+                            break;
+                          }
+                        else
+                          {
+                            const double surface=zone_vf.face_surfaces(face);
+                            const double ai= interfacial_area(elem); // nx pointe vers le liquide (sortant de phase 0)
+                            if (fabs(ai)>DMINFLOAT)
+                              {
+                                double x = 0.;
+                                if (vef)
+                                  {
+                                    for (int j = 0; j < dim; j++)
+                                      {
+                                        const double nf = zone_vf.face_normales(face , j);
+                                        const double nx = normale_elements(elem, j);
+                                        // produit scalaire :
+                                        x +=  nf*nx;
+                                        x *= ai/surface;
+                                        // Que/comment Choisir?
+                                        indic_face += x;
+                                        Cerr << "Never tested. To be verified. It should depend on a scalar product with the vect (xp-xv)" << finl;
+                                        Process::exit();
+                                      }
+                                  }
+                                else
+                                  {
+                                    // En VDF, l'acces a orientation permet d'eviter le calcul du produit scalaire.
+                                    const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+                                    const IntVect& orientation = zvdf.orientation();
+                                    const int dir = orientation[face];
+                                    const double nx = normale_elements(elem, dir);
+                                    // Assumes a cube, nx larger than diag means we can use the method rather safely
+                                    if (nx>0.707)
+                                      {
+                                        x = ai/surface*nx;
+                                        // On suppose que v0 est a gauche et v1 a droite!!!
+                                        if (v==0)
+                                          indic_face += x; // This way, we build chi_1 because normale points towards chi_1
+                                        else
+                                          indic_face += 1-x;
+                                      }
+                                    else
+                                      {
+                                        // L'interface croise probablement la face d'en face et la methode ne marche plus.
+                                        // We revert back to the standard method :
+                                        double tmp = 0.;
+                                        if (elem >= 0)
+                                          tmp = indicatrice(elem);
 
+                                        double bmax=1.-1e-9;
+                                        if(tmp <= 1.0e-9) tmp = 0. ;
+                                        else if(tmp >= bmax) tmp = 1. ;
 
-      for (int i = 0; i < nfaces; i++)
-        {
-          double h=volumes_entrelaces(i)/face_surfaces(i);
-          if (dist_face(i) > (position+thickness/2.)*h || indicatrice_faces(i)==1.)
-            indicatrice_faces(i)=1.;
-          else if (dist_face(i) >= (position-thickness/2.)*h && thickness !=0.)
-            indicatrice_faces(i) = (dist_face(i) - position*h)/(thickness*h) + 0.5 ;
-          else
-            indicatrice_faces(i)=0.;
-        }
+                                        indic_face += tmp;
+                                      }
+                                  }
+                              }
+                            else
+                              {
+                                Cerr <<" WTF, c'est impossible" << finl;
+                                Process::exit();
+                              }
+                          }
+                      }
+                    else
+                      {
+                        // The only neighbour to the face :
+                        const int elem_voisin = face_voisins(face, 1-v); // The other one is accessed by 1-v
+                        const double indic = indicatrice[elem_voisin]; // This is the value of chi_1 (ie =1 in phase 1!)
+                        indic_face = indic; // We want chi of phase_1
+                        break; // c'est important pour le if d'apres.
+                      }
+                  }
+                if (v==2)
+                  // On n'a pas touche le break, on est donc passe 2 fois. donc :
+                  indic_face*=0.5;
+
+                // assert((indic_face >=0) && (indic_face<=1.));
+                // ca arrive des petits derapages..
+                if (indic_face <0)
+                  indic_face=0.;
+                if (indic_face >1.)
+                  indic_face=1.;
+
+                indicatrice_faces_(face) = indic_face;
+              }
+          }
+        else
+          {
+            Cerr << "Interpolation option AI_BASED in Transport_Interfaces_FT_Disc is not available "
+                 << "in Transport_Interfaces_FT_Disc::calcul_indicatrice_faces if we do not "
+                 << "have a Navier_Stokes_FT_Disc equation..." << finl;
+            Process::exit();
+          }
+        break;
+      }
+    default:
+      Cerr << "Transport_Interfaces_FT_Disc::calcul_indicatrice_faces\n"
+           << " unknown case?" << finl;
+      Process::exit();
     }
 
   indicatrice_faces.echange_espace_virtuel();
@@ -3694,7 +4018,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       // correct
       Cerr << "Transport_Interfaces_FT_Disc_interne::ANALYTIQUE "<< finl ;
 
-      if( variables_internes_->indic_faces_modif && variables_internes_-> type_projete_calcule != Transport_Interfaces_FT_Disc_interne::PROJETE_SIMPLIFIE)
+      if( variables_internes_->type_indic_faces_ == Transport_Interfaces_FT_Disc_interne::MODIFIEE && variables_internes_-> type_projete_calcule != Transport_Interfaces_FT_Disc_interne::PROJETE_SIMPLIFIE)
         {
           double indic_pos=variables_internes_->modified_indic_faces_position;
           double indic_thi=variables_internes_->modified_indic_faces_thickness;
@@ -3703,7 +4027,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
               Cerr << "-------------------------------------------------------------------------"  << finl;
               Cerr << "-------------------------------------------------------------------------"  << finl;
               Cerr << "The datafile ask to use type_vitesse_imposee=ANALYTIQUE and"                << finl;
-              Cerr << "indic_faces_modif with a too large transition to reach zero"                << finl;
+              Cerr << "type_indic_faces modifiee with a too large transition to reach zero"        << finl;
               Cerr << "There is a big risk that fluid gradients cannot be computed"                << finl;
               Cerr << "because fluid points (Indic_faces=0) are too far from the interface"        << finl;
               Cerr << "To fix that, just do one of the following things:"                          << finl;
@@ -3711,7 +4035,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
               Cerr << "If not, use \"distance_projete_faces simplifiee\" "                         << finl;
               Cerr << "-------------------------------------------------------------------------"  << finl;
               Cerr << "-------------------------------------------------------------------------"  << finl;
-              exit();
+              Process::exit();
             }
 
         }
@@ -5900,11 +6224,14 @@ void Transport_Interfaces_FT_Disc::projete_point_face_interface( int& nb_proj_mo
     }
 }
 
-// Description: Deplace le maillage a l'aide du champ de vitesse impose entre l'instant maillage.temps()
-//  et l'instant "temps".
-//  La nouvelle position des sommets est obtenue par integration des lignes de courant de ce champ,
-//  par un schema RK3 (en un pas de temps) qui prend en compte la dependance en temps des vitesses imposees.
-//  On "nettoie" et on change le temps du maillage. Pas de remaillage. maillage MINIMAL en sortie.
+/*! @brief Deplace le maillage a l'aide du champ de vitesse impose entre l'instant maillage.
+ *
+ * temps() et l'instant "temps".
+ *   La nouvelle position des sommets est obtenue par integration des lignes de courant de ce champ,
+ *   par un schema RK3 (en un pas de temps) qui prend en compte la dependance en temps des vitesses imposees.
+ *   On "nettoie" et on change le temps du maillage. Pas de remaillage. maillage MINIMAL en sortie.
+ *
+ */
 static void deplacer_maillage_ft_v_impose(Noms expression_vitesse,
                                           Maillage_FT_Disc& maillage, double temps)
 {
@@ -6030,13 +6357,13 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local(const Maillage_
       if (dim3)
         prodscal += (vi_z - Vitesses(compo, 2)) * nz;
       double norme_carre = nx * nx + ny * ny + nz * nz;
-      prodscal /= norme_carre;
       if (norme_carre != 0.)
         {
+          prodscal /= norme_carre;
           deplacement(som, 0) = nx * prodscal + Vitesses(compo, 0);
           deplacement(som, 1) = ny * prodscal + Vitesses(compo, 1);
           if (dim3)
-            deplacement(som, 2) = nz * prodscal + Vitesses(compo, 1);
+            deplacement(som, 2) = nz * prodscal + Vitesses(compo, 2); // BugFix reported from baltik TCL on 2020/10/26
         }
     }
 }
@@ -6044,42 +6371,69 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local(const Maillage_
 void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double temps)
 {
   DoubleTab& deplacement = variables_internes_->deplacement_sommets;
-  const Champ_base *u0_ptr = 0;
   const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
   const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
   Maillage_FT_Disc& maillage = maillage_interface();
   // Calcul de la vitesse de deplacement des sommets par interpolation
   // (deplacement contient en fait la vitesse en m/s)
-  calculer_vitesse_transport_interpolee(champ_vitesse,
-                                        maillage,
-                                        deplacement, 1 /* recalculer le champ de vitesse L2 */);
-
+  int flag = 1;
   if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
     {
-      // On recupere le saut de vitesse a l'interface (changement de phase)
       const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
-      u0_ptr = ns.get_delta_vitesse_interface();
-      if (u0_ptr)
-        {
-          const Champ_base& u0 = *u0_ptr;
-          DoubleTabFT d2(deplacement);
-          calculer_vitesse_transport_interpolee(u0,
-                                                maillage,
-                                                d2, 1 /* recalculer le champ de vitesse L2 */);
-
-          const int n = d2.dimension(0);
-          const int dim = d2.line_size();
-
-          for (int i = 0; i < n; i++)
-            {
-              for (int j = 0; j < dim; j++)
-                {
-                  const double depl2 = d2(i,j);
-                  deplacement(i,j) -= depl2;
-                }
-            }
-        }
+      if (ns.get_delta_vitesse_interface())
+        flag=0;
     }
+  calculer_vitesse_transport_interpolee(champ_vitesse,
+                                        maillage,
+                                        deplacement, 1 /* recalculer le champ de vitesse L2 */,
+                                        flag /* Interpolation Multi-lineaire en VDF */);
+
+#if DEBUG_CONSERV_VOLUME
+  int n = maillage.nb_sommets();
+  double dmin=0.;
+  double dmax=0.;
+  double dmean = 0.;
+  DoubleTab norm_deplacement(n);
+  if (n>0)
+    {
+      for (int i=0; i<n; i++)
+        {
+          double x = 0.;
+          for (int j=0; j<deplacement.dimension(1); j++)
+            x += deplacement(i,j)*deplacement(i,j);
+          norm_deplacement[i]  = sqrt(x);
+          dmean +=sqrt(x);
+        }
+      dmean /=n;
+      dmin = min_array(norm_deplacement);
+      dmax = max_array(norm_deplacement);
+    }
+#endif
+  // On recupere et ajoute a deplacement le saut de vitesse a l'interface si changement de phase
+  ajouter_contribution_saut_vitesse(deplacement);
+
+#if DEBUG_CONSERV_VOLUME
+  if (n>0)
+    {
+      double dmean_wpch = 0.;
+      for (int i=0; i<n; i++)
+        {
+          double x = 0.;
+          for (int j=0; j<deplacement.dimension(1); j++)
+            x += deplacement(i,j)*deplacement(i,j);
+          norm_deplacement[i]  = sqrt(x);
+          dmean_wpch +=sqrt(x);
+        }
+      dmean_wpch /=n;
+      double dmin_wpch = min_array(norm_deplacement);
+      double dmax_wpch = max_array(norm_deplacement);
+      Cerr << "Interfacial_velocity before/after pch [min/mean/max]. Time: "
+           << schema_temps().temps_courant()
+           << " Without-pch: " << dmin << " " << dmean<< " "  << dmax
+           << " With-pch: "  << dmin_wpch << " " << dmean_wpch << " "  << dmax_wpch
+           << " [Warning, values invalid in //] " << finl;
+    }
+#endif
 
   if (interpolation_repere_local_)
     {
@@ -6110,7 +6464,11 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
   // Calcul du deplacement :
   deplacement *= delta_t;
 
-  if (variables_internes_->iterations_correction_volume > 0)
+// Debug GB 2020.03.20 Conservation de volume
+#if DEBUG_CONSERV_VOLUME
+  double  volume_avt = remaillage_interface().calculer_volume_mesh(maillage);
+#endif
+  if (variables_internes_->VOFlike_correction_volume > 0)
     {
       // Transport avec correction du volume des phases :
       // Sauvegarde de la position actuelle des sommets :
@@ -6121,19 +6479,48 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
       // champ de vitesse eulerien :
       ArrOfDoubleFT var_volume;
       {
-        const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+        // Desole pour le ref_cast_non_const, il y a probablement plus propre mais je ne sais pas faire.
+        // En l'etat, 'ns' doit etre non-const car il fait appel a get_update...normale et get_compute_indicatrice_faces
+        // qui modifient l'objet Transport_... dans lequel nous sommes!
+        Navier_Stokes_FT_Disc& ns = ref_cast_non_const(Navier_Stokes_FT_Disc, eqn_hydraulique);
+
         DoubleVect dI_dt;
         zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
+#if DEBUG_CONSERV_VOLUME
+        const int nb_elem = zone_dis().valeur().nb_elem();
+        double sum_before_rm = 0.;
+        double sum_before_rm_dvol = 0.;
+        for (int i = 0; i < nb_elem; i++)
+          sum_before_rm +=-dI_dt[i]; // It's already homogeneous to *volumes[i];
+
+        sum_before_rm_dvol +=sum_before_rm*delta_t;
+#endif
         ramasse_miettes(maillage, variables_internes_->tmp_flux->valeurs(), dI_dt);
         transfert_conservatif_eulerien_vers_lagrangien_sommets(maillage, dI_dt, var_volume);
+
+#if DEBUG_CONSERV_VOLUME
+        double sum = 0.;
+        for (int i = 0; i < nb_elem; i++)
+          sum +=-dI_dt[i]; // It's already homogeneous to *volumes[i];
+
+        const double dvoldt_totale = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);
+        const double sum_dvol =sum*delta_t;
+        Cerr << " time " << temps << " sum_dI_dt " << sum  << " sum_dvol " << sum_dvol
+             << " sum_before_rm_dI_dt " << sum_before_rm  << " sum_before_rm_dvol " << sum_before_rm_dvol
+             << " V_lagrangien= " << dvoldt_totale <<finl;
+#endif
       }
       // var_volume est une derivee par rapport au temps.
       // calcul de l'integrale pendant le pas de temps ...
       // et changement de signe car on veut la variation de volume de la phase 0
       // (et non celle de la phase 1)
       var_volume *= -delta_t;
+// Debug GB 2019.02.08 Conservation de volume
+#if DEBUG_CONSERV_VOLUME
+      double dvol_theo_depl = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);
+#endif
       maillage.preparer_tableau_avant_transport(var_volume,
                                                 maillage.desc_sommets());
       // Transport avec le deplacement interpole :
@@ -6151,6 +6538,16 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
       remaillage_interface().calculer_variation_volume(maillage,
                                                        position_precedente,
                                                        var_volume_deplacement);
+#if DEBUG_CONSERV_VOLUME
+      double  volume_apres = remaillage_interface().calculer_volume_mesh(maillage);
+      double dvol_reel_depl = remaillage_interface().calculer_somme_dvolume(maillage, var_volume_deplacement);
+      Cerr << "Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local " << finl
+           << " volume avt= " << volume_avt << finl
+           << " apres= " << volume_apres << finl
+           << " dvol_theo_depl= " << dvol_theo_depl << finl
+           << " dvol_reel_depl= " << dvol_reel_depl << finl
+           << finl;
+#endif
       // Calcul de la variation de volume de la phase 0 a imposer lors de la correction
       // de volume :
       var_volume -= var_volume_deplacement;
@@ -6158,14 +6555,13 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
       // Si volume de phase_1 imposee : on calcule une deuxieme correction
       if (variables_internes_->volume_impose_phase_1 > 0.)
         {
-//          double volume_phase_1 = 0.;
           DoubleVect values(2);
           values=0.;
 //        volume_phase_1     ->   values(0)
 //        volume_sous_zone   ->   values(1)
+//        volume_phase_0     ->   values(2)
           if (variables_internes_->nom_zone_volume_impose_ == "??")
-            values(0) = calculer_integrale_indicatrice(indicatrice_.valeurs());
-//            volume_phase_1 = calculer_integrale_indicatrice(indicatrice_.valeurs());
+            values(0) = calculer_integrale_indicatrice(indicatrice_.valeurs(), values(2));
           else
             {
               const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
@@ -6174,16 +6570,14 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
               const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
               const DoubleTab& indic = indicatrice_.valeurs();
               const int nb_elem = zone_vf.nb_elem();
-//              double volume_sous_zone = 0.;
               for (int i = 0; i < nb_elem_sous_zone; i++)
                 {
                   const int elem = sous_zone[i];
                   if (elem < nb_elem)
                     {
-//                      volume_phase_1 += indic(elem) * volumes(elem);
-//                      volume_sous_zone += volumes(elem);
                       values(0) += indic(elem) * volumes(elem);
                       values(1) += volumes(elem);
+                      values(2) += (1.-indic(elem)) * volumes(elem);
                     }
                 }
               mp_sum_for_each_item(values);
@@ -6194,7 +6588,6 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
                    values(1) << finl;
 
             }
-//          const double erreur_volume = variables_internes_->volume_impose_phase_1 - volume_phase_1;
           const double erreur_volume = variables_internes_->volume_impose_phase_1 - values(0);
           Journal() << "Transport_Interfaces_FT_Disc::mettre_a_jour "
                     << "correction_volume_impose_phase_1= " << erreur_volume << finl;
@@ -6230,18 +6623,98 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
           }
         }
       // Correction de volume :
+      // GB. 2019.05.13. Pourquoi utiliser iterations_correction_volume pour le nombre de lissage de dvol?
+      // remaillage_interface().lisser_dvolume(maillage, var_volume,
+      //                                      variables_internes_->iterations_correction_volume);
+      // 2019.05.13. Nouveau code :
       remaillage_interface().lisser_dvolume(maillage, var_volume,
-                                            variables_internes_->iterations_correction_volume);
-      remaillage_interface().corriger_volume(maillage, var_volume);
+                                            variables_internes_->nb_lissage_correction_volume);
+
+#if DEBUG_CONSERV_VOLUME
+      double  volume_before = remaillage_interface().calculer_volume_mesh(maillage);
+      double dvol_total_before = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);
+      Cerr << " dvol_error_before= " << dvol_total_before << " Volume_before= " << volume_before << " time " << temps << finl;
+#endif
+      // GB. 2019.05.13. Pourquoi utiliser nb_iter_bary_volume_seul_ plutot que iterations_correction_volume?
+      //remaillage_interface().corriger_volume(maillage, var_volume);
+      // 2019.05.13. Nouveau code :
+      remaillage_interface().corriger_volume_(maillage, var_volume,
+                                              variables_internes_->nb_iterations_correction_volume);
+#if DEBUG_CONSERV_VOLUME
+      double  volume_after = remaillage_interface().calculer_volume_mesh(maillage);
+      double dvol_total_after = remaillage_interface().calculer_somme_dvolume(maillage, var_volume);
+      Cerr << " dvol_error_after= " << dvol_total_after << " Volume_after= " << volume_after << " time " << temps << finl;
+#endif
     }
   else
     {
+#if DEBUG_CONSERV_VOLUME
+      // Sauvegarde de la position actuelle des sommets :
+      DoubleTabFT position_precedente = maillage.sommets();
+      maillage.preparer_tableau_avant_transport(position_precedente,
+                                                maillage.desc_sommets());
+#endif
       // Transport par interpolation de vitesse seule :
       remaillage_interface().traite_decollement(maillage_interface(), deplacement);
       maillage.transporter(deplacement);
+#if DEBUG_CONSERV_VOLUME
+      // Calcul de la variation de volume obtenue par ce deplacement :
+      ArrOfDoubleFT var_volume_deplacement;
+      remaillage_interface().calculer_variation_volume(maillage,
+                                                       position_precedente,
+                                                       var_volume_deplacement);
+
+      maillage.update_tableau_apres_transport(position_precedente,
+                                              maillage.nb_sommets(),
+                                              maillage.desc_sommets());
+      double  volume_apres = remaillage_interface().calculer_volume_mesh(maillage);
+      double dvol_reel_depl = remaillage_interface().calculer_somme_dvolume(maillage, var_volume_deplacement);
+      Cerr << "Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local " << finl
+           << " volume avt= " << volume_avt << finl
+           << " apres= " << volume_apres << finl;
+// pas calcule          Cerr << " dvol_theo_depl= " << dvol_theo_depl << finl;
+      Cerr     << " dvol_reel_depl= " << dvol_reel_depl << finl
+               << " dt= " << delta_t << finl;
+#endif
     }
   remaillage_interface().traite_adherence(maillage_interface());
   maillage.changer_temps(temps);
+}
+
+void Transport_Interfaces_FT_Disc::ajouter_contribution_saut_vitesse(DoubleTab& deplacement) const
+{
+  const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
+  const Champ_base *u0_ptr = 0;
+
+  if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
+    {
+      // On recupere le saut de vitesse a l'interface (changement de phase)
+      const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+      u0_ptr = ns.get_delta_vitesse_interface();
+      if (u0_ptr)
+        {
+          const Champ_base& u0 = *u0_ptr;
+          DoubleTabFT d2(deplacement);
+          // If ns.get_new_mass_source() == 0, we use a standard multi-linear interpolation.
+          // If ns.get_new_mass_source() == 1, we use the new method (1D-interpolation of each velocity component in its direction)
+          calculer_vitesse_transport_interpolee(u0,
+                                                maillage_interface(),
+                                                d2, 1 /* recalculer le champ de vitesse L2 */,
+                                                1-ns.get_new_mass_source());
+
+          const int n = d2.dimension(0);
+          const int dim = d2.line_size();
+          for (int i = 0; i < n; i++)
+            {
+              for (int j = 0; j < dim; j++)
+                {
+                  const double depl2 = d2(i,j);
+                  deplacement(i,j) -= depl2;
+                }
+            }
+        }
+    }
+
 }
 
 int Transport_Interfaces_FT_Disc::calculer_composantes_connexes_pour_suppression(IntVect& num_compo)
@@ -6459,8 +6932,10 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
             {
               maillage_interface().ajouter_maillage(maillage_tmp);
               get_update_indicatrice();
-              const double volume_phase_1_old = calculer_integrale_indicatrice(sauvegarde);
-              const double volume_phase_1 = calculer_integrale_indicatrice(variables_internes_->indicatrice_cache.valeur().valeurs());
+              double unused_vol_phase_0 = 0.;
+              const double volume_phase_1_old = calculer_integrale_indicatrice(sauvegarde, unused_vol_phase_0);
+              unused_vol_phase_0= 0.;
+              const double volume_phase_1 = calculer_integrale_indicatrice(variables_internes_->indicatrice_cache.valeur().valeurs(), unused_vol_phase_0);
               double volume = volume_phase_1-volume_phase_1_old;
               // pow(-1,1-phase) ne compile pas avec xlC sur AIX car n'a que pow(double,int)
               volume*=pow(-1.,1-phase);
@@ -6501,8 +6976,13 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
   get_update_normale_interface();
 
   {
-    const double volume_phase_1 = calculer_integrale_indicatrice(indicatrice_.valeurs());
-    Cerr << "Volume_phase_1 " << Nom(volume_phase_1, "%20.14g") << " time " << temps << finl;
+    double volume_phase_0 = 0.;
+    const double volume_phase_1 = calculer_integrale_indicatrice(indicatrice_.valeurs(), volume_phase_0);
+    if (Process::je_suis_maitre())
+      {
+        Cerr << "Volume_phase_0 " << Nom(volume_phase_0, "%20.14g") << " time " << temps << finl;
+        Cerr << "Volume_phase_1 " << Nom(volume_phase_1, "%20.14g") << " time " << temps << finl;
+      }
   }
 
   // Affichage de la surface totale d'interfaces dans le fichier .err
@@ -6605,7 +7085,6 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     const ArrOfInt& index_elem = intersections.index_elem();
     DoubleTab& surface = variables_internes_->surface_interface.valeur().valeurs();
     const int nb_elements = surface.dimension(0);
-    // double sum=0.;
     for (int element = 0; element < nb_elements; element++)
       {
         int index = index_elem[element];
@@ -6618,7 +7097,6 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
             index = data.index_facette_suivante_;
           }
         surface[element] = surface_totale;
-        // sum += surface[element];
       }
     surface.echange_espace_virtuel();
     variables_internes_->surface_interface.mettre_a_jour(temps);
@@ -6820,7 +7298,9 @@ void Transport_Interfaces_FT_Disc::nettoyer_proprietes_particules(const ArrOfInt
 }
 
 
-// Description:
+/*! @brief
+ *
+ */
 int Transport_Interfaces_FT_Disc::sauvegarder(Sortie& os) const
 {
   int bytes = Equation_base::sauvegarder(os);
@@ -6889,16 +7369,17 @@ const Algorithmes_Transport_FT_Disc& Transport_Interfaces_FT_Disc::algorithmes_t
   return variables_internes_->algorithmes_transport_.valeur();
 }
 
-// Description:
-//  Cherche le champ discret aux interfaces dont le nom est "champ",
-//  et verifie qu'il peut etre postraite a la localisation demandee (loc).
-//  Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
-//  avec le champ demande.
-//  Si non, on renvoie 0.
-//  (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
-//   car on n'a pas besoin de la valeur du champ, on veut seulement verifier
-//   qu'il existe).
-int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
+/*! @brief Cherche le champ discret aux interfaces dont le nom est "champ", et verifie qu'il peut etre postraite a la localisation demandee (loc).
+ *
+ *   Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
+ *   avec le champ demande.
+ *   Si non, on renvoie 0.
+ *   (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
+ *    car on n'a pas besoin de la valeur du champ, on veut seulement verifier
+ *    qu'il existe).
+ *
+ */
+int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, DoubleTab *ftab) const
 {
   int res = 1;
 
@@ -6971,25 +7452,33 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
-                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit, 0);
+                int flag = 1;
+                if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
+                  {
+                    const Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, eqn_hydraulique);
+                    if (ns.get_delta_vitesse_interface())
+                      flag=0;
+                  }
+                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
+                                                      0 /* ne pas recalculer le champ de vitesse L2 */,  // GB 2020/03/20 -> Je suis surpris par cette option 0 en desaccord avec le moment du calcul
+                                                      // mais je ne prends pas la responsabilite de changer car je ne sais pas trop ce que ca represente (c'est du VEF uniquement?)
+                                                      flag /* Interpolation Multi-lineaire en VDF */);
+                // Pour ajouter le saut de vitesse a l'interface :
+                ajouter_contribution_saut_vitesse(vit); // ici, l'interpolation depend de ns.get_new_mass_source()
                 const int nb_noeuds = vit.dimension(0);
                 const int nb_compo = vit.line_size();
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
                 // Coder le postraitement d'une vitesse imposee
                 Cerr << "Error : velocity nodes post-processing : to be developped." << finl;
                 assert(0);
-                exit();
+                Process::exit();
               }
             break;
           }
@@ -7004,7 +7493,12 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
                 const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
-                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit, 0);
+                calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
+                                                      0 /* ne pas recalculer le champ de vitesse L2 */,  // GB 2020/03/20 -> Je suis surpris par cette option 0 en desaccord avec le moment du calcul
+                                                      // mais je ne prends pas la responsabilite de changer car je ne sais pas trop ce que ca represente (c'est du VEF uniquement?)
+                                                      1 /* Interpolation Multi-lineaire en VDF */);
+                // Pour ajouter le saut de vitesse a l'interface :
+                ajouter_contribution_saut_vitesse(vit);// ici, l'interpolation depend de ns.get_new_mass_source()
                 calculer_vitesse_repere_local( maillage_interface_pour_post(), vit,Positions,Vitesses);
 
                 const int nb_noeuds = vit.dimension(0);
@@ -7012,12 +7506,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 ftab->resize(nb_noeuds, nb_compo);
                 int som2,k;
                 for (som2=0 ; som2<nb_noeuds ; som2++)
-                  {
-                    for (k=0 ; k<nb_compo ; k++)
-                      {
-                        (*ftab)(som2,k) = (float) vit(som2,k);
-                      }
-                  }
+                  for (k=0 ; k<nb_compo ; k++)
+                    (*ftab)(som2,k) = vit(som2,k);
               }
             else
               {
@@ -7038,12 +7528,8 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             ftab->resize(nb_fa7, nb_compo);
             int fa7,k;
             for (fa7=0 ; fa7<nb_fa7 ; fa7++)
-              {
-                for (k=0 ; k<nb_compo ; k++)
-                  {
-                    (*ftab)(fa7,k) = (float) valeurs(fa7,k);
-                  }
-              }
+              for (k=0 ; k<nb_compo ; k++)
+                (*ftab)(fa7,k) = valeurs(fa7,k);
             break;
           }
         default:
@@ -7057,8 +7543,11 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
   return res;
 }
 
-// Description:
-//  Voir l'autre get_champ_post_FT. Cette fonction est specifique aux champs d'entiers.
+/*! @brief Voir l'autre get_champ_post_FT.
+ *
+ * Cette fonction est specifique aux champs d'entiers.
+ *
+ */
 int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab) const
 {
   int res = 1;
@@ -7181,18 +7670,20 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
   return res;
 }
 
-// Description:
-//  Renvoie le maillage stocke specialement pour le postraitement
-//  (si on veut postraiter un etat intermediaire...)
+/*! @brief Renvoie le maillage stocke specialement pour le postraitement (si on veut postraiter un etat intermediaire.
+ *
+ * ..)
+ *
+ */
 const Maillage_FT_Disc& Transport_Interfaces_FT_Disc::maillage_interface_pour_post() const
 {
   //return variables_internes_->maillage_pour_post;
   return maillage_interface();
 }
 
-// Description:
-//  Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur
-//  egale a n_iterations_distance aux elements et discretisee aux elements
+/*! @brief Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface() const
 {
   // Si le tag du maillage et le tag du champ sont identiques, inutile de recalculer:
@@ -7210,9 +7701,9 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface() 
   return variables_internes_->distance_interface.valeur();
 }
 
-// Description:
-//  Calcule et renvoie la normale a l'interface, evaluee sur une epaisseur
-//  egale a n_iterations_distance aux elements et discretisee aux elements.
+/*! @brief Calcule et renvoie la normale a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements.
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_normale_interface() const
 {
   const int tag = maillage_interface().get_mesh_tag();
@@ -7229,10 +7720,12 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_normale_interface() c
   return variables_internes_->normale_interface.valeur();
 }
 
-// Description:
-// Renvoi de la distance signee entre l'interface et les sommets du maillage eulerien.
-// Si cette distance n'a pas encore ete calculee, appel a calculer_distance_interface_sommets.
-// C'est un DoubleTab parce qu'il n'existe pas (encore) de champ aux sommets en VDF ...
+/*! @brief Renvoi de la distance signee entre l'interface et les sommets du maillage eulerien.
+ *
+ * Si cette distance n'a pas encore ete calculee, appel a calculer_distance_interface_sommets.
+ *  C'est un DoubleTab parce qu'il n'existe pas (encore) de champ aux sommets en VDF ...
+ *
+ */
 const DoubleTab&   Transport_Interfaces_FT_Disc::get_update_distance_interface_sommets() const
 {
   // Si le tag du maillage et le tag du champ sont identiques, inutile de recalculer:
@@ -7251,34 +7744,35 @@ const DoubleTab&   Transport_Interfaces_FT_Disc::get_update_distance_interface_s
   return dist_som;
 }
 
-// Description:
-//  Calcule dist_som, la distance entre l'interface et les sommets du
-//  maillage eulerien a partir de dist_elem et normale_elem,
-//  distance et normale a l'interface aux centres des elements euleriens.
-//  Pour un element, on evalue la distance entre chaque sommet de l'element et l'interface
-//  comme :
-//   d = d1 + d2,
-//   d2 = normale scalaire (position_sommet - centre_element)
-//   d1 est la distance entre l'interface et le centre de l'element,
-//   normale est la normale a l'interface evaluee au centre de l'element
-//  Ensuite, la distance entre un sommet et l'interface est la moyenne de toutes
-//  les distances calculee a l'aide des elements adjacents a ce sommet.
-// La distance est invalide au-dela d'une certaine epaisseur autour de l'interface
-// (voir iterations de lissage dans calculer_distance_interface).
-// Dans ce cas on met une distance de +1e30 si l'indicatrice est >0.5,
-// sinon on met -1e30 (ce choix permet d'utiliser la fonction
-// distance dans les marching-cubes sans avoir a calculer une vraie distance partout).
-// Parametre : dist_elem
-// Signification : tableau contenant pour chaque element reel et virtuel la distance
-//                 entre l'interface et le centre de l'element (calculee par
-//                 calculer_distance_interface). L'espace virtuel doit etre a jour.
-// Parametre : normale_elem
-// Signification : idem pour la normale a l'interface
-// Parametre : dist_som
-// Signification : tableau ou on stocke le resultat du calcul. Le tableau doit
-//                 avoir la bonne taille et un descripteur adequat (voir "discretiser",
-//                 a priori un tableau avec une epaisseur de joint de zero et uniquement
-//                 des items communs).
+/*! @brief Calcule dist_som, la distance entre l'interface et les sommets du maillage eulerien a partir de dist_elem et normale_elem,
+ *
+ *   distance et normale a l'interface aux centres des elements euleriens.
+ *   Pour un element, on evalue la distance entre chaque sommet de l'element et l'interface
+ *   comme :
+ *    d = d1 + d2,
+ *    d2 = normale scalaire (position_sommet - centre_element)
+ *    d1 est la distance entre l'interface et le centre de l'element,
+ *    normale est la normale a l'interface evaluee au centre de l'element
+ *   Ensuite, la distance entre un sommet et l'interface est la moyenne de toutes
+ *   les distances calculee a l'aide des elements adjacents a ce sommet.
+ *  La distance est invalide au-dela d'une certaine epaisseur autour de l'interface
+ *  (voir iterations de lissage dans calculer_distance_interface).
+ *  Dans ce cas on met une distance de +1e30 si l'indicatrice est >0.5,
+ *  sinon on met -1e30 (ce choix permet d'utiliser la fonction
+ *  distance dans les marching-cubes sans avoir a calculer une vraie distance partout).
+ *  Parametre : dist_elem
+ *  Signification : tableau contenant pour chaque element reel et virtuel la distance
+ *                  entre l'interface et le centre de l'element (calculee par
+ *                  calculer_distance_interface). L'espace virtuel doit etre a jour.
+ *  Parametre : normale_elem
+ *  Signification : idem pour la normale a l'interface
+ *  Parametre : dist_som
+ *  Signification : tableau ou on stocke le resultat du calcul. Le tableau doit
+ *                  avoir la bonne taille et un descripteur adequat (voir "discretiser",
+ *                  a priori un tableau avec une epaisseur de joint de zero et uniquement
+ *                  des items communs).
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
   const DoubleTab& dist_elem,
   const DoubleTab& normale_elem,
@@ -7353,19 +7847,21 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
   Debog::verifier("Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets",dist_som);
 }
 
-// Description:
-//  Calcul d'un champ scalaire aux elements contenant une distance signee
-//  entre le centre de l'element et l'interface. La distance est positive dans
-//  la phase 1 et negative dans la phase 0.
-//  On calcule aussi un champ vectoriel aux elements contenant une normale
-//  a l'interface. Ce champ est evalue en resolvant moralement
-//   laplacien(normale) = gradient(indicatrice)
-//  ou gradient(indicatrice) est le gradient de l'indicatrice continue
-//  c'est a dire un dirac localise a la surface de l'interface.
-//  Pour l'instant, cette normale est calculee de facon approchee avec quelques
-//  iterations d'un lisseur. Le support est donc limite au voisinage de l'interface.
-//  Pour les autres elements, la distance vaut -1.e30
-// Precondition : le maillage doit etre parcouru
+/*! @brief Calcul d'un champ scalaire aux elements contenant une distance signee entre le centre de l'element et l'interface.
+ *
+ * La distance est positive dans
+ *   la phase 1 et negative dans la phase 0.
+ *   On calcule aussi un champ vectoriel aux elements contenant une normale
+ *   a l'interface. Ce champ est evalue en resolvant moralement
+ *    laplacien(normale) = gradient(indicatrice)
+ *   ou gradient(indicatrice) est le gradient de l'indicatrice continue
+ *   c'est a dire un dirac localise a la surface de l'interface.
+ *   Pour l'instant, cette normale est calculee de facon approchee avec quelques
+ *   iterations d'un lisseur. Le support est donc limite au voisinage de l'interface.
+ *   Pour les autres elements, la distance vaut -1.e30
+ *  Precondition : le maillage doit etre parcouru
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   const Maillage_FT_Disc& maillage,
   DoubleTab& distance_elements,
@@ -7608,40 +8104,40 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   statistiques().end_count(stat_counter);
 }
 
-// Description:
-//  Calcul de la derivee par rapport au temps du volume de phase 1
-//  aux sommets du maillage lagrangien a partir du champ de vitesse
-//  eulerien. On utilise le fait que le champ eulerien est a divergence
-//  nulle
-//  Cette grandeur permet de corriger le deplacement des sommets pour
-//  conserver le volume des phases (voir these B.M. paragraphe 3.2.10).
-//  On a I = rho_0 + (rho_1-rho_0) * I. Donc:
-//   drho/dt = (rho_1-rho_0) * dI/dt  (d'une part)
-//           = div(rho*u) = div( (rho_0 + (rho_1-rho_0)*I) * u)  (d'autre part)
-//  Donc, si div(u) = 0
-//   dI/dt = div(I * u)
-//  Si non (changement de phase):
-//   dI/dt = div((rho_0/(rho_1-rho_0) + I) * u)
-// Parametre : vitesse
-// Signification: le champ de vitesse eulerien aux faces du maillage.
-//                si vitesse.dimension(1)==1, on suppose que c'est la
-//                composante normale a la face de la vitesse, sinon
-//                on suppose que c'est le vecteur vitesse 2d ou 3d.
-// Parametre : indicatrice
-// Signification: indicatrice de phase aux elements euleriens.
-//                doit avoir son espace virtuel a jour et correspondre
-//                au maillage suivant...
-// Parametre : maillage
-// Signification : le maillage de l'interface,
-//                 doit etre parcouru.
-// Parametre : rho_0_sur_delta_rho_div_u
-// Signification: resultat de l'operateur div(u) aux elements (integrale de div_u
-//                sur les elements. Si ce tableau est de taille non nulle, on ajoute
-//                le terme en div_u
-// Parametre : var_volume
-// Signification : Tableau ou on stocke la variation de volume de phase 1
-//                 pour chaque sommet du maillage lagrangien.
-
+/*! @brief Calcul de la derivee par rapport au temps du volume de phase 1 aux sommets du maillage lagrangien a partir du champ de vitesse
+ *
+ *   eulerien. On utilise le fait que le champ eulerien est a divergence
+ *   nulle
+ *   Cette grandeur permet de corriger le deplacement des sommets pour
+ *   conserver le volume des phases (voir these B.M. paragraphe 3.2.10).
+ *   On a I = rho_0 + (rho_1-rho_0) * I. Donc:
+ *    drho/dt = (rho_1-rho_0) * dI/dt  (d'une part)
+ *            = div(rho*u) = div( (rho_0 + (rho_1-rho_0)*I) * u)  (d'autre part)
+ *   Donc, si div(u) = 0
+ *    dI/dt = div(I * u)
+ *   Si non (changement de phase):
+ *    dI/dt = div((rho_0/(rho_1-rho_0) + I) * u)
+ *  Parametre : vitesse
+ *  Signification: le champ de vitesse eulerien aux faces du maillage.
+ *                 si vitesse.dimension(1)==1, on suppose que c'est la
+ *                 composante normale a la face de la vitesse, sinon
+ *                 on suppose que c'est le vecteur vitesse 2d ou 3d.
+ *  Parametre : indicatrice
+ *  Signification: indicatrice de phase aux elements euleriens.
+ *                 doit avoir son espace virtuel a jour et correspondre
+ *                 au maillage suivant...
+ *  Parametre : maillage
+ *  Signification : le maillage de l'interface,
+ *                  doit etre parcouru.
+ *  Parametre : rho_0_sur_delta_rho_div_u
+ *  Signification: resultat de l'operateur div(u) aux elements (integrale de div_u
+ *                 sur les elements. Si ce tableau est de taille non nulle, on ajoute
+ *                 le terme en div_u
+ *  Parametre : var_volume
+ *  Signification : Tableau ou on stocke la variation de volume de phase 1
+ *                  pour chaque sommet du maillage lagrangien.
+ *
+ */
 #if 0
 void Transport_Interfaces_FT_Disc::calculer_derivee_volume_phase1(
   const DoubleTab& vitesse,

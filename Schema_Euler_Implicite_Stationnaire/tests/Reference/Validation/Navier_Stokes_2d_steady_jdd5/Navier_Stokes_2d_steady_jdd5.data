@@ -8,7 +8,10 @@ Pb_hydraulique pb
 
 Domaine dom
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh_tri_1 mesh_tri_6.med
+Lire_MED { 
+   domain dom 
+   file mesh_tri_6.med 
+}
 # END MESH #
 
 # BEGIN PARTITION
@@ -44,22 +47,21 @@ Read sch
 	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
 }
 }
-Fluide_incompressible fluide
-Lire fluide
-{
-	mu champ_uniforme 1 0.1
- 	rho champ_uniforme 1 1
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 0.1
+    	rho champ_uniforme 1 1
+   }
+   
+   	Navier_Stokes_standard
 	{
 		Solveur_pression	PETSC Cholesky { }
 		Convection { amont } 
@@ -130,3 +132,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

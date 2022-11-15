@@ -12,20 +12,12 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Op_Diff_K_Eps_Bas_Re_VEF_var_Face.h
-// Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Operateurs
-//
-//////////////////////////////////////////////////////////////////////////////
-
-
-//
-// .DESCRIPTION class Op_Diff_K_Eps_Bas_Re_VEF_Face
-//   Cette classe represente l'operateur de diffusion turbulente
-//   La discretisation est VEF
-//  Les methodes pour l'implicite sont codees.
-
+/*! @brief class Op_Diff_K_Eps_Bas_Re_VEF_Face Cette classe represente l'operateur de diffusion turbulente
+ *
+ *    La discretisation est VEF
+ *   Les methodes pour l'implicite sont codees.
+ *
+ */
 #ifndef Op_Diff_K_Eps_Bas_Re_VEF_var_Face_included
 #define Op_Diff_K_Eps_Bas_Re_VEF_var_Face_included
 

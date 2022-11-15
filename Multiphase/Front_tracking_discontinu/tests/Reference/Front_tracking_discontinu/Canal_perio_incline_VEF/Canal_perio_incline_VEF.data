@@ -85,22 +85,6 @@ Lire sch
 	seuil_statio -1
 	facsec 0.6
 }
-# # # Schema # # #
-
-
-Fluide_inCompressible fluide1
-Lire fluide1
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
-
-Fluide_inCompressible fluide2
-Lire fluide2
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
 
 Fluide_inCompressible fluide3
 Lire fluide3
@@ -109,20 +93,11 @@ Lire fluide3
 	rho   Champ_Uniforme 1 1000.
 }
 
-
-# # # Chimie # # #
-
-
-
 Navier_Stokes_FT_Disc              hydraulique
 
 Associate pb3 hydraulique
 
-Associate pb1 fluide1
-Associate pb2 fluide2
 Associate pb3 fluide3
-
-
 Associate pb1 DOM1
 Associate pb2 DOM2
 Associate pb3 DOM3
@@ -133,11 +108,6 @@ Associate pbc pb3
 Associate pbc sch
 
 Discretize pbc dis
-
-
-
-
-
 
 # # # Domaine principal # # #
 Lire pb3
@@ -173,6 +143,12 @@ Lire pb3
 # # # Boite gauche # # #
 lire pb1 
 {
+Fluide_inCompressible
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho   Champ_Uniforme 1 1000.
+}
+
 	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky {  }
@@ -210,6 +186,11 @@ lire pb1
 # # # Boite droite # # #
 lire pb2
 {
+Fluide_inCompressible
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho   Champ_Uniforme 1 1000.
+}
 	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky {  }

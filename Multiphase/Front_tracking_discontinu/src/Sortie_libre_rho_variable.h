@@ -25,13 +25,13 @@
 
 #include <Sortie_libre_pression_imposee.h>
 
-//////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//  Condition aux limites derivant de Sortie_libre_pression_imposee.
-//  Seule difference : le flux_impose (pression imposee) n'est pas
-//  divise par rho, c'est la vraie pression imposee.
-//////////////////////////////////////////////////////////////////////
+/*! @brief Condition aux limites derivant de Sortie_libre_pression_imposee.
+ *
+ * Seule difference : le flux_impose (pression imposee) n'est pas
+ *   divise par rho, c'est la vraie pression imposee.
+ *
+ *
+ */
 class Sortie_libre_rho_variable : public Sortie_libre_pression_imposee
 {
   Declare_instanciable(Sortie_libre_rho_variable);

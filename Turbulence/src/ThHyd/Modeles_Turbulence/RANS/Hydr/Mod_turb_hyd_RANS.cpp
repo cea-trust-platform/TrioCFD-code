@@ -36,40 +36,22 @@ Mod_turb_hyd_RANS::Mod_turb_hyd_RANS()
   LeK_MIN = 1.e-20;
   lquiet = 0;
 }
-// Description:
-//    Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Mod_turb_hyd_RANS::printOn(Sortie& is) const
 {
   return Mod_turb_hyd_base::printOn(is);
 }
 
 
-// Description:
-//    Simple appel a Mod_turb_hyd_base::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Mod_turb_hyd_RANS::readOn(Entree& is)
 {
   Mod_turb_hyd_base::readOn(is);
@@ -85,19 +67,9 @@ void Mod_turb_hyd_RANS::set_param(Param& param)
 }
 
 
-// Description:
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief
+ *
+ */
 void Mod_turb_hyd_RANS::completer()
 {
   eqn_transp_K_Eps().completer();
@@ -156,24 +128,15 @@ void Mod_turb_hyd_RANS::get_noms_champs_postraitables(Noms& nom,Option opt) cons
     }
 }
 
-// Description:
-//    Sauvegarde le modele de turbulence sur un flot de sortie.
-//    (en vue d'une reprise)
-//    Sauvegarde le type de l'objet et
-//    l'equation de transport K-epsilon associee.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage de:
-//                   Transport_K_Eps::sauvegarder(Sortie&)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.
+ *
+ * (en vue d'une reprise)
+ *     Sauvegarde le type de l'objet et
+ *     l'equation de transport K-epsilon associee.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&)
+ */
 int Mod_turb_hyd_RANS::sauvegarder(Sortie& os) const
 {
 
@@ -182,24 +145,14 @@ int Mod_turb_hyd_RANS::sauvegarder(Sortie& os) const
 }
 
 
-// Description:
-//    Reprise du modele a partir d'un flot d'entree.
-//    Si l'equation portee par l'objet est non nulle
-//    on effectue une reprise "bidon".
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage de:
-//                   Transport_K_Eps::sauvegarder(Sortie&)
-//                   ou 1 si la reprise est bidon.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise du modele a partir d'un flot d'entree.
+ *
+ * Si l'equation portee par l'objet est non nulle
+ *     on effectue une reprise "bidon".
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&) ou 1 si la reprise est bidon.
+ */
 int Mod_turb_hyd_RANS::reprendre(Entree& is)
 {
   Mod_turb_hyd_base::reprendre(is);

@@ -28,11 +28,9 @@
 
 #include <Algo_MG_base.h>
 class Pb_MG;
-//
-// .DESCRIPTION class Algo_Couple_1
-//
-// .SECTION voir aussi
-
+/*! @brief class Algo_Couple_1
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

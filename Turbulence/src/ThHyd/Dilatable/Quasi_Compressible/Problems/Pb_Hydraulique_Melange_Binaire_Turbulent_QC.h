@@ -28,18 +28,14 @@
 #include <Pb_Dilatable_Proto.h>
 #include <Pb_QC_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC
-//     Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
-//     avec modelisation de la turbulence:
-//      - Equations de Navier_Stokes en regime turbulent
-//      - Equation de conv/diff fraction massique en regime turbulent
-// .SECTION voir aussi
-//     Probleme_base Pb_QC_base Fluide_Quasi_Compressible
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
+ *
+ *      avec modelisation de la turbulence:
+ *       - Equations de Navier_Stokes en regime turbulent
+ *       - Equation de conv/diff fraction massique en regime turbulent
+ *
+ * @sa Probleme_base Pb_QC_base Fluide_Quasi_Compressible
+ */
 class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base, public Pb_Dilatable_Proto
 {
   Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);

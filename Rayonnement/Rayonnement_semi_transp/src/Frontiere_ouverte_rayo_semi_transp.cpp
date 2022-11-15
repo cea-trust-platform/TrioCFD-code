@@ -24,39 +24,21 @@
 
 Implemente_instanciable(Frontiere_ouverte_rayo_semi_transp,"Frontiere_ouverte_rayo_semi_transp",Neumann_sortie_libre);
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Frontiere_ouverte_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
 }
 
-// Description:
-//    Lecture des parametres de la condition Neumann_paroi
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture des parametres de la condition Neumann_paroi
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Frontiere_ouverte_rayo_semi_transp::readOn(Entree& is)
 {
   return Neumann_sortie_libre::readOn(is);

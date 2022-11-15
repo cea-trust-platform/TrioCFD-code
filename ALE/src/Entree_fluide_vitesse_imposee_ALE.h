@@ -27,16 +27,13 @@
 #include <Entree_fluide_vitesse_imposee.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Entree_fluide_vitesse_imposee
-//    Cas particulier de la classe Dirichlet_entree_fluide
-//    pour la vitesse imposee: impose la vitesse d'entree du fluide dans
-//    une equation de type Navier_Stokes
-// .SECTION voir aussi
-//    Dirichlet_entree_fluide Navier_Stokes_std
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Entree_fluide_vitesse_imposee Cas particulier de la classe Dirichlet_entree_fluide
+ *
+ *     pour la vitesse imposee: impose la vitesse d'entree du fluide dans
+ *     une equation de type Navier_Stokes
+ *
+ * @sa Dirichlet_entree_fluide Navier_Stokes_std
+ */
 class Entree_fluide_vitesse_imposee_ALE  : public Entree_fluide_vitesse_imposee
 {
 

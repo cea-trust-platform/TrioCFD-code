@@ -59,23 +59,23 @@ Lire sch
 
 VDF dis
 
-Fluide_Incompressible He
-Lire He
-{
-
-	    mu Champ_Uniforme  1 1e-5
-	    rho Champ_Uniforme  1 1.0
-}
 
 Associer pb1 dom_pb1
-Associer pb1 He  
+ 
 Associer pb1 sch
 
 Discretiser pb1 dis
 
 Lire pb1
 {
-        Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+    
+   	    mu Champ_Uniforme  1 1e-5
+   	    rho Champ_Uniforme  1 1.0
+   }
+   
+           Navier_Stokes_Turbulent
         {
                 solveur_pression petsc Cholesky { } 		
 		convection { amont }
@@ -147,3 +147,4 @@ Lire pb1
 
 Resoudre pb1
 Fin
+ 

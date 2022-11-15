@@ -26,24 +26,20 @@
 #include <Source_base.h>
 #include <Ref_Transport_Marqueur_FT.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//   Classe Source_Reaction_Particules
-//   Calcul du terme source a ajouter dans Navier_Stokes pour prendre en compte
-//   l action en retour des particules sur le fluide
-//   La somme des forces (action fluide sur les particules) a ete calculee aux positions
-//   des particules et stockee dans source_stockage_ porte par Transport_Marqueur_FT
-//   Dans chacune des classes filles on procede aux deux etapes suivantes :
-//      - une interpolation aux sommets de source_stockage_
-//       (chaque particule p situee dans un element elem contribue a chacun des sommets de elem)
-//        - l evaluation aux faces du terme source a ajouter dans Navier_Stokes
-//         (pour une face donnee, on ajoute la contribution de la source evaluee en chacun
-//          des sommets de la face)
-//
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Source_Reaction_Particules Calcul du terme source a ajouter dans Navier_Stokes pour prendre en compte
+ *
+ *    l action en retour des particules sur le fluide
+ *    La somme des forces (action fluide sur les particules) a ete calculee aux positions
+ *    des particules et stockee dans source_stockage_ porte par Transport_Marqueur_FT
+ *    Dans chacune des classes filles on procede aux deux etapes suivantes :
+ *       - une interpolation aux sommets de source_stockage_
+ *        (chaque particule p situee dans un element elem contribue a chacun des sommets de elem)
+ *         - l evaluation aux faces du terme source a ajouter dans Navier_Stokes
+ *          (pour une face donnee, on ajoute la contribution de la source evaluee en chacun
+ *           des sommets de la face)
+ *
+ *
+ */
 class Source_Reaction_Particules : public Source_base
 {
   Declare_base(Source_Reaction_Particules);

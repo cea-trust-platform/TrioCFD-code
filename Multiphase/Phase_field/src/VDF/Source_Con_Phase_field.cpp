@@ -751,21 +751,9 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
 }
 
 
-// Description:
-//     Calcule le premier demi pas de temps dans le cas implicite
-//     Calcule le pas de temps dans le cas explicite
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule le premier demi pas de temps dans le cas implicite Calcule le pas de temps dans le cas explicite
+ *
+ */
 void Source_Con_Phase_field::premier_demi_dt()
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
@@ -928,20 +916,10 @@ void Source_Con_Phase_field::premier_demi_dt()
     }
 }
 
-// Description:
-//     Calcul de Div(alpha*rho*Grad((C)) au centre des elements
-// Precondition:
-// Parametre: DoubleTab& div_alpha_gradC
-//    Signification: Div(alpha*Grad((C)) au centre des elements
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de Div(alpha*rho*Grad((C)) au centre des elements
+ *
+ * @param (DoubleTab& div_alpha_gradC) Div(alpha*Grad((C)) au centre des elements
+ */
 void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
@@ -966,20 +944,10 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
   eq_c.solv_masse().appliquer(div_alpha_gradC);
 }
 
-// Description:
-//     Calcul de Div(alpha*rho*Grad((C)) au centre des elements
-// Precondition:
-// Parametre: DoubleTab& div_alpha_rho_gradC
-//    Signification: Div(alpha*rho*Grad((C)) au centre des elements
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de Div(alpha*rho*Grad((C)) au centre des elements
+ *
+ * @param (DoubleTab& div_alpha_rho_gradC) Div(alpha*rho*Grad((C)) au centre des elements
+ */
 void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_rho_gradC) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
@@ -1033,20 +1001,9 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 }
 
 
-// Description:
-//    Assemble la matrice pour le calcul du point fixe
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Assemble la matrice pour le calcul du point fixe
+ *
+ */
 void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice_diffusion_CH)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
@@ -1400,20 +1357,9 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 }
 
 
-// Description:
-//    Calcul du point fixe
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul du point fixe
+ *
+ */
 void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const DoubleTab& mutilde, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& c_demi, DoubleTab& mutilde_demi)
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
@@ -1509,20 +1455,9 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
 }
 
 
-// Description:
-//     Construire le residu du GMRES NL
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Construire le residu du GMRES NL
+ *
+ */
 void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& v0, const DoubleTab& x1)
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
@@ -1612,20 +1547,9 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
 }
 
 
-// Description:
-//     Construire le residu du GMRES NL
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Construire le residu du GMRES NL
+ *
+ */
 void Source_Con_Phase_field::matvect(const DoubleTab& c, const Matrice_Morse& matrice_diffusion_CH, const DoubleTab& v0, const DoubleTab& x1, DoubleTab& v1)
 {
   const double delta = 1.e-5;
@@ -1651,22 +1575,11 @@ void Source_Con_Phase_field::matvect(const DoubleTab& c, const Matrice_Morse& ma
 }
 
 
-// Description:
-//     Algorithme GMRES Non Lineaire
-// Precondition:
-// Parametre: mutilde
-//    Signification: inverse A x = b
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-// Modifie par DJ
-//---------------
+/*! @brief Algorithme GMRES Non Lineaire
+ *
+ * @param (mutilde) inverse A x = b
+ * @return (int)
+ */
 int Source_Con_Phase_field::non_lin_gmres(const DoubleTab& c, const DoubleTab& mutilde, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& c_demi, DoubleTab& mutilde_demi)
 // int Source_Con_Phase_field::non_lin_gmres(DoubleTab& c, DoubleTab& mutilde, Matrice_Morse& matrice_diffusion_CH, DoubleTab& x1)
 //---------------
@@ -1969,20 +1882,10 @@ l5:
 }
 
 
-// Description:
-//     Calcul de mutilde au centre des elements
-// Precondition:
-// Parametre: mutilde
-//    Signification: mutilde au centre des elements
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de mutilde au centre des elements
+ *
+ * @param (mutilde) mutilde au centre des elements
+ */
 void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
@@ -2010,20 +1913,9 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 }
 
 
-// Description:
-//     Calcul de u2 au centre des elements
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de u2 au centre des elements
+ *
+ */
 void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 {
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
@@ -2101,20 +1993,10 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 }
 
 
-// Description:
-//     Calcul de alpha*(Grad(C))^2 au centre des elements
-// Precondition:
-// Parametre: DoubleTab& alpha_gradC_carre
-//    Signification: alpha*(Grad(C))^2 au centre des elements
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de alpha*(Grad(C))^2 au centre des elements
+ *
+ * @param (DoubleTab& alpha_gradC_carre) alpha*(Grad(C))^2 au centre des elements
+ */
 void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_carre) const
 {
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
@@ -2198,20 +2080,10 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
 
 
 
-// Description:
-//     Calcul de la pression thermodynamique aux elements
-// Precondition:
-// Parametre: DoubleTab& pression_thermo
-//    Signification: pression thermodynamique aux elements
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de la pression thermodynamique aux elements
+ *
+ * @param (DoubleTab& pression_thermo) pression thermodynamique aux elements
+ */
 void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));

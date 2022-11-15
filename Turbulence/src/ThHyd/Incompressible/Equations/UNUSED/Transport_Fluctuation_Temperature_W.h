@@ -72,19 +72,17 @@ protected :
 
 };
 
-// Fonctions inline:
-
-
-
-// Description:
-// renvoie le champ inconnue.
+/*! @brief renvoie le champ inconnue.
+ *
+ */
 inline Champ_Inc& Transport_Fluctuation_Temperature_W::inconnue()
 {
   return le_champ_Fluctu_Temperature;
 }
 
-// Description:
-// renvoie le champ inconnue.
+/*! @brief renvoie le champ inconnue.
+ *
+ */
 inline const Champ_Inc& Transport_Fluctuation_Temperature_W::inconnue() const
 {
   return le_champ_Fluctu_Temperature;

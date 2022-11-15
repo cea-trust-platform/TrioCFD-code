@@ -12,26 +12,12 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Fluide_eau_c3_gaz.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Milieu
-// Version:     /main/12
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #ifndef Fluide_eau_c3_gaz_included
 #define Fluide_eau_c3_gaz_included
 
 #include <Fluide_reel_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Fluide_eau_c3_gaz
-//    Cette classe represente un milieu reel
-//    dont les lois viennent de "Lois_Na"
-//////////////////////////////////////////////////////////////////////////////
 class Fluide_eau_c3_gaz: public Fluide_reel_base
 {
   Declare_instanciable(Fluide_eau_c3_gaz);
@@ -39,25 +25,20 @@ class Fluide_eau_c3_gaz: public Fluide_reel_base
   /* bornes (p, T_g) de H2OPROP.H */
   std::map<std::string, std::array<double, 2>> unknown_range() const override
   {
-    return { { "pression"   , { 0.01e5, 260e5 } },
-      { "temperature", {   -250, 2000  } }
-    };
+    return { { "pression" , { 0.01e5, 260e5}}, { "temperature", { -250, 2000}} };
   }
 
 protected :
-  // densite
-  double     rho_(const double T, const double P) const override;
-  double  dP_rho_(const double T, const double P) const override;
-  double  dT_rho_(const double T, const double P) const override;
-  // enthalpie
-  double       h_(const double T, const double P) const override;
-  double    dP_h_(const double T, const double P) const override;
-  double    dT_h_(const double T, const double P) const override;
-  // lois champs "faibles" -> pas de derivees
-  double      cp_(const double T, const double P) const override;
-  double    beta_(const double T, const double P) const override;
-  double      mu_(const double T, const double P) const override;
-  double  lambda_(const double T, const double P) const override;
+  void rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dP_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dT_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dP_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dT_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void cp_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void beta_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 };
 
-#endif
+#endif /* Fluide_eau_c3_gaz_included */

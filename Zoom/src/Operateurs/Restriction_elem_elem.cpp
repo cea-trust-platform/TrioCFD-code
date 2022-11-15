@@ -43,20 +43,9 @@ Entree& Restriction_elem_elem::readOn(Entree& s )
 
 
 
-// Description:
-//    calcul du nombre d'elements fins contenus dans chaque element grossier
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief calcul du nombre d'elements fins contenus dans chaque element grossier
+ *
+ */
 void Restriction_elem_elem::calculer(const Zone_VF& zone_VFG,
                                      const Zone_VF& zone_VFF,
                                      const IntVect& connect)
@@ -83,25 +72,14 @@ void Restriction_elem_elem::calculer(const Zone_VF& zone_VFG,
 
 
 
-// Description:
-//    Restriction de l'inconnue fine sur le domaine grossier
-//    pour inconnue TEMPERATURE ET PRESSION
-//    en VDF-VDF pour T du domG, en VDF-VDF, VDF-VEF, VEF-VEF
-//    et VEF-VDF pour p du domG
-//    remarque : pas de couplage!!
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Restriction de l'inconnue fine sur le domaine grossier pour inconnue TEMPERATURE ET PRESSION
+ *
+ *     en VDF-VDF pour T du domG, en VDF-VDF, VDF-VEF, VEF-VEF
+ *     et VEF-VDF pour p du domG
+ *     remarque : pas de couplage!!
+ *     car valeur
+ *
+ */
 void Restriction_elem_elem::restreindre(const Zone_VF& zone_VFG,
                                         const Zone_VF& zone_VFF,
                                         const IntVect& connect,

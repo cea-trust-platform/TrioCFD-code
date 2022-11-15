@@ -27,15 +27,12 @@
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Dissipation_WIT_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 la dissipation de l'equation de WIT
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Dissipation_WIT_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la dissipation de l'equation de WIT
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Dissipation_WIT_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Dissipation_WIT_PolyMAC_P0);

@@ -69,7 +69,7 @@ DoubleTab& Terme_Source_Constituant_Vortex_VEF_Face::calculer(DoubleTab& tab) co
   const DoubleVect& volumes = zone_vef.volumes_entrelaces();
   const DoubleVect& volumes_cl = zone_cl_vef.volumes_entrelaces_Cl();
   const int premiere_face_std = zone_vef.premiere_face_std();
-  const DoubleVect& porosites = zone_vef.porosite_face();
+  const DoubleVect& porosites = equation().milieu().porosite_face();
   const DoubleTab& xv = zone_vef.xv();  // Coord des centres des faces
   const int nb_faces = zone_vef.nb_faces();
   const int dim = Objet_U::dimension;

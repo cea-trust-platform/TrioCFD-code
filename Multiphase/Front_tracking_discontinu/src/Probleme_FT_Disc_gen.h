@@ -26,6 +26,7 @@
 #include <Pb_Fluide_base.h>
 #include <Vect_Ref_Equation_base.h>
 #include <Ref_Chimie.h>
+#include <Triple_Line_Model_FT_Disc.h>
 
 class Milieu_base;
 class Navier_Stokes_FT_Disc;
@@ -57,6 +58,15 @@ public:
   //
   // Methodes nouvelles de Probleme_FT_Disc_gen
   //
+  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
+  const Triple_Line_Model_FT_Disc& tcl() const
+  {
+    return tcl_ ;
+  };
+  Triple_Line_Model_FT_Disc& tcl()
+  {
+    return tcl_ ;
+  };
   virtual void associer_equation(Equation_base& eq);
   // Raccourcis pour le Front_Tracking
   virtual const Navier_Stokes_FT_Disc&         equation_hydraulique(const Motcle& nom) const;
@@ -74,6 +84,7 @@ private:
   //   puis ConvDiff.
   VECT(REF(Equation_base)) equations_;
   REF(Chimie)  la_chimie_;
+  Triple_Line_Model_FT_Disc tcl_;
 };
 
 #endif

@@ -55,8 +55,15 @@ Read sch
 	facsec 0.25
 }
 
-Fluide_Quasi_Compressible fluide
-Read fluide
+
+Associate pb dom
+Associate pb sch
+
+Discretize pb dis
+# Debog pb seq faces 1.e-6 0 #
+Read pb
+{
+Fluide_Quasi_Compressible
 {
         pression 140000.	
         loi_etat multi_gaz_parfait_qc {
@@ -65,20 +72,9 @@ Read fluide
                 dtol_fraction 1.e-5
         }
 	traitement_pth constant
+	 gravite Champ_Uniforme 3 0. 0. -9.81
+
 }
-
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-
-Associate fluide gravite
-Associate pb dom
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-# Debog pb seq faces 1.e-6 0 #
-Read pb
-{
         Navier_Stokes_Turbulent_QC
         {
                 solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-6 impr }        

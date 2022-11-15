@@ -79,22 +79,21 @@ Lire sch2
 
 }
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1 0.02
-	rho Champ_Uniforme 1 2
-}
 
 Associer pb dom
 Associer pb sch2
-Associer pb fluide
 
 Discretiser pb dis
 
 Lire pb
 	{
-	Navier_Stokes_standard
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 0.02
+   	rho Champ_Uniforme 1 2
+   }
+   
+   	Navier_Stokes_standard
 		{
                 solveur_pression GCP {
                         precond ssor { omega 1.5 }
@@ -134,3 +133,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

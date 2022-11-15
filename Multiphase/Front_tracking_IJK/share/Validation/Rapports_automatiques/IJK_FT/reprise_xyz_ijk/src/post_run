@@ -10,7 +10,6 @@ fi
 if [ $1 == "reprise_xyz_ijk" ] || [ $1 == "reprise_xyz_ijk_par8" ] ; then 
    sed '/INTERFACES/d' $1.sauv.lata > ${1}_velocity.lata
    sed -e '/IJK_EXT/d' -e '/FACETTE_PE/d' -e '/COMPO_CONNEXE/d'  -e '/INDEX_SOMMET_REEL/d' $1.lata > ${1}_mod.lata
-   source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh 
-   #python ./Lata_to_med.py $1.sauv.lata $1.med INTERFACES 1
-   python $TRUST_ROOT/Outils/lata2dx/lata2dx/Lata_to_med.py $1.sauv.lata $1.med INTERFACES 1
+   source $TRUST_ROOT/env_for_python.sh 
+   python $TRUST_ROOT/exec/lata_tools/lib/Lata_to_med.py $1.sauv.lata $1.med INTERFACES 1
 fi

@@ -95,29 +95,27 @@ Read sch
 	seuil_statio 1.e-8
 }
 
-Fluide_Incompressible water
-Read water
-{       
-        mu Champ_Uniforme 1 0.0008	 
-	rho Champ_Uniforme 1 995.0
-	lambda Champ_Uniforme 1 0.6
-        Cp Champ_Uniforme 1 4179.0
-	beta_th Champ_Uniforme 1 2.8e-4
-}
 
-Champ_Uniforme gravite
-Read gravite 3  0.0 -9.81 0.0
 
-Associate water gravite
 Associate pb dom
 Associate pb sch
-Associate pb water
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_standard
+   
+   fluide_incompressible { 
+        gravite champ_uniforme 3  0.0 -9.81 0.0
+         
+           mu Champ_Uniforme 1 0.0008	 
+   	rho Champ_Uniforme 1 995.0
+   	lambda Champ_Uniforme 1 0.6
+           Cp Champ_Uniforme 1 4179.0
+   	beta_th Champ_Uniforme 1 2.8e-4
+   }
+   
+   	Navier_Stokes_standard
 	{
 		solveur_pression Gcp { 
 			precond ssor { omega 1.5 }
@@ -251,3 +249,4 @@ Read pb
 
 Solve pb
 End
+ 

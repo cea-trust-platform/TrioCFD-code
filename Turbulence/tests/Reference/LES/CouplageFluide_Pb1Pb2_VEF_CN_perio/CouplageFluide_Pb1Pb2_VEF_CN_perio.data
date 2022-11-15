@@ -291,24 +291,11 @@ Lire sch
         facsec 1.
 }
 
-Fluide_Incompressible fluide1
-Lire fluide1
-{ 
-        mu Champ_Uniforme       1 2.84e-5
-        rho Champ_Uniforme      1 0.0976
-} 
 
-Fluide_Incompressible fluide2
-Lire fluide2
-{ 
-        mu Champ_Uniforme       1 2.84e-5
-        rho Champ_Uniforme      1 0.0976
-} 
+
 
 Associate pb1 dom01234
-Associate pb1 fluide1
 Associate pb2 dom56789
-Associate pb2 fluide2
 
 Probleme_Couple pbc
 Lire pbc { groupes { { pb1 } , { pb2 } } }
@@ -317,6 +304,12 @@ Discretize pbc dis
 
 Lire pb1
 { 
+Fluide_Incompressible
+{ 
+        mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+} 
+
  Navier_Stokes_Turbulent 
  { 
        solveur_pression Gcp { precond ssor { omega 1.5 } 
@@ -350,6 +343,11 @@ perioz1 periodique
 } 
 Lire pb2
 { 
+Fluide_Incompressible
+{ 
+        mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+} 
  Navier_Stokes_Turbulent 
  { 
        solveur_pression Gcp { precond ssor { omega 1.5 } 

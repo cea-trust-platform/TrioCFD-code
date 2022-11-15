@@ -93,7 +93,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   const DoubleTab& vitesse_au_sommets=dom_ale.vitesse();
   DoubleTab vitesse_face_absolue=dom_ale.vitesse_faces();
   vitesse_face_absolue *=-1;
-  const DoubleVect& porosite_face = zone_VEF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   int marq=opConvVEFbase.phi_u_transportant(equation());
   DoubleTab transporte_face_;
@@ -218,7 +218,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  const DoubleVect& porosite_elem = zone_VEF.porosite_elem();
+  const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
   double psc;
   int poly,face_adj,fa7,i,j,n_bord;
   int num_face, rang;
@@ -1077,19 +1077,18 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
 
 }
 
-// contribuer_a_avec() and modifier_pour_Cl() are needed when using Scheme_euler_implicit time scheme.
-
-//Description:
-//On assemble la matrice des inconnues implicite.
+/*! @brief On assemble la matrice des inconnues implicite.
+ *
+ */
 void Op_Conv_ALE_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   opConvVEFFace.ajouter_contribution(inco, matrice);
 }
 
-// Description:
-// On modifie le second membre et la matrice dans le cas des
-// conditions de dirichlet.
+/*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
+ *
+ */
 void Op_Conv_ALE_VEF::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());

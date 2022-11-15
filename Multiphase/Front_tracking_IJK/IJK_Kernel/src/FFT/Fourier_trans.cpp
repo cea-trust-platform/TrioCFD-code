@@ -12,12 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : Fourier_trans.cpp
-// Directory : $NEW_ALGO_QC_ROOT/src
-//
-/////////////////////////////////////////////////////////////////////////////
+
 #include <Fourier_trans.h>
 #include <IJK_Grid_Geometry.h>
 #include <TRUSTTab.h>
@@ -313,7 +308,7 @@ static int retirer_doublons(ArrOfDouble& tab)
       for ( int j = i+1 ; j < taille ; j++)
         {
           const double y = tab[j];
-          if ( fabs(y-x) <= (y*1.e-3 ))
+          if ( std::fabs(y-x) <= (y*1.e-3 ))
             {
               tab[j] = tab[taille-1]+i; // on va set a une valeur tres grande
               doublons++;
@@ -343,7 +338,7 @@ static void remplir_ref_ki(ArrOfDouble& tab_k_tri ,DoubleTab& tab_k,IntTab& ref_
           {
             double y = tab_k_tri[ou];
             double compa = x > y ? x : y;
-            if ( fabs(y-x) <= (compa*1.e-3) )
+            if ( std::fabs(y-x) <= (compa*1.e-3) )
               {
                 ref_k(i,j) = ou;
                 trouver = true;

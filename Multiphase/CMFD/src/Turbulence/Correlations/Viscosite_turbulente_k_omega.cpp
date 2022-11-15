@@ -37,6 +37,8 @@ Entree& Viscosite_turbulente_k_omega::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("limiter|limiteur", &limiter_);
+  param.ajouter("sigma", &sigma_);
+  param.ajouter("beta_k", &beta_k_);
   param.lire_avec_accolades_depuis(is);
   return is;
 }
@@ -51,7 +53,7 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < k.dimension(1) ? ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ): 0;
+      nu_t(i, n) = (n < k.dimension(1)) ?  sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) )   : 0;
 }
 
 void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
@@ -66,9 +68,14 @@ void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Ren
   const DoubleTab& gu = p_gu[i_part]; //le bon tableau
   for (i = 0; i < R_ij.dimension(0); i++)
     for (n = 0; n < N; n++)
-      for (d = 0; d < D; d++)
-        for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
-          R_ij(i, n, d, db) = n < Nk ? 2. / D * k(i, n) * (d ==db) - ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
+      {
+        double sum_diag = 0.;
+        double nut_loc = n < Nk ? (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) : 0 ;
+        for (d = 0; d < D; d++) sum_diag += gu(i, d, D * n + d) ;
+        for (d = 0; d < D; d++)
+          for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
+            R_ij(i, n, d, db) = (n < Nk)    ?    sigma_* (  2. / 3. * (k(i, n) + nut_loc * sum_diag) * (d ==db) - nut_loc * (gu(i, d, D * n + db) + gu(i, db, D * n + d))    ) : 0;
+      }
 }
 
 void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const
@@ -87,5 +94,5 @@ void Viscosite_turbulente_k_omega::eps(DoubleTab& eps_) const
   int i, nl = eps_.dimension(0), n, N = eps_.dimension(1), Nt = omega.dimension(1);
   assert(nl == omega.dimension(0) && Nt <= N);
   for (i = 0; i < nl; i++)
-    for (n = 0; n < N; n++) eps_(i, n) = (n < Nt) ? k(i,n) * omega(i, n) : 0;
+    for (n = 0; n < N; n++) eps_(i, n) = beta_k_ * ((n < Nt) ? k(i,n) * omega(i, n) : 0);
 }

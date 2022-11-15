@@ -35,13 +35,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Paroi_TBLE_QDM;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_ODVM_scal_VDF
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_ODVM_scal_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_TBLE_scal_VDF : public Paroi_std_scal_hyd_VDF, public Paroi_TBLE_QDM_Scal
 {
   Declare_instanciable_sans_constructeur(Paroi_TBLE_scal_VDF);

@@ -27,11 +27,18 @@ do
                [ $? ] && echo "venv for PyTools3 successfully created" && echo "You can load any requirements using : pip install -r requirements.txt after sourcing \$project_directory/$path/venv/bin/activate"
            fi
        else
-           echo "Error : please link PyTools3 in order to be able de run the fiches calling libraries from PyTools3"
+           echo " "
+           echo "If you want to make post-traitement with PyTools"
+           echo "Please clone GIT repository at the following address"
+           echo "https://codev-tuleap.intra.cea.fr/plugins/git/triocfd/PyTools.git"
+           echo "          or"
+           echo "ssh://gitolite@ssh-codev-tuleap.intra.cea.fr:2044/triocfd/PyTools.git"
+           echo "And create a link in /share directory named PyTools3"
+           echo " "
        fi
    done
-   echo "source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh" >> $env
-   echo "echo \"source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh ... OK\"" >> $env
+   echo "source $TRUST_ROOT/env_for_python.sh" >> $env
+   echo "echo \"source $TRUST_ROOT/env_for_python.sh ... OK\"" >> $env
    for path in share/bin
    do
       [ -d ${project_directory}/$path ] && grep "$path" $env 1>/dev/null 2>&1 || echo "export PATH=\${project_directory}/$path:\$PATH" >> $env

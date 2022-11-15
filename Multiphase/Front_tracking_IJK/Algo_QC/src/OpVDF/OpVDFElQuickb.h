@@ -26,21 +26,18 @@
 #include <ItVDFEl.h>
 #include <EvQuickbVDFEl.h>
 #include <Op_VDF_Elem.h>
-//
-// .DESCRIPTION class Op_Conv_Quickb_VDF_Elem
-//
-//  Cette classe represente l'operateur de convection associe a une equation de
-//  transport d'un scalaire.
-//  La discretisation est VDF
-//  Le champ convecte est scalaire
-//  Le schema de convection est du type Quickb
-//  L'iterateur associe est de type Iterateur_VDF_Elem
-//  L'evaluateur associe est de type Eval_Quickb_VDF_Elem
-
-//
-// .SECTION voir aussi
-//
-//
+/*! @brief class Op_Conv_Quickb_VDF_Elem
+ *
+ *   Cette classe represente l'operateur de convection associe a une equation de
+ *   transport d'un scalaire.
+ *   La discretisation est VDF
+ *   Le champ convecte est scalaire
+ *   Le schema de convection est du type Quickb
+ *   L'iterateur associe est de type Iterateur_VDF_Elem
+ *   L'evaluateur associe est de type Eval_Quickb_VDF_Elem
+ * 
+ *
+ */
 declare_It_VDF_Elem(Eval_Quickb_VDF_Elem)
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,8 +75,9 @@ inline Op_Conv_Quickb_VDF_Elem::Op_Conv_Quickb_VDF_Elem(const Iterateur_VDF_base
 {
 }
 
-// Description:
-// associe le champ de vitesse a l'evaluateur
+/*! @brief associe le champ de vitesse a l'evaluateur
+ *
+ */
 inline void Op_Conv_Quickb_VDF_Elem::associer_vitesse(const Champ_base& ch_vit)
 {
   const Champ_Face& vit = (Champ_Face&) ch_vit;

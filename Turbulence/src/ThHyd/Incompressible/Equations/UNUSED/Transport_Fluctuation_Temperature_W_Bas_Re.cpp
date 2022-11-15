@@ -33,8 +33,9 @@ Sortie& Transport_Fluctuation_Temperature_W_Bas_Re::printOn(Sortie& s ) const
   return s << que_suis_je() << "\n";
 }
 
-// Description:
-//  cf Transport_Fluctuation_Temperature_W::readOn(is)
+/*! @brief cf Transport_Fluctuation_Temperature_W::readOn(is)
+ *
+ */
 Entree& Transport_Fluctuation_Temperature_W_Bas_Re::readOn(Entree& is )
 {
   Transport_Fluctuation_Temperature_W::readOn(is);
@@ -79,9 +80,11 @@ int Transport_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_standard(const M
   return 1;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 const Operateur& Transport_Fluctuation_Temperature_W_Bas_Re::operateur(int i) const
 {
   assert(i>=0);
@@ -108,9 +111,11 @@ const Operateur& Transport_Fluctuation_Temperature_W_Bas_Re::operateur(int i) co
   return terme_diffusif;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 Operateur& Transport_Fluctuation_Temperature_W_Bas_Re::operateur(int i)
 {
   assert(i>=0);

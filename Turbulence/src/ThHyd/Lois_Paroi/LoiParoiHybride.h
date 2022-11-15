@@ -29,13 +29,11 @@ class Zone_dis_base;
 class Zone_Cl_dis_base;
 #include <TRUSTTabs_forward.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION LoiParoiHybride
-//    Classe Turbulence_paroi_base
-//    Cette loi de paroi permet de choisir des lois de parois differentes par conditions aux limites.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief LoiParoiHybride Classe Turbulence_paroi_base
+ *
+ *     Cette loi de paroi permet de choisir des lois de parois differentes par conditions aux limites.
+ *
+ */
 class LoiParoiHybride
 {
 

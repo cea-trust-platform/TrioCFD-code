@@ -25,13 +25,12 @@
 
 #include <Source_rayo_semi_transp_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Source_rayo_semi_transp_VDF_P0_VDF
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Source_rayo_semi_transp_VDF_P0_VDF
+ *
+ *  .SECTION
+ *
+ *
+ */
 class Source_rayo_semi_transp_VDF_P0_VDF: public Source_rayo_semi_transp_base
 {
   Declare_instanciable(Source_rayo_semi_transp_VDF_P0_VDF);

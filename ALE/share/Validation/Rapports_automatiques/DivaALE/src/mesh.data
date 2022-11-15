@@ -5,7 +5,10 @@ dimension 2
 Domaine_ALE dom
 
 # BEGIN MESH #
-Read_MED family_names_from_group_names dom Mesh_1 MeshDIVA_2.med
+Lire_MED { 
+   domain dom 
+   file MeshDIVA_2.med 
+}
 # END MESH #
 
 VerifierCoin dom {  }

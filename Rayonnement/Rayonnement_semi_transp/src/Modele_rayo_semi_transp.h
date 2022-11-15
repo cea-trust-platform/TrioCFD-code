@@ -31,26 +31,21 @@ class Champ_front;
 class Champ_Inc;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//
-//  Le Modele_rayo_semi_transp est un Probleme_base qui a 4 particularites :
-//  * Son equation doit etre typee en fonction de la dicretisation.
-//    Cela impose de differer certaines initialisations jusqu'a
-//    connaitre la discretisation utilisee.
-//  * Il partage son domaine avec un probleme de type hydraulique
-//    En l'etat actuel, toute la geometrie est clonee (donc postraitee 2 fois!)
-//    Apres le travail de B. Mathieu sur la geometrie, ce ne sera plus necessaire.
-//  * Il n'y a qu'une seule valeur temporelle (futur=present).
-//    Il faudrait en faire un probleme independant du temps.
-//  * Il conserve une ref sur le probleme hydraulique. Cette ref est utilisee de
-//    maniere intensive.
-//
-// .SECTION voir aussi
-//     Pb_Couple_rayo_semi_transp Equation_rayonnement_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Le Modele_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
+ *
+ *     Cela impose de differer certaines initialisations jusqu'a
+ *     connaitre la discretisation utilisee.
+ *   * Il partage son domaine avec un probleme de type hydraulique
+ *     En l'etat actuel, toute la geometrie est clonee (donc postraitee 2 fois!)
+ *     Apres le travail de B. Mathieu sur la geometrie, ce ne sera plus necessaire.
+ *   * Il n'y a qu'une seule valeur temporelle (futur=present).
+ *     Il faudrait en faire un probleme independant du temps.
+ *   * Il conserve une ref sur le probleme hydraulique. Cette ref est utilisee de
+ *     maniere intensive.
+ *
+ *
+ * @sa Pb_Couple_rayo_semi_transp Equation_rayonnement_base
+ */
 class Modele_rayo_semi_transp: public Probleme_base
 {
   Declare_instanciable(Modele_rayo_semi_transp);

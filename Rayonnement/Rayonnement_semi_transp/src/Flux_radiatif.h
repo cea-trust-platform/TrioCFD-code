@@ -28,16 +28,13 @@ class Zone_Cl_dis_base;
 
 Declare_deriv(Flux_radiatif_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Flux_radiatif
-//    Classe generique de la hierarchie des flux radiatifs
-//    Flux_radiatif peut referencer n'importe quel
-//    objet derivant de Flux_radiatif_base.
-// .SECTION voir aussi
-//      Flux_radiatif_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Flux_radiatif Classe generique de la hierarchie des flux radiatifs
+ *
+ *     Flux_radiatif peut referencer n'importe quel
+ *     objet derivant de Flux_radiatif_base.
+ *
+ * @sa Flux_radiatif_base
+ */
 class Flux_radiatif : public DERIV(Flux_radiatif_base)
 {
   Declare_instanciable(Flux_radiatif);

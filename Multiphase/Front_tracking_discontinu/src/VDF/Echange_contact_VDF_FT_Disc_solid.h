@@ -24,14 +24,13 @@
 
 #include <Echange_contact_VDF_FT_Disc.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Echange_contact_VDF_FT_Disc_solid
-//
-// <Description of class Echange_contact_VDF_FT_Disc_solid>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Echange_contact_VDF_FT_Disc_solid
+ *
+ *  <Description of class Echange_contact_VDF_FT_Disc_solid>
+ *
+ *
+ *
+ */
 class Echange_contact_VDF_FT_Disc_solid : public Echange_contact_VDF_FT_Disc
 {
 

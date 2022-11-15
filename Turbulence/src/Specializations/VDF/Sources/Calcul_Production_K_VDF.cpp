@@ -395,7 +395,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   int nb_elem = zone_VDF.nb_elem();
   int nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT
@@ -462,7 +462,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   int nb_elem = zone_VDF.nb_elem();
   int nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT
@@ -533,7 +533,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   int nb_elem = zone_VDF.nb_elem();
   int nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_conc(nb_faces,nb_consti);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
   //         ------>                      ---->
   // On note u_conc le vecteur alpha_turb.gradC

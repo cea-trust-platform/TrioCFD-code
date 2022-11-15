@@ -30,42 +30,24 @@ Implemente_instanciable_sans_constructeur(Transport_K_KEps,"Transport_K_KEps",Tr
 Transport_K_KEps::Transport_K_KEps() : nb_couches(10), ystar_switch(160),  type_switch(0), nut_switch(30), impr(0) { }
 
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Transport_K_KEps::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
 
-// Description:
-//    Lit les specifications d'une equation de transport K-epsilon
-//    a partir d'un flot d'entree.
-//    Controle dynamique du type du terme source.
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'une equation de transport K-epsilon a partir d'un flot d'entree.
+ *
+ *     Controle dynamique du type du terme source.
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Transport_K_KEps::readOn(Entree& s )
 {
   // Lecture des attributs de l'equation
@@ -160,20 +142,10 @@ int Transport_K_KEps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return 1;
 }
 
-// Description:
-//    Associe un modele de turbulence K-epsilon deux couches a l'equation.
-// Precondition:
-// Parametre: Modele_turbulence_hyd_K_Eps_2_Couches& modele
-//    Signification: le modele de turbulence K-epsilon deux couches a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation a un modele de turbulence associe
+/*! @brief Associe un modele de turbulence K-epsilon deux couches a l'equation.
+ *
+ * @param (Modele_turbulence_hyd_K_Eps_2_Couches& modele) le modele de turbulence K-epsilon deux couches a associer a l'equation
+ */
 void Transport_K_KEps::associer_modele_turbulence(const Mod_turb_hyd_RANS& modele)
 {
   const Equation_base& eqn_hydr = modele.equation();
@@ -185,43 +157,24 @@ void Transport_K_KEps::associer_modele_turbulence(const Mod_turb_hyd_RANS& model
 }
 
 
-// Description:
-//    Associe un milieu physique a l'equation.
-//    Le Milieu_base passe en parametre est caste en Fluide_Incompressible.
-// Precondition: le milieu doit etre de (forcable au) type Fluide_Incompressible
-// Parametre: Milieu_base& un_milieu
-//    Signification: le milieu physique a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//                 doit etre forcable au type Fluide_Incompressible
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un milieu physique a l'equation.
+ *
+ * Le Milieu_base passe en parametre est caste en Fluide_Incompressible.
+ *
+ * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
+ */
 void Transport_K_KEps::associer_milieu_base(const Milieu_base& un_milieu)
 {
   le_fluide = ref_cast(Fluide_base, un_milieu);
 }
 
 
-// Description:
-//    Renvoie le nom du domaine d'application de l'equation.
-//    Ici "Transport_Keps".
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Motcle&
-//    Signification: le nom du domaine d'application de l'equation
-//    Contraintes: toujours egal a "Transport_Keps"
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nom du domaine d'application de l'equation.
+ *
+ * Ici "Transport_Keps".
+ *
+ * @return (Motcle&) le nom du domaine d'application de l'equation
+ */
 const Motcle& Transport_K_KEps::domaine_application() const
 {
   static Motcle domaine = "Transport_Keps";

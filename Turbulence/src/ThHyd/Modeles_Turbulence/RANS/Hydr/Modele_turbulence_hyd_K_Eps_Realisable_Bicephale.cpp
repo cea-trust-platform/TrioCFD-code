@@ -46,8 +46,9 @@ Sortie& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::printOn(Sortie& s ) co
   return s << que_suis_je() << " " << le_nom();
 }
 
-// Description:
-// Simple appel a Mod_turb_hyd_RANS_Bicephale::readOn(Entree&)
+/*! @brief Simple appel a Mod_turb_hyd_RANS_Bicephale::readOn(Entree&)
+ *
+ */
 Entree& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::readOn(Entree& is)
 {
   return Mod_turb_hyd_RANS_Bicephale::readOn(is);

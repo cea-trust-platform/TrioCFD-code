@@ -43,9 +43,12 @@ Entree& Remailleur_Collision_FT_base::readOn(Entree& is)
   return is;
 }
 
-// Description: algorithme de remaillage qui tente de conserver le volume.
-//  voir class Remailler_Collision_FT_Thomas
-//  Par defaut, appelle le remailleur non conservatif traite_RuptureCoalescenceInterfaces()
+/*! @brief algorithme de remaillage qui tente de conserver le volume.
+ *
+ * voir class Remailler_Collision_FT_Thomas
+ *   Par defaut, appelle le remailleur non conservatif traite_RuptureCoalescenceInterfaces()
+ *
+ */
 int Remailleur_Collision_FT_base::traite_RuptureCoalescenceInterfaces_Conservatif(Maillage_FT_Disc& maillage,
                                                                                   Champ_base& indicatrice)
 {

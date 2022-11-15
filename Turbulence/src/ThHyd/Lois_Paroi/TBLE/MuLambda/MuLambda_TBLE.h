@@ -26,16 +26,10 @@
 
 Declare_deriv(MuLambda_TBLE_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe MuLambda_TBLE
-//
-// .SECTION voir aussi
-//    Diffu_totale_base
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe MuLambda_TBLE
+ *
+ * @sa Diffu_totale_base
+ */
 class MuLambda_TBLE : public DERIV(MuLambda_TBLE_base)
 
 {

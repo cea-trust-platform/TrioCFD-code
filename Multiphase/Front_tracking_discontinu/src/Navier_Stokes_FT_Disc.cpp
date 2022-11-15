@@ -43,7 +43,18 @@
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc.h>
 #include <Param.h>
-
+#include <Vecteur3.h>
+#include <Zone_Cl_VDF.h>
+#if TCL_MODEL
+//#include <Dirichlet_paroi_fixe.h>
+//#include <Dirichlet_paroi_defilante.h>
+//#include <Neumann_sortie_libre.h>
+//#include <Periodique.h>
+//#include <Symetrie.h>
+//#include <Dirichlet.h>
+//#include <Dirichlet_homogene.h>
+#endif
+#define NS_VERBOSE 0 // To activate verbose mode on err ...
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc,"Navier_Stokes_FT_Disc",Navier_Stokes_Turbulent);
 
@@ -62,6 +73,9 @@ public:
     clipping_courbure_interface(1e40),// Par defaut, pas de clipping
     terme_gravite_(GRAVITE_GRAD_I),   // Par defaut terme gravite ft sans courants parasites
     is_explicite(1),                  // Par defaut, calcul explicite de vpoint etape predicition
+    is_boussinesq_(0),                // Par defaut, l'hypothese de Boussinesq n'est pas utilisee pour la flottabilite dans les phases.
+    new_mass_source_(0),              // Par defaut, on utilise la methode historique pour imposer le saut de vitesse du changement de phase.
+    type_interpol_indic_pour_dI_dt_(INTERP_STANDARD), // Default is the historical interpolation
     is_penalized(0),                  // Par defaut, pas de penalisation L2 du forcage
     eta(1.0),                         // Par defaut, coefficient de penalisation L2 = 1.
     p_ref_pena(-1.e40),               // Par defaut, pas de penalisation L2 de la pression sinon valeur reference
@@ -75,6 +89,7 @@ public:
   int mpointv_inactif;
 
   Champ_Fonc second_membre_projection;
+  Champ_Fonc second_membre_projection_jump_;
   Champ_Fonc derivee_u_etoile;
   Champ_Fonc gradient_pression;
   Champ_Fonc terme_diffusion;
@@ -92,6 +107,8 @@ public:
   Champ_Fonc mpoint_vap;
   // Variation temporelle indicatrice de phase
   Champ_Fonc derivee_temporelle_indicatrice;
+  Champ_Fonc ai; // Eulerian interfacial area.
+  Champ_Inc vitesse_jump0_; // Extended Velocity of phase 0.
 
   LIST(REF(Champ_base)) liste_champs_compris;
 
@@ -121,6 +138,14 @@ public:
   // Si is_explicite != 0,
   //   on calcul vpoint de facon explicite dans l etape de prediction des vitesses.
   int is_explicite;
+  // Si is_boussinesq_ != 0, on calcul une force par le modele de boussinesq
+  int is_boussinesq_;
+  // Flag pour la method du saut de vitesse :
+  int new_mass_source_;
+
+  enum Type_interpol_indic_pour_dI_dt { INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED };
+  Type_interpol_indic_pour_dI_dt type_interpol_indic_pour_dI_dt_;
+
   // Si is_penalized != 0,
   //   on penalise L2 le terme de forcage.
   int is_penalized;
@@ -135,13 +160,14 @@ public:
   double z_pfl_imp;
 };
 
-// Description:
-//  Calcul de champ_rho_faces_ et champ_rho_elem_ en fonction de l'indicatrice:
-//   rho_elem_ = indicatrice * ( rho(phase_1) - rho(phase_0) ) + rho(phase_0)
-//   rho_faces_ = 0.5 * (rho_elem(voisin_0) + rho_elem(voisin_1))
-//  Le calcul des viscosites cinematique et dynamique est pour l'instant le suivant:
-//   nu_elem = indicatrice * ( nu(phase_1) - nu(phase_0) ) + nu(phase_0)
-//   mu_elem = nu_elem * rho_elem
+/*! @brief Calcul de champ_rho_faces_ et champ_rho_elem_ en fonction de l'indicatrice: rho_elem_ = indicatrice * ( rho(phase_1) - rho(phase_0) ) + rho(phase_0)
+ *
+ *    rho_faces_ = 0.5 * (rho_elem(voisin_0) + rho_elem(voisin_1))
+ *   Le calcul des viscosites cinematique et dynamique est pour l'instant le suivant:
+ *    nu_elem = indicatrice * ( nu(phase_1) - nu(phase_0) ) + nu(phase_0)
+ *    mu_elem = nu_elem * rho_elem
+ *
+ */
 static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zone_dis_base,
                                                     const Fluide_Diphasique& fluide,
                                                     const DoubleVect&         indicatrice_elem,
@@ -214,7 +240,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zo
     nu_elem.echange_espace_virtuel();
   }
 
-// Calcul de rho aux faces (on suppose que la vitesse est aux faces)
+  // Calcul de rho aux faces (on suppose que la vitesse est aux faces)
   {
     assert(rho_elem.size() == zone_dis_base.nb_elem());
     const IntTab& face_voisins = zone_dis_base.face_voisins();
@@ -310,7 +336,9 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Zone_dis_base& zdis,
       val_rho_faces.echange_espace_virtuel();
     }
 }
-// Description: constructeur par defaut
+/*! @brief constructeur par defaut
+ *
+ */
 Navier_Stokes_FT_Disc::Navier_Stokes_FT_Disc()
 {
   variables_internes_ = new Navier_Stokes_FT_Disc_interne;
@@ -318,7 +346,9 @@ Navier_Stokes_FT_Disc::Navier_Stokes_FT_Disc()
   is_repulsion=0;
 }
 
-// Description: le destructeur qui va avec
+/*! @brief le destructeur qui va avec
+ *
+ */
 Navier_Stokes_FT_Disc::~Navier_Stokes_FT_Disc()
 {
   delete variables_internes_;
@@ -338,6 +368,8 @@ Entree& Navier_Stokes_FT_Disc::readOn(Entree& is)
 void Navier_Stokes_FT_Disc::set_param(Param& param)
 {
   Navier_Stokes_Turbulent::set_param(param);
+  param.ajouter_flag("boussinesq_approximation",&variables_internes().is_boussinesq_);
+  param.ajouter_flag("new_mass_source",&variables_internes().new_mass_source_);
   param.ajouter_flag("matrice_pression_invariante",&variables_internes().matrice_pression_invariante);
   param.ajouter_non_std("equation_interfaces_vitesse_imposee",(this) );
   param.ajouter_non_std("equations_interfaces_vitesse_imposee",(this) );
@@ -352,6 +384,7 @@ void Navier_Stokes_FT_Disc::set_param(Param& param)
   param.ajouter_flag("mpoint_inactif_sur_qdm",&variables_internes().mpoint_inactif);
   param.ajouter_flag("mpoint_vapeur_inactif_sur_qdm",&variables_internes().mpointv_inactif);
   param.ajouter("correction_courbure_ordre", &variables_internes().correction_courbure_ordre_);
+  param.ajouter_non_std("interpol_indic_pour_dI_dt", (this));
 }
 
 int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -548,7 +581,51 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
           Cerr << "Erreur a la lecture des parametres de la penalisation du forcage " << finl;
           Cerr << "On attendait : " << accouverte << finl;
-          exit();
+          Process::exit();
+        }
+    }
+  else if (mot =="interpol_indic_pour_dI_dt")
+    {
+      Motcles motcles2(3);
+      motcles2[0] = "interp_standard";
+      motcles2[1] = "interp_modifiee";
+      motcles2[2] = "interp_ai_based";
+      Motcle motlu;
+      is >> motlu;
+      Cerr << mot << " " << motlu << finl;
+      Cout << "Setting the type of interpolation for calculer_dI_dt to " << motlu << "." << finl;
+      int rang = motcles2.search(motlu);
+      switch(rang)
+        {
+        case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way"
+                   << " where a mean value + upwind is used." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces"
+                   << " as defined by the interfacial transport option." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
+                   << " and on the normal to the interface." << finl;
+            return 1;
+          }
+        default:
+          Cerr << "Transport_Interfaces_FT_Disc::lire\n"
+               << "The options for methode_transport are :\n"
+               << motcles2;
+          Process::exit();
         }
     }
   else
@@ -612,12 +689,14 @@ Milieu_base& Navier_Stokes_FT_Disc::milieu()
     return Navier_Stokes_Turbulent::milieu();
 }
 
-// Description:
-//  Discretisation des champs utilises dans cette equation.
-//  Fonction appelee par Probleme_base::discretiser.
-//  B. Mathieu : a titre experimental, au lieu de dupliquer les noms
-//               des champs ici et dans "a_pour_champ_Fonc", on stocke
-//               les champs dans une liste. (voir a_pour_champ_fonc).
+/*! @brief Discretisation des champs utilises dans cette equation.
+ *
+ * Fonction appelee par Probleme_base::discretiser.
+ *   B. Mathieu : a titre experimental, au lieu de dupliquer les noms
+ *                des champs ici et dans "a_pour_champ_Fonc", on stocke
+ *                les champs dans une liste. (voir a_pour_champ_fonc).
+ *
+ */
 void Navier_Stokes_FT_Disc::discretiser()
 {
   Navier_Stokes_Turbulent::discretiser();
@@ -663,6 +742,12 @@ void Navier_Stokes_FT_Disc::discretiser()
                         variables_internes().second_membre_projection);
   champs_compris.add(variables_internes().second_membre_projection.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection);
+  dis.discretiser_champ("champ_elem", ma_zone_dis,
+                        "second_membre_projection_jump", "",
+                        1 /* composantes */, temps,
+                        variables_internes().second_membre_projection_jump_);
+  champs_compris.add(variables_internes().second_membre_projection_jump_.valeur());
+  champs_compris_.ajoute_champ(variables_internes().second_membre_projection_jump_);
   dis.discretiser_champ("vitesse", ma_zone_dis,
                         "gradient_pression", "",
                         -1 /* nb composantes par defaut */, temps,
@@ -760,13 +845,30 @@ void Navier_Stokes_FT_Disc::discretiser()
                         variables_internes().derivee_temporelle_indicatrice);
   champs_compris.add(variables_internes().derivee_temporelle_indicatrice.valeur());
   champs_compris_.ajoute_champ(variables_internes().derivee_temporelle_indicatrice);
+
+  // Eulerian Interfacial area :
+  dis.discretiser_champ("champ_elem", ma_zone_dis,
+                        "interfacial_area", "m2",
+                        1 /* composante */, temps,
+                        variables_internes().ai);
+  champs_compris.add(variables_internes().ai.valeur());
+  champs_compris_.ajoute_champ(variables_internes().ai);
+
+  // Velocity jump "u0" computed for phase 0 :
+  Nom nom = Nom("vitesse_jump0_") + le_nom();
+  dis.discretiser_champ("vitesse", ma_zone_dis, nom, "m/s", -1 /* nb composantes par defaut */,1,  temps,
+                        variables_internes().vitesse_jump0_);
+  variables_internes().vitesse_jump0_.associer_eqn(*this);
+  champs_compris.add(variables_internes().vitesse_jump0_.valeur());
+  champs_compris_.ajoute_champ(variables_internes().vitesse_jump0_);
 }
 
-// Description:
-//  Methode surchargee de Navier_Stokes_std, appelee par
-//   Navier_Stokes_std::discretiser().
-//  L'assembleur pression est particulier pour le front-tracking
-//  en VEF (en attendant qu'on factorise tous ces assembleurs pression)
+/*! @brief Methode surchargee de Navier_Stokes_std, appelee par Navier_Stokes_std::discretiser().
+ *
+ *   L'assembleur pression est particulier pour le front-tracking
+ *   en VEF (en attendant qu'on factorise tous ces assembleurs pression)
+ *
+ */
 void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
 {
   const Discretisation_base& dis = discretisation();
@@ -783,19 +885,26 @@ void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
 
   Assembleur_base& assembleur = assembleur_pression_.valeur();
   assembleur.associer_zone_dis_base(zone_dis().valeur());
-  // B. Mathieu, 07_2004 : premier jet de la methode, on resout en pression :
+  // B. Mathieu, 07_2004 : premier jet de la methode, on resout en pression.
+  // Version actuelle : pas d'increment de pression
   assembleur.set_resoudre_increment_pression(0);
   assembleur.set_resoudre_en_u(1);
 }
 
-// Description: methode appelee par Navier_Stokes_std::preparer_calcul...
+/*! @brief methode appelee par Navier_Stokes_std::preparer_calcul.
+ *
+ * ..
+ *
+ */
 void Navier_Stokes_FT_Disc::projeter()
 {
   if (Process::je_suis_maitre() && limpr())
     Cerr << "Navier_Stokes_FT_Disc::projeter does nothing" << finl;
 }
 
-// Description: methode appelee par Probleme_base::preparer_calcul()
+/*! @brief methode appelee par Probleme_base::preparer_calcul()
+ *
+ */
 int Navier_Stokes_FT_Disc::preparer_calcul()
 {
   Cerr << "Navier_Stokes_FT_Disc::preparer_calcul()" << finl;
@@ -915,6 +1024,31 @@ const int& Navier_Stokes_FT_Disc::get_is_penalized() const
   return variables_internes().is_penalized;
 }
 
+const int& Navier_Stokes_FT_Disc::get_new_mass_source() const
+{
+  return variables_internes().new_mass_source_;
+}
+
+const DoubleTab& Navier_Stokes_FT_Disc::get_interfacial_area() const
+{
+  return variables_internes().ai.valeur().valeurs();
+}
+
+DoubleTab& Navier_Stokes_FT_Disc::get_set_interfacial_area()
+{
+  return variables_internes().ai.valeur().valeurs();
+}
+
+const DoubleTab& Navier_Stokes_FT_Disc::get_mpoint() const
+{
+  return variables_internes().mpoint.valeur().valeurs();
+}
+
+DoubleTab& Navier_Stokes_FT_Disc::get_set_mpoint()
+{
+  return variables_internes().mpoint.valeur().valeurs();
+}
+
 void Navier_Stokes_FT_Disc::preparer_pas_de_temps()
 {
 }
@@ -929,29 +1063,30 @@ void Navier_Stokes_FT_Disc::mettre_a_jour(double temps)
   champ_nu_.mettre_a_jour(temps);
 }
 
+const SolveurSys& Navier_Stokes_FT_Disc::get_solveur_pression() const
+{
+  return solveur_pression_;
+}
 
-
-// Description:
-//  Calcul des forces de tension superficielles (F_sigma) et de la partie
-//  a rotationnel non nul de la gravite (G_rot) (si GRAVITE_GRAD_I) :
-//  F_sigma = INTEGRALE sur le volume de controle (
-//            sigma_aux_faces * courbure_aux_faces * gradient(indicatrice)
-//            + gradient_sigma )
-//  G_rot   = INTEGRALE sur le volume de controle (
-//               phi * gradient(rho) )   (avec phi = potentiel de pesanteur)
-// Parametre: gradient_indicatrice
-// Signification: le gradient de l'indicatrice issu de l'operateur "gradient",
-//  donc homogene a l'integrale du gradient sur les volumes de controle de la vitesse.
-// Parametre: potentiel_faces
-// Signification: un champ aux faces a une composante, ou on stocke le "potentiel aux faces"
-// Parametre: champ
-// Signification: le champ aux faces (meme discretisation que la vitesse)
-//  ou on stocke le terme source des forces superficielles.
+/*! @brief Calcul des forces de tension superficielles (F_sigma) et de la partie a rotationnel non nul de la gravite (G_rot) (si GRAVITE_GRAD_I) :
+ *
+ *   F_sigma = INTEGRALE sur le volume de controle (
+ *             sigma_aux_faces * courbure_aux_faces * gradient(indicatrice)
+ *             + gradient_sigma )
+ *   G_rot   = INTEGRALE sur le volume de controle (
+ *                phi * gradient(rho) )   (avec phi = potentiel de pesanteur)
+ *
+ * @param (gradient_indicatrice) le gradient de l'indicatrice issu de l'operateur "gradient", donc homogene a l'integrale du gradient sur les volumes de controle de la vitesse.
+ * @param (potentiel_faces) un champ aux faces a une composante, ou on stocke le "potentiel aux faces"
+ * @param (champ) le champ aux faces (meme discretisation que la vitesse) ou on stocke le terme source des forces superficielles.
+ */
+//
+//  The method is no longer const because it changes a member of variables_internes() to store the Eulerian interfacial Area.
 void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_FT_Disc& maillage,
                                                                  const Champ_base& gradient_indicatrice,
                                                                  Champ_base& potentiel_elements,
                                                                  Champ_base& potentiel_faces,
-                                                                 Champ_base& champ) const
+                                                                 Champ_base& champ)
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
   // Nombre de faces
@@ -1223,6 +1358,10 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         Debog::verifier("Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles poids:",poids);
       }
   }
+
+  // I take the opportunity to store the Eulerian Interfacial Area...
+  DoubleTab& interfacial_area = get_set_interfacial_area();
+  interfacial_area=poids;
   {
     // Boucle sur les faces
     int face;
@@ -1273,20 +1412,21 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
   }
 }
 
-// Description:
-//  Calcul du gradient de l'indicatrice.
-//  Ce gradient est utilise pour calculer le second membre de l'equation de qdm,
-//  contenant les termes de tension de surface.
-//  En VEF, on commence par creer un champ P1B a partir du champ P0
-//  et on calcule le gradient.
-//  Design de classe a revoir pour separer VDF et VEF...
-//
-// Parametre : indicatrice
-// Signification : un champ aux elements (l'espace virtuel doit etre a jour)
-// Parametre : gradient_i
-// Signification : un champ discretise comme la vitesse dans lequel
-//  on met gradient(indicatrice).
-
+/*! @brief Calcul du gradient de l'indicatrice.
+ *
+ * Ce gradient est utilise pour calculer le second membre de l'equation de qdm,
+ *   contenant les termes de tension de surface.
+ *   En VEF, on commence par creer un champ P1B a partir du champ P0
+ *   et on calcule le gradient.
+ *   Design de classe a revoir pour separer VDF et VEF...
+ *
+ *  Parametre : indicatrice
+ *  Signification : un champ aux elements (l'espace virtuel doit etre a jour)
+ *  Parametre : gradient_i
+ *  Signification : un champ discretise comme la vitesse dans lequel
+ *   on met gradient(indicatrice).
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
   const Champ_base& indicatrice,
   const DoubleTab& distance_interface_sommets,
@@ -1296,6 +1436,171 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     {
 
       gradient.calculer(indicatrice.valeurs(), gradient_i.valeurs());
+// #define PATCH_CORRECTION_GRADIENT_INDICATRICE_AT_CONTACT_LINE
+#if PATCH_CORRECTION_GRADIENT_INDICATRICE_AT_CONTACT_LINE // Patch GB. 8/01/2018
+      // Correction du gradient a la ligne de contact :
+      const DoubleTab& inco=indicatrice.valeurs();
+      DoubleTab& resu=gradient_i.valeurs();
+      //      assert_espace_virtuel_vect(inco);
+      const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+      const IntVect& orientation = zvdf.orientation();
+      //const Zone_VDF& zvdf = la_zone_vdf.valeur();
+      //      const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+      //      const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
+      const Zone_Cl_dis_base& zcldis = zone_Cl_dis().valeur();
+      const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zcldis);
+      //      const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+      const DoubleVect& face_surfaces = zvdf.face_surfaces();
+      const IntTab& elem_faces = zvdf.elem_faces();
+      const IntTab& face_voisins = zone_dis().valeur().face_voisins();
+
+      double coef;
+      int n0, n1;
+
+      // Boucle sur les bords pour traiter les conditions aux limites
+      int ndeb, nfin, num_face;
+      for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
+        {
+
+          // pour chaque Condition Limite on regarde son type
+          // Si face de Dirichlet ou de Symetrie on ne fait rien
+          // Si face de Neumann on calcule la contribution au terme source
+
+          const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
+          Cerr << que_suis_je() << "::calculer_gradient_indicatrice() correction du gradient a la CL : " <<  la_cl.valeur() << finl;
+          if ( sub_type(Neumann_sortie_libre,la_cl.valeur()) )
+            {
+              const Neumann_sortie_libre& la_cl_typee =
+                ref_cast(Neumann_sortie_libre, la_cl.valeur());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  double P_imp = la_cl_typee.flux_impose(num_face-ndeb);
+                  n0 = face_voisins(num_face,0);
+                  if (n0 != -1)
+                    {
+                      coef = face_surfaces(num_face);//*porosite_surf(num_face)*Option_VDF::coeff_P_neumann;
+                      resu(num_face) += (coef*(P_imp - inco(n0)))*0.;
+                    }
+                  else
+                    {
+                      n1 = face_voisins(num_face,1);
+                      coef = face_surfaces(num_face);//*porosite_surf(num_face)*Option_VDF::coeff_P_neumann;
+                      resu(num_face) += (coef*(inco(n1) - P_imp))*0.;
+                    }
+                }
+            }
+
+          // Correction periodicite :
+          else if (sub_type(Periodique,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  n0 = face_voisins(num_face,0);
+                  n1 = face_voisins(num_face,1);
+                  coef = face_surfaces(num_face);//*porosite_surf(num_face);
+                  resu(num_face) += (coef*(inco(n1) - inco(n0)))*0.;
+                }
+            }
+          else if (sub_type(Symetrie,la_cl.valeur()))
+            ;
+          else if ( (sub_type(Dirichlet,la_cl.valeur()))
+                    ||
+                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
+                  )
+            {
+              Cerr << " GB " << que_suis_je() << "CL : " <<  la_cl.valeur() << finl;
+              // ../IJK/src/FT/IJK_Interfaces.cpp~:              const int elem_voisin = faces_voisins(num_face, 0) + faces_voisins(num_face, 1) - elem;
+              //../IJK/src/FT/IJK_Interfaces.cpp~:3931:  const IntTab& elem_faces = zone_vf.elem_faces();
+              //const int num_face = elem_faces(elem, iface);
+              //../IJK/src/FT/Sonde_IJK.cpp:542:      const IntTab& elem_faces = zoneVF.elem_faces();
+
+              // do nothing
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+              const int dim=Objet_U::dimension;
+              for (num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  n0 = face_voisins(num_face,0);
+                  n1 = face_voisins(num_face,1);
+                  int elem = max(n0, n1);
+                  Cerr << "Elem: " << n0 << " ou " << n1 << " : retenu Elem " << elem << finl;
+                  Cerr << "num_face = " << num_face << finl;
+                  int nb_faces=elem_faces.dimension(1) ;
+                  int fac=0;
+                  double sum_grad_I = 0.;
+                  int memorized_sign = 0;
+                  for (fac=0; fac<nb_faces; fac++)
+                    {
+                      int num_face_courant=elem_faces(elem,fac);
+                      int sign = pow(-1,orientation(num_face_courant));
+                      if (num_face_courant == num_face)
+                        {
+                          Cerr << "face_surface : " << face_surfaces(num_face_courant)
+                               << " orientation : " << orientation(num_face_courant) << finl;
+                          memorized_sign = sign;
+                          ; // break;
+                        }
+                      else
+                        {
+                          sum_grad_I += resu(num_face_courant)*sign*face_surfaces(num_face_courant);
+                          Cerr << "face_surface : " << face_surfaces(num_face_courant)
+                               << " orientation : " << orientation(num_face_courant) << finl;
+                        }
+                    }
+                  sum_grad_I /= memorized_sign;
+                  // La face d'en face :
+                  int num_face_den_face=elem_faces(elem,(fac+dim)%nb_faces);
+                  //    int face_visavi = elem_faces(voisin0, ori) + elem_faces(voisin0, ori+Objet_U::dimension) - i;
+                  Cerr << "Face : " << fac << " en face de " << (fac+dim)%nb_faces << " -> " << num_face_den_face << finl;
+                  const int elem_voisin = face_voisins(num_face_den_face, 0) + face_voisins(num_face_den_face, 1) - elem;
+                  Cerr << "Voisin par la face " << fac << " [num=" <<num_face_den_face  << "] " << elem_voisin <<  finl;
+
+                  //coef = face_surfaces(num_face);//*porosite_surf(num_face);
+                  //resu(num_face) += (coef*(inco(n1) - inco(n0)));
+                  const double theta = 45;
+                  const double deg_to_rad = M_PI / 180.;
+                  const double cos_theta = cos(theta * deg_to_rad);
+
+                  REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+                  const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
+                  const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
+                  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+                  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
+                  const ArrOfInt& index_elem = intersections.index_elem();
+
+                  double surface_totale = 0.;
+                  {
+                    int index = index_elem[elem];
+                    // Boucle sur les faces qui traversent l'element:
+                    while (index >= 0)
+                      {
+                        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+                        surface_totale += data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+                        index = data.index_facette_suivante_;
+                      }
+                    Cerr << "Surface dans l'elem : " <<  surface_totale << finl;
+                    Cerr << "cos(theta) : " << cos_theta << finl;
+                    Cerr << "gradI en face : " << resu(num_face_den_face) << finl;
+                    Cerr << "sum_grad_I : " << sum_grad_I << finl;
+                  }
+
+                  //resu(num_face) = resu(num_face_den_face) + cos_theta*surface_totale ;
+                  resu(num_face) = -sum_grad_I;
+                }
+              Cerr << "Done" << finl;
+            }
+          // Fin de la boucle for
+        }
+
+#endif
 
     }
   else
@@ -1444,76 +1749,215 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     }
 }
 
-// Description:
-//  Calcul du saut de vitesse a l'interface du au changement de phase
-//  phase_pilote = -1: u+u0 = champ de vitesse de deplacement de l'interface
-//  phase_pilote = 0 : u+u0 = champ de vitesse de la phase 0
-//  phase_pilote = 1 : u+u0 = champ de vitesse de la phase 1
-//  ordre = 0 : pas de prise en compte de la correction en courbure
-//  ordre = 1 : prise en compte de la correction en courbure a l'ordre 1
-//  ordre = 2 : prise en compte de la correction en courbure a l'ordre 2
+/*! @brief Calcul du saut de vitesse a l'interface du au changement de phase
+ *
+ *   phase_pilote = -1: u-u0 = champ de vitesse de deplacement de l'interface
+ *   phase_pilote = 0 : u+u0 = champ de vitesse de la phase 0
+ *   phase_pilote = 1 : u+u0 = champ de vitesse de la phase 1
+ *   ordre = 0 : pas de prise en compte de la correction en courbure
+ *   ordre = 1 : prise en compte de la correction en courbure a l'ordre 1
+ *   ordre = 2 : prise en compte de la correction en courbure a l'ordre 2
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                                                        int phase_pilote,
                                                        int ordre)
 {
   //  static const Stat_Counter_Id count = statistiques().new_counter(1, "calculer_delta_u_interface", 0);
-
   //  statistiques().begin_count(count);
-
-  // GB : REMPLACEMENT TEMPORAIRE DE :
-  //   variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
-  //   const DoubleTab & mpoint = variables_internes().mpoint.valeur().valeurs();
-  // PAR  (voir un peu plus bas)
+  DoubleTab& u0 = champ_u0.valeurs();
+  const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
+  const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
+  const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+  const double rho_0 = tab_rho_phase_0(0,0);
+  const double rho_1 = tab_rho_phase_1(0,0);
+  //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
+  const double un_sur_rho_0 = 1. / rho_0;
+  const double un_sur_rho_1 = 1. / rho_1;
 
   REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
+
+  // Pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface,
+  // il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
+  const int nn = variables_internes().second_membre_projection.valeurs().dimension(0); // nombre d'elems
+  DoubleTab mpoint;
+  mpoint.resize(nn);
+  mpoint=0.; //pour initialiser
+  if (variables_internes().ref_equation_mpoint_.non_nul())
+    {
+      const DoubleTab& mp = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
+      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
+      if (!variables_internes().mpoint_inactif)
+        mpoint = mp;
+    }
+  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+    {
+      const DoubleTab& mpv = variables_internes().ref_equation_mpoint_vap_.valeur().get_mpoint();
+      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
+      if (!variables_internes().mpointv_inactif)
+        mpoint +=mpv;
+    }
+
+  if ((variables_internes().new_mass_source_) && (phase_pilote != 1))
+    {
+      const double delta_rho = (rho_1 - rho_0);
+      double c0 = 0.;
+      if (std::abs(delta_rho)>DMINFLOAT)
+        {
+          c0 = rho_1/delta_rho;
+        }
+      const double c1 = 1+c0;
+
+      const DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+      const DoubleTab& normale_elements = eq_transport.get_update_normale_interface().valeurs();
+      const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+
+      const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+      const IntTab& face_voisins = zone_vf.face_voisins();
+      const int nb_faces = face_voisins.dimension(0);
+      const int dim = Objet_U::dimension;
+      const DoubleTab& xp = zone_vf.xp(); // centres de gravite des elements
+      const DoubleTab& xv = zone_vf.xv(); // centres de gravite des faces.
+      u0 = 0.;
+      if (u0.line_size() == dim) // vef
+        {
+          Cerr << "Using option new_mass_source is not possible yet in VEF. Contact us. " << finl;
+          Process::exit();
+          for (int face = 0; face < nb_faces; face++)
+            for (int j = 0; j < dim; j++)
+              {
+                double x = 0.; // a coder...
+                u0(face,j) *= x;
+              }
+        }
+      else
+        {
+          const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+          const IntVect& orientation = zvdf.orientation();
+          for (int face = 0; face < nb_faces; face++)
+            {
+              const int dir = orientation[face];
+              const double surface=zone_vf.face_surfaces(face);
+              const int e1 = face_voisins(face, 0);
+              const int e2 = face_voisins(face, 1);
+              const double xf = xv(face,dir);
+              if (Objet_U::bidim_axi && fabs(xf)<=DMINFLOAT && (dir==0))
+                {
+                  // We are on the symmetry axis => surface = 0.;
+                  u0(face) = 0.; // there is no normal velocity at a symmetry axis
+                  continue;
+                }
+              double x = 0.;
+              double xx = 0.;
+              // Si on n'est pas au bord...
+              if (e1 >= 0)
+                {
+                  const double nx = normale_elements(e1, dir);
+                  const double c = ((xf-xp(e1,dir)) * nx >0.) ? c0 : c1;
+                  x = c*secmem2[e1]*nx;
+                  const double ai= interfacial_area(e1);
+                  // nx pointe vers le liquide (sortant de phase 0)
+                  if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
+                    {
+                      // distance positive on the vapour side (chi_0 = 1, ie indicatrice = 0)
+                      const double d = (xf-xp(e1,dir)) * nx;
+                      switch (phase_pilote)
+                        {
+                        case -1:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et egal a la
+                            // vitesse de deplacement de l'interface
+                            const double un_sur_rho = (d >0.) ? un_sur_rho_0 : un_sur_rho_1;
+                            xx = ai/surface * un_sur_rho * mpoint[e1]*nx;
+                            //Cerr << "diff " << x << " " << xx << finl;
+                            break;
+                          }
+                        case 0:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et
+                            // u+u0 = la vitesse de la phase 0 dans la phase 0
+                            const double p = (d >0.) ? 0. : (un_sur_rho_1 - un_sur_rho_0);
+                            xx = ai/surface * p * mpoint[e1]*nx;
+                            //Cerr << "face " << face << " " << xx << finl;
+                            break;
+                          }
+                        case 1:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et
+                            // u+u0 = la vitesse de la phase 1 dans la phase 1
+                            const double p = (d >0.) ? (un_sur_rho_0 - un_sur_rho_1) : 0. ;
+                            xx = ai/surface * p * mpoint[e1]*nx;
+                            //Cerr << "face " << face << " " << xx << finl;
+                            break;
+                          }
+                        default:
+                          Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface phase_pilote" << finl;
+                          Process::exit();
+                        }
+                    }
+                }
+              // We ADD contribution of e2 if not a boundary to xx
+              if (e2 >= 0)
+                {
+                  const double nx = normale_elements(e2, dir);
+                  const double c = ((xf-xp(e2,dir)) * nx >0.) ? c0 : c1;
+                  x += c*secmem2[e2]*normale_elements(e2, dir);
+                  const double ai= interfacial_area(e2);
+                  if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
+                    {
+                      // distance positive on the vapour side (chi_0 = 1, ie indicatrice = 0)
+                      const double d = (xf-xp(e2,dir)) * nx;
+                      switch (phase_pilote)
+                        {
+                        case -1:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et egal a la
+                            // vitesse de deplacement de l'interface
+                            const double un_sur_rho = (d >0.) ? un_sur_rho_0 : un_sur_rho_1;
+                            xx += ai/surface * un_sur_rho * mpoint[e2]*nx;
+                            //Cerr << "diff2 " << x << " " << xx << finl;
+                            break;
+                          }
+                        case 0:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et
+                            // u+u0 = la vitesse de la phase 0 dans la phase 0
+                            const double p = (d >0.) ? 0. : (un_sur_rho_1 - un_sur_rho_0);
+                            xx += ai/surface * p * mpoint[e2]*nx;
+                            //Cerr << "face2 " << face << " " << xx << finl;
+                            break;
+                          }
+                        case 1:
+                          {
+                            // Champ de vitesse tel que u + u0 soit continu et
+                            // u+u0 = la vitesse de la phase 1 dans la phase 1
+                            const double p = (d >0.) ? (un_sur_rho_0 - un_sur_rho_1) : 0. ;
+                            xx += ai/surface * p * mpoint[e2]*nx;
+                            //Cerr << "face2 " << face << " " << xx << finl;
+                            break;
+                          }
+                        default:
+                          Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface phase_pilote" << finl;
+                          Process::exit();
+                        }
+                    }
+
+                }
+              u0(face) = xx;
+            }
+        }
+
+      u0.echange_espace_virtuel();
+      return;
+    }
+
   // Distance a l'interface discretisee aux elements:
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
   DoubleTab phi = calculer_div_normale_interface().valeurs();
-
-  // GB : debut de mon rajout pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface.
-  // GB : Pour ce faire, il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
-  const int nn = phi.dimension(0);
-  DoubleTab mpoint;
-  DoubleTab mpoint_vap;
-  mpoint.resize(nn);
-  mpoint_vap.resize(nn);
-  mpoint=0.; //pour initialiser
-  mpoint_vap=0.; //pour initialiser
-  if (variables_internes().ref_equation_mpoint_.non_nul())
-    {
-      variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
-      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
-      if (!variables_internes().mpoint_inactif)
-        mpoint = variables_internes().mpoint.valeur().valeurs();
-    }
-  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
-    {
-      variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
-      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
-      if (!variables_internes().mpointv_inactif)
-        mpoint_vap = variables_internes().mpoint_vap.valeur().valeurs();
-    }
-  // GB : fin de mon rajout
-  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
-    mpoint +=mpoint_vap;
-
-  DoubleTab& u0 = champ_u0.valeurs();
-
   {
-    const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
-    const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
-    const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
-    const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-    const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
-    const double rho_0 = tab_rho_phase_0(0,0);
-    const double rho_1 = tab_rho_phase_1(0,0);
-    //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
-    const double un_sur_rho_0 = 1. / rho_0;
-    const double un_sur_rho_1 = 1. / rho_1;
-    //const Zone_VF & zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-    //const DoubleTab & xp = zone_vf.xp();
-
     const int n = phi.dimension(0);
     for (int i = 0; i < n; i++)
       {
@@ -1541,7 +1985,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 break;
               default:
                 Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface ordre" << finl;
-                exit();
+                Process::exit();
               }
             switch (phase_pilote)
               {
@@ -1557,21 +2001,21 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 // Champ de vitesse tel que u + u0 soit continu et
                 // u+u0 = la vitesse de la phase 0 dans la phase 0
                 if (d < 0)
-                  p = 0.;
+                  p = 0.; // dans la phase 0
                 else
-                  p *= (un_sur_rho_1 - un_sur_rho_0);
+                  p *= (un_sur_rho_0 - un_sur_rho_1); // GB BugFix 2020/10/09
                 break;
               case 1:
                 // Champ de vitesse tel que u + u0 soit continu et
                 // u+u0 = la vitesse de la phase 1 dans la phase 1
                 if (d < 0)
-                  p *= (un_sur_rho_0 - un_sur_rho_1);
+                  p *= (un_sur_rho_1 - un_sur_rho_0); // GB BugFix 2020/10/09
                 else
-                  p = 0.;
+                  p = 0.; // dans la phase 1
                 break;
               default:
                 Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface phase_pilote" << finl;
-                exit();
+                Process::exit();
               }
           }
         phi(i) = p;
@@ -1582,15 +2026,13 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   // Gradient de phi:
   if (champ_u0.que_suis_je() == "Champ_Face")
     {
-
       gradient.calculer(phi, u0);
-
     }
   else
     {
       Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface\n"
            << " Non code pour " << champ_u0.que_suis_je() << finl;
-      exit();
+      Process::exit();
     }
 
   // On annule la vitesse calculee pour les faces adjacentes a un element
@@ -1617,42 +2059,216 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
 }
 
 // Calcul de l'integrale de dI_dt sur chaque element du maillage.
-// Le tableau dI_dt doit avoir la bonne structure. L'espace virtuel n'est pas
-// mis a jour.
-void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
+// Le tableau dI_dt doit avoir la bonne structure. L'espace virtuel est
+// mis a jour. La method n'est plus const a cause des options
+// INTERP_MODIFIEE et AI_BASED qui recalculent indicatrice_faces.
+void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
 {
   const double rho_0 = fluide_diphasique().fluide_phase(0).masse_volumique().valeurs()(0,0);
   const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique().valeurs()(0,0);
   const double delta_rho = rho_0-rho_1;
 
-  double rho_0_delta_rho = 0.;
+  double rho_0_sur_delta_rho = 0.;
   if (delta_rho != 0)
-    rho_0_delta_rho = rho_0 / delta_rho;
+    rho_0_sur_delta_rho = rho_0 / delta_rho;
 
   const DoubleTab& tab_vitesse = inconnue().valeurs();
   const IntTab& face_voisins = zone_dis().valeur().face_voisins();
-  const DoubleTab& indic = variables_internes().ref_eq_interf_proprietes_fluide.valeur().inconnue().valeur().valeurs();
-  DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses
+
+  REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+  const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
+  const DoubleTab& indicatrice = eq_transport.inconnue().valeur().valeurs();
+  //  const DoubleTab& indicatrice = variables_internes().ref_eq_interf_proprietes_fluide.valeur().inconnue().valeur().valeurs();
+  DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses de ns
   const int dim = tab_vitesse.line_size();
   const int n = tab_vitesse.dimension(0);
-  for (int i = 0; i < n; i++)
+
+  switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
     {
-      const int elem0 = face_voisins(i, 0);
-      const int elem1 = face_voisins(i, 1);
-      double indic_0 = (elem0 >= 0) ? indic[elem0] : indic[elem1];
-      double indic_1 = (elem1 >= 0) ? indic[elem1] : indic[elem0];
-      // Decentrage : si la face est adjacente a une face monophasique,
-      //  prendre la phase pure pour toute la face:
-      if (indic_0 == 0. || indic_0 == 1.)
-        indic_1 = indic_0;
-      if (indic_1 == 0. || indic_1 == 1.)
-        indic_0 = indic_1;
-      const double indic_face = (indic_0 + indic_1) * 0.5;
-      const double x = rho_0_delta_rho - indic_face;
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
+      {
+        for (int i = 0; i < n; i++)
+          {
+            const int elem0 = face_voisins(i, 0);
+            const int elem1 = face_voisins(i, 1);
+            double indic_0 = (elem0 >= 0) ? indicatrice[elem0] : indicatrice[elem1];
+            double indic_1 = (elem1 >= 0) ? indicatrice[elem1] : indicatrice[elem0];
+            // Decentrage : si la face est adjacente a une face monophasique,
+            //  prendre la phase pure pour toute la face:
+            if (indic_0 == 0. || indic_0 == 1.)
+              indic_1 = indic_0;
+            if (indic_1 == 0. || indic_1 == 1.)
+              indic_0 = indic_1;
+            const double indic_face = (indic_0 + indic_1) * 0.5;
+            const double x = rho_0_sur_delta_rho - indic_face;
+            for (int j = 0; j < dim; j++)
+              tmp(i,j) *= x;
+          }
+        break;
+      }
+    case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE:
+      {
+        const DoubleTab& indicatrice_faces = refeq_transport.valeur().get_compute_indicatrice_faces().valeurs();
+        for (int i = 0; i < n; i++)
+          {
+            const double indic_face = indicatrice_faces(i);
+            const double x = rho_0_sur_delta_rho - indic_face;
+            for (int j = 0; j < dim; j++)
+              tmp(i,j) *= x;
+          }
+        break;
+      }
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+      {
+        const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+        // Avec changement de phase, on veut reconstruire u_vap (ie phase 0)
+        // Prise en compte du terme source div(u) du changement de phase
+        if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
+          {
+            calculer_delta_u_interface(variables_internes().vitesse_jump0_, 0,  variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
+            // u+u0 = champ de vitesse de la phase 0
+            tmp += variables_internes().vitesse_jump0_.valeurs();
+          }
+        if (Process::je_suis_maitre())
+          Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
+               << " and on the normal to the interface." << finl;
 
-      for (int j = 0; j < dim; j++)
-        tmp(i,j) *= x;
+        const DoubleTab& normale_elements = eq_transport.get_update_normale_interface().valeurs();
+        const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+        const DoubleTab& indicatrice_faces = refeq_transport.valeur().get_compute_indicatrice_faces().valeurs();
 
+#if NS_VERBOSE
+        const DoubleTab& xp = zone_vf.xp(); // centres de gravite des elements
+        const DoubleTab& xv = zone_vf.xv(); // centres de gravite des faces.
+#endif
+        // On fait la moyenne des 2 valeurs calculees sur les voisins
+        // ATTENTION, ici on veut la valeur de chiv (cad chi_0) a la face.
+        for (int face = 0; face < n; face++)
+          {
+            double indic_face = 0.;
+            int v;
+            for (v = 0; v < 2; v++)
+              {
+                const int elem = face_voisins(face, v);
+                if (elem >=0)
+                  {
+                    // If a neighbour is pure, we use that value at the face and stop further calculation.
+                    const double indic = indicatrice[elem]; // This is the value of chi_1 (ie =1 in phase 1!)
+                    //if (indic == 0. || indic == 1.)
+                    if (indic <=5e-3 || indic >= 1.-5e-3)
+                      {
+                        indic_face = 1-indic; // We want chi of phase_0
+                        break;
+                      }
+                    else
+                      {
+                        const double surface=zone_vf.face_surfaces(face);
+                        //const DoubleVect& volumes = zone_vf.volumes();
+                        const double ai= interfacial_area(elem); // nx pointe vers le liquide (sortant de phase 0)
+                        if (fabs(ai)>DMINFLOAT)
+                          {
+                            double x = 0.;
+                            if (dim>1) // dim==1 en VDF; sinon VEF
+                              {
+                                for (int j = 0; j < dim; j++)
+                                  {
+                                    const double nf = zone_vf.face_normales(face , j);
+                                    const double nx = normale_elements(elem, j);
+                                    // produit scalaire :
+                                    x +=  nf*nx;
+                                    x *= ai/surface;
+                                    // Que/comment Choisir?
+                                    indic_face += 1-x;
+                                    // indic_face += x;
+                                    Cerr << "Never tested. To be verified. It should depend on a scalar product with the vect (xp-xv)" << finl;
+                                    Process::exit();
+                                  }
+                              }
+                            else
+                              {
+                                // En VDF, l'acces a orientation permet d'eviter le calcul du produit scalaire.
+                                const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+                                const IntVect& orientation = zvdf.orientation();
+                                const int dir = orientation[face];
+                                const double nx = normale_elements(elem, dir);
+                                // Assumes a cube, nx larger than diag means we can use the method rather safely
+                                if (nx>0.707)
+                                  {
+                                    x = ai/surface*nx;
+                                    // On suppose que v0 est a gauche et v1 a droite!!!
+                                    if (v==0)
+                                      indic_face += 1-x; // This way, we build chi_0 because normale points towards chi_1
+                                    else
+                                      indic_face += x;
+                                  }
+                                else
+                                  {
+                                    // L'interface croise probablement la face d'en face et la methode ne marche plus.
+                                    // on revient a la methode classique :
+                                    indic_face += (1. - indicatrice_faces[face]);
+                                  }
+                              }
+                          }
+                        else
+                          {
+                            Cerr <<" WTF, c'est impossible" << finl;
+                            Process::exit();
+                          }
+                      }
+                  }
+                else
+                  {
+                    // The only neighbour to the face :
+                    const int elem_voisin = face_voisins(face, 1-v); // The other one is accessed by 1-v
+                    const double indic = indicatrice[elem_voisin]; // This is the value of chi_1 (ie =1 in phase 1!)
+                    indic_face = 1-indic; // We want chi of phase_0
+                    break; // c'est important pour le if d'apres.
+                  }
+
+              }
+            if (v==2)
+              // On n'a pas touche le break, on est donc passe 2 fois. donc :
+              indic_face*=0.5;
+
+            // assert((indic_face >=0) && (indic_face<=1.));
+            // ca arrive des petits derapages..
+            if (indic_face <0)
+              indic_face=0.;
+            if (indic_face >1.)
+              indic_face=1.;
+
+#if NS_VERBOSE
+            const double val = 1.-indicatrice_faces[face]; // indicatrice_faces=chi_1  whereas indic_face=chi_0 !!! Hence, the "1.-"
+            if (fabs(indic_face-val)>DMINFLOAT)
+              {
+                const int elem0 = face_voisins(face, 0);
+                const int elem1 = face_voisins(face, 1);
+                double indic_0 = (elem0 >= 0) ? indicatrice[elem0] : indicatrice[elem1];
+                double indic_1 = (elem1 >= 0) ? indicatrice[elem1] : indicatrice[elem0];
+                if (elem0>=0)
+                  Cerr << "xp0["<< elem0<< "]: " << xp(elem0, 0) << " "  << xp(elem0, 1) << " "  << finl;
+                else
+                  Cerr << "xp0: bord!" <<finl;
+                if (elem1>=0)
+                  Cerr << "xp1["<< elem1<< "]: " << xp(elem1, 0) << " "  << xp(elem1, 1) << " "  << finl;
+                else
+                  Cerr << "xp1: bord!" <<finl;
+
+                Cerr << "xv: " << xv(face, 0) << " "  << xv(face, 1) << " "  << finl;
+                Cerr << "voisins (ou ghost): " << indic_0 << " " << indic_1 << finl;
+                Cerr << "GB whats up?face="<< face <<" indic / val / diff " << indic_face << " " << val << " " << indic_face-val << finl;
+              }
+#endif
+            // chi_v * u_v_ext
+            for (int j = 0; j < dim; j++)
+              tmp(face,j) *= indic_face;
+          }
+        break;
+      }
+    default:
+      Cerr << " Navier_Stokes_FT_Disc::calculer_dI_dt \n"
+           << " unknown case?" << finl;
+      Process::exit();
     }
 
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
@@ -1687,10 +2303,210 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
   if(tab_vitesse.line_size() > 1) // i.e. VEF
     dI_dt *= dimension;
 
+#if NS_VERBOSE
+  {
+    Cerr << "[BEFORE-PCH] Locally, the maximum of dI_dt is : " << dI_dt.mp_max_abs_vect() << finl;
+    const double temps = schema_temps().temps_courant();
+    double sum = 0.;
+    for (int i=0; i< nb_elem; i++)
+      sum += dI_dt[i];
+    Cerr << "[BEFORE-PCH] " << temps << " The sum is : " << sum << " [not valid in //]" << finl;
+  }
+#endif
+
+  switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
+    {
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+      {
+        // dI_dt contains div(chi_v * u_v^ext) * vol_cell (sign to be checked!!)
+        // Integrated, this is equal to 0 or to the integral of chi_f entering or leaving the domain through boundaries...
+        // It is lacking the phase-change contribution
+#define CHECK 0
+#if CHECK
+        {
+          Cerr << "Checking if secmem2 is correctly filled in that case. Check it if you need it..." <<finl;
+          if (0) Process::exit();
+          DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+
+          //if (variables_internes().ref_equation_mpoint_.non_nul())
+          //  variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
+          //if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+          //  variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
+
+          const Fluide_Diphasique& fluide = fluide_diphasique();
+          const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
+          const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
+          const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+          const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+          const double rho_phase_0 = tab_rho_phase_0(0,0);
+          const double rho_phase_1 = tab_rho_phase_1(0,0);
+          const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
+
+          const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+          // Pas une ref, mais un tableau de travail local dans lequel on peut ajouter mointv
+          // DoubleTab mpoint = variables_internes().mpoint.valeur().valeurs();
+          DoubleTab mpoint = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
+          if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+            {
+              //const DoubleTab& mpointv = variables_internes().mpoint_vap.valeur().valeurs();
+              const DoubleTab& mpointv = variables_internes().ref_equation_mpoint_vap_.valeur().get_mpoint();
+              for (int elem = 0; elem < nb_elem; elem++)
+                mpoint[elem] += mpointv[elem];
+            }
+          for (int elem = 0; elem < nb_elem; elem++)
+            {
+              double diff = (secmem2[elem] - jump_inv_rho*interfacial_area[elem]*mpoint[elem]);
+              if (fabs(diff)>DMINFLOAT)
+                {
+                  Cerr << "Problem, secmem2 is not filled properly in that case? "
+                  << "elem= " << elem << " diff=" << diff <<finl;
+                  Process::exit();
+                }
+            }
+        }
+#endif
+        if (variables_internes().ref_equation_mpoint_.non_nul())
+          {
+            // Is it necessary to recompute them? no
+            //variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
+            const double un_sur_rho_0 =  1./rho_0;
+
+            // We can't use secmem2 because we can't undo jump_inv_rho as it may be 0. !!!
+            // DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+            const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+            // const DoubleVect& volumes = zone_vf.volumes();
+            // Pas une ref, mais un tableau de travail local dans lequel on peut ajouter mointv
+            //DoubleTab mpoint = variables_internes().mpoint.valeur().valeurs();
+            DoubleTab mpoint = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
+            if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+              {
+                // Is it necessary to recompute them? no
+                //variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
+                const DoubleTab& mpointv = variables_internes().ref_equation_mpoint_vap_.valeur().get_mpoint();
+                for (int elem = 0; elem < nb_elem; elem++)
+                  mpoint[elem] += mpointv[elem];
+              }
+            for (int elem=0; elem< nb_elem; elem++)
+              {
+                // By convention, mpoint is positive in condensation. Hence, mpoint >0 is responsible for dIv_dt < 0  => a minus sign!
+                //                But, \nabla \chi_v = -n_v \delta_i. => another minus sign!
+                //                ==> Consequently, it's a "+"
+                // Besides, ai = \int_cell delta^i dv => It's homogeneous to the integral, there's no need for an additional "*volumes[elem]"
+                //                                       It can be directly summed to the divergence computed before.
+                const double x = mpoint[elem]*interfacial_area[elem]*un_sur_rho_0;
+                dI_dt[elem] += x;
+              }
+          }
+        break;
+      }
+    default:
+      break;
+    }
+
+#if NS_VERBOSE
+  {
+    Cerr << "[AFTER-PCH] Locally, the maximum of dI_dt is : " << dI_dt.mp_max_abs_vect() << finl;
+    const double temps = schema_temps().temps_courant();
+    double sum = 0.;
+    for (int i=0; i< nb_elem; i++)
+      sum += dI_dt[i];
+    Cerr << "[AFTER-PCH] " << temps << " The sum is : " << sum << " [not valid in //]" << finl;
+  }
+#endif
+  dI_dt.echange_espace_virtuel();
 }
 
 // Description:
-//  Calcul de la derivee en temps de la vitesse.
+//  Compute in one Eulerian cell, the average of Front properties in it :
+//  normale, bary_facettes_dans_elem and surface_tot are area-weighted averages in the given cell.
+//  Warning : normale is not a UNIT vector!
+void compute_normale_barycenter_area_in_cell(const int elem,
+                                             const  Maillage_FT_Disc& mesh,
+                                             Vecteur3& normale,
+                                             Vecteur3& bary_facettes_dans_elem,
+                                             double& surface_tot)
+{
+  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
+  const IntTab& facettes = mesh.facettes();
+  const DoubleTab& sommets = mesh.sommets();
+  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
+  const DoubleTab& normale_facettes = mesh.get_update_normale_facettes();
+
+  surface_tot = 0.;
+  normale = 0.;
+  bary_facettes_dans_elem = 0.;
+  // Get the begining index defining the position in the list index_elem that contains information
+  // relative to the current element :
+  int index=intersections.index_elem()[elem];
+  if (index < 0)
+    return; // No facette in this element.
+
+  // Loop over the facettes crossing the element
+  int count = 0;
+  while (index >= 0)
+    {
+      // Accessing the structure containing all the relevant information for facette number fa7
+      // Beware, fraction_surface_intersection_ gives the fraction of the facette that is within the current element.
+      const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+      const int fa7 = data.numero_facette_;
+      const double surface_facette = surface_facettes[fa7];
+      const double surf = data.fraction_surface_intersection_ * surface_facette;
+      // We compute the (real) coordinates of barycenter of the fraction of facette within the elem
+      //    from the Barycentric Coordinates stored in data.barycentre_
+      //    (see the web for more information on Barycentric or Areal coordinates)
+      //    coord_barycentre_fraction will contain real coordinates (x,y,z) of the barycenter
+      Vecteur3 coord_barycentre_fraction(0., 0., 0.) ;
+      for (int dir = 0; dir< 3; dir++)
+        {
+          const double nx = normale_facettes(fa7,dir);
+          normale[dir] += nx * surf;
+        }
+      for (int isom = 0; isom< 3; isom++)
+        {
+          const int num_som = facettes(fa7, isom); // numero du sommet dans le tableau sommets
+          const double bary_som = data.barycentre_[isom];
+          for (int dir = 0; dir< 3; dir++)
+            coord_barycentre_fraction[dir] += bary_som * sommets(num_som,dir);
+
+        }
+      coord_barycentre_fraction *= surf;
+      surface_tot +=surf;
+      bary_facettes_dans_elem += coord_barycentre_fraction; // This is done for all the 3 components.
+
+      index = data.index_facette_suivante_;
+      count++;
+    }
+
+  if (surface_tot > 0.)
+    {
+      normale *= 1./surface_tot;
+      bary_facettes_dans_elem *= 1./surface_tot;
+    }
+  else
+    {
+      normale = 0.;
+      Cerr << " Error in compute_normale_barycenter_area_in_cell (Navier_Stokes_FT_Disc.cpp)." << finl;
+      Cerr << "The element " << elem << " only contains facettes of surface=0, so that surface_totale is zero!" << finl;
+      Cerr << "What a mess for the barycentre? ..." << finl;
+      //    assert(0);
+      Process::exit();
+      bary_facettes_dans_elem = 0.;
+    }
+#if NS_VERBOSE
+  const double norm =  normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2];
+  if (norm<0.9)
+    {
+      Cerr << " In Navier_Stokes_FT_Disc.cpp compute_normale_barycenter_area_in_cell." << finl;
+      Cerr << "Small normal : " << count << " facettes dans l'element " << elem
+           << ". surface_tot = "<< surface_tot << "Norm**2 = " << norm << finl;
+    }
+#endif
+
+}
+
+/*! @brief Calcul de la derivee en temps de la vitesse.
+ *
+ */
 DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 {
   // Preparation des champs utilises pour le calcul des derivees en temps
@@ -1840,12 +2656,129 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       //  (traitement special des CL de Dirichlet)
       if (nbdim1)
         {
+          const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
             gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
+
+          // Boussinesq Approximation in use :
+          if (variables_internes().is_boussinesq_)
+            {
+              REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+              if (!refeq_transport.non_nul())
+                {
+                  Cerr << "Trying to use Boussinesq approximation on a 2phase flow when the transport equation is not specified" << finl;
+                  Process::exit();
+                }
+              const DoubleTab& indicatrice = refeq_transport.valeur().get_update_indicatrice().valeurs();
+              const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
+
+              // First phase with temperature :
+              if (variables_internes().ref_equation_mpoint_.non_nul())
+                {
+                  const Convection_Diffusion_Temperature_FT_Disc& eq  =  variables_internes().ref_equation_mpoint_.valeur();
+                  const int phase_eq = eq.get_phase();
+                  const DoubleTab& temperature_eq = eq.inconnue().valeur().valeurs();
+                  const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
+                  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
+                  const double beta_th_phase_eq = tab_beta_th_phase_eq(0,0);
+                  if (phase_eq != 1)
+                    {
+                      Cerr << "phase " << eq.get_phase() << " is associated to the phase chi=0 whereas boussinesq approximation "
+                           << "assumes equation " << eq.le_nom() << " is associated to the indicator function chi = 1" << finl;
+                      Process::exit();
+                    }
+
+                  for (int face=0; face<n; face++)
+                    {
+                      const int elem0 = face_voisins(face, 0);
+                      const int elem1 = face_voisins(face, 1);
+                      double coef = 0.;
+                      if (elem0 >= 0)
+                        {
+                          double chi = indicatrice[elem0];
+                          double T_eq = temperature_eq[elem0];
+                          // On suppose la ref T0 egale a Tsat
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          //{
+                          // Pour les mailles monophasiques, on peut faire simplement l'hypothese que T = chi_k T_k
+                          coef = chi*T_eq * beta_th_phase_eq;
+                          //}
+                          //else
+                          //{
+                          // // Dans les mailles diphasiques, T = chi_k T_k est une hypothese discutable.
+                          // Pour les mailles diphasiques, on pourrait envisager une reconstruction plus precise de la
+                          // temperature monofluide a partir du gradient (cad de mpoint).
+                          // Neglected in first approximation.
+                          //}
+                        }
+                      if (elem1 >= 0)
+                        {
+                          double chi = indicatrice[elem1];
+                          double T_eq = temperature_eq[elem1];
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          coef += chi*T_eq * beta_th_phase_eq;
+                        }
+                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
+                        coef *= 0.5;
+                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
+                    }
+                }
+
+              // Second phase with temperature :
+              if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+                {
+                  const Convection_Diffusion_Temperature_FT_Disc& eqv =  variables_internes().ref_equation_mpoint_vap_.valeur();
+                  const int phase_eqv = eqv.get_phase();
+                  const DoubleTab& temperature_eqv = eqv.inconnue().valeur().valeurs();
+                  const Fluide_Incompressible& fluide_phase_eqv = fluide_dipha.fluide_phase(phase_eqv);
+                  const DoubleTab& tab_beta_th_phase_eqv = fluide_phase_eqv.beta_t().valeurs();
+                  const double beta_th_phase_eqv = tab_beta_th_phase_eqv(0,0);
+                  if (phase_eqv != 0)
+                    {
+                      Cerr << "phase " << eqv.get_phase() << " is associated to the phase chi=1 whereas boussinesq approximation "
+                           << "assumes equation " << eqv.le_nom() << " is associated to the indicator function chi = 0" << finl;
+                      Process::exit();
+                    }
+
+                  for (int face=0; face<n; face++)
+                    {
+                      const int elem0 = face_voisins(face, 0);
+                      const int elem1 = face_voisins(face, 1);
+                      double coef = 0.;
+                      if (elem0 >= 0)
+                        {
+                          double chi = 1.-indicatrice[elem0];
+                          double T_eqv = temperature_eqv[elem0];
+                          // On suppose la ref T0 egale a Tsat pour les 2 champs :
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          // on fait simplement l'hypothese que T = chi_k T_k
+                          coef = chi * T_eqv * beta_th_phase_eqv ;
+                          //}
+                        }
+                      if (elem1 >= 0)
+                        {
+                          double chi = 1.-indicatrice[elem1];
+                          double T_eqv  = temperature_eqv[elem1];
+                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
+                          coef += chi * T_eqv * beta_th_phase_eqv;
+                        }
+                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
+                        coef *= 0.5;
+                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
+                    }
+                }
+              // The end of boussinesq force source term.
+            }
+          // End of if nbdim1 that is VDF.
         }
       else
         {
+          if (variables_internes().is_boussinesq_)
+            {
+              Cerr << "Trying to use Boussinesq approximation on a 2phase flow in VEF? Not yet available. Ask TRUST support." << finl;
+              Process::exit();
+            }
           for (int face=0; face<n; face++)
             for (int dim=0; dim<m; dim++)
               gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
@@ -2169,6 +3102,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  prise en compte des conditions aux limites de pression/vitesse
 
   DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
+  DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+  const int nb_elem = secmem2.dimension(0);
   const double dt = schema_temps().pas_de_temps();
   const DoubleTab& inco = inconnue().valeur().valeurs();
   // secmem = div(U/dt+vpoint) = div(U(n+1)/dt)
@@ -2177,7 +3112,12 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   du += vpoint;
   divergence.calculer(du, secmem);
   secmem *= -1;
-
+#if NS_VERBOSE
+  double int_sec_mem = 0;
+  for (int elem = 0; elem < secmem.dimension(0); elem++)
+    int_sec_mem +=secmem(elem);
+  Cerr << "Secmem before tcl= " << int_sec_mem << finl;
+#endif
   // Prise en compte des sources de constituant (terme source dans une equation concentration)
   // Pour ne pas faire figurer la source deux fois, je la mets uniquement dans l'equation
   // de concentration... elle produit alors un terme source de div_u dans Navier_Stokes:
@@ -2202,58 +3142,214 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
     {
       // GB2016 : Le calcul de mpoint ci-dessous me semble inutile car il est fait au debut de calculer_delta_u_interface:
       // GB2016 : Mais si je ne le fais pas, j'ai parfois : 'vx.get_md_vector() == md' dans calculer_delta_u_interface
+
+      // GB2022 : Je ne comprend toujours pas bien pourquoi, mais il faut calculer les mpoints
+      //          pour avoir un cas FTD_Boiling_bubble avec une extension correcte
+      //          (sinon le champ postraite de T est moche dans l'extension)
       if (variables_internes().ref_equation_mpoint_.non_nul())
         variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
       if (variables_internes().ref_equation_mpoint_vap_.non_nul())
         variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
 
+      // Pas une ref, mais un tableau de travail local dans lequel on peut ajouter mointv
+      DoubleTab mpoint = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
+      if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+        {
+          const DoubleTab& mpointv = variables_internes().ref_equation_mpoint_vap_.valeur().get_mpoint();
+          for (int elem = 0; elem < nb_elem; elem++)
+            mpoint[elem] += mpointv[elem];
+        }
+      // We can compute delta_u_interface:
+      // depending on the option, either historical or new, the calculation may be based on the values filled in secmem2
       calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
 
-      const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-      const IntTab& face_voisins = zone_vf.face_voisins();
-      const IntTab& elem_faces = zone_vf.elem_faces();
-      const int   nb_faces_elem = elem_faces.line_size();
-      REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
-      const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
-      // Distance a l'interface discretisee aux elements:
-      const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
-      DoubleTab secmem2(secmem);
-      divergence.calculer(variables_internes().delta_u_interface->valeurs(), secmem2);
-      // On ne conserve que la divergence des elements traverses par l'interface
-      const int nb_elem = secmem2.dimension(0);
-      for (int elem = 0; elem < nb_elem; elem++)
+      const Fluide_Diphasique& fluide_diph = fluide_diphasique();
+      const Fluide_Incompressible& phase_0 = fluide_diph.fluide_phase(0);
+      const Fluide_Incompressible& phase_1 = fluide_diph.fluide_phase(1);
+      const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+      const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+      const double rho_phase_0 = tab_rho_phase_0(0,0);
+      const double rho_phase_1 = tab_rho_phase_1(0,0);
+      const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
+      if (variables_internes().new_mass_source_)
         {
-          const double dist = distance(elem);
-          int i_face = -1;
-          if (dist < -1e20)
+
+          const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+          for (int elem = 0; elem < nb_elem; elem++)
+            secmem2[elem] = jump_inv_rho*interfacial_area[elem]*mpoint[elem];
+        }
+      else
+        {
+          const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+          const IntTab& face_voisins = zone_vf.face_voisins();
+          const IntTab& elem_faces = zone_vf.elem_faces();
+          const int nb_faces_elem = elem_faces.line_size();
+          REF(Transport_Interfaces_FT_Disc) & refeq_transport =
+            variables_internes().ref_eq_interf_proprietes_fluide;
+          const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
+#if NS_VERBOSE
+          const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
+#endif
+          // Distance a l'interface discretisee aux elements:
+          const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
+          divergence.calculer(variables_internes().delta_u_interface->valeurs(), secmem2);
+          // On ne conserve que la divergence des elements traverses par l'interface
+          for (int elem = 0; elem < nb_elem; elem++)
             {
-              // Distance invalide: on est loin de l'interface
-              i_face = nb_faces_elem;
-            }
-          else
-            {
-              // Y a-t-il un voisin pour lequel la distance est de signe oppose
-              for (i_face = 0; i_face < nb_faces_elem; i_face++)
+              const double dist = distance(elem);
+              int i_face = -1;
+              if (dist < -1e20)
                 {
-                  const int face = elem_faces(elem, i_face);
-                  const int voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
-                  if (voisin >= 0)
+                  // Distance invalide: on est loin de l'interface
+                  i_face = nb_faces_elem;
+                }
+              else
+                {
+                  // Y a-t-il un voisin pour lequel la distance est de signe oppose
+                  for (i_face = 0; i_face < nb_faces_elem; i_face++)
                     {
-                      const double d = distance(voisin);
-                      if (d > -1e20 && d * dist < 0.)
-                        break; // Changement de signe
+                      const int face = elem_faces(elem, i_face);
+                      const int voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                      if (voisin >= 0)
+                        {
+                          const double d = distance(voisin);
+                          if (d > -1e20 && d * dist < 0.)
+                            {
+#if NS_VERBOSE
+                              Cerr << "Compa "<< secmem2[elem] << " " << jump_inv_rho*interfacial_area[elem]*mpoint[elem] << finl;
+#endif
+                              break; // Changement de signe
+                            }
+                        }
                     }
                 }
-            }
-          if (i_face == nb_faces_elem)
-            {
-              // Tous les voisins sont du meme cote de l'interface
-              secmem2(elem) = 0.;
+              if (i_face == nb_faces_elem)
+                {
+                  // Tous les voisins sont du meme cote de l'interface
+                  secmem2(elem) = 0.;
+#if NS_VERBOSE
+                  if(interfacial_area[elem]>DMINFLOAT)
+                    {
+                      Cerr << "[WARNING] secmem2 is set to zero in element whereas phase is not pure (indic= "
+                           << indicatrice[elem] << "). This is because the choice is based on the signs of distance." << finl;
+                      // Indeed, in a diagonal case, for the cell with "x", indic can be close to (but not) pure and all neighbouring
+                      // cells can still have the same distance.
+                      // __________
+                      // |  | /|  |
+                      // |__|/_|__|
+                      // | /| x|  |
+                      // |/_|__|__|
+                    }
+#endif
+                }
             }
         }
+#if TCL_MODEL
+
+      double int_sec_mem2 = 0.;
+      double int_sec_mem = 0.;
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          int_sec_mem2 +=secmem2(elem);
+          int_sec_mem +=secmem(elem);
+        }
+      //   Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl;
+      //  Cerr << "Integral of secmem before TCL and /DT : " << int_sec_mem << finl;
+
+      // Now that the correction "corriger_mpoint" is performed directly into Convection_Diffusion_Temperature_FT_Disc,
+      // it is no longer required to compute it here. The correction should propagate to calculer_delta_vitesse (in the discreete sense),
+      // and subsequently to secmem2. So that in the end, the whole TCL contribution should be accounted for naturally.
+      // However, in the discretized version, It is still required to correct secmem2 even though mpoint was corrected itself.
+      // It is because of the way secmem is computed (as the div( delta u)) that is using part of cells not crossed by the interface
+      // (in the wall-normal direction). It results in an underestimation of the real TCL contribution...
+      if (probleme_ft().tcl().is_activated())
+        {
+          Cerr << "Contact line model is activated" << finl;
+          ArrOfInt elems_with_CL_contrib;
+          ArrOfDouble mpoint_from_CL;
+          ArrOfDouble Q_from_CL;
+          // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
+          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, mpoint_from_CL, Q_from_CL);
+          // For later is they aren't passed as arguments
+          //const ArrOfInt& elems_with_CL_contrib = tcl.elems();
+          //const ArrOfDouble& mpoint_from_CL = tcl.mp();
+          //const ArrOfDouble& Q_from_CL = tcl.Q();
+
+          // Correct the field mpoint in wall-adjacent cells to account for TCL model:
+          // ---> It's done before now!
+          // DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
+          // probleme_ft().tcl().corriger_mpoint(elems_with_CL_contrib,mpoint_from_CL,mpoint);
+
+          const double Lvap = fluide_diph.chaleur_latente();
+          const double coef = jump_inv_rho/Lvap;
+          // Correct the secmem contribution due to TCL :
+          probleme_ft().tcl().corriger_secmem(coef, secmem2);
+          //  calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
+          //  divergence.calculer(variables_internes().delta_u_interface, secmem2);
+//          int_sec_mem2 = 0;
+//          int_sec_mem = 0;
+//          for (int elem = 0; elem < nb_elem; elem++)
+//            {
+//              int_sec_mem2 +=secmem2(elem);
+//              int_sec_mem +=secmem(elem);
+//            }
+//          Cerr << "Secmem2 after tcl= " << int_sec_mem2 << finl;
+//          Cerr << "Secmem after tcl= " << int_sec_mem << finl;
+          // One point to check still is that the CL contribution to mpoint (mpoint_from_CL) should gives the same secmem2 as
+          // corriger_secmem when corriger_secmem is given Q_from_CL (instead of
+          const int check_consistency = 1 ; // local option to check that secmem2 in near-wall cell is actually well calculated
+          if (check_consistency)
+            {
+              Cerr << "Verifying Contact line model consistency" << finl;
+              double error = 0.;
+              const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
+              for (int idx = 0; idx < nb_contact_line_contribution; idx++)
+                {
+                  const int elem = elems_with_CL_contrib[idx];
+                  const double sec = secmem2(elem);
+                  double Q = 0.;
+                  // Go through the list to find all occurences of elem;
+                  for (int idx2 = 0; idx2 < nb_contact_line_contribution; idx2++)
+                    {
+                      if (elem == elems_with_CL_contrib[idx2])
+                        {
+                          Q +=Q_from_CL[idx2];
+                        }
+                    }
+                  const double value = coef*Q;
+
+                  // sec and value should be the same:
+                  error +=fabs(sec - value);
+                  //    Cerr << "value = " << value << "sec= " << sec << finl;
+                  if (fabs(sec - value) > 1.e-12) // changed from 1.e-12 to 1.e-7 ---- for test
+                    {
+                      Cerr << "local difference sec-value=" << sec <<" - " << value << " = " << (sec - value) << finl;
+                    }
+                }
+
+              if (error > 1.e-7)// changed from 1.e-8 to 1.e-7 ---- for test
+                {
+                  Cerr << "Final error : " << error << " is fatal!" << finl;
+                  Process::exit();
+                }
+
+            }
+        }
+#endif
       secmem2 /= schema_temps().pas_de_temps();
       secmem += secmem2;
       secmem.echange_espace_virtuel();
+#if NS_VERBOSE
+      int_sec_mem2 = 0;
+      int_sec_mem = 0;
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          int_sec_mem2 +=secmem2(elem);
+          int_sec_mem +=secmem(elem);
+        }
+      Cerr << "Integral of secmem2 after TCL and /DT : " << int_sec_mem2 << finl;
+      Cerr << "Integral of secmem after TCL and /DT : " << int_sec_mem << finl;
+#endif
     }
 
   Champ_Fonc champ_rho_faces_modifie(champ_rho_faces_);
@@ -2318,7 +3414,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                                                 ? ref_cast(Matrice_Morse_Sym, (ref_cast(Matrice_Bloc, matrice_pression_.valeur())).get_bloc(0,0).valeur()) // VDF (1)
                                                 : ref_cast(Matrice_Morse_Sym, matrice_pression_.valeur())) ;                                              // VEF (>1)
           DoubleTab& pressu = la_pression.valeurs();
-          const int nb_elem = champ_rho_elem_.valeur().valeurs().dimension(0);
+          assert(nb_elem == champ_rho_elem_.valeur().valeurs().dimension(0));
           const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
           const Zone& ma_zone = zone_dis().zone ();
           const IntTab& elem_faces = zone_vf.elem_faces();
@@ -2491,8 +3587,9 @@ Probleme_FT_Disc_gen& Navier_Stokes_FT_Disc::probleme_ft()
   return probleme_ft_.valeur();
 }
 
-// Description:
-// In Front Tracking, pression is in Pa and so pression_pa field <=> pression field
+/*! @brief In Front Tracking, pression is in Pa and so pression_pa field <=> pression field
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_la_pression_en_pa()
 {
   la_pression_en_pa.valeurs()=la_pression.valeurs();
@@ -2507,11 +3604,13 @@ Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes()
   return *variables_internes_;
 }
 
-// Description: Si le champ de vitesse est discontinu (calcul avec changement de phase),
-//  renvoie un pointeur vers le champ delta_v de "discontinuite", tel que
-//  inconnue - delta_v = vitesse de deplacement des interfaces
-//  (voir Transport_Interfaces_FT_Disc::deplacer_maillage_v_fluide())
-//  Si pas de changement de phase, renvoie un pointeur nul.
+/*! @brief Si le champ de vitesse est discontinu (calcul avec changement de phase), renvoie un pointeur vers le champ delta_v de "discontinuite", tel que
+ *
+ *   inconnue - delta_v = vitesse de deplacement des interfaces
+ *   (voir Transport_Interfaces_FT_Disc::deplacer_maillage_v_fluide())
+ *   Si pas de changement de phase, renvoie un pointeur nul.
+ *
+ */
 const Champ_base *  Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
 {
   if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
@@ -2587,3 +3686,13 @@ int Navier_Stokes_FT_Disc::is_terme_gravite_rhog() const
   else
     return 0;
 }
+/*
+void Navier_Stokes_FT_Disc::corriger_mpoint()
+{
+  if (probleme_ft().tcl().is_activated())
+    {
+      DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
+      probleme_ft().tcl().corriger_mpoint(mpoint);
+    }
+}
+*/

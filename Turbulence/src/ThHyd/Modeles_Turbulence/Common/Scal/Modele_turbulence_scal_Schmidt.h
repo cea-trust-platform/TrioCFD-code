@@ -24,16 +24,13 @@
 
 #include <Mod_Turb_scal_diffturb_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_scal_Schmidt
-//    Cette classe represente le modele de calcul suivant
-//    pour la diffusion turbulente:
-//                  diffu_turb = visco_turb / Sc_turb;
-// .SECTION voir aussi
-//    Mod_Turb_scal_diffuturb_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Modele_turbulence_scal_Schmidt Cette classe represente le modele de calcul suivant
+ *
+ *     pour la diffusion turbulente:
+ *                   diffu_turb = visco_turb / Sc_turb;
+ *
+ * @sa Mod_Turb_scal_diffuturb_base
+ */
 class Modele_turbulence_scal_Schmidt : public Mod_Turb_scal_diffturb_base
 {
 
@@ -51,20 +48,10 @@ protected:
   Champ_Fonc& calculer_diffusion_turbulente();
 };
 
-// Description:
-//    Renvoie de la valeur du Prandtl
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: la valeur Prdt
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie de la valeur du Prandtl
+ *
+ * @return (la valeur Prdt)
+ */
 inline double Modele_turbulence_scal_Schmidt::get_Scturb() const
 {
   return LeScturb;

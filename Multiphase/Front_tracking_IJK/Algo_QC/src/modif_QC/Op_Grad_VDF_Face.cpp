@@ -59,7 +59,9 @@ Entree& Op_Grad_VDF_Face::readOn(Entree& s)
 
 
 
-// Description:
+/*! @brief 
+ *
+ */
 void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
                                 const Zone_Cl_dis& zone_Cl_dis,
                                 const Champ_Inc& )
@@ -69,7 +71,7 @@ void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
   la_zone_vdf = zvdf;
   la_zcl_vdf = zclvdf;
 
-  porosite_surf.ref(zvdf.porosite_face());
+  porosite_surf.ref(la_zcl_vdf->equation().milieu().porosite_face());
   volume_entrelaces.ref(zvdf.volumes_entrelaces());
   face_voisins.ref(zvdf.face_voisins());
   orientation.ref(zvdf.orientation());

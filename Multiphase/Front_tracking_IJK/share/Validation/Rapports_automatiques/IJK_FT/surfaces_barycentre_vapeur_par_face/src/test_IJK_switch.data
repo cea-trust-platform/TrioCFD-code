@@ -1,0 +1,57 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 48
+  nbelem_j 48
+  nbelem_k 24
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_Grid_Geometry DOM_NEW
+Lire DOM_NEW
+{
+  nbelem_i 96
+  nbelem_j 96
+  nbelem_k 48
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting_NEW
+Lire grid_splitting_NEW
+{
+  ijk_grid_geometry DOM_NEW
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+
+switch_double
+{
+   direct_write 0
+   old_ijk_splitting_ft_extension 20
+   old_ijk_splitting grid_splitting
+   new_ijk_splitting grid_splitting_NEW
+   nom_reprise    pre_run_noStats.sauv
+   nom_sauvegarde pre_run_fine.sauv
+}
+
+Fin

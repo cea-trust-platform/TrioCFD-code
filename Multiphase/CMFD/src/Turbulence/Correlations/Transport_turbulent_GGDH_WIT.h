@@ -25,14 +25,12 @@
 #include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Transport_turbulent_GGDH_WIT
-//    Transport turbulent de type GGDH pour l'equation sur WIT:
-//    < u'_i theta'> = - C_s * temps caract * <u'_i u'_j> * d_j theta
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Transport_turbulent_GGDH_WIT Transport turbulent de type GGDH pour l'equation sur WIT:
+ *
+ *     < u'_i theta'> = - C_s * temps caract * <u'_i u'_j> * d_j theta
+ *
+ *
+ */
 class Transport_turbulent_GGDH_WIT : public Transport_turbulent_base
 {
   Declare_instanciable(Transport_turbulent_GGDH_WIT);

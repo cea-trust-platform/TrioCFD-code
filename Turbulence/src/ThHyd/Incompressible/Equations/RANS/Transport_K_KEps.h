@@ -29,21 +29,18 @@
 
 class Motcle;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Transport_K_KEps
-//    Cette classe represente l'equation de transport de l'energie cinetique
-//    turbulente K et du taux de dissipation epsilon (eps) associee au modele
-//    de turbulence (k,eps) a deux couches.
-//    On traite en une seule equation le transport des deux
-//    grandeurs turbulentes. Il s'agit donc d'une equation vectorielle, dont
-//    le champ inconnue possede 2 composantes: K et epsilon.
-//    On instanciera un objet de cette classe uniquement si
-//    on utilise le modele a deux couches  pour traiter la turbulence
-// .SECTION voir aussi
-//    Equation_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Transport_K_KEps Cette classe represente l'equation de transport de l'energie cinetique
+ *
+ *     turbulente K et du taux de dissipation epsilon (eps) associee au modele
+ *     de turbulence (k,eps) a deux couches.
+ *     On traite en une seule equation le transport des deux
+ *     grandeurs turbulentes. Il s'agit donc d'une equation vectorielle, dont
+ *     le champ inconnue possede 2 composantes: K et epsilon.
+ *     On instanciera un objet de cette classe uniquement si
+ *     on utilise le modele a deux couches  pour traiter la turbulence
+ *
+ * @sa Equation_base
+ */
 class Transport_K_KEps : public Transport_K_Eps_non_std
 {
 
@@ -81,41 +78,23 @@ private:
 };
 
 
-// Description:
-//    Renvoie le nombre de couches utilisees pour le modele 1-equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre de couches
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre de couches utilisees pour le modele 1-equation.
+ *
+ * (version const)
+ *
+ * @return (int) le nombre de couches
+ */
 inline int Transport_K_KEps::get_nbcouches() const
 {
   return nb_couches;
 }
 
-// Description:
-//    Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre de couches
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
+ *
+ * (version const)
+ *
+ * @return (int) le nombre de couches
+ */
 inline int Transport_K_KEps::get_yswitch() const
 {
   return ystar_switch;
@@ -123,61 +102,34 @@ inline int Transport_K_KEps::get_yswitch() const
 
 
 
-// Description:
-//    Renvoie 0 si on choisit le switch par y*, 0 par nu_t.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie 0 si on choisit le switch par y*, 0 par nu_t.
+ *
+ * (version const)
+ *
+ * @return (int)
+ */
 inline int Transport_K_KEps::get_switch() const
 {
   return type_switch;
 }
 
-// Description:
-//    Renvoie la valeur de nut/nu qui delimite les deux couches.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: valeur limite de nu_t/nu
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la valeur de nut/nu qui delimite les deux couches.
+ *
+ * (version const)
+ *
+ * @return (int) valeur limite de nu_t/nu
+ */
 inline int Transport_K_KEps::get_nutswitch() const
 {
   return nut_switch;
 }
 
-// Description:
-//    indique si on doit ecrire la zone des 2 couches dans le .out.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: 1 si on imprime , 0 sinon.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief indique si on doit ecrire la zone des 2 couches dans le .
+ *
+ * out. (version const)
+ *
+ * @return (int) 1 si on imprime , 0 sinon.
+ */
 inline int Transport_K_KEps::get_impr() const
 {
   return impr;

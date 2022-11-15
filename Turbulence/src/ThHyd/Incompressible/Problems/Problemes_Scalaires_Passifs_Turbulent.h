@@ -16,18 +16,35 @@
 #ifndef Problemes_Scalaires_Passifs_Turbulent_inclus
 #define Problemes_Scalaires_Passifs_Turbulent_inclus
 
-#include <MacPbeqsup.h>
-
-#include <Pb_Thermohydraulique_Turbulent.h>
-#include <Pb_Thermohydraulique_Turbulent_QC.h>
-
-#include <Pb_Hydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Concentration_Turbulent.h>
+#include <Pb_Hydraulique_Concentration_Turbulent.h>
+#include <Pb_Thermohydraulique_Turbulent_QC.h>
+#include <Pb_Thermohydraulique_Turbulent.h>
+#include <TRUSTProblem_sup_eqns.h>
 
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs,Pb_Thermohydraulique_Turbulent)
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Especes_Turbulent_QC,Pb_Thermohydraulique_Turbulent_QC)
+/// \cond DO_NOT_DOCUMENT
+class Problemes_Scalaires_Passifs_Turbulent
+{ /* pour check sources */ };
+/// \endcond
 
-declare_instanciable_pb_eq_sup(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs,Pb_Hydraulique_Concentration_Turbulent)
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs,Pb_Thermohydraulique_Concentration_Turbulent)
+class Pb_Thermohydraulique_Turbulent_Scalaires_Passifs : public TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent>
+{
+  Declare_instanciable(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs);
+};
 
-#endif
+class Pb_Thermohydraulique_Especes_Turbulent_QC : public TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Turbulent_QC>
+{
+  Declare_instanciable(Pb_Thermohydraulique_Especes_Turbulent_QC);
+};
+
+class Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs : public TRUSTProblem_sup_eqns<Pb_Hydraulique_Concentration_Turbulent>
+{
+  Declare_instanciable(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs);
+};
+
+class Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs : public TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Concentration_Turbulent>
+{
+  Declare_instanciable(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs);
+};
+
+#endif /* Problemes_Scalaires_Passifs_Turbulent_inclus */

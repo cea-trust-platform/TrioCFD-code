@@ -25,42 +25,24 @@
 
 Implemente_instanciable(Loi_convforcee,"2couches_conv_forcee",Loi_2couches_base);
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Loi_convforcee::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
 
-// Description:
-//    Lit les specifications d'une equation de transport K-epsilon
-//    a partir d'un flot d'entree.
-//    Controle dynamique du type du terme source.
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'une equation de transport K-epsilon a partir d'un flot d'entree.
+ *
+ *     Controle dynamique du type du terme source.
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Loi_convforcee::readOn(Entree& s )
 {
   return s;

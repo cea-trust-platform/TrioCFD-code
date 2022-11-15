@@ -35,15 +35,13 @@
 #include <vector>
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Chouippe
-//
-// <Description of class Chouippe>
-//
-/////////////////////////////////////////////////////////////////////////////
-
-
+/*! @brief : class Chouippe
+ *
+ *  <Description of class Chouippe>
+ *
+ *
+ *
+ */
 int unidentified_function(int argc, char **argv);
 void Create_file(std::string const& fichname, std::string const& name);
 void Add_in_file(std::string const& fichname, std::string const& information);
@@ -88,7 +86,7 @@ private:
   // std::vector<double> fx(),fy(),fz();
   ArrOfDouble fx,fy,fz;
 
-  double compteur[3];
+  int compteur[3];
 };
 
 

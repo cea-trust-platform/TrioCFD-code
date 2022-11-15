@@ -28,14 +28,12 @@
 #include <LoiParoiHybride.h>
 
 
-//.DESCRIPTION
-//
-// CLASS: LoiParoiHybride_VDF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: LoiParoiHybride_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class LoiParoiHybride_VDF : public Paroi_hyd_base_VDF, LoiParoiHybride
 {
 

@@ -25,41 +25,22 @@
 Implemente_deriv(Diffu_totale_base);
 Implemente_instanciable(Diffu_totale,"Diffu_totale",DERIV(Diffu_totale_base));
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie de sauvegarde
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
-
+/*! @brief
+ *
+ * @param (Sortie& os) le flot de sortie de sauvegarde
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Diffu_totale::printOn(Sortie& os) const
 {
   return DERIV(Diffu_totale_base)::printOn(os);
 }
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture d'une equation
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot d'entree est modifie
-// Postcondition: l'equation est construite avec les elements lus.
+/*! @brief
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture d'une equation
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Diffu_totale::readOn( Entree& is)
 {
   return DERIV(Diffu_totale_base)::readOn(is);

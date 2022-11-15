@@ -35,11 +35,10 @@ Sortie& Sortie_libre_rho_variable::printOn(Sortie& os) const
   return os;
 }
 
-// Description:
-//  Renvoie la valeur de la pression imposee.
-// Parametre: i
-//  Signification: numero de la face de la cond_lim ou on cherche la pression
-//  Contrainte: 0 <= i <
+/*! @brief Renvoie la valeur de la pression imposee.
+ *
+ * @param (i) numero de la face de la cond_lim ou on cherche la pression Contrainte: 0 <= i <
+ */
 double Sortie_libre_rho_variable::flux_impose(int i) const
 {
   const DoubleTab& tab = le_champ_front.valeurs();
@@ -52,9 +51,11 @@ double Sortie_libre_rho_variable::flux_impose(int i) const
   return pimpose;
 }
 
-// Description:
-//  Idem avec plusieurs composantes... Qu'est-ce que ca peut bien
-//  vouloir dire ? L'appel a cette methode produit une erreur.
+/*! @brief Idem avec plusieurs composantes.
+ *
+ * .. Qu'est-ce que ca peut bien vouloir dire ? L'appel a cette methode produit une erreur.
+ *
+ */
 double Sortie_libre_rho_variable::flux_impose(int i, int j) const
 {
   Cerr << "Sortie_libre_rho_variable::flux_impose(int i, int j)\n ";

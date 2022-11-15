@@ -31,11 +31,9 @@
 
 class Pb_1G;
 
-//
-// .DESCRIPTION class Prolongement_identite
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_identite
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

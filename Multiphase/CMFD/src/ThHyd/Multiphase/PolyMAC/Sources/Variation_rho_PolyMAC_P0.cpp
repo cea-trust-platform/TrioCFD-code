@@ -77,7 +77,7 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
                    &rho = (*pch_rho).valeurs(),

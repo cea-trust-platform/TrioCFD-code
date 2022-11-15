@@ -25,13 +25,9 @@
 #include <Objet_U.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Loi_2couches_base
-//    Cette classe de base represente les modeles 1 equation pour le modele a deux couches.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Loi_2couches_base Cette classe de base represente les modeles 1 equation pour le modele a deux couches.
+ *
+ */
 class Loi_2couches_base : public Objet_U
 {
 

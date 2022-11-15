@@ -46,23 +46,18 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
 {
   //  Echange_contact_VDF_FT_Disc::readOn( is );
   Cerr<<"Lecture des parametres du contact (Echange_contact_VDF_FT_Disc_solid::readOn)"<<finl;
-  Nom nom_pb, nom_bord;
-  Motcle nom_champ;
   Param param("Echange_contact_VDF_FT_Disc_solid::readOn");
-  param.ajouter("autre_probleme",&nom_pb,Param::REQUIRED); // XD_ADD_P chaine name of other problem
+  param.ajouter("autre_probleme",&nom_autre_pb_,Param::REQUIRED); // XD_ADD_P chaine name of other problem
   param.ajouter("autre_bord",&nom_bord,Param::REQUIRED);  // XD_ADD_P chaine name of other boundary
   param.ajouter("autre_champ_temperature_indic1",&nom_champ,Param::REQUIRED); // XD_ADD_P chaine name of temperature indic 1
   param.ajouter("autre_champ_temperature_indic0",&nom_champ_T2_autre_pb_,Param::REQUIRED); // XD_ADD_P chaine name of temperature indic 0
   param.ajouter("autre_champ_indicatrice",&nom_champ_indicatrice_,Param::REQUIRED); // XD_ADD_P chaine name of indicatrice
   param.lire_avec_accolades(s);
 
-  nom_autre_pb_=nom_pb;
   nom_bord_oppose_=nom_bord;
   h_paroi=1e10;
   numero_T_=0;
   T_autre_pb().typer("Champ_front_calc");
-  Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
-  ch.creer(nom_pb, nom_bord, nom_champ);
   T_ext().typer("Ch_front_var_instationnaire_dep");
   T_ext()->fixer_nb_comp(1);
   return s;
@@ -133,20 +128,20 @@ void Echange_contact_VDF_FT_Disc_solid::completer()
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T2_autre_pb_.valeur());
 
 
-  Nom nom_bord=frontiere_dis().frontiere().le_nom();
+  Nom nom_bord_=frontiere_dis().frontiere().le_nom();
   Nom nom_pb=zone_Cl_dis().equation().probleme().le_nom();
   int distant=0;
   if (sub_type(Conduction,zone_Cl_dis().equation()))
     {
       nom_pb=nom_autre_pb_;
-      nom_bord=nom_bord_oppose_;
+      nom_bord_=nom_bord_oppose_;
       distant=1;
     }
   else
     {
       abort() ;
     }
-  ch.creer(nom_pb, nom_bord, nom_champ_T2_autre_pb_);
+  ch.creer(nom_pb, nom_bord_, nom_champ_T2_autre_pb_);
   ch.set_distant(distant);
 
   ch.associer_fr_dis_base(T_ext().frontiere_dis());
@@ -160,16 +155,18 @@ void Echange_contact_VDF_FT_Disc_solid::completer()
 
 
 
-// Description:
-//    Change le i-eme temps futur de la CL.
+/*! @brief Change le i-eme temps futur de la CL.
+ *
+ */
 void Echange_contact_VDF_FT_Disc_solid::changer_temps_futur(double temps,int i)
 {
   Echange_contact_VDF_FT_Disc::changer_temps_futur(temps,i);
   T2_autre_pb_->changer_temps_futur(temps,i);
 }
 
-// Description:
-//    Tourne la roue de la CL
+/*! @brief Tourne la roue de la CL
+ *
+ */
 int Echange_contact_VDF_FT_Disc_solid::avancer(double temps)
 {
   int ok=Echange_contact_VDF_FT_Disc::avancer(temps);
@@ -177,8 +174,9 @@ int Echange_contact_VDF_FT_Disc_solid::avancer(double temps)
   return ok;
 }
 
-// Description:
-//    Tourne la roue de la CL
+/*! @brief Tourne la roue de la CL
+ *
+ */
 int Echange_contact_VDF_FT_Disc_solid::reculer(double temps)
 {
   int ok=Echange_contact_VDF_FT_Disc::reculer(temps);
@@ -190,6 +188,10 @@ int Echange_contact_VDF_FT_Disc_solid::initialiser(double temps)
 {
   if (!Echange_contact_VDF_FT_Disc::initialiser(temps))
     return 0;
+
+  Champ_front_calc& cha=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+  cha.creer(nom_autre_pb_, nom_bord, nom_champ);
+
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T2_autre_pb_.valeur());
   return ch.initialiser(temps,zone_Cl_dis().equation().inconnue());
 }

@@ -24,16 +24,12 @@
 
 #include <Transport_K_Eps.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_hyd_K_Eps
-//    Cette classe represente le modele de turbulence (k,eps) pour les
-//    equations de Navier-Stokes.
-// .SECTION voir aussi
-//    Mod_turb_hyd_base Mod_turb_hyd_ss_maille
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Modele_turbulence_hyd_K_Eps Cette classe represente le modele de turbulence (k,eps) pour les
+ *
+ *     equations de Navier-Stokes.
+ *
+ * @sa Mod_turb_hyd_base Mod_turb_hyd_ss_maille
+ */
 class Modele_turbulence_hyd_K_Eps : public Mod_turb_hyd_RANS
 {
 
@@ -67,86 +63,50 @@ protected:
 };
 
 
-// Description:
-//    Renvoie le champ inconnue du modele de turbulence
-//    i.e. : (K,Epsilon). Cette inconnue est portee
-//    par l'equation de transport K-eps porte par le modele.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K,epsilon)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ inconnue du modele de turbulence i.
+ *
+ * e. : (K,Epsilon). Cette inconnue est portee
+ *     par l'equation de transport K-eps porte par le modele.
+ *     (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
 {
   return eqn_transport_K_Eps.inconnue();
 }
 
 
-// Description:
-//    Renvoie le champ inconnue du modele de turbulence
-//    i.e. : (K,Epsilon). Cette inconnue est portee
-//    par l'equation de transport K-eps porte par le modele.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K,epsilon)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ inconnue du modele de turbulence i.
+ *
+ * e. : (K,Epsilon). Cette inconnue est portee
+ *     par l'equation de transport K-eps porte par le modele.
+ *
+ * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
 {
   return eqn_transport_K_Eps.inconnue();
 }
 
-// Description:
-//    Renvoie l'equation du modele de turbulence
-//    i.e. : (K,Epsilon).
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_Eps&
-//    Signification: equation (K,epsilon)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation du modele de turbulence i.
+ *
+ * e. : (K,Epsilon).
+ *
+ * @return (Transport_K_Eps&) equation (K,epsilon)
+ */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
 {
   return eqn_transport_K_Eps;
 }
 
-// Description:
-//    Renvoie l'equation du modele de turbulence
-//    i.e. : (K,Epsilon).
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_Eps&
-//    Signification: equation (K,epsilon)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation du modele de turbulence i.
+ *
+ * e. : (K,Epsilon).
+ *     (version const)
+ *
+ * @return (Transport_K_Eps&) equation (K,epsilon)
+ */
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps() const
 {
   return eqn_transport_K_Eps;

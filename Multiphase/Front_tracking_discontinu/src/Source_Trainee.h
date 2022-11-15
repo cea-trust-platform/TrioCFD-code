@@ -25,16 +25,16 @@
 
 
 
-// .DESCRIPTION class Source_Trainee
-//
-//  Calcul de la force de trainee (expression vectorielle) :
-//  F_tr = -0.5*Cd*rho_f*(pi*dp*dp/4)*||u_p-u_f||*(u_p-u_f)
-//  Cd a une expression simplifiee :
-//  Cd = 24/Re_p avec Re_p = rho_f*||u_p-u_f||*d_p/mu_f
-//
-// .SECTION voir aussi
-//  Source_Action_Particules
-
+/*! @brief class Source_Trainee
+ *
+ *   Calcul de la force de trainee (expression vectorielle) :
+ *   F_tr = -0.5*Cd*rho_f*(pi*dp*dp/4)*||u_p-u_f||*(u_p-u_f)
+ *   Cd a une expression simplifiee :
+ *   Cd = 24/Re_p avec Re_p = rho_f*||u_p-u_f||*d_p/mu_f
+ *
+ *
+ * @sa Source_Action_Particules
+ */
 #include <Source_Action_Particules.h>
 
 

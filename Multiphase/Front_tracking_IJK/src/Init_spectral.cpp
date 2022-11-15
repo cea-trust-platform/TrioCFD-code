@@ -51,7 +51,7 @@ void compute_inital_velocity_spectral(FixedVector<IJK_Field_double, 3>& velocity
   fftw_plan plan_uy;
   fftw_plan plan_uz;
 
-  double seed = 1.0;
+  unsigned int seed = 1;
   int kmax = velocity[0].ni();
   // double kpic = 10;
   // double s = 2;

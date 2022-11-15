@@ -12,21 +12,14 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
-//
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION  class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
-//
-// Decrire ici la classe Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
-// Cette classe represente le modele de turbulence (k,eps) realisable ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
+ *
+ *  Decrire ici la classe Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
+ *  Cette classe represente le modele de turbulence (k,eps) realisable ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
+ *
+ *
+ *
+ */
 #ifndef Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 #define Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 

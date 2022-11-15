@@ -27,15 +27,12 @@
 #include <Entree_fluide_temperature_imposee.h>
 #include <Ref_Fluide_Quasi_Compressible.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Entree_fluide_temperature_imposee_H
-//    Cas particulier de la classe Entree_fluide_temperature_imposee
-//    pour une equation ayant l'enthalpie en inconnue
-// .SECTION voir aussi
-//    Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Entree_fluide_temperature_imposee_H Cas particulier de la classe Entree_fluide_temperature_imposee
+ *
+ *     pour une equation ayant l'enthalpie en inconnue
+ *
+ * @sa Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC 
+ */
 class Entree_fluide_temperature_imposee_H  : public Entree_fluide_temperature_imposee
 {
 

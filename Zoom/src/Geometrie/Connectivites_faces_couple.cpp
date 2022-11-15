@@ -65,21 +65,11 @@ void Connectivites_faces_couple::calculer_nb_facesF(Zone_VF& zone_vfG)
 
 
 
-// Description:
-//    Calcul des connectivites entre facesF et facesG
-//    Calcul du nombre de faces fines par face grossiere
-// Precondition:
-// Parametre:Zone& zoneG, Zone& zoneF
-//    Signification: zone discretisee grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: da
-// Effets de bord:
-// Postcondition: connect_elemF_elemG et connect_face_face sont remplis
+/*! @brief Calcul des connectivites entre facesF et facesG Calcul du nombre de faces fines par face grossiere
+ *
+ * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @throws da
+ */
 void Connectivites_faces_couple::calculer_connectivites(Zone_VF& zonef,
                                                         Zone_VF& zoneg,
                                                         Domaine& domg)

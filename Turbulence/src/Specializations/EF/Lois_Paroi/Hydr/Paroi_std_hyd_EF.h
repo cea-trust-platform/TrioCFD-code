@@ -36,15 +36,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_std_hyd_EF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
-
+/*! @brief CLASS: Paroi_std_hyd_EF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_std_hyd_EF : public Paroi_hyd_base_EF, public Paroi_log_QDM
 {
 
@@ -78,8 +75,11 @@ protected:
 };
 
 
-// Description: cette classe permet de specifier des options a la loi de
-// paroi standard. Elle est reservee aux experts.
+/*! @brief cette classe permet de specifier des options a la loi de paroi standard.
+ *
+ * Elle est reservee aux experts.
+ *
+ */
 class Loi_expert_hydr_EF : public Paroi_std_hyd_EF
 {
   Declare_instanciable(Loi_expert_hydr_EF);

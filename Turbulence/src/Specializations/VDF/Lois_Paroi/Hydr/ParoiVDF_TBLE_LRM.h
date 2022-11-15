@@ -38,13 +38,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Mod_echelle_LRM_base;
 
-//.DESCRIPTION
-//
-// CLASS: ParoiVDF_TBLE_LRM
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: ParoiVDF_TBLE_LRM
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class ParoiVDF_TBLE_LRM : public Paroi_hyd_base_VDF
 {
   Declare_instanciable_sans_constructeur(ParoiVDF_TBLE_LRM);

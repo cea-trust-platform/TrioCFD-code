@@ -25,14 +25,12 @@
 #include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Viscosite_turbulente_k_omega
-//    Viscosite turbulente pour un modele "k-omega" : nu_t = k / omega
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Viscosite_turbulente_k_omega Viscosite turbulente pour un modele "k-omega" : nu_t = k / omega
+ *
+ *     (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+ *
+ *
+ */
 class Viscosite_turbulente_k_omega : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_k_omega);
@@ -46,7 +44,8 @@ public:
 
 private:
   double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k / omega, 0.01 * limiter_)
-
+  double sigma_ = 1.;
+  double beta_k_ = 0.09;
 };
 
 #endif

@@ -35,40 +35,22 @@ Transport_K_ou_Eps_base::Transport_K_ou_Eps_base()
 {
   champs_compris_.ajoute_nom_compris("residu");
 }
-// Description:
-
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Transport_K_ou_Eps_base::printOn(Sortie& is) const
 {
   return is << que_suis_je() << "\n";
 
 }
 
-// Description:
-//    Simple appel a Equation_base::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Equation_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Transport_K_ou_Eps_base::readOn(Entree& is)
 {
   Equation_base::readOn(is);
@@ -141,56 +123,18 @@ void Transport_K_ou_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
     }
 }
 
-//void Transport_K_ou_Eps_base::creer_champ( const Motcle& motlu )
-//{
-//  Equation_base::creer_champ( motlu );
-//  if( motlu == "residu" )
-//    {
-//      if( !residu_.non_nul() )
-//        {
-//          const Discret_Thyd& dis=ref_cast( Discret_Thyd, discretisation() );
-//          dis.K_Eps_residu( zone_dis(), le_champ_ , residu_ );
-//          champs_compris_.ajoute_champ( residu_ );
-//        }
-//    }
-//}
-
-
-
-
-// Description:
-//    Associe un milieu physique a l'equation.
-// Precondition:
-// Parametre: Milieu_base& un_milieu
-//    Signification: le milieu physique a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un milieu physique a l'equation.
+ *
+ * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
+ */
 void Transport_K_ou_Eps_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   le_fluide =  un_milieu;
 }
-// Description:
-//    Renvoie le milieu (fluide) associe a l'equation.
-// Precondition: un milieu physique fluide doit avoir ete associe
-//               a l'equation
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le milieu (fluide) associe a l'equation
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le milieu (fluide) associe a l'equation.
+ *
+ * @return (Milieu_base&) le milieu (fluide) associe a l'equation
+ */
 Milieu_base& Transport_K_ou_Eps_base::milieu()
 {
   if(!le_fluide.non_nul())
@@ -203,22 +147,12 @@ Milieu_base& Transport_K_ou_Eps_base::milieu()
 }
 
 
-// Description:
-//    Renvoie le milieu (fluide) associe a l'equation.
-//    (version const)
-// Precondition: un milieu physique fluide doit avoir ete associe
-//               a l'equation
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le milieu (fluide) associe a l'equation
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le milieu (fluide) associe a l'equation.
+ *
+ * (version const)
+ *
+ * @return (Milieu_base&) le milieu (fluide) associe a l'equation
+ */
 const Milieu_base& Transport_K_ou_Eps_base::milieu() const
 {
   if(!le_fluide.non_nul())
@@ -237,22 +171,12 @@ void Transport_K_ou_Eps_base::associer(const Equation_base& eqn_hydr)
   Equation_base::associer_zone_dis(eqn_hydr.zone_dis());
 }
 
-// Description:
-//    Controle le champ inconnue K-epsilon en
-//    forcant a zero les valeurs du champ
-//    inferieurs a 1.e-10.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Controle le champ inconnue K-epsilon en forcant a zero les valeurs du champ
+ *
+ *     inferieurs a 1.e-10.
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Transport_K_ou_Eps_base::controler_variable()
 {
   DoubleTab& K_ou_Eps = le_champ_.valeurs();
@@ -496,8 +420,9 @@ int Transport_K_ou_Eps_base::controler_variable()
   return 1;
 }
 
-// Description:
-// on remet eps et K positifs
+/*! @brief on remet eps et K positifs
+ *
+ */
 void Transport_K_ou_Eps_base::valider_iteration()
 {
   controler_variable();

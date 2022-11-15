@@ -10,7 +10,7 @@ sed "s/Symy/Symx Symy Symz/;
 34a \# Schema_Euler_explicite sch \#
 34a 
 s/tmax 1000./tmax 15000./; 
-s/Read gravite 3 0 0 0/Read gravite 3 0 0 9.81/; 
+s/gravite Champ_Uniforme 3 0 0 0/gravite Champ_Uniforme 3 0 0 9.81/; 
 s/convection { negligeable }/convection { ef_stab { alpha 1.0 } }/; 
 s/pz1      paroi_temperature_imposee Champ_front_uniforme 1 0.0/pz1      paroi_adiabatique/;
 s/pz0      paroi_temperature_imposee Champ_front_uniforme 1 2.0/pz0      paroi_adiabatique/;

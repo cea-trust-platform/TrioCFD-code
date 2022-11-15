@@ -47,13 +47,14 @@ Sortie& Proprietes_part_vol::printOn(Sortie& os) const
   return os;
 }
 
-// Description:
-//  Lecture des proprietes sur un flot d'entree.
-//  Format de lecture :
-// -cas 1 lecture dans un fichier (motcle fichier)
-// -cas 2 specification des valeurs uniformes (motcle distribution)
-//  Appel a lire_distribution()
-
+/*! @brief Lecture des proprietes sur un flot d'entree.
+ *
+ * Format de lecture :
+ *  -cas 1 lecture dans un fichier (motcle fichier)
+ *  -cas 2 specification des valeurs uniformes (motcle distribution)
+ *   Appel a lire_distribution()
+ *
+ */
 Entree& Proprietes_part_vol::readOn(Entree& is)
 {
   Cerr << "Reading of data for the particles properties" << finl;
@@ -79,6 +80,7 @@ void Proprietes_part_vol::set_param(Param& param)
 
 int Proprietes_part_vol::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
+  int retval = 1;
   if (mot=="fichier")
     {
       Nom nomfic;
@@ -92,20 +94,14 @@ int Proprietes_part_vol::lire_motcle_non_standard(const Motcle& mot, Entree& is)
         }
       fic >> vitesse_p_ >> temperature_p_ >> masse_volumique_p_>> diametre_p_;
       nb_particules_ = vitesse_p_.dimension(0);
-      return 1;
     }
   else if (mot=="distribution")
     {
       lire_distribution(is);
-      return 1;
     }
-  else
-    {
-      Cerr << mot << " is not a keyword understood by " << que_suis_je() << " in lire_motcle_non_standard"<< finl;
-      exit();
-      return -1;
-    }
-  return 1;
+  else retval = -1;
+
+  return retval;
 }
 
 //Dimensionnement de delta_v_ et initialisation a 0

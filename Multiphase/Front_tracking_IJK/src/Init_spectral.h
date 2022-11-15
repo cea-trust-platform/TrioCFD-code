@@ -27,14 +27,13 @@
 #include <Objet_U.h>
 #include <fftw3.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Init_spectral
-//
-// <Description of class Init_spectral>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Init_spectral
+ *
+ *  <Description of class Init_spectral>
+ *
+ *
+ *
+ */
 void compute_inital_velocity_spectral(FixedVector<IJK_Field_double, 3>&);
 
 class Init_spectral : public Objet_U

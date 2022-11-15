@@ -24,14 +24,13 @@
 
 #include <Convection_Diffusion_Temperature.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Convection_Diffusion_Temperature_sensibility
-//
-// <Description of class Convection_Diffusion_Temperature_sensibility>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Convection_Diffusion_Temperature_sensibility
+ *
+ *  <Description of class Convection_Diffusion_Temperature_sensibility>
+ *
+ *
+ *
+ */
 class Convection_Diffusion_Temperature_sensibility : public Convection_Diffusion_Temperature
 {
 

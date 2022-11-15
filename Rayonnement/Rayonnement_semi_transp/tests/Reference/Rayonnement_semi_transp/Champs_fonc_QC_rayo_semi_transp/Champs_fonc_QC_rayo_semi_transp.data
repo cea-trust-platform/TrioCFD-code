@@ -2,7 +2,7 @@
 # PARALLEL OK 3 #
 dimension 3
 
-Pb_Thermohydraulique_Turbulent_QC pb
+Pb_Rayo_Thermohydraulique_Turbulent_QC pb
 
 Domaine DOM_DOM
 # BEGIN MESH #
@@ -72,15 +72,11 @@ Lire fluide
         Traitement_pth constant
 	indice Champ_Uniforme 1 1.
 	kappa Champ_Uniforme 1 10.
+	gravite Champ_Uniforme  3 0 -9.81 0
 }
-
-
-Champ_Uniforme gravite
-Lire gravite 3  0. -9.81 0.
 
 Modele_rayo_semi_transp modele_rayo
 Associate modele_rayo DOM_DOM
-Associate fluide gravite
 Associate pb DOM_DOM
 Associate pb fluide
 

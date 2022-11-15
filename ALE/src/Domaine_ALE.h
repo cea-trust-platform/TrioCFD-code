@@ -28,19 +28,16 @@
 #include <Champ_P1NC.h>
 
 class Domaine_dis;
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Domaine_ALE
-//    Cette classe est un interprete qui sert a lire l'attribut axi.
-//    Directive:
-//        Domaine_ALE
-//    Cette directive optionelle permets de faire les calculs en
-//    coordonnees cylindriques. En l'absence de cette directive les calculs
-//    se font en coordonnees cartesiennes.
-// .SECTION voir aussi
-//    Interprete Objet_U
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Domaine_ALE Cette classe est un interprete qui sert a lire l'attribut axi.
+ *
+ *     Directive:
+ *         Domaine_ALE
+ *     Cette directive optionelle permets de faire les calculs en
+ *     coordonnees cylindriques. En l'absence de cette directive les calculs
+ *     se font en coordonnees cartesiennes.
+ *
+ * @sa Interprete Objet_U
+ */
 class Domaine_ALE : public Domaine
 {
   Declare_instanciable_sans_constructeur(Domaine_ALE);

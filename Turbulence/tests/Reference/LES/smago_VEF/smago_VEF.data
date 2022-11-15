@@ -47,27 +47,25 @@ Lire sch
 	nb_pas_dt_max 10
 }
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Fonc_xyz dom 1 0.0002
-	rho Champ_Uniforme 1 2
-}
 
 
-Champ_Uniforme gravite
-Lire gravite 2 0 -9.81
 
-Associate fluide gravite
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 2 0 -9.81
+   	mu Champ_Fonc_xyz dom 1 0.0002
+   	rho Champ_Uniforme 1 2
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression GCP { precond ssor { omega 1.650000 } seuil 1.000000e-12 impr }
 		convection { muscl }
@@ -118,3 +116,4 @@ Lire pb
 
 Solve pb
 Fin
+ 

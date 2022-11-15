@@ -28,98 +28,49 @@
 Implemente_instanciable(Champ_front_zoom,"Champ_front_zoom",Ch_front_var_instationnaire_dep);
 
 
-// Description:
-//    NE FAIT RIEN
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief NE FAIT RIEN
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Champ_front_zoom::printOn(Sortie& os) const
 {
   return os;
 }
 
-// Description:
-//    Lit le nom d'un probleme multigrille, le nom d'un probleme base
-//    qui est le probleme fin et
-//    la nature des conditions limites a partir d'un flot d'entree.
-//    Cree ensuite le champ de frontiere correspondant.
-//    Format:
-//      Champ_front_zoom nom_pbMG nom_pbF nature_cond_lim
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entre
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit le nom d'un probleme multigrille, le nom d'un probleme base qui est le probleme fin et
+ *
+ *     la nature des conditions limites a partir d'un flot d'entree.
+ *     Cree ensuite le champ de frontiere correspondant.
+ *     Format:
+ *       Champ_front_zoom nom_pbMG nom_pbF nature_cond_lim
+ *
+ * @param (Entree& is) un flot d'entre
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Champ_front_zoom::readOn(Entree& is)
 {
   //Cerr << "Dans Champ_front_zoom::readOn(Entree& is) " << finl;
-  Nom nom_pbMG;
-  Nom nom_pbG;
-  Nom nom_pbF;
-  Nom bord;
-  Motcle nom_inco;
   Nom nature;
-  is >>  nom_pbMG >> nom_pbG >>  nom_pbF >> bord >> nom_inco ;
-  creer(nom_pbMG,nom_pbG,nom_pbF, bord,nom_inco);
+  is >>  nom_pbMG_ >> nom_pbG_ >>  nom_pbF_ >> bord_ >> nom_inco_ ;
+  fixer_nb_comp(1); // sinon boom !
   return is;
 }
 
-// Description:
-//    Cree l'objet Champ_front_zoom representant le prolongement
-//    de l'inconnue grossiere sur le bord fin a partir des noms:
-//         - du probleme multigrille portant le probleme a 2 grilles relatif
-//           au pbG et au pbF,portant lui-meme les connectivites
-//           necessaires au prolongement
-//         - du probleme fin
-//         - du nom de l'inconnue
-//         - de la nature des conditions limites (dirichlet ou neumann)
-// Precondition:
-// Parametre: Nom& nom_pbMG
-//    Signification: le nom du probleme MG auquel appartient le pb_2G contenant
-//                   les problemes fin et grossier, ainsi que le tableau
-//                   de connectivites
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Parametre: Nom& nom_pbF
-//    Signification: le nom du probleme fin pour lequel on veut
-//                   prendre le prolongement de l'inconnue grossiere
-//                   sur sa frontiere
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Parametre: Motcle& nom_inco
-//    Signification: le nom de l'inconnue
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Parametre: Nom& nature
-//    Signification: flag : dirichlet ou neumann
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cree l'objet Champ_front_zoom representant le prolongement de l'inconnue grossiere sur le bord fin a partir des noms:
+ *
+ *          - du probleme multigrille portant le probleme a 2 grilles relatif
+ *            au pbG et au pbF,portant lui-meme les connectivites
+ *            necessaires au prolongement
+ *          - du probleme fin
+ *          - du nom de l'inconnue
+ *          - de la nature des conditions limites (dirichlet ou neumann)
+ *
+ * @param (Nom& nom_pbMG) le nom du probleme MG auquel appartient le pb_2G contenant les problemes fin et grossier, ainsi que le tableau de connectivites
+ * @param (Nom& nom_pbF) le nom du probleme fin pour lequel on veut prendre le prolongement de l'inconnue grossiere sur sa frontiere
+ * @param (Motcle& nom_inco) le nom de l'inconnue
+ * @param (Nom& nature) flag : dirichlet ou neumann
+ */
 void Champ_front_zoom::creer(Nom& nom_pbMG,
                              Nom& nom_pbG, Nom& nom_pbF, Nom& nom_front,
                              Motcle& nom_inco)
@@ -188,20 +139,11 @@ void Champ_front_zoom::creer(Nom& nom_pbMG,
 
 
 
-// Description:
-//    Non code
-// Precondition:
-// Parametre: Champ_front_base& ch
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Retour: Champ_front_base&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Non code
+ *
+ * @param (Champ_front_base& ch)
+ * @return (Champ_front_base&)
+ */
 Champ_front_base& Champ_front_zoom::affecter_(const Champ_front_base& ch)
 {
   return *this;
@@ -210,7 +152,7 @@ Champ_front_base& Champ_front_zoom::affecter_(const Champ_front_base& ch)
 
 int Champ_front_zoom::initialiser(double temps, const Champ_Inc_base& inco)
 {
-
+  creer(nom_pbMG_,nom_pbG_,nom_pbF_, bord_,nom_inco_);
   Ch_front_var_instationnaire_dep::initialiser(temps, inco);
 
   // Dimensionnement des tableaux
@@ -228,23 +170,13 @@ int Champ_front_zoom::initialiser(double temps, const Champ_Inc_base& inco)
   return 1;
 }
 
-// Description:
-//    Mise a jour en temps du champ
-//    Cette methode effectue seulement le calcul de la derivee en
-//    temps de la CL grace a la methode GPoint : le champ est deja mis
-//    a jour par ailleurs (a proscrire!)
-// Precondition:
-// Parametre: double
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Mise a jour en temps du champ Cette methode effectue seulement le calcul de la derivee en
+ *
+ *     temps de la CL grace a la methode GPoint : le champ est deja mis
+ *     a jour par ailleurs (a proscrire!)
+ *
+ * @param (double)
+ */
 void Champ_front_zoom::mettre_a_jour(double temps)
 {
   DoubleTab& tab=valeurs_au_temps(temps);
@@ -252,20 +184,10 @@ void Champ_front_zoom::mettre_a_jour(double temps)
 }
 
 
-// Description:
-//    Renvoie le probleme fin base sur lequel on va prolonger.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Nom&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le probleme fin base sur lequel on va prolonger.
+ *
+ * @return (Nom&)
+ */
 Probleme_base& Champ_front_zoom::le_pb_fin()
 {
   return le_pb_ext_.valeur();
@@ -273,60 +195,30 @@ Probleme_base& Champ_front_zoom::le_pb_fin()
 
 
 
-// Description:
-//    Renvoie le probleme exterieur a celui concerne par ce champ_front.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Nom&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le probleme exterieur a celui concerne par ce champ_front.
+ *
+ * @return (Nom&)
+ */
 Probleme_base& Champ_front_zoom::le_pb_exterieur()
 {
   return le_pb_ext_.valeur();
 }
 
 
-// Description:
-//    Renvoie le probleme  base contenant ce champ_front.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Nom&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le probleme  base contenant ce champ_front.
+ *
+ * @return (Nom&)
+ */
 Probleme_base& Champ_front_zoom::le_pb_courant()
 {
   return le_pb_courant_.valeur();
 }
 
 
-// Description:
-//    Renvoie le probleme Multigrille sur lequel s applique le champ.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Nom&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le probleme Multigrille sur lequel s applique le champ.
+ *
+ * @return (Nom&)
+ */
 Pb_MG& Champ_front_zoom::le_pb_MG()
 {
   return le_pb_MG_.valeur();
@@ -344,22 +236,10 @@ const Champ_Inc_base& Champ_front_zoom::inconnue() const
 
 
 
-// Description:
-//    Renvoie la zone discretisee associee a l'equation
-//    qui porte le champ inconnue dont on prend la trace.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Zone_dis_base&
-//    Signification: la zone discretisee associee a l'equation
-//                   qui porte le champ inconnue dont on prend la trace
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la zone discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace.
+ *
+ * @return (Zone_dis_base&) la zone discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace
+ */
 const Zone_dis_base& Champ_front_zoom::zone_dis() const
 {
   return inconnue().zone_dis_base();
@@ -375,64 +255,30 @@ const Milieu_base& Champ_front_zoom::milieu() const
 }
 
 
-// Description:
-//    Renvoie l'equation associee au probleme exterieur.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Equation_base&
-//    Signification: l'equation associee a l'inconnue dont on prend
-//                   la trace
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation associee au probleme exterieur.
+ *
+ * @return (Equation_base&) l'equation associee a l'inconnue dont on prend la trace
+ */
 const Equation_base& Champ_front_zoom::equation() const
 {
   return inconnue().equation();
 }
-// Description:
-//    Renvoie la zone des conditions au limites discretisees
-//    portee par l'equation qui porte le champ inconnue
-//    dont on prend la trace
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Zone_Cl_dis_base&
-//    Signification: la zone des conditions au limites discretisees
-//                   portee par l'equation qui porte le champ inconnue
-//                   dont on prend la trace
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la zone des conditions au limites discretisees portee par l'equation qui porte le champ inconnue
+ *
+ *     dont on prend la trace
+ *
+ * @return (Zone_Cl_dis_base&) la zone des conditions au limites discretisees portee par l'equation qui porte le champ inconnue dont on prend la trace
+ */
 const Zone_Cl_dis_base& Champ_front_zoom::zone_Cl_dis() const
 {
   return equation().zone_Cl_dis().valeur();
 }
 
-// Description:
-//    Renvoie la frontiere discretisee correspondante
-//    au domaine sur lequel prend la trace.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Frontiere_dis_base&
-//    Signification: frontiere discretisee correspondante
-//                   au domaine sur lequel prend la trace
-//    Contraintes: reference constante
-// Exception: frontiere du nom specifie introuvable
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la frontiere discretisee correspondante au domaine sur lequel prend la trace.
+ *
+ * @return (Frontiere_dis_base&) frontiere discretisee correspondante au domaine sur lequel prend la trace
+ * @throws frontiere du nom specifie introuvable
+ */
 const Frontiere_dis_base& Champ_front_zoom::front_dis_exterieure() const
 {
   //Cerr << "Dans Champ_front_zoom frontiere dis " << finl;

@@ -62,29 +62,27 @@ solveur implicite { solveur gmres { diag seuil -1 nb_it_max 5 }
 facsec 5
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 	1 1.e-4
- 	rho Champ_Uniforme 	1 6.
-        lambda Champ_Uniforme	1 4.e-2
-	Cp Champ_Uniforme	1 4000.
-	beta_th Champ_Uniforme	1 0.
-}
 
-Champ_Uniforme gravite
-Read gravite 3 0. -9.81 0.
-Associate fluide gravite
 
 Associate pb dom
 Associate pb sch
-Associate pb fluide
 
 Discretize pb dis
 
 Read pb
 {
-	Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0. -9.81 0.
+   	mu Champ_Uniforme 	1 1.e-4
+    	rho Champ_Uniforme 	1 6.
+           lambda Champ_Uniforme	1 4.e-2
+   	Cp Champ_Uniforme	1 4000.
+   	beta_th Champ_Uniforme	1 0.
+   }
+   
+   	Navier_Stokes_Turbulent
 	{
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 }	
 		convection { muscl }
@@ -217,3 +215,4 @@ sortie   frontiere_ouverte K_EPS_EXT champ_front_uniforme 2 1.e-2 1.e-1
 
 sources { Puissance_thermique Champ_Uniforme 1 10. }
 reprise formatte LP_K_EPS_pb.sauv
+ 

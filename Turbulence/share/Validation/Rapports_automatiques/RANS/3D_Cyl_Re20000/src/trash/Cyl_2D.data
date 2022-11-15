@@ -50,20 +50,19 @@ Read mon_schema
 }
 
 # Je definis un milieu #
-Fluide_Incompressible milieu
-Read milieu
-{
-	mu  Champ_Uniforme 1 1.29e-3
-	rho Champ_Uniforme 1 1000
-}
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb milieu
 Discretize pb ma_discretisation
 Read pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu  Champ_Uniforme 1 1.29e-3
+   	rho Champ_Uniforme 1 1000
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		solveur_pression petsc cholesky { } 
 		convection { ef_stab { alpha 0.2 } }
@@ -115,3 +114,4 @@ Read pb
 	}
 }
 Solve pb
+ 

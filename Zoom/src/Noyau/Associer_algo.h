@@ -30,15 +30,12 @@
 #include <Pb_MG.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Associer_algo
-//     Interprete qui associe deux objets obj1 et obj2:
-//     [DANS LE JEU DE DONNEES] Associer_algo ob1 ob2
-// .SECTION voir aussi
-//     Interprete
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Associer_algo Interprete qui associe deux objets obj1 et obj2:
+ *
+ *      [DANS LE JEU DE DONNEES] Associer_algo ob1 ob2
+ *
+ * @sa Interprete
+ */
 class Associer_algo : public Interprete
 {
   Declare_instanciable(Associer_algo);

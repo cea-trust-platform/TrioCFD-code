@@ -31,11 +31,9 @@
 #include <Restriction_base.h>
 
 
-//
-// .DESCRIPTION class Restriction_elem_elem_2
-//
-// .SECTION voir aussi
-
+/*! @brief class Restriction_elem_elem_2
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

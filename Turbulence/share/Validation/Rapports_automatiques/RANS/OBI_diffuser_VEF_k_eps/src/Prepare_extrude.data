@@ -49,21 +49,20 @@ Read sch
 	}
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 5.7e-5
-	rho Champ_Uniforme 1 1.
-}
 
 Associate pb REC_2D
-Associate pb fluide
 Associate pb sch
 Discretize pb dis
 
 Read pb
 {
-        Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 5.7e-5
+   	rho Champ_Uniforme 1 1.
+   }
+   
+           Navier_Stokes_turbulent
         {
           solveur_pression Cholesky { }
                 convection { EF_stab { alpha 0.2 } }
@@ -135,3 +134,4 @@ Read pb
 Solve pb
 End
 
+ 

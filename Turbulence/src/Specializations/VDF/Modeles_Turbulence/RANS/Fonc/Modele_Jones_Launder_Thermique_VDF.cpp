@@ -90,7 +90,7 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Zone_
   const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   D = 0;
   //  const DoubleVect& volumes = la_zone.volumes();
-  const DoubleVect& porosite_surf = la_zone.porosite_face();
+  const DoubleVect& porosite_surf = zone_Cl_dis->equation().milieu().porosite_face();
   const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
   //  int nb_elem = la_zone.nb_elem();
   //  int nb_elem_tot = la_zone.nb_elem_tot();
@@ -179,7 +179,7 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_E(DoubleTab& E,const Zone_
   const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   E = 0;
   const DoubleVect& volumes = la_zone.volumes();
-  //  const DoubleVect& porosite_vol = la_zone.porosite_elem();
+  //  const DoubleVect& porosite_vol = la_equation().milieu().porosite_elem();
 
   int nb_elem = la_zone.nb_elem();
   int nb_elem_tot = la_zone.nb_elem_tot();

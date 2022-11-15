@@ -150,7 +150,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   int face;
   const IntTab& face_voisins = zone_VDF.face_voisins();
   uteta_T = 0;
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
   // on calcul tout d'abord le gradient de temperature par faces.
   // Traitement des faces internes
 
@@ -450,7 +450,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   int nb_elem = zone_VDF.nb_elem();
   int nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT
@@ -519,7 +519,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   int nb_elem = zone_VDF.nb_elem();
   int nb_faces= zone_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
   //                                      ---->
   // On note u_teta le vecteur alpha_turb.gradT
@@ -592,7 +592,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_Flux_Chaleur = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re,le_modele_scalaire);
   const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
+  const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite_->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();

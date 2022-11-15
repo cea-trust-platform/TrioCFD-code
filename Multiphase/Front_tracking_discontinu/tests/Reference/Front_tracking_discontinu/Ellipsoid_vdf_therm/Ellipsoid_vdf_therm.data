@@ -89,12 +89,9 @@ Lire fluide
    rho      Champ_Uniforme 1 2596.0
    mu       champ_fonc_fonction pb temperature 1 0.001*(val-1400.0)+7.9
    Cp       Champ_Uniforme 1 1500.0
+    gravite Champ_Uniforme 3 0. 0. -9.81
    lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. -9.81
-Associate fluide gravite
 
 Navier_Stokes_FT_Disc eq_hydraulique
 Transport_Interfaces_FT_Disc agit

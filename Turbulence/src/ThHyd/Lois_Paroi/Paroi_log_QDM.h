@@ -31,10 +31,9 @@
 
 class Param;
 
-//.DESCRIPTION
-// Classe rassemblant les specificites d une loi logarithmique
-//
-
+/*! @brief Classe rassemblant les specificites d une loi logarithmique
+ *
+ */
 class Paroi_log_QDM
 {
 public:

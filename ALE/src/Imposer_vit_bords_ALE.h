@@ -25,17 +25,14 @@
 
 #include <Interprete_geometrique_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Imposer_vit_bords_ALE
-//     Discretise un probleme:
-//     {DANS LE JEU DE DONNEES] Imposer_vit_bords_ALE pb dis
-//     Discretise le probleme "pb" avec la discretisation "dis"
-//     ou "dis" est une Discretisation_base VEF pour le moment.
-// .SECTION voir aussi
-//     Interprete Discretisation_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Imposer_vit_bords_ALE Discretise un probleme:
+ *
+ *      {DANS LE JEU DE DONNEES] Imposer_vit_bords_ALE pb dis
+ *      Discretise le probleme "pb" avec la discretisation "dis"
+ *      ou "dis" est une Discretisation_base VEF pour le moment.
+ *
+ * @sa Interprete Discretisation_base
+ */
 class Imposer_vit_bords_ALE : public Interprete_geometrique_base
 {
   Declare_instanciable(Imposer_vit_bords_ALE);

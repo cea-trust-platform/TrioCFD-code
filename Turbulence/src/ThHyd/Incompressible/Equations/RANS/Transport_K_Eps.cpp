@@ -34,20 +34,11 @@
 
 Implemente_instanciable(Transport_K_Eps,"Transport_K_Eps",Transport_K_Eps_base);
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Transport_K_Eps::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
@@ -61,22 +52,13 @@ void Transport_K_Eps::set_param(Param& param)
   param.dictionnaire("yes",1);
 }
 
-// Description:
-//    Lit les specifications d'une equation de transport K-epsilon
-//    a partir d'un flot d'entree.
-//    Controle dynamique du type du terme source.
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'une equation de transport K-epsilon a partir d'un flot d'entree.
+ *
+ *     Controle dynamique du type du terme source.
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Transport_K_Eps::readOn(Entree& s )
 {
   with_nu_=0;
@@ -169,20 +151,10 @@ int Transport_K_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return 1;
 }
 
-// Description:
-//    Associe un modele de turbulence K-epsilon a l'equation.
-// Precondition:
-// Parametre: Modele_turbulence_hyd_K_Eps& modele
-//    Signification: le modele de turbulence K-epsilon a asoocier a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation a un modele de turbulence associe
+/*! @brief Associe un modele de turbulence K-epsilon a l'equation.
+ *
+ * @param (Modele_turbulence_hyd_K_Eps& modele) le modele de turbulence K-epsilon a asoocier a l'equation
+ */
 void Transport_K_Eps::associer_modele_turbulence(const Mod_turb_hyd_RANS& modele)
 {
   const Equation_base& eqn_hydr = modele.equation();
@@ -193,44 +165,27 @@ void Transport_K_Eps::associer_modele_turbulence(const Mod_turb_hyd_RANS& modele
   discretiser();
 }
 
-// Description:
-//    Renvoie le nombre d'operateurs de l'equation.
-//    Ici 2.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre d'operateurs de l'equation
-//    Contraintes: toujours egal a 2
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre d'operateurs de l'equation.
+ *
+ * Ici 2.
+ *
+ * @return (int) le nombre d'operateurs de l'equation
+ */
 int Transport_K_Eps::nombre_d_operateurs() const
 {
   return 2;
 }
 
-// Description:
-//    Renvoie l'operateur specifie par son index:
-//     renvoie terme_diffusif si i = 0
-//     renvoie terme_convectif si i = 1
-//     exit si i>1
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur specifie
-//    Contraintes: reference constante
-// Exception: l'equation n'a pas plus de 2 operateurs
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+ *
+ *      renvoie terme_convectif si i = 1
+ *      exit si i>1
+ *     (version const)
+ *
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur specifie
+ * @throws l'equation n'a pas plus de 2 operateurs
+ */
 const Operateur& Transport_K_Eps::operateur(int i) const
 {
   switch(i)
@@ -249,23 +204,15 @@ const Operateur& Transport_K_Eps::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-//    Renvoie l'operateur specifie par son index:
-//     renvoie terme_diffusif si i = 0
-//     renvoie terme_convectif si i = 1
-//     exit si i>1
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur specifie
-//    Contraintes:
-// Exception: l'equation n'a pas plus de 2 operateurs
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+ *
+ *      renvoie terme_convectif si i = 1
+ *      exit si i>1
+ *
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur specifie
+ * @throws l'equation n'a pas plus de 2 operateurs
+ */
 Operateur& Transport_K_Eps::operateur(int i)
 {
   switch(i)
@@ -285,21 +232,12 @@ Operateur& Transport_K_Eps::operateur(int i)
 }
 
 
-// Description:
-//    Renvoie le nom du domaine d'application de l'equation.
-//    Ici "Transport_Keps".
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Motcle&
-//    Signification: le nom du domaine d'application de l'equation
-//    Contraintes: toujours egal a "Transport_Keps"
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nom du domaine d'application de l'equation.
+ *
+ * Ici "Transport_Keps".
+ *
+ * @return (Motcle&) le nom du domaine d'application de l'equation
+ */
 const Motcle& Transport_K_Eps::domaine_application() const
 {
   static Motcle domaine = "Transport_Keps";

@@ -30,19 +30,16 @@
 class Champ_Fonc;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Pb_Hydraulique_Concentration_Turbulent
-//    Cette classe represente un probleme d'hydraulique avec transport
-//    de constituants (1 ou plusieurs) et avec modelisation de la turbulence:
-//     - Equations de Navier_Stokes en regime turbulent
-//       pour un fluide incompressible
-//     - Equation de Convection-Diffusion d'une ou plusieurs concentrations
-//       en regime turbulent
-// .SECTION voir aussi
-//      Pb_Fluide_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Pb_Hydraulique_Concentration_Turbulent Cette classe represente un probleme d'hydraulique avec transport
+ *
+ *     de constituants (1 ou plusieurs) et avec modelisation de la turbulence:
+ *      - Equations de Navier_Stokes en regime turbulent
+ *        pour un fluide incompressible
+ *      - Equation de Convection-Diffusion d'une ou plusieurs concentrations
+ *        en regime turbulent
+ *
+ * @sa Pb_Fluide_base
+ */
 class Pb_Hydraulique_Concentration_Turbulent : public Pb_Fluide_base
 {
 
@@ -65,20 +62,10 @@ protected:
 };
 
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la viscosite turbulente.
+ *
+ * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ */
 inline const Champ_Fonc& Pb_Hydraulique_Concentration_Turbulent::viscosite_turbulente() const
 {
   return eq_hydraulique.viscosite_turbulente();

@@ -14,7 +14,10 @@ Pb_Thermohydraulique_Turbulent pb
 Domaine dom
 
 # DEBUT MAILLAGE #
-read_MED short_family_names dom domain_mesh res_domain_mesh_80_pl_mesh_1.med
+Lire_MED { 
+   domain dom 
+   file res_domain_mesh_80_pl_mesh_1.med 
+}
 
 regroupebord dom Wall { TOP BOTTOM }
 regroupebord dom Postpro { IN OUT }
@@ -66,26 +69,25 @@ Read sch
 }
 
 
-Fluide_Incompressible fluid
 
-Read fluid
-{
-    mu  Champ_Uniforme 1 1.812e-5
-    rho Champ_Uniforme 1 1.208
-    lambda  Champ_Uniforme 1 1.0e-3
-    Cp      Champ_Uniforme 1 1000.0
-    beta_th Champ_Uniforme 1 1.0e-3
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb fluid
 
 Discretiser pb dis
 
 Read pb
 {
-    Navier_Stokes_Turbulent
+   
+   fluide_incompressible {
+        mu  Champ_Uniforme 1 1.812e-5
+       rho Champ_Uniforme 1 1.208
+       lambda  Champ_Uniforme 1 1.0e-3
+       Cp      Champ_Uniforme 1 1000.0
+       beta_th Champ_Uniforme 1 1.0e-3
+   }
+   
+       Navier_Stokes_Turbulent
     {
         modele_turbulence combinaison {
                 nb_var 0
@@ -105,8 +107,16 @@ Read pb
         {
 	Source_PDF
             {
-                aire Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh aire elem 0.
-                rotation Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh rotation elem 0.
+                aire Champ_Fonc_MED { domain domain_mesh 
+                                      file res_domain_mesh_80_pl_mesh_1.med 
+                                      field aire 
+                                      last_time 
+                                      }
+                rotation Champ_Fonc_MED { domain domain_mesh 
+                                          file res_domain_mesh_80_pl_mesh_1.med 
+                                          field rotation 
+                                          last_time 
+                                          }
                 modele
                 {
                     eta 1.0e-12
@@ -114,10 +124,29 @@ Read pb
                 }
                 interpolation Interpolation_IBM_power_law_tbl
                 {
-                    points_fluides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh projection_Fluid som 0.
-                    points_solides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh projection_Solid som 0.
-                    elements_fluides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh fl_elem_number som 0.
-                    correspondance_elements Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh TRUST_SALOME_correspondance elem 0.
+                    points_fluides Champ_Fonc_MED { domain domain_mesh 
+                                                    file res_domain_mesh_80_pl_mesh_1.med 
+                                                    field projection_Fluid 
+                                                    loc som 
+                                                    last_time 
+                                                    }
+                    points_solides Champ_Fonc_MED { domain domain_mesh 
+                                                    file res_domain_mesh_80_pl_mesh_1.med 
+                                                    field projection_Solid 
+                                                    loc som 
+                                                    last_time 
+                                                    }
+                    elements_fluides Champ_Fonc_MED { domain domain_mesh 
+                                                      file res_domain_mesh_80_pl_mesh_1.med 
+                                                      field fl_elem_number 
+                                                      loc som 
+                                                      last_time 
+                                                      }
+                    correspondance_elements Champ_Fonc_MED { domain domain_mesh 
+                                                             file res_domain_mesh_80_pl_mesh_1.med 
+                                                             field TRUST_SALOME_correspondance 
+                                                             last_time 
+                                                             }
 		    impr
                 }
             } 
@@ -176,3 +205,4 @@ Read pb
 }
 resoudre pb
 fin
+ 

@@ -25,14 +25,12 @@
 #include <Source_base.h>
 #include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Correction_Lubchenko_PolyMAC_P0
-//      Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Correction_Lubchenko_PolyMAC_P0 Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
+ *
+ *
+ *
+ *
+ */
 class Correction_Lubchenko_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Correction_Lubchenko_PolyMAC_P0);
@@ -50,10 +48,15 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
+  void ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+  void ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+
   int n_l = -1; //phase liquide
   int is_turb = 0;
   REF(Correlation) correlation_lift_;
   REF(Correlation) correlation_dispersion_;
+  double beta_lift_ =  1. ; // To adjust the force in .data
+  double beta_disp_ =  1. ; // To adjust the force in .data
 };
 
 #endif

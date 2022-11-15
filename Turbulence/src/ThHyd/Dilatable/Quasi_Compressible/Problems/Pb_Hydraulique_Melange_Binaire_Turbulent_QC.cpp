@@ -33,13 +33,14 @@ Sortie& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::printOn(Sortie& os) const {
 
 Entree& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-// Description:
-//    Renvoie 2 car il y a 2 equations : Navier_Stokes_Turbulent_QC et Convection_Diffusion_Espece_Binaire_Turbulent_QC
+/*! @brief Renvoie 2 car il y a 2 equations : Navier_Stokes_Turbulent_QC et Convection_Diffusion_Espece_Binaire_Turbulent_QC
+ *
+ */
 int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::nombre_d_equations() const { return 2; }
 
-// Description:
-//    Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent_QC si i=0
-//    Renvoie l'equation de conv/diff fraction massique de type Convection_Diffusion_Espece_Binaire_Turbulent_QC si i=1
+/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent_QC si i=0 Renvoie l'equation de conv/diff fraction massique de type Convection_Diffusion_Espece_Binaire_Turbulent_QC si i=1
+ *
+ */
 const Equation_base& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::equation(int i) const
 {
   return equation_impl(i,eq_hydraulique,eq_frac_mass);
@@ -50,9 +51,11 @@ Equation_base& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::equation(int i)
   return equation_impl(i,eq_hydraulique,eq_frac_mass);
 }
 
-// Description:
-//    Teste la compatibilite des equations de la fraction massique et de l'hydraulique.
-//    Teste la compatibilite des modeles de turbulence
+/*! @brief Teste la compatibilite des equations de la fraction massique et de l'hydraulique.
+ *
+ * Teste la compatibilite des modeles de turbulence
+ *
+ */
 int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
 {
   const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();

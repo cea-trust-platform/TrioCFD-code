@@ -43,21 +43,9 @@ Entree& Restriction_face_face::readOn(Entree& s )
 
 
 
-// Description:
-//    calcul du nombre de faces fines dont l'elem contient le centre
-//    de gravite pour chaque face grossiere
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief calcul du nombre de faces fines dont l'elem contient le centre de gravite pour chaque face grossiere
+ *
+ */
 void Restriction_face_face::calculer(const Zone_VF& zone_VFG,
                                      const Zone_VF& zone_VFF,
                                      const IntVect& connect)
@@ -186,23 +174,12 @@ void Restriction_face_face::calculer(const Zone_VF& zone_VFG,
 
 
 
-// Description:
-//    Restriction de l'inconnue fine sur le domaine grossier
-//    pour inconnue TEMPERATURE
-//    en VDF-VEF pour T du domG,
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Restriction de l'inconnue fine sur le domaine grossier pour inconnue TEMPERATURE
+ *
+ *     en VDF-VEF pour T du domG,
+ *     car valeur
+ *
+ */
 void Restriction_face_face::restreindre(const Zone_VF& zone_VFG,
                                         const Zone_VF& zone_VFF,
                                         const IntVect& connect,

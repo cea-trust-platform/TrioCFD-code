@@ -26,23 +26,23 @@
 
 #include <Op_Conv_VEF_Face.h>
 
-//
-// .DESCRIPTION class Op_Conv_RT_VEF_Face
-//
-//  Cette classe represente l'operateur de convection associe a une equation de
-//  transport d'un scalaire.
-//  La discretisation est VEF
-//  Le champ convecte est scalaire ou vecteur de type Champ_P1NC
-//  Le schema de convection est du type RT
-
-//
-// .SECTION voir aussi
-// Operateur_Conv_base
-
-
+/*! @brief class Op_Conv_RT_VEF_Face
+ *
+ *   Cette classe represente l'operateur de convection associe a une equation de
+ *   transport d'un scalaire.
+ *   La discretisation est VEF
+ *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
+ *   Le schema de convection est du type RT
+ *
+ *
+ * @sa Operateur_Conv_base
+ */
 class Op_Conv_RT_VEF_Face : public Op_Conv_VEF_Face
 {
   Declare_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face);
+public:
+  DoubleTab& ajouter(const DoubleTab& transporte, DoubleTab& resu) const override;
+  void ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const override;
 };
 
 

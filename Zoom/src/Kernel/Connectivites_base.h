@@ -28,11 +28,9 @@
 #include <TRUSTVect.h>
 class Zone_VF;
 class Domaine;
-//
-// .DESCRIPTION class Connectivites_base
-//
-// .SECTION voir aussi
-
+/*! @brief class Connectivites_base
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

@@ -67,29 +67,27 @@ Lire sch
 	facsec_max 100
 }
 
-Fluide_incompressible He
-Lire He
-{
-	mu	champ_uniforme 1 4.46437e-05
-	rho	champ_uniforme 1 4.40684
-	lambda	champ_uniforme 1 0.344964
-	Cp	champ_uniforme 1 5193
-	beta_th	champ_uniforme 1 0.0014285714
-}
 
-Champ_uniforme gravite
-Lire gravite 3 0 0 0
 
-Associer He gravite
 Associer pb dom
-Associer pb He
 Associer pb sch
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_turbulent
+   
+   fluide_incompressible {
+   
+        gravite champ_uniforme 3 0 0 0
+   	mu	champ_uniforme 1 4.46437e-05
+   	rho	champ_uniforme 1 4.40684
+   	lambda	champ_uniforme 1 0.344964
+   	Cp	champ_uniforme 1 5193
+   	beta_th	champ_uniforme 1 0.0014285714
+   }
+   
+   	Navier_Stokes_turbulent
 	{
 		Solveur_pression	petsc Cholesky { }
 		Convection		{ negligeable }
@@ -147,3 +145,4 @@ Lire pb
 
 Resoudre pb
 Fin
+ 

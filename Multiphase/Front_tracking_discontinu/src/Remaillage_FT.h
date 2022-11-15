@@ -35,13 +35,12 @@ class Param;
 // POUR DEBUGGER LA CONSERVATION DU VOLUME
 #define DEBUG_CONSERV_VOLUME 0
 
-// ====================================================================
-// .DESCRIPTION        : class Remaillage_FT
-//  Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
-//
-// .SECTION voir aussi
-//  Transport_Interfaces_FT_Disc Maillage_FT_Disc
-
+/*! @brief : class Remaillage_FT Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
+ *
+ *
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
+ */
 class Remaillage_FT : public Objet_U
 {
   Declare_instanciable_sans_constructeur(Remaillage_FT);
@@ -81,6 +80,10 @@ public:
                                     const double coeff,
                                     ArrOfDouble& dvolume) const;
 
+  int get_nb_iter_bary_volume_seul()
+  {
+    return nb_iter_bary_volume_seul_;
+  };
 #if DEBUG_CONSERV_VOLUME
   double calculer_volume_mesh(const Maillage_FT_Disc& mesh) const;
   double calculer_somme_dvolume(const Maillage_FT_Disc&, const ArrOfDouble&) const;
@@ -108,8 +111,8 @@ protected:
                                             DoubleTab& barycentres) const;
 
   int calculer_connectivites_sommetFacettes(const Maillage_FT_Disc& maillage,ArrOfInt& fa7VoisinesSom_index, IntTab& fa7VoisinesSom_data) const;
+  // Used by IJK only:
   int calculer_correction_deplacement(DoubleTab& deplacement,const ArrOfDouble& varVolume,const DoubleTab& deplacement_varVolume, const ArrOfDouble& norme2_deplacement_varVolume) const;
-
   int calculer_differentielle_volume(const Maillage_FT_Disc& maillage,
                                      DoubleTab& differentielle_volume) const;
 

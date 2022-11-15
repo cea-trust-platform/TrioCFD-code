@@ -26,17 +26,16 @@
 #include <Maillage_FT_Disc.h>
 #include <Linear_algebra_tools.h>
 #include <IJK_Splitting.h>
-#include <FloatTab.h>
+#include <TRUSTTab.h>
 class Zone_dis;
 class Parcours_interface;
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : Maillage_FT_IJK
-// .DESCRIPTION : class Maillage_FT_IJK
-//
-// <Description of class Maillage_FT_IJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Maillage_FT_IJK
+ *
+ *  <Description of class Maillage_FT_IJK>
+ *
+ *
+ *
+ */
 class Maillage_FT_IJK : public Maillage_FT_Disc
 {
 

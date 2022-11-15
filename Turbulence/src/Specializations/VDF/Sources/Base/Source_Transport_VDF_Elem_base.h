@@ -22,82 +22,41 @@
 #ifndef Source_Transport_VDF_Elem_base_included
 #define Source_Transport_VDF_Elem_base_included
 
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Calcul_Production_K_VDF.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Equation_base.h>
+#include <Source_Transport_proto.h>
 #include <Ref_Zone_Cl_VDF.h>
 #include <Ref_Zone_VDF.h>
-#include <Source_base.h>
+#include <Zone_Cl_VDF.h>
 #include <Zone_VDF.h>
 
-class Modele_Fonc_Bas_Reynolds;
-class Probleme_base;
-class Zone_Cl_dis;
-class Zone_dis;
-
-class Source_Transport_VDF_Elem_base : public Source_base, public Calcul_Production_K_VDF
+class Source_Transport_VDF_Elem_base : public Source_base, public Calcul_Production_K_VDF, public Source_Transport_proto
 {
   Declare_base_sans_constructeur( Source_Transport_VDF_Elem_base );
 public :
   Source_Transport_VDF_Elem_base() { }
-  Source_Transport_VDF_Elem_base(double cs1, double cs2) : C1(cs2), C2(cs2) { }
+  Source_Transport_VDF_Elem_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
+
   DoubleTab& calculer(DoubleTab& ) const override;
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
   inline int has_interface_blocs() const override { return 1; }
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override {}
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override= 0; // XXX XXX XXX Elie Saikali : like that !!
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override = 0; // XXX XXX XXX Elie Saikali : like that !!
 
   inline void mettre_a_jour(double t)  override { Calcul_Production_K_VDF::mettre_a_jour(t); }
 
 protected :
-  static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
-
-  // pour les classes derivees
-  Entree& readOn_nothing(Entree& is);
-  void verifier_pb_keps(const Probleme_base&, const Nom& );
   DoubleTab& ajouter_keps(DoubleTab& ) const;
-
-  double C1 = C1__, C2 = C2__;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  REF(Equation_base) eq_hydraulique;
-
-  // pour les classes anisotherme
-  Entree& readOn_anisotherme(Entree& is);
-  void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& );
-  void verifier_milieu_anisotherme(const Probleme_base&, const Nom& );
-  void associer_pb_anisotherme(const Probleme_base& );
   DoubleTab& ajouter_anisotherme(DoubleTab& ) const;
-
-  double C3 = C3__;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-
-  // pour les classes concen
-  Entree& readOn_concen(Entree& is);
-  void verifier_pb_keps_concen(const Probleme_base&, const Nom& );
-  void verifier_milieu_concen(const Probleme_base&, const Nom& );
-  void associer_pb_concen(const Probleme_base& );
   DoubleTab& ajouter_concen(DoubleTab& ) const;
-
-  REF(Champ_Don) beta_c;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-
-  // pour les classes anisotherme_concen
-  Entree& readOn_anisotherme_concen(Entree& is);
-  void verifier_pb_keps_anisotherme_concen(const Probleme_base&, const Nom& );
-  void verifier_milieu_anisotherme_concen(const Probleme_base&, const Nom& );
-  void associer_pb_anisotherme_concen(const Probleme_base& );
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
+  REF(Zone_VDF) la_zone_VDF;
+  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+
 private:
-  void verifier_beta_concen(const  Fluide_base&);
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const { return not_implemented<Modele_Fonc_Bas_Reynolds&>(__func__); }

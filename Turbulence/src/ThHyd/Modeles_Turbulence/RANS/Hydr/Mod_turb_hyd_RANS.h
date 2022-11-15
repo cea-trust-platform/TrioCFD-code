@@ -29,14 +29,10 @@ class Equation_base;
 class Transport_K_Eps_base;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_turb_hyd_RANS
-//    Classe de base des modeles de type RANS
-// .SECTION voir aussi
-//    Mod_turb_hyd_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_turb_hyd_RANS Classe de base des modeles de type RANS
+ *
+ * @sa Mod_turb_hyd_base
+ */
 class Mod_turb_hyd_RANS : public Mod_turb_hyd_base
 {
 

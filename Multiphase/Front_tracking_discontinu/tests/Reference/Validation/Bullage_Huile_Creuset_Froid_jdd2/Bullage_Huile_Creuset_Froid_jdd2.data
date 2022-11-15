@@ -255,56 +255,37 @@ Postraitement
 
  liste_postraitements
        {
-        Postraitement_ft_lata post_ancre
-	{	
-		dt_post .06250000000000000000
-		nom_fichier lata/ancre
-		print
-                interfaces agit 
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
-        Postraitement_ft_lata post_cuve
-	{		
-		dt_post .06250000000000000000
-		nom_fichier lata/post_cuve
-		print
-                interfaces cuve
-                {
-                champs sommets
-                        {
-                        courbure
-                        }
-                }
-	}
-	Postraitement_ft_lata post_interf
-	{	
-		
-		dt_post .06250000000000000000
-		nom_fichier lata/post_interf
-		print
-                champs elements
-                {
-                        vitesse
-                        pression
-                        Divergence_U
-			indicatrice_interf
-			indicatrice_agit
-                        indicatrice_cuve
-                }
-		interfaces interf
-		{
-		champs sommets
-			{
-			courbure
-			}
-		}	               		
-	}
+        postraitement_ft_lata post_ancre { 
+    format Lata 
+    fichier lata/ancre 
+    interfaces agit { 
+        courbure som 
+    } 
+}
+        postraitement_ft_lata post_cuve { 
+    format Lata 
+    fichier lata/post_cuve 
+    interfaces cuve { 
+        courbure som 
+    } 
+}
+	postraitement_ft_lata post_interf { 
+    format Lata 
+    fichier lata/post_interf 
+    champs dt_post .06250000000000000000 { 
+        vitesse elem 
+        pression elem 
+        Divergence_U elem 
+        indicatrice_interf elem 
+        indicatrice_agit elem 
+        indicatrice_cuve elem 
+    } 
+    interfaces interf { 
+        courbure som 
+    } 
+}
     } 
 }
 Solve pb
 End
+ 

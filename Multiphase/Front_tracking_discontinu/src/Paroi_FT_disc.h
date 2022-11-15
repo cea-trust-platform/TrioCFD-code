@@ -25,22 +25,18 @@
 
 #include <Symetrie.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//   classe Paroi_FT_disc
-//   Condition aux limites d'angle de contact pour l'equation
-//    "Transport_Interfaces_FT_disc"
-//   Le champ frontiere contient une valeur d'angle de contact exprimee
-//   en degres (voir methode readOn)
-//   Attention: l'heritage de "Symetrie" est necessaire pour
-//    - le calcul du gradient de l'indicatrice (nul au bord)
-//    - le calcul du champ indicatrice_som du fichier lml pour
-//      les cas-tests de non regression
-// .SECTION voir aussi
-//    Symetrie
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Paroi_FT_disc Condition aux limites d'angle de contact pour l'equation
+ *
+ *     "Transport_Interfaces_FT_disc"
+ *    Le champ frontiere contient une valeur d'angle de contact exprimee
+ *    en degres (voir methode readOn)
+ *    Attention: l'heritage de "Symetrie" est necessaire pour
+ *     - le calcul du gradient de l'indicatrice (nul au bord)
+ *     - le calcul du champ indicatrice_som du fichier lml pour
+ *       les cas-tests de non regression
+ *
+ * @sa Symetrie
+ */
 class Paroi_FT_disc : public Symetrie
 {
   Declare_instanciable(Paroi_FT_disc);

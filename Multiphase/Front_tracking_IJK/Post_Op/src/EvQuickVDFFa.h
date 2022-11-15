@@ -19,20 +19,18 @@
 #include <EvAmontVDFFa.h>
 #include <EvalVDFFace.h>
 #include <Zone_VDF.h>
-//
-// .DESCRIPTION class Eval_Quick_VDF_Face
-//
-// Evaluateur VDF pour la convection
-// Le champ convecte est un Champ_Face
-// Schema de convection Quick
-// Rq:Les evaluateurs de flux convectifs calculent en fait le terme 
-// convectif qui figure au second membre de l'equation d'evolution 
-// c.a.d l'oppose du flux convectif
-
-//
-// .SECTION voir aussi Eval_Conv_VDF
-
-
+/*! @brief class Eval_Quick_VDF_Face
+ *
+ *  Evaluateur VDF pour la convection
+ *  Le champ convecte est un Champ_Face
+ *  Schema de convection Quick
+ *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
+ *  convectif qui figure au second membre de l'equation d'evolution
+ *  c.a.d l'oppose du flux convectif
+ * 
+ *
+ * @sa Eval_Conv_VDF 
+ */
 class Eval_Quick_VDF_Face : public Eval_Amont_VDF_Face
 {
 

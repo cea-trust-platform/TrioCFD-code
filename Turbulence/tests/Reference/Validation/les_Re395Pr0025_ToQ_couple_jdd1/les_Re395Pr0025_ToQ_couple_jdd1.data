@@ -71,38 +71,9 @@ Read sch
 	dt_impr 1e5
 	seuil_statio 1.e-18
 }
-
-# Acier #
-# K=0.2 #
-Solide sol
-Read sol
-{
-        rho Champ_Uniforme 1 8000
-        lambda Champ_Uniforme 1 50
-        Cp Champ_Uniforme 1 500.
-}
-
-Fluide_Incompressible mercure
-Read mercure
-{
-	mu Champ_Uniforme 1    1.5e-3
-	rho Champ_Uniforme 1 13500.
-	lambda Champ_Uniforme 1  8.4 
-	Cp Champ_Uniforme 1  140 
-        beta_th Champ_Uniforme  1 1.9954e-3     
-        
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0 0 0
  
-Associate mercure gravite
 Associate pb dom
-Associate pb mercure
-
-
 Associate pb_solide dom_solide
-Associate pb_solide sol
 
 Probleme_Couple pbc
 Associate pbc pb
@@ -113,6 +84,16 @@ Discretize pbc dis
 
 Read pb
 {
+Fluide_Incompressible
+{
+	mu Champ_Uniforme 1    1.5e-3
+	rho Champ_Uniforme 1 13500.
+	lambda Champ_Uniforme 1  8.4 
+	Cp Champ_Uniforme 1  140 
+        beta_th Champ_Uniforme  1 1.9954e-3     
+      gravite  Champ_Uniforme 3 0 0 0
+} 
+
 	Navier_Stokes_Turbulent	
 	{
 		solveur_pression Cholesky { }
@@ -190,6 +171,16 @@ Read pb
 }
 Read pb_solide
 {
+
+# Acier #
+# K=0.2 #
+Solide
+{
+        rho Champ_Uniforme 1 8000
+        lambda Champ_Uniforme 1 50
+        Cp Champ_Uniforme 1 500.
+}
+
         Conduction
         {
                 diffusion { }
