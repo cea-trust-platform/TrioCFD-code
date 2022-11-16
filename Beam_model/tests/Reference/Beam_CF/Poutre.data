@@ -6,7 +6,10 @@ Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
- Read_med family_names_from_group_names dom Poutre Poutre.med 
+    Read_MED {
+        domain dom
+        file Poutre.med  
+    }
 # END MESH #
 
 VerifierCoin dom { }
