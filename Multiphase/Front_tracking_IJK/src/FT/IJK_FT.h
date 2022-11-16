@@ -432,7 +432,8 @@ protected :
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ft_;
 
   // Celui la est discretise sur le maillage ns:
-  FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_;
+  FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
+  FixedVector<IJK_Field_double, 3> terme_SigCou_div_par_rho_;   // [ du/dt / V = m/s/s/m^3 ]
   FixedVector<IJK_Field_double, 3> terme_repulsion_interfaces_ns_;
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ns_;
 
