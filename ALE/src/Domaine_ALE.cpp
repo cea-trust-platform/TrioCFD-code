@@ -16,6 +16,7 @@
 //
 // File:        Domaine_ALE.cpp
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
+// Version:     /main/21
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Scatter.h>
@@ -24,19 +25,33 @@
 #include <Debog.h>
 #include <Domaine_ALE.h>
 #include <Probleme_base.h>
+#include <Schema_Temps_base.h>
 #include <Zone_VDF.h>
 #include <Zone_VEF.h>
 #include <Motcle.h>
 #include <EFichier.h>
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
+#include <Champ_front_ALE_Beam.h>
+#include <Champs_front_ALE_projection.h>
+#include <Noms.h>
+#include <Navier_Stokes_std.h>
+#include <Equation_base.h>
+#include <Operateur_Diff.h>
+#include <Operateur_Grad.h>
+#include <communications.h>
 
 
-Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
+
+Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : nb_bords_ALE(0),update_or_not_matrix_coeffs_(1), resumption(0)
+Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
 {
-
+  beam = new Beam_model();
+}
+Domaine_ALE::~Domaine_ALE()
+{
+  delete beam;
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -75,6 +90,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
       //On recalcule les vitesses aux faces
       Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
+
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
       IntTab& face_sommets=la_zone_VF.face_sommets();
@@ -111,10 +127,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           IntVect& rang_elem_non_standard=la_zone_VEF.rang_elem_non_std();
           la_zone_VF.volumes_entrelaces()=0;
           la_zone_VEF.calculer_volumes_entrelaces();
-
-
-          // PL: je trouve etonnant que le calcul des surfaces se fasse AVANT le calcul des normales
-          // PL: il devrait se faire APRES
 
           int nb_faces_tot=face_sommets.dimension_tot(0);
           la_zone_VEF.calculer_h_carre();
@@ -156,8 +168,133 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           Cerr << "Discretisation non reconnue par ALE!" << finl;
           exit();
         }
+
     }
 }
+//Compute the fluid force projected within the requested boundaries
+void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
+{
+  Cerr<<"update_ALE_projection "<<finl;
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  double modalForce = 0.;
+
+  for (int n=0; n<nb_bords_ALE; n++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
+      if(name_ALE_boundary_projection==le_nom_bord_ALE)
+        {
+          if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
+            {
+              double phi=0.;
+              modalForce=0.;
+              int ndeb = les_bords_ALE(n).num_premiere_face();
+              int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+              for (int face=ndeb; face<nfin; face++)
+                {
+                  for(int comp=0; comp<dimension; comp++)
+                    {
+                      phi=field_ALE_projection.evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
+                      modalForce += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
+                    }
+                }
+            }
+
+
+        }
+
+    }
+  mp_sum(modalForce);
+  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName.txt file
+    {
+      std::string nom="ModalForce_";
+      nom += name_ALE_boundary_projection;
+      nom +="_";
+      std::string index(std::to_string(nb_mode));
+      nom +=index;
+      nom+=".txt";
+      std::ofstream ofs_1;
+      ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
+      ofs_1<<temps<<" "<<modalForce;
+      ofs_1<<endl;
+      ofs_1.close();
+    }
+}
+//Compute the fluid force projected within the requested boundaries
+void  Domaine_ALE::update_ALE_projection(const double temps)
+{
+
+  int size_projection_boundaries=field_ALE_projection_.size();
+  if(size_projection_boundaries==0)
+    {
+      return;
+    }
+  Cerr<<"update_ALE_projection "<<finl;
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  DoubleVect modalForce(size_projection_boundaries);
+  modalForce=0.;
+  for (int n=0; n<nb_bords_ALE; n++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
+      for(int i=0; i<size_projection_boundaries; i++)
+        {
+          if(name_ALE_boundary_projection_[i]==le_nom_bord_ALE)
+            {
+              if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
+                {
+                  double phi=0.;
+                  modalForce[i]=0.;
+                  int ndeb = les_bords_ALE(n).num_premiere_face();
+                  int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+                  for (int face=ndeb; face<nfin; face++)
+                    {
+                      for(int comp=0; comp<dimension; comp++)
+                        {
+                          phi=field_ALE_projection_[i].evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
+                          modalForce[i] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+  mp_sum_for_each_item(modalForce);
+  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName_[i].txt file
+    {
+      for(int i=0; i<size_projection_boundaries; i++)
+        {
+          std::string nom="ModalForce_";
+          nom += name_ALE_boundary_projection_[i];
+          nom +="_";
+          std::string index(std::to_string(i+1));
+          nom +=index;
+          nom+=".txt";
+          std::ofstream ofs_1;
+          ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
+          ofs_1<<temps<<" "<<modalForce[i];
+          ofs_1<<endl;
+          ofs_1.close();
+        }
+    }
+
+}
+
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
   //Cerr << "Domaine_ALE::initialiser  " << finl;
@@ -173,6 +310,13 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   int nb_faces_tot=la_zone_VF.nb_faces_tot();
   int nb_som_face=la_zone_VF.nb_som_face();
   IntTab& face_sommets=la_zone_VF.face_sommets();
+
+  if(!associate_eq)
+    {
+      const Equation_base& equation=pb.equation(0);
+      associer_equation(equation);
+      associate_eq=true;
+    }
 
   vf.resize(nb_faces, dimension);
   const MD_Vector& md = la_zone_VF.md_vector_faces();
@@ -201,6 +345,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
+
   int n; // A activer ou desactiver si on utilise le laplacien ou non
   int N_som=nb_som_tot(); //A activer ou desactiver si on utilise le laplacien ou non
 
@@ -219,7 +364,6 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       const Frontiere_dis_base& la_fr_dis=le_domaine_dis.zone_dis(0).frontiere_dis(rang);
       les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
-
       if (le_nom_ch_front_courant == "Champ_front_ALE")
         {
           ref_cast(Champ_front_ALE, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
@@ -266,6 +410,38 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
           else   //If two ALE boundaries have mutual node, then ALE boundary velocity should be taken account only once.
             {
               DoubleTab vit_bord_ale = ref_cast(Ch_front_input_ALE, les_champs_front[n].valeur()).get_vit_som_bord_ALE();
+              for(int dim=0; dim<dimension; dim++)
+                {
+                  for(int i=0; i<N_som; i++)
+                    {
+                      if(vit_bords(i, dim) == 0.)
+                        vit_bords(i, dim) += vit_bord_ale(i, dim);
+                    }
+                }
+            }
+        }
+      else if (le_nom_ch_front_courant == "Champ_front_ALE_Beam")
+        {
+          if(!associate_eq)
+            {
+              const Equation_base& equation=pb.equation(0);
+              associer_equation(equation);
+              associate_eq=true;
+            }
+          ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
+          DoubleTab vit_bord_ale = ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).get_vit_som_bord_ALE();
+          if (nb_bords_ALE==1)
+            {
+              for(int dim=0; dim<dimension; dim++)
+                {
+                  for(int i=0; i<N_som; i++)
+                    {
+                      vit_bords(i, dim) += vit_bord_ale(i, dim);
+                    }
+                }
+            }
+          else
+            {
               for(int dim=0; dim<dimension; dim++)
                 {
                   for(int i=0; i<N_som; i++)
@@ -417,7 +593,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
               {
                 int som=zone_VEF.face_sommets(face,isom);
                 som=get_renum_som_perio(som);
-                diag[som]=1.e6;
+                diag[som]=1.e14;
               }
           }
       }
@@ -447,14 +623,13 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
-
           for (int face=num1; face<num2; face++)
             {
               for(int isom=0; isom<dimension; isom++)
                 {
                   int som=zone_VEF.face_sommets(face,isom);
                   som=get_renum_som_perio(som);
-                  secmem(som)=1.e6*vit_bords(som,comp);
+                  secmem(som)=1.e14*vit_bords(som,comp);
                 }
             }
         }
@@ -546,6 +721,38 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
       compteur++;
     }
 }
+//Read the projection boundary
+void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  int nb_projection;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error when reading the 'Projection_ALE_boundary' \n";
+      Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
+           << motlu;
+      exit();
+    }
+  is >> nb_projection;
+  Cerr << "Number of ALE projection boundary : " <<  nb_projection << finl;
+  field_ALE_projection_.dimensionner(nb_projection);
+  int compteur=0;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+      name_ALE_boundary_projection_.add(nomlu);
+      is >> field_ALE_projection_[compteur];
+      compteur++;
+    }
+}
 
 //  Read the solver used to solve the system giving the moving mesh velocity
 void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
@@ -572,5 +779,394 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
       motlu=nomlu;
       if (motlu == accolade_fermee)
         break;
+    }
+}
+
+
+//Read the mechanical beam model parameters. See the Beam class for details
+void Domaine_ALE::reading_beam_model(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  Nom masse_and_stiffness_file_name;
+  Noms phi_file_name;
+  Nom absc_file_name;
+  Nom CI_file_name;
+  Nom Restart_file_name="none";
+  int var_int;
+  int nb_modes;
+  int nb_output_points_1D=0;
+  DoubleVect output_position_1D(nb_output_points_1D);
+  int nb_output_points_3D=0;
+  DoubleTab output_position_3D(nb_output_points_3D,0);
+  double var_double;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
+      Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
+           << motlu;
+      exit();
+    }
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if(motlu=="nb_modes")
+        {
+          is >> nb_modes;
+          beam->setNbModes(nb_modes);
+          Cerr << "Number of modes : " <<  beam->getNbModes() << finl;
+        }
+      if(motlu=="direction")
+        {
+          is >> var_int;
+          beam->setDirection(var_int);
+          Cerr << "Direction : " <<  beam->getDirection() << finl;
+        }
+      if(motlu=="Young_Module")
+        {
+          is >> var_double;
+          beam->setYoung(var_double);
+          Cerr << "Young module : " <<  beam->getYoung() << finl;
+        }
+      if(motlu=="Rho_beam")
+        {
+          is >> var_double;
+          beam->setRhoBeam(var_double);
+          Cerr << "Rho beam : " <<  beam->getRhoBeam() << finl;
+        }
+      if(motlu=="Mass_and_stiffness_file_name")
+        {
+          is >> nomlu;
+          masse_and_stiffness_file_name=nomlu;
+
+        }
+      if(motlu=="Absc_file_name")
+        {
+          is >> nomlu;
+          absc_file_name=nomlu;
+
+        }
+      if(motlu=="CI_file_name")
+        {
+          is >> nomlu;
+          CI_file_name=nomlu;
+
+        }
+
+      if(motlu=="Modal_deformation_file_name")
+        {
+          is >> var_int;
+          for (int i=0; i< var_int; i ++)
+            {
+              is >>nomlu;
+              phi_file_name.add(nomlu);
+            }
+        }
+      if(motlu=="NewmarkTimeScheme")
+        {
+          is >> nomlu;
+          bool scheme=true;
+          if(nomlu=="FD")
+            scheme=false;
+          else if(nomlu=="MA")
+            scheme=true;
+          else
+            {
+              Cerr << "NewmarkTimeScheme wrong: choose between FD and MA" <<finl;
+              exit();
+            }
+
+          beam->setTimeScheme(scheme);
+        }
+      if(motlu=="Output_position_1D")
+        {
+          Cerr << "Beam Output_position_1D "<< finl;
+          is>>nb_output_points_1D;
+          output_position_1D.resize(nb_output_points_1D);
+          double poz;
+          for (int i=0; i< nb_output_points_1D; i ++)
+            {
+              is >>poz;
+              output_position_1D[i]=poz;
+            }
+
+          beam->setOutputPosition1D(output_position_1D);
+        }
+      if(motlu=="Output_position_3D")
+        {
+          Cerr << "Beam Output_position_3D "<< finl;
+          is>>nb_output_points_3D;
+          output_position_3D.resize(nb_output_points_3D, 3);
+          double poz=0.;
+          for (int i=0; i< nb_output_points_3D; i ++)
+            {
+              for (int j=0; j< 3; j ++)
+                {
+                  is >>poz;
+                  output_position_3D(i,j)=poz;
+                }
+            }
+          beam->setOutputPosition3D(output_position_3D);
+        }
+      if (motlu=="Restart_file_name")
+        {
+          is >> nomlu;
+          Restart_file_name=nomlu;
+        }
+
+      if (motlu == accolade_fermee)
+        break;
+    }
+  beam->readInputMassStiffnessFiles(masse_and_stiffness_file_name);
+  beam->readInputAbscFiles(absc_file_name);
+  assert(nb_modes==phi_file_name.size());
+  beam->readInputModalDeformation(phi_file_name);
+  beam->readInputCIFile(CI_file_name);
+  fluidForceOnBeam.resize(nb_modes);
+  fluidForceOnBeam=0.;
+  tempsComputeForceOnBeam=0.;
+  if(Restart_file_name!="none")
+    {
+      beam->readRestartFile(Restart_file_name);
+      tempsComputeForceOnBeam=beam->getTime();
+
+      std::string const nomFichier(Restart_file_name);
+      ifstream monFlux(nomFichier.c_str());
+
+      if(monFlux)
+        {
+          double temps, displacement, speed, acceleration, force;
+          for(int i=0; i<nb_modes; i++)
+            {
+              monFlux >> temps >> displacement >> speed >>acceleration>>force;
+              fluidForceOnBeam[i]=force;
+            }
+
+          monFlux.close();
+        }
+      else
+        {
+          Cerr<< "ERROR: Unable to open the file " <<Restart_file_name<<finl;
+        }
+    }
+  else
+    {
+      //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
+      std::remove("BeamDisplacement1D.txt");
+      std::remove("BeamVelocity1D.txt");
+      std::remove("BeamAcceleration1D.txt");
+      std::remove("BeamDisplacement3D.txt");
+      std::remove("BeamVelocity3D.txt");
+      std::remove("BeamAcceleration3D.txt");
+      std::remove("ModalForceFluide1D.txt");
+      //end delete old files
+
+      //prepare the headers of the output file ModalForceFluide1D
+      std::ofstream ofs;
+      ofs.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs<<"# Printing modal 1D fluid force: time mode  ";
+      for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
+      ofs<<endl;
+      ofs.close();
+      //end prepare the headers of the output file ModalForceFluide1D
+
+      if(nb_output_points_1D>0)
+        {
+          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
+          std::ofstream ofs_1;
+          ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_2;
+          ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_3;
+          ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
+
+          ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_1D; k++)
+            {
+              ofs_1<<output_position_1D[k]<<" ";
+            }
+          ofs_1<<endl;
+          ofs_1.close();
+
+          ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_1D; k++)
+            {
+              ofs_2<<output_position_1D[k]<<" ";
+            }
+          ofs_2<<endl;
+          ofs_2.close();
+
+
+          ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_1D; k++)
+            {
+              ofs_3<<output_position_1D[k]<<" ";
+            }
+          ofs_3<<endl;
+          ofs_3.close();
+          //end prepare the headers
+        }
+      if(nb_output_points_3D>0)
+        {
+          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
+          std::ofstream ofs_1;
+          ofs_1.open ("BeamDisplacement3D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_2;
+          ofs_2.open ("BeamVelocity3D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_3;
+          ofs_3.open ("BeamAcceleration3D.txt", std::ofstream::out | std::ofstream::app);
+
+          ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_1<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
+            }
+          ofs_1<<endl;
+          ofs_1.close();
+
+          ofs_2<<"# Printing Beam 3D velocity: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_2<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
+            }
+          ofs_2<<endl;
+          ofs_2.close();
+
+
+          ofs_3<<"# Printing Beam 3D acceleration: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_3<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
+            }
+          ofs_3<<endl;
+          ofs_3.close();
+          //end prepare the headers
+        }
+    }
+
+}
+DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
+{
+  return beam->interpolationOnThe3DSurface(x,y,z, u, R);
+}
+
+void Domaine_ALE::initializationBeam (double velocity)
+{
+  beam->initialization(velocity);
+}
+double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+{
+
+  double dt = 0.;
+  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
+  const DoubleVect& surfaces = zone_VEF.face_surfaces();
+  double minSurf = mp_min_vect(surfaces);
+  minSurf = Process::mp_min(minSurf);
+  //Cerr << " Surface min: "<< minSurf << endl;
+  double soundSpeed=beam->soundSpeed();
+  //Cerr << "soundSpeed: "<< soundSpeed << endl;
+  dt = 0.5*(minSurf/soundSpeed);
+  return dt;
+}
+
+const DoubleTab& Domaine_ALE::getBeamDisplacement(int i) const
+{
+  return beam->getDisplacement(i);
+}
+const DoubleTab& Domaine_ALE::getBeamRotation(int i) const
+{
+  return beam->getRotation(i);
+
+}
+const int& Domaine_ALE::getBeamDirection() const
+{
+  return beam->getDirection();
+}
+DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
+{
+  //if tps=tempsComputeForceOnBeam then the dynamics of the beam has already been solved. We only solve once per time step.
+  if(tps!=tempsComputeForceOnBeam && dt!=0.)
+    {
+      computeFluidForceOnBeam();
+      tempsComputeForceOnBeam = tps; // update the variable tempsComputeForceOnBeam after computing the fluid force
+    }
+  return beam->getVelocity(tps, dt, fluidForceOnBeam);
+}
+const int& Domaine_ALE::getBeamNbModes()
+{
+  return beam->getNbModes();
+}
+
+const DoubleVect& Domaine_ALE::getFluidForceOnBeam()
+{
+
+  return fluidForceOnBeam;
+}
+
+Equation_base& Domaine_ALE::getEquation()
+{
+  return eq;
+}
+//Compute the modal fluid force acting on the Beam: sum of a pressure (op_grad.flux_bords) and a viscous term (op_diff.flux_bords) projected on the 3D modal deformation
+void  Domaine_ALE::computeFluidForceOnBeam()
+{
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  const int nbModes=fluidForceOnBeam.size();
+
+  if (flux_bords_grad.size()==0)
+    {
+      //The flux_bords are zero during the first time step following a resumption of calculation
+      //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
+      SFichier os("toto_grad.txt");
+      op_grad.impr(os);
+    }
+
+  if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
+    {
+      fluidForceOnBeam=0.;
+      DoubleVect phi(3);
+      phi=0.;
+      for (int n=0; n<nb_bords_ALE; n++)
+        {
+          int ndeb = les_bords_ALE(n).num_premiere_face();
+          int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+          for (int face=ndeb; face<nfin; face++)
+            {
+              for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+                {
+                  const DoubleTab& u=getBeamDisplacement(nbmodes);
+                  const DoubleTab& R=getBeamRotation(nbmodes);
+                  phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R); //compute the 3D modal deformation
+                  for(int comp=0; comp<3; comp++)
+                    {
+                      fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
+                    }
+                }
+            }
+
+        }
+    }
+  mp_sum_for_each_item(fluidForceOnBeam);
+  if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
+    {
+      std::ofstream ofs_1;
+      ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1<<tempsComputeForceOnBeam<<" ";
+      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
+      ofs_1<<endl;
+      ofs_1.close();
     }
 }

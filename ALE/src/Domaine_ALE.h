@@ -16,6 +16,7 @@
 //
 // File:        Domaine_ALE.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
+// Version:     /main/11
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -26,24 +27,31 @@
 #include <TRUSTLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
-
+#include <Ref_Equation_base.h>
+#include <Beam_model.h>
+#include <Champs_front_ALE_projection.h>
 class Domaine_dis;
-/*! @brief Classe Domaine_ALE Cette classe est un interprete qui sert a lire l'attribut axi.
- *
- *     Directive:
- *         Domaine_ALE
- *     Cette directive optionelle permets de faire les calculs en
- *     coordonnees cylindriques. En l'absence de cette directive les calculs
- *     se font en coordonnees cartesiennes.
- *
- * @sa Interprete Objet_U
- */
+class Beam_model;
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    Classe Domaine_ALE
+//    Cette classe est un interprete qui sert a lire l'attribut axi.
+//    Directive:
+//        Domaine_ALE
+//    Cette directive optionelle permets de faire les calculs en
+//    coordonnees cylindriques. En l'absence de cette directive les calculs
+//    se font en coordonnees cartesiennes.
+// .SECTION voir aussi
+//    Interprete Objet_U
+//////////////////////////////////////////////////////////////////////////////
 class Domaine_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur(Domaine_ALE);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
 
 public :
   Domaine_ALE();
+  ~Domaine_ALE();
   inline const double& get_dt() const;
   void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
@@ -53,9 +61,13 @@ public :
   void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
   DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
-  virtual void reading_vit_bords_ALE(Entree& is);
+  void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
-  virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+  void reading_beam_model(Entree& is);
+  void reading_projection_ALE_boundary(Entree& is);
+  void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
+  void  update_ALE_projection(const double);
+  DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   void resumptionJacobian(DoubleTab&, DoubleTab&);
@@ -64,6 +76,19 @@ public :
   inline const DoubleTab& getNewJacobian();
   inline const DoubleTab& getNewJacobian() const;
 
+
+  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
+  void initializationBeam (double velocity) ;
+  double computeDtBeam(Domaine_dis&);
+  const DoubleTab& getBeamDisplacement(int i) const;
+  const DoubleTab& getBeamRotation(int i) const;
+  const int& getBeamDirection() const;
+  DoubleVect& getBeamVelocity(const double& tps, const double& dt);
+  const int& getBeamNbModes();
+  void computeFluidForceOnBeam();
+  const DoubleVect& getFluidForceOnBeam();
+  Equation_base& getEquation() ;
+  inline void associer_equation(const Equation_base& une_eq);
 protected:
 
   double dt_;
@@ -79,6 +104,15 @@ protected:
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
+  Beam_model *beam; // Mechanical model: a beam model
+  REF(Equation_base) eq;
+  DoubleVect fluidForceOnBeam; //Fluid force acting on the IFS boundary
+  Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
+  Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
+  bool associate_eq;
+  double tempsComputeForceOnBeam; // Time at which the fluid force acting on the Beam is computed.
+
+
 };
 
 
@@ -121,4 +155,10 @@ inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 {
   return ALEjacobian_new;
 }
+
+inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
+{
+  eq = une_eq;
+}
+
 #endif

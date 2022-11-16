@@ -27,13 +27,16 @@
 #include <Ch_front_var_instationnaire_dep.h>
 #include <Parser_U.h>
 #include <Vect_Parser_U.h>
-/*! @brief class Champ_front_ALE
- *
- *      Cette classe represente un champ sur une frontiere in case of ALE calculation.
- *
- *
- * @sa Champ_Input_Proto
- */
+//////////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//     class Champ_front_ALE
+//
+//     Cette classe represente un champ sur une frontiere in case of ALE calculation.
+//
+// .SECTION voir aussi
+//   Champ_Input_Proto
+/////////////////////////////////////////////////////////////////////////////////
 class Champ_front_ALE : public Ch_front_var_instationnaire_dep
 {
   Declare_instanciable(Champ_front_ALE);
@@ -43,13 +46,14 @@ public:
   Champ_front_base& affecter_(const Champ_front_base& ch) override;
   int initialiser(double temps, const Champ_Inc_base& inco) override;
   void mettre_a_jour(double temps) override;
-  void remplir_vit_som_bord_ALE(double);
+  virtual void remplir_vit_som_bord_ALE(double);
 
 protected :
   DoubleTab vit_som_bord_ALE;
+  VECT(Parser_U) fxyzt;
 
 private:
-  VECT(Parser_U) fxyzt;
+
 
 };
 
