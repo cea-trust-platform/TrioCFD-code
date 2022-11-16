@@ -149,6 +149,7 @@ public :
   //void compute_and_add_source_qdm_gr(const double threshold_0, const double threshold_1, const double threshold_2, const double threshold_3);
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
+  void compute_and_add_qdm_corrections_monophasic();
 
   // SURCHARGE DES OPERATEURS : dans FixedVector, on ajoute le produit_scalaire
   //  mais il faut que les operateur * et += soient definis pour IJK_FT_double
@@ -433,7 +434,6 @@ protected :
 
   // Celui la est discretise sur le maillage ns:
   FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
-  FixedVector<IJK_Field_double, 3> terme_SigCou_div_par_rho_;   // [ du/dt / V = m/s/s/m^3 ]
   FixedVector<IJK_Field_double, 3> terme_repulsion_interfaces_ns_;
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ns_;
 
