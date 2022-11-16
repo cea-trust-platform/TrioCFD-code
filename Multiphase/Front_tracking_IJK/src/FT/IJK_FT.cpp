@@ -3743,7 +3743,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           for (int dir = 0; dir<3; dir++)
             rho_u_euler_av_prediction[dir] = calculer_v_moyen(rho_u_euler_av_prediction_champ[dir]);
         }
-      // GAB, remarque : calculer dv calcul dv, MAIS NE L'APPLIQUE PAS au champ de vitesse !!!
+      // GAB, remarque : calculer dv calcule dv, MAIS NE L'APPLIQUE PAS au champ de vitesse !!!
       //                 l'increment de vitesse est ajoute au champ de vitesse avec euler_explicit_update
       calculer_dv(timestep_, current_time_, -1 /*rk_step = -1 pour sch euler... */);
       // GAB, qdm calculer_dv ne fait que l'etape de prediction)
