@@ -59,7 +59,7 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
       if(_DIR_ == DIRECTION::Z && _VCOMPO_ != DIRECTION::Z)
         {
           int top_wall = 0, bottom_wall = 0;
-          Boundary_Conditions::BCType bc_type;
+          Boundary_Conditions::BCType bc_type = Boundary_Conditions::Perio; //dummy initialization, will be filled later on
 
           // We are at bottom wall: z=0
           if (global_k_layer == first_global_k_layer-1)
