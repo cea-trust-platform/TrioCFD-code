@@ -46,6 +46,7 @@ Entree& Op_Conv_ALE_VEF::readOn(Entree& is)
   op_conv.associer_eqn(equation());
   op_conv.associer_vitesse(la_vitesse.valeur());
   op_conv.lire(is);
+  op_conv.completer();
   Cerr << "OpConvALE_VEF : " << op_conv.que_suis_je() << finl;
   return is;
 }
@@ -60,7 +61,8 @@ void Op_Conv_ALE_VEF::associer (const Zone_dis& zone_dis ,
 
   la_zone_vef = zvef;
   la_zcl_vef = zclvef;
-  Op_Conv_ALE::associer(zone_dis,zone_cl_dis,inco);
+  dom = inco->domaine();
+  //Op_Conv_ALE::associer(zone_dis,zone_cl_dis,inco);
 }
 
 
