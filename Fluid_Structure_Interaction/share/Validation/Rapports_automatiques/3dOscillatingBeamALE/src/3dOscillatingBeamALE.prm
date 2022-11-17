@@ -3,7 +3,7 @@ Parameters {
 	Title "3D oscillating cylindrical beam into a confined space"	
 	Author "M. A. Puscas"
 	
-	TestCase  . 3dOscillatingBeam.data 40   /*jdd en annexe*/ 
+	TestCase  . 3dOscillatingBeamALE.data 40   /*jdd en annexe*/ 
 
 
 	ParametersTRUST Problem: Pb_hydraulique_ALE
@@ -15,7 +15,7 @@ Parameters {
 	ParametersTRUST Medium: Fluide_Incompressible
 	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
 	ParametersTRUST Convection scheme: ALE muscl
-	ParametersTRUST Location: ALE/share/Validation/Rapports_automatiques/3dOscillatingBeam
+	ParametersTRUST Location: ALE/share/Validation/Rapports_automatiques/3dOscillatingBeamALE
 
 	
 	IncludeData 2
