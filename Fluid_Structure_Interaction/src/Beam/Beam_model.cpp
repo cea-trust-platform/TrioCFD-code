@@ -41,6 +41,9 @@ using namespace std;
 Implemente_liste(DoubleTab);
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model", Interprete_geometrique_base ) ;
+//XD  Beam_model interprete Beam_model 0 Reduced mechanical model: a beam model. Resolution based on a modal analysis. Temporal discretization: Newmark
+//XD  attr dom ref_domaine dom 0 Name of domain.
+//XD attr bloc bloc_lecture bloc 0 between the braces, you must specify nb_modes, direction, Young_Module, Rho_beam, NewmarkTimeScheme, Mass_and_stiffness_file_name, Absc_file_name, CI_file_name, Modal_deformation_file_name.
 
 Beam_model::Beam_model()
 {

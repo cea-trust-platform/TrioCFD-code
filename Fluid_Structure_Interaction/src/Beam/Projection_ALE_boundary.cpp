@@ -22,7 +22,10 @@
 #include <Projection_ALE_boundary.h>
 #include <Domaine_ALE.h>
 
-Implemente_instanciable( Projection_ALE_boundary, "Projection_ALE_boundary", Interprete_geometrique_base ) ;
+Implemente_instanciable(Projection_ALE_boundary, "Projection_ALE_boundary", Interprete_geometrique_base ) ;
+//XD  Projection_ALE_boundary interprete Projection_ALE_boundary 0 block to compute the projection of a modal function on a mobile boundary. Use to compute modal added coefficients in FSI.
+//XD  attr dom ref_domaine dom 0 Name of domain.
+//XD attr bloc bloc_lecture bloc 0 between the braces, you must specify the numbers of the mobile borders then list these mobile borders and indicate the modal function which must be projected on these boundaries.  NL2 Example:  Projection_ALE_boundary dom_name  { 1  boundary_name   3  0.sin(pi*x)*1.e-4 0. }
 
 Sortie& Projection_ALE_boundary::printOn( Sortie& os ) const
 {

@@ -36,6 +36,8 @@ using namespace std;
 
 
 Implemente_instanciable( Champ_front_ALE_Beam, "Champ_front_ALE_Beam", Ch_front_var_instationnaire_dep ) ;
+//XD Champ_front_ALE_Beam front_field_base Champ_front_ALE_Beam 0 Class to define a Beam on a FSI boundary.
+//XD attr val listchaine val 0 NL2 Example:  3 0 0 0
 
 Sortie& Champ_front_ALE_Beam::printOn( Sortie& os ) const
 {
