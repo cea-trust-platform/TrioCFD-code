@@ -72,7 +72,7 @@ Read mon_schema
         # End time [s] #
 	tmax  0.0313885 #  5T= 0.0313885 #
 	# Max number of time steps #
-        # nb_pas_dt_max 10 #
+        nb_pas_dt_max 3
         # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-15
 }
@@ -123,7 +123,7 @@ Read pb
 	Post_processing
 	{			
 		# Fields #
-		format lata 
+		format lml 
 		fields dt_post 6.e-3
 		{
 			pression_pa som
