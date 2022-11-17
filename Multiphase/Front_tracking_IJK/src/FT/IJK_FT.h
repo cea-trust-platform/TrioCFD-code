@@ -356,11 +356,6 @@ protected :
 
   IJK_Field_double potential_phi_;
 
-  //
-  // Post-processing helper class:
-  //
-  friend class IJK_FT_Post;
-  IJK_FT_Post post_;
 
   int check_divergence_;
 
@@ -536,7 +531,6 @@ protected :
   // comme par exemple : deplacer_interfaces,
   //    calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
   int disable_diphasique_;
-
   int time_scheme_;
   double store_RK3_source_acc_;
   double store_RK3_fac_sv_;
@@ -549,6 +543,7 @@ protected :
   corrections_qdm qdm_corrections_;
   // Le maillage des interfaces:
   IJK_Interfaces interfaces_;
+
   // Maillage etendu pour les interfaces
   // Nombre de mailles etendues dans les directions periodiques
   int ijk_splitting_ft_extension_;
@@ -566,6 +561,11 @@ protected :
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
 
+  //
+  // Post-processing helper class:
+  //
+  friend class IJK_FT_Post;
+  IJK_FT_Post post_;
 };
 
 #endif /* IJK_FT_included */

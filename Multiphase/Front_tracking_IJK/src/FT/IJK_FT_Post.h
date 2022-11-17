@@ -90,6 +90,10 @@ public:
   {
     return dt_post_;
   }
+  int post_par_paires() const
+  {
+    return post_par_paires_;
+  }
   double t_debut_statistiques() const
   {
     return t_debut_statistiques_;
@@ -170,6 +174,8 @@ protected:
   // Pour numeroter les fichiers .lata il faut compter combien on en a ecrit:
   int compteur_post_instantanes_;
   int postraiter_sous_pas_de_temps_; // drapeau 0 ou 1
+  // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
+  int post_par_paires_; // drapeau 0 ou 1
 
   // Pour des fiches de validation, on post-traite le champ analytique attendu dans le lata pour calcul de l'erreur:
   Noms expression_vitesse_analytique_; // on attend trois expressions
