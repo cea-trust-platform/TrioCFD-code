@@ -43,6 +43,8 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft):
   interfaces_(ijk_ft.interfaces_),
   pressure_(ijk_ft.pressure_),
   velocity_(ijk_ft.velocity_),
+  source_spectrale_(ijk_ft.forcage_.get_force_ph2()),
+//  source_spectrale_(ijk_ft.forcage_.f_ph_THI.force_),
   d_velocity_(ijk_ft.d_velocity_),
   splitting_(ijk_ft.splitting_),
   splitting_ft_(ijk_ft.splitting_ft_),
@@ -151,7 +153,6 @@ int IJK_FT_Post::initialise(int reprise)
 {
   int nalloc = 0;
 
-  source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
   //poisson_solver_post_.initialize(splitting_);
   // pour relire les champs de temps integres:
   if (liste_post_instantanes_.contient_("INTEGRATED_TIMESCALE"))
@@ -429,9 +430,6 @@ static void interpolate_to_center(FixedVector<IJK_Field_double, 3>& cell_center_
           ccf0 = (face_field[0](i,j,k) + face_field[0](i+1, j, k)) * 0.5;
           ccf1 = (face_field[1](i,j,k) + face_field[1](i, j+1, k)) * 0.5;
           ccf2 = (face_field[2](i,j,k) + face_field[2](i, j, k+1)) * 0.5;
-
-          Cout << "face_field[2]("<<i<<","<<j<<","<<k<<") = "<<face_field[2](i,j,k)<<finl;
-          Cout << "cell_center_field[2]("<<i<<","<<j<<","<<k<<") = "<<ccf2<<finl;
         }
 }
 //
@@ -443,22 +441,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
   const int latastep = compteur_post_instantanes_;
   dumplata_newtime(lata_name,current_time);
-  if ((liste_post_instantanes_.contient_("FORCE_PH")) or (liste_post_instantanes_.contient_("CELL_FORCE_PH")))
-    {
-      source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
-    }
-  if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
-    {
-      source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
-    }
-  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
-    {
-      source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
-    }
-  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
-    {
-      repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
-    }
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);
@@ -470,22 +452,15 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("MU");
       liste_post_instantanes_.add("PRESSURE_RHS");
       liste_post_instantanes_.add("VELOCITY_FT");
-      liste_post_instantanes_.add("SOURCE_QDM_INTERF");
-      liste_post_instantanes_.add("GRAD_INDICATRICE_FT");
-      liste_post_instantanes_.add("REBUILT_INDICATRICE_FT");
-      liste_post_instantanes_.add("REPULSION_FT");//("POTENTIEL_FT");
-      liste_post_instantanes_.add("AIRE_INTERF");
       liste_post_instantanes_.add("PRESSURE_LIQ");
       liste_post_instantanes_.add("PRESSURE_VAP");
       liste_post_instantanes_.add("GRAD_U");
       liste_post_instantanes_.add("GRAD_V");
       liste_post_instantanes_.add("GRAD_W");
-      liste_post_instantanes_.add("SURFACE_VAPEUR_PAR_FACE");
-      liste_post_instantanes_.add("BARYCENTRE_VAPEUR_PAR_FACE");
-      // GAB, THI sondes
-      //liste_post_instantanes_.add("FORCE_PH");
-
-      interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
+      if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
+        liste_post_instantanes_.add("FORCE_PH");
+      if (!disable_diphasique_)
+        interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
 
       {
         int idx_th = 0;
@@ -507,6 +482,18 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_en;
           }
       }
+    }
+  if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
+    {
+      source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+    {
+      source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+    {
+      repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -552,7 +539,15 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   // GAB
   if (liste_post_instantanes_.contient_("FORCE_PH"))
     {
-      n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
+      if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
+        {
+          n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
+        }
+      else
+        {
+          n--;
+          Cerr << "Post-processing of FORCE_PH demanded, but the spectral force is not present, not initialized" << finl;
+        }
     }
   //
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
@@ -813,20 +808,20 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("CELL_VELOCITY"))
     {
       interpolate_to_center(cell_velocity_,velocity_);
-      n--,dumplata_cellvector(lata_name,"VELOCITY" /* AT CELL-CENTER */, cell_velocity_, latastep);
+      n--,dumplata_cellvector(lata_name,"CELL_VELOCITY" /* AT CELL-CENTER */, cell_velocity_, latastep);
     }
   // GAB
   if (liste_post_instantanes_.contient_("CELL_FORCE_PH"))
     {
       interpolate_to_center(cell_source_spectrale_,source_spectrale_);
-      n--,dumplata_cellvector(lata_name,"FORCE_PH" /* AT CELL-CENTER */, cell_source_spectrale_, latastep);
+      n--,dumplata_cellvector(lata_name,"CELL_FORCE_PH" /* AT CELL-CENTER */, cell_source_spectrale_, latastep);
     }
   //
   // GAB
   if (liste_post_instantanes_.contient_("CELL_GRAD_P"))
     {
       interpolate_to_center(cell_grad_p_,grad_P_);
-      n--,dumplata_cellvector(lata_name,"GRAD_P" /* AT CELL-CENTER */, cell_grad_p_, latastep);
+      n--,dumplata_cellvector(lata_name,"CELL_GRAD_P" /* AT CELL-CENTER */, cell_grad_p_, latastep);
     }
   //
   if (liste_post_instantanes_.contient_("GRAD_U"))
@@ -2013,7 +2008,7 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(cell_velocity_,splitting_, 0);
       nalloc +=3;
     }
-  if (liste_post_instantanes_.contient_("CELL_FORCE_PH"))
+  if (liste_post_instantanes_.contient_("CELL_FORCE_PH")||liste_post_instantanes_.contient_("TOUS"))
     {
       allocate_cell_vector(cell_source_spectrale_,splitting_, 0);
       nalloc +=3;
@@ -2023,12 +2018,12 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(cell_grad_p_,splitting_, 0);
       nalloc +=3;
     }
-  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
     {
       allocate_cell_vector(cell_source_interface_,splitting_, 0);
       nalloc +=3;
     }
-  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION")||liste_post_instantanes_.contient_("TOUS"))
     {
       allocate_cell_vector(cell_repulsion_interface_,splitting_, 0);
       nalloc +=3;
