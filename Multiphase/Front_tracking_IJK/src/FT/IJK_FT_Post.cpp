@@ -2143,7 +2143,7 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
   // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
-  if ((post_par_paires_ == 1 && tstep % dt_post_ == 0) || stop)
+  if ((post_par_paires_ == 1 && tstep % dt_post_ == 0) ) // si stop==1 il ne faut pas entrer dans cette boucle
     {
       Cout << "deuxieme de la paire, tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
