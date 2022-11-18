@@ -1,0 +1,22 @@
+# Partition for the validation test case 3dOscillatingBeamALE #
+
+dimension 3
+
+Domaine_ALE dom
+
+# BEGIN MESH #
+Lire_MED { 
+   domain dom 
+   file Poutre.med 
+}
+# END MESH #
+
+# BEGIN PARTITION #
+Partition dom
+{
+    Partition_tool metis { Nb_parts 40 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+# END PARTITION #

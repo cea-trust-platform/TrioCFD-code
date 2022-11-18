@@ -1,0 +1,143 @@
+# Hydraulique 2D laminar with ALE : DIVA configuration #
+# Set of circular cylinders, arranged in a square configuration. The central cylinders moves with an harmonic motion while the others are fixed  #
+# Moving domain #
+# SEQUENTIAL CALCULATION #
+
+dimension 2
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom
+
+# BEGIN MESH #
+Lire_MED { domain dom file MeshDIVA_1.med } 
+# END MESH #
+
+VerifierCoin dom {  }
+
+# BEGIN PARTITION 
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name dom
+}
+End
+ END PARTITION #
+
+# BEGIN SCATTER #
+# Scatter DOM.Zones dom #
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom
+{
+	1 # number of mobile boundaries #
+	Cylindre_Centre Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # name and speed of the border #
+}
+
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr } } 
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+# Lire ma_discretisation { P0 P1 Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 1 } #
+
+
+
+# Time scheme, choice between: Euler explicit or implicit, and Adams Bashforth order 2  or order 3 #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0.
+	nb_pas_dt_max 3
+	# Min time step #
+        dt_min 1.e-15
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-6
+	# tcpumax 47.5 #
+	# .sauv files printing period #
+        dt_sauv 100.
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 1
+        facsec_max 1
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax 0.25
+	# Max number of time steps #
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+# I define a medium #
+
+# Gravity vector definition 
+Uniform_field my_gravity
+Read my_gravity 2 0.0 0.0 #
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Discretize pb ma_discretisation
+
+Read pb
+{
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 1.007e-3
+   	rho Champ_Uniforme 1 1000
+   }
+   
+   	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression	PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr }
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework. Choice between: amont and muscl #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			Cylindre_Centre frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # mobile bord in ALE framework #
+			Cylindre_Nord paroi_fixe
+			Cylindre_Sud paroi_fixe
+			Cylindre_Est paroi_fixe
+			Cylindre_Ouest paroi_fixe
+			Paroi_Cylindre paroi_fixe
+			Paroi_Gauche paroi_fixe
+			Paroi_Droite paroi_fixe
+			Periodique_Haut paroi_fixe
+			Periodique_Bas paroi_fixe
+		}
+	}
+	Post_processing
+	{
+          	# Fields #
+		format lml 
+		fields dt_post 0.025
+		{
+			pression_pa som
+			vitesse som
+                        # vorticite som #
+                        ALEMeshVelocity som
+			# ALEMeshTotalDisplacement som #
+                        
+		}
+	} 
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
+ 

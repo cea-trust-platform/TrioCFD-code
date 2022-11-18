@@ -1,0 +1,23 @@
+dimension 2
+
+Domaine dom
+
+# Lecture du maillage #
+# Read_file MeshWithCylinderInBigDomaine.med ; #
+
+Lire_MED { 
+   domain dom 
+   file MeshWithCylinderInBigDomaine.med 
+}
+
+
+# Creation des DOM_***.Zones #
+Partition dom
+{
+	Partition_tool metis { nb_parts 4 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+
+

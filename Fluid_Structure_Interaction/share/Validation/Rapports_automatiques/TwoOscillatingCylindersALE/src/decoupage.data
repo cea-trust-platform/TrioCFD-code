@@ -1,0 +1,24 @@
+# TEST #
+
+dimension 2
+
+Domaine_ALE dom
+
+# BEGIN MESH #
+Lire_MED { 
+   domain dom 
+   file TwoOscillatingCylinders.med 
+}
+# END MESH #
+
+# BEGIN PARTITION #
+Partition dom
+{
+	Partition_tool metis { Nb_parts 10 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+# END PARTITION #
+
+

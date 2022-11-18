@@ -1,0 +1,143 @@
+# 3D oscillating cylindrical beam into a confined space. Warning: very coarse mesh #
+
+dimension 3
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom
+
+# BEGIN MESH #
+    Read_MED {
+        domain dom
+        file Mesh_1.med 
+    }
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 35 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+ END PARTITION #
+
+# BEGIN SCATTER #
+# Scatter DOM.Zones dom #
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom
+{
+	3 # number of mobile boundaries #
+			Poutre      Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			In_poutre   Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			Out_poutre  Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+}
+
+# Solver used to solve the system giving the moving mesh velocity #
+# Solver_moving_mesh_ALE dom { PETSC Cholesky { }  } #
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  } }
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+# Lire ma_discretisation { P0 } #
+
+
+# Time scheme, choice between: Euler explicit or implicit, and Adams Bashforth order 2  or order 3 #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0
+	# Min time step #
+        dt_min 1.e-15
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-7
+	tcpumax 9.5
+	# .sauv files printing period #
+        periode_sauvegarde_securite_en_heures 9
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 0.5
+        facsec_max 0.5
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax  0.0313885 #  5T= 0.0313885 #
+	# Max number of time steps #
+        nb_pas_dt_max 3
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+# I define a medium #
+
+# Gravity vector definition 
+Uniform_field my_gravity
+Read my_gravity 2 0.0 0.0 #
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Discretize pb ma_discretisation
+
+Read pb
+{
+   
+   fluide_incompressible {
+    	mu Champ_Uniforme 1 1.007e-3
+   	rho Champ_Uniforme 1 1000
+   }
+   
+   	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  } 
+		# solveur_pression PETSC Cholesky { } #
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			Poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3     0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			In_poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			Out_poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3 0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+
+
+			Wall  paroi_fixe
+			In    frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                        Out   frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+		}
+	}
+	Post_processing
+	{			
+		# Fields #
+		format lml 
+		fields dt_post 6.e-3
+		{
+			pression_pa som
+			vitesse som
+		}
+	} 
+}
+
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
+
+
+
+ 
