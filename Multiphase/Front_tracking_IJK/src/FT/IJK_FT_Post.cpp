@@ -43,7 +43,9 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft):
   interfaces_(ijk_ft.interfaces_),
   pressure_(ijk_ft.pressure_),
   velocity_(ijk_ft.velocity_),
+  Cout << "test" << finl;
   source_spectrale_(ijk_ft.forcage_.get_force_ph2()),
+  Cout << "test" << finl;
 //  source_spectrale_(ijk_ft.forcage_.f_ph_THI.force_),
   d_velocity_(ijk_ft.d_velocity_),
   splitting_(ijk_ft.splitting_),
