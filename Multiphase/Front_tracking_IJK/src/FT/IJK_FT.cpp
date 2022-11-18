@@ -1761,18 +1761,21 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
           // ON NE VEUT PAS METTRE A JOUR TERME_SOURCE_ACCELERATION_ AVEC CETTE METHODE
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
-              terme_source_acceleration_ += derivee_acceleration * timestep;
-              facteur_variable_source_ += derivee_facteur_sv * timestep;
+              //terme_source_acceleration_ += derivee_acceleration * timestep;
+              terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
+              //facteur_variable_source_ += derivee_facteur_sv * timestep;
+              facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
               new_time += timestep;
             }
           else if ( get_time_scheme() == RK3_FT )
             {
               const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep, rk_step);
-              runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
-                                            terme_source_acceleration_, rk_step, timestep);
-
-              runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
-                                            facteur_variable_source_, rk_step, timestep);
+              //runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
+              //                             terme_source_acceleration_, rk_step, timestep);
+              terme_source_acceleration_ += 0;
+              //runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
+              //                             facteur_variable_source_, rk_step, timestep);
+              facteur_variable_source_ += 0;
               new_time += intermediate_dt;
             }
         }
