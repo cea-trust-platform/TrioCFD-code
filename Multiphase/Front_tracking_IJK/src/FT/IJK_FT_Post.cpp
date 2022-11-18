@@ -43,9 +43,7 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft):
   interfaces_(ijk_ft.interfaces_),
   pressure_(ijk_ft.pressure_),
   velocity_(ijk_ft.velocity_),
-  Cout << "test" << finl;
   source_spectrale_(ijk_ft.forcage_.get_force_ph2()),
-  Cout << "test" << finl;
 //  source_spectrale_(ijk_ft.forcage_.f_ph_THI.force_),
   d_velocity_(ijk_ft.d_velocity_),
   splitting_(ijk_ft.splitting_),
@@ -165,7 +163,7 @@ int IJK_FT_Post::initialise(int reprise)
         {
           if (fichier_reprise_integrated_timescale_ == "??")
             {
-              Cerr << "fichier_reprise_integrated_timescale should be specified in the restart file" << finl;
+              Cerr << "fichier_reprise_integrated_timescale should be specified in the restart file" << endl;
               Process::exit();
             }
           const int timestep_reprise_integrated_timescale_ = 1;
@@ -196,11 +194,11 @@ int IJK_FT_Post::initialise(int reprise)
         {
           if (fichier_reprise_integrated_velocity_ == "??")
             {
-              Cerr << "fichier_reprise_integrated_velocity should be specified in the restart file" << finl;
+              Cerr << "fichier_reprise_integrated_velocity should be specified in the restart file" << endl;
               Process::exit();
             }
           const int timestep_reprise_integrated_velocity_ = 1;
-          Cout << "Lecture vitesse integree initiale dans fichier " << fichier_reprise_integrated_velocity_ << " timestep= " << timestep_reprise_integrated_velocity_ << finl;
+          cout << "Lecture vitesse integree initiale dans fichier " << fichier_reprise_integrated_velocity_ << " timestep= " << timestep_reprise_integrated_velocity_ << endl;
           const Nom& geom_name = velocity_[0].get_splitting().get_grid_geometry().le_nom();
           lire_dans_lata(fichier_reprise_integrated_velocity_, timestep_reprise_integrated_velocity_, geom_name, "INTEGRATED_VELOCITY",
                          integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2]); // fonction qui lit un champ a partir d'un lata .
@@ -236,11 +234,11 @@ int IJK_FT_Post::initialise(int reprise)
         {
           if (fichier_reprise_integrated_pressure_ == "??")
             {
-              Cerr << "fichier_reprise_integrated_pressure should be specified in the restart file" << finl;
+              Cerr << "fichier_reprise_integrated_pressure should be specified in the restart file" << endl;
               Process::exit();
             }
           const int timestep_reprise_integrated_pressure_ = 1;
-          Cout << "Lecture pression integree initiale dans fichier " << fichier_reprise_integrated_pressure_ << " timestep= " << timestep_reprise_integrated_pressure_ << finl;
+          cout << "Lecture pression integree initiale dans fichier " << fichier_reprise_integrated_pressure_ << " timestep= " << timestep_reprise_integrated_pressure_ << endl;
           const Nom& geom_name = pressure_.get_splitting().get_grid_geometry().le_nom();
           lire_dans_lata(fichier_reprise_integrated_pressure_, timestep_reprise_integrated_pressure_, geom_name, "INTEGRATED_PRESSURE",
                          integrated_pressure_); // fonction qui lit un champ a partir d'un lata .
@@ -279,57 +277,57 @@ int IJK_FT_Post::initialise(int reprise)
   // Pour le check_stats_ :
   if (check_stats_)
     {
-      Cout << "Initialisation champs analytiques (derivee P)"
+      cout << "Initialisation champs analytiques (derivee P)"
            << "\ndPdx = " <<  expression_gradP_analytique_[0]
            << "\ndPdy = " <<  expression_gradP_analytique_[1]
-           << "\ndPdz = " <<  expression_gradP_analytique_[2]  << finl;
+           << "\ndPdz = " <<  expression_gradP_analytique_[2]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivee U)"
+      cout << "Initialisation champs analytiques (derivee U)"
            << "\ndUdx = " <<  expression_gradU_analytique_[0]
            << "\ndUdy = " <<  expression_gradU_analytique_[1]
-           << "\ndUdz = " <<  expression_gradU_analytique_[2]  << finl;
+           << "\ndUdz = " <<  expression_gradU_analytique_[2]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivee V)"
+      cout << "Initialisation champs analytiques (derivee V)"
            << "\ndVdx = " <<  expression_gradV_analytique_[0]
            << "\ndVdy = " <<  expression_gradV_analytique_[1]
-           << "\ndVdz = " <<  expression_gradV_analytique_[2]  << finl;
+           << "\ndVdz = " <<  expression_gradV_analytique_[2]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivee W)"
+      cout << "Initialisation champs analytiques (derivee W)"
            << "\ndWdx = " <<  expression_gradW_analytique_[0]
            << "\ndWdy = " <<  expression_gradW_analytique_[1]
-           << "\ndWdz = " <<  expression_gradW_analytique_[2]  << finl;
+           << "\ndWdz = " <<  expression_gradW_analytique_[2]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes P) "
+      cout << "Initialisation champs analytiques (derivees secondes P) "
            << "\nddPdxdx = " <<  expression_grad2P_analytique_[0]
            << "\nddPdydy = " <<  expression_grad2P_analytique_[1]
            << "\nddPdzdz = " <<  expression_grad2P_analytique_[2] ;
-      Cout   << "\nddPdxdy = " <<  expression_grad2P_analytique_[3]
+      cout   << "\nddPdxdy = " <<  expression_grad2P_analytique_[3]
              << "\nddPdxdz = " <<  expression_grad2P_analytique_[4]
-             << "\nddPdydz = " <<  expression_grad2P_analytique_[5]  << finl;
+             << "\nddPdydz = " <<  expression_grad2P_analytique_[5]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes U) "
+      cout << "Initialisation champs analytiques (derivees secondes U) "
            << "\nddUdxdx = " <<  expression_grad2U_analytique_[0]
            << "\nddUdydy = " <<  expression_grad2U_analytique_[1]
            << "\nddUdzdz = " <<  expression_grad2U_analytique_[2] ;
-      Cout   << "\nddUdxdy = " <<  expression_grad2U_analytique_[3]
+      cout   << "\nddUdxdy = " <<  expression_grad2U_analytique_[3]
              << "\nddUdxdz = " <<  expression_grad2U_analytique_[4]
-             << "\nddUdydz = " <<  expression_grad2U_analytique_[5]  << finl;
+             << "\nddUdydz = " <<  expression_grad2U_analytique_[5]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes V) "
+      cout << "Initialisation champs analytiques (derivees secondes V) "
            << "\nddVdxdx = " <<  expression_grad2V_analytique_[0]
            << "\nddVdydy = " <<  expression_grad2V_analytique_[1]
            << "\nddVdzdz = " <<  expression_grad2V_analytique_[2] ;
-      Cout << "\nddVdxdy = " <<  expression_grad2V_analytique_[3]
+      cout << "\nddVdxdy = " <<  expression_grad2V_analytique_[3]
            << "\nddVdxdz = " <<  expression_grad2V_analytique_[4]
-           << "\nddVdydz = " <<  expression_grad2V_analytique_[5]  << finl;
+           << "\nddVdydz = " <<  expression_grad2V_analytique_[5]  << endl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes W) "
+      cout << "Initialisation champs analytiques (derivees secondes W) "
            << "\nddWdxdx = " <<  expression_grad2W_analytique_[0]
            << "\nddWdydy = " <<  expression_grad2W_analytique_[1]
            << "\nddWdzdz = " <<  expression_grad2W_analytique_[2];
-      Cout   << "\nddWdxdy = " <<  expression_grad2W_analytique_[3]
+      cout   << "\nddWdxdy = " <<  expression_grad2W_analytique_[3]
              << "\nddWdxdz = " <<  expression_grad2W_analytique_[4]
-             << "\nddWdydz = " <<  expression_grad2W_analytique_[5]  << finl;
+             << "\nddWdydz = " <<  expression_grad2W_analytique_[5]  << endl;
 
       for (int i = 0; i < 3; i++)
         {
@@ -369,7 +367,7 @@ void IJK_FT_Post::complete(int reprise)
 
 int IJK_FT_Post::initialise_stats(IJK_Splitting& splitting, ArrOfDouble& vol_bulles, const double vol_bulle_monodisperse)
 {
-  Cout << "Initialisation des statistiques. T_debut_statistiques=" << t_debut_statistiques_ << finl;
+  cout << "Initialisation des statistiques. T_debut_statistiques=" << t_debut_statistiques_ << endl;
   int nalloc = statistiques_FT_.initialize(ref_ijk_ft_,splitting, check_stats_);
   // Si on utilise un seul groupe et qu'on impose un volume unique a toutes les bulles,
   if (vol_bulle_monodisperse>=0.)
@@ -398,7 +396,7 @@ void IJK_FT_Post::init_indicatrice_non_perturbe()
   if ( (fichier_reprise_indicatrice_non_perturbe_ != "??") && (fichier_reprise_indicatrice_non_perturbe_ != "RESET"))
     {
       const int timestep_reprise_indicatrice_non_perturbe = 1; // 1 ou 0 est le premier? attention au get_db ou latadb...
-      Cout << "Lecture indicatrice non perturbee dans fichier " << fichier_reprise_indicatrice_non_perturbe_ << " timestep= " << timestep_reprise_indicatrice_non_perturbe << finl;
+      cout << "Lecture indicatrice non perturbee dans fichier " << fichier_reprise_indicatrice_non_perturbe_ << " timestep= " << timestep_reprise_indicatrice_non_perturbe << endl;
       const Nom& geom_name = indicatrice_non_perturbe_.get_splitting().get_grid_geometry().le_nom();
       lire_dans_lata(fichier_reprise_indicatrice_non_perturbe_, timestep_reprise_indicatrice_non_perturbe, geom_name, "INDICATRICE_PERTURBE",
                      indicatrice_non_perturbe_); // fonction qui lit un champ a partir d'un lata .
@@ -439,14 +437,14 @@ static void interpolate_to_center(FixedVector<IJK_Field_double, 3>& cell_center_
 // GAB
 void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double current_time, int time_iteration)
 {
-  Cout << "1" << finl;
+  cout << "1" << endl;
   statistiques().begin_count(postraitement_counter_);
-  Cout << "2" << finl;
+  cout << "2" << endl;
 
   const int latastep = compteur_post_instantanes_;
-  Cout << "3" << finl;
+  cout << "3" << endl;
   dumplata_newtime(lata_name,current_time);
-  Cout << "4" << finl;
+  cout << "4" << endl;
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);
@@ -463,13 +461,13 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("GRAD_U");
       liste_post_instantanes_.add("GRAD_V");
       liste_post_instantanes_.add("GRAD_W");
-  Cout << "5" << finl;
+      cout << "5" << endl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         liste_post_instantanes_.add("FORCE_PH");
-  Cout << "6" << finl;
+      cout << "6" << endl;
       if (!disable_diphasique_)
         interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
-  Cout << "1a" << finl;
+      cout << "1a" << endl;
 
       {
         int idx_th = 0;
@@ -491,22 +489,22 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_en;
           }
       }
-  Cout << "2a" << finl;
+      cout << "2a" << endl;
     }
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
     {
-  Cout << "3a" << finl;
+      cout << "3a" << endl;
       //source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
     }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
-  Cout << "4a" << finl;
+      cout << "4a" << endl;
       //source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
       repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
-  Cout << "5a" << finl;
+      cout << "5a" << endl;
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -530,7 +528,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           dumplata_vector(lata_name,"EXTERNAL_FORCE", ref_ijk_ft_.force_rappel_[0], ref_ijk_ft_.force_rappel_[1], ref_ijk_ft_.force_rappel_[2], latastep);
         }
       else
-        Cerr << "Posttraitement demande pour EXTERNAL_FORCE but ignored because coef_immobilisation_ <= 1e-16" << finl;
+        Cerr << "Posttraitement demande pour EXTERNAL_FORCE but ignored because coef_immobilisation_ <= 1e-16" << endl;
     }
   if (liste_post_instantanes_.contient_("NUM_COMPO"))
     {
@@ -552,7 +550,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   // GAB
   if (liste_post_instantanes_.contient_("FORCE_PH"))
     {
-  Cout << "6a" << finl;
+      cout << "6a" << endl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         {
           n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
@@ -560,9 +558,9 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       else
         {
           n--;
-          Cerr << "Post-processing of FORCE_PH demanded, but the spectral force is not present, not initialized" << finl;
+          Cerr << "Post-processing of FORCE_PH demanded, but the spectral force is not present, not initialized" << endl;
         }
-  Cout << "7a" << finl;
+      cout << "7a" << endl;
     }
   //
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
@@ -632,10 +630,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           if (!Process::je_suis_maitre())
             {
               Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):"
-                                 << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                                 << " " << ni << " " << nj << " " << nk << " " << ntot << endl;
             }
         }
-      Cerr << finl ;
+      Cerr << endl ;
       n--,dumplata_vector(lata_name,"ECART_ANA", ecart_ana_[0], ecart_ana_[1], ecart_ana_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("PRESSURE_ANA"))
@@ -658,7 +656,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         }
       else
         {
-          Cerr << "To do for other time scheme" << finl;
+          Cerr << "To do for other time scheme" << endl;
         }
       Cerr << "GB: ERROR P FIELD " << ct;
       double err = 0.;
@@ -683,10 +681,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       if (!Process::je_suis_maitre())
         {
           Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_P_ANA sur ce proc (ni,nj,nk,ntot):"
-                             << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                             << " " << ni << " " << nj << " " << nk << " " << ntot << endl;
         }
       ecart_p_ana_.echange_espace_virtuel(ecart_p_ana_.ghost());
-      Cerr << finl ;
+      Cerr << endl ;
       n--,dumplata_scalar(lata_name,"ECART_P_ANA", ecart_p_ana_, latastep);
     }
   if (liste_post_instantanes_.contient_("D_VELOCITY_ANA"))
@@ -715,10 +713,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             if (!Process::je_suis_maitre())
               {
                 Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):"
-                                   << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                                   << " " << ni << " " << nj << " " << nk << " " << ntot << endl;
               }
           }
-        Cerr << finl ;
+        Cerr << endl ;
       }
       n--,dumplata_vector(lata_name,"D_VELOCITY_ANA", d_velocity_ana_[0],d_velocity_ana_[1],d_velocity_ana_[2], latastep);
     }
@@ -927,9 +925,9 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     n--,dumplata_cellvector(lata_name,"GROUPS_FT", interfaces_.groups_indicatrice_n_ft(), latastep);
   if (liste_post_instantanes_.contient_("SURFACE_VAPEUR_PAR_FACE"))
     {
-      Cerr << "Tentative de sauvegarder champ surface vapeur par face" << finl;
+      Cerr << "Tentative de sauvegarder champ surface vapeur par face" << endl;
       n--,dumplata_vector(lata_name, "SURFACE_VAPEUR_PAR_FACE", interfaces_.get_surface_vapeur_par_face()[0], interfaces_.get_surface_vapeur_par_face()[1], interfaces_.get_surface_vapeur_par_face()[2], latastep);
-      Cerr << "Reussi" << finl;
+      Cerr << "Reussi" << endl;
     }
   if (liste_post_instantanes_.contient_("BARYCENTRE_VAPEUR_PAR_FACE"))
     {
@@ -998,12 +996,12 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         ++curseur_en;
       }
 
-    Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
+    Cerr << "les champs postraites sont: " << liste_post_instantanes_ << endl;
   }
 
   if (n>0)
     {
-      Cerr << "Il y a des noms de champs a postraiter inconnus dans la liste de champs a postraiter" << finl;
+      Cerr << "Il y a des noms de champs a postraiter inconnus dans la liste de champs a postraiter" << endl;
       Process::exit();
     }
 
@@ -1134,7 +1132,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
 #else
               sprintf(s, "%s_bulles_Ti_%ld.out", nomcas, idx_th);
 #endif
-              // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+              // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
               fic.ouvrir(s, mode);
               sprintf(s, "%.16e ", current_time);
               fic << s;
@@ -1143,10 +1141,10 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
                   sprintf(s,"%.16e ", Ti_per_bubble[i]);
                   fic << s;
                 }
-              fic << finl;
+              fic << endl;
               fic.close();
 
-              // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+              // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
 #ifndef INT_is_64_
               sprintf(s, "%s_bulles_phin_%d.out", nomcas, idx_th);
 #else
@@ -1160,10 +1158,10 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
                   sprintf(s,"%.16e ", phin_per_bubble[i]);
                   fic << s;
                 }
-              fic << finl;
+              fic << endl;
               fic.close();
 
-              Cerr << "Fin de l'ecriture des stats par bulles pour la temperature " << idx_th << finl;
+              Cerr << "Fin de l'ecriture des stats par bulles pour la temperature " << idx_th << endl;
             }
 
           ++idx_th;
@@ -1180,7 +1178,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
 
       sprintf(s, "%s_bulles_pousseex.out", nomcas);
-      // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
       fic.ouvrir(s, mode);
       sprintf(s, "%.16e ", current_time);
       fic << s;
@@ -1189,11 +1187,11 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", poussee(i,0));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_hx.out", nomcas);
-      // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
       fic.ouvrir(s, mode);
       sprintf(s, "%.16e ", current_time);
       fic << s;
@@ -1202,11 +1200,11 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", hauteurs_bulles(i,0));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_hy.out", nomcas);
-      // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
       fic.ouvrir(s, mode);
       sprintf(s, "%.16e ", current_time);
       fic << s;
@@ -1215,11 +1213,11 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", hauteurs_bulles(i,1));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_hz.out", nomcas);
-      // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
       fic.ouvrir(s, mode);
       sprintf(s, "%.16e ", current_time);
       fic << s;
@@ -1228,11 +1226,11 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", hauteurs_bulles(i,2));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_centre_x.out", nomcas);
-      // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
       fic.ouvrir(s, mode);
       sprintf(s, "%.16e ", current_time);
       fic << s;
@@ -1241,7 +1239,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", position(i,0));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_centre_y.out", nomcas);
@@ -1253,7 +1251,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", position(i,1));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_centre_z.out", nomcas);
@@ -1265,7 +1263,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", position(i,2));
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_surface.out", nomcas);
@@ -1277,7 +1275,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", surface[i]);
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       sprintf(s, "%s_bulles_volume.out", nomcas);
@@ -1289,7 +1287,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           sprintf(s,"%.16e ", volume[i]);
           fic << s;
         }
-      fic << finl;
+      fic << endl;
       fic.close();
 
       if (interfaces_.follow_colors())
@@ -1304,7 +1302,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
               sprintf(s,"%d ", (True_int)colors[i]);
               fic << s;
             }
-          fic << finl;
+          fic << endl;
           fic.close();
         }
 #if 0
@@ -1321,7 +1319,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
               sprintf(s,"%.16e ", individual_forces(ib,idir));
               fic << s;
             }
-          fic << finl;
+          fic << endl;
           fic.close();
         }
     }
@@ -1450,7 +1448,7 @@ const FixedVector<IJK_Field_double, 3>& IJK_FT_Post::get_IJK_vector_field(const 
     }
   Cerr << "Erreur dans IJK_FT_Post::get_IJK_vector_field : "
        << "Champ demande : " << nom
-       << " Liste des champs possibles : "  << finl;
+       << " Liste des champs possibles : "  << endl;
   Process::exit();
   throw;
 }
@@ -1475,7 +1473,7 @@ int convert_suffix_to_int(const Nom& nom)
   if(is_suffix_number)
     {
       suffix_int = std::stoi(suffix);
-      Cerr << suffix_int << finl ;
+      Cerr << suffix_int << endl ;
     }
   return suffix_int ;
 }
@@ -1493,7 +1491,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
-          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_velocity_[0];
@@ -1502,7 +1500,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
-          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_velocity_[1];
@@ -1511,7 +1509,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
-          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_VELOCITY while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_velocity_[2];
@@ -1522,7 +1520,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
-          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_spectrale_[0];
@@ -1531,7 +1529,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
-          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_spectrale_[1];
@@ -1540,7 +1538,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
-          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_FORCE_PH while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_spectrale_[2];
@@ -1551,7 +1549,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
-          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_grad_p_[0];
@@ -1560,7 +1558,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
-          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_grad_p_[1];
@@ -1569,7 +1567,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
-          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_GRAD_P while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_grad_p_[2];
@@ -1581,7 +1579,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[0];
@@ -1590,7 +1588,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[1];
@@ -1599,7 +1597,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[2];
@@ -1609,7 +1607,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[0];
@@ -1618,7 +1616,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[1];
@@ -1627,7 +1625,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     {
       if (!liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
         {
-          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
       return cell_source_interface_[2];
@@ -1672,7 +1670,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
       // Reponse GB : le vrai test a faire c'est si le field force_ph existe, ie s'il y a un forcage
       if (!liste_post_instantanes_.contient_("FORCE_PH"))
         {
-          Cerr << "A probe is attempting to access a field FORCE_PH while it has not been computed in the post-processed fields" << finl;
+          Cerr << "A probe is attempting to access a field FORCE_PH while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
 //      FixedVector<IJK_Field_double, 3>& source_spectrale = ref_ijk_ft_.forcage_.get_force_ph2();
@@ -1702,7 +1700,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
 
   const int idx_wanted = convert_suffix_to_int(nom);
   const Nom field_name = nom.getPrefix(Nom("_")+Nom(idx_wanted)) ;
-  Cerr << "In get_IJK_field by name : " << nom << " read as : (" << field_name << " ; "<< idx_wanted << ")" << finl;
+  Cerr << "In get_IJK_field by name : " << nom << " read as : (" << field_name << " ; "<< idx_wanted << ")" << endl;
 
 // Remplir la liste de tous les possibles :
   Motcles liste_champs_thermiques_possibles;
@@ -1711,18 +1709,18 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
   if (rang ==-1)
     {
       Cerr << field_name << " not found as possible for field name. Should be in the list: "
-           << liste_champs_thermiques_possibles  << finl;
+           << liste_champs_thermiques_possibles  << endl;
       Process::exit();
     }
 
   const Motcle& mot= liste_champs_thermiques_possibles[rang];
   if ((mot == field_name) && (idx_wanted>=0))
     {
-      Cerr << "found as planned " << finl;
+      Cerr << "found as planned " << endl;
     }
   else
     {
-      Cerr << "Some issue with the name provided for the sonde. Unrecognised."  << finl;
+      Cerr << "Some issue with the name provided for the sonde. Unrecognised."  << endl;
       Process::exit();
     }
 
@@ -1765,10 +1763,10 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
     }
 
-  Cerr << "Erreur dans IJK_FT_Post::get_IJK_field : " << finl;
-  Cerr << "Champ demande : " << nom << finl;
-  Cerr << "Index maximal pour la temperature : " << idx_th-1 << finl;
-  Cerr << "Liste des champs possibles pour la thermique : " << liste_champs_thermiques_possibles  << finl;
+  Cerr << "Erreur dans IJK_FT_Post::get_IJK_field : " << endl;
+  Cerr << "Champ demande : " << nom << endl;
+  Cerr << "Index maximal pour la temperature : " << idx_th-1 << endl;
+  Cerr << "Liste des champs possibles pour la thermique : " << liste_champs_thermiques_possibles  << endl;
   Process::exit();
   throw;
 
@@ -1782,7 +1780,7 @@ const int& IJK_FT_Post::get_IJK_flag(const Nom& nom) const
 
   Cerr << "Erreur dans IJK_FT_Post::get_IJK_variable : "
        << "Variable demandee : " << nom
-       << " Liste des variables possibles : "  << finl;
+       << " Liste des variables possibles : "  << endl;
   Process::exit();
   throw;
 }
@@ -1824,13 +1822,13 @@ void IJK_FT_Post::sauvegarder_post_maitre(const Nom& lata_name, SFichier& fichie
 
   if (statistiques_FT_.t_integration() > 0.)
     {
-      Cerr << "All bubbles : " << finl;
+      Cerr << "All bubbles : " << endl;
       fichier << " statistiques_FT " << statistiques_FT_;
       // S'il y a plusieurs groups, on s'occupe des objets stats pour chaque group:
       // (en ecrivant directement le vecteur d'objets)
       if (interfaces_.nb_groups()>1)
         {
-          Cerr << "Group by group :" << finl;
+          Cerr << "Group by group :" << endl;
           fichier << " groups_statistiques_FT "<< groups_statistiques_FT_;
         }
     }
@@ -1978,7 +1976,7 @@ int IJK_FT_Post::alloc_fields()
       // On alloue un tableau assez grand pour contenir tous les groupes.
       if (interfaces_.nb_groups()>3)
         {
-          Cerr << "More than 3 groups are planned, but the allocated fields has only 3 components" << finl;
+          Cerr << "More than 3 groups are planned, but the allocated fields has only 3 components" << endl;
           Process::exit();
         }
       // TODO AYM: allocate fait dans IJK_Interfaces a l init
@@ -2154,13 +2152,13 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
 {
   if (tstep % dt_post_ == dt_post_-1 || stop)
     {
-      Cout << "tstep : " << tstep << finl;
+      cout << "tstep : " << tstep << endl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
   // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
   if ((post_par_paires_ == 1 && tstep % dt_post_ == 0) ) // si stop==1 il ne faut pas entrer dans cette boucle
     {
-      Cout << "deuxieme de la paire, tstep : " << tstep << finl;
+      cout << "deuxieme de la paire, tstep : " << tstep << endl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
   // --
@@ -2301,7 +2299,7 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
                        && index_kp1 >= 0 && index_k >= 0 )
                     {
                       //Process::Journal() << "Proc: " << Process::me() << " i,j,k: "
-                      //                   << index_i << " " << index_j << " " << index_k << finl;
+                      //                   << index_i << " " << index_j << " " << index_k << endl;
                       c_1 = indic(index_i, index_j, index_k);
                       if(index_i != ni+gh-1)
                         c_2 = indic(index_i+1, index_j, index_k);
@@ -2390,7 +2388,7 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
             {
               // Error!
               Cerr << "Error in ijk_interpolate_implementation: request interpolation of point "
-                   << x << " " << y << " " << z << " which is outside of the domain on processor " << Process::me() << finl;
+                   << x << " " << y << " " << z << " which is outside of the domain on processor " << Process::me() << endl;
               Process::exit();
             }
         }
@@ -2443,7 +2441,7 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
     if (phase < 0 || phase > 1)
       Process::exit();
 
-    Cerr << extended_p(0,0,0) << finl;
+    Cerr << extended_p(0,0,0) << endl;
 
 
     // If we need it, mesh must not be "const"
@@ -2501,7 +2499,7 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
             {
               if ((interfaces_.In_ft()(i,j,k) > 1.e-6 ) && (1.-interfaces_.In_ft()(i,j,k) > 1.e-6))
                 {
-                  // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+                  // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << endl;
                   //The normal may only be computed on the extended domain
                   // A relationship between the indices of the two meshes is defined
                   // Non sono piu necessari perche si lavora solo  una griglia, quella estesa
@@ -2523,8 +2521,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                   //     normale[0]=1.;
                   //     normale[1]=1.;
                   //     normale[2]=1.;
-                  //     Cerr << "Error no compo traversante on proc. " << Process::me() << finl;
-                  //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+                  //     Cerr << "Error no compo traversante on proc. " << Process::me() << endl;
+                  //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << endl;
                   //     Process::exit();
                   //   }
                   // else if ( nb_compo_traversantes == 1)
@@ -2557,27 +2555,27 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                   norm =  sqrt(normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2]);
                   //if (norm<0.95)
                   //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
-                  //                       << " norm= " << norm << finl;
+                  //                       << " norm= " << norm << endl;
                   //  }
                   if (norm<1.e-8)
                     {
-                      // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
-                      Process::Journal() << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+                      // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << endl;
+                      Process::Journal() << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << endl;
                       Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided ("
-                                         <<  " normale " << normale[0] << " " << normale[1] << " " << normale[2] << " )" << finl;
-                      Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
+                                         <<  " normale " << normale[0] << " " << normale[1] << " " << normale[2] << " )" << endl;
+                      Process::Journal() << " But we have no distance to extrapolate the pressure" << endl;
                       dist = 1.52*sqrt(dx*dx+dy*dy+dz*dz)/3.;
                       if (interfaces_.In_ft()(i,j,k)*(1-interfaces_.In_ft()(i,j,k))>1.e-6)
                         {
-                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << endl;
                           if (interfaces_.In_ft()(i,j,k)>0.99)
                             {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << finl;
+                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << endl;
                               extended_pv_ft_(i,j,k) = 1.e20;
                             }
                           else
                             {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << finl;
+                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << endl;
                               extended_pl_ft_(i,j,k) = 1.e20;
                             }
                           continue; // This cell is not added to crossed cells.
@@ -2592,15 +2590,15 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                           norm =  sqrt(normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2]);
                           if (std::fabs(norm)<1.e-10)
                             {
-                              Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
+                              Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << endl;
                             }
                         }
                     }
 
                   if (std::fabs(norm)<1.e-10)
                     {
-                      Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
-                      Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
+                      Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << endl;
+                      Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << endl;
                       dist = 0.;
                       errcount_pext++;
                     }
@@ -2642,7 +2640,7 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   errcount_pext = Process::mp_sum(errcount_pext);
   if ((Process::je_suis_maitre()) && (errcount_pext))
     {
-      Cerr << "[WARNING-Extended-pressure] Error Count = " << errcount_pext << finl;
+      Cerr << "[WARNING-Extended-pressure] Error Count = " << errcount_pext << endl;
     }
 
 // Interpolation on the image points
@@ -2707,9 +2705,9 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   inval_pl_count = Process::mp_sum(inval_pl_count);
   inval_pv_count = Process::mp_sum(inval_pv_count);
   if ((Process::je_suis_maitre()) && (inval_pl_count))
-    Cerr << "[WARNING-Extended-pressure] Invalid p_l cells Count = " << inval_pl_count << finl;
+    Cerr << "[WARNING-Extended-pressure] Invalid p_l cells Count = " << inval_pl_count << endl;
   if ((Process::je_suis_maitre()) && (inval_pv_count))
-    Cerr << "[WARNING-Extended-pressure] Invalid p_v cells Count = " << inval_pv_count << finl;
+    Cerr << "[WARNING-Extended-pressure] Invalid p_v cells Count = " << inval_pv_count << endl;
 
 
   // The previous evaluated extended pressure has to be recomputed on the real NS domain
@@ -2798,9 +2796,9 @@ for (int icompo = 0; icompo < nbulles_tot; icompo++)
     pv_2(icompo) = pv(icompo)-source(icompo)+diff(icompo);
   }
 // Printing on screen
-Cout<< "courbure: "  << k;
-Cout<< "Liquid field: "  << pl;
-Cout<< "Vapor field: "  << pv_2;
+cout<< "courbure: "  << k;
+cout<< "Liquid field: "  << pl;
+cout<< "Vapor field: "  << pv_2;
 
 }
 fichier_reprise_vitesse_
@@ -2907,7 +2905,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
                                                           LIST_CURSEUR(IJK_Thermique) curseur,
                                                           const int idx)
 {
-  Cerr << liste_post_instantanes << finl;
+  Cerr << liste_post_instantanes << endl;
   int n = 0; // nombre de champs postraites
   std::ostringstream oss;
   oss << "TEMPERATURE_" << idx;
@@ -3047,7 +3045,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_pos
                                                         LIST_CURSEUR(IJK_Energie) curseur,
                                                         const int idx)
 {
-  Cerr << liste_post_instantanes << finl;
+  Cerr << liste_post_instantanes << endl;
   int n = 0; // nombre de champs postraites
   std::ostringstream oss;
   oss << "TEMPERATURE_EN_" << idx;
@@ -3114,7 +3112,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Mot
                                                                        LIST_CURSEUR(IJK_Thermique) curseur,
                                                                        const int idx)
 {
-  Cerr << liste_post_instantanes << finl;
+  Cerr << liste_post_instantanes << endl;
   int n = 0; // nombre de champs postraites
   std::ostringstream oss;
   oss << "INTERFACE_TEMPERATURE_" << idx;
@@ -3163,7 +3161,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcl
                                                                      LIST_CURSEUR(IJK_Energie) curseur,
                                                                      const int idx)
 {
-  Cerr << liste_post_instantanes << finl;
+  Cerr << liste_post_instantanes << endl;
   int n = 0; // nombre de champs postraites
   std::ostringstream oss;
   oss << "INTERFACE_TEMPERATURE_EN_" << idx;
@@ -3212,7 +3210,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
                                                          )
 {
 
-  //Cerr << liste_post_instantanes << finl;
+  //Cerr << liste_post_instantanes << endl;
   int n = 0; // nombre de champs postraites
 
   if (liste_post_instantanes.contient_("TEMPERATURE"))
@@ -3272,7 +3270,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
     }
 
   return n;
-  Cerr << "Aucun champs thermiques n'a ete lu" << finl;
+  Cerr << "Aucun champs thermiques n'a ete lu" << endl;
 } */
 
 /*
@@ -3376,10 +3374,10 @@ if (liste_post_instantanes.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
        if (!Process::je_suis_maitre())
          {
            Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_T_ANA sur ce proc (ni,nj,nk,ntot):"
-                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                              << " " << ni << " " << nj << " " << nk << " " << ntot << endl;
          }
        // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
-       Cerr << finl ;
+       Cerr << endl ;
 
       n++,dumplata_scalar(lata_name,"ECART_T_ANA", curseur->ecart_t_ana_, latastep);
     }
@@ -3417,10 +3415,10 @@ if (liste_post_instantanes.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
        if (!Process::je_suis_maitre())
          {
            Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_SOURCE_TEMPERATURE_ANA sur ce proc (ni,nj,nk,ntot):"
-                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                              << " " << ni << " " << nj << " " << nk << " " << ntot << endl;
          }
        // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
-       Cerr << finl ;
+       Cerr << endl ;
 
       n++,dumplata_scalar(lata_name,"ECART_SOURCE_TEMPERATURE_ANA", curseur->ecart_source_t_ana_, latastep);
     }
