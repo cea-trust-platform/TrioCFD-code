@@ -485,11 +485,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
     {
-      source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
+      //source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
     }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
-      source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
+      //source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
@@ -857,13 +857,13 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
     n--,dumplata_vector(lata_name,"VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
-    n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", source_interface_ft_[0],
-                        source_interface_ft_[1],
-                        source_interface_ft_[2], latastep);
+    n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ft_[0],
+                        ref_ijk_ft_.terme_source_interfaces_ft_[1],
+                        ref_ijk_ft_.terme_source_interfaces_ft_[2], latastep);
   // GAB
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
-      interpolate_to_center(cell_source_interface_,source_interface_ns_);
+      interpolate_to_center(cell_source_interface_,ref_ijk_ft_.terme_source_interfaces_ns_);
       n--,dumplata_cellvector(lata_name,"SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))

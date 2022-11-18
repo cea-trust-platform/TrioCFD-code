@@ -317,7 +317,7 @@ protected:
   const IJK_Interfaces& interfaces_;
   IJK_Field_double& pressure_;                   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3>& velocity_;   // non-const because some echange_espace_virtuel()
-  FixedVector<IJK_Field_double, 3> source_spectrale_;   // non-const because some echange_espace_virtuel()
+  FixedVector<IJK_Field_double, 3>& source_spectrale_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_interface_ft_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_interface_ns_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> repulsion_interface_ns_;   // non-const because some echange_espace_virtuel()
