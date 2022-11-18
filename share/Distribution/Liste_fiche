@@ -122,6 +122,8 @@
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/conservation_volume NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/barycentrage_lissage NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/repulsion NNR
+./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/energie_bulle_seule NNR
+./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/surfaces_barycentre_vapeur_par_face NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/switch NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/forcage_thi_101 NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/interfacial_temperature_and_flux NNR
