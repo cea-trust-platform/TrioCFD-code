@@ -439,10 +439,14 @@ static void interpolate_to_center(FixedVector<IJK_Field_double, 3>& cell_center_
 // GAB
 void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double current_time, int time_iteration)
 {
+  Cout << "1" << finl;
   statistiques().begin_count(postraitement_counter_);
+  Cout << "2" << finl;
 
   const int latastep = compteur_post_instantanes_;
+  Cout << "3" << finl;
   dumplata_newtime(lata_name,current_time);
+  Cout << "4" << finl;
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);
@@ -459,10 +463,13 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("GRAD_U");
       liste_post_instantanes_.add("GRAD_V");
       liste_post_instantanes_.add("GRAD_W");
+  Cout << "5" << finl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         liste_post_instantanes_.add("FORCE_PH");
+  Cout << "6" << finl;
       if (!disable_diphasique_)
         interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
+  Cout << "1a" << finl;
 
       {
         int idx_th = 0;
@@ -484,18 +491,22 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_en;
           }
       }
+  Cout << "2a" << finl;
     }
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
     {
+  Cout << "3a" << finl;
       //source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
     }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
+  Cout << "4a" << finl;
       //source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
       repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
+  Cout << "5a" << finl;
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -541,6 +552,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   // GAB
   if (liste_post_instantanes_.contient_("FORCE_PH"))
     {
+  Cout << "6a" << finl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         {
           n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
@@ -550,6 +562,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           n--;
           Cerr << "Post-processing of FORCE_PH demanded, but the spectral force is not present, not initialized" << finl;
         }
+  Cout << "7a" << finl;
     }
   //
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
