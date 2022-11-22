@@ -13,20 +13,20 @@
 *
 *****************************************************************************/
 
-#ifndef Saturation_eau_c3_included
-#define Saturation_eau_c3_included
+#ifndef Saturation_R12_c1_included
+#define Saturation_R12_c1_included
 
 #include <Saturation_base.h>
 
-class Saturation_eau_c3 : public Saturation_base
+class Saturation_R12_c1 : public Saturation_base
 {
-  Declare_instanciable(Saturation_eau_c3);
+  Declare_instanciable(Saturation_R12_c1);
 
 private:
   void Tsat_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
   void dP_Tsat_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dT_Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override;
+  void Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override { Process::exit(que_suis_je() + " : Psat(T) isn't included in R12 fortran laws !");};
+  void dT_Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override { Process::exit(que_suis_je() + " : Psat(T) isn't included in R12 fortran laws !");};
   void Lvap_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
   void dP_Lvap_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
   void Hls_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
@@ -37,4 +37,4 @@ private:
   void sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
 };
 
-#endif /* Saturation_R12_c3_included */
+#endif /* Saturation_R12_c1_included */

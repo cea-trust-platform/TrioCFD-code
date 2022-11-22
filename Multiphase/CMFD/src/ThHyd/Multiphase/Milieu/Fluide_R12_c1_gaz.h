@@ -13,28 +13,36 @@
 *
 *****************************************************************************/
 
-#ifndef Saturation_eau_c3_included
-#define Saturation_eau_c3_included
+#ifndef Fluide_R12_c1_gaz_included
+#define Fluide_R12_c1_gaz_included
 
-#include <Saturation_base.h>
+#include <Fluide_reel_base.h>
 
-class Saturation_eau_c3 : public Saturation_base
+class Fluide_R12_c1_gaz: public Fluide_reel_base
 {
-  Declare_instanciable(Saturation_eau_c3);
+  Declare_instanciable(Fluide_R12_c1_gaz);
+
+  /* bornes (p, T_g) de H2OPROP.H */
+  std::map<std::string, std::array<double, 2>> unknown_range() const override
+  {
+    return { { "pression" , { 0.01e5, 260e5}}, { "temperature", { -250, 2000}} };
+  }
+
+protected :
+  void rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dP_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dT_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dP_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void dT_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void cp_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void beta_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+  void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 
 private:
-  void Tsat_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dP_Tsat_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dT_Psat_(const SpanD T, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void Lvap_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dP_Lvap_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void Hls_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dP_Hls_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void Hvs_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
-  void dP_Hvs_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
+  int like_eos_ = 0;
 
-  void sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
 };
 
-#endif /* Saturation_R12_c3_included */
+#endif /* Fluide_eau_c3_gaz_included */
