@@ -23,7 +23,6 @@
 #ifndef Dispersion_bulles_turbulente_LLB_included
 #define Dispersion_bulles_turbulente_LLB_included
 #include <Dispersion_bulles_base.h>
-#include <Correlation.h>
 
 /*! @brief classe Dispersion_bulles_turbulente_LLB coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
  *

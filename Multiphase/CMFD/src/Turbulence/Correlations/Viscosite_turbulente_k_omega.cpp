@@ -84,7 +84,7 @@ void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const
   int i, nl = k_sur_eps.dimension(0), n, N = k_sur_eps.dimension(1), Nt = omega.dimension(1);
   assert(nl == omega.dimension(0) && Nt <= N);
   for (i = 0; i < nl; i++)
-    for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/omega(i, n) : 0) : 0;
+    for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/(omega(i, n)*beta_k_) : 0) : 0;
 }
 
 void Viscosite_turbulente_k_omega::eps(DoubleTab& eps_) const

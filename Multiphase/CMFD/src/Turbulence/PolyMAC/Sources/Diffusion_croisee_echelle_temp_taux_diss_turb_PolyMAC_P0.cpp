@@ -229,11 +229,12 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
 
             if (diss(e,n)>1.e-8) // Else everything = 0
               {
-                secmem(e, n) += pe(e) * ve(e) * sigma_d * alpha_rho(e, n) / diss_passe(e, n)*(2-diss(e, n)/diss_passe(e, n))* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
-                if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("alpha")       ? der_alpha_rho.at("alpha")(e,n) : 0 )       / diss_passe(e, n)*(2-diss(e, n)/diss_passe(e, n))* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
-                if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e,n) : 0 ) / diss_passe(e, n)*(2-diss(e, n)/diss_passe(e, n))* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
-                if (!(Mp==nullptr))    (*Mp)(N * e + n, Np * e + mp)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e,n) : 0 )    / diss_passe(e, n)*(2-diss(e, n)/diss_passe(e, n))* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
-                if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= pe(e) * ve(e) * sigma_d * alpha_rho(e, n) * (-1/(diss_passe(e,n)*diss_passe(e,n))) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
+                double dp = std::max(diss_passe(e, n), 1.e-6);
+                secmem(e, n) += pe(e) * ve(e) * sigma_d * alpha_rho(e, n) / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
+                if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("alpha")       ? der_alpha_rho.at("alpha")(e,n) : 0 )       / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
+                if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e,n) : 0 ) / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
+                if (!(Mp==nullptr))    (*Mp)(N * e + n, Np * e + mp)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e,n) : 0 )    / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
+                if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= pe(e) * ve(e) * sigma_d * alpha_rho(e, n) * (-1/(dp*dp)) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
               }
           }
       }
