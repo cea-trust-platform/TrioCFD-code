@@ -14,30 +14,30 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Flux_parietal_Kommajosyula.h
+// File:        Flux_parietal_Kurul_Podowski.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Flux_parietal_Kommajosyula_included
-#define Flux_parietal_Kommajosyula_included
+#ifndef Flux_parietal_Kurul_Podowski_included
+#define Flux_parietal_Kurul_Podowski_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
 #include <Correlation.h>
 #include <Param.h>
 
-/*! @brief classe Flux_parietal_Kommajosyula classe qui implemente une correlation de flux parietal monophasique
+/*! @brief classe Flux_parietal_Kurul_Podowski classe qui implemente une correlation de flux parietal diphasique
  *
  *       pour un ecoulement turbulent avec une loi de paroi adaptative
- *       (i.e. qui peut gerer la domaine visqueuse comme la domaine log en proche paroi)
+ *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
  *       cf page 123 de la these de Kommajosyula
  *
  *
  */
-class Flux_parietal_Kommajosyula : public Flux_parietal_base
+class Flux_parietal_Kurul_Podowski : public Flux_parietal_base
 {
-  Declare_instanciable(Flux_parietal_Kommajosyula);
+  Declare_instanciable(Flux_parietal_Kurul_Podowski);
 public:
   virtual void qp(const input_t& input, output_t& output) const override;
 
@@ -47,15 +47,6 @@ public:
 
 protected :
   Correlation correlation_monophasique_;
-  double theta_ ; //contact angle on the surface
-  double molar_mass_ ; //molar mass (unit: kg/mol)
-
-  double Lambert_W_function(double x) const;
-  double dx_Lambert_W_function(double x) const;
-  double Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
-  double dTp_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
-  double dTl_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
-  double dTk_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
 };
 
 #endif
