@@ -10,6 +10,7 @@ Lire DOM
   uniform_domain_size_k 6.28318530717959 # 2pi #
   perio_i
   perio_j
+  perio_k
 }
 
 IJK_Splitting grid_splitting
@@ -25,6 +26,7 @@ IJK_FT_double
 {
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 0
+  tinit 0.
   timestep 0.1
   nb_pas_dt_max 10   
   time_scheme RK3_FT
@@ -32,6 +34,7 @@ IJK_FT_double
 #  include_pressure_gradient_in_ustar #
   timestep_facsec 1.0   
   dt_post 1
+#  postraiter_sous_pas_de_temps #
   dt_post_stats_bulles 1000
   dt_post_stats_plans 1000
    Boundary_Conditions {
@@ -68,8 +71,8 @@ IJK_FT_double
   # 2pi/Lx = 6.28318530717959 #
   expression_variable_source_x  -0.*1047.1975511966*3.14159265358979*z*(1.-z)*cos(3.14159265358979*t)*cos(1047.1975511966*x)*sin(1047.1975511966*y)
   expression_variable_source_y   0.*1047.1975511966*3.14159265358979*z*(1.-z)*cos(3.14159265358979*t)*sin(1047.1975511966*x)*cos(1047.1975511966*y)
-  expression_variable_source_z  (sin(x)+sin(y)+sin(z))*cos(t)
-  postraiter_sous_pas_de_temps
+  expression_variable_source_z  0.
+  expression_potential_phi (sin(x)+sin(y)+sin(z))*cos(t)
   gravite 3 0. 0. 0. 
   rho_liquide 1.
   mu_liquide 1e-20
@@ -92,4 +95,5 @@ IJK_FT_double
        pression_p  pressure periode 0.0000000000000001 point 1 0.001 0.001 0.0
   }
 }
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 Fin

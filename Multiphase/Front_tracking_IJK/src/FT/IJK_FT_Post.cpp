@@ -603,9 +603,17 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         }
       else if (ref_ijk_ft_.get_time_scheme() == IJK_FT_double::RK3_FT)
         {
-          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, 2);
+          Cerr << "rkstep " << ref_ijk_ft_.rk_step_ << finl;
+          int rk_step_before = ref_ijk_ft_.rk_step_;
+          if ((rk_step_before==0) || (rk_step_before==3))
+            rk_step_before = 2;
+          else if (rk_step_before==1)
+            rk_step_before = 0;
+          else /* ici, c'est rk_step_before=2 */
+            rk_step_before = 1;
+          Cerr << "rkstep_before " << rk_step_before  << finl;
+          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, rk_step_before);
           ct -= intermediate_dt;
-
         }
       else
         {
