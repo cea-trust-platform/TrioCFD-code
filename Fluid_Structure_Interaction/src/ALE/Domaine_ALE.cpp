@@ -1124,13 +1124,13 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
   const int nbModes=fluidForceOnBeam.size();
 
-  if (flux_bords_grad.size()==0)
-    {
-      //The flux_bords are zero during the first time step following a resumption of calculation
-      //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
-      SFichier os("toto_grad.txt");
-      op_grad.impr(os);
-    }
+  /* if (flux_bords_grad.size()==0)
+     {
+       //The flux_bords are zero during the first time step following a resumption of calculation
+       //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
+       SFichier os("toto_grad.txt");
+       op_grad.impr(os);
+     }*/
 
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
