@@ -1761,21 +1761,23 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
           // ON NE VEUT PAS METTRE A JOUR TERME_SOURCE_ACCELERATION_ AVEC CETTE METHODE
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
-              //terme_source_acceleration_ += derivee_acceleration * timestep;
-              terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
-              //facteur_variable_source_ += derivee_facteur_sv * timestep;
-              facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
+              terme_source_acceleration_ += derivee_acceleration * timestep;
+              //terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
+              facteur_variable_source_ += derivee_facteur_sv * timestep;
+              //facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
               new_time += timestep;
             }
           else if ( get_time_scheme() == RK3_FT )
             {
               const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep, rk_step);
-              //runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
-              //                             terme_source_acceleration_, rk_step, timestep);
-              terme_source_acceleration_ += 0;
-              //runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
-              //                             facteur_variable_source_, rk_step, timestep);
-              facteur_variable_source_ += 0;
+              runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
+                                            terme_source_acceleration_, rk_step, timestep);
+              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
+              //terme_source_acceleration_ += 0;
+              runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
+                                            facteur_variable_source_, rk_step, timestep);
+              Cout << "facteur_variable_source_" << facteur_variable_source_ << finl;
+              //facteur_variable_source_ += 0;
               new_time += intermediate_dt;
             }
         }
@@ -2369,32 +2371,10 @@ void IJK_FT_double::run()
                   for (int dir=0; dir<3; dir++)
                     {
                       rho_u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir]);
-//                      rho_u_euler_ap_rho_mu_ind[dir] += 7;
                       u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                     }
                 }
             }
-          /* A SUPPRIMER
-          // GAB qdm patch a posteriori, choix 1 : v* = v - < \r u >/< \r >
-          // choix 10 : on evalue qdm_patch_correction_ sans l'appliquer
-          if (patch_qdm_gr_ == 1 || patch_qdm_gr_ == 10)
-            {
-              calculer_rho_v(rho_field_,velocity_,rho_u_euler_ap_rho_mu_ind_champ);
-              for (int dir=0; dir<3; dir++)
-                if(dir != direction_gravite_)
-                  {
-                    qdm_patch_correction_[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir])/calculer_v_moyen(rho_field_);
-                    if (patch_qdm_gr_ == 1)
-                      {
-                        IJK_Field_double& vel = velocity_[dir];
-                        for (int k=0; k<vel.nk(); k++)
-                          for (int j=0; j<vel.nj(); j++)
-                            for (int i=0; i<vel.ni(); i++)
-                              vel(i,j,k) -= qdm_patch_correction_[dir];
-                      }
-                  }
-            }
-          */
           if (!(qdm_corrections_.is_type_none()))
             {
               set_time_for_corrections();
@@ -2533,6 +2513,11 @@ void IJK_FT_double::run()
                 compute_and_add_qdm_corrections_monophasic();
               else
                 compute_and_add_qdm_corrections();
+            }
+          else
+            {
+              Cout << "qdm_corrections_.is_type_none() : " << qdm_corrections_.is_type_none() << finl;
+              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
             }
         }
       else
@@ -3411,6 +3396,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                 for (int i = 0; i < ni; i++)
                   {
                     dv(i,j,k) += facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f;
+                    Cout << "facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f" << facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f << endl;
                   }
             }
           else

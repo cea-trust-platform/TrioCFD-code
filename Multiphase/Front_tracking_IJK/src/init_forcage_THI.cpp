@@ -176,17 +176,17 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
     }
   if (type_forcage_active==100)
     {
-      Cout << "On force un dirac en spectral, uniX" << finl;
+      Cout << "On force un dirac en spectral, uniX : cos(kx) ex" << finl;
       f_sp_THI.compute_dirac_point_uniX_alongX();
     }
   if (type_forcage_active==200)
     {
-      Cout << "On force un dirac en spectral, uniX" << finl;
+      Cout << "On force un dirac en spectral, uniX : cos(kx) ey" << finl;
       f_sp_THI.compute_dirac_point_uniX_alongY();
     }
   if (type_forcage_active==010)
     {
-      Cout << "On force un dirac en spectral, uniY" << finl;
+      Cout << "On force un dirac en spectral, uniY : cos(k_) e_" << finl;
       f_sp_THI.compute_dirac_point_uniY();
     }
   if (type_forcage_active==001 || type_forcage_active==1)
