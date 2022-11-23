@@ -64,7 +64,7 @@ Fluide_Incompressible
 	# Thermal expanson coefficient #
 	beta_th Champ_Uniforme 1 0.0034
 	# Gravity field #
-	gravity Champ_Uniforme 3 0 -9.81 0
+	gravite Champ_Uniforme 3 0 -9.81 0
 }
 
 	Navier_Stokes_Turbulent
