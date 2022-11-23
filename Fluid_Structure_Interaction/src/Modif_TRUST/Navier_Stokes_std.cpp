@@ -1124,9 +1124,9 @@ bool Navier_Stokes_std::initTimeStep(double dt)
 
   //Resumption: The flux_bords are zero during the first time step following a resumption of calculation
   //and are updated only at the end of this time step. The call to the "ajouter" function is used to update flux_bords variable.
-  DoubleTab resu=la_vitesse.valeurs();
-  resu=0.;
-  terme_diffusif.ajouter(la_vitesse.valeurs(),resu);
+  //DoubleTab resu=la_vitesse.valeurs();
+  //resu=0.;
+  //terme_diffusif.ajouter(la_vitesse.valeurs(),resu);
   //end resumption
 
   P_n=pression()->valeurs();
