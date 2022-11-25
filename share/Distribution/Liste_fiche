@@ -59,7 +59,7 @@
 ./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE STD
 ./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/RotationALE NNR
 ./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE STD
-./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeam NNR
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE NNR
 ./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
 ./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE NNR
 ./Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_NO_MASS STD
