@@ -164,7 +164,7 @@ Read pb
     format Lata 
     fichier lata/post1 
     champs dt_post 0.1 { 
-        vitesse faces 
+        vitesse elem 
         pression elem 
         indicatrice_agit elem 
         Divergence_U elem 

@@ -117,6 +117,9 @@ liste_postraitements {
 	postraitement_ft_lata post1 { 
     format Lata 
     fichier lata/post 
+    champs dt_post 1. {
+	indicatrice_interf elem
+    }
     interfaces interf { 
         pe som 
         courbure som 
