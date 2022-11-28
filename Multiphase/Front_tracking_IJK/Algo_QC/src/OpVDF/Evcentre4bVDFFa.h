@@ -35,9 +35,9 @@
  *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
  *  convectif qui figure au second membre de l'equation d'evolution
  *  c.a.d l'oppose du flux convectif
- * 
  *
- * @sa Eval_Conv_VDF 
+ *
+ * @sa Eval_Conv_VDF
  */
 class Eval_centre4b_VDF_Face : public Eval_Conv_VDF, public Eval_VDF_Face
 {

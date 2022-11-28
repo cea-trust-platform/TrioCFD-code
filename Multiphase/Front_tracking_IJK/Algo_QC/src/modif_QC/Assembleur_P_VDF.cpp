@@ -704,8 +704,8 @@ int Assembleur_P_VDF::assembler(Matrice& matrice)
  *
  *   et calcul des coefficients pour modifier_secmem.
  *
- * @param (matrice) La matrice a assembler. Contrainte:    Soit la matrice n'est pas encore typee (alors on la "construit"), soit c'est la meme que lors de l'appel precedent. 
- * @param (rho)  
+ * @param (matrice) La matrice a assembler. Contrainte:    Soit la matrice n'est pas encore typee (alors on la "construit"), soit c'est la meme que lors de l'appel precedent.
+ * @param (rho)
  */
 int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
                                              const Champ_Don_base& rho)
@@ -771,8 +771,8 @@ int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
  *     Le drapeau resoudre_increment_pression est mis a zero s'il n'a pas
  *     encore ete assigne.
  *
- * @param (DoubleTab& tab_rho) mass volumique 
- * @return (int) renvoie toujours 1 
+ * @param (DoubleTab& tab_rho) mass volumique
+ * @return (int) renvoie toujours 1
  */
 int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {

@@ -50,8 +50,8 @@ Convection_Diffusion_Chaleur_QC::Convection_Diffusion_Chaleur_QC():mode_convecti
 
 /*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
  *
- * @param (Sortie& is) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Convection_Diffusion_Chaleur_QC::printOn(Sortie& is) const
 {
@@ -61,8 +61,8 @@ Sortie& Convection_Diffusion_Chaleur_QC::printOn(Sortie& is) const
 
 /*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree& is) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree& is) le flot d'entree modifie
  */
 Entree& Convection_Diffusion_Chaleur_QC::readOn(Entree& is)
 {
@@ -180,8 +180,8 @@ int Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(const Motcle& motl
 
 /*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_Incompressible ou en Fluide_Ostwald.
  *
- * @param (Milieu_base& un_milieu)  
- * @throws les proprietes physiques du fluide ne sont pas toutes specifiees 
+ * @param (Milieu_base& un_milieu)
+ * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
  */
 void Convection_Diffusion_Chaleur_QC::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -229,7 +229,7 @@ void Convection_Diffusion_Chaleur_QC::discretiser()
  * (un Fluide_Incompressible upcaste en Milieu_base)
  *     (version const)
  *
- * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base 
+ * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base
  */
 const Milieu_base& Convection_Diffusion_Chaleur_QC::milieu() const
 {
@@ -241,7 +241,7 @@ const Milieu_base& Convection_Diffusion_Chaleur_QC::milieu() const
  *
  * (un Fluide_Incompressible upcaste en Milieu_base)
  *
- * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base 
+ * @return (Milieu_base&) le Fluide_Incompressible upcaste en Milieu_base
  */
 Milieu_base& Convection_Diffusion_Chaleur_QC::milieu()
 {
@@ -253,8 +253,8 @@ Milieu_base& Convection_Diffusion_Chaleur_QC::milieu()
  *
  * (version const)
  *
- * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
- * @throws pas de fluide associe a l'eqaution 
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation
+ * @throws pas de fluide associe a l'eqaution
  */
 const Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide() const
 {
@@ -269,8 +269,8 @@ const Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide() const
 
 /*! @brief Renvoie le fluide incompressible associe a l'equation.
  *
- * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
- * @throws pas de fluide associe a l'eqaution 
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation
+ * @throws pas de fluide associe a l'eqaution
  */
 Fluide_Incompressible& Convection_Diffusion_Chaleur_QC::fluide()
 {
@@ -336,8 +336,8 @@ void Convection_Diffusion_Chaleur_QC::calculer_div_u_ou_div_rhou(DoubleTab& deri
  * Le calcul est le suivant:
  *          d(inconnue)/dt = M^{-1} * (sources - somme(Op_{i}(inconnue))) / rho
  *
- * @param (DoubleTab& derivee) le tableau des valeurs de la derivee en temps du champ inconnu 
- * @return (DoubleTab&) le tableau des valeurs de la derivee en temps du champ inconnu 
+ * @param (DoubleTab& derivee) le tableau des valeurs de la derivee en temps du champ inconnu
+ * @return (DoubleTab&) le tableau des valeurs de la derivee en temps du champ inconnu
  */
 DoubleTab& Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco(DoubleTab& derivee)
 {
@@ -735,9 +735,9 @@ int Convection_Diffusion_Chaleur_QC::sauvegarder(Sortie& os) const
  * Appelle Equation_base::reprendre()
  *      et reprend l'inconnue de la chaleur et la pression thermodynamique
  *
- * @param (Entree& is) un flot d'entree 
- * @return (int) renvoie toujours 1 
- * @throws la reprise a echoue, identificateur de la pression non trouve 
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ * @throws la reprise a echoue, identificateur de la pression non trouve
  */
 int Convection_Diffusion_Chaleur_QC::reprendre(Entree& is)
 {
@@ -773,8 +773,8 @@ int Convection_Diffusion_Chaleur_QC::reprendre(Entree& is)
  *
  * Appelle Equation_base::impr(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (int) code de retour propage 
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage
  */
 int Convection_Diffusion_Chaleur_QC::impr(Sortie& os) const
 {
@@ -786,7 +786,7 @@ int Convection_Diffusion_Chaleur_QC::impr(Sortie& os) const
  *
  * Ici "Thermique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation 
+ * @return (Motcle&) le nom du domaine d'application de l'equation
  */
 const Motcle& Convection_Diffusion_Chaleur_QC::domaine_application() const
 {
@@ -800,7 +800,7 @@ const Motcle& Convection_Diffusion_Chaleur_QC::domaine_application() const
 
 /*! @brief Associe un fluide incompressible a l'equation.
  *
- * @param (Fluide_Incompressible& un_fluide) le milieu fluide incompressible a associer a l'equation 
+ * @param (Fluide_Incompressible& un_fluide) le milieu fluide incompressible a associer a l'equation
  */
 void Convection_Diffusion_Chaleur_QC::associer_fluide(const Fluide_Incompressible& un_fluide)
 {

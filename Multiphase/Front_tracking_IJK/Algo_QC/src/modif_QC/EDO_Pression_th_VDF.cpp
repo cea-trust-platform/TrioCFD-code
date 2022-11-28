@@ -72,7 +72,7 @@ void EDO_Pression_th_VDF::completer()
 
 /*! @brief Calcule la moyenne volumique de la grandeur P0 donnee
  *
- * @return (DoubleTab&) rho discretise par face 
+ * @return (DoubleTab&) rho discretise par face
  */
 double EDO_Pression_th_VDF::moyenne_vol(const DoubleTab& tab) const
 {
@@ -153,7 +153,7 @@ void EDO_Pression_th_VDF::calculer_rho_face_np1(const DoubleTab& tab_rhoP0)
 
 /*! @brief Renvoie rho avec la meme discretisation que la vitesse : une valeur par face en VDF
  *
- * @return (DoubleTab&) rho discretise par face 
+ * @return (DoubleTab&) rho discretise par face
  */
 const DoubleTab& EDO_Pression_th_VDF::rho_discvit() const
 {
@@ -165,7 +165,7 @@ const DoubleTab& EDO_Pression_th_VDF::rho_discvit() const
 
 /*! @brief Renvoie div(u) avec la meme discretisation que la vitesse : une valeur par face en VDF
  *
- * @return (DoubleTab&) div(u) discretise par face 
+ * @return (DoubleTab&) div(u) discretise par face
  */
 void EDO_Pression_th_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secmem2)
 {
@@ -193,7 +193,7 @@ void EDO_Pression_th_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secm
 
 /*! @brief Renvoie la valeur de la pression calculee pour conserver la masse
  *
- * @return (Double) pression calculee 
+ * @return (Double) pression calculee
  */
 double EDO_Pression_th_VDF::masse_totale(double P,const DoubleTab& T)
 {
@@ -229,7 +229,7 @@ double EDO_Pression_th_VDF::masse_totale(double P,const DoubleTab& T)
 
 /*! @brief Calcule le second membre de l'equation de continuite : div(rhoU) = W = -dZ/dT    avec Z=rho
  *
- * @return (DoubleTab&) rho discretise par face 
+ * @return (DoubleTab&) rho discretise par face
  */
 void EDO_Pression_th_VDF::secmembre_divU_Z(DoubleTab& tab_W) const
 {
