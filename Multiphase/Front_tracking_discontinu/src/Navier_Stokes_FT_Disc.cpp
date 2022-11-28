@@ -1850,14 +1850,14 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                   u0(face) = 0.; // there is no normal velocity at a symmetry axis
                   continue;
                 }
-              double x = 0.;
+              //double x = 0.;
               double xx = 0.;
               // Si on n'est pas au bord...
               if (e1 >= 0)
                 {
                   const double nx = normale_elements(e1, dir);
                   const double c = ((xf-xp(e1,dir)) * nx >0.) ? c0 : c1;
-                  x = c*secmem2[e1]*nx;
+                  //x = c*secmem2[e1]*nx;
                   const double ai= interfacial_area(e1);
                   // nx pointe vers le liquide (sortant de phase 0)
                   if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
@@ -1904,7 +1904,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 {
                   const double nx = normale_elements(e2, dir);
                   const double c = ((xf-xp(e2,dir)) * nx >0.) ? c0 : c1;
-                  x += c*secmem2[e2]*normale_elements(e2, dir);
+                  //x += c*secmem2[e2]*normale_elements(e2, dir);
                   const double ai= interfacial_area(e2);
                   if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
                     {
@@ -3246,13 +3246,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         }
 #if TCL_MODEL
 
-      double int_sec_mem2 = 0.;
+      /* double int_sec_mem2 = 0.;
       double int_sec_mem = 0.;
       for (int elem = 0; elem < nb_elem; elem++)
         {
-          int_sec_mem2 +=secmem2(elem);
+          //int_sec_mem2 +=secmem2(elem);
           int_sec_mem +=secmem(elem);
-        }
+        } */
       //   Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl;
       //  Cerr << "Integral of secmem before TCL and /DT : " << int_sec_mem << finl;
 
@@ -3340,8 +3340,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       secmem += secmem2;
       secmem.echange_espace_virtuel();
 #if NS_VERBOSE
-      int_sec_mem2 = 0;
-      int_sec_mem = 0;
+      double int_sec_mem2 = 0;
+      double int_sec_mem = 0;
       for (int elem = 0; elem < nb_elem; elem++)
         {
           int_sec_mem2 +=secmem2(elem);

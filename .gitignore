@@ -6,11 +6,13 @@ env_TrioCFD.sh
 full_env_TrioCFD.sh
 TrioCFD
 TrioCFD_opt
+TrioCFD_semi_opt
 Makefile
 README.BALTIK
 index.html
 .test*
 Lois_eau_c3.h.bak
+local/
 
 # Eclipse
 .cproject
