@@ -166,15 +166,13 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
     }
 
   double limiter_ = visc_turb.limiteur();
-  double nut_l, fac;
+  double nut_l = -10000., fac;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
                    &tab_alp = equation().probleme().get_champ("alpha").passe(),
                     &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
                      &k = equation().probleme().get_champ("k").valeurs(),
-                      &pk = equation().probleme().get_champ("k").passe(),
-                       *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
-                        *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr ;
+                      *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr;
 
   const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
