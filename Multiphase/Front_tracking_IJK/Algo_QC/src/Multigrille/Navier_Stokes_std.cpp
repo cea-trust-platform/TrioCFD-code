@@ -66,8 +66,8 @@ Navier_Stokes_std::Navier_Stokes_std():methode_calcul_pression_initiale_(0),div_
 }
 /*! @brief Simple appel a:  Equation_base::printOn(Sortie&) Ecrit l'equation sur un flot de sortie.
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Navier_Stokes_std::printOn(Sortie& is) const
 {
@@ -81,13 +81,13 @@ Sortie& Navier_Stokes_std::printOn(Sortie& is) const
  *         - le terme convectif,
  *         - le solveur en pression
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  * @throws terme diffusif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger 
+ * un type negligeable pour l'operateur si il est a negliger
  * @throws terme convectif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger 
- * @throws solveur pression non defini dans jeu de donnees 
+ * un type negligeable pour l'operateur si il est a negliger
+ * @throws solveur pression non defini dans jeu de donnees
  */
 Entree& Navier_Stokes_std::readOn(Entree& is)
 {
@@ -282,7 +282,7 @@ const Champ_base& Navier_Stokes_std::vitesse_pour_transport()
  *
  *      s'associe avec les operateurs de divergence et de gradient.
  *
- * @param (Probleme_base& pb) le probleme auquel s'associer 
+ * @param (Probleme_base& pb) le probleme auquel s'associer
  */
 void Navier_Stokes_std::associer_pb_base(const Probleme_base& pb)
 {
@@ -407,7 +407,7 @@ void Navier_Stokes_std::discretiser_assembleur_pression()
 
 /*! @brief Renvoie le nombre d'operateurs de l'equation: Pour Navier Stokes Standard c'est 2.
  *
- * @return (int) le nombre d'operateur de l'equation 
+ * @return (int) le nombre d'operateur de l'equation
  */
 int Navier_Stokes_std::nombre_d_operateurs() const
 {
@@ -425,8 +425,8 @@ int Navier_Stokes_std::nombre_d_operateurs_tot() const
  *      exit si i>1
  *     (version const)
  *
- * @param (int i) l'index de l'operateur a renvoyer 
- * @return (Operateur&) l'operateur indexe par i 
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur indexe par i
  */
 const Operateur& Navier_Stokes_std::operateur(int i) const
 {
@@ -451,8 +451,8 @@ const Operateur& Navier_Stokes_std::operateur(int i) const
  *       - le terme_convectif si i = 1
  *      exit si i>1
  *
- * @param (int i) l'index de l'operateur a renvoyer 
- * @return (Operateur&) l'operateur indexe par i 
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur indexe par i
  */
 Operateur& Navier_Stokes_std::operateur(int i)
 {
@@ -511,7 +511,7 @@ Operateur& Navier_Stokes_std::operateur_fonctionnel(int i)
 
 /*! @brief Renvoie l'operateur de calcul de la divergence associe a l'equation.
  *
- * @return (Operateur_Div&) l'operateur de calcul de la divergence. 
+ * @return (Operateur_Div&) l'operateur de calcul de la divergence.
  */
 Operateur_Div& Navier_Stokes_std::operateur_divergence()
 {
@@ -522,7 +522,7 @@ Operateur_Div& Navier_Stokes_std::operateur_divergence()
  *
  *     (version const)
  *
- * @return (Operateur_Div&) l'operateur de calcul de la divergence 
+ * @return (Operateur_Div&) l'operateur de calcul de la divergence
  */
 const Operateur_Div& Navier_Stokes_std::operateur_divergence() const
 {
@@ -531,7 +531,7 @@ const Operateur_Div& Navier_Stokes_std::operateur_divergence() const
 
 /*! @brief Renvoie l'operateur de calcul du gradient associe a l'equation.
  *
- * @return (Operateur_Grad&) l'operateur de calcul du gradient 
+ * @return (Operateur_Grad&) l'operateur de calcul du gradient
  */
 Operateur_Grad& Navier_Stokes_std::operateur_gradient()
 {
@@ -542,7 +542,7 @@ Operateur_Grad& Navier_Stokes_std::operateur_gradient()
  *
  *     (version const)
  *
- * @return (Operateur_Grad&) l'operateur de calcul du gradient 
+ * @return (Operateur_Grad&) l'operateur de calcul du gradient
  */
 const Operateur_Grad& Navier_Stokes_std::operateur_gradient() const
 {
@@ -552,7 +552,7 @@ const Operateur_Grad& Navier_Stokes_std::operateur_gradient() const
 
 /*! @brief Renvoie la vitesse (champ inconnue de l'equation) (version const)
  *
- * @return (Champ_Inc&) le champ inconnue representant la vitesse 
+ * @return (Champ_Inc&) le champ inconnue representant la vitesse
  */
 const Champ_Inc& Navier_Stokes_std::inconnue() const
 {
@@ -561,7 +561,7 @@ const Champ_Inc& Navier_Stokes_std::inconnue() const
 
 /*! @brief Renvoie la vitesse (champ inconnue de l'equation)
  *
- * @return (Champ_Inc&) le champ inconnue representant la vitesse 
+ * @return (Champ_Inc&) le champ inconnue representant la vitesse
  */
 Champ_Inc& Navier_Stokes_std::inconnue()
 {
@@ -570,7 +570,7 @@ Champ_Inc& Navier_Stokes_std::inconnue()
 
 /*! @brief Renvoie le solveur en pression (version const)
  *
- * @return (SolveurSys&) le solveur en pression 
+ * @return (SolveurSys&) le solveur en pression
  */
 SolveurSys& Navier_Stokes_std::solveur_pression()
 {
@@ -581,7 +581,7 @@ SolveurSys& Navier_Stokes_std::solveur_pression()
  *
  *     (version const)
  *
- * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation
  */
 const Fluide_Incompressible& Navier_Stokes_std::fluide() const
 {
@@ -591,7 +591,7 @@ const Fluide_Incompressible& Navier_Stokes_std::fluide() const
 
 /*! @brief Renvoie le fluide incompressible (milieu physique de l'equation) associe a l'equation.
  *
- * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation
  */
 Fluide_Incompressible& Navier_Stokes_std::fluide()
 {
@@ -725,7 +725,7 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
  *     On resoud le probleme en vitesse en appliquant le solveur
  *     de masse au gradient de P:  U=V - dt*M-1BtP
  *
- * @throws pas de temps trop petit 
+ * @throws pas de temps trop petit
  */
 void Navier_Stokes_std::projeter()
 {
@@ -833,7 +833,7 @@ int Navier_Stokes_std::projection_a_faire()
  *
  *      initialisation de la pression.
  *
- * @return (int) renvoie toujours 1 
+ * @return (int) renvoie toujours 1
  */
 int Navier_Stokes_std::preparer_calcul()
 // assemblage du systeme en pression
@@ -947,7 +947,7 @@ int Navier_Stokes_std::preparer_calcul()
  *      Integration des points suivis si le fluide est marque
  *      Mise a jour du champ postraitable correspondant
  *
- * @param (double temps) le temps de mise a jour 
+ * @param (double temps) le temps de mise a jour
  */
 void Navier_Stokes_std::mettre_a_jour(double temps)
 {
@@ -1088,8 +1088,8 @@ void Navier_Stokes_std::calculer_la_pression_en_pa()
 
 /*! @brief Appelle Equation_base::sauvegarder(Sortie&) et sauvegarde la pression sur un flot de sortie.
  *
- * @param (Sortie& os) un flot de sortie sur lequel sauvegarder 
- * @return (int) renvoie toujours 1 
+ * @param (Sortie& os) un flot de sortie sur lequel sauvegarder
+ * @return (int) renvoie toujours 1
  */
 int Navier_Stokes_std::sauvegarder(Sortie& os) const
 {
@@ -1108,9 +1108,9 @@ int Navier_Stokes_std::sauvegarder(Sortie& os) const
  * Appelle Equation_base::reprendre()
  *      et reprend la pression.
  *
- * @param (Entree& is) un flot d'entree 
- * @return (int) renvoie toujours 1 
- * @throws la reprise a echoue, identificateur de la pression non trouve 
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ * @throws la reprise a echoue, identificateur de la pression non trouve
  */
 int Navier_Stokes_std::reprendre(Entree& is)
 {
@@ -1133,7 +1133,7 @@ int Navier_Stokes_std::reprendre(Entree& is)
  *
  *     a partir de l'objet Milieu_base passe en parametre.
  *
- * @param (Milieu_base& un_milieu) le milieu a associer a l'equation 
+ * @param (Milieu_base& un_milieu) le milieu a associer a l'equation
  */
 void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -1151,7 +1151,7 @@ void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 
 /*! @brief Renvoie le milieu physique de l'equation (le Fluide_Incompressible upcaste en Milieu_base)
  *
- * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base 
+ * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base
  */
 const Milieu_base& Navier_Stokes_std::milieu() const
 {
@@ -1167,7 +1167,7 @@ const Milieu_base& Navier_Stokes_std::milieu() const
  *
  *     (version const)
  *
- * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base 
+ * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base
  */
 Milieu_base& Navier_Stokes_std::milieu()
 {
@@ -1395,8 +1395,8 @@ void Navier_Stokes_std::get_noms_champs_postraitables(Noms& nom,Option opt) cons
  *        - divergence
  *        - gradient
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (int) renvoie toujours 1 
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) renvoie toujours 1
  */
 int Navier_Stokes_std::impr(Sortie& os) const
 {
@@ -1450,7 +1450,7 @@ int Navier_Stokes_std::impr(Sortie& os) const
 
 /*! @brief Renvoie le nom du domaine d'application: "Hydraulique".
  *
- * @return (Motcle&) lenom representant le domaine d'application 
+ * @return (Motcle&) lenom representant le domaine d'application
  */
 const Motcle& Navier_Stokes_std::domaine_application() const
 {

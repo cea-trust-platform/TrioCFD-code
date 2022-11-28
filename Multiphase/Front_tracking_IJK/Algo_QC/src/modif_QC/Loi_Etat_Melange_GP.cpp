@@ -41,8 +41,8 @@ Loi_Etat_Melange_GP::Loi_Etat_Melange_GP()
 
 /*! @brief Imprime la loi sur un flot de sortie.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) le flot de sortie pour l'impression
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Loi_Etat_Melange_GP::printOn(Sortie& os) const
 {
@@ -52,9 +52,9 @@ Sortie& Loi_Etat_Melange_GP::printOn(Sortie& os) const
 
 /*! @brief Lecture d'une loi sur un flot d'entree.
  *
- * @param (Entree& is) le flot d'entree pour la lecture des parametres 
- * @return (Entree&) le flot d'entree modifie 
- * @throws accolade ouvrante attendue 
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
  */
 Entree& Loi_Etat_Melange_GP::readOn(Entree& is)
 {
@@ -97,14 +97,14 @@ Entree& Loi_Etat_Melange_GP::readOn(Entree& is)
 
 /*! @brief Associe le fluide a la loi d'etat
  *
- * @param (Fluide_Quasi_Compressible& fl) le fluide associe 
+ * @param (Fluide_Quasi_Compressible& fl) le fluide associe
  */
 void Loi_Etat_Melange_GP::associer_fluide(const Fluide_Quasi_Compressible& fl)
 {
   le_fluide = fl;
 }
 
-/*! @brief 
+/*! @brief
  *
  */
 void Loi_Etat_Melange_GP::initialiser_inco_ch()
@@ -118,7 +118,7 @@ void Loi_Etat_Melange_GP::initialiser_inco_ch()
 
 /*! @brief Associe l inconnue de chaque equation de fraction massique a la loi d'etat
  *
- * @param (inconnue) l inconnue associee 
+ * @param (inconnue) l inconnue associee
  */
 void Loi_Etat_Melange_GP::associer_inconnue(const Champ_Inc_base& inconnue)
 {
@@ -129,7 +129,7 @@ void Loi_Etat_Melange_GP::associer_inconnue(const Champ_Inc_base& inconnue)
 
 /*! @brief Associe les proprietes physiques d une espece a la loi d'etat
  *
- * @param (M, Cp, mu, lambda)  
+ * @param (M, Cp, mu, lambda)
  */
 void Loi_Etat_Melange_GP::associer_espece(const Convection_Diffusion_fraction_massique_QC& eq)
 {

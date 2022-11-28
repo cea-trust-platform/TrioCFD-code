@@ -36,7 +36,7 @@
  *   Le schema de convection est du type centre4b (centre sur 4 points)
  *   L'iterateur associe est de type Iterateur_VDF_Face
  *   L'evaluateur associe est de type Eval_centre4b_VDF_Face
- * 
+ *
  *
  */
 declare_It_VDF_Face(Eval_centre4b_VDF_Face)

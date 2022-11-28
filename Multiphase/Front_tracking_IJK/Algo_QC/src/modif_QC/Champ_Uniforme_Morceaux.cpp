@@ -34,8 +34,8 @@ Implemente_instanciable(Champ_Uniforme_Morceaux,"Champ_Uniforme_Morceaux",Champ_
 
 /*! @brief Imprime les valeurs du champs sur un flot de sortie
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Champ_Uniforme_Morceaux::printOn(Sortie& os) const
 {
@@ -52,10 +52,10 @@ Sortie& Champ_Uniforme_Morceaux::printOn(Sortie& os) const
  *      Champ_Uniforme_Morceaux nom_domaine nb_comp
  *      { Defaut val_def sous_zone_1 val_1 ... sous_zone_i val_i }
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le champ d'entree modifie 
- * @throws accolade ouvrante attendue 
- * @throws mot clef "defaut" attendu 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le champ d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws mot clef "defaut" attendu
  */
 Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
 {
@@ -192,7 +192,7 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
  *
  * (version const)
  *
- * @return (REF(Domaine)&) reference sur le domaine associe 
+ * @return (REF(Domaine)&) reference sur le domaine associe
  */
 const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
 {
@@ -201,7 +201,7 @@ const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
 
 /*! @brief Renvoie une reference sur le domaine associe.
  *
- * @return (REF(Domaine)&) reference sur le domaine associe 
+ * @return (REF(Domaine)&) reference sur le domaine associe
  */
 REF(Domaine)& Champ_Uniforme_Morceaux::domaine()
 {
@@ -212,7 +212,7 @@ REF(Domaine)& Champ_Uniforme_Morceaux::domaine()
  *
  * (version const)
  *
- * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees
  */
 const LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones() const
 {
@@ -221,7 +221,7 @@ const LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones() const
 
 /*! @brief Renvoie la liste des sous_zones associees.
  *
- * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees
  */
 LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones()
 {
@@ -231,8 +231,8 @@ LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones()
 
 /*! @brief NE FAIT RIEN
  *
- * @param (mp_base& ch)  
- * @return (Champ_base&)  
+ * @param (mp_base& ch)
+ * @return (Champ_base&)
  */
 Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 {
@@ -275,9 +275,9 @@ Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 
 /*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees.
  *
- * @param (DoubleVect& positions) les coordonnees du point de calcul 
- * @param (DoubleVect& valeurs) la valeur du champ au point specifie 
- * @return (DoubleVect&) la valeur du champ au point specifie 
+ * @param (DoubleVect& positions) les coordonnees du point de calcul
+ * @param (DoubleVect& valeurs) la valeur du champ au point specifie
+ * @return (DoubleVect&) la valeur du champ au point specifie
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
                                               DoubleVect& tab_valeurs) const
@@ -293,11 +293,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
  *
  *     situe dans un element specifie.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul 
- * @param (DoubleVect& val) la valeur du champ au point specifie 
- * @param (int le_poly) l'element dans lequel est situe le point de calcul 
- * @return (DoubleVect&) la valeur du champ au point specifie 
- * @throws tableau stockant la valeur du champ de taille incorrecte 
+ * @param (DoubleVect&) les coordonnees du point de calcul
+ * @param (DoubleVect& val) la valeur du champ au point specifie
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @return (DoubleVect&) la valeur du champ au point specifie
+ * @throws tableau stockant la valeur du champ de taille incorrecte
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
                                                    DoubleVect& val,
@@ -326,11 +326,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
  *
  *     situe dans un element specifie.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul 
- * @param (int le_poly) l'element dans lequel est situe le point de calcul 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (double) la valeur de la composante du champ specifiee au point specifie 
- * @throws index de la composante du champ a calculer trop grand 
+ * @param (DoubleVect&) les coordonnees du point de calcul
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (double) la valeur de la composante du champ specifiee au point specifie
+ * @throws index de la composante du champ a calculer trop grand
  */
 double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
                                                     int le_poly,
@@ -357,9 +357,9 @@ double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
 
 /*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
- * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies 
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
+ * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
  */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
                                                DoubleTab& tab_valeurs) const
@@ -373,10 +373,10 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
 
 /*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
- * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
+ * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions,
                                                       DoubleVect& tab_valeurs, int ncomp) const
@@ -392,11 +392,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions
  *
  *     calculs sont situes dans les elements indiques.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
- * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies 
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
- * @throws le tableau des valeurs a plus de 2 entrees (rang > 2) 
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
+ * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
+ * @throws le tableau des valeurs a plus de 2 entrees (rang > 2)
  */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
                                                      const IntVect& les_polys,
@@ -494,11 +494,11 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
  *
  *     calculs sont situes dans les elements indiques.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
- * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
+ * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies
  */
 DoubleVect& Champ_Uniforme_Morceaux::
 valeur_aux_elems_compo(const DoubleTab&,

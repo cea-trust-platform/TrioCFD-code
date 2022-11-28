@@ -31,7 +31,7 @@
  *
  *     pour une equation ayant l'enthalpie en inconnue
  *
- * @sa Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC 
+ * @sa Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC
  */
 class Entree_fluide_temperature_imposee_H  : public Entree_fluide_temperature_imposee
 {

@@ -29,8 +29,8 @@ Implemente_instanciable(Entree_fluide_temperature_imposee_H,"Entree_temperature_
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
  *
- * @param (Sortie& s) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Entree_fluide_temperature_imposee_H::printOn(Sortie& s ) const
 {
@@ -39,8 +39,8 @@ Sortie& Entree_fluide_temperature_imposee_H::printOn(Sortie& s ) const
 
 /*! @brief Simple appel a: Cond_lim_base::readOn(Entree& )
  *
- * @param (Entree& s) un flot d'entree 
- * @return (Entree& s) le flot d'entree modifie 
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree& s) le flot d'entree modifie
  */
 Entree& Entree_fluide_temperature_imposee_H::readOn(Entree& s)
 {
@@ -61,8 +61,8 @@ void Entree_fluide_temperature_imposee_H::completer()
  *     avec une equation dont le domaine est la Thermique
  *     ou bien indetermine.
  *
- * @param (Equation_base& eqn) l'equation avec laquelle il faut verifier la compatibilite 
- * @return (int) valeur booleenne, 1 si les CL sont compatibles avec l'equation 0 sinon 
+ * @param (Equation_base& eqn) l'equation avec laquelle il faut verifier la compatibilite
+ * @return (int) valeur booleenne, 1 si les CL sont compatibles avec l'equation 0 sinon
  */
 int Entree_fluide_temperature_imposee_H::compatible_avec_eqn(const Equation_base& eqn) const
 {
@@ -85,9 +85,9 @@ void Entree_fluide_temperature_imposee_H::mettre_a_jour(double temps)
 }
 /*! @brief Renvoie la valeur imposee sur la i-eme composante du champ a la frontiere.
  *
- * @param (int i) indice suivant la premiere dimension du champ 
- * @return (double) la valeur imposee sur la composante du champ specifiee 
- * @throws deuxieme dimension du champ de frontiere superieur a 1 
+ * @param (int i) indice suivant la premiere dimension du champ
+ * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @throws deuxieme dimension du champ de frontiere superieur a 1
  */
 double Entree_fluide_temperature_imposee_H::val_imp(int i) const
 {
@@ -122,9 +122,9 @@ double Entree_fluide_temperature_imposee_H::val_imp(int i) const
 
 /*! @brief Renvoie la valeur imposee sur la (i,j)-eme composante du champ a la frontiere.
  *
- * @param (int i) indice suivant la premiere dimension du champ 
- * @param (int j) indice suivant la deuxieme dimension du champ 
- * @return (double) la valeur imposee sur la composante du champ specifiee 
+ * @param (int i) indice suivant la premiere dimension du champ
+ * @param (int j) indice suivant la deuxieme dimension du champ
+ * @return (double) la valeur imposee sur la composante du champ specifiee
  */
 double Entree_fluide_temperature_imposee_H::val_imp(int i, int j) const
 {
