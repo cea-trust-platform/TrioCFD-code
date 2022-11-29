@@ -61,6 +61,7 @@ protected :
   double beta_omega = 0.075;
   double beta_k = 0.09;
   double is_tau_=-1 ; // 0 : omega ; 1 : tau
+  double facteur_paroi_=10.;
 };
 
 #endif

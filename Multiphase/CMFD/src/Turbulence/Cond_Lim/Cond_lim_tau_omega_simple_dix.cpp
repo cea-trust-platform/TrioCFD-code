@@ -55,6 +55,7 @@ Entree& Cond_lim_tau_omega_simple_dix::readOn(Entree& s )
   param.ajouter("beta_omega", &beta_omega);
   param.ajouter("beta_k", &beta_k);
   param.ajouter("von_karman", &von_karman_);
+  param.ajouter("facteur_paroi", &facteur_paroi_);
   param.lire_avec_accolades_depuis(s);
 
   le_champ_front.typer("Champ_front_vide");
@@ -128,7 +129,7 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
           int f_domaine = f + f1; // number of the face in the domaine
           int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = 10.*calc_tau(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
+          d_(f, n) = facteur_paroi_*calc_tau(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
         }
     }
   if (is_tau_ == 0)
@@ -138,8 +139,8 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
           int f_domaine = f + f1; // number of the face in the domaine
           int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = 10.*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
-        }
+          d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
+       }
     }
   d_.echange_espace_virtuel();
 }
