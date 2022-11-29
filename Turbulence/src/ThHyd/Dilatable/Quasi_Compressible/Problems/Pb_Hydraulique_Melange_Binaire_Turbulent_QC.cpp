@@ -26,6 +26,7 @@
 
 Implemente_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC,"Pb_Hydraulique_Melange_Binaire_Turbulent_QC",Pb_QC_base);
 // XD pb_hydraulique_melange_binaire_turbulent_qc Pb_base pb_hydraulique_melange_binaire_turbulent_qc -1 Resolution of a turbulent binary mixture problem for a quasi-compressible fluid with an iso-thermal condition.
+// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
 // XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equation for a quasi-compressible fluid as well as the associated turbulence model equations.
 // XD attr Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC 0 Species conservation equation for a quasi-compressible fluid as well as the associated turbulence model equations.
 

@@ -24,6 +24,7 @@
 
 Implemente_instanciable(Pb_Hydraulique_sensibility,"Pb_Hydraulique_sensibility",Pb_Fluide_base);
 // XD Pb_Hydraulique_sensibility Pb_base Pb_Hydraulique_sensibility -1 Resolution of hydraulic sensibility problems
+// XD  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
 // XD  attr Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility 0 Navier-Stokes sensibility equations
 
 

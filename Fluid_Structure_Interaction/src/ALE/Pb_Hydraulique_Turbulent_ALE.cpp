@@ -29,6 +29,7 @@
 
 Implemente_instanciable(Pb_Hydraulique_Turbulent_ALE,"Pb_Hydraulique_Turbulent_ALE",Pb_Fluide_base);
 // XD Pb_Hydraulique_Turbulent_ALE Pb_base Pb_Hydraulique_Turbulent_ALE -1 Resolution of hydraulic turbulent problems for ALE
+// XD  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
 // XD  attr Navier_Stokes_Turbulent_ALE Navier_Stokes_Turbulent_ALE Navier_Stokes_Turbulent_ALE 0 Navier-Stokes_ALE equations as well as the associated turbulence model equations on mobile domain (ALE)
 
 
