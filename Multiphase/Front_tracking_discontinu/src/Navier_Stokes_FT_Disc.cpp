@@ -1803,15 +1803,6 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
 
   if ((variables_internes().new_mass_source_) && (phase_pilote != 1))
     {
-      const double delta_rho = (rho_1 - rho_0);
-      double c0 = 0.;
-      if (std::abs(delta_rho)>DMINFLOAT)
-        {
-          c0 = rho_1/delta_rho;
-        }
-      const double c1 = 1+c0;
-
-      const DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
       const DoubleTab& normale_elements = eq_transport.get_update_normale_interface().valeurs();
       const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
 
@@ -1856,7 +1847,6 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
               if (e1 >= 0)
                 {
                   const double nx = normale_elements(e1, dir);
-                  const double c = ((xf-xp(e1,dir)) * nx >0.) ? c0 : c1;
                   //x = c*secmem2[e1]*nx;
                   const double ai= interfacial_area(e1);
                   // nx pointe vers le liquide (sortant de phase 0)
@@ -1903,7 +1893,6 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
               if (e2 >= 0)
                 {
                   const double nx = normale_elements(e2, dir);
-                  const double c = ((xf-xp(e2,dir)) * nx >0.) ? c0 : c1;
                   //x += c*secmem2[e2]*normale_elements(e2, dir);
                   const double ai= interfacial_area(e2);
                   if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
