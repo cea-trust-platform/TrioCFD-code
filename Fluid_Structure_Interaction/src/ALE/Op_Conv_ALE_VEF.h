@@ -48,6 +48,8 @@ public :
 
   inline void dimensionner(Matrice_Morse& ) const override;
 
+  void completer() override;
+
 protected :
   REF(Zone_VEF) la_zone_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
