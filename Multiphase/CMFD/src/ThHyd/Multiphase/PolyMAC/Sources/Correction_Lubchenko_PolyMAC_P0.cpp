@@ -258,8 +258,12 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
              vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Requis pour corrections vort et u_l-u-g
 
   const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_lift_->valeur());
-
   double vl_norm ;
+
+  Portance_interfaciale_base::input_t in;
+  Portance_interfaciale_base::output_t out;
+  DoubleTab& Cl = out.Cl;
+  Cl.resize(N, N);
 
   /* elements */
   int f;
@@ -268,27 +272,21 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
       /* arguments de coeff */
       for (int n = 0; n < N; n++)
         {
-          a_l(n)   = alpha(e, n);
-          p_l(n)   = press(e, n * (Np > 1));
-          T_l(n)   = temp(e, n);
-          rho_l(n) = rho(!cR * e, n);
-          mu_l(n)  = mu(!cM * e, n);
-          d_b_l(n) = d_bulles(e,n) ;
           for (int k = 0; k < N; k++)
             if(milc.has_interface(n, k))
               {
                 Interface_base& sat = milc.get_interface(n, k);
                 sigma_l(n,k) = sat.sigma(temp(e,n), press(e,n * (Np > 1)));
               }
-
           for (int k = 0; k < N; k++)
             dv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, nullptr, nullptr);
         }
 
-      for (int n = 0; n <Nk; n++)   k_l(n)   = (k_turb)   ? (*k_turb)(e,0) : 0;
+      in.alpha = &alpha(e, 0), in.T = &temp(e, 0), in.p = press(e, 0), in.nv = &dv(0, 0), in.d_bulles= &d_bulles(e,0);
+      in.mu = &mu(!cM * e, 0), in.rho = &rho(!cR * e, 0), in.sigma = &sigma_l(0,0);
+      in.k_turb  = (k_turb)   ? &(*k_turb)(e,0) : nullptr;
 
-
-      correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, k_l, d_b_l, dv, e, coeff);
+      correlation_pi.coefficient(in, out);
 
       double fac_e = beta_lift_*pe(e) * ve(e);
       int i = nf_tot + D * e;
@@ -318,10 +316,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                 else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
                 else                                   fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                secmem(i, n_l) += fac_e * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
-                secmem(i,  k ) -= fac_e * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
-                secmem(i+1,n_l)-= fac_e * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
-                secmem(i+1, k )+= fac_e * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                secmem(i, n_l) += fac_e * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                secmem(i+1,n_l)-= fac_e * out.Cl(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                secmem(i+1, k )+= fac_e * out.Cl(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
               } // 100% explicit
           for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
             if (f<domaine.nb_faces())
@@ -336,10 +334,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                       else if (y_elem(e) > d_bulles(e,k)) fac_f *=  0 ; // no effect
                       else                                fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                      secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
-                      secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
-                      secmem(f, n_l) -= fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
-                      secmem(f,  k ) += fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                      secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                      secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
+                      secmem(f, n_l) -= fac_f * n_f(f, 1)/fs(f) * out.Cl(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
+                      secmem(f,  k ) += fac_f * n_f(f, 1)/fs(f) * out.Cl(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
                     } // 100% explicit
 
         }
@@ -354,35 +352,13 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                 else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
                 else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
 
-                secmem(i, n_l) += fac_e * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                secmem(i,  k ) -= fac_e * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                secmem(i+1, k )-= fac_e * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
-                secmem(i+2, k )-= fac_e * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                secmem(i, n_l) += fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
+                secmem(i+1,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                secmem(i+1, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
+                secmem(i+2,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                secmem(i+2, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
               } // 100% explicit
-
-          /*          for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-                      if (f<domaine.nb_faces())
-                        if (fcl(f, 0) < 2)
-                          for (int k = 0; k < N; k++)
-                            if (k!= n_l) // gas phase
-                              {
-                                int c = (e == f_e(f, 0)) ? 0 : 1 ;
-                                double fac_f = beta_*pf(f) * vf_dir(f, c);
-
-                                if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
-                                else if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
-                                else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
-
-                                secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                                secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                                secmem(f, n_l) += fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                                secmem(f,  k ) -= fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                                secmem(f, n_l) += fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
-                                secmem(f,  k ) -= fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
-                              } // 100% explicit */
-
         }
 
     }
@@ -425,7 +401,11 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
               for (n = 0; n < Nk; n++)  k_l(n)   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
             }
 
-          correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, k_l, d_b_l, dv, e, coeff);
+          in.alpha = &a_l(0), in.T = &T_l(0), in.p = p_l( 0), in.nv = &dv(0, 0), in.d_bulles= &d_b_l(0);
+          in.mu = &mu_l( 0), in.rho = &rho_l(0), in.sigma = &sigma_l(0,0);
+          in.k_turb  = (k_turb)   ? &k_l(0) : nullptr;
+
+          correlation_pi.coefficient(in, out);
 
           grad_l = 0; // we fill grad_l so that grad_l(d, d2) = du_d/dx_d2 by averaging between both elements
           for (d = 0 ; d<D ; d++)
@@ -484,12 +464,12 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                 else if (y_faces(f) > d_b_l(k)) fac_f *=  0 ; // no effect
                 else                            fac_f *= (3*std::pow(2*y_faces(f)/d_b_l(k)-1, 2) - 2*std::pow(2*y_faces(f)/d_b_l(k)-1, 3)) - 1; // partial damping
 
-                secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
-                secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * coeff(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
-                secmem(f, n_l) += fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort_l(0) - vr_l(k, 0) * vort_l(2)) ;
-                secmem(f,  k ) -= fac_f * n_f(f, 1)/fs(f) * coeff(n_l, k) * (vr_l(k, 2) * vort_l(0) - vr_l(k, 0) * vort_l(2)) ;
-                secmem(f, n_l) += fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort_l(1) - vr_l(k, 1) * vort_l(0)) ;
-                secmem(f,  k ) -= fac_f * n_f(f, 2)/fs(f) * coeff(n_l, k) * (vr_l(k, 0) * vort_l(1) - vr_l(k, 1) * vort_l(0)) ;
+                secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
+                secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
+                secmem(f, n_l) += fac_f * n_f(f, 1)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 2) * vort_l(0) - vr_l(k, 0) * vort_l(2)) ;
+                secmem(f,  k ) -= fac_f * n_f(f, 1)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 2) * vort_l(0) - vr_l(k, 0) * vort_l(2)) ;
+                secmem(f, n_l) += fac_f * n_f(f, 2)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 0) * vort_l(1) - vr_l(k, 1) * vort_l(0)) ;
+                secmem(f,  k ) -= fac_f * n_f(f, 2)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 0) * vort_l(1) - vr_l(k, 1) * vort_l(0)) ;
               } // 100% explicit
         }
 
