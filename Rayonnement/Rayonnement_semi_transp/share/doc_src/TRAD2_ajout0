@@ -23,6 +23,10 @@ flux_radiatif condlim_base flux_radiatif 0 Boundary condition for radiation equa
   attr emissivite front_field_base emissivite 0 Wall emissivity, value between 0 and 1.
 flux_radiatif_vdf flux_radiatif flux_radiatif_vdf -1 Boundary condition for radiation equation in VDF.
 flux_radiatif_vef flux_radiatif flux_radiatif_vef -1 Boundary condition for radiation equation in VEF.
+paroi_contact_rayo condlim_base paroi_contact_rayo -1 Thermal condition between two domains.
+  attr autrepb ref_Pb_base autrepb 0 Name of other problem.
+  attr nameb chaine nameb 0 boundary name of the remote problem which should be the same than the local name
+  attr type chaine(into=["TRANSP","SEMI_TRANSP"]) type 0 not_set
 
 floatentier objet_lecture nul 0 A real and an integer.
   attr the_float floattant the_float 0 Real.
