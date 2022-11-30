@@ -12,6 +12,10 @@ echange_contact_rayo_transp_vdf paroi_echange_contact_vdf echange_contact_rayo_t
 frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with transparent gas.
 frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
 frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre
+paroi_contact_rayo condlim_base paroi_contact_rayo -1 Thermal condition between two domains.
+  attr autrepb ref_Pb_base autrepb 0 Name of other problem.
+  attr nameb chaine nameb 0 boundary name of the remote problem which should be the same than the local name
+  attr type chaine(into=["TRANSP","SEMI_TRANSP"]) type 0 not_set
 
 floatentier objet_lecture nul 0 A real and an integer.
   attr the_float floattant the_float 0 Real.

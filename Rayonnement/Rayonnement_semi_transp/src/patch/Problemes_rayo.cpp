@@ -16,12 +16,19 @@
 #include <Problemes_rayo.h>
 
 // XD Pb_Rayo_Conduction Pb_Conduction Pb_Rayo_Conduction -1 Resolution of the heat equation with rayonnement.
+// XD ref solide solide
 // XD Pb_Rayo_Hydraulique pb_hydraulique Pb_Rayo_Hydraulique -1 Resolution of the Navier-Stokes equations with rayonnement.
+// XD ref fluide_incompressible fluide_incompressible
 // XD Pb_Rayo_Thermohydraulique pb_thermohydraulique Pb_Rayo_Thermohydraulique -1 Resolution of pb_thermohydraulique with rayonnement.
+// XD ref fluide_incompressible fluide_incompressible
 // XD Pb_Rayo_Thermohydraulique_QC pb_thermohydraulique_QC Pb_Rayo_Thermohydraulique_QC -1 Resolution of pb_thermohydraulique_QC with rayonnement.
+// XD ref fluide_quasi_compressible fluide_quasi_compressible
 // XD Pb_Rayo_Hydraulique_Turbulent pb_hydraulique_turbulent Pb_Rayo_Hydraulique_Turbulent -1 Resolution of pb_hydraulique_turbulent with rayonnement.
+// XD ref fluide_incompressible fluide_incompressible
 // XD Pb_Rayo_Thermohydraulique_Turbulent pb_thermohydraulique_turbulent Pb_Rayo_Thermohydraulique_Turbulent -1 Resolution of pb_thermohydraulique_turbulent with rayonnement.
+// XD ref fluide_incompressible fluide_incompressible
 // XD Pb_Rayo_Thermohydraulique_Turbulent_QC pb_thermohydraulique_turbulent_qc Pb_Rayo_Thermohydraulique_Turbulent_QC -1 Resolution of pb_thermohydraulique_turbulent_qc with rayonnement.
+// XD ref fluide_quasi_compressible fluide_quasi_compressible
 
 Implemente_instanciable(Pb_Rayo_Conduction,"Pb_Rayo_Conduction",Pb_Conduction);
 Implemente_instanciable(Pb_Rayo_Hydraulique,"Pb_Rayo_Hydraulique",Pb_Hydraulique);
