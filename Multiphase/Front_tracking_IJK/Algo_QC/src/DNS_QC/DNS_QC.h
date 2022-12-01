@@ -48,82 +48,82 @@
 #include <Redistribute_Field.h>
 #endif
 
-
+ 
 class DNS_QC_double : public Interprete
 {
   Declare_instanciable(DNS_QC_double);
-public:
-  Entree& interpreter(Entree&);
+ public:
+  Entree & interpreter(Entree &);
   void run();
   void rk3_time_step();
-protected:
+ protected:
   void initialise();
   void calculer_moyennes_flux();
   void rk3_sub_step(const int rk_step, const double total_timestep);
 
   template<class T>
-  void calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>& rho_v,
-                                   FixedVector<IJK_Field_double, 3>& velocity,
-                                   const ArrOfDouble_with_ghost& delta_z,
+  void calculer_convection_vitesse(FixedVector<IJK_Field_double, 3> & rho_v,
+                                   FixedVector<IJK_Field_double, 3> & velocity,
+                                   const ArrOfDouble_with_ghost & delta_z,
                                    const double facteur_delta_x,
                                    const double facteur_delta_y,
-                                   const ArrOfDouble_with_ghost& delta_z_pour_delta,
+                                   const ArrOfDouble_with_ghost & delta_z_pour_delta,
                                    T& kernel,
-                                   FixedVector<IJK_Field_local_double, 18>& tmp_b,
-                                   FixedVector<IJK_Field_local_double, 18>& tmp_a,
-                                   FixedVector<IJK_Field_double, 3>& d_velocity_tmp,
-                                   FixedVector<IJK_Field_double, 3>& d_velocity,
-                                   IJK_Field_double& u_div_rho_u);
+                                   FixedVector<IJK_Field_local_double, 18> & tmp_b,
+                                   FixedVector<IJK_Field_local_double, 18> & tmp_a,
+                                   FixedVector<IJK_Field_double, 3> & d_velocity_tmp,
+                                   FixedVector<IJK_Field_double, 3> & d_velocity,
+                                   IJK_Field_double & u_div_rho_u);
   template<class T>
-  void calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_double, 3>& velocity,
-                                            const IJK_Field_double& turbulent_mu_xx,
-                                            const IJK_Field_double& turbulent_mu_xy,
-                                            const IJK_Field_double& turbulent_mu_xz,
-                                            const IJK_Field_double& turbulent_mu_yy,
-                                            const IJK_Field_double& turbulent_mu_yz,
-                                            const IJK_Field_double& turbulent_mu_zz,
-                                            const ArrOfDouble_with_ghost& delta_z,
+  void calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_double, 3> & velocity,
+                                            const IJK_Field_double & turbulent_mu_xx,
+                                            const IJK_Field_double & turbulent_mu_xy,
+                                            const IJK_Field_double & turbulent_mu_xz,
+                                            const IJK_Field_double & turbulent_mu_yy,
+                                            const IJK_Field_double & turbulent_mu_yz,
+                                            const IJK_Field_double & turbulent_mu_zz,
+                                            const ArrOfDouble_with_ghost & delta_z,
                                             const double facteur_delta_x,
                                             const double facteur_delta_y,
-                                            const ArrOfDouble_with_ghost& delta_z_pour_delta,
+                                            const ArrOfDouble_with_ghost & delta_z_pour_delta,
                                             T& kernel,
-                                            FixedVector<IJK_Field_local_double, 18>& tmp_b,
-                                            FixedVector<IJK_Field_local_double, 18>& tmp_a,
-                                            FixedVector<IJK_Field_double, 3>& d_velocity_tmp,
-                                            FixedVector<IJK_Field_double, 3>& d_velocity);
+                                            FixedVector<IJK_Field_local_double, 18> & tmp_b,
+                                            FixedVector<IJK_Field_local_double, 18> & tmp_a,
+                                            FixedVector<IJK_Field_double, 3> & d_velocity_tmp,
+                                            FixedVector<IJK_Field_double, 3> & d_velocity);
   template<class T>
-  void calculer_structural_diffusion_vitesse(FixedVector<IJK_Field_double, 3>& velocity,
-                                             const FixedVector<IJK_Field_double, 6>& structural_uu_tensor,
-                                             const ArrOfDouble_with_ghost& delta_z,
+  void calculer_structural_diffusion_vitesse(FixedVector<IJK_Field_double, 3> & velocity,
+                                             const FixedVector<IJK_Field_double, 6> & structural_uu_tensor,
+                                             const ArrOfDouble_with_ghost & delta_z,
                                              const double facteur_delta_x,
                                              const double facteur_delta_y,
-                                             const ArrOfDouble_with_ghost& delta_z_pour_delta,
+                                             const ArrOfDouble_with_ghost & delta_z_pour_delta,
                                              T& kernel,
-                                             FixedVector<IJK_Field_local_double, 18>& tmp_b,
-                                             FixedVector<IJK_Field_local_double, 18>& tmp_a,
-                                             FixedVector<IJK_Field_double, 3>& d_velocity_tmp,
-                                             FixedVector<IJK_Field_double, 3>& d_velocity);
-  void calculer_diffusion_scalar(const IJK_Field_double& rho,
-                                 const IJK_Field_double& turbulent_kappa_x,
-                                 const IJK_Field_double& turbulent_kappa_y,
-                                 const IJK_Field_double& turbulent_kappa_z,
-                                 IJK_Field_double& d_rho,
-                                 const IJK_Field_local_double& boundary_flux_kmin,
-                                 const IJK_Field_local_double& boundary_flux_kmax);
+                                             FixedVector<IJK_Field_local_double, 18> & tmp_b,
+                                             FixedVector<IJK_Field_local_double, 18> & tmp_a,
+                                             FixedVector<IJK_Field_double, 3> & d_velocity_tmp,
+                                             FixedVector<IJK_Field_double, 3> & d_velocity);
+  void calculer_diffusion_scalar(const IJK_Field_double & rho,
+                                 const IJK_Field_double & turbulent_kappa_x,
+                                 const IJK_Field_double & turbulent_kappa_y,
+                                 const IJK_Field_double & turbulent_kappa_z,
+                                 IJK_Field_double & d_rho,
+                                 const IJK_Field_local_double & boundary_flux_kmin,
+                                 const IJK_Field_local_double & boundary_flux_kmax);
 
-  void calcul_p_thermo_et_bilan(const IJK_Field_double& rho,
-                                IJK_Field_double& temperature,
+  void calcul_p_thermo_et_bilan(const IJK_Field_double & rho,
+                                IJK_Field_double & temperature,
                                 const int turbulent_diffusivity,
-                                const IJK_Field_double& lambda_turbulent,
+                                const IJK_Field_double & lambda_turbulent,
                                 const int flag_lambda_anisotropic,
                                 const int structural_uscalar,
-                                const IJK_Field_double& structural_uscalar_z,
+                                const IJK_Field_double & structural_uscalar_z,
                                 const double P_th_initial,
-                                double& P_th_final,
+                                double & P_th_final,
                                 const double fractionnal_timestep,
-                                double& d_Pth_divise_par_gammamoins1) const;
-  // initialise lambda aux paroi, crash si appeller apres le dt Numero 0 ;
-  void calculer_lambda_paroi_air(double& lambda_de_t_paroi_kmin_ , double& lambda_de_t_paroi_kmax_) const;
+                                double & d_Pth_divise_par_gammamoins1) const;
+  // initialise lambda aux paroi, crash si appeller apres le dt Numero 0 ; 
+  void calculer_lambda_paroi_air(double & lambda_de_t_paroi_kmin_ , double & lambda_de_t_paroi_kmax_) const;
 
   void ecrire_fichier_sauv(const char *fichier_sauvegarde,
                            const char *lata_name);
@@ -132,12 +132,12 @@ protected:
   void calculer_velocity_elem();
   void posttraiter_champs_instantanes(const char * lata_name, double time);
 
-  void fixer_reference_pression(double& reference_pression);
-  void translation_pression(const double& reference_pression);
+  void fixer_reference_pression(double & reference_pression);
+  void translation_pression(const double & reference_pression);
 
   IJK_Splitting splitting_;
   // taille des mailles de ce processeur en z, avec des mailles fantomes:
-  ArrOfDouble_with_ghost delta_z_local_;
+  ArrOfDouble_with_ghost delta_z_local_; 
   // Cond.lim diffusion qdm, par defaut paroi fixe:
   Boundary_Conditions boundary_conditions_;
   // -------------------------------------------------
@@ -160,7 +160,7 @@ protected:
   // Statistiques temporelles
   Statistiques_dns_ijk statistiques_;
   double t_debut_statistiques_;
-
+  
   // Statistiques spectrale de la turbulence
   Fourier_trans partie_fourier_;
   int dt_post_spectral_;
@@ -182,7 +182,7 @@ protected:
   IJK_Field_double velocity_elem_Y_sauvegarde_;
   IJK_Field_double velocity_elem_Z_sauvegarde_;
 
-
+  
   // -------------------------------------------------
   // Champs supplementaires (variables temporaires de calcul deduites des inconnues)
   IJK_Field_double velocity_elem_X_;
@@ -306,10 +306,10 @@ protected:
   Nom large_eddy_simulation_formulation_;
   double facteur_delta_x_;
   double facteur_delta_y_;
-  ArrOfDouble_with_ghost delta_z_local_pour_delta_;
+  ArrOfDouble_with_ghost delta_z_local_pour_delta_; 
   double facteur_delta_filtre_x_;
   double facteur_delta_filtre_y_;
-  ArrOfDouble_with_ghost delta_z_local_pour_delta_filtre_;
+  ArrOfDouble_with_ghost delta_z_local_pour_delta_filtre_; 
   int formulation_favre_;
   int formulation_velocity_;
   ArrOfDouble_with_ghost constante_modele_;
@@ -322,7 +322,7 @@ protected:
   OpConvCentre4IJK_double velocity_convection_op_;
   OpConvQuickSharpIJK_double velocity_convection_op_quicksharp_;
   OpConvAmontIJK_double velocity_convection_op_amont_;
-
+  
   OpConvIJKQuickScalar_double rho_convection_op_;
   OpConvCentre2IJKScalar_double rho_convection_op_centre2_;
   OpConvCentre4IJK_double rho_convection_op_centre4_;
@@ -365,7 +365,7 @@ protected:
 
   Nom expression_derivee_acceleration_;
   Parser parser_derivee_acceleration_;
-  // F.A nouvelle source
+  // F.A nouvelle source 
   double dump_factor_ ;
   double debit_actuel_ ;
   double debit_cible_ ;
@@ -376,7 +376,7 @@ protected:
   int convection_velocity_amont_;
   int convection_velocity_centre2_;
   int convection_velocity_quicksharp_;
-
+  
   // Nom expression_derivee_acceleration_;
   // Parser parser_derivee_acceleration_;
   // pour me simplifier la vie
@@ -392,16 +392,16 @@ protected:
   // F.A 17/03/14 ajout diffs et convection negligeables
   int diff_qdm_negligeable_;
   int diff_temp_negligeable_;
-
+  
   int conv_qdm_negligeable_;
-  int conv_rho_negligeable_;
+  int conv_rho_negligeable_; 
 
   // DD,2016-10-14: ajout disable_solveur_poisson_
   int disable_solveur_poisson_;
 
   // F.A 17/03/14 ajout possibiltie de dt_start
   double dt_start_;
-
+  
   // ----------------------------------------------
   // Valeurs recalculees a partir des donnees:
   double rho_paroi_impose_kmin_;

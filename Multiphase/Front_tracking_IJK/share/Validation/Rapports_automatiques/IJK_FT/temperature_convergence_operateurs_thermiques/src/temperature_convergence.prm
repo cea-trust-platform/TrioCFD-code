@@ -35,14 +35,14 @@ Chapitre {
 		titre "Solution analytique"
 		cycles -1
 		width 7cm
-		pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_ANA ELEM
+		pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_0_ANA ELEM
 	}
 
 	visu {
 		titre "Ecart a la solution analytique"
 		cycles -1
 		width 7cm
-		pseudocolor DIFFUSION/DIFFUSION.lata DOM ECART_T_ANA ELEM
+		pseudocolor DIFFUSION/DIFFUSION.lata DOM ECART_T_ANA0 ELEM
 	}
 
 	Figure {
@@ -90,14 +90,14 @@ Chapitre {
 		titre "Solution analytique"
 		cycles -1
 		width 7cm
-		pseudocolor CONVECTION/CONVERGENCE/DX_EUL_256/lata/CONVECTION.lata DOM TEMPERATURE_ANA ELEM
+		pseudocolor CONVECTION/CONVERGENCE/DX_EUL_256/lata/CONVECTION.lata DOM TEMPERATURE_0_ANA ELEM
 	}
 
 	visu {
 		titre "Ecart a la solution analytique"
 		cycles -1
 		width 7cm
-		pseudocolor CONVECTION/CONVERGENCE/DX_EUL_256/lata/CONVECTION.lata DOM ECART_T_ANA ELEM
+		pseudocolor CONVECTION/CONVERGENCE/DX_EUL_256/lata/CONVECTION.lata DOM ECART_T_ANA0 ELEM
 	}
 
 	Description <<EOF
@@ -146,14 +146,14 @@ Chapitre {
 		titre "Solution analytique"
 			cycles -1
 			width 7cm
-			pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_ANA ELEM
+			pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_0_ANA ELEM
 	}
 
 	visu {
 		titre "Ecart a la solution analytique"
 			cycles -1
 			width 7cm
-			pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM ECART_T_ANA ELEM
+			pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM ECART_T_ANA0 ELEM
 	}
 	Description <<EOF
 		Quand la source sera implementee, ajouter un graphe de convergence selon le pas de temps.

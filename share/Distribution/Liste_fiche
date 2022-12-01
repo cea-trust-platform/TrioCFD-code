@@ -56,12 +56,12 @@
 ./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Numerical_test_cases/ThHyd_3D_VEF_steady NNR
 ./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Analytical_solutions_2d_and_3d/Navier_Stokes_2d_steady STD
 ./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Analytical_solutions_2d_and_3d/Navier_Stokes_3d_steady STD
-./ALE/share/Validation/Rapports_automatiques/TwoCylindersALE STD
-./ALE/share/Validation/Rapports_automatiques/RotationALE NNR
-./ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE STD
-./ALE/share/Validation/Rapports_automatiques/3dOscillatingBeam NNR
-./ALE/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
-./ALE/share/Validation/Rapports_automatiques/DivaALE NNR
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE STD
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/RotationALE NNR
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE STD
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE NNR
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
+./Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE NNR
 ./Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_NO_MASS STD
 ./Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_WITH_MASS NNR
 ./Multiphase/CMFD/share/Validation/Rapports_automatiques/shock_dodecane STD
@@ -122,6 +122,8 @@
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/conservation_volume NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/barycentrage_lissage NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/repulsion NNR
+./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/energie_bulle_seule NNR
+./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/surfaces_barycentre_vapeur_par_face NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/switch NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/forcage_thi_101 NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/interfacial_temperature_and_flux NNR

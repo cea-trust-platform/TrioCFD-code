@@ -33,7 +33,7 @@ visu {
 	mesh transfo_VDF/interface.lata INTERFACES
         mesh transfo_VDF/marqueurs.lata PARTICULES
 	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM 
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
 	
 	cycles -9  
@@ -48,7 +48,7 @@ visu {
 	mesh transfo_VDF/interface.lata INTERFACES
         mesh transfo_VDF/marqueurs.lata PARTICULES
 	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM 
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
 	
 	cycles -4
@@ -60,10 +60,10 @@ visu {
 	Title "Transient time (t=0.05)"
 	description "FTD bubbles and particles positions"
         
-	mesh transfo_VDF/interface.lata INTERFACES
+        mesh transfo_VDF/interface.lata INTERFACES
         mesh transfo_VDF/marqueurs.lata PARTICULES
 	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM 
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
 
 	cycles -1
@@ -95,7 +95,7 @@ visu {
         mesh transfo_VEF/interface.lata INTERFACES
         mesh transfo_VEF/marqueurs.lata PARTICULES
 	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE SOM 
+	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
 	
 	cycles -9
@@ -110,7 +110,7 @@ visu {
         mesh transfo_VEF/interface.lata INTERFACES
 	mesh transfo_VEF/marqueurs.lata PARTICULES
 	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE SOM 
+	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
 	
 	cycles -4
@@ -125,10 +125,9 @@ visu {
         mesh transfo_VEF/interface.lata INTERFACES
         mesh transfo_VEF/marqueurs.lata PARTICULES
 	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE SOM 0.0005
-	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE SOM
 	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
 	
-	cycles -1
+	cycles -1 
 	normal3D 0. 1. 0.
 	up3D 0. 0. 1.   
 }

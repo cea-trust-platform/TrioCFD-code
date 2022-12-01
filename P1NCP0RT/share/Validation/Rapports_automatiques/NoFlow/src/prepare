@@ -33,7 +33,7 @@ for Discr in $Discretization ; do
              
         DataFile="NoFlow_"$Discr"_"$Ra".data"
         cp  $DataFile $fold/NoFlow.data
-        sed -i "s/ Square_h1 Square_h1.med/ $MeshFile $MeshFile.med/" $fold/NoFlow.data
+        sed -i "s/ Square_h1.med/ $MeshFile.med/" $fold/NoFlow.data
     done
   done
 done

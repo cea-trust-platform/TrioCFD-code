@@ -5313,7 +5313,6 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
           //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
           // It relies on the classical assumption in the FT module that the first equation is NS.
         }
-      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
       //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
     }
 #endif

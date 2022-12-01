@@ -2659,7 +2659,6 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
       const int i = crossed_cells(icell,0);
       const int j = crossed_cells(icell,1);
       const int k = crossed_cells(icell,2);
-      const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
       // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
       const int nb_compo_traversantes = interfaces_.nb_compo_traversantes(i,j,k);
       if (nb_compo_traversantes !=1)

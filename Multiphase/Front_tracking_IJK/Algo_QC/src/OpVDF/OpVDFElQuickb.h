@@ -35,7 +35,7 @@
  *   Le schema de convection est du type Quickb
  *   L'iterateur associe est de type Iterateur_VDF_Elem
  *   L'evaluateur associe est de type Eval_Quickb_VDF_Elem
- * 
+ *
  *
  */
 declare_It_VDF_Elem(Eval_Quickb_VDF_Elem)

@@ -40,8 +40,8 @@ Loi_Etat_GP::Loi_Etat_GP()
 
 /*! @brief Imprime la loi sur un flot de sortie.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) le flot de sortie pour l'impression
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Loi_Etat_GP::printOn(Sortie& os) const
 {
@@ -51,9 +51,9 @@ Sortie& Loi_Etat_GP::printOn(Sortie& os) const
 
 /*! @brief Lecture d'une loi sur un flot d'entree.
  *
- * @param (Entree& is) le flot d'entree pour la lecture des parametres 
- * @return (Entree&) le flot d'entree modifie 
- * @throws accolade ouvrante attendue 
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
  */
 Entree& Loi_Etat_GP::readOn(Entree& is)
 {
@@ -160,8 +160,8 @@ Entree& Loi_Etat_GP::readOn(Entree& is)
 
 /*! @brief Renvoie le type de fluide associe.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) le flot de sortie pour l'impression
+ * @return (Sortie&) le flot de sortie modifie
  */
 const Nom Loi_Etat_GP::type_fluide() const
 {
@@ -170,7 +170,7 @@ const Nom Loi_Etat_GP::type_fluide() const
 
 /*! @brief Associe le fluide a la loi d'etat
  *
- * @param (Fluide_Quasi_Compressible& fl) le fluide associe 
+ * @param (Fluide_Quasi_Compressible& fl) le fluide associe
  */
 void Loi_Etat_GP::associer_fluide(const Fluide_Quasi_Compressible& fl)
 {
