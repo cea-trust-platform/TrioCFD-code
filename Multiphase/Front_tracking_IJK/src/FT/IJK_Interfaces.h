@@ -572,7 +572,7 @@ public :
   }
 
 protected:
-  // Met à jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
+  // Met a jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
   SurfaceVapeurIJKComputation surface_vapeur_par_face_computation_;
 
   ComputeValParCompoInCell val_par_compo_in_cell_computation_;
@@ -669,7 +669,7 @@ protected:
   DoubleTab mean_force_;
   DoubleTab force_time_n_;
   DoubleTab positions_reference_;
-  int flag_positions_reference_;
+  int flag_positions_reference_ = 0; // Pas de position de reference imposee
 
   Nom fichier_reprise_interface_;
   int timestep_reprise_interface_;
@@ -677,21 +677,21 @@ protected:
 
   // Pour ecrire dans le fichier sauv :
   Nom fichier_sauvegarde_interface_;
-  int timestep_sauvegarde_interface_;
+  int timestep_sauvegarde_interface_ = 1;
 
   // Activation du suivi des couleurs des bulles
-  int follow_colors_;
+  int follow_colors_ = 0;
 
   // Activer la repulsion aux parois :
-  int active_repulsion_paroi_;
+  int active_repulsion_paroi_ = 0;
 
   // Modification de l'evaluation du potentiel :
-  int correction_gradient_potentiel_;
+  int correction_gradient_potentiel_ = 0;
 
   int compute_distance_autres_interfaces_;
   // Nombres de bulles reeles :
-  int nb_bulles_reelles_;
-  int nb_bulles_ghost_;
+  int nb_bulles_reelles_ = 0;
+  int nb_bulles_ghost_ = 0;
   int nb_bulles_ghost_before_;
   int recompute_indicator_;
   int parser_;
@@ -719,7 +719,7 @@ protected:
   // dans toutes les direction ou le domaine NS est perio.
   int ncells_forbidden_;
   int ncells_deleted_;
-  int frozen_; // flag to disable the interfaces motion.
+  int frozen_ = 0; // flag to disable the interfaces motion.
   DoubleTab bounding_box_forbidden_criteria_;
   DoubleTab bounding_box_delete_criteria_;
 
@@ -731,11 +731,11 @@ protected:
   double portee_force_repulsion_;
   // delta de pression maxi cree par la force de repulsion
   // (pour l'instant lineaire, valeur max quand la distance est nulle)
-  double delta_p_max_repulsion_;
+  double delta_p_max_repulsion_ = 0.; // desactive par defaut
 
   // Si souhaite, une valeur differente pour les parois :
   double portee_wall_repulsion_;
-  double delta_p_wall_max_repulsion_;
+  double delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
 
   ArrOfDoubleFT distance_autres_interfaces_;
 
@@ -750,9 +750,9 @@ protected:
 
   enum Terme_Gravite { GRAVITE_RHO_G, GRAVITE_GRAD_I };
   // Terme_Gravite terme_gravite_;
-  int terme_gravite_;
+  int terme_gravite_ = 0;
 
-  int nb_groups_;           // Nombre de groupes/classes de bulles.
+  int nb_groups_ = 1;           // Nombre de groupes/classes de bulles. Par defaut toutes les bulles sont dans le meme group.
   ArrOfInt compo_to_group_; // Tableau de conversion: numero_de_groupe =
   // compo_to_group_[icompo]
 
@@ -787,7 +787,7 @@ protected:
   /////////////////////////////////////
 
   int n_cell_diph_;
-  bool old_en_premier_;
+  bool old_en_premier_ = true;
 
   FixedVector<IJK_Field_double, 2> indicatrice_ns_;
   FixedVector<IJK_Field_double, 2> indicatrice_ft_;

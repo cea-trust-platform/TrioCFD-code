@@ -256,7 +256,10 @@ liste_postraitements
 {	
         postraitement_ft_lata marqueurs { 
     format Lata 
-    fichier marqueurs 
+    fichier marqueurs
+    champs dt_post 0.05 {
+        indicatrice_interf elem
+    } 
     champs dt_post 0.005 { 
         vitesse som 
     } 
@@ -271,8 +274,12 @@ liste_postraitements
 	postraitement_ft_lata interface { 
     format Lata 
     fichier interface 
+    champs dt_post 0.005 {
+        indicatrice_interf elem
+    }    
     interfaces interf { 
     } 
+
 }	
 }
 
