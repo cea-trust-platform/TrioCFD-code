@@ -326,22 +326,22 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   lata_interfaces_meshname_ = nom_par_defaut_interfaces;
   reprise_ = 0;
   timestep_reprise_interface_ = 1;
-  timestep_sauvegarde_interface_ = 1;
+  //timestep_sauvegarde_interface_ = 1;
   fichier_sauvegarde_interface_ = "??";
   portee_force_repulsion_ = 1e-8;
-  delta_p_max_repulsion_ = 0.; // desactive par defaut
+  //delta_p_max_repulsion_ = 0.; // desactive par defaut
   portee_wall_repulsion_ = 1e-8;
-  delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
-  active_repulsion_paroi_ = 0;      // La repulsion paroi est desactive par defaut,
+  //delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
+  //active_repulsion_paroi_ = 0;      // La repulsion paroi est desactive par defaut,
   // meme si l'inter-bulles l'est
-  follow_colors_ = 0;
+  //follow_colors_ = 0;
   RK3_G_store_vi_.set_smart_resize(1);
   vinterp_.set_smart_resize(1);
   distance_autres_interfaces_.set_smart_resize(1);
   ghost_compo_converter_.set_smart_resize(1);
-  nb_bulles_ghost_ = 0;
+  //nb_bulles_ghost_ = 0;
   nb_bulles_ghost_before_ = 0;
-  nb_bulles_reelles_ = 0;
+  //nb_bulles_reelles_ = 0;
   compute_distance_autres_interfaces_ = 0;
   recompute_indicator_ = 1; // doit-on calculer l'indicatrice avec une methode
   // de debug (1) ou optimisee (0) ?
@@ -353,7 +353,7 @@ Entree& IJK_Interfaces::readOn(Entree& is)
 
   // Pour calculer le terme source comme grad(potentiel*I) au lieu de
   // potentiel_face*gradI
-  correction_gradient_potentiel_ = 0;
+  //correction_gradient_potentiel_ = 0;
   terme_gravite_ = GRAVITE_GRAD_I; // Par defaut terme gravite ft sans courants parasites
 
   // ncells_forbidden_ est le nombre de mailles au bord du domaine etendu ou on
@@ -363,13 +363,13 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   // Suppression des bulles sur le pourtour du domaine lors de la sauvegarde
   // finale.
   ncells_deleted_ = -1;           // Valeur recommandee par defaut. On ne veut pas supprimer de bulles.
-  frozen_ = 0;                    // By default, we want the motion of the interfaces.
-  flag_positions_reference_ = 0;  // Pas de position de reference imposee
+  //frozen_ = 0;                    // By default, we want the motion of the interfaces.
+  //flag_positions_reference_ = 0;  // Pas de position de reference imposee
   positions_reference_.resize(0); // Par defaut, a dimensionner ensuite
   mean_force_.resize(0);          // Par defaut, a dimensionner ensuite
 
   Param param(que_suis_je());
-  nb_groups_ = 1;            // Par defaut toutes les bulles sont dans le meme group.
+  //nb_groups_ = 1;            // Par defaut toutes les bulles sont dans le meme group.
   compo_to_group_.resize(0); // Par defaut, a dimensionner ensuite par nb_bulles
   param.ajouter("bubble_groups", &compo_to_group_);
   param.ajouter("fichier_reprise_interface", &fichier_reprise_interface_, Param::REQUIRED);
