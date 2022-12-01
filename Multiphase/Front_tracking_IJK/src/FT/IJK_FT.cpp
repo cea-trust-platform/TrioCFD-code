@@ -3396,7 +3396,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                 for (int i = 0; i < ni; i++)
                   {
                     dv(i,j,k) += facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f;
-                    Cout << "facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f" << facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f << endl;
                   }
             }
           else
