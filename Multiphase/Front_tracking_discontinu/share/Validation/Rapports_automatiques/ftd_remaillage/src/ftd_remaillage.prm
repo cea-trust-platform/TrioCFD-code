@@ -80,7 +80,7 @@ visu {
 	instruction_visit SetPlotOptions(m2)
 	normal3D 0. 1. 0.
 	up3D 0. 0. 1.
-	cycles 6 10 14 17 
+	cycles 2 4 6 8 
       }
 
 }
