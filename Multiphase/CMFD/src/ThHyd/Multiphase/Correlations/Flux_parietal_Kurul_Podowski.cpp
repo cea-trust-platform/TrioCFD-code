@@ -89,12 +89,15 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
     if (n_l != k)
       if (milc.has_saturation(n_l, k))
         {
-          Saturation_base& sat = milc.get_saturation(n_l, k);
+          // on part de ind_sat = (k*(in.N-1)-(k-1)*(k)/2) + (l-k-1) // avec k<l
 
-          if (in.Tp - sat.Tsat(in.p) > 0) // Else : no wall superheat => no nucleation => single phase heat transfer only
+          int ind_sat = k<n_l ? ( k *(in.N-1)-( k -1)*( k )/2) + (n_l- k -1) :
+                        (n_l*(in.N-1)-(n_l-1)*(n_l)/2) + ( k -n_l-1);
+
+          if (in.Tp - in.Tsat[ind_sat] > 0) // Else : no wall superheat => no nucleation => single phase heat transfer only
             {
 
-              double dd = 1.e-4*(in.Tp - sat.Tsat(in.p))+0.0014;
+              double dd = 1.e-4*(in.Tp - in.Tsat[ind_sat])+0.0014;
               double dTp_dd = 1.e-4;
               // NB: dans Neptune, on utilise un correlation plus complexe:
               /*double b = (sat.Tsat(in.p)-in.T[n_l])/(2-2*in.rho[k]/in.rho[n_l])
@@ -104,8 +107,8 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
               // NB: dans Neptune, le b est un peu different mais il faudrait un newton pour le calculer...
               */
 
-              double N_sites = std::pow(210*(in.Tp - sat.Tsat(in.p)), 1.8);
-              double dTp_N_sites = 210*std::pow(210*(in.Tp - sat.Tsat(in.p)), .8);
+              double N_sites = std::pow(210*(in.Tp - in.Tsat[ind_sat]), 1.8);
+              double dTp_N_sites = 210*std::pow(210*(in.Tp - in.Tsat[ind_sat]), .8);
 
               double A_bubbles = std::min(1., N_sites*3.1415*dd*dd/4.);
               double dTp_A_bubbles = (N_sites*3.1415*dd*dd/4.>1) ? 0. : dTp_N_sites*3.1415*dd*dd/4.+N_sites*3.1415*2.*dTp_dd*dd/4.;
@@ -113,10 +116,10 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
               double f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l]*dd));
               double dTp_f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l])) * .5 / std::sqrt(dd);
 
-              double q_evap  = f_dep * 3.1415/6. * dd*dd*dd * in.rho[k] * sat.Lvap(in.p) * N_sites ;
-              double dTp_q_evap= dTp_f_dep * 3.1415/6. * dd*dd*dd       * in.rho[k] * sat.Lvap(in.p) * N_sites
-                                 +f_dep     * 3.1415/6. *3.*dTp_dd*dd*dd * in.rho[k] * sat.Lvap(in.p) * N_sites
-                                 +f_dep     * 3.1415/6. * dd*dd*dd       * in.rho[k] * sat.Lvap(in.p) * dTp_N_sites ;
+              double q_evap  = f_dep * 3.1415/6. * dd*dd*dd * in.rho[k] * in.Lvap[ind_sat] * N_sites ;
+              double dTp_q_evap=  dTp_f_dep * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * N_sites
+                                  +f_dep     * 3.1415/6. *3.*dTp_dd*dd*dd * in.rho[k] * in.Lvap[ind_sat] * N_sites
+                                  +f_dep     * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * dTp_N_sites ;
 
 
               double q_quench= A_bubbles *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep);

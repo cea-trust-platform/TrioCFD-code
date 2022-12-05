@@ -78,26 +78,27 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
     if (n_l != k)
       if (milc.has_saturation(n_l, k))
         {
-          Saturation_base& sat = milc.get_saturation(n_l, k);
+          int ind_sat = k<n_l ? ( k *(in.N-1)-( k -1)*( k )/2) + (n_l- k -1) :
+                        (n_l*(in.N-1)-(n_l-1)*(n_l)/2) + ( k -n_l-1);
 
-          double Delta_T_sup = in.Tp - sat.Tsat(in.p); // Wall superheat
+          double Delta_T_sup = in.Tp - in.Tsat[ind_sat]; // Wall superheat
 
           if (Delta_T_sup > 0) // Else : no wall superheat => no nucleation => single phase heat transfer only
             {
-              double Delta_T_sub = std::max(sat.Tsat(in.p) - in.T[n_l], 1.e-8) ; // Subcooling ; non negative for numerical reasons
+              double Delta_T_sub = std::max(in.Tsat[ind_sat] - in.T[n_l], 1.e-8) ; // Subcooling ; non negative for numerical reasons
               double dTp_Delta_T_sup = 1.;
               double dTl_Delta_T_sub = -1.;
-              double Ja_sup = in.rho[n_l]*in.Cp[n_l]*Delta_T_sup/(in.rho[k] * sat.Lvap(in.p));// Superheat Jakob number
-              double Ja_sub = in.rho[n_l]*in.Cp[n_l]*Delta_T_sub/(in.rho[k] * sat.Lvap(in.p));// Subcooling Jakob number
-              double dTp_Ja_sup = in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * sat.Lvap(in.p));
-              double dTl_Ja_sub =-in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * sat.Lvap(in.p));
+              double Ja_sup = in.rho[n_l]*in.Cp[n_l]*Delta_T_sup/(in.rho[k] * in.Lvap[ind_sat]);// Superheat Jakob number
+              double Ja_sub = in.rho[n_l]*in.Cp[n_l]*Delta_T_sub/(in.rho[k] * in.Lvap[ind_sat]);// Subcooling Jakob number
+              double dTp_Ja_sup = in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * in.Lvap[ind_sat]);
+              double dTl_Ja_sub =-in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * in.Lvap[ind_sat]);
 
               // Nucleation site density (Hibiki Ishii 2003)
               double N_sites, dTp_N_sites, dTl_N_sites, dTk_N_sites;
-              N_sites     =     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_);
-              dTp_N_sites = dTp_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_);
-              dTl_N_sites = dTl_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_);
-              dTk_N_sites = dTk_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_);
+              N_sites     =     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTp_N_sites = dTp_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTl_N_sites = dTl_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTk_N_sites = dTk_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
 
               double u_bulk = 0;
               if (sub_type(Flux_parietal_adaptatif, correlation_monophasique_.valeur()))
@@ -225,14 +226,14 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               if (out.dTp_qpk) (*out.dTp_qpk)( k )      += S_sl*2.*h_fc + dTp_S_sl*2.*h_fc*(in.Tp-in.T[n_l]) ;
 
               // Evaporation (calculer les derivees/T apres)
-              if (out.qpi)         (*out.qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) *              std::pow(D_lo,3.) *     f_dep *     N_active;
-              if (out.dTp_qpi) (*out.dTp_qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * (3.*dTp_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
-                                                                                                          +        std::pow(D_lo,3.) * dTp_f_dep *     N_active
-                                                                                                          +        std::pow(D_lo,3.) *     f_dep * dTp_N_active);
-              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k, n_l) = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * (3.*dTl_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
-                                                                                                          +        std::pow(D_lo,3.) * dTl_f_dep *     N_active
-                                                                                                          +        std::pow(D_lo,3.) *     f_dep * dTl_N_active);
-              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k,   k) = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * (            std::pow(D_lo,3.) *     f_dep * dTk_N_active);
+              if (out.qpi)         (*out.qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] *              std::pow(D_lo,3.) *     f_dep *     N_active;
+              if (out.dTp_qpi) (*out.dTp_qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (3.*dTp_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) * dTp_f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) *     f_dep * dTp_N_active);
+              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k, n_l) = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (3.*dTl_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) * dTl_f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) *     f_dep * dTl_N_active);
+              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k,   k) = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (            std::pow(D_lo,3.) *     f_dep * dTk_N_active);
 
               if (out.d_nuc) (*out.d_nuc)(k) = D_lo;
             }
