@@ -123,6 +123,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
   if (Type_diss == "") abort();
   const Champ_Elem_PolyMAC_P0& ch_diss = ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ(Nom(Type_diss.c_str()))); // Champ tau ou omega
   const DoubleTab&                diss = ch_diss.valeurs() ;
+  const DoubleTab&               pdiss = ch_diss.passe() ;
 
   const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = domaine.nb_elem();
 
@@ -137,22 +138,24 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
       {
         if (Type_diss == "tau")
           {
-            double inv_tau =  k(e, mk) / std::max(k(e, mk) * diss(e, mk), visc_turb.limiteur() * nu(e, mk));
+            double inv_tau = (k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
+                             ? 1./pdiss(e,mk) * (2. - diss(e, mk)/pdiss(e,mk))
+                             : k(e, mk) / (visc_turb.limiteur() * nu(e, mk)) ;
             secmem(e, mk) -= pe(e) * ve(e) * beta_k * alpha_rho_k(e,mk) * inv_tau;
             if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("alpha") ?       der_alpha_rho_k.at("alpha")(e,mk) : 0 )        * inv_tau;	// derivee en alpha
             if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * inv_tau;	// derivee par rapport a la temperature
             if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ?    der_alpha_rho_k.at("pression")(e, mp) : 0 )    * inv_tau;		// derivee par rapport a la pression
             if (!(Mk==nullptr))
               {
-                if (k(e, mk) * diss(e, mk) > visc_turb.limiteur() * nu(e, mk))
-                  (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) / diss(e, mk); // derivee en k ; depend de l'activation ou non du limiteur
+                if (k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
+                  (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * inv_tau; // derivee en k ; depend de l'activation ou non du limiteur
                 else
                   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * 2 * beta_k * alpha_rho_k(e, mk) / (visc_turb.limiteur() * nu(e, mk)); // derivee en k
               }
             if (!(Mdiss==nullptr))
               {
-                if ( k(e, mk) * diss(e, mk) > visc_turb.limiteur() * nu(e, mk))
-                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk) * (-1)/(diss(e,mk)*diss(e,mk)); // derivee en tau  ; depend de l'activation ou non du limiteur
+                if ( k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
+                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk) * (-1)/(pdiss(e,mk)*pdiss(e,mk)); // derivee en tau  ; depend de l'activation ou non du limiteur
                 else
                   (*Mdiss)(Nk * e + mk, Nk * e + mk)       += 0;
               }

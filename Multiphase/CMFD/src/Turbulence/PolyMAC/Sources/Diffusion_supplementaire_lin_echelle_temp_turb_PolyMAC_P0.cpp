@@ -151,6 +151,7 @@ void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(ma
             else if (fcl(f_bord, 0) == 1 || fcl(f_bord, 0) == 2) //Echange_impose_base
               grad_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Echange_impose_base, cls[fcl(f_bord, 1)].valeur()).T_ext(fcl(f_bord, 2), n)      / std::sqrt(std::max(limiter_tau_, tab_tau_passe(domaine.face_voisins(f_bord, 0), n))) : 0;
             else if (fcl(f_bord, 0) == 4) //Neumann non homogene
+
               Process::exit(que_suis_je() + " : Inhomogeneous Neumann BC not allowed when calculating sqrt(tau) !") ;
 //              grad_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Neumann_paroi      , cls[fcl(f_bord, 1)].valeur()).flux_impose(fcl(f_bord, 2), n)*.5/std::sqrt(std::max(limiter_tau_, tab_tau(domaine.face_voisins(f_bord, 0), n))) : 0;
             else if (fcl(f_bord, 0) == 6) // Dirichlet

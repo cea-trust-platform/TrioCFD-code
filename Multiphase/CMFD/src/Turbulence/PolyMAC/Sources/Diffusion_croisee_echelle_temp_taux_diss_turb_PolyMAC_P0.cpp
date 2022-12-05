@@ -211,9 +211,9 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
       {
         if (Type_diss == "tau")
           {
-            const Champ_Inc_base& 	ch_alpha_rho_tau 	= equation().champ_conserve();
-            const DoubleTab& 			alpha_rho_tau		= ch_alpha_rho_tau.valeurs();
-            const tabs_t& 			der_alpha_rho_tau 	= ch_alpha_rho_tau.derivees(); // dictionnaire des derivees
+            const Champ_Inc_base& ch_alpha_rho_tau = equation().champ_conserve();
+            const DoubleTab&         alpha_rho_tau = ch_alpha_rho_tau.valeurs();
+            const tabs_t&        der_alpha_rho_tau = ch_alpha_rho_tau.derivees(); // dictionnaire des derivees
             double secmem_en = pe(e) * ve(e) * sigma_d * alpha_rho_tau(e, n) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.);
             secmem(e, n) += secmem_en;
             if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("alpha")       ? der_alpha_rho_tau.at("alpha")(e,n) : 0 )       * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
