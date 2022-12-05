@@ -464,6 +464,13 @@ void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
   const int n_point_interp = positions.dimension(0);
   temperature_interp.resize_array(n_point_interp);
   flux_normal_interp.resize_array(n_point_interp);
+  if ((ldal + ldav) == 0.)
+    {
+      Cerr << "Corrige flux used with no conductivity. Ti and Qi set to 0. " << finl;
+      temperature_interp = 0.;
+      flux_normal_interp = 0.;
+      return;
+    }
   for (int i_point_interp = 0; i_point_interp < n_point_interp; i_point_interp++)
     {
       const double Ti =
