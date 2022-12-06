@@ -1382,7 +1382,6 @@ int IJK_FT_double::initialise()
 #endif
     }
 #endif
-  nalloc += post_.initialise(reprise_);
 
 // Pour le check_stats_ :
   // Pour le check_stats_ ou pour travailler en increment de pression, il faut connaitre la pression initiale :
@@ -1400,6 +1399,8 @@ int IJK_FT_double::initialise()
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, zone_dis);
+
+  nalloc += post_.initialise(reprise_);
 
   // statistiques...
   nalloc += post_.initialise_stats(splitting_, vol_bulles_, vol_bulle_monodisperse_);

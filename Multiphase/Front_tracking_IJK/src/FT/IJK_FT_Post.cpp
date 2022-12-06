@@ -210,11 +210,6 @@ int IJK_FT_Post::initialise(int reprise)
           velocity_[1].echange_espace_virtuel(velocity_[1].ghost());
           velocity_[2].echange_espace_virtuel(velocity_[2].ghost());
 
-          // GAB
-          source_spectrale_[0].echange_espace_virtuel(source_spectrale_[0].ghost());
-          source_spectrale_[1].echange_espace_virtuel(source_spectrale_[1].ghost());
-          source_spectrale_[2].echange_espace_virtuel(source_spectrale_[2].ghost());
-
           update_integral_velocity(velocity_, integrated_velocity_, interfaces_.In(), integrated_timescale_);
 
         }
