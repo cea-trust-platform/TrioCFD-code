@@ -4,7 +4,7 @@
 
 # python ./ordre_cvg.py
 cas=`echo $1`
-rm -r CONVERGENCE 
+rm -rf CONVERGENCE
 mkdir CONVERGENCE
 echo "Début post traitement"
 cd CONVERGENCE/
