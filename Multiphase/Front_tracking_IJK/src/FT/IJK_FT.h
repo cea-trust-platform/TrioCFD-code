@@ -362,6 +362,7 @@ protected :
   IJK_FT_Post post_;
 
   int check_divergence_;
+  int rk_step_;
 
   Nom check_stop_file_; // Nom du fichier stop
 

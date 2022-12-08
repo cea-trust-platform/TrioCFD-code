@@ -27,9 +27,9 @@ IJK_FT_double
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 0
   tinit 0.
-  timestep 0.1
-  nb_pas_dt_max 10   
-  time_scheme RK3_FT
+	nb_pas_dt_max 3
+    timestep .200 
+    time_scheme euler_explicit 
   cfl 10000
 #  include_pressure_gradient_in_ustar #
   timestep_facsec 1.0   
@@ -69,9 +69,6 @@ IJK_FT_double
   disable_source_interf
   # pi/Lx = 3.14159265358979 #
   # 2pi/Lx = 6.28318530717959 #
-  expression_variable_source_x  -0.*1047.1975511966*3.14159265358979*z*(1.-z)*cos(3.14159265358979*t)*cos(1047.1975511966*x)*sin(1047.1975511966*y)
-  expression_variable_source_y   0.*1047.1975511966*3.14159265358979*z*(1.-z)*cos(3.14159265358979*t)*sin(1047.1975511966*x)*cos(1047.1975511966*y)
-  expression_variable_source_z  0.
   expression_potential_phi (sin(x)+sin(y)+sin(z))*cos(t)
   gravite 3 0. 0. 0. 
   rho_liquide 1.
@@ -79,10 +76,10 @@ IJK_FT_double
   rho_vapeur 1.
   mu_vapeur 1e-20
   sigma 1e-11
-  expression_vx_ana 0.*(-1047.1975511966)*9.e-6*z*(0.003-z)*sin(3.14159265358979*t)*cos(1047.1975511966*x)*sin(1047.1975511966*y)
-  expression_vy_ana 0.*1047.1975511966*9.e-6*z*(0.003-z)*sin(3.14159265358979*t)*sin(1047.1975511966*x)*cos(1047.1975511966*y)
+  expression_vx_ana 0.
+  expression_vy_ana 0.
   expression_vz_ana 0.
-  expression_p_ana (sin(x)+sin(y)+sin(z))*cos(t)
+  expression_p_ana   (sin(x)+sin(y)+sin(z))*cos(t)
   expression_p_init (sin(x)+sin(y)+sin(z))*cos(0.)
   expression_vx_init 0.
   expression_vy_init 0.
