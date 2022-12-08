@@ -42,14 +42,14 @@ EOF
         titre "Solution analytique"
         cycles -1
         width 7cm
-        pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_ANA ELEM
+        pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_0_ANA ELEM
     }
 
     visu {
         titre "Ecart a la solution analytique"
         cycles -1
         width 7cm
-        pseudocolor DIFFUSION/DIFFUSION.lata DOM ECART_T_ANA ELEM
+        pseudocolor DIFFUSION/DIFFUSION.lata DOM ECART_T_ANA0 ELEM
     }
     
     Figure {
@@ -95,14 +95,14 @@ EOF
 #         titre "Solution analytique"
 #         cycles -1
 #         width 7cm
-#         pseudocolor CONVECTION/CONVECTION.lata DOM TEMPERATURE_ANA ELEM
+#         pseudocolor CONVECTION/CONVECTION.lata DOM TEMPERATURE_0_ANA ELEM
 #     }
 # 
 #     visu {
 #         titre "Ecart a la solution analytique"
 #         cycles -1
 #         width 7cm
-#         pseudocolor CONVECTION/CONVECTION.lata DOM ECART_T_ANA ELEM
+#         pseudocolor CONVECTION/CONVECTION.lata DOM ECART_T_ANA0 ELEM
 #     }
 #     Description <<EOF
 # Ici on observe un comportement qui peut sembler etonnant, mais en realite c'est le comportement attendu de l'operateur QUICK qui possede un limiteur. Ce limiteur est active aux extremas de la fonction a predire, ce qui est bien le cas ici. Le limiteur degrade localement l'ordre de la solution qui passe de 3 a 1. Cela donne donc une erreur plus importante dans la zone des extremas de la fonction a predire.
@@ -151,14 +151,14 @@ EOF
 #         titre "Solution analytique"
 #         cycles -1
 #         width 7cm
-#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_ANA ELEM
+#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_0_ANA ELEM
 #     }
 # 
 #     visu {
 #         titre "Ecart a la solution analytique"
 #         cycles -1
 #         width 7cm
-#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM ECART_T_ANA ELEM
+#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM ECART_T_ANA0 ELEM
 #     }
 #     Description <<EOF
 # Quand la source sera implementee, ajouter un graphe de convergence selon le pas de temps.

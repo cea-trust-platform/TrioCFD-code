@@ -159,7 +159,7 @@ IJK_FT_double
     {
        # Il faut mettre +epsilon pour etre sur d'avoir la vitesse sur la bonne face...
        IL ecrit dans le fichier sonde la coord precise de la position post-traitee (face ici). #
-       pp_T temperature periode 1e-9 points 1 0.003 0.003 0.0015
+       pp_T temperature_0 periode 1e-9 points 1 0.003 0.003 0.0015
     }
 
 }
