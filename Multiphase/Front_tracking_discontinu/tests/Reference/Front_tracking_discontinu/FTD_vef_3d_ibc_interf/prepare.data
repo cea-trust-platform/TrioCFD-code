@@ -1,13 +1,11 @@
-#  
- Cas test Front-tracking discontinu VEF.
+#  Cas test Front-tracking discontinu VEF.
  Interface IBC avec lecture MED
  Interface fluide_fluide
  Equation convection-diffusion-ft avec renommage inconnue
  Gravite rho*g
  Test de la reprise xyz d'une interface IBC + interface fluide-fluide
 
- Essai de reprise du fichier, puis trois pas de temps
-#
+ Essai de reprise du fichier, puis trois pas de temps #
 
 dimension 3
 Probleme_FT_Disc_gen pb
@@ -201,7 +199,10 @@ liste_postraitements {
 }
   postraitement_ft_lata post2 { 
     format Lata 
-    fichier post2 
+    fichier post2  
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+    } 
     interfaces interf { 
     } 
 }

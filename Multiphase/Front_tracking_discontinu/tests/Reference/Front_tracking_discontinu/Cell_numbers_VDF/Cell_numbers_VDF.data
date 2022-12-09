@@ -201,7 +201,7 @@ Lire pb
 						 			localisation elem
 			  						source refChamp { Pb_champ pb vitesse } } ,
 			 					Interpolation {
-			 						localisation elem
+			 			localisation elem
 			  						source refChamp { Pb_champ pb vitesse } }
 							}
 							nom_source u2_plus_v2_plus_w2
@@ -242,6 +242,10 @@ Lire pb
 	    postraitement_ft_lata ancre { 
     format Lata 
     fichier ancre 
+    champs dt_post .06250000000000000000
+        {
+            indicatrice_cuve elem
+        }	    
     interfaces agit { 
         courbure som 
     } 
