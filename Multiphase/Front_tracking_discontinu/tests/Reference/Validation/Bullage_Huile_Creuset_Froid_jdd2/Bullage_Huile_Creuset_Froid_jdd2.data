@@ -258,6 +258,10 @@ Postraitement
         postraitement_ft_lata post_ancre { 
     format Lata 
     fichier lata/ancre 
+    champs dt_post .06250000000000000000
+     { 
+        indicatrice_agit elem 
+    } 
     interfaces agit { 
         courbure som 
     } 
@@ -265,6 +269,10 @@ Postraitement
         postraitement_ft_lata post_cuve { 
     format Lata 
     fichier lata/post_cuve 
+    champs dt_post .06250000000000000000
+     { 
+        indicatrice_cuve elem 
+    } 
     interfaces cuve { 
         courbure som 
     } 
@@ -272,7 +280,8 @@ Postraitement
 	postraitement_ft_lata post_interf { 
     format Lata 
     fichier lata/post_interf 
-    champs dt_post .06250000000000000000 { 
+    champs dt_post .06250000000000000000
+     { 
         vitesse elem 
         pression elem 
         Divergence_U elem 

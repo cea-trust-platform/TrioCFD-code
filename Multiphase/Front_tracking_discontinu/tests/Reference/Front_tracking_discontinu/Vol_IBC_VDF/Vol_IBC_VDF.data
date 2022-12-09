@@ -170,12 +170,20 @@ Lire pb
 	    postraitement_ft_lata aile_gauche { 
     format Lata 
     fichier aile_gauche 
+	    champs dt_post 0.01
+	    {
+		    indicatrice_aile_gauche	elem
+	    }
     interfaces aile_gauche { 
     } 
 } 
 	    postraitement_ft_lata aile_droite { 
     format Lata 
     fichier aile_droite 
+	    champs dt_post 0.01
+	    {
+		    indicatrice_aile_droite	elem
+	    }
     interfaces aile_droite { 
     } 
 } 	    

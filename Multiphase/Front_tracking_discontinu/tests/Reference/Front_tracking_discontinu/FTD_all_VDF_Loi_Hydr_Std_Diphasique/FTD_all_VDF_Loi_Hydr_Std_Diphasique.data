@@ -297,6 +297,10 @@ liste_postraitements
 	postraitement_ft_lata liquid_gas { 
     format Lata 
     fichier liquid_gas 
+    fields dt_post 0.05
+    {
+       indicatrice_interf elem
+    }
     interfaces interf { 
         courbure som 
         vitesse som 
@@ -306,6 +310,10 @@ liste_postraitements
 	postraitement_ft_lata body { 
     format Lata 
     fichier body 
+    fields dt_post 0.05
+    {
+       indicatrice_body elem
+    }
     interfaces body { 
         courbure som 
     } 
