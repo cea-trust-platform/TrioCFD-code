@@ -14,9 +14,12 @@
 *****************************************************************************/
 
 #include <Estimateur_Aposteriori_P0_VEF.h>
+#include <Navier_Stokes_Aposteriori.h>
+#include <Terme_Source_Qdm_VEF_Face.h>
 #include <Champ_P1_isoP1Bulle.h>
 #include <Champ_P1NC.h>
 #include <Champ_Don.h>
+#include <Source.h>
 
 Implemente_instanciable( Estimateur_Aposteriori_P0_VEF, "Estimateur_Aposteriori_P0_VEF", Champ_Fonc_P0_VEF ) ;
 
@@ -64,10 +67,20 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   const DoubleVect& inverse_volumes = zone_VEF.inverse_volumes();
   DoubleTab la_vitesse = vitesse_.valeur().valeurs();
   DoubleTab la_pression = pression_p1isop1b_.valeur().valeurs();
-  cout << "Estimateur_Aposteriori_P0_VEF ici " << endl;
+
   DoubleTab le_terme_source(vitesse_.valeur().valeurs());
-  cout << "Estimateur_Aposteriori_P0_VEF la " << endl;
-  le_terme_source = 0.;
+
+
+  Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
+  //const Sources& sources_eq =  eq.sources();
+
+  Champ espace_stockage;
+  const Champ_base& ch_bs = eq.get_champ_source().get_champ(espace_stockage);
+  const DoubleTab& src = ch_bs.valeurs();
+
+  //Cerr << src << finl;
+
+  le_terme_source = src;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
   const DoubleTab tabnu=viscosite_cinematique_.valeur().valeurs();
