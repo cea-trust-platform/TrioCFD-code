@@ -897,6 +897,7 @@
 #define DISSIP_VAP_MOY 794  // Après dernière ligne
 #define TRUE_DISSIP_MOY 795
 #define TRUE_DISSIP_VAP_MOY 796  // Dernière ligne
+#define POWER_INTERF 797
 //#define END_DISSIP 796
 
 //

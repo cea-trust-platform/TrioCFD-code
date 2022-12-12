@@ -2863,7 +2863,7 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
     {
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_bilan_qdm.out",
-                                  "tstep\ttime\tFs_theo\tFtot\trhov\ttauw\tS\tacceleration\tres\tcumul_res\tCorrFs\n# Forces have 3 components.",
+                                  "tstep\ttime\tFs_theo\tFtot\trhov\ttauw\tS\tacceleration\tres\tcumul_res\tCorrFs\nConvection\tDiffusion\tPression\n# Forces have 3 components.",
                                   reset, 20/*prec*/);
 
       fic << tstep_<<" "<< current_time_<<" "
