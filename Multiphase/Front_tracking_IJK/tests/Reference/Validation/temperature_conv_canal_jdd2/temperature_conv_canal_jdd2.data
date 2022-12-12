@@ -37,7 +37,7 @@ IJK_FT_double
   disable_diffusion_qdm
   
 
-  champs_a_postraiter 1 TEMPERATURE 
+  champs_a_postraiter 3 TEMPERATURE TEMPERATURE_ANA ECART_T_ANA
   check_stop_file stop.txt
   dt_sauvegarde 3000
   tinit 0
@@ -96,6 +96,7 @@ IJK_FT_double
     # TEMPS expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
     expression_source_temperature -1/(0.00024*800)*exp(-t/(0.00024*800))
     TEMPS #
+    expression_T_ana 0.0 
     cp_vapor 1.
     lambda_vapor 1.
     fo 0.5
