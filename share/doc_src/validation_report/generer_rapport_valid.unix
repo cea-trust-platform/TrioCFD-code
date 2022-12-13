@@ -38,6 +38,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Poiseuille_flow_2D_VDF_VEF/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### Lid_driven_cavity ########################
@@ -64,6 +65,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Lid_driven_cavity/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### Cir_Cyl_Re100 ########################
@@ -90,6 +92,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Cir_Cyl_Re100/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
@@ -119,6 +122,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Convection_Vahl_Davis/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### Oscillatory convection flow ################
@@ -145,6 +149,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Oscillating_Flow/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
@@ -174,6 +179,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/OBI_diffuser_VEF_k_eps/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### Mixing_length_VEF_WF ################
@@ -200,6 +206,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Mixing_length_VEF_WF/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
@@ -255,6 +262,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/Channel_T1_T2_incompressible/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 sed -i "109 s@Incompressible/Canal\_plan\_bi\_periodique\_M1/Canal\_plan\_bi\_periodique\_M1@M1@" corps.tex
@@ -289,6 +297,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/FTD_oscillating_bubble/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### FTD_hanging_drop ################
@@ -315,6 +324,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/FTD_hanging_drop/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
@@ -327,9 +337,9 @@ cd DivaALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -344,6 +354,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/DivaALE/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### TwoCylindersALE ################
@@ -353,9 +364,9 @@ cd TwoCylindersALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -370,6 +381,7 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/TwoCylindersALE/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### TwoOscillatingCylindersALE ################
@@ -379,9 +391,9 @@ cd TwoOscillatingCylindersALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -396,7 +408,35 @@ sed -i '/makeindex/d' fic.tex
 sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/TwoOscillatingCylindersALE/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### 3dOscillatingBeamALE ################
+cd $rapport/fiches
+mkdir 3dOscillatingBeamALE
+cd 3dOscillatingBeamALE
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{ALE}@g" fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i '/\makesavenoteenv{tabular}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/3dOscillatingBeamALE/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
 #           Generation document final

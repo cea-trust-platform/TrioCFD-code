@@ -1,6 +1,25 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.9.1_beta : Enhancements, modifications and corrected bugs since version 1.9.0 :
+Release notes version 1.9.1 : Enhancements, modifications and corrected bugs since version 1.9.0 :
 --------------------------------------------------------------------------------------------------
+09/12/22 (TrioCFD) Enhancement : Aposteriori estimator takes now into account equation's source terms
+19/11/22 (TrioCFD) Bug fixed   : Fix Wilke's viscosity formula + documentation for Multi-species QC
+18/11/22 (TrioCFD) New feature : New Baltik Fluid_structure_interaction: Partitioned explicit serial coupling between the ALE module and the Beam model.
+18/11/22 (TrioCFD) New features: Reduced mechanical model (Beam model): Euler-bernouli model with a resolution based on a modal analysis and Newmark temporal discretization.
+03/11/22 (TrioCFD) Change      : IJK_Kernel (multigrid + simd) are moved to TRUST
+03/11/22 (TrioCFD) New feature : Activation of TCL module (to include singular heat flux and contact angle at Triple Contact Line)
+03/11/22 (TrioCFD) Enhancement : Improvement in FTD 2D_Axi calculations (contact angle, interpolation,...)
+03/11/22 (TrioCFD) Enhancement : Keywords for phase-change : modification of volume_correction keywords, Option New mass source term
+03/11/22 (TrioCFD) Bug fix     : Fix of phase indicator calculation and remeshing
+30/06/22 (TrioCFD) New feature : Front_Tracking_IJK (TrioIJK) is now activated in TrioCFD.
+19/10/22 (TRUST)   Tool        : Syntax in datafile for medium, gravity, porosity, champ_fonc_MED* and Read_MED can be updated using command: trust -convert_data <datafile>
+18/10/22 (TRUST)   Syntax      : Champ_Fonc_MED* keywords have a new syntax using { } and key/value pairs. See reference manual. Old syntax supported until 1.9.3.
+13/10/22 (TRUST)   Syntax      : Read_MED/Lire_MED has a new syntax using { } and key/value pairs. See reference manual. Old syntax supported until 1.9.3.
+12/10/22 (TrioCFD) Change      : postraitement_ft_lata syntax changed since it uses Lata_V2 instead of Lata_V1 format. Syntaxe has also evolved for this particular post-processing.
+12/10/22 (TrioCFD) Change      : Lata_V1 is not supported anymore. Only Lata_V2 (option 'lata') remains. Domain and Zone postprocessing in Lata_V2.
+04/10/22 (TrioCFD) Major Change: Previous Phases interpret is no more available in Pb_multiphase and Pb_HEM. Milieu_composite class should now be used and should be placed as well in the problem.
+04/10/22 (TrioCFD) Major Change: Medium (Fluid, solid, constituent, ...) is no more read and associated to a problem for non Front-Tracking problems. It should be read at the begining of each problem bloc.
+04/10/22 (TrioCFD) Major Change: Gravity is no more read and associated to a medium for non Front-Tracking datafiles. It is read directly in the medium.
+04/10/22 (TrioCFD) Syntax      : For Rayonnement datafiles, the problem name should now contain _Rayo (ex: Pb_Thermohydraulique -> Pb_Rayo_Thermohydraulique) 
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.0 : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------

@@ -434,6 +434,8 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr ijk_splitting chaine(into=["grid_splitting"]) ijk_splitting 1 not_set
   attr ijk_splitting_ft_extension entier ijk_splitting_ft_extension 1 not_set
   attr timestep floattant timestep 1 not_set
+  attr time_scheme chaine time_scheme 1 not_set
+  attr cfl floattant cfl 1 not_set
   attr timestep_facsec floattant timestep_facsec 1 not_set
   attr dt_post entier dt_post 1 not_set
   attr dt_post_stats_bulles entier dt_post_stats_bulles 1 not_set
@@ -460,6 +462,10 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr expression_vz_init chaine expression_vz_init 1 not_set
   attr expression_derivee_force chaine expression_derivee_force 1 not_set
   attr expression_p_init chaine expression_p_init 1 not_set
+  attr expression_p_ana chaine expression_p_ana 1 not_set
+  attr expression_vx_ana chaine expression_vx_ana 1 not_set
+  attr expression_vy_ana chaine expression_vy_ana 1 not_set
+  attr expression_vz_ana chaine expression_vz_ana 1 not_set
   attr expression_dPdx_ana chaine expression_dPdx_ana 1 not_set
   attr expression_dPdy_ana chaine expression_dPdy_ana 1 not_set
   attr expression_dPdz_ana chaine expression_dPdz_ana 1 not_set
@@ -496,12 +502,15 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr expression_ddWdxdy_ana chaine expression_ddWdxdy_ana 1 not_set
   attr expression_ddWdxdz_ana chaine expression_ddWdxdz_ana 1 not_set
   attr expression_ddWdydz_ana chaine expression_ddWdydz_ana 1 not_set
+  attr expression_potential_phi chaine expression_potential_phi 1 not_set
   attr check_divergence rien check_divergence 1 not_set
+  attr refuse_patch_conservation_QdM_RK3_source_interf rien refuse_patch_conservation_QdM_RK3_source_interf 1 not_set
   attr check_stats rien check_stats 1 not_set
   attr disable_diphasique rien disable_diphasique 1 not_set
   attr disable_diffusion_qdm rien disable_diffusion_qdm 1 not_set
   attr disable_convection_qdm rien disable_convection_qdm 1 not_set
   attr disable_solveur_poisson rien disable_solveur_poisson 1 not_set
+  attr disable_source_interf rien disable_source_interf 1 not_set
   attr nom_sauvegarde chaine nom_sauvegarde 1 not_set
   attr nom_reprise chaine nom_reprise 1 not_set
   attr sondes bloc_lecture sondes 1 not_set
@@ -541,6 +550,7 @@ multigrid_solver interprete nul 1 not_set
   attr seuil floattant seuil 1 not_set
   attr nb_full_mg_steps listentier nb_full_mg_steps 1 not_set
   attr solveur_grossier solveur_sys_base solveur_grossier 1 not_set
+  attr iterations_mixed_solver entier iterations_mixed_solver 1 not_set
   attr impr rien impr 1 not_set
 Coarsen_Operator_Uniform objet_lecture nul 0 not_set
   attr Coarsen_Operator_Uniform chaine Coarsen_Operator_Uniform 1 not_set
@@ -2711,6 +2721,8 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr ijk_splitting chaine(into=["grid_splitting"]) ijk_splitting 1 not_set
   attr ijk_splitting_ft_extension entier ijk_splitting_ft_extension 1 not_set
   attr timestep floattant timestep 1 not_set
+  attr time_scheme chaine time_scheme 1 not_set
+  attr cfl floattant cfl 1 not_set
   attr timestep_facsec floattant timestep_facsec 1 not_set
   attr dt_post entier dt_post 1 not_set
   attr dt_post_stats_bulles entier dt_post_stats_bulles 1 not_set
@@ -2737,6 +2749,10 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr expression_vz_init chaine expression_vz_init 1 not_set
   attr expression_derivee_force chaine expression_derivee_force 1 not_set
   attr expression_p_init chaine expression_p_init 1 not_set
+  attr expression_p_ana chaine expression_p_ana 1 not_set
+  attr expression_vx_ana chaine expression_vx_ana 1 not_set
+  attr expression_vy_ana chaine expression_vy_ana 1 not_set
+  attr expression_vz_ana chaine expression_vz_ana 1 not_set
   attr expression_dPdx_ana chaine expression_dPdx_ana 1 not_set
   attr expression_dPdy_ana chaine expression_dPdy_ana 1 not_set
   attr expression_dPdz_ana chaine expression_dPdz_ana 1 not_set
@@ -2773,12 +2789,15 @@ IJK_FT_double interprete IJK_FT_double 1 not_set
   attr expression_ddWdxdy_ana chaine expression_ddWdxdy_ana 1 not_set
   attr expression_ddWdxdz_ana chaine expression_ddWdxdz_ana 1 not_set
   attr expression_ddWdydz_ana chaine expression_ddWdydz_ana 1 not_set
+  attr expression_potential_phi chaine expression_potential_phi 1 not_set
   attr check_divergence rien check_divergence 1 not_set
+  attr refuse_patch_conservation_QdM_RK3_source_interf rien refuse_patch_conservation_QdM_RK3_source_interf 1 not_set
   attr check_stats rien check_stats 1 not_set
   attr disable_diphasique rien disable_diphasique 1 not_set
   attr disable_diffusion_qdm rien disable_diffusion_qdm 1 not_set
   attr disable_convection_qdm rien disable_convection_qdm 1 not_set
   attr disable_solveur_poisson rien disable_solveur_poisson 1 not_set
+  attr disable_source_interf rien disable_source_interf 1 not_set
   attr nom_sauvegarde chaine nom_sauvegarde 1 not_set
   attr nom_reprise chaine nom_reprise 1 not_set
   attr sondes bloc_lecture sondes 1 not_set
@@ -2818,6 +2837,7 @@ multigrid_solver interprete nul 1 not_set
   attr seuil floattant seuil 1 not_set
   attr nb_full_mg_steps listentier nb_full_mg_steps 1 not_set
   attr solveur_grossier solveur_sys_base solveur_grossier 1 not_set
+  attr iterations_mixed_solver entier iterations_mixed_solver 1 not_set
   attr impr rien impr 1 not_set
 Coarsen_Operator_Uniform objet_lecture nul 0 not_set
   attr Coarsen_Operator_Uniform chaine Coarsen_Operator_Uniform 1 not_set
