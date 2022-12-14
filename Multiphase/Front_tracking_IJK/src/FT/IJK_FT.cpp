@@ -1817,6 +1817,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       for (int dir = 0; dir < 3; dir++)
         fic <<" "<< 0.; //qdm_patch_correction_[dir];
 
+      // Puissance du travail des forces interfaciales
+      // fic <<" "<<ajoute_produit_scalaire();
       fic<<finl;
       fic.close();
       //    Cout << "T= " << time

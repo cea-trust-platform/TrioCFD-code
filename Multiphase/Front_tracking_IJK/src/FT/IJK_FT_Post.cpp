@@ -461,13 +461,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("GRAD_U");
       liste_post_instantanes_.add("GRAD_V");
       liste_post_instantanes_.add("GRAD_W");
-      cout << "5" << endl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         liste_post_instantanes_.add("FORCE_PH");
-      cout << "6" << endl;
       if (!disable_diphasique_)
         interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
-      cout << "1a" << endl;
 
       {
         int idx_th = 0;
@@ -489,22 +486,18 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_en;
           }
       }
-      cout << "2a" << endl;
     }
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
     {
-      cout << "3a" << endl;
       //source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
     }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
-      cout << "4a" << endl;
       //source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
       repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
-      cout << "5a" << endl;
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -1355,7 +1348,9 @@ void IJK_FT_Post::update_stat_ft(const double dt)
       for (int dir = 0; dir < 3; dir++)
         grad_P_[dir].echange_espace_virtuel(1);
 
+      Cout << "in IJK_FT_Post, Before : update_stat" << finl;
       statistiques_FT_.update_stat(ref_ijk_ft_, dt);
+      Cout << "in IJK_FT_Post, After : update_stat" << finl;
       return;
     }
   int nb_groups = interfaces_.nb_groups();

@@ -979,8 +979,8 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 
   FixedVector<IJK_Field_double, 3>& vitesse=cas.velocity_;
   // GR262753 : travail des forces d'interfaces
-  FixedVector<IJK_Field_double, 3>& force_interfaces=cas.terme_source_interfaces_ft_;
-  const FixedVector<IJK_Field_double, 3>& repulsion_interfaces=cas.terme_repulsion_interfaces_ft_;
+  FixedVector<IJK_Field_double, 3>& force_interfaces=cas.velocity_;//terme_source_interfaces_ft_;
+  const FixedVector<IJK_Field_double, 3>& repulsion_interfaces=cas.velocity_;//terme_repulsion_interfaces_ft_;
   // ---
   IJK_Field_double& extended_pressure_liq= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pl_: cas.pressure_;
   IJK_Field_double& extended_pressure_vap= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pv_: cas.pressure_;
