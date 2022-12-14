@@ -213,6 +213,11 @@ int IJK_FT_Post::initialise(int reprise)
           velocity_[1].echange_espace_virtuel(velocity_[1].ghost());
           velocity_[2].echange_espace_virtuel(velocity_[2].ghost());
 
+          // GAB
+          source_spectrale_[0].echange_espace_virtuel(source_spectrale_[0].ghost());
+          source_spectrale_[1].echange_espace_virtuel(source_spectrale_[1].ghost());
+          source_spectrale_[2].echange_espace_virtuel(source_spectrale_[2].ghost());
+
           update_integral_velocity(velocity_, integrated_velocity_, interfaces_.In(), integrated_timescale_);
 
         }
@@ -638,17 +643,9 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         }
       else if (ref_ijk_ft_.get_time_scheme() == IJK_FT_double::RK3_FT)
         {
-          Cerr << "rkstep " << ref_ijk_ft_.rk_step_ << finl;
-          int rk_step_before = ref_ijk_ft_.rk_step_;
-          if ((rk_step_before==0) || (rk_step_before==3))
-            rk_step_before = 2;
-          else if (rk_step_before==1)
-            rk_step_before = 0;
-          else /* ici, c'est rk_step_before=2 */
-            rk_step_before = 1;
-          Cerr << "rkstep_before " << rk_step_before  << finl;
-          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, rk_step_before);
+          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, 2);
           ct -= intermediate_dt;
+
         }
       else
         {
@@ -1351,7 +1348,9 @@ void IJK_FT_Post::update_stat_ft(const double dt)
       for (int dir = 0; dir < 3; dir++)
         grad_P_[dir].echange_espace_virtuel(1);
 
+      Cout << "in IJK_FT_Post, Before : update_stat" << finl;
       statistiques_FT_.update_stat(ref_ijk_ft_, dt);
+      Cout << "in IJK_FT_Post, After : update_stat" << finl;
       return;
     }
   int nb_groups = interfaces_.nb_groups();
