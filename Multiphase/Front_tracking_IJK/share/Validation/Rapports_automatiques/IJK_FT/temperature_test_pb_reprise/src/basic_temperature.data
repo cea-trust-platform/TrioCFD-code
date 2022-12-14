@@ -100,6 +100,7 @@ IJK_FT_double
     lambda_vapor 0.1
     expression_T_ana (z/1.)*(1.-(0.5*(z/1.)))-0.0408
     wall_flux
+    type_T_source patch_dabiri
     }
 
   }

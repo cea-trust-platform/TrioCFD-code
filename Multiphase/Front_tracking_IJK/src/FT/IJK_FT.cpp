@@ -287,6 +287,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   Objet_U::dimension=3;
 
   check_divergence_ = 0;
+  rk_step_ = -1; // default value
 
   expression_pression_initiale_ = "??"; // par defaut, invalide
   fichier_reprise_vitesse_ = "??"; // par defaut, invalide
@@ -538,6 +539,16 @@ Entree& IJK_FT_double::interpreter(Entree& is)
           Cout << "The option frozen_velocity automatically freeze the interface motion "
                <<  "by activating the flag interfaces_.frozen_" << finl;
         }
+    }
+
+  if ((expression_potential_phi_ != "??") &&
+      ((expression_variable_source_[0] != "??") ||
+       (expression_variable_source_[1] != "??")
+       || (expression_variable_source_[2] != "??")))
+    {
+      Cerr << "expression_potential_phi and expression_variable_source are used together"
+           << "nabla(phi) will be added to the expression given for the variable source" << finl;
+      //Process::exit();
     }
 
   if ((include_pressure_gradient_in_ustar_) && (expression_pression_initiale_ == "??"))
@@ -1382,7 +1393,6 @@ int IJK_FT_double::initialise()
 #endif
     }
 #endif
-  nalloc += post_.initialise(reprise_);
 
 // Pour le check_stats_ :
   // Pour le check_stats_ ou pour travailler en increment de pression, il faut connaitre la pression initiale :
@@ -1400,6 +1410,8 @@ int IJK_FT_double::initialise()
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, zone_dis);
+
+  nalloc += post_.initialise(reprise_);
 
   // statistiques...
   nalloc += post_.initialise_stats(splitting_, vol_bulles_, vol_bulle_monodisperse_);
@@ -2302,7 +2314,7 @@ void IJK_FT_double::run()
           if (!disable_diphasique_)
             {
               // TODO: aym pour GAB, si tu veux gagner en memoire et virer le doublon n/np1 il faut
-              // insérer une méthode ici style "mettre_a_jour_valeur_interface_temps_n()"
+              // inserer une methode ici style "mettre_a_jour_valeur_interface_temps_n()"
               deplacer_interfaces(timestep_,
                                   -1 /* le numero du sous pas de temps est -1 si on n'est pas en rk3 */,
                                   var_volume_par_bulle);
@@ -2402,23 +2414,23 @@ void IJK_FT_double::run()
             {
               interfaces_.creer_duplicata_bulles();
             }
-          for (int rk_step = 0; rk_step < 3; rk_step++)
+          for (rk_step_ = 0; rk_step_ < 3; rk_step_++)
             {
               const double fractionnal_timestep =
                 compute_fractionnal_timestep_rk3(timestep_ /* total*/,
-                                                 rk_step);
+                                                 rk_step_);
 
               // Mise a jour des positions des marqueurs.
               // Deplacement des interfaces par le champ de vitesse au sous pas de temps k :
               if (!disable_diphasique_)
                 {
-                  deplacer_interfaces_rk3(timestep_ /* total */, rk_step,
+                  deplacer_interfaces_rk3(timestep_ /* total */, rk_step_,
                                           var_volume_par_bulle);
                   parcourir_maillage();
                 }
               // Cerr << "RK3 : step " << rk_step << finl;
               // Mise a jour de la temperature et de la vitesse :
-              rk3_sub_step(rk_step, timestep_, fractionnal_timestep,
+              rk3_sub_step(rk_step_, timestep_, fractionnal_timestep,
                            current_time_at_rk3_step);
 
               // GAB patch qdm : choix 1
@@ -2435,7 +2447,7 @@ void IJK_FT_double::run()
               // (sauf au dernier sous pas de temps pour lequel c'est fait a la fin du pas de temps)
               // TODO: verifier qu'on doit bien le faire aussi au dernier sous pas de temps : rk_step != 2 &&
               // TODO aym: verifier ce bloc, qui applique les sous pas de temps RK3 de la rustine a la temperature
-              if (rk_step != 2 && !disable_diphasique_)
+              if (rk_step_ != 2 && !disable_diphasique_)
                 {
                   // Attention, il faut que les duplicatas soient present pour faire maj_indicatrice_rho_mu :
                   maj_indicatrice_rho_mu();
@@ -2446,7 +2458,7 @@ void IJK_FT_double::run()
                       if (curseur->conserv_energy_global_)
                         {
                           const double dE = curseur->E0_ - curseur->compute_global_energy();
-                          curseur->rk3_rustine_sub_step(rk_step, timestep_, fractionnal_timestep,
+                          curseur->rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
                                                         current_time_at_rk3_step, dE);
                         }
                       ++curseur;
@@ -2458,7 +2470,7 @@ void IJK_FT_double::run()
               // /!\ On laisse ce calcul du temre_source_aceleration car il ecrit aussi le fichier acceleration.out qui nous est chere
               Cout << "BF : calculer_terme_source_acceleration" <<finl;
               calculer_terme_source_acceleration(velocity_[direction_gravite_],
-                                                 current_time_at_rk3_step, timestep_ /*total*/, rk_step);
+                                                 current_time_at_rk3_step, timestep_ /*total*/, rk_step_);
               Cout << "AF : calculer_terme_source_acceleration" <<finl;
 
 
@@ -2468,7 +2480,7 @@ void IJK_FT_double::run()
               // On ne postraite pas le sous-dt 2 car c'est fait plus bas si on post-traite le pas de temps :
               if (post_.postraiter_sous_pas_de_temps()
                   && (tstep_ % post_.dt_post() == post_.dt_post() - 1)
-                  && (rk_step != 2))
+                  && (rk_step_ != 2))
                 {
                   post_.posttraiter_champs_instantanes(lata_name, current_time_at_rk3_step, tstep_);
                 }
@@ -4129,7 +4141,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // Comme ca, ils seront visibles a la visu.
   interfaces_.creer_duplicata_bulles();
 
-  // On met à jour l'indicatrice du pas de temps d'apres.
+  // On met a jour l'indicatrice du pas de temps d'apres.
   // On met aussi a jour le surf et bary des faces mouillees,
   // les valeurs moyennes en ijk, les val moy en ijkf, etc
   const double delta_rho = rho_liquide_ - rho_vapeur_;
@@ -4182,7 +4194,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 
   // On a conserve les duplicatas donc pas besoin de les re-creer...
   // On calcule l'indicatrice du prochain pas de temps (qui correspond aux interfaces qu'on
-  // vient de déplacer.
+  // vient de deplacer.
 
   const double delta_rho = rho_liquide_ - rho_vapeur_;
   interfaces_.switch_indicatrice_next_old();

@@ -130,7 +130,7 @@ do
 		-e "s/cp_vapor .*/ cp_vapor $cp_vapeur/g"	\
 		-e "s/lambda_liquid .*/ lambda_liquid $lambda_liquide/g"	\
 		-e "s/lambda_vapor .*/ lambda_vapor $lambda_vapeur/g"	\
-		-e "s/sonde_temp .*/ sonde_temp temperature periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
+		-e "s/sonde_temp .*/ sonde_temp temperature_0 periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
 		mv basic_temperature_tmp.data $dir/$dir_conv/${dir_conv}.data 	
 
 		echo "JDD pour preparation du calcul en avancant la bulle au bout du domaine..."$dir/$dir_conv
@@ -197,7 +197,7 @@ do
 		-e "s/cp_vapor .*/cp_vapor $cp_vapeur/g"	\
 		-e "s/lambda_liquid .*/lambda_liquid $lambda_liquide/g"	\
 		-e "s/lambda_vapor .*/lambda_vapor $lambda_vapeur/g"	\
-		-e "s/sonde_temp .*/sonde_temp temperature periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
+		-e "s/sonde_temp .*/sonde_temp temperature_0 periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
 		mv basic_temperature_tmp.data basic_temperature.data
 
 

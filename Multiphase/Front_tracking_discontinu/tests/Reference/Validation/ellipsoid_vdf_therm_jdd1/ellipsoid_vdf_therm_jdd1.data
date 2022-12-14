@@ -308,6 +308,9 @@ Postraitement
         postraitement_ft_lata post_internes { 
     format Lata 
     fichier lata/post_internes 
+    champs dt_post 0.01 { 
+        indicatrice_internes elem 
+    } 
     interfaces internes { 
         courbure som 
     } 
@@ -315,6 +318,9 @@ Postraitement
         postraitement_ft_lata post_cuve { 
     format Lata 
     fichier lata/post_cuve 
+    champs dt_post 0.01 { 
+        indicatrice_cuve elem 
+    } 
     interfaces cuve { 
         courbure som 
     } 

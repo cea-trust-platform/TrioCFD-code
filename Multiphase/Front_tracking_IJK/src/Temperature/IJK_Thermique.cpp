@@ -1838,7 +1838,7 @@ void IJK_Thermique::compute_T_rust(const FixedVector<IJK_Field_double, 3>& veloc
   const double rho_l = ref_ijk_ft_->rho_liquide_;
   const double rho_v = ref_ijk_ft_->rho_vapeur_;
 
-  // DONE: remplacer rho_cp par un champ rho_cp_ mis à jour dans update_thermal_properties. Necessaire pour que ça marche.
+  // DONE: remplacer rho_cp par un champ rho_cp_ mis a jour dans update_thermal_properties. Necessaire pour que ca marche.
   //On calcule div(rho_cp*v) qu'on stocke dans T_rust
   switch (type_temperature_convection_op_)
     {

@@ -1,23 +1,16 @@
 # cas 2D de chimie #
 # PARALLEL OK #
 
-
-
-
 /*
  Tube Y
  Chimie iodure-iodate
  0 famille monodisperse
 */
+
 Dimension 2
 Probleme_FT_Disc_gen pb3
 
 Domaine DOM3
-
-
-# # # Maillage # # #
-
-
 
 # BEGIN MESH #
 Read_file DOM3 Pb1_2D.geom 
@@ -26,6 +19,7 @@ Dilate DOM3 0.001
 
 /* Postraiter_domaine { domaine DOM3  fichier domaine.lata format lml } */
 # END MESH #
+
 # BEGIN PARTITION
 Partition DOM3
 {
@@ -44,16 +38,6 @@ Scatter DOM.Zones DOM3
 END SCATTER #
 
 
-
-
-
-
-
-
-
-
-
-# # # Schema # # #
 VDF dis
 
 Sch_CN_EX_iteratif  sch
@@ -70,16 +54,6 @@ Read sch
 	niter_min 1
 	niter_max 4
 }
-/*
-Schema_euler_implicite sch
-Read sch {
-tinit 0.
-	nb_pas_dt_max 3
-seuil_statio -1
-solveur implicite { solveur gmres { diag seuil 1e-5 impr  } }
-}
-*/
-# # # Schema # # #
 
 Constituant sirop
 Read sirop
@@ -94,11 +68,7 @@ Read fluide3
 	rho   Champ_Uniforme 1 1000.
 }
 
-
-
-
-# # # Chimie # # #
- Chimie la_chimie
+Chimie la_chimie
 Read la_chimie
 {
 modele_micro_melange 1
@@ -139,16 +109,6 @@ reactions {
    }
 }
 
-# # # Chimie # # #
-
-
-
-/*
-Champ_Uniforme gravite
-Read gravite 2 -6.935  -6.935
-Associate liquide gravite
-*/
-
 Navier_Stokes_FT_Disc              hydraulique
 Convection_Diffusion_Concentration H2BO3m
 Convection_Diffusion_Concentration Hp
@@ -184,11 +144,7 @@ Associate pb3 la_chimie
 # Associate pb3 interf #
 Discretize pb3 dis
 
-
-
-
-
-# # # Domaine principal # # #
+# Domaine principal #
 Read pb3
 {
 	# constante_cinetique1 1.  #
@@ -357,10 +313,6 @@ liste_de_postraitements
 # Sauvegarde binaire TubeY.sauv #
 # reprise binaire TubeY.sauv #
 }
-
-# # # Domaine principal # # #
-
-
 
 Solve pb3
 End

@@ -107,7 +107,7 @@ rm -rf DX*
 : > plot.gplot
 cat >> plot.gplot << EOF
 #!/usr/bin/gnuplot
-set terminal png size 640,480 enhanced font "Helvetica,12"
+set terminal png large
 
 #set output './cvgx_son.png'
 #set log xy
@@ -126,7 +126,7 @@ set output './cvgx_L2.png'
 set log xy
 set title "Norme L2 fonction de NX"
 plot   "./cvgx_L2_EUL.txt" u 1:3 t "PAR_DEF - EUL", \
-    0.00440539*10**(-1)*(x/8)**(-2) w l ls 2 t 'o2', \
+    0.00440539*10**(-1)*(x/8)**(-2) w l ls 2 t 'o2' \
     # 0.00440539*(x/8)**(-1) w l ls 3 t 'o1' #, \
     #       "./$schx/cvgx_L2_RK.txt" u 1:3 t "$schx - RK", \
     #       "./$schx/cvgx_L2_VDF.txt" u 1:3 t "$schx - VDF" #, \

@@ -327,9 +327,9 @@ cd DivaALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/DivaALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -353,9 +353,9 @@ cd TwoCylindersALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoCylindersALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -379,9 +379,9 @@ cd TwoOscillatingCylindersALE
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/.[!.]* .
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -397,6 +397,32 @@ sed -i '/begin{document}/d' fic.tex
 sed -i '/huge/d' fic.tex
 sed -i '/end{document}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/TwoOscillatingCylindersALE/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### 3dOscillatingBeamALE ################
+cd $rapport/fiches
+mkdir 3dOscillatingBeamALE
+cd 3dOscillatingBeamALE
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/Fluid_Structure_Interaction/share/Validation/Rapports_automatiques/3dOscillatingBeamALE/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{ALE}@g" fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/3dOscillatingBeamALE/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
 #           Generation document final
