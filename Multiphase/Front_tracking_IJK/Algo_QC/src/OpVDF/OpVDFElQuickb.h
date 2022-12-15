@@ -80,7 +80,7 @@ inline Op_Conv_Quickb_VDF_Elem::Op_Conv_Quickb_VDF_Elem(const Iterateur_VDF_base
  */
 inline void Op_Conv_Quickb_VDF_Elem::associer_vitesse(const Champ_base& ch_vit)
 {
-  const Champ_Face& vit = (Champ_Face&) ch_vit;
+  const Champ_Face_VDF& vit = (Champ_Face_VDF&) ch_vit;
 
   Eval_Quickb_VDF_Elem& eval_conv = (Eval_Quickb_VDF_Elem&) iter.evaluateur();
   eval_conv.associer(vit );                // Eval_Conv_VDF::associer

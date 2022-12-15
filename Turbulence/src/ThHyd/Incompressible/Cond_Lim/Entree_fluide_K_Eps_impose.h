@@ -23,7 +23,7 @@
 #ifndef Entree_fluide_K_Eps_impose_included
 #define Entree_fluide_K_Eps_impose_included
 
-#include <Dirichlet_entree_fluide.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 
 
 /*! @brief classe Entree_fluide_K_Eps_impose Cas particulier de la classe Dirichlet_entree_fluide

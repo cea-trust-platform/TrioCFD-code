@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Entree_fluide_K_Eps_impose.h>
-#include <Motcle.h>
 #include <Equation_base.h>
+#include <Motcle.h>
 
 Implemente_instanciable(Entree_fluide_K_Eps_impose,"Frontiere_ouverte_K_Eps_impose",Dirichlet_entree_fluide);
 

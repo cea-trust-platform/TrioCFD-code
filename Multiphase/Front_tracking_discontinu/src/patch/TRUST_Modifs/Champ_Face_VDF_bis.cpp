@@ -20,86 +20,8 @@
 #include <Champ_Face_VDF.h>
 #include <Champ_Uniforme.h>
 #include <Probleme_base.h>
+#include <distances_VDF.h>
 #include <Zone_Cl_VDF.h>
-
-void moy_2D_vit(const DoubleVect& vit, int elem, int iori, const Zone_VDF& zone, double& u)
-{
-  int num1, num2;
-  if (iori == 0)
-    {
-      num1 = zone.elem_faces(elem, 1);
-      num2 = zone.elem_faces(elem, 3);
-    }
-  else if (iori == 1)
-    {
-      num1 = zone.elem_faces(elem, 0);
-      num2 = zone.elem_faces(elem, 2);
-    }
-  else
-    {
-      Cerr << "valeur de iori " << iori << " impossible en 2D" << finl;
-      Process::exit();
-      num1 = num2 = -1;
-    }
-  u = 0.5 * (vit(num1) + vit(num2));
-}
-
-double norm_2D_vit(const DoubleVect& vit, int elem, int iori, const Zone_VDF& zone, double& u)
-{
-  double v;
-  moy_2D_vit(vit, elem, iori, zone, v);
-  v = std::fabs(v);
-  if (v == 0)
-    u = 0;
-  else
-    u = 1;
-  return v;
-}
-
-void moy_3D_vit(const DoubleVect& vit, int elem, int iori, const Zone_VDF& zone, double& val1, double& val2)
-{
-  int num1, num2, num3, num4;
-  if (iori == 0)
-    {
-      num1 = zone.elem_faces(elem, 1);
-      num2 = zone.elem_faces(elem, 4);
-      num3 = zone.elem_faces(elem, 2);
-      num4 = zone.elem_faces(elem, 5);
-    }
-  else if (iori == 1)
-    {
-      num1 = zone.elem_faces(elem, 0);
-      num2 = zone.elem_faces(elem, 3);
-      num3 = zone.elem_faces(elem, 2);
-      num4 = zone.elem_faces(elem, 5);
-    }
-  else if (iori == 2)
-    {
-      num1 = zone.elem_faces(elem, 0);
-      num2 = zone.elem_faces(elem, 3);
-      num3 = zone.elem_faces(elem, 1);
-      num4 = zone.elem_faces(elem, 4);
-    }
-  else
-    {
-      Cerr << "valeur de iori " << iori << " impossible en 3D" << finl;
-      Process::exit();
-      num1 = num2 = num3 = num4 = -1;
-    }
-  val1 = 0.5 * (vit(num1) + vit(num2));
-  val2 = 0.5 * (vit(num3) + vit(num4));
-}
-
-double norm_3D_vit(const DoubleVect& vit, int elem, int iori, const Zone_VDF& zone, double& val1, double& val2)
-{
-  moy_3D_vit(vit, elem, iori, zone, val1, val2);
-  double v1 = std::fabs(val1);
-  double v2 = std::fabs(val2);
-  double norm_vit = sqrt(v1 * v1 + v2 * v2);
-  val1 = v1 / (norm_vit + DMINFLOAT);
-  val2 = v2 / (norm_vit + DMINFLOAT);
-  return norm_vit;
-}
 
 void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& zone_Cl_VDF)
 {

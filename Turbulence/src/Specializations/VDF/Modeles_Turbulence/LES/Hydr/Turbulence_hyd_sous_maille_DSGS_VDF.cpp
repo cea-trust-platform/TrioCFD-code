@@ -21,7 +21,7 @@
 
 #include <Turbulence_hyd_sous_maille_DSGS_VDF.h>
 #include <Champ_Fonc_P0_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
@@ -697,7 +697,7 @@ void Turbulence_hyd_sous_maille_DSGS_VDF::calculer_model_coefficient(const Doubl
 void Turbulence_hyd_sous_maille_DSGS_VDF::calculer_Sij(const DoubleTab& in_vel,
                                                        DoubleTab& out_vel)
 {
-  Champ_Face& vit = ref_cast(Champ_Face, mon_equation->inconnue().valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation->inconnue().valeur());
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
 
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();

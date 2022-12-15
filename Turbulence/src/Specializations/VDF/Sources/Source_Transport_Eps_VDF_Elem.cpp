@@ -47,7 +47,7 @@ const DoubleTab& Source_Transport_Eps_VDF_Elem::get_visc_turb() const
   return mon_eq_transport_Eps->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
-void Source_Transport_Eps_VDF_Elem::calculer_terme_production(const Champ_Face& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
+void Source_Transport_Eps_VDF_Elem::calculer_terme_production(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
   const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs();
 

@@ -26,7 +26,7 @@
 #include <Sortie_libre_pression_imposee_QC.h>
 #include <Debog.h>
 #include <Convection_Diffusion_Temperature.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Loi_Etat_Melange_GP.h>
 #include <Check_espace_virtuel.h>
 #include <Dirichlet.h>

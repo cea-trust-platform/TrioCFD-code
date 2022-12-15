@@ -26,11 +26,11 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Probleme_base.h>
 #include <TRUSTTrav.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Entree_fluide_concentration_imposee.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Debog.h>
@@ -43,7 +43,7 @@
 /////////////////////////////////////////////////////////////////////////////
 DoubleVect& Calcul_Production_K_VDF::
 calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF , DoubleVect& S,  const DoubleTab& K_eps,
-                            const DoubleTab& vitesse,const Champ_Face& vit,  const DoubleTab& visco_turb )  const
+                            const DoubleTab& vitesse,const Champ_Face_VDF& vit,  const DoubleTab& visco_turb )  const
 {
   int nb_elem = zone_VDF.zone().nb_elem();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -93,7 +93,7 @@ calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl
 
 DoubleVect& Calcul_Production_K_VDF::
 calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
-                                const Champ_Face& vitesse,
+                                const Champ_Face_VDF& vitesse,
                                 DoubleVect& P,
                                 const DoubleTab& K_Eps,
                                 const DoubleTab& visco_turb) const
@@ -587,7 +587,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
 
 DoubleVect& Calcul_Production_K_VDF::
 calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF , DoubleVect& S,  const DoubleTab& K,
-                                const DoubleTab& vitesse,const Champ_Face& vit,  const DoubleTab& visco_turb )  const
+                                const DoubleTab& vitesse,const Champ_Face_VDF& vit,  const DoubleTab& visco_turb )  const
 {
   int nb_elem = zone_VDF.zone().nb_elem();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -637,7 +637,7 @@ calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zon
 
 DoubleVect& Calcul_Production_K_VDF::
 calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
-                                    const Champ_Face& vitesse,
+                                    const Champ_Face_VDF& vitesse,
                                     DoubleVect& P,
                                     const DoubleTab& K,
                                     const DoubleTab& visco_turb) const

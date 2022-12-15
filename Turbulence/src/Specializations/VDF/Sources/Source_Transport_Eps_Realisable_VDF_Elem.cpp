@@ -47,7 +47,7 @@ const Modele_Fonc_Realisable_base& Source_Transport_Eps_Realisable_VDF_Elem::get
   return mod_turb.associe_modele_fonction();
 }
 
-void Source_Transport_Eps_Realisable_VDF_Elem::calculer_terme_production_real(const Champ_Face& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleTrav& P) const
+void Source_Transport_Eps_Realisable_VDF_Elem::calculer_terme_production_real(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleTrav& P) const
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs();
 

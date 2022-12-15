@@ -25,7 +25,7 @@
 #define Frontiere_ouverte_temperature_imposee_rayo_semi_transp_included
 
 #include <Cond_Lim_rayo_semi_transp.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 class Champ_front;
 
 /*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp

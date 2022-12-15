@@ -22,7 +22,7 @@
 #include <Turbulence_hyd_sous_maille_selectif_VDF.h>
 #include <math.h>
 #include <VDF_discretisation.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Equation_base.h>
 #include <Zone_VDF.h>
 
@@ -119,7 +119,7 @@ void Turbulence_hyd_sous_maille_selectif_VDF::calculer_fonction_structure()
 void Turbulence_hyd_sous_maille_selectif_VDF::cutoff()
 {
   static const double Sin2Angl = SIN2ANGL;
-  const Champ_Face& vitesse = ref_cast(Champ_Face,mon_equation->inconnue().valeur());
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();

@@ -36,7 +36,7 @@ class Champ_Don_base;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
-class Champ_Face;
+class Champ_Face_VDF;
 
 class Modele_Jones_Launder_Thermique_VDF : public Modele_Fonc_Bas_Reynolds_Thermique_Base
 {

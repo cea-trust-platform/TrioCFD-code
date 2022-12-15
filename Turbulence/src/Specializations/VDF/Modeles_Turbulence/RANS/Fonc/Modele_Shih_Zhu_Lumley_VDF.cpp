@@ -31,7 +31,7 @@
 #include <Symetrie.h>
 #include <Neumann.h>
 #include <Neumann_homogene.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_Uniforme.h>
 
 
@@ -84,9 +84,9 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Zone_dis& zone_dis, const Zone_C
 
   int nb_elem_tot=zone_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
-  const Champ_Face& vitesse = ref_cast( Champ_Face,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
 
   for (int elem=0; elem<nelem_; elem++)
     {
@@ -159,9 +159,9 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Zone_dis& zone_dis, cons
 
   int nb_elem_tot=zone_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
-  const Champ_Face& vitesse = ref_cast( Champ_Face,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
 
   DoubleTab U_etoile( nelem_);
   DoubleTab As( nelem_);
@@ -231,9 +231,9 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, 
 
   int nb_elem_tot=zone_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
-  const Champ_Face& vitesse = ref_cast( Champ_Face,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
 
   DoubleTab U_etoile( nelem_);
   DoubleTab As( nelem_);

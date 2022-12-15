@@ -21,7 +21,7 @@
 
 #include <Paroi_negligeable_VDF.h>
 #include <Zone_Cl_dis.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_Uniforme.h>
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>

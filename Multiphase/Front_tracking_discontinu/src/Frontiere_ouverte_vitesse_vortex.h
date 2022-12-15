@@ -22,7 +22,7 @@
 #ifndef Frontiere_ouverte_vitesse_vortex_included
 #define Frontiere_ouverte_vitesse_vortex_included
 
-#include <Entree_fluide_vitesse_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 
 class Frontiere_ouverte_vitesse_vortex : public Entree_fluide_vitesse_imposee
 {
