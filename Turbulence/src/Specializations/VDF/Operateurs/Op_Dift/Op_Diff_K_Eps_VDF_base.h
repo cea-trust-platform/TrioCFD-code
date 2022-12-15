@@ -24,8 +24,8 @@
 
 #include <Eval_Diff_K_Eps_VDF_leaves.h>
 #include <Op_Diff_K_Eps_base.h>
+#include <Iterateur_VDF_Elem.h>
 #include <Op_VDF_Elem.h>
-#include <ItVDFEl.h>
 
 class Zone_Cl_dis;
 class Zone_dis;
@@ -46,7 +46,6 @@ public:
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
 
-  inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
   inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override
   {
     mettre_a_jour_diffusivite();

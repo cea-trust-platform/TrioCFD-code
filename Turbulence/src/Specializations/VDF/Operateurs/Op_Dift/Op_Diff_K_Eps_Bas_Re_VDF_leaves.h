@@ -29,7 +29,6 @@
 class Op_Diff_K_Eps_Bas_Re_VDF_leaves { };
 /// \endcond
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)
 class Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi);
@@ -42,7 +41,6 @@ public:
   inline const Champ_base& diffusivite() const override { return diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)
 class Op_Diff_K_Eps_Bas_Re_VDF_Elem : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem);
@@ -58,7 +56,6 @@ public:
 ///////////////////////////////////
 // VAR
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem)
 class Op_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_var_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_var_Elem);

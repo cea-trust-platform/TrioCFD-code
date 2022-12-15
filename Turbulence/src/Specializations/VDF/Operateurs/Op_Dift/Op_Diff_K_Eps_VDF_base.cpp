@@ -26,6 +26,7 @@
 #include <Op_Diff_K_Eps_VDF_base.h>
 #include <Fluide_Dilatable_base.h>
 #include <Operateur_base.h>
+#include <Probleme_base.h>
 #include <Champ_P0_VDF.h>
 #include <Statistiques.h>
 
@@ -153,7 +154,7 @@ const Champ_Fonc& Op_Diff_K_Eps_VDF_base::diffusivite_turbulente() const
 
 void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VDF_Elem::modifier_pour_Cl(iter.zone(), iter.zone_Cl(), matrice, secmem);
+  Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem);
 
   const Navier_Stokes_Turbulent& eqn_hydr = ref_cast(Navier_Stokes_Turbulent,equation().probleme().equation(0) ) ;
   const Mod_turb_hyd& mod_turb = eqn_hydr.modele_turbulence();
@@ -166,7 +167,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
       const IntVect& tab1=matrice.get_tab1();
       DoubleVect& coeff = matrice.get_set_coeff();
 
-      const IntTab& face_voisins = iter.zone().face_voisins();
+      const IntTab& face_voisins = iter->zone().face_voisins();
 
       if(sub_type(Transport_K_Eps,mon_equation.valeur()))
         {
@@ -287,7 +288,7 @@ void Op_Diff_K_Eps_VDF_base::dimensionner_blocs(matrices_t matrices, const tabs_
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
-  Op_VDF_Elem::dimensionner(iter.zone(), iter.zone_Cl(), mat2);
+  Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), mat2);
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
 }
 
@@ -299,9 +300,9 @@ void Op_Diff_K_Eps_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secme
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
   const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeur().valeurs();
 
-  if(mat) iter.ajouter_contribution(inco, *mat);
+  if(mat) iter->ajouter_contribution(inco, *mat);
   mettre_a_jour_diffusivite();
-  iter.ajouter(inco,secmem);
+  iter->ajouter(inco,secmem);
   statistiques().end_count(diffusion_counter_);
 
 }
