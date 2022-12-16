@@ -61,11 +61,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override
   {
     statistiques().begin_count(diffusion_counter_);
-    const std::string& nom_inco = equation().inconnue().le_nom().getString();
-    Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
-    const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeur().valeurs();
-    if(mat) iter->ajouter_contribution(inco, *mat);
-    iter->ajouter(inco,secmem);
+    iter->ajouter_blocs(matrices,secmem,semi_impl);
     statistiques().end_count(diffusion_counter_);
   }
   inline int has_interface_blocs() const override { return 1; }
