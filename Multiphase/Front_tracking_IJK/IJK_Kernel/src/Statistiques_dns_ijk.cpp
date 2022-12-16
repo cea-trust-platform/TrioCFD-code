@@ -2405,11 +2405,11 @@ void Statistiques_dns_ijk::compute_vecA_minus_vecB_in_vecA(FixedVector<IJK_Field
   const int kmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 2);
 
   //const int offset = splitting.get_offset_local(DIRECTION_K);
-
+  Cout << "in compute_vecA_minus_vecB_in_vecA" << vecA[0](4,4,4) << finl;
   for (int k = 0; k < kmax; k++)
     for (int j = 0; j < jmax; j++)
       for (int i = 0; i < imax; i++)
-        for (int dir = 0; dir > 3; ++dir)
+        for (int dir = 0; dir < 3; ++dir)
           {
             vecA[dir](i,j,k) -= vecB[dir](i,j,k);
           }

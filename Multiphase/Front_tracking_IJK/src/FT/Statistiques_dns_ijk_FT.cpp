@@ -900,7 +900,7 @@ Statistiques_dns_ijk_FT::Statistiques_dns_ijk_FT(IJK_FT_double& ijk_ft):
   // FONCTIONNE
 //  nval_=502+196+27+6+9+25+29;//+6;
   // A VOIR
-  nval_=502+196+27+6+9+25+29+3;
+  nval_=502+196+27+6+9+25+29+3+1;
 
   noms_moyennes_.dimensionner_force(nval_);
   for (int i=0; i<nval_; i++)
@@ -979,8 +979,9 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 
   FixedVector<IJK_Field_double, 3>& vitesse=cas.velocity_;
   // GR262753 : travail des forces d'interfaces
-  FixedVector<IJK_Field_double, 3>& force_interfaces=cas.velocity_;//terme_source_interfaces_ft_;
-  const FixedVector<IJK_Field_double, 3>& repulsion_interfaces=cas.velocity_;//terme_repulsion_interfaces_ft_;
+  Cout << "src/FT/Stat...ijk_FT.cpp" << finl;
+  FixedVector<IJK_Field_double, 3>& force_interfaces=cas.terme_source_interfaces_ft_;
+  const FixedVector<IJK_Field_double, 3>& repulsion_interfaces=cas.terme_repulsion_interfaces_ft_;
   // ---
   IJK_Field_double& extended_pressure_liq= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pl_: cas.pressure_;
   IJK_Field_double& extended_pressure_vap= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pv_: cas.pressure_;
@@ -1053,7 +1054,9 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
   const IJK_Field_double& vitesse_k = vitesse[2];
 
   // GR262753 : travail forces interfaces
+  Cout << "Before : compute_vecA_minus_vecB_in_vecA" << finl;
   compute_vecA_minus_vecB_in_vecA(force_interfaces, repulsion_interfaces);
+  Cout << "After : compute_vecA_minus_vecB_in_vecA" << finl;
 
   /*
   IJK_Field_double& force_interfaces_i = force_interfaces[0];
@@ -1182,12 +1185,13 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                                                               dUdx, dUdy, dUdz,
                                                               dVdx, dVdy, dVdz,
                                                               dWdx, dWdy, dWdz);
-
+              Cout << "travail_Force_interfaces_vitesse : " << finl;
               double travail_Force_interfaces_vitesse = calculer_produit_scalaire_faces_to_center (
                                                           vitesse_i, vitesse_j, vitesse_k,
                                                           force_interfaces[0], force_interfaces[1], force_interfaces[2],
                                                           i,j,k
                                                         );
+              Cout << travail_Force_interfaces_vitesse << finl;
 
 
               // Pour verifier un peu les stats ou pour le post-traitement, on stocke (systematiquement) les grad de vitesse :
@@ -1836,7 +1840,9 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               AJOUT(DISSIP_VAP_MOY,chiv*pseudo_dissip);
               AJOUT(TRUE_DISSIP_MOY,chi*true_dissip);
               AJOUT(TRUE_DISSIP_VAP_MOY,chiv*true_dissip);
+              Cout << "bf AJOUT(POWER_INTERF,tra" <<finl ;
               AJOUT(POWER_INTERF,travail_Force_interfaces_vitesse);
+              Cout << "af AJOUT(POWER_INTERF,tra" <<finl ;
               //
               // correlations 2 eme ordre vitesse (cote vapeur) :
               AJOUT(UUIv_MOY,u*u*chiv);
