@@ -36,6 +36,7 @@ class Paroi_Rayo_transp: public Cond_Lim_Rayo, public Neumann_paroi
 public :
   double flux_impose(int i) const override;
   double flux_impose(int i,int j) const override;
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
 };
 

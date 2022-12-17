@@ -39,7 +39,7 @@ class Echange_externe_impose_rayo_transp : public Cond_Lim_Rayo,public Echange_e
   Declare_instanciable(Echange_externe_impose_rayo_transp);
 
 public :
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void mettre_a_jour(double ) override;
   void calculer_Teta_i();

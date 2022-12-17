@@ -32,6 +32,7 @@ class Frontiere_Ouverte_temperature_imposee_Rayo_transp : public Cond_Lim_Rayo, 
   Declare_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp);
 
 public :
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
   void completer() override;
   void mettre_a_jour(double ) override;

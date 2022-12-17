@@ -40,7 +40,7 @@ public :
   const Cond_lim_base& la_cl() const override;
   Champ_front& temperature_bord();
   void calculer_temperature_bord(double temps);
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void verifie_ch_init_nb_comp() const override;
 };
