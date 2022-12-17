@@ -38,13 +38,7 @@
  */
 class Entree_fluide_K_Eps_impose  : public Dirichlet_entree_fluide
 {
-
   Declare_instanciable(Entree_fluide_K_Eps_impose);
-
-public :
-  int compatible_avec_eqn(const Equation_base&) const override;
-
 };
 
-#endif
-
+#endif /* Entree_fluide_K_Eps_impose_included */
