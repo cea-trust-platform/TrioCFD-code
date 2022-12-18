@@ -71,6 +71,11 @@ int Boundary_field_keps_from_ud::initialiser(double tps, const Champ_Inc_base& i
   vitesse_frontiere.completer();
   vitesse_frontiere.fixer_nb_valeurs_temporelles(nb_cases);
   vitesse_frontiere.initialiser(tps, inco);
+
+  // pour utiliser la trace ...
+  if (sub_type(Champ_front_calc,vitesse_frontiere))
+    ref_cast(Champ_front_calc,vitesse_frontiere).set_distant(0);
+
   vitesse_frontiere.mettre_a_jour(tps);
 
   mettre_a_jour(tps);
