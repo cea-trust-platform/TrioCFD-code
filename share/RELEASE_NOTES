@@ -1,10 +1,13 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.9.2_beta : Enhancements, modifications and corrected bugs since version 1.9.1 :
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 Release notes version 1.9.1 : Enhancements, modifications and corrected bugs since version 1.9.0 :
 --------------------------------------------------------------------------------------------------
 09/12/22 (TrioCFD) Enhancement : Aposteriori estimator takes now into account equation's source terms
 19/11/22 (TrioCFD) Bug fixed   : Fix Wilke's viscosity formula + documentation for Multi-species QC
 18/11/22 (TrioCFD) New feature : New Baltik Fluid_structure_interaction: Partitioned explicit serial coupling between the ALE module and the Beam model.
-18/11/22 (TrioCFD) New features: Reduced mechanical model (Beam model): Euler-bernouli model with a resolution based on a modal analysis and Newmark temporal discretization.
+18/11/22 (TrioCFD) New features: Reduced mechanical model (Beam model): Euler-Bernoulli model with a resolution based on a modal analysis and Newmark temporal discretization.
 03/11/22 (TrioCFD) Change      : IJK_Kernel (multigrid + simd) are moved to TRUST
 03/11/22 (TrioCFD) New feature : Activation of TCL module (to include singular heat flux and contact angle at Triple Contact Line)
 03/11/22 (TrioCFD) Enhancement : Improvement in FTD 2D_Axi calculations (contact angle, interpolation,...)
