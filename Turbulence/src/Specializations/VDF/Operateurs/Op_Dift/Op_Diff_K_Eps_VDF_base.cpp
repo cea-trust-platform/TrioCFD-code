@@ -42,6 +42,7 @@ void Op_Diff_K_Eps_VDF_base::completer()
   Operateur_base::completer();
   iter->completer_();
   iter->associer_champ_convecte_ou_inc(equation().inconnue(), nullptr);
+  iter->set_name_champ_inco(equation().inconnue().le_nom().getString());
   iter->set_convective_op_pb_type(false /* diff op */, 0 /* pas pb_multiphase */);
 
   diffuse_k_seul   = false;
