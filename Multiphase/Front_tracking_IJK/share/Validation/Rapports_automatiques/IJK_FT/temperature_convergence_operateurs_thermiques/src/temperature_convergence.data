@@ -60,9 +60,9 @@ IJK_FT_double
   sigma 0.07
 
   # plutot utiliser une vitesse imposée #
-  expression_vx_init 1.0
+  expression_vx_init 0.1
   expression_vy_init 0.1
-  expression_vz_init 1.0
+  expression_vz_init 0.1
  
  thermique
   {
@@ -85,7 +85,7 @@ IJK_FT_double
 
     # Etude de la convection #
     # CONV  expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
-    expression_T_ana 0.5*cos((x-1.*t)*2*Pi/0.006)*cos((y-0.1*t)*2*Pi/0.006)
+    expression_T_ana 0.5*cos((x-0.1*t)*2*Pi/0.006)*cos((y-0.1*t)*2*Pi/0.006)
     CONV #
 
     # Etude du schéma temps #
