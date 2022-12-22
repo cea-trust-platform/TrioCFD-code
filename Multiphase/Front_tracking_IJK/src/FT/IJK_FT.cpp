@@ -1274,16 +1274,17 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     }
   dt_cfl *= cfl;
   const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
-  const double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  if (disable_diffusion_qdm_) dt_fo = 1.e20;
   // Au cas ou sigma = 0, on utilise (sigma + 1e-20) :
   const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
-  const double dt_eq_velocity = std::min(max_timestep, 1./(1./dt_cfl+1./dt_fo+1./dt_oh) * timestep_facsec_);
+  const double dt_eq_velocity = 1./(1./dt_cfl+1./dt_fo+1./dt_oh);
 
   double dt_thermique = 1.e20;
   CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
   while(curseur)
     {
-      const double dt_th = curseur->compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
+      const double dt_th =  curseur->compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_thermique= std::min(dt_thermique, dt_th);
       ++curseur;
@@ -1299,7 +1300,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       ++curseur_en;
     }
 
-  const double dt = std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie);
+  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie));
 
   if (Process::je_suis_maitre())
     {

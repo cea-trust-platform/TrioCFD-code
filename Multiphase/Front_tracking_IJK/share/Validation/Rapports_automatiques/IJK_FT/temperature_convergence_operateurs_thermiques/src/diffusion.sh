@@ -22,7 +22,7 @@ rm -rf DX*
    # cp ../${jdd}.data .
     #cp ../${jdd}_VDF.data .
     # ln -s ../init.lata* .
-    echo "Schema diffusion  :   QUICK PAR DEFAUT ....."
+    echo "Schema diffusion  :    DEFAUT (centre)....."
     for n in 8 16 32 64 128 256
     do
         mkdir -p DX_EUL_$n # DX_RK_$n 
@@ -49,11 +49,13 @@ rm -rf DX*
         if [ $n == 32 ]; then 
             mkdir -p DX_EUL_${n}_3D
             sed -e "s/nbelem_i .*/nbelem_i $n/g" -e "s/nbelem_j .*/nbelem_j $n/g" \
-                -e "s#cos(y\*2\*Pi/0.06)#cos(y\*2\*Pi/0.06)*cos(z\*2\*Pi/0.06)#g" \
-                -e "s#2\*(2\*Pi/0.06)^2)#3\*(2\*Pi/0.06)^2)#g" \
+                -e "s#cos(y\*2\*Pi/0.006)#cos(y\*2\*Pi/0.006)*cos(z\*2\*Pi/0.006)#g" \
+                -e "s#2\*(2\*Pi/0.006)^2)#3\*(2\*Pi/0.006)^2)#g" \
                 -e "s/nbelem_k .*/nbelem_k $n/g" \
+                -e "s/timestep .*/timestep 9./"\
+                -e "s/timestep_facsec .*/timestep_facsec 1./"\
                 ${jdd}.data > ${jdd}_3D.data
-            echo -n "    Calculating DX_EUL_${n}_3D....."
+            echo -n "    Calculating DX_EUL_${n}_3D with a Fourier limited timestep....."
             triou ${jdd}_3D 1> out 2> err
             [ $? != 0 ] && echo "Calculation DX_EUL_${n}_3D failed! Exiting..." && exit -1
             echo "Done!"
@@ -127,7 +129,7 @@ set output './cvgx_L2.png'
 set log xy
 set title "Norme L2 fonction de NX"
 plot   "./cvgx_L2_EUL.txt" u 1:3 t "PAR_DEF - EUL", \
-    0.00440539*10**(-1)*(x/8)**(-2) w l ls 2 t 'o2t '
+    4.9509e-05*(x/8)**(-2) w l ls 2 t 'o2t '
     # 0.00440539*(x/8)**(-1) w l ls 3 t 'o1' #, \
     #       "./$schx/cvgx_L2_RK.txt" u 1:3 t "$schx - RK", \
     #       "./$schx/cvgx_L2_VDF.txt" u 1:3 t "$schx - VDF" #, \
