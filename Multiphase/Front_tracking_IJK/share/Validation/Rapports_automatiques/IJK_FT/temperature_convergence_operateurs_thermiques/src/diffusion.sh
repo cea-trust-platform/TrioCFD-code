@@ -145,5 +145,5 @@ EOF
 export LC_ALL="en_US.UTF-8"
 gnuplot plot.gplot
 echo "You can display:", display $PWD/cvgx_L2.png
-rm *.lata*
+# rm *.lata*
 # cd ..

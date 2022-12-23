@@ -2731,8 +2731,13 @@ void IJK_FT_double::run()
         }
 
     }
-
-
+  if (Process::je_suis_maitre())
+    {
+      SFichier master_file;
+      master_file.ouvrir(lata_name, ios::app);
+      master_file << "FIN" << finl;
+      master_file.close();
+    }
 // Pour forcer l'ecriture du dernier pas de temps dans la sonde (peut-etre deja ecrit...)
 // Alan 2020/03/02 : effectivement, deja ecrit
 // post_.postraiter_sondes();
