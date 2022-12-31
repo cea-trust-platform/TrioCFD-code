@@ -1811,9 +1811,10 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
     {
       // GR : 07.01.22 : ce serai pas mal de mettre une condition if (tstep % dt_post_stats_acc_ == dt_post_stats_acc_ - 1 || stop)
       //      pour alleger le dossier OUT. Voir avec GB et AB.
+      double ff=0.;
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_acceleration.out",
-                                  "tstep\ttime\tVx\trhoVx\ttauw\tda/dt\tNewT\tacceleration\tfac_var_source\tqdm_source\tvap_velocity_tmoy_\tliq_velocity_tmoy_\tqdm_patch_correction_[0]\tqdm_patch_correction_[1]\tqdm_patch_correction_[2]",
+                                  "tstep\ttime\tVx\trhoVx\ttauw\tda/dt\tNewT\tacceleration\tfac_var_source\tqdm_source\tvap_velocity_tmoy_\tliq_velocity_tmoy_\tqdm_patch_correction_[0]\tqdm_patch_correction_[1]\tqdm_patch_correction_[2]\tF_sigma_moyen[0]\tF_sigma_moyen[1]\tF_sigma_moyen[2]\tvelocity.F_sigma",
                                   reset);
       // la derivee_acceleration n'est connue que sur le maitre
       fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<rhov_moy <<" "<<tauw ;
@@ -1829,17 +1830,18 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       for (int dir = 0; dir < 3; dir++)
         fic <<" "<< 0.; //qdm_patch_correction_[dir];
 
-      // Puissance du travail des forces interfaciales
-      // fic <<" "<<ajoute_produit_scalaire();
+      // Force interfacial et puissance du travail des forces interfaciales
+      // terme_source_interfaces_ns_
+      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[0]);}
+      fic <<" "<< ff; // F_sigma_moyen[0]
+      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[1]);}
+      fic <<" "<< ff; // F_sigma_moyen[1]
+      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[2]);}
+      fic <<" "<< ff; // F_sigma_moyen[2]
+      if (!disable_diphasique_) {ff=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));}
+      fic <<" "<< ff; // velocity.F_sigma
       fic<<finl;
       fic.close();
-      //    Cout << "T= " << time
-      //	 << " Vx_moyen= " << v_moy
-      //	 << " rhoVx_moyen= " << rhov_moy
-      //	 << " tauw= " << tauw;
-      //    Cout << " da/dt= " << derivee_acceleration
-      //	 << " NewT= " << new_time
-      //	 << " acceleration= " << terme_source_acceleration_
       //	 << finl;
     }
   statistiques().end_count(source_counter_);
@@ -2466,8 +2468,6 @@ void IJK_FT_double::run()
                 }
               // Calcul du terme source force acceleration :
               // GAB, rotation
-              // calculer_terme_source_acceleration(velocity_[0],
-              // /!\ On laisse ce calcul du temre_source_aceleration car il ecrit aussi le fichier acceleration.out qui nous est chere
               Cout << "BF : calculer_terme_source_acceleration" <<finl;
               calculer_terme_source_acceleration(velocity_[direction_gravite_],
                                                  current_time_at_rk3_step, timestep_ /*total*/, rk_step_);
@@ -4799,4 +4799,29 @@ void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
   Cout << "AF : compute_and_add_qdm_corrections_monophasic" << finl;
 }
 
+IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2)
+{
+  IJK_Field_double resu;
+  resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
+
+  int nk = V1[0].nk();
+  if (nk != V2[0].nk()) {Cerr << "scalar product of field with different dimensions (nk)"<< finl;}
+  int nj = V1[0].nj();
+  if (nj != V2[0].nj()) {Cerr << "scalar product of field with different dimensions (nj)"<< finl;}
+  int ni = V1[0].ni();
+  if (ni != V2[0].ni()) {Cerr << "scalar product of field with different dimensions (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          resu(i,j,k) = 0.25*(
+                          (V1[0](i,j,k)+V1[0](i+1,j,k))*(V2[0](i,j,k)+V2[0](i+1,j,k))
+                          +(V1[1](i,j,k)+V1[1](i+1,j,k))*(V2[1](i,j,k)+V2[1](i+1,j,k))
+                          +(V1[2](i,j,k)+V1[2](i+1,j,k))*(V2[2](i,j,k)+V2[2](i+1,j,k))
+                        );
+        }
+
+  return resu;
+}
 

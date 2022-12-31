@@ -150,7 +150,7 @@ public :
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
   void compute_and_add_qdm_corrections_monophasic();
-
+  IJK_Field_double scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2);
   // SURCHARGE DES OPERATEURS : dans FixedVector, on ajoute le produit_scalaire
   //  mais il faut que les operateur * et += soient definis pour IJK_FT_double
   //  /!\ operator* est une fonction, pas une methode de la classe

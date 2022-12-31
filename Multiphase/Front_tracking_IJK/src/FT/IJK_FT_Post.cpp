@@ -432,14 +432,10 @@ static void interpolate_to_center(FixedVector<IJK_Field_double, 3>& cell_center_
 // GAB
 void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double current_time, int time_iteration)
 {
-  cout << "1" << endl;
   statistiques().begin_count(postraitement_counter_);
-  cout << "2" << endl;
 
   const int latastep = compteur_post_instantanes_;
-  cout << "3" << endl;
   dumplata_newtime(lata_name,current_time);
-  cout << "4" << endl;
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);

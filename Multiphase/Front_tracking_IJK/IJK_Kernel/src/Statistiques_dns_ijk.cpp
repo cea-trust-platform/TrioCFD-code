@@ -2395,7 +2395,6 @@ double Statistiques_dns_ijk::calculer_produit_scalaire_faces_to_center(
 
 void Statistiques_dns_ijk::compute_vecA_minus_vecB_in_vecA(FixedVector<IJK_Field_double, 3>& vecA, const FixedVector<IJK_Field_double, 3>& vecB)
 {
-
   const IJK_Splitting& splitting = vecA.get_splitting();
   // Nombre total de mailles en K
   //const int nktot = splitting.get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
@@ -2405,7 +2404,6 @@ void Statistiques_dns_ijk::compute_vecA_minus_vecB_in_vecA(FixedVector<IJK_Field
   const int kmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 2);
 
   //const int offset = splitting.get_offset_local(DIRECTION_K);
-  Cout << "in compute_vecA_minus_vecB_in_vecA" << vecA[0](4,4,4) << finl;
   for (int k = 0; k < kmax; k++)
     for (int j = 0; j < jmax; j++)
       for (int i = 0; i < imax; i++)

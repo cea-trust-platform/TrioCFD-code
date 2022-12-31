@@ -976,7 +976,6 @@ double Calculer_valeur_seuil(double p_seuil, double pressionijk, double p_seuil_
 
 void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 {
-
   FixedVector<IJK_Field_double, 3>& vitesse=cas.velocity_;
   // GR262753 : travail des forces d'interfaces
   FixedVector<IJK_Field_double, 3>& force_interfaces=cas.terme_source_interfaces_ft_;
@@ -1053,7 +1052,8 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
   const IJK_Field_double& vitesse_k = vitesse[2];
 
   // GR262753 : travail forces interfaces
-  compute_vecA_minus_vecB_in_vecA(force_interfaces, repulsion_interfaces);
+  if (!cas.disable_diphasique_)
+    compute_vecA_minus_vecB_in_vecA(force_interfaces, repulsion_interfaces);
 
   /*
   IJK_Field_double& force_interfaces_i = force_interfaces[0];
@@ -1182,11 +1182,15 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                                                               dUdx, dUdy, dUdz,
                                                               dVdx, dVdy, dVdz,
                                                               dWdx, dWdy, dWdz);
-              double travail_Force_interfaces_vitesse = calculer_produit_scalaire_faces_to_center (
-                                                          vitesse_i, vitesse_j, vitesse_k,
-                                                          force_interfaces[0], force_interfaces[1], force_interfaces[2],
-                                                          i,j,k
-                                                        );
+              double travail_Force_interfaces_vitesse = 0.;
+              if (!cas.disable_diphasique_)
+                {
+                  travail_Force_interfaces_vitesse = calculer_produit_scalaire_faces_to_center (
+                                                       vitesse_i, vitesse_j, vitesse_k,
+                                                       force_interfaces[0], force_interfaces[1], force_interfaces[2],
+                                                       i,j,k
+                                                     );
+                }
 
 
               // Pour verifier un peu les stats ou pour le post-traitement, on stocke (systematiquement) les grad de vitesse :
@@ -2597,7 +2601,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
             << L2_d_divU_dy << " "
             << L2_d_divU_dz << finl;
 #endif
-
+  Cout << "Statistiques_dns_ijk_FT::update_stat" << finl;
 }
 
 // This method is called only on master proc.
