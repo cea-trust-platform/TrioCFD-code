@@ -1805,16 +1805,38 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
         }
     }
   envoyer_broadcast(terme_source_acceleration_, 0);
-
+  // -----------------------------------------------------------
+  // Force interface (:"force sigma") seloon x,y,z et u.Force_interface
+  double fs0(0),fs1(0),fs2(0),psn(0);
+  if (!disable_diphasique_)
+    {
+      {fs0=calculer_v_moyen(terme_source_interfaces_ns_[0]);}
+      {fs1=calculer_v_moyen(terme_source_interfaces_ns_[1]);}
+      {fs2=calculer_v_moyen(terme_source_interfaces_ns_[2]);}
+      {psn=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));}
+    }
+  // energie cinetique
+  double uu(calculer_v_moyen(scalar_product(velocity_,velocity_)));
+  // Force exterieur (:"force thi") selon x,y,z et u.Force_THI
+  double ft0(0),ft1(0),ft2(0),ftft(0),ptn(0);
+  if (forcage_.get_type_forcage() > 0)
+    {
+      {ft0 = calculer_v_moyen(forcage_.get_force_ph2()[0]);}
+      {ft1 = calculer_v_moyen(forcage_.get_force_ph2()[1]);}
+      {ft2 = calculer_v_moyen(forcage_.get_force_ph2()[2]);}
+      {ftft = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));}
+      {ptn = calculer_v_moyen(scalar_product(velocity_,forcage_.get_force_ph2()));}
+    }
+  // -----------------------------------------------------------
   // Impression dans le fichier _acceleration.out
   if (Process::je_suis_maitre())
     {
       // GR : 07.01.22 : ce serai pas mal de mettre une condition if (tstep % dt_post_stats_acc_ == dt_post_stats_acc_ - 1 || stop)
       //      pour alleger le dossier OUT. Voir avec GB et AB.
-      double ff=0.;
+      // double ff=0.;
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_acceleration.out",
-                                  "tstep\ttime\tVx\trhoVx\ttauw\tda/dt\tNewT\tacceleration\tfac_var_source\tqdm_source\tvap_velocity_tmoy_\tliq_velocity_tmoy_\tqdm_patch_correction_[0]\tqdm_patch_correction_[1]\tqdm_patch_correction_[2]\tF_sigma_moyen[0]\tF_sigma_moyen[1]\tF_sigma_moyen[2]\tvelocity.F_sigma",
+                                  "1.tstep\t2.time\t3.Vx\t4.rhoVx\t5.tauw\t6.da/dt\t7.NewT\t8.acceleration\t9.fac_var_source\t10.qdm_source\t11.vap_velocity_tmoy_\t12.liq_velocity_tmoy_\t13.qdm_patch_correction_[0]\t14.qdm_patch_correction_[1]\t15.qdm_patch_correction_[2]\t16.F_sigma_moyen[0]\t17.F_sigma_moyen[1]\t18F_sigma_moyen[2]\t19.velocity.F_sigma\t20.u.u\t21.F_THI[0]\t22.F_THI[1]\t23.F_THI[2]\t24.F_THI.F_THI\t25.u.F_THI",
                                   reset);
       // la derivee_acceleration n'est connue que sur le maitre
       fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<rhov_moy <<" "<<tauw ;
@@ -1830,16 +1852,22 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       for (int dir = 0; dir < 3; dir++)
         fic <<" "<< 0.; //qdm_patch_correction_[dir];
 
-      // Force interfacial et puissance du travail des forces interfaciales
+      // Force interfaciale et puissance du travail des forces interfaciales
       // terme_source_interfaces_ns_
-      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[0]);}
-      fic <<" "<< ff; // F_sigma_moyen[0]
-      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[1]);}
-      fic <<" "<< ff; // F_sigma_moyen[1]
-      if (!disable_diphasique_) {ff=calculer_v_moyen(terme_source_interfaces_ns_[2]);}
-      fic <<" "<< ff; // F_sigma_moyen[2]
-      if (!disable_diphasique_) {ff=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));}
-      fic <<" "<< ff; // velocity.F_sigma
+      fic <<" "<< fs0; // F_sigma_moyen[0]
+      fic <<" "<< fs1; // F_sigma_moyen[1]
+      fic <<" "<< fs2; // F_sigma_moyen[2]
+      fic <<" "<< psn; // velocity.F_sigma
+      // Energie cinetique (double)
+      // u.u (qui est aussi accessible par les .txt)
+      fic <<" "<< uu;
+      // Travail du forcage exterieur
+      // u.F_THI
+      fic <<" "<< ft0; // F_THI[0]
+      fic <<" "<< ft1; // F_THI[1]
+      fic <<" "<< ft2; // F_THI[2]
+      fic <<" "<< ftft; // F_THI.F_THI
+      fic <<" "<< ptn; // velocity.F_THI
       fic<<finl;
       fic.close();
       //	 << finl;
@@ -4803,7 +4831,6 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
 {
   IJK_Field_double resu;
   resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
-
   int nk = V1[0].nk();
   if (nk != V2[0].nk()) {Cerr << "scalar product of fields with different dimensions (nk)"<< finl;}
   int nj = V1[0].nj();
@@ -4821,7 +4848,7 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
                           +(V1[2](i,j,k)+V1[2](i,j,k+1))*(V2[2](i,j,k)+V2[2](i,j,k+1))
                         );
         }
-
+  // Communication avec tous les process ?
   return resu;
 }
 
