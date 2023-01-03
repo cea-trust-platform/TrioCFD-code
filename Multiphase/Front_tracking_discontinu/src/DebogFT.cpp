@@ -42,18 +42,19 @@ Entree& DebogFT::readOn(Entree& is)
 {
   return is;
 }
+// XD DebogFT interprete DebogFT 1 not_set
 Entree& DebogFT::interpreter(Entree& is)
 {
   filename_ = "DEBOG.txt";
   Param param(que_suis_je());
-  param.ajouter("mode", &debog_mode_);
+  param.ajouter("mode", &debog_mode_); // XD_ADD_P chaine(into=["disabled","write_pass","check_pass"]) not_set
   param.dictionnaire("disabled", (int)DISABLED);
   param.dictionnaire("write_pass", (int)WRITE_PASS);
   param.dictionnaire("check_pass", (int)CHECK_PASS);
-  param.ajouter("filename", &filename_);
-  param.ajouter("seuil_absolu", &seuil_absolu_);
-  param.ajouter("seuil_relatif", &seuil_relatif_);
-  param.ajouter("seuil_minimum_relatif", &seuil_minimum_relatif_);
+  param.ajouter("filename", &filename_); // XD_ADD_P  chaine not_set
+  param.ajouter("seuil_absolu", &seuil_absolu_); // XD_ADD_P floattant not_set
+  param.ajouter("seuil_relatif", &seuil_relatif_); // XD_ADD_P floattant not_set
+  param.ajouter("seuil_minimum_relatif", &seuil_minimum_relatif_); // XD_ADD_P floattant not_set
   param.lire_avec_accolades(is);
   if (je_suis_maitre())
     {
