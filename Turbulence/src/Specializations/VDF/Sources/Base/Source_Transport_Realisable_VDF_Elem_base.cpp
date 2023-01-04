@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 
 Implemente_base_sans_constructeur(Source_Transport_Realisable_VDF_Elem_base, "Source_Transport_Realisable_VDF_Elem_base",Source_Transport_VDF_Elem_base) ;
 
@@ -37,7 +37,7 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   const Modele_Fonc_Realisable_base& mon_modele_fonc = get_modele_fonc(); // voir les classes filles
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());

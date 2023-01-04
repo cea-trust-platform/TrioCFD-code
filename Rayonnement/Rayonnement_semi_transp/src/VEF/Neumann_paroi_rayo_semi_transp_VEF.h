@@ -38,7 +38,6 @@ public :
   double flux_impose(int i,int j) const override;
   inline Champ_front& temperature_bord();
   inline const Champ_front& temperature_bord() const;
-
   void calculer_temperature_bord(double temps);
 
   void completer() override;

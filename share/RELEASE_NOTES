@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.2_beta : Enhancements, modifications and corrected bugs since version 1.9.1 :
 --------------------------------------------------------------------------------------------------
+04/01/23 (TRUST) Major Change : For Pb_Multiphase, simple calls are now applied to compute fluid/saturations properties (improve significantly the performance especially with libraries like EOS, RefProp, ...)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.1 : Enhancements, modifications and corrected bugs since version 1.9.0 :
 --------------------------------------------------------------------------------------------------

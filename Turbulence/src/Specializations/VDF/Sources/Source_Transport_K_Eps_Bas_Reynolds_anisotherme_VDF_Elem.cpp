@@ -23,10 +23,10 @@
 #include <Convection_Diffusion_Temperature_Turbulent.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Champ_Uniforme.h>
+#include <Champ_Face_VDF.h>
 #include <Probleme_base.h>
 #include <Zone_Cl_VDF.h>
 #include <Fluide_base.h>
-#include <Champ_Face.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem,"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_P0_VDF",Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem);
@@ -66,7 +66,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
-  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const int nb_elem = zone_VDF.nb_elem(), nb_elem_tot = zone_VDF.nb_elem_tot();
 
   DoubleTrav P(nb_elem_tot), G(nb_elem_tot), G1(nb_elem_tot), D(nb_elem_tot), E(nb_elem_tot), F1(nb_elem_tot), F2(nb_elem_tot);
@@ -125,7 +125,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
   mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,ch_visco_dyn);
 
   //Calcul du terme de production
-  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   calculer_terme_production_K(zone_VDF,zcl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
 
   //Calcul du terme source

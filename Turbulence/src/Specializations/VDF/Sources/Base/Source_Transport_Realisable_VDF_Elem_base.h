@@ -39,7 +39,7 @@ private:
   // methodes a surcharger sinon throw !!
   const DoubleTab& get_visc_turb() const  override { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Realisable_base& get_modele_fonc() const { return not_implemented<Modele_Fonc_Realisable_base&>(__func__); }
-  virtual void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const { return not_implemented<void>(__func__); }
+  virtual void calculer_terme_production_real(const Champ_Face_VDF&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const { return not_implemented<void>(__func__); }
 };

@@ -30,7 +30,7 @@
 #include <Probleme_base.h>
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem,"Source_Transport_K_KEps_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
@@ -244,12 +244,12 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
 
   if (axi)
     {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       calculer_terme_production_K_Axi(zone_VDF,vitesse,P,K_eps,visco_turb);
     }
   else
     {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       calculer_terme_production_K(zone_VDF,zone_Cl_VDF_NS,P,K_eps,vit,vitesse,visco_turb);
     }
 

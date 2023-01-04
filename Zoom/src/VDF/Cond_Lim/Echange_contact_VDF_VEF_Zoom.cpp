@@ -24,18 +24,9 @@
 #include <Conduction.h>
 #include <Connectivites_faces_couple.h>
 #include <Convection_Diffusion_std.h>
-
+#include <Ref_Milieu_base.h>
 
 Implemente_instanciable(Echange_contact_VDF_VEF_Zoom,"Contact_VDF_VEF",Echange_contact_VDF_Zoom_base);
-
-
-
-
-
-
-
-
-
 
 // Fonctions hors classe pour le pdt scal n_i.n_j
 // Attention : la normal a la face num_face est suppose sortante

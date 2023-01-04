@@ -30,7 +30,7 @@
 #include <SFichier.h>
 #include <LecFicDistribue.h>
 #include <Probleme_FT_Disc_gen.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Dirichlet_homogene.h>
 #include <Debog.h>
 #include <Array_tools.h>

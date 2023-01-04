@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Variation_rho_PolyMAC_P0.h>
+#include <Zone_PolyMAC_P0.h>
 #include <Pb_Multiphase.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Matrix_tools.h>

@@ -25,13 +25,14 @@
 
 
 #include <Cond_Lim_Rayo.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 
 class Frontiere_Ouverte_temperature_imposee_Rayo_transp : public Cond_Lim_Rayo, public Entree_fluide_temperature_imposee
 {
   Declare_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp);
 
 public :
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
   void completer() override;
   void mettre_a_jour(double ) override;
