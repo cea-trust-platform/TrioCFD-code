@@ -4805,11 +4805,11 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
   resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
 
   int nk = V1[0].nk();
-  if (nk != V2[0].nk()) {Cerr << "scalar product of field with different dimensions (nk)"<< finl;}
+  if (nk != V2[0].nk()) {Cerr << "scalar product of fields with different dimensions (nk)"<< finl;}
   int nj = V1[0].nj();
-  if (nj != V2[0].nj()) {Cerr << "scalar product of field with different dimensions (nj)"<< finl;}
+  if (nj != V2[0].nj()) {Cerr << "scalar product of fields with different dimensions (nj)"<< finl;}
   int ni = V1[0].ni();
-  if (ni != V2[0].ni()) {Cerr << "scalar product of field with different dimensions (ni)"<< finl;}
+  if (ni != V2[0].ni()) {Cerr << "scalar product of fields with different dimensions (ni)"<< finl;}
 
   for (int k=0; k<nk; ++k)
     for (int j=0; j<nj; ++j)
@@ -4817,8 +4817,8 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
         {
           resu(i,j,k) = 0.25*(
                           (V1[0](i,j,k)+V1[0](i+1,j,k))*(V2[0](i,j,k)+V2[0](i+1,j,k))
-                          +(V1[1](i,j,k)+V1[1](i+1,j,k))*(V2[1](i,j,k)+V2[1](i+1,j,k))
-                          +(V1[2](i,j,k)+V1[2](i+1,j,k))*(V2[2](i,j,k)+V2[2](i+1,j,k))
+                          +(V1[1](i,j,k)+V1[1](i,j+1,k))*(V2[1](i,j,k)+V2[1](i,j+1,k))
+                          +(V1[2](i,j,k)+V1[2](i,j,k+1))*(V2[2](i,j,k)+V2[2](i,j,k+1))
                         );
         }
 
