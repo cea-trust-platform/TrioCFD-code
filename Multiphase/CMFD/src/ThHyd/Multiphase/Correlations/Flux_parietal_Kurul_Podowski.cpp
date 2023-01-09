@@ -77,6 +77,7 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
   if (out.dv_qpi)  (*out.dv_qpi) = 0.;
   if (out.dTf_qpi) (*out.dTf_qpi)= 0.;
   if (out.dTp_qpi) (*out.dTp_qpi)= 0.;
+  if (out.nonlinear) (*out.nonlinear) = 1;
 
   // On remplit le monophasique ; pas besoin du flux interfacial normalement
   ref_cast(Flux_parietal_base, correlation_monophasique_.valeur()).qp(in, out);
@@ -107,50 +108,60 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
               // NB: dans Neptune, le b est un peu different mais il faudrait un newton pour le calculer...
               */
 
-              double N_sites = std::pow(210*(in.Tp - in.Tsat[ind_sat]), 1.8);
-              double dTp_N_sites = 210*std::pow(210*(in.Tp - in.Tsat[ind_sat]), .8);
+              double     N_sites =          std::pow(210.*(in.Tp - in.Tsat[ind_sat]), 1.8);
+              double dTp_N_sites = 210.*1.8*std::pow(210.*(in.Tp - in.Tsat[ind_sat]),  .8);
 
-              double A_bubbles = std::min(1., N_sites*3.1415*dd*dd/4.);
-              double dTp_A_bubbles = (N_sites*3.1415*dd*dd/4.>1) ? 0. : dTp_N_sites*3.1415*dd*dd/4.+N_sites*3.1415*2.*dTp_dd*dd/4.;
+              double     A_bubbles = std::min(1., 3.1415/4.*N_sites*dd*dd);
+              double dTp_A_bubbles = (3.1415/4.*N_sites*dd*dd>1) ? 0. : 3.1415/4.*dTp_N_sites*dd*dd+3.1415/4.*N_sites*2.*dTp_dd*dd ;
 
-              double f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l]*dd));
-              double dTp_f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l])) * .5 / std::sqrt(dd);
+              double     f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l]))   *            std::pow(dd, -0.5);
+              double dTp_f_dep = std::sqrt(4./3*9.81*(in.rho[n_l]-in.rho[k])/(in.rho[n_l]))   *-0.5*dTp_dd*std::pow(dd, -1.5);
 
-              double q_evap  = f_dep * 3.1415/6. * dd*dd*dd * in.rho[k] * in.Lvap[ind_sat] * N_sites ;
-              double dTp_q_evap=  dTp_f_dep * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * N_sites
-                                  +f_dep     * 3.1415/6. *3.*dTp_dd*dd*dd * in.rho[k] * in.Lvap[ind_sat] * N_sites
-                                  +f_dep     * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * dTp_N_sites ;
+              double   q_evap  =       f_dep * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * N_sites ;
+              double dTp_q_evap=   dTp_f_dep * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * N_sites
+                                   +f_dep    * 3.1415/6. *3.*dTp_dd*dd*dd * in.rho[k] * in.Lvap[ind_sat] * N_sites
+                                   +f_dep    * 3.1415/6. * dd*dd*dd       * in.rho[k] * in.Lvap[ind_sat] * dTp_N_sites ;
 
 
-              double q_quench= A_bubbles *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep);
-              double dTl_q_quench= A_bubbles *2. * in.lambda[n_l] * (-1.)           / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep);
+              double     q_quench= A_bubbles     *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep);
+              double dTl_q_quench= A_bubbles     *2. * in.lambda[n_l] * (-1.)               / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep);
               double dTp_q_quench= dTp_A_bubbles *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep)
-                                   +A_bubbles     *2. * in.lambda[n_l] * (1.)                / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep)
-                                   +A_bubbles     *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * .5*dTp_f_dep/std::sqrt(f_dep);
+                                   +A_bubbles    *2. * in.lambda[n_l] * (1.)                / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * std::sqrt(f_dep)
+                                   +A_bubbles    *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * .5*dTp_f_dep/std::sqrt(f_dep);
 
               // We correct the single phase heat flux
-              DoubleTrav qpk_loc;
-              if (out.qpk)     qpk_loc    = *out.qpk;
-              if (out.qpk)     (*out.qpk)    *= (1-A_bubbles);
-              if (out.da_qpk)  (*out.da_qpk) *= (1-A_bubbles);
-              if (out.dp_qpk)  (*out.dp_qpk) *= (1-A_bubbles);
-              if (out.dv_qpk)  (*out.dv_qpk) *= (1-A_bubbles);
-              if (out.dTf_qpk) (*out.dTf_qpk)*= (1-A_bubbles);
-              if (out.dTp_qpk)
-                {
-                  (*out.dTp_qpk)         *= (1-A_bubbles);
-                  (*out.dTp_qpk)(n_l)    += -dTp_A_bubbles*qpk_loc(n_l);
-                }
+              /*              double qpk_nl_loc = -1;
+                            Cerr << "qpk lol " << (*out.qpk)(n_l) << " " ;
+                            Cerr << A_bubbles << " " ;
+                            if (out.qpk)        qpk_nl_loc  = (*out.qpk)(n_l);
+                            if (out.qpk)     (*out.qpk)    *= (1-A_bubbles);
+                            if (out.da_qpk)  (*out.da_qpk) *= (1-A_bubbles);
+                            if (out.dp_qpk)  (*out.dp_qpk) *= (1-A_bubbles);
+                            if (out.dv_qpk)  (*out.dv_qpk) *= (1-A_bubbles);
+                            if (out.dTf_qpk) (*out.dTf_qpk)*= (1-A_bubbles);
+                            if (out.dTp_qpk)
+                              {
+                                (*out.dTp_qpk)         *= (1-A_bubbles);
+                                (*out.dTp_qpk)(n_l)    += -dTp_A_bubbles*qpk_nl_loc;
+                              }
+              */
+              Cerr <<(*out.qpk)(n_l) << " " ;
 
               // Quenching
               if (out.qpk)     (*out.qpk)(n_l)        += q_quench;
               if (out.dTp_qpk) (*out.dTp_qpk)(n_l)    += dTp_q_quench;
               if (out.dTf_qpk) (*out.dTf_qpk)(n_l,n_l)+= dTl_q_quench;
 
+              Cerr <<(*out.qpk)(n_l) << " " ;
+              Cerr <<(*out.qpk)(k) << " " ;
+
               // Evaporation
               if (out.qpi)     (*out.qpi)(n_l, k)     += q_evap;
               if (out.dTp_qpi) (*out.dTp_qpi)(n_l, k) += dTp_q_evap;
+
             }
         }
+  Cerr <<finl;
+
 }
 

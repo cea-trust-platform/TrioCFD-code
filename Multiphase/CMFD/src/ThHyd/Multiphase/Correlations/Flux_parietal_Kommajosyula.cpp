@@ -67,6 +67,21 @@ void Flux_parietal_Kommajosyula::completer()
 
 void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
 {
+  // On met tout a 0 a tout hasard
+  if (out.qpk)     (*out.qpk)    = 0.;
+  if (out.da_qpk)  (*out.da_qpk) = 0.;
+  if (out.dp_qpk)  (*out.dp_qpk) = 0.;
+  if (out.dv_qpk)  (*out.dv_qpk) = 0.;
+  if (out.dTf_qpk) (*out.dTf_qpk)= 0.;
+  if (out.dTp_qpk) (*out.dTp_qpk)= 0.;
+  if (out.qpi)     (*out.qpi)    = 0.;
+  if (out.da_qpi)  (*out.da_qpi) = 0.;
+  if (out.dp_qpi)  (*out.dp_qpi) = 0.;
+  if (out.dv_qpi)  (*out.dv_qpi) = 0.;
+  if (out.dTf_qpi) (*out.dTf_qpi)= 0.;
+  if (out.dTp_qpi) (*out.dTp_qpi)= 0.;
+  if (out.nonlinear) (*out.nonlinear) = 1;
+
   // On remplit le monophasique ; pas besoin du flux interfacial normalement
   ref_cast(Flux_parietal_base, correlation_monophasique_.valeur()).qp(in, out);
 
@@ -85,6 +100,7 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
 
           if (Delta_T_sup > 0) // Else : no wall superheat => no nucleation => single phase heat transfer only
             {
+
               double Delta_T_sub = std::max(in.Tsat[ind_sat] - in.T[n_l], 1.e-8) ; // Subcooling ; non negative for numerical reasons
               double dTp_Delta_T_sup = 1.;
               double dTl_Delta_T_sub = -1.;
@@ -236,6 +252,7 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k,   k) = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (            std::pow(D_lo,3.) *     f_dep * dTk_N_active);
 
               if (out.d_nuc) (*out.d_nuc)(k) = D_lo;
+
             }
         }
 }
