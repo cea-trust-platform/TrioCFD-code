@@ -53,6 +53,9 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
+//      nu_t(i, n) = sigma_ * ( (omega(i,n*(k.dimension(1)-1)) > 0.) ?
+//                   std::max(k(i, n*(k.dimension(1)-1)) / omega(i, n*(k.dimension(1)-1)), limiter_ * nu(i, n)):
+//                   limiter_ * nu(i, n) )  ;
       nu_t(i, n) = (n < k.dimension(1)) ?  sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) )   : 0;
 }
 

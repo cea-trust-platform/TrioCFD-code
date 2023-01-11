@@ -130,30 +130,23 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
                                    +A_bubbles    *2. * in.lambda[n_l] * (in.Tp - in.T[n_l]) / std::sqrt(3.1415*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])) * .5*dTp_f_dep/std::sqrt(f_dep);
 
               // We correct the single phase heat flux
-              /*              double qpk_nl_loc = -1;
-                            Cerr << "qpk lol " << (*out.qpk)(n_l) << " " ;
-                            Cerr << A_bubbles << " " ;
-                            if (out.qpk)        qpk_nl_loc  = (*out.qpk)(n_l);
-                            if (out.qpk)     (*out.qpk)    *= (1-A_bubbles);
-                            if (out.da_qpk)  (*out.da_qpk) *= (1-A_bubbles);
-                            if (out.dp_qpk)  (*out.dp_qpk) *= (1-A_bubbles);
-                            if (out.dv_qpk)  (*out.dv_qpk) *= (1-A_bubbles);
-                            if (out.dTf_qpk) (*out.dTf_qpk)*= (1-A_bubbles);
-                            if (out.dTp_qpk)
-                              {
-                                (*out.dTp_qpk)         *= (1-A_bubbles);
-                                (*out.dTp_qpk)(n_l)    += -dTp_A_bubbles*qpk_nl_loc;
-                              }
-              */
-              Cerr <<(*out.qpk)(n_l) << " " ;
+              double qpk_nl_loc = -1;
+              if (out.qpk)        qpk_nl_loc  = (*out.qpk)(n_l);
+              if (out.qpk)     (*out.qpk)    *= (1-A_bubbles);
+              if (out.da_qpk)  (*out.da_qpk) *= (1-A_bubbles);
+              if (out.dp_qpk)  (*out.dp_qpk) *= (1-A_bubbles);
+              if (out.dv_qpk)  (*out.dv_qpk) *= (1-A_bubbles);
+              if (out.dTf_qpk) (*out.dTf_qpk)*= (1-A_bubbles);
+              if (out.dTp_qpk)
+                {
+                  (*out.dTp_qpk)         *= (1-A_bubbles);
+                  (*out.dTp_qpk)(n_l)    += -dTp_A_bubbles*qpk_nl_loc;
+                }
 
               // Quenching
               if (out.qpk)     (*out.qpk)(n_l)        += q_quench;
               if (out.dTp_qpk) (*out.dTp_qpk)(n_l)    += dTp_q_quench;
               if (out.dTf_qpk) (*out.dTf_qpk)(n_l,n_l)+= dTl_q_quench;
-
-              Cerr <<(*out.qpk)(n_l) << " " ;
-              Cerr <<(*out.qpk)(k) << " " ;
 
               // Evaporation
               if (out.qpi)     (*out.qpi)(n_l, k)     += q_evap;
@@ -161,7 +154,5 @@ void Flux_parietal_Kurul_Podowski::qp(const input_t& in, output_t& out) const
 
             }
         }
-  Cerr <<finl;
-
 }
 

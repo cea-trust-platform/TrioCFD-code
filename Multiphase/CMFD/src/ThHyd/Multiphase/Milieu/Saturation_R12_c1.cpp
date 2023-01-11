@@ -238,7 +238,7 @@ void Saturation_R12_c1::sigma_(const SpanD T, const SpanD P, SpanD res, int ncom
       // Calcule sigma
       double sigma, dsig1;
       F77NAME(FSIGMAR12)(&un, &tsp, &dtsp1, &sigma, &dsig1);
-      res[i] = sigma;
+      res[i*ncomp+ind] = sigma;
     }
 #else
   for (int i =0; i < (int)P.size(); i++) res[i] = 0;
