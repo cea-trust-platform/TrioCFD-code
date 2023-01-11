@@ -1244,7 +1244,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
   }
   // En cas d'erreur d'arrondi ...
   if (surface < 0.) surface = 0.;
-  
+
   // calcul des contributions.
   double barycentre_phase1[3] = {0.,0.,0.};
   if (correction_parcours_thomas_ || (sqrt(surface) > 5. * Erreur_max_coordonnees_))
