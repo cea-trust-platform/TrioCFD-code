@@ -22,7 +22,6 @@
 
 #include <Source_rayo_semi_transp.h>
 
-Implemente_deriv(Source_rayo_semi_transp_base);
 Implemente_instanciable(Source_rayo_semi_transp,"Source_rayo_semi_transp",DERIV(Source_rayo_semi_transp_base));
 
 

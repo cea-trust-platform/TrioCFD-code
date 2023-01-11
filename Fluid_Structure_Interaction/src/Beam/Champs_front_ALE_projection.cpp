@@ -21,7 +21,6 @@
 
 #include <Champs_front_ALE_projection.h>
 
-Implemente_vect(Champ_front_ALE_projection);
 Implemente_instanciable(Champs_front_ALE_projection, "Champs_front_ALE_projection",VECT(Champ_front_ALE_projection) ) ;
 
 

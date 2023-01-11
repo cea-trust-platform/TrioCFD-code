@@ -23,8 +23,8 @@
 #define Champs_front_ALE_projection_included
 
 #include <Champ_front_ALE_projection.h>
+#include <TRUST_Vector.h>
 
-Declare_vect(Champ_front_ALE_projection);
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class Champs_front_ALE_projection

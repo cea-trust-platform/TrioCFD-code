@@ -24,8 +24,6 @@
 #include <IJK_Field.h>
 
 Implemente_base(Tube_base, "Tube_base", Objet_U);
-Implemente_deriv(Tube_base);
-Implemente_vect(DERIV(Tube_base));
 Implemente_instanciable(Faisceau_Tubes, "Faisceau_Tubes", VECT(DERIV(Tube_base)));
 
 static void evaluer_f_et_df_dt_et_df2_dt2(const Noms& expressions, const double t, const double dt, Vecteur3& f, Vecteur3& df_dt, Vecteur3& df2_dt2)

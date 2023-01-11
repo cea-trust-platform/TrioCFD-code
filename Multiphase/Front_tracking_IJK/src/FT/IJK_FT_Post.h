@@ -25,10 +25,9 @@
 
 #include <IJK_Field.h>
 #include <Motcle.h>
-#include <Vect.h>
+#include <TRUST_Vector.h>
 #include <Statistiques_dns_ijk_FT.h>
 #include <Statistiques_dns_ijk_monophasique.h>
-#include <Vect_Statistiques_dns_ijk_FT.h>
 #include <Sondes_IJK.h>
 #include <IJK_Interfaces.h>
 #include <Multigrille_Adrien.h>

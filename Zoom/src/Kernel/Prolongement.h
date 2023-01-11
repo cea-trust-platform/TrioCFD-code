@@ -27,10 +27,9 @@
 #ifndef Prolongement_included
 #define Prolongement_included
 
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <Prolongement_base.h>
 
-Declare_deriv(Prolongement_base);
 
 /*! @brief classe Prolongement Classe generique de la hierarchie des algorithmes, un objet
  *

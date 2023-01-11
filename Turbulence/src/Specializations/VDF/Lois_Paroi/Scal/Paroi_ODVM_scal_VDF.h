@@ -24,7 +24,8 @@
 
 #include <Paroi_scal_hyd_base_VDF.h>
 #include <Zone_Cl_dis.h>
-#include <Vect_Eq_ODVM.h>
+#include <TRUST_Vector.h>
+#include <Eq_ODVM.h>
 #include <Ref_Convection_Diffusion_std.h>
 #include <Ref_DoubleVect.h>
 #include <Milieu_base.h>

@@ -24,7 +24,8 @@
 
 #include <Paroi_std_scal_hyd_VDF.h>
 #include <Zone_Cl_dis.h>
-#include <Vect_Eq_couch_lim.h>
+#include <Eq_couch_lim.h>
+#include <TRUST_Vector.h>
 #include <Ref_Convection_Diffusion_std.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM_Scal.h>

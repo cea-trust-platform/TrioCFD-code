@@ -22,7 +22,8 @@
 #ifndef Paroi_TBLE_QDM_Scal_included
 #define Paroi_TBLE_QDM_Scal_included
 
-#include <Vect_Eq_couch_lim.h>
+#include <TRUST_Vector.h>
+#include <Eq_couch_lim.h>
 #include <TRUSTTab.h>
 #include <Noms.h>
 #include <TRUSTVects.h>

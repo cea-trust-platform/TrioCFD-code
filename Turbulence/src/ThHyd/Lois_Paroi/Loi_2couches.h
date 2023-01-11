@@ -23,9 +23,8 @@
 #define Loi_2couches_included
 
 #include <Loi_2couches_base.h>
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Loi_2couches_base);
 
 /*! @brief classe Loi_2couches Classe generique pour les modeles 1 equation pour le modele a deux couches.
  *

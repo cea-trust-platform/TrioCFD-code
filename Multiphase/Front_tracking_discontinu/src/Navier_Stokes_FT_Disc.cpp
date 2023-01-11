@@ -29,6 +29,7 @@
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Assembleur_base.h>
+#include <TRUST_Vector.h>
 #include <Ref_Champ_base.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VDF.h>
@@ -59,8 +60,6 @@
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc,"Navier_Stokes_FT_Disc",Navier_Stokes_Turbulent);
 
 Implemente_ref(Navier_Stokes_FT_Disc);
-Declare_vect(REF(Transport_Interfaces_FT_Disc));
-Implemente_vect(REF(Transport_Interfaces_FT_Disc));
 
 class Navier_Stokes_FT_Disc_interne
 {

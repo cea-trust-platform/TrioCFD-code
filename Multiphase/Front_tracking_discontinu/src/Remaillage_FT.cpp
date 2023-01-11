@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Remaillage_FT.h>
-#include <Deriv_Remaillage_FT.h>
+#include <TRUST_Deriv.h>
 #include <Motcle.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
@@ -40,7 +40,6 @@
 
 Implemente_instanciable_sans_constructeur(Remaillage_FT,"Remaillage_FT",Objet_U);
 
-Implemente_deriv(Remaillage_FT);
 
 Remaillage_FT::Remaillage_FT() :
   // Values initialized:

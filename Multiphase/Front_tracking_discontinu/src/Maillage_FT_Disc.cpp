@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Maillage_FT_Disc.h>
-#include <Deriv_Maillage_FT_Disc.h>
+#include <TRUST_Deriv.h>
 #include <TRUSTVect.h>
 #include <Zone.h>
 #include <Zone_VF.h>
@@ -94,7 +94,6 @@ void Maillage_FT_Disc_Data_Cache::clear()
 
 Implemente_instanciable_sans_constructeur(Maillage_FT_Disc,"Maillage_FT_Disc",Ensemble_Lagrange_base);
 
-Implemente_deriv(Maillage_FT_Disc);
 
 /*! @brief Pour chaque sommet du maillage, s'il est sur un bord, on calcule costheta min et max (hysteresis) correspondant a la condition aux limites ou
  *

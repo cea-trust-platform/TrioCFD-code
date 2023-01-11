@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Marching_Cubes.h>
-#include <Deriv_Marching_Cubes.h>
+#include <TRUST_Deriv.h>
 #include <Marching_Cubes_data.h>
 #include <ArrOfBit.h>
 #include <TRUSTVect.h>
@@ -38,7 +38,6 @@
 
 Implemente_instanciable_sans_constructeur(Marching_Cubes,"Marching_Cubes",Objet_U);
 
-Implemente_deriv(Marching_Cubes);
 
 // **********************************************************************
 //                       Methodes publiques

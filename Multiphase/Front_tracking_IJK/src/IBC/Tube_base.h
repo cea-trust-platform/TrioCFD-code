@@ -22,6 +22,8 @@
 #include <Linear_algebra_tools.h>
 #include <Noms.h>
 #include <IJK_Splitting.h>
+#include <TRUST_Vector.h>
+#include <TRUST_Deriv.h>
 
 class Tube_base : public Objet_U
 {
@@ -66,8 +68,6 @@ protected:
   Nom nom_;
 };
 
-Declare_deriv(Tube_base);
-Declare_vect(DERIV(Tube_base));
 
 class Tube_impose : public Tube_base
 {

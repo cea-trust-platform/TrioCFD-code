@@ -24,7 +24,6 @@
 
 Implemente_base(Op_Diff_Fluctu_Temp_Base,"Op_Diff_Fluctu_Temp_Base",Operateur_base);
 Implemente_instanciable(Op_Diff_Fluctu_Temp_negligeable,"Op_Diff_Fluctu_Temp_negligeable",Op_Diff_Fluctu_Temp_Base);
-Implemente_deriv(Op_Diff_Fluctu_Temp_Base);
 Implemente_instanciable(Op_Diff_Fluctu_Temp,"Op_Diff_Fluctu_Temp",DERIV(Op_Diff_Fluctu_Temp_Base));
 
 
