@@ -359,11 +359,12 @@ void Fluide_R12_c1_liquide::mu_(const SpanD T, const SpanD P, SpanD res, int nco
   /* calcul a saturation */
   for (auto& val : res)
     {
-      int un = 1;
-      double dtl1 = 0., dtl2 = 0.; // We don't need the derivative of lambda
-      double mul, dmu1, dmu2;
-      F77NAME(FMULR12)(&un, &T[ind * ncomp + id], &dtl1, &dtl2, &mul, &dmu1, &dmu2);
-      val =  mul;
+      // Fit we did manually using NIST data
+      double a1 = 4.51272790e-09;
+      double a2 = -2.14503254e-06;
+      double a3 = 2.44480131e-04 ;
+
+      val =  a3 + a2*T[ind * ncomp + id] + a1*T[ind * ncomp + id]*T[ind * ncomp + id];
     }
 #else
   for (auto& val : res) val = 0;
