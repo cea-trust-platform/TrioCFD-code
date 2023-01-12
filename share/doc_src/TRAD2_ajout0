@@ -3235,4 +3235,3 @@ bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the syn
   attr KeOverKmin floattant KeOverKmin 0 ratio of the most energetic wavenumber Ke over the minimum wavenumber Kmin representing the largest turbulent eddies
   attr timeScale floattant timeScale 0 turbulent time scale
   attr dir_fluct listf dir_fluct 0 directions for the velocity fluctations (e.g 1 0 0 generates velocity fluctuations in the x-direction only)
-
