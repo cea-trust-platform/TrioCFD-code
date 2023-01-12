@@ -2721,10 +2721,10 @@ void Statistiques_dns_ijk_FT::completer_read(Param& param)
   // However, we can do something for nb_thermal_fields_ from the problem !
   {
     int idx =0;
-    for ( auto& itr : ref_ijk_ft_->thermique_);
-    {
-      idx++;
-    }
+    for ( auto&& itr = ref_ijk_ft_->thermique_.begin(); itr != ref_ijk_ft_->thermique_.end(); ++itr )
+      {
+        idx++;
+      }
     //curseur = ref_ijk_ft_->thermique_; //RAZ
     nb_thermal_fields_ = idx;
     Journal() <<"ooooo "<<Process::me() << finl;
@@ -2758,10 +2758,10 @@ void Statistiques_dns_ijk_FT::initialize(const IJK_FT_double& ijk_ft, const IJK_
     elem_coord_[i] = (coord_z[i] + coord_z[i+1]) * 0.5;
 
   int idx =0;
-  for (auto& itr : ref_ijk_ft_->thermique_);
-  {
-    idx++;
-  }
+  for ( auto&& itr = ref_ijk_ft_->thermique_.begin(); itr != ref_ijk_ft_->thermique_.end(); ++itr )
+    {
+      idx++;
+    }
   //curseur = ref_ijk_ft_->thermique_; //RAZ
   nb_thermal_fields_ = idx;
   Journal() <<"ooooo "<< Process::me() << " with nb_thermal_fields=" << nb_thermal_fields_ << finl;

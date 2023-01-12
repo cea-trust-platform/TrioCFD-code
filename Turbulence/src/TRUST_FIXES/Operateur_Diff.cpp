@@ -19,26 +19,14 @@
 #include <Discretisation_base.h>
 #include <stat_counters.h>
 #include <Champ_base.h>
-Implemente_deriv(Operateur_Diff_base);
+
 Implemente_instanciable(Operateur_Diff,"Operateur_Diff",DERIV(Operateur_Diff_base));
 
-
-/*! @brief Simple appel a Operateur::ecrire(Sortie&) Ecrit l'operateur sur un flot de sortie.
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Operateur_Diff::printOn(Sortie& os) const
 {
   return Operateur::ecrire(os);
 }
 
-
-/*! @brief Simple appel a Operateur::lire(Entree&) Lit l'operateur a partir d'un flot d'entree.
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Operateur_Diff::readOn(Entree& is)
 {
 //  valeur().Garde_Tenseur_Reynolds();

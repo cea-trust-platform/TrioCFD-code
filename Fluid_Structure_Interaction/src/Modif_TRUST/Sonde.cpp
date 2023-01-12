@@ -1030,25 +1030,28 @@ void Sonde::ouvrir_fichier()
 {
   if(je_suis_maitre())
     {
-      if (!le_fichier_.is_open())
-        {
-          //struct stat f {}; Pb sur 4.8.5
-          struct stat f;
-          const char *sonde_file = nom_fichier_;
-          if (stat(sonde_file, &f))
-            reprise = 0;
-          else if (reprise == 0)
-            reprise = mon_post->probleme().reprise_effectuee();
+      if( le_fichier_)
+        delete le_fichier_;
 
-          if (reprise == 0)
-            le_fichier_.ouvrir(nom_fichier_);
-          else
-            le_fichier_.ouvrir(nom_fichier_, ios::app);
+      {
+        //struct stat f {}; Pb sur 4.8.5
+        struct stat f;
+        const char *sonde_file = nom_fichier_;
+        if (stat(sonde_file, &f))
+          reprise = 0;
+        else if (reprise == 0)
+          reprise = mon_post->probleme().reprise_effectuee();
 
-          le_fichier_.setf(ios::scientific);
-          le_fichier_.precision(8);
-        }
-      SFichier& s = le_fichier_;
+        if (reprise == 0)
+          le_fichier_=new SFichier(nom_fichier_);
+        else
+          le_fichier_=new SFichier(nom_fichier_, ios::app);
+
+        (*le_fichier_).setf(ios::scientific);
+        (*le_fichier_).precision(8);
+      }
+
+      SFichier& s = *le_fichier_;
       // Ecriture de l'en tete des fichiers sondes :
       if ((dim==0 || dim==1) && reprise==0)
         {
@@ -1281,8 +1284,7 @@ void Sonde::postraiter()
       int nbproc = Process::nproc();
       DoubleTab valeurs_pe;
       DoubleTab& valeurs=(nbproc==1?valeurs_locales:valeurs_sur_maitre);
-      if (nbproc==1)
-        ;//valeurs=valeurs_locales;
+      if (nbproc==1) { /* Do nothing */} //valeurs=valeurs_locales;
       else
         {
           int nb_val = valeurs_locales.dimension(0);

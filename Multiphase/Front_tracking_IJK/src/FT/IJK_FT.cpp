@@ -1125,7 +1125,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         {
           fichier << *itr ;
           ++itr;
-          if (itr)
+          if (itr != thermique_.end())
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -1143,7 +1143,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         {
           fichier << *itr ;
           ++itr;
-          if (itr)
+          if (itr != energie_.end())
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -3824,7 +3824,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
     {
       itr.rk3_sub_step(rk_step, total_timestep, time);
     }
-  for (auto& itr : energie_)
+  for (auto&& itr = energie_.begin(); itr != energie_.begin(); ++itr)
     {
       // curseur->rk3_sub_step(rk_step, total_timestep, time);
       // ++curseur;

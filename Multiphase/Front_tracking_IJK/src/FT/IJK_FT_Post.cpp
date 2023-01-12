@@ -405,7 +405,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
       {
         int idx_th = 0;
-        for (const auto &itr : thermique_)
+        for (auto&& itr = thermique_.begin(); itr != thermique_.end(); ++itr)
           {
             posttraiter_tous_champs_thermique(liste_post_instantanes_, idx_th);
             ++idx_th;
@@ -413,7 +413,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       }
       {
         int idx_en = 0;
-        for (const auto &itr : energie_)
+        for (auto&& itr = energie_.begin(); itr != energie_.end(); ++itr)
           ;
         {
           posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);

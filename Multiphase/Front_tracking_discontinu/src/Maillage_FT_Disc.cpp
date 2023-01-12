@@ -63,7 +63,6 @@ EOF
  */
 
 Implemente_instanciable_sans_constructeur(Maillage_FT_Disc_Data_Cache,"Maillage_FT_Disc_Data_Cache",Objet_U);
-Implemente_deriv(Maillage_FT_Disc_Data_Cache);
 Entree& Maillage_FT_Disc_Data_Cache::readOn(Entree& is)
 {
   assert(0);

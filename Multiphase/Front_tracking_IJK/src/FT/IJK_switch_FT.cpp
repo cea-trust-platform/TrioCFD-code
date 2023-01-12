@@ -127,7 +127,7 @@ int Switch_FT_double::init_thermique()
   int idx =0;
     for (auto& itr : thermique_)
     {
-      Cout << "Reading the old temperature field from " << Nom(curseur->get_fichier_sauvegarde())
+      Cout << "Reading the old temperature field from " << Nom(itr.get_fichier_sauvegarde())
                << " to fill the thermique_ field."<< finl;
       nb_allocated_arrays += itr.initialize(old_mesh_, idx);
       idx++;
@@ -181,7 +181,7 @@ void Switch_FT_double::ecrire_fichier_reprise(const char *fichier_sauvegarde, co
           (*itr).set_fichier_sauvegarde(lata_name);
           fichier << *itr ;
           ++itr;
-          if (itr)
+          if (itr != thermique_.end() )
             fichier << ", \n" ;
           else
             fichier << "\n" ;

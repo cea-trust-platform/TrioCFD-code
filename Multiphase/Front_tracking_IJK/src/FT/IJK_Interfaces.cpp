@@ -4884,7 +4884,7 @@ void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& 
           if (reset)
             {
               // Header in the file:
-              ssprintf(s, 1000, "# Individual forces applied inside chiv[bubble_i]=1.\n# value=1./Vol_bubble \\int F_j(bubble_i) dv");
+              snprintf(s, 1000, "# Individual forces applied inside chiv[bubble_i]=1.\n# value=1./Vol_bubble \\int F_j(bubble_i) dv");
               fic << s;
               fic << finl;
             }

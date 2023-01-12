@@ -19,26 +19,13 @@
 #include <stat_counters.h>
 #include <Champ_base.h>
 
-Implemente_deriv(Operateur_Conv_base);
 Implemente_instanciable(Operateur_Conv,"Operateur_Conv",DERIV(Operateur_Conv_base));
 
-
-/*! @brief Simple appel a Operateur::ecrire(Sortie&) Ecrit l'operateur sur un flot de sortie.
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Operateur_Conv::printOn(Sortie& os) const
 {
   return Operateur::ecrire(os);
 }
 
-
-/*! @brief Simple appel a Operateur::lire(Entree&) Lit l'operateur a partir d'un flot d'entree.
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Operateur_Conv::readOn(Entree& is)
 {
   Operateur::lire(is);
