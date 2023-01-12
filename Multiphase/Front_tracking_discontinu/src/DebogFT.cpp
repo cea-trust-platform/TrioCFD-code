@@ -160,7 +160,7 @@ void DebogFT::verifier_(const char *msg, const ArrOfDouble& sig)
       char ss[1000];
       for (int i = 0; i < sig.size_array(); i++)
         {
-          sprintf(ss, "%24.16e ", sig[i]);
+          snprintf(ss, 1000, "%24.16e ", sig[i]);
           s += ss;
         }
       s += msg;
@@ -174,7 +174,7 @@ void DebogFT::verifier_(const char *msg, const ArrOfDouble& sig)
           for (int i = 0; i < sig.size_array(); i++)
             {
               infile_ >> sig2[i];
-              sprintf(ss, "%24.16e ", sig2[i]);
+              snprintf(ss, 1000, "%24.16e ", sig2[i]);
               s2 += ss;
             }
           std::string ligne;

@@ -434,9 +434,9 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
   nom_fic += "_";
   char str[14];
 #ifndef INT_is_64_
-  sprintf(str,"%03d",compteur_plot++);
+  snprintf(str,14,"%03d",compteur_plot++);
 #else
-  sprintf(str,"%03ld",compteur_plot++);
+  snprintf(str,14,"%03ld",compteur_plot++);
 #endif
   nom_fic += Nom(str);
   nom_fic += "_";
@@ -449,18 +449,18 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
     {
 #ifndef INT_is_64_
       if (Process::nproc()<=1000)
-        sprintf(str,"%03d_",me());
+        snprintf(str,14,"%03d_",me());
       else if (Process::nproc()<=10000)
-        sprintf(str,"%04d_",me());
+        snprintf(str,14,"%04d_",me());
       else if (Process::nproc()<=100000)
-        sprintf(str,"%05d_",me());
+        snprintf(str,14,"%05d_",me());
 #else
       if (Process::nproc()<=1000)
-        sprintf(str,"%03ld_",me());
+        snprintf(str,14,"%03ld_",me());
       else if (Process::nproc()<=10000)
-        sprintf(str,"%04ld_",me());
+        snprintf(str,14,"%04ld_",me());
       else if (Process::nproc()<=100000)
-        sprintf(str,"%05ld_",me());
+        snprintf(str,14,"%05ld_",me());
 #endif
       else
         {

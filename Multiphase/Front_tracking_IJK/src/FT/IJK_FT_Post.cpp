@@ -1056,17 +1056,17 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
               IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
 
 #ifndef INT_is_64_
-              sprintf(s, "%s_bulles_Ti_%d.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_Ti_%d.out", nomcas, idx_th);
 #else
-              sprintf(s, "%s_bulles_Ti_%ld.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_Ti_%ld.out", nomcas, idx_th);
 #endif
               // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
               fic.ouvrir(s, mode);
-              sprintf(s, "%.16e ", current_time);
+              snprintf(s, 1000, "%.16e ", current_time);
               fic << s;
               for (int i = 0; i < n; i++)
                 {
-                  sprintf(s, "%.16e ", Ti_per_bubble[i]);
+                  snprintf(s, 1000, "%.16e ", Ti_per_bubble[i]);
                   fic << s;
                 }
               fic << finl;
@@ -1074,16 +1074,16 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
 
               // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
 #ifndef INT_is_64_
-              sprintf(s, "%s_bulles_phin_%d.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_phin_%d.out", nomcas, idx_th);
 #else
-              sprintf(s, "%s_bulles_phin_%ld.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_phin_%ld.out", nomcas, idx_th);
 #endif
               fic.ouvrir(s, mode);
-              sprintf(s, "%.16e ", current_time);
+              snprintf(s, 1000, "%.16e ", current_time);
               fic << s;
               for (int i = 0; i < n; i++)
                 {
-                  sprintf(s, "%.16e ", phin_per_bubble[i]);
+                  snprintf(s, 1000, "%.16e ", phin_per_bubble[i]);
                   fic << s;
                 }
               fic << finl;
@@ -1104,114 +1104,114 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       const int n = position.dimension(0);
       IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
 
-      sprintf(s, "%s_bulles_pousseex.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_pousseex.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", poussee(i, 0));
+          snprintf(s, 1000, "%.16e ", poussee(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hx.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hx.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", hauteurs_bulles(i, 0));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hy.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hy.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", hauteurs_bulles(i, 1));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 1));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hz.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hz.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", hauteurs_bulles(i, 2));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 2));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_x.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_x.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", position(i, 0));
+          snprintf(s, 1000, "%.16e ", position(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_y.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_y.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", position(i, 1));
+          snprintf(s, 1000, "%.16e ", position(i, 1));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_z.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_z.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", position(i, 2));
+          snprintf(s, 1000, "%.16e ", position(i, 2));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_surface.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_surface.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", surface[i]);
+          snprintf(s, 1000, "%.16e ", surface[i]);
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_volume.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_volume.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s, "%.16e ", volume[i]);
+          snprintf(s, 1000, "%.16e ", volume[i]);
           fic << s;
         }
       fic << finl;
@@ -1220,13 +1220,13 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       if (interfaces_.follow_colors())
         {
           const ArrOfInt& colors = interfaces_.get_colors();
-          sprintf(s, "%s_bulles_colors.out", nomcas);
+          snprintf(s, 1000, "%s_bulles_colors.out", nomcas);
           fic.ouvrir(s, mode);
-          sprintf(s, "%.16e ", current_time);
+          snprintf(s, 1000, "%.16e ", current_time);
           fic << s;
           for (int i = 0; i < n; i++)
             {
-              sprintf(s, "%d ", (True_int) colors[i]);
+              snprintf(s, 1000, "%d ", (True_int) colors[i]);
               fic << s;
             }
           fic << finl;
@@ -1237,13 +1237,13 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       // On ne peut donc pas le post-traiter avec la frequence lue dans le jdd comme les autres.
       for (int idir=0; idir<3; idir++)
         {
-          sprintf(s, "%s_bulles_external_force_%d.out", nomcas, idir);
+          snprintf(s, 1000, "%s_bulles_external_force_%d.out", nomcas, idir);
           fic.ouvrir(s, mode);
-          sprintf(s, "%.16e ", current_time);
+          snprintf(s, 1000, "%.16e ", current_time);
           fic << s;
           for (int ib = 0; ib < interfaces_.nb_bulles_reelles_; ib++)
             {
-              sprintf(s,"%.16e ", individual_forces(ib,idir));
+              snprintf(s, 1000,"%.16e ", individual_forces(ib,idir));
               fic << s;
             }
           fic << finl;

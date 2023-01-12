@@ -52,7 +52,7 @@ static void compare(const IJK_Field_double& ref, const IJK_Field_double& x, cons
           if (/*fabs(x(i,j,k)) > 1e-15 || fabs(ref(i,j,k))>1e-15*/ d > 1e-15)
             {
               char s[100];
-              sprintf(s, "%10g  %10g      %5g", ref(i,j,k), x(i,j,k), d);
+              snprintf(s, 100, "%10g  %10g      %5g", ref(i,j,k), x(i,j,k), d);
               Process::Journal() << "check centre4 " << msg << " (i,j,k)="
                                  << i << "," << j << "," << k
                                  << " ref val=" << s << finl;
