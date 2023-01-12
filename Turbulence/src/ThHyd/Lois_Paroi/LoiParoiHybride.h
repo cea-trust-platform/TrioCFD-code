@@ -22,12 +22,13 @@
 #ifndef LoiParoiHybride_included
 #define LoiParoiHybride_included
 
+#include <TRUSTTabs_forward.h>
+#include <Turbulence_paroi.h>
+#include <TRUST_Vector.h>
 #include <Noms.h>
-#include <Vect_Turbulence_paroi.h>
 
 class Zone_dis_base;
 class Zone_Cl_dis_base;
-#include <TRUSTTabs_forward.h>
 
 /*! @brief LoiParoiHybride Classe Turbulence_paroi_base
  *

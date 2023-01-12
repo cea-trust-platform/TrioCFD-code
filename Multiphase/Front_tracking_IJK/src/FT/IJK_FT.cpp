@@ -54,9 +54,6 @@
 #define get_velocity_convection_op(type) (((type)==0)?(velocity_convection_op_sharp_):(velocity_convection_op_centre_))
 //#define SMOOTHING_RHO
 
-Implemente_liste(IJK_Thermique);
-Implemente_liste(IJK_Energie);
-
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
@@ -754,18 +751,11 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   interfaces_.associer(*this);
 
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  while(curseur)
-    {
-      curseur->associer(*this);
-      ++curseur;
-    }
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  while(curseur_en)
-    {
-      curseur_en->associer(*this);
-      ++curseur_en;
-    }
+  for (auto& itr : thermique_)
+    itr.associer(*this);
+
+  for (auto& itr : energie_)
+    itr.associer(*this);
 
   run();
   return is;
@@ -1072,23 +1062,19 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
     interfaces_.sauvegarder_interfaces(lata_name);
 
 //thermique_->sauvegarder_temperature(lata_name);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
   int idx =0;
   //TODO sauvegarde des champs surfaces (vapeur) et barycentre,
   //eventuellement du med pour voir si la conversion marche.
-  while(curseur)
+  for (auto& itr : thermique_)
     {
-      curseur->sauvegarder_temperature(lata_name, idx);
-      ++curseur;
+      itr.sauvegarder_temperature(lata_name, idx);
       ++idx;
     }
 
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   int idx2 =0;
-  while(curseur_en)
+  for (auto& itr : energie_)
     {
-      curseur_en->sauvegarder_temperature(lata_name, idx2);
-      ++curseur_en;
+      itr.sauvegarder_temperature(lata_name, idx2);
       ++idx2;
     }
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
@@ -1130,17 +1116,16 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       fichier << " forcage " << forcage_
               << " corrections_qdm " << qdm_corrections_;
       int flag_list_not_empty = 0;
-      LIST_CURSEUR(IJK_Thermique) curseur_bis(thermique_);
-      if (curseur_bis)
+      if (thermique_.size() > 0)
         {
           fichier << " thermique {\n" ;
           flag_list_not_empty = 1;
         }
-      while(curseur_bis)
+      for(auto itr = thermique_.begin(); itr != thermique_.end(); )
         {
-          fichier << curseur_bis.valeur() ;
-          ++curseur_bis;
-          if (curseur_bis)
+          fichier << *itr ;
+          ++itr;
+          if (itr)
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -1149,17 +1134,16 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         fichier << " } \n" ;
 
       int flag_list_not_empty_en = 0;
-      LIST_CURSEUR(IJK_Energie) curseur_bis_en(energie_);
-      if (curseur_bis_en)
+      if (energie_.size() > 0)
         {
           fichier << " energie {\n" ;
           flag_list_not_empty_en = 1;
         }
-      while(curseur_bis_en)
+      for(auto itr = energie_.begin(); itr != energie_.end(); )
         {
-          fichier << curseur_bis_en.valeur() ;
-          ++curseur_bis_en;
-          if (curseur_bis_en)
+          fichier << *itr ;
+          ++itr;
+          if (itr)
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -1281,23 +1265,19 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   const double dt_eq_velocity = 1./(1./dt_cfl+1./dt_fo+1./dt_oh);
 
   double dt_thermique = 1.e20;
-  CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  while(curseur)
+  for (const auto& itr : thermique_)
     {
-      const double dt_th =  curseur->compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
+      const double dt_th = itr.compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_thermique= std::min(dt_thermique, dt_th);
-      ++curseur;
     }
 
-  CONST_LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   double dt_energie = 1.e20;
-  while(curseur_en)
+  for (const auto& itr : energie_)
     {
-      const double dt_en = curseur_en->compute_timestep(dt_energie, dxmin);
+      const double dt_en = itr.compute_timestep(dt_energie, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_energie= std::min(dt_energie, dt_en);
-      ++curseur_en;
     }
 
   const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie));
@@ -1458,37 +1438,27 @@ int IJK_FT_double::initialise()
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
   statistiques().begin_count(calculer_thermique_prop_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
   int idx =0;
-  while(curseur)
+  for (auto& itr : thermique_)
     {
-      nalloc += curseur->initialize(splitting_, idx);
+      nalloc += itr.initialize(splitting_, idx);
       if (!disable_diphasique_)
-        {
-          curseur->update_thermal_properties();
-        }
-      ++curseur;
+        itr.update_thermal_properties();
       idx++;
     }
 
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   int idx2 =0;
-  while(curseur_en)
+  for (auto& itr : energie_)
     {
-      nalloc += curseur_en->initialize(splitting_, idx2);
+      nalloc += itr.initialize(splitting_, idx2);
       if (!disable_diphasique_)
-        {
-          curseur_en->update_thermal_properties();
-        }
-      ++curseur_en;
+        itr.update_thermal_properties();
       idx2++;
     }
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
-  LIST_CURSEUR(IJK_Energie) curseur_en2(energie_);
-  LIST_CURSEUR(IJK_Thermique) curseur2(thermique_);
-  if ((curseur2) or (curseur_en2))
+  if ((energie_.size() > 0) or (thermique_.size() >0))
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -2020,18 +1990,11 @@ void IJK_FT_double::run()
           maj_indicatrice_rho_mu();
           if (!disable_diphasique_)
             {
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              while(curseur)
-                {
-                  curseur->update_thermal_properties();
-                  ++curseur;
-                }
-              LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              while(curseur_en)
-                {
-                  curseur_en->update_thermal_properties();
-                  ++curseur_en;
-                }
+              for (auto& itr : thermique_)
+                itr.update_thermal_properties();
+
+              for (auto& itr : energie_)
+                itr.update_thermal_properties();
             }
           // La pression n'est pas encore initialisee. elle est donc nulle.
           // Avec cette option, on essaye une initialisation basee sur le champ de pression diphasique
@@ -2138,37 +2101,26 @@ void IJK_FT_double::run()
       // C'est deja fait dans l'initialize (aucune raison de ne pas le faire)
       // indicatrice_ns_.data() = 1.;
       // indicatrice_ns_next_.data() = 1.;
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      while(curseur)
+
+      for (auto& itr : thermique_)
         {
           // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
-          curseur->update_thermal_properties();
-          ++curseur;
+          itr.update_thermal_properties();
         }
-      LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-      while(curseur_en)
+      for (auto& itr : energie_)
         {
           // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
-          curseur_en->update_thermal_properties();
-          ++curseur_en;
+          itr.update_thermal_properties();
         }
     }
   else
     {
       Cerr << "Cas normal diphasique l2158" << finl;
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      while(curseur)
-        {
-          curseur->update_thermal_properties();
-          ++curseur;
-        }
+      for (auto& itr : thermique_)
+        itr.update_thermal_properties();
 
-      LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-      while(curseur_en)
-        {
-          curseur_en->update_thermal_properties();
-          ++curseur_en;
-        }
+      for (auto& itr : energie_)
+        itr.update_thermal_properties();
 
       const double indic_moyen = calculer_v_moyen(interfaces_.I());
       rho_moyen_ = indic_moyen*rho_liquide_ + (1-indic_moyen)*rho_vapeur_;
@@ -2340,21 +2292,15 @@ void IJK_FT_double::run()
                     rho_u_euler_av_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_av_rho_mu_ind_champ[dir]);
                 }
               maj_indicatrice_rho_mu();
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              // LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              // if ((curseur) || (curseur_en))
-              //   {
-              //     interfaces_.compute_surf_and_barys();
-              //   }
-              while(curseur)
+
+              for (auto& itr : thermique_)
                 {
-                  curseur->update_thermal_properties();
-                  if (curseur->conserv_energy_global_)
+                  itr.update_thermal_properties();
+                  if (itr.conserv_energy_global_)
                     {
-                      const double dE = curseur->E0_ - curseur->compute_global_energy();
-                      curseur->euler_rustine_step(timestep_, dE);
+                      const double dE = itr.E0_ - itr.compute_global_energy();
+                      itr.euler_rustine_step(timestep_, dE);
                     }
-                  ++curseur;
                 }
 
               // GAB, qdm rho_n+1 v_n+1 :
@@ -2364,7 +2310,6 @@ void IJK_FT_double::run()
                   for (int dir=0; dir<3; dir++)
                     {
                       rho_u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir]);
-//                      rho_u_euler_ap_rho_mu_ind[dir] += 7;
                       u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                     }
                 }
@@ -2377,32 +2322,10 @@ void IJK_FT_double::run()
                   for (int dir=0; dir<3; dir++)
                     {
                       rho_u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir]);
-//                      rho_u_euler_ap_rho_mu_ind[dir] += 7;
                       u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                     }
                 }
             }
-          /* A SUPPRIMER
-          // GAB qdm patch a posteriori, choix 1 : v* = v - < \r u >/< \r >
-          // choix 10 : on evalue qdm_patch_correction_ sans l'appliquer
-          if (patch_qdm_gr_ == 1 || patch_qdm_gr_ == 10)
-            {
-              calculer_rho_v(rho_field_,velocity_,rho_u_euler_ap_rho_mu_ind_champ);
-              for (int dir=0; dir<3; dir++)
-                if(dir != direction_gravite_)
-                  {
-                    qdm_patch_correction_[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir])/calculer_v_moyen(rho_field_);
-                    if (patch_qdm_gr_ == 1)
-                      {
-                        IJK_Field_double& vel = velocity_[dir];
-                        for (int k=0; k<vel.nk(); k++)
-                          for (int j=0; j<vel.nj(); j++)
-                            for (int i=0; i<vel.ni(); i++)
-                              vel(i,j,k) -= qdm_patch_correction_[dir];
-                      }
-                  }
-            }
-          */
           if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()))
             {
               set_time_for_corrections();
@@ -2462,17 +2385,15 @@ void IJK_FT_double::run()
                 {
                   // Attention, il faut que les duplicatas soient present pour faire maj_indicatrice_rho_mu :
                   maj_indicatrice_rho_mu();
-                  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-                  while(curseur)
+                  for (auto& itr : thermique_)
                     {
-                      curseur->update_thermal_properties();
-                      if (curseur->conserv_energy_global_)
+                      itr.update_thermal_properties();
+                      if (itr.conserv_energy_global_)
                         {
-                          const double dE = curseur->E0_ - curseur->compute_global_energy();
-                          curseur->rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
-                                                        current_time_at_rk3_step, dE);
+                          const double dE = itr.E0_ - itr.compute_global_energy();
+                          itr.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
+                                                   current_time_at_rk3_step, dE);
                         }
-                      ++curseur;
                     }
                 }
               // Calcul du terme source force acceleration :
@@ -2508,18 +2429,12 @@ void IJK_FT_double::run()
 
               // Mise a jour rho, mu et l'indicatrice a partir de la nouvelle position de l'interface :
               maj_indicatrice_rho_mu();
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              while(curseur)
-                {
-                  curseur->update_thermal_properties();
-                  ++curseur;
-                }
-              LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              while(curseur_en)
-                {
-                  curseur_en->update_thermal_properties();
-                  ++curseur_en;
-                }
+
+              for (auto& itr : thermique_)
+                itr.update_thermal_properties();
+
+              for (auto& itr : energie_)
+                itr.update_thermal_properties();
             }
           // GAB, qdm rho_n+1 v_n+1 :
           if (test_etapes_et_bilan)
@@ -3712,9 +3627,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  if ((curseur) || (curseur_en))
+  if ((thermique_.size() > 0) || (energie_.size()))
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
       // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
@@ -3722,16 +3635,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
       velocity_[1].echange_espace_virtuel(2);
       velocity_[2].echange_espace_virtuel(2);
     }
-  while(curseur)
-    {
-      curseur->euler_time_step(timestep_);
-      ++curseur;
-    }
-  while(curseur_en)
-    {
-      curseur_en->euler_time_step(velocity_);
-      ++curseur_en;
-    }
+
+  for (auto& itr : thermique_)
+    itr.euler_time_step(timestep_);
+
+  for (auto& itr : energie_)
+    itr.euler_time_step(velocity_);
+
   if (!frozen_velocity_)
     {
       velocity_[0].echange_espace_virtuel(2);
@@ -3917,14 +3827,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
   assert(rk_step>=0 && rk_step<3);
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  while(curseur)
+
+  for (auto& itr : thermique_)
     {
-      curseur->rk3_sub_step(rk_step, total_timestep, time);
-      ++curseur;
+      itr.rk3_sub_step(rk_step, total_timestep, time);
     }
-  while(curseur_en)
+  for (auto& itr : energie_)
     {
       // curseur->rk3_sub_step(rk_step, total_timestep, time);
       // ++curseur;

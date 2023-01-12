@@ -38,7 +38,6 @@
 
 using namespace std;
 
-Implemente_liste(DoubleTab);
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model", Interprete_geometrique_base ) ;
 

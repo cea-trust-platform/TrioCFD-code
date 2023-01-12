@@ -26,8 +26,8 @@
 
 
 #include <Couplage_U.h>
-//#include <Pb_grossier.h>
-#include <List_Pb_2G.h>
+#include <TRUST_List.h>
+#include <Pb_2G.h>
 #include <Ref_Pb_2G.h>
 #include <Ref_Algo_MG_base.h>
 #include <Ref_Probleme_base.h>
