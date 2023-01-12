@@ -200,14 +200,12 @@ void Convection_Diffusion_Temperature_Turbulent::imprimer(Sortie& os) const
 
 const RefObjU& Convection_Diffusion_Temperature_Turbulent::get_modele(Type_modele type) const
 {
-  CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
-  while(curseur)
+  for (const auto& itr : liste_modeles_)
     {
-      const RefObjU&  mod = curseur.valeur();
+      const RefObjU&  mod = itr;
       if (mod.non_nul())
         if ((sub_type(Modele_turbulence_scal_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
-      ++curseur;
     }
   return Equation_base::get_modele(type);
 }

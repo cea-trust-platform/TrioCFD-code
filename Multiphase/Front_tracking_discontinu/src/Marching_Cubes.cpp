@@ -878,26 +878,6 @@ void Marching_Cubes::construire_noeuds_joints(const ArrOfBit& signe,
                                               IntTab& def_noeud) const
 {
   const Zone_VF& zone_vf = ref_zone_vf_.valeur();
-#if 0
-  const Zone& zone = zone_vf.zone();
-  // Boucle sur les joints
-  LIST_CURSEUR(Joint) joint(zone.faces_joint());
-
-  for (; joint; ++joint)
-    {
-
-      const Joint& le_joint = joint.valeur();
-      const IntTab& faces_sommets = le_joint.faces().les_sommets();
-      const int PE_voisin = le_joint.PEvoisin();
-      const int nb_faces = le_joint.nb_faces();
-
-      construire_noeuds_liste_faces(signe,
-                                    faces_sommets,
-                                    nb_faces,
-                                    PE_voisin,
-                                    def_noeud);
-    } // Fin de la boucle sur les joints
-#endif
   // Creation des sommets situes sur les faces de bord
   {
     // Les faces de bord sont les premieres faces de la zone

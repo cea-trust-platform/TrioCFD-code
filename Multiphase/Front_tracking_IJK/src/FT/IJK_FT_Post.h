@@ -36,6 +36,7 @@
 class IJK_FT;
 class IJK_Splitting;
 class IJK_Thermique;
+class IJK_Energie;
 class List_IJK_Thermique;
 class list_curseurIJK_Thermique;
 class const_list_curseurIJK_Thermique;
@@ -135,24 +136,19 @@ public:
   int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
                                                const char *lata_name,
                                                const int lata_step, const double current_time,
-                                               LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
+                                               IJK_Thermique& ,  const int idx);
   int posttraiter_champs_instantanes_energie(const Motcles& liste_post_instantanes,
                                              const char *lata_name,
                                              const int lata_step, const double current_time,
-                                             LIST_CURSEUR(IJK_Energie) curseur,  const int idx);
+                                             IJK_Energie& ,  const int idx);
   int posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
                                                             const char *lata_name,
                                                             const int lata_step, const double current_time,
-                                                            LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
+                                                            IJK_Thermique& ,  const int idx);
   int posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes,
                                                           const char *lata_name,
                                                           const int lata_step, const double current_time,
-                                                          LIST_CURSEUR(IJK_Energie) curseur,  const int idx);
-  //CONST_LIST_CURSEUR(IJK_Thermique) curseur,  const int idx);
-  /*  int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
-                                                 const char *lata_name,
-                                                 const int lata_step, const double current_time,
-                                                 CONST_LIST_CURSEUR(IJK_Thermique) curseur);*/
+                                                          IJK_Energie& ,  const int idx);
 //  void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
 
   Motcles get_liste_post_instantanes() const

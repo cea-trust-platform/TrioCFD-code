@@ -1187,14 +1187,6 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
    */
 //  param.ajouter("last_source_qdm_update_time", &last_source_qdm_update_time_);
 //  param.ajouter("offset_list_index_", &offset_list_index_);
-  /*
-    LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-    while(curseur)
-      {
-        param.ajouter("fichier_reprise_temperature", &curseur->fichier_reprise_temperature_);
-        ++curseur;
-      }
-  */
   post_.reprendre_post(param);
 
   param.lire_avec_accolades(fichier);

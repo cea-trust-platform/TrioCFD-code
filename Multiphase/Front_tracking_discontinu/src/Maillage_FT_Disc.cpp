@@ -595,10 +595,9 @@ void Maillage_FT_Disc::associer_zone_dis_parcours(const Zone_dis& zone_dis, cons
 
   // On recupere la liste des PE voisins
   ArrOfIntFT pe_list;
-  CONST_LIST_CURSEUR(Joint) curseur(zone_dis.zone().faces_joint());
-  for (; curseur; ++curseur)
+  for (const auto& itr : zone_dis.zone().faces_joint())
     {
-      const Joint& joint = curseur.valeur();
+      const Joint& joint = itr;
       const int pe_voisin = joint.PEvoisin();
       pe_list.append_array(pe_voisin);
     }

@@ -107,12 +107,10 @@ Entree& Transport_Marqueur_FT::readOn(Entree& is)
   int ok_impl = 0;
   if (implicite_==1)
     {
-      LIST_CURSEUR(Source) curseur = les_sources ;
-      while(curseur)
+      for (auto& itr : les_sources)
         {
-          if (sub_type(Source_Masse_Ajoutee,curseur.valeur().valeur()))
+          if (sub_type(Source_Masse_Ajoutee,itr.valeur()))
             ok_impl = 1;
-          ++curseur;
         }
       if (!ok_impl)
         {

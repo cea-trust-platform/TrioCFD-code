@@ -145,12 +145,10 @@ void Pb_QC_base::mettre_a_jour(double temps)
   //     equation(i).mettre_a_jour(temps);
   les_postraitements.mettre_a_jour(temps);
   domaine().mettre_a_jour(temps,domaine_dis(),*this);
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for  (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      Loi_Fermeture_base& loi=itr.valeur();
       loi.mettre_a_jour(temps);
-      ++curseur;
     }
 }
 

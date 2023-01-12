@@ -212,16 +212,6 @@ void Switch_FT_double::ecrire_header_lata(const Nom lata_name) // const
   // dans le fichier de sauvegarde des champs exrits pour la reprise. Ce n'est pas ce que l'on veut.
   // On avait pu se permettre cela pour l'interface car on ecrit directement celui qu'on a relu, meme
   // s'il n'a pas le bon support (le vieux geom).
-  /*
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      int idx =0;
-      while(curseur)
-        {
-          curseur->sauvegarder_temperature(lata_name, idx); // Doublon, ne devrait pas etre avant dans cette fonction, revoir l'ordre des choses
-          ++curseur;
-          ++idx;
-        }
-   */
 
 }
 
@@ -301,12 +291,6 @@ void Switch_FT_double::compute_and_write_extra_fields_direct(SFichier& file,
                                                            DoubleTab& coeff_j, IntTab Indice_j,
                                                            DoubleTab& coeff_k, IntTab Indice_k)
 {
-  //      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  //      if (curseur)
-  //        {
-  //          Cerr << " direct_write not supported yet with thermique " << finl ;
-  //          Process::exit();
-  //        }
 }
 
 
