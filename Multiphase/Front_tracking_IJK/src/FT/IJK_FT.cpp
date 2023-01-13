@@ -1810,10 +1810,14 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
   double fs0(0),fs1(0),fs2(0),psn(0);
   if (!disable_diphasique_)
     {
-      {fs0=calculer_v_moyen(terme_source_interfaces_ns_[0]);}
-      {fs1=calculer_v_moyen(terme_source_interfaces_ns_[1]);}
-      {fs2=calculer_v_moyen(terme_source_interfaces_ns_[2]);}
-      {psn=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));}
+      // FORCE INTERFACIALE : on veut un terme homogene a [rho.g]=[N.m^{-3}]
+      // terme_source_interfaces_ns_       est homogene a [du/dt]=[m.s^{-2}]
+      //   -> in calculer_dv : "~ velocity_ += force_interf * dt ~"
+      //   --> force_interf a bien eu un mass_solver_with_rho plus haut
+      fs0=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[0],0));
+      fs1=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[1],1));
+      fs2=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[2],2));
+      psn=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));
     }
   // energie cinetique
   double uu(calculer_v_moyen(scalar_product(velocity_,velocity_)));
@@ -1821,11 +1825,14 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
   double ft0(0),ft1(0),ft2(0),ftft(0),ptn(0);
   if (forcage_.get_type_forcage() > 0)
     {
-      {ft0 = calculer_v_moyen(forcage_.get_force_ph2()[0]);}
-      {ft1 = calculer_v_moyen(forcage_.get_force_ph2()[1]);}
-      {ft2 = calculer_v_moyen(forcage_.get_force_ph2()[2]);}
-      {ftft = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));}
-      {ptn = calculer_v_moyen(scalar_product(velocity_,forcage_.get_force_ph2()));}
+      // FORCE IMPOSEE : on veut un terme homogene a [rho.g]=[N.m^{-3}]
+      // forcage_.get_force_ph2()     est homogene a [du/dt]=[m.s^{-2}]
+      //   -> in compute_add_THI_force_sur_d_velocity : "~ d_velocity += forcage_.get_force_ph2() ~"
+      ft0 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[0],0));
+      ft1 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[1],1));
+      ft2 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[2],2));
+      ftft = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));
+      ptn = calculer_v_moyen(scalar_product(velocity_,forcage_.get_force_ph2()));
     }
   // -----------------------------------------------------------
   // Impression dans le fichier _acceleration.out
@@ -1853,20 +1860,24 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
         fic <<" "<< 0.; //qdm_patch_correction_[dir];
 
       // Force interfaciale et puissance du travail des forces interfaciales
-      // terme_source_interfaces_ns_
+      // rho*terme_source_interfaces_ns_
       fic <<" "<< fs0; // F_sigma_moyen[0]
       fic <<" "<< fs1; // F_sigma_moyen[1]
       fic <<" "<< fs2; // F_sigma_moyen[2]
+      // u.rho*terme_source_interfaces_ns_
       fic <<" "<< psn; // velocity.F_sigma
+
       // Energie cinetique (double)
       // u.u (qui est aussi accessible par les .txt)
       fic <<" "<< uu;
-      // Travail du forcage exterieur
-      // u.F_THI
+
+      // Force imposee et puissance du traveil de la force imposee
+      // rho*F_THI
       fic <<" "<< ft0; // F_THI[0]
       fic <<" "<< ft1; // F_THI[1]
       fic <<" "<< ft2; // F_THI[2]
       fic <<" "<< ftft; // F_THI.F_THI
+      // u.rho*F_THI
       fic <<" "<< ptn; // velocity.F_THI
       fic<<finl;
       fic.close();
@@ -2496,10 +2507,8 @@ void IJK_FT_double::run()
                 }
               // Calcul du terme source force acceleration :
               // GAB, rotation
-              Cout << "BF : calculer_terme_source_acceleration" <<finl;
               calculer_terme_source_acceleration(velocity_[direction_gravite_],
                                                  current_time_at_rk3_step, timestep_ /*total*/, rk_step_);
-              Cout << "AF : calculer_terme_source_acceleration" <<finl;
 
 
               current_time_at_rk3_step += fractionnal_timestep;
@@ -4847,6 +4856,62 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
                           +(V1[1](i,j,k)+V1[1](i,j+1,k))*(V2[1](i,j,k)+V2[1](i,j+1,k))
                           +(V1[2](i,j,k)+V1[2](i,j,k+1))*(V2[2](i,j,k)+V2[2](i,j,k+1))
                         );
+        }
+  // Communication avec tous les process ?
+  return resu;
+}
+
+FixedVector<IJK_Field_double, 3> IJK_FT_double::scalar_times_vector(const IJK_Field_double& Sca, const FixedVector<IJK_Field_double, 3>& Vec)
+{
+  /*
+   * Produit d'un champ scalaire par un champ de vecteur.
+   * Le champ scalaire est aux centre des elements, le champ de vecteur est aux faces
+   * Le resultat reste localise au meme endroit que le champ de vecteur passe en entree.
+   */
+
+  FixedVector<IJK_Field_double, 3> resu;
+  allocate_velocity(resu,splitting_,3); // j'ai besoin de mettre des cellules ghost ? non, je ne pense pas
+  int nk = Vec[0].nk();
+  if (nk != Sca.nk()) {Cerr << "scalar fields has different dimension from vector field  (nk)"<< finl;}
+  int nj = Vec[0].nj();
+  if (nj != Sca.nj()) {Cerr << "scalar fields has different dimension from vector field  (nj)"<< finl;}
+  int ni = Vec[0].ni();
+  if (ni != Sca.nk()) {Cerr << "scalar fields has different dimension from vector field  (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          resu[0](i,j,k) = 0.5*(Sca(i-1,j,k)+Sca(i,j,k))*Vec[0](i,j,k);
+          resu[1](i,j,k) = 0.5*(Sca(i,j-1,k)+Sca(i,j,k))*Vec[1](i,j,k);
+          resu[2](i,j,k) = 0.5*(Sca(i,j,k-1)+Sca(i,j,k))*Vec[2](i,j,k);
+        }
+  // Communication avec tous les process ?
+  return resu;
+}
+
+IJK_Field_double IJK_FT_double::scalar_fields_product(const IJK_Field_double& S1, const IJK_Field_double& S2, int dir)
+{
+  /*
+   * Produit d'un champ scalaire aux centres (S1) par une des composantes d'un champ de vecteur (S2).
+   * Le resultat est localise au meme endroit que le champ de vecteur dont est issu S2.
+   */
+  IJK_Field_double resu;
+  resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  int nk = S1.nk();
+  if (nk != S2.nk()) {Cerr << "scalar fields have different dimensions for the product (nk)"<< finl;}
+  int nj = S1.nj();
+  if (nj != S2.nj()) {Cerr << "scalar fields have different dimensions for the product (nj)"<< finl;}
+  int ni = S1.ni();
+  if (ni != S2.ni()) {Cerr << "scalar fields have different dimensions for the product (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          if (dir==0) {resu(i,j,k) = 0.5*(S1(i-1,j,k)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==0) {resu(i,j,k) = 0.5*(S1(i,j-1,k)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==0) {resu(i,j,k) = 0.5*(S1(i,j,k-1)+S1(i,j,k))*S2(i,j,k);}
         }
   // Communication avec tous les process ?
   return resu;
