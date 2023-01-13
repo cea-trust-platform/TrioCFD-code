@@ -196,8 +196,8 @@ Read pb
             		pression elem
             		Divergence_U elem
             		vitesse som
-			u_star som
-			y_plus som
+			u_star_ibm som
+			y_plus_ibm som
         	}
 	}
     }
