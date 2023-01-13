@@ -104,8 +104,8 @@ void Sonde::completer()
   //On devrait acceder au domaine par le champ generique
   //Mais reference pas encore faite
   Probleme_base& Pb = mon_post->probleme();
-  //const Motcle& nom_domaine = Pb.domaine().le_nom();
   const Motcle nom_domaine = mon_post->domaine().le_nom();
+
   Motcle nom_champ_ref;
   Motcle nom_macro=nom_champ_lu_;
   Motcle nom_macro_test, nom1("_not_def"), nom2("_not_def");
