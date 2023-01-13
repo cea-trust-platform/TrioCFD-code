@@ -68,9 +68,6 @@ Read sch
     facsec 2.5
 }
 
-
-
-
 Associer pb dom
 Associer pb sch
 
@@ -147,7 +144,7 @@ Read pb
                                                              field TRUST_SALOME_correspondance 
                                                              last_time 
                                                              }
-		    impr
+		    impr nb_histo_boxes_impr 5
                 }
             } 
         }
@@ -199,6 +196,8 @@ Read pb
             		pression elem
             		Divergence_U elem
             		vitesse som
+			u_star_ibm som
+			y_plus_ibm som
         	}
 	}
     }
