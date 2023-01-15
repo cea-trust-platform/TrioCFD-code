@@ -414,11 +414,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       {
         int idx_en = 0;
         for (auto&& itr = energie_.begin(); itr != energie_.end(); ++itr)
-          ;
-        {
-          posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);
-          ++idx_en;
-        }
+          {
+            posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);
+            ++idx_en;
+          }
       }
     }
   int n = liste_post_instantanes_.size();
