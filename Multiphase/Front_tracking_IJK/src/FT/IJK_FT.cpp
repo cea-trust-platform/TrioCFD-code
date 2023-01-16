@@ -1817,12 +1817,12 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       fs0=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[0],0));
       fs1=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[1],1));
       fs2=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[2],2));
-      psn=calculer_v_moyen(scalar_product(velocity_,terme_source_interfaces_ns_));
+      psn=calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,terme_source_interfaces_ns_)));
     }
   // energie cinetique
   double uu(calculer_v_moyen(scalar_product(velocity_,velocity_)));
-  // Force exterieur (:"force thi") selon x,y,z et u.Force_THI
-  double ft0(0),ft1(0),ft2(0),ftft(0),ptn(0);
+  // Force exterieur (:"force thi") selon x,y,z et acceleration_thi.acceleration_thi, force_thi.foce_thi, u.Force_THI
+  double ft0(0),ft1(0),ft2(0),atat(0),ftft(0),ptn(0);
   if (forcage_.get_type_forcage() > 0)
     {
       // FORCE IMPOSEE : on veut un terme homogene a [rho.g]=[N.m^{-3}]
@@ -1831,8 +1831,9 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       ft0 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[0],0));
       ft1 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[1],1));
       ft2 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[2],2));
-      ftft = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));
-      ptn = calculer_v_moyen(scalar_product(velocity_,forcage_.get_force_ph2()));
+      atat = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));
+      ftft = calculer_v_moyen(scalar_product(scalar_times_vector(rho_field_,forcage_.get_force_ph2()),scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
+      ptn = calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
     }
   // -----------------------------------------------------------
   // Impression dans le fichier _acceleration.out
@@ -1843,7 +1844,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       // double ff=0.;
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_acceleration.out",
-                                  "1.tstep\t2.time\t3.Vx\t4.rhoVx\t5.tauw\t6.da/dt\t7.NewT\t8.acceleration\t9.fac_var_source\t10.qdm_source\t11.vap_velocity_tmoy_\t12.liq_velocity_tmoy_\t13.qdm_patch_correction_[0]\t14.qdm_patch_correction_[1]\t15.qdm_patch_correction_[2]\t16.F_sigma_moyen[0]\t17.F_sigma_moyen[1]\t18F_sigma_moyen[2]\t19.velocity.F_sigma\t20.u.u\t21.F_THI[0]\t22.F_THI[1]\t23.F_THI[2]\t24.F_THI.F_THI\t25.u.F_THI",
+                                  "1.tstep\t2.time\t3.Vx\t4.rhoVx\t5.tauw\t6.da/dt\t7.NewT\t8.acceleration\t9.fac_var_source\t10.qdm_source\t11.vap_velocity_tmoy_\t12.liq_velocity_tmoy_\t13.qdm_patch_correction_[0]\t14.qdm_patch_correction_[1]\t15.qdm_patch_correction_[2]\t16.F_sigma_moyen[0]\t17.F_sigma_moyen[1]\t18.F_sigma_moyen[2]\t19.y.F_sigma\t20.u.u\t21.F_THI[0]\t22.F_THI[1]\t23.F_THI[2]\t24.A_THI.A_THI\t25.F_THI.F_THI\t26.u.F_THI",
                                   reset);
       // la derivee_acceleration n'est connue que sur le maitre
       fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<rhov_moy <<" "<<tauw ;
@@ -1876,6 +1877,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       fic <<" "<< ft0; // F_THI[0]
       fic <<" "<< ft1; // F_THI[1]
       fic <<" "<< ft2; // F_THI[2]
+      fic <<" "<< atat; // A_THI.A_THI
       fic <<" "<< ftft; // F_THI.F_THI
       // u.rho*F_THI
       fic <<" "<< ptn; // velocity.F_THI
@@ -4838,6 +4840,9 @@ void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
 
 IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2)
 {
+  /*
+   * * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
+   */
   IJK_Field_double resu;
   resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
   int nk = V1[0].nk();
@@ -4864,9 +4869,10 @@ IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_doubl
 FixedVector<IJK_Field_double, 3> IJK_FT_double::scalar_times_vector(const IJK_Field_double& Sca, const FixedVector<IJK_Field_double, 3>& Vec)
 {
   /*
-   * Produit d'un champ scalaire par un champ de vecteur.
+   * Produit d'un champ scalaire (Sca) par un champ de vecteur (Vec).
    * Le champ scalaire est aux centre des elements, le champ de vecteur est aux faces
    * Le resultat reste localise au meme endroit que le champ de vecteur passe en entree.
+   * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
    */
 
   FixedVector<IJK_Field_double, 3> resu;
@@ -4895,6 +4901,7 @@ IJK_Field_double IJK_FT_double::scalar_fields_product(const IJK_Field_double& S1
   /*
    * Produit d'un champ scalaire aux centres (S1) par une des composantes d'un champ de vecteur (S2).
    * Le resultat est localise au meme endroit que le champ de vecteur dont est issu S2.
+   * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
    */
   IJK_Field_double resu;
   resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
