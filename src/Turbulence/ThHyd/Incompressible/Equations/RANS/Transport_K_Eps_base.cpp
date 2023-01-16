@@ -20,16 +20,16 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Transport_K_Eps_base.h>
-#include <Discret_Thyd.h>
-#include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Domaine_VF.h>
+#include <Champ_Inc_P0_base.h>
+#include <communications.h>
+#include <Probleme_base.h>
+#include <Discret_Thyd.h>
 #include <Param.h>
 #include <Debog.h>
-#include <communications.h>
-#include <Champ_Inc_P0_base.h>
 
-Implemente_base_sans_constructeur(Transport_K_Eps_base,"Transport_K_Eps_base",Equation_base);
+Implemente_base_sans_constructeur(Transport_K_Eps_base, "Transport_K_Eps_base", Transport_2eq_base);
 
 Transport_K_Eps_base::Transport_K_Eps_base()
 {
@@ -47,11 +47,11 @@ Transport_K_Eps_base::Transport_K_Eps_base()
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Transport_K_Eps_base::printOn(Sortie& is) const
-{
-  return is << que_suis_je() << "\n";
+// Sortie& Transport_K_Eps_base::printOn(Sortie& is) const
+// {
+//   return is << que_suis_je() << "\n";
 
-}
+// }
 
 /*! @brief Simple appel a Equation_base::readOn(Entree&)
  *
@@ -62,15 +62,6 @@ Entree& Transport_K_Eps_base::readOn(Entree& is)
 {
   Equation_base::readOn(is);
   return is;
-}
-
-void Transport_K_Eps_base::set_param(Param& param)
-{
-  Equation_base::set_param(param);
-  param.ajouter_non_std("diffusion",(this));
-  param.ajouter_non_std("convection",(this));
-  param.ajouter_condition("is_read_diffusion","The diffusion operator must be read, select negligeable type if you want to neglect it.");
-  param.ajouter_condition("is_read_convection","The convection operator must be read, select negligeable type if you want to neglect it.");
 }
 
 void Transport_K_Eps_base::discretiser()
@@ -110,52 +101,37 @@ void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
   dis.discretiser_champ("temperature",z.valeur(),multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
   ch.valeur().nommer("K_Eps");
 }
-/*! @brief Associe un milieu physique a l'equation.
- *
- * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
- */
-void Transport_K_Eps_base::associer_milieu_base(const Milieu_base& un_milieu)
+
+// For VEF-like scheme
+void Transport_K_Eps_base::get_position_faces(Nom& position, int& n)
 {
-  le_fluide =  un_milieu;
-}
-/*! @brief Renvoie le milieu (fluide) associe a l'equation.
- *
- * @return (Milieu_base&) le milieu (fluide) associe a l'equation
- */
-Milieu_base& Transport_K_Eps_base::milieu()
-{
-  if(!le_fluide.non_nul())
+  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+
+  position = "x=";
+  position += (Nom)zone_vf.xv(n, 0);
+  position += " y=";
+  position += (Nom)zone_vf.xv(n, 1);
+  if (dimension == 3)
     {
-      Cerr << "No fluid has been associated to the Transport K_Epsilon"
-           << que_suis_je()<< " equation." << finl;
-      exit();
+      position += " z=";
+      position += (Nom)zone_vf.xv(n, 2);
     }
-  return le_fluide.valeur();
 }
 
-
-/*! @brief Renvoie le milieu (fluide) associe a l'equation.
- *
- * (version const)
- *
- * @return (Milieu_base&) le milieu (fluide) associe a l'equation
- */
-const Milieu_base& Transport_K_Eps_base::milieu() const
+// For VDF-like scheme
+void Transport_K_Eps_base::get_position_cells(Nom& position, int& n)
 {
-  if(!le_fluide.non_nul())
+  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+
+  position = "x=";
+  position += (Nom)zone_vf.xp(n, 0);
+  position += " y=";
+  position += (Nom)zone_vf.xp(n, 1);
+  if (dimension == 3)
     {
-      Cerr << "No fluid has been associated to the Transport K_Epsilon"
-           << que_suis_je() <<" equation." << finl;
-      exit();
+      position += " z=";
+      position += (Nom)zone_vf.xp(n, 2);
     }
-  return le_fluide.valeur();
-}
-
-void Transport_K_Eps_base::associer(const Equation_base& eqn_hydr)
-{
-  Equation_base::associer_pb_base(eqn_hydr.probleme());
-  Equation_base::associer_sch_tps_base(eqn_hydr.schema_temps());
-  Equation_base::associer_domaine_dis(eqn_hydr.domaine_dis());
 }
 
 /*! @brief Controle le champ inconnue K-epsilon en forcant a zero les valeurs du champ
@@ -167,8 +143,8 @@ void Transport_K_Eps_base::associer(const Equation_base& eqn_hydr)
 int Transport_K_Eps_base::controler_K_Eps()
 {
   DoubleTab& K_Eps = le_champ_K_Eps.valeurs();
-  int size=K_Eps.dimension(0);
-  if (size<0)
+  int size = K_Eps.dimension(0);
+  if (size < 0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
         size = le_champ_K_Eps.valeur().equation().domaine_dis().domaine().nb_elem();
@@ -178,12 +154,13 @@ int Transport_K_Eps_base::controler_K_Eps()
           Process::exit(-1);
         }
     }
+
   //int size_tot=mp_sum(size);
   // On estime pour eviter un mp_sum toujours couteux:
   int size_tot = size * Process::nproc();
   ArrOfInt neg(3);
-  neg=0;
-  int control=1;
+  neg = 0;
+  int control = 1;
   int lquiet = modele_turbulence().get_lquiet();
   // On interdit K-Eps negatif pour le K-Eps seulement
   // Les autres modeles (2 couches, Launder, ne sont pas assez valides)
@@ -204,48 +181,52 @@ int Transport_K_Eps_base::controler_K_Eps()
   // Changement: 13/12/07: en cas de valeurs negatives pour k OU eps
   // on fixe k ET eps a une valeur moyenne des 2 elements voisins
   Nom position;
-  Debog::verifier("Transport_K_Eps_base::controler_K_Eps K_Eps before",K_Eps);
-  for (int n=0; n<size; n++)
+  Debog::verifier("Transport_K_Eps_base::controler_K_Eps K_Eps before", K_Eps);
+
+  for (int n = 0; n < size; n++)
     {
-      double& k   = K_Eps(n,0);
-      double& eps = K_Eps(n,1);
+      double& k   = K_Eps(n, 0);
+      double& eps = K_Eps(n, 1);
       if (k < 0 || eps < 0)
         {
           neg[0] += (  k<0 ? 1 : 0);
           neg[1] += (eps<0 ? 1 : 0);
 
-          position="x=";
-          position+=(Nom)domaine_vf.xv(n,0);
-          position+=" y=";
-          position+=(Nom)domaine_vf.xv(n,1);
-          if (dimension==3)
-            {
-              position+=" z=";
-              position+=(Nom)domaine_vf.xv(n,2);
-            }
+//          position="x=";
+//          position+=(Nom)domaine_vf.xv(n,0);
+//          position+=" y=";
+//          position+=(Nom)domaine_vf.xv(n,1);
+//          if (dimension==3)
+//            {
+//              position+=" z=";
+//              position+=(Nom)domaine_vf.xv(n,2);
+//            }
+
+          get_position_faces(position, n);
+
           // On impose une valeur plus physique (moyenne des elements voisins)
           k = 0;
           eps = 0;
           int nk = 0;
           int neps = 0;
           int nb_faces_elem = elem_faces.line_size();
-          if (size==face_voisins.dimension(0))
+          if (size == face_voisins.dimension(0))
             {
               // K-Eps on faces (eg:VEF)
-              for (int i=0; i<2; i++)
+              for (int i = 0; i < 2; i++)
                 {
-                  int elem = face_voisins(n,i);
-                  if (elem!=-1)
-                    for (int j=0; j<nb_faces_elem; j++)
+                  int elem = face_voisins(n, i);
+                  if (elem != -1)
+                    for (int j = 0; j < nb_faces_elem; j++)
                       if (j != n)
                         {
-                          double& k_face = K_Eps(elem_faces(elem,j),0);
+                          double& k_face = K_Eps(elem_faces(elem, j), 0);
                           if (k_face > LeK_MIN)
                             {
                               k += k_face;
                               nk++;
                             }
-                          double& e_face = K_Eps(elem_faces(elem,j),1);
+                          double& e_face = K_Eps(elem_faces(elem, j), 1);
                           if (e_face > LeEPS_MIN)
                             {
                               eps += e_face;
@@ -254,18 +235,21 @@ int Transport_K_Eps_base::controler_K_Eps()
                         }
                 }
             }
-          else
+          else // (size != face_voisins.dimension(0))
             {
               // K-Eps on cells (eg:VDF)
-              position="x=";
-              position+=(Nom)domaine_vf.xp(n,0);
-              position+=" y=";
-              position+=(Nom)domaine_vf.xp(n,1);
-              if (dimension==3)
-                {
-                  position+=" z=";
-                  position+=(Nom)domaine_vf.xp(n,2);
-                }
+//              position="x=";
+//              position+=(Nom)domaine_vf.xp(n,0);
+//              position+=" y=";
+//              position+=(Nom)domaine_vf.xp(n,1);
+//              if (dimension==3)
+//                {
+//                  position+=" z=";
+//                  position+=(Nom)domaine_vf.xp(n,2);
+//                }
+
+              get_position_cells(position, n);
+
               nk = 0;   // k -> k_min
               neps = 0; // eps -> eps_min
               /* Error in algorithm ?
@@ -292,10 +276,11 @@ int Transport_K_Eps_base::controler_K_Eps()
                }
               }
               }*/
-            }
-          if (nk!=0) k /= nk;
+            } // fin de (size != face_voisins.dimension(0))
+
+          if (nk != 0) k /= nk;
           else k = LeK_MIN;
-          if (neps!=0) eps /= neps;
+          if (neps != 0) eps /= neps;
           else eps = LeEPS_MIN;
           if (schema_temps().limpr() && !lquiet)
             {
@@ -305,37 +290,41 @@ int Transport_K_Eps_base::controler_K_Eps()
               Cerr << (control ? "***Warning***: " : "***Error***: ");
               Cerr << "eps forced to " << eps << " on node " << n << " : " << position << finl;
             }
-        }
+        } // fin (k < 0 || eps < 0)
       else if (eps > LeEPS_MAX)
         {
           neg[2] += 1;
 
-          if (size==face_voisins.dimension(0))
+          if (size == face_voisins.dimension(0))
             {
               // K-Eps on faces (eg:VEF)
 
-              position="x=";
-              position+=(Nom)domaine_vf.xv(n,0);
-              position+=" y=";
-              position+=(Nom)domaine_vf.xv(n,1);
-              if (dimension==3)
-                {
-                  position+=" z=";
-                  position+=(Nom)domaine_vf.xv(n,2);
-                }
+//              position="x=";
+//              position+=(Nom)domaine_vf.xv(n,0);
+//              position+=" y=";
+//              position+=(Nom)domaine_vf.xv(n,1);
+//              if (dimension==3)
+//                {
+//                  position+=" z=";
+//                  position+=(Nom)domaine_vf.xv(n,2);
+//                }
+
+              get_position_faces(position, n);
             }
           else
             {
               // K-Eps on cells (eg:VDF)
-              position="x=";
-              position+=(Nom)domaine_vf.xp(n,0);
-              position+=" y=";
-              position+=(Nom)domaine_vf.xp(n,1);
-              if (dimension==3)
-                {
-                  position+=" z=";
-                  position+=(Nom)domaine_vf.xp(n,2);
-                }
+//              position="x=";
+//              position+=(Nom)domaine_vf.xp(n,0);
+//              position+=" y=";
+//              position+=(Nom)domaine_vf.xp(n,1);
+//              if (dimension==3)
+//                {
+//                  position+=" z=";
+//                  position+=(Nom)domaine_vf.xp(n,2);
+//                }
+
+              get_position_cells(position, n);
             }
 
           eps = LeEPS_MAX;
@@ -343,7 +332,6 @@ int Transport_K_Eps_base::controler_K_Eps()
             {
               // Warnings printed:
               Cerr << (control ? "***Warning***: " : "***Error***: ");
-
               Cerr << "eps forced to " << eps << " on node " << n << " : " << position << finl;
             }
         }
@@ -360,11 +348,9 @@ int Transport_K_Eps_base::controler_K_Eps()
               const double time = le_champ_K_Eps.temps();
               Cerr << "Values forced for k and eps because:" << finl;
               if (neg[0])
-                Cerr << "Negative values found for k on " << neg[0] << "/" << size_tot << " nodes at time " << time
-                     << finl;
+                Cerr << "Negative values found for k on " << neg[0] << "/" << size_tot << " nodes at time " << time << finl;
               if (neg[1])
-                Cerr << "Negative values found for eps on " << neg[1] << "/" << size_tot << " nodes at time "
-                     << time << finl;
+                Cerr << "Negative values found for eps on " << neg[1] << "/" << size_tot << " nodes at time " << time << finl;
               // Warning if more than 0.01% of nodes are values fixed
               double ratio_k = 100. * neg[0] / size_tot;
               double ratio_eps = 100. * neg[1] / size_tot;
@@ -373,24 +359,14 @@ int Transport_K_Eps_base::controler_K_Eps()
                   Cerr << "It is possible your initial and/or boundary conditions on k and/or eps are wrong." << finl;
                   Cerr << "Check the initial and boundary values for k and eps by using:" << finl;
                   Cerr << "k~" << (dimension == 2 ? "" : "3/2*") << "(t*U)^2 (t turbulence rate, U mean velocity) ";
-                  Cerr
-                      << "and eps~Cmu^0.75 k^1.5/l with l turbulent length scale and Cmu a k-eps model parameter whose value is typically given as 0.09."
-                      << finl;
+                  Cerr << "and eps~Cmu^0.75 k^1.5/l with l turbulent length scale and Cmu a k-eps model parameter whose value is typically given as 0.09." << finl;
                   Cerr << "See explanations here: http://www.esi-cfd.com/esi-users/turb_parameters/" << finl;
-                  Cerr
-                      << "Remark : by giving the velocity field (u) and the hydraulic diameter (d), by using boundary_field_uniform_keps_from_ud and field_uniform_keps_from_ud,  "
-                      << finl;
-                  Cerr
-                      << "respectively for boudnaries and initial conditions, TRUST will determine automatically values for k and eps."
-                      << finl;
+                  Cerr << "Remark : by giving the velocity field (u) and the hydraulic diameter (d), by using boundary_field_uniform_keps_from_ud and field_uniform_keps_from_ud,  " << finl;
+                  Cerr << "respectively for boudnaries and initial conditions, TRUST will determine automatically values for k and eps." << finl;
                   if (probleme().is_dilatable() == 1)
                     {
-                      Cerr
-                          << "Please, don't forget (sorry for this TRUST syntax weakness) that when using Quasi-Compressible module"
-                          << finl;
-                      Cerr
-                          << "the unknowns for which you define initial and boundary conditions are rho*k and rho*eps."
-                          << finl;
+                      Cerr << "Please, don't forget (sorry for this TRUST syntax weakness) that when using Quasi-Compressible module" << finl;
+                      Cerr << "the unknowns for which you define initial and boundary conditions are rho*k and rho*eps." << finl;
                     }
                 }
             }
@@ -398,8 +374,7 @@ int Transport_K_Eps_base::controler_K_Eps()
             {
               // On quitte en postraitant pour trouver les noeuds
               // qui posent probleme
-              Cerr << "The problem is postprocessed in order to find the nodes where K or Eps values go below 0."
-                   << finl;
+              Cerr << "The problem is postprocessed in order to find the nodes where K or Eps values go below 0." << finl;
               probleme().postraiter(1);
               exit();
             };
@@ -410,12 +385,11 @@ int Transport_K_Eps_base::controler_K_Eps()
             {
               const double time = le_champ_K_Eps.temps();
               Cerr << "Values forced for eps because:" << finl;
-              Cerr << "Maximum values found for eps on " << neg[2] << "/" << size_tot << " nodes at time " << time
-                   << finl;
+              Cerr << "Maximum values found for eps on " << neg[2] << "/" << size_tot << " nodes at time " << time << finl;
             }
         }
     }
-  Debog::verifier("Transport_K_Eps_base::controler_K_Eps K_Eps after",K_Eps);
+  Debog::verifier("Transport_K_Eps_base::controler_K_Eps K_Eps after", K_Eps);
   return 1;
 }
 /*! @brief on remet eps et K positifs
@@ -425,9 +399,3 @@ void Transport_K_Eps_base::valider_iteration()
 {
   controler_K_Eps();
 }
-double Transport_K_Eps_base::calculer_pas_de_temps() const
-{
-  // on prend le pas de temps de l'eq de NS.
-  return probleme().equation(0).calculer_pas_de_temps();
-}
-
