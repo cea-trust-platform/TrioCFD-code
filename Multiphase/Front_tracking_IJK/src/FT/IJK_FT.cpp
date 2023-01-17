@@ -4917,8 +4917,8 @@ IJK_Field_double IJK_FT_double::scalar_fields_product(const IJK_Field_double& S1
       for (int i=0; i<ni; ++i)
         {
           if (dir==0) {resu(i,j,k) = 0.5*(S1(i-1,j,k)+S1(i,j,k))*S2(i,j,k);}
-          if (dir==0) {resu(i,j,k) = 0.5*(S1(i,j-1,k)+S1(i,j,k))*S2(i,j,k);}
-          if (dir==0) {resu(i,j,k) = 0.5*(S1(i,j,k-1)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==1) {resu(i,j,k) = 0.5*(S1(i,j-1,k)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==2) {resu(i,j,k) = 0.5*(S1(i,j,k-1)+S1(i,j,k))*S2(i,j,k);}
         }
   // Communication avec tous les process ?
   return resu;
