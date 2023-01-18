@@ -20,28 +20,22 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Transport_2eq_base.h>
-#include <Discret_Thyd.h>
-#include <Probleme_base.h>
 #include <Schema_Temps_base.h>
+#include <Champ_Inc_P0_base.h>
+#include <communications.h>
+#include <Probleme_base.h>
+#include <Discret_Thyd.h>
 #include <Zone_VF.h>
 #include <Param.h>
 #include <Debog.h>
-#include <communications.h>
-#include <Champ_Inc_P0_base.h>
 
-Implemente_base_sans_constructeur(Transport_2eq_base,"Transport_2eq_base",Equation_base);
+Implemente_base_sans_constructeur(Transport_2eq_base, "Transport_2eq_base", Equation_base);
 
 Transport_2eq_base::Transport_2eq_base()
 {
   champs_compris_.ajoute_nom_compris("2eq_residu");
-  /*
-    Noms& nom=champs_compris_.liste_noms_compris();
-    nom.dimensionner(3);
-    nom[0]="k";
-    nom[1]="eps";
-    nom[2]="k_eps";
-  */
 }
+
 /*! @brief
  *
  * @param (Sortie& is) un flot de sortie
@@ -50,7 +44,6 @@ Transport_2eq_base::Transport_2eq_base()
 Sortie& Transport_2eq_base::printOn(Sortie& is) const
 {
   return is << que_suis_je() << "\n";
-
 }
 
 /*! @brief Simple appel a Equation_base::readOn(Entree&)
@@ -67,10 +60,10 @@ Entree& Transport_2eq_base::readOn(Entree& is)
 void Transport_2eq_base::set_param(Param& param)
 {
   Equation_base::set_param(param);
-  param.ajouter_non_std("diffusion",(this));
-  param.ajouter_non_std("convection",(this));
-  param.ajouter_condition("is_read_diffusion","The diffusion operator must be read, select negligeable type if you want to neglect it.");
-  param.ajouter_condition("is_read_convection","The convection operator must be read, select negligeable type if you want to neglect it.");
+  param.ajouter_non_std("diffusion", (this));
+  param.ajouter_non_std("convection", (this));
+  param.ajouter_condition("is_read_diffusion", "The diffusion operator must be read, select negligeable type if you want to neglect it.");
+  param.ajouter_condition("is_read_convection", "The convection operator must be read, select negligeable type if you want to neglect it.");
 }
 
 /*! @brief Associe un milieu physique a l'equation.
@@ -81,6 +74,7 @@ void Transport_2eq_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   le_fluide =  un_milieu;
 }
+
 /*! @brief Renvoie le milieu (fluide) associe a l'equation.
  *
  * @return (Milieu_base&) le milieu (fluide) associe a l'equation
@@ -90,7 +84,7 @@ Milieu_base& Transport_2eq_base::milieu()
   if(!le_fluide.non_nul())
     {
       Cerr << "No fluid has been associated to the two equations Transport"
-           << que_suis_je()<< " equation." << finl;
+           << que_suis_je() << " equation." << finl;
       exit();
     }
   return le_fluide.valeur();
@@ -107,7 +101,7 @@ const Milieu_base& Transport_2eq_base::milieu() const
   if(!le_fluide.non_nul())
     {
       Cerr << "No fluid has been associated to the Transport K_Epsilon"
-           << que_suis_je() <<" equation." << finl;
+           << que_suis_je() << " equation." << finl;
       exit();
     }
   return le_fluide.valeur();

@@ -66,15 +66,6 @@ protected:
 
 };
 
-/*! @brief
- *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
-
-inline Sortie& Transport_K_Eps_base::printOn(Sortie& is) const
-{ return is << que_suis_je() << "\n"; }
-
 /*! @brief Renvoie le champ inconnue de l'equation.
  *
  * Un champ vecteur contenant K et epsilon.

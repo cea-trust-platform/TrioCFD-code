@@ -42,16 +42,14 @@ Transport_K_Eps_base::Transport_K_Eps_base()
     nom[2]="k_eps";
   */
 }
+
 /*! @brief
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-// Sortie& Transport_K_Eps_base::printOn(Sortie& is) const
-// {
-//   return is << que_suis_je() << "\n";
-
-// }
+Sortie& Transport_K_Eps_base::printOn(Sortie& is) const
+{ return is << que_suis_je() << "\n"; }
 
 /*! @brief Simple appel a Equation_base::readOn(Entree&)
  *
