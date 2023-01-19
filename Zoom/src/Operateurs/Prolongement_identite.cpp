@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_identite.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Prolongement_identite,"Prolongement_identite",Prolongement_base);

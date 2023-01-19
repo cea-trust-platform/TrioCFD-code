@@ -99,7 +99,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
 
 
-      //Cerr << "Domaine : "<<zone_dis1.zone().domaine().le_nom()<<finl;
+      //Cerr << "Zone : "<<zone_dis1.zone().domaine().le_nom()<<finl;
       //Cerr << "On traite le raccord de nom " << nom_racc1 << finl;
       int nb_faces_raccord1 = zone_dis1.zone().raccord(nom_racc1).valeur().nb_faces();
       tab.resize(nb_faces_raccord1,nb_comp);

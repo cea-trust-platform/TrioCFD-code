@@ -26,7 +26,7 @@
 #include <Zone_Cl_dis_base.h>
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
-#include <Domaine.h>
+#include <Zone.h>
 
 Implemente_instanciable(Frontiere_ouverte_vitesse_vortex,"Frontiere_ouverte_vitesse_vortex",Entree_fluide_vitesse_imposee);
 

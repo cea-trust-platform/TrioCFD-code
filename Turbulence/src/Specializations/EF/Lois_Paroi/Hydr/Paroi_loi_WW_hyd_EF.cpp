@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Mod_turb_hyd_base.h>
 #include <Equation_base.h>
 #include <Param.h>

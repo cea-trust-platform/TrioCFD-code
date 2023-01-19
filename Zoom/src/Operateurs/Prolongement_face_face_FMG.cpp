@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_face_face_FMG.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Prolongement_face_face_FMG,"Prolongement_face_face_FMG",Prolongement_base);
@@ -59,7 +59,7 @@ void Prolongement_face_face_FMG::prolonger(Zone_VF& zone_VFG,
   int nb_elemF = connect.size_array();
   Zone& zonef = zone_VFF.zone();
   Zone& zoneg = zone_VFG.zone();
-  Domaine& domg = zoneg.domaine();
+  Zone& domg = zoneg.domaine();
   int nb_faces_elem_fin = zonef.nb_faces_elem();
   int nb_faces_elem_gros = zoneg.nb_faces_elem();
   const DoubleTab& cg_face_fine = zone_VFF.xv();

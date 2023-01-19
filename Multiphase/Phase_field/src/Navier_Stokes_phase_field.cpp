@@ -30,7 +30,7 @@
 #include <Statistiques.h>
 #include <TRUSTTrav.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Param.h>
 #include <Champ_Fonc_Tabule.h>
 #include <EChaine.h>

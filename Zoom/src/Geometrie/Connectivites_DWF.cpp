@@ -45,7 +45,7 @@ Entree& Connectivites_DWF::readOn(Entree& s )
 
 void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
                                                          Zone_VF& zoneg,
-                                                         Domaine& domg)
+                                                         Zone& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
   int nb_zone = domg.nb_zones();
@@ -846,7 +846,7 @@ void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
  */
 void Connectivites_DWF::calculer_connectivites(Zone_VF& zonef,
                                                Zone_VF& zoneg,
-                                               Domaine& domg)
+                                               Zone& domg)
 {
   calculer_connectivites_face_face(zonef, zoneg, domg);
   calculer_connectivites_elem_elem(zonef, zoneg);

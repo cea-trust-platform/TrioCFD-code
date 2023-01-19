@@ -467,7 +467,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   int nb_faces_bord=zone_VEF.nb_faces_bord();
   const IntTab& KEL=type_elemvef.KEL();
   const DoubleTab& xv=zone_VEF.xv();
-  const Domaine& domaine=zone.domaine();
+  const Zone& domaine=zone.domaine();
   const DoubleTab& coord_sommets=domaine.coord_sommets();
 
   // Boucle ou non selon la valeur de alpha (uniquement a l'ordre 3 pour le moment)

@@ -26,7 +26,7 @@
 #include <ArrOfBit.h>
 #include <TRUSTVect.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Rectangle.h>
 #include <Rectangle_2D_axi.h>
 #include <Triangle.h>
@@ -307,7 +307,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
   parser.parseString();
 
   // Construction d'un tableau de valeurs aux sommets euleriens
-  const Domaine& domaine = ref_zone_vf_.valeur().zone().domaine();
+  const Zone& domaine = ref_zone_vf_.valeur().zone().domaine();
   const int nb_sommets = domaine.nb_som();
 
   for (int i = 0; i < nb_sommets; i++)

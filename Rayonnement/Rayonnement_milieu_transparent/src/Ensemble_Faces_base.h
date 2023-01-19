@@ -43,7 +43,7 @@ public:
   double teta_i(int ) ;
   int contient(int) const;
   inline  const IntVect& Table_faces () const ;
-  void lire(const Nom&,const Nom&, const Domaine& );
+  void lire(const Nom&,const Nom&, const Zone& );
   inline int nb_faces_bord() const;
   int is_ok() const;
 protected:

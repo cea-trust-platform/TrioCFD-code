@@ -4939,7 +4939,7 @@ void IJK_Interfaces::compute_external_forces_color_function(FixedVector<IJK_Fiel
           // num_elem_zvdf contient le numero de l'elem dans sa Zone_VF sur le proc num_proc.
           // Normalement, c'est cette cellule qui est au centre de la bulle ib.
           const int num_elem_zvdf = s_ft.convert_ijk_cell_to_packed(ijk_local);
-          const int icompo = num_compo_[num_elem_zvdf]; // la valeur dans le tableau eulerien (Domaine i,j,k ecrit en non structure VDF)
+          const int icompo = num_compo_[num_elem_zvdf]; // la valeur dans le tableau eulerien (Zone i,j,k ecrit en non structure VDF)
           assert(icompo>=0);
           decodeur_num_compo[icompo] = ib; // On remplit le decodeur avec le numero de la bulle.
           //Cerr << "Decodeur : ib=" << ib << " in icompo= " << icompo << " on proc: " << Process::me() << finl;

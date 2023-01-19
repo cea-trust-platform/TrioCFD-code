@@ -30,7 +30,7 @@
 #include <Maillage_FT_Disc.h>
 
 class Maillage_FT_Disc;
-class Domaine;
+class Zone;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Zone;

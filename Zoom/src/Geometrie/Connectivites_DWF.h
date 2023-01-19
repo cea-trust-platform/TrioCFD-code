@@ -28,7 +28,7 @@
 #include <Zone_VF.h>
 #include <Connectivites_base.h>
 
-#include <Domaine.h>
+#include <Zone.h>
 /*! @brief class Connectivites_DWF
  *
  */
@@ -47,14 +47,14 @@ class Connectivites_DWF : public Connectivites_base
 
 public:
   void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                              Domaine& domg) override;
+                              Zone& domg) override;
   IntVect& connectivites_faceG_faceF() ;
 
 
 private:
   IntVect connect_faceG_faceF;
   void calculer_connectivites_face_face(Zone_VF& zonef, Zone_VF& zoneg,
-                                        Domaine& domg);
+                                        Zone& domg);
 
 };
 

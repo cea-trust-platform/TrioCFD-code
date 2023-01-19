@@ -41,7 +41,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
   Nom nom,nom2,nomS,nom_dom;
   is >> nom_dom >> nom;
   associer_domaine(nom_dom);
-  Domaine& dom=domaine();
+  Zone& dom=domaine();
   nomS=nom_du_cas();
   nom2=nom_du_cas();
   nom2+=Nom(".factforme");

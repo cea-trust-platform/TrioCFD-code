@@ -75,7 +75,7 @@ void Connectivites_IndGros::calculer_indice_gros(Zone_VF& zone_vfF,
  */
 void Connectivites_IndGros::calculer_connectivites(Zone_VF& zonef,
                                                    Zone_VF& zoneg,
-                                                   Domaine& domg)
+                                                   Zone& domg)
 {
   Connectivites_base::calculer_connectivites(zonef, zoneg, domg);
   calculer_indice_gros(zonef, zoneg);

@@ -23,7 +23,7 @@
 #include <Source_Reaction_Particules_VEF.h>
 #include <TRUSTTab.h>
 #include <Transport_Marqueur_FT.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 #include <Champ_implementation_P1.h>
 #include <Dirichlet.h>
@@ -59,7 +59,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   const Zone_VF& zvf = ref_cast(Zone_VF,zdis);
   const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
   const Zone& zone_geom = zdis.zone();
-  const Domaine& dom = zone_geom.domaine();
+  const Zone& dom = zone_geom.domaine();
   const DoubleTab& coord = dom.coord_sommets();
   const IntTab& sommet_poly = zone_geom.les_elems();
   const IntTab& face_som = zvf.face_sommets();

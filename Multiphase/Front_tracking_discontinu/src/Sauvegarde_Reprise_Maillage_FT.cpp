@@ -24,7 +24,7 @@
 #include <Zone_VF.h>
 #include <communications.h>
 #include <Array_tools.h>
-#include <Domaine.h>
+#include <Zone.h>
 
 void ecrire_tableau(Sortie& os, const DoubleTab& tab)
 {
@@ -155,7 +155,7 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
 void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
                                               const Zone_VF * zone_vf,
                                               Entree * fichier,
-                                              const Domaine * domaine_src)
+                                              const Zone * domaine_src)
 {
   // On doit donner un fichier OU un domaine_src, mais pas les deux !
   assert((fichier && (!domaine_src)) || ((!fichier) && domaine_src));

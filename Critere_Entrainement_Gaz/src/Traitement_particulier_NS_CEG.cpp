@@ -30,7 +30,7 @@
 #include <Param.h>
 #include <Milieu_base.h>
 #include <SFichier.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <TRUSTList.h>
 #include <Statistiques.h>
 #include <stat_counters.h>

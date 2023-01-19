@@ -25,7 +25,7 @@
 
 
 #include <Interprete_geometrique_base.h>
-class Domaine;
+class Zone;
 class Sous_Zone;
 #include <TRUSTTabs_forward.h>
 class Zone;
@@ -49,9 +49,9 @@ public :
 
 protected :
 
-  static void creer_sommet_et_elem(Domaine&, Sous_Zone&, IntTab&);
+  static void creer_sommet_et_elem(Zone&, Sous_Zone&, IntTab&);
   static void creer_bords(Zone&, Sous_Zone&, IntTab&);
-  static int ajouterSom(Domaine& , const DoubleTab&, DoubleTab&, int& );
+  static int ajouterSom(Zone& , const DoubleTab&, DoubleTab&, int& );
 
 };
 #endif

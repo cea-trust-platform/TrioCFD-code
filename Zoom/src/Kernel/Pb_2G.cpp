@@ -64,7 +64,7 @@ void Pb_2G::calculer_connectivites_2G()
   Zone_dis_base& zone_disF = domF.zone_dis(0);
   Zone_VF& zone_VFF = ref_cast(Zone_VF, zone_disF);
 
-  Domaine& domaineG = pb_G.domaine();
+  Zone& domaineG = pb_G.domaine();
   Domaine_dis& domG = pb_G.domaine_dis();
   Zone_dis_base& zone_disG = domG.zone_dis(0);
   Zone_VF& zone_VFG = ref_cast(Zone_VF, zone_disG);

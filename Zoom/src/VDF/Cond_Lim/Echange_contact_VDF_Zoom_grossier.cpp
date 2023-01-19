@@ -116,7 +116,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
 
 
-      //Cerr << "Domaine : "<<zone_dis1.zone().domaine().le_nom()<<finl;
+      //Cerr << "Zone : "<<zone_dis1.zone().domaine().le_nom()<<finl;
       //Cerr << "On traite le raccord de nom " << nom_racc1 << finl;
       const int nb_faces_front_gros = front_vf.nb_faces();
       const int num_prem_faceG = front_vf.num_premiere_face();

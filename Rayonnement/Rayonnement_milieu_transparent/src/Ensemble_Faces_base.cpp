@@ -23,7 +23,7 @@
 #include <Ensemble_Faces_base.h>
 #include <EFichier.h>
 #include <Frontiere_dis_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <TRUSTList.h>
 
 Implemente_instanciable_sans_constructeur(Ensemble_Faces_base,"Ensemble_Faces_base",Objet_U);
@@ -57,7 +57,7 @@ Sortie& Ensemble_Faces_base::printOn(Sortie& os) const
   return os;
 }
 
-void Ensemble_Faces_base::lire(const Nom& nom_bord_lu,const Nom& nom_bord, const Domaine& dom)
+void Ensemble_Faces_base::lire(const Nom& nom_bord_lu,const Nom& nom_bord, const Zone& dom)
 {
   {
     Nom fic2(dom.le_nom()+"."+nom_bord);

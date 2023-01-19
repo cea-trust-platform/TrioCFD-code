@@ -4561,7 +4561,7 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
   const IntTab& face_sommets = zone_VDF.face_sommets();
   const DoubleTab& positions = zone_VDF.xp();
   const Zone& zone_geom = zone_VDF.zone();
-  const Domaine& dom=zone_geom.domaine();
+  const Zone& dom=zone_geom.domaine();
   const int nb_elem = zone_VDF.nb_elem_tot();
   int f0,f1, som0,som1;
   double psi,val0,val1;
@@ -4644,7 +4644,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   const IntTab& face_sommets = zone_VDF.face_sommets();
   const DoubleTab& positions = zone_VDF.xp();
   const Zone& zone_geom = zone_VDF.zone();
-  const Domaine& dom=zone_geom.domaine();
+  const Zone& dom=zone_geom.domaine();
   const int nb_elem = zone_VDF.nb_elem();
   int nb_compo_;
   int elem;

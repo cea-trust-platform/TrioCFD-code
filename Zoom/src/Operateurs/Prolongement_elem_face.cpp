@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_elem_face.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Prolongement_elem_face,"Prolongement_elem_face",Prolongement_base);

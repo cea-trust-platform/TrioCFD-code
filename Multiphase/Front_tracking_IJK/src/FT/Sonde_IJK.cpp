@@ -24,7 +24,7 @@
 #include <IJK_Field.h>
 #include <Ref_Probleme_FT_Disc_gen.h>
 #include <Probleme_FT_Disc_gen.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 #include <Champ_Generique_Interpolation.h>
 #include <communications.h>

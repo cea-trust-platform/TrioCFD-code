@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Parcours_interface.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <TRUST_Deriv.h>
 #include <Comm_Group.h>
 #include <Connectivite_frontieres.h>

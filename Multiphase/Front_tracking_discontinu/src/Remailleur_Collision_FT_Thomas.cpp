@@ -22,7 +22,7 @@
 
 #include <Remailleur_Collision_FT_Thomas.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Param.h>
 #include <communications.h>
 #include <SFichier.h>
@@ -92,7 +92,7 @@ int Remailleur_Collision_FT_Thomas::construire_voisinage_sommet(const Maillage_F
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Zone& domaine = zone.domaine();
 
   const int nb_elem_tot = zone.nb_elem_tot();
   const int nb_som_elem = zone.nb_som_elem();
@@ -616,7 +616,7 @@ int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
   //  const Maillage_FT_Disc& maillage = ;
   const Zone_VF& zone_VF = ref_cast(Zone_VF,une_zone_dis);
   const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Zone& domaine = zone.domaine();
 
   const int nb_som_elem = zone.nb_som_elem();
   const int end_liste = -1;
@@ -1143,7 +1143,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
 
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Zone& domaine = zone.domaine();
 
   //Affichage des voisinages des sommets
   const int nb_som_tot = zone.nb_som_tot();
@@ -1922,7 +1922,7 @@ int Remailleur_Collision_FT_Thomas::initialiser_data(const Maillage_FT_Disc& mai
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Zone& domaine = zone.domaine();
 
   const int nb_elem_tot = zone.nb_elem_tot();
   const int nb_som_elem = zone.nb_som_elem();

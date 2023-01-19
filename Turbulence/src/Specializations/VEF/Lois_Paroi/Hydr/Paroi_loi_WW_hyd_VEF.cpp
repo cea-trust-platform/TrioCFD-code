@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Mod_turb_hyd_base.h>
 #include <Equation_base.h>
 #include <Param.h>
@@ -510,7 +510,7 @@ double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet
   const Zone& zone_geom = zone.zone();
   //  const IntTab& face_sommets = zone.face_sommets();
   const IntTab& elem_faces = zone.elem_faces();
-  const Domaine& dom = zone_geom.domaine();
+  const Zone& dom = zone_geom.domaine();
   const DoubleTab& coord = dom.coord_sommets();
   const Zone& zoneg = zone.zone();
   int nfac = zoneg.nb_faces_elem();
@@ -547,7 +547,7 @@ double distance_3D_som(int fac,int elem,const Zone_VEF& zone) //distance sommet 
   const Zone& zone_geom = zone.zone();
   const IntTab& face_sommets = zone.face_sommets();
   const IntTab& elem_faces = zone.elem_faces();
-  const Domaine& dom = zone_geom.domaine();
+  const Zone& dom = zone_geom.domaine();
   const DoubleTab& coord = dom.coord_sommets();
   const Zone& zoneg = zone.zone();
   int nfac = zoneg.nb_faces_elem();

@@ -24,7 +24,7 @@
 #include <Zone_VEF.h>
 #include <Navier_Stokes_std.h>
 #include <Champ_P1NC.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Periodique.h>
 #include <TRUSTTrav.h>
 #include <Pave.h>

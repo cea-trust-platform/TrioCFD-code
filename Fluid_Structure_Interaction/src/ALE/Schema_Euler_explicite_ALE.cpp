@@ -24,7 +24,7 @@
 
 #include <Debog.h>
 #include <Probleme_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Domaine_ALE.h>
 
 Implemente_instanciable(Schema_Euler_explicite_ALE,"Schema_euler_explicite_ALE|Scheme_euler_explicit_ALE",Schema_Euler_explicite);

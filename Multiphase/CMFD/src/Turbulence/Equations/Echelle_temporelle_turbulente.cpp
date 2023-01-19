@@ -24,7 +24,7 @@
 #include <Pb_Multiphase.h>
 #include <Discret_Thyd.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Avanc.h>
 #include <Debog.h>
 #include <Frontiere_dis_base.h>

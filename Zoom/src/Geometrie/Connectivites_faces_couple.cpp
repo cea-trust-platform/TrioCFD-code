@@ -72,7 +72,7 @@ void Connectivites_faces_couple::calculer_nb_facesF(Zone_VF& zone_vfG)
  */
 void Connectivites_faces_couple::calculer_connectivites(Zone_VF& zonef,
                                                         Zone_VF& zoneg,
-                                                        Domaine& domg)
+                                                        Zone& domg)
 {
   Cerr<<"debut de Connectivites_faces_couple::calculer_connectivites"<<finl;
   Connectivites_base::calculer_connectivites_face_face(zonef, zoneg, domg);

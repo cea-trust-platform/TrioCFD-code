@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Ecr_fic_Ansys.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <SFichier.h>
 
 Implemente_instanciable(Ecr_fic_Ansys,"Ecrire_fichier_Ansys",Interprete);
@@ -46,14 +46,14 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
   int non_hidden,zones,tetas;
   int i,j,k;
   is >> nom_dom >> nom_fic >> non_hidden >> zones >> tetas;
-  if(! sub_type(Domaine, objet(nom_dom)))
+  if(! sub_type(Zone, objet(nom_dom)))
     {
       Cerr << nom_dom << " est du type " << objet(nom_dom).que_suis_je() << finl;
-      Cerr << "On attendait un objet de type Domaine" << finl;
+      Cerr << "On attendait un objet de type Zone" << finl;
       exit();
     }
   // On recupere le domaine a partir du nom de domaine
-  const Domaine& dom=ref_cast(Domaine, objet(nom_dom));
+  const Zone& dom=ref_cast(Zone, objet(nom_dom));
   const Zone& zone=dom.zone(0);
   SFichier fic(nom_fic);
   // On ecrit l'en tete du fichier Ansys

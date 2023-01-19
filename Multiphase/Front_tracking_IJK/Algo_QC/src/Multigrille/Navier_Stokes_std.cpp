@@ -22,7 +22,7 @@
 
 #include <Navier_Stokes_std.h>
 #include <Probleme_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Fluide_Incompressible.h>
 #include <Discret_Thyd.h>
 #include <Avanc.h>

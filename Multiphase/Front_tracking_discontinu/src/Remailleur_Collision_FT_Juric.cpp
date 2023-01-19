@@ -23,7 +23,7 @@
 #include <Remailleur_Collision_FT_Juric.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Probleme_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Param.h>
 #include <Scatter.h>
 
@@ -67,7 +67,7 @@ Entree& Remailleur_Collision_FT_Juric::readOn(Entree& is)
   return is;
 }
 
-static void calculer_iso_avec_distance(const Domaine&     domaine,
+static void calculer_iso_avec_distance(const Zone&     domaine,
                                        const Champ_base& indicatrice,
                                        const DoubleTab&   distance,
                                        DoubleTab&         fonction_iso)
@@ -95,7 +95,7 @@ static void calculer_iso_avec_distance(const Domaine&     domaine,
   fonction_iso.echange_espace_virtuel();
 }
 
-static void calculer_iso_avec_indicatrice(const Domaine&     domaine,
+static void calculer_iso_avec_indicatrice(const Zone&     domaine,
                                           const Champ_base& indicatrice,
                                           DoubleTab&         fonction_iso)
 {
@@ -125,7 +125,7 @@ int Remailleur_Collision_FT_Juric::traite_RuptureCoalescenceInterfaces(
   Process::Journal()<<"DEB Remailleur_Collision_FT_Juric::traite_RuptureCoalescenceInterfaces"<<finl;
 
   const Transport_Interfaces_FT_Disc& eq_transport_FT = maillage.equation_transport();
-  const Domaine& domaine = eq_transport_FT.zone_dis().zone().domaine();
+  const Zone& domaine = eq_transport_FT.zone_dis().zone().domaine();
 
   DoubleTab fonction_iso;
 

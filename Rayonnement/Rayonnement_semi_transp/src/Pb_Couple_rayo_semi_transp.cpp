@@ -180,8 +180,8 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
 
   // Clonage et association du domaine (WEC)
   // Deviendra inutile avec la version de gomtrie de B. Mathieu
-  der_domaine_clone.typer("Domaine");
-  Domaine& dom_clone=ref_cast(Domaine,der_domaine_clone.valeur());
+  der_domaine_clone.typer("Zone");
+  Zone& dom_clone=ref_cast(Zone,der_domaine_clone.valeur());
   dom_clone=le_pb.domaine();
   Nom new_name=dom_clone.le_nom()+"_copy";
   dom_clone.nommer(new_name); // nommage

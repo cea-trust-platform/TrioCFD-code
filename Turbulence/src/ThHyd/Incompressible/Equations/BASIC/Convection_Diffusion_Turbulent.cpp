@@ -26,7 +26,7 @@
 #include <Discretisation_base.h>
 #include <Champ_Don.h>
 #include <Probleme_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Schema_Temps_base.h>
 #include <Avanc.h>
 

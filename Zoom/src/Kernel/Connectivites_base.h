@@ -27,7 +27,7 @@
 
 #include <TRUSTVect.h>
 class Zone_VF;
-class Domaine;
+class Zone;
 /*! @brief class Connectivites_base
  *
  */
@@ -44,7 +44,7 @@ class Connectivites_base : public Objet_U
 
 public:
   virtual void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                                      Domaine& domg);
+                                      Zone& domg);
   inline IntVect& connectivites_faceF_faceG();
   inline IntVect& connectivites_elemF_elemG();
   inline const IntVect& connectivites_faceF_faceG()const ;
@@ -55,7 +55,7 @@ protected:
   IntVect connect_faceF_faceG;
   IntVect connect_elemF_elemG;
   void calculer_connectivites_face_face(Zone_VF& zonef, Zone_VF& zoneg,
-                                        Domaine& domg);
+                                        Zone& domg);
   void calculer_connectivites_elem_elem(Zone_VF& zonef, Zone_VF& zoneg);
 
 

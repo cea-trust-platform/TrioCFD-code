@@ -43,7 +43,7 @@
 
 
 
-Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
+Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Zone);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
 Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
 {
@@ -55,14 +55,14 @@ Domaine_ALE::~Domaine_ALE()
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
-  Domaine::printOn(os);
+  Zone::printOn(os);
   return os ;
 }
 
 
 Entree& Domaine_ALE::readOn(Entree& is)
 {
-  Domaine::readOn(is);
+  Zone::readOn(is);
   return is ;
 }
 

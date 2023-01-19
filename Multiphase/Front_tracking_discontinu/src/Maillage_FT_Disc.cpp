@@ -6355,7 +6355,7 @@ int Maillage_FT_Disc::type_statut() const
   return -1;
 }
 
-/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_sommets()
+/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Zone::creer_tableau_sommets()
  *
  */
 void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_Options opt) const

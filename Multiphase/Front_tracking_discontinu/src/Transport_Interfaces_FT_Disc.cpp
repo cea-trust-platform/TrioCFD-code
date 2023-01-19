@@ -58,7 +58,7 @@
 #include <Param.h>
 #include <sys/stat.h>
 #include <TRUSTList.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <TRUSTTrav.h>
 #include <stat_counters.h>
 
@@ -892,8 +892,8 @@ static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 
 void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 {
-  Domaine dom;
-  REF(Domaine) ref_dom;
+  Zone dom;
+  REF(Zone) ref_dom;
   Nom filename;
   ArrOfInt phase_specifiee;
   DoubleTab points;
@@ -1007,12 +1007,12 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   else
     {
       Cerr << "Reading interface in existing domain: " << domain_name << finl;
-      if (!sub_type(Domaine, Interprete::objet(domain_name)))
+      if (!sub_type(Zone, Interprete::objet(domain_name)))
         {
           Cerr << "Error : object " << domain_name << " is not a domain" << finl;
           exit();
         }
-      ref_dom = ref_cast(Domaine, Interprete::objet(domain_name));
+      ref_dom = ref_cast(Zone, Interprete::objet(domain_name));
     }
   if (reverse_normal)
     {
@@ -1160,7 +1160,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
     {
       Cerr << "Writing lata file" << finl;
       Format_Post_Lata lata;
-      const Domaine& un_dom = zone_vf.zone().domaine();
+      const Zone& un_dom = zone_vf.zone().domaine();
       constexpr double TEMPS = 0.;
       constexpr int FIRST_POST = 1;
       lata.initialize(lata_file, Format_Post_Lata::BINAIRE, "SIMPLE");
@@ -1499,7 +1499,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   // Construction de la structure du tableau avec l'espace virtuel:
   {
     DoubleTab& d = variables_internes_->distance_interface_sommets;
-    const Domaine& dom = zone_dis().zone().domaine();
+    const Zone& dom = zone_dis().zone().domaine();
     d.resize(0);
     dom.creer_tableau_sommets(d);
   }

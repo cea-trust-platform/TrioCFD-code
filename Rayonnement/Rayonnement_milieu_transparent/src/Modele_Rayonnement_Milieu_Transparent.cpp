@@ -883,7 +883,7 @@ void Modele_Rayonnement_Milieu_Transparent::mettre_a_jour(double temps)
   //imprimer_flux_radiatifs(Cerr);
 }
 
-void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_base& dis, const Domaine& domaine)
+void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_base& dis, const Zone& domaine)
 {
   for (int i=0; i<nb_faces_totales(); i++)
     {

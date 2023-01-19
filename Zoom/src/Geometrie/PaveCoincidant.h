@@ -62,7 +62,7 @@ public:
 private :
 
   double xmin, xmax, ymin, ymax, zmin, zmax;
-  REF(Domaine) dom_qui_coincide;
+  REF(Zone) dom_qui_coincide;
 
 
 };

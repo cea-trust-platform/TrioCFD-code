@@ -22,7 +22,7 @@
 
 #include <Source_Reaction_Particules.h>
 #include <Transport_Marqueur_FT.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>

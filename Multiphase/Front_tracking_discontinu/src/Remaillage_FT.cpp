@@ -24,7 +24,7 @@
 #include <TRUST_Deriv.h>
 #include <Motcle.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Triangle.h>
 #include <Rectangle.h>
 #include <Rectangle_2D_axi.h>

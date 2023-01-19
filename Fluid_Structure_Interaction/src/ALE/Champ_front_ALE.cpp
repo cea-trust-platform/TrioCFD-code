@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_front_ALE.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Frontiere_dis_base.h>
 #include <MD_Vector_tools.h>
 
@@ -33,7 +33,7 @@ Implemente_instanciable(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instation
 {
   const Frontiere& front=la_frontiere_dis->frontiere();
   const Zone& zone=front.zone();
-  const Domaine& domaine=zone.domaine();
+  const Zone& domaine=zone.domaine();
   vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
   const MD_Vector& md = zone.domaine().md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
@@ -162,7 +162,7 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
-  const Domaine& domaine=zone.domaine();
+  const Zone& domaine=zone.domaine();
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;

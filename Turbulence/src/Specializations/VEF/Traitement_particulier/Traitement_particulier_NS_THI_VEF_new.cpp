@@ -22,7 +22,7 @@
 #include <Traitement_particulier_NS_THI_VEF_new.h>
 #include <Navier_Stokes_std.h>
 #include <Champ_P1NC.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <SFichier.h>
@@ -474,7 +474,7 @@ void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
   const DoubleTab& xv = zone_VEF.xv();
   const Zone_dis& zdis = mon_equation->zone_dis();
   const Zone& zone = zdis.zone();
-  const Domaine& dom = zone.domaine();
+  const Zone& dom = zone.domaine();
   const DoubleTab& coord = dom.coord_sommets();
   int nb_som = zone.nb_som();
   calcul_nb_som_dir(zone);

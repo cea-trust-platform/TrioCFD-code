@@ -23,7 +23,7 @@
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Uniforme.h>
 #include <Sous_Zone.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Interprete.h>
 #include <Parser_U.h>
 #include <TRUST_Vector.h>
@@ -65,8 +65,8 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
   Nom nom;
   int k, poly;
   is >> nom;
-  mon_domaine = ref_cast(Domaine, Interprete::objet(nom));
-  Domaine& le_domaine=mon_domaine.valeur();
+  mon_domaine = ref_cast(Zone, Interprete::objet(nom));
+  Zone& le_domaine=mon_domaine.valeur();
   const IntTab& les_elems=le_domaine.zone(0).les_elems();
   const int nb_som_elem = le_domaine.zone(0).nb_som_elem();
   double x=0,y=0,z=0;
@@ -193,18 +193,18 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
  *
  * (version const)
  *
- * @return (REF(Domaine)&) reference sur le domaine associe
+ * @return (REF(Zone)&) reference sur le domaine associe
  */
-const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
+const REF(Zone)& Champ_Uniforme_Morceaux::domaine() const
 {
   return mon_domaine;
 }
 
 /*! @brief Renvoie une reference sur le domaine associe.
  *
- * @return (REF(Domaine)&) reference sur le domaine associe
+ * @return (REF(Zone)&) reference sur le domaine associe
  */
-REF(Domaine)& Champ_Uniforme_Morceaux::domaine()
+REF(Zone)& Champ_Uniforme_Morceaux::domaine()
 {
   return mon_domaine;
 }

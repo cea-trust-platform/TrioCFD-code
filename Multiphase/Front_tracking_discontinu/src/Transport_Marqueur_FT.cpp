@@ -30,7 +30,7 @@
 #include <Fluide_Diphasique.h>
 #include <Zone_VF.h>
 #include <Source_Reaction_Particules.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Source_Masse_Ajoutee.h>
 #include <communications.h>
 #include <Param.h>
@@ -778,7 +778,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
 {
   const Zone_VF& zvf = ref_cast(Zone_VF, zone_dis().valeur());
   const Zone& zone_geom = zvf.zone();
-  const Domaine& dom = zone_geom.domaine();
+  const Zone& dom = zone_geom.domaine();
   const DoubleVect& volume_elem = zvf.volumes();
 
   // Recherche de l'element contenant le centre de gravite de chaque composante connexe

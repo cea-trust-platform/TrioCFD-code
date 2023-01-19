@@ -714,7 +714,7 @@ protected:
   DoubleTab bounding_box_NS_domain_;
   bool perio_NS_[3];
 
-  // Domaine autorise pour les bulles :
+  // Zone autorise pour les bulles :
   // c'est le geom du splitting_FT reduit de ncells_forbidden_
   // dans toutes les direction ou le domaine NS est perio.
   int ncells_forbidden_;
@@ -723,7 +723,7 @@ protected:
   DoubleTab bounding_box_forbidden_criteria_;
   DoubleTab bounding_box_delete_criteria_;
 
-  // Domaine a l'interieur duquel la duplication d'une bulle est inutile
+  // Zone a l'interieur duquel la duplication d'une bulle est inutile
   DoubleTab bounding_box_duplicate_criteria_;
 
   // Distance max en metres a laquelle agit la force de repulsion entre les

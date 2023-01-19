@@ -23,7 +23,7 @@
 #include <PaveCoincidant.h>
 #include <math.h>
 #include <Motcle.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <EChaine.h>
 #include <Interprete.h>
 
@@ -83,7 +83,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
   is >> ledom;
   Cerr << "Lecture du pave " << nom_ << " qui doit coincider avec le domaine " << ledom << finl;
 
-  dom_qui_coincide=ref_cast(Domaine, Interprete::objet(ledom));
+  dom_qui_coincide=ref_cast(Zone, Interprete::objet(ledom));
 
   Motcle motlu;
   int rang,nmx,nmy,nmz;

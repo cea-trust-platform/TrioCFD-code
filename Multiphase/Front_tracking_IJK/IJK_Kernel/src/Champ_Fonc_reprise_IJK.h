@@ -57,8 +57,8 @@ public :
                                             const IntVect& les_polys,
                                             DoubleVect& les_valeurs,
                                             int ncomp) const override ;
-  inline DoubleTab& valeur_aux_sommets(const Domaine&, DoubleTab&) const override;
-  inline DoubleVect& valeur_aux_sommets_compo(const Domaine&,
+  inline DoubleTab& valeur_aux_sommets(const Zone&, DoubleTab&) const override;
+  inline DoubleVect& valeur_aux_sommets_compo(const Zone&,
                                               DoubleVect&, int) const override;
   inline DoubleTab& remplir_coord_noeuds(DoubleTab& ) const override;
   inline int remplir_coord_noeuds_et_polys(DoubleTab&, IntVect&) const override;
@@ -114,12 +114,12 @@ inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_elems_compo(const DoubleTa
   return le_champ().valeur_aux_elems_compo(positions, les_polys, les_valeurs, ncomp);
 }
 
-inline DoubleTab& Champ_Fonc_reprise_IJK::valeur_aux_sommets(const Domaine& dom, DoubleTab& sommets) const
+inline DoubleTab& Champ_Fonc_reprise_IJK::valeur_aux_sommets(const Zone& dom, DoubleTab& sommets) const
 {
   return le_champ().valeur_aux_sommets(dom, sommets);
 }
 
-inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_sommets_compo(const Domaine& dom,
+inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_sommets_compo(const Zone& dom,
                                                                     DoubleVect& sommets, int compo) const
 {
   return le_champ().valeur_aux_sommets_compo(dom, sommets, compo);

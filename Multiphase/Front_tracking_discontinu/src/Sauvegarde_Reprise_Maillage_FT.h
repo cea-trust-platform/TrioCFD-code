@@ -27,7 +27,7 @@ class Maillage_FT_Disc;
 class Zone_VF;
 class Sortie;
 class Entree;
-class Domaine;
+class Zone;
 class Sauvegarde_Reprise_Maillage_FT
 {
 public:
@@ -35,7 +35,7 @@ public:
   static void lire_xyz(Maillage_FT_Disc& mesh,
                        const Zone_VF * zone_vf,
                        Entree * fichier,
-                       const Domaine * domaine_src);
+                       const Zone * domaine_src);
 protected:
 
   int init_temps_physique(Maillage_FT_Disc& mesh);

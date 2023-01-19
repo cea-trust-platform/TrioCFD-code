@@ -23,7 +23,7 @@
 #include <Convection_Diffusion_Chaleur_QC.h>
 #include <Probleme_base.h>
 #include <Discret_Thyd.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Avanc.h>
 #include <Debog.h>
 #include <Frontiere_dis_base.h>

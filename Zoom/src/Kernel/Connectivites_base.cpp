@@ -24,7 +24,7 @@
 #include <LecFicDistribueBin.h>
 #include <EcrFicCollecteBin.h>
 #include <Zone_VF.h>
-#include <Domaine.h>
+#include <Zone.h>
 
 #define PRECISION 1.e-9
 
@@ -53,7 +53,7 @@ Entree& Connectivites_base::readOn(Entree& s )
  */
 void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                                           Zone_VF& zoneg,
-                                                          Domaine& domg)
+                                                          Zone& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
   Nom nom_domf = zonef.zone().domaine().le_nom();
@@ -940,7 +940,7 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
  */
 void Connectivites_base::calculer_connectivites(Zone_VF& zonef,
                                                 Zone_VF& zoneg,
-                                                Domaine& domg)
+                                                Zone& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites"<<finl;
   calculer_connectivites_face_face(zonef, zoneg, domg);

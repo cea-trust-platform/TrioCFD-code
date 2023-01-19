@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_elem_elem_complet.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Prolongement_elem_elem_complet,"Prolongement_elem_elem_complet",Prolongement_base);

@@ -21,7 +21,7 @@
 
 #include <Champ_front_ALE_projection.h>
 #include <Champ_front_ALE.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Frontiere_dis_base.h>
 #include <MD_Vector_tools.h>
 

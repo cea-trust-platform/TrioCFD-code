@@ -564,7 +564,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
                     is >> variables_internes().y_pfl_imp ;
                     if( Objet_U::dimension == 3 )
                       is >> variables_internes().z_pfl_imp ;
-                    Cerr <<"Domaine flottant fluide"<< finl;
+                    Cerr <<"Zone flottant fluide"<< finl;
                     Cerr <<"Lecture de la position du point de reference pression fluide : "<<variables_internes().x_pfl_imp <<" "<<variables_internes().y_pfl_imp<<" "<<variables_internes().z_pfl_imp<< finl;
                     break;
                   }

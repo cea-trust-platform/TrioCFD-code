@@ -30,7 +30,7 @@
 #include <RK3b.h>
 #include <Debog.h>
 #include <Schema_Euler_Implicite.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Loi_Etat_GP.h>
 #include <Navier_Stokes_std.h>
 #include <Navier_Stokes_QC_impl.h>

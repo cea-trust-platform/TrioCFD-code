@@ -24,7 +24,7 @@
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Interprete.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Frontiere_dis_base.h>
 #include <communications.h>
 #include <Convert_ICoCoTrioField.h>
@@ -119,7 +119,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   //int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
-  const Domaine& domaine=zone.domaine();
+  const Zone& domaine=zone.domaine();
   //int nbsf=faces.nb_som_faces();
   int i,j;
   int nb_som_tot=domaine.nb_som_tot();

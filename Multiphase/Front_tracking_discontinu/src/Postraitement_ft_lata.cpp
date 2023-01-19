@@ -17,7 +17,7 @@
 #include <Probleme_FT_Disc_gen.h>
 #include <Transport_Marqueur_FT.h>
 #include <Motcle.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <EcrFicPartage.h>
 #include <EcrFicPartageBin.h>
 #include <Fichier_Lata.h>
@@ -343,7 +343,7 @@ void Postraitement_ft_lata::postprocess_field_values()
               unites.add("");
               noms_compo.add(nc < 3 ? cp[nc] : Nom(nc));
             }
-          Domaine dummy_dom;
+          Zone dummy_dom;
           dummy_dom.nommer(id_domaine_);
           Nom nature = nb_compo == 1 ? "scalar" : "vectorial";
           const int component_to_process = -1; // meaning that we always want all components

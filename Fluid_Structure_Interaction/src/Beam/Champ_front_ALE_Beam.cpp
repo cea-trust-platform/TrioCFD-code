@@ -24,7 +24,7 @@
 #include <Zone_Cl_dis_base.h>
 #include <Front_VF.h>
 #include <Domaine_ALE.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VEF.h>
 #include <Cond_lim.h>
 #include <TRUSTVects.h>
@@ -58,7 +58,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
 
-  const Domaine& domaine=zone.domaine();
+  const Zone& domaine=zone.domaine();
   Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
 
   double dt = dom_ale.get_dt();

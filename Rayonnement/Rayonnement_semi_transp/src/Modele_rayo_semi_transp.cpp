@@ -39,7 +39,7 @@
 #include <verif_cast.h>
 #include <Champ_Uniforme.h>
 #include <Discretisation_base.h>
-#include <Domaine.h>
+#include <Zone.h>
 
 Implemente_instanciable(Modele_rayo_semi_transp,"Modele_rayo_semi_transp",Probleme_base);
 

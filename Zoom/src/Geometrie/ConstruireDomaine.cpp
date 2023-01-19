@@ -26,7 +26,6 @@
 #include <Faces_builder.h>
 #include <TRUST_Deriv.h>
 #include <Sous_Zone.h>
-#include <Domaine.h>
 #include <Zone.h>
 
 Implemente_instanciable(ConstruireDomaine,"ConstruireDomaine",Interprete_geometrique_base);
@@ -60,7 +59,7 @@ Entree& ConstruireDomaine::interpreter_(Entree& is)
   Nom nom_dom, nom_sszone;
   is >> nom_dom >> nom_sszone;
   associer_domaine(nom_dom);
-  Domaine& dom=domaine();
+  Zone& dom=domaine();
   Sous_Zone& sszone=ref_cast(Sous_Zone, objet(nom_sszone));
 
   DERIV(Zone) zone_raf;
@@ -77,16 +76,15 @@ Entree& ConstruireDomaine::interpreter_(Entree& is)
 
   creer_bords(zoneraf,sszone,correspo_new_som);
 
-
   return is;
 }
 
 
 
-void ConstruireDomaine::creer_sommet_et_elem(Domaine& dom, Sous_Zone& ssz,IntTab& correspo_newsom)
+void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& correspo_newsom)
 {
   Zone& zone0 = ssz.zone();
-  Domaine& dom0 = zone0.domaine();
+  Zone& dom0 = zone0.domaine();
 
   const int nb_poly = ssz.nb_elem_tot();
   const int nb_som_poly = zone0.nb_som_elem();
@@ -124,7 +122,7 @@ void ConstruireDomaine::creer_sommet_et_elem(Domaine& dom, Sous_Zone& ssz,IntTab
 
 }
 
-int ConstruireDomaine::ajouterSom(Domaine& dom, const DoubleTab& un_som, DoubleTab& newsom, int& compteur)
+int ConstruireDomaine::ajouterSom(Zone& dom, const DoubleTab& un_som, DoubleTab& newsom, int& compteur)
 {
   const DoubleTab& les_coord = dom.coord_sommets();
   const int nbsom = dom.nb_som();

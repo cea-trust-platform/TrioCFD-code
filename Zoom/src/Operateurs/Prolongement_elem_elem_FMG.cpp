@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_elem_elem_FMG.h>
-#include <Domaine.h>
+#include <Zone.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Prolongement_elem_elem_FMG,"Prolongement_elem_elem_FMG",Prolongement_base);
@@ -83,7 +83,7 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
   double dist;
   tab = 0.;
 
-  Domaine& domG = zoneg.domaine();
+  Zone& domG = zoneg.domaine();
   const DoubleTab& coordG = domG.coord_sommets();
   DoubleVect coord_somG;
   coord_somG.resize(dimension);

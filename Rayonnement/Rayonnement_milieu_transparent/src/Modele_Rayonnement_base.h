@@ -32,7 +32,7 @@ class Modele_Rayonnement_base : public Objet_U
 
 public:
 
-  virtual void discretiser(const Discretisation_base&, const Domaine& ) = 0;
+  virtual void discretiser(const Discretisation_base&, const Zone& ) = 0;
   virtual void mettre_a_jour (double temps) =0;
   virtual void preparer_calcul () =0;
   virtual void calculer_temperatures()=0;
