@@ -185,8 +185,6 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
   dom_clone=le_pb.domaine();
   Nom new_name=dom_clone.le_nom()+"_copy";
   dom_clone.nommer(new_name); // nommage
-  for (int i=0; i<dom_clone.nb_zones(); i++) // Association des zones
-    dom_clone.zone(i).associer_domaine(dom_clone);
   modele().associer_domaine(dom_clone); // association
   // Ici ajouter d'ventuelles autres associations ...
   Interprete_bloc::interprete_courant().ajouter(new_name,der_domaine_clone);

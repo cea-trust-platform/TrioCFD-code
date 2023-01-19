@@ -59,8 +59,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
   Nom nom_domf = zonef.zone().domaine().le_nom();
   Nom nom_domg = zoneg.zone().domaine().le_nom();
 
-  int nb_zone = domg.nb_zones();
-  const Elem_geom& type_elem = domg.zone(nb_zone-1).type_elem();
+  const Elem_geom& type_elem = domg.type_elem();
   int nb_faces_bordF = zonef.nb_faces_bord();
 
   //coord du centre de gravite des faces fines

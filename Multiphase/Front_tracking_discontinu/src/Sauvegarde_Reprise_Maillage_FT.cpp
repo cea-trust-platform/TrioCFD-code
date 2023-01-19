@@ -405,8 +405,8 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
   else
     {
       // lecture cao : on utilise le domaine
-      nb_faces_tot = domaine_src.nb_elem();
-      if (domaine_src.les_elems().dimension(1) != dim)
+      nb_faces_tot = domaine_src->nb_elem();
+      if (domaine_src->les_elems().dimension(1) != dim)
         {
           Cerr << "Error in Sauvegarde_Reprise_Maillage_FT::lire_xyz : source domain elements have bad dimension" << finl;
           Process::exit();
@@ -425,7 +425,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
         else
           {
             // Copie des elements dans le domaine
-            const IntTab& elems = domaine_src.les_elems();
+            const IntTab& elems = domaine_src->les_elems();
             for (int j = 0; j < n_to_read; j++)
               for (int k = 0; k < dim; k++)
                 tmp(j, k) = elems(i+j, k);

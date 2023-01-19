@@ -58,12 +58,9 @@ class PaveCoincidant : public Pave
 public:
   void determine_bornes() ;
 
-
 private :
-
   double xmin, xmax, ymin, ymax, zmin, zmax;
   REF(Zone) dom_qui_coincide;
-
 
 };
 

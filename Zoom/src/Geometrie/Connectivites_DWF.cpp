@@ -48,8 +48,7 @@ void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
                                                          Zone& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
-  int nb_zone = domg.nb_zones();
-  const Elem_geom& type_elem = domg.zone(nb_zone-1).type_elem();
+  const Elem_geom& type_elem = domg.type_elem();
   const int nb_faces_bordF = zonef.nb_faces_bord();
   const int nb_faces_bordG = zoneg.nb_faces_bord();
 

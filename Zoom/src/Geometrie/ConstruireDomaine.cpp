@@ -55,26 +55,20 @@ Entree& ConstruireDomaine::readOn(Entree& is)
  */
 Entree& ConstruireDomaine::interpreter_(Entree& is)
 {
-
   Nom nom_dom, nom_sszone;
   is >> nom_dom >> nom_sszone;
   associer_domaine(nom_dom);
   Zone& dom=domaine();
   Sous_Zone& sszone=ref_cast(Sous_Zone, objet(nom_sszone));
 
-  DERIV(Zone) zone_raf;
-  zone_raf.typer("Zone");
-  Zone& zoneraf = dom.add(zone_raf.valeur());
-  zoneraf.associer_domaine(dom);
-
   Cout << "Type elem = " << sszone.zone().type_elem()->que_suis_je() << finl;
 
-  zoneraf.typer("Rectangle");
+  dom.typer("Rectangle");
 
   IntTab correspo_new_som;
   creer_sommet_et_elem(dom,sszone,correspo_new_som);
 
-  creer_bords(zoneraf,sszone,correspo_new_som);
+  creer_bords(dom,sszone,correspo_new_som);
 
   return is;
 }
