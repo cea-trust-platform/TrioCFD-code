@@ -14,7 +14,7 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Domaine_ALE.cpp
+// File:        Zone_ALE.cpp
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
 // Version:     /main/21
 //
@@ -23,7 +23,7 @@
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
 #include <Debog.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VDF.h>
@@ -43,30 +43,30 @@
 
 
 
-Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Zone);
+Implemente_instanciable_sans_constructeur_ni_destructeur(Zone_ALE,"Domaine_ALE",Zone);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
+Zone_ALE::Zone_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
 {
   beam = new Beam_model();
 }
-Domaine_ALE::~Domaine_ALE()
+Zone_ALE::~Zone_ALE()
 {
   delete beam;
 }
-Sortie& Domaine_ALE::printOn(Sortie& os) const
+Sortie& Zone_ALE::printOn(Sortie& os) const
 {
   Zone::printOn(os);
   return os ;
 }
 
 
-Entree& Domaine_ALE::readOn(Entree& is)
+Entree& Zone_ALE::readOn(Entree& is)
 {
   Zone::readOn(is);
   return is ;
 }
 
-void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
+void Zone_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
 {
   zone(0).invalide_octree();
   //Modification des coordonnees du maillage
@@ -74,7 +74,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
   update_or_not_matrix_coeffs_=0;
 
-  //Cerr<<"Domaine_ALE::mettre_a_jour"<<finl;
+  //Cerr<<"Zone_ALE::mettre_a_jour"<<finl;
 
   bool  check_NoZero_ALE=true; //  if ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
 
@@ -172,7 +172,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
     }
 }
 //Compute the fluid force projected within the requested boundaries
-void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
+void Zone_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
 {
   Cerr<<"update_ALE_projection "<<finl;
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
@@ -227,7 +227,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
     }
 }
 //Compute the fluid force projected within the requested boundaries
-void  Domaine_ALE::update_ALE_projection(const double temps)
+void  Zone_ALE::update_ALE_projection(const double temps)
 {
 
   int size_projection_boundaries=field_ALE_projection_.size();
@@ -295,9 +295,9 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 }
 
-void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
+void Zone_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
-  //Cerr << "Domaine_ALE::initialiser  " << finl;
+  //Cerr << "Zone_ALE::initialiser  " << finl;
 
   deformable_=1;
   zone(0).invalide_octree();
@@ -343,7 +343,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   //End of initializing Ch_front_input_ALE
 }
 
-DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
+DoubleTab Zone_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
 
   int n; // A activer ou desactiver si on utilise le laplacien ou non
@@ -474,12 +474,12 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       update_or_not_matrix_coeffs_=1;
     }
 
-  Debog::verifier("Domaine_ALE::calculer_vitesse -vit_maillage", vit_maillage);
+  Debog::verifier("Zone_ALE::calculer_vitesse -vit_maillage", vit_maillage);
   return vit_maillage;
 
 }
 
-DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_faces,int nb_som_face, IntTab& face_sommets)
+DoubleTab& Zone_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_faces,int nb_som_face, IntTab& face_sommets)
 {
   int i,j,s;
   vf=0.;
@@ -499,13 +499,13 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
         }
     }
   vf.echange_espace_virtuel();
-  Debog::verifier("Domaine_ALE::calculer_vitesse_faces -vit_maillage_aux_faces", vf);
+  Debog::verifier("Zone_ALE::calculer_vitesse_faces -vit_maillage_aux_faces", vf);
   return vf;
 }
 
-DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
+DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
-  //Cerr << "Domaine_ALE::laplacien" << finl;
+  //Cerr << "Zone_ALE::laplacien" << finl;
   const Zone& lazone = les_zones_(0);
   int nb_elem_tot = lazone.nb_elem_tot();
   //int nbsom = lazone.nb_som();
@@ -634,7 +634,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
             }
         }
       secmem.echange_espace_virtuel();
-      Debog::verifier("Domaine_ALE::laplacien -secmem", secmem);
+      Debog::verifier("Zone_ALE::laplacien -secmem", secmem);
       // If secmem is zero, then it is zero solution. Otherwise system is solved.
       if (secmem.mp_max_abs_vect() >=1.e-15)
         {
@@ -654,16 +654,16 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
   ch_som.echange_espace_virtuel();
   //double x = mp_norme_vect(ch_som);
   //Cerr << "norme(c) = " << x << finl;
-  Debog::verifier("Domaine_ALE::laplacien -ch_som", ch_som);
+  Debog::verifier("Zone_ALE::laplacien -ch_som", ch_som);
   return ch_som;
 }
 
-void Domaine_ALE::set_dt(double& dt)
+void Zone_ALE::set_dt(double& dt)
 {
   dt_=dt;
 }
 
-void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,DoubleTab& NewValueOf_ALEjacobian_new, int TimeStepNr)
+void Zone_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,DoubleTab& NewValueOf_ALEjacobian_new, int TimeStepNr)
 {
 
   if(TimeStepNr==0 && resumption==0)
@@ -681,14 +681,14 @@ void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,Doub
     }
 }
 
-void Domaine_ALE::resumptionJacobian(DoubleTab& ValueOf_ALEjacobian_old, DoubleTab& ValueOf_ALEjacobian_new)
+void Zone_ALE::resumptionJacobian(DoubleTab& ValueOf_ALEjacobian_old, DoubleTab& ValueOf_ALEjacobian_new)
 {
 
   ALEjacobian_old=ValueOf_ALEjacobian_old;
   ALEjacobian_new=ValueOf_ALEjacobian_new;
   resumption=1;
 }
-void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
+void Zone_ALE::reading_vit_bords_ALE(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -722,7 +722,7 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
     }
 }
 //Read the projection boundary
-void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
+void Zone_ALE::reading_projection_ALE_boundary(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -755,7 +755,7 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
 }
 
 //  Read the solver used to solve the system giving the moving mesh velocity
-void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
+void Zone_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -784,7 +784,7 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 
 
 //Read the mechanical beam model parameters. See the Beam class for details
-void Domaine_ALE::reading_beam_model(Entree& is)
+void Zone_ALE::reading_beam_model(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -1050,16 +1050,16 @@ void Domaine_ALE::reading_beam_model(Entree& is)
     }
 
 }
-DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
+DoubleVect Zone_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
   return beam->interpolationOnThe3DSurface(x,y,z, u, R);
 }
 
-void Domaine_ALE::initializationBeam (double velocity)
+void Zone_ALE::initializationBeam (double velocity)
 {
   beam->initialization(velocity);
 }
-double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+double Zone_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
 {
 
   double dt = 0.;
@@ -1074,20 +1074,20 @@ double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
   return dt;
 }
 
-const DoubleTab& Domaine_ALE::getBeamDisplacement(int i) const
+const DoubleTab& Zone_ALE::getBeamDisplacement(int i) const
 {
   return beam->getDisplacement(i);
 }
-const DoubleTab& Domaine_ALE::getBeamRotation(int i) const
+const DoubleTab& Zone_ALE::getBeamRotation(int i) const
 {
   return beam->getRotation(i);
 
 }
-const int& Domaine_ALE::getBeamDirection() const
+const int& Zone_ALE::getBeamDirection() const
 {
   return beam->getDirection();
 }
-DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
+DoubleVect& Zone_ALE::getBeamVelocity(const double& tps, const double& dt)
 {
   //if tps=tempsComputeForceOnBeam then the dynamics of the beam has already been solved. We only solve once per time step.
   if(tps!=tempsComputeForceOnBeam && dt!=0.)
@@ -1097,23 +1097,23 @@ DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
     }
   return beam->getVelocity(tps, dt, fluidForceOnBeam);
 }
-const int& Domaine_ALE::getBeamNbModes()
+const int& Zone_ALE::getBeamNbModes()
 {
   return beam->getNbModes();
 }
 
-const DoubleVect& Domaine_ALE::getFluidForceOnBeam()
+const DoubleVect& Zone_ALE::getFluidForceOnBeam()
 {
 
   return fluidForceOnBeam;
 }
 
-Equation_base& Domaine_ALE::getEquation()
+Equation_base& Zone_ALE::getEquation()
 {
   return eq;
 }
 //Compute the modal fluid force acting on the Beam: sum of a pressure (op_grad.flux_bords) and a viscous term (op_diff.flux_bords) projected on the 3D modal deformation
-void  Domaine_ALE::computeFluidForceOnBeam()
+void  Zone_ALE::computeFluidForceOnBeam()
 {
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();

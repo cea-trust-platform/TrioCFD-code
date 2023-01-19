@@ -1019,7 +1019,7 @@ void Navier_Stokes_std::abortTimeStep()
 bool Navier_Stokes_std::initTimeStep(double dt)
 {
   P_n=pression()->valeurs();
-  if (probleme().domaine().que_suis_je()=="Domaine_ALE")
+  if (probleme().domaine().que_suis_je()=="Zone_ALE")
     {
       assembleur_pression_.assembler(matrice_pression_);
       solveur_pression_->reinit();

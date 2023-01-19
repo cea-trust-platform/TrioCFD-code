@@ -21,7 +21,7 @@
 
 #include <Navier_Stokes_std_ALE.h>
 #include <Probleme_base.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <Schema_Temps_base.h>
 #include <Op_Conv_ALE_VEF.h>
 #include <Discretisation_base.h>
@@ -51,7 +51,7 @@ int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
   int bytes=0, a_faire,special;
   bytes += Navier_Stokes_std::sauvegarder(os);
   EcritureLectureSpecial::is_ecriture_special(special,a_faire);
-  const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  const Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
   if (a_faire)
     {
       Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
@@ -104,7 +104,7 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
     }
 
   // set resumption field
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
   dom_ale.resumptionJacobian(JacobianOld->valeurs(), JacobianNew->valeurs());
   return 1;
 }
@@ -116,7 +116,7 @@ void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
 {
   //Renewing ALE Jacobians
   int TimeStepNr=probleme().schema_temps().nb_pas_dt();
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
 
   DoubleTab New_ALEjacobian_Old=dom_ale.getNewJacobian(); //New  value for ALEjacobian_old
   DoubleTab New_ALEjacobian_New(New_ALEjacobian_Old);
@@ -150,7 +150,7 @@ void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
 
 void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double timestep, DoubleTab& derivee, DoubleTrav& secmemP )
 {
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
   DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();
   DoubleTab ALEjacobian_New=dom_ale.getNewJacobian();
   DoubleTab& vitesse_faces_ALE= dom_ale.vitesse_faces();
@@ -181,7 +181,7 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
 void Navier_Stokes_std_ALE::update_pressure_matrix( void )
 {
   //In case of zero ALE mesh velocity (..._coeffs()=1), BM-1Bt matrix stays unchanged.
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
   if(dom_ale.update_or_not_matrix_coeffs() == 0)
     {
       assembleur_pression_.assembler(matrice_pression_); // Here B M-1 Bt is assembled.
@@ -208,7 +208,7 @@ void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
   Navier_Stokes_std::mettre_a_jour(temps);
   if(temps>0.)
     {
-      const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+      const Zone_ALE& dom_ale=ref_cast(Zone_ALE, probleme().domaine());
       const DoubleTab& ALEMeshVelocity= dom_ale.vitesse_faces();//we access the mesh speed
       ALEMeshVelocity_.valeurs()= ALEMeshVelocity;
       double dt = schema_temps().pas_de_temps();

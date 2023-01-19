@@ -22,7 +22,7 @@
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <Postraitement.h>
 #include <stat_counters.h>
 #include <FichierHDFPar.h>
@@ -1264,12 +1264,12 @@ int Probleme_base::postraiter(int force)
   statistiques().end_count(postraitement_counter_);
 
   //specific ALE postraitement
-  if(le_domaine_dis.domaine().que_suis_je()=="Domaine_ALE")
+  if(le_domaine_dis.domaine().que_suis_je()=="Zone_ALE")
     {
       if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
         {
           //compute the projection on the ALE boundaries
-          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis.domaine());
+          Zone_ALE& dom_ale = ref_cast(Zone_ALE,le_domaine_dis.domaine());
           double temps = le_schema_en_temps->temps_courant();
           dom_ale.update_ALE_projection(temps);
         }

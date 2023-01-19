@@ -14,7 +14,7 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Domaine_ALE.h
+// File:        Zone_ALE.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
 // Version:     /main/11
 //
@@ -45,13 +45,13 @@ class Beam_model;
 // .SECTION voir aussi
 //    Interprete Objet_U
 //////////////////////////////////////////////////////////////////////////////
-class Domaine_ALE : public Domaine
+class Zone_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Zone_ALE);
 
 public :
-  Domaine_ALE();
-  ~Domaine_ALE();
+  Zone_ALE();
+  ~Zone_ALE();
   inline const double& get_dt() const;
   void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
@@ -100,7 +100,7 @@ protected:
   Champs_front les_champs_front;
   int nb_bords_ALE;
   Bords les_bords_ALE;
-  int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
+  int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Zone_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
@@ -116,47 +116,47 @@ protected:
 };
 
 
-inline const DoubleTab& Domaine_ALE::vitesse() const
+inline const DoubleTab& Zone_ALE::vitesse() const
 {
   return ALE_mesh_velocity;
 }
 
-inline const double& Domaine_ALE::get_dt() const
+inline const double& Zone_ALE::get_dt() const
 {
   return dt_;
 }
 
-inline DoubleTab& Domaine_ALE::vitesse_faces()
+inline DoubleTab& Zone_ALE::vitesse_faces()
 {
   return vf;
 }
-inline const DoubleTab& Domaine_ALE::vitesse_faces() const
+inline const DoubleTab& Zone_ALE::vitesse_faces() const
 {
   return vf;
 }
-inline int Domaine_ALE::update_or_not_matrix_coeffs() const
+inline int Zone_ALE::update_or_not_matrix_coeffs() const
 {
   return update_or_not_matrix_coeffs_;
 }
-inline const DoubleTab& Domaine_ALE::getOldJacobian()
+inline const DoubleTab& Zone_ALE::getOldJacobian()
 {
   return ALEjacobian_old;
 }
-inline const DoubleTab& Domaine_ALE::getOldJacobian() const
+inline const DoubleTab& Zone_ALE::getOldJacobian() const
 {
   return ALEjacobian_old;
 }
 
-inline const DoubleTab& Domaine_ALE::getNewJacobian()
+inline const DoubleTab& Zone_ALE::getNewJacobian()
 {
   return ALEjacobian_new;
 }
-inline const DoubleTab& Domaine_ALE::getNewJacobian() const
+inline const DoubleTab& Zone_ALE::getNewJacobian() const
 {
   return ALEjacobian_new;
 }
 
-inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
+inline void Zone_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
 }

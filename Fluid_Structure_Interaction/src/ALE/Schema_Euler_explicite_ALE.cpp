@@ -25,7 +25,7 @@
 #include <Debog.h>
 #include <Probleme_base.h>
 #include <Zone.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 
 Implemente_instanciable(Schema_Euler_explicite_ALE,"Schema_euler_explicite_ALE|Scheme_euler_explicit_ALE",Schema_Euler_explicite);
 // XD scheme_euler_explicite_ALE schema_temps_base schema_euler_explicite_ALE -1 This is the Euler explicit scheme used for ALE problems.
@@ -66,7 +66,7 @@ int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eq
   //Adding ALE Jacobians. Jacobians are renewed in Navier_Stokes_std::corriger_derivee_impl().
   // In ALE Un+1=(Jn/Jn+1)*Un+dt_*dU/dt
   Probleme_base& problem=pb_base();
-  Domaine_ALE& domaineALE=ref_cast(Domaine_ALE, problem.domaine());
+  Zone_ALE& domaineALE=ref_cast(Zone_ALE, problem.domaine());
   DoubleTab ALEjacobian_Old=domaineALE.getOldJacobian();
   DoubleTab ALEjacobian_New=domaineALE.getNewJacobian();
 

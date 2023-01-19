@@ -21,7 +21,7 @@
 
 #include <Implicite_ALE.h>
 #include <Op_Conv_ALE_VEF.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Debog.h>
@@ -44,7 +44,7 @@ void Implicite_ALE::first_special_treatment(Equation_base& eqn, Navier_Stokes_st
 {
   //Renewing ALE Jacobians
   int TimeStepNr=eqn.probleme().schema_temps().nb_pas_dt();
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, eqn.probleme().domaine());
 
   DoubleTab New_ALEjacobian_Old=dom_ale.getNewJacobian(); //New  value for ALEjacobian_old
   DoubleTab New_ALEjacobian_New(New_ALEjacobian_Old);
@@ -67,7 +67,7 @@ void Implicite_ALE::first_special_treatment(Equation_base& eqn, Navier_Stokes_st
 
 void Implicite_ALE::second_special_treatment(Equation_base& eqn,DoubleTab& current, DoubleTrav& resu, Matrice_Morse& matrice)
 {
-  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
+  Zone_ALE& dom_ale=ref_cast(Zone_ALE, eqn.probleme().domaine());
   DoubleVect ALEjacobian_New=dom_ale.getNewJacobian();
 
   Debog::verifier(" Test ALE Jacobian New", ALEjacobian_New );

@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Imposer_vit_bords_ALE.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 
 
 Implemente_instanciable(Imposer_vit_bords_ALE,"Imposer_vit_bords_ALE",Interprete_geometrique_base);
@@ -71,7 +71,7 @@ Entree& Imposer_vit_bords_ALE::readOn(Entree& is)
 Entree& Imposer_vit_bords_ALE::interpreter_(Entree& is)
 {
   associer_domaine(is);
-  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
+  Zone_ALE& dom=ref_cast(Zone_ALE, domaine());
   dom.reading_vit_bords_ALE(is);
   return is;
 }

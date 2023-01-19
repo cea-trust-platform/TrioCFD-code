@@ -21,7 +21,7 @@
 
 #include <Op_Conv_ALE_VEF.h>
 #include <Op_Conv_VEF_base.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <TRUSTTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
@@ -76,7 +76,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   //statistiques().begin_count(m1);
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
-  const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, dom.valeur());
+  const Zone_ALE& dom_ale=ref_cast(Zone_ALE, dom.valeur());
   const Op_Conv_VEF_base& opConvVEFbase = ref_cast(Op_Conv_VEF_base, op_conv.valeur());
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
 
@@ -817,7 +817,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
 //old const DoubleTab& tab_vitesse=la_vitesse.valeurs();
 //new DoubleTab velocity= equation().inconnue().valeurs();
   const DoubleTab& tab_vitesse= equation().inconnue().valeurs();
-  const DoubleTab& tab_vitesse_faces_ALE = ref_cast(Domaine_ALE, dom.valeur()).vitesse_faces();
+  const DoubleTab& tab_vitesse_faces_ALE = ref_cast(Zone_ALE, dom.valeur()).vitesse_faces();
 
   const DoubleTab& face_normales=zone_VEF.face_normales();
   const int nb_faces = zone_VEF.nb_faces();
@@ -856,7 +856,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
 void Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Mesh_Velocity_Gradient) const
 {
 
-  const DoubleTab& vitesse_faces_ALE = ref_cast(Domaine_ALE, dom.valeur()).vitesse_faces();
+  const DoubleTab& vitesse_faces_ALE = ref_cast(Zone_ALE, dom.valeur()).vitesse_faces();
   int i,k,num_face;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();

@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Beam_model.h>
-#include <Domaine_ALE.h>
+#include <Zone_ALE.h>
 #include <TRUSTVects.h>
 #include <TRUSTTabs.h>
 #include <Probleme_base.h>
@@ -117,7 +117,7 @@ Entree& Beam_model::readOn( Entree& is )
 Entree&  Beam_model::interpreter_(Entree& is)
 {
   associer_domaine(is);
-  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
+  Zone_ALE& dom=ref_cast(Zone_ALE, domaine());
   dom.reading_beam_model(is);
   return is;
 }
