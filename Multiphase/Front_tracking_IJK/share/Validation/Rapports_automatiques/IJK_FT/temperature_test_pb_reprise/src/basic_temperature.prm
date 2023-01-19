@@ -24,7 +24,7 @@ EOF
 }
 
 Chapitre {
-	Titre "Temperature diffusion in a channel flowwith fixed wall temperature"
+	Titre "Temperature diffusion in a channel flow with fixed wall temperature"
 	Description <<EOF
 We validate the code in channel conditions for the temperature.
 
@@ -66,40 +66,40 @@ EOF
 	}
 }
 
-#Chapitre {	
-#			Title "Temperature evolution in a channel flow with Newman boundary conditions"
-#			Description <<EOF
-#We take the same equation except for the last term where the $cosine $ is replaced by a $sine$ in the wall normal direction $z$. The imposed wall temperature is $T_w=10$.
-#EOF
-#
-#    visu {
-#        titre "Calculated solution sequenial"
-#        cycles -1
-#        width 9cm
-#        pseudocolor CANAL/CANAL_seq.lata DOM TEMPERATURE_1 ELEM
-#        operator slice2d_y 0.015 0.007 0.005
-#    }
-#    visu {
-#        titre "Calculated solution on 8 procs"
-#        cycles -1
-#        width 12cm
-#		pseudocolor CANAL/CANAL_par8.lata DOM TEMPERATURE_1 ELEM
-# 		operator slice2d_y 0.015 0.007 0.005
-#	}
-#	visu {
-#		titre "Calculated solution with reprise"
-#		cycles 1
-#		width 12cm
-#		pseudocolor CANAL/CANAL_repr.lata DOM TEMPERATURE_1 ELEM
-#		operator slice2d_y 0.015 0.007 0.005
-#	}
-#   visu {
-#        titre "Calculated solution with reprise on 8 procs"
-#        cycles 1
-#        width 12cm
-#		pseudocolor CANAL/CANAL_repr_par8.lata DOM TEMPERATURE_1 ELEM
-#		operator slice2d_y 0.015 0.007 0.005
-#	}
-#}
+Chapitre {	
+			Title "Temperature evolution in a channel flow with Newman boundary conditions"
+			Description <<EOF
+We take the same equation except for the last term where the $cosine $ is replaced by a $sine$ in the wall normal direction $z$. The imposed wall temperature is $T_w=10$.
+EOF
+
+    visu {
+        titre "Calculated solution sequenial"
+        cycles -1
+        width 9cm
+        pseudocolor CANAL/CANAL_seq.lata DOM TEMPERATURE_1 ELEM
+        operator slice2d_y 0.015 0.007 0.005
+    }
+    visu {
+        titre "Calculated solution on 8 procs"
+        cycles -1
+        width 12cm
+		pseudocolor CANAL/CANAL_par8.lata DOM TEMPERATURE_1 ELEM
+		operator slice2d_y 0.015 0.007 0.005
+	}
+	visu {
+		titre "Calculated solution with reprise"
+		cycles 1
+		width 12cm
+		pseudocolor CANAL/CANAL_repr.lata DOM TEMPERATURE_1 ELEM
+		operator slice2d_y 0.015 0.007 0.005
+	}
+    visu {
+        titre "Calculated solution with reprise on 8 procs"
+        cycles 1
+        width 12cm
+		pseudocolor CANAL/CANAL_repr_par8.lata DOM TEMPERATURE_1 ELEM
+		operator slice2d_y 0.015 0.007 0.005
+	}
+}
 
  

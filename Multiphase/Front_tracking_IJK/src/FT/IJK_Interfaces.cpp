@@ -523,8 +523,8 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           bary_par_compo_[next()][idx].allocate(splitting_FT, IJK_Splitting::ELEM, 1);
         }
     }
-  allocate_velocity(normal_of_interf_[old()], splitting_FT, 1);
-  allocate_velocity(normal_of_interf_[next()], splitting_FT, 1);
+  allocate_velocity(normal_of_interf_[old()], splitting_FT, 2);
+  allocate_velocity(normal_of_interf_[next()], splitting_FT, 2);
   allocate_velocity(normal_of_interf_ns_[old()], splitting_NS, 1);
   allocate_velocity(normal_of_interf_ns_[next()], splitting_NS, 1);
 
@@ -2935,6 +2935,16 @@ void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
                   somme_contrib -= 1.;
                 while (somme_contrib < 0.)
                   somme_contrib += 1.;
+
+                // GB Fix 2022: tolerance play:
+                // Si l'on est proche de 0 ou de 1, on ne sait pas vraiment si on a bien fait nos calculs
+                // (les modulos et les sommes peuvent avoir conduit a une imprecision).
+                // On fait le choix de le considerer comme non-traverser, et on laisse le soin au calcul
+                // des compos connexes de determiner si c'est 0 ou 1 :
+                if ((somme_contrib<1e-6) || (1.-somme_contrib)<1e-6)
+                  {
+                    somme_contrib = 0.; // L'elem retourne dans la liste des elements "non traverses"
+                  }
                 if (somme_contrib > 0.)
                   {
                     // if(somme_contrib == 1.)

@@ -35,7 +35,6 @@
 #ifndef Interface_ijk_included
 #define Interface_ijk_included
 
-#include <IJK_Field.h>
 #include <IJK_Splitting.h>
 #include <Objet_U.h>
 #include <IJK_Field_forward.h>
@@ -49,7 +48,6 @@
  *
  *
  */
-
 
 class Intersection_Interface_ijk
 {
