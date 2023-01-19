@@ -40,7 +40,7 @@
 #include <Operateur_Diff.h>
 #include <Operateur_Grad.h>
 #include <communications.h>
-
+#include <Faces.h>
 
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Zone_ALE,"Domaine_ALE",Zone);
@@ -68,7 +68,7 @@ Entree& Zone_ALE::readOn(Entree& is)
 
 void Zone_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
 {
-  zone(0).invalide_octree();
+  invalide_octree();
   //Modification des coordonnees du maillage
   int N_som=nb_som_tot();
 
@@ -98,21 +98,20 @@ void Zone_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Problem
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
-      Zone la_zone=les_zones_(0);
       la_zone_VF.volumes()=0;
-      la_zone.calculer_volumes(la_zone_VF.volumes(),la_zone_VF.inverse_volumes());
+      calculer_volumes(la_zone_VF.volumes(),la_zone_VF.inverse_volumes());
       la_zone_VF.xp()=0;
-      la_zone.calculer_centres_gravite(la_zone_VF.xp());
+      calculer_centres_gravite(la_zone_VF.xp());
 
       DoubleTab& xv=la_zone_VF.xv();
       xv.set_smart_resize(1);
       xv.reset();
-      Type_Face type_face=la_zone.type_elem().type_face();
+      Type_Face type_face=type_elem().type_face();
       IntTab& elem_faces=la_zone_VF.elem_faces();
       IntTab& face_voisins=la_zone_VF.face_voisins();
 
-      calculer_centres_gravite(xv, type_face,
-                               sommets_, face_sommets);
+      ::calculer_centres_gravite(xv, type_face,
+                                 sommets_, face_sommets);
       if(sub_type(Zone_VDF, la_zone_VF))
         {
           Zone_VDF& la_zone_VDF=ref_cast(Zone_VDF,le_domaine_dis.zone_dis(0).valeur());
@@ -137,8 +136,8 @@ void Zone_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Problem
           for (int num_face=0; num_face<nb_faces_tot; num_face++)
             type_elem.normale(num_face,normales, face_sommets,
                               face_voisins,elem_faces,
-                              la_zone) ;
-          type_elem.creer_facette_normales(la_zone, facette_normales_, rang_elem_non_standard);
+                              *this) ;
+          type_elem.creer_facette_normales(*this, facette_normales_, rang_elem_non_standard);
           //Cerr << "carre_pas_du_maillage : " << la_zone_VEF.carre_pas_du_maillage() << finl;
           int nb_eqn=pb.nombre_d_equations();
 
@@ -300,7 +299,7 @@ void Zone_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_b
   //Cerr << "Zone_ALE::initialiser  " << finl;
 
   deformable_=1;
-  zone(0).invalide_octree();
+  invalide_octree();
   bool  check_NoZero_ALE= true;
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
@@ -349,9 +348,8 @@ DoubleTab Zone_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,P
   int n; // A activer ou desactiver si on utilise le laplacien ou non
   int N_som=nb_som_tot(); //A activer ou desactiver si on utilise le laplacien ou non
 
-  const Zone& lazone = les_zones_(0);
-  const MD_Vector& md = lazone.domaine().md_vector_sommets();
-  DoubleTab vit_maillage(lazone.nb_som(),dimension);
+  const MD_Vector& md = md_vector_sommets();
+  DoubleTab vit_maillage(nb_som(),dimension);
   MD_Vector_tools::creer_tableau_distribue(md, vit_maillage);
 
   vit_maillage=0.;
@@ -360,7 +358,7 @@ DoubleTab Zone_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,P
   for (n=0; n<nb_bords_ALE; n++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
-      int rang=les_zones_(0).rang_frontiere(le_nom_bord_ALE);
+      int rang=rang_frontiere(le_nom_bord_ALE);
       const Frontiere_dis_base& la_fr_dis=le_domaine_dis.zone_dis(0).frontiere_dis(rang);
       les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
@@ -506,15 +504,14 @@ DoubleTab& Zone_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_faces
 DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
   //Cerr << "Zone_ALE::laplacien" << finl;
-  const Zone& lazone = les_zones_(0);
-  int nb_elem_tot = lazone.nb_elem_tot();
-  //int nbsom = lazone.nb_som();
-  int nbsom = lazone.nb_som_tot();
-  int nb_som_elem = lazone.nb_som_elem();
+  int nb_elem_t = nb_elem_tot();
+  //int nbsom = nb_som();
+  int nbsom = nb_som_tot();
+  int nb_som_ele = nb_som_elem();
   const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
   const DoubleTab& normales=zone_VEF.face_normales();
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF, pb.equation(0).zone_Cl_dis().valeur());
-  const IntTab& elem_som = lazone.les_elems();
+  const IntTab& elem_som = les_elems();
   const IntTab& elem_faces=zone_VEF.elem_faces();
   double mijK;
   int nb_comp=ch_som.dimension(1);
@@ -535,14 +532,14 @@ DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, co
     IntLists voisins(nbsom);
     DoubleLists coeffs(nbsom);
     DoubleVect diag(nbsom);
-    for (elem=0; elem<nb_elem_tot; elem++)
+    for (elem=0; elem<nb_elem_t; elem++)
       {
         double volume=zone_VEF.volumes(elem);
-        for (int isom=0; isom<nb_som_elem; isom++)
+        for (int isom=0; isom<nb_som_ele; isom++)
           {
             int facei=elem_faces(elem,isom);
             int ii=get_renum_som_perio(elem_som(elem,isom));
-            for (int jsom=isom+1; jsom<nb_som_elem; jsom++)
+            for (int jsom=isom+1; jsom<nb_som_ele; jsom++)
               {
                 int i=ii;
                 int facej=elem_faces(elem,jsom);
@@ -606,8 +603,8 @@ DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, co
     //Cerr << "Matrice de Laplacien P1 : " << finl;
   }
   //Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
-  DoubleVect secmem(lazone.nb_som());
-  const MD_Vector& md = lazone.domaine().md_vector_sommets();
+  DoubleVect secmem(nb_som());
+  const MD_Vector& md = domaine().md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, secmem);
 
   DoubleVect solution(secmem);
@@ -715,8 +712,8 @@ void Zone_ALE::reading_vit_bords_ALE(Entree& is)
         break;
       Cerr << "Lecture des vitesses "
            << "imposees a " << nomlu << "....." << finl;
-      int rang=les_zones_(0).rang_frontiere(nomlu);
-      les_bords_ALE.add(les_zones_(0).faces_bord()(rang));
+      int rang=rang_frontiere(nomlu);
+      les_bords_ALE.add(faces_bord()(rang));
       is >> les_champs_front[compteur];
       compteur++;
     }

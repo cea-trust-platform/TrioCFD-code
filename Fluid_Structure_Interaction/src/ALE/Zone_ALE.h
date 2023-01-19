@@ -35,7 +35,7 @@ class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Domaine_ALE
+//    Classe Zone_ALE
 //    Cette classe est un interprete qui sert a lire l'attribut axi.
 //    Directive:
 //        Domaine_ALE
@@ -45,7 +45,7 @@ class Beam_model;
 // .SECTION voir aussi
 //    Interprete Objet_U
 //////////////////////////////////////////////////////////////////////////////
-class Zone_ALE : public Domaine
+class Zone_ALE : public Zone
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(Zone_ALE);
 
