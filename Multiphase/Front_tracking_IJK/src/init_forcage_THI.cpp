@@ -187,6 +187,8 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
   if (type_forcage_active==010)
     {
       Cout << "On force un dirac en spectral, uniY : cos(k_) e_" << finl;
+      Cout << "f_sp = 1/sq(2) (d(k-k_0)+d(k+k_0)) . [0;1;0]" << finl;
+      Cout << "f_ph = sq(2) cos(nk_0(x-z))        . [0;1;0]" << finl;
       f_sp_THI.compute_dirac_point_uniY();
     }
   if (type_forcage_active==001 || type_forcage_active==1)
@@ -199,8 +201,8 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
       Cout << "On force un dirac en spectral, uniXZ" << finl;
       Cout << "f_sp = 1/sq(2) (d(k-k_0)+d(k+k_0)) . [1;0;-1]" << finl;
       Cout << "f_ph = sq(2) cos(nk_0(x-z))        . [1;0;-1]" << finl;
-      // k_0 = nk0 [1, 0, -1]
-      f_sp_THI.compute_dirac_point_div_nulle(mode_min);
+      // k_0 = nk0 [1, 0, -1], nk0 = minimal_forced_mode
+      f_sp_THI.compute_dirac_point_div_nulle();
     }
   if (type_forcage_active==2)
     {

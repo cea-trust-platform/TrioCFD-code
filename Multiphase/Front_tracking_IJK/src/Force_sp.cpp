@@ -384,7 +384,7 @@ void Force_sp::compute_dirac_point()
   envoyer_broadcast(force_flt,0);
 }
 
-void Force_sp::compute_dirac_point_div_nulle(const int nk0)
+void Force_sp::compute_dirac_point_div_nulle()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
   if (Process::je_suis_maitre())
@@ -396,7 +396,7 @@ void Force_sp::compute_dirac_point_div_nulle(const int nk0)
       */
 
       int n_dir(3);
-      int roc(nk0);
+      int roc(momin);
       int n_ind_lmn(n_lmn);
 
       int l_moins(nl-roc), l_plus(nl+roc);
@@ -474,7 +474,7 @@ void Force_sp::compute_dirac_point_uniY()
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
   if (Process::je_suis_maitre())
     {
-      // donne cos(y) (ex)
+      // donne cos(momin*2pi/L*(y)) (ex)
       int dir(1);
       int n_dir(3);
       int roc(momin+0);

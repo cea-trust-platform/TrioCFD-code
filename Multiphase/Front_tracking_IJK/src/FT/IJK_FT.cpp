@@ -3632,8 +3632,9 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
       Cout << "AF : update_advection_length" << finl;
     }
   forcage_.compute_THI_force(time_iteration,dt,current_time,splitting_);
-
   statistiques().end_count(m2);
+  
+
 
   statistiques().begin_count(m3);
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
@@ -3692,7 +3693,10 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
     }
   forcage_.compute_THI_force(time_iteration,dt,current_time,splitting_);
   statistiques().end_count(m2);
-
+  // forcage_.get_force_ph2() a quelques cellules fantomes, on doit les comuniuer aux procs voisins, notament en vue de produire des champs cell_force_ph justes.
+  forcage_.get_force_ph2()[0].echange_espace_virtuel(forcage_.get_force_ph2()[0].ghost());
+  forcage_.get_force_ph2()[1].echange_espace_virtuel(forcage_.get_force_ph2()[1].ghost());
+  forcage_.get_force_ph2()[2].echange_espace_virtuel(forcage_.get_force_ph2()[2].ghost());
   statistiques().begin_count(m3);
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
 

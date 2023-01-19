@@ -57,7 +57,7 @@ public:
   void field_advection(const ArrOfDouble& advection_length, const double dt, const int it);
   void set_zero();
   void compute_dirac_board();
-  void compute_dirac_point_div_nulle(const int nk0);
+  void compute_dirac_point_div_nulle();
   void compute_dirac_point_uniZ();
   void compute_dirac_point_uniY();
   void compute_dirac_point_uniX_alongX();
