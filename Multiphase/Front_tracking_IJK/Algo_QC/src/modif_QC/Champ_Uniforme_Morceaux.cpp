@@ -67,8 +67,8 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
   is >> nom;
   mon_domaine = ref_cast(Zone, Interprete::objet(nom));
   Zone& le_domaine=mon_domaine.valeur();
-  const IntTab& les_elems=le_domaine.zone(0).les_elems();
-  const int nb_som_elem = le_domaine.zone(0).nb_som_elem();
+  const IntTab& les_elems=le_domaine.les_elems();
+  const int nb_som_elem = le_domaine.nb_som_elem();
   double x=0,y=0,z=0;
   int num_som;
 
@@ -109,7 +109,7 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
       fxyz[k].parseString();
     }
 
-  for( poly=0; poly<le_domaine.zone(0).nb_elem(); poly++)
+  for( poly=0; poly<le_domaine.nb_elem(); poly++)
     {
       x = le_domaine.coord(les_elems(poly,0),0);
       y = le_domaine.coord(les_elems(poly,0),1);
@@ -283,7 +283,7 @@ Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
                                               DoubleVect& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
+  const Zone& la_zone = mon_domaine;
   IntVect le_poly(1);
   la_zone.chercher_elements(positions,le_poly);
   return valeur_a_elem(positions,tab_valeurs,le_poly[0]);
@@ -365,7 +365,7 @@ double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
                                                DoubleTab& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
+  const Zone& la_zone = mon_domaine;
   IntVect les_polys(la_zone.nb_elem());
   la_zone.chercher_elements(positions,les_polys);
   return valeur_aux_elems(positions,les_polys,tab_valeurs);
@@ -382,7 +382,7 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
 DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions,
                                                       DoubleVect& tab_valeurs, int ncomp) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
+  const Zone& la_zone = mon_domaine;
   IntVect les_polys(la_zone.nb_elem());
   la_zone.chercher_elements(positions,les_polys);
   return valeur_aux_elems_compo(positions,les_polys,tab_valeurs,ncomp);

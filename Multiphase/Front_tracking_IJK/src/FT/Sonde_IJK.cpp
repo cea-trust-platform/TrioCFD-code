@@ -471,7 +471,7 @@ void Sonde_IJK::initialiser()
     elem_.resize(nbre_points);
 
   const IJK_Splitting& splitting = ref_ijk_ft_.valeur().get_splitting_ft();
-  const Zone& zone_geom = ref_ijk_ft_.valeur().probleme(splitting).domaine().zone(0);
+  const Zone& zone_geom = ref_ijk_ft_.valeur().probleme(splitting).domaine();
   if ( numero_elem_==-1)
     {
       int nb_som = zone_geom.type_elem().nb_som();
@@ -538,7 +538,7 @@ void Sonde_IJK::initialiser()
     }
   // PQ : 07/10/04 : nodes=1 || grav=1 : relocalisation des points de sondes aux centres de gravite ou aux noeuds les plus proches
 
-  const Zone& zone = zone_geom ; // mon_champ->get_ref_domain().zone(0);
+  const Zone& zone = zone_geom ; // mon_champ->get_ref_domain();
   Noms nom_champ;
   nom_champ.dimensionner(1);
   nom_champ[0] =  nom_champ_lu_; //mon_champ->get_property("nom");

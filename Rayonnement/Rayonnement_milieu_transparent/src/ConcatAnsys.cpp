@@ -47,7 +47,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
   nom2+=Nom(".factforme");
   Nom nomS2=nom_du_cas();
   nomS2+=Nom(".facesrayo");
-  Zone& zone=dom.zone(0);
+  Zone& zone=dom;
   // Definition du nombre de faces rayonnantes
   int nombre_faces_rayonnantes=zone.nb_bords()+zone.nb_raccords();
   // Tableau des facteurs de forme regroupes

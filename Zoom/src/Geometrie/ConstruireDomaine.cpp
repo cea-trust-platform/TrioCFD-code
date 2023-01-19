@@ -95,7 +95,7 @@ void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& c
   IntTab new_elems(nb_poly, nb_som_poly); // les nouveaux elements
   correspo_newsom.resize(zone0.nb_som_tot());
   correspo_newsom = -1;
-  IntTab& les_elems_= dom.zone(0).les_elems();
+  IntTab& les_elems_= dom.les_elems();
   les_elems_.ref(new_elems);
 
   for (i=0; i<nb_poly; i++)

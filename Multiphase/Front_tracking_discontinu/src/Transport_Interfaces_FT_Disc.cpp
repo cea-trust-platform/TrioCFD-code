@@ -1017,7 +1017,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   if (reverse_normal)
     {
       Cerr << "Reversing mesh normal vectors" << finl;
-      Zone& zone = ref_dom.valeur().zone(0);
+      Zone& zone = ref_dom.valeur();
       IntTab& elems = zone.les_elems();
       const int nb_elem = elems.dimension(0);
       const int nb_som_elem = elems.line_size();
@@ -1041,7 +1041,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   // Verification qu'il n'existe pas deux fois la meme facette
   {
     Scatter::uninit_sequential_domain(ref_dom.valeur());
-    Zone& zone = ref_dom.valeur().zone(0);
+    Zone& zone = ref_dom.valeur();
     IntTab& fa7 = zone.les_elems();
 
     // tri du tableau

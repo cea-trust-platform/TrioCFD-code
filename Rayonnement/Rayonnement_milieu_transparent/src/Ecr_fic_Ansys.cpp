@@ -54,7 +54,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
     }
   // On recupere le domaine a partir du nom de domaine
   const Zone& dom=ref_cast(Zone, objet(nom_dom));
-  const Zone& zone=dom.zone(0);
+  const Zone& zone=dom;
   SFichier fic(nom_fic);
   // On ecrit l'en tete du fichier Ansys
   fic << "/BATCH" << finl;
@@ -104,7 +104,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
           fic << finl;
         }
     }
-  Nom type=dom.zone(0).type_elem()->que_suis_je();
+  Nom type=dom.type_elem()->que_suis_je();
   if (non_hidden>1)
     {
       // Quel que soit le type et la dimension du probleme
@@ -202,7 +202,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                   pos(0,0)=0.5*(x0+x1)+alpha*nx;
                   pos(0,1)=0.5*(y0+y1)+alpha*ny;
                 }
-              dom.zone(0).chercher_elements(pos,elem);
+              dom.chercher_elements(pos,elem);
               if (elem(0)!=-1)
                 {
                   fic<<"EN,"<<num_globale+j+1<<","<<som(j,0)+1<<","<<som(j,1)+1;
@@ -258,7 +258,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                       else
                         pos(0,1)=(1-e)*t0;
                     }
-                  dom.zone(0).chercher_elements(pos,elem);
+                  dom.chercher_elements(pos,elem);
                   if (elem(0)!=-1)
                     fic<<"EN,"<<num_globale+j+1<<","<<som(j,0)+1<<","<<som(j,1)+1<<","<<som(j,3)+1<<","<<som(j,2)+1<<finl;
                   else
@@ -283,7 +283,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                   pos(0,0)=(x0+x1+x2)/3.+alpha*nx;
                   pos(0,1)=(y0+y1+y2)/3.+alpha*ny;
                   pos(0,2)=(z0+z1+z2)/3.+alpha*nz;
-                  dom.zone(0).chercher_elements(pos,elem);
+                  dom.chercher_elements(pos,elem);
                   if (elem(0)!=-1)
                     {
                       if (type=="Tetraedre")
@@ -304,7 +304,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                       pos(0,0)=(x0+x1+x2)/3.-alpha*nx;
                       pos(0,1)=(y0+y1+y2)/3.-alpha*ny;
                       pos(0,2)=(z0+z1+z2)/3.-alpha*nz;
-                      dom.zone(0).chercher_elements(pos,elem);
+                      dom.chercher_elements(pos,elem);
                       if (elem(0)!=-1)
                         {
                           Cerr << "Cas non prevu dans l'algorithme de Ecr_fic_Ansys::interpreter ! " << finl;
