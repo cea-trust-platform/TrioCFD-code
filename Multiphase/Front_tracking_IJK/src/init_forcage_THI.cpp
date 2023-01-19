@@ -197,7 +197,10 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
   if (type_forcage_active==101)
     {
       Cout << "On force un dirac en spectral, uniXZ" << finl;
-      f_sp_THI.compute_dirac_point_div_nulle();
+      Cout << "f_sp = 1/sq(2) (d(k-k_0)+d(k+k_0)) . [1;0;-1]" << finl;
+      Cout << "f_ph = sq(2) cos(nk_0(x-z))        . [1;0;-1]" << finl;
+      // k_0 = nk0 [1, 0, -1]
+      f_sp_THI.compute_dirac_point_div_nulle(mode_min);
     }
   if (type_forcage_active==2)
     {
