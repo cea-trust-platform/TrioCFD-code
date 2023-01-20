@@ -56,8 +56,8 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                                           Zone& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
-  Nom nom_domf = zonef.zone().domaine().le_nom();
-  Nom nom_domg = zoneg.zone().domaine().le_nom();
+  Nom nom_domf = zonef.zone().le_nom();
+  Nom nom_domg = zoneg.zone().le_nom();
 
   const Elem_geom& type_elem = domg.type_elem();
   int nb_faces_bordF = zonef.nb_faces_bord();
@@ -864,8 +864,8 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
                                                           Zone_VF& zone_vfG)
 {
   Cerr << "Creation of connectivites_elem in progress... " << finl;
-  Nom nom_domf = zone_vfF.zone().domaine().le_nom();
-  Nom nom_domg = zone_vfG.zone().domaine().le_nom();
+  Nom nom_domf = zone_vfF.zone().le_nom();
+  Nom nom_domg = zone_vfG.zone().le_nom();
 
   //centre de gravite des elements fins
   Zone& zoneF = zone_vfF.zone();

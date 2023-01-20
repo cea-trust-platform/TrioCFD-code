@@ -324,7 +324,7 @@ Entree& Transport_Interfaces_FT_Disc::readOn(Entree& is)
     {
       Cerr << "Name of subzone for interfaces deletion: " << suppression_interfaces_sous_zone_ << finl;
       // Juste un test pour verifier que le nom existe:
-      zone_dis().zone().domaine().ss_zone(suppression_interfaces_sous_zone_);
+      zone_dis().zone().ss_zone(suppression_interfaces_sous_zone_);
     }
   return is;
 }
@@ -1160,7 +1160,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
     {
       Cerr << "Writing lata file" << finl;
       Format_Post_Lata lata;
-      const Zone& un_dom = zone_vf.zone().domaine();
+      const Zone& un_dom = zone_vf.zone();
       constexpr double TEMPS = 0.;
       constexpr int FIRST_POST = 1;
       lata.initialize(lata_file, Format_Post_Lata::BINAIRE, "SIMPLE");
@@ -1499,7 +1499,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   // Construction de la structure du tableau avec l'espace virtuel:
   {
     DoubleTab& d = variables_internes_->distance_interface_sommets;
-    const Zone& dom = zone_dis().zone().domaine();
+    const Zone& dom = zone_dis().zone();
     d.resize(0);
     dom.creer_tableau_sommets(d);
   }
@@ -6564,7 +6564,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
             {
               const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
               const DoubleVect& volumes = zone_vf.volumes();
-              const Sous_Zone& sous_zone = zone_dis().valeur().zone().domaine().ss_zone(variables_internes_->nom_zone_volume_impose_);
+              const Sous_Zone& sous_zone = zone_dis().valeur().zone().ss_zone(variables_internes_->nom_zone_volume_impose_);
               const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
               const DoubleTab& indic = indicatrice_.valeurs();
               const int nb_elem = zone_vf.nb_elem();
@@ -6738,7 +6738,7 @@ void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_zone()
     return;
 
   const DoubleTab& indicatrice = get_update_indicatrice().valeurs();
-  const Sous_Zone& sous_zone = zone_dis().zone().domaine().ss_zone(suppression_interfaces_sous_zone_);
+  const Sous_Zone& sous_zone = zone_dis().zone().ss_zone(suppression_interfaces_sous_zone_);
   // Construction de la liste des elements de la sous-zone contenant la phase a supprimer
   ArrOfInt liste_elems_sous_zone;
   liste_elems_sous_zone.set_smart_resize(1);
@@ -7779,7 +7779,7 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
   const Zone_VF&    zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
   const IntTab&     elem_som = zone_vf.zone().les_elems();
   const DoubleTab& xp = zone_vf.xp();
-  const DoubleTab& coord_som = zone_vf.zone().domaine().les_sommets();
+  const DoubleTab& coord_som = zone_vf.zone().les_sommets();
 
   const int nb_sommets = dist_som.dimension_tot(0);
   ArrOfInt ncontrib(nb_sommets);

@@ -154,7 +154,7 @@ void Op_Diff_Tau_PolyMAC_P0_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& 
       zone.push_back(std::ref(ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur())));
       f_e.push_back(std::ref(zone[i].get().face_voisins())), e_f.push_back(std::ref(zone[i].get().elem_faces())), f_s.push_back(std::ref(zone[i].get().face_sommets()));
       fs.push_back(std::ref(zone[i].get().face_surfaces())), nf.push_back(std::ref(zone[i].get().face_normales()));
-      xp.push_back(std::ref(zone[i].get().xp())), xv.push_back(std::ref(zone[i].get().xv())), xs.push_back(std::ref(zone[i].get().zone().domaine().coord_sommets()));
+      xp.push_back(std::ref(zone[i].get().xp())), xv.push_back(std::ref(zone[i].get().xv())), xs.push_back(std::ref(zone[i].get().zone().coord_sommets()));
       cls.push_back(std::ref(equation().zone_Cl_dis().les_conditions_limites()));
       const Champ_Elem_PolyMAC_P0& ch = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
       inco.push_back(std::ref(semi_impl.count(nom_mat) ? semi_impl.at(nom_mat) : ch.valeurs()));

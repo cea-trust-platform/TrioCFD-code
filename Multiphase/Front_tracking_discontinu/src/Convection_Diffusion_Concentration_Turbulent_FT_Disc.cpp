@@ -456,7 +456,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_zo
   const int nb_faces_elem = elem_faces.dimension(1);
   marqueur.resize_array(nb_faces_tot);
   marqueur = 0;
-  const Sous_Zone& sous_zone = zone_dis().valeur().zone().domaine().ss_zone(nom_sous_zone);
+  const Sous_Zone& sous_zone = zone_dis().valeur().zone().ss_zone(nom_sous_zone);
   const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
   const DoubleVect& volumes_cl = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur()).volumes_entrelaces_Cl();
   int i;

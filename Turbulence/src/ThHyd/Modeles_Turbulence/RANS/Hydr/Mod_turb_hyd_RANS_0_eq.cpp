@@ -161,7 +161,7 @@ void Mod_turb_hyd_RANS_0_eq::completer()
     {
       // 1) on cree le fichier med et on postraite le domaine
       EcrMED ecr_med;
-      const Zone& dom=mon_equation->zone_dis().zone().domaine();
+      const Zone& dom=mon_equation->zone_dis().zone();
       ecr_med.ecrire_domaine(fichier_K_eps_sortie_.nom_me(me()),dom,dom.le_nom(),-1);
       //2 on discretise le champ K_eps_pour_la_sortie
       const Discretisation_base& dis = mon_equation->discretisation();
@@ -240,7 +240,7 @@ void Mod_turb_hyd_RANS_0_eq::imprimer (Sortie& os )  const
           }
 
         // enfin ecriture du champ aux elems (il y est deja)
-        const Zone& dom=mon_equation->zone_dis().zone().domaine();
+        const Zone& dom=mon_equation->zone_dis().zone();
         Nom fic=fichier_K_eps_sortie_.nom_me(me());
 
         EcrMED ecr_med;

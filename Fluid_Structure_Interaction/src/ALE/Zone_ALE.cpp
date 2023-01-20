@@ -604,7 +604,7 @@ DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, co
   }
   //Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
   DoubleVect secmem(nb_som());
-  const MD_Vector& md = domaine().md_vector_sommets();
+  const MD_Vector& md = md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, secmem);
 
   DoubleVect solution(secmem);

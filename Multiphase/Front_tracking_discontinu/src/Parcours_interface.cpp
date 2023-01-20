@@ -99,7 +99,7 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
 
   // Calcul de la valeur maximale des coordonnees du maillage fixe:
   {
-    const DoubleTab& coord_som = zone_vf.zone().domaine().coord_sommets();
+    const DoubleTab& coord_som = zone_vf.zone().coord_sommets();
     Valeur_max_coordonnees_ = mp_max_abs_vect(coord_som);
     Erreur_max_coordonnees_ = Valeur_max_coordonnees_ * Erreur_relative_maxi_;
   }
@@ -186,7 +186,7 @@ void Parcours_interface::parcourir(Maillage_FT_Disc& maillage) const
 
   const Zone_VF& zone_vf = refzone_vf_.valeur();
   zone_elem_ptr = & zone_vf.zone().les_elems();
-  zone_sommets_ptr = & zone_vf.zone().domaine().les_sommets();
+  zone_sommets_ptr = & zone_vf.zone().les_sommets();
 
   DoubleTab copie_sommets_maillage;
   if (correction_parcours_thomas_)

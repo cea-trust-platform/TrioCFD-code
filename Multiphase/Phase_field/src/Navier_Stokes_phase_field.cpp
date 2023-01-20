@@ -813,7 +813,7 @@ void Navier_Stokes_phase_field::_aff_donnee_P1Bulle(const DoubleTab& tab, const 
   int nbelems = zoneVF.nb_elem_tot();
   int nbsoms = zoneVF.nb_som();
   const DoubleTab xp = zoneVF.xp();
-  const DoubleTab xs = zoneVF.zone().domaine().coord_sommets();
+  const DoubleTab xs = zoneVF.zone().coord_sommets();
   Cerr<<mot<<finl;
   for (ielem=0 ; ielem<nbelems ; ielem++)
     {

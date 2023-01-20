@@ -162,11 +162,10 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
-  const Zone& domaine=zone.domaine();
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
-  int nb_som_tot=domaine.nb_som_tot();
+  int nb_som_tot=zone.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   /*if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
     {
@@ -182,11 +181,11 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
       x=y=z=0;
       for( k=0; k<nbsf; k++)
         {
-          x=domaine.coord(faces.sommet(i,k),0);
+          x=zone.coord(faces.sommet(i,k),0);
           if(dimension>1)
-            y=domaine.coord(faces.sommet(i,k),1);
+            y=zone.coord(faces.sommet(i,k),1);
           if(dimension>2)
-            z=domaine.coord(faces.sommet(i,k),2);
+            z=zone.coord(faces.sommet(i,k),2);
           for( j=0; j<nb_comp(); j++)
             {
               fxyzt[j].setVar("x",x);

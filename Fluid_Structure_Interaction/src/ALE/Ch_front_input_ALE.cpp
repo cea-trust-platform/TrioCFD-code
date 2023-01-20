@@ -119,10 +119,9 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   //int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
-  const Zone& domaine=zone.domaine();
   //int nbsf=faces.nb_som_faces();
   int i,j;
-  int nb_som_tot=domaine.nb_som_tot();
+  int nb_som_tot=zone.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   //int nb_som=domaine.nb_som();
   //if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
@@ -139,7 +138,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   // Construction de la liste des sommets
   int nn=0;
   ArrOfInt liste_sommets(nb_som_tot);
-  ArrOfInt marqueur(domaine.les_sommets().dimension(0));
+  ArrOfInt marqueur(zone.les_sommets().dimension(0));
   const IntTab& ffaces=faces.les_sommets() ;
   marqueur=-1;
   for (int f=0; f<ffaces.dimension(0); f++)

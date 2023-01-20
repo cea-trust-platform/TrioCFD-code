@@ -350,7 +350,7 @@ void Champ_Fonc_reprise_IJK::reprendre_IJK(Entree& fich, Champ_base& ch)
           exit();
         }
       const DoubleTab& coords = zvf.xv(); // Descripteur des face
-      const double epsilon = zvf.zone().domaine().epsilon();
+      const double epsilon = zvf.zone().epsilon();
       ntot += lire_special(fich, coords, val, epsilon);
     }
   else

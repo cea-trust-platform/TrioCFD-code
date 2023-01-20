@@ -69,7 +69,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const IntTab& elem_sommets = zone.les_elems();
-  const DoubleTab& coord_sommets=zone.domaine().les_sommets();
+  const DoubleTab& coord_sommets=zone.les_sommets();
 
   // Permet d'avoir un flux_bord coherent avec les CLs (mais parfois diverge?)
   // Active uniquement pour ordre 3
@@ -149,7 +149,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
             for (i=0; i<=dimension; i++)
               {
                 int num_face=elem_faces(elem, i);
-                // Code modifié pour prise en compte CL de Dirichlet
+                // Code modifie pour prise en compte CL de Dirichlet
                 for (dim=0; dim<dimension; dim++)
                   {
                     double contrib_resu=rotVit*FacesNormales(i,dim)*resu_face(i);
@@ -345,7 +345,7 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
     Cout<<"Op_Conv_RT_VEF_Face::ajouter_contribution RT\n";
     const DoubleVect& volumes = zone_VEF.volumes();
     const IntTab& face_voisins  = zone_VEF.face_voisins();
-    const DoubleTab& coord_sommets=zone_VEF.zone().domaine().les_sommets();
+    const DoubleTab& coord_sommets=zone_VEF.zone().les_sommets();
     double volume=0.;
     int dim,elem,alfa,beta,k;
     if (dimension==2)

@@ -59,11 +59,10 @@ void Prolongement_face_face_FMG::prolonger(Zone_VF& zone_VFG,
   int nb_elemF = connect.size_array();
   Zone& zonef = zone_VFF.zone();
   Zone& zoneg = zone_VFG.zone();
-  Zone& domg = zoneg.domaine();
   int nb_faces_elem_fin = zonef.nb_faces_elem();
   int nb_faces_elem_gros = zoneg.nb_faces_elem();
   const DoubleTab& cg_face_fine = zone_VFF.xv();
-  const DoubleTab& som_gros = domg.coord_sommets();
+  const DoubleTab& som_gros = zoneg.coord_sommets();
   const IntTab& faces_som = zone_VFG.face_sommets();
   int trouve=0, i, nbj;
   IntTab& num_face_elemF = zone_VFF.elem_faces();

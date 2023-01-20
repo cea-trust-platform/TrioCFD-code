@@ -56,8 +56,7 @@ DoubleTab& Source_Reaction_Particules_VDF::ajouter(DoubleTab& resu) const
   const Zone_VDF& zvf = ref_cast(Zone_VDF,zdis);
   const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
   const Zone& zone_geom = zdis.zone();
-  const Zone& dom = zone_geom.domaine();
-  const DoubleTab& coord = dom.coord_sommets();
+  const DoubleTab& coord = zone_geom.coord_sommets();
   const IntTab& sommet_poly = zone_geom.les_elems();
   const IntTab& face_som = zvf.face_sommets();
   const IntVect& orient = zvf.orientation();
@@ -80,7 +79,7 @@ DoubleTab& Source_Reaction_Particules_VDF::ajouter(DoubleTab& resu) const
 
   //creation d un espace virtuel pour source_som
   DoubleTab source_som(0, dim);
-  dom.creer_tableau_sommets(source_som);
+  zone_geom.creer_tableau_sommets(source_som);
 
   //is_QC=0 le terme source est homogne a dv/dt sinon homogene a d(rho*v)/dt
   is_QC = equation().probleme().is_dilatable();

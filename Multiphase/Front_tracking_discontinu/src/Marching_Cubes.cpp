@@ -307,7 +307,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
   parser.parseString();
 
   // Construction d'un tableau de valeurs aux sommets euleriens
-  const Zone& domaine = ref_zone_vf_.valeur().zone().domaine();
+  const Zone& domaine = ref_zone_vf_.valeur().zone();
   const int nb_sommets = domaine.nb_som();
 
   for (int i = 0; i < nb_sommets; i++)
@@ -1245,7 +1245,7 @@ void Marching_Cubes::calculer_coord_noeuds(const DoubleVect& valeurs_sommets,
                                            Maillage_FT_Disc& maillage) const
 {
   // Raccourci vers les coordonnees des sommets du maillage eulerien
-  const DoubleTab& coord_ = ref_zone_vf_.valeur().zone().domaine().coord_sommets();
+  const DoubleTab& coord_ = ref_zone_vf_.valeur().zone().coord_sommets();
   const int nb_noeuds = def_noeud.dimension(0);
   DoubleTab& coord_noeuds = maillage.sommets_;
   coord_noeuds.resize(nb_noeuds, dimension);

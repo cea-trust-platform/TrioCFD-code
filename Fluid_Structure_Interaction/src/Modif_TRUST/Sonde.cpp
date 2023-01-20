@@ -689,7 +689,7 @@ void Sonde::initialiser()
       int nb_coord = les_positions_sondes_.dimension(1);
       if (nb_coord != Objet_U::dimension)
         {
-          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<zone_geom.domaine().le_nom()<<finl;
+          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<zone_geom.le_nom()<<finl;
           Cerr << "which has spatial dimension " << Objet_U::dimension << finl;
           Cerr << "Change the probe coordinates or use numero_elem_sur_maitre keyword (see documentation)" << finl;
           Cerr << "to specify a cell containing the probe and not its coordinates." << finl;
@@ -706,7 +706,7 @@ void Sonde::initialiser()
       const IntTab& les_elems=mon_champ->get_ref_zone_dis_base().zone().les_elems();
       if (numero_elem_<les_elems.dimension_tot(0))
         {
-          const DoubleTab& coord=mon_champ->get_ref_zone_dis_base().zone().domaine().les_sommets();
+          const DoubleTab& coord=mon_champ->get_ref_zone_dis_base().zone().les_sommets();
           int nb_som=les_elems.dimension(1);
           // Fill les_positions_ with the cog of the cell numero_elem_
           for (int s=0; s<nb_som; s++)
@@ -734,7 +734,7 @@ void Sonde::initialiser()
   mp_max_for_each_item(tmp);
   for (int i=0; i<nbre_points_tot; i++)
     if (tmp[i]==-1)
-      Cerr << "WARNING: The point number " << i+1 << " of the probe named " << nom_ << " is outside the computational domain " << zone_geom.domaine().le_nom() << finl;
+      Cerr << "WARNING: The point number " << i+1 << " of the probe named " << nom_ << " is outside the computational domain " << zone_geom.le_nom() << finl;
 
   // Probes may be moved to cog, face, vertex:
   const Zone& zone = mon_champ->get_ref_domain();
@@ -776,7 +776,7 @@ void Sonde::initialiser()
       const IntTab& elem_faces = zoneVF.elem_faces();
       if (mp_max(elem_faces.size_array())==0)
         {
-          Cerr << "Error: the domain " << zoneVF.zone().domaine().le_nom() << " is not discretized." << finl;
+          Cerr << "Error: the domain " << zoneVF.zone().le_nom() << " is not discretized." << finl;
           exit();
         }
       if (sub_type(Champ_Generique_Interpolation,mon_champ.valeur()))
@@ -841,7 +841,7 @@ void Sonde::initialiser()
       Cerr<<"The location of the probe named "<<nom_<<" are modified (to vertexes). Check the .log files to see the new location."<<finl;
       const IntTab& sommet_elem = zone.les_elems();
       const int sommets_par_element = zone.les_elems().dimension(1);
-      const DoubleTab& coord = zone.domaine().les_sommets();
+      const DoubleTab& coord = zone.les_sommets();
       for (int i=0; i<nbre_points_tot; i++)
         {
           double dist_min=DMAXFLOAT;

@@ -58,8 +58,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
 
-  const Zone& domaine=zone.domaine();
-  Zone_ALE& dom_ale=ref_cast_non_const(Zone_ALE, zone.domaine());
+  Zone_ALE& dom_ale=ref_cast_non_const(Zone_ALE, zone);
 
   double dt = dom_ale.get_dt();
   const int nbModes=dom_ale.getBeamNbModes();
@@ -67,7 +66,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
-  int nb_som_tot=domaine.nb_som_tot();
+  int nb_som_tot=zone.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
   const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt);
@@ -77,11 +76,11 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
       x=y=z=0;
       for( k=0; k<nbsf; k++)
         {
-          x=domaine.coord(faces.sommet(i,k),0);
+          x=zone.coord(faces.sommet(i,k),0);
           if(dimension>1)
-            y=domaine.coord(faces.sommet(i,k),1);
+            y=zone.coord(faces.sommet(i,k),1);
           if(dimension>2)
-            z=domaine.coord(faces.sommet(i,k),2);
+            z=zone.coord(faces.sommet(i,k),2);
           DoubleVect value(3);
           value=0.;
           DoubleVect phi(3);

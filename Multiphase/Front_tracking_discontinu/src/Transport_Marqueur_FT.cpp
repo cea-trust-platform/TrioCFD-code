@@ -778,7 +778,6 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
 {
   const Zone_VF& zvf = ref_cast(Zone_VF, zone_dis().valeur());
   const Zone& zone_geom = zvf.zone();
-  const Zone& dom = zone_geom.domaine();
   const DoubleVect& volume_elem = zvf.volumes();
 
   // Recherche de l'element contenant le centre de gravite de chaque composante connexe
@@ -798,7 +797,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
     const int nb_sous_zones = nom_sz_transfo_.size();
     for (int i_sous_zone = 0; i_sous_zone < nb_sous_zones; i_sous_zone++)
       {
-        const Sous_Zone& sous_zone = dom.ss_zone(nom_sz_transfo_[i_sous_zone]);
+        const Sous_Zone& sous_zone = zone_geom.ss_zone(nom_sz_transfo_[i_sous_zone]);
         const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
         for (int i = 0; i < nb_elem_sous_zone; i++)
           {

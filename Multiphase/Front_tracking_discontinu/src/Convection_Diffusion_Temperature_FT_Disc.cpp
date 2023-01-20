@@ -1240,7 +1240,7 @@ void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
       const Nom nom_sous_zone = nom_sous_zone_;
       const double temp_moy_ini = temp_moy_ini_;
       const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-      const Zone& dom = zone_vf.zone().domaine();
+      const Zone& dom = zone_vf.zone();
       const Sous_Zone& ss_zone = dom.ss_zone(nom_sous_zone);
 
       Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();

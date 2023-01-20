@@ -474,8 +474,7 @@ void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
   const DoubleTab& xv = zone_VEF.xv();
   const Zone_dis& zdis = mon_equation->zone_dis();
   const Zone& zone = zdis.zone();
-  const Zone& dom = zone.domaine();
-  const DoubleTab& coord = dom.coord_sommets();
+  const DoubleTab& coord = zone.coord_sommets();
   int nb_som = zone.nb_som();
   calcul_nb_som_dir(zone);
   int nsize,  nl, ntot;

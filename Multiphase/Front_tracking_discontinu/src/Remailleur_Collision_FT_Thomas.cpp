@@ -92,7 +92,6 @@ int Remailleur_Collision_FT_Thomas::construire_voisinage_sommet(const Maillage_F
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Zone& domaine = zone.domaine();
 
   const int nb_elem_tot = zone.nb_elem_tot();
   const int nb_som_elem = zone.nb_som_elem();
@@ -118,7 +117,7 @@ int Remailleur_Collision_FT_Thomas::construire_voisinage_sommet(const Maillage_F
     for (int som=0; som<nb_som_elem; som++)
       {
         const int som_global =
-          domaine.get_renum_som_perio(elem_sommets(elem,som));
+          zone.get_renum_som_perio(elem_sommets(elem,som));
 
         const int p = nb_som_elem*elem+som;
 
@@ -616,7 +615,6 @@ int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
   //  const Maillage_FT_Disc& maillage = ;
   const Zone_VF& zone_VF = ref_cast(Zone_VF,une_zone_dis);
   const Zone& zone = zone_VF.zone();
-  const Zone& domaine = zone.domaine();
 
   const int nb_som_elem = zone.nb_som_elem();
   const int end_liste = -1;
@@ -631,13 +629,13 @@ int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
   //Calcul du voisinage
   for (int som=0; som<nb_som_elem; som++)
     {
-      const int som_global = domaine.get_renum_som_perio(elem_sommets(elem,som));
+      const int som_global = zone.get_renum_som_perio(elem_sommets(elem,som));
 
       //On parcourt la liste des elements "elem_voisin" qui contiennent "som_global"
       for (int p=voisinage_sommet_[som_global]; p!=end_liste; p=next_elem_[p])
         {
           const int elem_voisin = p/nb_som_elem;
-          assert(som_global==domaine.get_renum_som_perio(elem_sommets(elem_voisin,p%nb_som_elem)));
+          assert(som_global==zone.get_renum_som_perio(elem_sommets(elem_voisin,p%nb_som_elem)));
           if (!tmp_flag_elements_.testsetbit(elem_voisin))
             liste_voisins.append_array(elem_voisin);
         }
@@ -1143,7 +1141,6 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
 
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Zone& domaine = zone.domaine();
 
   //Affichage des voisinages des sommets
   const int nb_som_tot = zone.nb_som_tot();
@@ -1158,7 +1155,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
   fichier_voisinage_sommet << finl;
   fichier_voisinage_sommet << finl;
 
-  for (int som=domaine.get_renum_som_perio(0); som<nb_som_tot; som++) // som=domaine.get_renum_som_perio(som+1))
+  for (int som=zone.get_renum_som_perio(0); som<nb_som_tot; som++) // som=domaine.get_renum_som_perio(som+1))
     {
       fichier_voisinage_sommet << "Affichage des elements voisins du sommet " << som << " : {{{ ";
 
@@ -1167,7 +1164,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
           const int elem = p/nb_som_elem;
 
           assert(elem<nb_elem_tot);
-          assert(som==domaine.get_renum_som_perio(zone.les_elems()(elem,p%nb_som_elem)));
+          assert(som==zone.get_renum_som_perio(zone.les_elems()(elem,p%nb_som_elem)));
           fichier_voisinage_sommet << elem << " ";
         }
 
@@ -1922,7 +1919,6 @@ int Remailleur_Collision_FT_Thomas::initialiser_data(const Maillage_FT_Disc& mai
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
-  const Zone& domaine = zone.domaine();
 
   const int nb_elem_tot = zone.nb_elem_tot();
   const int nb_som_elem = zone.nb_som_elem();
@@ -1933,11 +1929,11 @@ int Remailleur_Collision_FT_Thomas::initialiser_data(const Maillage_FT_Disc& mai
   nombre_de_voisins_plus_proches_.reset();
   surface_interface_elements_voisins_.reset();
   volume_perdu_.reset();
-  domaine.creer_tableau_elements(distance_interface_element_eulerien_, Array_base::NOCOPY_NOINIT);
+  zone.creer_tableau_elements(distance_interface_element_eulerien_, Array_base::NOCOPY_NOINIT);
   distance_interface_element_eulerien_=-1;
-  domaine.creer_tableau_elements(nombre_de_voisins_plus_proches_);
-  domaine.creer_tableau_elements(surface_interface_elements_voisins_);
-  domaine.creer_tableau_elements(volume_perdu_);
+  zone.creer_tableau_elements(nombre_de_voisins_plus_proches_);
+  zone.creer_tableau_elements(surface_interface_elements_voisins_);
+  zone.creer_tableau_elements(volume_perdu_);
 
   //On dimensionne les donnees
   voisinage_sommet_.resize(nb_som_tot, Array_base::NOCOPY_NOINIT);

@@ -55,7 +55,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
   const IntTab& elem_sommets = zone_VEF.zone().les_elems();
   const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& coord_sommets=zone_VEF.zone().domaine().les_sommets();
+  const DoubleTab& coord_sommets=zone_VEF.zone().les_sommets();
   ArrOfDouble T0 = getScalaire0();
   double beta_a=0;
   // Verifie la validite de T0:

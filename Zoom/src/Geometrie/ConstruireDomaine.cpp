@@ -78,7 +78,7 @@ Entree& ConstruireDomaine::interpreter_(Entree& is)
 void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& correspo_newsom)
 {
   Zone& zone0 = ssz.zone();
-  Zone& dom0 = zone0.domaine();
+  Zone& dom0 = zone0;
 
   const int nb_poly = ssz.nb_elem_tot();
   const int nb_som_poly = zone0.nb_som_elem();
@@ -224,7 +224,7 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
     mes_faces.associer_zone(zone0);
 
     Static_Int_Lists connectivite_som_elem;
-    const int     nb_sommets_tot = zone0.domaine().nb_som_tot();
+    const int     nb_sommets_tot = zone0.nb_som_tot();
     const IntTab&    elements       = zone0.les_elems();
 
     construire_connectivite_som_elem(nb_sommets_tot,

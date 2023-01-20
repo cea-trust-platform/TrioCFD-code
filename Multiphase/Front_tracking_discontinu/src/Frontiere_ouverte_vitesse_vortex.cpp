@@ -66,7 +66,7 @@ void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
   const Equation_base& equation = zone_Cl_dis_base.equation().probleme().get_equation_by_name(nom_equation_);
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, equation);
   const DoubleTab& indic = eq.inconnue().valeurs();
-  const Sous_Zone& sous_zone = zone_Cl_dis_base.zone().domaine().ss_zone(nom_sous_zone_);
+  const Sous_Zone& sous_zone = zone_Cl_dis_base.zone().ss_zone(nom_sous_zone_);
   const DoubleVect& volume = ref_cast(Zone_VF, zone_Cl_dis_base.zone_dis().valeur()).volumes();
 
   double integrale = 0.;

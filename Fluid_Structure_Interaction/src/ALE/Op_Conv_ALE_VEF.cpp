@@ -381,8 +381,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
 
   const IntTab& KEL=type_elemvef.KEL();
   const DoubleTab& xv=zone_VEF.xv();
-  const Zone& domaine=zone.domaine();
-  const DoubleTab& coord_sommets=domaine.coord_sommets();
+  const DoubleTab& coord_sommets=zone.coord_sommets();
 
   // Boucle ou non selon la valeur de alpha (uniquement a l'ordre 3 pour le moment)
   // Si alpha=1, la boucle se limite a une simple passe avec le schema choisi (muscl, amont, centre)

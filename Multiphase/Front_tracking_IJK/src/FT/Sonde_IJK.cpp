@@ -478,7 +478,7 @@ void Sonde_IJK::initialiser()
       int nb_coord = les_positions_.dimension(1);
       if (nb_coord+1>nb_som)
         {
-          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<zone_geom.domaine().le_nom()<<finl;
+          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<zone_geom.le_nom()<<finl;
           Cerr << "which is constituted with cells of kind " << zone_geom.type_elem().valeur().que_suis_je() << "." << finl;
           Cerr << "Change the probe coordinates or use numero_elem_sur_maitre keyword (see documentation)" << finl;
           Cerr << "to specify a cell containing the probe and not its coordinates." << finl;
@@ -494,7 +494,7 @@ void Sonde_IJK::initialiser()
         {
           elem_[0]= numero_elem_;
           const IntTab& les_elems=mon_champ->get_ref_zone_dis_base().zone().les_elems();
-          const DoubleTab& coord=mon_champ->get_ref_zone_dis_base().zone().domaine().les_sommets();
+          const DoubleTab& coord=mon_champ->get_ref_zone_dis_base().zone().les_sommets();
           int nb_som=les_elems.dimension(1);
           if (numero_elem_<les_elems.dimension_tot(0))
             {
@@ -568,7 +568,7 @@ void Sonde_IJK::initialiser()
       const IntTab& elem_faces = zoneVF.elem_faces();
       if (mp_max(elem_faces.size_array())==0)
         {
-          Cerr << "Error: the domain " << zoneVF.zone().domaine().le_nom() << " is not discretized." << finl;
+          Cerr << "Error: the domain " << zoneVF.zone().le_nom() << " is not discretized." << finl;
           exit();
         }
       if (sub_type(Champ_Generique_Interpolation,mon_champ.valeur()))
@@ -626,7 +626,7 @@ void Sonde_IJK::initialiser()
       Cerr<<"The location of probes associated to "<<nom_champ[0]<<" are modified (to vertexes):"<<finl;
       const IntTab& sommet_elem = zone.les_elems();
       const int sommets_par_element = zone.les_elems().dimension(1);
-      const DoubleTab& coord = zone.domaine().les_sommets();
+      const DoubleTab& coord = zone_geom.les_sommets();
       for (int i=0; i<nbre_points; i++)
         {
           double dist_min=DMAXFLOAT;

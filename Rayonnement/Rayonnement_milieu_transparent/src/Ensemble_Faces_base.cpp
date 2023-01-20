@@ -129,7 +129,7 @@ void Ensemble_Faces_base::associer_les_cl(Cond_lim_base& la_cl)
       Faces& faces=le_bord.faces();
       // pos contient les centres de gravite des faces du bord
       if (nb_faces_bord_)
-        calculer_centres_gravite(pos,faces.type_face(), le_bord.zone().domaine().coord_sommets(),faces.les_sommets());
+        calculer_centres_gravite(pos,faces.type_face(), le_bord.zone().coord_sommets(),faces.les_sommets());
       for (int fac=0; fac<n1; fac++)
         {
           int marq=0;

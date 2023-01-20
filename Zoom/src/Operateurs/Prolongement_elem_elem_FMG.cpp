@@ -83,8 +83,7 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
   double dist;
   tab = 0.;
 
-  Zone& domG = zoneg.domaine();
-  const DoubleTab& coordG = domG.coord_sommets();
+  const DoubleTab& coordG = zoneg.coord_sommets();
   DoubleVect coord_somG;
   coord_somG.resize(dimension);
   int dim;

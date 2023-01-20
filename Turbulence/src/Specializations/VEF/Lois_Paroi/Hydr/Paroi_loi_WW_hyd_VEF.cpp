@@ -510,8 +510,7 @@ double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet
   const Zone& zone_geom = zone.zone();
   //  const IntTab& face_sommets = zone.face_sommets();
   const IntTab& elem_faces = zone.elem_faces();
-  const Zone& dom = zone_geom.domaine();
-  const DoubleTab& coord = dom.coord_sommets();
+  const DoubleTab& coord = zone_geom.coord_sommets();
   const Zone& zoneg = zone.zone();
   int nfac = zoneg.nb_faces_elem();
   const IntTab& som_elem=zone_geom.les_elems();
@@ -547,8 +546,7 @@ double distance_3D_som(int fac,int elem,const Zone_VEF& zone) //distance sommet 
   const Zone& zone_geom = zone.zone();
   const IntTab& face_sommets = zone.face_sommets();
   const IntTab& elem_faces = zone.elem_faces();
-  const Zone& dom = zone_geom.domaine();
-  const DoubleTab& coord = dom.coord_sommets();
+  const DoubleTab& coord = zone_geom.coord_sommets();
   const Zone& zoneg = zone.zone();
   int nfac = zoneg.nb_faces_elem();
 
