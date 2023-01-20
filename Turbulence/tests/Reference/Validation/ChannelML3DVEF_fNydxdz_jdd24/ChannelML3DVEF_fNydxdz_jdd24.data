@@ -86,7 +86,8 @@ Read pb
 	}
 
 	Postraitement
-        	{       
+        	{
+		Domaine DOM_BODY
                 Sondes
                 	{ 
                         sonde_vit  vitesse periode 0.1 segment 70 39.0 0. 0.8 39.0 2.0 0.8
@@ -95,8 +96,6 @@ Read pb
 			
 			}
 		format lml
-
-		Domaine DOM_BODY
 		Champs dt_post 3
 			{
 			vitesse

@@ -140,7 +140,8 @@ Read pb
 	}
 
 	Postraitement
-        	{       
+        	{
+		Domaine dom_prepare   
                 Sondes
                 	{ 
                         sonde_vit  vitesse periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4
@@ -149,8 +150,6 @@ Read pb
 			sonde_eps Eps  periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4 
 			}
 		format lata
-
-		Domaine dom_prepare
 		Champs dt_post 5.
 			{
 			vitesse faces
