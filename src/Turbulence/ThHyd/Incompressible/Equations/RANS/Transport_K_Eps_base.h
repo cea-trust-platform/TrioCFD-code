@@ -24,8 +24,8 @@
 #ifndef Transport_K_Eps_base_included
 #define Transport_K_Eps_base_included
 
+#include <Mod_turb_hyd_RANS_keps.h>
 #include <Transport_2eq_base.h>
-#include <Mod_turb_hyd_RANS.h>
 #include <TRUST_Ref.h>
 
 class Champ_Inc;
@@ -45,7 +45,7 @@ class Transport_K_Eps_base: public Transport_2eq_base
 public:
 
   Transport_K_Eps_base();
-  virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS& )=0;
+  virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_keps& )=0;
   void discretiser() override;
   void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
@@ -53,8 +53,8 @@ public:
   void valider_iteration() override;
   inline const Champ_Inc& inconnue() const override;
   inline Champ_Inc& inconnue() override;
-  inline const Mod_turb_hyd_RANS& modele_turbulence() const;
-  inline Mod_turb_hyd_RANS& modele_turbulence();
+  inline const Mod_turb_hyd_RANS_keps& modele_turbulence() const;
+  inline Mod_turb_hyd_RANS_keps& modele_turbulence();
 
   void get_position_cells(Nom&, int&);
   void get_position_faces(Nom&, int&);
@@ -63,6 +63,7 @@ public:
 protected:
 
   Champ_Inc le_champ_K_Eps;
+  REF(Mod_turb_hyd_RANS_keps) mon_modele;
 
 };
 
@@ -90,7 +91,7 @@ inline const Champ_Inc& Transport_K_Eps_base::inconnue() const { return le_champ
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline const Mod_turb_hyd_RANS& Transport_K_Eps_base::modele_turbulence() const
+inline const Mod_turb_hyd_RANS_keps& Transport_K_Eps_base::modele_turbulence() const
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();
@@ -100,7 +101,7 @@ inline const Mod_turb_hyd_RANS& Transport_K_Eps_base::modele_turbulence() const
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline Mod_turb_hyd_RANS& Transport_K_Eps_base::modele_turbulence()
+inline Mod_turb_hyd_RANS_keps& Transport_K_Eps_base::modele_turbulence()
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();

@@ -24,7 +24,7 @@
 #include <Les_mod_turb.h>
 #include <Verif_Cl.h>
 #include <Verif_Cl_Turb.h>
-#include <Mod_turb_hyd_RANS.h>
+#include <Mod_turb_hyd_RANS_keps.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Turbulent,"Pb_Thermohydraulique_Turbulent",Pb_Fluide_base);
 
@@ -149,9 +149,9 @@ int Pb_Thermohydraulique_Turbulent::verifier()
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
-  if ( sub_type(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -186,4 +186,3 @@ int Pb_Thermohydraulique_Turbulent::verifier()
   */
   return 1;
 }
-

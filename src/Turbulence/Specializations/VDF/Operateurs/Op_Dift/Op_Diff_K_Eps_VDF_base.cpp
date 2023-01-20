@@ -111,7 +111,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
     {
       const Transport_K_Eps_base& eqn_transport = ref_cast(Transport_K_Eps_base,mon_equation.valeur());
       {
-        const Mod_turb_hyd_RANS& mod_turb = ref_cast(Mod_turb_hyd_RANS,eqn_transport.modele_turbulence());
+        const Mod_turb_hyd_RANS_keps& mod_turb = ref_cast(Mod_turb_hyd_RANS_keps,eqn_transport.modele_turbulence());
         const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
         Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter->evaluateur());
         eval_diff.associer_diff_turb(diff_turb);
@@ -309,6 +309,3 @@ void Op_Diff_K_Eps_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secme
   statistiques().end_count(diffusion_counter_);
 
 }
-
-
-

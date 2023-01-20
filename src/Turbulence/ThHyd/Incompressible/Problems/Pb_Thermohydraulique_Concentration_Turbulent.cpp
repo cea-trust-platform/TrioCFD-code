@@ -169,9 +169,9 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
   // Verification de la compatibilite des conditions aux limites
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
   tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
-  if ( sub_type(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);

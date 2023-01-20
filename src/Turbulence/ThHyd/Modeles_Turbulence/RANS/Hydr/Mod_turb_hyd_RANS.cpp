@@ -14,20 +14,20 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_RANS.cpp
+// File:        Mod_turb_hyd_RANS_keps.cpp
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Mod_turb_hyd_RANS.h>
+#include <Mod_turb_hyd_RANS_keps.h>
 #include <Transport_K_Eps_base.h>
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_RANS,"Mod_turb_hyd_RANS",Mod_turb_hyd_base);
-// XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_keps,"Mod_turb_hyd_RANS_keps",Mod_turb_hyd_RANS_2eq);
+// XD mod_turb_hyd_rans_keps modele_turbulence_hyd_deriv mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
 
-Mod_turb_hyd_RANS::Mod_turb_hyd_RANS()
+Mod_turb_hyd_RANS_keps::Mod_turb_hyd_RANS_keps()
 {
   Prandtl_K = 1.;
   Prandtl_Eps = 1.3;
@@ -41,9 +41,9 @@ Mod_turb_hyd_RANS::Mod_turb_hyd_RANS()
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Mod_turb_hyd_RANS::printOn(Sortie& is) const
+Sortie& Mod_turb_hyd_RANS_keps::printOn(Sortie& is) const
 {
-  return Mod_turb_hyd_base::printOn(is);
+  return Mod_turb_hyd_RANS_2eq::printOn(is);
 }
 
 
@@ -52,12 +52,12 @@ Sortie& Mod_turb_hyd_RANS::printOn(Sortie& is) const
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
-Entree& Mod_turb_hyd_RANS::readOn(Entree& is)
+Entree& Mod_turb_hyd_RANS_keps::readOn(Entree& is)
 {
-  Mod_turb_hyd_base::readOn(is);
+  Mod_turb_hyd_RANS_2eq::readOn(is);
   return is;
 }
-void Mod_turb_hyd_RANS::set_param(Param& param)
+void Mod_turb_hyd_RANS_keps::set_param(Param& param)
 {
   Mod_turb_hyd_base::set_param(param);
   param.ajouter("eps_min",&LeEPS_MIN); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
@@ -70,13 +70,13 @@ void Mod_turb_hyd_RANS::set_param(Param& param)
 /*! @brief
  *
  */
-void Mod_turb_hyd_RANS::completer()
+void Mod_turb_hyd_RANS_keps::completer()
 {
   eqn_transp_K_Eps().completer();
   verifie_loi_paroi();
 }
 
-void Mod_turb_hyd_RANS::verifie_loi_paroi()
+void Mod_turb_hyd_RANS_keps::verifie_loi_paroi()
 {
   Nom lp=loipar.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
@@ -88,7 +88,7 @@ void Mod_turb_hyd_RANS::verifie_loi_paroi()
     }
 }
 
-const Champ_base& Mod_turb_hyd_RANS::get_champ(const Motcle& nom) const
+const Champ_base& Mod_turb_hyd_RANS_keps::get_champ(const Motcle& nom) const
 {
 
   try
@@ -116,7 +116,7 @@ const Champ_base& Mod_turb_hyd_RANS::get_champ(const Motcle& nom) const
 
   //return champs_compris_.get_champ(nom);
 }
-void Mod_turb_hyd_RANS::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Mod_turb_hyd_RANS_keps::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
   Mod_turb_hyd_base::get_noms_champs_postraitables(nom,opt);
 
@@ -137,7 +137,7 @@ void Mod_turb_hyd_RANS::get_noms_champs_postraitables(Noms& nom,Option opt) cons
  * @param (Sortie& os) un flot de sortie
  * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&)
  */
-int Mod_turb_hyd_RANS::sauvegarder(Sortie& os) const
+int Mod_turb_hyd_RANS_keps::sauvegarder(Sortie& os) const
 {
 
   Mod_turb_hyd_base::sauvegarder(os);
@@ -153,7 +153,7 @@ int Mod_turb_hyd_RANS::sauvegarder(Sortie& os) const
  * @param (Entree& is) un flot d'entree
  * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&) ou 1 si la reprise est bidon.
  */
-int Mod_turb_hyd_RANS::reprendre(Entree& is)
+int Mod_turb_hyd_RANS_keps::reprendre(Entree& is)
 {
   Mod_turb_hyd_base::reprendre(is);
   if (mon_equation.non_nul())
@@ -171,4 +171,3 @@ int Mod_turb_hyd_RANS::reprendre(Entree& is)
       return 1;
     }
 }
-

@@ -27,7 +27,7 @@
 #include <Transport_K_Eps_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Mod_turb_hyd_RANS.h>
+#include <Mod_turb_hyd_RANS_keps.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Post_Operateur_Eqn,"Operateur_Eqn|Champ_Post_Operateur_Eqn",Champ_Generique_Operateur_base);
 
@@ -126,7 +126,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                     const RefObjU& modele_turbulence = eq_test.get_modele(TURBULENCE);
                     if (sub_type(Modele_turbulence_hyd_K_Eps, modele_turbulence.valeur()) || sub_type(Modele_turbulence_hyd_K_Eps_Realisable, modele_turbulence.valeur()) )
                       {
-                        const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_test.get_modele(TURBULENCE).valeur());
+                        const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Eps_base& transportkeps = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
                         if ((transportkeps.inconnue().le_nom() == mon_champ_inc.le_nom()))
                           {
@@ -151,7 +151,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
     ref_eq_=Pb.equation(numero_eq_);
   else
     {
-      const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
+      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       ref_eq_= ref_cast(Equation_base,eqn);
     }
@@ -366,4 +366,3 @@ Operateur_base& Champ_Post_Operateur_Eqn::Operateur()
 {
   return ref_eq_->operateur(numero_op_).l_op_base();
 }
-

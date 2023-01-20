@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,54 +14,41 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Transport_2eq_base.h
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Equations/RANS
+// File:        Mod_turb_hyd_RANS_2eq.cpp
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef Transport_2eq_base_included
-#define Transport_2eq_base_included
-
-#include <Equation_base.h>
-#include <Ref_Champ_Inc.h>
 #include <Mod_turb_hyd_RANS_2eq.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Mod_turb_hyd_RANS_2eq.h>
-#include <Ref_Champ_Inc_base.h>
+#include <Transport_2eq_base.h>
+#include <TRUSTTrav.h>
+#include <Param.h>
 
-/*! @brief Classe Transport_2eq_base Classe de base pour les equations
- *
- *     de transport des modeles k_Epsilon.
- *
- */
-class Transport_2eq_base: public Equation_base
+Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_2eq, "Mod_turb_hyd_RANS_2eq", Mod_turb_hyd_base);
+// XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+
+Mod_turb_hyd_RANS_2eq::Mod_turb_hyd_RANS_2eq()
 {
 
-  Declare_base_sans_constructeur(Transport_2eq_base);
-
-public:
-
-  Transport_2eq_base();
-  void set_param(Param&) override;
-  void associer(const Equation_base&);
-  inline void associer_vitesse(const Champ_base&);
-  void associer_milieu_base(const Milieu_base&) override;
-  Milieu_base& milieu() override;
-  const Milieu_base& milieu() const override;
-  double calculer_pas_de_temps() const override;
-
-
-protected:
-
-  REF(Milieu_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-
-};
-
-inline void Transport_2eq_base::associer_vitesse(const Champ_base& vit)
-{
-  la_vitesse_transportante = ref_cast(Champ_Inc_base, vit);
 }
 
-#endif
+/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
+Sortie& Mod_turb_hyd_RANS_2eq::printOn(Sortie& is) const
+{
+  return Mod_turb_hyd_base::printOn(is);
+}
+
+/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
+Entree& Mod_turb_hyd_RANS_2eq::readOn(Entree& is)
+{
+  Mod_turb_hyd_base::readOn(is);
+  return is;
+}

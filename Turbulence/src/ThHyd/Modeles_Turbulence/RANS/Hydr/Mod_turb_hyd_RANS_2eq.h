@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,54 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Transport_2eq_base.h
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Equations/RANS
+// File:        Mod_turb_hyd_RANS_2eq.h
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Transport_2eq_base_included
-#define Transport_2eq_base_included
+#ifndef Mod_turb_hyd_RANS_2eq_included
+#define Mod_turb_hyd_RANS_2eq_included
 
-#include <Equation_base.h>
-#include <Ref_Champ_Inc.h>
-#include <Mod_turb_hyd_RANS_2eq.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Mod_turb_hyd_RANS_2eq.h>
-#include <Ref_Champ_Inc_base.h>
+#include <Mod_turb_hyd_base.h>
 
-/*! @brief Classe Transport_2eq_base Classe de base pour les equations
+class Equation_base;
+class Transport_2eq_base;
+
+
+/*! @brief Classe Mod_turb_hyd_RANS_2eq Classe de base des modeles de type RANS à deux equations
  *
- *     de transport des modeles k_Epsilon.
- *
+ * @sa Mod_turb_hyd_base
  */
-class Transport_2eq_base: public Equation_base
+class Mod_turb_hyd_RANS_2eq: public Mod_turb_hyd_base
 {
 
-  Declare_base_sans_constructeur(Transport_2eq_base);
+  Declare_base_sans_constructeur(Mod_turb_hyd_RANS_2eq);
 
 public:
 
-  Transport_2eq_base();
-  void set_param(Param&) override;
-  void associer(const Equation_base&);
-  inline void associer_vitesse(const Champ_base&);
-  void associer_milieu_base(const Milieu_base&) override;
-  Milieu_base& milieu() override;
-  const Milieu_base& milieu() const override;
-  double calculer_pas_de_temps() const override;
-
+  Mod_turb_hyd_RANS_2eq();
 
 protected:
 
-  REF(Milieu_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-
 };
 
-inline void Transport_2eq_base::associer_vitesse(const Champ_base& vit)
-{
-  la_vitesse_transportante = ref_cast(Champ_Inc_base, vit);
-}
 
 #endif
