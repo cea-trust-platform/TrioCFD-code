@@ -80,10 +80,12 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
         nb_inc = "_Multi_inco_";
 
       Nom type_diff;
-      if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-        type_diff="";
+      if (disc == "VDF") type_diff = "var_";
       else
-        type_diff="var_";
+        {
+          if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
+          else type_diff = "var_";
+        }
 
       Nom type_inco=eqn.inconnue()->que_suis_je();
 
@@ -115,10 +117,13 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
       type+= nb_inc ;
 
       Nom type_diff;
-      if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-        type_diff="";
+      if (disc == "VDF") type_diff = "var_";
       else
-        type_diff="var_";
+        {
+          if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
+          else type_diff = "var_";
+        }
+
       type+= type_diff;
 
       Nom type_inco=eqn.inconnue()->que_suis_je();
