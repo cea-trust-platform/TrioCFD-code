@@ -22,12 +22,12 @@
 #ifndef Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 
-#include <Eval_Diff_VDF_var.h>
+#include <Eval_Diff_VDF.h>
 #include <Ref_Champ_Fonc.h>
 #include <Ref_Champ_Uniforme.h>
 #include <Champ_Fonc.h>
 
-class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var
+class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF
 {
 public:
   Eval_Diff_K_Eps_Bas_Re_VDF_var(double Prandt_K = PRDT_K_DEFAUT , double Prandt_Eps =PRDT_EPS_DEFAUT ) : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps)
