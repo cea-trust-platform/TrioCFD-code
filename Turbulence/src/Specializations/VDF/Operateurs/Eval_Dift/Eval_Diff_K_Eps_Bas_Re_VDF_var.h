@@ -43,7 +43,7 @@ public:
   // pour CRTP
   inline double nu_1_impl(int i, int compo) const
   {
-    return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
+    return tab_diffusivite_(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
   }
 
   inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
