@@ -80,7 +80,7 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
         nb_inc = "_Multi_inco_";
 
       Nom type_diff;
-      if (disc == "VDF") type_diff = "var_";
+      if (disc == "VDF") type_diff = ""; /* pas de const/var en VDF */
       else
         {
           if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
@@ -117,7 +117,7 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
       type+= nb_inc ;
 
       Nom type_diff;
-      if (disc == "VDF") type_diff = "var_";
+      if (disc == "VDF") type_diff = ""; /* pas de const/var en VDF */
       else
         {
           if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";

@@ -151,7 +151,7 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
 
   Nom type_diff;
 
-  if (discr == "VDF") type_diff = "var_";
+  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
   else
     {
       if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";

@@ -126,7 +126,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   type+=nb_inc;
 
   Nom type_diff;
-  if (discr == "VDF") type_diff = "var_";
+  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
   else
     {
       if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite())) type_diff="const_";
