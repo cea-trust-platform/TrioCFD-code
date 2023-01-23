@@ -154,9 +154,11 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   return la_viscosite_turbulente;
 }
 
-void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(const Schema_Temps_base& sch, int avant)
+void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(int avant) const
 {
+  const Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
   const Champ_Inc& le_champ_K_Eps = K_Eps();
+
   if (sch.nb_pas_dt()==0 || sch.limpr())
     {
       const DoubleTab& K_Eps = le_champ_K_Eps.valeurs();
@@ -283,7 +285,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 
   const Milieu_base& mil=equation().probleme().milieu();
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),1);
+  imprimer_evolution_keps_realisable(1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(K_Eps().temps());
@@ -295,7 +297,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),0);
+  imprimer_evolution_keps_realisable(0);
   return 1;
 
 }
@@ -315,7 +317,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),1);
+  imprimer_evolution_keps_realisable(1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());
