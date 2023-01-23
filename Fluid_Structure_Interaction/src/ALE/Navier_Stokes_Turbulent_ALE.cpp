@@ -152,10 +152,14 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
   type+= nb_inc ;
 
   Nom type_diff;
-  if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-    type_diff="";
+
+  if (discr == "VDF") type_diff=""; /* pas de const/var en VDF */
   else
-    type_diff="var_";
+    {
+      if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
+      else type_diff = "var_";
+    }
+
   type+= type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
