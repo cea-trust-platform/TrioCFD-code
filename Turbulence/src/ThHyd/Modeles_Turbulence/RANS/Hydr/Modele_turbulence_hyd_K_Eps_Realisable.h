@@ -71,6 +71,7 @@ private :
   Modele_Fonc_Realisable mon_modele_fonc;
   Transport_K_Eps_Realisable  eqn_transport_K_Eps_Rea;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void imprimer_evolution_keps_realisable(const Schema_Temps_base& sch, int avant);
 
 };
 

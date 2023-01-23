@@ -63,6 +63,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
   param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
   param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
   param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
+  param.ajouter("CMU",&LeCmu); // XD_ADD_P double Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -153,8 +154,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   return la_viscosite_turbulente;
 }
 
-void imprimer_evolution_keps_realisable(const Champ_Inc& le_champ_K_Eps, const Schema_Temps_base& sch, double LeCmu, int avant)
+void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(const Schema_Temps_base& sch, int avant)
 {
+  const Champ_Inc& le_champ_K_Eps = K_Eps();
   if (sch.nb_pas_dt()==0 || sch.limpr())
     {
       const DoubleTab& K_Eps = le_champ_K_Eps.valeurs();
@@ -219,14 +221,6 @@ void imprimer_evolution_keps_realisable(const Champ_Inc& le_champ_K_Eps, const S
               loc_nut_max = n;
             }
         }
-      /*
-      k_min = Process::mp_min(k_min);
-      eps_min = Process::mp_min(eps_min);
-      nut_min = Process::mp_min(nut_min);
-      k_max = Process::mp_max(k_max);
-      eps_max = Process::mp_max(eps_max);
-      nut_max = Process::mp_max(nut_max);
-       */
       ArrOfDouble values(3);
 
       values[0]=k_min;
@@ -289,7 +283,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 
   const Milieu_base& mil=equation().probleme().milieu();
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  imprimer_evolution_keps_realisable(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,1);
+  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(K_Eps().temps());
@@ -301,7 +295,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  imprimer_evolution_keps_realisable(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,0);
+  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),0);
   return 1;
 
 }
@@ -321,7 +315,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  imprimer_evolution_keps_realisable(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,1);
+  imprimer_evolution_keps_realisable(eqn_transp_K_Eps().schema_temps(),1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());
