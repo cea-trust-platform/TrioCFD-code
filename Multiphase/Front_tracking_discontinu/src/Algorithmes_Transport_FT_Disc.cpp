@@ -28,7 +28,6 @@
 
 Implemente_instanciable(Algorithmes_Transport_FT_Disc,"Algorithmes_Transport_FT_Disc",Objet_U);
 
-Implemente_deriv(Algorithmes_Transport_FT_Disc);
 
 /*! @brief readOn : appel interdit
  *

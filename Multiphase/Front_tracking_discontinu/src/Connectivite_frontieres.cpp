@@ -20,12 +20,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Connectivite_frontieres.h>
-#include <Deriv_Connectivite_frontieres.h>
+#include <TRUST_Deriv.h>
 #include <Ref_Connectivite_frontieres.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Connectivite_frontieres,"Connectivite_frontieres",Objet_U);
-Implemente_deriv(Connectivite_frontieres);
 Implemente_ref(Connectivite_frontieres);
 
 Entree& Connectivite_frontieres::readOn(Entree& is)

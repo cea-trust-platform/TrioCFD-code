@@ -24,7 +24,7 @@
 #define Remailleur_Collision_FT_included
 
 #include <Remailleur_Collision_FT_base.h>
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 
 /*! @brief classe Remailleur_Collision_FT Cette classe represente un objet de remaillage generique pour des interfaces
  *
@@ -33,7 +33,6 @@
  *
  * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
  */
-Declare_deriv(Remailleur_Collision_FT_base);
 
 class Remailleur_Collision_FT : public DERIV(Remailleur_Collision_FT_base)
 {

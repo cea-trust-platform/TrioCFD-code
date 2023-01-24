@@ -18,6 +18,7 @@
 #include <Champ_P1_isoP1Bulle.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
+#include <Postraitements.h>
 #include <Probleme_base.h>
 #include <Champ_P1NC.h>
 #include <EChaine.h>
@@ -55,7 +56,7 @@ void Navier_Stokes_Aposteriori::creer_champ(const Motcle& motlu)
           chaine += "  vitesse } } }";
           EChaine echaine(chaine);
           echaine >> champ_src_;
-          champ_src_.completer(probleme().postraitements().valeur());
+          champ_src_.completer(probleme().postraitements().front());
         }
     }
 }

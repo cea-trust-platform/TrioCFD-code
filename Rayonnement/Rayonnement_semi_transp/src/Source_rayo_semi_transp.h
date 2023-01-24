@@ -24,10 +24,9 @@
 #define Source_rayo_semi_transp_included
 
 #include <Source_rayo_semi_transp_base.h>
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 class Modele_rayo_semi_transp;
 
-Declare_deriv(Source_rayo_semi_transp_base);
 
 /*! @brief class Source_rayo_semi_transp Classe generique de la hierarchie des termes sources de l'eqution de
  *

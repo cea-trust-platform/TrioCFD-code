@@ -21,7 +21,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Connectivites.h>
-Implemente_deriv(Connectivites_base);
 
 Implemente_instanciable(Connectivites,"Connectivites",DERIV(Connectivites_base));
 

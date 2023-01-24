@@ -98,7 +98,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
-      Zone la_zone=les_zones(0);
+      Zone la_zone=les_zones_(0);
       la_zone_VF.volumes()=0;
       la_zone.calculer_volumes(la_zone_VF.volumes(),la_zone_VF.inverse_volumes());
       la_zone_VF.xp()=0;
@@ -112,7 +112,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       IntTab& face_voisins=la_zone_VF.face_voisins();
 
       calculer_centres_gravite(xv, type_face,
-                               sommets, face_sommets);
+                               sommets_, face_sommets);
       if(sub_type(Zone_VDF, la_zone_VF))
         {
           Zone_VDF& la_zone_VDF=ref_cast(Zone_VDF,le_domaine_dis.zone_dis(0).valeur());
@@ -349,7 +349,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
   int n; // A activer ou desactiver si on utilise le laplacien ou non
   int N_som=nb_som_tot(); //A activer ou desactiver si on utilise le laplacien ou non
 
-  const Zone& lazone = les_zones(0);
+  const Zone& lazone = les_zones_(0);
   const MD_Vector& md = lazone.domaine().md_vector_sommets();
   DoubleTab vit_maillage(lazone.nb_som(),dimension);
   MD_Vector_tools::creer_tableau_distribue(md, vit_maillage);
@@ -360,7 +360,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
   for (n=0; n<nb_bords_ALE; n++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
-      int rang=les_zones(0).rang_frontiere(le_nom_bord_ALE);
+      int rang=les_zones_(0).rang_frontiere(le_nom_bord_ALE);
       const Frontiere_dis_base& la_fr_dis=le_domaine_dis.zone_dis(0).frontiere_dis(rang);
       les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
@@ -506,7 +506,7 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
 DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
   //Cerr << "Domaine_ALE::laplacien" << finl;
-  const Zone& lazone = les_zones(0);
+  const Zone& lazone = les_zones_(0);
   int nb_elem_tot = lazone.nb_elem_tot();
   //int nbsom = lazone.nb_som();
   int nbsom = lazone.nb_som_tot();
@@ -715,8 +715,8 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
         break;
       Cerr << "Lecture des vitesses "
            << "imposees a " << nomlu << "....." << finl;
-      int rang=les_zones(0).rang_frontiere(nomlu);
-      les_bords_ALE.add(les_zones(0).faces_bord()(rang));
+      int rang=les_zones_(0).rang_frontiere(nomlu);
+      les_bords_ALE.add(les_zones_(0).faces_bord()(rang));
       is >> les_champs_front[compteur];
       compteur++;
     }

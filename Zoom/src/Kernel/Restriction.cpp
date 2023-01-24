@@ -22,7 +22,6 @@
 
 #include <Restriction.h>
 
-Implemente_deriv(Restriction_base);
 Implemente_instanciable(Restriction,"Restriction",DERIV(Restriction_base));
 
 

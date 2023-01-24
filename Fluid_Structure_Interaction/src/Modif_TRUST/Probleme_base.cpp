@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,12 +13,12 @@
 *
 *****************************************************************************/
 
-#include <Deriv_Entree_Fichier_base.h>
 #include <EcritureLectureSpecial.h>
-#include <List_Ref_Postraitement.h>
+#include <Entree_Fichier_base.h>
 #include <Discretisation_base.h>
 #include <Loi_Fermeture_base.h>
 #include <EcrFicCollecteBin.h>
+#include <Ref_Postraitement.h>
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
@@ -27,6 +27,7 @@
 #include <stat_counters.h>
 #include <FichierHDFPar.h>
 #include <Milieu_base.h>
+#include <TRUST_Deriv.h>
 #include <sys/stat.h>
 #include <Equation.h>
 #include <Debog.h>
@@ -332,12 +333,10 @@ void Probleme_base::completer()
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).completer();
 
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi = curseur.valeur().valeur();
+      Loi_Fermeture_base& loi = itr.valeur();
       loi.completer();
-      ++curseur;
     }
 
   les_postraitements.completer();
@@ -414,12 +413,10 @@ void Probleme_base::discretiser(const Discretisation_base& une_discretisation)
         }
     }
 
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi = curseur.valeur().valeur();
+      Loi_Fermeture_base& loi = itr.valeur();
       loi.discretiser(une_discretisation);
-      ++curseur;
     }
 }
 
@@ -428,14 +425,11 @@ void Probleme_base::discretiser(const Discretisation_base& une_discretisation)
  */
 void Probleme_base::init_postraitements()
 {
-  LIST_CURSEUR(DERIV(Postraitement_base)) curseur = les_postraitements;
-  while (curseur)   // Pour chaque postraitement
+  for (auto& itr : les_postraitements) // Pour chaque postraitement
     {
-
-      DERIV(Postraitement_base) &der_post = curseur.valeur();
+      DERIV(Postraitement_base) &der_post = itr;
 
       // S'il est de type Postraitement, initialiser premier/dernier _pour_nom_fich
-
       if (sub_type(Postraitement, der_post.valeur()))
         {
 
@@ -469,7 +463,6 @@ void Probleme_base::init_postraitements()
             }
           post.est_le_dernier_postraitement_pour_nom_fich() = 1;
         }
-      ++curseur;
     }
   les_postraitements.init();
 }
@@ -777,12 +770,10 @@ void Probleme_base::creer_champ(const Motcle& motlu)
   for (int i=0; i<nb_eq; i++)
     equation(i).creer_champ(motlu);
 
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      Loi_Fermeture_base& loi=itr.valeur();
       loi.creer_champ(motlu);
-      ++curseur;
     }
 }
 
@@ -797,30 +788,28 @@ bool Probleme_base::has_champ(const Motcle& un_nom) const
         {
           champ = &equation(i).get_champ(un_nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur& err_)
         {
         }
       try
         {
           champ = &equation(i).milieu().get_champ(un_nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur& err_)
         {
         }
     }
 
-  CONST_LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (const auto& itr : liste_loi_fermeture_)
     {
-      const Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      const Loi_Fermeture_base& loi=itr.valeur();
       try
         {
           champ = &loi.get_champ(un_nom);
         }
-      catch(Champs_compris_erreur)
+      catch(Champs_compris_erreur& err_)
         {
         }
-      ++curseur;
     }
 
   if (champ) return true ;
@@ -836,30 +825,28 @@ const Champ_base& Probleme_base::get_champ(const Motcle& un_nom) const
         {
           return equation(i).get_champ(un_nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur& err_)
         {
         }
       try
         {
           return equation(i).milieu().get_champ(un_nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur& err_)
         {
         }
     }
 
-  CONST_LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (const auto& itr : liste_loi_fermeture_)
     {
-      const Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      const Loi_Fermeture_base& loi=itr.valeur();
       try
         {
           return loi.get_champ(un_nom);
         }
-      catch(Champs_compris_erreur)
+      catch(Champs_compris_erreur& err_)
         {
         }
-      ++curseur;
     }
 
   if (discretisation().que_suis_je()=="VDF")
@@ -890,27 +877,23 @@ void Probleme_base::get_noms_champs_postraitables(Noms& noms,Option opt) const
   for (int i=0; i<nb_eq; i++)
     equation(i).get_noms_champs_postraitables(noms,opt);
 
-  CONST_LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (const auto& itr : liste_loi_fermeture_)
     {
-      const Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      const Loi_Fermeture_base& loi=itr.valeur();
       loi.get_noms_champs_postraitables(noms,opt);
-      ++curseur;
     }
 
 }
 
 int Probleme_base::comprend_champ_post(const Motcle& un_nom) const
 {
-  if (un_nom=="TEMPERATURE_PHYSIQUE")
-    return 0;
-  CONST_LIST_CURSEUR(DERIV(Postraitement_base)) curseur_post = postraitements();
-  while (curseur_post)
+  if (un_nom == "TEMPERATURE_PHYSIQUE") return 0;
+
+  for (const auto &itr : postraitements())
     {
-      const Postraitement& post = ref_cast(Postraitement,curseur_post.valeur().valeur());
+      const Postraitement& post = ref_cast(Postraitement, itr.valeur());
       if (post.comprend_champ_post(un_nom))
         return 1;
-      ++curseur_post;
     }
   return 0;
 }
@@ -920,61 +903,43 @@ int Probleme_base::comprend_champ_post(const Motcle& un_nom) const
  */
 int Probleme_base::verifie_tdeb_tfin(const Motcle& un_nom) const
 {
-  CONST_LIST_CURSEUR(DERIV(Postraitement_base)) curseur_post = postraitements();
-  while (curseur_post)
+  for (const auto &itr : postraitements())
     {
-      const Postraitement& post = ref_cast(Postraitement,curseur_post.valeur().valeur());
-      if (tstat_deb_==-1)
+      const Postraitement& post = ref_cast(Postraitement, itr.valeur());
+      if (tstat_deb_ == -1)
         tstat_deb_ = post.tstat_deb();
-      else if (!est_egal(tstat_deb_,post.tstat_deb()) && post.tstat_deb()!=-1)
-        {
-          //Cerr << finl;
-          //Cerr << "Error in " << un_nom << finl;
-          //Cerr << "Your beginning time of statistics t_deb=" << post.tstat_deb() << " must be equal" << finl;
-          //Cerr << "to the previous beginning time already read t_deb=" << tstat_deb_ << finl;
-          Cerr << "Beginning times of statistics t_deb are differents but the calculation continues" << finl;
-          //exit();
-        }
-      if (tstat_fin_==-1)
+      else if (!est_egal(tstat_deb_, post.tstat_deb()) && post.tstat_deb() != -1)
+        Cerr << "Beginning times of statistics t_deb are differents but the calculation continues" << finl;
+
+      if (tstat_fin_ == -1)
         tstat_fin_ = post.tstat_fin();
-      else if (!est_egal(tstat_fin_,post.tstat_fin()) && post.tstat_fin()!=-1)
-        {
-          //Cerr << finl;
-          //Cerr << "Error in " << un_nom << finl;
-          //Cerr << "Your ending time of statistics t_fin=" << post.tstat_fin() << " must be equal" << finl;
-          //Cerr << "to the previous ending time already read t_fin=" << tstat_fin_ << finl;
-          Cerr << "Ending times of statistics t_fin are differents but the calculation continues" << finl;
-          //exit();
-        }
-      ++curseur_post;
+      else if (!est_egal(tstat_fin_, post.tstat_fin()) && post.tstat_fin() != -1)
+        Cerr << "Ending times of statistics t_fin are differents but the calculation continues" << finl;
     }
   return 1;
 }
 
 const Champ_Generique_base& Probleme_base::get_champ_post(const Motcle& un_nom) const
 {
-
   REF(Champ_Generique_base) ref_champ;
 
-  CONST_LIST_CURSEUR(DERIV(Postraitement_base)) curseur_post = postraitements();
-  while (curseur_post)
+  for (const auto &itr : postraitements())
     {
-      if (sub_type(Postraitement,curseur_post.valeur().valeur()))
+      if (sub_type(Postraitement, itr.valeur()))
         {
-          const Postraitement& post = ref_cast(Postraitement,curseur_post.valeur().valeur());
+          const Postraitement& post = ref_cast(Postraitement, itr.valeur());
           try
             {
               return post.get_champ_post(un_nom);
             }
-          catch (Champs_compris_erreur) { }
+          catch (Champs_compris_erreur& err_) { }
         }
-      ++curseur_post;
     }
   Cerr<<" "<<finl;
   Cerr<<"The field named "<<un_nom<<" do not correspond to a field understood by the problem."<<finl;
   Cerr<<"Check the name of the field indicated into the postprocessing block of the data file " << finl;
   Cerr<<"or in the list of post-processed fields above (in the block 'Reading of fields to be postprocessed')."<<finl;
-  exit();
+  Process::exit();
 
   //Pour compilation
   return ref_champ;
@@ -1013,12 +978,10 @@ void Probleme_base::mettre_a_jour(double temps)
   // Update the domain:
   domaine().mettre_a_jour(temps,domaine_dis(),*this);
 
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      Loi_Fermeture_base& loi=itr.valeur();
       loi.mettre_a_jour(temps);
-      ++curseur;
     }
 }
 
@@ -1043,12 +1006,10 @@ void Probleme_base::preparer_calcul()
   if (schema_temps().file_allocation() && EcritureLectureSpecial::Active)
     file_size_xyz();
 
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi = curseur.valeur().valeur();
+      Loi_Fermeture_base& loi = itr.valeur();
       loi.preparer_calcul();
-      ++curseur;
     }
 }
 

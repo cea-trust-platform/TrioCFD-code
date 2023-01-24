@@ -366,14 +366,12 @@ void Navier_Stokes_Turbulent_ALE::imprimer(Sortie& os) const
 
 const RefObjU& Navier_Stokes_Turbulent_ALE::get_modele(Type_modele type) const
 {
-  CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
-  while(curseur)
+  for(const auto& itr : liste_modeles_)
     {
-      const RefObjU&  mod = curseur.valeur();
+      const RefObjU&  mod = itr;
       if (mod.non_nul())
         if ((sub_type(Mod_turb_hyd_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
-      ++curseur;
     }
   return Equation_base::get_modele(type);
 }

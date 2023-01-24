@@ -24,9 +24,9 @@
 #define Flux_radiatif_included
 
 #include <Flux_radiatif_base.h>
+#include <TRUST_Deriv.h>
 class Zone_Cl_dis_base;
 
-Declare_deriv(Flux_radiatif_base);
 
 /*! @brief classe Flux_radiatif Classe generique de la hierarchie des flux radiatifs
  *

@@ -21,10 +21,9 @@
 
 #ifndef MuLambda_TBLE_included
 #define MuLambda_TBLE_included
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <MuLambda_TBLE_base.h>
 
-Declare_deriv(MuLambda_TBLE_base);
 
 /*! @brief Classe MuLambda_TBLE
  *

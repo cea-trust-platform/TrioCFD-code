@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Topologie_Maillage_FT.h>
-#include <Deriv_Topologie_Maillage_FT.h>
+#include <TRUST_Deriv.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Motcle.h>
 #include <Remailleur_Collision_FT_Juric.h>
@@ -36,7 +36,6 @@
 
 Implemente_instanciable_sans_constructeur(Topologie_Maillage_FT,"Topologie_Maillage_FT",Objet_U);
 
-Implemente_deriv(Topologie_Maillage_FT);
 
 Topologie_Maillage_FT::Topologie_Maillage_FT() :
   active_(0),

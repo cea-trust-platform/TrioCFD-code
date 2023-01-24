@@ -28,7 +28,7 @@
 #include <Source_base.h>
 #include <Connectivites_IndGros.h>
 #include <Restriction_base.h>
-#include <List_Prolongement.h>
+#include <Prolongement.h>
 
 class Equation_base;
 class Probleme_base;

@@ -26,8 +26,8 @@
 #define Equation_rayonnement_included
 
 #include <Equation_rayonnement_base.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Equation_rayonnement_base);
 
 class Equation_rayonnement : public DERIV(Equation_rayonnement_base)
 {

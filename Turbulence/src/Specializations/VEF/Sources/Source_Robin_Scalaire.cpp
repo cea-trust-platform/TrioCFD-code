@@ -71,16 +71,14 @@ void Source_Robin_Scalaire::completer()
   Source_base::completer();
   const Equation_base& eqn_NS = equation().probleme().equation(0);
   const Sources& srcs = eqn_NS.sources();
-  CONST_LIST_CURSEUR(Source) curseur = srcs;
-  while(curseur)
+  for (const auto& itr : srcs)
     {
-      if (sub_type(Source_Robin,curseur->valeur()))
+      if (sub_type(Source_Robin,itr.valeur()))
         {
-          const Source_Robin& ts_Robin = ref_cast(Source_Robin,curseur->valeur());
+          const Source_Robin& ts_Robin = ref_cast(Source_Robin,itr.valeur());
           tab_u_star = ts_Robin.tab_u_star();
           tab_d_plus = ts_Robin.tab_d_plus();
         }
-      ++curseur;
     }
 }
 

@@ -23,7 +23,6 @@
 #include <Nom.h>
 
 
-Implemente_deriv(Mod_echelle_LRM_base);
 Implemente_instanciable(Mod_echelle_LRM,"Mod_echelle_LRM",DERIV(Mod_echelle_LRM_base));
 
 /*! @brief

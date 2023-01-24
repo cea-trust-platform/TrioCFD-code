@@ -25,7 +25,8 @@
 
 #define Sigma_DEFAULT 5.67e-8
 
-#include <Vect_Face_Rayonnante.h>
+#include <TRUST_Vector.h>
+#include <Face_Rayonnante.h>
 #include <Modele_Rayonnement_base.h>
 #include <Matrice_Morse.h>
 

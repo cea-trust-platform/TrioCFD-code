@@ -22,7 +22,6 @@
 #include <Diffu_totale.h>
 
 
-Implemente_deriv(Diffu_totale_base);
 Implemente_instanciable(Diffu_totale,"Diffu_totale",DERIV(Diffu_totale_base));
 
 /*! @brief

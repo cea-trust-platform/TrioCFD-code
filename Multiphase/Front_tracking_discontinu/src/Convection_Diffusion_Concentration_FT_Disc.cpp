@@ -72,12 +72,12 @@ Entree& Convection_Diffusion_Concentration_FT_Disc::readOn(Entree& is)
       nom_fic += "_bilan.out";
       SFichier f(nom_fic);
       char s[1000];
-      sprintf(s, "#%15s %16s %16s %16s %16s",
-              "temps",
-              "integrale0",
-              "integrale1",
-              "bilan_sortie",
-              "debit_sortie");
+      snprintf(s, 1000, "#%15s %16s %16s %16s %16s",
+               "temps",
+               "integrale0",
+               "integrale1",
+               "bilan_sortie",
+               "debit_sortie");
       f << s << finl;
     }
 
@@ -531,12 +531,12 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
       nom_fic += "_bilan.out";
       SFichier f(nom_fic, ios::out | ios::app);
       char s[1000];
-      sprintf(s, "%16.8f %16.8g %16.8g %16.8g %16.8g",
-              temps,
-              integrale0,
-              integrale1,
-              integrale_sortie,
-              integrale_sortie / dt);
+      snprintf(s, 1000, "%16.8f %16.8g %16.8g %16.8g %16.8g",
+               temps,
+               integrale0,
+               integrale1,
+               integrale_sortie,
+               integrale_sortie / dt);
       f << s << finl;
     }
   Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c2", inconnue().valeur().valeurs());

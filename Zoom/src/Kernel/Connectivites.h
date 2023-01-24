@@ -26,6 +26,7 @@
 
 
 #include <Connectivites_base.h>
+#include <TRUST_Deriv.h>
 class Zone_VF;
 class Domaine;
 #include <TRUSTTabs_forward.h>
@@ -39,7 +40,6 @@ class Domaine;
 // CLASS: Connectivites
 //
 /////////////////////////////////////////////////////////////////////////////////
-Declare_deriv(Connectivites_base);
 
 class Connectivites : public DERIV(Connectivites_base)
 {

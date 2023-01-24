@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Maillage_FT_Disc.h>
-#include <Deriv_Maillage_FT_Disc.h>
+#include <TRUST_Deriv.h>
 #include <TRUSTVect.h>
 #include <Zone.h>
 #include <Zone_VF.h>
@@ -63,7 +63,6 @@ EOF
  */
 
 Implemente_instanciable_sans_constructeur(Maillage_FT_Disc_Data_Cache,"Maillage_FT_Disc_Data_Cache",Objet_U);
-Implemente_deriv(Maillage_FT_Disc_Data_Cache);
 Entree& Maillage_FT_Disc_Data_Cache::readOn(Entree& is)
 {
   assert(0);
@@ -94,7 +93,6 @@ void Maillage_FT_Disc_Data_Cache::clear()
 
 Implemente_instanciable_sans_constructeur(Maillage_FT_Disc,"Maillage_FT_Disc",Ensemble_Lagrange_base);
 
-Implemente_deriv(Maillage_FT_Disc);
 
 /*! @brief Pour chaque sommet du maillage, s'il est sur un bord, on calcule costheta min et max (hysteresis) correspondant a la condition aux limites ou
  *
@@ -435,9 +433,9 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
   nom_fic += "_";
   char str[14];
 #ifndef INT_is_64_
-  sprintf(str,"%03d",compteur_plot++);
+  snprintf(str,14,"%03d",compteur_plot++);
 #else
-  sprintf(str,"%03ld",compteur_plot++);
+  snprintf(str,14,"%03ld",compteur_plot++);
 #endif
   nom_fic += Nom(str);
   nom_fic += "_";
@@ -450,18 +448,18 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
     {
 #ifndef INT_is_64_
       if (Process::nproc()<=1000)
-        sprintf(str,"%03d_",me());
+        snprintf(str,14,"%03d_",me());
       else if (Process::nproc()<=10000)
-        sprintf(str,"%04d_",me());
+        snprintf(str,14,"%04d_",me());
       else if (Process::nproc()<=100000)
-        sprintf(str,"%05d_",me());
+        snprintf(str,14,"%05d_",me());
 #else
       if (Process::nproc()<=1000)
-        sprintf(str,"%03ld_",me());
+        snprintf(str,14,"%03ld_",me());
       else if (Process::nproc()<=10000)
-        sprintf(str,"%04ld_",me());
+        snprintf(str,14,"%04ld_",me());
       else if (Process::nproc()<=100000)
-        sprintf(str,"%05ld_",me());
+        snprintf(str,14,"%05ld_",me());
 #endif
       else
         {
@@ -596,10 +594,9 @@ void Maillage_FT_Disc::associer_zone_dis_parcours(const Zone_dis& zone_dis, cons
 
   // On recupere la liste des PE voisins
   ArrOfIntFT pe_list;
-  CONST_LIST_CURSEUR(Joint) curseur(zone_dis.zone().faces_joint());
-  for (; curseur; ++curseur)
+  for (const auto& itr : zone_dis.zone().faces_joint())
     {
-      const Joint& joint = curseur.valeur();
+      const Joint& joint = itr;
       const int pe_voisin = joint.PEvoisin();
       pe_list.append_array(pe_voisin);
     }

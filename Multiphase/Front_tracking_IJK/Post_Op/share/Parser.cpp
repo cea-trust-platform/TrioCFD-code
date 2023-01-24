@@ -14,7 +14,7 @@ void debug(StringTokenizer*);
 
 Constante Parser::c_pi;
 
-/* Les identificateurs suivants doivent etre définis de manière unique pour chaque fonction */
+/* Les identificateurs suivants doivent etre dï¿½finis de maniï¿½re unique pour chaque fonction */
 
 
 
@@ -195,9 +195,9 @@ double Parser::evalFunc(PNode* node)
   /* OC : Nouvelle version : */
   if (node->value<=0)
     {
-      UnaryFunction& f = unary_func[-node->value-1]; // OC attention, dans node->value c est l'opposé de l'indice de la func dans la liste 
-      // afin de distinguer opérateur binaire (>0) et fonctions unaires (<0>
-      // Il est donc necessaire de prendre -node->value ici pour référencer un élément de la liste
+      UnaryFunction& f = unary_func[-node->value-1]; // OC attention, dans node->value c est l'opposï¿½ de l'indice de la func dans la liste 
+      // afin de distinguer opï¿½rateur binaire (>0) et fonctions unaires (<0>
+      // Il est donc necessaire de prendre -node->value ici pour rï¿½fï¿½rencer un ï¿½lï¿½ment de la liste
       // De plus, on rajoute +1 car le zero ne doit pas etre utiliser pour les fonctions
       return f.eval(eval(node->left));
     }
@@ -209,7 +209,7 @@ double Parser::evalFunc(PNode* node)
     }
 }
 
-// Ne pas inliner car sinon Parser::eval(PNode* node) plus souvent appelée encore
+// Ne pas inliner car sinon Parser::eval(PNode* node) plus souvent appelï¿½e encore
 // ne sera peut etre pas inlinee...
 double Parser::evalOp(PNode* node)
 {
@@ -328,7 +328,7 @@ void Parser::parserState0(StringTokenizer* tokenizer, PSTACK(PNode)* ob, STACK(i
           trouv = searchFunc(func);
           if (trouv>-1)
             {
-              op->push(-trouv); // OC 01/2005 : Attention, on stocke l'opposé de l'indice trouvé afin de bien dissocier les opérateurs binaires des fonctions unaires.
+              op->push(-trouv); // OC 01/2005 : Attention, on stocke l'opposï¿½ de l'indice trouvï¿½ afin de bien dissocier les opï¿½rateurs binaires des fonctions unaires.
               state = 0;
             }
           else 
@@ -636,14 +636,12 @@ void Parser::addVar(const char *vv)
         
 int Parser::searchCst(const String&v) 
 {
-  LIST_CURSEUR(Constante) curseur(les_cst);
   int i=0;
   Nom nv(v.toChar());
-  while(curseur)
+  for (auto& itr : les_cst)
     {
-      Constante& cst = ref_cast(Constante,curseur.valeur());
+      Constante& cst = ref_cast(Constante,itr);
       if (nv == cst.le_nom()) return i;
-      ++curseur;
       i++;
     }
   //Non ca marche pas encore le pere !!
@@ -656,17 +654,15 @@ int Parser::searchCst(const String&v)
 
 int Parser::searchFunc(const String&v) 
 {
-  LIST_CURSEUR(DERIV(UnaryFunction)) curseur(unary_func);
   int i=0;
   Nom nv(v.toChar());
   nv.majuscule();
-  while(curseur)
+  for (auto& itr : unary_func)
     {
-      UnaryFunction& f = curseur.valeur().valeur();
+      UnaryFunction& f = itr.valeur();
       Nom n2(f.getName());
       n2.majuscule();
-      if (nv == n2) return i+1 ; // OC: pour ne pas utiliser le zero car sinon conflit avec la nouvelle numérotation des opérateurs binaires.
-      ++curseur;
+      if (nv == n2) return i+1 ; // OC: pour ne pas utiliser le zero car sinon conflit avec la nouvelle numï¿½rotation des opï¿½rateurs binaires.
       i++;
     }
   //Non ca marche pas encore le pere, car la numerotation des fcts n est pas la meme entre pere et fils !!

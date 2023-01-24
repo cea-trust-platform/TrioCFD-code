@@ -39,7 +39,7 @@ void Validation_VDF::compare(const IJK_Field_double& ref, const IJK_Field_double
           if (d > 1e-15)
             {
               char s[1000];
-              sprintf(s, " local_ijk=( %3d %3d %3d )  global_ijk=( %3d %3d %3d ) ref= %10g  current= %10g  delta=%5g",
+              snprintf(s, 1000, " local_ijk=( %3d %3d %3d )  global_ijk=( %3d %3d %3d ) ref= %10g  current= %10g  delta=%5g",
                       i, j, k, i+i0, j+j0, k+k0, ref(i,j,k), x(i,j,k), d);
               Process::Journal() << msg << s << finl;
             }
