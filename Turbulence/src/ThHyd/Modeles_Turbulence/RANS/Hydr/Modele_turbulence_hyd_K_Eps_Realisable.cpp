@@ -160,7 +160,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
 
   if (sch.nb_pas_dt()==0 || sch.limpr())
     {
-      const DoubleTab& K_Eps = le_champ_K_Eps.valeurs();
+      const DoubleTab& tabKEps = K_Eps().valeurs();
       double k_min=DMAXFLOAT;
       double eps_min=DMAXFLOAT;
       double nut_min=DMAXFLOAT;
@@ -173,7 +173,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
       int loc_k_max=-1;
       int loc_eps_max=-1;
       int loc_nut_max=-1;
-      int size=K_Eps.dimension(0);
+      int size = tabKEps.dimension(0);
       if (size<0)
         {
           if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
@@ -187,8 +187,8 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
       ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
-          const double k = K_Eps(n,0);
-          const double eps = K_Eps(n,1);
+          const double k = tabKEps(n,0);
+          const double eps = tabKEps(n,1);
           double nut = 0;
           if (eps > 0) nut = LeCmu*k*k/eps;
           if (k < k_min)
