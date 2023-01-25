@@ -51,6 +51,7 @@ class Echange_contact_VDF_VEF_Zoom  : public Echange_contact_VDF_Zoom_base
 public :
   void mettre_a_jour(double ) override ;
   int compatible_avec_discr(const Discretisation_base& ) const override;
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
 };
 

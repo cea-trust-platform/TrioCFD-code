@@ -24,7 +24,8 @@
 
 #include <Paroi_hyd_base_VEF.h>
 #include <Zone_Cl_dis.h>
-#include <Vect_Eq_couch_lim.h>
+#include <TRUST_Vector.h>
+#include <Eq_couch_lim.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM.h>
 

@@ -16,6 +16,7 @@
 #ifndef Navier_Stokes_Aposteriori_included
 #define Navier_Stokes_Aposteriori_included
 
+#include <Champ_Post_Operateur_Eqn.h>
 #include <Navier_Stokes_std.h>
 
 class Navier_Stokes_Aposteriori : public Navier_Stokes_std
@@ -33,8 +34,11 @@ public:
   const Champ_base& get_champ(const Motcle& nom) const override;
   void creer_champ(const Motcle& motlu) override;
 
+  Champ_Post_Operateur_Eqn& get_champ_source() { return champ_src_; }
+
 private:
   Champ_Fonc estimateur_aposteriori_;
+  Champ_Post_Operateur_Eqn champ_src_;
   void estimateur_aposteriori();
 };
 

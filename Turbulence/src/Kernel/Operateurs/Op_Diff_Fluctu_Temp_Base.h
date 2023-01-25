@@ -26,6 +26,7 @@
 #include <Operateur.h>
 #include <Operateur_negligeable.h>
 #include <Matrice_Morse.h>
+#include <TRUST_Deriv.h>
 
 class Champ_Fonc;
 class Champ_Don;
@@ -77,7 +78,6 @@ public:
 //
 //////////////////////////////////////////////////////////////////////////////
 
-Declare_deriv(Op_Diff_Fluctu_Temp_Base);
 
 class Op_Diff_Fluctu_Temp :  public Operateur,
   public DERIV(Op_Diff_Fluctu_Temp_Base)

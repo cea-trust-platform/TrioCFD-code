@@ -20,33 +20,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <ConstruireDomaine.h>
-#include <Domaine.h>
-#include <Sous_Zone.h>
-#include <Deriv_Zone.h>
-#include <Static_Int_Lists.h>
 #include <Connectivite_som_elem.h>
+#include <ConstruireDomaine.h>
+#include <Static_Int_Lists.h>
 #include <Faces_builder.h>
+#include <TRUST_Deriv.h>
+#include <Sous_Zone.h>
+#include <Domaine.h>
+#include <Zone.h>
 
 Implemente_instanciable(ConstruireDomaine,"ConstruireDomaine",Interprete_geometrique_base);
 
-
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& ConstruireDomaine::printOn(Sortie& os) const
 {
   return Interprete::printOn(os);
 }
 
-
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& ConstruireDomaine::readOn(Entree& is)
 {
   return Interprete::readOn(is);
@@ -74,16 +63,10 @@ Entree& ConstruireDomaine::interpreter_(Entree& is)
   Domaine& dom=domaine();
   Sous_Zone& sszone=ref_cast(Sous_Zone, objet(nom_sszone));
 
-
-
-
-
   DERIV(Zone) zone_raf;
   zone_raf.typer("Zone");
   Zone& zoneraf = dom.add(zone_raf.valeur());
   zoneraf.associer_domaine(dom);
-
-
 
   Cout << "Type elem = " << sszone.zone().type_elem()->que_suis_je() << finl;
 
@@ -93,11 +76,6 @@ Entree& ConstruireDomaine::interpreter_(Entree& is)
   creer_sommet_et_elem(dom,sszone,correspo_new_som);
 
   creer_bords(zoneraf,sszone,correspo_new_som);
-
-
-
-  //Domaine& dom0 = zone0.domaine();
-  // Cerr << "Zone 0 nb faces bord = " << zone0.nb_faces_bord() << finl;
 
 
   return is;
@@ -205,14 +183,13 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
 
   Bords& mes_faces_bord = zoneraf.faces_bord();
   Elem_geom& elem = zoneraf.type_elem();
-  LIST_CURSEUR(Bord) curseur(zone0.faces_bord());
-  while(curseur)
+  for (auto& itr : zone0.faces_bord())
     {
-      Faces& les_faces=curseur->faces();
+      Faces& les_faces=itr.faces();
       Bord& bord=mes_faces_bord.add(Bord());
-      Cout << "Dans ConstruireDomaine  Nom bord = " << curseur->le_nom() << finl;
+      Cout << "Dans ConstruireDomaine  Nom bord = " << itr.le_nom() << finl;
       //Cout << "Dans ConstruireDomaine  type face  = " << les_faces.type_face() << finl;
-      bord.nommer(curseur->le_nom());
+      bord.nommer(itr.le_nom());
       bord.typer_faces(les_faces.type_face());
       bord.associer_zone(zoneraf);
 
@@ -239,9 +216,6 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
               bord.ajouter_faces(uneface);
             }
         }
-
-      //Cout << " faces = " << les_faces << finl;
-      ++curseur;
     }
 
   Bord& bord=mes_faces_bord.add(Bord());

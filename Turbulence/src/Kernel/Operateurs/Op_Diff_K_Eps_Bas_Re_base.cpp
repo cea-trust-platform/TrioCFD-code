@@ -26,7 +26,6 @@
 
 Implemente_base(Op_Diff_K_Eps_Bas_Re_base,"Op_Diff_K_Eps_Bas_Re_base",Operateur_base);
 Implemente_instanciable(Op_Diff_K_Eps_Bas_Re_negligeable,"Op_Diff_K_Eps_Bas_Re_negligeable",Op_Diff_K_Eps_Bas_Re_base);
-Implemente_deriv(Op_Diff_K_Eps_Bas_Re_base);
 Implemente_instanciable(Op_Diff_K_Eps_Bas_Re,"Op_Diff_K_Eps_Bas_Re",DERIV(Op_Diff_K_Eps_Bas_Re_base));
 
 

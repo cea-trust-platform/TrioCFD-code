@@ -21,7 +21,7 @@
 
 #include <Turbulence_hyd_sous_maille_axi_VDF.h>
 #include <Periodique.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Neumann_sortie_libre.h>
 #include <Symetrie.h>
 #include <TRUSTTrav.h>

@@ -94,7 +94,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 {
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
+  const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
   const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &n_f = zone.face_normales();
   const DoubleTab& pvit = ch.passe(),
@@ -245,17 +245,14 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),
                          &y_elem = zone.y_elem(),
                           &y_faces = zone.y_faces(),
-                           &n_y_elem = zone.normale_paroi_elem(),
-                            &n_y_faces = zone.normale_paroi_faces(),
-                             &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs(),
-                              &grad_v = equation().probleme().get_champ("gradient_vitesse").valeurs(),
-                               * k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : nullptr ;
+                           &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs(),
+                            &grad_v = equation().probleme().get_champ("gradient_vitesse").valeurs(),
+                             * k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : nullptr ;
 
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   int N = pvit.line_size() , Np = press.line_size(), Nk = (k_turb) ? (*k_turb).dimension(1) : 1, D = dimension,
-      nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),
-      cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
+      nf_tot = zone.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
 
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), k_l(Nk), d_b_l(N), dv(N, N), ddv_c(4), coeff(N, N), //arguments pour coeff
              vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Requis pour corrections vort et u_l-u-g

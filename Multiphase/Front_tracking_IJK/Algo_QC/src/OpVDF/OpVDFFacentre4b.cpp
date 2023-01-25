@@ -51,7 +51,7 @@ void Op_Conv_centre4b_VDF_Face::associer(const Zone_dis& zone_dis,
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
-  const Champ_Face& vit = ref_cast(Champ_Face,ch_vit.valeur());
+  const Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF,ch_vit.valeur());
 
   iter.associer(zvdf, zclvdf, *this);
 

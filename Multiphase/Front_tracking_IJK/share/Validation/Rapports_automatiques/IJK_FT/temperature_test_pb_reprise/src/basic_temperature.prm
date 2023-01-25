@@ -24,7 +24,7 @@ EOF
 }
 
 Chapitre {
-	Titre "Temperature diffusion in a channel flowwith fixed wall temperature"
+	Titre "Temperature diffusion in a channel flow with fixed wall temperature"
 	Description <<EOF
 We validate the code in channel conditions for the temperature.
 

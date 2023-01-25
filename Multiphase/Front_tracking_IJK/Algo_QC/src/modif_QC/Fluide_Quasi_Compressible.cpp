@@ -53,8 +53,8 @@ Fluide_Quasi_Compressible::Fluide_Quasi_Compressible()
 
 /*! @brief Ecrit les proprietes du fluide sur un flot de sortie.
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
 {
@@ -78,9 +78,9 @@ Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
  *      }
  *  cd Fluide_Incompressible::readOn
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
- * @throws accolade ouvrante attendue 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
  */
 Entree& Fluide_Quasi_Compressible::readOn(Entree& is)
 {
@@ -232,7 +232,7 @@ int Fluide_Quasi_Compressible::lire_motcle_non_standard(const Motcle& mot, Entre
 
 /*! @brief Complete le fluide avec les champs inconnus associes au probleme
  *
- * @param (Pb_Thermohydraulique& pb) le probleme a resoudre 
+ * @param (Pb_Thermohydraulique& pb) le probleme a resoudre
  */
 void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 {
@@ -273,7 +273,7 @@ void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 
 /*! @brief Complete le fluide avec un Cp constant
  *
- * @param (double Cp) le cp du fluide 
+ * @param (double Cp) le cp du fluide
  */
 void Fluide_Quasi_Compressible::set_Cp(double Cp_)
 {
@@ -370,7 +370,7 @@ void Fluide_Quasi_Compressible::discretiser(const Probleme_base& pb, const  Disc
 
 /*! @brief Verifie que les champs lus l'ont ete correctement.
  *
- * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie 
+ * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie
  */
 void Fluide_Quasi_Compressible::verifier_coherence_champs(int& err,Nom& msg)
 {
@@ -481,7 +481,7 @@ void Fluide_Quasi_Compressible::creer_champs_non_lus()
  *     nouveau temps specifie, les autres sont mis a
  *     par un appel a CLASSE_DU_CHAMP::mettre_a_jour(double temps).
  *
- * @param (double temps) le temps de mise a jour 
+ * @param (double temps) le temps de mise a jour
  */
 void Fluide_Quasi_Compressible::mettre_a_jour(double temps)
 {

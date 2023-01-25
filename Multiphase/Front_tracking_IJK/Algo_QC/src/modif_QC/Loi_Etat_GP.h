@@ -31,7 +31,7 @@
  *      dont la loi d'eata est :
  *         Pth = rho*R*T
  *
- * @sa Fluide_Quasi_Compressible Loi_Etat_base 
+ * @sa Fluide_Quasi_Compressible Loi_Etat_base
  */
 class Loi_Etat_GP : public Loi_Etat_base
 {

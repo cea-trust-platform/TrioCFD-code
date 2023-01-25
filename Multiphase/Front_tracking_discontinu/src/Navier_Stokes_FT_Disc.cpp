@@ -29,6 +29,7 @@
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Assembleur_base.h>
+#include <TRUST_Vector.h>
 #include <Ref_Champ_base.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VDF.h>
@@ -59,8 +60,6 @@
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc,"Navier_Stokes_FT_Disc",Navier_Stokes_Turbulent);
 
 Implemente_ref(Navier_Stokes_FT_Disc);
-Declare_vect(REF(Transport_Interfaces_FT_Disc));
-Implemente_vect(REF(Transport_Interfaces_FT_Disc));
 
 class Navier_Stokes_FT_Disc_interne
 {
@@ -1803,15 +1802,6 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
 
   if ((variables_internes().new_mass_source_) && (phase_pilote != 1))
     {
-      const double delta_rho = (rho_1 - rho_0);
-      double c0 = 0.;
-      if (std::abs(delta_rho)>DMINFLOAT)
-        {
-          c0 = rho_1/delta_rho;
-        }
-      const double c1 = 1+c0;
-
-      const DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
       const DoubleTab& normale_elements = eq_transport.get_update_normale_interface().valeurs();
       const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
 
@@ -1850,14 +1840,13 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                   u0(face) = 0.; // there is no normal velocity at a symmetry axis
                   continue;
                 }
-              double x = 0.;
+              //double x = 0.;
               double xx = 0.;
               // Si on n'est pas au bord...
               if (e1 >= 0)
                 {
                   const double nx = normale_elements(e1, dir);
-                  const double c = ((xf-xp(e1,dir)) * nx >0.) ? c0 : c1;
-                  x = c*secmem2[e1]*nx;
+                  //x = c*secmem2[e1]*nx;
                   const double ai= interfacial_area(e1);
                   // nx pointe vers le liquide (sortant de phase 0)
                   if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
@@ -1903,8 +1892,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
               if (e2 >= 0)
                 {
                   const double nx = normale_elements(e2, dir);
-                  const double c = ((xf-xp(e2,dir)) * nx >0.) ? c0 : c1;
-                  x += c*secmem2[e2]*normale_elements(e2, dir);
+                  //x += c*secmem2[e2]*normale_elements(e2, dir);
                   const double ai= interfacial_area(e2);
                   if ((fabs(ai)>DMINFLOAT) && (fabs(nx)>DMINFLOAT))
                     {
@@ -3246,13 +3234,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         }
 #if TCL_MODEL
 
-      double int_sec_mem2 = 0.;
+      /* double int_sec_mem2 = 0.;
       double int_sec_mem = 0.;
       for (int elem = 0; elem < nb_elem; elem++)
         {
-          int_sec_mem2 +=secmem2(elem);
+          //int_sec_mem2 +=secmem2(elem);
           int_sec_mem +=secmem(elem);
-        }
+        } */
       //   Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl;
       //  Cerr << "Integral of secmem before TCL and /DT : " << int_sec_mem << finl;
 
@@ -3340,8 +3328,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       secmem += secmem2;
       secmem.echange_espace_virtuel();
 #if NS_VERBOSE
-      int_sec_mem2 = 0;
-      int_sec_mem = 0;
+      double int_sec_mem2 = 0;
+      double int_sec_mem = 0;
       for (int elem = 0; elem < nb_elem; elem++)
         {
           int_sec_mem2 +=secmem2(elem);

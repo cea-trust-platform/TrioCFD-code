@@ -21,7 +21,7 @@
 #include <Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h>
 #include <Zone.h>
 #include <TRUSTTrav.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_Fonc_P0_VDF.h>
 #include <Debog.h>
 #include <TRUSTTrav.h>
@@ -741,7 +741,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(
   DoubleTab& Sij, const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF, Champ_Inc& inco)
 {
-  Champ_Face& vit = ref_cast(Champ_Face, inco.valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, inco.valeur());
   const DoubleTab& vitesse = inco.valeurs();
   const int nb_elem_tot = zone_VDF.nb_elem_tot();
   const int nb_elem = zone_VDF.nb_elem();

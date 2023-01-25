@@ -27,7 +27,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem,"Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_P0_VDF",Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem);
@@ -62,7 +62,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_bl
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = ref_cast(Modele_Fonc_Bas_Reynolds,mod_turb.associe_modele_fonction());
   const int nb_elem = zone_VDF.nb_elem(), nb_elem_tot = zone_VDF.nb_elem_tot(), nb_consti = eq_concentration->nb_constituants();

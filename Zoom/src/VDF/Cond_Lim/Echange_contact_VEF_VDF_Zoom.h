@@ -51,7 +51,7 @@ class Echange_contact_VEF_VDF_Zoom  : public Temperature_imposee_paroi
 
 public :
   void mettre_a_jour(double ) override ;
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 };
 
 

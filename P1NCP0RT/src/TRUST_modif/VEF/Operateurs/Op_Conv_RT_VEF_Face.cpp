@@ -61,30 +61,15 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
   const Champ_Inc_base& la_vitesse=vitesse();
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
-  const DoubleVect& porosite_face = equation().milieu().porosite_face();
-
-  int marq=phi_u_transportant(equation());
   DoubleTab transporte_face_;
   DoubleTab vitesse_face_;
-  // soit on a transporte_face=phi*transporte et vitesse_face=vitesse
-  // soit on a transporte_face=transporte et vitesse_face=phi*vitesse
-  // cela depend si on transporte avec phi*u ou avec u.
-  const DoubleTab& transporte_face = modif_par_porosite_si_flag(transporte,transporte_face_,!marq,porosite_face);
-  const DoubleTab& vitesse_face    = modif_par_porosite_si_flag(vitesse_face_absolue,vitesse_face_,marq,porosite_face);
 
   const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& facenormales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
   const Zone& zone = zone_VEF.zone();
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
   const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
   const IntTab& elem_sommets = zone.les_elems();
   const DoubleTab& coord_sommets=zone.domaine().les_sommets();
-  const DoubleTab& vecteur_face_facette = ref_cast_non_const(Zone_VEF,zone_VEF).vecteur_face_facette();
-  const  DoubleTab& vecteur_face_facette_Cl = zone_Cl_VEF.vecteur_face_facette_Cl();
-  const IntTab& les_elems=zone.les_elems();
 
   // Permet d'avoir un flux_bord coherent avec les CLs (mais parfois diverge?)
   // Active uniquement pour ordre 3
@@ -300,16 +285,9 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const DoubleTab& face_normales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
   const Zone& zone = zone_VEF.zone();
-  const Elem_VEF& type_elem = zone_VEF.type_elem();
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-
-
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
-  const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
 
   int nfac = zone.nb_faces_elem();
   int nsom = zone.nb_som_elem();
@@ -327,9 +305,8 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
 
   double psc;
   DoubleTab pscl=0;
-  int poly,face_adj,fa7,i,j,n_bord;
-  int num_face, rang ,itypcl;
-  int num10,num20,num_som;
+  int i,j,n_bord;
+  int num_face;
   int ncomp_ch_transporte;
   if (transporte.nb_dim() == 1)
     ncomp_ch_transporte=1;
@@ -362,7 +339,6 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // dans la zone
 
   // boucle sur les polys
-  const IntTab& KEL=zone_VEF.type_elem().valeur().KEL();
   int phi_u_transportant_yes=phi_u_transportant(equation());
 
   {

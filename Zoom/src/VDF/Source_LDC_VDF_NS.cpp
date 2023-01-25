@@ -87,21 +87,6 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
   le_residu = 0;
 
 
-
-  //On calcule le second membre grossier
-  /* LIST_CURSEUR(Source) curseur(eq.sources());
-     while(curseur){
-     if (!sub_type(Source_Correction_Deficitaire,curseur.valeur().valeur()))
-     {
-     curseur->ajouter(le_residu);
-     }
-     ++curseur;
-     }
-  */
-
-  //Cout << "source = " << le_residu << finl;
-
-
   // On calcule la somme des operateurs fins puis leur restriction
   DoubleTab op_fin, op_fin_restreint;
 

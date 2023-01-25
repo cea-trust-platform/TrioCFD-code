@@ -23,6 +23,7 @@
 #include <Ref_Parcours_interface.h>
 #include <Ref_Transport_Interfaces_FT_Disc.h>
 #include <Intersections_Elem_Facettes_Data.h>
+#include <TRUST_Deriv.h>
 
 #include <TRUSTTabs_forward.h>
 class Remaillage_FT;
@@ -31,7 +32,6 @@ class Parcours_interface;
 class Maillage_Echange;
 class Zone_VF;
 class Maillage_FT_Disc_Data_Cache;
-Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 
 /*! @brief : class Maillage_FT_Disc Cette classe decrit un maillage:
  *
@@ -137,6 +137,9 @@ public:
   virtual const ArrOfDouble& get_update_surface_facettes() const;
   virtual const DoubleTab& get_update_normale_facettes() const;
   virtual const ArrOfDouble& get_update_courbure_sommets() const;
+
+  virtual const ArrOfDouble& get_surface_facettes() const;
+  virtual const DoubleTab& get_normale_facettes() const;
 
   inline int set_niveau_plot(int niv);
 

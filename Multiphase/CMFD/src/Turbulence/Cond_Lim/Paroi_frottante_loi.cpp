@@ -46,6 +46,8 @@ Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 
 Entree& Paroi_frottante_loi::readOn(Entree& s )
 {
+  if (app_domains.size() == 0) app_domains = { Motcle("indetermine") };
+
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
   param.ajouter("beta_k", &beta_k);
@@ -69,17 +71,6 @@ void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
   for (int f =0 ; f < nf ; f++)
     for (int n = 0 ; n<N ; n++)
       tab(f + f1, n) |= 1;
-}
-
-int Paroi_frottante_loi::compatible_avec_eqn(const Equation_base& eqn) const
-{
-  Motcle dom_app=eqn.domaine_application();
-  Motcle Hydraulique="Hydraulique";
-
-  if (dom_app==Hydraulique)
-    return 1;
-  else err_pas_compatible(eqn);
-  return 0;
 }
 
 double Paroi_frottante_loi::coefficient_frottement(int i) const

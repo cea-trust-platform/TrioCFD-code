@@ -38,8 +38,8 @@ Implemente_instanciable(EDO_Pression_th_VDF_Gaz_Parfait,"EDO_Pression_th_VDF_Gaz
 
 /*! @brief Imprime la loi sur un flot de sortie.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) le flot de sortie pour l'impression
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& EDO_Pression_th_VDF_Gaz_Parfait::printOn(Sortie& os) const
 {
@@ -49,8 +49,8 @@ Sortie& EDO_Pression_th_VDF_Gaz_Parfait::printOn(Sortie& os) const
 
 /*! @brief Lecture d'une EDO sur un flot d'entree.
  *
- * @param (Entree& is) le flot d'entree pour la lecture des parametres 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& EDO_Pression_th_VDF_Gaz_Parfait::readOn(Entree& is)
 {
@@ -60,8 +60,8 @@ Entree& EDO_Pression_th_VDF_Gaz_Parfait::readOn(Entree& is)
 
 /*! @brief Resoud l'EDO
  *
- * @param (double Pth_n) La pression a l'etape precedente 
- * @return (double) La nouvelle valeur de la pression 
+ * @param (double Pth_n) La pression a l'etape precedente
+ * @return (double) La nouvelle valeur de la pression
  */
 double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
 {

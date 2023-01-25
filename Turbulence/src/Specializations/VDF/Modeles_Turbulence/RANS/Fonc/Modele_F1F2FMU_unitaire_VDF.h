@@ -29,7 +29,7 @@ class Zone_Cl_dis;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
-class Champ_Face;
+class Champ_Face_VDF;
 
 class Modele_F1F2FMU_unitaire_VDF : public Modele_Jones_Launder_VDF
 {

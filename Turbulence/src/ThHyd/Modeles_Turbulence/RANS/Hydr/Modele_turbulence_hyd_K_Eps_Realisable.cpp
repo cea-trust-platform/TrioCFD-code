@@ -34,6 +34,7 @@
 #include <Modele_turbulence_scal_base.h>
 #include <TRUSTTrav.h>
 #include <communications.h>
+#include <Champ_Inc_P0_base.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);
 
@@ -152,6 +153,117 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   return la_viscosite_turbulente;
 }
 
+void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(int avant) const
+{
+  const Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
+  const Champ_Inc& le_champ_K_Eps = K_Eps();
+
+  if (sch.nb_pas_dt()==0 || sch.limpr())
+    {
+      const DoubleTab& tabKEps = K_Eps().valeurs();
+      double k_min=DMAXFLOAT;
+      double eps_min=DMAXFLOAT;
+      double nut_min=DMAXFLOAT;
+      double k_max=0;
+      double eps_max=0;
+      double nut_max=0;
+      int loc_k_min=-1;
+      int loc_eps_min=-1;
+      int loc_nut_min=-1;
+      int loc_k_max=-1;
+      int loc_eps_max=-1;
+      int loc_nut_max=-1;
+      int size = tabKEps.dimension(0);
+      if (size<0)
+        {
+          if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
+            size = le_champ_K_Eps.valeur().equation().zone_dis().zone().nb_elem();
+          else
+            {
+              Cerr << "Unsupported K_Eps field in Modele_turbulence_hyd_K_Eps_realisable::imprimer_evolution_keps_realisable()" << finl;
+              Process::exit(-1);
+            }
+        }
+      ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
+      for (int n=0; n<size; n++)
+        {
+          const double k = tabKEps(n,0);
+          const double eps = tabKEps(n,1);
+          double nut = 0;
+          if (eps > 0) nut = LeCmu*k*k/eps;
+          if (k < k_min)
+            {
+              k_min = k;
+              loc_k_min = n;
+            }
+          else if (k > k_max)
+            {
+              k_max = k;
+              loc_k_max = n;
+            }
+          if (eps < eps_min)
+            {
+              eps_min = eps;
+              loc_eps_min = n;
+            }
+          else if (eps > eps_max)
+            {
+              eps_max = eps;
+              loc_eps_max = n;
+            }
+          if (nut < nut_min)
+            {
+              nut_min = nut;
+              loc_nut_min = n;
+            }
+          else if (nut > nut_max)
+            {
+              nut_max = nut;
+              loc_nut_max = n;
+            }
+        }
+      ArrOfDouble values(3);
+
+      values[0]=k_min;
+      values[1]=eps_min;
+      values[2]=nut_min;
+      mp_min_for_each_item(values);
+      k_min=values[0];
+      eps_min=values[1];
+      nut_min=values[2];
+
+      values[0]=k_max;
+      values[1]=eps_max;
+      values[2]=nut_max;
+      mp_max_for_each_item(values);
+      k_max=values[0];
+      eps_max=values[1];
+      nut_max=values[2];
+      if (Process::je_suis_maitre())
+        {
+          Cout << finl << "K_Eps evolution (" << (avant?"before":"after") << " law of the wall applies) at time " << le_champ_K_Eps.temps() << ":" << finl;
+          Cout << "std::min(k)=" << k_min;
+          if (Process::nproc()==1) Cout << " located at node " << loc_k_min;
+          Cout << finl;
+          Cout << "std::min(eps)=" << eps_min;
+          if (Process::nproc()==1) Cout << " located at node " << loc_eps_min;
+          Cout << finl;
+          Cout << "std::min(nut)=" << nut_min;
+          if (Process::nproc()==1) Cout << " located at node " << loc_nut_min;
+          Cout << finl;
+          Cout << "std::max(k)=" << k_max;
+          if (Process::nproc()==1) Cout << " located at node " << loc_k_max;
+          Cout << finl;
+          Cout << "std::max(eps)=" << eps_max;
+          if (Process::nproc()==1) Cout << " located at node " << loc_eps_max;
+          Cout << finl;
+          Cout << "std::max(nut)=" << nut_max;
+          if (Process::nproc()==1) Cout << " located at node " << loc_nut_max;
+          Cout << finl;
+        }
+    }
+}
+
 int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
@@ -172,6 +284,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 
   const Milieu_base& mil=equation().probleme().milieu();
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+  imprimer_evolution_keps_realisable(1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(K_Eps().temps());
@@ -183,6 +296,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  imprimer_evolution_keps_realisable(0);
   return 1;
 
 }
@@ -202,6 +316,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+  imprimer_evolution_keps_realisable(1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());

@@ -22,7 +22,6 @@
 
 #include <Modele_Rayonnement.h>
 
-Implemente_deriv(Modele_Rayonnement_base);
 Implemente_instanciable(Modele_Rayonnement,"Modele_Rayonnement",DERIV(Modele_Rayonnement_base));
 
 Entree& Modele_Rayonnement::readOn(Entree& is)

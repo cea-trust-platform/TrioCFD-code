@@ -24,8 +24,8 @@
 
 #include <MorEqn.h>
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Modele_Fonc_Bas_Reynolds_Base);
 
 
 

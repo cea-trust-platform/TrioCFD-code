@@ -564,22 +564,22 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               if (dt_post_<0) dt_post_ = post.dt_post_ch();
               // Impression des criteres
               Noms Critere_nom(3);
-              Critere_nom(0)="CEA_JAEA_alpha";
-              Critere_nom(1)="CEA_JAEA_alphaXgamma2";
-              Critere_nom(2)="CEA_JAEA_alpha2Xgamma2";
+              Critere_nom[0]="CEA_JAEA_alpha";
+              Critere_nom[1]="CEA_JAEA_alphaXgamma2";
+              Critere_nom[2]="CEA_JAEA_alpha2Xgamma2";
 
               for (int critere=0; critere<3; critere++)
                 {
                   //int vortex = Vortex_max(critere);
                   for (int i=0; i<3; i++) centre_vortex[i]=Centre(vortex_principal,i);
                   //imprimer(Critere_max(critere), Critere_nom(critere), centre_vortex, Rayon(vortex));
-                  imprimer(Critere(vortex_principal,critere), Critere_nom(critere), centre_vortex, Rayon[vortex_principal]);
+                  imprimer(Critere(vortex_principal,critere), Critere_nom[critere], centre_vortex, Rayon[vortex_principal]);
 
                   // Impression periodique des caracteristiques du vortex pour chaque critere
                   if (lpost(sch.temps_courant(),dt_post_))
                     {
                       Nom filename("Vortex_");
-                      filename+=Critere_nom(critere);
+                      filename+=Critere_nom[critere];
                       filename+="_";
                       filename+=Objet_U::nom_du_cas();
                       filename+=".";

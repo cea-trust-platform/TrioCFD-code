@@ -273,6 +273,9 @@ liste_postraitements
 	postraitement_ft_lata post2 { 
     format Lata 
     fichier post2 
+    champs dt_post 0.01 { 
+        indicatrice_interf elem 
+    } 
     interfaces body { 
         pe som 
     } 

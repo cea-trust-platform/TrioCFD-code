@@ -43,6 +43,8 @@ class Echange_contact_VDF_Zoom_base  : public Echange_externe_impose
   Declare_base(Echange_contact_VDF_Zoom_base);
 public :
   void mettre_a_jour(double ) override =0;
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+
 protected :
   double h_paroi;
 

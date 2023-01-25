@@ -172,10 +172,12 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
-
+  mutilde_NS.resize(eq_c.get_mutilde_()->valeurs().dimension_tot(0), 1);
 
   const DoubleTab& mutilde=eq_c.get_mutilde_()->valeurs();
-  mutilde_NS=mutilde;
+
+  for (int i = 0; i < eq_c.get_mutilde_()->valeurs().dimension_tot(0); i++) mutilde_NS(i,0) = mutilde(i);
+
   u_carre=source_pf.get_u_carre();
 
   if (eq_c.get_mutype_())
@@ -281,6 +283,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
   int nbfaces=zone_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
+  Sources list_sources = eq_c.sources();
+  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
+  int type_systeme_naire = source_pf.get_type_systeme_naire();
 
   // Forme en c*Grad(Div(alpha*rho*Grad(C)))
   //========================================
@@ -362,6 +367,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
   int nbfaces=zone_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
+  Sources list_sources = eq_c.sources();
+  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
+  int type_systeme_naire = source_pf.get_type_systeme_naire();
 
   // Forme en c*Grad(Div(alpha*rho*Grad(C)))-alpha*rho*Grad((Grad(C))^2)/2
   //======================================================================
@@ -472,6 +480,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
   int nbfaces=zone_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
+  Sources list_sources = eq_c.sources();
+  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
+  int type_systeme_naire = source_pf.get_type_systeme_naire();
 
   // Forme en -Div(alpha*rho*Grad(C))*Grad(C)
   //=========================================

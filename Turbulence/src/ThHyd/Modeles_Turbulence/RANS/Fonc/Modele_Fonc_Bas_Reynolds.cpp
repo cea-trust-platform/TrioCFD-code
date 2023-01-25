@@ -24,7 +24,6 @@
 #include <Equation_base.h>
 #include <Discretisation_base.h>
 
-Implemente_deriv(Modele_Fonc_Bas_Reynolds_Base);
 Implemente_instanciable(Modele_Fonc_Bas_Reynolds,"Modele_Fonc_Bas_Reynolds",DERIV(Modele_Fonc_Bas_Reynolds_Base));
 
 //

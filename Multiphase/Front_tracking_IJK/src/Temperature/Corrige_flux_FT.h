@@ -37,11 +37,9 @@
 
 #include <MonofluidVar.h>
 #include <Boundary_Conditions_Thermique.h>
-#include <IJK_Field.h>
 #include <IJK_Splitting.h>
 #include <Objet_U.h>
 #include <Parser.h>
-//#include <Interprete.h>
 #include <IJK_Interfaces.h>
 #include <IJK_Lata_writer.h>
 #include <Intersection_Interface_ijk.h>

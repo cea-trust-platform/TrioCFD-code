@@ -450,7 +450,8 @@ double IJK_Thermique::compute_timestep(const double timestep,
 {
   // alpha = lambda/(rho*cp)
   const double alpha_max = std::max(lambda_liquid_/(rho_l*cp_liquid_), lambda_vapor_/(rho_v*cp_vapor_));
-  const double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  if (diff_temp_negligible_) dt_fo = 1.e20;
   return dt_fo;
 }
 
@@ -1838,7 +1839,7 @@ void IJK_Thermique::compute_T_rust(const FixedVector<IJK_Field_double, 3>& veloc
   const double rho_l = ref_ijk_ft_->rho_liquide_;
   const double rho_v = ref_ijk_ft_->rho_vapeur_;
 
-  // DONE: remplacer rho_cp par un champ rho_cp_ mis à jour dans update_thermal_properties. Necessaire pour que ça marche.
+  // DONE: remplacer rho_cp par un champ rho_cp_ mis a jour dans update_thermal_properties. Necessaire pour que ca marche.
   //On calcule div(rho_cp*v) qu'on stocke dans T_rust
   switch (type_temperature_convection_op_)
     {

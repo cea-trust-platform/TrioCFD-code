@@ -78,11 +78,8 @@ Lire air
 {
 	mu  Champ_Uniforme 1 1.8e-5
  	rho Champ_Uniforme 1 1.2
+	gravite Champ_Uniforme 3 0. 0. -9.81
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. -9.81
-Associate air gravite
 
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       corps
@@ -173,12 +170,20 @@ Lire pb
 	    postraitement_ft_lata aile_gauche { 
     format Lata 
     fichier aile_gauche 
+	    champs dt_post 0.01
+	    {
+		    indicatrice_aile_gauche	elem
+	    }
     interfaces aile_gauche { 
     } 
 } 
 	    postraitement_ft_lata aile_droite { 
     format Lata 
     fichier aile_droite 
+	    champs dt_post 0.01
+	    {
+		    indicatrice_aile_droite	elem
+	    }
     interfaces aile_droite { 
     } 
 } 	    

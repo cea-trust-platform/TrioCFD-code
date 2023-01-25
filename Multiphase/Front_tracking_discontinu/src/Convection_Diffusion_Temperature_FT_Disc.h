@@ -31,7 +31,6 @@
 #include <Assembleur.h>
 #include <Assembleur_base.h>
 
-////Declare_liste(REF(Champ_base));
 
 class Convection_Diffusion_Temperature_FT_Disc: public Convection_Diffusion_Temperature
 {

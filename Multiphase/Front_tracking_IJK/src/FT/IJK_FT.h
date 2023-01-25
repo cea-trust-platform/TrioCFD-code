@@ -42,10 +42,8 @@
 #include <init_forcage_THI.h>
 #include <corrections_qdm.h>
 #include <Force_sp.h>
+#include <TRUST_List.h>
 #include <IJK_Energie.h>
-
-Declare_liste(IJK_Thermique);
-Declare_liste(IJK_Energie);
 
 // #define SMOOTHING_RHO
 
@@ -362,6 +360,7 @@ protected :
   IJK_FT_Post post_;
 
   int check_divergence_;
+  int rk_step_;
 
   Nom check_stop_file_; // Nom du fichier stop
 
@@ -465,7 +464,7 @@ protected :
   	  	  	  	  	  	  	  	  	 * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
   	  	  	  	  	  	  	  	  	 *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
   	  	  	  	  	  	  	  	  	 */
-  OpConvQuickSharpIJK_double velocity_convection_op_sharp_;
+  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
   OpConvCentre4IJK_double velocity_convection_op_centre_;
   OpConvAmontIJK_double velocity_convection_op_amont_;
 

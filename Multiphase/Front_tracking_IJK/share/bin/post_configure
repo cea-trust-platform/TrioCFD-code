@@ -37,8 +37,8 @@ do
            echo " "
        fi
    done
-   echo "source $TRUST_ROOT/env_for_python.sh" >> $env
-   echo "echo \"source $TRUST_ROOT/env_for_python.sh ... OK\"" >> $env
+   echo "#source \$TRUST_ROOT/env_for_python.sh" >> $env
+   echo "echo \"source \$TRUST_ROOT/env_for_python.sh ... NOT LOADED, if needed load it.\"" >> $env
    for path in share/bin
    do
       [ -d ${project_directory}/$path ] && grep "$path" $env 1>/dev/null 2>&1 || echo "export PATH=\${project_directory}/$path:\$PATH" >> $env

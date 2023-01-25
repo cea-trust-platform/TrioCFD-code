@@ -79,9 +79,9 @@ Entree& PaveCoincidant::readOn(Entree& is)
 {
   Nom ledom,bh,bb,bd,bg,bder,bdev;
 
-  is >> nom;
+  is >> nom_;
   is >> ledom;
-  Cerr << "Lecture du pave " << nom << " qui doit coincider avec le domaine " << ledom << finl;
+  Cerr << "Lecture du pave " << nom_ << " qui doit coincider avec le domaine " << ledom << finl;
 
   dom_qui_coincide=ref_cast(Domaine, Interprete::objet(ledom));
 
@@ -90,7 +90,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
   is >> motlu;
   if (motlu!="{")
     {
-      Cerr << "On attendait une { apres " << nom << finl;
+      Cerr << "On attendait une { apres " << nom_ << finl;
       exit();
     }
 
@@ -177,7 +177,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
     {
       Nom nom_nx(nmx);
       Nom nom_ny(nmy);
-      desc_pave = nom;
+      desc_pave = nom_;
       desc_pave+=" { Origine ";
       desc_pave+= (Nom)xmin;
       desc_pave+= " ";
@@ -229,7 +229,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
       Nom nom_nx(nmx);
       Nom nom_ny(nmy);
       Nom nom_nz(nmz);
-      desc_pave = nom;
+      desc_pave = nom_;
       desc_pave+= " { Origine " ;
       desc_pave+= (Nom)xmin ;
       desc_pave+= " " ;

@@ -23,7 +23,6 @@
 #include <Remailleur_Collision_FT.h>
 #include <Motcle.h>
 
-Implemente_deriv(Remailleur_Collision_FT_base);
 Implemente_instanciable(Remailleur_Collision_FT,"Remailleur_Collision_FT",DERIV(Remailleur_Collision_FT_base));
 
 Sortie& Remailleur_Collision_FT::printOn(Sortie& os) const

@@ -27,10 +27,9 @@
 #ifndef Restriction_included
 #define Restriction_included
 
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <Restriction_base.h>
 
-Declare_deriv(Restriction_base);
 
 /*! @brief classe Restriction Classe generique de la hierarchie des algorithmes, un objet
  *

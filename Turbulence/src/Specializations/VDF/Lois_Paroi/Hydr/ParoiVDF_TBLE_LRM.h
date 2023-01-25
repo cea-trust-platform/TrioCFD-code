@@ -22,11 +22,10 @@
 #ifndef ParoiVDF_TBLE_LRM_included
 #define ParoiVDF_TBLE_LRM_included
 
-#include <Vect.h>
+#include <TRUST_Vector.h>
 #include <Paroi_hyd_base_VDF.h>
 #include <Zone_dis.h>
 #include <Zone_Cl_dis.h>
-#include <Vect_Eq_couch_lim.h>
 #include <Eq_couch_lim.h>
 #include <Ref_Milieu_base.h>
 #include <Milieu_base.h>

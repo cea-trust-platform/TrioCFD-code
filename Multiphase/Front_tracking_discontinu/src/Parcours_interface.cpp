@@ -22,7 +22,7 @@
 #include <Parcours_interface.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
-#include <Deriv_Parcours_interface.h>
+#include <TRUST_Deriv.h>
 #include <Comm_Group.h>
 #include <Connectivite_frontieres.h>
 #include <Param.h>
@@ -33,7 +33,6 @@ Implemente_instanciable_sans_constructeur(Parcours_interface,"Parcours_interface
 
 static int flag_warning_code_missing=1;
 Implemente_ref(Parcours_interface);
-Implemente_deriv(Parcours_interface);
 
 const double Parcours_interface::Erreur_relative_maxi_ = 1.E-13;
 
@@ -1011,6 +1010,8 @@ inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
 
 /*! @brief Cette methode permet de calculer l'intersection entre une facette et un element du maillage eulerien
  *
+ * Precondition: dimension = 3
+ *
  * @param (zone_vf) zone du calcul
  * @param (maillage) description du maillage de l'interface
  * @param (num_facette) indice de la facette intersectant
@@ -1242,12 +1243,10 @@ int Parcours_interface::calcul_intersection_facelem_3D(
   }
   // En cas d'erreur d'arrondi ...
   if (surface < 0.) surface = 0.;
+
   // calcul des contributions.
-  //  Modif BM 9/9/2004 : calcul d'une surface reelle et non d'une fraction!
-  double normale[3];
-  const double surface_facette = maillage.calcul_normale_3D(num_facette, normale);
   double barycentre_phase1[3] = {0.,0.,0.};
-  if (correction_parcours_thomas_ || (surface * surface_facette > 5. * Erreur_max_coordonnees_))
+  if (correction_parcours_thomas_ || (sqrt(surface) > 5. * Erreur_max_coordonnees_))
     {
       //normalisation du centre de gravite
       if (sup_strict(surface,0.))
@@ -1358,6 +1357,8 @@ int Parcours_interface::calcul_intersection_facelem_3D(
 
 /*! @brief Cette methode (statique) permet d'inverser une matrice 3x3
  *
+ * Precondition: des denominateurs non nuls
+ *
  * @param (matrice) matrice 3x3 a inverser
  * @param (matrice_inv) inverse de la matrice 3x3
  * @return (rien)
@@ -1434,6 +1435,8 @@ void Parcours_interface::calcul_produit_matrice33_vecteur(const FTd_matrice33& m
  *
  * C'est une fraction du volume de l'element
  *    comprise entre epsilon et 1.-epsilon
+ *
+ * Precondition: dimension = 3
  *
  * @param (zone_vf) zone du calcul
  * @param (num_element) indice de l'element intersecte
@@ -1542,6 +1545,8 @@ double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
 /*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans le tetraedre de reference.
  *
  *    Dans ce tetraedre, on utilise le plan OXZ comme plan de projection (projection selon OY donc)
+ *
+ * Precondition: la surface doit etre un triangle (nb_sommets_poly==3)
  *
  * @param (poly_reelles_ref) coordonnees (reelles) des sommets l'element de reference
  * @param (norme) normale a la surface, dans l'element de reference
@@ -1778,6 +1783,8 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
  *
  * C'est une fraction du volume de l'element
  *    comprise entre epsilon et 1.-epsilon
+ *
+ * Precondition: dimension = 3
  *
  * @param (zone_vf) zone du calcul
  * @param (num_element) indice de l'element intersecte

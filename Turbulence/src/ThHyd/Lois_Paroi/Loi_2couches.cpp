@@ -21,7 +21,6 @@
 
 #include <Loi_2couches.h>
 
-Implemente_deriv(Loi_2couches_base);
 Implemente_instanciable(Loi_2couches,"Loi_2couches",DERIV(Loi_2couches_base));
 
 /*! @brief Imprime le type de l'equation sur un flot de sortie.

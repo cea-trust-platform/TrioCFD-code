@@ -17,7 +17,8 @@
 #define RK3_MassRedistrib_included
 
 #include <Schema_RK_Williamson.h>
-#include <Vect_Ref_Probleme_base.h>
+#include <Ref_Probleme_base.h>
+#include <TRUST_Vector.h>
 #include <Source_Con_Phase_field.h>
 #include <Probleme_base.h>
 

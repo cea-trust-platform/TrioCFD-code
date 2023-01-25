@@ -27,8 +27,8 @@ Implemente_instanciable(RK3b,"Runge_Kutta_ordre_3_QC",Schema_Temps_base);
 
 /*! @brief Simple appel a: Schema_Temps_base::printOn(Sortie& ) Ecrit le schema en temps sur un flot de sortie.
  *
- * @param (Sortie& s) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& RK3b::printOn(Sortie& s) const
 {
@@ -40,8 +40,8 @@ Sortie& RK3b::printOn(Sortie& s) const
  *
  * Simple appel a: Schema_Temps_base::readOn(Entree& )
  *
- * @param (Entree& s) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& RK3b::readOn(Entree& s)
 {
@@ -103,8 +103,8 @@ double RK3b::temps_defaut() const
  *       avec a1=0, a2=-5/9, a3=-153/128
  *                               b1=1/3, b2=15/16, b3=8/15
  *
- * @param (Equation_base& eqn) l'equation que l'on veut faire avancer d'un pas de temps 
- * @return (int) renvoie toujours 1 
+ * @param (Equation_base& eqn) l'equation que l'on veut faire avancer d'un pas de temps
+ * @return (int) renvoie toujours 1
  */
 int RK3b::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {

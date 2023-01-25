@@ -171,12 +171,15 @@ Lire pb
 	}
 	liste_postraitements
 	{
-		postraitement_ft_lata post2 { 
-    format Lata 
-    fichier plot 
-    interfaces interf { 
-    } 
-}
+          postraitement_ft_lata post2 { 
+              format Lata 
+              fichier plot
+              champs dt_post 0.001 {
+                 indicatrice_interf elem
+               }
+               interfaces interf { 
+               } 
+          }
 	}
 }
 Solve pb

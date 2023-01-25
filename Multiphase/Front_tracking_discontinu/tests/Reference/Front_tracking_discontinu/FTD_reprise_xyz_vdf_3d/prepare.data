@@ -2,8 +2,7 @@
  Cas test Front-tracking discontinu VDF.
  Test de la reprise xyz
 
- Preparation du calcul: generation d'un maillage de depart
-#
+ Preparation du calcul: generation d'un maillage de depart #
 
 dimension 3
 Probleme_FT_Disc_gen pb
@@ -184,6 +183,9 @@ liste_postraitements {
   postraitement_ft_lata post2 { 
     format Lata 
     fichier prepare2 
+    champs dt_post 1.0 { 
+        indicatrice_body elem 
+    } 
     interfaces body { 
     } 
 }

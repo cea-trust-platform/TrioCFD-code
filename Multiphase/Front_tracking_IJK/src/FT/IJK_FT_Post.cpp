@@ -36,18 +36,9 @@
 /*
  * Take as main parameter reference to FT to be able to use its members.
  */
-IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft):
-  statistiques_FT_(ijk_ft),
-  ref_ijk_ft_(ijk_ft),
-  disable_diphasique_(ijk_ft.disable_diphasique_),
-  interfaces_(ijk_ft.interfaces_),
-  pressure_(ijk_ft.pressure_),
-  velocity_(ijk_ft.velocity_),
-  d_velocity_(ijk_ft.d_velocity_),
-  splitting_(ijk_ft.splitting_),
-  splitting_ft_(ijk_ft.splitting_ft_),
-  thermique_(ijk_ft.thermique_),
-  energie_(ijk_ft.energie_)
+IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
+  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
+  d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_)
 {
   groups_statistiques_FT_.dimensionner(0);
 }
@@ -149,14 +140,14 @@ int IJK_FT_Post::initialise(int reprise)
 {
   int nalloc = 0;
 
-  source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
+  source_spectrale_ = ref_ijk_ft_.forcage_.get_force_ph2();
   //poisson_solver_post_.initialize(splitting_);
   // pour relire les champs de temps integres:
   if (liste_post_instantanes_.contient_("INTEGRATED_TIMESCALE"))
     {
       integrated_timescale_.allocate(splitting_, IJK_Splitting::ELEM, 0);
-      nalloc +=1;
-      if ( (reprise) && (fichier_reprise_integrated_timescale_ != "RESET"))
+      nalloc += 1;
+      if ((reprise) && (fichier_reprise_integrated_timescale_ != "RESET"))
         {
           if (fichier_reprise_integrated_timescale_ == "??")
             {
@@ -165,29 +156,27 @@ int IJK_FT_Post::initialise(int reprise)
             }
           const int timestep_reprise_integrated_timescale_ = 1;
           const Nom& geom_name = integrated_timescale_.get_splitting().get_grid_geometry().le_nom();
-          lire_dans_lata(fichier_reprise_integrated_timescale_, timestep_reprise_integrated_timescale_, geom_name, "INTEGRATED_TIMESCALE",
-                         integrated_timescale_); // fonction qui lit un champ a partir d'un lata .
+          lire_dans_lata(fichier_reprise_integrated_timescale_, timestep_reprise_integrated_timescale_, geom_name, "INTEGRATED_TIMESCALE", integrated_timescale_); // fonction qui lit un champ a partir d'un lata .
         }
       else
         {
           integrated_timescale_.data() = 0.;
           // Question GB pour Antoine : c'est une precaution pour pas qu'il vaille 0 au debut?
           // Mais du coup, on le compte deux fois...
-          update_integral_indicatrice(interfaces_.In(),1. /* Should be the integration timestep */, integrated_timescale_);
+          update_integral_indicatrice(interfaces_.In(), 1. /* Should be the integration timestep */, integrated_timescale_);
         }
 
     }
 
   // Pour relire les champs de vitesse et pression integres :
-  if ( ((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ <  1.e10))
-       || (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY")) )
+  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ < 1.e10)) || (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY")))
     {
-      allocate_velocity(integrated_velocity_, splitting_, 2 );
-      nalloc +=3;
+      allocate_velocity(integrated_velocity_, splitting_, 2);
+      nalloc += 3;
     }
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
     {
-      if ( (reprise) && (fichier_reprise_integrated_velocity_ != "RESET"))
+      if ((reprise) && (fichier_reprise_integrated_velocity_ != "RESET"))
         {
           if (fichier_reprise_integrated_velocity_ == "??")
             {
@@ -197,8 +186,8 @@ int IJK_FT_Post::initialise(int reprise)
           const int timestep_reprise_integrated_velocity_ = 1;
           Cout << "Lecture vitesse integree initiale dans fichier " << fichier_reprise_integrated_velocity_ << " timestep= " << timestep_reprise_integrated_velocity_ << finl;
           const Nom& geom_name = velocity_[0].get_splitting().get_grid_geometry().le_nom();
-          lire_dans_lata(fichier_reprise_integrated_velocity_, timestep_reprise_integrated_velocity_, geom_name, "INTEGRATED_VELOCITY",
-                         integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2]); // fonction qui lit un champ a partir d'un lata .
+          lire_dans_lata(fichier_reprise_integrated_velocity_, timestep_reprise_integrated_velocity_, geom_name, "INTEGRATED_VELOCITY", integrated_velocity_[0], integrated_velocity_[1],
+                         integrated_velocity_[2]); // fonction qui lit un champ a partir d'un lata .
         }
       else
         {
@@ -210,24 +199,18 @@ int IJK_FT_Post::initialise(int reprise)
           velocity_[1].echange_espace_virtuel(velocity_[1].ghost());
           velocity_[2].echange_espace_virtuel(velocity_[2].ghost());
 
-          // GAB
-          source_spectrale_[0].echange_espace_virtuel(source_spectrale_[0].ghost());
-          source_spectrale_[1].echange_espace_virtuel(source_spectrale_[1].ghost());
-          source_spectrale_[2].echange_espace_virtuel(source_spectrale_[2].ghost());
-
           update_integral_velocity(velocity_, integrated_velocity_, interfaces_.In(), integrated_timescale_);
 
         }
     }
-  if ( ((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ <  1.e10))
-       || (liste_post_instantanes_.contient_("INTEGRATED_PRESSURE")) )
+  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ < 1.e10)) || (liste_post_instantanes_.contient_("INTEGRATED_PRESSURE")))
     {
       integrated_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 0);
-      nalloc +=1;
+      nalloc += 1;
     }
   if (liste_post_instantanes_.contient_("INTEGRATED_PRESSURE"))
     {
-      if ( (reprise) && (fichier_reprise_integrated_velocity_ != "RESET"))
+      if ((reprise) && (fichier_reprise_integrated_velocity_ != "RESET"))
         {
           if (fichier_reprise_integrated_pressure_ == "??")
             {
@@ -237,8 +220,7 @@ int IJK_FT_Post::initialise(int reprise)
           const int timestep_reprise_integrated_pressure_ = 1;
           Cout << "Lecture pression integree initiale dans fichier " << fichier_reprise_integrated_pressure_ << " timestep= " << timestep_reprise_integrated_pressure_ << finl;
           const Nom& geom_name = pressure_.get_splitting().get_grid_geometry().le_nom();
-          lire_dans_lata(fichier_reprise_integrated_pressure_, timestep_reprise_integrated_pressure_, geom_name, "INTEGRATED_PRESSURE",
-                         integrated_pressure_); // fonction qui lit un champ a partir d'un lata .
+          lire_dans_lata(fichier_reprise_integrated_pressure_, timestep_reprise_integrated_pressure_, geom_name, "INTEGRATED_PRESSURE", integrated_pressure_); // fonction qui lit un champ a partir d'un lata .
 
         }
       else
@@ -253,12 +235,11 @@ int IJK_FT_Post::initialise(int reprise)
 
   // En reprise, il se peut que le champ ne soit pas dans la liste des posts, mais qu'on l'ait quand meme.
   // Dans ce cas, on choisi de le lire, remplir le field et le re-sauvegarder a la fin (on n'en a rien fait de plus entre temps...)
-  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ <  1.e10))
-      || (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
-      || ((reprise) && ( (fichier_reprise_indicatrice_non_perturbe_ != "??"))))
+  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ < 1.e10)) || (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
+      || ((reprise) && ((fichier_reprise_indicatrice_non_perturbe_ != "??"))))
     {
       indicatrice_non_perturbe_.allocate(splitting_, IJK_Splitting::ELEM, 0);
-      nalloc +=1;
+      nalloc += 1;
     }
 
   // Pour le post-traitement de lambda2 :
@@ -268,63 +249,39 @@ int IJK_FT_Post::initialise(int reprise)
       dudy_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       dvdx_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       dwdy_.allocate(splitting_, IJK_Splitting::ELEM, 0);
-      nalloc +=4;
+      nalloc += 4;
     }
 
   // Pour le check_stats_ :
   if (check_stats_)
     {
-      Cout << "Initialisation champs analytiques (derivee P)"
-           << "\ndPdx = " <<  expression_gradP_analytique_[0]
-           << "\ndPdy = " <<  expression_gradP_analytique_[1]
-           << "\ndPdz = " <<  expression_gradP_analytique_[2]  << finl;
+      Cout << "Initialisation champs analytiques (derivee P)" << "\ndPdx = " << expression_gradP_analytique_[0] << "\ndPdy = " << expression_gradP_analytique_[1] << "\ndPdz = "
+           << expression_gradP_analytique_[2] << finl;
 
-      Cout << "Initialisation champs analytiques (derivee U)"
-           << "\ndUdx = " <<  expression_gradU_analytique_[0]
-           << "\ndUdy = " <<  expression_gradU_analytique_[1]
-           << "\ndUdz = " <<  expression_gradU_analytique_[2]  << finl;
+      Cout << "Initialisation champs analytiques (derivee U)" << "\ndUdx = " << expression_gradU_analytique_[0] << "\ndUdy = " << expression_gradU_analytique_[1] << "\ndUdz = "
+           << expression_gradU_analytique_[2] << finl;
 
-      Cout << "Initialisation champs analytiques (derivee V)"
-           << "\ndVdx = " <<  expression_gradV_analytique_[0]
-           << "\ndVdy = " <<  expression_gradV_analytique_[1]
-           << "\ndVdz = " <<  expression_gradV_analytique_[2]  << finl;
+      Cout << "Initialisation champs analytiques (derivee V)" << "\ndVdx = " << expression_gradV_analytique_[0] << "\ndVdy = " << expression_gradV_analytique_[1] << "\ndVdz = "
+           << expression_gradV_analytique_[2] << finl;
 
-      Cout << "Initialisation champs analytiques (derivee W)"
-           << "\ndWdx = " <<  expression_gradW_analytique_[0]
-           << "\ndWdy = " <<  expression_gradW_analytique_[1]
-           << "\ndWdz = " <<  expression_gradW_analytique_[2]  << finl;
+      Cout << "Initialisation champs analytiques (derivee W)" << "\ndWdx = " << expression_gradW_analytique_[0] << "\ndWdy = " << expression_gradW_analytique_[1] << "\ndWdz = "
+           << expression_gradW_analytique_[2] << finl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes P) "
-           << "\nddPdxdx = " <<  expression_grad2P_analytique_[0]
-           << "\nddPdydy = " <<  expression_grad2P_analytique_[1]
-           << "\nddPdzdz = " <<  expression_grad2P_analytique_[2] ;
-      Cout   << "\nddPdxdy = " <<  expression_grad2P_analytique_[3]
-             << "\nddPdxdz = " <<  expression_grad2P_analytique_[4]
-             << "\nddPdydz = " <<  expression_grad2P_analytique_[5]  << finl;
+      Cout << "Initialisation champs analytiques (derivees secondes P) " << "\nddPdxdx = " << expression_grad2P_analytique_[0] << "\nddPdydy = " << expression_grad2P_analytique_[1] << "\nddPdzdz = "
+           << expression_grad2P_analytique_[2];
+      Cout << "\nddPdxdy = " << expression_grad2P_analytique_[3] << "\nddPdxdz = " << expression_grad2P_analytique_[4] << "\nddPdydz = " << expression_grad2P_analytique_[5] << finl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes U) "
-           << "\nddUdxdx = " <<  expression_grad2U_analytique_[0]
-           << "\nddUdydy = " <<  expression_grad2U_analytique_[1]
-           << "\nddUdzdz = " <<  expression_grad2U_analytique_[2] ;
-      Cout   << "\nddUdxdy = " <<  expression_grad2U_analytique_[3]
-             << "\nddUdxdz = " <<  expression_grad2U_analytique_[4]
-             << "\nddUdydz = " <<  expression_grad2U_analytique_[5]  << finl;
+      Cout << "Initialisation champs analytiques (derivees secondes U) " << "\nddUdxdx = " << expression_grad2U_analytique_[0] << "\nddUdydy = " << expression_grad2U_analytique_[1] << "\nddUdzdz = "
+           << expression_grad2U_analytique_[2];
+      Cout << "\nddUdxdy = " << expression_grad2U_analytique_[3] << "\nddUdxdz = " << expression_grad2U_analytique_[4] << "\nddUdydz = " << expression_grad2U_analytique_[5] << finl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes V) "
-           << "\nddVdxdx = " <<  expression_grad2V_analytique_[0]
-           << "\nddVdydy = " <<  expression_grad2V_analytique_[1]
-           << "\nddVdzdz = " <<  expression_grad2V_analytique_[2] ;
-      Cout << "\nddVdxdy = " <<  expression_grad2V_analytique_[3]
-           << "\nddVdxdz = " <<  expression_grad2V_analytique_[4]
-           << "\nddVdydz = " <<  expression_grad2V_analytique_[5]  << finl;
+      Cout << "Initialisation champs analytiques (derivees secondes V) " << "\nddVdxdx = " << expression_grad2V_analytique_[0] << "\nddVdydy = " << expression_grad2V_analytique_[1] << "\nddVdzdz = "
+           << expression_grad2V_analytique_[2];
+      Cout << "\nddVdxdy = " << expression_grad2V_analytique_[3] << "\nddVdxdz = " << expression_grad2V_analytique_[4] << "\nddVdydz = " << expression_grad2V_analytique_[5] << finl;
 
-      Cout << "Initialisation champs analytiques (derivees secondes W) "
-           << "\nddWdxdx = " <<  expression_grad2W_analytique_[0]
-           << "\nddWdydy = " <<  expression_grad2W_analytique_[1]
-           << "\nddWdzdz = " <<  expression_grad2W_analytique_[2];
-      Cout   << "\nddWdxdy = " <<  expression_grad2W_analytique_[3]
-             << "\nddWdxdz = " <<  expression_grad2W_analytique_[4]
-             << "\nddWdydz = " <<  expression_grad2W_analytique_[5]  << finl;
+      Cout << "Initialisation champs analytiques (derivees secondes W) " << "\nddWdxdx = " << expression_grad2W_analytique_[0] << "\nddWdydy = " << expression_grad2W_analytique_[1] << "\nddWdzdz = "
+           << expression_grad2W_analytique_[2];
+      Cout << "\nddWdxdy = " << expression_grad2W_analytique_[3] << "\nddWdxdz = " << expression_grad2W_analytique_[4] << "\nddWdydz = " << expression_grad2W_analytique_[5] << finl;
 
       for (int i = 0; i < 3; i++)
         {
@@ -334,14 +291,14 @@ int IJK_FT_Post::initialise(int reprise)
           set_field_data(ana_dWd_[i], expression_gradW_analytique_[i]);
           // Pour les deriv secondes :
           set_field_data(ana_grad2Pi_[i], expression_grad2P_analytique_[i]);
-          set_field_data(ana_grad2Pc_[i], expression_grad2P_analytique_[3+i]);
+          set_field_data(ana_grad2Pc_[i], expression_grad2P_analytique_[3 + i]);
           // And for the 3 components of velocity :
           set_field_data(ana_grad2Ui_[i], expression_grad2U_analytique_[i]);
-          set_field_data(ana_grad2Uc_[i], expression_grad2U_analytique_[3+i]);
+          set_field_data(ana_grad2Uc_[i], expression_grad2U_analytique_[3 + i]);
           set_field_data(ana_grad2Vi_[i], expression_grad2V_analytique_[i]);
-          set_field_data(ana_grad2Vc_[i], expression_grad2V_analytique_[3+i]);
+          set_field_data(ana_grad2Vc_[i], expression_grad2V_analytique_[3 + i]);
           set_field_data(ana_grad2Wi_[i], expression_grad2W_analytique_[i]);
-          set_field_data(ana_grad2Wc_[i], expression_grad2W_analytique_[3+i]);
+          set_field_data(ana_grad2Wc_[i], expression_grad2W_analytique_[3 + i]);
 
           // Pas necessaire d'echange_espace_virtuel car ghost_ = 0
         }
@@ -354,9 +311,8 @@ void IJK_FT_Post::complete(int reprise)
   // Meme if que pour l'allocation.
   // On ne fait le calcul/remplissage du champ que dans un deuxieme temps car on
   // n'avait pas les interfaces avant (lors de l'init)
-  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ <  1.e10))
-      || (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
-      || ((reprise) && ( (fichier_reprise_indicatrice_non_perturbe_ != "??"))))
+  if (((ref_ijk_ft_.coef_immobilisation_ > 1e-16) && (t_debut_statistiques_ < 1.e10)) || (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
+      || ((reprise) && ((fichier_reprise_indicatrice_non_perturbe_ != "??"))))
     {
       init_indicatrice_non_perturbe();
     }
@@ -365,9 +321,9 @@ void IJK_FT_Post::complete(int reprise)
 int IJK_FT_Post::initialise_stats(IJK_Splitting& splitting, ArrOfDouble& vol_bulles, const double vol_bulle_monodisperse)
 {
   Cout << "Initialisation des statistiques. T_debut_statistiques=" << t_debut_statistiques_ << finl;
-  int nalloc = statistiques_FT_.initialize(ref_ijk_ft_,splitting, check_stats_);
+  int nalloc = statistiques_FT_.initialize(ref_ijk_ft_, splitting, check_stats_);
   // Si on utilise un seul groupe et qu'on impose un volume unique a toutes les bulles,
-  if (vol_bulle_monodisperse>=0.)
+  if (vol_bulle_monodisperse >= 0.)
     {
       // on redimensionne le tableau a nb bulles reelles'
       vol_bulles.resize_array(interfaces_.get_nb_bulles_reelles());
@@ -375,12 +331,12 @@ int IJK_FT_Post::initialise_stats(IJK_Splitting& splitting, ArrOfDouble& vol_bul
     }
   // S'il n'y a pas qu'un group, on s'occupe des objets stats pour chaque group:
   const int nb_groups = interfaces_.nb_groups();
-  if (nb_groups>1)
+  if (nb_groups > 1)
     {
       groups_statistiques_FT_.dimensionner(nb_groups);
       for (int igroup = 0; igroup < nb_groups; igroup++)
         {
-          groups_statistiques_FT_[igroup].initialize(ref_ijk_ft_,splitting, check_stats_);
+          groups_statistiques_FT_[igroup].initialize(ref_ijk_ft_, splitting, check_stats_);
         }
     }
   return nalloc;
@@ -390,13 +346,12 @@ void IJK_FT_Post::init_indicatrice_non_perturbe()
 {
   // Est-il deja rempli et stocke?
   // Si on n'est pas en reprise de calcul, le fichier "fichier_reprise_indicatrice_non_perturbe_" est forcement a "??"
-  if ( (fichier_reprise_indicatrice_non_perturbe_ != "??") && (fichier_reprise_indicatrice_non_perturbe_ != "RESET"))
+  if ((fichier_reprise_indicatrice_non_perturbe_ != "??") && (fichier_reprise_indicatrice_non_perturbe_ != "RESET"))
     {
       const int timestep_reprise_indicatrice_non_perturbe = 1; // 1 ou 0 est le premier? attention au get_db ou latadb...
       Cout << "Lecture indicatrice non perturbee dans fichier " << fichier_reprise_indicatrice_non_perturbe_ << " timestep= " << timestep_reprise_indicatrice_non_perturbe << finl;
       const Nom& geom_name = indicatrice_non_perturbe_.get_splitting().get_grid_geometry().le_nom();
-      lire_dans_lata(fichier_reprise_indicatrice_non_perturbe_, timestep_reprise_indicatrice_non_perturbe, geom_name, "INDICATRICE_PERTURBE",
-                     indicatrice_non_perturbe_); // fonction qui lit un champ a partir d'un lata .
+      lire_dans_lata(fichier_reprise_indicatrice_non_perturbe_, timestep_reprise_indicatrice_non_perturbe, geom_name, "INDICATRICE_PERTURBE", indicatrice_non_perturbe_); // fonction qui lit un champ a partir d'un lata .
     }
   else
     {
@@ -415,10 +370,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   statistiques().begin_count(postraitement_counter_);
 
   const int latastep = compteur_post_instantanes_;
-  dumplata_newtime(lata_name,current_time);
+  dumplata_newtime(lata_name, current_time);
   if ((liste_post_instantanes_.contient_("FORCE_PH")) or (liste_post_instantanes_.contient_("CELL_FORCE_PH")))
     {
-      source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
+      source_spectrale_ = ref_ijk_ft_.forcage_.get_force_ph2();
     }
   if (liste_post_instantanes_.contient_("TOUS"))
     {
@@ -434,7 +389,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("SOURCE_QDM_INTERF");
       liste_post_instantanes_.add("GRAD_INDICATRICE_FT");
       liste_post_instantanes_.add("REBUILT_INDICATRICE_FT");
-      liste_post_instantanes_.add("REPULSION_FT");//("POTENTIEL_FT");
+      liste_post_instantanes_.add("REPULSION_FT"); //("POTENTIEL_FT");
       liste_post_instantanes_.add("AIRE_INTERF");
       liste_post_instantanes_.add("PRESSURE_LIQ");
       liste_post_instantanes_.add("PRESSURE_VAP");
@@ -450,21 +405,17 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
       {
         int idx_th = 0;
-        CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-        while(curseur)
+        for (auto&& itr = thermique_.begin(); itr != thermique_.end(); ++itr)
           {
             posttraiter_tous_champs_thermique(liste_post_instantanes_, idx_th);
-            ++curseur;
             ++idx_th;
           }
       }
       {
         int idx_en = 0;
-        CONST_LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-        while(curseur_en)
+        for (auto&& itr = energie_.begin(); itr != energie_.end(); ++itr)
           {
             posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);
-            ++curseur_en;
             ++idx_en;
           }
       }
@@ -473,11 +424,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("CURL"))
     {
       // C'est un vecteur mais localise aux elems. On ne peut donc pas le dumper par dumplata_vector :
-      n--,dumplata_cellvector(lata_name,"CURL", rot_, latastep);
+      n--, dumplata_cellvector(lata_name, "CURL", rot_, latastep);
     }
   if (liste_post_instantanes_.contient_("CRITERE_Q"))
     {
-      n--,dumplata_scalar(lata_name,"CRITERE_Q", critere_Q_, latastep);
+      n--, dumplata_scalar(lata_name, "CRITERE_Q", critere_Q_, latastep);
     }
   if (liste_post_instantanes_.contient_("EXTERNAL_FORCE"))
     {
@@ -486,9 +437,8 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         {
           if (!ref_ijk_ft_.interfaces_.get_forcing_method())
             for (int dir = 0; dir < 3; dir++)
-              ref_ijk_ft_.redistribute_from_splitting_ft_faces_[dir].redistribute(ref_ijk_ft_.force_rappel_ft_[dir],
-                                                                                  ref_ijk_ft_.force_rappel_[dir]);
-          dumplata_vector(lata_name,"EXTERNAL_FORCE", ref_ijk_ft_.force_rappel_[0], ref_ijk_ft_.force_rappel_[1], ref_ijk_ft_.force_rappel_[2], latastep);
+              ref_ijk_ft_.redistribute_from_splitting_ft_faces_[dir].redistribute(ref_ijk_ft_.force_rappel_ft_[dir], ref_ijk_ft_.force_rappel_[dir]);
+          dumplata_vector(lata_name, "EXTERNAL_FORCE", ref_ijk_ft_.force_rappel_[0], ref_ijk_ft_.force_rappel_[1], ref_ijk_ft_.force_rappel_[2], latastep);
         }
       else
         Cerr << "Posttraitement demande pour EXTERNAL_FORCE but ignored because coef_immobilisation_ <= 1e-16" << finl;
@@ -504,57 +454,56 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           for (int i = 0; i < ni; i++)
             {
               const int num_elem = splitting_ft_.convert_ijk_cell_to_packed(i, j, k);
-              num_compo_ft_(i,j,k) = num_compo[num_elem];
+              num_compo_ft_(i, j, k) = num_compo[num_elem];
             }
-      n--,dumplata_scalar(lata_name,"NUM_COMPO", num_compo_ft_, latastep);
+      n--, dumplata_scalar(lata_name, "NUM_COMPO", num_compo_ft_, latastep);
     }
   if (liste_post_instantanes_.contient_("VELOCITY"))
-    n--,dumplata_vector(lata_name,"VELOCITY", velocity_[0], velocity_[1], velocity_[2], latastep);
+    n--, dumplata_vector(lata_name, "VELOCITY", velocity_[0], velocity_[1], velocity_[2], latastep);
   // GAB
   if (liste_post_instantanes_.contient_("FORCE_PH"))
     {
-      n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
+      n--, dumplata_vector(lata_name, "FORCE_PH", source_spectrale_[0], source_spectrale_[1], source_spectrale_[2], latastep);
     }
   //
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
     {
       update_integral_velocity(velocity_, integrated_velocity_, interfaces_.In(), integrated_timescale_);
-      n--,dumplata_vector(lata_name,"INTEGRATED_VELOCITY", integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2], latastep);
+      n--, dumplata_vector(lata_name, "INTEGRATED_VELOCITY", integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("INTEGRATED_PRESSURE"))
     {
       //      integrated_pressure_ += timestep_*pressure_;
       update_integral_pressure(pressure_, integrated_pressure_, interfaces_.In(), integrated_timescale_);
-      n--,dumplata_scalar(lata_name,"INTEGRATED_PRESSURE", integrated_pressure_, latastep);
+      n--, dumplata_scalar(lata_name, "INTEGRATED_PRESSURE", integrated_pressure_, latastep);
     }
   if (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
     {
       //Faut-il faire un update_...( indicatrice_non_perturbe_) avant?
-      n--,dumplata_scalar(lata_name,"INDICATRICE_PERTURBE", indicatrice_non_perturbe_, latastep);
+      n--, dumplata_scalar(lata_name, "INDICATRICE_PERTURBE", indicatrice_non_perturbe_, latastep);
     }
   if (liste_post_instantanes_.contient_("INTEGRATED_TIMESCALE"))
     {
       update_integral_indicatrice(interfaces_.In(), 1. /* Should be the integration timestep */, integrated_timescale_);
-      n--,dumplata_scalar(lata_name,"INTEGRATED_TIMESCALE", integrated_timescale_, latastep);
+      n--, dumplata_scalar(lata_name, "INTEGRATED_TIMESCALE", integrated_timescale_, latastep);
     }
 
   if (liste_post_instantanes_.contient_("COORDS"))
-    n--,dumplata_vector(lata_name,"COORDS", coords_[0], coords_[1], coords_[2], latastep);
+    n--, dumplata_vector(lata_name, "COORDS", coords_[0], coords_[1], coords_[2], latastep);
   if (liste_post_instantanes_.contient_("LAMBDA2"))
     {
       get_update_lambda2();
-      n--,dumplata_scalar(lata_name,"LAMBDA2", lambda2_, latastep);
+      n--, dumplata_scalar(lata_name, "LAMBDA2", lambda2_, latastep);
     }
   if (liste_post_instantanes_.contient_("VELOCITY_ANA"))
     {
       for (int i = 0; i < 3; i++)
         set_field_data(velocity_ana_[i], expression_vitesse_analytique_[i], current_time);
-      n--,dumplata_vector(lata_name,"VELOCITY_ANA", velocity_ana_[0], velocity_ana_[1], velocity_ana_[2], latastep);
+      n--, dumplata_vector(lata_name, "VELOCITY_ANA", velocity_ana_[0], velocity_ana_[1], velocity_ana_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("VARIABLE_SOURCE"))
     {
-      n--,dumplata_vector(lata_name,"VARIABLE_SOURCE", ref_ijk_ft_.variable_source_[0],
-                          ref_ijk_ft_.variable_source_[1], ref_ijk_ft_.variable_source_[2], latastep);
+      n--, dumplata_vector(lata_name, "VARIABLE_SOURCE", ref_ijk_ft_.variable_source_[0], ref_ijk_ft_.variable_source_[1], ref_ijk_ft_.variable_source_[2], latastep);
     }
 
   if (liste_post_instantanes_.contient_("ECART_ANA"))
@@ -568,44 +517,52 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           const int ni = velocity_[dir].ni();
           const int nj = velocity_[dir].nj();
           const int nk = velocity_[dir].nk();
-          const int ntot=Process::mp_sum(ni*nj*nk);
+          const int ntot = Process::mp_sum(ni * nj * nk);
           for (int k = 0; k < nk; k++)
             for (int j = 0; j < nj; j++)
               for (int i = 0; i < ni; i++)
                 {
-                  const double val =  velocity_ana_[dir](i,j,k) -velocity_[dir](i,j,k);
-                  ecart_ana_[dir](i,j,k) = val;
-                  err += val*val;
+                  const double val = velocity_ana_[dir](i, j, k) - velocity_[dir](i, j, k);
+                  ecart_ana_[dir](i, j, k) = val;
+                  err += val * val;
                 }
-          err=Process::mp_sum(err);
-          err=sqrt(err/ntot);
-          Cerr << " " << err ;
+          err = Process::mp_sum(err);
+          err = sqrt(err / ntot);
+          Cerr << " " << err;
           if (!Process::je_suis_maitre())
             {
-              Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):"
-                                 << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+              Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
             }
         }
-      Cerr << finl ;
-      n--,dumplata_vector(lata_name,"ECART_ANA", ecart_ana_[0], ecart_ana_[1], ecart_ana_[2], latastep);
+      Cerr << finl;
+      n--, dumplata_vector(lata_name, "ECART_ANA", ecart_ana_[0], ecart_ana_[1], ecart_ana_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("PRESSURE_ANA"))
     {
       set_field_data(pressure_ana_, expression_pression_analytique_, current_time);
-      n--,dumplata_scalar(lata_name,"PRESSURE_ANA", pressure_ana_, latastep);
+      n--, dumplata_scalar(lata_name, "PRESSURE_ANA", pressure_ana_, latastep);
     }
   if (liste_post_instantanes_.contient_("ECART_P_ANA"))
     {
       double ct = current_time;
-      if (ref_ijk_ft_.get_time_scheme() == IJK_FT_double::EULER_EXPLICITE )
+      if (ref_ijk_ft_.get_time_scheme() == IJK_FT_double::EULER_EXPLICITE)
         {
           ct -= ref_ijk_ft_.timestep_;
         }
       else if (ref_ijk_ft_.get_time_scheme() == IJK_FT_double::RK3_FT)
         {
-          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, 2);
+          Cerr << "rkstep " << ref_ijk_ft_.rk_step_ << finl;
+          int rk_step_before = ref_ijk_ft_.rk_step_;
+          if ((rk_step_before == 0) || (rk_step_before == 3))
+            rk_step_before = 2;
+          else if (rk_step_before == 1)
+            rk_step_before = 0;
+          else
+            /* ici, c'est rk_step_before=2 */
+            rk_step_before = 1;
+          Cerr << "rkstep_before " << rk_step_before << finl;
+          const double intermediate_dt = compute_fractionnal_timestep_rk3(ref_ijk_ft_.timestep_, rk_step_before);
           ct -= intermediate_dt;
-
         }
       else
         {
@@ -617,28 +574,27 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       const int ni = pressure_.ni();
       const int nj = pressure_.nj();
       const int nk = pressure_.nk();
-      const int ntot=Process::mp_sum(ni*nj*nk);
+      const int ntot = Process::mp_sum(ni * nj * nk);
       // La pression est definie a une constante pres:
-      const double cst_press = pressure_ana_(0,0,0) -pressure_(0,0,0);
+      const double cst_press = pressure_ana_(0, 0, 0) - pressure_(0, 0, 0);
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
-              const double val =  pressure_ana_(i,j,k) -pressure_(i,j,k) - cst_press;
-              ecart_p_ana_(i,j,k) = val;
-              err += val*val;
+              const double val = pressure_ana_(i, j, k) - pressure_(i, j, k) - cst_press;
+              ecart_p_ana_(i, j, k) = val;
+              err += val * val;
             }
-      err=Process::mp_sum(err);
-      err=sqrt(err/ntot);
-      Cerr << " " << err ;
+      err = Process::mp_sum(err);
+      err = sqrt(err / ntot);
+      Cerr << " " << err;
       if (!Process::je_suis_maitre())
         {
-          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_P_ANA sur ce proc (ni,nj,nk,ntot):"
-                             << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_P_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
         }
       ecart_p_ana_.echange_espace_virtuel(ecart_p_ana_.ghost());
-      Cerr << finl ;
-      n--,dumplata_scalar(lata_name,"ECART_P_ANA", ecart_p_ana_, latastep);
+      Cerr << finl;
+      n--, dumplata_scalar(lata_name, "ECART_P_ANA", ecart_p_ana_, latastep);
     }
   if (liste_post_instantanes_.contient_("D_VELOCITY_ANA"))
     {
@@ -652,123 +608,122 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             const int ni = d_velocity_[dir].ni();
             const int nj = d_velocity_[dir].nj();
             const int nk = d_velocity_[dir].nk();
-            const int ntot=Process::mp_sum(ni*nj*nk);
+            const int ntot = Process::mp_sum(ni * nj * nk);
             for (int k = 0; k < nk; k++)
               for (int j = 0; j < nj; j++)
                 for (int i = 0; i < ni; i++)
                   {
-                    const double val =  d_velocity_ana_[dir](i,j,k) -d_velocity_[dir](i,j,k);
-                    err += val*val;
+                    const double val = d_velocity_ana_[dir](i, j, k) - d_velocity_[dir](i, j, k);
+                    err += val * val;
                   }
-            err=Process::mp_sum(err);
-            err=sqrt(err/ntot);
-            Cerr << " " << err ;
+            err = Process::mp_sum(err);
+            err = sqrt(err / ntot);
+            Cerr << " " << err;
             if (!Process::je_suis_maitre())
               {
-                Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):"
-                                   << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
               }
           }
-        Cerr << finl ;
+        Cerr << finl;
       }
-      n--,dumplata_vector(lata_name,"D_VELOCITY_ANA", d_velocity_ana_[0],d_velocity_ana_[1],d_velocity_ana_[2], latastep);
+      n--, dumplata_vector(lata_name, "D_VELOCITY_ANA", d_velocity_ana_[0], d_velocity_ana_[1], d_velocity_ana_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("D_VELOCITY"))
     {
-      n--,dumplata_vector(lata_name,"D_VELOCITY", d_velocity_[0],d_velocity_[1],d_velocity_[2], latastep);
+      n--, dumplata_vector(lata_name, "D_VELOCITY", d_velocity_[0], d_velocity_[1], d_velocity_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("OP_CONV"))
     {
-      n--,dumplata_vector(lata_name,"DU_DT", op_conv_[0],op_conv_[1],op_conv_[2], latastep);
+      n--, dumplata_vector(lata_name, "DU_DT", op_conv_[0], op_conv_[1], op_conv_[2], latastep);
     }
 
   if ((liste_post_instantanes_.contient_("GRAD_P")) or (liste_post_instantanes_.contient_("CELL_GRAD_P")))
-    n--,dumplata_vector(lata_name,"dPd", grad_P_[0], grad_P_[1], grad_P_[2], latastep);
+    n--, dumplata_vector(lata_name, "dPd", grad_P_[0], grad_P_[1], grad_P_[2], latastep);
   // Pour le check_stats_ :
   if (check_stats_)
     {
 
       //MR
       /*   if (liste_post_instantanes_.contient_("GRAD_T"))
-           n--,dumplata_vector(lata_name,"dTd", grad_T_[0], grad_T_[1], grad_T_[2], latastep);*/
+       n--,dumplata_vector(lata_name,"dTd", grad_T_[0], grad_T_[1], grad_T_[2], latastep);*/
 
       if (liste_post_instantanes_.contient_("ANA_GRAD_P"))
-        n--,dumplata_vector(lata_name,"ANA_dPd", ana_gradP_[0], ana_gradP_[1], ana_gradP_[2], latastep);
+        n--, dumplata_vector(lata_name, "ANA_dPd", ana_gradP_[0], ana_gradP_[1], ana_gradP_[2], latastep);
       if (liste_post_instantanes_.contient_("ANA_GRAD_U"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_dUd", ana_dUd_, latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_dUd", ana_dUd_, latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD_V"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_dVd", ana_dVd_, latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_dVd", ana_dVd_, latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD_W"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_dWd", ana_dWd_, latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_dWd", ana_dWd_, latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD2_P"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_ddPdd", ana_grad2Pi_, latastep);
-          dumplata_scalar(lata_name,"ANA_ddPdxdy", ana_grad2Pc_[0], latastep);
-          dumplata_scalar(lata_name,"ANA_ddPdxdz", ana_grad2Pc_[1], latastep);
-          dumplata_scalar(lata_name,"ANA_ddPdydz", ana_grad2Pc_[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_ddPdd", ana_grad2Pi_, latastep);
+          dumplata_scalar(lata_name, "ANA_ddPdxdy", ana_grad2Pc_[0], latastep);
+          dumplata_scalar(lata_name, "ANA_ddPdxdz", ana_grad2Pc_[1], latastep);
+          dumplata_scalar(lata_name, "ANA_ddPdydz", ana_grad2Pc_[2], latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD2_U"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_ddUdd", ana_grad2Ui_, latastep);
-          dumplata_scalar(lata_name,"ANA_ddUdxdy", ana_grad2Uc_[0], latastep);
-          dumplata_scalar(lata_name,"ANA_ddUdxdz", ana_grad2Uc_[1], latastep);
-          dumplata_scalar(lata_name,"ANA_ddUdydz", ana_grad2Uc_[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_ddUdd", ana_grad2Ui_, latastep);
+          dumplata_scalar(lata_name, "ANA_ddUdxdy", ana_grad2Uc_[0], latastep);
+          dumplata_scalar(lata_name, "ANA_ddUdxdz", ana_grad2Uc_[1], latastep);
+          dumplata_scalar(lata_name, "ANA_ddUdydz", ana_grad2Uc_[2], latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD2_V"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_ddVdd", ana_grad2Vi_, latastep);
-          dumplata_scalar(lata_name,"ANA_ddVdxdy", ana_grad2Vc_[0], latastep);
-          dumplata_scalar(lata_name,"ANA_ddVdxdz", ana_grad2Vc_[1], latastep);
-          dumplata_scalar(lata_name,"ANA_ddVdydz", ana_grad2Vc_[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_ddVdd", ana_grad2Vi_, latastep);
+          dumplata_scalar(lata_name, "ANA_ddVdxdy", ana_grad2Vc_[0], latastep);
+          dumplata_scalar(lata_name, "ANA_ddVdxdz", ana_grad2Vc_[1], latastep);
+          dumplata_scalar(lata_name, "ANA_ddVdydz", ana_grad2Vc_[2], latastep);
         }
       if (liste_post_instantanes_.contient_("ANA_GRAD2_W"))
         {
-          n--,dumplata_cellvector(lata_name,"ANA_ddWdd", ana_grad2Wi_, latastep);
-          dumplata_scalar(lata_name,"ANA_ddWdxdy", ana_grad2Wc_[0], latastep);
-          dumplata_scalar(lata_name,"ANA_ddWdxdz", ana_grad2Wc_[1], latastep);
-          dumplata_scalar(lata_name,"ANA_ddWdydz", ana_grad2Wc_[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ANA_ddWdd", ana_grad2Wi_, latastep);
+          dumplata_scalar(lata_name, "ANA_ddWdxdy", ana_grad2Wc_[0], latastep);
+          dumplata_scalar(lata_name, "ANA_ddWdxdz", ana_grad2Wc_[1], latastep);
+          dumplata_scalar(lata_name, "ANA_ddWdydz", ana_grad2Wc_[2], latastep);
         }
       if (liste_post_instantanes_.contient_("GRAD2_P"))
         {
           const FixedVector<IJK_Field_double, 3>& grad2Pi = statistiques_FT_.get_IJK_vector_field("grad2Pi");
           const FixedVector<IJK_Field_double, 3>& grad2Pc = statistiques_FT_.get_IJK_vector_field("grad2Pc");
-          n--,dumplata_cellvector(lata_name,"ddPdd", grad2Pi, latastep);
-          dumplata_scalar(lata_name,"ddPdxdy", grad2Pc[0], latastep);
-          dumplata_scalar(lata_name,"ddPdxdz", grad2Pc[1], latastep);
-          dumplata_scalar(lata_name,"ddPdydz", grad2Pc[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ddPdd", grad2Pi, latastep);
+          dumplata_scalar(lata_name, "ddPdxdy", grad2Pc[0], latastep);
+          dumplata_scalar(lata_name, "ddPdxdz", grad2Pc[1], latastep);
+          dumplata_scalar(lata_name, "ddPdydz", grad2Pc[2], latastep);
         }
       if (liste_post_instantanes_.contient_("GRAD2_U"))
         {
           const FixedVector<IJK_Field_double, 3>& grad2Ui = statistiques_FT_.get_IJK_vector_field("grad2Ui");
           const FixedVector<IJK_Field_double, 3>& grad2Uc = statistiques_FT_.get_IJK_vector_field("grad2Uc");
-          n--,dumplata_cellvector(lata_name,"ddUdd", grad2Ui, latastep);
-          dumplata_scalar(lata_name,"ddUdxdy", grad2Uc[0], latastep);
-          dumplata_scalar(lata_name,"ddUdxdz", grad2Uc[1], latastep);
-          dumplata_scalar(lata_name,"ddUdydz", grad2Uc[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ddUdd", grad2Ui, latastep);
+          dumplata_scalar(lata_name, "ddUdxdy", grad2Uc[0], latastep);
+          dumplata_scalar(lata_name, "ddUdxdz", grad2Uc[1], latastep);
+          dumplata_scalar(lata_name, "ddUdydz", grad2Uc[2], latastep);
         }
       if (liste_post_instantanes_.contient_("GRAD2_V"))
         {
           const FixedVector<IJK_Field_double, 3>& grad2Vi = statistiques_FT_.get_IJK_vector_field("grad2Vi");
           const FixedVector<IJK_Field_double, 3>& grad2Vc = statistiques_FT_.get_IJK_vector_field("grad2Vc");
-          n--,dumplata_cellvector(lata_name,"ddVdd", grad2Vi, latastep);
-          dumplata_scalar(lata_name,"ddVdxdy", grad2Vc[0], latastep);
-          dumplata_scalar(lata_name,"ddVdxdz", grad2Vc[1], latastep);
-          dumplata_scalar(lata_name,"ddVdydz", grad2Vc[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ddVdd", grad2Vi, latastep);
+          dumplata_scalar(lata_name, "ddVdxdy", grad2Vc[0], latastep);
+          dumplata_scalar(lata_name, "ddVdxdz", grad2Vc[1], latastep);
+          dumplata_scalar(lata_name, "ddVdydz", grad2Vc[2], latastep);
         }
       if (liste_post_instantanes_.contient_("GRAD2_W"))
         {
           const FixedVector<IJK_Field_double, 3>& grad2Wi = statistiques_FT_.get_IJK_vector_field("grad2Wi");
           const FixedVector<IJK_Field_double, 3>& grad2Wc = statistiques_FT_.get_IJK_vector_field("grad2Wc");
-          n--,dumplata_cellvector(lata_name,"ddWdd", grad2Wi, latastep);
-          dumplata_scalar(lata_name,"ddWdxdy", grad2Wc[0], latastep);
-          dumplata_scalar(lata_name,"ddWdxdz", grad2Wc[1], latastep);
-          dumplata_scalar(lata_name,"ddWdydz", grad2Wc[2], latastep);
+          n--, dumplata_cellvector(lata_name, "ddWdd", grad2Wi, latastep);
+          dumplata_scalar(lata_name, "ddWdxdy", grad2Wc[0], latastep);
+          dumplata_scalar(lata_name, "ddWdxdz", grad2Wc[1], latastep);
+          dumplata_scalar(lata_name, "ddWdydz", grad2Wc[2], latastep);
         }
     }
   if (liste_post_instantanes_.contient_("CELL_VELOCITY"))
@@ -780,14 +735,14 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         for (int j = 0; j < jmax; j++)
           for (int i = 0; i < imax; i++)
             {
-              double u = (velocity_[0](i,j,k) + velocity_[0](i+1, j, k)) * 0.5;
-              double v = (velocity_[1](i,j,k) + velocity_[1](i, j+1, k)) * 0.5;
-              double w = (velocity_[2](i,j,k) + velocity_[2](i, j, k+1)) * 0.5;
-              cell_velocity_[0](i,j,k) = u;
-              cell_velocity_[1](i,j,k) = v;
-              cell_velocity_[2](i,j,k) = w;
+              double u = (velocity_[0](i, j, k) + velocity_[0](i + 1, j, k)) * 0.5;
+              double v = (velocity_[1](i, j, k) + velocity_[1](i, j + 1, k)) * 0.5;
+              double w = (velocity_[2](i, j, k) + velocity_[2](i, j, k + 1)) * 0.5;
+              cell_velocity_[0](i, j, k) = u;
+              cell_velocity_[1](i, j, k) = v;
+              cell_velocity_[2](i, j, k) = w;
             }
-      n--,dumplata_cellvector(lata_name,"VELOCITY" /* AT CELL-CENTER */, cell_velocity_, latastep);
+      n--, dumplata_cellvector(lata_name, "VELOCITY" /* AT CELL-CENTER */, cell_velocity_, latastep);
     }
   // GAB
   if (liste_post_instantanes_.contient_("CELL_FORCE_PH"))
@@ -805,17 +760,17 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
               {
                 // Interpolation d'ordre 1 des vitesses aux centres des elements
-                f = (source_spectrale_[0](i,j,k) + source_spectrale_[0](i+1, j, k)) * 0.5;
-                g = (source_spectrale_[1](i,j,k) + source_spectrale_[1](i, j+1, k)) * 0.5;
-                h = (source_spectrale_[2](i,j,k) + source_spectrale_[2](i, j, k+1)) * 0.5;
+                f = (source_spectrale_[0](i, j, k) + source_spectrale_[0](i + 1, j, k)) * 0.5;
+                g = (source_spectrale_[1](i, j, k) + source_spectrale_[1](i, j + 1, k)) * 0.5;
+                h = (source_spectrale_[2](i, j, k) + source_spectrale_[2](i, j, k + 1)) * 0.5;
 
               }
 
-              cell_source_spectrale_[0](i,j,k) = f;
-              cell_source_spectrale_[1](i,j,k) = g;
-              cell_source_spectrale_[2](i,j,k) = h;
+              cell_source_spectrale_[0](i, j, k) = f;
+              cell_source_spectrale_[1](i, j, k) = g;
+              cell_source_spectrale_[2](i, j, k) = h;
             }
-      n--,dumplata_cellvector(lata_name,"FORCE_PH" /* AT CELL-CENTER */, cell_source_spectrale_, latastep);
+      n--, dumplata_cellvector(lata_name, "FORCE_PH" /* AT CELL-CENTER */, cell_source_spectrale_, latastep);
     }
   //
   // GAB
@@ -834,172 +789,147 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
               {
                 // Interpolation d'ordre 1 des vitesses aux centres des elements
-                p = (grad_P_[0](i,j,k) + grad_P_[0](i+1, j, k)) * 0.5;
-                q = (grad_P_[1](i,j,k) + grad_P_[1](i, j+1, k)) * 0.5;
-                r = (grad_P_[2](i,j,k) + grad_P_[2](i, j, k+1)) * 0.5;
+                p = (grad_P_[0](i, j, k) + grad_P_[0](i + 1, j, k)) * 0.5;
+                q = (grad_P_[1](i, j, k) + grad_P_[1](i, j + 1, k)) * 0.5;
+                r = (grad_P_[2](i, j, k) + grad_P_[2](i, j, k + 1)) * 0.5;
 
               }
 
-              cell_grad_p_[0](i,j,k) = p;
-              cell_grad_p_[1](i,j,k) = q;
-              cell_grad_p_[2](i,j,k) = r;
+              cell_grad_p_[0](i, j, k) = p;
+              cell_grad_p_[1](i, j, k) = q;
+              cell_grad_p_[2](i, j, k) = r;
             }
-      n--,dumplata_cellvector(lata_name,"GRAD_P" /* AT CELL-CENTER */, cell_grad_p_, latastep);
+      n--, dumplata_cellvector(lata_name, "GRAD_P" /* AT CELL-CENTER */, cell_grad_p_, latastep);
     }
   //
   if (liste_post_instantanes_.contient_("GRAD_U"))
     {
       const FixedVector<IJK_Field_double, 3>& gradU = statistiques_FT_.get_IJK_vector_field("gradU");
-      n--,dumplata_cellvector(lata_name,"dUd", gradU, latastep);
+      n--, dumplata_cellvector(lata_name, "dUd", gradU, latastep);
     }
   if (liste_post_instantanes_.contient_("GRAD_V"))
     {
       const FixedVector<IJK_Field_double, 3>& gradV = statistiques_FT_.get_IJK_vector_field("gradV");
-      n--,dumplata_cellvector(lata_name,"dVd", gradV, latastep);
+      n--, dumplata_cellvector(lata_name, "dVd", gradV, latastep);
     }
   if (liste_post_instantanes_.contient_("GRAD_W"))
     {
       const FixedVector<IJK_Field_double, 3>& gradW = statistiques_FT_.get_IJK_vector_field("gradW");
-      n--,dumplata_cellvector(lata_name,"dWd", gradW, latastep);
+      n--, dumplata_cellvector(lata_name, "dWd", gradW, latastep);
     }
 
   if (liste_post_instantanes_.contient_("PRESSURE"))
-    n--,dumplata_scalar(lata_name,"PRESSURE", pressure_, latastep);
+    n--, dumplata_scalar(lata_name, "PRESSURE", pressure_, latastep);
   if (liste_post_instantanes_.contient_("D_PRESSURE"))
-    n--,dumplata_scalar(lata_name,"D_PRESSURE", ref_ijk_ft_.d_pressure_, latastep);
+    n--, dumplata_scalar(lata_name, "D_PRESSURE", ref_ijk_ft_.d_pressure_, latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE"))
-    n--,dumplata_scalar(lata_name,"INDICATRICE", interfaces_.In(), latastep);
+    n--, dumplata_scalar(lata_name, "INDICATRICE", interfaces_.In(), latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE_FT"))
-    n--,dumplata_scalar(lata_name,"INDICATRICE_FT", interfaces_.In_ft(), latastep);
+    n--, dumplata_scalar(lata_name, "INDICATRICE_FT", interfaces_.In_ft(), latastep);
   if (liste_post_instantanes_.contient_("MU"))
-    n--,dumplata_scalar(lata_name,"MU", ref_ijk_ft_.molecular_mu_, latastep);
+    n--, dumplata_scalar(lata_name, "MU", ref_ijk_ft_.molecular_mu_, latastep);
   if (liste_post_instantanes_.contient_("RHO"))
-    n--,dumplata_scalar(lata_name,"RHO", ref_ijk_ft_.rho_field_, latastep);
+    n--, dumplata_scalar(lata_name, "RHO", ref_ijk_ft_.rho_field_, latastep);
   if (liste_post_instantanes_.contient_("PRESSURE_RHS"))
-    n--,dumplata_scalar(lata_name,"PRESSURE_RHS", ref_ijk_ft_.pressure_rhs_, latastep);
+    n--, dumplata_scalar(lata_name, "PRESSURE_RHS", ref_ijk_ft_.pressure_rhs_, latastep);
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
-    n--,dumplata_vector(lata_name,"VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
+    n--, dumplata_vector(lata_name, "VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
-    n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ft_[0],
-                        ref_ijk_ft_.terme_source_interfaces_ft_[1],
-                        ref_ijk_ft_.terme_source_interfaces_ft_[2], latastep);
+    n--, dumplata_vector(lata_name, "SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ft_[0], ref_ijk_ft_.terme_source_interfaces_ft_[1], ref_ijk_ft_.terme_source_interfaces_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
-    n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ns_, latastep);
+    n--, dumplata_cellvector(lata_name, "CELL_SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ns_, latastep);
   if (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
-    n--,dumplata_vector(lata_name,"GRAD_INDICATRICE_FT", grad_I_ft_[0],grad_I_ft_[1],grad_I_ft_[2], latastep);
+    n--, dumplata_vector(lata_name, "GRAD_INDICATRICE_FT", grad_I_ft_[0], grad_I_ft_[1], grad_I_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("REBUILT_INDICATRICE_FT"))
-    n--,dumplata_scalar(lata_name,"REBUILT_INDICATRICE_FT", rebuilt_indic_, latastep);
+    n--, dumplata_scalar(lata_name, "REBUILT_INDICATRICE_FT", rebuilt_indic_, latastep);
   //  if (liste_post_instantanes_.contient_("POTENTIEL_FT"))
   //    n--,dumplata_scalar(lata_name,"POTENTIEL_FT", potentiel_, latastep);
   if (liste_post_instantanes_.contient_("REPULSION_FT"))
-    n--,dumplata_scalar(lata_name,"REPULSION_FT", potentiel_, latastep);
+    n--, dumplata_scalar(lata_name, "REPULSION_FT", potentiel_, latastep);
   if (liste_post_instantanes_.contient_("AIRE_INTERF"))
     {
       interfaces_.calculer_aire_interfaciale(ai_ft_);
-      n--,dumplata_scalar(lata_name,"AIRE_INTERF", ai_ft_, latastep);
+      n--, dumplata_scalar(lata_name, "AIRE_INTERF", ai_ft_, latastep);
     }
   if (liste_post_instantanes_.contient_("COURBURE_AIRE_INTERF"))
     {
       // On suppose implicitement qu'il est bien calcule et mis a jour avant d'arriver ici.
-      n--,dumplata_scalar(lata_name,"COURBURE_AIRE_INTERF", kappa_ai_ft_, latastep);
+      n--, dumplata_scalar(lata_name, "COURBURE_AIRE_INTERF", kappa_ai_ft_, latastep);
     }
   if (liste_post_instantanes_.contient_("NORMALE_EULER"))
     {
       // On suppose implicitement qu'il est bien calcule et mis a jour avant d'arriver ici.
-      n--,dumplata_cellvector(lata_name,"NORMALE_EULER", normale_cell_ft_, latastep);
+      n--, dumplata_cellvector(lata_name, "NORMALE_EULER", normale_cell_ft_, latastep);
     }
 
   if (liste_post_instantanes_.contient_("PRESSURE_LIQ"))
     {
       // On suppose implicitement qu'il est bien calcule et mis a jour avant d'arriver ici.
-      n--,dumplata_scalar(lata_name,"PRESSURE_LIQ", extended_pl_, latastep);
+      n--, dumplata_scalar(lata_name, "PRESSURE_LIQ", extended_pl_, latastep);
     }
   if (liste_post_instantanes_.contient_("PRESSURE_VAP"))
     {
       // On suppose implicitement qu'il est bien calcule et mis a jour avant d'arriver ici.
-      n--,dumplata_scalar(lata_name,"PRESSURE_VAP", extended_pv_, latastep);
+      n--, dumplata_scalar(lata_name, "PRESSURE_VAP", extended_pv_, latastep);
     }
   if (liste_post_instantanes_.contient_("GROUPS"))
-    n--,dumplata_cellvector(lata_name,"GROUPS", interfaces_.groups_indicatrice_n_ns(), latastep);
+    n--, dumplata_cellvector(lata_name, "GROUPS", interfaces_.groups_indicatrice_n_ns(), latastep);
   if (liste_post_instantanes_.contient_("GROUPS_FT"))
-    n--,dumplata_cellvector(lata_name,"GROUPS_FT", interfaces_.groups_indicatrice_n_ft(), latastep);
+    n--, dumplata_cellvector(lata_name, "GROUPS_FT", interfaces_.groups_indicatrice_n_ft(), latastep);
   if (liste_post_instantanes_.contient_("SURFACE_VAPEUR_PAR_FACE"))
     {
       Cerr << "Tentative de sauvegarder champ surface vapeur par face" << finl;
-      n--,dumplata_vector(lata_name, "SURFACE_VAPEUR_PAR_FACE", interfaces_.get_surface_vapeur_par_face()[0], interfaces_.get_surface_vapeur_par_face()[1], interfaces_.get_surface_vapeur_par_face()[2], latastep);
+      n--, dumplata_vector(lata_name, "SURFACE_VAPEUR_PAR_FACE", interfaces_.get_surface_vapeur_par_face()[0], interfaces_.get_surface_vapeur_par_face()[1],
+                           interfaces_.get_surface_vapeur_par_face()[2], latastep);
       Cerr << "Reussi" << finl;
     }
   if (liste_post_instantanes_.contient_("BARYCENTRE_VAPEUR_PAR_FACE"))
     {
-      n--,dumplata_vector(lata_name, "BARYCENTRE_X_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[0][0], interfaces_.get_barycentre_vapeur_par_face()[0][1], interfaces_.get_barycentre_vapeur_par_face()[0][2], latastep);
-      n--,dumplata_vector(lata_name, "BARYCENTRE_Y_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[1][0], interfaces_.get_barycentre_vapeur_par_face()[1][1], interfaces_.get_barycentre_vapeur_par_face()[1][2], latastep);
-      n--,dumplata_vector(lata_name, "BARYCENTRE_Z_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[2][0], interfaces_.get_barycentre_vapeur_par_face()[2][1], interfaces_.get_barycentre_vapeur_par_face()[2][2], latastep);
+      n--, dumplata_vector(lata_name, "BARYCENTRE_X_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[0][0], interfaces_.get_barycentre_vapeur_par_face()[0][1],
+                           interfaces_.get_barycentre_vapeur_par_face()[0][2], latastep);
+      n--, dumplata_vector(lata_name, "BARYCENTRE_Y_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[1][0], interfaces_.get_barycentre_vapeur_par_face()[1][1],
+                           interfaces_.get_barycentre_vapeur_par_face()[1][2], latastep);
+      n--, dumplata_vector(lata_name, "BARYCENTRE_Z_VAPEUR_PAR_FACE", interfaces_.get_barycentre_vapeur_par_face()[2][0], interfaces_.get_barycentre_vapeur_par_face()[2][1],
+                           interfaces_.get_barycentre_vapeur_par_face()[2][2], latastep);
     }
 
   if (!disable_diphasique_)
     {
       interfaces_.update_surface_normale(); // necessaire avant posttraiter_champs_instantanes_thermique_interfaciaux
-      n -= interfaces_.posttraiter_champs_instantanes(liste_post_instantanes_,
-                                                      lata_name,
-                                                      latastep);
+      n -= interfaces_.posttraiter_champs_instantanes(liste_post_instantanes_, lata_name, latastep);
     }
 
   {
     int idx_th = 0;
-    //CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-    LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-    while(curseur)
+    for (auto &itr : thermique_)
       {
-        int nb= posttraiter_champs_instantanes_thermique(liste_post_instantanes_,
-                                                         lata_name,
-                                                         latastep,
-                                                         current_time,
-                                                         curseur,
-                                                         idx_th);
+        int nb = posttraiter_champs_instantanes_thermique(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
         // Interfacial thermal fields :
         if (!disable_diphasique_)
-          nb +=posttraiter_champs_instantanes_thermique_interfaciaux(liste_post_instantanes_,
-                                                                     lata_name,
-                                                                     latastep,
-                                                                     current_time,
-                                                                     curseur,
-                                                                     idx_th);
+          nb += posttraiter_champs_instantanes_thermique_interfaciaux(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
 
-        if (idx_th==0)
-          n-=nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
+        if (idx_th == 0)
+          n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_th;
-        ++curseur;
       }
     // TODO: finir post-traitement de l'energie, choisir a quel niveau le faire.
     int idx_en = 0;
-    LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-    while(curseur_en)
+    for (auto &itr : energie_)
       {
-        int nb= posttraiter_champs_instantanes_energie(liste_post_instantanes_,
-                                                       lata_name,
-                                                       latastep,
-                                                       current_time,
-                                                       curseur_en,
-                                                       idx_en);
+        int nb = posttraiter_champs_instantanes_energie(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_en);
         // Interfacial thermal fields :
         if (!disable_diphasique_)
-          nb +=posttraiter_champs_instantanes_energie_interfaciaux(liste_post_instantanes_,
-                                                                   lata_name,
-                                                                   latastep,
-                                                                   current_time,
-                                                                   curseur_en,
-                                                                   idx_en);
+          nb += posttraiter_champs_instantanes_energie_interfaciaux(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_en);
 
-        if (idx_en==0)
-          n-=nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
+        if (idx_en == 0)
+          n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_en;
-        ++curseur_en;
       }
 
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
   }
 
-  if (n>0)
+  if (n > 0)
     {
       Cerr << "Il y a des noms de champs a postraiter inconnus dans la liste de champs a postraiter" << finl;
       Process::exit();
@@ -1022,37 +952,37 @@ void IJK_FT_Post::posttraiter_statistiques_plans(double current_time)
       Nom n("");
       // post-traitement des stats diphasiques :
       // (si calcul monophasique, on devrait avoir chi=1)
-      for (int flag_valeur_instantanee=0; flag_valeur_instantanee<2; flag_valeur_instantanee++)
+      for (int flag_valeur_instantanee = 0; flag_valeur_instantanee < 2; flag_valeur_instantanee++)
         {
           if (disable_diphasique_)
-            n="monophasique_";
+            n = "monophasique_";
           else
-            n="diphasique_";
+            n = "diphasique_";
 
           if (flag_valeur_instantanee == 0)
-            n+="statistiques_";
+            n += "statistiques_";
           else
-            n+="moyenne_spatiale_";
+            n += "moyenne_spatiale_";
 
           n += Nom(current_time);
           if ((flag_valeur_instantanee) || (statistiques_FT_.t_integration() > 0.))
             {
-              SFichier f(n+Nom(".txt"));
-              f.setf(ios::scientific);// precision pour allez chercher les 4 ordres
+              SFichier f(n + Nom(".txt"));
+              f.setf(ios::scientific);      // precision pour allez chercher les 4 ordres
               f.precision(15);
               statistiques_FT_.postraiter(f, flag_valeur_instantanee /* flag pour ecrire la moyenne instantanee ou la moyenne */);
               statistiques_FT_.postraiter_thermique(current_time); /* moyenne instantanee et temporelle */
 
               // S'il n'y a pas qu'un group, on posttraite les objets stats pour chaque group:
-              if ((!disable_diphasique_) && (interfaces_.nb_groups()>1))
+              if ((!disable_diphasique_) && (interfaces_.nb_groups() > 1))
                 {
                   for (int igroup = 0; igroup < interfaces_.nb_groups(); igroup++)
                     {
-                      SFichier figroup(n+Nom("_grp")+Nom(igroup)+Nom(".txt"));
+                      SFichier figroup(n + Nom("_grp") + Nom(igroup) + Nom(".txt"));
                       figroup.setf(ios::scientific);
                       figroup.precision(15);
-                      groups_statistiques_FT_[igroup].postraiter(figroup,flag_valeur_instantanee /* flag pour ecrire la moyenne instantanee ou la moyenne */);
-                      if (flag_valeur_instantanee==1)
+                      groups_statistiques_FT_[igroup].postraiter(figroup, flag_valeur_instantanee /* flag pour ecrire la moyenne instantanee ou la moyenne */);
+                      if (flag_valeur_instantanee == 1)
                         groups_statistiques_FT_[igroup].postraiter_thermique(current_time); /* moyenne instantanee et temporelle */
                     }
                 }
@@ -1082,7 +1012,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
   interfaces_.calculer_bounding_box_bulles(bounding_box);
   for (int ib = 0; ib < nbulles; ib++)
     for (int dir = 0; dir < 3; dir++)
-      hauteurs_bulles(ib, dir) = bounding_box(ib, dir, 1) - bounding_box(ib, dir, 0) ;
+      hauteurs_bulles(ib, dir) = bounding_box(ib, dir, 1) - bounding_box(ib, dir, 0);
 
   // La methode calcule a present les surfaces meme pour les bulles ghost.
   // Pour les enlever, il suffit simplement de reduire la taille du tableau :
@@ -1093,26 +1023,23 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
   // Pour les enlever, il suffit simplement de reduire la taille du tableau :
   interfaces_.calculer_volume_bulles(volume, position);
   volume.resize_array(nbulles);
-  position.resize(nbulles,3);
+  position.resize(nbulles, 3);
 
   DoubleTab poussee;
   interfaces_.calculer_poussee_bulles(gravite, poussee);
   if (1)
     {
       int idx_th = 0;
-      // No longer const due to the access to storage
-      // CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      while(curseur)
+      for (auto &itr : thermique_)
         {
           ArrOfDouble interfacial_temperature;
           ArrOfDouble interfacial_phin_ai;
           // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
-          IJK_Field_double& temperature_ft = curseur->get_temperature_ft();
-          ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(curseur->get_temperature(),temperature_ft);
+          IJK_Field_double& temperature_ft = itr.get_temperature_ft();
+          ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
           temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
-          //curseur->compute_interfacial_temperature(interfacial_temperature, interfacial_phin_ai, curseur->get_storage());
-          curseur->compute_interfacial_temperature2(interfacial_temperature, interfacial_phin_ai);
+          //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin_ai, itr.get_storage());
+          itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin_ai);
 
           // Compute Bubble mean :
           ArrOfDouble Ti_per_bubble;
@@ -1128,17 +1055,17 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
               IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
 
 #ifndef INT_is_64_
-              sprintf(s, "%s_bulles_Ti_%d.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_Ti_%d.out", nomcas, idx_th);
 #else
-              sprintf(s, "%s_bulles_Ti_%ld.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_Ti_%ld.out", nomcas, idx_th);
 #endif
               // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
               fic.ouvrir(s, mode);
-              sprintf(s, "%.16e ", current_time);
+              snprintf(s, 1000, "%.16e ", current_time);
               fic << s;
               for (int i = 0; i < n; i++)
                 {
-                  sprintf(s,"%.16e ", Ti_per_bubble[i]);
+                  snprintf(s, 1000, "%.16e ", Ti_per_bubble[i]);
                   fic << s;
                 }
               fic << finl;
@@ -1146,16 +1073,16 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
 
               // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
 #ifndef INT_is_64_
-              sprintf(s, "%s_bulles_phin_%d.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_phin_%d.out", nomcas, idx_th);
 #else
-              sprintf(s, "%s_bulles_phin_%ld.out", nomcas, idx_th);
+              snprintf(s, 1000, "%s_bulles_phin_%ld.out", nomcas, idx_th);
 #endif
               fic.ouvrir(s, mode);
-              sprintf(s, "%.16e ", current_time);
+              snprintf(s, 1000, "%.16e ", current_time);
               fic << s;
               for (int i = 0; i < n; i++)
                 {
-                  sprintf(s,"%.16e ", phin_per_bubble[i]);
+                  snprintf(s, 1000, "%.16e ", phin_per_bubble[i]);
                   fic << s;
                 }
               fic << finl;
@@ -1165,7 +1092,6 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
             }
 
           ++idx_th;
-          ++curseur;
         }
     }
 
@@ -1177,114 +1103,114 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       const int n = position.dimension(0);
       IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
 
-      sprintf(s, "%s_bulles_pousseex.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_pousseex.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", poussee(i,0));
+          snprintf(s, 1000, "%.16e ", poussee(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hx.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hx.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", hauteurs_bulles(i,0));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hy.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hy.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", hauteurs_bulles(i,1));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 1));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_hz.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_hz.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", hauteurs_bulles(i,2));
+          snprintf(s, 1000, "%.16e ", hauteurs_bulles(i, 2));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_x.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_x.out", nomcas);
       // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", position(i,0));
+          snprintf(s, 1000, "%.16e ", position(i, 0));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_y.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_y.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", position(i,1));
+          snprintf(s, 1000, "%.16e ", position(i, 1));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_centre_z.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_centre_z.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", position(i,2));
+          snprintf(s, 1000, "%.16e ", position(i, 2));
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_surface.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_surface.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", surface[i]);
+          snprintf(s, 1000, "%.16e ", surface[i]);
           fic << s;
         }
       fic << finl;
       fic.close();
 
-      sprintf(s, "%s_bulles_volume.out", nomcas);
+      snprintf(s, 1000, "%s_bulles_volume.out", nomcas);
       fic.ouvrir(s, mode);
-      sprintf(s, "%.16e ", current_time);
+      snprintf(s, 1000, "%.16e ", current_time);
       fic << s;
       for (int i = 0; i < n; i++)
         {
-          sprintf(s,"%.16e ", volume[i]);
+          snprintf(s, 1000, "%.16e ", volume[i]);
           fic << s;
         }
       fic << finl;
@@ -1293,13 +1219,13 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       if (interfaces_.follow_colors())
         {
           const ArrOfInt& colors = interfaces_.get_colors();
-          sprintf(s, "%s_bulles_colors.out", nomcas);
+          snprintf(s, 1000, "%s_bulles_colors.out", nomcas);
           fic.ouvrir(s, mode);
-          sprintf(s, "%.16e ", current_time);
+          snprintf(s, 1000, "%.16e ", current_time);
           fic << s;
           for (int i = 0; i < n; i++)
             {
-              sprintf(s,"%d ", (True_int)colors[i]);
+              snprintf(s, 1000, "%d ", (True_int) colors[i]);
               fic << s;
             }
           fic << finl;
@@ -1310,13 +1236,13 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       // On ne peut donc pas le post-traiter avec la frequence lue dans le jdd comme les autres.
       for (int idir=0; idir<3; idir++)
         {
-          sprintf(s, "%s_bulles_external_force_%d.out", nomcas, idir);
+          snprintf(s, 1000, "%s_bulles_external_force_%d.out", nomcas, idir);
           fic.ouvrir(s, mode);
-          sprintf(s, "%.16e ", current_time);
+          snprintf(s, 1000, "%.16e ", current_time);
           fic << s;
           for (int ib = 0; ib < interfaces_.nb_bulles_reelles_; ib++)
             {
-              sprintf(s,"%.16e ", individual_forces(ib,idir));
+              snprintf(s, 1000,"%.16e ", individual_forces(ib,idir));
               fic << s;
             }
           fic << finl;
@@ -1351,7 +1277,7 @@ void IJK_FT_Post::update_stat_ft(const double dt)
 
       // pressure gradient requires the "left" value in all directions:
       //  pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
-      add_gradient_times_constant(pressure_, 1. /*constant*/,  grad_P_[0], grad_P_[1], grad_P_[2]);
+      add_gradient_times_constant(pressure_, 1. /*constant*/, grad_P_[0], grad_P_[1], grad_P_[2]);
       for (int dir = 0; dir < 3; dir++)
         grad_P_[dir].echange_espace_virtuel(1);
 
@@ -1361,14 +1287,11 @@ void IJK_FT_Post::update_stat_ft(const double dt)
   int nb_groups = interfaces_.nb_groups();
   // Boucle debute a -1 pour faire l'indicatrice globale.
   // S'il n'y a pas de groupes de bulles (monophasique ou monodisperse), on passe exactement une fois dans la boucle
-  if (nb_groups==1)
-    nb_groups=0; // Quand il n'y a qu'un groupe, on ne posttraite pas les choses pour ce groupe unique puisque c'est identique au cas global
+  if (nb_groups == 1)
+    nb_groups = 0; // Quand il n'y a qu'un groupe, on ne posttraite pas les choses pour ce groupe unique puisque c'est identique au cas global
   for (int igroup = -1; igroup < nb_groups; igroup++)
     {
-      interfaces_.calculer_normales_et_aires_interfaciales(ai_ft_,
-                                                           kappa_ai_ft_,
-                                                           normale_cell_ft_,
-                                                           igroup);
+      interfaces_.calculer_normales_et_aires_interfaciales(ai_ft_, kappa_ai_ft_, normale_cell_ft_, igroup);
       // Puis les redistribue sur le ns :
       ref_ijk_ft_.redistribute_from_splitting_ft_elem_.redistribute(ai_ft_, ai_ns_);
       ref_ijk_ft_.redistribute_from_splitting_ft_elem_.redistribute(kappa_ai_ft_, kappa_ai_ns_);
@@ -1380,7 +1303,7 @@ void IJK_FT_Post::update_stat_ft(const double dt)
         {
           // interfaces_.In().echange_espace_virtuel(1);
           // Calcul des champs grad_P_, grad_I_ns_
-          calculer_gradient_indicatrice_et_pression(interfaces_.In()) ;
+          calculer_gradient_indicatrice_et_pression(interfaces_.In());
           ref_ijk_ft_.transfer_ft_to_ns(); // pour remplir : terme_repulsion_interfaces_ft_ et terme_abs_repulsion_interfaces_ft_
           // Calcul des champs grad_P_, grad_I_ns_, terme_repulsion_interfaces_ns_, terme_abs_repulsion_interfaces_ns_
           // a partir de pressure_, interfaces_.In(), et terme_*_ft_
@@ -1391,7 +1314,7 @@ void IJK_FT_Post::update_stat_ft(const double dt)
           // interfaces_.groups_indicatrice_n_ns()[igroup].echange_espace_virtuel(1);
           // Calcul des champs grad_P_, grad_I_ns_, terme_repulsion_interfaces_ns_, terme_abs_repulsion_interfaces_ns_
           // a partir de pressure_, interfaces_.In(), et terme_*_ft_
-          calculer_gradient_indicatrice_et_pression(interfaces_.groups_indicatrice_n_ns()[igroup]) ;
+          calculer_gradient_indicatrice_et_pression(interfaces_.groups_indicatrice_n_ns()[igroup]);
           ref_ijk_ft_.transfer_ft_to_ns();
           groups_statistiques_FT_[igroup].update_stat(ref_ijk_ft_, dt);
         }
@@ -1406,9 +1329,7 @@ void IJK_FT_Post::get_update_lambda2()
 {
   compute_and_store_gradU_cell(velocity_[0], velocity_[1], velocity_[2],
                                /* Et les champs en sortie */
-                               dudx_, dvdy_, dwdx_,
-                               dudz_, dvdz_, dwdz_, 1 /* yes compute_all */,
-                               dudy_, dvdx_, dwdy_, lambda2_);
+                               dudx_, dvdy_, dwdx_, dudz_, dvdz_, dwdz_, 1 /* yes compute_all */, dudy_, dvdx_, dwdy_, lambda2_);
 }
 
 void IJK_FT_Post::get_update_lambda2_and_rot_and_curl()
@@ -1422,33 +1343,29 @@ void IJK_FT_Post::get_update_lambda2_and_rot_and_curl()
     for (int j = 0; j < jmax; j++)
       for (int i = 0; i < imax; i++)
         {
-          rot_[0](i,j,k) = dwdy_(i,j,k) - dvdz_(i,j,k);
-          rot_[1](i,j,k) = dudz_(i,j,k) - dwdx_(i,j,k);
-          rot_[2](i,j,k) = dvdx_(i,j,k) - dudy_(i,j,k);
+          rot_[0](i, j, k) = dwdy_(i, j, k) - dvdz_(i, j, k);
+          rot_[1](i, j, k) = dudz_(i, j, k) - dwdx_(i, j, k);
+          rot_[2](i, j, k) = dvdx_(i, j, k) - dudy_(i, j, k);
           // Calcul du critere Q selon (Jeong & Hussain 1995)
-          critere_Q_(i,j,k) = -0.5 * (dudx_(i,j,k)*dudx_(i,j,k) + 2.*dudy_(i,j,k)*dvdx_(i,j,k) + 2.*dudz_(i,j,k)*dwdx_(i,j,k)
-                                      + dvdy_(i,j,k)*dvdy_(i,j,k) + 2.*dvdz_(i,j,k)*dwdy_(i,j,k)
-                                      + dwdz_(i,j,k)*dwdz_(i,j,k) );
+          critere_Q_(i, j, k) = -0.5
+                                * (dudx_(i, j, k) * dudx_(i, j, k) + 2. * dudy_(i, j, k) * dvdx_(i, j, k) + 2. * dudz_(i, j, k) * dwdx_(i, j, k) + dvdy_(i, j, k) * dvdy_(i, j, k) + 2. * dvdz_(i, j, k) * dwdy_(i, j, k)
+                                   + dwdz_(i, j, k) * dwdz_(i, j, k));
         }
 }
 
 const FixedVector<IJK_Field_double, 3>& IJK_FT_Post::get_IJK_vector_field(const Nom& nom) const
 {
   //int idx_th = 0;
-  CONST_LIST_CURSEUR(IJK_Thermique) curseur(ref_ijk_ft_.thermique_);
-  while(curseur)
+  for (const auto &itr : ref_ijk_ft_.thermique_)
     {
       std::ostringstream oss;
       oss << "GRAD_T"; // << idx_th;
-      if (nom== Nom(oss.str().c_str()))
-        return curseur->grad_T_;
+      if (nom == Nom(oss.str().c_str()))
+        return itr.grad_T_;
       oss.str("");
-      ++curseur;
       // ++idx_th;
     }
-  Cerr << "Erreur dans IJK_FT_Post::get_IJK_vector_field : "
-       << "Champ demande : " << nom
-       << " Liste des champs possibles : "  << finl;
+  Cerr << "Erreur dans IJK_FT_Post::get_IJK_vector_field : " << "Champ demande : " << nom << " Liste des champs possibles : " << finl;
   Process::exit();
   throw;
 }
@@ -1456,7 +1373,8 @@ const FixedVector<IJK_Field_double, 3>& IJK_FT_Post::get_IJK_vector_field(const 
 bool is_number(const std::string& s)
 {
   std::string::const_iterator it = s.begin();
-  while (it != s.end() && std::isdigit(*it)) ++it;
+  while (it != s.end() && std::isdigit(*it))
+    ++it;
   return !s.empty() && it == s.end();
 }
 
@@ -1465,29 +1383,29 @@ int convert_suffix_to_int(const Nom& nom)
   std::string nom_str = nom.getString();
   std::size_t index = nom_str.find_last_of("_");
   std::string suffix("");
-  if(index != std::string::npos)
-    suffix = nom_str.substr(index+1);
+  if (index != std::string::npos)
+    suffix = nom_str.substr(index + 1);
 
   bool is_suffix_number = is_number(suffix);
-  int suffix_int = -1 ;
-  if(is_suffix_number)
+  int suffix_int = -1;
+  if (is_suffix_number)
     {
       suffix_int = std::stoi(suffix);
-      Cerr << suffix_int << finl ;
+      Cerr << suffix_int << finl;
     }
-  return suffix_int ;
+  return suffix_int;
 }
 
 const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
 {
-  if (nom== "PRESSURE_ANA")
+  if (nom == "PRESSURE_ANA")
     return pressure_ana_;
-  if (nom== "PRESSURE_LIQ")
+  if (nom == "PRESSURE_LIQ")
     return extended_pl_;
-  if (nom== "PRESSURE_VAP")
+  if (nom == "PRESSURE_VAP")
     return extended_pv_;
 
-  if (nom== "CELL_VELOCITY_X")
+  if (nom == "CELL_VELOCITY_X")
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
@@ -1496,7 +1414,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_velocity_[0];
     }
-  if (nom== "CELL_VELOCITY_Y")
+  if (nom == "CELL_VELOCITY_Y")
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
@@ -1505,7 +1423,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_velocity_[1];
     }
-  if (nom== "CELL_VELOCITY_Z")
+  if (nom == "CELL_VELOCITY_Z")
     {
       if (!liste_post_instantanes_.contient_("CELL_VELOCITY"))
         {
@@ -1516,7 +1434,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     }
 
   // GAB
-  if (nom== "CELL_FORCE_PH_X")
+  if (nom == "CELL_FORCE_PH_X")
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
@@ -1525,7 +1443,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_source_spectrale_[0];
     }
-  if (nom== "CELL_FORCE_PH_Y")
+  if (nom == "CELL_FORCE_PH_Y")
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
@@ -1534,7 +1452,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_source_spectrale_[1];
     }
-  if (nom== "CELL_FORCE_PH_Z")
+  if (nom == "CELL_FORCE_PH_Z")
     {
       if (!liste_post_instantanes_.contient_("CELL_FORCE_PH"))
         {
@@ -1545,7 +1463,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
     }
 
   // GAB
-  if (nom== "CELL_GRAD_P_X")
+  if (nom == "CELL_GRAD_P_X")
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
@@ -1554,7 +1472,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_grad_p_[0];
     }
-  if (nom== "CELL_GRAD_P_Y")
+  if (nom == "CELL_GRAD_P_Y")
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
@@ -1563,7 +1481,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_grad_p_[1];
     }
-  if (nom== "CELL_GRAD_P_Z")
+  if (nom == "CELL_GRAD_P_Z")
     {
       if (!liste_post_instantanes_.contient_("CELL_GRAD_P"))
         {
@@ -1577,31 +1495,31 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
   if (nom.debute_par("dU"))
     {
       const FixedVector<IJK_Field_double, 3>& gradU = statistiques_FT_.get_IJK_vector_field("gradU");
-      if (nom== "DUDX")
+      if (nom == "DUDX")
         return gradU[0];
-      if (nom== "DUDY")
+      if (nom == "DUDY")
         return gradU[1];
-      if (nom== "DUDZ")
+      if (nom == "DUDZ")
         return gradU[2];
     }
   if (nom.debute_par("dV"))
     {
       const FixedVector<IJK_Field_double, 3>& gradV = statistiques_FT_.get_IJK_vector_field("gradV");
-      if (nom== "DVDX")
+      if (nom == "DVDX")
         return gradV[0];
-      if (nom== "DVDY")
+      if (nom == "DVDY")
         return gradV[1];
-      if (nom== "DVDZ")
+      if (nom == "DVDZ")
         return gradV[2];
     }
   if (nom.debute_par("dW"))
     {
       const FixedVector<IJK_Field_double, 3>& gradW = statistiques_FT_.get_IJK_vector_field("gradW");
-      if (nom== "DWDX")
+      if (nom == "DWDX")
         return gradW[0];
-      if (nom== "DWDY")
+      if (nom == "DWDY")
         return gradW[1];
-      if (nom== "DWDZ")
+      if (nom == "DWDZ")
         return gradW[2];
     }
 
@@ -1616,99 +1534,94 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
           Process::exit();
         }
 //      FixedVector<IJK_Field_double, 3>& source_spectrale = ref_ijk_ft_.forcage_.get_force_ph2();
-      if (nom== "FORCE_PH_X")
+      if (nom == "FORCE_PH_X")
         return source_spectrale_[0];
-      if (nom== "FORCE_PH_Y")
+      if (nom == "FORCE_PH_Y")
         return source_spectrale_[1];
-      if (nom== "FORCE_PH_Z")
+      if (nom == "FORCE_PH_Z")
         return source_spectrale_[2];
     }
   //
   // if (disable_diphasique_)
   {
-    if (nom== "VELOCITY_ANA_X")
+    if (nom == "VELOCITY_ANA_X")
       return velocity_ana_[0];
-    if (nom== "VELOCITY_ANA_Y")
+    if (nom == "VELOCITY_ANA_Y")
       return velocity_ana_[1];
-    if (nom== "VELOCITY_ANA_Z")
+    if (nom == "VELOCITY_ANA_Z")
       return velocity_ana_[2];
-    if (nom== "ECART_ANA_X")
+    if (nom == "ECART_ANA_X")
       return ecart_ana_[0];
-    if (nom== "ECART_ANA_Y")
+    if (nom == "ECART_ANA_Y")
       return ecart_ana_[1];
-    if (nom== "ECART_ANA_Z")
+    if (nom == "ECART_ANA_Z")
       return ecart_ana_[2];
   }
 
   const int idx_wanted = convert_suffix_to_int(nom);
-  const Nom field_name = nom.getPrefix(Nom("_")+Nom(idx_wanted)) ;
-  Cerr << "In get_IJK_field by name : " << nom << " read as : (" << field_name << " ; "<< idx_wanted << ")" << finl;
+  const Nom field_name = nom.getPrefix(Nom("_") + Nom(idx_wanted));
+  Cerr << "In get_IJK_field by name : " << nom << " read as : (" << field_name << " ; " << idx_wanted << ")" << finl;
 
 // Remplir la liste de tous les possibles :
   Motcles liste_champs_thermiques_possibles;
   posttraiter_tous_champs_thermique(liste_champs_thermiques_possibles, 0);
-  int rang =liste_champs_thermiques_possibles.rang(field_name);
-  if (rang ==-1)
+  int rang = liste_champs_thermiques_possibles.rang(field_name);
+  if (rang == -1)
     {
-      Cerr << field_name << " not found as possible for field name. Should be in the list: "
-           << liste_champs_thermiques_possibles  << finl;
+      Cerr << field_name << " not found as possible for field name. Should be in the list: " << liste_champs_thermiques_possibles << finl;
       Process::exit();
     }
 
-  const Motcle& mot= liste_champs_thermiques_possibles[rang];
-  if ((mot == field_name) && (idx_wanted>=0))
+  const Motcle& mot = liste_champs_thermiques_possibles[rang];
+  if ((mot == field_name) && (idx_wanted >= 0))
     {
       Cerr << "found as planned " << finl;
     }
   else
     {
-      Cerr << "Some issue with the name provided for the sonde. Unrecognised."  << finl;
+      Cerr << "Some issue with the name provided for the sonde. Unrecognised." << finl;
       Process::exit();
     }
 
   int idx_th = 0;
-  CONST_LIST_CURSEUR(IJK_Thermique) curseur(ref_ijk_ft_.thermique_);
-  while(curseur)
+  for (const auto &itr : ref_ijk_ft_.thermique_)
     {
-      if (idx_th==idx_wanted)
+      if (idx_th == idx_wanted)
         {
           if (field_name == Nom("TEMPERATURE"))
-            return curseur->temperature_;
-          if  (field_name == Nom("TEMPERATURE_ANA"))
-            return curseur->temperature_ana_;
-          if  (field_name == Nom("SOURCE_TEMPERATURE"))
-            return curseur->source_temperature_;
-          if  (field_name == Nom("TEMPERATURE_PHYSIQUE_T"))
-            return curseur->temperature_physique_T_;
-          if  (field_name == Nom("T_RUST"))
-            return curseur->T_rust_;
-          if  (field_name == Nom("div_rho_cp_T"))
-            return curseur->div_rho_cp_T_;
-          if  (field_name == Nom("ECART_T_ANA"))
-            return curseur->ecart_t_ana_;
-          if  (field_name == Nom("TEMPERATURE_ADIM_BULLES"))
-            return curseur->temperature_adim_bulles_;
-          if  (field_name == Nom("GRAD_T0"))
-            return curseur->grad_T_[0];
-          if  (field_name == Nom("GRAD_T1"))
-            return curseur->grad_T_[1];
-          if  (field_name == Nom("GRAD_T2"))
-            return curseur->grad_T_[2];
+            return itr.temperature_;
+          if (field_name == Nom("TEMPERATURE_ANA"))
+            return itr.temperature_ana_;
+          if (field_name == Nom("SOURCE_TEMPERATURE"))
+            return itr.source_temperature_;
+          if (field_name == Nom("TEMPERATURE_PHYSIQUE_T"))
+            return itr.temperature_physique_T_;
+          if (field_name == Nom("T_RUST"))
+            return itr.T_rust_;
+          if (field_name == Nom("div_rho_cp_T"))
+            return itr.div_rho_cp_T_;
+          if (field_name == Nom("ECART_T_ANA"))
+            return itr.ecart_t_ana_;
+          if (field_name == Nom("TEMPERATURE_ADIM_BULLES"))
+            return itr.temperature_adim_bulles_;
+          if (field_name == Nom("GRAD_T0"))
+            return itr.grad_T_[0];
+          if (field_name == Nom("GRAD_T1"))
+            return itr.grad_T_[1];
+          if (field_name == Nom("GRAD_T2"))
+            return itr.grad_T_[2];
           break;
         }
       else
         {
-
-
-          ++curseur;
           ++idx_th;
         }
     }
 
   Cerr << "Erreur dans IJK_FT_Post::get_IJK_field : " << finl;
   Cerr << "Champ demande : " << nom << finl;
-  Cerr << "Index maximal pour la temperature : " << idx_th-1 << finl;
-  Cerr << "Liste des champs possibles pour la thermique : " << liste_champs_thermiques_possibles  << finl;
+  Cerr << "Index maximal pour la temperature : " << idx_th - 1 << finl;
+  Cerr << "Liste des champs possibles pour la thermique : " << liste_champs_thermiques_possibles << finl;
   Process::exit();
   throw;
 
@@ -1716,38 +1629,34 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
 
 const int& IJK_FT_Post::get_IJK_flag(const Nom& nom) const
 {
-  CONST_LIST_CURSEUR(IJK_Thermique) curseur(ref_ijk_ft_.thermique_);
-  if (nom== "WALL_FLUX")
-    return curseur->wall_flux_;
+  const auto& ii = ref_ijk_ft_.thermique_.front();
+  if (nom == "WALL_FLUX")
+    return ii.wall_flux_;
 
-  Cerr << "Erreur dans IJK_FT_Post::get_IJK_variable : "
-       << "Variable demandee : " << nom
-       << " Liste des variables possibles : "  << finl;
+  Cerr << "Erreur dans IJK_FT_Post::get_IJK_variable : " << "Variable demandee : " << nom << " Liste des variables possibles : " << finl;
   Process::exit();
   throw;
 }
 
-
 void IJK_FT_Post::sauvegarder_post(const Nom& lata_name)
 {
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
-    dumplata_vector(lata_name,"INTEGRATED_VELOCITY", integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2],0);
+    dumplata_vector(lata_name, "INTEGRATED_VELOCITY", integrated_velocity_[0], integrated_velocity_[1], integrated_velocity_[2], 0);
 
   if (liste_post_instantanes_.contient_("INTEGRATED_PRESSURE"))
-    dumplata_scalar(lata_name,"INTEGRATED_PRESSURE", integrated_pressure_,0);
+    dumplata_scalar(lata_name, "INTEGRATED_PRESSURE", integrated_pressure_, 0);
 
   if (liste_post_instantanes_.contient_("INDICATRICE_PERTURBE"))
-    dumplata_scalar(lata_name,"INDICATRICE_PERTURBE", indicatrice_non_perturbe_,0);
+    dumplata_scalar(lata_name, "INDICATRICE_PERTURBE", indicatrice_non_perturbe_, 0);
 
   if (liste_post_instantanes_.contient_("INTEGRATED_TIMESCALE"))
-    dumplata_scalar(lata_name,"INTEGRATED_TIMESCALE", integrated_timescale_,0);
+    dumplata_scalar(lata_name, "INTEGRATED_TIMESCALE", integrated_timescale_, 0);
   // Not necessary, but convenient for picturing...
   if (liste_post_instantanes_.contient_("LAMBDA2"))
     {
       get_update_lambda2();
-      dumplata_scalar(lata_name,"LAMBDA2", lambda2_,0);
+      dumplata_scalar(lata_name, "LAMBDA2", lambda2_, 0);
     }
-
 
 }
 
@@ -1768,10 +1677,10 @@ void IJK_FT_Post::sauvegarder_post_maitre(const Nom& lata_name, SFichier& fichie
       fichier << " statistiques_FT " << statistiques_FT_;
       // S'il y a plusieurs groups, on s'occupe des objets stats pour chaque group:
       // (en ecrivant directement le vecteur d'objets)
-      if (interfaces_.nb_groups()>1)
+      if (interfaces_.nb_groups() > 1)
         {
           Cerr << "Group by group :" << finl;
-          fichier << " groups_statistiques_FT "<< groups_statistiques_FT_;
+          fichier << " groups_statistiques_FT " << groups_statistiques_FT_;
         }
     }
 }
@@ -1781,7 +1690,7 @@ void IJK_FT_Post::reprendre_post(Param& param)
   param.ajouter("statistiques_FT", &statistiques_FT_);
   param.ajouter("groups_statistiques_FT", &groups_statistiques_FT_);
 
-  if(ref_ijk_ft_.coef_immobilisation_>1e-16)
+  if (ref_ijk_ft_.coef_immobilisation_ > 1e-16)
     {
       param.ajouter("fichier_reprise_integrated_velocity", &fichier_reprise_integrated_velocity_);
       param.ajouter("fichier_reprise_integrated_pressure", &fichier_reprise_integrated_pressure_);
@@ -1813,14 +1722,11 @@ void IJK_FT_Post::calculer_gradient_indicatrice_et_pression(const IJK_Field_doub
 
   // From IJK_Navier_Stokes_Tools.cpp
   // interfaces_.In().echange_espace_virtuel(1);
-  add_gradient_times_constant(indic, 1. /*Constante multiplicative*/,
-                              grad_I_ns_[DIRECTION_I],
-                              grad_I_ns_[DIRECTION_J],
-                              grad_I_ns_[DIRECTION_K]);
+  add_gradient_times_constant(indic, 1. /*Constante multiplicative*/, grad_I_ns_[DIRECTION_I], grad_I_ns_[DIRECTION_J], grad_I_ns_[DIRECTION_K]);
 
   // pressure gradient requires the "left" value in all directions:
   //  pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
-  add_gradient_times_constant(pressure_, 1. /*constant*/,  grad_P_[0], grad_P_[1], grad_P_[2]);
+  add_gradient_times_constant(pressure_, 1. /*constant*/, grad_P_[0], grad_P_[1], grad_P_[2]);
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -1834,60 +1740,47 @@ int IJK_FT_Post::alloc_fields()
   int nalloc = 0;
   rebuilt_indic_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
   potentiel_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
-  if ( (!disable_diphasique_) &&
-       ( (liste_post_instantanes_.contient_("AIRE_INTERF"))
-         ||  (liste_post_instantanes_.contient_("TOUS"))
-         || ((t_debut_statistiques_ <  1.e10) )))
+  if ((!disable_diphasique_) && ((liste_post_instantanes_.contient_("AIRE_INTERF")) || (liste_post_instantanes_.contient_("TOUS")) || ((t_debut_statistiques_ < 1.e10))))
     {
       ai_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
-      nalloc +=1;
+      nalloc += 1;
     }
   // Pour les stats, on calcule kappa*ai :
-  if ( (!disable_diphasique_) &&
-       ( (t_debut_statistiques_ <  1.e10) ))
+  if ((!disable_diphasique_) && ((t_debut_statistiques_ < 1.e10)))
     {
       kappa_ai_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
       kappa_ai_ns_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       ai_ns_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       allocate_cell_vector(normale_cell_ns_, splitting_, 0);
-      nalloc +=6;
+      nalloc += 6;
     }
 
   // For the pressure field extension:
-  if ( (!disable_diphasique_) &&
-       (  (liste_post_instantanes_.contient_("PRESSURE_LIQ"))
-          ||  (liste_post_instantanes_.contient_("PRESSURE_VAP"))
-          ||  (liste_post_instantanes_.contient_("TOUS"))
-          || (t_debut_statistiques_ <  1.e10) ))
+  if ((!disable_diphasique_)
+      && ((liste_post_instantanes_.contient_("PRESSURE_LIQ")) || (liste_post_instantanes_.contient_("PRESSURE_VAP")) || (liste_post_instantanes_.contient_("TOUS")) || (t_debut_statistiques_ < 1.e10)))
     {
       extended_pressure_computed_ = 1;
-      pressure_ft_.allocate(splitting_ft_,IJK_Splitting::ELEM,5);
+      pressure_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 5);
       extended_pl_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       extended_pv_.allocate(splitting_, IJK_Splitting::ELEM, 0);
       extended_pl_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
       extended_pv_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
-      nalloc +=5;
+      nalloc += 5;
     }
   else
     extended_pressure_computed_ = 0;
 
   // Allocation du champ de normale aux cellules :
-  if ( (!disable_diphasique_) &&
-       ( (liste_post_instantanes_.contient_("NORMALE_INTERF"))
-         ||  (liste_post_instantanes_.contient_("PRESSURE_LIQ")) // Je ne suis pas sur que ce soit necessaire. Seulement si on l'utilise dans le calcul de p_ext
-         ||  (liste_post_instantanes_.contient_("PRESSURE_VAP")) // Je ne suis pas sur que ce soit necessaire.
-         ||(liste_post_instantanes_.contient_("TOUS"))
-         || ((t_debut_statistiques_ <  1.e10) )))
+  if ((!disable_diphasique_) && ((liste_post_instantanes_.contient_("NORMALE_INTERF")) || (liste_post_instantanes_.contient_("PRESSURE_LIQ")) // Je ne suis pas sur que ce soit necessaire. Seulement si on l'utilise dans le calcul de p_ext
+                                 || (liste_post_instantanes_.contient_("PRESSURE_VAP")) // Je ne suis pas sur que ce soit necessaire.
+                                 || (liste_post_instantanes_.contient_("TOUS")) || ((t_debut_statistiques_ < 1.e10))))
     {
       allocate_cell_vector(normale_cell_ft_, splitting_ft_, 0);
-      nalloc +=3;
+      nalloc += 3;
     }
 
   // Allocation des champs derivee de vitesse :
-  if ( (t_debut_statistiques_ <  1.e10)
-       || (liste_post_instantanes_.contient_("LAMBDA2"))
-       || (liste_post_instantanes_.contient_("CRITERE_Q"))
-       || (liste_post_instantanes_.contient_("CURL")) )
+  if ((t_debut_statistiques_ < 1.e10) || (liste_post_instantanes_.contient_("LAMBDA2")) || (liste_post_instantanes_.contient_("CRITERE_Q")) || (liste_post_instantanes_.contient_("CURL")))
     {
       dudx_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       dudy_.allocate(splitting_, IJK_Splitting::ELEM, 1);
@@ -1898,25 +1791,25 @@ int IJK_FT_Post::alloc_fields()
       dvdz_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       dwdy_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       dwdz_.allocate(splitting_, IJK_Splitting::ELEM, 1);
-      nalloc +=9;
+      nalloc += 9;
       if (liste_post_instantanes_.contient_("LAMBDA2"))
         {
           lambda2_.allocate(splitting_, IJK_Splitting::ELEM, 0);
-          nalloc +=1;
+          nalloc += 1;
         }
-      if ( (liste_post_instantanes_.contient_("CRITERE_Q")) || (liste_post_instantanes_.contient_("CURL")) )
+      if ((liste_post_instantanes_.contient_("CRITERE_Q")) || (liste_post_instantanes_.contient_("CURL")))
         {
           critere_Q_.allocate(splitting_, IJK_Splitting::ELEM, 0);
           // Le rotationnel, aux elems aussi :
-          allocate_cell_vector(rot_,splitting_, 0);
-          nalloc +=4;
+          allocate_cell_vector(rot_, splitting_, 0);
+          nalloc += 4;
         }
     }
 
-  if (interfaces_.nb_groups()>1)
+  if (interfaces_.nb_groups() > 1)
     {
       // On alloue un tableau assez grand pour contenir tous les groupes.
-      if (interfaces_.nb_groups()>3)
+      if (interfaces_.nb_groups() > 3)
         {
           Cerr << "More than 3 groups are planned, but the allocated fields has only 3 components" << finl;
           Process::exit();
@@ -1924,7 +1817,7 @@ int IJK_FT_Post::alloc_fields()
       // TODO AYM: allocate fait dans IJK_Interfaces a l init
       // allocate_cell_vector(interfaces_.groups_indicatrice_n_ns(),splitting_, 1); // Besoin d'un ghost pour le calcul du grad
       // allocate_cell_vector(interfaces_.groups_indicatrice_n_ft(),splitting_ft_, 1); // peut-etre qu'un ghost=0 suffit et fonctionne pour le redistribute.
-      nalloc +=6;
+      nalloc += 6;
     }
 
   // Pour verification des stats :
@@ -1951,27 +1844,27 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(ana_grad2Vc_, splitting_, 0);
       allocate_cell_vector(ana_grad2Wi_, splitting_, 0);
       allocate_cell_vector(ana_grad2Wc_, splitting_, 0);
-      nalloc +=36;
+      nalloc += 36;
     }
   if (liste_post_instantanes_.contient_("NUM_COMPO"))
     {
       num_compo_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
-      nalloc +=1;
+      nalloc += 1;
     }
   if (liste_post_instantanes_.contient_("CELL_VELOCITY"))
     {
-      allocate_cell_vector(cell_velocity_,splitting_, 0);
-      nalloc +=3;
+      allocate_cell_vector(cell_velocity_, splitting_, 0);
+      nalloc += 3;
     }
   if (liste_post_instantanes_.contient_("CELL_FORCE_PH"))
     {
-      allocate_cell_vector(cell_source_spectrale_,splitting_, 0);
-      nalloc +=3;
+      allocate_cell_vector(cell_source_spectrale_, splitting_, 0);
+      nalloc += 3;
     }
   if (liste_post_instantanes_.contient_("CELL_GRAD_P"))
     {
-      allocate_cell_vector(cell_grad_p_,splitting_, 0);
-      nalloc +=3;
+      allocate_cell_vector(cell_grad_p_, splitting_, 0);
+      nalloc += 3;
     }
   return nalloc;
 }
@@ -1980,35 +1873,34 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
 {
   int n = 0;
   // Le mot cle TOUS n'a pas encore ete compris comme tel.
-  if ( (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
-       ||  (liste_post_instantanes_.contient_("TOUS")))
-    n+=3,allocate_velocity(grad_I_ft_, splitting_ft_, 2);
+  if ((liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT")) || (liste_post_instantanes_.contient_("TOUS")))
+    n += 3, allocate_velocity(grad_I_ft_, splitting_ft_, 2);
 
-  if ((liste_post_instantanes_.contient_("VELOCITY_ANA")) || (liste_post_instantanes_.contient_("ECART_ANA")) )
-    n+=3,allocate_velocity(velocity_ana_, splitting_, 1);
+  if ((liste_post_instantanes_.contient_("VELOCITY_ANA")) || (liste_post_instantanes_.contient_("ECART_ANA")))
+    n += 3, allocate_velocity(velocity_ana_, splitting_, 1);
   if (liste_post_instantanes_.contient_("ECART_ANA"))
-    n+=3,allocate_velocity(ecart_ana_, splitting_, 0);
+    n += 3, allocate_velocity(ecart_ana_, splitting_, 0);
   if (liste_post_instantanes_.contient_("D_VELOCITY_ANA"))
-    n+=3,allocate_velocity(d_velocity_ana_, splitting_, 1);
-  if ((liste_post_instantanes_.contient_("PRESSURE_ANA")) || (liste_post_instantanes_.contient_("ECART_P_ANA")) )
-    n++,pressure_ana_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+    n += 3, allocate_velocity(d_velocity_ana_, splitting_, 1);
+  if ((liste_post_instantanes_.contient_("PRESSURE_ANA")) || (liste_post_instantanes_.contient_("ECART_P_ANA")))
+    n++, pressure_ana_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   if (liste_post_instantanes_.contient_("ECART_P_ANA"))
-    n++,ecart_p_ana_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+    n++, ecart_p_ana_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   if (liste_post_instantanes_.contient_("OP_CONV"))
     {
-      n+=3,allocate_velocity(op_conv_, splitting_, ref_ijk_ft_.d_velocity_[0].ghost()); // Il y a 1 ghost chez d_velocity_
+      n += 3, allocate_velocity(op_conv_, splitting_, ref_ijk_ft_.d_velocity_[0].ghost()); // Il y a 1 ghost chez d_velocity_
       //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
     }
   // Pour le calcul des statistiques diphasiques :
   // (si le t_debut_stat a ete initialise... Sinon, on ne va pas les calculer au cours de ce calcul)
-  if ((t_debut_statistiques_ <  1.e10) )
+  if ((t_debut_statistiques_ < 1.e10))
     {
-      n+=3,allocate_velocity(grad_I_ns_, splitting_, 1);
-      n+=3,allocate_velocity(grad_P_, splitting_, 1);
+      n += 3, allocate_velocity(grad_I_ns_, splitting_, 1);
+      n += 3, allocate_velocity(grad_P_, splitting_, 1);
     }
   else if (flag_variable_source)
     {
-      n+=3,allocate_velocity(grad_I_ns_, splitting_, 1);
+      n += 3, allocate_velocity(grad_I_ns_, splitting_, 1);
     }
   return n;
 }
@@ -2042,7 +1934,6 @@ void IJK_FT_Post::improved_initial_pressure_guess(bool imp)
 
 }
 
-
 void IJK_FT_Post::postraiter_ci(const Nom& lata_name, const double current_time)
 {
   dumplata_header(lata_name);
@@ -2063,26 +1954,21 @@ void IJK_FT_Post::postraiter_ci(const Nom& lata_name, const double current_time)
       // pour faire la vraie indicatrice + les groupes
       update_stat_ft(0.);
     }
-  else if ( !(liste_post_instantanes_.contient_("CURL"))
-            &&  !(liste_post_instantanes_.contient_("CRITERE_Q"))
-            &&  (liste_post_instantanes_.contient_("LAMBDA2")))
+  else if (!(liste_post_instantanes_.contient_("CURL")) && !(liste_post_instantanes_.contient_("CRITERE_Q")) && (liste_post_instantanes_.contient_("LAMBDA2")))
     {
       // On ne calcul pas encore les stats, mais on veut post-traiter Lambda2 seulement...
       get_update_lambda2();
     }
-  else if ( (liste_post_instantanes_.contient_("CURL"))
-            ||  (liste_post_instantanes_.contient_("CRITERE_Q"))
-            ||  (liste_post_instantanes_.contient_("LAMBDA2")))
+  else if ((liste_post_instantanes_.contient_("CURL")) || (liste_post_instantanes_.contient_("CRITERE_Q")) || (liste_post_instantanes_.contient_("LAMBDA2")))
     {
       // On ne calcul pas encore les stats, mais on veut deja post-traiter le rotationnel ou Lambda2 ou critere_Q...
       get_update_lambda2_and_rot_and_curl();
     }
 }
 
-void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, double timestep, const Nom& lata_name,
-                                 const ArrOfDouble& gravite, const Nom& nom_cas)
+void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, double timestep, const Nom& lata_name, const ArrOfDouble& gravite, const Nom& nom_cas)
 {
-  if (tstep % dt_post_ == dt_post_-1 || stop)
+  if (tstep % dt_post_ == dt_post_ - 1 || stop)
     {
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
@@ -2103,8 +1989,8 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
 }
 
 // NEW INTERPOLATING FUNCTION TO AVOID EULERIAN POINTS LYING IN THE BUBBLES OR ON THE INTERFACE
-static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, const DoubleTab& coordinates, ArrOfDouble& result,
-                                               int skip_unknown_points, double value_for_bad_points,const IJK_Field_double& indic)
+static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, const DoubleTab& coordinates, ArrOfDouble& result, int skip_unknown_points, double value_for_bad_points,
+                                               const IJK_Field_double& indic)
 {
   const int ghost = field.ghost();
   const int ni = field.ni();
@@ -2116,12 +2002,9 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
   const double dy = geom.get_constant_delta(DIRECTION_J);
   const double dz = geom.get_constant_delta(DIRECTION_K);
   const IJK_Splitting::Localisation loc = field.get_localisation();
-  double origin_x = geom.get_origin(DIRECTION_I)
-                    + ((loc==IJK_Splitting::FACES_J || loc==IJK_Splitting::FACES_K || loc==IJK_Splitting::ELEM) ? (dx * 0.5) : 0. ) ;
-  double origin_y = geom.get_origin(DIRECTION_J)
-                    + ((loc==IJK_Splitting::FACES_K || loc==IJK_Splitting::FACES_I || loc==IJK_Splitting::ELEM) ? (dy * 0.5) : 0. ) ;
-  double origin_z = geom.get_origin(DIRECTION_K)
-                    + ((loc==IJK_Splitting::FACES_I || loc==IJK_Splitting::FACES_J || loc==IJK_Splitting::ELEM) ? (dz * 0.5) : 0. ) ;
+  double origin_x = geom.get_origin(DIRECTION_I) + ((loc == IJK_Splitting::FACES_J || loc == IJK_Splitting::FACES_K || loc == IJK_Splitting::ELEM) ? (dx * 0.5) : 0.);
+  double origin_y = geom.get_origin(DIRECTION_J) + ((loc == IJK_Splitting::FACES_K || loc == IJK_Splitting::FACES_I || loc == IJK_Splitting::ELEM) ? (dy * 0.5) : 0.);
+  double origin_z = geom.get_origin(DIRECTION_K) + ((loc == IJK_Splitting::FACES_I || loc == IJK_Splitting::FACES_J || loc == IJK_Splitting::ELEM) ? (dz * 0.5) : 0.);
   const int nb_coords = coordinates.dimension(0);
   const int gh = indic.ghost();
   result.resize_array(nb_coords);
@@ -2133,10 +2016,10 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
       const double x2 = (x - origin_x) / dx;
       const double y2 = (y - origin_y) / dy;
       const double z2 = (z - origin_z) / dz;
-      const int index_i = (int)(floor(x2)) - splitting.get_offset_local(DIRECTION_I);  //index of the closest cell center is this defined only in the single processor?
-      const int index_j = (int)(floor(y2)) - splitting.get_offset_local(DIRECTION_J);
-      const int index_k = (int)(floor(z2)) - splitting.get_offset_local(DIRECTION_K);
-      const int index_kp1 = index_k +1;
+      const int index_i = (int) (floor(x2)) - splitting.get_offset_local(DIRECTION_I);  //index of the closest cell center is this defined only in the single processor?
+      const int index_j = (int) (floor(y2)) - splitting.get_offset_local(DIRECTION_J);
+      const int index_k = (int) (floor(z2)) - splitting.get_offset_local(DIRECTION_K);
+      const int index_kp1 = index_k + 1;
       const double xfact = x2 - floor(x2);  // non-dimension distance inside the cell where the interpolation is requested
       const double yfact = y2 - floor(y2);
       const double zfact = z2 - floor(z2);
@@ -2164,24 +2047,23 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
                 {
                   // The phase indicator function is correctly evaluated only inside the domain of the single processor
                   // otherwise its value remains equal to 0, leading to ad invalid value for the interpolation
-                  if ( index_k>=0 && index_k <nk && index_kp1 >=0 && index_kp1 < nk
-                       && index_i >=0 && index_i < ni && index_j >=0 && index_j < nj)
+                  if (index_k >= 0 && index_k < nk && index_kp1 >= 0 && index_kp1 < nk && index_i >= 0 && index_i < ni && index_j >= 0 && index_j < nj)
                     {
                       c_1 = indic(index_i, index_j, index_k);
-                      if(index_i != ni-1)
-                        c_2 = indic(index_i+1, index_j, index_k);
-                      if(index_j != nj-1)
-                        c_3 = indic(index_i, index_j+1, index_k);
-                      if(index_i != ni-1 && index_j != nj-1)
-                        c_4 = indic(index_i+1, index_j+1, index_k);
+                      if (index_i != ni - 1)
+                        c_2 = indic(index_i + 1, index_j, index_k);
+                      if (index_j != nj - 1)
+                        c_3 = indic(index_i, index_j + 1, index_k);
+                      if (index_i != ni - 1 && index_j != nj - 1)
+                        c_4 = indic(index_i + 1, index_j + 1, index_k);
 
                       c_5 = indic(index_i, index_j, index_kp1);
-                      if(index_i != ni-1)
-                        c_6 = indic(index_i+1, index_j, index_kp1);
-                      if(index_j != nj-1)
-                        c_7 = indic(index_i, index_j+1, index_kp1);
-                      if(index_i != ni-1 && index_j != nj-1)
-                        c_8 = indic(index_i+1, index_j+1, index_kp1);
+                      if (index_i != ni - 1)
+                        c_6 = indic(index_i + 1, index_j, index_kp1);
+                      if (index_j != nj - 1)
+                        c_7 = indic(index_i, index_j + 1, index_kp1);
+                      if (index_i != ni - 1 && index_j != nj - 1)
+                        c_8 = indic(index_i + 1, index_j + 1, index_kp1);
                     }
                 }
             }
@@ -2194,76 +2076,67 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
             {
               if (kmin == 0) //on the left wall
                 {
-                  if (index_k>=0 && index_kp1 >=0
-                      && index_i >=-gh && index_i < ni+gh
-                      && index_j >=-gh && index_j < nj+gh
-                      && index_kp1 <nk && index_k < nk)
+                  if (index_k >= 0 && index_kp1 >= 0 && index_i >= -gh && index_i < ni + gh && index_j >= -gh && index_j < nj + gh && index_kp1 < nk && index_k < nk)
                     {
                       c_1 = indic(index_i, index_j, index_k);
-                      if(index_i != ni+gh-1)
-                        c_2 = indic(index_i+1, index_j, index_k);
-                      if(index_j != nj+gh-1)
-                        c_3 = indic(index_i, index_j+1, index_k);
-                      if(index_i != ni+gh-1 && index_j != nj+gh-1)
-                        c_4 = indic(index_i+1, index_j+1, index_k);
+                      if (index_i != ni + gh - 1)
+                        c_2 = indic(index_i + 1, index_j, index_k);
+                      if (index_j != nj + gh - 1)
+                        c_3 = indic(index_i, index_j + 1, index_k);
+                      if (index_i != ni + gh - 1 && index_j != nj + gh - 1)
+                        c_4 = indic(index_i + 1, index_j + 1, index_k);
 
                       c_5 = indic(index_i, index_j, index_kp1);
-                      if(index_i != ni+gh-1)
-                        c_6 = indic(index_i+1, index_j, index_kp1);
-                      if(index_j != nj+gh-1)
-                        c_7 = indic(index_i, index_j+1, index_kp1);
-                      if(index_i != ni+gh-1 && index_j != nj+gh-1)
-                        c_8 = indic(index_i+1, index_j+1, index_kp1);
+                      if (index_i != ni + gh - 1)
+                        c_6 = indic(index_i + 1, index_j, index_kp1);
+                      if (index_j != nj + gh - 1)
+                        c_7 = indic(index_i, index_j + 1, index_kp1);
+                      if (index_i != ni + gh - 1 && index_j != nj + gh - 1)
+                        c_8 = indic(index_i + 1, index_j + 1, index_kp1);
                     }
                 }
-              else  if (kmin + nk == nktot) // on the right wall
+              else if (kmin + nk == nktot) // on the right wall
                 {
-                  if  (index_k <nk && index_kp1 < nk
-                       && index_i >=-gh && index_i < ni+gh
-                       && index_j >=-gh && index_j < nj+gh
-                       && index_kp1 >= 0 && index_k >= 0 )
+                  if (index_k < nk && index_kp1 < nk && index_i >= -gh && index_i < ni + gh && index_j >= -gh && index_j < nj + gh && index_kp1 >= 0 && index_k >= 0)
                     {
                       //Process::Journal() << "Proc: " << Process::me() << " i,j,k: "
                       //                   << index_i << " " << index_j << " " << index_k << finl;
                       c_1 = indic(index_i, index_j, index_k);
-                      if(index_i != ni+gh-1)
-                        c_2 = indic(index_i+1, index_j, index_k);
-                      if(index_j != nj+gh-1)
-                        c_3 = indic(index_i, index_j+1, index_k);
-                      if(index_i != ni+gh-1 && index_j != nj+gh-1)
-                        c_4 = indic(index_i+1, index_j+1, index_k);
+                      if (index_i != ni + gh - 1)
+                        c_2 = indic(index_i + 1, index_j, index_k);
+                      if (index_j != nj + gh - 1)
+                        c_3 = indic(index_i, index_j + 1, index_k);
+                      if (index_i != ni + gh - 1 && index_j != nj + gh - 1)
+                        c_4 = indic(index_i + 1, index_j + 1, index_k);
 
                       c_5 = indic(index_i, index_j, index_kp1);
-                      if(index_i != ni+gh-1)
-                        c_6 = indic(index_i+1, index_j, index_kp1);
-                      if(index_j != nj+gh-1)
-                        c_7 = indic(index_i, index_j+1, index_kp1);
-                      if(index_i != ni+gh-1 && index_j != nj+gh-1)
-                        c_8 = indic(index_i+1, index_j+1, index_kp1);
+                      if (index_i != ni + gh - 1)
+                        c_6 = indic(index_i + 1, index_j, index_kp1);
+                      if (index_j != nj + gh - 1)
+                        c_7 = indic(index_i, index_j + 1, index_kp1);
+                      if (index_i != ni + gh - 1 && index_j != nj + gh - 1)
+                        c_8 = indic(index_i + 1, index_j + 1, index_kp1);
                     }
                 }
               else  // points in processor not treating walls
                 {
-                  if  (index_k <nk+gh && index_kp1 < nk+gh
-                       && index_i >=-gh && index_i < ni+gh
-                       && index_j >=-gh && index_j < nj+gh
-                       && index_kp1 >= -gh && index_k >= -gh )
+                  if (index_k < nk + gh && index_kp1 < nk + gh && index_i >= -gh && index_i < ni + gh && index_j >= -gh && index_j < nj + gh && index_kp1 >= -gh && index_k >= -gh)
                     {
                       c_1 = indic(index_i, index_j, index_k);
-                      if(index_i < ni+gh-1)
-                        c_2 = indic(index_i+1, index_j, index_k);
-                      if(index_j < nj+gh-1)
-                        c_3 = indic(index_i, index_j+1, index_k);
-                      if(index_i < ni+gh-1 && index_j < nj+gh-1)
-                        c_4 = indic(index_i+1, index_j+1, index_k);
+                      if (index_i < ni + gh - 1)
+                        c_2 = indic(index_i + 1, index_j, index_k);
+                      if (index_j < nj + gh - 1)
+                        c_3 = indic(index_i, index_j + 1, index_k);
+                      if (index_i < ni + gh - 1 && index_j < nj + gh - 1)
+                        c_4 = indic(index_i + 1, index_j + 1, index_k);
 
                       c_5 = indic(index_i, index_j, index_kp1);
-                      if(index_i < ni+gh-1)
-                        c_6 = indic(index_i+1, index_j, index_kp1);
-                      if(index_j < nj+gh-1)
-                        c_7 = indic(index_i, index_j+1, index_kp1);
-                      if(index_i < ni+gh-1 && index_j < nj+gh-1)
-                        c_8 = indic(index_i+1, index_j+1, index_kp1);
+                      if (index_i < ni + gh - 1)
+                        c_6 = indic(index_i + 1, index_j, index_kp1);
+                      if (index_j < nj + gh - 1)
+                        c_7 = indic(index_i, index_j + 1, index_kp1);
+                      if (index_i < ni + gh - 1 && index_j < nj + gh - 1)
+                        c_8 = indic(index_i + 1, index_j + 1, index_kp1);
                     }
                 }
             }
@@ -2271,37 +2144,32 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
 
       else // ghost cells may be interrogated when the direction is periodic
         {
-          if  (index_k <nk+gh && index_kp1 < nk+gh
-               && index_i >=-gh && index_i < ni+gh
-               && index_j >=-gh && index_j < nj+gh
-               && index_kp1 >= -gh && index_k >= -gh )
+          if (index_k < nk + gh && index_kp1 < nk + gh && index_i >= -gh && index_i < ni + gh && index_j >= -gh && index_j < nj + gh && index_kp1 >= -gh && index_k >= -gh)
             {
               c_1 = indic(index_i, index_j, index_k);
-              if(index_i < ni+gh-1)
-                c_2 = indic(index_i+1, index_j, index_k);
-              if(index_j < nj+gh-1)
-                c_3 = indic(index_i, index_j+1, index_k);
-              if(index_i < ni+gh-1 && index_j < nj+gh-1)
-                c_4 = indic(index_i+1, index_j+1, index_k);
+              if (index_i < ni + gh - 1)
+                c_2 = indic(index_i + 1, index_j, index_k);
+              if (index_j < nj + gh - 1)
+                c_3 = indic(index_i, index_j + 1, index_k);
+              if (index_i < ni + gh - 1 && index_j < nj + gh - 1)
+                c_4 = indic(index_i + 1, index_j + 1, index_k);
 
               c_5 = indic(index_i, index_j, index_kp1);
-              if(index_i < ni+gh-1)
-                c_6 = indic(index_i+1, index_j, index_kp1);
-              if(index_j < nj+gh-1)
-                c_7 = indic(index_i, index_j+1, index_kp1);
-              if(index_i < ni+gh-1 && index_j < nj+gh-1)
-                c_8 = indic(index_i+1, index_j+1, index_kp1);
+              if (index_i < ni + gh - 1)
+                c_6 = indic(index_i + 1, index_j, index_kp1);
+              if (index_j < nj + gh - 1)
+                c_7 = indic(index_i, index_j + 1, index_kp1);
+              if (index_i < ni + gh - 1 && index_j < nj + gh - 1)
+                c_8 = indic(index_i + 1, index_j + 1, index_kp1);
             }
         }
 
       // Where at least of the points used in the interpolation is outside the liquid phase (at the interface or in the vapor phase)
       // the invalid value is assigned by the interpolation function
-      bool ok_2 = (c_1+c_2+c_3+c_4+c_5+c_6+c_7+c_8 >=7.99);
+      bool ok_2 = (c_1 + c_2 + c_3 + c_4 + c_5 + c_6 + c_7 + c_8 >= 7.99);
 
 // is point in the domain ? (ghost cells ok...)
-      bool ok = (index_i >= -ghost && index_i < ni+ghost-1)
-                && (index_j >= -ghost && index_j < nj+ghost-1)
-                && (index_k >= -ghost && index_k < nk+ghost-1);
+      bool ok = (index_i >= -ghost && index_i < ni + ghost - 1) && (index_j >= -ghost && index_j < nj + ghost - 1) && (index_k >= -ghost && index_k < nk + ghost - 1);
       if (!ok or !ok_2)
         {
           if (skip_unknown_points)
@@ -2312,27 +2180,23 @@ static void ijk_interpolate_implementation_bis(const IJK_Field_double& field, co
           else
             {
               // Error!
-              Cerr << "Error in ijk_interpolate_implementation: request interpolation of point "
-                   << x << " " << y << " " << z << " which is outside of the domain on processor " << Process::me() << finl;
+              Cerr << "Error in ijk_interpolate_implementation: request interpolation of point " << x << " " << y << " " << z << " which is outside of the domain on processor " << Process::me()
+                   << finl;
               Process::exit();
             }
         }
 
-
-      double r = (((1.-xfact) * field(index_i, index_j, index_k) + xfact * field(index_i + 1, index_j, index_k)) * (1.-yfact)
-                  + ((1.-xfact) * field(index_i, index_j+1, index_k) + xfact * field(index_i + 1, index_j+1, index_k)) * (yfact)) * (1.-zfact)
-                 + (((1.-xfact) * field(index_i, index_j, index_kp1) + xfact * field(index_i + 1, index_j, index_kp1)) * (1.-yfact)
-                    + ((1.-xfact) * field(index_i, index_j+1, index_kp1) + xfact * field(index_i + 1, index_j+1, index_kp1)) * (yfact)) * (zfact);
+      double r = (((1. - xfact) * field(index_i, index_j, index_k) + xfact * field(index_i + 1, index_j, index_k)) * (1. - yfact)
+                  + ((1. - xfact) * field(index_i, index_j + 1, index_k) + xfact * field(index_i + 1, index_j + 1, index_k)) * (yfact)) * (1. - zfact)
+                 + (((1. - xfact) * field(index_i, index_j, index_kp1) + xfact * field(index_i + 1, index_j, index_kp1)) * (1. - yfact)
+                    + ((1. - xfact) * field(index_i, index_j + 1, index_kp1) + xfact * field(index_i + 1, index_j + 1, index_kp1)) * (yfact)) * (zfact);
       result[idx] = r;
     }
 }
-void  ijk_interpolate_skip_unknown_points_bis(const IJK_Field_double& field, const DoubleTab& coordinates, ArrOfDouble& result,
-                                              const double value_for_bad_points,const IJK_Field_double& indic)
+void ijk_interpolate_skip_unknown_points_bis(const IJK_Field_double& field, const DoubleTab& coordinates, ArrOfDouble& result, const double value_for_bad_points, const IJK_Field_double& indic)
 {
   ijk_interpolate_implementation_bis(field, coordinates, result, 1 /* yes:skip unknown points */, value_for_bad_points, indic);
 }
-
-
 
 // Here begins the computation of the extended pressure fields
 // ALL the calculations are performed on the extended domain (FT) and the final field is the redistributed on the physical one (Navier-Stokes)
@@ -2345,9 +2209,9 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   // The following calculation is defined on the extended domain ft
   const IJK_Splitting& split_ft = splitting_ft_;
   //const IJK_Grid_Geometry& geom = split_ft.get_grid_geometry();
-  const int ni = split_ft.get_nb_elem_local(DIRECTION_I) ;
-  const int nj = split_ft.get_nb_elem_local(DIRECTION_J) ;
-  const int nk = split_ft.get_nb_elem_local(DIRECTION_K) ;
+  const int ni = split_ft.get_nb_elem_local(DIRECTION_I);
+  const int nj = split_ft.get_nb_elem_local(DIRECTION_J);
+  const int nk = split_ft.get_nb_elem_local(DIRECTION_K);
   const double dx = split_ft.get_grid_geometry().get_constant_delta(DIRECTION_I);
   const double dy = split_ft.get_grid_geometry().get_constant_delta(DIRECTION_J);
   const double dz = split_ft.get_grid_geometry().get_constant_delta(DIRECTION_K);
@@ -2356,44 +2220,42 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
 // double origin_z = geom.get_origin(DIRECTION_K);
 
   /*
-  void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh,
-                                               const IJK_Field_double& indic,
-                                               const int phase)
-  {
-    //const IJK_Field_double& pressure = pressure_;
-    IJK_Field_double& extended_p = phase == 1? extended_pl_ : extended_pv_;
-    // The field we want to fill :
-    if (phase < 0 || phase > 1)
-      Process::exit();
+   void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh,
+   const IJK_Field_double& indic,
+   const int phase)
+   {
+   //const IJK_Field_double& pressure = pressure_;
+   IJK_Field_double& extended_p = phase == 1? extended_pl_ : extended_pv_;
+   // The field we want to fill :
+   if (phase < 0 || phase > 1)
+   Process::exit();
 
-    Cerr << extended_p(0,0,0) << finl;
+   Cerr << extended_p(0,0,0) << finl;
 
 
-    // If we need it, mesh must not be "const"
-    //  const DoubleTab& normale_facettes = mesh.get_update_normale_facettes();
+   // If we need it, mesh must not be "const"
+   //  const DoubleTab& normale_facettes = mesh.get_update_normale_facettes();
 
-    / Do we need a global table for it?
-    interfaces_.calculer_normales_et_aires_interfaciales(ai_,
-                                                       kappa_ai_,
-                                                       normale_cell_ft_,
-                                                       -1) ;
-    */
+   / Do we need a global table for it?
+   interfaces_.calculer_normales_et_aires_interfaciales(ai_,
+   kappa_ai_,
+   normale_cell_ft_,
+   -1) ;
+   */
   //onst IJK_Splitting& split = ref_ijk_ft_.splitting_;
   //const int ni = split.get_nb_elem_local(DIRECTION_I) ;
   //const int nj = split.get_nb_elem_local(DIRECTION_J) ;
   //const int nk = split.get_nb_elem_local(DIRECTION_K) ;
-
   //const double dx = split.get_grid_geometry().get_constant_delta(DIRECTION_I);
   //const double dy = split.get_grid_geometry().get_constant_delta(DIRECTION_J);
   //const double dz = split.get_grid_geometry().get_constant_delta(DIRECTION_K);
   //const double delta[3] = {dx,dy,dz};
-
   int nbsom = 0;
   // ArrOfInt liste_composantes_connexes_dans_element;
   // liste_composantes_connexes_dans_element.set_smart_resize(1);
-  DoubleTab positions_liq(2*nbsom,3); // Table of coordinates where interpolation needs to be computed
-  DoubleTab positions_vap(2*nbsom,3);
-  IntTab crossed_cells(nbsom,3); // Table to store i,j,k of cells crossed by the interface.
+  DoubleTab positions_liq(2 * nbsom, 3); // Table of coordinates where interpolation needs to be computed
+  DoubleTab positions_vap(2 * nbsom, 3);
+  IntTab crossed_cells(nbsom, 3); // Table to store i,j,k of cells crossed by the interface.
   positions_liq.set_smart_resize(1);
   positions_vap.set_smart_resize(1);
   crossed_cells.set_smart_resize(1);
@@ -2416,13 +2278,13 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
 
   int errcount_pext = 0;
   // i,j,k are the indices if the cells in the extended domain, for each processor
-  for (int k = 0; k < nk; k++ )
+  for (int k = 0; k < nk; k++)
     {
-      for (int j=0; j < nj; j++ )
+      for (int j = 0; j < nj; j++)
         {
-          for (int i=0; i< ni; i++)
+          for (int i = 0; i < ni; i++)
             {
-              if ((interfaces_.In_ft()(i,j,k) > 1.e-6 ) && (1.-interfaces_.In_ft()(i,j,k) > 1.e-6))
+              if ((interfaces_.In_ft()(i, j, k) > 1.e-6) && (1. - interfaces_.In_ft()(i, j, k) > 1.e-6))
                 {
                   // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
                   //The normal may only be computed on the extended domain
@@ -2438,8 +2300,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                   // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element); //number of bubbles crossing the cell
                   Vecteur3 bary_facettes_dans_elem;
                   Vecteur3 normale;
-                  double norm= 1.;
-                  double dist=0.;
+                  double norm = 1.;
+                  double dist = 0.;
                   // int num_compo;
                   // if ( nb_compo_traversantes == 0)
                   //   {
@@ -2472,55 +2334,57 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                   //                                                             normale,
                   //                                                             bary_facettes_dans_elem);
                   //   }
-                  for (int c=0; c < 3; c++)
+                  for (int c = 0; c < 3; c++)
                     {
-                      normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i,j,k);
-                      bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i,j,k);
+                      normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i, j, k);
+                      bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i, j, k);
                     }
-                  norm =  sqrt(normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2]);
+                  norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
                   //if (norm<0.95)
                   //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
                   //                       << " norm= " << norm << finl;
                   //  }
-                  if (norm<1.e-8)
+                  if (norm < 1.e-8)
                     {
                       // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
-                      Process::Journal() << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                      Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided ("
-                                         <<  " normale " << normale[0] << " " << normale[1] << " " << normale[2] << " )" << finl;
+                      Process::Journal() << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                      Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided (" << " normale " << normale[0] << " " << normale[1]
+                                         << " " << normale[2] << " )" << finl;
                       Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
-                      dist = 1.52*sqrt(dx*dx+dy*dy+dz*dz)/3.;
-                      if (interfaces_.In_ft()(i,j,k)*(1-interfaces_.In_ft()(i,j,k))>1.e-6)
+                      dist = 1.52 * sqrt(dx * dx + dy * dy + dz * dz) / 3.;
+                      if (interfaces_.In_ft()(i, j, k) * (1 - interfaces_.In_ft()(i, j, k)) > 1.e-6)
                         {
-                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                          if (interfaces_.In_ft()(i,j,k)>0.99)
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                          if (interfaces_.In_ft()(i, j, k) > 0.99)
                             {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << finl;
-                              extended_pv_ft_(i,j,k) = 1.e20;
+                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i << "," << j << "," << k << "] = "
+                                                 << pressure_ft_(i, j, k) << finl;
+                              extended_pv_ft_(i, j, k) = 1.e20;
                             }
                           else
                             {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i <<"," << j << "," << k << "] = " << pressure_ft_(i,j,k) << finl;
-                              extended_pl_ft_(i,j,k) = 1.e20;
+                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i << "," << j << "," << k << "] = "
+                                                 << pressure_ft_(i, j, k) << finl;
+                              extended_pl_ft_(i, j, k) = 1.e20;
                             }
                           continue; // This cell is not added to crossed cells.
                         }
                       else
                         {
                           // We still need a unit normal
-                          for (int dir=0; dir<3; dir++)
-                            if (normale[dir]!=0)
-                              normale[dir] = (normale[dir]>0.) ? 1.0 : -1.0;
+                          for (int dir = 0; dir < 3; dir++)
+                            if (normale[dir] != 0)
+                              normale[dir] = (normale[dir] > 0.) ? 1.0 : -1.0;
 
-                          norm =  sqrt(normale[0]*normale[0] +  normale[1]*normale[1] +  normale[2]*normale[2]);
-                          if (std::fabs(norm)<1.e-10)
+                          norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
+                          if (std::fabs(norm) < 1.e-10)
                             {
                               Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
                             }
                         }
                     }
 
-                  if (std::fabs(norm)<1.e-10)
+                  if (std::fabs(norm) < 1.e-10)
                     {
                       Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
                       Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
@@ -2529,7 +2393,7 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                     }
                   else
                     {
-                      dist = 1.52*(std::fabs(dx*normale[0])+std::fabs(dy*normale[1])+std::fabs(dz*normale[2]))/norm;
+                      dist = 1.52 * (std::fabs(dx * normale[0]) + std::fabs(dy * normale[1]) + std::fabs(dz * normale[2])) / norm;
                       // 2020.04.15 : GB correction for non-isotropic meshes and closer extrapolation points:
                       // The previous version was looking very far away in the direction where the mesh is fine (dz in channel flows).
                       // Then, a lot of ghost would be required.
@@ -2539,23 +2403,23 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                     }
 
                   nbsom++;
-                  crossed_cells.resize(nbsom,3,Array_base::COPY_INIT);
-                  positions_liq.resize(2*nbsom, 3, Array_base::COPY_INIT);
-                  positions_vap.resize(2*nbsom,3, Array_base::COPY_INIT);
+                  crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
+                  positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+                  positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
 
-                  crossed_cells(nbsom-1,0) = i;
-                  crossed_cells(nbsom-1,1) = j;
-                  crossed_cells(nbsom-1,2) = k;
+                  crossed_cells(nbsom - 1, 0) = i;
+                  crossed_cells(nbsom - 1, 1) = j;
+                  crossed_cells(nbsom - 1, 2) = k;
 
-                  for (int dir=0; dir<3; dir++)
+                  for (int dir = 0; dir < 3; dir++)
                     {
                       // Four image points are calculated, two on each side of the interface
                       //liquid phase
-                      positions_liq(2*nbsom-2,dir) = bary_facettes_dans_elem[dir] + dist*normale[dir]; // 1st point to be done...
-                      positions_liq(2*nbsom-1,dir) = bary_facettes_dans_elem[dir] + 2*dist*normale[dir]; // 2nd point to be done...
+                      positions_liq(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] + dist * normale[dir]; // 1st point to be done...
+                      positions_liq(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] + 2 * dist * normale[dir]; // 2nd point to be done...
                       //vapor_phase
-                      positions_vap(2*nbsom-2,dir) = bary_facettes_dans_elem[dir] - dist*normale[dir]; // 1st point to be done...
-                      positions_vap(2*nbsom-1,dir) = bary_facettes_dans_elem[dir] - 2*dist*normale[dir]; // 2nd point to be done...
+                      positions_vap(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] - dist * normale[dir]; // 1st point to be done...
+                      positions_vap(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] - 2 * dist * normale[dir]; // 2nd point to be done...
                     }
                 }
             }
@@ -2571,57 +2435,56 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
 // Interpolation on the image points
 // All the quantities are evaluated on the extended domain, both the pressure field, both the image points coordinates
 
-  ArrOfDouble p_interp_liq(2*nbsom);
-  ArrOfDouble p_interp_vap(2*nbsom);
-  ijk_interpolate_skip_unknown_points(pressure_ft_,positions_vap,p_interp_vap,1.e5 /*value for unknown points*/);
-  ijk_interpolate_skip_unknown_points_bis(pressure_ft_,positions_liq,p_interp_liq,1.e5 /* value for unknown points */, interfaces_.In_ft());
+  ArrOfDouble p_interp_liq(2 * nbsom);
+  ArrOfDouble p_interp_vap(2 * nbsom);
+  ijk_interpolate_skip_unknown_points(pressure_ft_, positions_vap, p_interp_vap, 1.e5 /*value for unknown points*/);
+  ijk_interpolate_skip_unknown_points_bis(pressure_ft_, positions_liq, p_interp_liq, 1.e5 /* value for unknown points */, interfaces_.In_ft());
 
 // Extrapolation in the eulerian cells crossed by the interface
   int inval_pl_count = 0.;
   int inval_pv_count = 0.;
-  for (int icell=0; icell<nbsom; icell++)
+  for (int icell = 0; icell < nbsom; icell++)
     {
-      const int i = crossed_cells(icell,0);
-      const int j = crossed_cells(icell,1);
-      const int k = crossed_cells(icell,2);
-      const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
+      const int i = crossed_cells(icell, 0);
+      const int j = crossed_cells(icell, 1);
+      const int k = crossed_cells(icell, 2);
       // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element);
-      const int nb_compo_traversantes = interfaces_.nb_compo_traversantes(i,j,k);
-      if (nb_compo_traversantes !=1)
+      const int nb_compo_traversantes = interfaces_.nb_compo_traversantes(i, j, k);
+      if (nb_compo_traversantes != 1)
         {
-          extended_pv_ft_(i,j,k) = 1.e20;
+          extended_pv_ft_(i, j, k) = 1.e20;
           inval_pv_count++;
         }
       else
         {
-          extended_pv_ft_(i,j,k) =  2*p_interp_vap[2*icell]-1*p_interp_vap[2*icell+1];
+          extended_pv_ft_(i, j, k) = 2 * p_interp_vap[2 * icell] - 1 * p_interp_vap[2 * icell + 1];
         }
 
       //for(int dir=0; dir<3; dir++)
-      if (p_interp_liq[2*icell+1] == 1.e5)
+      if (p_interp_liq[2 * icell + 1] == 1.e5)
         {
-          if (p_interp_liq[2*icell] == 1.e5)   //May changing the order affect the result??
+          if (p_interp_liq[2 * icell] == 1.e5)   //May changing the order affect the result??
             {
-              extended_pl_ft_(i,j,k) = 1.e20;
+              extended_pl_ft_(i, j, k) = 1.e20;
               inval_pl_count++;
               //dP_ft_[dir](i,j,k) = 1.e20
             }
           else
             {
-              extended_pl_ft_(i,j,k) = p_interp_liq[2*icell] ;
+              extended_pl_ft_(i, j, k) = p_interp_liq[2 * icell];
               //dP_ft_[dir](i,j,k) = 1.e20
             }
         }
       else
         {
-          if   (p_interp_liq[2*icell] !=1.e5)
+          if (p_interp_liq[2 * icell] != 1.e5)
             {
-              extended_pl_ft_(i,j,k) = 2*p_interp_liq[2*icell] -1*p_interp_liq[2*icell+1];
+              extended_pl_ft_(i, j, k) = 2 * p_interp_liq[2 * icell] - 1 * p_interp_liq[2 * icell + 1];
               //dP_ft_[dir](i,j,k) = (p_interp_liq(2*icell) - 1*p_interp_liq(2*icell+1))*normale[dir]/dist;
             }
           else
             {
-              extended_pl_ft_(i,j,k) = p_interp_liq[2*icell+1];
+              extended_pl_ft_(i, j, k) = p_interp_liq[2 * icell + 1];
               //dP_ft_[dir](i,j,k) = 1.e20
             }
         }
@@ -2633,7 +2496,6 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
     Cerr << "[WARNING-Extended-pressure] Invalid p_l cells Count = " << inval_pl_count << finl;
   if ((Process::je_suis_maitre()) && (inval_pv_count))
     Cerr << "[WARNING-Extended-pressure] Invalid p_v cells Count = " << inval_pv_count << finl;
-
 
   // The previous evaluated extended pressure has to be recomputed on the real NS domain
   ref_ijk_ft_.redistribute_from_splitting_ft_elem_.redistribute(extended_pl_ft_, extended_pl_);
@@ -2771,11 +2633,9 @@ void IJK_FT_Post::compute_phase_pressures_based_on_poisson(const int phase)
 }
 #endif
 
-
 // Methode appelee lorsqu'on a mis "TOUS" dans la liste des champs a postraiter.
 // Elle ajoute a la liste tous les noms de champs postraitables par IJK_Interfaces
-void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste,
-                                                    const int idx) const
+void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste, const int idx) const
 {
   liste.add("TEMPERATURE");
   liste.add("CP");
@@ -2800,8 +2660,7 @@ void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste,
 
 // Methode appelee lorsqu'on a mis "TOUS" dans la liste des champs a postraiter.
 // Elle ajoute a la liste tous les noms de champs postraitables par IJK_Interfaces
-void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste,
-                                                  const int idx) const
+void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste, const int idx) const
 {
   liste.add("TEMPERATURE");
   liste.add("CP");
@@ -2824,10 +2683,7 @@ void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste,
 }
 
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
-                                                          const char *lata_name,
-                                                          const int latastep, const double current_time,
-                                                          LIST_CURSEUR(IJK_Thermique) curseur,
+int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Thermique& itr,
                                                           const int idx)
 {
   Cerr << liste_post_instantanes << finl;
@@ -2835,26 +2691,24 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
   std::ostringstream oss;
   oss << "TEMPERATURE_" << idx;
   Nom nom_temp(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE"))
-      || (liste_post_instantanes.contient_(nom_temp)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
     {
-      n++,dumplata_scalar(lata_name,nom_temp, curseur->temperature_, latastep);
+      n++, dumplata_scalar(lata_name, nom_temp, itr.temperature_, latastep);
     }
   oss.str("");
   if (liste_post_instantanes.contient_("CP"))
-    n++,dumplata_scalar(lata_name,"CP", curseur->cp_, latastep);
+    n++, dumplata_scalar(lata_name, "CP", itr.cp_, latastep);
   if (liste_post_instantanes.contient_("LAMBDA"))
-    n++,dumplata_scalar(lata_name,"LAMBDA", curseur->lambda_, latastep);
+    n++, dumplata_scalar(lata_name, "LAMBDA", itr.lambda_, latastep);
 
   //MR: temperature analytique
   oss << "TEMPERATURE_" << idx << "_ANA";
   Nom nom_ana(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_ANA"))
-      || (liste_post_instantanes.contient_(nom_ana)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE_ANA")) || (liste_post_instantanes.contient_(nom_ana)))
     {
-      //set_field_data(curseur->temperature_ana_, curseur->expression_T_ana_, current_time);
-      curseur->set_field_T_ana();
-      n++,dumplata_scalar(lata_name,nom_ana, curseur->temperature_ana_, latastep);
+      //set_field_data(itr.temperature_ana_, itr.expression_T_ana_, current_time);
+      itr.set_field_T_ana();
+      n++, dumplata_scalar(lata_name, nom_ana, itr.temperature_ana_, latastep);
     }
   oss.str("");
 
@@ -2863,11 +2717,11 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
 
   if (liste_post_instantanes_.contient_("GRAD_T") || (liste_post_instantanes.contient_(nom1)))
     {
-      const FixedVector<IJK_Field_double, 3>& grad_T = curseur->grad_T_;
-      n++,dumplata_vector(lata_name,"GRADT", grad_T[0], grad_T[1], grad_T[2], latastep);
-      //  IJK_Field_double& grad_T0 = curseur->grad_T_[0];
-      //  IJK_Field_double& grad_T1 = curseur->grad_T_[1];
-      // IJK_Field_double& grad_T2 = curseur->grad_T_[2];
+      const FixedVector<IJK_Field_double, 3>& grad_T = itr.grad_T_;
+      n++, dumplata_vector(lata_name, "GRADT", grad_T[0], grad_T[1], grad_T[2], latastep);
+      //  IJK_Field_double& grad_T0 = itr.grad_T_[0];
+      //  IJK_Field_double& grad_T1 = itr.grad_T_[1];
+      // IJK_Field_double& grad_T2 = itr.grad_T_[2];
       //FixedVector<IJK_Field_double, 3>& grad_T = [grad_T0, grad_T1, grad_T2];
       // n++,dumplata_scalar(lata_name,"dTd", grad_T2, latastep);
     }
@@ -2875,71 +2729,64 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
 
   oss << "TEMPERATURE_" << idx << "_ADIMENSIONNELLE_THETA";
   Nom nom2(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
-      || (liste_post_instantanes.contient_(nom2)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA")) || (liste_post_instantanes.contient_(nom2)))
     {
-      //  set_field_data(temperature_ana_, curseur->expression_T_ana_, current_time);
-      n++,dumplata_scalar(lata_name,nom2, curseur->temperature_adimensionnelle_theta_, latastep);
+      //  set_field_data(temperature_ana_, itr.expression_T_ana_, current_time);
+      n++, dumplata_scalar(lata_name, nom2, itr.temperature_adimensionnelle_theta_, latastep);
     }
   oss.str("");
 
-  oss << "SOURCE_TEMPERATURE_" << idx ;
+  oss << "SOURCE_TEMPERATURE_" << idx;
   Nom nom3(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("SOURCE_TEMPERATURE"))
-      || liste_post_instantanes.contient_(nom3))
+  if ((liste_post_instantanes_.contient_("SOURCE_TEMPERATURE")) || liste_post_instantanes.contient_(nom3))
     {
-      // set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
-      n++,dumplata_scalar(lata_name,nom3, curseur->source_temperature_, latastep);
+      // set_field_data(source_temperature_ana_, itr.expression_source_temperature_, velocity_[0], current_time);
+      n++, dumplata_scalar(lata_name, nom3, itr.source_temperature_, latastep);
     }
   oss.str("");
 
   oss << "TEMPERATURE_" << idx << "_ADIM_BULLES";
   Nom nom20(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES"))
-      || (liste_post_instantanes.contient_(nom20)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES")) || (liste_post_instantanes.contient_(nom20)))
     {
-      n++,dumplata_scalar(lata_name,nom20, curseur->temperature_adim_bulles_, latastep);
+      n++, dumplata_scalar(lata_name, nom20, itr.temperature_adim_bulles_, latastep);
     }
   oss.str("");
 
-  oss << "TEMPERATURE_PHYSIQUE_T_" << idx ;
+  oss << "TEMPERATURE_PHYSIQUE_T_" << idx;
   Nom nom6(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_PHYSIQUE_T"))
-      || liste_post_instantanes.contient_(nom6))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE_PHYSIQUE_T")) || liste_post_instantanes.contient_(nom6))
     {
-      // set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
-      n++,dumplata_scalar(lata_name,nom6, curseur->temperature_physique_T_, latastep);
+      // set_field_data(source_temperature_ana_, itr.expression_source_temperature_, velocity_[0], current_time);
+      n++, dumplata_scalar(lata_name, nom6, itr.temperature_physique_T_, latastep);
     }
   oss.str("");
 
-  oss << "ECART_T_ANA" << idx ;
+  oss << "ECART_T_ANA" << idx;
   Nom nom4(oss.str().c_str());
   if ((liste_post_instantanes_.contient_("ECART_T_ANA") || liste_post_instantanes.contient_(nom4)))
     {
-      curseur->calculer_ecart_T_ana();
-      n++,dumplata_scalar(lata_name,nom4, curseur->ecart_t_ana_, latastep);
+      itr.calculer_ecart_T_ana();
+      n++, dumplata_scalar(lata_name, nom4, itr.ecart_t_ana_, latastep);
     }
   oss.str("");
 
-  oss << "DIV_LAMBDA_GRAD_T_VOLUME" << idx ;
-  Nom  nom5(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME")|| liste_post_instantanes.contient_(nom5)))
+  oss << "DIV_LAMBDA_GRAD_T_VOLUME" << idx;
+  Nom nom5(oss.str().c_str());
+  if ((liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME") || liste_post_instantanes.contient_(nom5)))
     {
-      n++,dumplata_scalar(lata_name,nom5, curseur->div_lambda_grad_T_volume_, latastep);
+      n++, dumplata_scalar(lata_name, nom5, itr.div_lambda_grad_T_volume_, latastep);
     }
   oss.str("");
 
   oss << "T_" << idx << "_RUST";
   Nom nom7(oss.str().c_str());
-  if (((liste_post_instantanes.contient_("T_RUST"))
-       || (liste_post_instantanes.contient_(nom7)))
-      && (curseur->conserv_energy_global_))
+  if (((liste_post_instantanes.contient_("T_RUST")) || (liste_post_instantanes.contient_(nom7))) && (itr.conserv_energy_global_))
     {
-      //  set_field_data(temperature_ana_, curseur->expression_T_ana_, current_time);
-      n++,dumplata_scalar(lata_name,nom7, curseur->T_rust_, latastep);
+      //  set_field_data(temperature_ana_, itr.expression_T_ana_, current_time);
+      n++, dumplata_scalar(lata_name, nom7, itr.T_rust_, latastep);
     }
-  else if ((liste_post_instantanes.contient_("T_RUST"))
-           || (liste_post_instantanes.contient_(nom7)))
+  else if ((liste_post_instantanes.contient_("T_RUST")) || (liste_post_instantanes.contient_(nom7)))
     {
       n++;
     }
@@ -2947,15 +2794,12 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
 
   oss << "DIV_RHO_CP_T_" << idx << "_V";
   Nom nom8(oss.str().c_str());
-  if (((liste_post_instantanes.contient_("DIV_RHO_CP_T_V"))
-       || (liste_post_instantanes.contient_(nom8)))
-      && (curseur->type_temperature_convection_form_==2))
+  if (((liste_post_instantanes.contient_("DIV_RHO_CP_T_V")) || (liste_post_instantanes.contient_(nom8))) && (itr.type_temperature_convection_form_ == 2))
     {
-      //  set_field_data(temperature_ana_, curseur->expression_T_ana_, current_time);
-      n++,dumplata_scalar(lata_name,nom8, curseur->div_rho_cp_T_, latastep);
+      //  set_field_data(temperature_ana_, itr.expression_T_ana_, current_time);
+      n++, dumplata_scalar(lata_name, nom8, itr.div_rho_cp_T_, latastep);
     }
-  else if ((liste_post_instantanes.contient_("DIV_RHO_CP_T_V"))
-           || (liste_post_instantanes.contient_(nom8)))
+  else if ((liste_post_instantanes.contient_("DIV_RHO_CP_T_V")) || (liste_post_instantanes.contient_(nom8)))
     {
       n++;
     }
@@ -2964,33 +2808,27 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_p
   return n;
 }
 
-int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_post_instantanes,
-                                                        const char *lata_name,
-                                                        const int latastep, const double current_time,
-                                                        LIST_CURSEUR(IJK_Energie) curseur,
-                                                        const int idx)
+int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Energie& itr, const int idx)
 {
   Cerr << liste_post_instantanes << finl;
   int n = 0; // nombre de champs postraites
   std::ostringstream oss;
   oss << "TEMPERATURE_EN_" << idx;
   Nom nom_temp(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE"))
-      || (liste_post_instantanes.contient_(nom_temp)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
     {
-      n++,dumplata_scalar(lata_name,nom_temp, curseur->temperature_, latastep);
+      n++, dumplata_scalar(lata_name, nom_temp, itr.temperature_, latastep);
     }
   oss.str("");
 
   //MR: temperature analytique
   oss << "TEMPERATURE_EN_" << idx << "_ANA";
   Nom nom_ana(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_ANA"))
-      || (liste_post_instantanes.contient_(nom_ana)))
+  if ((liste_post_instantanes_.contient_("TEMPERATURE_ANA")) || (liste_post_instantanes.contient_(nom_ana)))
     {
-      //set_field_data(curseur->temperature_ana_, curseur->expression_T_ana_, current_time);
-      curseur->set_field_T_ana();
-      n++,dumplata_scalar(lata_name,nom_ana, curseur->temperature_ana_, latastep);
+      //set_field_data(itr.temperature_ana_, itr.expression_T_ana_, current_time);
+      itr.set_field_T_ana();
+      n++, dumplata_scalar(lata_name, nom_ana, itr.temperature_ana_, latastep);
     }
   oss.str("");
 
@@ -2999,42 +2837,37 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_pos
 
   if (liste_post_instantanes_.contient_("GRAD_T") || (liste_post_instantanes.contient_(nom1)))
     {
-      const FixedVector<IJK_Field_double, 3>& grad_T = curseur->grad_T_;
-      n++,dumplata_vector(lata_name,"GRADT", grad_T[0], grad_T[1], grad_T[2], latastep);
-      //  IJK_Field_double& grad_T0 = curseur->grad_T_[0];
-      //  IJK_Field_double& grad_T1 = curseur->grad_T_[1];
-      // IJK_Field_double& grad_T2 = curseur->grad_T_[2];
+      const FixedVector<IJK_Field_double, 3>& grad_T = itr.grad_T_;
+      n++, dumplata_vector(lata_name, "GRADT", grad_T[0], grad_T[1], grad_T[2], latastep);
+      //  IJK_Field_double& grad_T0 = itr.grad_T_[0];
+      //  IJK_Field_double& grad_T1 = itr.grad_T_[1];
+      // IJK_Field_double& grad_T2 = itr.grad_T_[2];
       //FixedVector<IJK_Field_double, 3>& grad_T = [grad_T0, grad_T1, grad_T2];
       // n++,dumplata_scalar(lata_name,"dTd", grad_T2, latastep);
     }
   oss.str("");
 
-  oss << "ECART_T_ANA_EN_" << idx ;
+  oss << "ECART_T_ANA_EN_" << idx;
   Nom nom4(oss.str().c_str());
   if ((liste_post_instantanes_.contient_("ECART_T_ANA") || liste_post_instantanes.contient_(nom4)))
     {
-      curseur->calculer_ecart_T_ana();
-      n++,dumplata_scalar(lata_name,nom4, curseur->ecart_t_ana_, latastep);
+      itr.calculer_ecart_T_ana();
+      n++, dumplata_scalar(lata_name, nom4, itr.ecart_t_ana_, latastep);
     }
   oss.str("");
 
-  oss << "DIV_LAMBDA_GRAD_T_VOLUME_EN_" << idx ;
-  Nom  nom5(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME")|| liste_post_instantanes.contient_(nom5)))
+  oss << "DIV_LAMBDA_GRAD_T_VOLUME_EN_" << idx;
+  Nom nom5(oss.str().c_str());
+  if ((liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME") || liste_post_instantanes.contient_(nom5)))
     {
-      n++,dumplata_scalar(lata_name,nom5, curseur->div_lambda_grad_T_volume_, latastep);
+      n++, dumplata_scalar(lata_name, nom5, itr.div_lambda_grad_T_volume_, latastep);
     }
   oss.str("");
   return n;
 }
 
-
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
-                                                                       const char *lata_name,
-                                                                       const int latastep,
-                                                                       const double current_time,
-                                                                       LIST_CURSEUR(IJK_Thermique) curseur,
+int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Thermique& itr,
                                                                        const int idx)
 {
   Cerr << liste_post_instantanes << finl;
@@ -3045,45 +2878,39 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Mot
   std::ostringstream oss2;
   oss2 << "INTERFACE_PHIN_" << idx;
   Nom nom_phin(oss2.str().c_str());
-  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE"))
-      || (liste_post_instantanes.contient_("INTERFACE_PHIN"))
-      || (liste_post_instantanes.contient_(nom_temp))
+  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_temp))
       || (liste_post_instantanes.contient_(nom_phin)))
     {
       //  Computing interfacial temperature at fa7 centre :
       const Maillage_FT_IJK& mesh = interfaces_.maillage_ft_ijk();
       const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-      const int nb_facettes=mesh.nb_facettes();
+      const int nb_facettes = mesh.nb_facettes();
       ArrOfDouble interfacial_temperature;
       ArrOfDouble interfacial_phin;
       // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
-      IJK_Field_double& temperature_ft = curseur->get_temperature_ft();
-      ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(curseur->get_temperature(),temperature_ft);
+      IJK_Field_double& temperature_ft = itr.get_temperature_ft();
+      ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
       temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
       // results are prop to the area :
-      //curseur->compute_interfacial_temperature(interfacial_temperature, interfacial_phin, curseur->get_storage());
-      curseur->compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
+      //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin, itr.get_storage());
+      itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
       for (int fa7 = 0; fa7 < nb_facettes; fa7++)
         {
-          const double sf=surface_facettes[fa7];
+          const double sf = surface_facettes[fa7];
           interfacial_temperature[fa7] /= sf;
           interfacial_phin[fa7] /= sf;
         }
-      if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE"))|| (liste_post_instantanes.contient_(nom_temp)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_temp, "ELEM",  interfacial_temperature, latastep);
+      if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
+        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_temp, "ELEM", interfacial_temperature, latastep);
       if ((liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_phin)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_phin, "ELEM",  interfacial_phin, latastep);
+        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_phin, "ELEM", interfacial_phin, latastep);
     }
   oss.str("");
   return n;
 }
 
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes,
-                                                                     const char *lata_name,
-                                                                     const int latastep,
-                                                                     const double current_time,
-                                                                     LIST_CURSEUR(IJK_Energie) curseur,
+int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Energie& itr,
                                                                      const int idx)
 {
   Cerr << liste_post_instantanes << finl;
@@ -3094,288 +2921,33 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcl
   std::ostringstream oss2;
   oss2 << "INTERFACE_PHIN_EN_" << idx;
   Nom nom_phin(oss2.str().c_str());
-  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE"))
-      || (liste_post_instantanes.contient_("INTERFACE_PHIN"))
-      || (liste_post_instantanes.contient_(nom_temp))
+  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_temp))
       || (liste_post_instantanes.contient_(nom_phin)))
     {
       //  Computing interfacial temperature at fa7 centre :
       const Maillage_FT_IJK& mesh = interfaces_.maillage_ft_ijk();
       const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-      const int nb_facettes=mesh.nb_facettes();
+      const int nb_facettes = mesh.nb_facettes();
       ArrOfDouble interfacial_temperature;
       ArrOfDouble interfacial_phin;
       // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
-      IJK_Field_double& temperature_ft = curseur->get_temperature_ft();
-      ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(curseur->get_temperature(),temperature_ft);
+      IJK_Field_double& temperature_ft = itr.get_temperature_ft();
+      ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
       temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
       // results are prop to the area :
-      //curseur->compute_interfacial_temperature(interfacial_temperature, interfacial_phin, curseur->get_storage());
-      curseur->compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
+      //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin, itr.get_storage());
+      itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
       for (int fa7 = 0; fa7 < nb_facettes; fa7++)
         {
-          const double sf=surface_facettes[fa7];
+          const double sf = surface_facettes[fa7];
           interfacial_temperature[fa7] /= sf;
           interfacial_phin[fa7] /= sf;
         }
-      if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE"))|| (liste_post_instantanes.contient_(nom_temp)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_temp, "ELEM",  interfacial_temperature, latastep);
+      if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
+        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_temp, "ELEM", interfacial_temperature, latastep);
       if ((liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_phin)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_phin, "ELEM",  interfacial_phin, latastep);
+        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_phin, "ELEM", interfacial_phin, latastep);
     }
   oss.str("");
   return n;
 }
-
-/*
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
-                                                          const char *lata_name,
-                                                          const int latastep, const double current_time,
-                                                          CONST_LIST_CURSEUR(IJK_Thermique) curseur
-                                                         )
-{
-
-  //Cerr << liste_post_instantanes << finl;
-  int n = 0; // nombre de champs postraites
-
-  if (liste_post_instantanes.contient_("TEMPERATURE"))
-
-    {
-      n++,dumplata_scalar(lata_name,"TEMPERATURE", curseur->temperature_, latastep);
-    }
-
-  if (liste_post_instantanes.contient_("CP"))
-    n++,dumplata_scalar(lata_name,"CP", curseur->cp_, latastep);
-  if (liste_post_instantanes.contient_("LAMBDA"))
-    n++,dumplata_scalar(lata_name,"LAMBDA", curseur->lambda_, latastep);
-
-  //MR: temperature analytique
-
-  if (liste_post_instantanes.contient_("TEMPERATURE_ANA"))
-
-    {
-      // set_field_data(curseur->temperature_ana_, curseur->expression_T_ana_, current_time);
-      n++,dumplata_scalar(lata_name,"TEMPERATURE_ANA", curseur->temperature_ana_, latastep);
-    }
-
-
-
-  if (liste_post_instantanes_.contient_("GRAD_T")
-      || (t_debut_statistiques_ <  1.e10 ))
-    {
-      const FixedVector<IJK_Field_double, 3>& grad_T = curseur->grad_T_;
-      n++,dumplata_vector(lata_name,"GRADT", grad_T[0], grad_T[1], grad_T[2], latastep);
-      //  IJK_Field_double& grad_T0 = curseur->grad_T_[0];
-      //  IJK_Field_double& grad_T1 = curseur->grad_T_[1];
-      // IJK_Field_double& grad_T2 = curseur->grad_T_[2];
-      //FixedVector<IJK_Field_double, 3>& grad_T = [grad_T0, grad_T1, grad_T2];
-      // n++,dumplata_scalar(lata_name,"dTd", grad_T2, latastep);
-    }
-
-
-
-
-  if (liste_post_instantanes.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
-
-    {
-      //  set_field_data(temperature_ana_, curseur->expression_T_ana_, current_time);
-      n++,dumplata_scalar(lata_name,"TEMPERATURE_ADIMENSIONNELLE_THETA", curseur->temperature_adimensionnelle_theta_, latastep);
-    }
-
-  if (liste_post_instantanes.contient_("SOURCE_TEMPERATURE"))
-    //|| (t_debut_statistiques_ <  1.e10 )) //(liste_post_instantanes.contient_(nom))
-    {
-      // set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
-      n++,dumplata_scalar(lata_name,"SOURCE_TEMPERATURE", curseur->source_temperature_, latastep);
-    }
-
-  if (liste_post_instantanes_.contient_("ECART_T_ANA"))
-    {
-      n++,dumplata_scalar(lata_name,"ECART_T_ANA", curseur->ecart_t_ana_, latastep);
-    }
-
-  return n;
-  Cerr << "Aucun champs thermiques n'a ete lu" << finl;
-} */
-
-/*
-//GradT scalar fields
-oss << "GRAD_T_0_" << idx;
-Nom nom_gradT0(oss.str().c_str());
-if (liste_post_instantanes_.contient_("GRAD_T0")
-|| (liste_post_instantanes.contient_(nom_gradT0)))
-{
-const IJK_Field_double& grad_T0 = curseur->grad_T_[0];
-
-n++,dumplata_scalar(lata_name,"dTdx", grad_T0, latastep);
-}
-oss.clear();
-
-oss << "GRAD_T_1_" << idx;
-Nom nom_gradT1(oss.str().c_str());
-if (liste_post_instantanes_.contient_("GRAD_T1")
-|| (liste_post_instantanes.contient_(nom_gradT1)))
-{
-const IJK_Field_double& grad_T1 = curseur->grad_T_[1];
-
-n++,dumplata_scalar(lata_name,"dTdy", grad_T1, latastep);
-}
-oss.clear();
-
-oss << "GRAD_T_2_" << idx;
-Nom nom_gradT2(oss.str().c_str());
-if (liste_post_instantanes_.contient_("GRAD_T2")
-|| (liste_post_instantanes.contient_(nom_gradT2)))
-{
-const IJK_Field_double& grad_T2 = curseur->grad_T_[2];
-
-n++,dumplata_scalar(lata_name,"dTdz", grad_T2, latastep);
-}
-oss.clear();
-*/
-//MR: source temperature analytique
-
-/*
-    oss << "SOURCE_TEMPERATURE_" << idx_th << "_ANA";
-    Nom nom_(oss.str().c_str());
-
- if (liste_post_instantanes.contient_("SOURCE_TEMPERATURE_ANA"))
-    || (liste_post_instantanes.contient_(nom_temp)))
-    {
-      // set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
-      n++,dumplata_scalar(lata_name,"SOURCE_TEMPERATURE_ANA", curseur->source_temperature_ana_, latastep);
-    }
-     oss.clear();
-
-
-if (liste_post_instantanes.contient_("DIV_LAMBDA_GRAD_T_VOLUME"))
-  {
-    n++,dumplata_scalar(lata_name,"DIV_LAMBDA_GRAD_T_VOLUME", curseur->div_lambda_grad_T_volume_, latastep);
-  }
-if (liste_post_instantanes.contient_("TERME_SOURCE_TEMPERATURE"))
-  {
-    n++,dumplata_scalar(lata_name,"TERME_SOURCE_TEMPERATURE", curseur->source_temperature_, latastep);
-  }
-if (liste_post_instantanes.contient_("TEMPERATURE_PHYSIQUE_T"))
-  {
-    n++,dumplata_scalar(lata_name,"TEMPERATURE_PHYSIQUE_T", curseur->temperature_physique_T_, latastep);
-  }
-if (liste_post_instantanes.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
-  {
-    n++,dumplata_scalar(lata_name,"TEMPERATURE_ADIMENSIONNELLE_THETA", curseur->temperature_adimensionnelle_theta_, latastep);
-  }
- */
-
-//MR: ecart temperature
-/*  if (liste_post_instantanes_.contient_("ECART_T_ANA"))
-    {
-       if (!liste_post_instantanes.contient_("TEMPERATURE_ANA"))
-         {
-           set_field_data(temperature_ana_, curseur->expression_T_ana_, current_time);
-         }
-       // do some work
-
-       double ct = current_time;
-       Cerr << "GB: ERROR T FIELD " << ct;
-       double err = 0.;
-       //set_field_data(temperature_ana_, curseur->expression_T_ana_, ct);
-       const int ni = curseur->temperature_.ni();
-       const int nj = curseur->temperature_.nj();
-       const int nk = curseur->temperature_.nk();
-       const int ntot=Process::mp_sum(ni*nj*nk);
-       // La temperature est definie a une constante pres:
-       //const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
-       for (int k = 0; k < nk; k++)
-         for (int j = 0; j < nj; j++)
-           for (int i = 0; i < ni; i++)
-             {
-               const double val =   temperature_ana_(i,j,k) - curseur->temperature_(i,j,k); //- cst_temp;
-               ecart_t_ana_(i,j,k) = val;
-               err += val*val;
-             }
-       err=Process::mp_sum(err);
-       err=sqrt(err/ntot);
-       Cerr << " " << err ;
-       if (!Process::je_suis_maitre())
-         {
-           Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_T_ANA sur ce proc (ni,nj,nk,ntot):"
-                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
-         }
-       // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
-       Cerr << finl ;
-
-      n++,dumplata_scalar(lata_name,"ECART_T_ANA", curseur->ecart_t_ana_, latastep);
-    }
-/////////////////
-  //MR: ecart source temperature analytique
-    if (liste_post_instantanes_.contient_("ECART_SOURCE_TEMPERATURE_ANA"))
-    {
-      if (!liste_post_instantanes.contient_("SOURCE_TEMPERATURE_ANA"))
-         {
-           set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
-         }
-       // do some work
-
-       double ct = current_time;
-       Cerr << "MR: ERROR SOURCE T FIELD " << ct;
-       double err = 0.;
-       //set_field_data(source_temperature_ana_, curseur->expression_source_T_ana_, ct);
-       const int ni = curseur->source_temperature_.ni();
-       const int nj = curseur->source_temperature_.nj();
-       const int nk = curseur->source_temperature_.nk();
-       const int ntot=Process::mp_sum(ni*nj*nk);
-       // La temperature est definie a une constante pres:
-       //const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
-       for (int k = 0; k < nk; k++)
-         for (int j = 0; j < nj; j++)
-           for (int i = 0; i < ni; i++)
-             {
-               const double val =   source_temperature_ana_(i,j,k) - curseur->source_temperature_(i,j,k); //- cst_temp;
-               ecart_source_t_ana_(i,j,k) = val;
-               err += val*val;
-             }
-       err=Process::mp_sum(err);
-       err=sqrt(err/ntot);
-       Cerr << " " << err ;
-       if (!Process::je_suis_maitre())
-         {
-           Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_SOURCE_TEMPERATURE_ANA sur ce proc (ni,nj,nk,ntot):"
-                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
-         }
-       // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
-       Cerr << finl ;
-
-      n++,dumplata_scalar(lata_name,"ECART_SOURCE_TEMPERATURE_ANA", curseur->ecart_source_t_ana_, latastep);
-    }
-  */
-
-//calcul de grad_T pour les stats
-/*  if (( (!disable_diphasique_) && (t_debut_statistiques_ <  1.e10) )
-      || (liste_post_instantanes_.contient_("GRAD_T")))
-    {
-      calculer_gradient_temperature(curseur->temperature_,curseur->grad_T_);
-
-      n++,dumplata_vector(lata_name,"dTd", grad_T_[0], grad_T_[1], grad_T_[2], latastep);
-    }
-
-
-return n;
-}
-
-void IJK_FT_Post::calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T)
-{
-// Remise a zero :
-for (int dir = 0; dir < 3; dir++)
-  {
-    grad_T[dir].data() = 0.;
-  }
-Boundary_Conditions_Thermique& boundary = curseur->boundary_conditions_;
-compute_gradient_scalar(temperature, 1. ,*/ /*constant*/  /* grad_T[0], grad_T[1], grad_T[2], boundary);
-
-// Remise a zero :
-for (int dir = 0; dir < 3; dir++)
-  {
-    grad_T[dir].echange_espace_virtuel(1);
-  }
-}
-*/

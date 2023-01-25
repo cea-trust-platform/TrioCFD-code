@@ -28,12 +28,12 @@
 #include <Zone_VF.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champs_compris.h>
 #include <Transport_Interfaces_base.h>
 #include <Probleme_base.h>
 #include <Loi_Etat_GP.h>
-#include <Champ_Fonc_Face.h>
+#include <Champ_Fonc_Face_VDF.h>
 #include <Assembleur_P_VDF.h>
 #include <Matrice_Morse.h>
 #include <Multigrille_Adrien.h>
@@ -83,8 +83,8 @@ DoubleTab& rho_vitesse_impl(const DoubleTab& tab_rho,const DoubleTab& vitesse,Do
  *     Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
  *     Calcule egalement la pression.
  *
- * @param (DoubleTab& vpoint) le tableau des valeurs de l'acceleration dU/dt 
- * @return (DoubleTab&) le tableau des valeurs de l'acceleration (derivee de la vitesse) 
+ * @param (DoubleTab& vpoint) le tableau des valeurs de l'acceleration dU/dt
+ * @return (DoubleTab&) le tableau des valeurs de l'acceleration (derivee de la vitesse)
  */
 DoubleTab& Navier_Stokes_QC_impl::derivee_en_temps_inco_impl(Navier_Stokes_std& eqn,DoubleTab& vpoint, Fluide_Incompressible& le_fluide, Matrice& matrice_pression_,Assembleur& assembleur_pression_)
 {
@@ -114,7 +114,7 @@ void compare(const IJK_Field_double& ref, const IJK_Field_double& x, const char 
           if (d > 1e-15)
             {
               char s[1000];
-              sprintf(s, " local_ijk=( %3d %3d %3d )  global_ijk=( %3d %3d %3d ) ref= %10g  current= %10g  delta=%5g",
+              snprintf(s, 1000, " local_ijk=( %3d %3d %3d )  global_ijk=( %3d %3d %3d ) ref= %10g  current= %10g  delta=%5g",
                       i, j, k, i+i0, j+j0, k+k0, ref(i,j,k), x(i,j,k), d);
               Process::Journal() << msg << s << finl;
             }

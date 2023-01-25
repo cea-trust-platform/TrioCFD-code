@@ -27,7 +27,7 @@
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
 #include <Constituant.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Debog.h>
 
 Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Transport_VDF_Elem_base", Source_base);
@@ -54,7 +54,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const Champ_Face& ch_vit = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
+  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
 
   DoubleVect P; // Ajout d'un espace virtuel au tableu P
   zone_VDF.zone().creer_tableau_elements(P);

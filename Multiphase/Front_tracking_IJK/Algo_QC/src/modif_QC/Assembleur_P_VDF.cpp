@@ -26,7 +26,7 @@
 #include <Periodique.h>
 #include <Symetrie.h>
 #include <Neumann_sortie_libre.h>
-#include <Entree_fluide_vitesse_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Champ_front_instationnaire_base.h>
@@ -34,7 +34,7 @@
 #include <Matrice_Bloc.h>
 #include <Debog.h>
 #include <Option_VDF.h>
-#include <Champ_Fonc_Face.h>
+#include <Champ_Fonc_Face_VDF.h>
 #include <Matrice_Morse_Sym.h>
 #include <Milieu_base.h>
 
@@ -300,7 +300,7 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   const DoubleVect * valeurs_rho = 0;
   if (rho_ptr)
     {
-      assert(sub_type(Champ_Fonc_Face, *rho_ptr));
+      assert(sub_type(Champ_Fonc_Face_VDF, *rho_ptr));
       valeurs_rho = & (rho_ptr->valeurs());
     }
 
@@ -704,8 +704,8 @@ int Assembleur_P_VDF::assembler(Matrice& matrice)
  *
  *   et calcul des coefficients pour modifier_secmem.
  *
- * @param (matrice) La matrice a assembler. Contrainte:    Soit la matrice n'est pas encore typee (alors on la "construit"), soit c'est la meme que lors de l'appel precedent. 
- * @param (rho)  
+ * @param (matrice) La matrice a assembler. Contrainte:    Soit la matrice n'est pas encore typee (alors on la "construit"), soit c'est la meme que lors de l'appel precedent.
+ * @param (rho)
  */
 int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
                                              const Champ_Don_base& rho)
@@ -771,8 +771,8 @@ int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
  *     Le drapeau resoudre_increment_pression est mis a zero s'il n'a pas
  *     encore ete assigne.
  *
- * @param (DoubleTab& tab_rho) mass volumique 
- * @return (int) renvoie toujours 1 
+ * @param (DoubleTab& tab_rho) mass volumique
+ * @return (int) renvoie toujours 1
  */
 int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {

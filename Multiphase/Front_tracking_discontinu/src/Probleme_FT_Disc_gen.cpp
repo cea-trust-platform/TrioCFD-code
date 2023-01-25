@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Probleme_FT_Disc_gen.h>
-#include <List_Nom.h>
+#include <TRUST_List.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Constituant.h>
@@ -102,6 +102,7 @@ void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc
 
 /*! @brief Verifie que le milieu est de type Fluide_Diphasique et associe le milieu aux equations.
  *
+ * Precondition: Toutes les equations doivent avoir ete associees.
  */
 void Probleme_FT_Disc_gen::associer_milieu_base(const Milieu_base& un_milieu)
 {

@@ -26,6 +26,8 @@
 #include <Operateur.h>
 #include <Operateur_negligeable.h>
 #include <Matrice_Morse.h>
+#include <Op_Diff_Flux_Chaleur_Turb_Base.h>
+#include <TRUST_Deriv.h>
 
 class Champ_Fonc;
 class Champ_Don;
@@ -77,7 +79,6 @@ public:
 //
 //////////////////////////////////////////////////////////////////////////////
 
-Declare_deriv(Op_Diff_Flux_Chaleur_Turb_Base);
 
 class Op_Diff_Flux_Chaleur_Turb :  public Operateur,
   public DERIV(Op_Diff_Flux_Chaleur_Turb_Base)

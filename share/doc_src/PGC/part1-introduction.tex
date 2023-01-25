@@ -291,11 +291,12 @@ Pour TrioCFD, les \'evolutions majeures sont explicit\'ees sur la frise chronolo
 	\draw[green,thick,dashed] (6.3,01.52) -- (8.0,01.52) ;	
 	\draw (6.2,01.52) node[left]{R\'eorganisation des fiches de validation} ;	
 	\draw (8.8,01.52) node[right]{\textcolor{blue}{v1.9.0} \textbf{Baltik} Multiphase/CMFD};
-	\draw (7.8,01.10) -- (8.0,01.10) ;
 	\draw (9.8,01.18) node[right]{\textbf{Baltik} Multiphase/Front\_tracking\_IJK};
+	\draw (7.8,01.10) -- (8.0,01.10) ;
+	\draw[blue,thick,dashed] (8.0,00.82) -- (8.7,00.82) ;
+	\draw (8.8,00.82) node[right]{\textcolor{blue}{v1.9.1} \textbf{Baltik} Fluid\_Structure\_Interaction};
 	\draw (7.8,00.68) -- (8.2,00.68) ;
-	\draw (7.8,00.42) node[left]{$2023$} ;
-	\draw (7.8,00.42) -- (8.0,00.42) ;
+	\draw (7.8,00.68) node[left]{$2023$} ;
 %	\draw (7.8,01.84) -- (8.0,01.84) ;
 %	\draw (7.8,01.42) -- (8.0,01.42) ;
 %	\draw (7.8,01.00) -- (8.2,01.00) ;
@@ -394,9 +395,12 @@ TrioCFD est lui-même composé de plusieurs Baltiks et sous-Baltiks ayant tous u
 \hline\hline
 \rowcolor{lightgray}\textbf{Baltik} & \textbf{Description}  & \textbf{D\'ependances} \tabularnewline
 \hline
-\textbf{ALE} & M\'ethode Arbitrary Langrangian-Eulerian  & Turbulence \tabularnewline
- & pour les interactions fluide-structure & \tabularnewline\hline
-\textbf{Critere\_Entrainement\_Gaz} &  & Turbulence \tabularnewline\hline
+
+\textbf{Critere\_Entrainement\_Gaz} & Crit\`ere num\'erique bas\'e sur la voriticit\'e & Turbulence \tabularnewline
+& pour pr\'edire l'aparition d'un vortex & Turbulence \tabularnewline\hline
+ & M\'ethode Arbitrary Langrangian-Eulerian  & Turbulence \tabularnewline
+\textbf{Fluid\_Structure\_Interaction} & pour les interactions fluide-structure & \tabularnewline
+  & mod\`ele vibratoire de poutre & \tabularnewline\hline
 \textbf{Multiphase} & & \tabularnewline
 $\hookrightarrow$ CMFD & Computational Multiphase Fluid Dynamics  & SO \tabularnewline
 $\hookrightarrow$ Front\_tracking\_IJK & Int\'egration de TrioIJK dans TrioCFD  & Turbulence \& FTD \tabularnewline

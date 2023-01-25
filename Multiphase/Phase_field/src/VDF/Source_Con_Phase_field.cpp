@@ -227,7 +227,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                     Cerr << motlu << " is not understood."<< finl;
                     Cerr << "We are expecting a keyword among ";
                     for (int i=1; i<8; i++)
-                      Cerr << les_mots(i) << " ";
+                      Cerr << les_mots[i] << " ";
                     Cerr<< finl;
                     exit();
                   }
@@ -284,9 +284,9 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                             is >> motlu;
                             int cpt1=0;
                             Motcles param_alpha(3);
-                            param_alpha(0)="alpha_ref";
-                            param_alpha(1)="rotation_angle";
-                            param_alpha(2)="diagonal_coefficient";
+                            param_alpha[0]="alpha_ref";
+                            param_alpha[1]="rotation_angle";
+                            param_alpha[2]="diagonal_coefficient";
                             while(motlu!="}")
                               {
                                 int rang0 = param_alpha.search(motlu);
@@ -367,7 +367,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                 {
                                   Cerr << "Source_Con_Phase_field::readOn: Error while reading alpha_rotation " << finl;
                                   Cerr << motlu << " is not understood."<< finl;
-                                  Cerr << "We are expecting a keyword among " << les_mots(1) << finl;
+                                  Cerr << "We are expecting a keyword among " << les_mots[1] << finl;
                                   exit();
                                 }
                               }
@@ -393,8 +393,8 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         is >> motlu;
                         int cpt1=0;
                         Motcles param_potentiel_chimique(2);
-                        param_potentiel_chimique(0)="xEq_phase1";
-                        param_potentiel_chimique(1)="xEq_phase2";
+                        param_potentiel_chimique[0]="xEq_phase1";
+                        param_potentiel_chimique[1]="xEq_phase2";
                         while(motlu!="}")
                           {
                             int rang0 = param_potentiel_chimique.search(motlu);
@@ -450,11 +450,11 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                             is >> motlu;
                             int cpt1=0;
                             Motcles param_potentiel_analytique_ternaire(5);
-                            param_potentiel_analytique_ternaire(0)="psi";
-                            param_potentiel_analytique_ternaire(1)="xEqComp0";
-                            param_potentiel_analytique_ternaire(2)="xEqComp1";
-                            param_potentiel_analytique_ternaire(3)="aEqComp0";
-                            param_potentiel_analytique_ternaire(4)="aEqComp1";
+                            param_potentiel_analytique_ternaire[0]="psi";
+                            param_potentiel_analytique_ternaire[1]="xEqComp0";
+                            param_potentiel_analytique_ternaire[2]="xEqComp1";
+                            param_potentiel_analytique_ternaire[3]="aEqComp0";
+                            param_potentiel_analytique_ternaire[4]="aEqComp1";
                             while(motlu!="}")
                               {
                                 int rang0 = param_potentiel_analytique_ternaire.search(motlu);
@@ -534,14 +534,14 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                             is >> motlu;
                             int cpt1=0;
                             Motcles param_potentiel_analytique_quaternaire(8);
-                            param_potentiel_analytique_quaternaire(0)="psi";
-                            param_potentiel_analytique_quaternaire(1)="phi";
-                            param_potentiel_analytique_quaternaire(2)="xEqComp0";
-                            param_potentiel_analytique_quaternaire(3)="xEqComp1";
-                            param_potentiel_analytique_quaternaire(4)="xEqComp2";
-                            param_potentiel_analytique_quaternaire(5)="aEqComp0";
-                            param_potentiel_analytique_quaternaire(6)="aEqComp1";
-                            param_potentiel_analytique_quaternaire(7)="aEqComp2";
+                            param_potentiel_analytique_quaternaire[0]="psi";
+                            param_potentiel_analytique_quaternaire[1]="phi";
+                            param_potentiel_analytique_quaternaire[2]="xEqComp0";
+                            param_potentiel_analytique_quaternaire[3]="xEqComp1";
+                            param_potentiel_analytique_quaternaire[4]="xEqComp2";
+                            param_potentiel_analytique_quaternaire[5]="aEqComp0";
+                            param_potentiel_analytique_quaternaire[6]="aEqComp1";
+                            param_potentiel_analytique_quaternaire[7]="aEqComp2";
 
                             while(motlu!="}")
                               {
@@ -699,10 +699,10 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         is >> motlu;
                         int cpt1=0;
                         Motcles param_mobilite(4);
-                        param_mobilite(0)="coefficient_auto_diffusion";
-                        param_mobilite(1)="temperature";
-                        param_mobilite(2)="volume_molaire";
-                        param_mobilite(3)="prefacteur_a";
+                        param_mobilite[0]="coefficient_auto_diffusion";
+                        param_mobilite[1]="temperature";
+                        param_mobilite[2]="volume_molaire";
+                        param_mobilite[3]="prefacteur_a";
                         while(motlu!="}")
                           {
                             int rang0 = param_mobilite.search(motlu);
@@ -781,7 +781,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                 {
                                   Cerr << "Source_Con_Phase_field::readOn: Error while reading kappa_auto_diffusion " << finl;
                                   Cerr << motlu << " is not understood."<< finl;
-                                  Cerr << "We are expecting a keyword among " << les_mots(4) << finl;
+                                  Cerr << "We are expecting a keyword among " << les_mots[4] << finl;
                                   exit();
                                 }
                               }

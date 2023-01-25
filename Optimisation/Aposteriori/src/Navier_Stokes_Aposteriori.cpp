@@ -18,7 +18,10 @@
 #include <Champ_P1_isoP1Bulle.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
+#include <Postraitements.h>
+#include <Probleme_base.h>
 #include <Champ_P1NC.h>
+#include <EChaine.h>
 
 Implemente_instanciable_sans_constructeur(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
 // XD Navier_Stokes_Aposteriori navier_stokes_standard Navier_Stokes_Aposteriori -1 Modification of the Navier_Stokes_standard class in order to accept the estimateur_aposteriori post-processing. To post-process estimateur_aposteriori, add this keyword into the list of fields to be post-processed. This estimator whill generate a map of aposteriori error estimators; it is defined on each mesh cell and is a measure of the local discretisation error. This will serve for adaptive mesh refinement
@@ -47,6 +50,13 @@ void Navier_Stokes_Aposteriori::creer_champ(const Motcle& motlu)
         {
           estimateur_aposteriori();
           champs_compris_.ajoute_champ(estimateur_aposteriori_);
+
+          Nom chaine = "{ numero_source 0 sources { refChamp { pb_champ ";
+          chaine += probleme().le_nom();
+          chaine += "  vitesse } } }";
+          EChaine echaine(chaine);
+          echaine >> champ_src_;
+          champ_src_.completer(probleme().postraitements().front());
         }
     }
 }

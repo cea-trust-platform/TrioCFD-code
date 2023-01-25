@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Turbulence_hyd_sous_maille_Smago_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Param.h>
@@ -93,7 +93,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Smago_VDF::calculer_viscosite_turbulente(
 
 void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
 {
-  Champ_Face& vit = ref_cast(Champ_Face, mon_equation->inconnue().valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation->inconnue().valeur());
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();

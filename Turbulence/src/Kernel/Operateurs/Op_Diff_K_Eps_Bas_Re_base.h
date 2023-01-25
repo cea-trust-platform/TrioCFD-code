@@ -25,6 +25,7 @@
 #include <Operateur_Diff_base.h>
 #include <Operateur.h>
 #include <Operateur_negligeable.h>
+#include <TRUST_Deriv.h>
 #include <Matrice_Morse.h>
 #include <Ref_Champ_Don.h>
 
@@ -92,7 +93,6 @@ protected:
   REF(Champ_base) la_diffusivite;
 };
 
-Declare_deriv(Op_Diff_K_Eps_Bas_Re_base);
 
 
 /*! @brief Classe Op_Diff_K_Eps_Bas_Re Classe generique de la hierarchie des operateurs de diffusion dans

@@ -94,9 +94,9 @@ static void Operator_IJK_div_set(const IJK_Field_local_double& flux_x,
         for (int i = 0; i < imax; i += vsize)
           {
             Simd_double r, a, b;
-            fx.get_center_right_x(i, a, b);
+            fx.get_center_right(DIRECTION::X, i, a, b);
             r = a - b;
-            fy.get_center_right_y(i, a, b);
+            fy.get_center_right(DIRECTION::Y, i, a, b);
             r += a - b;
             fzmin.get_center(i, a);
             fzmax.get_center(i, b);

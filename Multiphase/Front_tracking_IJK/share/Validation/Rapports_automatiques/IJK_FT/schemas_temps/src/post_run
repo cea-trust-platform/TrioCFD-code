@@ -6,11 +6,9 @@ echo $PWD $1
 cd ..
 # python ./ordre_cvg.py
 
-# cd EULER ; grep "ERROR FIELD 0.5" */*err > a
-# sed -e "s/Niv//g;s/\/calcul.err:GB: ERROR FIELD 0.5//g" a > b
-
-grep "ERROR FIELD 0.5" */*err > err_vit.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR FIELD 0.5//g" err_vit.txt
-grep "ERROR P FIELD 0.5" */*err > err_press.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR P FIELD 0.5//g" err_press.txt
+grep "ERROR FIELD 1 " */*err > err_vit.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR FIELD 1//g" err_vit.txt
+#grep "ERROR P FIELD 1 " */*err > err_press.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR P FIELD 1//g" err_press.txt
+grep "ERROR P FIELD 1" */*err | sed -e "s/Niv//g;s/\/calcul.err:GB: ERROR P FIELD 1.* / /g" > err_press.txt
 if [ `basename $PWD ` == "RK3" ] ; then
 cd ..
 gnuplot  << EOF

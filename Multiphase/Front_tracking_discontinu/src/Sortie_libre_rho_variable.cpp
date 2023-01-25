@@ -58,9 +58,10 @@ double Sortie_libre_rho_variable::flux_impose(int i) const
  */
 double Sortie_libre_rho_variable::flux_impose(int i, int j) const
 {
+  if (j == 0) return flux_impose(i);
+
   Cerr << "Sortie_libre_rho_variable::flux_impose(int i, int j)\n ";
   Cerr << " Qu'est-ce que ca veut dire ?" << finl;
-  assert(0);
   exit();
   return 0.;
 }

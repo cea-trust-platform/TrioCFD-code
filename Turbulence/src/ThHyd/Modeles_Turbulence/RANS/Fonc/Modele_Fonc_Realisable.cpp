@@ -24,7 +24,6 @@
 #include <Equation_base.h>
 #include <Discretisation_base.h>
 
-Implemente_deriv(Modele_Fonc_Realisable_base);
 Implemente_instanciable(Modele_Fonc_Realisable,"Modele_Fonc_Realisable",DERIV(Modele_Fonc_Realisable_base));
 
 // XD Modele_Fonc_Realisable Modele_Fonc_Realisable_base Modele_Fonc_Realisable -1 Deriv for instanciation of functions necessary to Realizable K-Epsilon Turbulence Model

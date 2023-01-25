@@ -24,7 +24,6 @@
 #include <Discretisation_base.h>
 #include <Equation_base.h>
 
-Implemente_deriv(Flux_radiatif_base);
 Implemente_instanciable(Flux_radiatif,"Flux_radiatif",DERIV(Flux_radiatif_base));
 
 

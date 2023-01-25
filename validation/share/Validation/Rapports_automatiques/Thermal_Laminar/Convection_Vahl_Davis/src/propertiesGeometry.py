@@ -40,18 +40,16 @@ def readPropertiesData(nomFic):
                 properties['cp'] = float(tLigne[-1])
             elif ligne.startswith('rho'):
                 properties['rho'] = float(tLigne[-1])
-            #else:
-            #       print 'Ligne avec champ_uniforme non reconnue : %s' % (ligne)
-        elif ligne.find('gravite')>-1:
-            if ligne.startswith('lire') or ligne.startswith('read'):
+            elif ligne.startswith('gravite'):
                 dim = int(tLigne[2])
                 g = 0.
                 for i in range(dim):
                     gi = float(tLigne[i+3])
                     g += gi*gi
-                properties['g'] = math.sqrt(g)
-            #else:
-            #       print 'Ligne avec gravite non reconnue : %s' % (ligne)
+                    properties['g'] = math.sqrt(g)                          
+            else:
+                   print ('Ligne avec champ_uniforme non reconnue : %s' % (ligne))
+
 
 
         #for chaine in chaines:

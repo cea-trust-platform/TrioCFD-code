@@ -1,0 +1,126 @@
+dimension 2
+Domaine dom
+
+# Read_med family_names_from_group_names dom maillage_NS_unif Mesh_Trio_Cas_Ghina.med #
+Read_med family_names_from_group_names dom ghina_modif_02 ghina_modif_03.med
+VerifierCoin dom { }
+Sous_Zone SSZ
+Associate SSZ dom
+Read SSZ
+{
+          Rectangle
+          Origine  -1.625  -0.9
+          Cotes   4.25 0.4 
+}
+
+VEFPreP1B ma_discretisation  
+Read ma_discretisation 
+{
+    P0 P1
+}
+
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+    tinit 0
+    tmax 0.2
+    # dt_min 1.e-7 #
+    dt_max 0.05
+    dt_impr 0.005
+    dt_sauv 100
+    # facsec 20
+    facsec_max 200 #
+    # seuil_statio 1.e-5 #
+    nb_pas_dt_max 90000
+    solveur implicite { solveur gmres { diag seuil 1e-20 nb_it_max 3 } }
+}
+# I define a medium #
+fluide_incompressible milieu 
+Read milieu
+{
+    mu champ_uniforme         1 0.001
+   # mu champ_fonc_xyz dom 1 x*x+y #
+    rho champ_uniforme        1 1
+	# freefem : nu=mu/rho=1/Re viscosite cinematique #
+}
+# Problem definition #
+Pb_hydraulique_aposteriori pb
+/* Pb_ThermoHydraulique pb */ 
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+# Problem description #
+Read pb
+{
+	Navier_Stokes_aposteriori
+	{
+		# Pressure matrix solved with #
+		solveur_pression PETSc Cholesky {  }
+		convection  { EF_stab { alpha 0.2 } }
+		diffusion   { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			paroi_fixe 	paroi_fixe
+		}
+		sources {
+			source_qdm champ_uniforme_morceaux dom 2 
+			{ defaut 0. 0. SSZ -2. 0. }
+		}
+	}
+
+    Post_processings
+    {
+	lata {
+        format lata
+        fichier cas_test_ghina_adapt_03
+        fields  dt_post 0.1
+        {
+           # pression elem #
+           # pression som #
+            # vitesse elem #
+            # vitesse som #
+            # Vorticite som #
+           # Vorticite elem #
+             estimateur_aposteriori elem 
+           # Taux_cisaillement elem #
+        }
+ #       Statistiques  dt_post 0.1 #
+ #       { #
+ #           t_deb  0.1          #
+ #           t_fin  5.0          #
+ #           moyenne vitesse     #
+ #           ecart_type vitesse  #
+ #           moyenne pression    #
+ #           ecart_type pression #
+ #       } #
+ 	}
+ 	lml {
+        format lml
+        fichier cas_test_ghina_adapt_03
+        fields  dt_post 0.1
+        {
+          #  pression elem #
+           #  pression som #
+            # vitesse elem #
+            # vitesse som #
+            # Vorticite som #
+           # Vorticite elem #
+             estimateur_aposteriori elem 
+           # Taux_cisaillement elem #
+        }
+  	}
+    } 
+}
+
+# The problem is solved with #
+Solve pb
+lata_to_other med NOM_DU_CAS NOM_DU_CAS
+# Not necessary keyword to finish #
+End

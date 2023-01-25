@@ -25,7 +25,6 @@
 #include <Discretisation_base.h>
 
 
-Implemente_deriv(Modele_Fonc_Bas_Reynolds_Thermique_Base);
 Implemente_instanciable(Modele_Fonc_Bas_Reynolds_Thermique,"Modele_Fonc_Bas_Reynolds_Thermique",DERIV(Modele_Fonc_Bas_Reynolds_Thermique_Base));
 
 //

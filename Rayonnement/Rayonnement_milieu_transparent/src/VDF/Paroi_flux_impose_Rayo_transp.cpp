@@ -202,7 +202,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
         }
     }
   // Impression:
-  if (zvdf.zone().Bords_a_imprimer().contient(la_frontiere_VF.le_nom()) && sch.limpr())
+  if (zvdf.zone().bords_a_imprimer().contient(la_frontiere_VF.le_nom()) && sch.limpr())
     {
       Cout << "Impression des temperatures de paroi sur la frontiere " << la_frontiere_VF.le_nom() << " :" << finl;
       Cout << "---------------------------------------------------------------------" << finl;

@@ -23,7 +23,7 @@
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <Periodique.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Navier_Stokes_std.h>
 #include <calcul_spectres.h>
 #include <SFichier.h>
@@ -169,7 +169,7 @@ void Traitement_particulier_NS_THI_VDF::calcul_Ec_D(double& Ec, double& D)
   const Zone& zone = zdisbase.zone();
   const int nb_elem=zone.nb_elem();
 
-  const Champ_Face& vit = ref_cast(Champ_Face,mon_equation->inconnue().valeur());
+  const Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
   //  Calcul de l'Energie cinetique et de l enstrophie
   const DoubleVect& vitesse =mon_equation->inconnue().valeurs();
   const int dim = Objet_U::dimension;

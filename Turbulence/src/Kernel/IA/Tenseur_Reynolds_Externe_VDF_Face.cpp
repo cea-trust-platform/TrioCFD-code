@@ -39,7 +39,7 @@
 #include <Echange_externe_impose.h>
 #include <Neumann.h>
 #include <Neumann_homogene.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Transport_K_Eps.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Tenseur_Reynolds_Externe_VDF_Face,"Tenseur_Reynolds_Externe_VDF_Face",Source_base);
@@ -435,9 +435,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
 
   int nb_elem_tot=zone_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
-  const Champ_Face& vitesse = ref_cast( Champ_Face,eqn_NS_->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
 
   DoubleTab lambda_1(nb_elem_tot);
   DoubleTab lambda_2(nb_elem_tot);
