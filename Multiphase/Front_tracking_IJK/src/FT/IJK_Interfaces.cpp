@@ -319,7 +319,7 @@ Sortie& IJK_Interfaces::printOn(Sortie& os) const
 
   return os;
 }
-
+// XD interfaces interprete nul 1 not_set
 Entree& IJK_Interfaces::readOn(Entree& is)
 {
   is_diphasique_ = true;
@@ -372,17 +372,17 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   //nb_groups_ = 1;            // Par defaut toutes les bulles sont dans le meme group.
   compo_to_group_.resize(0); // Par defaut, a dimensionner ensuite par nb_bulles
   param.ajouter("bubble_groups", &compo_to_group_);
-  param.ajouter("fichier_reprise_interface", &fichier_reprise_interface_, Param::REQUIRED);
-  param.ajouter("timestep_reprise_interface", &timestep_reprise_interface_);
-  param.ajouter("lata_meshname", &lata_interfaces_meshname_);
-  param.ajouter("remaillage_ft_ijk", &remaillage_ft_ijk_);
+  param.ajouter("fichier_reprise_interface", &fichier_reprise_interface_, Param::REQUIRED); // XD_ADD_P  chaine not_set
+  param.ajouter("timestep_reprise_interface", &timestep_reprise_interface_); // XD_ADD_P entier not_set
+  param.ajouter("lata_meshname", &lata_interfaces_meshname_); // XD_ADD_P chaine not_set
+  param.ajouter("remaillage_ft_ijk", &remaillage_ft_ijk_); // XD_ADD_P remaillage_ft_ijk not_set
   param.ajouter("portee_force_repulsion", &portee_force_repulsion_);
   param.ajouter("delta_p_max_repulsion", &delta_p_max_repulsion_);
   param.ajouter("portee_wall_repulsion", &portee_wall_repulsion_);
   param.ajouter("delta_p_wall_max_repulsion", &delta_p_wall_max_repulsion_);
   param.ajouter_flag("active_repulsion_paroi", &active_repulsion_paroi_);
   param.ajouter_flag("follow_colors", &follow_colors_);
-  param.ajouter_flag("compute_distance_autres_interfaces", &compute_distance_autres_interfaces_);
+  param.ajouter_flag("compute_distance_autres_interfaces", &compute_distance_autres_interfaces_); // XD_ADD_P rien not_set
   param.ajouter("reprise_colors", &through_yminus_);
   param.ajouter_flag("correction_gradient_potentiel", &correction_gradient_potentiel_);
   param.ajouter("ncells_forbidden", &ncells_forbidden_);

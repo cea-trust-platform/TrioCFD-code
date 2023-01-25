@@ -275,6 +275,8 @@ IJK_FT_double::TimeScheme IJK_FT_double::get_time_scheme() const
 {
   return (TimeScheme) time_scheme_;
 }
+
+// XD IJK_FT_double interprete IJK_FT_double 1 not_set
 Entree& IJK_FT_double::interpreter(Entree& is)
 {
   tstep_ = 0;
@@ -410,120 +412,165 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   coef_rayon_force_rappel_ = 0.;
   p_seuil_max_ = 10000000 ;
   p_seuil_min_ = -10000000 ;
-  param.ajouter("p_seuil_max", &p_seuil_max_);
-  param.ajouter("p_seuil_min", &p_seuil_min_);
-  param.ajouter("coef_ammortissement", &coef_ammortissement_);
-  param.ajouter("coef_immobilisation", &coef_immobilisation_);
-  param.ajouter("coef_mean_force", &coef_mean_force_);
-  param.ajouter("coef_force_time_n", &coef_force_time_n_);
-  param.ajouter("coef_rayon_force_rappel", &coef_rayon_force_rappel_);
-  param.ajouter("tinit", &current_time_);
-  param.ajouter("ijk_splitting", &ijk_splitting_name, Param::REQUIRED);
-  param.ajouter("timestep", &timestep_, Param::REQUIRED);
-  param.ajouter("timestep_facsec", &timestep_facsec_);
-  param.ajouter("cfl", &cfl_);
-  param.ajouter("fo", &fo_);
-  param.ajouter("oh", &oh_);
-  param.ajouter("nb_pas_dt_max", &nb_timesteps_, Param::REQUIRED);
-  param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED);
-  param.ajouter_flag("check_divergence", &check_divergence_);
-  param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED);
-  param.ajouter("vitesse_entree", &vitesse_entree_);
-  param.ajouter("vitesse_upstream", &vitesse_upstream_);
-  param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
-  param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED);
-  param.ajouter("check_stop_file", &check_stop_file_);
-  param.ajouter("dt_sauvegarde", &dt_sauvegarde_);
-  param.ajouter("nom_sauvegarde", &nom_sauvegarde_);
-  param.ajouter_flag("sauvegarder_xyz", &sauvegarder_xyz_);
-  param.ajouter("nom_reprise", &nom_reprise_);
-  param.ajouter("gravite", &gravite_);
+  param.ajouter("p_seuil_max", &p_seuil_max_); // XD_ADD_P floattant not_set, default 10000000
+  param.ajouter("p_seuil_min", &p_seuil_min_); // XD_ADD_P floattant not_set, default -10000000
+  param.ajouter("coef_ammortissement", &coef_ammortissement_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_immobilisation", &coef_immobilisation_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_mean_force", &coef_mean_force_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_force_time_n", &coef_force_time_n_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_rayon_force_rappel", &coef_rayon_force_rappel_); // XD_ADD_P floattant not_set
+  param.ajouter("tinit", &current_time_); // XD_ADD_P floattant initial time
+  param.ajouter("ijk_splitting", &ijk_splitting_name, Param::REQUIRED); // XD_ADD_P chaine(into=["grid_splitting"]) Definition of domain decomposition for parallel computations
+  param.ajouter("timestep", &timestep_, Param::REQUIRED); // XD_ADD_P floattant Upper limit of the timestep
+  param.ajouter("timestep_facsec", &timestep_facsec_); // XD_ADD_P floattant Security factor on timestep
+  param.ajouter("cfl", &cfl_); // XD_ADD_P floattant  To provide a value of the limiting CFL number used for setting the timestep
+  param.ajouter("fo", &fo_); // XD_ADD_P floattant not_set
+  param.ajouter("oh", &oh_); // XD_ADD_P floattant not_set
+  param.ajouter("nb_pas_dt_max", &nb_timesteps_, Param::REQUIRED); // XD_ADD_P entier maximum limit for the number of timesteps
+  param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
+  param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
+  param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
+  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P chaine not_set
+  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
+  param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
+  param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
+  param.ajouter("nom_sauvegarde", &nom_sauvegarde_); // XD_ADD_P chaine Definition of filename to save the calculation
+  param.ajouter_flag("sauvegarder_xyz", &sauvegarder_xyz_); // XD_ADD_P rien save in xyz format
+  param.ajouter("nom_reprise", &nom_reprise_); // XD_ADD_P chaine Enable restart from filename given
+  param.ajouter("gravite", &gravite_); // XD_ADD_P list gravity vector [gx, gy, gz]
   expression_vitesse_initiale_.dimensionner_force(3);
-  param.ajouter("expression_vx_init", &expression_vitesse_initiale_[0]);
-  param.ajouter("expression_vy_init", &expression_vitesse_initiale_[1]);
-  param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]);
-  param.ajouter("expression_derivee_force", &expression_derivee_acceleration_);
-  param.ajouter("terme_force_init", &terme_source_acceleration_);
-  param.ajouter("correction_force", &correction_force_);
-  param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_);
-  param.ajouter("vol_bulles", &vol_bulles_);
-  param.ajouter("time_scheme", &time_scheme_);
+  param.ajouter("expression_vx_init", &expression_vitesse_initiale_[0]); // XD_ADD_P chaine initial field for x-velocity component (parser of x,y,z)
+  param.ajouter("expression_vy_init", &expression_vitesse_initiale_[1]); // XD_ADD_P chaine initial field for y-velocity component (parser of x,y,z)
+  param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]); // XD_ADD_P chaine initial field for z-velocity component (parser of x,y,z)
+  param.ajouter("expression_derivee_force", &expression_derivee_acceleration_); // XD_ADD_P chaine expression of the time-derivative of the X-component of a source-term (see terme_force_ini for the initial value). terme_force_ini : initial value of the X-component of the source term (see expression_derivee_force  for time evolution)
+  param.ajouter("terme_force_init", &terme_source_acceleration_); // XD_ADD_P chaine not_set
+  param.ajouter("correction_force", &correction_force_); // XD_ADD_P chaine not_set
+  param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_); // XD_ADD_P chaine not_set
+  param.ajouter("vol_bulles", &vol_bulles_); // XD_ADD_P chaine not_set
+  param.ajouter("time_scheme", &time_scheme_); // XD_ADD_P chaine(into=["euler_explicit","RK3_FT"]) Type of time scheme
   param.dictionnaire("euler_explicit", EULER_EXPLICITE);
   param.dictionnaire("RK3_FT", RK3_FT);
 
   // GAB question : pourquoi expression_variable_source_ est de type nom et pas de type Vecteur3 ??
   expression_variable_source_.dimensionner_force(3);
-  param.ajouter("expression_variable_source_x", &expression_variable_source_[0]);
-  param.ajouter("expression_variable_source_y", &expression_variable_source_[1]);
-  param.ajouter("expression_variable_source_z", &expression_variable_source_[2]);
-  param.ajouter("facteur_variable_source_init", &facteur_variable_source_);
-  param.ajouter("expression_derivee_facteur_variable_source", &expression_derivee_facteur_variable_source_);
+  param.ajouter("expression_variable_source_x", &expression_variable_source_[0]); // XD_ADD_P chaine not_set
+  param.ajouter("expression_variable_source_y", &expression_variable_source_[1]); // XD_ADD_P chaine not_set
+  param.ajouter("expression_variable_source_z", &expression_variable_source_[2]); // XD_ADD_P chaine not_set
+  param.ajouter("facteur_variable_source_init", &facteur_variable_source_); // XD_ADD_P chaine not_set
+  param.ajouter("expression_derivee_facteur_variable_source", &expression_derivee_facteur_variable_source_); // XD_ADD_P chaine not_set
 
 
-  param.ajouter("expression_p_init", &expression_pression_initiale_);
+  param.ajouter("expression_p_init", &expression_pression_initiale_); // XD_ADD_P chaine initial pressure field (optional)
 
-  param.ajouter("expression_potential_phi", &expression_potential_phi_);
+  param.ajouter("expression_potential_phi", &expression_potential_phi_); // XD_ADD_P chaine parser to define phi and make a momentum source Nabla phi.
 
-  param.ajouter("type_velocity_diffusion_form", &type_velocity_diffusion_form_);
-  param.ajouter("type_velocity_convection_form", &type_velocity_convection_form_);
-  param.ajouter("type_velocity_convection_op", &type_velocity_convection_op_);
+  param.ajouter("type_velocity_diffusion_form", &type_velocity_diffusion_form_); // XD_ADD_P chaine not_set
+  param.ajouter("type_velocity_convection_form", &type_velocity_convection_form_); // XD_ADD_P chaine not_set
+  param.ajouter("type_velocity_convection_op", &type_velocity_convection_op_); // XD_ADD_P chaine not_set
   param.dictionnaire("Quick",0);
   param.dictionnaire("Centre",1);
   param.dictionnaire("Amont",2);
 
-  param.ajouter("interfaces", &interfaces_);
+  param.ajouter("interfaces", &interfaces_); // XD_ADD_P interfaces not_set
   // GAB, THI
-  param.ajouter("forcage", &forcage_); // X_D forcage_ forcage_ forcage_ 1 attr type 0 description
-  param.ajouter("corrections_qdm", &qdm_corrections_);
+  param.ajouter("forcage", &forcage_);  // XD_ADD_P chaine not_set
+  param.ajouter("corrections_qdm", &qdm_corrections_); // XD_ADD_P chaine not_set
   // Read list of thermic equations:
-  param.ajouter("thermique", &thermique_);
-  param.ajouter("energie", &energie_);
+  param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
+  param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
 
-  param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED);
+  param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
-  param.ajouter("fichier_post", &fichier_post_);
+  param.ajouter("fichier_post", &fichier_post_); // XD_ADD_P chaine name of the post-processing file (lata file)
   // ATTENTION les fichiers reprises sont des fichiers .lata ou sauv.lata
   // On peut reprendre uniquement la vitesse ou uniquement rho dans un fichier de post:
-  param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
-  param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
+  param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_); // XD_ADD_P chaine not_set
+  param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_); // XD_ADD_P chaine not_set
 
-  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED);
-  param.ajouter_flag("disable_solveur_poisson", &disable_solveur_poisson_);
-  param.ajouter_flag("disable_diffusion_qdm", &disable_diffusion_qdm_);
-  param.ajouter_flag("disable_source_interf", &disable_source_interf_);
-  param.ajouter_flag("disable_convection_qdm", &disable_convection_qdm_);
-  param.ajouter_flag("disable_diphasique", &disable_diphasique_);
-  param.ajouter_flag("frozen_velocity", &frozen_velocity_);
-  param.ajouter_flag("velocity_reset", &velocity_reset_);
-  param.ajouter_flag("improved_initial_pressure_guess", &improved_initial_pressure_guess_);
-  param.ajouter_flag("include_pressure_gradient_in_ustar", &include_pressure_gradient_in_ustar_);
+  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // XD_ADD_P bloc_lecture BC
+  param.ajouter_flag("disable_solveur_poisson", &disable_solveur_poisson_); // XD_ADD_P rien Disable pressure poisson solver
+  param.ajouter_flag("disable_diffusion_qdm", &disable_diffusion_qdm_); // XD_ADD_P rien Disable diffusion operator in momentum
+  param.ajouter_flag("disable_source_interf", &disable_source_interf_); // XD_ADD_P rien Disable computation of the interfacial source term
+  param.ajouter_flag("disable_convection_qdm", &disable_convection_qdm_); // XD_ADD_P rien Disable convection operator in momentum
+  param.ajouter_flag("disable_diphasique", &disable_diphasique_); // XD_ADD_P rien Disable all calculations related to interfaces (phase properties, interfacial force, ... )
+  param.ajouter_flag("frozen_velocity", &frozen_velocity_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("velocity_reset", &velocity_reset_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("improved_initial_pressure_guess", &improved_initial_pressure_guess_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("include_pressure_gradient_in_ustar", &include_pressure_gradient_in_ustar_); // XD_ADD_P chaine not_set
   //  param.ajouter_flag("use_inv_rho", &use_inv_rho_);
-  param.ajouter_flag("use_inv_rho_for_mass_solver_and_calculer_rho_v", &use_inv_rho_for_mass_solver_and_calculer_rho_v_);
-  param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_);
-  param.ajouter_flag("diffusion_alternative", &diffusion_alternative_);
-  param.ajouter_flag("suppression_rejetons", &suppression_rejetons_);
-  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_);
-  param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_);
+  param.ajouter_flag("use_inv_rho_for_mass_solver_and_calculer_rho_v", &use_inv_rho_for_mass_solver_and_calculer_rho_v_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("diffusion_alternative", &diffusion_alternative_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("suppression_rejetons", &suppression_rejetons_); // XD_ADD_P chaine not_set
+  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_); // XD_ADD_P rien experimental Keyword, not for use
   // GAB; qdm
-  param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan);
+  param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan); // XD_ADD_P chaine not_set
   //
   // GAB, champ de reprise + champ initial
-  param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_);
+  param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_); // XD_ADD_P chaine not_set
   //
 
-  param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
-  param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
+  param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_); // XD_ADD_P chaine not_set
+  param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_); // XD_ADD_P chaine not_set
   vap_velocity_tmoy_ = reprise_vap_velocity_tmoy_;
   liq_velocity_tmoy_ = reprise_liq_velocity_tmoy_;
 
   //
-  param.ajouter("sigma", &sigma_);
-  param.ajouter("rho_vapeur", &rho_vapeur_);
-  param.ajouter("mu_vapeur", &mu_vapeur_);
-
+  param.ajouter("sigma", &sigma_); // XD_ADD_P floattant surface tension
+  param.ajouter("rho_vapeur", &rho_vapeur_); // XD_ADD_P floattant vapour density
+  param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
   post_.complete_interpreter(param, is);
-
+// XD attr check_stats rien check_stats 1 Flag to compute additional (xy)-plane averaged statistics
+// XD attr dt_post entier dt_post 1 Post-processing frequency (for lata output)
+// XD attr dt_post_stats_plans entier dt_post_stats_plans 1 Post-processing frequency for averaged statistical files (txt files containing averaged information on (xy) planes for each z-center) both instantaneous, or cumulated time-integration (see file header for variables list)
+// XD attr dt_post_stats_bulles entier dt_post_stats_bulles 1 Post-processing frequency for bubble information (for out files as bubble area, centroid position, etc...)
+// XD attr champs_a_postraiter listchaine champs_a_postraiter 1 List of variables to post-process in lata files.
+// XD attr expression_vx_ana chaine expression_vx_ana 1 Analytical Vx (parser of x,y,z, t) used for post-processing only
+// XD attr expression_vy_ana chaine expression_vy_ana 1 Analytical Vy (parser of x,y,z, t) used for post-processing only
+// XD attr expression_vz_ana chaine expression_vz_ana 1 Analytical Vz (parser of x,y,z, t) used for post-processing only
+// XD attr expression_p_ana chaine expression_p_ana 1 analytical pressure solution (parser of x,y,z, t) used for post-processing only
+// XD attr expression_dPdx_ana chaine expression_dPdx_ana 1 analytical expression dP/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dPdy_ana chaine expression_dPdy_ana 1 analytical expression dP/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dPdz_ana chaine expression_dPdz_ana 1 analytical expression dP/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdx_ana chaine expression_dUdx_ana 1 analytical expression dU/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdy_ana chaine expression_dUdy_ana 1 analytical expression dU/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdz_ana chaine expression_dUdz_ana 1 analytical expression dU/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdx_ana chaine expression_dVdx_ana 1 analytical expression dV/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdy_ana chaine expression_dVdy_ana 1 analytical expression dV/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdz_ana chaine expression_dVdz_ana 1 analytical expression dV/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdx_ana chaine expression_dWdx_ana 1 analytical expression dW/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdy_ana chaine expression_dWdy_ana 1 analytical expression dW/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdz_ana chaine expression_dWdz_ana 1 analytical expression dW/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdx_ana chaine expression_ddPdxdx_ana 1 analytical expression d2P/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdydy_ana chaine expression_ddPdydy_ana 1 analytical expression d2P/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdzdz_ana chaine expression_ddPdzdz_ana 1 analytical expression d2P/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdy_ana chaine expression_ddPdxdy_ana 1 analytical expression d2P/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdz_ana chaine expression_ddPdxdz_ana 1 analytical expression d2P/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdydz_ana chaine expression_ddPdydz_ana 1 analytical expression d2P/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdx_ana chaine expression_ddUdxdx_ana 1 analytical expression d2U/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdydy_ana chaine expression_ddUdydy_ana 1 analytical expression d2U/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdzdz_ana chaine expression_ddUdzdz_ana 1 analytical expression d2U/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdy_ana chaine expression_ddUdxdy_ana 1 analytical expression d2U/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdz_ana chaine expression_ddUdxdz_ana 1 analytical expression d2U/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdydz_ana chaine expression_ddUdydz_ana 1 analytical expression d2U/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdx_ana chaine expression_ddVdxdx_ana 1 analytical expression d2V/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdydy_ana chaine expression_ddVdydy_ana 1 analytical expression d2V/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdzdz_ana chaine expression_ddVdzdz_ana 1 analytical expression d2V/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdy_ana chaine expression_ddVdxdy_ana 1 analytical expression d2V/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdz_ana chaine expression_ddVdxdz_ana 1 analytical expression d2V/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdydz_ana chaine expression_ddVdydz_ana 1 analytical expression d2V/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdx_ana chaine expression_ddWdxdx_ana 1 analytical expression d2W/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdydy_ana chaine expression_ddWdydy_ana 1 analytical expression d2W/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdzdz_ana chaine expression_ddWdzdz_ana 1 analytical expression d2W/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdy_ana chaine expression_ddWdxdy_ana 1 analytical expression d2W/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdz_ana chaine expression_ddWdxdz_ana 1 analytical expression d2W/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdydz_ana chaine expression_ddWdydz_ana 1 analytical expression d2W/dydz=f(x,y,z,t), for post-processing only
+// XD attr t_debut_statistiques floattant t_debut_statistiques 1 Initial time for computation, printing and accumulating time-integration
+// XD attr sondes bloc_lecture sondes 1 probes
   param.lire_avec_accolades(is);
   // GAB, rotation
   direction_gravite_ = get_direction(gravite_);
