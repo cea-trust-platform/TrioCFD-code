@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,9 +13,8 @@
 *
 *****************************************************************************/
 
-
-#include <Operateur_Conv.h>
 #include <Discretisation_base.h>
+#include <Operateur_Conv.h>
 #include <stat_counters.h>
 #include <Champ_base.h>
 
@@ -29,11 +28,6 @@ Sortie& Operateur_Conv::printOn(Sortie& os) const
 Entree& Operateur_Conv::readOn(Entree& is)
 {
   Operateur::lire(is);
-  if (valeur().que_suis_je()=="Op_Conv_ALE_VEF" )//|| valeur().que_suis_je()=="Op_Conv_ALE_VDF")
-    {
-      //Op_Conv_ALE_VEF& mon_op_conv_ALE_VEF=ref_cast(Op_Conv_ALE_VEF, valeur());
-      //valeur().lire_op_conv(is);
-    }
   if ((mon_equation.le_nom() ==  "pb_sensibiliteNavier_Stokes_standard_sensibility")  && (valeur().que_suis_je()!="Op_Conv_sensibility_VEF_P1NC"))
     {
       Cerr<<" You should use the sensibility convection operator within Navier_Stokes_standard_sensibility equation "<<finl;
@@ -42,8 +36,6 @@ Entree& Operateur_Conv::readOn(Entree& is)
     }
   return is;
 }
-
-
 
 /*! @brief Type l'operateur: "Op_Conv" + motcle + discretisation + inconnue
  *
