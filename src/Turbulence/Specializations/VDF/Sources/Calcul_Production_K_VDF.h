@@ -37,6 +37,9 @@ protected:
 
   DoubleVect& calculer_terme_production_K(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
 
+  // cAlan, 23/01/2023. To be merged with previous one when the model is validated.
+  DoubleVect& calculer_terme_production_K_for_komega(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
+
   DoubleVect& calculer_terme_production_K_Axi(const Domaine_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
 
   DoubleVect& calculer_terme_production_K_BiK(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
