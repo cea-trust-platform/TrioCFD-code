@@ -109,19 +109,21 @@ Lire pb
 		convection { quick }
 	        sources { 
 			Source_Con_Phase_field {
+				Systeme_naire non  {
+					alpha                      .1406250000e-3
+					potentiel_chimique         { defaut }
+					beta                       115.2000000
+					kappa                      20.e-7
+					kappa_variable             { non }
+				} 
 				Temps_d_affichage	   0
-				alpha                      .1406250000e-3
-				potentiel_chimique 	   { defaut }
-				beta                       115.2000000
-				kappa                      20.e-7
-				kappa_variable             { defaut }
 				moyenne_de_kappa           harmonique
 				multiplicateur_de_kappa    6.
 				couplage_NS_CH             mutilde(n+1/2)
 				implicitation_CH           oui
 				gmres_non_lineaire         oui
 				seuil_cv_iterations_ptfixe 1.e-2
-				seuil_residu_ptfixe        1.e-2
+				seuil_residu_ptfixe        1.e-2 
 				seuil_residu_gmresnl       1.e-10
 				dimension_espace_de_krylov 2
 				nb_iterations_gmresnl      10
