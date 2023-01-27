@@ -185,8 +185,10 @@ inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 
 inline double Source_Con_Phase_field::dWdc_defaut(const double c) const
 {
-  //return (4*c*(c+0.5)*(c-0.5));
-  return 2*(c-0)*(c-0.68)*(2*c-0-0.68);
+  return 4*c*(c+0.5)*(c-0.5);
+  //return 2*c*(1-c)*(1-2*c);
+
+  //return 2*(c-0)*(c-0.68)*(2*c-0-0.68);
 
 }
 

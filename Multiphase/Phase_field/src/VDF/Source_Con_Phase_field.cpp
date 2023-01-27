@@ -1954,11 +1954,11 @@ void Source_Con_Phase_field::premier_demi_dt()
                   //calculer_mutilde_demi(mutilde_demi, c_demi);
                   //calculer_mutilde(mutilde_demi);
                   //mutilde=mutilde_demi;
-                  //mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
-                  //mutilde_demi(n_elem)/=theta;
+                  mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
+                  mutilde_demi(n_elem)/=theta;
                 }
-              calculer_mutilde_demi(mutilde_demi, c_demi);
-              mutilde_demi.echange_espace_virtuel();
+              //calculer_mutilde_demi(mutilde_demi, c_demi);
+              //mutilde_demi.echange_espace_virtuel();
               //Cerr<<"c_demi -(1-theta)cn/theta"<<c_demi<<finl;
 
             }
@@ -1983,12 +1983,12 @@ void Source_Con_Phase_field::premier_demi_dt()
                       //calculer_mutilde_demi(mutilde_demi, c_demi);
                       //calculer_mutilde(mutilde_demi);
                       //mutilde=mutilde_demi;
-                      //mutilde_demi(n_elem,j)-=(1-theta)*mutilde(n_elem,j);
-                      //mutilde_demi(n_elem,j)/=theta;
+                      mutilde_demi(n_elem,j)-=(1-theta)*mutilde(n_elem,j);
+                      mutilde_demi(n_elem,j)/=theta;
                     }
                 }
-              calculer_mutilde_demi(mutilde_demi, c_demi);
-              mutilde_demi.echange_espace_virtuel();
+              //calculer_mutilde_demi(mutilde_demi, c_demi);
+              //mutilde_demi.echange_espace_virtuel();
 
             }
 
