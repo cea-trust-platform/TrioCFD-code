@@ -283,6 +283,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
   int nbfaces=zone_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
+
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
@@ -346,8 +347,6 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
             }
         }
     }
-  //===========================================================
-
   return resu;
 }
 
@@ -367,6 +366,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
   int nbfaces=zone_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
+
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
@@ -459,8 +459,6 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
             }
         }
     }
-  //===============================================================================================
-
   return resu;
 }
 

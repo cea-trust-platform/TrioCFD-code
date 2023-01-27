@@ -2302,40 +2302,42 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 
   int el0,el1;
   double vol0,vol1;
-
-  DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-  if (prov_face.size()==0)
-    prov_face=eq_ns.inconnue().valeurs();
-  prov_face=0.;
-
-  // Grad(C)
-  opgrad.calculer(c,prov_face);
-  eq_ns.solv_masse().appliquer(prov_face);
-
-  const DoubleTab rhoPF=eq_ns.rho().valeurs();
-  double rho_face;
-
-  if (boussi_==1)
+  if (type_systeme_naire_==0)
     {
-      prov_face *= alpha*rho0; // Cas approximation de Boussinesq
-    }
-  else if (boussi_==0)
-    {
-      for (int fac=ndeb; fac<nbfaces; fac++)
+      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
+
+      // Grad(C)
+      opgrad.calculer(c,prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
+
+      const DoubleTab rhoPF=eq_ns.rho().valeurs();
+      double rho_face;
+
+      if (boussi_==1)
         {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
-
-          rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-          prov_face(fac) *= alpha*rho_face;
+          prov_face *= alpha*rho0; // Cas approximation de Boussinesq
         }
-    }
+      else if (boussi_==0)
+        {
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
 
-  // Div(alpha*rho*Grad(c))
-  opdiv.calculer(prov_face,div_alpha_rho_gradC);
-  eq_c.solv_masse().appliquer(div_alpha_rho_gradC);
+              rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
+              prov_face(fac) *= alpha*rho_face;
+            }
+        }
+
+      // Div(alpha*rho*Grad(c))
+      opdiv.calculer(prov_face,div_alpha_rho_gradC);
+      eq_c.solv_masse().appliquer(div_alpha_rho_gradC);
+    }
 }
 
 

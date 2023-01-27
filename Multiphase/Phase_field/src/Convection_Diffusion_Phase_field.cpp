@@ -158,14 +158,14 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
   // En sequentiel : resize() autorise
   // En parallele : resize() interdit, car alors on ne prend pas en compte les joints
 
-  //div_alpha_rho_gradC = inconnue().valeurs();
-  //div_alpha_rho_gradC = 0.;
+  div_alpha_rho_gradC = inconnue().valeurs();
+  div_alpha_rho_gradC = 0.;
 
   div_alpha_gradC = inconnue().valeurs();
   div_alpha_gradC = 0.;
 
 
-  //alpha_gradC_carre = div_alpha_gradC;
+  alpha_gradC_carre = div_alpha_gradC;
   //pression_thermo = div_alpha_gradC;
 
   //Cerr<<" mutilde : preparer_calcul = "<< mutilde <<finl;
