@@ -71,6 +71,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   int nb_faces = zone_VEF.nb_faces();
   const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
+  const int interpol_visco = 0;
 
   DoubleTrav P(nb_faces), G(nb_faces), G1(nb_faces), D(nb_faces), E(nb_faces), F1(nb_faces), F2(nb_faces);
 
@@ -78,7 +79,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
   mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
-  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
+  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb, interpol_visco);
 
   // C'est l'objet de type zone_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
