@@ -106,7 +106,7 @@ calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Dom
   S = 0.;
   vit.calcul_S_barre(vitesse, S, zone_Cl_VDF);
 
-  Debog::verifier("Source_Transport_K_Eps_VDF_P0_VDF::calculer_terme_production_K",
+  Debog::verifier("Source_Transport_K_Omega_VDF_P0_VDF::calculer_terme_production_K",
                   S);
 
   int nb_elem = domaine_VDF.nb_elem();
@@ -123,8 +123,8 @@ calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Dom
 
       //Corrections pour prendre en compte la divergence de u
       //non nulle en Quasi-Compressible
-      S(elem) += -(2./3.)*visco_turb(elem)*coef * coef;
-      S(elem) += -(2./3.)*K_eps(elem,0) * coef ;
+      S(elem) += -(2./3.)*visco_turb(elem)*coef*coef;
+      S(elem) += -(2./3.)*K_Omega(elem, 0)*coef;
     }
 
   Debog::verifier("Source_Transport_K_Omega_VDF_P0_VDF::calculer_terme_production_K_for_komega",

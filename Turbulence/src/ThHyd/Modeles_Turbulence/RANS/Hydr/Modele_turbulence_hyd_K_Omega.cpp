@@ -75,7 +75,7 @@ int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, E
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS_komega::lire_motcle_non_standard(mot,is);
+    return Mod_turb_hyd_RANS_komega::lire_motcle_non_standard(mot, is);
   return 1;
 }
 
@@ -87,7 +87,7 @@ int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, E
  */
 Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK_Omega=eqn_transp_K_Omega().inconnue().valeur();
+  const Champ_base& chK_Omega = eqn_transp_K_Omega().inconnue().valeur();
   Nom type = chK_Omega.que_suis_je();
   const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Omega().zone_Cl_dis();
   const DoubleTab& tab_K_Omega = chK_Omega.valeurs();
@@ -113,8 +113,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before", la_viscosite_turbulente.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente tab_K_Omega", tab_K_Omega);
   if (visco_turb.size() == n)
-    non_prepare=0.;
-  non_prepare=mp_max(non_prepare);
+    non_prepare = 0.;
+  non_prepare = mp_max(non_prepare);
 
   if (non_prepare == 1)
     {
@@ -128,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
       ch_visco_turb_K_Omega.fixer_nb_valeurs_nodales(n);
       ch_visco_turb_K_Omega.fixer_unite("inconnue");
       ch_visco_turb_K_Omega.changer_temps(0.);
-      DoubleTab& visco_turb_K_Omega =  ch_visco_turb_K_Omega.valeurs();
+      DoubleTab& visco_turb_K_Omega = ch_visco_turb_K_Omega.valeurs();
 
       if(visco_turb_K_Omega.size() != n)
         {
@@ -145,7 +145,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
           if (tab_K_Omega(i, 1) <= OMEGA_MIN)
             visco_turb_K_Omega[i] = 0;
           else
-            visco_turb_K_Omega[i] = ALPHA_STAR*tab_K_Omega(i, 0)/(tab_K_Omega(i, 1));
+            visco_turb_K_Omega[i] = tab_K_Omega(i, 0)/(tab_K_Omega(i, 1)); // k/omega
         }
       // Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_K_Omega after",visco_turb_K_Omega);
 
@@ -162,7 +162,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
           if (tab_K_Omega(i, 1) <= OMEGA_MIN)
             visco_turb[i] = 0;
           else
-            visco_turb[i] = ALPHA_STAR*tab_K_Omega(i, 0)/(tab_K_Omega(i, 1));
+            visco_turb[i] = tab_K_Omega(i, 0)/(tab_K_Omega(i, 1)); // k/omega
         }
     }
 
@@ -176,18 +176,10 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {
       const DoubleTab& K_Omega = le_champ_K_Omega.valeurs();
-      double k_min = DMAXFLOAT;
-      double omega_min = DMAXFLOAT;
-      double nut_min = DMAXFLOAT;
-      double k_max = 0;
-      double omega_max = 0;
-      double nut_max = 0;
-      int loc_k_min = -1;
-      int loc_omega_min = -1;
-      int loc_nut_min = -1;
-      int loc_k_max = -1;
-      int loc_omega_max = -1;
-      int loc_nut_max = -1;
+      double k_min = DMAXFLOAT, omega_min = DMAXFLOAT, nut_min = DMAXFLOAT;
+      double k_max = 0, omega_max = 0, nut_max = 0;
+      int loc_k_min = -1, loc_omega_min = -1, loc_nut_min = -1;
+      int loc_k_max = -1, loc_omega_max = -1, loc_nut_max = -1;
       int size = K_Omega.dimension(0);
 
       if (size < 0)
@@ -207,7 +199,7 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
           const double omega = K_Omega(n, 1);
           double nut = 0;
 
-          if (omega > 0) nut = ALPHA_STAR*k/omega;
+          if (omega > 0) nut = k/omega;
 
           if (k < k_min)
             {
@@ -306,10 +298,11 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
   Champ_Inc& ch_K_Omega = K_Omega();
 
   const Milieu_base& mil = equation().probleme().milieu();
-  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
+  if (equation().probleme().is_dilatable())
+    diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
   // loipar.calculer_hyd(ch_K_Omega);
-  eqn_transp_K_Eps().controler_K_Omega();
+  eqn_transp_K_Omega().controler_K_Omega();
   calculer_viscosite_turbulente(ch_K_Omega.temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_Omega par rho
@@ -346,15 +339,16 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   eqn_transp_K_Omega().zone_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Omega().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Omega());
-  eqn_transp_K_Eps().mettre_a_jour(temps);
+  eqn_transp_K_Omega().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
   // cAlan : Mutualisable avec preparer ?
   const Milieu_base& mil = equation().probleme().milieu();
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente.valeurs());
   // on divise K_Omega par rho en QC pour revenir a K et Omega
-  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
-  imprimer_evolution_keps(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
+  if (equation().probleme().is_dilatable())
+    diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
+  imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
   // loipar.calculer_hyd(ch_K_Omega);
   eqn_transp_K_Omega().controler_K_Omega();
   calculer_viscosite_turbulente(ch_K_Omega.temps());
@@ -379,11 +373,11 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 // }
 
 // cAlan : templatable avec K_Eps
-const Champ_base&  Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) const
+const Champ_base& Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) const
 {
   try
     {
-      return Mod_turb_hyd_RANS_Omega::get_champ(nom);
+      return Mod_turb_hyd_RANS_K_Omega::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {

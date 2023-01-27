@@ -43,7 +43,7 @@ public:
 
   inline int has_interface_blocs() const override { return 1; }
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override {}
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override = 0; // XXX XXX XXX Elie Saikali : like that !!
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override = 0;
 
   inline void mettre_a_jour(double t) override { Calcul_Production_K_VDF::mettre_a_jour(t); }
 
@@ -52,7 +52,7 @@ protected:
 
   // Constants for the classic k-omega model Wilcox 1988
   static constexpr double BETA_K = 0.09; // Cmu or BETA_STAR, but clearer with _K
-  static constexpr double BETA_OMGEA = 3./40.; // BETA
+  static constexpr double BETA_OMEGA = 3./40.; // BETA
   static constexpr double SIGMA_K = 0.5; // SIGMA_STAR
   static constexpr double SIGMA_OMEGA = 0.5; // SIGMA
   static constexpr double ALPHA_OMEGA = 5./9.; // ALPHA

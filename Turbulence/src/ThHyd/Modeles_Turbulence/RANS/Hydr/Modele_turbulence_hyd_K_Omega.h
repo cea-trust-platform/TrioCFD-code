@@ -30,7 +30,7 @@
  *
  * @sa Mod_turb_hyd_base Mod_turb_hyd_ss_maille
  */
-class Modele_turbulence_hyd_K_Omega : public Mod_turb_hyd_RANS_komega
+class Modele_turbulence_hyd_K_Omega: public Mod_turb_hyd_RANS_komega
 {
 
   Declare_instanciable(Modele_turbulence_hyd_K_Omega);
@@ -52,7 +52,7 @@ public:
   // const Equation_base& equation_k_eps(int) const override ;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;
 
 protected:
   Transport_K_Omega eqn_transport_K_Omega;

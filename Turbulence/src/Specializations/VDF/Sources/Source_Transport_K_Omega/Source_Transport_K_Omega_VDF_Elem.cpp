@@ -29,6 +29,7 @@ Implemente_instanciable_sans_constructeur(Source_Transport_K_Omega_VDF_Elem,
                                           Source_Transport_K_Omega_VDF_Elem_base);
 
 Sortie& Source_Transport_K_Omega_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
+
 Entree& Source_Transport_K_Omega_VDF_Elem::readOn(Entree& is)
 {
   Source_Transport_K_Omega_VDF_Elem_base::verifier_pb_komega(mon_equation->probleme(), que_suis_je());

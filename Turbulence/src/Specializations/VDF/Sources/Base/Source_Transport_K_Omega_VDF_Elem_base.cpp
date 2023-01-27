@@ -35,6 +35,7 @@ Implemente_base_sans_constructeur(Source_Transport_K_Omega_VDF_Elem_base,
                                   Source_base);
 
 Sortie& Source_Transport_K_Omega_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
+
 Entree& Source_Transport_K_Omega_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is, que_suis_je()); }
 
 // cAlan : mutualisable
