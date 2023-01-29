@@ -139,7 +139,6 @@ int Transport_K_KEps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     }
   else
     return Transport_K_Eps_non_std::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Associe un modele de turbulence K-epsilon deux couches a l'equation.

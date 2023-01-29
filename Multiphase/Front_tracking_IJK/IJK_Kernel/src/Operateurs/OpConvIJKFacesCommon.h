@@ -53,13 +53,10 @@ protected:
       {
       case DIRECTION::X:
         return *inputx_;
-        break;
       case DIRECTION::Y:
         return *inputy_;
-        break;
       case DIRECTION::Z:
         return *inputz_;
-        break;
       default:
         Cerr << "Error in OpConvIJKFacesCommon::get_input: wrong direction..." << finl;
         Process::exit();
@@ -74,13 +71,10 @@ protected:
       {
       case DIRECTION::X:
         return *vx_;
-        break;
       case DIRECTION::Y:
         return *vy_;
-        break;
       case DIRECTION::Z:
         return *vz_;
-        break;
       default:
         Cerr << "Error in OpConvIJKFacesCommon::get_v: wrong direction..." << finl;
         Process::exit();

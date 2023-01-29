@@ -302,7 +302,6 @@ const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle& query) const
             compo[0] = nom_post_;
             return compo;
           }
-        break;
       }
 
     case 1:
@@ -325,7 +324,6 @@ const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle& query) const
             unites[0] = "unit";
             return unites;
           }
-        break;
       }
 
     }

@@ -216,7 +216,6 @@ const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(co
     }
 
   throw Champs_compris_erreur();
-  return ref_champ;
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W::get_noms_champs_postraitables(Noms& nom,Option opt) const

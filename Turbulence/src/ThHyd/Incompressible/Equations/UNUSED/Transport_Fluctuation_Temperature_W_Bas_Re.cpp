@@ -77,7 +77,6 @@ int Transport_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_standard(const M
     }
   else
     return Transport_Fluctuation_Temperature_W::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief surcharge de la methode d'Equation_base.

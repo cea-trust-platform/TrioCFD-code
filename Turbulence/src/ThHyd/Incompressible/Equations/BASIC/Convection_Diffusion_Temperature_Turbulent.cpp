@@ -75,7 +75,6 @@ int Convection_Diffusion_Temperature_Turbulent::lire_motcle_non_standard(const M
     }
   else
     return Convection_Diffusion_Temperature::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Temperature::sauvegarder(Sortie& );
@@ -160,8 +159,6 @@ const Champ_base& Convection_Diffusion_Temperature_Turbulent::get_champ(const Mo
       {
       }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
-  return ref_champ;
 }
 
 

@@ -139,7 +139,6 @@ int Convection_Diffusion_Concentration_FT_Disc::lire_motcle_non_standard(const M
     }
   else
     return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief calcul de l'integrale du champ sur tout le domaine.

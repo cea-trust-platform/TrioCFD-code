@@ -73,13 +73,10 @@ private:
       {
       case DIRECTION::X:
         return delta_x_;
-        break;
       case DIRECTION::Y:
         return delta_y_;
-        break;
       case DIRECTION::Z:
         return delta_z_;
-        break;
       default:
         Cerr << "Error in OpConvIJKQuickSsarp::get_delta: wrong direction..." << finl;
         Process::exit();

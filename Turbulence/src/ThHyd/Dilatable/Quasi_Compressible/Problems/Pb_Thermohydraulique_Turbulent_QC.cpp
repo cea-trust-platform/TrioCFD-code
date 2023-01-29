@@ -95,5 +95,4 @@ int Pb_Thermohydraulique_Turbulent_QC::expression_predefini(const Motcle& motlu,
     }
   else
     return Pb_QC_base::expression_predefini(motlu,expression);
-  return 0;
 }

@@ -458,6 +458,4 @@ const Champ_base& Transport_K_ou_Eps_base::get_champ( const Motcle& nom ) const
     }
 
   throw Champs_compris_erreur();
-
-  return ref_champ;
 }

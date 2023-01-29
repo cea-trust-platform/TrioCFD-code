@@ -99,7 +99,6 @@ int Convection_Diffusion_Phase_field::lire_motcle_non_standard(const Motcle& mot
     }
   else
     return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Discretise l'equation.

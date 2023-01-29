@@ -73,7 +73,6 @@ int Transport_K_ou_Eps_non_std::lire_motcle_non_standard(const Motcle& mot, Entr
     }
   else
     return Transport_K_ou_Eps_base::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 // Retour: int

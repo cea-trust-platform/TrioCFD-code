@@ -126,7 +126,6 @@ int Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::lire_motcle_non_standard(const Mot
     }
   else
     return Turbulence_hyd_sous_maille_Smago_VDF::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::associer(

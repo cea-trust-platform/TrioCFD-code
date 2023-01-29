@@ -67,7 +67,6 @@ int Convection_Diffusion_Espece_Multi_Turbulent_QC::lire_motcle_non_standard(con
     }
   else
     return Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Double appel a: Convection_Diffusion_Turbulent::completer()

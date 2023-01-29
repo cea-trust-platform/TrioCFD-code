@@ -143,7 +143,6 @@ Sortie& moyenne_par_morceaux::printOn( Sortie& os ) const
      << " v_reprise " << v_cible_ << "\n";
   os << " }\n" ;
   return os;
-  return os;
 }
 
 Entree& moyenne_par_morceaux::readOn( Entree& is )
@@ -670,7 +669,6 @@ Sortie& corrections_qdm::printOn( Sortie& os ) const
        << " correction_z " << correction_z_ << "\n";
   os << " }\n" ;
   return os;
-  return os;
 }
 
 Entree& corrections_qdm::readOn( Entree& is )
@@ -811,16 +809,13 @@ double corrections_qdm::get_correct_velocitiy_one_direction(int dir)
     {
     case 0:
       return correction_x_.get_correct_velocity();
-      break;
     case 1:
       return correction_y_.get_correct_velocity();
-      break;
     case 2:
       return correction_z_.get_correct_velocity();
-      break;
     default:
-      return 0.;
       Cerr << "In corrections_qdm::compute_correction_one_direction, dir " << dir << " Error." << finl;
+      return 0.;
     }
 }
 
@@ -830,16 +825,13 @@ int corrections_qdm::get_need_for_vitesse_relative(int direction)
     {
     case 0:
       return correction_x_.get_need_for_vit_rel();
-      break;
     case 1:
       return correction_y_.get_need_for_vit_rel();
-      break;
     case 2:
       return correction_z_.get_need_for_vit_rel();
-      break;
     default:
-      return 0.;
       Cerr << "In corrections_qdm::compute_correction_one_direction, dir " << direction << " Error." << finl;
+      return 0.;
     };
 }
 
@@ -849,16 +841,13 @@ int corrections_qdm::get_need_to_compute_correction_value_one_direction(int dire
     {
     case 0:
       return correction_x_.get_need_to_compute_correction_value();
-      break;
     case 1:
       return correction_y_.get_need_to_compute_correction_value();
-      break;
     case 2:
       return correction_z_.get_need_to_compute_correction_value();
-      break;
     default:
-      return 0.;
       Cerr << "In corrections_qdm::compute_correction_one_direction, dir " << direction << " Error." << finl;
+      return 0.;
     };
 }
 

@@ -188,3 +188,4 @@ double Cond_lim_k_complique_transition_flux_nul_demi::calc_k(double y, double u_
 
   return u_tau*u_tau*(std::max((1-b1)*f1 + b1*f2, 0.)*(1-b2)+b2*f3) ;
 }
+

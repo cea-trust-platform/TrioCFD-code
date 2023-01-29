@@ -64,6 +64,4 @@ double Paroi_Rayo_transp::flux_impose(int i,int j) const
   double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
   const int k = (le_champ_front.valeurs().size() == 1) ? 0 : i;
   return le_champ_front(k, j)-flux_radia;
-  return 0.;
-
 }

@@ -725,7 +725,6 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
             if (Process::je_suis_maitre())
               Cerr << " Standard interpolation of indicatrice to faces." << finl;
             return 1;
-            break;
           }
         case Transport_Interfaces_FT_Disc_interne::MODIFIEE:
           {
@@ -790,7 +789,6 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
                 Cerr << "L indicatrice face sera calculee a partir de la distance. Position : d=" << variables_internes_->modified_indic_faces_position << "h ; Epaisseur : "<< variables_internes_->modified_indic_faces_thickness << "h" <<finl;
               }
             return 1;
-            break;
           }
         case Transport_Interfaces_FT_Disc_interne::AI_BASED:
           {
@@ -7188,7 +7186,6 @@ const Operateur& Transport_Interfaces_FT_Disc::operateur(int i) const
   assert(0);
   exit();
   throw;
-  return operateur(0);
 }
 
 Operateur& Transport_Interfaces_FT_Disc::operateur(int i)
@@ -7196,7 +7193,6 @@ Operateur& Transport_Interfaces_FT_Disc::operateur(int i)
   assert(0);
   exit();
   throw;
-  return operateur(0);
 }
 
 const Champ_Inc& Transport_Interfaces_FT_Disc::inconnue(void) const

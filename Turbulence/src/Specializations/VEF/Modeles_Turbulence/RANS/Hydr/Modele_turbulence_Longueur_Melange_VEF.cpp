@@ -105,7 +105,6 @@ int Modele_turbulence_Longueur_Melange_VEF::lire_motcle_non_standard(const Motcl
     }
   else
     return Mod_turb_hyd_RANS_0_eq::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Modele_turbulence_Longueur_Melange_VEF::associer(

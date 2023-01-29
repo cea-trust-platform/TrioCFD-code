@@ -65,7 +65,6 @@ inline DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_IndGros& conne
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_DC_VDF_NS !!"<<finl;
   exit();
   throw;
-  return calculer_residu( connect,  rest, eq_fine);
 }
 
 

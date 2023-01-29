@@ -92,8 +92,8 @@ void Champ_front_contact_rayo_transp_VEF::mettre_a_jour(double temps)
 
   Champ_front_contact_VEF::mettre_a_jour(temps);
   return;
-  calculer_temperature_bord(temps);
-  verifier_scalaire_bord(temps);
+  //calculer_temperature_bord(temps);
+  //verifier_scalaire_bord(temps);
 }
 
 void Champ_front_contact_rayo_transp_VEF::calculer_coeffs_echange(double temps)

@@ -85,19 +85,15 @@ const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_v(DIRECTION _DIR
     {
     case DIRECTION::X:
       return *vx_;
-      break;
     case DIRECTION::Y:
       return *vy_;
-      break;
     case DIRECTION::Z:
       return *vz_;
-      break;
     default:
       Cerr << "Error in OpDiffIJKFacesGeneric_double::get_v: wrong direction..." << finl;
       Process::exit();
-      // for compilation only...
-      return *vx_;
     }
+  return *vx_;
 }
 const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_molecular_nu_tensor(DIRECTION _COMPO1_, DIRECTION _COMPO2_)
 {
