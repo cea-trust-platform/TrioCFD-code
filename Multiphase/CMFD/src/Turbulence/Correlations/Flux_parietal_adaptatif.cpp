@@ -24,7 +24,7 @@
 #include <Loi_paroi_adaptative.h>
 #include <Correlation.h>
 #include <Pb_Multiphase.h>
-#include <Domaine_dis.h>
+#include <Zone_dis.h>
 #include <Zone_VF.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>

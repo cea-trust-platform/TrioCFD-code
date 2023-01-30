@@ -66,7 +66,7 @@ Entree& Zone_ALE::readOn(Entree& is)
   return is ;
 }
 
-void Zone_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
+void Zone_ALE::mettre_a_jour (double temps, Zone_dis& le_domaine_dis, Probleme_base& pb)
 {
   invalide_octree();
   //Modification des coordonnees du maillage
@@ -294,7 +294,7 @@ void  Zone_ALE::update_ALE_projection(const double temps)
 
 }
 
-void Zone_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
+void Zone_ALE::initialiser (double temps, Zone_dis& le_domaine_dis,Probleme_base& pb)
 {
   //Cerr << "Zone_ALE::initialiser  " << finl;
 
@@ -342,7 +342,7 @@ void Zone_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_b
   //End of initializing Ch_front_input_ALE
 }
 
-DoubleTab Zone_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
+DoubleTab Zone_ALE::calculer_vitesse(double temps, Zone_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
 
   int n; // A activer ou desactiver si on utilise le laplacien ou non
@@ -501,7 +501,7 @@ DoubleTab& Zone_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_faces
   return vf;
 }
 
-DoubleTab& Zone_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
+DoubleTab& Zone_ALE::laplacien(Zone_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
   //Cerr << "Zone_ALE::laplacien" << finl;
   int nb_elem_t = nb_elem_tot();
@@ -1056,7 +1056,7 @@ void Zone_ALE::initializationBeam (double velocity)
 {
   beam->initialization(velocity);
 }
-double Zone_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+double Zone_ALE::computeDtBeam(Zone_dis& le_domaine_dis)
 {
 
   double dt = 0.;
