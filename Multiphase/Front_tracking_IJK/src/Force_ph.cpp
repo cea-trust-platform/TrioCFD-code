@@ -556,6 +556,8 @@ void Force_ph::from_spect_to_phys_opti2_advection(ArrOfDouble& coeff_force, cons
                 }
             }
       ///////////////////////////////////////////////////////////////
+      // Si on plante ici, mettre un 0 au moment du allocate
+      force_[dir].echange_espace_virtuel(force_[dir].ghost());
     }
 
 }
