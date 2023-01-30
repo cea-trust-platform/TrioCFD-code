@@ -22,6 +22,7 @@
 #include <Frontiere_ouverte_vitesse_vortex.h>
 #include <EChaine.h>
 #include <Param.h>
+#include <Sous_Zone.h>
 #include <Zone_VF.h>
 #include <Zone_Cl_dis_base.h>
 #include <Probleme_base.h>

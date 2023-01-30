@@ -27,11 +27,11 @@
 #include <EcritureLectureSpecial.h>
 #include <Discret_Thyd.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VF.h>
 #include <time.h>
 #include <Parser.h>
 #include <Zone_VF.h>
 #include <Zone_VDF.h>
+#include <Sous_Zone.h>
 #include <Champ_Face_VDF.h>
 #include <Champ_P1NC.h>
 #include <Champ_Fonc_P1NC.h>

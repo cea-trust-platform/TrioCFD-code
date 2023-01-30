@@ -246,7 +246,7 @@ void Modele_rayo_semi_transp::preparer_calcul()
 }
 
 
-void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
+void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 {
 
   // Typage de l'equation de rayonnement
@@ -266,7 +266,16 @@ void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
   associer();
   la_discretisation=dis;
   Cerr << "Discretisation du domaine associe au probleme " << le_nom() << finl;
+  if (!le_domaine_.non_nul())
+    Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
+  // Initialisation du tableau renum_som_perio
+  le_domaine_->init_renum_perio();
+
+  dis.associer_domaine(le_domaine_.valeur());
   dis.discretiser(le_domaine_dis);
+  // Can not do this before, since the Zone_dis is not typed yet:
+  le_domaine_dis.associer_zone(le_domaine_);
+
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     {

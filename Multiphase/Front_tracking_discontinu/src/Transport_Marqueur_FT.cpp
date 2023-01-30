@@ -31,6 +31,7 @@
 #include <Zone_VF.h>
 #include <Source_Reaction_Particules.h>
 #include <Zone.h>
+#include <Sous_Zone.h>
 #include <Source_Masse_Ajoutee.h>
 #include <communications.h>
 #include <Param.h>

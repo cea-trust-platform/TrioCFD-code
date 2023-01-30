@@ -77,7 +77,7 @@ public:
   virtual void preparer_mise_a_jour(void);
 
   // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
-  void discretiser(const Discretisation_base&) override;
+  void discretiser(Discretisation_base&) override;
 protected:
 
 private:

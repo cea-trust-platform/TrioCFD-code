@@ -28,6 +28,7 @@
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Zone.h>
+#include <Sous_Zone.h>
 #include <Param.h>
 #include <Champ_Uniforme.h>
 #include <Echange_impose_base.h>

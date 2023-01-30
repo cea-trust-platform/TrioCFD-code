@@ -362,8 +362,7 @@ int Probleme_base::verifier()
  */
 void Probleme_base::associer_domaine(const Zone& un_domaine)
 {
-  le_domaine_dis.associer_domaine(un_domaine);
-
+  le_domaine_ = un_domaine;
 }
 
 void Probleme_base::discretiser_equations()
@@ -384,12 +383,22 @@ void Probleme_base::discretiser_equations()
  *
  * @param (Discretisation_base& discretisation) une discretisation pour le probleme
  */
-void Probleme_base::discretiser(const Discretisation_base& une_discretisation)
+void Probleme_base::discretiser(Discretisation_base& une_discretisation)
 {
   associer();
   la_discretisation = une_discretisation;
   Cerr << "Discretization of the domain associated with the problem " << le_nom() << finl;
+
+  if (!le_domaine_.non_nul())
+    Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
+
+  // Initialisation du tableau renum_som_perio
+  le_domaine_->init_renum_perio();
+
+  une_discretisation.associer_domaine(le_domaine_.valeur());
   une_discretisation.discretiser(le_domaine_dis);
+  // Can not do this before, since the Zone_dis is not typed yet:
+  le_domaine_dis.associer_zone(le_domaine_);
 
   if (milieu_via_associer() || is_pb_FT())
     {
@@ -608,7 +617,7 @@ Schema_Temps_base& Probleme_base::schema_temps()
  */
 const Zone& Probleme_base::domaine() const
 {
-  return le_domaine_dis.domaine();
+  return le_domaine_.valeur();
 }
 
 /*! @brief Renvoie le domaine associe au probleme.
@@ -617,7 +626,7 @@ const Zone& Probleme_base::domaine() const
  */
 Zone& Probleme_base::domaine()
 {
-  return le_domaine_dis.domaine();
+  return le_domaine_.valeur();
 }
 
 /*! @brief Renvoie le domaine discretise associe au probleme.
@@ -1264,12 +1273,12 @@ int Probleme_base::postraiter(int force)
   statistiques().end_count(postraitement_counter_);
 
   //specific ALE postraitement
-  if(le_domaine_dis.domaine().que_suis_je()=="Zone_ALE")
+  if(le_domaine_dis.zone().que_suis_je()=="Zone_ALE")
     {
       if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
         {
           //compute the projection on the ALE boundaries
-          Zone_ALE& dom_ale = ref_cast(Zone_ALE,le_domaine_dis.domaine());
+          Zone_ALE& dom_ale = ref_cast(Zone_ALE,le_domaine_dis.zone());
           double temps = le_schema_en_temps->temps_courant();
           dom_ale.update_ALE_projection(temps);
         }

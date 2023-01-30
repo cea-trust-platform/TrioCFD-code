@@ -28,6 +28,7 @@
 #include <Check_espace_virtuel.h>
 #include <Debog.h>
 #include <Zone.h>
+#include <Sous_Zone.h>
 #include <SFichier.h>
 #include <Param.h>
 #include <Constituant.h>

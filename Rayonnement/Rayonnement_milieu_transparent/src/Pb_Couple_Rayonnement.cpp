@@ -357,12 +357,3 @@ void Pb_Couple_Rayonnement::completer()
 
   //  Cerr << "Pb_Couple_Rayonnement::completer() Fin" << finl;
 }
-
-void Pb_Couple_Rayonnement::discretiser(const Discretisation_base& dis)
-{
-  //   for(int i=0; i< nb_problemes(); i++)
-  //     probleme(i).discretiser(dis);
-  Probleme_Couple::discretiser(dis);
-
-
-}
