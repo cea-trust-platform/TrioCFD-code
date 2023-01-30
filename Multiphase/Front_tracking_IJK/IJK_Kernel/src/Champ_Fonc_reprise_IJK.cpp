@@ -102,12 +102,12 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
 //      exit();
 //    }
 
-  associer_zone_dis_base(pb.domaine_dis().zone_dis(0));
+  associer_zone_dis_base(pb.domaine_dis());
   // on cree un champ comme le ch_ref;
   vrai_champ_.typer(ref_ch.valeur().que_suis_je());
   const Champ_Inc_base& ch_inc=ref_cast(Champ_Inc_base,ref_ch.valeur());
   Champ_Inc_base& v_champ=vrai_champ_.valeur();
-  le_champ().associer_zone_dis_base(pb.domaine_dis().zone_dis(0));
+  le_champ().associer_zone_dis_base(pb.domaine_dis());
 
   v_champ.fixer_nb_valeurs_temporelles(2);
   v_champ.nommer(ch_inc.le_nom());

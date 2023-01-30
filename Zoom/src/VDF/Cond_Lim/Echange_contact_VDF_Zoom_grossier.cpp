@@ -60,7 +60,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
       int indice_pb=pbMG.indice_probleme(pbF.le_nom());
       le_pb2G=pbMG.pb_2G(indice_pb);
 
-      const Zone_dis_base& zone_disF = pbF.domaine_dis().zone_dis(0);
+      const Zone_dis_base& zone_disF = pbF.domaine_dis();
       const Zone_VDF& zvdfF = ref_cast(Zone_VDF, zone_disF);
       const DoubleVect& surfacesF = zvdfF.face_surfaces();
       const IntTab& face_voisinsF = zvdfF.face_voisins();

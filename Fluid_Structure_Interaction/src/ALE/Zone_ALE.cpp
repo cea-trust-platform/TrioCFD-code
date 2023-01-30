@@ -89,7 +89,7 @@ void Zone_ALE::mettre_a_jour (double temps, Zone_dis& le_domaine_dis, Probleme_b
         }
 
       //On recalcule les vitesses aux faces
-      Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
+      Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.valeur());
 
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
@@ -114,13 +114,13 @@ void Zone_ALE::mettre_a_jour (double temps, Zone_dis& le_domaine_dis, Probleme_b
                                  sommets_, face_sommets);
       if(sub_type(Zone_VDF, la_zone_VF))
         {
-          Zone_VDF& la_zone_VDF=ref_cast(Zone_VDF,le_domaine_dis.zone_dis(0).valeur());
+          Zone_VDF& la_zone_VDF=ref_cast(Zone_VDF,le_domaine_dis.valeur());
           la_zone_VF.volumes_entrelaces()=0;
           la_zone_VDF.calculer_volumes_entrelaces();
         }
       else if(sub_type(Zone_VEF, la_zone_VF))
         {
-          Zone_VEF& la_zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
+          Zone_VEF& la_zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.valeur());
           DoubleTab& normales=la_zone_VEF.face_normales();
           DoubleTab& facette_normales_=la_zone_VEF.facette_normales();
           IntVect& rang_elem_non_standard=la_zone_VEF.rang_elem_non_std();
@@ -304,7 +304,7 @@ void Zone_ALE::initialiser (double temps, Zone_dis& le_domaine_dis,Probleme_base
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
   //On initialise les vitesses aux faces
-  Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
+  Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.valeur());
   int nb_faces=la_zone_VF.nb_faces();
   int nb_faces_tot=la_zone_VF.nb_faces_tot();
   int nb_som_face=la_zone_VF.nb_som_face();
@@ -359,7 +359,7 @@ DoubleTab Zone_ALE::calculer_vitesse(double temps, Zone_dis& le_domaine_dis,Prob
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
       int rang=rang_frontiere(le_nom_bord_ALE);
-      const Frontiere_dis_base& la_fr_dis=le_domaine_dis.zone_dis(0).frontiere_dis(rang);
+      const Frontiere_dis_base& la_fr_dis=le_domaine_dis.frontiere_dis(rang);
       les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
       if (le_nom_ch_front_courant == "Champ_front_ALE")
@@ -508,7 +508,7 @@ DoubleTab& Zone_ALE::laplacien(Zone_dis& le_domaine_dis,Probleme_base& pb, const
   //int nbsom = nb_som();
   int nbsom = nb_som_tot();
   int nb_som_ele = nb_som_elem();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
+  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.valeur());
   const DoubleTab& normales=zone_VEF.face_normales();
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF, pb.equation(0).zone_Cl_dis().valeur());
   const IntTab& elem_som = les_elems();
@@ -1060,7 +1060,7 @@ double Zone_ALE::computeDtBeam(Zone_dis& le_domaine_dis)
 {
 
   double dt = 0.;
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
+  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.valeur());
   const DoubleVect& surfaces = zone_VEF.face_surfaces();
   double minSurf = mp_min_vect(surfaces);
   minSurf = Process::mp_min(minSurf);

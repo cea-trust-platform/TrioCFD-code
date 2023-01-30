@@ -115,7 +115,7 @@ void Paroi_frottante_loi::mettre_a_jour(double tps)
 void Paroi_frottante_loi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().probleme().domaine_dis().zone_dis(0).valeur());
+  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().probleme().domaine_dis().valeur());
 
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();

@@ -66,12 +66,12 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       int indice_pb=pbMG.indice_probleme(pbF.le_nom());
       le_pb2G=pbMG.pb_2G(indice_pb);
 
-      const Zone_dis_base& zone_disG = pbG.domaine_dis().zone_dis(0);
+      const Zone_dis_base& zone_disG = pbG.domaine_dis();
       const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_disG); // ce doit etre en principe une zone VDF !!!
       const IntTab& face_voisinsG = zvdf.face_voisins();
       const DoubleVect& surfacesVDF = zvdf.face_surfaces();
 
-      const Zone_dis_base& zone_disF = pbF.domaine_dis().zone_dis(0);
+      const Zone_dis_base& zone_disF = pbF.domaine_dis();
       const Zone_VEF& zvef = ref_cast(Zone_VEF, zone_disF); // ce doit etre en principe une zone VEF !!!
       const IntTab& face_voisinsF = zvef.face_voisins();
 

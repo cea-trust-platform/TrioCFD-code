@@ -60,7 +60,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       const Frontiere_dis_base& front=ch.frontiere_dis();
       const Probleme_base& pbG = ch.le_pb_exterieur();
-      const Zone_dis_base& zone_disG = pbG.domaine_dis().zone_dis(0);
+      const Zone_dis_base& zone_disG = pbG.domaine_dis();
       const Zone_VDF& zvdfG = ref_cast(Zone_VDF, zone_disG);
       const IntTab& face_voisinsG = zvdfG.face_voisins();
       ///////////////////////////

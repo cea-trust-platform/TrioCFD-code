@@ -76,7 +76,7 @@ void Switch_FT_double::initialise()
   build_extended_splitting(new_mesh_, splitting_ft, new_ijk_splitting_ft_extension);
   // Le probleme ft disc qui porte le maillage vdf pour les algorithmes front-tracking
   Probleme_base& refprobleme_ft_disc = creer_zone_vdf(splitting_ft, vdf_name);
-  const Zone_dis& zone_dis = refprobleme_ft_disc.domaine_dis().zone_dis(0);
+  const Zone_dis& zone_dis = refprobleme_ft_disc.domaine_dis();
   interfaces_.initialize(splitting_ft /* splitting_FT */,
       new_mesh_ /* splitting_Ns */,
       zone_dis, 

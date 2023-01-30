@@ -61,12 +61,12 @@ void Pb_2G::calculer_connectivites_2G()
   Probleme_base& pb_G = pbG();
 
   Zone_dis& domF = pbF.domaine_dis();
-  Zone_dis_base& zone_disF = domF.zone_dis(0);
+  Zone_dis_base& zone_disF = domF;
   Zone_VF& zone_VFF = ref_cast(Zone_VF, zone_disF);
 
   Zone& domaineG = pb_G.domaine();
   Zone_dis& domG = pb_G.domaine_dis();
-  Zone_dis_base& zone_disG = domG.zone_dis(0);
+  Zone_dis_base& zone_disG = domG;
   Zone_VF& zone_VFG = ref_cast(Zone_VF, zone_disG);
 
 
@@ -131,11 +131,11 @@ void Pb_2G::prolonger_2G(IntVect& connect, DoubleTab& valG, int nb_compo,
 
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis().zone_dis(0);
+  Zone_dis_base& zonef = pbF.domaine_dis();
   Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis().zone_dis(0);
+  Zone_dis_base& zoneg = pb_G.domaine_dis();
   Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
 
   //Cout << "Inco Grossiere = " << incoG.valeurs() << finl;
@@ -160,11 +160,11 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
 {
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis().zone_dis(0);
+  Zone_dis_base& zonef = pbF.domaine_dis();
   Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis().zone_dis(0);
+  Zone_dis_base& zoneg = pb_G.domaine_dis();
   Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
   //Tableau de connectivites necessaire a la restriction
   //   Connectivites& connections = connectivites();
@@ -187,11 +187,11 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
 {
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis().zone_dis(0);
+  Zone_dis_base& zonef = pbF.domaine_dis();
   Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis().zone_dis(0);
+  Zone_dis_base& zoneg = pb_G.domaine_dis();
   Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
 
   ma_restriction_(num_rest).restreindre(zone_VFG, zone_VFF,connect, val_incoG, val_incoF,nb_comp_incoG, num_prem_face_frontG);

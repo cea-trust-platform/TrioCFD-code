@@ -1418,7 +1418,7 @@ int IJK_FT_double::initialise()
 
 
   // On peut recuperer la zonevf:
-  const Zone_dis& zone_dis = refprobleme_ft_disc_.valeur().domaine_dis().zone_dis(0);
+  const Zone_dis& zone_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, zone_dis);

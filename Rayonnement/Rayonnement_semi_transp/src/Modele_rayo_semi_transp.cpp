@@ -270,7 +270,7 @@ void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     {
-      equation(i).associer_zone_dis(domaine_dis().zone_dis(0));
+      equation(i).associer_zone_dis(domaine_dis());
       equation(i).discretiser();
     }
 

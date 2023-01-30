@@ -58,7 +58,7 @@ Entree& Loi_paroi_Ramstorfer::readOn(Entree& is)
 void Loi_paroi_Ramstorfer::completer()
 {
   const DoubleTab& vit = pb_.valeur().get_champ("vitesse").valeurs() ;
-  Zone_Poly_base& zone = ref_cast(Zone_Poly_base, pb_.valeur().domaine_dis().zone_dis(0).valeur());
+  Zone_Poly_base& zone = ref_cast(Zone_Poly_base, pb_.valeur().domaine_dis().valeur());
   int nf_tot = zone.nb_faces_tot();
 
   valeurs_loi_paroi_["y_plus"] = DoubleTab(0,1); // pour l'instant, turbulence dans seulement une phase
@@ -115,7 +115,7 @@ void Loi_paroi_Ramstorfer::mettre_a_jour(double temps)
 
 void Loi_paroi_Ramstorfer::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
-  Zone_Poly_base& zone = ref_cast(Zone_Poly_base, pb_.valeur().domaine_dis().zone_dis(0).valeur());
+  Zone_Poly_base& zone = ref_cast(Zone_Poly_base, pb_.valeur().domaine_dis().valeur());
   DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"], &y = valeurs_loi_paroi_["y"], &u_p = valeurs_loi_paroi_["u_plus"], &d_u_p = valeurs_loi_paroi_["dyp_u_plus"];
   const DoubleTab& d_bulles = pb_->get_champ("diametre_bulles").valeurs(),
                    & alpha  = pb_->get_champ("alpha").valeurs();
