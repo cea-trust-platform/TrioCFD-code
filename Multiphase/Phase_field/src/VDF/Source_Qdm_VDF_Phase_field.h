@@ -20,18 +20,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Qdm_VDF_Phase_field_included
 #define Source_Qdm_VDF_Phase_field_included
-#include <Navier_Stokes_std.h>
 
+#include <Navier_Stokes_std.h>
 #include <Terme_Source_Qdm.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
+
 /*! @brief class Source_Qdm_VDF_Phase_field
- *
- *
- *
  *
  * @sa Source_base
  */

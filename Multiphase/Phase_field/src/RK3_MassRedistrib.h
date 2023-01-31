@@ -12,18 +12,29 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Source_Con_Phase_field_base.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
-// Version:     /main/9
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#include <Source_Con_Phase_field_base.h>
+#ifndef RK3_MassRedistrib_included
+#define RK3_MassRedistrib_included
 
-Implemente_base(Source_Con_Phase_field_base,"Source_Con_Phase_field_base",Source_base);
+#include <Schema_RK_Williamson.h>
+#include <Ref_Probleme_base.h>
+#include <TRUST_Vector.h>
+#include <Source_Con_Phase_field.h>
+#include <Probleme_base.h>
 
-Sortie& Source_Con_Phase_field_base::printOn(Sortie& os) const { return Source_base::printOn(os); }
+class Pb_MG;
+class Pb_2G;
 
-Entree& Source_Con_Phase_field_base::readOn(Entree& is) { return Source_base::readOn(is); }
+class RK3_MassRedistrib: public RK3
+{
+  Declare_instanciable(RK3_MassRedistrib);
+public:
+  int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
+
+private:
+  int trouver_tous_les_pbs(Pb_MG&, VECT(REF(Probleme_base))&);
+  void associer_pb_fins(int, Pb_MG&, VECT(REF(Probleme_base))&);
+  void nb_pb_fins(int&, Pb_MG&);
+};
+
+#endif /* RK3_MassRedistrib_included */

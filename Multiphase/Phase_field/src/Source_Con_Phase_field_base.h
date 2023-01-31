@@ -20,7 +20,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Con_Phase_field_base_included
 #define Source_Con_Phase_field_base_included
 

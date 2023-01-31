@@ -12,18 +12,20 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Source_Con_Phase_field_base.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
-// Version:     /main/9
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#include <Source_Con_Phase_field_base.h>
+#ifndef Schema_Euler_explicite_Phase_field_included
+#define Schema_Euler_explicite_Phase_field_included
 
-Implemente_base(Source_Con_Phase_field_base,"Source_Con_Phase_field_base",Source_base);
+#include <Schema_Euler_explicite.h>
+#include <Source_Con_Phase_field.h>
+#include <Source_Con_Phase_field.h>
+#include <Probleme_base.h>
 
-Sortie& Source_Con_Phase_field_base::printOn(Sortie& os) const { return Source_base::printOn(os); }
+class Schema_Euler_explicite_Phase_field: public Schema_Euler_explicite
+{
+  Declare_instanciable(Schema_Euler_explicite_Phase_field);
+public :
+  int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
+};
 
-Entree& Source_Con_Phase_field_base::readOn(Entree& is) { return Source_base::readOn(is); }
+#endif
