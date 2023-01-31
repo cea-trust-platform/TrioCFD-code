@@ -41,9 +41,9 @@ public:
   void completer() override;
 
 protected:
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
-  void associer_zones(const Zone_dis& , const Zone_Cl_dis&) override;
+  REF(Zone_VEF) le_dom_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
+  void associer_domaines(const Zone_dis& , const Zone_Cl_dis&) override;
 //  double dt_post;
   Noms noms_parois;
   DoubleVect T_parois;

@@ -45,7 +45,7 @@ public :
   Entree& lire(const Motcle&, Entree&);
   void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
   void mettre_a_jour(double) override;
-  //     void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  //     void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& );
 
   DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
   DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
@@ -65,8 +65,8 @@ protected:
   DoubleTab& calcul_derivees_premieres_croisees(DoubleTab& , const Zone_dis& , const Zone_Cl_dis& , const DoubleTab&  ) const;
   DoubleTab& calcul_derivees_secondes_croisees(DoubleTab& , const Zone_dis& , const Zone_Cl_dis& , const DoubleTab&  ) const;
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
 };
 
 #endif

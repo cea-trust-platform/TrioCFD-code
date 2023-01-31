@@ -1354,7 +1354,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser_assembleur_pression()
   //type += "_homogene";
   Cerr << "Navier_Stokes_std::discretiser_assembleur_pression : type="<< type << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
+  assembleur_pression_.associer_domaine_dis_base(zone_dis().valeur());
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::completer()
@@ -1412,7 +1412,7 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
 
       // Associate to the newly created zcl :
       // required because It's not a good plan to use ns.zone_Cl_dis().valeur() because of outlet_BC
-      assembleur_pression_.associer_zone_cl_dis_base(zcl_fictitious_.valeur());
+      assembleur_pression_.associer_domaine_cl_dis_base(zcl_fictitious_.valeur());
       assembleur_pression_.completer(ns); // Should it be associated to (*this) or ns?
       //                                        I think it does not matter because Assembleur_base::completer is called and does nothing
       // On assemble la matrice de pression une seule et unique fois (puisqu'elle ne depend pas de rho...).

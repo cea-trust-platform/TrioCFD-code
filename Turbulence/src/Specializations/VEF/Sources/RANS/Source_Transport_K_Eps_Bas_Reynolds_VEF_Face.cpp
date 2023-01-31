@@ -43,8 +43,8 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter resu 0", resu);
   const Zone_Cl_dis& zcl_keps = eqn_keps_bas_re->zone_Cl_dis();
   const Zone_dis& zone_dis_keps = eqn_keps_bas_re->zone_dis();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();

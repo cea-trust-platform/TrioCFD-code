@@ -100,11 +100,11 @@ int Turbulence_hyd_sous_maille_VDF::lire_motcle_non_standard(const Motcle& mot, 
 
 Champ_Fonc& Turbulence_hyd_sous_maille_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   int nb_poly = zone_VDF.zone().nb_elem();
-  int nb_poly_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_poly_tot = le_dom_VDF->zone().nb_elem_tot();
 
   F2.resize(nb_poly_tot);
 
@@ -133,7 +133,7 @@ void Turbulence_hyd_sous_maille_VDF::calculer_energie_cinetique_turb()
 {
   double temps = mon_equation->inconnue().temps();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
-  int nb_poly = la_zone_VDF->zone().nb_elem();
+  int nb_poly = le_dom_VDF->zone().nb_elem();
 
   if (k.size() != nb_poly)
     {
@@ -151,7 +151,7 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
 {
 
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_poly = zone_VDF.zone().nb_elem();
   int nb_poly_tot = zone_VDF.zone().nb_elem_tot();
   const IntTab& face_voisins = zone_VDF.face_voisins();
@@ -273,7 +273,7 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       //*******************************
       //Prise en compte des CL
       //*******************************
-      const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+      const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
       //      const int nb_cond_lim = zone_Cl_VDF.nb_cond_lim();
       //      int indic_perio =0;
 
@@ -469,7 +469,7 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
 
           // pour chaque Condition Limite on regarde son type
 
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_entree_fluide,la_cl.valeur()) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());

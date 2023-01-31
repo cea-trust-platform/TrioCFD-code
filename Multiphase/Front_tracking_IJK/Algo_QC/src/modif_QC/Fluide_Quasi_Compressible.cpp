@@ -250,7 +250,7 @@ void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
   typ += loi_etat_->type_fluide();
   //typ+="Gaz_Parfait";
   EDO_Pth_.typer(typ);
-  EDO_Pth_->associer_zones(pb.equation(0).zone_dis(),pb.equation(0).zone_Cl_dis());
+  EDO_Pth_->associer_domaines(pb.equation(0).zone_dis(),pb.equation(0).zone_Cl_dis());
   EDO_Pth_->associer_fluide(*this);
 
   EDO_Pth_->mettre_a_jour_CL(Pth_);

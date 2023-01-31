@@ -701,10 +701,10 @@ void Navier_Stokes_FT_Disc::discretiser()
   Navier_Stokes_Turbulent::discretiser();
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
-  const Zone_dis_base& ma_zone_dis = zone_dis().valeur();
+  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
   LIST(REF(Champ_base)) & champs_compris = variables_internes().liste_champs_compris;
 
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "diffusivite", "m^2/s",
                         1 /* composantes */, temps,
                         champ_nu_);
@@ -712,14 +712,14 @@ void Navier_Stokes_FT_Disc::discretiser()
   //Nouvelle formulation
   champs_compris_.ajoute_champ(champ_nu_);
 
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "viscosite_dynamique", "kg/m.s",
                         1 /* composantes */, temps,
                         champ_mu_);
   champs_compris.add(champ_mu_.valeur());
   champs_compris_.ajoute_champ(champ_mu_);
 
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "masse_volumique", "kg/m3",
                         1 /* composantes */, temps,
                         champ_rho_elem_);
@@ -727,7 +727,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(champ_rho_elem_);
 
   // La masse volumique discretisee sur les volumes de controle de la vitesse
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "masse_volumique_vnodes", "kg/m3",
                         1 /* composantes */, temps,
                         champ_rho_faces_);
@@ -735,49 +735,49 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(champ_rho_faces_);
 
   // Variables internes
-  dis.discretiser_champ("pression", ma_zone_dis,
+  dis.discretiser_champ("pression", mon_dom_dis,
                         "second_membre_projection", "",
                         1 /* composantes */, temps,
                         variables_internes().second_membre_projection);
   champs_compris.add(variables_internes().second_membre_projection.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection);
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "second_membre_projection_jump", "",
                         1 /* composantes */, temps,
                         variables_internes().second_membre_projection_jump_);
   champs_compris.add(variables_internes().second_membre_projection_jump_.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection_jump_);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "gradient_pression", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().gradient_pression);
   champs_compris.add(variables_internes().gradient_pression.valeur());
   champs_compris_.ajoute_champ(variables_internes().gradient_pression);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "derivee_u_etoile", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().derivee_u_etoile);
   champs_compris.add(variables_internes().derivee_u_etoile.valeur());
   champs_compris_.ajoute_champ(variables_internes().derivee_u_etoile);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "terme_diffusion_vitesse", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().terme_diffusion);
   champs_compris.add(variables_internes().terme_diffusion.valeur());
   champs_compris_.ajoute_champ(variables_internes().terme_diffusion);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "terme_convection_vitesse", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().terme_convection);
   champs_compris.add(variables_internes().terme_convection.valeur());
   champs_compris_.ajoute_champ(variables_internes().terme_convection);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "terme_source_vitesse", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().terme_source);
   champs_compris.add(variables_internes().terme_source.valeur());
   champs_compris_.ajoute_champ(variables_internes().terme_source);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "terme_source_interfaces", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().terme_source_interfaces);
@@ -785,7 +785,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(variables_internes().terme_source_interfaces);
   if (dis.que_suis_je() == "VEFPreP1B")
     {
-      dis.discretiser_champ("pression", ma_zone_dis,
+      dis.discretiser_champ("pression", mon_dom_dis,
                             "indicatrice_p1b", "",
                             1 /* composantes */, temps,
                             variables_internes().indicatrice_p1b);
@@ -793,25 +793,25 @@ void Navier_Stokes_FT_Disc::discretiser()
       champs_compris_.ajoute_champ(variables_internes().indicatrice_p1b);
     }
 
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "gradient_indicatrice", "",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().gradient_indicatrice);
   champs_compris.add(variables_internes().gradient_indicatrice.valeur());
   champs_compris_.ajoute_champ(variables_internes().gradient_indicatrice);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "potentiel_faces", "",
                         1 /* composante */, temps,
                         variables_internes().potentiel_faces);
   champs_compris.add(variables_internes().potentiel_faces.valeur());
   champs_compris_.ajoute_champ(variables_internes().potentiel_faces);
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "potentiel_elements", "",
                         1 /* composante */, temps,
                         variables_internes().potentiel_elements);
   champs_compris.add(variables_internes().potentiel_elements.valeur());
   champs_compris_.ajoute_champ(variables_internes().potentiel_elements);
-  dis.discretiser_champ("vitesse", ma_zone_dis,
+  dis.discretiser_champ("vitesse", mon_dom_dis,
                         "vitesse_delta_interface", "m/s",
                         -1 /* nb composantes par defaut */, 1, temps,
                         variables_internes().delta_u_interface);
@@ -819,26 +819,26 @@ void Navier_Stokes_FT_Disc::discretiser()
   variables_internes().delta_u_interface.associer_eqn(*this);
   champs_compris.add(variables_internes().delta_u_interface.valeur());
   champs_compris_.ajoute_champ(variables_internes().delta_u_interface);
-  dis.discretiser_champ("pression", ma_zone_dis,
+  dis.discretiser_champ("pression", mon_dom_dis,
                         "pression_laplacien_d", "",
                         1 /* composante */, temps,
                         variables_internes().laplacien_d);
   champs_compris.add(variables_internes().laplacien_d.valeur());
   champs_compris_.ajoute_champ(variables_internes().laplacien_d);
-  dis.discretiser_champ("temperature", ma_zone_dis,
+  dis.discretiser_champ("temperature", mon_dom_dis,
                         "temperature_mpoint", "",
                         1 /* composante */, temps,
                         variables_internes().mpoint);
   champs_compris.add(variables_internes().mpoint.valeur());
   champs_compris_.ajoute_champ(variables_internes().mpoint);
-  dis.discretiser_champ("temperature", ma_zone_dis,
+  dis.discretiser_champ("temperature", mon_dom_dis,
                         "temperature_mpointv", "",
                         1 /* composante */, temps,
                         variables_internes().mpoint_vap);
   champs_compris.add(variables_internes().mpoint_vap.valeur());
   champs_compris_.ajoute_champ(variables_internes().mpoint_vap);
   // Pour variation temporelle dI_dt
-  dis.discretiser_champ("pression", ma_zone_dis,
+  dis.discretiser_champ("pression", mon_dom_dis,
                         "derivee_temporelle_indicatrice", "",
                         1 /* composante */, temps,
                         variables_internes().derivee_temporelle_indicatrice);
@@ -846,7 +846,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(variables_internes().derivee_temporelle_indicatrice);
 
   // Eulerian Interfacial area :
-  dis.discretiser_champ("champ_elem", ma_zone_dis,
+  dis.discretiser_champ("champ_elem", mon_dom_dis,
                         "interfacial_area", "m2",
                         1 /* composante */, temps,
                         variables_internes().ai);
@@ -855,7 +855,7 @@ void Navier_Stokes_FT_Disc::discretiser()
 
   // Velocity jump "u0" computed for phase 0 :
   Nom nom = Nom("vitesse_jump0_") + le_nom();
-  dis.discretiser_champ("vitesse", ma_zone_dis, nom, "m/s", -1 /* nb composantes par defaut */,1,  temps,
+  dis.discretiser_champ("vitesse", mon_dom_dis, nom, "m/s", -1 /* nb composantes par defaut */,1,  temps,
                         variables_internes().vitesse_jump0_);
   variables_internes().vitesse_jump0_.associer_eqn(*this);
   champs_compris.add(variables_internes().vitesse_jump0_.valeur());
@@ -883,7 +883,7 @@ void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
     }
 
   Assembleur_base& assembleur = assembleur_pression_.valeur();
-  assembleur.associer_zone_dis_base(zone_dis().valeur());
+  assembleur.associer_domaine_dis_base(zone_dis().valeur());
   // B. Mathieu, 07_2004 : premier jet de la methode, on resout en pression.
   // Version actuelle : pas d'increment de pression
   assembleur.set_resoudre_increment_pression(0);
@@ -1315,8 +1315,8 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         //  non zero on the faces of these elements.
         int element;
         const int nb_elements = poids.dimension(0);
-        const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
-        const Zone_VF& zonevf = ref_cast(Zone_VF, la_zone_dis.valeur().valeur());
+        const IntTab& face_voisins = le_dom_dis.valeur().valeur().face_voisins();
+        const Zone_VF& zonevf = ref_cast(Zone_VF, le_dom_dis.valeur().valeur());
         const IntTab& elem_faces = zonevf.elem_faces();
         const int nb_faces_par_element = elem_faces.line_size();
         DoubleVect copie_valeurs_potentiel_elements(valeurs_potentiel_elements);
@@ -1368,7 +1368,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
     valeurs_potentiel_faces = 0.;
     const DoubleTab& valeurs_potentiel_elements = potentiel_elements.valeurs();
     const int nb_faces_pot = valeurs_potentiel_faces.dimension(0);
-    const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
+    const IntTab& face_voisins = le_dom_dis.valeur().valeur().face_voisins();
     for (face = 0; face < nb_faces_pot; face++)
       {
         double p = 0.; // Somme des poids des deux elements voisins
@@ -1443,7 +1443,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
       //      assert_espace_virtuel_vect(inco);
       const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
       const IntVect& orientation = zvdf.orientation();
-      //const Zone_VDF& zvdf = la_zone_vdf.valeur();
+      //const Zone_VDF& zvdf = le_dom_vdf.valeur();
       //      const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
       //      const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
       const Zone_Cl_dis_base& zcldis = zone_Cl_dis().valeur();
@@ -2644,7 +2644,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       //  (traitement special des CL de Dirichlet)
       if (nbdim1)
         {
-          const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
+          const IntTab& face_voisins = le_dom_dis.valeur().valeur().face_voisins();
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
             gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
@@ -3404,21 +3404,21 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           DoubleTab& pressu = la_pression.valeurs();
           assert(nb_elem == champ_rho_elem_.valeur().valeurs().dimension(0));
           const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-          const Zone& ma_zone = zone_dis().zone ();
+          const Zone& mon_dom = zone_dis().zone ();
           const IntTab& elem_faces = zone_vf.elem_faces();
           const int   nb_faces_elem = elem_faces.line_size();
-          const int   nb_sommet = ma_zone.nb_som_elem();
+          const int   nb_sommet = mon_dom.nb_som_elem();
           int numero_global_som, ligne_mat;
           int point_fluide_dirichlet=-1;
           if (variables_internes().is_pfl_flottant)
             {
               if( Objet_U::dimension == 3 )
                 {
-                  point_fluide_dirichlet = ma_zone.chercher_elements( variables_internes().x_pfl_imp , variables_internes().y_pfl_imp , variables_internes().z_pfl_imp );
+                  point_fluide_dirichlet = mon_dom.chercher_elements( variables_internes().x_pfl_imp , variables_internes().y_pfl_imp , variables_internes().z_pfl_imp );
                 }
               else
                 {
-                  point_fluide_dirichlet = ma_zone.chercher_elements( variables_internes().x_pfl_imp , variables_internes().y_pfl_imp );
+                  point_fluide_dirichlet = mon_dom.chercher_elements( variables_internes().x_pfl_imp , variables_internes().y_pfl_imp );
                 }
               if (mp_max(point_fluide_dirichlet)==-1)
                 {
@@ -3458,7 +3458,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                     {
                       for (int somloc = 0; somloc < nb_sommet; somloc ++)
                         {
-                          numero_global_som = ma_zone.sommet_elem(e,somloc);
+                          numero_global_som = mon_dom.sommet_elem(e,somloc);
                           ligne_mat = nb_elem+numero_global_som;
                           //                         matrice_valeurs(ligne_mat,ligne_mat) += 1.0 / variables_internes().eta;
                           pressu(ligne_mat) = 0.0 ;

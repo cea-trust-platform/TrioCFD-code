@@ -62,13 +62,13 @@ Entree& Turbulence_hyd_sous_maille_axi_VDF::readOn(Entree& s )
 
 Champ_Fonc& Turbulence_hyd_sous_maille_axi_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   static const double Csm1 = CSM1;
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   int nb_poly = zone_VDF.zone().nb_elem();
-  int nb_poly_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_poly_tot = le_dom_VDF->zone().nb_elem_tot();
   int numfa[6];
   double delta_C_axi ;
   double h_x,h_y,h_z;
@@ -110,7 +110,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_axi_VDF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
 {
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_poly = zone_VDF.zone().nb_elem();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -223,18 +223,18 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
       // par modification du tableau Qdm ( dans Zone_VDF.cpp )
 
 
-      const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+      const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
       const int nb_cond_lim = zone_Cl_VDF.nb_cond_lim();
 
       for(int i=0; i<nb_cond_lim; i++)
         {
-          const Cond_lim_base& cl = la_zone_Cl_VDF->les_conditions_limites(i).valeur();
+          const Cond_lim_base& cl = le_dom_Cl_VDF->les_conditions_limites(i).valeur();
 
           // Cerr << "les_conditions_limites(i).valeur() : " << cl << finl;
 
           if (sub_type(Periodique, cl))
             {
-              //            const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+              //            const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
 
               int ndeb = zone_VDF.premiere_arete_bord();
               int nfin = ndeb + zone_VDF.nb_aretes_bord();
@@ -317,7 +317,7 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
 
           // pour chaque Condition Limite on regarde son type
 
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_entree_fluide,la_cl.valeur()) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());

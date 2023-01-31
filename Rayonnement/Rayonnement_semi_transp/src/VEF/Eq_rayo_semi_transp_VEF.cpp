@@ -394,7 +394,7 @@ void Eq_rayo_semi_transp_VEF::completer()
   for (ii =0; ii<n; ii++)
     {
       const Frontiere_dis_base& la_fr_dis = une_zone_dis.frontiere_dis(ii);
-      la_zone_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
+      le_dom_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
     }
 
   Equation_rayonnement_base::completer();

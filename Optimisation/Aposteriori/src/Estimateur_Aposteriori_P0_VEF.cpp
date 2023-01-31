@@ -27,9 +27,9 @@ Sortie& Estimateur_Aposteriori_P0_VEF::printOn( Sortie& s ) const { return s << 
 
 Entree& Estimateur_Aposteriori_P0_VEF::readOn( Entree& s ) { return s; }
 
-void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Zone_Cl_dis_base& la_zone_Cl_dis_base)
+void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Zone_Cl_dis_base& le_dom_Cl_dis_base)
 {
-  la_zone_Cl_VEF  = ref_cast(Zone_Cl_VEF, la_zone_Cl_dis_base);
+  le_dom_Cl_VEF  = ref_cast(Zone_Cl_VEF, le_dom_Cl_dis_base);
   vitesse_= la_vitesse;
   pression_p1isop1b_ = la_pression;
   viscosite_cinematique_ = la_viscosite_cinematique;
@@ -37,9 +37,9 @@ void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse,
 
 void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
 {
-  const Zone_Cl_VEF& zone_cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_Cl_VEF& zone_cl_VEF = le_dom_Cl_VEF.valeur();
   const Zone_VEF& zone_VEF = zone_cl_VEF.zone_VEF();
-  const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b, la_zone_VF.valeur());
+  const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b, le_dom_VF.valeur());
   const Zone& zone = zone_VEF_p.zone();
 
   const DoubleTab& face_normales = zone_VEF.face_normales();
@@ -140,7 +140,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   vite_moye /= (dim+1.0);
 
   // Calcul du gradient des vitesses; sert à calculer "grad u" dans "u . grad u"
-  Champ_P1NC::calcul_gradient(la_vitesse, gradient_elem, la_zone_Cl_VEF.valeur());
+  Champ_P1NC::calcul_gradient(la_vitesse, gradient_elem, le_dom_Cl_VEF.valeur());
 
 
   // Calcul de "u . grad u"
@@ -168,7 +168,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem1>=0)
             {
               signe=1.;
-              som_opp = la_zone_VF->get_num_fac_loc(fac, 0);
+              som_opp = le_dom_VF->get_num_fac_loc(fac, 0);
               som_opp = som_elem(elem1, som_opp);
               for (j=0; j<dim; j++)
                 {
@@ -179,7 +179,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem2>=0)
             {
               signe=-1.;
-              som_opp = la_zone_VF->get_num_fac_loc(fac, 1);
+              som_opp = le_dom_VF->get_num_fac_loc(fac, 1);
               som_opp = som_elem(elem2, som_opp);
               for (j=0; j<dim; j++)
                 {

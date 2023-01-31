@@ -45,15 +45,15 @@ void Y_plus_Champ_Face::me_calculer(double tps)
       const Nom& nom_loipar = loipar.que_suis_je();
 
       if (nom_loipar == "loi_standard_hydr_diphasique_VDF")
-        mon_champ_->calcul_y_plus_diphasique(valeurs(), la_zone_Cl_VDF.valeur());
+        mon_champ_->calcul_y_plus_diphasique(valeurs(), le_dom_Cl_VDF.valeur());
     }
   else
-    mon_champ_->calcul_y_plus(valeurs(), la_zone_Cl_VDF.valeur());
+    mon_champ_->calcul_y_plus(valeurs(), le_dom_Cl_VDF.valeur());
 }
 
 const Zone_Cl_dis_base& Y_plus_Champ_Face::zone_Cl_dis_base() const
 {
-  return la_zone_Cl_VDF.valeur();
+  return le_dom_Cl_VDF.valeur();
 }
 
 void Y_plus_Champ_Face::mettre_a_jour(double tps)

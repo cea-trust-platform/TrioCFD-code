@@ -196,16 +196,16 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
 {
   Cerr << "debut init_lois_paroi" << finl;
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  //  eq_k_U_W.dimensionner(la_zone_VDF->nb_faces_bord());
+  //  eq_k_U_W.dimensionner(le_dom_VDF->nb_faces_bord());
   int compteur_faces_paroi = 0;
-  DoubleVect corresp(la_zone_VDF->nb_faces_bord());
+  DoubleVect corresp(le_dom_VDF->nb_faces_bord());
 
   // B.M. Nouveau codage a tester: je n'ai pas trouve ou est fait le resize()
   // initial du tableau a nb_faces_bord. Je ne sais pas si le tableau contient
@@ -228,7 +228,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
 
   for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -251,7 +251,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
 
 
 
-  compteur_faces_paroi = la_zone_VDF->nb_faces_bord();
+  compteur_faces_paroi = le_dom_VDF->nb_faces_bord();
   //  Cerr << "compteur_faces_paroi pour dimensionnement = " << compteur_faces_paroi << finl;
   eq_k_U_W.dimensionner(compteur_faces_paroi); //Dimensionnement du vecteur eq_couch_lim
   corresp.resize(compteur_faces_paroi); //Redimensionnement de corresp
@@ -268,7 +268,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
       for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
         {
 
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -313,7 +313,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -499,7 +499,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
       Cerr << "ParoiVDF_TBLE_LRM::calculer_hyd n'est pas parallelise." << finl;
       exit();
     }
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -590,7 +590,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   //SFichier fic_v("v.dat",ios::app); // impression de la vitesse normale pour test
 
   int compteur_faces_paroi = 0;
-  DoubleVect corresp(la_zone_VDF->nb_faces_bord());
+  DoubleVect corresp(le_dom_VDF->nb_faces_bord());
 
 
   // Boucle sur les bords
@@ -598,7 +598,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
   for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -630,7 +630,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
       // aux voisinages des parois
 
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -648,7 +648,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
           if(dimension == 2)
             {
-              //eq_k_U_W.dimensionner(2*la_zone_VDF->nb_faces_bord());
+              //eq_k_U_W.dimensionner(2*le_dom_VDF->nb_faces_bord());
 
               //Boucle sur les faces des bords parietaux
 
@@ -993,7 +993,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
           else if(dimension == 3)
             {
-              //eq_k_U_W.dimensionner(2*la_zone_VDF->nb_faces_bord());
+              //eq_k_U_W.dimensionner(2*le_dom_VDF->nb_faces_bord());
 
               //Boucle sur les faces des bords parietaux
 
@@ -1421,7 +1421,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
       Cerr << "ParoiVDF_TBLE_LRM::calculer_hyd n'est pas parallelise." << finl;
       exit();
     }
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -1512,7 +1512,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   //SFichier fic_v("v.dat",ios::app); // impression de la vitesse normale pour test
 
   int compteur_faces_paroi = 0;
-  DoubleVect corresp(la_zone_VDF->nb_faces_bord());
+  DoubleVect corresp(le_dom_VDF->nb_faces_bord());
 
 
   // Boucle sur les bords
@@ -1520,7 +1520,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
 
   for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -1552,7 +1552,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
       // aux voisinages des parois
 
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -1570,7 +1570,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
 
           if(dimension == 2)
             {
-              //eq_k_U_W.dimensionner(2*la_zone_VDF->nb_faces_bord());
+              //eq_k_U_W.dimensionner(2*le_dom_VDF->nb_faces_bord());
 
               //Boucle sur les faces des bords parietaux
 
@@ -1923,7 +1923,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
 
           else if(dimension == 3)
             {
-              //eq_k_U_W.dimensionner(2*la_zone_VDF->nb_faces_bord());
+              //eq_k_U_W.dimensionner(2*le_dom_VDF->nb_faces_bord());
 
               //Boucle sur les faces des bords parietaux
 
@@ -2347,11 +2347,11 @@ void ParoiVDF_TBLE_LRM::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
 
 
-  //  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  //  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   //  int ndeb,nfin;
   //double upmoy,dpmoy,utaumoy;
   //upmoy=0.;dpmoy=0.;utaumoy=0.;

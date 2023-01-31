@@ -80,8 +80,8 @@ Entree& Modele_Lam_Bremhorst_VEF::lire(const Motcle& , Entree& is)
 void  Modele_Lam_Bremhorst_VEF::associer(const Zone_dis& zone_dis,
                                          const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
 }
 
 DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
@@ -99,8 +99,8 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
 
 /* DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
@@ -114,19 +114,19 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& z
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
-  la_zone.creer_tableau_faces(wall_length_face);
+  le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
-  la_zone.creer_tableau_faces(Pderive);
+  le_dom.creer_tableau_faces(Pderive);
   DoubleTab Fmu_loc(0);
-  la_zone.creer_tableau_faces(Fmu_loc);
-  int nb_faces = la_zone.nb_faces();
+  le_dom.creer_tableau_faces(Fmu_loc);
+  int nb_faces = le_dom.nb_faces();
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
   double Rey,Re;
   /*
@@ -169,30 +169,30 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& z
             }
         }
     }
-  int n0 = la_zone.premiere_face_int();
+  int n0 = le_dom.premiere_face_int();
   for (num_face=n0; num_face<nb_faces; num_face++)
     {
-      int elem0 = la_zone.face_voisins(num_face,0);
-      int elem1 = la_zone.face_voisins(num_face,1);
+      int elem0 = le_dom.face_voisins(num_face,0);
+      int elem1 = le_dom.face_voisins(num_face,1);
       wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
     }
   // Calcul de la distance a la paroi aux faces
-  /*    for (num_face=0; num_face< la_zone.premiere_face_int(); num_face++)
+  /*    for (num_face=0; num_face< le_dom.premiere_face_int(); num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
     	  if (elem0 != -1)
     		  wall_length_face(num_face) = wall_length(elem0);
     	  else
     	  {
-    		  elem0 = la_zone.face_voisins(num_face,1);
+    		  elem0 = le_dom.face_voisins(num_face,1);
     		  wall_length_face(num_face) = wall_length(elem0);
     	  }
       }
 
       for (; num_face<nb_faces; num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
-    	  int elem1 = la_zone.face_voisins(num_face,1);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
+    	  int elem1 = le_dom.face_voisins(num_face,1);
     	  wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
       }
   */
@@ -235,8 +235,8 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
 
@@ -244,12 +244,12 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
     {
       if (!is_visco_const)
         {
-          int elem0 = la_zone.face_voisins(num_face,0);
-          int elem1 = la_zone.face_voisins(num_face,1);
+          int elem0 = le_dom.face_voisins(num_face,0);
+          int elem1 = le_dom.face_voisins(num_face,1);
           if (elem1!=-1)
             {
-              visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-              visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+              visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+              visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
             }
           else
             visco =  tab_visco(elem0);
@@ -275,17 +275,17 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
-  la_zone.creer_tableau_faces(wall_length_face);
+  le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
-  la_zone.creer_tableau_faces(Pderive);
-  int nb_faces = la_zone.nb_faces();
+  le_dom.creer_tableau_faces(Pderive);
+  int nb_faces = le_dom.nb_faces();
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
   double Rey,Re;
   /*
@@ -328,30 +328,30 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
             }
         }
     }
-  int n0 = la_zone.premiere_face_int();
+  int n0 = le_dom.premiere_face_int();
   for (num_face=n0; num_face<nb_faces; num_face++)
     {
-      int elem0 = la_zone.face_voisins(num_face,0);
-      int elem1 = la_zone.face_voisins(num_face,1);
+      int elem0 = le_dom.face_voisins(num_face,0);
+      int elem1 = le_dom.face_voisins(num_face,1);
       wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
     }
   // Calcul de la distance a la paroi aux faces
-  /*    for (num_face=0; num_face< la_zone.premiere_face_int(); num_face++)
+  /*    for (num_face=0; num_face< le_dom.premiere_face_int(); num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
     	  if (elem0 != -1)
     		  wall_length_face(num_face) = wall_length(elem0);
     	  else
     	  {
-    		  elem0 = la_zone.face_voisins(num_face,1);
+    		  elem0 = le_dom.face_voisins(num_face,1);
     		  wall_length_face(num_face) = wall_length(elem0);
     	  }
       }
 
       for (; num_face<nb_faces; num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
-    	  int elem1 = la_zone.face_voisins(num_face,1);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
+    	  int elem1 = le_dom.face_voisins(num_face,1);
     	  wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
       }
   */
@@ -754,7 +754,7 @@ void Modele_Lam_Bremhorst_VEF::lire_distance_paroi( )
 
   // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   DoubleTab& wall_length = BR_wall_length_.valeurs();
   wall_length=-1.;
 //  return;
@@ -1011,17 +1011,17 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
-  la_zone.creer_tableau_faces(wall_length_face);
+  le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
-  la_zone.creer_tableau_faces(Pderive);
-  int nb_faces = la_zone.nb_faces();
+  le_dom.creer_tableau_faces(Pderive);
+  int nb_faces = le_dom.nb_faces();
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
   double Rey,Re;
   /*
@@ -1064,30 +1064,30 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_
             }
         }
     }
-  int n0 = la_zone.premiere_face_int();
+  int n0 = le_dom.premiere_face_int();
   for (num_face=n0; num_face<nb_faces; num_face++)
     {
-      int elem0 = la_zone.face_voisins(num_face,0);
-      int elem1 = la_zone.face_voisins(num_face,1);
+      int elem0 = le_dom.face_voisins(num_face,0);
+      int elem1 = le_dom.face_voisins(num_face,1);
       wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
     }
   // Calcul de la distance a la paroi aux faces
-  /*    for (num_face=0; num_face< la_zone.premiere_face_int(); num_face++)
+  /*    for (num_face=0; num_face< le_dom.premiere_face_int(); num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
     	  if (elem0 != -1)
     		  wall_length_face(num_face) = wall_length(elem0);
     	  else
     	  {
-    		  elem0 = la_zone.face_voisins(num_face,1);
+    		  elem0 = le_dom.face_voisins(num_face,1);
     		  wall_length_face(num_face) = wall_length(elem0);
     	  }
       }
 
       for (; num_face<nb_faces; num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
-    	  int elem1 = la_zone.face_voisins(num_face,1);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
+    	  int elem1 = le_dom.face_voisins(num_face,1);
     	  wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
       }
   */
@@ -1126,8 +1126,8 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
 
@@ -1135,12 +1135,12 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
     {
       if (!is_visco_const)
         {
-          int elem0 = la_zone.face_voisins(num_face,0);
-          int elem1 = la_zone.face_voisins(num_face,1);
+          int elem0 = le_dom.face_voisins(num_face,0);
+          int elem1 = le_dom.face_voisins(num_face,1);
           if (elem1!=-1)
             {
-              visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-              visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+              visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+              visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
             }
           else
             visco =  tab_visco(elem0);
@@ -1167,19 +1167,19 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_di
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
-  la_zone.creer_tableau_faces(wall_length_face);
+  le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
-  la_zone.creer_tableau_faces(Pderive);
+  le_dom.creer_tableau_faces(Pderive);
   DoubleTab Fmu_loc(0);
-  la_zone.creer_tableau_faces(Fmu_loc);
-  int nb_faces = la_zone.nb_faces();
+  le_dom.creer_tableau_faces(Fmu_loc);
+  int nb_faces = le_dom.nb_faces();
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
   double Rey,Re;
   /*
@@ -1222,30 +1222,30 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_di
             }
         }
     }
-  int n0 = la_zone.premiere_face_int();
+  int n0 = le_dom.premiere_face_int();
   for (num_face=n0; num_face<nb_faces; num_face++)
     {
-      int elem0 = la_zone.face_voisins(num_face,0);
-      int elem1 = la_zone.face_voisins(num_face,1);
+      int elem0 = le_dom.face_voisins(num_face,0);
+      int elem1 = le_dom.face_voisins(num_face,1);
       wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
     }
   // Calcul de la distance a la paroi aux faces
-  /*    for (num_face=0; num_face< la_zone.premiere_face_int(); num_face++)
+  /*    for (num_face=0; num_face< le_dom.premiere_face_int(); num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
     	  if (elem0 != -1)
     		  wall_length_face(num_face) = wall_length(elem0);
     	  else
     	  {
-    		  elem0 = la_zone.face_voisins(num_face,1);
+    		  elem0 = le_dom.face_voisins(num_face,1);
     		  wall_length_face(num_face) = wall_length(elem0);
     	  }
       }
 
       for (; num_face<nb_faces; num_face++)
       {
-    	  int elem0 = la_zone.face_voisins(num_face,0);
-    	  int elem1 = la_zone.face_voisins(num_face,1);
+    	  int elem0 = le_dom.face_voisins(num_face,0);
+    	  int elem1 = le_dom.face_voisins(num_face,1);
     	  wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
       }
   */

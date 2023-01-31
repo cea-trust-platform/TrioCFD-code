@@ -30,7 +30,7 @@ public :
   void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don&, const Zone_Cl_dis_base&);
 
 private:
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
   REF(Champ_P1NC) vitesse_;
   REF(Champ_P1_isoP1Bulle) pression_p1isop1b_;
   REF(Champ_Don) viscosite_cinematique_;

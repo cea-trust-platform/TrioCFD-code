@@ -89,7 +89,7 @@ int Paroi_std_scal_hyd_VDF::init_lois_paroi()
 
 int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
@@ -179,7 +179,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       // Si l'on est a une paroi a flux impose, le flux est connu et il est
       // directement pris a la condition aux limites pour le calcul des flux diffusifs.
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
         {
@@ -253,7 +253,7 @@ int Paroi_std_scal_hyd_VDF::init_lois_paroi_scalaire()
   /*
   // Initialisations de tab_d_equiv
   // On initialise les distances equivalentes avec les distances geometriques
-  const Zone_VDF& zvdf = la_zone_VDF.valeur();
+  const Zone_VDF& zvdf = le_dom_VDF.valeur();
 
   if (axi)
   for (int num_face=0; num_face<zvdf.nb_faces_bord(); num_face++)

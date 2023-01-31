@@ -335,7 +335,7 @@ void Navier_Stokes_phase_field::discretiser()
   type = "Assembleur_P_VDF_Phase_Field";
   Cerr << "** Pressure assembling tool : " << type << " **" << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
+  assembleur_pression_.associer_domaine_dis_base(zone_dis().valeur());
   assembleur_pression_.valeur().set_resoudre_increment_pression(1);
   // la discretisation du champ associe
   // - a la masse volumique est "retardee" a la methode creer_champ/completer
@@ -1128,7 +1128,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //Assembleur_P_VDF_FT& assembleur_pression=ref_cast(Assembleur_P_VDF_FT, assembleur_pression_.valeur());
       //assembleur_pression.modifier_matrice_pression(matrice_pression_);
 
-      const Zone_VF& zone_VF = ref_cast(Zone_VF,la_zone_dis.valeur().valeur());
+      const Zone_VF& zone_VF = ref_cast(Zone_VF,le_dom_dis.valeur().valeur());
       const DoubleVect& volumes = zone_VF.volumes();
       int el0,el1;
       double vol0,vol1;

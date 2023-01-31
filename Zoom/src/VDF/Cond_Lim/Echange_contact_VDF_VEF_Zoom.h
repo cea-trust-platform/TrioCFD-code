@@ -56,9 +56,9 @@ public :
 };
 
 // Fonctions hors classes
-double pdt_scal(const Zone_VEF& la_zone,int num_face,int num2,int num_elem,int dimension,double diffu);
-double pdt_scalSqrt(const Zone_VEF& la_zone,int num_face,int num2,int num_elem,int dimension,double diffu);
-double surfacesVEF(const Zone_VEF& la_zone,int num_face,int dimension);
+double pdt_scal(const Zone_VEF& le_dom,int num_face,int num2,int num_elem,int dimension,double diffu);
+double pdt_scalSqrt(const Zone_VEF& le_dom,int num_face,int num2,int num_elem,int dimension,double diffu);
+double surfacesVEF(const Zone_VEF& le_dom,int num_face,int dimension);
 
 
 #endif

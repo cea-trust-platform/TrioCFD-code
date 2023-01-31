@@ -86,8 +86,8 @@ void Source_Robin_Scalaire::completer()
 // ajouter
 DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& temperature = equation().inconnue().valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
   const Champ_Don& lambda = fluide.conductivite();
@@ -137,9 +137,9 @@ DoubleTab& Source_Robin_Scalaire::calculer(DoubleTab& resu) const
 }
 
 
-// associer_zones
-void Source_Robin_Scalaire::associer_zones(const Zone_dis& z, const Zone_Cl_dis& zcl)
+// associer_domaines
+void Source_Robin_Scalaire::associer_domaines(const Zone_dis& z, const Zone_Cl_dis& zcl)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,z.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,z.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
 }

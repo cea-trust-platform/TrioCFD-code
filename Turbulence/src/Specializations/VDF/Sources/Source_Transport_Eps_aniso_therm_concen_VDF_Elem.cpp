@@ -43,7 +43,7 @@ void Source_Transport_Eps_aniso_therm_concen_VDF_Elem::fill_resu_anisotherme_con
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   double C3_loc, G_sum, LeK_MIN = mon_eq_transport_Eps->modele_turbulence().get_LeK_MIN();
 
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       G_sum = G_t(elem) + G_c(elem) ;
       if (K(elem) >= LeK_MIN)

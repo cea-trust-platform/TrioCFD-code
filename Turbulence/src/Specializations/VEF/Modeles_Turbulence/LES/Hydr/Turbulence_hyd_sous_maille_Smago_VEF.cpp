@@ -62,7 +62,7 @@ void Turbulence_hyd_sous_maille_Smago_VEF::set_param(Param& param)
 
 Champ_Fonc& Turbulence_hyd_sous_maille_Smago_VEF::calculer_viscosite_turbulente()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem();
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
   SMA_barre.resize(nb_elem_tot);
@@ -85,7 +85,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Smago_VEF::calculer_viscosite_turbulente(
 
 void Turbulence_hyd_sous_maille_Smago_VEF::calculer_S_barre()
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
 
   Champ_P1NC::calcul_S_barre(la_vitesse,SMA_barre,zone_Cl_VEF);

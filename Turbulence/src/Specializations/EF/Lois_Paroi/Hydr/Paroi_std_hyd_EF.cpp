@@ -96,16 +96,16 @@ void Paroi_std_hyd_EF::set_param(Param& param)
 
 int Paroi_std_hyd_EF::init_lois_paroi()
 {
-  tab_u_star_.resize(la_zone_EF->nb_faces_tot());
-  tab_d_plus_.resize(la_zone_EF->nb_faces_tot());
-  uplus_.resize(la_zone_EF->nb_faces_tot());
+  tab_u_star_.resize(le_dom_EF->nb_faces_tot());
+  tab_d_plus_.resize(le_dom_EF->nb_faces_tot());
+  uplus_.resize(le_dom_EF->nb_faces_tot());
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
     {
       Cisaillement_paroi_.resize(0, dimension);
-      la_zone_EF.valeur().creer_tableau_faces(Cisaillement_paroi_);
+      le_dom_EF.valeur().creer_tableau_faces(Cisaillement_paroi_);
     }
-  seuil_LP.resize(la_zone_EF->nb_faces_tot());
-  iterations_LP.resize(la_zone_EF->nb_faces_tot());
+  seuil_LP.resize(le_dom_EF->nb_faces_tot());
+  iterations_LP.resize(le_dom_EF->nb_faces_tot());
 
   return init_lois_paroi_hydraulique();
 
@@ -138,7 +138,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
+  const Zone_EF& zone_EF = le_dom_EF.valeur();
   const IntTab& face_voisins = zone_EF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -187,7 +187,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   int nb_bords=zone_EF.nb_front_Cl();
   for (int n_bord=0; n_bord<nb_bords; n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
@@ -355,7 +355,7 @@ double Paroi_std_hyd_EF::calculer_u_plus(const int ind_face,const double u_plus_
 
 void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
 {
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
+  const Zone_EF& zone_EF = le_dom_EF.valeur();
   int ndeb,nfin;
   double upmoy,dpmoy,utaumoy;
   double seuil_moy,iter_moy;
@@ -374,7 +374,7 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
 
   for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||

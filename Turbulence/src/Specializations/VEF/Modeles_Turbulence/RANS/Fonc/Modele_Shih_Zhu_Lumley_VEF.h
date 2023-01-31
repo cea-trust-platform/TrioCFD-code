@@ -80,8 +80,8 @@ protected:
   DoubleTab S_elem_;
   DoubleTab R_elem_;
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Zone_VEF) le_dom_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
 
   double A0_;
 };

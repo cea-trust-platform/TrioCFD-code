@@ -116,7 +116,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
       int nb_faces=faces.nb_faces();
       // Calcul des surfaces de chaque face
       DoubleVect Si;
-      faces.associer_zone(zone);
+      faces.associer_domaine(zone);
       faces.calculer_surfaces(Si);
       for (i=0; i<nb_faces; i++)
         {

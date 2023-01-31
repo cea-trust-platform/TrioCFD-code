@@ -65,8 +65,8 @@ void Modele_turb_scal_sm_dyn_VDF::associer(
   const Zone_dis& zone_dis,
   const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,20 +190,20 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
 
   Debog::verifier("la_viscosite_turbulente",champ.valeurs());
   double temps = champ.temps();
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->zone().nb_elem_tot();
   DoubleTab l(nb_elem_tot);
   cell_cent_vel.resize(nb_elem_tot,dimension);
 
   DoubleTab filt_vel(0, dimension);
-  la_zone_VDF->zone().creer_tableau_elements(filt_vel);
+  le_dom_VDF->zone().creer_tableau_elements(filt_vel);
 
   const DoubleTab& teta = equation().inconnue().valeurs();
   DoubleTab filt_teta;
-  la_zone_VDF->zone().creer_tableau_elements(filt_teta);
+  le_dom_VDF->zone().creer_tableau_elements(filt_teta);
   DoubleTab Lj(filt_vel);
 
   DoubleTab Sij_grid_scale(0, dimension, dimension);
-  la_zone_VDF->zone().creer_tableau_elements(Sij_grid_scale);
+  le_dom_VDF->zone().creer_tableau_elements(Sij_grid_scale);
   DoubleTab Sij_test_scale(Sij_grid_scale);
 
   DoubleTab S_test_scale_norme(nb_elem_tot);
@@ -213,17 +213,17 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
   DoubleTab Mj(nb_elem_tot,dimension);
   model_coeff.resize(nb_elem_tot);
 
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,la_zone_VDF.valeur());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_cell_cent_vel(cell_cent_vel,la_zone_VDF.valeur(),eq_NS_turb.inconnue());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(cell_cent_vel,filt_vel,la_zone_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,le_dom_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_cell_cent_vel(cell_cent_vel,le_dom_VDF.valeur(),eq_NS_turb.inconnue());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(cell_cent_vel,filt_vel,le_dom_VDF.valeur());
   calculer_filter_coeff(teta,filt_teta);
   calculer_Lj(teta,filt_teta,cell_cent_vel,filt_vel,Lj);
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(Sij_grid_scale,la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),eq_NS_turb.inconnue());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(filt_vel,Sij_test_scale,la_zone_VDF.valeur());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,la_zone_VDF->zone().nb_elem_tot());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_test_scale,S_test_scale_norme,la_zone_VDF->zone().nb_elem_tot());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(Sij_grid_scale,le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),eq_NS_turb.inconnue());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(filt_vel,Sij_test_scale,le_dom_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,le_dom_VDF->zone().nb_elem_tot());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_test_scale,S_test_scale_norme,le_dom_VDF->zone().nb_elem_tot());
   calculer_grad_teta(teta,grad_teta);
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(grad_teta,filt_grad_teta,la_zone_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(grad_teta,filt_grad_teta,le_dom_VDF.valeur());
   calculer_Mj(S_grid_scale_norme,S_test_scale_norme,grad_teta,filt_grad_teta,l,Mj);
   calculer_model_coefficient(Lj,Mj);
 
@@ -240,7 +240,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_filter_coeff(
   const DoubleTab& coeff,
   DoubleTab& filt_coeff)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   int nb_elem = zone_VDF.zone().nb_elem();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -343,7 +343,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Lj(
   const DoubleTab& filt_vel,
   DoubleTab& Lj)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   int element_number;
 
@@ -358,7 +358,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Lj(
         temp(element_number,j)=vel(element_number,j)*teta(element_number);
     }
 
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(temp,filt_u_teta,la_zone_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(temp,filt_u_teta,le_dom_VDF.valeur());
 
   for (element_number=0 ; element_number<nb_elem_tot ; element_number ++)
     {
@@ -373,9 +373,9 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
   const DoubleVect& teta,
   DoubleTab& grad_teta)
 {
-  const int nb_elem = la_zone_VDF->zone().nb_elem();
-  const int nb_faces_tot = la_zone_VDF->nb_faces();
-  const int nb_faces_bord = la_zone_VDF->zone().nb_faces_bord();
+  const int nb_elem = le_dom_VDF->zone().nb_elem();
+  const int nb_faces_tot = le_dom_VDF->nb_faces();
+  const int nb_faces_bord = le_dom_VDF->zone().nb_faces_bord();
 
   const Op_Dift_VDF_base& operateur_diff =  ref_cast(Op_Dift_VDF_base,(mon_equation->operateur(0)).l_op_base());
   const DoubleVect& flux_bords = operateur_diff.flux_bords();
@@ -384,17 +384,17 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
   // de diffusion
   if (flux_bords.size_array()==0)
     {
-      DoubleTab resu(la_zone_VDF->nb_faces_tot(), 1);
+      DoubleTab resu(le_dom_VDF->nb_faces_tot(), 1);
       operateur_diff.ajouter(static_cast<const DoubleTab&>(teta),resu);
     }
-  const DoubleVect& faces_surfaces = la_zone_VDF->face_surfaces();
+  const DoubleVect& faces_surfaces = le_dom_VDF->face_surfaces();
   DoubleTab grad_teta_face(nb_faces_tot);
   int element_number;
 
   int face, n0, n1, ori;
-  const IntTab& face_voisins = la_zone_VDF->face_voisins();
-  const IntVect& orientation = la_zone_VDF->orientation();
-  const DoubleTab& xp = la_zone_VDF->xp();
+  const IntTab& face_voisins = le_dom_VDF->face_voisins();
+  const IntVect& orientation = le_dom_VDF->orientation();
+  const DoubleTab& xp = le_dom_VDF->xp();
 
   const Milieu_base& le_milieu=equation().probleme().milieu();
   const Champ_Don& lambda = le_milieu.conductivite();
@@ -429,7 +429,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
     }
 
   // Boucle sur les faces internes
-  for (face=la_zone_VDF->premiere_face_int(); face<nb_faces_tot; face++)
+  for (face=le_dom_VDF->premiere_face_int(); face<nb_faces_tot; face++)
     {
       n0 = face_voisins(face,0);
       n1 = face_voisins(face,1);
@@ -437,7 +437,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
       grad_teta_face(face) = (teta(n1)-teta(n0))/(xp(n1,ori)-xp(n0,ori));
     }
   //Calcul du gradient aux elements
-  const IntTab& elem_faces = la_zone_VDF.valeur().elem_faces();
+  const IntTab& elem_faces = le_dom_VDF.valeur().elem_faces();
   int num0,num1,num2,num3,num4,num5;
   for (element_number=0 ; element_number<nb_elem ; element_number ++)
     {
@@ -477,7 +477,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Mj(
   const DoubleTab& l,
   DoubleTab& Mj)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   int element_number;
   const double alpha=sqrt(6.0);
@@ -490,7 +490,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Mj(
     for (j=0 ; j<dimension ; j++)
       temp(element_number,j)= S_grid_scale_norme(element_number) * grad_teta(element_number,j);
 
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(temp,S_norme_filt_grad_teta,la_zone_VDF.valeur());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(temp,S_norme_filt_grad_teta,le_dom_VDF.valeur());
   for (element_number=0 ; element_number<nb_elem_tot ; element_number ++)
     {
       for (j=0 ; j<dimension ; j++)
@@ -504,7 +504,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_model_coefficient(
   const DoubleTab& Lj,
   const DoubleTab& Mj )
 {
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->zone().nb_elem_tot();
   DoubleTab haut(nb_elem_tot);
   DoubleTab bas(nb_elem_tot);
   int i,j;
@@ -584,7 +584,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_6_points(
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   const IntTab& elem_faces = zone_VDF.elem_faces();
@@ -700,7 +700,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_plans_paralleles(
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   int nb_elem = zone_VDF.zone().nb_elem();
   DoubleVect coeff_m_tmp(N_c_);
@@ -739,7 +739,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_euler(
 {
   int nb_0=0;
   static int init = 1;
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
@@ -763,7 +763,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_euler(
     }
   else
     {
-      Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,la_zone_VDF.valeur());
+      Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,le_dom_VDF.valeur());
 
       for (element_number=0 ; element_number<nb_elem_tot ; element_number ++)
         {
@@ -817,7 +817,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_lagrange(
 {
   int nb_0=0;
   static int init = 1;
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
@@ -842,7 +842,7 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_lagrange(
     }
   else
     {
-      Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,la_zone_VDF.valeur());
+      Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(l,le_dom_VDF.valeur());
 
       for (element_number=0 ; element_number<nb_elem_tot ; element_number ++)
         {
@@ -925,7 +925,7 @@ void Modele_turb_scal_sm_dyn_VDF::calcul_voisins(
       num[6]=elem_elem_(element_number,indice(0),indice(1),1);
       num[7]=elem_elem_(element_number,indice(0),indice(1),indice(2));
 
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
       const DoubleTab& xp = zone_VDF.xp();
       DoubleTab x(3);
       for (i=0; i<3; i++)
@@ -978,7 +978,7 @@ void Modele_turb_scal_sm_dyn_VDF::calcul_voisins(
 
 void Modele_turb_scal_sm_dyn_VDF::calc_elem_elem(void)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();

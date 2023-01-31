@@ -286,7 +286,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
 
     }
 
-  const Probleme_base& pb =  ma_zone_cl_dis->equation().probleme();
+  const Probleme_base& pb =  mon_dom_cl_dis->equation().probleme();
   if (sub_type(Pb_Conduction,pb))
     {
       Cerr<<"On ne devrait pas a avoir a calculer la temperature de bord pour le probleme"<<finl;

@@ -46,7 +46,7 @@ Entree& Paroi_std_hyd_VDF_diphasique::readOn( Entree& is )
 // tab1 = tab_nu_t and tab2 = tab_k
 int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
@@ -105,7 +105,7 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();

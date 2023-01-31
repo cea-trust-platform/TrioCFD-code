@@ -68,9 +68,9 @@ void  Operateur_Conv_sensibility_VEF::associer (const Zone_dis& zone_dis ,
   const Zone_VEF& zvef = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zclvef = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
 
-  la_zone_vef = zvef;
+  le_dom_vef = zvef;
   la_zcl_vef = zclvef;
-  la_zone_vef.valeur().creer_tableau_faces(fluent);
+  le_dom_vef.valeur().creer_tableau_faces(fluent);
   Operateur_Conv_sensibility::associer(zone_dis,zone_cl_dis,inco);
 }
 
@@ -83,7 +83,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   int convectionSchemeDiscrType; // amont=0, muscl=1, centre=2
   opConvVEFFace.get_type_op(convectionSchemeDiscrType);
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
 
   if(convectionSchemeDiscrType==0 || convectionSchemeDiscrType==1 || convectionSchemeDiscrType==2) // Convection scheme discr "amont".
     {
@@ -168,7 +168,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& velocity, const DoubleTab& transporte, DoubleTab& resu,  DoubleTab& flux_b) const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
   const Op_Conv_VEF_base& opConvVEFbase = ref_cast(Op_Conv_VEF_base, op_conv.valeur());
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
 
@@ -828,7 +828,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 {
   Cout<<"ajouter_Lstate_sensibility "<<finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const DoubleTab& facenormales = zone_VEF.face_normales();
   const DoubleTab& facette_normales = zone_VEF.facette_normales();
@@ -1219,7 +1219,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 {
   Cout<<"ajouter_Lsensibility_state "<<finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const DoubleTab& facenormales = zone_VEF.face_normales();
   const DoubleTab& facette_normales = zone_VEF.facette_normales();
@@ -1788,7 +1788,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
 {
 
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
   const Champ_Inc_base& velocity=vitesse();
   const DoubleTab& vitesse_face=velocity.valeurs();
   const IntTab& elem_faces = zone_VEF.elem_faces();
@@ -1966,7 +1966,7 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
   return DMAXFLOAT; //on resout la sensibilite avec le meme dt que l'etat
 
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const DoubleVect& volumes_entrelaces_Cl = zone_Cl_VEF.volumes_entrelaces_Cl();
   remplir_fluent(fluent);
@@ -2028,7 +2028,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 {
   Cerr << "add_diffusion_term" << finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   int nb_comp = 1;
   int nb_dim = resu.nb_dim();
@@ -2190,7 +2190,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 
 inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem, double diffu) const
 {
-  const Zone_VEF& zone=la_zone_vef.valeur();
+  const Zone_VEF& zone=le_dom_vef.valeur();
   const IntTab& face_voisins=zone.face_voisins();
   const DoubleTab& face_normales=zone.face_normales();
   const DoubleVect& inverse_volumes=zone.inverse_volumes();
@@ -2212,7 +2212,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
 
   Cerr << "add_diffusion_scalar_term" << finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   DoubleTab& tab_flux_bords = flux_bords_;
 
   const IntTab& elemfaces = zone_VEF.elem_faces();

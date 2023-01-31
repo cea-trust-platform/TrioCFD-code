@@ -274,12 +274,12 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
   dis.associer_domaine(le_domaine_.valeur());
   dis.discretiser(le_domaine_dis);
   // Can not do this before, since the Zone_dis is not typed yet:
-  le_domaine_dis.associer_zone(le_domaine_);
+  le_domaine_dis.associer_domaine(le_domaine_);
 
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     {
-      equation(i).associer_zone_dis(domaine_dis());
+      equation(i).associer_domaine_dis(domaine_dis());
       equation(i).discretiser();
     }
 

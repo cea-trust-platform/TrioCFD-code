@@ -44,7 +44,7 @@ public:
 
 
 private:
-  REF(Zone_VDF) la_zone_vdf;
+  REF(Zone_VDF) le_dom_vdf;
   REF(Zone_Cl_VDF) la_zcl_vdf;
 
 public:

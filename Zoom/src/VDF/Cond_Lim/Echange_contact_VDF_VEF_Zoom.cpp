@@ -32,54 +32,54 @@ Implemente_instanciable(Echange_contact_VDF_VEF_Zoom,"Contact_VDF_VEF",Echange_c
 // Attention : la normal a la face num_face est suppose sortante
 // tandis que celle a la face num2 est reorientee dans la methode
 // afin d etre sortante.
-double pdt_scal(const Zone_VEF& la_zone,int num_face,int num2,
+double pdt_scal(const Zone_VEF& le_dom,int num_face,int num2,
                 int num_elem,int dimension,double diffu)
 {
   double pscal;
-  const IntTab& face_voisinsF = la_zone.face_voisins();
+  const IntTab& face_voisinsF = le_dom.face_voisins();
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,2);
 
   //if (!(face_voisinsF(num2,0) == num_elem)) pscal = -pscal;
   if ( (face_voisinsF(num_face,0) == face_voisinsF(num2,0)) ||
        (face_voisinsF(num_face,1) == face_voisinsF(num2,1))) pscal = -pscal;
 
-  return (pscal*diffu)/la_zone.volumes(num_elem);
+  return (pscal*diffu)/le_dom.volumes(num_elem);
 }
 
 
 // Attention : la normal a la face num_face est suppose sortante
 // tandis que celle a la face num2 est reorientee dans la methode
 // afin d etre sortante.
-double pdt_scalSqrt(const Zone_VEF& la_zone,int num_face,int num2,
+double pdt_scalSqrt(const Zone_VEF& le_dom,int num_face,int num2,
                     int num_elem,int dimension,double diffu)
 {
   double pscal;
-  //const IntTab& face_voisinsF = la_zone.face_voisins();
+  //const IntTab& face_voisinsF = le_dom.face_voisins();
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,2);
   pscal = sqrt(std::fabs(pscal));
   //if (!(face_voisinsF(num2,0) == num_elem)) pscal = -pscal;
   //  if ( (face_voisinsF(num_face,0) == face_voisinsF(num2,0)) ||
   //     (face_voisinsF(num_face,1) == face_voisinsF(num2,1))) pscal = -pscal;
 
-  return (pscal*diffu)/la_zone.volumes(num_elem);
+  return (pscal*diffu)/le_dom.volumes(num_elem);
 }
 
-double surfacesVEF(const Zone_VEF& la_zone,int num_face,int dimension)
+double surfacesVEF(const Zone_VEF& le_dom,int num_face,int dimension)
 {
   double pscal;
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num_face,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num_face,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num_face,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num_face,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num_face,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num_face,2);
   pscal = sqrt(pscal);
 
   return pscal;

@@ -52,7 +52,7 @@ Entree& Entree_fluide_temperature_imposee_H::readOn(Entree& s)
  */
 void Entree_fluide_temperature_imposee_H::completer()
 {
-  le_fluide = ref_cast(Fluide_Quasi_Compressible,ma_zone_cl_dis->equation().milieu());
+  le_fluide = ref_cast(Fluide_Quasi_Compressible,mon_dom_cl_dis->equation().milieu());
 }
 
 /*! @brief Renvoie un booleen indiquant la compatibilite des conditions aux limites avec l'equation specifiee en parametre.

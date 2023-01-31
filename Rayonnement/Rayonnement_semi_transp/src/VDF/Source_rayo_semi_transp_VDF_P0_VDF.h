@@ -43,7 +43,7 @@ public :
   //  void recherche_et_associe_le_modele();
 
 protected :
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
 };

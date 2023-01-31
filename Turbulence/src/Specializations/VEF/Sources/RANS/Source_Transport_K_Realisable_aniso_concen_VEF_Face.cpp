@@ -43,5 +43,5 @@ DoubleTab& Source_Transport_K_Realisable_aniso_concen_VEF_Face::ajouter(DoubleTa
 
 void Source_Transport_K_Realisable_aniso_concen_VEF_Face::fill_resu_concen(const DoubleTrav& G, const DoubleVect& volumes_entrelaces, DoubleTab& resu) const
 {
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++) resu(face) += G(face) * volumes_entrelaces(face);
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++) resu(face) += G(face) * volumes_entrelaces(face);
 }

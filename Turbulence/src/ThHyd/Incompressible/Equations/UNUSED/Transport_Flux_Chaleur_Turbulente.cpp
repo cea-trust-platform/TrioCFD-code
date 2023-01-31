@@ -164,9 +164,9 @@ void Transport_Flux_Chaleur_Turbulente::completer()
     {
       operateur(i).completer();
     }
-  la_zone_Cl_dis->completer();
+  le_dom_Cl_dis->completer();
   // Supression car le completer fait appel au 2eme completer desormais
-  //la_zone_Cl_dis->completer(zone_dis());
+  //le_dom_Cl_dis->completer(zone_dis());
 }
 
 void Transport_Flux_Chaleur_Turbulente::discretiser()
@@ -212,7 +212,7 @@ void Transport_Flux_Chaleur_Turbulente::associer_modele_turbulence(const Modele_
   const Equation_base& eqn_therm = modele.equation();
   Equation_base::associer_pb_base(eqn_therm.probleme());
   Equation_base::associer_sch_tps_base(eqn_therm.schema_temps());
-  Equation_base::associer_zone_dis(eqn_therm.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_therm.zone_dis());
   associer_milieu_base(eqn_therm.milieu());
   associer_vitesse(eqn_therm.inconnue());
   mon_modele_fluctu = modele;

@@ -55,8 +55,8 @@ Entree& SourceFiltree_FT_disc_VEF_P1NC::lire(Entree& is)
 
 DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const DoubleTab& xv = zone_VEF.xv();
   const DoubleTab& Indicatrice = Indic_->valeurs();
@@ -191,10 +191,10 @@ void SourceFiltree_FT_disc_VEF_P1NC::completer()
   Source_base::completer();
 }
 
-void SourceFiltree_FT_disc_VEF_P1NC::associer_zones(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void SourceFiltree_FT_disc_VEF_P1NC::associer_domaines(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur());
 }
 void SourceFiltree_FT_disc_VEF_P1NC::associer_pb(const Probleme_base& pb)
 {

@@ -315,7 +315,7 @@ void Transport_Marqueur_FT::discretiser(void)
   Transport_Interfaces_FT_Disc::discretiser();
 
   const Zone& zone = une_zone_dis.zone();
-  maillage_interface().associer_zone(zone);
+  maillage_interface().associer_domaine(zone);
 }
 
 /*! @brief Complete la construction (initialisation) des objets : maillage_interface et proprietes_particules_
@@ -326,11 +326,11 @@ void Transport_Marqueur_FT::discretiser(void)
 void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
-  ////la_zone_Cl_dis->completer();
-  const Zone& zone = la_zone_dis.valeur().zone();
+  ////le_dom_Cl_dis->completer();
+  const Zone& zone = le_dom_dis.valeur().zone();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
-  ens_points.associer_zone(zone);
+  ens_points.associer_domaine(zone);
   ens_points.generer_structure();
   ens_points.associer_equation_transport(*this);
 
@@ -339,7 +339,7 @@ void Transport_Marqueur_FT::completer()
   proprietes_particules().nettoyer(som_init);
 
   Maillage_FT_Disc& ens_points_inject = maillage_inject();
-  ens_points_inject.associer_zone(zone);
+  ens_points_inject.associer_domaine(zone);
   ens_points_inject.generer_structure();
   ens_points_inject.associer_equation_transport(*this);
 
@@ -843,7 +843,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
 
 //Construction de la structure maillage (ensemble de points) et proprietes (proprietes materielles) a injecter
 // en remplacement des groupes connexes
-//Pour la structure maillage :   ens_points.associer_zone(...)
+//Pour la structure maillage :   ens_points.associer_domaine(...)
 //                                   ens_points.generer_structure(...)
 //                                   ens_points.associer_equation_transport(...)
 
@@ -873,8 +873,8 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
       size_new++;
 
   //remplir sommets_lu et proprietes
-  const Zone& zone = la_zone_dis->zone();
-  ens_points.associer_zone(zone);
+  const Zone& zone = le_dom_dis->zone();
+  ens_points.associer_domaine(zone);
 
   DoubleTab&   soms_tmp =  ens_points.sommets_lu();
   DoubleTab& vitesse_tmp = propri.vitesse_particules();

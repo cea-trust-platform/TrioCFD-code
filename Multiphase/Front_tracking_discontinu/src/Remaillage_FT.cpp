@@ -200,9 +200,9 @@ void Remaillage_FT::set_param(Param& p)
  * @param (zone_dis) zone discretisee de calcul
  * @return le flot d'entree
  */
-void Remaillage_FT::associer_zone(const Zone_dis& zone_dis)
+void Remaillage_FT::associer_domaine(const Zone_dis& zone_dis)
 {
-  Cerr<<"Remaillage_FT::associer_zone_dis"<<finl;
+  Cerr<<"Remaillage_FT::associer_domaine_dis"<<finl;
   refzone_VF_ = ref_cast(Zone_VF,zone_dis.valeur());
 }
 

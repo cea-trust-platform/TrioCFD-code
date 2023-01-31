@@ -108,8 +108,8 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   //                ------->  -------->
   // Calcul de beta.grav . tetacarre
-  const Zone& la_zone=zone_VDF.zone();
-  const int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  const int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
 
@@ -128,8 +128,8 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   //                ------->  -------->
   // Calcul de beta.grav . tetacarre
-  const Zone& la_zone=zone_VDF.zone();
-  const int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  const int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
@@ -289,8 +289,8 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   //                ------->  ------>
   // Calcul de beta.grav . u_teta
-  const Zone& la_zone=zone_VDF.zone();
-  const int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  const int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(Objet_U::dimension);
@@ -336,8 +336,8 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   //                ------->  ------>
   // Calcul de beta.grav . u_teta
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleVect coef(dimension);

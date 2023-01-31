@@ -300,8 +300,8 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, 
 void  Modele_Shih_Zhu_Lumley_VDF::associer(const Zone_dis& zone_dis,
                                            const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 
   Initialisation( zone_dis );
 }

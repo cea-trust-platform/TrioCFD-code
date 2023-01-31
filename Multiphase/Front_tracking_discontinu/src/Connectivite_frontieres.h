@@ -31,7 +31,7 @@ class Connectivite_frontieres : public Objet_U
 {
   Declare_instanciable(Connectivite_frontieres);
 public:
-  virtual void     associer_zone_vf(const Zone_VF& zone_vf);
+  virtual void     associer_domaine_vf(const Zone_VF& zone_vf);
   const IntTab&    faces_voisins() const;
   const ArrOfInt& face_cond_lim() const;
   const IntTab&    def_face_aretes() const;

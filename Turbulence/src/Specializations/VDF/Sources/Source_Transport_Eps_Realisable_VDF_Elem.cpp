@@ -51,18 +51,18 @@ void Source_Transport_Eps_Realisable_VDF_Elem::calculer_terme_production_real(co
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs();
 
-  if (axi) calculer_terme_production_K_BiK_Axi(la_zone_VDF.valeur(),vitesse,P,K_Rea,visco_turb);
-  else calculer_terme_production_K_BiK(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_Rea,vit,vitesse,visco_turb);
+  if (axi) calculer_terme_production_K_BiK_Axi(le_dom_VDF.valeur(),vitesse,P,K_Rea,visco_turb);
+  else calculer_terme_production_K_BiK(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K_Rea,vit,vitesse,visco_turb);
 }
 
 void Source_Transport_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_visco_const, const DoubleTab& tab_visco, const DoubleTrav& P, const DoubleTrav& CC1, const DoubleTrav& S, double& visco, DoubleTab& resu) const
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence());
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
 
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if (!is_visco_const) visco =  tab_visco(elem);
       assert(visco>0.);

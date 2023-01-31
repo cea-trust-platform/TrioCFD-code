@@ -105,9 +105,9 @@ void Transport_Fluctuation_Temperature::completer()
     {
       operateur(i).completer();
     }
-  la_zone_Cl_dis->completer();
+  le_dom_Cl_dis->completer();
   // Suppression car le completer fait desormais appel au 2eme completer
-  //la_zone_Cl_dis->completer(zone_dis());
+  //le_dom_Cl_dis->completer(zone_dis());
 }
 
 /*! @brief surcharge de la methode d'Equation_base.
@@ -226,7 +226,7 @@ void Transport_Fluctuation_Temperature::associer_modele_turbulence(const Modele_
   const Equation_base& eqn_therm = modele.equation();
   Equation_base::associer_pb_base(eqn_therm.probleme());
   Equation_base::associer_sch_tps_base(eqn_therm.schema_temps());
-  Equation_base::associer_zone_dis(eqn_therm.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_therm.zone_dis());
   associer_milieu_base(eqn_therm.milieu());
   mon_modele_Fluctu_Temp=modele;
   discretiser();

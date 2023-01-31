@@ -64,19 +64,19 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  //  const Zone_Cl_VEF& la_zone_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
-  const DoubleVect& volumes = la_zone.volumes();
-  //  int nb_faces = la_zone.nb_faces();
-  int nb_faces_tot = la_zone.nb_faces();
-  //  int nb_elem = la_zone.nb_elem();
-  int nb_elem_tot = la_zone.nb_elem_tot();
-  //  int nb_elem_tot = la_zone.nb_elem_tot();
-  const Zone& zone=la_zone.zone();
-  const IntTab& elem_faces = la_zone.elem_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  //  const Zone_Cl_VEF& le_dom_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const DoubleVect& volumes = le_dom.volumes();
+  //  int nb_faces = le_dom.nb_faces();
+  int nb_faces_tot = le_dom.nb_faces();
+  //  int nb_elem = le_dom.nb_elem();
+  int nb_elem_tot = le_dom.nb_elem_tot();
+  //  int nb_elem_tot = le_dom.nb_elem_tot();
+  const Zone& zone=le_dom.zone();
+  const IntTab& elem_faces = le_dom.elem_faces();
   const int nb_faces_elem = zone.nb_faces_elem();
-  const DoubleTab& face_normales = la_zone.face_normales();
-  const DoubleVect& vol_ent = la_zone.volumes_entrelaces();
+  const DoubleTab& face_normales = le_dom.face_normales();
+  const DoubleVect& vol_ent = le_dom.volumes_entrelaces();
 
   D = 0;
   //return D;
@@ -101,7 +101,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
           for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
             {
               face_glob = elem_faces(num_elem,face_loc);
-              deriv += sqrt(K_eps_Bas_Re(face_glob,0))*face_normales(face_glob,i)*la_zone.oriente_normale(face_glob,num_elem);
+              deriv += sqrt(K_eps_Bas_Re(face_glob,0))*face_normales(face_glob,i)*le_dom.oriente_normale(face_glob,num_elem);
             }
           deriv /= Vol;
           for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
@@ -135,18 +135,18 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
 // Pour le calcul de la derivee seconde
 // 1/|v|*(Si,elem)ind_der*(Sj,elem)ind_der
 /* pas appele
-   static double viscA(const Zone_VEF& la_zone,int num_face,int num2,int dimension,
+   static double viscA(const Zone_VEF& le_dom,int num_face,int num2,int dimension,
    int num_elem, int ind_der)
    {
    double pscal;
 
-   pscal = la_zone.face_normales(num_face,ind_der)*la_zone.face_normales(num2,ind_der);
+   pscal = le_dom.face_normales(num_face,ind_der)*le_dom.face_normales(num2,ind_der);
 
-   if ( (la_zone.face_voisins(num_face,0) == la_zone.face_voisins(num2,0)) ||
-   (la_zone.face_voisins(num_face,1) == la_zone.face_voisins(num2,1)))
-   return -pscal/la_zone.volumes(num_elem);
+   if ( (le_dom.face_voisins(num_face,0) == le_dom.face_voisins(num2,0)) ||
+   (le_dom.face_voisins(num_face,1) == le_dom.face_voisins(num2,1)))
+   return -pscal/le_dom.volumes(num_elem);
    else
-   return pscal/la_zone.volumes(num_elem);
+   return pscal/le_dom.volumes(num_elem);
    }
 */
 
@@ -361,8 +361,8 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
 
 DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
@@ -375,8 +375,8 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
 
@@ -386,12 +386,12 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
         {
           if (!is_visco_const)
             {
-              int elem0 = la_zone.face_voisins(num_face,0);
-              int elem1 = la_zone.face_voisins(num_face,1);
+              int elem0 = le_dom.face_voisins(num_face,0);
+              int elem1 = le_dom.face_voisins(num_face,1);
               if (elem1!=-1)
                 {
-                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                  visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+                  visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
                 }
               else
                 visco =  tab_visco(elem0);
@@ -419,8 +419,8 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
   Fmu = 0;
@@ -431,12 +431,12 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
         {
           if (!is_visco_const)
             {
-              int elem0 = la_zone.face_voisins(num_face,0);
-              int elem1 = la_zone.face_voisins(num_face,1);
+              int elem0 = le_dom.face_voisins(num_face,0);
+              int elem1 = le_dom.face_voisins(num_face,1);
               if (elem1!=-1)
                 {
-                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                  visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+                  visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
                 }
               else
                 visco =  tab_visco(elem0);
@@ -462,8 +462,8 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
   Fmu = 0;
@@ -474,12 +474,12 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
         {
           if (!is_visco_const)
             {
-              int elem0 = la_zone.face_voisins(num_face,0);
-              int elem1 = la_zone.face_voisins(num_face,1);
+              int elem0 = le_dom.face_voisins(num_face,0);
+              int elem1 = le_dom.face_voisins(num_face,1);
               if (elem1!=-1)
                 {
-                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                  visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+                  visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
                 }
               else
                 visco =  tab_visco(elem0);
@@ -505,8 +505,8 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
 
@@ -516,12 +516,12 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
         {
           if (!is_visco_const)
             {
-              int elem0 = la_zone.face_voisins(num_face,0);
-              int elem1 = la_zone.face_voisins(num_face,1);
+              int elem0 = le_dom.face_voisins(num_face,0);
+              int elem1 = le_dom.face_voisins(num_face,1);
               if (elem1!=-1)
                 {
-                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
-                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                  visco = tab_visco(elem0)*le_dom.volumes(elem0)+tab_visco(elem1)*le_dom.volumes(elem1);
+                  visco /= le_dom.volumes(elem0) + le_dom.volumes(elem1);
                 }
               else
                 visco =  tab_visco(elem0);
@@ -546,8 +546,8 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
 
 DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
@@ -567,19 +567,19 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& 
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  //  const Zone_Cl_VEF& la_zone_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
-  const DoubleVect& volumes = la_zone.volumes();
-  //  int nb_faces = la_zone.nb_faces();
-  int nb_faces_tot = la_zone.nb_faces();
-  //  int nb_elem = la_zone.nb_elem();
-  int nb_elem_tot = la_zone.nb_elem_tot();
-  //  int nb_elem_tot = la_zone.nb_elem_tot();
-  const Zone& zone=la_zone.zone();
-  const IntTab& elem_faces = la_zone.elem_faces();
+  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  //  const Zone_Cl_VEF& le_dom_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const DoubleVect& volumes = le_dom.volumes();
+  //  int nb_faces = le_dom.nb_faces();
+  int nb_faces_tot = le_dom.nb_faces();
+  //  int nb_elem = le_dom.nb_elem();
+  int nb_elem_tot = le_dom.nb_elem_tot();
+  //  int nb_elem_tot = le_dom.nb_elem_tot();
+  const Zone& zone=le_dom.zone();
+  const IntTab& elem_faces = le_dom.elem_faces();
   const int nb_faces_elem = zone.nb_faces_elem();
-  const DoubleTab& face_normales = la_zone.face_normales();
-  const DoubleVect& vol_ent = la_zone.volumes_entrelaces();
+  const DoubleTab& face_normales = le_dom.face_normales();
+  const DoubleVect& vol_ent = le_dom.volumes_entrelaces();
 
   D = 0;
   //return D;
@@ -604,7 +604,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& 
           for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
             {
               face_glob = elem_faces(num_elem,face_loc);
-              deriv += sqrt(K_Bas_Re(face_glob))*face_normales(face_glob,i)*la_zone.oriente_normale(face_glob,num_elem);
+              deriv += sqrt(K_Bas_Re(face_glob))*face_normales(face_glob,i)*le_dom.oriente_normale(face_glob,num_elem);
             }
           deriv /= Vol;
           for(face_loc=0; face_loc<nb_faces_elem; face_loc++)

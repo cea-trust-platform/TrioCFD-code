@@ -69,7 +69,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
 
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
       const IntTab& face_voisins = zone_VDF.face_voisins();
       const IntVect& orientation = zone_VDF.orientation();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -87,7 +87,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 
       for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {
@@ -147,7 +147,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
 
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
       const IntTab& face_voisins = zone_VDF.face_voisins();
       const IntVect& orientation = zone_VDF.orientation();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -165,7 +165,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
       for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {

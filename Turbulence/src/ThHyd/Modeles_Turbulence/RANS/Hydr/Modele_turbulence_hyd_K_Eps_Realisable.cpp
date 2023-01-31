@@ -111,7 +111,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
       Champ_Inc visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
       Champ_Inc_base& ch_visco_turb_K_eps_Rea=visco_turb_au_format_K_eps_Rea.valeur();
-      ch_visco_turb_K_eps_Rea.associer_zone_dis_base(eqn_transp_K_Eps().zone_dis().valeur());
+      ch_visco_turb_K_eps_Rea.associer_domaine_dis_base(eqn_transp_K_Eps().zone_dis().valeur());
       ch_visco_turb_K_eps_Rea.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps_Rea.fixer_nb_comp(1);
       ch_visco_turb_K_eps_Rea.fixer_nb_valeurs_nodales(n);

@@ -133,16 +133,16 @@ Entree& Paroi_ODVM_scal_VDF::readOn(Entree& is)
 int Paroi_ODVM_scal_VDF::init_lois_paroi()
 {
 
-  //tab_d_equiv_.resize(la_zone_VDF->nb_faces_bord());
-  tab_u_star.resize(la_zone_VDF->nb_faces_bord());
+  //tab_d_equiv_.resize(le_dom_VDF->nb_faces_bord());
+  tab_u_star.resize(le_dom_VDF->nb_faces_bord());
 
   // Pour passer a l'echange contact pour imposer la temperature a l'interface.
-  Tf0.resize(la_zone_VDF->nb_faces_bord());
+  Tf0.resize(le_dom_VDF->nb_faces_bord());
 
   int ndeb,nfin;
   int elem;
   double dist; //distance du premier centre de maille a la paroi
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
@@ -209,7 +209,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
     {
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       const Cond_lim& la_cl_th = zone_Cl_VDF_th.les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
@@ -317,7 +317,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
 
 int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   int nb_elems = zone_VDF.nb_elem();
 
@@ -413,7 +413,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {

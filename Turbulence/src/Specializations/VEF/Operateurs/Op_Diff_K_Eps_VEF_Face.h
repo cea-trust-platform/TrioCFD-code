@@ -54,7 +54,7 @@ public:
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline double viscA(int, int, int, double) const;
-  void calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& la_zone,int num_face,int num2,int dimension, int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const;
+  void calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& le_dom,int num_face,int num2,int dimension, int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const;
   // Methodes pour l implicite.
 
   inline void dimensionner(Matrice_Morse& ) const override;
@@ -65,7 +65,7 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_VEF) le_dom_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
   REF(Champ_P1NC) inconnue_;
 };
@@ -75,7 +75,7 @@ protected :
 // mu <Si, Sj> / |K|
 inline double Op_Diff_K_Eps_VEF_Face::viscA(int num_face, int num2, int num_elem, double diffu) const
 {
-  const Zone_VEF& zone=la_zone_vef.valeur();
+  const Zone_VEF& zone=le_dom_vef.valeur();
   const IntTab& face_voisins=zone.face_voisins();
   const DoubleTab& face_normales=zone.face_normales();
   const DoubleVect& inverse_volumes=zone.inverse_volumes();
@@ -96,7 +96,7 @@ inline double Op_Diff_K_Eps_VEF_Face::viscA(int num_face, int num2, int num_elem
  */
 inline  void Op_Diff_K_Eps_VEF_Face::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
 

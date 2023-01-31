@@ -54,7 +54,7 @@ void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Zone_dis& zone_di
   nbmailles_euler_j_ = s.get_nb_elem_local(DIRECTION_J);
   nbmailles_euler_k_ = s.get_nb_elem_local(DIRECTION_K);
 
-  associer_zone_dis_parcours(zone_dis, parcours);
+  associer_domaine_dis_parcours(zone_dis, parcours);
 }
 
 // Deplace tous les sommets lagrangiens dont les indices locaux sont mentionnes dans liste_sommets_initiale

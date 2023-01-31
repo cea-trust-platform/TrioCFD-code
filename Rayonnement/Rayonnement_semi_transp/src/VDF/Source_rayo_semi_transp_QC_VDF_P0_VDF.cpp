@@ -69,7 +69,7 @@ void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_zones(const Zone_dis& zone_dis,
+void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_domaines(const Zone_dis& zone_dis,
                                                            const Zone_Cl_dis& zone_Cl_dis)
 {
   ;

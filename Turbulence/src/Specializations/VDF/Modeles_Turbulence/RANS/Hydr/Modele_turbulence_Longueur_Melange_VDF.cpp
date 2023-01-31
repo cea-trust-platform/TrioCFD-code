@@ -80,8 +80,8 @@ void Modele_turbulence_Longueur_Melange_VDF::associer(
   const Zone_dis& zone_dis,
   const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulente()
@@ -92,7 +92,7 @@ Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulent
   double Cmu = CMU;
 
   double temps = mon_equation->inconnue().temps();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
   const int nb_elem = zone_VDF.nb_elem();
@@ -155,8 +155,8 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
 {
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const int nb_elem = zone_VDF.nb_elem_tot();
 
   DoubleTab duidxj(nb_elem,dimension,dimension);

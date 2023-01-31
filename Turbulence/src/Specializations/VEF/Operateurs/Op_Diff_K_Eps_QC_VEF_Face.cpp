@@ -50,22 +50,22 @@ Entree& Op_Diff_K_Eps_QC_VEF_Face::readOn(Entree& s )
 
 // Fonction utile visc
 // mu <Si, Sj> / |K|
-static double viscA_QC(const Zone_VEF& la_zone,const Zone_Cl_VEF& zone_Cl_VEF, int num_face,int num2,int dimension,
+static double viscA_QC(const Zone_VEF& le_dom,const Zone_Cl_VEF& zone_Cl_VEF, int num_face,int num2,int dimension,
                        int num_elem,double diffu)
 {
   double pscal;
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,1);
 
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,2);
 
-  if ( (la_zone.face_voisins(num_face,0) == la_zone.face_voisins(num2,0)) ||
-       (la_zone.face_voisins(num_face,1) == la_zone.face_voisins(num2,1)))
-    return -(pscal*diffu)/(la_zone.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
+  if ( (le_dom.face_voisins(num_face,0) == le_dom.face_voisins(num2,0)) ||
+       (le_dom.face_voisins(num_face,1) == le_dom.face_voisins(num2,1)))
+    return -(pscal*diffu)/(le_dom.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
   else
-    return (pscal*diffu)/(la_zone.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
+    return (pscal*diffu)/(le_dom.volumes(num_elem)*zone_Cl_VEF.equation().milieu().porosite_elem(num_elem));
 
 }
 
@@ -97,7 +97,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
 
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();

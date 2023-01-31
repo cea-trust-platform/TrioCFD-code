@@ -34,11 +34,11 @@ Sortie& LoiParoiHybride_VDF::printOn(Sortie& s) const
 
 Entree& LoiParoiHybride_VDF::readOn(Entree& s)
 {
-  const int nbord = la_zone_VDF.valeur().nb_front_Cl();
+  const int nbord = le_dom_VDF.valeur().nb_front_Cl();
   Noms noms(nbord);
   for (int ibord=0; ibord<nbord; ibord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(ibord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(ibord);
       noms[ibord] = la_cl.valeur().frontiere_dis().le_nom();
     }
 
@@ -59,28 +59,28 @@ int LoiParoiHybride_VDF::init_lois_paroi()
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
     {
       Cisaillement_paroi_.resize(0, dimension);
-      la_zone_VDF.valeur().creer_tableau_faces_bord(Cisaillement_paroi_);
+      le_dom_VDF.valeur().creer_tableau_faces_bord(Cisaillement_paroi_);
     }
   return 1;
 }
 
 int LoiParoiHybride_VDF::calculer_hyd(DoubleTab& tab1)
 {
-  LoiParoiHybride::calculer_hyd(tab1, la_zone_VDF.valeur(), la_zone_Cl_VDF.valeur(), Cisaillement_paroi_);
+  LoiParoiHybride::calculer_hyd(tab1, le_dom_VDF.valeur(), le_dom_Cl_VDF.valeur(), Cisaillement_paroi_);
 
   return 1;
 }
 
 int LoiParoiHybride_VDF::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 {
-  LoiParoiHybride::calculer_hyd(tab1, tab2, la_zone_VDF.valeur(), la_zone_Cl_VDF.valeur(), Cisaillement_paroi_);
+  LoiParoiHybride::calculer_hyd(tab1, tab2, le_dom_VDF.valeur(), le_dom_Cl_VDF.valeur(), Cisaillement_paroi_);
 
   return 1;
 }
 
 int LoiParoiHybride_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 {
-  LoiParoiHybride::calculer_hyd_BiK(tab_k, tab_eps, la_zone_VDF.valeur(), la_zone_Cl_VDF.valeur(), Cisaillement_paroi_);
+  LoiParoiHybride::calculer_hyd_BiK(tab_k, tab_eps, le_dom_VDF.valeur(), le_dom_Cl_VDF.valeur(), Cisaillement_paroi_);
 
   return 1;
 }

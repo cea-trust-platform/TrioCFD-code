@@ -38,7 +38,7 @@ public :
   Source_Transport_VDF_Elem_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   DoubleTab& calculer(DoubleTab& ) const override;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
   inline int has_interface_blocs() const override { return 1; }
@@ -53,8 +53,8 @@ protected :
   DoubleTab& ajouter_concen(DoubleTab& ) const;
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
 
 private:
   // methodes a surcharger sinon throw !!

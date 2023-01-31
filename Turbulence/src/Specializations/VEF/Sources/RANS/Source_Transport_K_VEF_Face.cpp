@@ -84,14 +84,14 @@ void Source_Transport_K_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_tur
 void Source_Transport_K_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
   const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  for (int fac = 0; fac < la_zone_VEF->nb_faces(); fac++)
+  for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     resu(fac) += (P(fac) - Eps(fac) - D(fac)) * volumes_entrelaces(fac);
 }
 
 void Source_Transport_K_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, DoubleTab& resu) const
 {
   const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  for (int fac = 0; fac < la_zone_VEF->nb_faces(); fac++)
+  for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     resu(fac) += (P(fac) - Eps(fac)) * volumes_entrelaces(fac);
 }
 

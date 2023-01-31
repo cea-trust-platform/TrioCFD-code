@@ -1156,7 +1156,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   //const Zone_dis& aa= zcldis.zone_dis();
   const Zone_dis_base& zone_dis = ns.zone_dis().valeur();
   const IntTab& face_voisins = zone_dis.face_voisins();
-  //const IntTab& face_voisins = ns.la_zone_dis.valeur().valeur().face_voisins();
+  //const IntTab& face_voisins = ns.le_dom_dis.valeur().valeur().face_voisins();
   //       const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zcldis);
   // Boucle sur les bords pour traiter les conditions aux limites
   //            double m_evap = 0.;

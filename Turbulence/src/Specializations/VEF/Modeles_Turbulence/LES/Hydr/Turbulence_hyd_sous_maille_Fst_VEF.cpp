@@ -61,7 +61,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 {
   //  static double C1 = 0.02587;
   //  static double C1 =0.777*0.18247*0.18247; // PQ:07/09/05 affectation de C1 dans le Readon
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
@@ -96,7 +96,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 ////  double C2 = cs*cs*9.56;
 //  double temps = mon_equation->inconnue().temps();
 //  DoubleVect& k = energie_cinetique_turb_.valeurs();
-//  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+//  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
 //  const int nb_elem = zone_VEF.nb_elem();
 //
 //  if (k.size() != nb_elem)
@@ -116,8 +116,8 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_Fst_VEF::calculer_racine()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem();
   const int nb_elem_tot = zone_VEF.nb_elem_tot();
   const DoubleVect& vol = zone_VEF.volumes();

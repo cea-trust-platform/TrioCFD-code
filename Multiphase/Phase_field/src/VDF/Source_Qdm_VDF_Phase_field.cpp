@@ -133,17 +133,17 @@ void Source_Qdm_VDF_Phase_field::associer_pb(const Probleme_base& pb)
   eq_ns.getset_compressible_()=compressible;
 }
 
-void Source_Qdm_VDF_Phase_field::associer_zones(const Zone_dis& zone_dis,
+void Source_Qdm_VDF_Phase_field::associer_domaines(const Zone_dis& zone_dis,
                                                 const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 }
 
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
@@ -269,7 +269,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
@@ -352,7 +352,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
@@ -464,7 +464,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
@@ -550,7 +550,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::ajouter(DoubleTab& resu) const
 {
-  //   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  //   const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   //   const IntTab& face_voisins = zone_VDF.face_voisins();
   //   const DoubleVect& volumes = zone_VDF.volumes();
 

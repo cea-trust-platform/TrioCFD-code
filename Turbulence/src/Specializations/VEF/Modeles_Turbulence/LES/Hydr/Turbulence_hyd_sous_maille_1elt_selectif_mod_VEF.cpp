@@ -144,7 +144,7 @@ void Turbulence_hyd_sous_maille_1elt_selectif_mod_VEF::cutoff()
   //  static const double Sin2Angl = SIN2ANGL_new2;
   double Sin2Angl;
   const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();
@@ -294,7 +294,7 @@ void Turbulence_hyd_sous_maille_1elt_selectif_mod_VEF::calculer_angle_limite(con
    //  CSMS2 = 27/8*M_PI^2*CSMS1^2*C_k^3
    double temps = mon_equation->inconnue().temps();
    DoubleVect& k = energie_cinetique_turb_.valeurs();
-   int nb_poly = la_zone_VEF->zone().nb_elem();
+   int nb_poly = le_dom_VEF->zone().nb_elem();
 
    if (k.size() != nb_poly) {
    Cerr << "erreur dans la taille du DoubleVect valeurs de l'energie cinetique turbulente" << finl;

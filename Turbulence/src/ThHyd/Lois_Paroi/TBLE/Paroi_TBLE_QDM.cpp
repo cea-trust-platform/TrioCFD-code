@@ -186,7 +186,7 @@ int Paroi_TBLE_QDM::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return -1;
 }
 
-int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_base& la_zone_Cl)
+int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_base& le_dom_Cl)
 {
   const int nb_elem = zone_dis.nb_elem();
 
@@ -198,7 +198,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_b
 
   for (int n_bord=0; n_bord<zone_dis.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -234,7 +234,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_b
       compteur_faces_paroi=0;
       for (int n_bord=0; n_bord<zone_dis.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
 
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
             {
@@ -334,7 +334,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_b
 }
 
 
-int Paroi_TBLE_QDM::reprendre(Entree&, const Zone_dis_base& zone_dis, const Zone_Cl_dis_base& la_zone_Cl, double tps_reprise)
+int Paroi_TBLE_QDM::reprendre(Entree&, const Zone_dis_base& zone_dis, const Zone_Cl_dis_base& le_dom_Cl, double tps_reprise)
 {
   if (restart == 0)    // Si on souhaite bien reprendre TBLE
     {
@@ -358,7 +358,7 @@ int Paroi_TBLE_QDM::reprendre(Entree&, const Zone_dis_base& zone_dis, const Zone
       // On compte avant pour dimensionner
       for (int n_bord=0; n_bord<zone_dis.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
 
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -373,7 +373,7 @@ int Paroi_TBLE_QDM::reprendre(Entree&, const Zone_dis_base& zone_dis, const Zone
 
       for (int n_bord=0; n_bord<zone_dis.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -402,7 +402,7 @@ int Paroi_TBLE_QDM::reprendre(Entree&, const Zone_dis_base& zone_dis, const Zone
 
 
 
-int Paroi_TBLE_QDM::sauvegarder(Sortie&, const Zone_dis_base& zone_dis, const Zone_Cl_dis_base& la_zone_Cl,double tps) const
+int Paroi_TBLE_QDM::sauvegarder(Sortie&, const Zone_dis_base& zone_dis, const Zone_Cl_dis_base& le_dom_Cl,double tps) const
 {
   Cerr << "Sauvegarde du champ TBLE  au temps = " << tps<< finl;
   const int ME=Process::me();
@@ -415,7 +415,7 @@ int Paroi_TBLE_QDM::sauvegarder(Sortie&, const Zone_dis_base& zone_dis, const Zo
   int compteur_faces_paroi=0;
   for (int n_bord=0; n_bord<zone_dis.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());

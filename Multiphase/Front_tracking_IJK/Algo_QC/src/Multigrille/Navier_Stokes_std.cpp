@@ -328,14 +328,14 @@ void Navier_Stokes_std::completer()
   initialise_residu(1);
 
   la_pression.associer_eqn(*this);
-  la_pression->completer(la_zone_Cl_dis.valeur());
+  la_pression->completer(le_dom_Cl_dis.valeur());
   divergence_U.associer_eqn(*this);
   gradient_P.associer_eqn(*this);
   la_pression_en_pa.associer_eqn(*this);
-  la_pression_en_pa->completer(la_zone_Cl_dis.valeur());
+  la_pression_en_pa->completer(le_dom_Cl_dis.valeur());
   divergence.completer();
   gradient.completer();
-  assembleur_pression_.associer_zone_cl_dis_base(zone_Cl_dis().valeur());
+  assembleur_pression_.associer_domaine_cl_dis_base(zone_Cl_dis().valeur());
   assembleur_pression_.completer(*this);
   if (sub_type(Multigrille_Adrien,solveur_pression_.valeur()))
     {
@@ -402,7 +402,7 @@ void Navier_Stokes_std::discretiser_assembleur_pression()
   type += discretisation().que_suis_je();
   Cerr << "Navier_Stokes_std::discretiser_assembleur_pression : type="<< type << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
+  assembleur_pression_.associer_domaine_dis_base(zone_dis().valeur());
 }
 
 /*! @brief Renvoie le nombre d'operateurs de l'equation: Pour Navier Stokes Standard c'est 2.
@@ -879,7 +879,7 @@ int Navier_Stokes_std::preparer_calcul()
 
 
   // Au cas ou une cl de pression depend de u que l'on vient de modifier
-  la_zone_Cl_dis->mettre_a_jour(temps);
+  le_dom_Cl_dis->mettre_a_jour(temps);
   gradient.calculer(la_pression.valeurs(), gradient_P.valeurs());
 
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression ap projeter", la_pression.valeurs());

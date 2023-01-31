@@ -46,16 +46,16 @@ Entree& Source_LDC_VDF::readOn(Entree& s )
 }
 
 
-void Source_LDC_VDF::associer_zones(const Zone_dis& zone_dis,
+void Source_LDC_VDF::associer_domaines(const Zone_dis& zone_dis,
                                     const Zone_Cl_dis& zone_cl_dis)
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
   // const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
 
-  // const Zone& ma_zone = zvdf.zone();
+  // const Zone& mon_dom = zvdf.zone();
   Champ_Inc_base& inco = equation().inconnue();
   int nb_compo = inco.nb_comp();
-  //Cerr<<" nb_compo dans Source_LDC_VDF::associer_zones = "<<nb_compo<<finl;
+  //Cerr<<" nb_compo dans Source_LDC_VDF::associer_domaines = "<<nb_compo<<finl;
 
   if(nb_compo == 1)
     {
@@ -83,10 +83,10 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
   DoubleTab& present_fin = eq_fine.inconnue().valeurs();
   DoubleTab& passe_fin = eq_fine.inconnue().passe();
   double dt = eq_fine.schema_temps().pas_de_temps();
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF, eq.zone_dis().valeur());
-  const Zone_VDF& la_zone_fine = ref_cast(Zone_VDF, eq_fine.zone_dis().valeur());
-  const DoubleVect& volumes = la_zone.volumes();
-  const DoubleVect& volumes_fin = la_zone_fine.volumes();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF, eq.zone_dis().valeur());
+  const Zone_VDF& le_dom_fine = ref_cast(Zone_VDF, eq_fine.zone_dis().valeur());
+  const DoubleVect& volumes = le_dom.volumes();
+  const DoubleVect& volumes_fin = le_dom_fine.volumes();
   const IntVect& indice_gros = connect.indice_gros();
   int i, nb_compo;
 
@@ -103,13 +103,13 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
 
   if(nb_compo == 1)
     {
-      op_fin.resize(la_zone_fine.nb_elem());
-      op_fin_restreint.resize(la_zone.nb_elem());
+      op_fin.resize(le_dom_fine.nb_elem());
+      op_fin_restreint.resize(le_dom.nb_elem());
     }
   else
     {
-      op_fin.resize(la_zone_fine.nb_faces());
-      op_fin_restreint.resize(la_zone.nb_faces());
+      op_fin.resize(le_dom_fine.nb_faces());
+      op_fin_restreint.resize(le_dom.nb_faces());
     }
   //////////////////
 
@@ -127,9 +127,9 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
 
 
   //restriction
-  restriction.restreindre(la_zone, la_zone_fine,connect.connectivites_elemF_elemG(),op_fin_restreint , op_fin,1);
+  restriction.restreindre(le_dom, le_dom_fine,connect.connectivites_elemF_elemG(),op_fin_restreint , op_fin,1);
   la_correction = present;
-  restriction.restreindre(la_zone, la_zone_fine,connect.connectivites_elemF_elemG(),la_correction , present_fin,1);
+  restriction.restreindre(le_dom, le_dom_fine,connect.connectivites_elemF_elemG(),la_correction , present_fin,1);
 
   Cout << " ope fin restreint = " << op_fin_restreint << finl;
 

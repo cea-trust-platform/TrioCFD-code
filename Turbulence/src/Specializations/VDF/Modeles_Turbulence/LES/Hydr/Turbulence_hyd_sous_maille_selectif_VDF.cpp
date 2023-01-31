@@ -120,7 +120,7 @@ void Turbulence_hyd_sous_maille_selectif_VDF::cutoff()
 {
   static const double Sin2Angl = SIN2ANGL;
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   int nb_poly = zone_VDF.zone().nb_elem();

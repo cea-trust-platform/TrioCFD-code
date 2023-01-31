@@ -54,7 +54,7 @@ public:
   inline DoubleTab& calculer(DoubleTab& ) const override ;
   void completer() override;
   void associer_pb(const Probleme_base& ) override;
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override = 0;
+  void associer_domaines(const Zone_dis&, const Zone_Cl_dis& ) override = 0;
   void mettre_a_jour(double temps) override
   {
     ;

@@ -61,7 +61,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
       // initialisation de Teta_i
       const Zone_VDF& zvdf = zone_VDF.valeur();
 
-      const DoubleTab& T_f = ma_zone_cl_dis->equation().inconnue().valeurs();
+      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -81,7 +81,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
   else
     {
       // initialisation de Teta_i en VEF
-      const DoubleTab& T_p = ma_zone_cl_dis->equation().inconnue().valeurs();
+      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -106,11 +106,11 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 {
-  const Zone_VDF& la_zone_vdf = zone_VDF.valeur();
-  const Milieu_base& le_milieu = ma_zone_cl_dis->equation().milieu();
+  const Zone_VDF& le_dom_vdf = zone_VDF.valeur();
+  const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
   ////double d_Lambda = Lambda(0,0);
-  const DoubleTab& T_f = ma_zone_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -146,7 +146,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
       d_Cp = Cp(0,0);
     }
 
-  Schema_Temps_base& sch = ma_zone_cl_dis->equation().probleme().schema_temps();
+  Schema_Temps_base& sch = mon_dom_cl_dis->equation().probleme().schema_temps();
   double dt= sch.pas_de_temps() ;
 
   int is_relax=1;
@@ -164,7 +164,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
       if (!is_conduc_unif)
         d_Lambda = Lambda(elem);
       double omega;
-      double e = la_zone_vdf.dist_norm_bord(numfa+ndeb);
+      double e = le_dom_vdf.dist_norm_bord(numfa+ndeb);
       if (is_relax)
         {
 
@@ -213,7 +213,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VEF()
 {
-  const DoubleTab& T_p = ma_zone_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
   double Temp;
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();

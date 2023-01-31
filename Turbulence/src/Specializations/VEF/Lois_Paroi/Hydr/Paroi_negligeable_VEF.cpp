@@ -64,15 +64,15 @@ int Paroi_negligeable_VEF::init_lois_paroi()
 
   // Dimensionnement du tableau elem_paroi
   int num_cl,fac,i;
-  const Conds_lim& les_cl = la_zone_Cl_VEF->les_conditions_limites();
-  //  const IntTab& elem_faces = la_zone_VEF->elem_faces();
-  const IntTab& face_voisins = la_zone_VEF->face_voisins();
+  const Conds_lim& les_cl = le_dom_Cl_VEF->les_conditions_limites();
+  //  const IntTab& elem_faces = le_dom_VEF->elem_faces();
+  const IntTab& face_voisins = le_dom_VEF->face_voisins();
 
-  DoubleTrav Verif_elem_double(la_zone_VEF->nb_elem());
+  DoubleTrav Verif_elem_double(le_dom_VEF->nb_elem());
   compteur_elem_paroi = 0;
   Verif_elem_double = 0;
-  elem_paroi.resize(la_zone_VEF->nb_faces_bord());
-  elem_paroi_double.resize(la_zone_VEF->nb_faces_bord());
+  elem_paroi.resize(le_dom_VEF->nb_faces_bord());
+  elem_paroi_double.resize(le_dom_VEF->nb_faces_bord());
 
   for (num_cl=0; num_cl<les_cl.size(); num_cl++)
     {
@@ -136,7 +136,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
       IntVect num(dimension);
 
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
       const IntTab& face_voisins = zone_VEF.face_voisins();
       const IntTab& elem_faces = zone_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -160,7 +160,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 
       for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {
@@ -237,7 +237,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
       IntVect num(dimension);
 
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
       const IntTab& face_voisins = zone_VEF.face_voisins();
       const IntTab& elem_faces = zone_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -261,7 +261,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
       for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {

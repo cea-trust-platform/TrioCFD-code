@@ -42,7 +42,7 @@ class Champ_Fonc_reprise_IJK: public Champ_Fonc_base
 
 public :
 
-  inline void associer_zone_dis_base(const Zone_dis_base&) override;
+  inline void associer_domaine_dis_base(const Zone_dis_base&) override;
   const Zone_dis_base& zone_dis_base() const override;
   void mettre_a_jour(double ) override;
 
@@ -76,9 +76,9 @@ private:
   inline virtual Champ_Inc_base& le_champ();
 };
 
-inline void Champ_Fonc_reprise_IJK::associer_zone_dis_base(const Zone_dis_base& la_zone_dis_base)
+inline void Champ_Fonc_reprise_IJK::associer_domaine_dis_base(const Zone_dis_base& le_dom_dis_base)
 {
-  zone_dis=la_zone_dis_base;
+  zone_dis=le_dom_dis_base;
 }
 inline const Champ_Inc_base& Champ_Fonc_reprise_IJK::le_champ() const
 {

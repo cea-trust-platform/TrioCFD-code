@@ -56,8 +56,8 @@ public:
 
 protected:
 
-  REF(Zone_EF) la_zone_EF;
-  REF(Zone_Cl_EF) la_zone_Cl_EF;
+  REF(Zone_EF) le_dom_EF;
+  REF(Zone_Cl_EF) le_dom_Cl_EF;
   IntVect face_keps_imposee_; // avec descripteur parallele
   int flag_face_keps_imposee_;
 };

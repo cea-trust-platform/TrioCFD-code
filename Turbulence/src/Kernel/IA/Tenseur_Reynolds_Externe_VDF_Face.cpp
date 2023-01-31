@@ -160,20 +160,20 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
     }
 }
 
-void Tenseur_Reynolds_Externe_VDF_Face::associer_zones(const Zone_dis& zone_dis,
+void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Zone_dis& zone_dis,
                                                        const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 
-  nelem_ = la_zone_VDF.valeur().nb_elem();
+  nelem_ = le_dom_VDF.valeur().nb_elem();
 }
 
 
 void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntVect& orientation = zone_VDF.orientation();
   const DoubleVect& porosite_surf = zone_Cl_VDF.equation().milieu().porosite_face();
@@ -338,10 +338,10 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::calculer(DoubleTab& resu) const
 
 void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 {
-  int nb_elem_tot = la_zone_VDF.valeur().nb_elem_tot();
-  int nb_faces_tot = la_zone_VDF.valeur().nb_faces_tot();
-  const IntTab& face_vois = la_zone_VDF.valeur().face_voisins();
-  const DoubleVect& volumes = la_zone_VDF.valeur().volumes();
+  int nb_elem_tot = le_dom_VDF.valeur().nb_elem_tot();
+  int nb_faces_tot = le_dom_VDF.valeur().nb_faces_tot();
+  const IntTab& face_vois = le_dom_VDF.valeur().face_voisins();
+  const DoubleVect& volumes = le_dom_VDF.valeur().volumes();
 
   DoubleTab valeurs_source(nb_elem_tot,dimension);
   valeurs_source = 0;
@@ -386,9 +386,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
           }
     }
 
-  const IntTab& elem_faces   = la_zone_VDF.valeur().elem_faces();
-  const IntTab& face_voisins = la_zone_VDF.valeur().face_voisins();
-  const DoubleVect& inverse_vol  = la_zone_VDF.valeur().inverse_volumes();
+  const IntTab& elem_faces   = le_dom_VDF.valeur().elem_faces();
+  const IntTab& face_voisins = le_dom_VDF.valeur().face_voisins();
+  const DoubleVect& inverse_vol  = le_dom_VDF.valeur().inverse_volumes();
   const int nb_faces_elem=elem_faces.line_size();
 
   int facei;
@@ -408,7 +408,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 
               for (int j=0; j<Objet_U::dimension; j++)
                 {
-                  div+=signe*la_zone_VDF.valeur().face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
+                  div+=signe*le_dom_VDF.valeur().face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
                 }
             }
           div*= inverse_vol(elem);
@@ -430,8 +430,8 @@ void Tenseur_Reynolds_Externe_VDF_Face::completer()
 
 void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
 
   int nb_elem_tot=zone_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);

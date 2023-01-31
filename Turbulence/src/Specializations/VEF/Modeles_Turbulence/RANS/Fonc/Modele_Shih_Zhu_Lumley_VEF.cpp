@@ -446,8 +446,8 @@ void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, 
 void  Modele_Shih_Zhu_Lumley_VEF::associer(const Zone_dis& zone_dis,
                                            const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
 
   Initialisation( zone_dis );
 }

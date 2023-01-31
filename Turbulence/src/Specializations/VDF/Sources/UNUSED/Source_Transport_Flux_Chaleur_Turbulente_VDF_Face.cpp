@@ -111,11 +111,11 @@ void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_pb(const Proble
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_zones(const Zone_dis& zone_dis,
+void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const Zone_dis& zone_dis,
                                                                        const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 }
 
 ////////////////////////////////////////////////////////////
@@ -130,8 +130,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
 
   // Calcul des du/dy+dv/dx ...et des gradients par elements
 
-  //  const Zone& la_zone=zone_VDF.zone();
-  //  int nb_faces_elem = la_zone.nb_faces_elem();
+  //  const Zone& le_dom=zone_VDF.zone();
+  //  int nb_faces_elem = le_dom.nb_faces_elem();
   int nb_elem = zone_VDF.nb_elem();
   int nb_elem_tot = zone_VDF.nb_elem_tot();
   int n_deb = zone_VDF.premiere_arete_interne();
@@ -289,8 +289,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
 
   // Calcul des du/dy+dv/dx ...et des gradients par elements
 
-  //  const Zone& la_zone=zone_VDF.zone();
-  //  int nb_faces_elem = la_zone.nb_faces_elem();
+  //  const Zone& le_dom=zone_VDF.zone();
+  //  int nb_faces_elem = le_dom.nb_faces_elem();
   int nb_elem = zone_VDF.nb_elem();
   int nb_elem_tot = zone_VDF.nb_elem_tot();
   int n_deb = zone_VDF.premiere_arete_interne();
@@ -461,8 +461,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
@@ -488,8 +488,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
@@ -504,8 +504,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
 
 DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntVect& orientation = zone_VDF.orientation();
   const DoubleTab& temper = eq_thermique->inconnue().valeurs();

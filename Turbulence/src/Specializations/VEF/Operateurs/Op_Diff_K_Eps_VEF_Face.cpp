@@ -51,7 +51,7 @@ void Op_Diff_K_Eps_VEF_Face::associer(const Zone_dis& zone_dis,
   const Zone_VEF& zVEF = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zclVEF = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
   inconnue_ = inco;
-  la_zone_vef = zVEF;
+  le_dom_vef = zVEF;
   la_zcl_vef=zclVEF;
 }
 
@@ -84,7 +84,7 @@ void Op_Diff_K_Eps_VEF_Face::associer_diffusivite_turbulente()
 }
 
 
-void  Op_Diff_K_Eps_VEF_Face::calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& la_zone,int num_face,int num2,int dimension_inut,
+void  Op_Diff_K_Eps_VEF_Face::calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& le_dom,int num_face,int num2,int dimension_inut,
                                         int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const
 {
   double valA=viscA(num_face,num2,num_elem,diffu_turb);
@@ -101,7 +101,7 @@ void  Op_Diff_K_Eps_VEF_Face::calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& l
 DoubleTab& Op_Diff_K_Eps_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();
@@ -478,7 +478,7 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
 {
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const IntTab& face_voisins = zone_VEF.face_voisins();
@@ -948,7 +948,7 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
 void Op_Diff_K_Eps_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   int n_bord;
   // Prise en compte des conditions aux limites de Neumnan a la paroi
 
@@ -1009,7 +1009,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
       DoubleVect& coeff = matrice.get_set_coeff();
       int nb_comp=2;
 
-      Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+      Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
       if (face_keps_imposee.size_array()>0)
         // en plus des dirichlets ????
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
@@ -1046,7 +1046,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
       DoubleVect& coeff = matrice.get_set_coeff();
       int nb_comp=2;
 
-      Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+      Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
       if (face_keps_imposee.size_array()>0)
         // en plus des dirichlets ????
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
@@ -1081,7 +1081,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
       const IntVect& tab1=matrice.get_tab1();
       DoubleVect& coeff = matrice.get_set_coeff();
 
-      Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+      Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
       if (face_keps_imposee.size_array()>0)
         // en plus des dirichlets ????
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....

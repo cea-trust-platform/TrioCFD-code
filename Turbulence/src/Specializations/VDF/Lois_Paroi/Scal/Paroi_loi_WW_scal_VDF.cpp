@@ -74,14 +74,14 @@ double Paroi_loi_WW_scal_VDF::Fthpar(double y_plus,double Pr,double Beta)
 
 int Paroi_loi_WW_scal_VDF::init_lois_paroi()
 {
-  tab_u_star.resize(la_zone_VDF->nb_faces_bord());
+  tab_u_star.resize(le_dom_VDF->nb_faces_bord());
   return Paroi_scal_hyd_base_VDF::init_lois_paroi();
 }
 
 int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
   static double C = 1./2.12;
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
@@ -137,7 +137,7 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       // Si l'on est a une paroi a flux impose, le flux est connu et il est
       // directement pris a la condition aux limites pour le calcul des flux diffusifs.
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
         {

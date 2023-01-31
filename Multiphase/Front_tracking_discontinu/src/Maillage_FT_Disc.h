@@ -97,7 +97,7 @@ public:
                                   const Intersections_Elem_Facettes* ief=NULL) const;
 
   void associer_equation_transport(const Equation_base& equation) override;
-  void associer_zone_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours);
+  void associer_domaine_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours);
   Transport_Interfaces_FT_Disc& equation_transport();
   const Transport_Interfaces_FT_Disc& equation_transport() const;
   int type_statut() const;
@@ -280,7 +280,7 @@ protected:
   REF(Transport_Interfaces_FT_Disc) refequation_transport_;
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
   // a la zone_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
-  // C'est initialise dans associer_zone_dis.
+  // C'est initialise dans associer_domaine_dis.
   REF(Zone_dis) refzone_dis_;
   // Pour la meme raison, ajout d'une ref au parcours de l'interface:
   REF(Parcours_interface) refparcours_interface_;

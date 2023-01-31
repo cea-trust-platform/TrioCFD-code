@@ -47,7 +47,7 @@ class Source_DWF_VDF : public Source_base
 
 public:
 
-  inline void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
+  inline void associer_domaines(const Zone_dis&, const Zone_Cl_dis& ) override;
 
   inline DoubleTab& ajouter(DoubleTab& ) const override ;
   inline DoubleTab& calculer(DoubleTab& ) const override ;
@@ -83,7 +83,7 @@ inline DoubleTab& Source_DWF_VDF::calculer(DoubleTab& resu) const
   return resu;
 }
 
-void Source_DWF_VDF::associer_zones(const Zone_dis& zone_dis,
+void Source_DWF_VDF::associer_domaines(const Zone_dis& zone_dis,
                                     const Zone_Cl_dis& zone_cl_dis)
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());

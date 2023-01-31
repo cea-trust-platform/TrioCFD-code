@@ -112,7 +112,7 @@ protected:
   int nkr, nit;
   double rec_min, rec_max, epsGMRES;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
   DoubleTab& laplacien(const DoubleTab&, DoubleTab&) const;
   DoubleTab& div_kappa_grad(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   void calculer_alpha_gradC_carre(DoubleTab&) const;
@@ -143,8 +143,8 @@ protected:
   //---------------
 
   REF(Probleme_base) le_probleme2;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
 };
 
 inline const DoubleVect& Source_Con_Phase_field::get_u_carre()

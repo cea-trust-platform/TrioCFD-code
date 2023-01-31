@@ -65,14 +65,14 @@ Entree& Paroi_hyd_base_EF::readOn(Entree& s)
 
 void Paroi_hyd_base_EF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_EF = ref_cast(Zone_EF,zone_dis.valeur());
-  la_zone_Cl_EF = ref_cast(Zone_Cl_EF,zone_Cl_dis.valeur());
+  le_dom_EF = ref_cast(Zone_EF,zone_dis.valeur());
+  le_dom_Cl_EF = ref_cast(Zone_Cl_EF,zone_Cl_dis.valeur());
 }
 
 void Paroi_hyd_base_EF::init_lois_paroi_()
 {
-  const Zone_VF& zvf = la_zone_EF.valeur();
-  const int nb_faces_bord = la_zone_EF->nb_faces_bord();
+  const Zone_VF& zvf = le_dom_EF.valeur();
+  const int nb_faces_bord = le_dom_EF->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
@@ -105,7 +105,7 @@ void Paroi_hyd_base_EF::imprimer_premiere_ligne_ustar(int boundaries_, const LIS
 {
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
+  const Zone_EF& zone_EF = le_dom_EF.valeur();
   Nom ligne, err;
 
   err="";
@@ -113,7 +113,7 @@ void Paroi_hyd_base_EF::imprimer_premiere_ligne_ustar(int boundaries_, const LIS
 
   for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       const Nom& nom_bord = la_cl.frontiere_dis().le_nom();
       if( je_suis_maitre()
           && ( boundaries_list.contient(nom_bord) || boundaries_list.size()==0 ) )
@@ -148,7 +148,7 @@ void Paroi_hyd_base_EF::imprimer_premiere_ligne_ustar(int boundaries_, const LIS
 
 void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const
 {
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
+  const Zone_EF& zone_EF = le_dom_EF.valeur();
   const Probleme_base& pb=mon_modele_turb_hyd->equation().probleme();
   const Schema_Temps_base& sch=pb.schema_temps();
   int ndeb,nfin, size0, num_bord;
@@ -170,7 +170,7 @@ void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, co
 
   for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
@@ -204,7 +204,7 @@ void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, co
   num_bord=0;
   for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {

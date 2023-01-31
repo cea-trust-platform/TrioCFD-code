@@ -35,10 +35,10 @@ Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Trans
 Sortie& Source_Transport_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VDF_Elem_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
+void Source_Transport_VDF_Elem_base::associer_domaines(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 void Source_Transport_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -51,7 +51,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
@@ -102,15 +102,15 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeurs();
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
-  la_zone_VDF->zone().creer_tableau_elements(G);
+  le_dom_VDF->zone().creer_tableau_elements(G);
 
 
-  if (sub_type(Champ_Uniforme,beta_t->valeur())) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
-  else calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
+  if (sub_type(Champ_Uniforme,beta_t->valeur())) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
+  else calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
 
   fill_resu_anisotherme(G,volumes,porosite_vol,resu); // voir les classes filles
   return resu;
@@ -124,18 +124,18 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
   const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
-  const DoubleVect& g = gravite->valeurs(), &volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& g = gravite->valeurs(), &volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const int nb_consti = eq_concentration->constituant().nb_constituants();
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
-  la_zone_VDF->zone().creer_tableau_elements(G);
+  le_dom_VDF->zone().creer_tableau_elements(G);
 
-  if (nb_consti == 1) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G,concen,diffu_turb,ch_beta_concen(0,0),g);
+  if (nb_consti == 1) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_co,G,concen,diffu_turb,ch_beta_concen(0,0),g);
   else
     {
       const DoubleVect& d_beta_c = ch_beta_concen.valeurs();
-      calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G,concen,diffu_turb,d_beta_c,g,nb_consti);
+      calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_co,G,concen,diffu_turb,d_beta_c,g,nb_consti);
     }
 
   fill_resu_concen(G,volumes,porosite_vol,resu); // voir les classes filles
@@ -162,22 +162,22 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
   const DoubleTab& diffu_turb = le_modele_scal_co.conductivite_turbulente().valeurs(), &tab_beta_t = ch_beta_temper.valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scal_co.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem(), &g = gravite->valeurs();
+  const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &g = gravite->valeurs();
   const int nb_consti = eq_concentration->constituant().nb_constituants();
 
   // Ajout d'un espace virtuel au tableaux Gt et Gc
   DoubleVect G_t, G_c;
-  la_zone_VDF->zone().creer_tableau_elements(G_t);
-  la_zone_VDF->zone().creer_tableau_elements(G_c);
+  le_dom_VDF->zone().creer_tableau_elements(G_t);
+  le_dom_VDF->zone().creer_tableau_elements(G_c);
 
-  if (sub_type(Champ_Uniforme,ch_beta_temper.valeur())) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t(0,0),g);
-  else calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t,g);
+  if (sub_type(Champ_Uniforme,ch_beta_temper.valeur())) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t(0,0),g);
+  else calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t,g);
 
-  if (nb_consti == 1) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G_c,concen,diffu_turb,ch_beta_concen(0,0),g);
+  if (nb_consti == 1) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_co,G_c,concen,diffu_turb,ch_beta_concen(0,0),g);
   else
     {
       const DoubleVect& d_beta_c = ch_beta_concen.valeurs();
-      calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G_c,concen,diffu_turb,d_beta_c,g,nb_consti);
+      calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_co,G_c,concen,diffu_turb,d_beta_c,g,nb_consti);
     }
 
   fill_resu_anisotherme_concen(G_t,G_c,volumes,porosite_vol,resu); // voir les classes filles

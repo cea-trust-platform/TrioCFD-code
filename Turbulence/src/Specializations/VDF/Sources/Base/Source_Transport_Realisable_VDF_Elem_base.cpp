@@ -45,7 +45,7 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
 
-  const int nb_elem = la_zone_VDF->nb_elem();
+  const int nb_elem = le_dom_VDF->nb_elem();
   DoubleTrav P(visco_turb), CC1(nb_elem), S(nb_elem);
   CC1 = mon_modele_fonc.get_C1();
   S = mon_modele_fonc.get_S();
@@ -65,7 +65,7 @@ void Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices_t matrice
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const DoubleVect& porosite = la_zone_Cl_VDF->equation().milieu().porosite_elem(), &volumes=la_zone_VDF->volumes();
+  const DoubleVect& porosite = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &volumes=le_dom_VDF->volumes();
   const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);

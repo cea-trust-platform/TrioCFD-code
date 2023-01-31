@@ -42,7 +42,7 @@ class Zone_Cl_dis;
  *  Turbulence_paroi_base
  *
  */
-void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Zone_VEF& zone_VEF,const REF(Zone_Cl_VEF) la_zone_Cl_VEF,int is_champ_P1NC);
+void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Zone_VEF& zone_VEF,const REF(Zone_Cl_VEF) le_dom_Cl_VEF,int is_champ_P1NC);
 
 
 class Paroi_std_hyd_VEF : public Paroi_hyd_base_VEF, public Paroi_log_QDM

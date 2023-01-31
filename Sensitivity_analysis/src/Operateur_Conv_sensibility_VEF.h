@@ -53,7 +53,7 @@ public :
   double application_LIMITEUR(double, double, Motcle&) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_VEF) le_dom_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
   mutable DoubleVect fluent;           // tableau qui sert pour le calcul du pas de temps de stabilite
   mutable ArrOfInt traitement_pres_bord_;

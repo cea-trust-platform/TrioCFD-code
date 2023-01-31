@@ -46,14 +46,14 @@ void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
 
 void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const Zone_VDF& zone_VDF_NS = ref_cast(Zone_VDF,eq_hydraulique->zone_dis().valeur());
   const Zone_Cl_VDF& zone_Cl_VDF_NS = ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur());
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const int nbcouches = mon_eq_transport_K_Eps->get_nbcouches();

@@ -111,8 +111,8 @@ void Modele_turbulence_Longueur_Melange_VEF::associer(
   const Zone_dis& zone_dis,
   const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
 }
 
 Champ_Fonc& Modele_turbulence_Longueur_Melange_VEF::calculer_viscosite_turbulente()
@@ -121,7 +121,7 @@ Champ_Fonc& Modele_turbulence_Longueur_Melange_VEF::calculer_viscosite_turbulent
   double Cmu = CMU;
 
   double temps = mon_equation->inconnue().temps();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
   const int nb_elem = zone_VEF.nb_elem();
@@ -245,8 +245,8 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_Sij2()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
   const Champ_P1NC& ch= ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem_tot();
 
   DoubleTab duidxj(nb_elem,dimension,dimension);
@@ -277,7 +277,7 @@ void Modele_turbulence_Longueur_Melange_VEF::lire_distance_paroi( )
 
   // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   DoubleTab& wall_length = wall_length_.valeurs();
   wall_length=-1.;
 
@@ -327,7 +327,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
   //                 f_vd^4 < 0.99          =>   u+.y+ < 2784
   //
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem();
   DoubleTab& wall_length = wall_length_.valeurs();
   int nb_face_elem = zone_VEF.zone().nb_faces_elem();

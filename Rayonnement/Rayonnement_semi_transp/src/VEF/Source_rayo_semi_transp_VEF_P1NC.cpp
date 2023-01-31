@@ -98,7 +98,7 @@ void Source_rayo_semi_transp_VEF_P1NC::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VEF_P1NC::associer_zones(const Zone_dis& zone_dis,
+void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Zone_dis& zone_dis,
                                                       const Zone_Cl_dis& zone_Cl_dis)
 {
   ;

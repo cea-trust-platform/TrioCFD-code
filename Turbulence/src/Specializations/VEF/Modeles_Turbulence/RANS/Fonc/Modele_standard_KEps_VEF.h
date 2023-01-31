@@ -59,8 +59,8 @@ public :
 
 protected:
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Zone_VEF) le_dom_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
   /*   REF(Fluide_Incompressible) le_fluide; */
   /*   REF(Champ_Inc) la_vitesse_transportante; */
   /*   REF(Transport_K_Eps_Bas_Reynolds) eq_transport_K_Eps_Bas_Re; */

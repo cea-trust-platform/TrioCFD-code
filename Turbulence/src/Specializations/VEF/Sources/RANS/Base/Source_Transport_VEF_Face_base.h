@@ -36,7 +36,7 @@ public :
   Source_Transport_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
@@ -49,8 +49,8 @@ protected :
   DoubleTab& ajouter_concen(DoubleTab& ) const;
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Zone_VEF) le_dom_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
 
 private:
   // methodes a surcharger sinon throw !!

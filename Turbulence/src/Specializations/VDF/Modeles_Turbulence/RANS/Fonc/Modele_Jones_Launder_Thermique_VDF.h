@@ -59,8 +59,8 @@ public :
 
 protected:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
   REF(Fluide_base) le_fluide;
   REF(Champ_Inc) la_vitesse_transportante;
   REF(Transport_Fluctuation_Temperature_W_Bas_Re) eq_transport_Fluctu_Temp_Bas_Re;

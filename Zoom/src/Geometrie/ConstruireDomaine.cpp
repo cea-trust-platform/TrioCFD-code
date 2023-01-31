@@ -183,7 +183,7 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
       //Cout << "Dans ConstruireDomaine  type face  = " << les_faces.type_face() << finl;
       bord.nommer(itr.le_nom());
       bord.typer_faces(les_faces.type_face());
-      bord.associer_zone(zoneraf);
+      bord.associer_domaine(zoneraf);
 
       int nb_faces = les_faces.nb_faces_tot();
       int nb_som_faces = les_faces.nb_som_faces();
@@ -213,7 +213,7 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
   Bord& bord=mes_faces_bord.add(Bord());
   bord.nommer("interface");
   bord.typer_faces(elem.type_face());
-  bord.associer_zone(zoneraf);
+  bord.associer_domaine(zoneraf);
   bord.dimensionner(0);
 
   Faces mes_faces;
@@ -221,7 +221,7 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
     // bloc a factoriser avec Zone_VF.cpp :
     Type_Face type_face = zone0.type_elem().type_face(0);
     mes_faces.typer(type_face);
-    mes_faces.associer_zone(zone0);
+    mes_faces.associer_domaine(zone0);
 
     Static_Int_Lists connectivite_som_elem;
     const int     nb_sommets_tot = zone0.nb_som_tot();

@@ -57,7 +57,7 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_VEF) le_dom_vef;
   REF(Champ_base) diffusivite_;
   mutable DoubleTab nu_;
   REF(Zone_Cl_VEF) la_zcl_vef;
@@ -68,7 +68,7 @@ protected :
  */
 inline  void Op_Diff_K_Eps_Bas_Re_VEF_Face::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
 /*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
@@ -76,7 +76,7 @@ inline  void Op_Diff_K_Eps_Bas_Re_VEF_Face::dimensionner(Matrice_Morse& matrice)
  */
 inline void Op_Diff_K_Eps_Bas_Re_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+  Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
 }
 
 

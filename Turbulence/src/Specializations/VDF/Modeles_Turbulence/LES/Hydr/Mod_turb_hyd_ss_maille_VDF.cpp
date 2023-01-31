@@ -42,13 +42,13 @@ Entree& Mod_turb_hyd_ss_maille_VDF::readOn(Entree& is )
 void Mod_turb_hyd_ss_maille_VDF::associer(const Zone_dis& zone_dis,
                                           const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 void Mod_turb_hyd_ss_maille_VDF::calculer_longueurs_caracteristiques()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   int nb_elem = zone_VDF.zone().nb_elem();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const IntVect& orientation = zone_VDF.orientation();

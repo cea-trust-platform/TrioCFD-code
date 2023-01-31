@@ -168,7 +168,7 @@ void Transport_K_ou_Eps_base::associer(const Equation_base& eqn_hydr)
 {
   Equation_base::associer_pb_base(eqn_hydr.probleme());
   Equation_base::associer_sch_tps_base(eqn_hydr.schema_temps());
-  Equation_base::associer_zone_dis(eqn_hydr.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_hydr.zone_dis());
 }
 
 /*! @brief Controle le champ inconnue K-epsilon en forcant a zero les valeurs du champ

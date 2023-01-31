@@ -47,7 +47,7 @@ class Remaillage_FT : public Objet_U
 public:
   Remaillage_FT();
   void set_param(Param& p);
-  void associer_zone(const Zone_dis& zone_dis);
+  void associer_domaine(const Zone_dis& zone_dis);
 
   int supprimer_facettes_nulles(Maillage_FT_Disc& maillage) const;
   int traite_adherence(Maillage_FT_Disc& maillage) const;

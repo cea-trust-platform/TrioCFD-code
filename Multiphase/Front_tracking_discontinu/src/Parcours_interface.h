@@ -42,7 +42,7 @@ class Parcours_interface : public Objet_U
   Declare_instanciable_sans_constructeur(Parcours_interface);
 public:
   Parcours_interface();
-  void associer_zone_dis(const Zone_dis& zone_dis);
+  void associer_domaine_dis(const Zone_dis& zone_dis);
   void associer_connectivite_frontieres(const Connectivite_frontieres& connect);
   int calculer_face_sortie_element(const Zone_VF& zone_vf,
                                    const int num_element,

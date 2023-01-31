@@ -67,12 +67,12 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Wale_VEF::calculer_viscosite_turbulente()
 {
   // cw est la constante du modele WALE qui correspond a une correction
   //  de la constante Cs du modele de Smagorinsky.
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   const int nb_elem = zone_VEF.nb_elem();
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
 
   if (visco_turb.size() != nb_elem)
     {

@@ -48,7 +48,7 @@ class Source_LDC_VDF : public  Source_Correction_Deficitaire
 
 public:
 
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis&, const Zone_Cl_dis& ) override;
 
 
 

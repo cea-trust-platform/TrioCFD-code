@@ -89,7 +89,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
+  const Zone_EF& zone_EF = le_dom_EF.valeur();
   const IntTab& face_voisins = zone_EF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -140,7 +140,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {

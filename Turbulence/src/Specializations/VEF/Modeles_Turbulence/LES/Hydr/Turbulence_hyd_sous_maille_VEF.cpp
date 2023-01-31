@@ -57,8 +57,8 @@ Entree& Turbulence_hyd_sous_maille_VEF::readOn(Entree& s )
 Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
 {
   static const double Csm1 = CSM1;
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   const int nb_face = zone_VEF.nb_faces();
@@ -128,8 +128,8 @@ Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
 
   const int nb_face = zone_VEF.nb_faces();
   const IntTab& elem_faces = zone_VEF.elem_faces();

@@ -609,9 +609,9 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
         }
     }
 
-  parcours_.associer_zone_dis(zone_dis);
+  parcours_.associer_domaine_dis(zone_dis);
   Zone_VF& zone_vf = ref_cast_non_const(Zone_VF, zone_dis.valeur());
-  connectivite_frontieres_.associer_zone_vf(zone_vf);
+  connectivite_frontieres_.associer_domaine_vf(zone_vf);
   parcours_.associer_connectivite_frontieres(connectivite_frontieres_);
 
   maillage_ft_ijk_.initialize(splitting_FT, zone_dis, parcours_);
@@ -620,7 +620,7 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                               timestep_reprise_interface_,
                                               lata_interfaces_meshname_);
 
-  remaillage_ft_ijk_.associer_zone(zone_dis);
+  remaillage_ft_ijk_.associer_domaine(zone_dis);
 
   // Si des bulles ghost sont lues, on les detruit
   // pour etre sur de les creer toutes.

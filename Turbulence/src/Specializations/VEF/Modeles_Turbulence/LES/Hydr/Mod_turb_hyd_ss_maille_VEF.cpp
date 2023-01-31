@@ -44,13 +44,13 @@ Entree& Mod_turb_hyd_ss_maille_VEF::readOn(Entree& is )
 void Mod_turb_hyd_ss_maille_VEF::associer(const Zone_dis& zone_dis,
                                           const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
 }
 
 void Mod_turb_hyd_ss_maille_VEF::calculer_longueurs_caracteristiques()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem_tot();
   l_.resize(nb_elem);
 

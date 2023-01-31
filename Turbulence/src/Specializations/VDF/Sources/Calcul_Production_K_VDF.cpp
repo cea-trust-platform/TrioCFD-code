@@ -414,8 +414,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(Objet_U::dimension);
@@ -481,8 +481,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleVect coef(Objet_U::dimension);
@@ -552,8 +552,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ----->
   // Calcul de beta.gravite . u_conc
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleVect coef(Objet_U::dimension);

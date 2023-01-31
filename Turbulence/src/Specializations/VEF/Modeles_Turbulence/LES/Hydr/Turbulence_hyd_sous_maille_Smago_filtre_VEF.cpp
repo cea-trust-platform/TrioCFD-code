@@ -56,7 +56,7 @@ Entree& Turbulence_hyd_sous_maille_Smago_filtre_VEF::readOn(Entree& s )
 //  double C2 = 0.43;
 //  double temps = mon_equation->inconnue().temps();
 //  DoubleVect& k = energie_cinetique_turb_.valeurs();
-//  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+//  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
 //  const int nb_elem = zone_VEF.nb_elem();
 //  double temp;
 //
@@ -84,8 +84,8 @@ Entree& Turbulence_hyd_sous_maille_Smago_filtre_VEF::readOn(Entree& s )
 void Turbulence_hyd_sous_maille_Smago_filtre_VEF::calculer_S_barre()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const int nb_elem = zone_VEF.nb_elem();
 
   const DoubleVect& vol = zone_VEF.volumes();

@@ -68,7 +68,7 @@ void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis.valeur());
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
-  la_zone_vdf = zvdf;
+  le_dom_vdf = zvdf;
   la_zcl_vdf = zclvdf;
 
   porosite_surf.ref(la_zcl_vdf->equation().milieu().porosite_face());
@@ -82,7 +82,7 @@ void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
 DoubleTab& Op_Grad_VDF_Face::ajouter(const DoubleTab& inco, DoubleTab& resu) const
 {
   assert_espace_virtuel_vect(inco);
-  const Zone_VDF& zvdf = la_zone_vdf.valeur();
+  const Zone_VDF& zvdf = le_dom_vdf.valeur();
   const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
 
@@ -173,11 +173,11 @@ DoubleTab& Op_Grad_VDF_Face::calculer(const DoubleTab& inco, DoubleTab& resu) co
 
 int Op_Grad_VDF_Face::impr(Sortie& os) const
 {
-  const int& impr_mom=la_zone_vdf->zone().Moments_a_imprimer();
-  const int impr_sum=(la_zone_vdf->zone().Bords_a_imprimer_sum().est_vide() ? 0:1);
-  const int impr_bord=(la_zone_vdf->zone().Bords_a_imprimer().est_vide() ? 0:1);
+  const int& impr_mom=le_dom_vdf->zone().Moments_a_imprimer();
+  const int impr_sum=(le_dom_vdf->zone().Bords_a_imprimer_sum().est_vide() ? 0:1);
+  const int impr_bord=(le_dom_vdf->zone().Bords_a_imprimer().est_vide() ? 0:1);
   const Schema_Temps_base& sch = equation().probleme().schema_temps();
-  const Zone_VDF& zvdf = la_zone_vdf.valeur();
+  const Zone_VDF& zvdf = le_dom_vdf.valeur();
   const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
   const Equation_base& eqn = equation();

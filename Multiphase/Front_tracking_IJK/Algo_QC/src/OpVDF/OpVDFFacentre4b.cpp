@@ -56,7 +56,7 @@ void Op_Conv_centre4b_VDF_Face::associer(const Zone_dis& zone_dis,
   iter.associer(zvdf, zclvdf, *this);
 
   Eval_centre4b_VDF_Face& eval_conv = (Eval_centre4b_VDF_Face&) iter.evaluateur();
-  eval_conv.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
+  eval_conv.associer_domaines(zvdf, zclvdf );          // Evaluateur_VDF::associer_domaines
   eval_conv.associer_inconnue(vit);        // Eval_VDF_Face::associer_inconnue
   if (Process::nproc()>1 && zvdf.zone().nb_joints() && zvdf.zone().joint(0).epaisseur()<2)
     {

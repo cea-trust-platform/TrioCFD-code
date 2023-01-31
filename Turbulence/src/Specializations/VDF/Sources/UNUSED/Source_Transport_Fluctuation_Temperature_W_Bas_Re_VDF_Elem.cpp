@@ -118,11 +118,11 @@ void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_pb(con
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_zones(const Zone_dis& zone_dis,
+void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Zone_dis& zone_dis,
                                                                                 const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 }
 
 
@@ -139,8 +139,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
                                                                                              DoubleTab& uteta_T) const
 {
   int nb_faces= zone_VDF.nb_faces();
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleTrav grad_T(nb_faces);
@@ -245,8 +245,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
@@ -273,8 +273,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
@@ -469,8 +469,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(Objet_U::dimension);
@@ -538,8 +538,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleVect coef(dimension);

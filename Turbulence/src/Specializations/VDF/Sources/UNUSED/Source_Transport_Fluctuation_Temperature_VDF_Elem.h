@@ -68,8 +68,8 @@ public :
 protected :
 
   double Ca, Cb, Cc, Cd;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
   REF(Equation_base) eq_hydraulique;
   REF(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
   REF(Transport_Fluctuation_Temperature) mon_eq_transport_Fluctu_Temp;
@@ -77,7 +77,7 @@ protected :
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
 
 };
 

@@ -283,9 +283,9 @@ Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
                                               DoubleVect& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine;
+  const Zone& le_dom = mon_domaine;
   IntVect le_poly(1);
-  la_zone.chercher_elements(positions,le_poly);
+  le_dom.chercher_elements(positions,le_poly);
   return valeur_a_elem(positions,tab_valeurs,le_poly[0]);
 }
 
@@ -365,9 +365,9 @@ double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
                                                DoubleTab& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine;
-  IntVect les_polys(la_zone.nb_elem());
-  la_zone.chercher_elements(positions,les_polys);
+  const Zone& le_dom = mon_domaine;
+  IntVect les_polys(le_dom.nb_elem());
+  le_dom.chercher_elements(positions,les_polys);
   return valeur_aux_elems(positions,les_polys,tab_valeurs);
 }
 
@@ -382,9 +382,9 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
 DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions,
                                                       DoubleVect& tab_valeurs, int ncomp) const
 {
-  const Zone& la_zone = mon_domaine;
-  IntVect les_polys(la_zone.nb_elem());
-  la_zone.chercher_elements(positions,les_polys);
+  const Zone& le_dom = mon_domaine;
+  IntVect les_polys(le_dom.nb_elem());
+  le_dom.chercher_elements(positions,les_polys);
   return valeur_aux_elems_compo(positions,les_polys,tab_valeurs,ncomp);
 }
 

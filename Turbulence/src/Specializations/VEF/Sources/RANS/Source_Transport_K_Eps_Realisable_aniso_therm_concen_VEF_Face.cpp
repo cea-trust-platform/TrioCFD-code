@@ -46,7 +46,7 @@ void Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face::fill_resu_an
   const DoubleTab& K_eps = eqn_keps_Rea->inconnue().valeurs();
   // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
   double C3_loc, G_sum, C1_loc = C1__, LeK_MIN = eqn_keps_Rea->modele_turbulence().get_LeK_MIN();
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
       G_sum = G_t(face) + G_c(face);
       resu(face, 0) += G_sum * volumes_entrelaces(face);

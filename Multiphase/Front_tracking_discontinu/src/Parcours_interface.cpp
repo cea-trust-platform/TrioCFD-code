@@ -84,7 +84,7 @@ const Parcours_interface& Parcours_interface::operator=(const Parcours_interface
  *    equations_plans_faces_).
  *
  */
-void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
+void Parcours_interface::associer_domaine_dis(const Zone_dis& zone_dis)
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
   assert(! refzone_vf_.non_nul());
@@ -158,7 +158,7 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
     type_element_ = HEXA;
   else
     {
-      Cerr << "Parcours_interface::associer_zone_vf\n";
+      Cerr << "Parcours_interface::associer_domaine_vf\n";
       Cerr << " Le type d'element " << nom_elem;
       Cerr << " n'est pas reconnu !\n";
       exit();

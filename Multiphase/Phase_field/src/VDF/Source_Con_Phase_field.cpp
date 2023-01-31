@@ -1244,11 +1244,11 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Cerr << (int) system(tps_sleep) << finl;
 }
 
-void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
+void Source_Con_Phase_field::associer_domaines(const Zone_dis& zone_dis,
                                             const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 }
 
 
@@ -1278,7 +1278,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   //const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-  //const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  //const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   //const IntTab& face_voisins = zone_VDF.face_voisins();
   //const DoubleVect& volumes = zone_VDF.volumes();
   resu=0.;
@@ -1402,7 +1402,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
   const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
@@ -1553,7 +1553,7 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
  */
 void Source_Con_Phase_field::premier_demi_dt()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const int nb_elem = zone_VDF.nb_elem_tot();
 
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
@@ -2294,7 +2294,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
   const int ndeb=zone_VDF.premiere_face_int();
@@ -2349,7 +2349,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const DoubleTab& positions = zone_VDF.xp();
@@ -3227,7 +3227,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
  */
 void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const DoubleTab& mutilde, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& c_demi, DoubleTab& mutilde_demi)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const int nb_elem = zone_VDF.nb_elem_tot();
   const double theta=0.6;
   DoubleVect residu1(nb_elem);
@@ -3325,7 +3325,7 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
  */
 void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& v0, const DoubleTab& x1)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const int nb_elem = zone_VDF.nb_elem_tot();
   int nb_elem_tot = c.size_totale();
 
@@ -3903,7 +3903,7 @@ l5:
       int i,j,nk,i0,im,it,ii;
       double tem=1.,res,ccos,ssin ;
       const int ns = 2*c.size_totale();
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
       const int nb_elem = zone_VDF.nb_elem_tot();
 
       // Ajoute par DJ
@@ -4556,7 +4556,7 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
   // ------------------------------------------
 
   // Interpolation aux elements de u^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const IntTab& face_sommets = zone_VDF.face_sommets();
   const DoubleTab& positions = zone_VDF.xp();
@@ -4638,7 +4638,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   gradc2.carre();
 
   // Interpolation aux elements de (Grad(c))^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const IntTab& face_sommets = zone_VDF.face_sommets();
   const DoubleTab& positions = zone_VDF.xp();
@@ -4686,7 +4686,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
     Cerr<<"prov_face apres gradc2.carre"<<gradc2<<finl;
 
     // Interpolation aux elements de (Grad(c))^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-    const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+    const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
     const IntTab& elem_faces = zone_VDF.elem_faces();
     const IntTab& face_sommets = zone_VDF.face_sommets();
     const DoubleTab& positions = zone_VDF.xp();
@@ -4798,7 +4798,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
   if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
     {
       const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
       const int isfct = table.isfonction();
       DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();

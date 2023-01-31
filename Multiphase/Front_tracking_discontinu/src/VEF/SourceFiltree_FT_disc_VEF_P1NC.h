@@ -46,11 +46,11 @@ public :
 
 protected :
   Entree& lire(Entree& is);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Zone_VEF) le_dom_VEF;
+  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
   REF(Champ_Inc) Indic_;
 };
 

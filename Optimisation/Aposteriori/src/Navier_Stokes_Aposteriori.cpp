@@ -83,7 +83,7 @@ void Navier_Stokes_Aposteriori::estimateur_aposteriori()
   const Zone_Cl_VEF& zone_cl_vef = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur());
   estimateur_aposteriori_.typer("Estimateur_Aposteriori_P0_VEF");
   Estimateur_Aposteriori_P0_VEF& ch = ref_cast(Estimateur_Aposteriori_P0_VEF, estimateur_aposteriori_.valeur());
-  ch.associer_zone_dis_base(zone_vef);
+  ch.associer_domaine_dis_base(zone_vef);
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, la_vitesse.valeur());
   const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, la_pression.valeur());
   ch.associer_champ(vit, pres, diffusivite_pour_transport() /* viscosite_cinematique */, zone_cl_vef);

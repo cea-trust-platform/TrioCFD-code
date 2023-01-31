@@ -46,16 +46,16 @@ Entree& Source_LDC_VDF_NS::readOn(Entree& s )
 }
 
 
-void Source_LDC_VDF_NS::associer_zones(const Zone_dis& zone_dis,
+void Source_LDC_VDF_NS::associer_domaines(const Zone_dis& zone_dis,
                                        const Zone_Cl_dis& zone_cl_dis)
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
   // const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
 
-  // const Zone& ma_zone = zvdf.zone();
+  // const Zone& mon_dom = zvdf.zone();
   Champ_Inc_base& inco = equation().inconnue();
   int nb_compo = inco.nb_comp();
-  Cerr<<" nb_compo dans Source_LDC_VDF_NS::associer_zones = "<<nb_compo<<finl;
+  Cerr<<" nb_compo dans Source_LDC_VDF_NS::associer_domaines = "<<nb_compo<<finl;
 
   int nb_face = zvdf.nb_faces();
   la_correction.resize(nb_face);
@@ -73,15 +73,15 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
   // Equation_base& eq_fine = pb_fin.equation(0); // 1 seule equation pour l instant !!
   DoubleTab& present = eq.inconnue().valeurs();
   DoubleTab& present_fin = eq_fine.inconnue().valeurs();
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF, eq.zone_dis().valeur());
-  const Zone_VDF& la_zone_fine = ref_cast(Zone_VDF, eq_fine.zone_dis().valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF, eq.zone_dis().valeur());
+  const Zone_VDF& le_dom_fine = ref_cast(Zone_VDF, eq_fine.zone_dis().valeur());
   const IntVect& indice_gros = connect.indice_gros();
   int i;
   //AJOUT !
   Champ_Inc_base& incoG = eq.inconnue();
   int nb_compo = incoG.nb_comp();
   //int nbC;
-  const IntTab& face_voisG = la_zone.face_voisins();
+  const IntTab& face_voisG = le_dom.face_voisins();
   int num_elemG;
 
   le_residu = 0;
@@ -91,8 +91,8 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
   DoubleTab op_fin, op_fin_restreint;
 
 
-  op_fin.resize(la_zone_fine.nb_faces());
-  op_fin_restreint.resize(la_zone.nb_faces());
+  op_fin.resize(le_dom_fine.nb_faces());
+  op_fin_restreint.resize(le_dom.nb_faces());
   //////////////////
 
 
@@ -112,11 +112,11 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
 
   //restriction
   //Cerr<<"restriction de la somme des operateurs fins"<<finl;
-  restriction.restreindre(la_zone, la_zone_fine,connect.connectivites_elemF_elemG(),op_fin_restreint , op_fin,nb_compo);
+  restriction.restreindre(le_dom, le_dom_fine,connect.connectivites_elemF_elemG(),op_fin_restreint , op_fin,nb_compo);
   la_correction = present;
 
 
-  restriction.restreindre(la_zone, la_zone_fine,connect.connectivites_elemF_elemG(),la_correction , present_fin,nb_compo);
+  restriction.restreindre(le_dom, le_dom_fine,connect.connectivites_elemF_elemG(),la_correction , present_fin,nb_compo);
 
   //Cout << " ope fin restreint = " << op_fin_restreint << finl;
 

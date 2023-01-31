@@ -44,7 +44,7 @@ void Source_Transport_K_Eps_aniso_therm_concen_VEF_Face::fill_resu_anisotherme_c
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   double C3_loc, G_sum, LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_LeK_MIN();
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
       G_sum = G_t(face) + G_c(face);
       resu(face, 0) += G_sum * volumes_entrelaces(face);

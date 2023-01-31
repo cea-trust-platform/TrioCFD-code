@@ -51,7 +51,7 @@ public :
   void completer() override;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_VEF) le_dom_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
@@ -59,7 +59,7 @@ protected :
 
 inline  void Op_Conv_ALE_VEF::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice);
 }
 
 

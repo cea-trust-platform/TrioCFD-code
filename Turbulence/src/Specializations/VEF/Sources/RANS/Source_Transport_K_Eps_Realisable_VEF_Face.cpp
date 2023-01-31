@@ -52,7 +52,7 @@ const Modele_Fonc_Realisable_base& Source_Transport_K_Eps_Realisable_VEF_Face::g
 void Source_Transport_K_Eps_Realisable_VEF_Face::calculer_terme_production_real(const DoubleTab& vitesse_filtree,const DoubleTab& visco_turb, DoubleTrav& P) const
 {
   const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
-  calculer_terme_production_K(la_zone_VEF.valeur(), la_zone_Cl_VEF.valeur(), P, K_eps_Rea, vitesse_filtree, visco_turb);
+  calculer_terme_production_K(le_dom_VEF.valeur(), le_dom_Cl_VEF.valeur(), P, K_eps_Rea, vitesse_filtree, visco_turb);
 }
 
 void Source_Transport_K_Eps_Realisable_VEF_Face::fill_resu_real(const int num_face, const DoubleVect& vol_ent, const DoubleTrav& P, const DoubleTab& CC1, const DoubleTab& S, const double visco,

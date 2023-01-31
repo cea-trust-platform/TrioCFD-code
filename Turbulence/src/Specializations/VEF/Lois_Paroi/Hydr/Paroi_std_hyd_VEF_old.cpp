@@ -68,7 +68,7 @@ void Paroi_std_hyd_VEF_old::set_param(Param& param)
 int Paroi_std_hyd_VEF_old::init_lois_paroi()
 {
   Paroi_hyd_base_VEF::init_lois_paroi_();
-  uplus_.resize(la_zone_VEF->nb_faces_tot());
+  uplus_.resize(le_dom_VEF->nb_faces_tot());
   return init_lois_paroi_hydraulique();
 }
 
@@ -87,20 +87,20 @@ int Paroi_std_hyd_VEF_old::init_lois_paroi_hydraulique()
 int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
 {
   const int nb_comp = tab.line_size();
-  const IntTab& face_voisins = la_zone_VEF->face_voisins();
+  const IntTab& face_voisins = le_dom_VEF->face_voisins();
 
   // Boucle sur les bords
 
   int ndeb,nfin,elem;
 
-  for (int n_bord=0; n_bord<la_zone_VEF->nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<le_dom_VEF->nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))  ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
@@ -130,7 +130,7 @@ int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
 
 int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
 
 
   //const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
@@ -174,7 +174,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
   //  methode_calcul_face_bloquee pour garder l'ancien comportement
   int  methode_calcul_face_bloquee=1;
-  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_bloquee,face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_bloquee,face_keps_imposee_, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
 
   // Boucle sur les bords
   ArrOfInt is_defilante_face(zone_VEF.nb_faces_tot());
@@ -185,7 +185,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
         {
           int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
@@ -357,7 +357,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
       ArrOfInt test;
       //  methode_calcul_face_bloquee pour garder l'ancien comportement
       int  methode_calcul_face_bloquee=1;
-      remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+      remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
       test-=face_keps_imposee_;
       if (max(test)>0|| min(test)<0)
         {
@@ -399,7 +399,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   // on recalcule partout ou c'est impose
   int nb_faces_tot=zone_VEF.nb_faces_tot();
   //int tutu=0;
-  //remplir_face_keps_imposee( flag_face_keps_imposee_, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  //remplir_face_keps_imposee( flag_face_keps_imposee_, face_keps_imposee_, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
   //  if (!is_champ_Q1NC)
   for (int face=0; face<nb_faces_tot; face++)
     {
@@ -450,7 +450,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 
 int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
 
 
   //const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
@@ -494,7 +494,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
   int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
   //  methode_calcul_face_bloquee pour garder l'ancien comportement
   int  methode_calcul_face_bloquee=1;
-  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_bloquee,face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_bloquee,face_keps_imposee_, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
 
   // Boucle sur les bords
   ArrOfInt is_defilante_face(zone_VEF.nb_faces_tot());
@@ -505,7 +505,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
         {
           int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
@@ -677,7 +677,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
       ArrOfInt test;
       //  methode_calcul_face_bloquee pour garder l'ancien comportement
       int  methode_calcul_face_bloquee=1;
-      remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+      remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
       test-=face_keps_imposee_;
       if (std::max(test)>0|| std::min(test)<0)
         {
@@ -719,7 +719,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
   // on recalcule partout ou c'est impose
   int nb_faces_tot=zone_VEF.nb_faces_tot();
   //int tutu=0;
-  //remplir_face_keps_imposee( flag_face_keps_imposee_, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  //remplir_face_keps_imposee( flag_face_keps_imposee_, face_keps_imposee_, zone_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
   //  if (!is_champ_Q1NC)
   for (int face=0; face<nb_faces_tot; face++)
     {
@@ -770,7 +770,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
@@ -822,7 +822,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1694,7 +1694,7 @@ int Paroi_std_hyd_VEF_old::calculer_sous_couche_log(double u_star, DoubleTab& nu
 
 void Paroi_std_hyd_VEF_old::imprimer_ustar(Sortie& os) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   int ndeb,nfin;
   double upmoy,dpmoy,utaumoy;
   upmoy=0.;
@@ -1708,7 +1708,7 @@ void Paroi_std_hyd_VEF_old::imprimer_ustar(Sortie& os) const
 
   for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {

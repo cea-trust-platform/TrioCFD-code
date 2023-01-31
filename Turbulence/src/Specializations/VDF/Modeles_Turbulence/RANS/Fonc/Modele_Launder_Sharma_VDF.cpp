@@ -53,8 +53,8 @@ Entree& Modele_Launder_Sharma_VDF::lire(const Motcle& , Entree& is)
 void  Modele_Launder_Sharma_VDF::associer(const Zone_dis& zone_dis,
                                           const Zone_Cl_dis& zone_Cl_dis)
 {
-  //  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  //  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  //  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  //  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
@@ -65,9 +65,9 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   if (is_visco_const)
     visco=tab_visco(0,0);
   // Cerr << " dans Jones Sharma Calc Fmu " << finl;
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
   for (elem=0; elem< nb_elem ; elem++)
@@ -93,9 +93,9 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const DoubleTab& tab_visco ) const
   {
   // Cerr << " dans Jones Sharma Calc Fmu " << finl;
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   int elem;
   DoubleTab Re(nb_elem);
   for (elem=0; elem< nb_elem ; elem++) {
@@ -118,9 +118,9 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
   if (is_visco_const)
     visco=tab_visco(0,0);
   // Cerr << " dans Jones Sharma Calc Fmu " << finl;
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
   for (elem=0; elem< nb_elem ; elem++)

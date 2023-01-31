@@ -100,7 +100,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
 
   // Pour passer a l'echange contact pour imposer la temperature a l'interface.
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
@@ -121,7 +121,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
     }
 
   Paroi_std_scal_hyd_VEF::init_lois_paroi();
-  Paroi_TBLE_QDM_Scal::init_lois_paroi(zone_VEF, la_zone_Cl_VEF.valeur());
+  Paroi_TBLE_QDM_Scal::init_lois_paroi(zone_VEF, le_dom_Cl_VEF.valeur());
 
   int compteur_faces_paroi = 0;
   int elem;
@@ -141,7 +141,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
 
   for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -258,7 +258,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
   // Boucle sur les bords:
   for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int size=le_bord.nb_faces_tot();
       for (int ind_face=0; ind_face<size; ind_face++)
@@ -287,7 +287,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
 
 int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
@@ -331,7 +331,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
@@ -491,7 +491,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
 int ParoiVEF_TBLE_scal::calculer_stats()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const DoubleTab& face_normale = zone_VEF.face_normales();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
@@ -607,19 +607,19 @@ void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 
 int ParoiVEF_TBLE_scal::sauvegarder(Sortie& os) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   double tps =  mon_modele_turb_scal->equation().inconnue().temps();
-  return Paroi_TBLE_QDM_Scal::sauvegarder(os, zone_VEF, la_zone_Cl_VEF.valeur(), tps);
+  return Paroi_TBLE_QDM_Scal::sauvegarder(os, zone_VEF, le_dom_Cl_VEF.valeur(), tps);
 }
 
 
 int ParoiVEF_TBLE_scal::reprendre(Entree& is)
 {
-  if (la_zone_VEF.non_nul()) // test pour ne pas planter dans "avancer_fichier(...)"
+  if (le_dom_VEF.non_nul()) // test pour ne pas planter dans "avancer_fichier(...)"
     {
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
       double tps_reprise = mon_modele_turb_scal->equation().schema_temps().temps_courant();
-      return Paroi_TBLE_QDM_Scal::reprendre(is, zone_VEF, la_zone_Cl_VEF.valeur(), tps_reprise);
+      return Paroi_TBLE_QDM_Scal::reprendre(is, zone_VEF, le_dom_Cl_VEF.valeur(), tps_reprise);
     }
   return 1;
 }

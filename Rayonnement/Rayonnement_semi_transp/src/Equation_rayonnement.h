@@ -35,7 +35,7 @@ class Equation_rayonnement : public DERIV(Equation_rayonnement_base)
 
 public :
 
-  inline void associer_zone_dis(const Zone_dis& Zd);
+  inline void associer_domaine_dis(const Zone_dis& Zd);
   inline void associer_milieu_base(const Milieu_base&);
   inline void associer_fluide(const Fluide_base&);
   inline void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
@@ -225,9 +225,9 @@ inline const Zone_Cl_dis& Equation_rayonnement::zone_Cl_dis() const
   return valeur().zone_Cl_dis();
 }
 
-inline void Equation_rayonnement::associer_zone_dis(const Zone_dis& Zd)
+inline void Equation_rayonnement::associer_domaine_dis(const Zone_dis& Zd)
 {
-  valeur().associer_zone_dis(Zd);
+  valeur().associer_domaine_dis(Zd);
 }
 
 #endif

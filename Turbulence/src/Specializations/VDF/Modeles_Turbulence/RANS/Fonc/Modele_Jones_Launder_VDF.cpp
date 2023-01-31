@@ -78,8 +78,8 @@ Entree& Modele_Jones_Launder_VDF::lire(const Motcle& , Entree& is)
 void  Modele_Jones_Launder_VDF::associer(const Zone_dis& zone_dis,
                                          const Zone_Cl_dis& zone_Cl_dis)
 {
-  //  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  //  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  //  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  //  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
 }
 
 
@@ -93,23 +93,23 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
   if (is_visco_const)
     visco=tab_visco(0,0);
 
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   D = 0;
   //  return D;
-  //  const DoubleVect& volumes = la_zone.volumes();
+  //  const DoubleVect& volumes = le_dom.volumes();
   const DoubleVect& porosite_surf = zone_Cl_dis->equation().milieu().porosite_face();
-  const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
-  //  int nb_elem = la_zone.nb_elem();
-  int nb_elem_tot = la_zone.nb_elem_tot();
-  const Zone& zone=la_zone.zone();
+  const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
+  //  int nb_elem = le_dom.nb_elem();
+  int nb_elem_tot = le_dom.nb_elem_tot();
+  const Zone& zone=le_dom.zone();
 
   int nb_faces_elem = zone.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   double coef;
-  //  const IntTab& elem_faces = la_zone.elem_faces();
-  const IntTab& face_voisins = la_zone.face_voisins();
-  int nb_faces = la_zone.nb_faces();
+  //  const IntTab& elem_faces = le_dom.elem_faces();
+  const IntTab& face_voisins = le_dom.face_voisins();
+  int nb_faces = le_dom.nb_faces();
 
   double gradk;
   int num_face,poly1,poly2,ori, ndeb, nfin;
@@ -123,10 +123,10 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
       exit();
     }
   // Boucle sur les bords pour traiter les conditions aux limites
-  for (int n_bord=0; n_bord<la_zone.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
 
     {
-      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
 
       if ( sub_type(Dirichlet,la_cl.valeur())||
            sub_type(Dirichlet_homogene,la_cl.valeur()) ||
@@ -148,7 +148,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
                 {
                   // coef = 0.5;
                   coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
-                  gradk = ( - sqrt(K_eps_Bas_Re(poly1,0)))/la_zone.dist_norm_bord(num_face);
+                  gradk = ( - sqrt(K_eps_Bas_Re(poly1,0)))/le_dom.dist_norm_bord(num_face);
                   if (!is_visco_const)
                     visco=tab_visco[poly1];
                   D[poly1] += 2*visco*(gradk*gradk)*coef;
@@ -158,7 +158,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
                   poly2 = face_voisins(num_face,1);
                   // coef = 0.5;
                   coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
-                  gradk = ((sqrt(K_eps_Bas_Re(poly2,0)) ))/la_zone.dist_norm_bord(num_face);
+                  gradk = ((sqrt(K_eps_Bas_Re(poly2,0)) ))/le_dom.dist_norm_bord(num_face);
                   //
                   if (!is_visco_const)
                     visco=tab_visco[poly2];
@@ -177,13 +177,13 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
               gradk = 0;
               poly1 = face_voisins(num_face,0);
               poly2 = face_voisins(num_face,1);
-              ori = la_zone.orientation(num_face);
+              ori = le_dom.orientation(num_face);
               // coef = 0.5;
 
               coef = volume_entrelaces(num_face)*porosite_surf(num_face);
 
 
-              gradk =  (sqrt(K_eps_Bas_Re(poly2,0))-sqrt(K_eps_Bas_Re(poly1,0)))/la_zone.dist_elem_period(poly1,poly2,ori);
+              gradk =  (sqrt(K_eps_Bas_Re(poly2,0))-sqrt(K_eps_Bas_Re(poly1,0)))/le_dom.dist_elem_period(poly1,poly2,ori);
               if (!is_visco_const)
                 visco=tab_visco[poly1];
               D[poly1] += 2*visco*(gradk*gradk)*coef;
@@ -211,16 +211,16 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
     }
 
   // Traitement des faces internes
-  for (num_face=la_zone.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (num_face=le_dom.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       poly1 = face_voisins(num_face,0);
       poly2 = face_voisins(num_face,1);
-      ori = la_zone.orientation(num_face);
+      ori = le_dom.orientation(num_face);
       // coef = 0.5;
 
       coef = volume_entrelaces(num_face)*porosite_surf(num_face);
 
-      gradk =  (sqrt(K_eps_Bas_Re(poly2,0))-sqrt(K_eps_Bas_Re(poly1,0)))/(la_zone.xp(poly2,ori)- la_zone.xp(poly1,ori));
+      gradk =  (sqrt(K_eps_Bas_Re(poly2,0))-sqrt(K_eps_Bas_Re(poly1,0)))/(le_dom.xp(poly2,ori)- le_dom.xp(poly1,ori));
       //      Cerr<<" ici "<< num_face<< " "<<gradk*gradk/K_eps_Bas_Re(poly2,0)<<" K "<<K_eps_Bas_Re(poly2,0)/K_eps_Bas_Re(0,0)<<finl;
       if (num_face==-396)
         Cerr << "K_eps_Bas_Re(poly2,0)=" << K_eps_Bas_Re(poly2,0)/K_eps_Bas_Re(0,0) << " K_eps_Bas_Re(poly1,0)=" << K_eps_Bas_Re(poly1,0)/K_eps_Bas_Re(0,0) << " test "<<sqrt(  K_eps_Bas_Re(poly2,0))/sqrt( K_eps_Bas_Re(0,0))<<" "<<sqrt(  K_eps_Bas_Re(poly1,0))/sqrt( K_eps_Bas_Re(0,0))<< " "<<(sqrt(K_eps_Bas_Re(poly2,0))-sqrt(K_eps_Bas_Re(poly1,0)))/sqrt( K_eps_Bas_Re(0,0))<<" "<< K_eps_Bas_Re(0,0)<<finl;
@@ -236,7 +236,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
 
   // provisoire
   D/=2;
-  const DoubleVect& volumes= la_zone.volumes();
+  const DoubleVect& volumes= le_dom.volumes();
   for (int i=0; i<nb_elem_tot; i++)
     D(i)/=volumes(i);
   //Cerr<<D.mp_min_vect()<<" DDDDDDDDDDDDDD "<<D.mp_max_vect()<<finl;
@@ -245,11 +245,11 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Zone_dis& zone_
   // D abord sans le 1/3 2/3
 }
 
-// void Modele_Jones_Launder_VDF::associer_zones(const Zone_dis& zone_dis,
+// void Modele_Jones_Launder_VDF::associer_domaines(const Zone_dis& zone_dis,
 //                                                         const Zone_Cl_dis& zone_Cl_dis)
 // {
-//   la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-//   la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+//   le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+//   le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 // }
 
 
@@ -260,18 +260,18 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   E = 0;
   //return E;
   // provisoire
   if (1)
     {
-      const IntTab& face_voisins = la_zone.face_voisins();
-      const IntTab& elem_faces = la_zone.elem_faces();
+      const IntTab& face_voisins = le_dom.face_voisins();
+      const IntTab& elem_faces = le_dom.elem_faces();
 
       const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
-      int nb_elem_tot=la_zone.nb_elem_tot();
+      int nb_elem_tot=le_dom.nb_elem_tot();
       DoubleTab gij(nb_elem_tot,dimension,dimension);
       // Rque methode non const Pourquoi ?
 
@@ -295,7 +295,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
             for (int j=0; j<dimension; j++)
               for (int k=0; k<dimension; k++)
                 {
-                  der_seconde(i,j,k)=0.5*(gij(num[k+dimension],i,j)-gij(num[k],i,j))/la_zone.dim_elem(elem,k);
+                  der_seconde(i,j,k)=0.5*(gij(num[k+dimension],i,j)-gij(num[k],i,j))/le_dom.dim_elem(elem,k);
                 }
 
           if (!is_visco_const)
@@ -325,12 +325,12 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
     }
 
 
-  int nb_faces_tot = la_zone.nb_faces_tot();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  int nb_faces_tot = le_dom.nb_faces_tot();
+  const IntTab& face_voisins = le_dom.face_voisins();
   int n_bord,poly1, poly2,fac=-1;
 
   DoubleTab derivee_premiere(0, Objet_U::dimension, Objet_U::dimension);
-  la_zone.creer_tableau_faces(derivee_premiere);
+  le_dom.creer_tableau_faces(derivee_premiere);
   DoubleTab derivee_seconde(derivee_premiere);
 
   calcul_derivees_premieres_croisees(derivee_premiere,zone_dis,zone_Cl_dis,vit );
@@ -338,9 +338,9 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
 
   // traitement par faces pour avoir la contribution par element de D
   double val2,val3,val4;
-  for (n_bord=0; n_bord<la_zone.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -448,14 +448,14 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
 
 DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTab& derivee_premiere, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vit ) const
 {
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
-  //  Cerr<<la_zone_Cl.equation().le_nom()<<finl;exit();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  //  Cerr<<le_dom_Cl.equation().le_nom()<<finl;exit();
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Zone_Cl_VDF& zcl_hydro = ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur());
-  //  int nb_faces = la_zone.nb_faces();
-  const IntTab& Qdm = la_zone.Qdm();
-  const IntVect& orientation = la_zone.orientation();
+  //  int nb_faces = le_dom.nb_faces();
+  const IntTab& Qdm = le_dom.Qdm();
+  const IntVect& orientation = le_dom.orientation();
   IntTrav num(4);
   int i,num_arete;
   double pond1,pond2;
@@ -470,8 +470,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       // Boucle sur les aretes internes  pour le calcul
       // des moyennes des derivees croisees
 
-      ndeb = la_zone.premiere_arete_interne();
-      nfin = la_zone.nb_aretes_internes() + ndeb;
+      ndeb = le_dom.premiere_arete_interne();
+      nfin = le_dom.nb_aretes_internes() + ndeb;
 
       for (num_arete =ndeb; num_arete<nfin; num_arete++)
         {
@@ -480,8 +480,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_premiere(num[0],ori0,ori1) +=  coef[0];
           derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -490,8 +490,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
         }
 
       // Boucle sur les aretes_mixte
-      ndeb = la_zone.premiere_arete_mixte();
-      nfin = ndeb + la_zone.nb_aretes_mixtes();
+      ndeb = le_dom.premiere_arete_mixte();
+      nfin = ndeb + le_dom.nb_aretes_mixtes();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -500,8 +500,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_premiere(num[0],ori0,ori1) +=  coef[0];
           derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -517,13 +517,13 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       //On parcourt les aretes bords
       //*******************************
 
-      ndeb = la_zone.premiere_arete_bord();
-      nfin = ndeb + la_zone.nb_aretes_bord();
+      ndeb = le_dom.premiere_arete_bord();
+      nfin = ndeb + le_dom.nb_aretes_bord();
       int n_type;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=la_zone_Cl.type_arete_bord(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_bord(num_arete-ndeb);
 
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
@@ -532,8 +532,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -545,17 +545,17 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               ori1 = orientation(num[2]);
               signe = num[3];
 
-              pond1 = la_zone.face_normales(num[0],ori0);
-              pond2 = la_zone.face_normales(num[1],ori0);
+              pond1 = le_dom.face_normales(num[0],ori0);
+              pond2 = le_dom.face_normales(num[1],ori0);
               double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
                                Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
               vit_imp /= pond1+pond2;
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              ////coef[1] =  0.5*(vit_imp-vit(num[2]))/la_zone.dist_norm_bord(num[2])*signe;
-              coef[1] =  0.5*(vit_imp-vit(num[2]))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              ////coef[1] =  0.5*(vit_imp-vit(num[2]))/le_dom.dist_norm_bord(num[2])*signe;
+              coef[1] =  0.5*(vit_imp-vit(num[2]))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -567,8 +567,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       //On parcourt les aretes coins
       //*******************************
 
-      ndeb = la_zone.premiere_arete_coin();
-      nfin = ndeb + la_zone.nb_aretes_coin();
+      ndeb = le_dom.premiere_arete_coin();
+      nfin = ndeb + le_dom.nb_aretes_coin();
 
       int compt_coin=0;
 
@@ -577,7 +577,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
-          n_type=la_zone_Cl.type_arete_coin(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_coin(num_arete-ndeb);
           //***************************************
           // Traitement des aretes coin perio-perio
           //***************************************
@@ -586,8 +586,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -603,8 +603,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               ori1 = orientation(num[2]);
               signe = num[3];
 
-              pond1 = la_zone.face_normales(num[0],ori0);
-              pond2 = la_zone.face_normales(num[1],ori0);
+              pond1 = le_dom.face_normales(num[0],ori0);
+              pond2 = le_dom.face_normales(num[1],ori0);
               double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
                                Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
@@ -612,8 +612,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               vit_imp /= pond1+pond2;
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(vit_imp-vit(num[2]))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(vit_imp-vit(num[2]))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -635,8 +635,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
       // Boucle sur les aretes internes  pour le calcul
       // des moyennes des derivees croisees
-      int ndeb = la_zone.premiere_arete_interne();
-      int nfin = la_zone.nb_aretes_internes() + ndeb;
+      int ndeb = le_dom.premiere_arete_interne();
+      int nfin = le_dom.nb_aretes_internes() + ndeb;
 
       for (num_arete =ndeb; num_arete<nfin; num_arete++)
         {
@@ -645,8 +645,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_premiere(num[0],ori0,ori1) +=  coef[0];
           derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -654,8 +654,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
           derivee_premiere(num[3],ori1,ori0) +=  coef[1];
         }
       // Boucle sur les aretes_mixte
-      ndeb = la_zone.premiere_arete_mixte();
-      nfin = ndeb + la_zone.nb_aretes_mixtes();
+      ndeb = le_dom.premiere_arete_mixte();
+      nfin = ndeb + le_dom.nb_aretes_mixtes();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -664,8 +664,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_premiere(num[0],ori0,ori1) +=  coef[0];
           derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -681,13 +681,13 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       //On parcourt les aretes bords
       //*******************************
 
-      ndeb = la_zone.premiere_arete_bord();
-      nfin = ndeb + la_zone.nb_aretes_bord();
+      ndeb = le_dom.premiere_arete_bord();
+      nfin = ndeb + le_dom.nb_aretes_bord();
       int n_type;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=la_zone_Cl.type_arete_bord(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_bord(num_arete-ndeb);
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
@@ -701,8 +701,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
                   Cerr << "Cela n'est pas valide pour le Modele Jones Launder et son calcul de derivees croisees..." << finl;
                   exit();
                 }
-              coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -717,16 +717,16 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
-              pond1 = la_zone.face_normales(num[0],ori0);
-              pond2 = la_zone.face_normales(num[1],ori0);
+              pond1 = le_dom.face_normales(num[0],ori0);
+              pond2 = le_dom.face_normales(num[1],ori0);
               double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
                                Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
               // val tangentielle
               vit_imp /= pond1+pond2;
 
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(vit_imp-vit(num[2]))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(vit_imp-vit(num[2]))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -737,8 +737,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       //On parcourt les aretes coins
       //*******************************
 
-      ndeb = la_zone.premiere_arete_coin();
-      nfin = ndeb + la_zone.nb_aretes_coin();
+      ndeb = le_dom.premiere_arete_coin();
+      nfin = ndeb + le_dom.nb_aretes_coin();
 
       int compt_coin=0;
 
@@ -747,7 +747,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
-          n_type=la_zone_Cl.type_arete_coin(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_coin(num_arete-ndeb);
 
           //***************************************
           // Traitement des aretes coin perio-perio
@@ -757,8 +757,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] = 0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] = 0.5*(vit(num[3])-vit(num[2]))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] = 0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] = 0.5*(vit(num[3])-vit(num[2]))/le_dom.dist_face(num[2],num[3],ori0);
 
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
@@ -775,8 +775,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               ori1 = orientation(num[2]);
               signe = num[3];
 
-              pond1 = la_zone.face_normales(num[0],ori0);
-              pond2 = la_zone.face_normales(num[1],ori0);
+              pond1 = le_dom.face_normales(num[0],ori0);
+              pond2 = le_dom.face_normales(num[1],ori0);
               double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
                                Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
@@ -786,8 +786,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
 
-              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(vit_imp-vit(num[2]))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(vit(num[1])-vit(num[0]))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(vit_imp-vit(num[2]))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_premiere(num[0],ori0,ori1) +=  coef[0];
               derivee_premiere(num[1],ori0,ori1) +=  coef[0];
               derivee_premiere(num[2],ori1,ori0) +=  coef[1];
@@ -806,14 +806,14 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
 DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab& derivee_seconde, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& derivee_premiere ) const
 {
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   //  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
 
-  //  int nb_faces = la_zone.nb_faces();
-  const IntTab& Qdm = la_zone.Qdm();
-  const IntVect& orientation = la_zone.orientation();
-  //  const int nb_cond_lim = la_zone_Cl.nb_cond_lim();
+  //  int nb_faces = le_dom.nb_faces();
+  const IntTab& Qdm = le_dom.Qdm();
+  const IntVect& orientation = le_dom.orientation();
+  //  const int nb_cond_lim = le_dom_Cl.nb_cond_lim();
   IntTrav num(4);
   int i,num_arete,ori0,ori1;
 
@@ -824,8 +824,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
     {
       DoubleVect coef(2);
 
-      ndeb = la_zone.premiere_arete_interne();
-      nfin = la_zone.nb_aretes_internes() + ndeb;
+      ndeb = le_dom.premiere_arete_interne();
+      nfin = le_dom.nb_aretes_internes() + ndeb;
       // Boucle sur les aretes internes  pour le calcul
       // des moyennes des derivees croisees
 
@@ -836,8 +836,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_seconde(num[0],ori0,ori1) +=  coef[0];
           derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -846,8 +846,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
         }
 
       // Boucle sur les aretes_mixte
-      ndeb = la_zone.premiere_arete_mixte();
-      nfin = ndeb + la_zone.nb_aretes_mixtes();
+      ndeb = le_dom.premiere_arete_mixte();
+      nfin = ndeb + le_dom.nb_aretes_mixtes();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -856,8 +856,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_seconde(num[0],ori0,ori1) +=  coef[0];
           derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -872,13 +872,13 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       //*******************************
       //On parcourt les aretes bords
       //*******************************
-      ndeb = la_zone.premiere_arete_bord();
-      nfin = ndeb + la_zone.nb_aretes_bord();
+      ndeb = le_dom.premiere_arete_bord();
+      nfin = ndeb + le_dom.nb_aretes_bord();
       int n_type;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=la_zone_Cl.type_arete_bord(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_bord(num_arete-ndeb);
 
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
@@ -887,8 +887,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               derivee_seconde(num[2],ori1,ori0) +=  coef[1];
@@ -904,8 +904,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
               //               double  val_deriv_prem = 0.5*(vit.val_imp_face_bord(num[0],ori1)+
               //                                     vit.val_imp_face_bord(num[1],ori1));                // val tangentielle
               // ///???????????????
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               derivee_seconde(num[2],ori1,ori0) =  2.*derivee_seconde(num[2],ori1,ori0);
@@ -916,8 +916,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       //On parcourt les aretes coins
       //*******************************
 
-      ndeb = la_zone.premiere_arete_coin();
-      nfin = ndeb + la_zone.nb_aretes_coin();
+      ndeb = le_dom.premiere_arete_coin();
+      nfin = ndeb + le_dom.nb_aretes_coin();
 
       int compt_coin=0;
 
@@ -926,7 +926,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
-          n_type=la_zone_Cl.type_arete_coin(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_coin(num_arete-ndeb);
           //***************************************
           // Traitement des aretes coin perio-perio
           //***************************************
@@ -935,8 +935,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] =  0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] =  0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               derivee_seconde(num[2],ori1,ori0) +=  coef[1];
@@ -956,8 +956,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
               //               double  val_deriv_prem = 0.5*(vit.val_imp_face_bord(num[0],ori1)+
               //                                     vit.val_imp_face_bord(num[1],ori1));                // val tangentielle
               // ///???????????????
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               //              derivee_seconde(num[2],ori1,ori0) +=  coef[1];
@@ -980,8 +980,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
       // Boucle sur les aretes internes  pour le calcul
       // des moyennes des derivees croisees
-      ndeb = la_zone.premiere_arete_interne();
-      nfin = la_zone.nb_aretes_internes() + ndeb;
+      ndeb = le_dom.premiere_arete_interne();
+      nfin = le_dom.nb_aretes_internes() + ndeb;
 
       for (num_arete =ndeb; num_arete<nfin; num_arete++)
         {
@@ -990,8 +990,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_seconde(num[0],ori0,ori1) +=  coef[0];
           derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -1000,8 +1000,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
         }
 
       // Boucle sur les aretes_mixte
-      ndeb = la_zone.premiere_arete_mixte();
-      nfin = ndeb + la_zone.nb_aretes_mixtes();
+      ndeb = le_dom.premiere_arete_mixte();
+      nfin = ndeb + le_dom.nb_aretes_mixtes();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -1010,8 +1010,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
           ori0 = orientation(num[0]);
           ori1 = orientation(num[2]);
-          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+          coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+          coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
           derivee_seconde(num[0],ori0,ori1) +=  coef[0];
           derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -1027,13 +1027,13 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       //On parcourt les aretes bords
       //*******************************
 
-      ndeb = la_zone.premiere_arete_bord();
-      nfin = ndeb + la_zone.nb_aretes_bord();
+      ndeb = le_dom.premiere_arete_bord();
+      nfin = ndeb + le_dom.nb_aretes_bord();
       int n_type;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=la_zone_Cl.type_arete_bord(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_bord(num_arete-ndeb);
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
@@ -1041,8 +1041,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -1060,8 +1060,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
               //                                     vit.val_imp_face_bord(num[1],ori1));                // val tangentielle
               // ///???????????????
 
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               //              derivee_seconde(num[2],ori1,ori0) +=  coef[1];
@@ -1073,8 +1073,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       //On parcourt les aretes coins
       //*******************************
 
-      ndeb = la_zone.premiere_arete_coin();
-      nfin = ndeb + la_zone.nb_aretes_coin();
+      ndeb = le_dom.premiere_arete_coin();
+      nfin = ndeb + le_dom.nb_aretes_coin();
 
       int compt_coin=0;
 
@@ -1083,7 +1083,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
           for (i=0; i<4; i++)
             num[i] = Qdm(num_arete,i);
 
-          n_type=la_zone_Cl.type_arete_coin(num_arete-ndeb);
+          n_type=le_dom_Cl.type_arete_coin(num_arete-ndeb);
           //***************************************
           // Traitement des aretes coin perio-perio
           //***************************************
@@ -1091,8 +1091,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
             {
               ori0 = orientation(num[0]);
               ori1 = orientation(num[2]);
-              coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_face(num[2],num[3],ori0);
+              coef[0] = 0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              coef[1] = 0.5*(derivee_premiere(num[3],ori1,ori0)-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_face(num[2],num[3],ori0);
 
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
@@ -1114,8 +1114,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
               //                                     vit.val_imp_face_bord(num[1],ori1));                // val tangentielle
               // ///???????????????
 
-              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/la_zone.dist_face(num[0],num[1],ori1);
-              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/la_zone.dist_norm_bord(num[0])*signe;
+              coef[0] =  0.5*(derivee_premiere(num[1],ori0,ori1)-derivee_premiere(num[0],ori0,ori1))/le_dom.dist_face(num[0],num[1],ori1);
+              //coef[1] =  0.5*(val_deriv_prem-derivee_premiere(num[2],ori1,ori0))/le_dom.dist_norm_bord(num[0])*signe;
               derivee_seconde(num[0],ori0,ori1) +=  coef[0];
               derivee_seconde(num[1],ori0,ori1) +=  coef[0];
               derivee_seconde(num[2],ori1,ori0) =  2.*derivee_seconde(num[2],ori1,ori0);
@@ -1136,8 +1136,8 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 
 DoubleTab& Modele_Jones_Launder_VDF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  int nb_elem = la_zone.nb_elem();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = le_dom.nb_elem();
   for (int elem=0; elem <nb_elem; elem ++ )
     F1[elem] = 1.;
   return F1;
@@ -1150,8 +1150,8 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  int nb_elem = la_zone.nb_elem();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
 
@@ -1175,8 +1175,8 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2( DoubleTab& F2, DoubleTab& D, const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re, const DoubleTab& tab_visco ) const
   {
   exit();
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  int nb_elem = la_zone.nb_elem();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = le_dom.nb_elem();
   DoubleTab Re(nb_elem);
   int elem;
 
@@ -1199,9 +1199,9 @@ DoubleTab&  Modele_Jones_Launder_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
   //  Cerr << " Calc Fmu " << finl;
@@ -1232,10 +1232,10 @@ DoubleTab&  Modele_Jones_Launder_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
   DoubleTab&  Modele_Jones_Launder_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const DoubleTab& tab_visco ) const
   {
   exit();
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   double Re;
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   int elem;
   for (elem=0; elem< nb_elem ; elem++) {
   //     Fmu[elem] = exp(-2.5/(1.+K_eps_Bas_Re(elem,0)*K_eps_Bas_Re(elem,0)/(tab_visco(elem)*K_eps_Bas_Re(elem,1))));
@@ -1259,9 +1259,9 @@ DoubleTab&  Modele_Jones_Launder_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
   Fmu = 0;
-  int nb_elem = la_zone.nb_elem();
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
   //  Cerr << " Calc Fmu " << finl;
@@ -1297,8 +1297,8 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  int nb_elem = la_zone.nb_elem();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = le_dom.nb_elem();
   double Re;
   int elem;
 
@@ -1323,8 +1323,8 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
 
 DoubleTab& Modele_Jones_Launder_VDF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  int nb_elem = la_zone.nb_elem();
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = le_dom.nb_elem();
   for (int elem=0; elem <nb_elem; elem ++ )
     F1[elem] = 1.;
   return F1;
@@ -1346,23 +1346,23 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
   if (is_visco_const)
     visco=tab_visco(0,0);
 
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  const Zone_VDF& le_dom = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& le_dom_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   D = 0;
   //  return D;
-  //  const DoubleVect& volumes = la_zone.volumes();
+  //  const DoubleVect& volumes = le_dom.volumes();
   const DoubleVect& porosite_surf = zone_Cl_dis->equation().milieu().porosite_face();
-  const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
-  //  int nb_elem = la_zone.nb_elem();
-  int nb_elem_tot = la_zone.nb_elem_tot();
-  const Zone& zone=la_zone.zone();
+  const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
+  //  int nb_elem = le_dom.nb_elem();
+  int nb_elem_tot = le_dom.nb_elem_tot();
+  const Zone& zone=le_dom.zone();
 
   int nb_faces_elem = zone.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   double coef;
-  //  const IntTab& elem_faces = la_zone.elem_faces();
-  const IntTab& face_voisins = la_zone.face_voisins();
-  int nb_faces = la_zone.nb_faces();
+  //  const IntTab& elem_faces = le_dom.elem_faces();
+  const IntTab& face_voisins = le_dom.face_voisins();
+  int nb_faces = le_dom.nb_faces();
 
   double gradk;
   int num_face,poly1,poly2,ori, ndeb, nfin;
@@ -1376,10 +1376,10 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
       exit();
     }
   // Boucle sur les bords pour traiter les conditions aux limites
-  for (int n_bord=0; n_bord<la_zone.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
 
     {
-      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
 
       if ( sub_type(Dirichlet,la_cl.valeur())||
            sub_type(Dirichlet_homogene,la_cl.valeur()) ||
@@ -1401,7 +1401,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
                 {
                   // coef = 0.5;
                   coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
-                  gradk = ( - sqrt(K_Bas_Re(poly1)))/la_zone.dist_norm_bord(num_face);
+                  gradk = ( - sqrt(K_Bas_Re(poly1)))/le_dom.dist_norm_bord(num_face);
                   if (!is_visco_const)
                     visco=tab_visco[poly1];
                   D[poly1] += 2*visco*(gradk*gradk)*coef;
@@ -1411,7 +1411,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
                   poly2 = face_voisins(num_face,1);
                   // coef = 0.5;
                   coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
-                  gradk = ((sqrt(K_Bas_Re(poly2)) ))/la_zone.dist_norm_bord(num_face);
+                  gradk = ((sqrt(K_Bas_Re(poly2)) ))/le_dom.dist_norm_bord(num_face);
                   //
                   if (!is_visco_const)
                     visco=tab_visco[poly2];
@@ -1430,13 +1430,13 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
               gradk = 0;
               poly1 = face_voisins(num_face,0);
               poly2 = face_voisins(num_face,1);
-              ori = la_zone.orientation(num_face);
+              ori = le_dom.orientation(num_face);
               // coef = 0.5;
 
               coef = volume_entrelaces(num_face)*porosite_surf(num_face);
 
 
-              gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/la_zone.dist_elem_period(poly1,poly2,ori);
+              gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/le_dom.dist_elem_period(poly1,poly2,ori);
               if (!is_visco_const)
                 visco=tab_visco[poly1];
               D[poly1] += 2*visco*(gradk*gradk)*coef;
@@ -1464,16 +1464,16 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
     }
 
   // Traitement des faces internes
-  for (num_face=la_zone.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (num_face=le_dom.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       poly1 = face_voisins(num_face,0);
       poly2 = face_voisins(num_face,1);
-      ori = la_zone.orientation(num_face);
+      ori = le_dom.orientation(num_face);
       // coef = 0.5;
 
       coef = volume_entrelaces(num_face)*porosite_surf(num_face);
 
-      gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/(la_zone.xp(poly2,ori)- la_zone.xp(poly1,ori));
+      gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/(le_dom.xp(poly2,ori)- le_dom.xp(poly1,ori));
       //      Cerr<<" ici "<< num_face<< " "<<gradk*gradk/K_eps_Bas_Re(poly2,0)<<" K "<<K_eps_Bas_Re(poly2,0)/K_eps_Bas_Re(0,0)<<finl;
       if (num_face==-396)
         Cerr << "K_eps_Bas_Re(poly2,0)=" << K_Bas_Re(poly2)/K_Bas_Re(0) << " K_eps_Bas_Re(poly1,0)=" << K_Bas_Re(poly1)/K_Bas_Re(0) << " test "<<sqrt(  K_Bas_Re(poly2,0))/sqrt( K_Bas_Re(0))<<" "<<sqrt(  K_Bas_Re(poly1))/sqrt( K_Bas_Re(0))<< " "<<(sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/sqrt( K_Bas_Re(0))<<" "<< K_Bas_Re(0)<<finl;
@@ -1489,7 +1489,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& z
 
   // provisoire
   D/=2;
-  const DoubleVect& volumes= la_zone.volumes();
+  const DoubleVect& volumes= le_dom.volumes();
   for (int i=0; i<nb_elem_tot; i++)
     D(i)/=volumes(i);
   //Cerr<<D.mp_min_vect()<<" DDDDDDDDDDDDDD "<<D.mp_max_vect()<<finl;

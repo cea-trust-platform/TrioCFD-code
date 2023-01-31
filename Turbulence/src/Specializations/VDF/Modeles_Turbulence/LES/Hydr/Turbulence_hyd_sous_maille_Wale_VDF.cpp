@@ -70,7 +70,7 @@ void Turbulence_hyd_sous_maille_Wale_VDF::set_param(Param& param)
 
 Champ_Fonc& Turbulence_hyd_sous_maille_Wale_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   if (est_egal(cw,0.,1.e-15))
@@ -114,8 +114,8 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
 
   Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation->inconnue().valeur());
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
   int nb_elem = zone_VDF.zone().nb_elem_tot();
   const int nb_elem_tot = zone_VDF.nb_elem_tot();
 

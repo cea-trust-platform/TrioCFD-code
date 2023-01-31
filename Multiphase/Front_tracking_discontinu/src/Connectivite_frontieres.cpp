@@ -119,7 +119,7 @@ void Connectivite_frontieres::remplir_def_face_aretes(const Zone_VF& zone_vf)
     }
 }
 
-void Connectivite_frontieres::associer_zone_vf(const Zone_VF& zone_vf)
+void Connectivite_frontieres::associer_domaine_vf(const Zone_VF& zone_vf)
 {
   refzone_vf_ = zone_vf;
 
@@ -273,7 +273,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
           if (faces_voisins_(i,j) < 0)
             {
               Cerr << "(PE" << me();
-              Cerr << ") Erreur dans Connectivite_frontieres::associer_zone_vf\n";
+              Cerr << ") Erreur dans Connectivite_frontieres::associer_domaine_vf\n";
               Cerr << " faces_voisins_(" << i << "," << j << ") < 0" << finl;
               assert(0);
               exit();

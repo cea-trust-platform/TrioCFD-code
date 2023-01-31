@@ -80,7 +80,7 @@ Sortie& Marching_Cubes::printOn(Sortie& os) const
   return os;
 }
 
-void Marching_Cubes::associer_zone_vf(const Zone_VF& zone_vf)
+void Marching_Cubes::associer_domaine_vf(const Zone_VF& zone_vf)
 {
   const Zone& zone = zone_vf.zone();
   ref_zone_vf_ = zone_vf;
@@ -88,7 +88,7 @@ void Marching_Cubes::associer_zone_vf(const Zone_VF& zone_vf)
   remplir_renum_virt_loc(zone);
 }
 
-/*! @brief Construction d'un maillage en segments ou en triangles comme l'isovaleur d'une fonction discretisee aux sommets du maillage eulerien (associer_zone_vf).
+/*! @brief Construction d'un maillage en segments ou en triangles comme l'isovaleur d'une fonction discretisee aux sommets du maillage eulerien (associer_domaine_vf).
  *
  *   L'algorithme est un "marching cubes" generalise pour travailler avec un
  *   maillage vf en triangles, rectangles, cubes ou tetraedres.

@@ -584,10 +584,10 @@ void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation
 
   const Zone_dis& zone_dis = eq.zone_dis();
   const Parcours_interface& parcours_interface = eq.parcours_interface();
-  associer_zone_dis_parcours(zone_dis, parcours_interface);
+  associer_domaine_dis_parcours(zone_dis, parcours_interface);
 }
 
-void Maillage_FT_Disc::associer_zone_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours)
+void Maillage_FT_Disc::associer_domaine_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours)
 {
   refzone_dis_ = zone_dis;
   refparcours_interface_ = parcours;
@@ -1255,7 +1255,7 @@ void Maillage_FT_Disc::remplir_structure(const DoubleTab& soms)
 void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms)
 {
   int som;
-  const Zone& mazone = ma_zone_.valeur();
+  const Zone& mazone = mon_dom_.valeur();
   const int nb_elements_reels = mazone.nb_elem();
   const int nb_sommets_tot = soms.dimension(0);
 
@@ -3042,13 +3042,13 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
   static ArrOfIntFT liste_pe_dest;
 
   const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone& la_zone = zone_dis.zone();
-  const int nb_elem = la_zone.nb_elem(); // Nombre d'elements reels
+  const Zone& le_dom = zone_dis.zone();
+  const int nb_elem = le_dom.nb_elem(); // Nombre d'elements reels
   {
     liste_pe_dest.resize_array(nb_facettes_envoi);
     liste_elem_arrivee_local.resize_array(nb_facettes_envoi);
 
-    const IntTab& elem_virt_pe_num = la_zone.elem_virt_pe_num();
+    const IntTab& elem_virt_pe_num = le_dom.elem_virt_pe_num();
 
     for (i = 0; i < nb_facettes_envoi; i++)
       {

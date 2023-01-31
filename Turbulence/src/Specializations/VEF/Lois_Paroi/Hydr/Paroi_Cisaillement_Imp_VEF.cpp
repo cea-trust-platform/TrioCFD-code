@@ -77,7 +77,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_
 
 int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -95,8 +95,8 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   int l_unif;
   int n_bord;
 
-  tab_u_star_.resize(la_zone_VEF->nb_faces_tot());
-  tab_d_plus_.resize(la_zone_VEF->nb_faces_tot());
+  tab_u_star_.resize(le_dom_VEF->nb_faces_tot());
+  tab_d_plus_.resize(le_dom_VEF->nb_faces_tot());
 
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
@@ -127,7 +127,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());

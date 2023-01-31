@@ -108,7 +108,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
-  const Zone_dis& la_zone_dis = eqn_transport_Fluctu_Temp->zone_dis();
+  const Zone_dis& le_dom_dis = eqn_transport_Fluctu_Temp->zone_dis();
 
   const Probleme_base& mon_pb = mon_equation->probleme();
   const Equation_base& eqn_hydr = mon_pb.equation(0);
@@ -149,7 +149,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
 
   int nb_elem = K_eps_Bas_Re.dimension(0);
   DoubleTab Flambda(nb_elem);
-  mon_modele_fonc.Calcul_Flambda( Flambda,la_zone_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
+  mon_modele_fonc.Calcul_Flambda( Flambda,le_dom_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
 
   if (temps != diffusivite_turbulente_.temps())
     {

@@ -109,7 +109,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
 {
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
   const IntTab& face_voisins=zvdf.face_voisins();
-  const Milieu_base& le_milieu = ma_zone_cl_dis->equation().milieu();
+  const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = front_vf.nb_faces();
@@ -141,14 +141,14 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
       d_Lambda = Lambda(0,0);
     }
 
-  Schema_Temps_base& sch = ma_zone_cl_dis->equation().probleme().schema_temps();
+  Schema_Temps_base& sch = mon_dom_cl_dis->equation().probleme().schema_temps();
   double dt= sch.pas_de_temps() ;
 
 
   //  Cerr<<"Nom du bord : "<<front_vf.le_nom()<<finl;
   ////double d_Lambda = Lambda(0,0);
 
-  const DoubleTab& T_f = ma_zone_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   DoubleTab& T_b = temperature_bord_->valeurs_au_temps(temps);
 
   const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
@@ -198,7 +198,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
   Neumann_paroi::completer();
 
   // On type et on dimmensionne le champ_front temperature_bord_
-  //  const Milieu_base& mil=ma_zone_cl_dis->equation().milieu();
+  //  const Milieu_base& mil=mon_dom_cl_dis->equation().milieu();
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int nb_comp = 1;
   temperature_bord_.typer("Champ_front_fonc");
@@ -211,7 +211,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
   int ndeb = front_vf.num_premiere_face();
   const IntTab& face_voisins = zvdf.face_voisins();
-  const DoubleTab& T = ma_zone_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T = mon_dom_cl_dis->equation().inconnue().valeurs();
   int face=0;
   //
   // Debut de la boucle sur les faces de bord

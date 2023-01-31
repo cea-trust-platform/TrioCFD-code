@@ -87,7 +87,7 @@ void Source_Transport_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_LeK_MIN();
-  for (int fac = 0; fac < la_zone_VEF->nb_faces(); fac++)
+  for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)
       resu(fac) += ((C1 * P(fac) * F1(fac) - C2 * Eps(fac) * F2(fac)) * Eps(fac) / (K(fac)) + E(fac)) * volumes_entrelaces(fac);
 }
@@ -96,7 +96,7 @@ void Source_Transport_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelac
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_LeK_MIN();
-  for (int fac = 0; fac < la_zone_VEF->nb_faces(); fac++)
+  for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)
       resu(fac) += (C1 * P(fac) - C2 * Eps(fac)) * volumes_entrelaces(fac) * Eps(fac) / K(fac);
 }

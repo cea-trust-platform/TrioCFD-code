@@ -49,8 +49,8 @@ public:
 
 protected:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Zone_VDF) le_dom_VDF;
+  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
 
   mutable int nb_impr_;        // Compteur d'impression
 

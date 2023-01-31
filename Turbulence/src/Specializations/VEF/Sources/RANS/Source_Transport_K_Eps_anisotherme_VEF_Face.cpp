@@ -45,7 +45,7 @@ void Source_Transport_K_Eps_anisotherme_VEF_Face::fill_resu_anisotherme(const Do
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   double C3_loc, LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_LeK_MIN();
 
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
       resu(face, 0) += G(face) * volumes_entrelaces(face);
       if (K_eps(face, 0) >= LeK_MIN)

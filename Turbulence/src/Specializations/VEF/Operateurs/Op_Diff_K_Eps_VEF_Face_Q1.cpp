@@ -58,7 +58,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::associer(const Zone_dis& zone_dis,
   const Zone_VEF& zVEF = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zclVEF = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
   inconnue_ = inco;
-  la_zone_vef = zVEF;
+  le_dom_vef = zVEF;
   la_zcl_vef=zclVEF;
 }
 
@@ -82,27 +82,27 @@ void Op_Diff_K_Eps_VEF_Face_Q1::associer_diffusivite_turbulente()
 // Fonction utile visc
 //
 
-static double viscA_Q1(const Zone_VEF& la_zone,int num_face,int num2,int dimension,
+static double viscA_Q1(const Zone_VEF& le_dom,int num_face,int num2,int dimension,
                        int num_elem,double diffu)
 {
-  double constante = (diffu)/la_zone.volumes(num_elem);
+  double constante = (diffu)/le_dom.volumes(num_elem);
   double Valeur=0;
   // Cerr << "num_face " << num_face << " et num2 " << num2 << " et num_elem " << num_elem << finl;
   if(dimension==2)
     {
-      Valeur=la_zone.face_normales(num_face,0)*
-             la_zone.face_normales(num2,1) -
-             la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,0);
+      Valeur=le_dom.face_normales(num_face,0)*
+             le_dom.face_normales(num2,1) -
+             le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,0);
       Valeur=constante*std::fabs(Valeur);
     }
   else
     {
-      Valeur=(la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,2) -
-              la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,1)) +
-             (la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,0) -
-              la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,2)) +
-             (la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,1) -
-              la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,0));
+      Valeur=(le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,2) -
+              le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,1)) +
+             (le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,0) -
+              le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,2)) +
+             (le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,1) -
+              le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,0));
       Valeur=constante*std::fabs(Valeur);
     }
   return Valeur;
@@ -111,7 +111,7 @@ static double viscA_Q1(const Zone_VEF& la_zone,int num_face,int num2,int dimensi
 DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  DoubleTab& resu) const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
   const IntTab& elem_faces = zone_VEF.elem_faces();
@@ -268,7 +268,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
 
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
   const IntTab& elem_faces = zone_VEF.elem_faces();
@@ -444,7 +444,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::contribue_au_second_membre(DoubleTab& resu ) con
 {
 
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 
   //  const IntTab& elem_faces = zone_VEF.elem_faces();
   //  const IntTab& face_voisins = zone_VEF.face_voisins();

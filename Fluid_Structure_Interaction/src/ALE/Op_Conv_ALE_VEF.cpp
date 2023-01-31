@@ -66,7 +66,7 @@ void Op_Conv_ALE_VEF::associer (const Zone_dis& zone_dis ,
   const Zone_VEF& zvef = ref_cast(Zone_VEF,zone_dis.valeur());
   const Zone_Cl_VEF& zclvef = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
   dom=inco->domaine();
-  la_zone_vef = zvef;
+  le_dom_vef = zvef;
   la_zcl_vef = zclvef;
 }
 
@@ -75,7 +75,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
 {
   //statistiques().begin_count(m1);
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
   const Zone_ALE& dom_ale=ref_cast(Zone_ALE, dom.valeur());
   const Op_Conv_VEF_base& opConvVEFbase = ref_cast(Op_Conv_VEF_base, op_conv.valeur());
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
@@ -747,7 +747,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
 double Op_Conv_ALE_VEF::calculer_dt_stab() const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const DoubleVect& volumes_entrelaces_Cl = zone_Cl_VEF.volumes_entrelaces_Cl();
   DoubleTrav fluent(volumes_entrelaces);
@@ -811,7 +811,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
 {
 // Taken from Op_Conv_EF_VEF_P1NC_Stab::remplir_fluent(DoubleVect& fluent_)
 //
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
 //old const Champ_Inc_base& la_vitesse=vitesse_.valeur();
 //old const DoubleTab& tab_vitesse=la_vitesse.valeurs();
 //new DoubleTab velocity= equation().inconnue().valeurs();
@@ -858,7 +858,7 @@ void Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Me
   const DoubleTab& vitesse_faces_ALE = ref_cast(Zone_ALE, dom.valeur()).vitesse_faces();
   int i,k,num_face;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_VEF);
   const DoubleVect& volumes=zone_VF.volumes();
   const int nb_faces = zone_VEF.nb_faces();
@@ -1039,7 +1039,7 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
 
   int num_face;
   double timestep=equation().probleme().schema_temps().pas_de_temps();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
   const int nb_faces_tot = zone_VEF.nb_faces_tot();
   DoubleTab ALEmeshVelocityGradient(nb_faces_tot,dimension,dimension);
   //jacobianALE.resize(nb_faces_tot,dimension);

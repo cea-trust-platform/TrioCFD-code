@@ -39,7 +39,7 @@ class Marching_Cubes : public Objet_U
 public:
   Marching_Cubes();
 
-  void associer_zone_vf(const Zone_VF& zone_vf);
+  void associer_domaine_vf(const Zone_VF& zone_vf);
 
   int construire_iso(const DoubleVect& valeurs_sommets,
                      double isovaleur,

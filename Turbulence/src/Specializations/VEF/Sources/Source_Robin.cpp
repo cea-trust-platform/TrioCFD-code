@@ -61,7 +61,7 @@ void Source_Robin::completer()
 {
   Source_base::completer();
   Cerr << "Dans Source_Robin::completer()" << finl;
-  const int nb_faces_bord = la_zone_VEF->nb_faces_bord();
+  const int nb_faces_bord = le_dom_VEF->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
   Cerr << "nb_faces_bord = " << nb_faces_bord << finl;
@@ -71,8 +71,8 @@ void Source_Robin::completer()
 // ajouter
 DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF             = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF       = la_zone_Cl_VEF.valeur();
+  const Zone_VEF& zone_VEF             = le_dom_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF       = le_dom_Cl_VEF.valeur();
   const Navier_Stokes_Turbulent& eq_ns = ref_cast(Navier_Stokes_Turbulent,equation());
   const DoubleTab& cisaillement        = eq_ns.modele_turbulence().loi_paroi().valeur().Cisaillement_paroi();
 //  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi().valeur().tab_u_star();
@@ -143,9 +143,9 @@ DoubleTab& Source_Robin::calculer(DoubleTab& resu) const
 }
 
 
-// associer_zones
-void Source_Robin::associer_zones(const Zone_dis& z, const Zone_Cl_dis& zcl)
+// associer_domaines
+void Source_Robin::associer_domaines(const Zone_dis& z, const Zone_Cl_dis& zcl)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,z.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Zone_VEF,z.valeur());
+  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
 }

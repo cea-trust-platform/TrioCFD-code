@@ -85,7 +85,7 @@ void Op_Diff_Tau_PolyMAC_P0_Elem::modifier_nu(DoubleTab& mu) const // Multiplica
 
 double Op_Diff_Tau_PolyMAC_P0_Elem::calculer_dt_stab() const
 {
-  const Zone_PolyMAC_P0& zone = la_zone_poly_.valeur();
+  const Zone_PolyMAC_P0& zone = le_dom_poly_.valeur();
   const IntTab& e_f = zone.elem_faces();
   const DoubleTab& nf = zone.face_normales(),
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe() : NULL,

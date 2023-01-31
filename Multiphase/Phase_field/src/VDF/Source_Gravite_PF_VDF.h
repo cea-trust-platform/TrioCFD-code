@@ -50,9 +50,9 @@ public:
   void mettre_a_jour(double temps) override { }
 
 protected :
-  void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& ) override;
-  REF(Zone_VDF) la_zone;
-  REF(Zone_Cl_VDF) la_zone_Cl;
+  void associer_domaines(const Zone_dis& zone,const Zone_Cl_dis& ) override;
+  REF(Zone_VDF) le_dom;
+  REF(Zone_Cl_VDF) le_dom_Cl;
   REF(Probleme_base) le_probleme;
 };
 

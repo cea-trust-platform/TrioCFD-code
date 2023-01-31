@@ -62,7 +62,7 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_VEF) le_dom_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
   REF(Champ_Q1NC) inconnue_;
   //DoubleVect porosite_face;
@@ -73,7 +73,7 @@ protected :
  */
 inline  void Op_Diff_K_Eps_VEF_Face_Q1::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
 /*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
@@ -81,7 +81,7 @@ inline  void Op_Diff_K_Eps_VEF_Face_Q1::dimensionner(Matrice_Morse& matrice) con
  */
 inline void Op_Diff_K_Eps_VEF_Face_Q1::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+  Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
 }
 
 

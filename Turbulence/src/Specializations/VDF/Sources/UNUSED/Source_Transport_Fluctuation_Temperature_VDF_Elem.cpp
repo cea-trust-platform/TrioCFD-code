@@ -119,11 +119,11 @@ void Source_Transport_Fluctuation_Temperature_VDF_Elem::associer_pb(const Proble
   gravite = fluide.gravite();
 }
 
-void Source_Transport_Fluctuation_Temperature_VDF_Elem::associer_zones(const Zone_dis& zone_dis,
+void Source_Transport_Fluctuation_Temperature_VDF_Elem::associer_domaines(const Zone_dis& zone_dis,
                                                                        const Zone_Cl_dis& zone_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
 }
 
 
@@ -140,8 +140,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::calculer_Prod_utet
                                                                                     DoubleTab& uteta_T) const
 {
   int nb_faces= zone_VDF.nb_faces();
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Zone& le_dom=zone_VDF.zone();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
   const IntTab& les_elem_faces = zone_VDF.elem_faces();
   DoubleTrav grad_T(nb_faces);
@@ -232,7 +232,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
 
   const Zone_Cl_dis& zcl = eq_hydraulique->zone_Cl_dis();
   const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,eq_hydraulique->zone_dis().valeur());
-  const Zone& la_zone=zone_VDF.zone();
+  const Zone& le_dom=zone_VDF.zone();
   const Zone_Cl_VDF& zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zcl.valeur());
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
   const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
@@ -280,7 +280,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   if (sub_type(Champ_Uniforme,ch_beta.valeur()))
     // calculer_terme_g(zone_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
     {
-      int nb_faces_elem =la_zone.nb_faces_elem();
+      int nb_faces_elem =le_dom.nb_faces_elem();
       IntTrav numfa(nb_faces_elem);
       DoubleVect coef(Objet_U::dimension);
       const IntTab& les_elem_faces = zone_VDF.elem_faces();
@@ -309,7 +309,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
     {
       // calculer_terme_g(zone_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
       G = 0;
-      int nb_faces_elem = la_zone.nb_faces_elem();
+      int nb_faces_elem = le_dom.nb_faces_elem();
       IntTrav numfa(nb_faces_elem);
       const IntTab& les_elem_faces = zone_VDF.elem_faces();
       DoubleVect coef(dimension);
