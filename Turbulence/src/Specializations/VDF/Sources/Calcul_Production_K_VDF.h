@@ -23,9 +23,9 @@
 #define Calcul_Production_K_VDF_included
 
 #include <TRUSTTabs_forward.h>
-class Zone_Cl_VDF;
+class Domaine_Cl_VDF;
 class Champ_Face_VDF;
-class Zone_VDF;
+class Domaine_VDF;
 
 //  CLASS Calcul_Production_K_VDF
 // Classe qui porte les fonctions de calcul des termes de production de l'energie cinetique turbulente et de destruction de cette energie
@@ -35,25 +35,25 @@ class Calcul_Production_K_VDF
 protected:
   Calcul_Production_K_VDF() {}
 
-  DoubleVect& calculer_terme_production_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_Axi(const Zone_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_Axi(const Domaine_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_BiK(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_BiK(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_BiK_Axi(const Zone_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_BiK_Axi(const Domaine_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_destruction_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
+  DoubleVect& calculer_terme_destruction_K(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
 
-  DoubleVect& calculer_terme_destruction_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, double, const DoubleVect&) const;
+  DoubleVect& calculer_terme_destruction_K(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, double, const DoubleVect&) const;
 
-  DoubleVect& calculer_terme_destruction_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const DoubleVect&, const DoubleVect&, int) const;
+  DoubleVect& calculer_terme_destruction_K(const Domaine_VDF&, const Domaine_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const DoubleVect&, const DoubleVect&, int) const;
 
   void mettre_a_jour(double ) { }
 
-  DoubleTab& calculer_u_teta(const Zone_VDF&, const Zone_Cl_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  DoubleTab& calculer_u_teta(const Domaine_VDF&, const Domaine_Cl_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
 
-  DoubleTab& calculer_u_conc(const Zone_VDF&, const Zone_Cl_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&, int) const;
+  DoubleTab& calculer_u_conc(const Domaine_VDF&, const Domaine_Cl_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&, int) const;
 };
 
 #endif /* Calcul_Production_K_VDF_included */

@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Modele_EASM_Baglietto_VEF.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Periodique.h>
 #include <Champ_Uniforme.h>
 #include <Scatter.h>
@@ -53,7 +53,7 @@ Entree& Modele_EASM_Baglietto_VEF::readOn(Entree& is )
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D=0;
@@ -61,7 +61,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   double kkk = CNL1;
   Cerr<<"kkk = " << kkk <<finl;
@@ -69,16 +69,16 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
   return E;
 }
 
-/*DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis) const
+/*DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis) const
 {
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
 }
 */
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -86,15 +86,15 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& 
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
   le_dom.creer_tableau_faces(Pderive);
   int nb_faces = le_dom.nb_faces();
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
   const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
@@ -107,7 +107,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& 
   // Calcul de la distance a la paroi aux faces
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -184,14 +184,14 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& 
   return F1;
 }
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -228,9 +228,9 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
   return F2;
 }
 /*
-  DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& D, const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re, const DoubleTab& tab_visco ) const
+  DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& D, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re, const DoubleTab& tab_visco ) const
   {
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face,elem0,elem1;
   double Re,nulam;
@@ -261,22 +261,22 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
   }
 
 */
-DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Rey;
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
   const IntTab& face_voisins = le_dom.face_voisins();
   Fmu = 0;
@@ -284,7 +284,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   // Calcul de la distance a la paroi aux faces
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -369,22 +369,22 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   return Fmu;
 }
 
-DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Rey;
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
   const IntTab& face_voisins = le_dom.face_voisins();
   Fmu = 0;
@@ -392,7 +392,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
   // Calcul de la distance a la paroi aux faces
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -479,14 +479,14 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
 
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -523,7 +523,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
   return F2;
 }
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -531,15 +531,15 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_d
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   const DoubleTab& wall_length = BR_wall_length_.valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
   le_dom.creer_tableau_faces(Pderive);
   int nb_faces = le_dom.nb_faces();
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
   const IntTab& face_voisins = le_dom.face_voisins();
   int num_face;
@@ -552,7 +552,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_d
   // Calcul de la distance a la paroi aux faces
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -630,12 +630,12 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_d
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
-  return Calcul_E( E, zone_dis, zone_Cl_dis, transporte, K_Bas_Re, ch_visco, visco_turb );
+  return Calcul_E( E, domaine_dis, domaine_Cl_dis, transporte, K_Bas_Re, ch_visco, visco_turb );
 }
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                    const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D=0;

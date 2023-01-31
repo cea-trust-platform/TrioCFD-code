@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_LDC_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Operateur.h>
 #include <Schema_Temps_base.h>
 
@@ -46,13 +46,13 @@ Entree& Source_LDC_VDF::readOn(Entree& s )
 }
 
 
-void Source_LDC_VDF::associer_domaines(const Zone_dis& zone_dis,
-                                    const Zone_Cl_dis& zone_cl_dis)
+void Source_LDC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+                                       const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-  // const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
 
-  // const Zone& mon_dom = zvdf.zone();
+  // const Domaine& mon_dom = zvdf.domaine();
   Champ_Inc_base& inco = equation().inconnue();
   int nb_compo = inco.nb_comp();
   //Cerr<<" nb_compo dans Source_LDC_VDF::associer_domaines = "<<nb_compo<<finl;
@@ -83,8 +83,8 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
   DoubleTab& present_fin = eq_fine.inconnue().valeurs();
   DoubleTab& passe_fin = eq_fine.inconnue().passe();
   double dt = eq_fine.schema_temps().pas_de_temps();
-  const Zone_VDF& le_dom = ref_cast(Zone_VDF, eq.zone_dis().valeur());
-  const Zone_VDF& le_dom_fine = ref_cast(Zone_VDF, eq_fine.zone_dis().valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis().valeur());
+  const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis().valeur());
   const DoubleVect& volumes = le_dom.volumes();
   const DoubleVect& volumes_fin = le_dom_fine.volumes();
   const IntVect& indice_gros = connect.indice_gros();

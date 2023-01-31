@@ -72,8 +72,8 @@ void Nucleation_paroi_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const 
 void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const IntTab& f_e = domaine.face_voisins();
 
   const DoubleTab& rho = pbm.milieu().masse_volumique().passe(),
                    &press = pbm.eq_qdm.pression().passe(),
@@ -85,7 +85,7 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
   const Milieu_composite& milc = ref_cast(Milieu_composite, pbm.milieu());
 
   /* elements */
-  for (int f = 0; f < zone.premiere_face_int(); f++) // On n'injecte que dans les elems de bord
+  for (int f = 0; f < domaine.premiere_face_int(); f++) // On n'injecte que dans les elems de bord
     for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1))
       if (k != n_l)
         if (milc.has_saturation(n_l, k)) //phase vapeur

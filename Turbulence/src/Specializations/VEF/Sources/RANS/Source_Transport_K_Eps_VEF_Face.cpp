@@ -23,7 +23,7 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Transport_K_Eps.h>
 #include <Milieu_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_VEF_Face,"Source_Transport_K_Eps_VEF_P1NC",Source_Transport_VEF_Face_base);
 
@@ -65,12 +65,12 @@ void Source_Transport_K_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, 
                                                            const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
-  get_modele_fonc_bas_reyn().Calcul_D(D,mon_eq_transport_K_Eps->zone_dis(),mon_eq_transport_K_Eps->zone_Cl_dis(),vit,K_eps,ch_visco_cin);
-  get_modele_fonc_bas_reyn().Calcul_E(E,mon_eq_transport_K_Eps->zone_dis(),mon_eq_transport_K_Eps->zone_Cl_dis(),vit,K_eps,ch_visco_cin,visco_turb);
+  get_modele_fonc_bas_reyn().Calcul_D(D,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin);
+  get_modele_fonc_bas_reyn().Calcul_E(E,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin,visco_turb);
   D.echange_espace_virtuel();
   E.echange_espace_virtuel();
-  get_modele_fonc_bas_reyn().Calcul_F1(F1,mon_eq_transport_K_Eps->zone_dis(),mon_eq_transport_K_Eps->zone_Cl_dis(), P, K_eps,ch_visco_cin_ou_dyn);
-  get_modele_fonc_bas_reyn().Calcul_F2(F2,D,mon_eq_transport_K_Eps->zone_dis(),K_eps, ch_visco_cin_ou_dyn  );
+  get_modele_fonc_bas_reyn().Calcul_F1(F1,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(), P, K_eps,ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn().Calcul_F2(F2,D,mon_eq_transport_K_Eps->domaine_dis(),K_eps, ch_visco_cin_ou_dyn  );
 }
 
 const Nom Source_Transport_K_Eps_VEF_Face::get_type_paroi() const

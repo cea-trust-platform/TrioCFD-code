@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Champ_Fonc_Tabule.h>
 #include <Debog.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Probleme_base.h>
 #include <Param.h>
 
@@ -366,7 +366,7 @@ void Loi_Etat_Melange_GP::calculer_alpha()
     }
   else
     {
-      const IntTab& elem_faces=ref_cast(Zone_VF,le_fluide->vitesse().zone_dis_base()).elem_faces();
+      const IntTab& elem_faces=ref_cast(Domaine_VF,le_fluide->vitesse().domaine_dis_base()).elem_faces();
       double rhoelem,Cpelem;
       int nfe=elem_faces.dimension(1),face;
       if (sub_type(Champ_Uniforme,lambda.valeur()))

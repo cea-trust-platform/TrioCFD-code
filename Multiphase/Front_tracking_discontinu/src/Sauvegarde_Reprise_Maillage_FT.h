@@ -24,23 +24,23 @@
 #include <arch.h>
 
 class Maillage_FT_Disc;
-class Zone_VF;
+class Domaine_VF;
 class Sortie;
 class Entree;
-class Zone;
+class Domaine;
 class Sauvegarde_Reprise_Maillage_FT
 {
 public:
-  static void ecrire_xyz(const Maillage_FT_Disc& mesh, const Zone_VF& zone_vf, Sortie& fichier);
+  static void ecrire_xyz(const Maillage_FT_Disc& mesh, const Domaine_VF& domaine_vf, Sortie& fichier);
   static void lire_xyz(Maillage_FT_Disc& mesh,
-                       const Zone_VF * zone_vf,
+                       const Domaine_VF * domaine_vf,
                        Entree * fichier,
-                       const Zone * domaine_src);
+                       const Domaine * domaine_src);
 protected:
 
   int init_temps_physique(Maillage_FT_Disc& mesh);
-  void   init_sommets(Maillage_FT_Disc& mesh, const Zone_VF * zone_vf);
-  void   init_facettes(Maillage_FT_Disc& mesh, const Zone_VF * zone_vf);
+  void   init_sommets(Maillage_FT_Disc& mesh, const Domaine_VF * domaine_vf);
+  void   init_facettes(Maillage_FT_Disc& mesh, const Domaine_VF * domaine_vf);
 
 };
 #endif

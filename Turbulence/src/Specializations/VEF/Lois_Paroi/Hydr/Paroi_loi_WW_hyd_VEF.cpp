@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Mod_turb_hyd_base.h>
 #include <Equation_base.h>
 #include <Param.h>
@@ -89,8 +89,8 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
@@ -124,7 +124,7 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   // Boucle sur les bords
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -136,7 +136,7 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const IntTab& elem_faces = zone_VEF.elem_faces();
+          const IntTab& elem_faces = domaine_VEF.elem_faces();
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -150,11 +150,11 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                 if (num[0]==num_face) num[0]=elem_faces(elem,2);
                 else if (num[1]==num_face) num[1]=elem_faces(elem,2);
 
-                norm_v=norm_2D_vit(vit,num[0],num[1],num_face,zone_VEF,val,val1,val2);
+                norm_v=norm_2D_vit(vit,num[0],num[1],num_face,domaine_VEF,val,val1,val2);
 
-                dist_G = distance_2D(num_face,elem,zone_VEF,signe);
+                dist_G = distance_2D(num_face,elem,domaine_VEF,signe);
                 dist_som = (dimension+1)*dist_G;
-                //                dist_som = distance_2D_som(num_face,elem,zone_VEF);
+                //                dist_som = distance_2D_som(num_face,elem,domaine_VEF);
 
                 if (l_unif)
                   d_visco = visco;
@@ -184,11 +184,11 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                 //                     if (rang_elem_non_std(elem_voisin)==-1) {
                 //                       // elem_voisin n'est pas un element de bord
 
-                //                       norm_v=norm_2D_vit3(vit,num0,num1,num2,num_face,zone_VEF,val,val1,val2);
+                //                       norm_v=norm_2D_vit3(vit,num0,num1,num2,num_face,domaine_VEF,val,val1,val2);
 
-                //                       dist_G = distance_2D(num_face,elem,zone_VEF,signe);
+                //                       dist_G = distance_2D(num_face,elem,domaine_VEF,signe);
                 //                       dist_som = (dimension+1)*dist_G/dimension;  // cf 3D
-                // //                      dist_som = distance_2D_som(num_face,elem,zone_VEF);
+                // //                      dist_som = distance_2D_som(num_face,elem,domaine_VEF);
 
                 //                       if (l_unif)
                 //                         d_visco = visco;
@@ -215,11 +215,11 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                 else if (num[1]==num_face) num[1]=elem_faces(elem,3);
                 else if (num[2]==num_face) num[2]=elem_faces(elem,3);
 
-                norm_v=norm_3D_vit(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                norm_v=norm_3D_vit(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
 
-                dist_G = distance_3D(num_face,elem,zone_VEF,signe);
+                dist_G = distance_3D(num_face,elem,domaine_VEF,signe);
                 dist_som = (dimension+1)*dist_G;
-                //                dist_som = distance_3D_som(num_face,elem,zone_VEF);
+                //                dist_som = distance_3D_som(num_face,elem,domaine_VEF);
 
                 if (l_unif)
                   d_visco = visco;
@@ -256,12 +256,12 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                 //                     else if (num3==num0) num3=elem_faces(elem_voisin,3);
                 //                     if (rang_elem_non_std(elem_voisin)==-1) {
                 //                       // elem_voisin n'est pas un element de bord
-                //                       norm_v=norm_3D_vit4(vit, num_face, num0, num1, num2, num3, zone_VEF, val1, val2, val3);
-                //                       dist_G = distance_3D(num_face,elem_voisin,zone_VEF,signe);
+                //                       norm_v=norm_3D_vit4(vit, num_face, num0, num1, num2, num3, domaine_VEF, val1, val2, val3);
+                //                       dist_G = distance_3D(num_face,elem_voisin,domaine_VEF,signe);
                 //                       dist_som = (dimension+1)*dist_G/dimension;
                 //                       // Il faudrait chercher la distance entre la paroi et le centre de gravite de la face ne touchant pas la pario
                 //                       // Premiere approx : dist_som_3.*dist_G
-                // //                      dist_som = distance_3D_som(num_face,elem_voisin,zone_VEF);
+                // //                      dist_som = distance_3D_som(num_face,elem_voisin,domaine_VEF);
 
                 //                       if (l_unif)
                 //                         d_visco = visco;
@@ -306,13 +306,13 @@ int Paroi_loi_WW_hyd_VEF::calculer_local(double d_visco,
       tab_nu_t(elem) = 0.;
       tab_k(elem) = 0.;
 
-      if (impr==1)  Cerr << "Zone lineaire" << finl;
+      if (impr==1)  Cerr << "Domaine lineaire" << finl;
     }
   else
     {
       calculer_u_star_couche_puissance(norm_vit,d_visco,dist_som,num_face);
       calculer_couche_puissance(tab_nu_t,tab_k,dist_som,elem,num_face);
-      if (impr==1)  Cerr << "Zone en puissance" << finl;
+      if (impr==1)  Cerr << "Domaine en puissance" << finl;
     }
   return 1;
 }
@@ -371,9 +371,9 @@ int Paroi_loi_WW_hyd_VEF::calculer_couche_puissance(DoubleTab& nu_t,DoubleTab& t
 //
 ////////////////////////////////////////////////////
 
-double norm_2D_vit(const DoubleTab& vit,int num1,int num2,int fac,const Zone_VEF& zone,double& u,double& val1, double& val2)
+double norm_2D_vit(const DoubleTab& vit,int num1,int num2,int fac,const Domaine_VEF& domaine,double& u,double& val1, double& val2)
 {
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& face_normale = domaine.face_normales();
   // fac numero de la face a paroi fixe
   DoubleVect r(2);
   r[0]=face_normale(fac,0);
@@ -394,9 +394,9 @@ double norm_2D_vit(const DoubleTab& vit,int num1,int num2,int fac,const Zone_VEF
   return v;
 }
 
-double norm_2D_vit3(const DoubleTab& vit,int num1,int num2,int num3,int fac,const Zone_VEF& zone,double& u,double& val1, double& val2)
+double norm_2D_vit3(const DoubleTab& vit,int num1,int num2,int num3,int fac,const Domaine_VEF& domaine,double& u,double& val1, double& val2)
 {
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& face_normale = domaine.face_normales();
   // fac numero de la face a paroi fixe
   DoubleVect r(2);
   r[0]=face_normale(fac,0);
@@ -418,10 +418,10 @@ double norm_2D_vit3(const DoubleTab& vit,int num1,int num2,int num3,int fac,cons
 }
 
 double norm_3D_vit(const DoubleTab& vit,int fac,int num1,int num2,int num3,
-                   const Zone_VEF& zone,
+                   const Domaine_VEF& domaine,
                    double& val1,double& val2,double& val3)
 {
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& face_normale = domaine.face_normales();
   // fac numero de la face a paroi fixe
   DoubleVect r(3);
   r[0]=face_normale(fac,0);
@@ -441,10 +441,10 @@ double norm_3D_vit(const DoubleTab& vit,int fac,int num1,int num2,int num3,
 }
 
 double norm_3D_vit4(const DoubleTab& vit,int fac,int num1,int num2,int num3,int num4,
-                    const Zone_VEF& zone,
+                    const Domaine_VEF& domaine,
                     double& val1,double& val2,double& val3)
 {
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& face_normale = domaine.face_normales();
   // fac numero de la face a paroi fixe
   DoubleVect r(3);
   r[0]=face_normale(fac,0);
@@ -463,11 +463,11 @@ double norm_3D_vit4(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   return norm_vit;
 }
 
-double distance_2D(int fac,int elem,const Zone_VEF& zone, double& signe) //distance centre de gravite -> face 2D
+double distance_2D(int fac,int elem,const Domaine_VEF& domaine, double& signe) //distance centre de gravite -> face 2D
 {
-  const DoubleTab& xp = zone.xp();    // centre de gravite des elements
-  const DoubleTab& xv = zone.xv();    // centre de gravite des faces
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& xp = domaine.xp();    // centre de gravite des elements
+  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& face_normale = domaine.face_normales();
 
   DoubleVect r(2);
   r[0]=face_normale(fac,0);
@@ -485,11 +485,11 @@ double distance_2D(int fac,int elem,const Zone_VEF& zone, double& signe) //dista
   return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
 }
 
-double distance_3D(int fac,int elem,const Zone_VEF& zone, double& signe) //distance centre de gravite -> face 2D
+double distance_3D(int fac,int elem,const Domaine_VEF& domaine, double& signe) //distance centre de gravite -> face 2D
 {
-  const DoubleTab& xp = zone.xp();    // centre de gravite des elements
-  const DoubleTab& xv = zone.xv();    // centre de gravite des faces
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& xp = domaine.xp();    // centre de gravite des elements
+  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& face_normale = domaine.face_normales();
 
   DoubleVect r(3);
   r[0]=face_normale(fac,0);
@@ -505,19 +505,19 @@ double distance_3D(int fac,int elem,const Zone_VEF& zone, double& signe) //dista
   return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0)+r[2]*(z1-z0))/norme_array(r);
 }
 
-double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet -> face 2D
+double distance_2D_som(int fac,int elem,const Domaine_VEF& domaine ) //distance sommet -> face 2D
 {
-  const Zone& zone_geom = zone.zone();
-  //  const IntTab& face_sommets = zone.face_sommets();
-  const IntTab& elem_faces = zone.elem_faces();
-  const DoubleTab& coord = zone_geom.coord_sommets();
-  const Zone& zoneg = zone.zone();
-  int nfac = zoneg.nb_faces_elem();
-  const IntTab& som_elem=zone_geom.les_elems();
+  const Domaine& domaine_geom = domaine.domaine();
+  //  const IntTab& face_sommets = domaine.face_sommets();
+  const IntTab& elem_faces = domaine.elem_faces();
+  const DoubleTab& coord = domaine_geom.coord_sommets();
+  const Domaine& domaineg = domaine.domaine();
+  int nfac = domaineg.nb_faces_elem();
+  const IntTab& som_elem=domaine_geom.les_elems();
 
 
-  const DoubleTab& xv = zone.xv();    // centre de gravite des faces
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& face_normale = domaine.face_normales();
 
   int i,num0,sommet;
   IntVect num(2),som(2);
@@ -541,17 +541,17 @@ double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet
   return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
 }
 
-double distance_3D_som(int fac,int elem,const Zone_VEF& zone) //distance sommet -> face en 3D
+double distance_3D_som(int fac,int elem,const Domaine_VEF& domaine) //distance sommet -> face en 3D
 {
-  const Zone& zone_geom = zone.zone();
-  const IntTab& face_sommets = zone.face_sommets();
-  const IntTab& elem_faces = zone.elem_faces();
-  const DoubleTab& coord = zone_geom.coord_sommets();
-  const Zone& zoneg = zone.zone();
-  int nfac = zoneg.nb_faces_elem();
+  const Domaine& domaine_geom = domaine.domaine();
+  const IntTab& face_sommets = domaine.face_sommets();
+  const IntTab& elem_faces = domaine.elem_faces();
+  const DoubleTab& coord = domaine_geom.coord_sommets();
+  const Domaine& domaineg = domaine.domaine();
+  int nfac = domaineg.nb_faces_elem();
 
-  const DoubleTab& xv = zone.xv();    // centre de gravite des faces
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& face_normale = domaine.face_normales();
 
   int i,j=0,num0,sommet=-1,k;
   IntVect num(3),som0(3),som1(3);

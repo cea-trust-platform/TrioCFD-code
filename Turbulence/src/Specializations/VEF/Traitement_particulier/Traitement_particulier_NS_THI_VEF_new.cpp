@@ -22,7 +22,7 @@
 #include <Traitement_particulier_NS_THI_VEF_new.h>
 #include <Navier_Stokes_std.h>
 #include <Champ_P1NC.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <SFichier.h>
@@ -56,9 +56,9 @@ Entree& Traitement_particulier_NS_THI_VEF_new::readOn(Entree& is)
 
 void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 {
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  calcul_nb_som_dir(zone);
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
   nl = nb_som_dir; // anciennement nb_som_dir
@@ -130,9 +130,9 @@ void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 
 void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 {
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  calcul_nb_som_dir(zone);
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
   nl = nb_som_dir; // anciennement nb_som_dir
@@ -201,10 +201,10 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 
 
 
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VEF.nb_faces();
+  const int nb_faces = domaine_VEF.nb_faces();
   double Ectot=0.0;
   double Ec_ub=0.0;
   double Ec_up=0.0;
@@ -253,10 +253,10 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 
 void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VEF.nb_faces();
+  const int nb_faces = domaine_VEF.nb_faces();
   double Ectot=0.0;
 
 
@@ -280,9 +280,9 @@ void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
   {
   Ectot=0.0;
 
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  int nb_som = zone.nb_som();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  int nb_som = domaine.nb_som();
   double nb=pow(nb_som*1.,1./3.);
   int nsize, nsizes2, nl;
 
@@ -405,9 +405,9 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_2(DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit_u_s, DoubleTab& vit_v_s, DoubleTab& vit_w_s) const
 {
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  int nb_som = zone.nb_som();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  int nb_som = domaine.nb_som();
   int nl;
 
   nl = nb_som_dir; // anciennement nb_som_dir
@@ -469,14 +469,14 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleTab& xv = zone_VEF.xv();
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  const DoubleTab& coord = zone.coord_sommets();
-  int nb_som = zone.nb_som();
-  calcul_nb_som_dir(zone);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleTab& xv = domaine_VEF.xv();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  const DoubleTab& coord = domaine.coord_sommets();
+  int nb_som = domaine.nb_som();
+  calcul_nb_som_dir(domaine);
   int nsize,  nl, ntot;
 
   nl = nb_som_dir; // anciennement nb_som_dir
@@ -484,7 +484,7 @@ void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
   //  nsizes2=nsize/2;
   ntot= nl*nl*(nsize+1);
 
-  int nb_faces = zone_VEF.nb_faces();
+  int nb_faces = domaine_VEF.nb_faces();
   int num_face,num_som;
   int ix,iy,iz,ii,jj,kk;
   //int i,j,k;

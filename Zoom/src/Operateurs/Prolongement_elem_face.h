@@ -45,8 +45,8 @@ class Prolongement_elem_face : public Prolongement_base
 public:
 
   inline DoubleTab& distances();
-  void calculer(Zone_VF& , Zone_VF& , IntVect& ) override;
-  void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+  void calculer(Domaine_VF& , Domaine_VF& , IntVect& ) override;
+  void prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                  const Frontiere& frontF,IntVect& connect,
                  const DoubleTab& incoG,
                  DoubleTab& tab, int nb_comp) override;

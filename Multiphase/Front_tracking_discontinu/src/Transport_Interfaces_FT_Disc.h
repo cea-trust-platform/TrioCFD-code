@@ -303,7 +303,7 @@ protected:
                                              DoubleTab& deplacement,
                                              DoubleTab& Positions,
                                              DoubleTab& Vitesses) const;
-  virtual void test_suppression_interfaces_sous_zone();
+  virtual void test_suppression_interfaces_sous_domaine();
 
 
   virtual void calculer_distance_interface_faces(const DoubleTab& dist_elem,
@@ -341,7 +341,7 @@ protected:
                                                                      const DoubleVect& valeurs_euler,
                                                                      ArrOfDouble& valeurs_lagrange);
 
-  Nom suppression_interfaces_sous_zone_;
+  Nom suppression_interfaces_sous_domaine_;
 
   Champ_Fonc vitesse_imp_interp_;
 
@@ -453,8 +453,8 @@ public:
   // Si cette valeur est positive, on deplace toute l'interface d'une certaine distance
   // pour que le volume de la phase 1 reste toujours egal a la valeur prescrite
   double volume_impose_phase_1;
-  // Si non nul, le calcul de l'integrale pour le volume impose porte sur cette sous-zone
-  Nom    nom_zone_volume_impose_;
+  // Si non nul, le calcul de l'integrale pour le volume impose porte sur cette sous-domaine
+  Nom    nom_domaine_volume_impose_;
 
   Champ_Inc vitesse_filtree;
   DoubleTab doubletab_pos;

@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Paroi_std_hyd_VDF_diphasique.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Fluide_Quasi_Compressible.h>
@@ -46,9 +46,9 @@ Entree& Paroi_std_hyd_VDF_diphasique::readOn( Entree& is )
 // tab1 = tab_nu_t and tab2 = tab_k
 int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
 
@@ -63,8 +63,8 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
   const double delta_nu = tab_visco_ph1(0,0) - tab_visco_ph0(0,0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab
-  const Zone_Cl_dis_base& zone_Cl_dis_base = eqn_hydr.zone_Cl_dis().valeur();
-  const Equation_base& eqn_trans = zone_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
+  const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
   const DoubleTab& indic = eqn_interf.inconnue().valeurs();
 
@@ -98,7 +98,7 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 
   // Boucle sur les bords
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -137,21 +137,21 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
               ori = orientation(num_face);
               if ( (elem =face_voisins(num_face,0)) != -1)
                 {
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = -1.;
                 }
               else
                 {
                   elem = face_voisins(num_face,1);
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = 1.;
                 }
               if (axi)
-                dist=zone_VDF.dist_norm_bord_axi(num_face);
+                dist=domaine_VDF.dist_norm_bord_axi(num_face);
               else
-                dist=zone_VDF.dist_norm_bord(num_face);
+                dist=domaine_VDF.dist_norm_bord(num_face);
               if (l_unif)
                 d_visco = visco_ph0 + indic(elem) * delta_nu;
               else

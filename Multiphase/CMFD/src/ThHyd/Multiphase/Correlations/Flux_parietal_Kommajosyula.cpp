@@ -25,8 +25,8 @@
 #include <Loi_paroi_adaptative.h>
 #include <Correlation.h>
 #include <Pb_Multiphase.h>
-#include <Zone_dis.h>
-#include <Zone_VF.h>
+#include <Domaine_dis.h>
+#include <Domaine_VF.h>
 #include <TRUSTTrav.h>
 #include <Milieu_composite.h>
 #include <Saturation_base.h>

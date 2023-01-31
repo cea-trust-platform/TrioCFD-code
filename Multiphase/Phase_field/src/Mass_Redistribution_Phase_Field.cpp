@@ -41,11 +41,11 @@ double minvalue = 0;
  * */
 
 
-//void Mass_Redistribution_Phase_Field::impose_mass_redistribution(const Zone_VDF& zvdf, DoubleTab& c_present, const DoubleVect minvalue, const DoubleVect topvalue, const DoubleVect minnMassreditribution, const DoubleVect maxxMassredistribution)
-void Mass_Redistribution_Phase_Field::impose_mass_redistribution(const Zone_VDF& zvdf, DoubleTab& c_present, DoubleVect minX, DoubleVect maxX)
+//void Mass_Redistribution_Phase_Field::impose_mass_redistribution(const Domaine_VDF& zvdf, DoubleTab& c_present, const DoubleVect minvalue, const DoubleVect topvalue, const DoubleVect minnMassreditribution, const DoubleVect maxxMassredistribution)
+void Mass_Redistribution_Phase_Field::impose_mass_redistribution(const Domaine_VDF& zvdf, DoubleTab& c_present, DoubleVect minX, DoubleVect maxX)
 {
   DoubleTab createMDvect(c_ini.dimension(0));
-  const MD_Vector& md = zvdf.zone().md_vector_elements();
+  const MD_Vector& md = zvdf.domaine().md_vector_elements();
   MD_Vector_tools::creer_tableau_distribue(md,createMDvect);
   createMDvect = 0.;
 

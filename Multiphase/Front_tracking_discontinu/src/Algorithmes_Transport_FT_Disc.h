@@ -31,7 +31,7 @@
 #include <Objet_U.h>
 #include <TRUST_Deriv.h>
 
-class Zone_VF;
+class Domaine_VF;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Algorithmes_Transport_FT_Disc;
@@ -48,7 +48,7 @@ class Algorithmes_Transport_FT_Disc : public Objet_U
 {
   Declare_instanciable(Algorithmes_Transport_FT_Disc);
 public:
-  virtual void calculer_moments_indicatrice(const Zone_VF& zone_vf,
+  virtual void calculer_moments_indicatrice(const Domaine_VF& domaine_vf,
                                             const DoubleTab& indicatrice,
                                             double& volume_total,
                                             double& volume_phase_1,

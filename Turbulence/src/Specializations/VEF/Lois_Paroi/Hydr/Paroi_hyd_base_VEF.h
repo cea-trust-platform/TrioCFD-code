@@ -25,10 +25,10 @@
 #define Paroi_hyd_base_VEF_included
 
 #include <Turbulence_paroi_base.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 
 
 /*! @brief CLASS: Paroi_hyd_base_VEF Classe de base des lois de paroi hydraulique en VEF
@@ -44,7 +44,7 @@ class Paroi_hyd_base_VEF : public Turbulence_paroi_base
 
 public:
 
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   void init_lois_paroi_();
   DoubleTab& corriger_derivee_impl(DoubleTab& d) const override;
   inline const ArrOfInt& face_keps_imposee() const
@@ -56,8 +56,8 @@ public:
 
 protected:
 
-  REF(Zone_VEF) le_dom_VEF;
-  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
   IntVect face_keps_imposee_; // avec descripteur parallele
   int flag_face_keps_imposee_;
 };

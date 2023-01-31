@@ -27,8 +27,8 @@
 #include <Transport_K_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 
 class Modele_turbulence_hyd_K_Eps_Realisable : public  Mod_turb_hyd_RANS

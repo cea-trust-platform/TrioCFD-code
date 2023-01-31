@@ -25,7 +25,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Debog.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_VEF_Face,"Source_Transport_K_Realisable_VEF_P1NC",Source_base);
@@ -83,10 +83,10 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
   const DoubleTab& tab_paroi = mod_turb.loi_paroi().valeur().Cisaillement_paroi();
 
-  const Zone_Cl_dis& zcl_keps = eqn_k_Rea->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps = eqn_k_Rea->zone_dis();
+  const Domaine_Cl_dis& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
+  const Domaine_dis& domaine_dis_keps = eqn_k_Rea->domaine_dis();
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), & eps_Rea = eqn_eps_Rea->inconnue().valeurs();
-  mon_modele_fonc.Contributions_Sources_Paroi_BiK(zone_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
+  mon_modele_fonc.Contributions_Sources_Paroi_BiK(domaine_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
 
   Calcul_Production_K_VEF::mettre_a_jour(temps);
 }

@@ -24,7 +24,7 @@
 #include <Champ_Don.h>
 #include <Champ_Uniforme.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Periodique.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Symetrie.h>
@@ -57,13 +57,13 @@ Entree& Op_Diff_K_Eps_Bas_Re_VEF_Face::readOn(Entree& s )
 /*! @brief complete l'evaluateur
  *
  */
-void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer(const Zone_dis& zone_dis,
-                                             const Zone_Cl_dis& zone_cl_dis,
+void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer(const Domaine_dis& domaine_dis,
+                                             const Domaine_Cl_dis& domaine_cl_dis,
                                              const Champ_Inc& ch_diffuse)
 {
   const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse.valeur());
-  const Zone_VEF& zVEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zclVEF = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
+  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
   inconnue_ = inco;
   le_dom_vef = zVEF;
   la_zcl_vef=zclVEF;
@@ -95,7 +95,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer_diffusivite(const Champ_base& diffu
 // Fonction utile visc
 // mu <Si, Sj> / |K|
 
-static double viscA(const Zone_VEF& le_dom,int num_face,int num2,int dimension,
+static double viscA(const Domaine_VEF& le_dom,int num_face,int num2,int dimension,
                     int num_elem,double diffu)
 {
   double pscal;
@@ -116,10 +116,10 @@ static double viscA(const Zone_VEF& le_dom,int num_face,int num2,int dimension,
 
 void Op_Diff_K_Eps_Bas_Re_VEF_Face::remplir_nu(DoubleTab& nu) const
 {
-  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   // On dimensionne nu
   if (nu.size()==0)
-    nu.resize(zone_VEF.nb_elem_tot());
+    nu.resize(domaine_VEF.nb_elem_tot());
   const DoubleTab& diffu=diffusivite().valeurs();
   if (diffu.size()==1)
     nu = diffu(0,0);
@@ -132,16 +132,16 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::remplir_nu(DoubleTab& nu) const
 DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  DoubleTab& resu) const
 {
   remplir_nu(nu_);
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   int i,j,num_face;
-  int n1 = zone_VEF.nb_faces();
+  int n1 = domaine_VEF.nb_faces();
   int elem;
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
-  //  int nb_elem = zone_VEF.zone().nb_elem();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
+  //  int nb_elem = domaine_VEF.domaine().nb_elem();
   double valA,valA_bis, d_mu;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
@@ -150,14 +150,14 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
   // Pour epsilon on a D
   // on calcul D a la paroi
   DoubleTrav D(n1);
-  // mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,inconnue,nu);
+  // mon_modele_fonc.Calcul_D(D,domaine_dis_keps,zcl_keps,vit,inconnue,nu);
 
   D=0.;
   // On traite les faces bord :
   int n_bord;
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -177,8 +177,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
                       if ( ( (j= elem_faces(elem,i)) > num_face ) && (j != fac_asso) )
                         {
 
-                          valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                          valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                          valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                          valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
 
                           resu(num_face,0)+=valA*inconnue(j,0);
                           resu(num_face,0)-=valA*inconnue(num_face,0);
@@ -206,8 +206,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                      valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                      valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                      valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
 
                       resu(num_face,0)+=valA*inconnue(j,0);
                       resu(num_face,0)-=valA*inconnue(num_face,0);
@@ -234,8 +234,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                      valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                      valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                      valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
 
                       resu(num_face,0)+=valA*inconnue(j,0);
                       resu(num_face,0)-=valA*inconnue(num_face,0);
@@ -262,8 +262,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                      valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                      valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                      valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
 
                       resu(num_face,0)+=valA*inconnue(j,0);
                       resu(num_face,0)-=valA*inconnue(num_face,0);
@@ -284,7 +284,7 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
 
   // On traite les faces internes
 
-  for (num_face=zone_VEF.premiere_face_int(); num_face<n1; num_face++)
+  for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       for (int k=0; k<2; k++)
         {
@@ -294,8 +294,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
             {
               if ( (j= elem_faces(elem,i)) > num_face )
                 {
-                  valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                  valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                  valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                  valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
 
                   resu(num_face,0)+=valA*inconnue(j,0);
                   resu(num_face,0)-=valA*inconnue(num_face,0);
@@ -312,9 +312,9 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
     }
 
   // Prise en compte des conditions aux limites de Neumnan a la paroi
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -324,8 +324,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
             {
-              resu(face,0) += la_cl_paroi.flux_impose(face-ndeb,0)*zone_VEF.surface(face);
-              resu(face,1) += la_cl_paroi.flux_impose(face-ndeb,1)*zone_VEF.surface(face);
+              resu(face,0) += la_cl_paroi.flux_impose(face-ndeb,0)*domaine_VEF.surface(face);
+              resu(face,1) += la_cl_paroi.flux_impose(face-ndeb,1)*domaine_VEF.surface(face);
             }
         }
     }
@@ -350,16 +350,16 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::calculer(const DoubleTab& inconnue , D
 void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const
 
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
 
   int i,j,k,nc,l,num_face;
-  int n1 = zone_VEF.nb_faces();
+  int n1 = domaine_VEF.nb_faces();
   int elem;
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, valA_bis, d_mu,Prdt;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
@@ -371,9 +371,9 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
   const int nb_comp = transporte.line_size();
 
   // On traite les faces bord
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -392,8 +392,8 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
                     {
                       if ( ( (j= elem_faces(elem,i)) > num_face ) && (j != fac_asso) )
                         {
-                          valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                          valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                          valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                          valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
                           for ( nc=0; nc<nb_comp; nc++)
                             {
                               if (nc==0)
@@ -436,8 +436,8 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                      valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                      valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                      valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
                       for ( nc=0; nc<nb_comp; nc++)
                         {
                           if (nc==0)
@@ -473,7 +473,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
 
   // On traite les faces internes
 
-  for (num_face=zone_VEF.premiere_face_int(); num_face<n1; num_face++)
+  for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       for ( l=0; l<2; l++)
         {
@@ -483,8 +483,8 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
             {
               if ( (j= elem_faces(elem,i)) > num_face )
                 {
-                  valA = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
-                  valA_bis = viscA(zone_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
+                  valA = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_K);
+                  valA_bis = viscA(domaine_VEF,num_face,j,dimension,elem,nu_(elem)+d_mu/Prdt_Eps);
                   for ( nc=0; nc<nb_comp; nc++)
                     {
                       if (nc==0)
@@ -521,14 +521,14 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
 void Op_Diff_K_Eps_Bas_Re_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
 {
 
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
   int n_bord;
   // Prise en compte des conditions aux limites de Neumnan a la paroi
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -538,8 +538,8 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::contribue_au_second_membre(DoubleTab& resu )
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
             {
-              resu(face,0) += la_cl_paroi.flux_impose(face-ndeb,0)*zone_VEF.surface(face);
-              resu(face,1) += la_cl_paroi.flux_impose(face-ndeb,1)*zone_VEF.surface(face);
+              resu(face,0) += la_cl_paroi.flux_impose(face-ndeb,0)*domaine_VEF.surface(face);
+              resu(face,1) += la_cl_paroi.flux_impose(face-ndeb,1)*domaine_VEF.surface(face);
             }
         }
     }

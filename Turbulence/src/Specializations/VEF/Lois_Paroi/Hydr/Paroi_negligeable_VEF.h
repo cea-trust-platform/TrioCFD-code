@@ -27,8 +27,8 @@
 #include <Paroi_hyd_base_VEF.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_negligeable_VEF
  *

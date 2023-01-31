@@ -58,17 +58,17 @@ Entree& Paroi_scal_hyd_base_VEF::readOn(Entree& s)
 //  Implementation des fonctions de la classe Paroi_std_hyd_VEF
 //
 /////////////////////////////////////////////////////////////////////
-void Paroi_scal_hyd_base_VEF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_scal_hyd_base_VEF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   // On initialise tout de suite la loi de paroi
   Paroi_scal_hyd_base_VEF::init_lois_paroi();
 }
 
 DoubleVect& Paroi_scal_hyd_base_VEF::equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const
 {
-  int nb_boundaries=le_dom_VEF->zone().nb_front_Cl();
+  int nb_boundaries=le_dom_VEF->domaine().nb_front_Cl();
   for (int n_bord=0; n_bord<nb_boundaries; n_bord++)
     {
       const Front_VF& fr_vf = le_dom_VEF->front_VF(n_bord);
@@ -94,11 +94,11 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
   // On initialise les distances equivalentes avec les distances geometriques
   const DoubleTab& face_normales = le_dom_VEF->face_normales();
   //  const DoubleTab& xv = le_dom_VEF->xv();
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleVect& volumes_maille = zone_VEF.volumes();
-  const DoubleVect& surfaces_face = zone_VEF.face_surfaces();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleVect& volumes_maille = domaine_VEF.volumes();
+  const DoubleVect& surfaces_face = domaine_VEF.face_surfaces();
 
   if (axi)
     {
@@ -107,7 +107,7 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
     }
   else
     {
-      int nb_front=zone_VEF.nb_front_Cl();
+      int nb_front=domaine_VEF.nb_front_Cl();
       equivalent_distance_.dimensionner(nb_front);
       for (int n_bord=0; n_bord<nb_front; n_bord++)
         {
@@ -154,9 +154,9 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
               positions_Pf_(num_face,i)=xv(num_face,i) - tab_d_reel_[num_face]*(face_normales(num_face,i)/ratio);
 
               if (dimension == 2)
-              elems_plus_(num_face) = le_dom_VEF->zone().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1));
+              elems_plus_(num_face) = le_dom_VEF->domaine().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1));
               else
-              elems_plus_(num_face) = le_dom_VEF->zone().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1),positions_Pf_(num_face,2));
+              elems_plus_(num_face) = le_dom_VEF->domaine().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1),positions_Pf_(num_face,2));
 
 
               if (elems_plus_(num_face) < 0)
@@ -165,9 +165,9 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
               positions_Pf_(num_face,i)=xv(num_face,i) - tab_d_reel_[num_face]*(face_normales(num_face,i)/ratio);
 
               if (dimension == 2)
-              elems_plus_(num_face) = le_dom_VEF->zone().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1));
+              elems_plus_(num_face) = le_dom_VEF->domaine().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1));
               else
-              elems_plus_(num_face) = le_dom_VEF->zone().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1),positions_Pf_(num_face,2));
+              elems_plus_(num_face) = le_dom_VEF->domaine().chercher_elements(positions_Pf_(num_face,0), positions_Pf_(num_face,1),positions_Pf_(num_face,2));
               }
               */
             }
@@ -182,9 +182,9 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
 
 void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
@@ -197,15 +197,15 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur())) )
         {
-          const Zone_Cl_VEF& zone_Cl_VEF_th = ref_cast(Zone_Cl_VEF, eqn.probleme().equation(1).zone_Cl_dis().valeur());
-          const Cond_lim& la_cl_th = zone_Cl_VEF_th.les_conditions_limites(n_bord);
+          const Domaine_Cl_VEF& domaine_Cl_VEF_th = ref_cast(Domaine_Cl_VEF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Cond_lim& la_cl_th = domaine_Cl_VEF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           if(je_suis_maitre())
@@ -255,8 +255,8 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
           nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
-              double x=zone_VEF.xv(num_face,0);
-              double y=zone_VEF.xv(num_face,1);
+              double x=domaine_VEF.xv(num_face,0);
+              double y=domaine_VEF.xv(num_face,1);
               double lambda,lambda_t;
               elem = face_voisins(num_face,0);
               if (elem == -1)
@@ -276,14 +276,14 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
                 Nusselt << x << "\t| " << y;
               if (dimension == 3)
                 {
-                  double z=zone_VEF.xv(num_face,2);
+                  double z=domaine_VEF.xv(num_face,2);
                   Nusselt << x << "\t| " << y << "\t| " << z;
                 }
 
               // on doit calculer Tfluide premiere maille sans prendre en compte Tparoi
               double tfluide=0.;
-              int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
-              double surface_face=zone_VEF.face_surfaces(num_face);
+              int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
+              double surface_face=domaine_VEF.face_surfaces(num_face);
               double surface_pond;
               int j;
               for (int i=0; i<nb_faces_elem; i++)
@@ -292,8 +292,8 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
                     {
                       surface_pond = 0.;
                       for (int kk=0; kk<dimension; kk++)
-                        surface_pond -= (zone_VEF.face_normales(j,kk)*zone_VEF.oriente_normale(j,elem)*zone_VEF.face_normales(num_face,kk)*
-                                         zone_VEF.oriente_normale(num_face,elem))/(surface_face*surface_face);
+                        surface_pond -= (domaine_VEF.face_normales(j,kk)*domaine_VEF.oriente_normale(j,elem)*domaine_VEF.face_normales(num_face,kk)*
+                                         domaine_VEF.oriente_normale(num_face,elem))/(surface_face*surface_face);
                       tfluide+=temperature(j)*surface_pond;
                     }
                 }

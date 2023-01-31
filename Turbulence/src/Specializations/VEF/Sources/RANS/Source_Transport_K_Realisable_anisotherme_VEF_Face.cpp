@@ -21,7 +21,7 @@
 
 #include <Source_Transport_K_Realisable_anisotherme_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_anisotherme_VEF_Face,"Source_Transport_K_Realisable_anisotherme_VEF_P1NC",Source_Transport_K_Realisable_VEF_Face);
 

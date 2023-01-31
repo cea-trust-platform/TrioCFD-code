@@ -28,8 +28,8 @@
 #include <Probleme_base.h>
 #include <TRUSTTrav.h>
 #include <Champ_Uniforme.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Flux_Chaleur_Turbulente_VDF_Face,"Source_Transport_Flux_Chaleur_Turbulente_VDF_Face",Source_base);
@@ -111,11 +111,11 @@ void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_pb(const Proble
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const Zone_dis& zone_dis,
-                                                                       const Zone_Cl_dis& zone_Cl_dis)
+void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const Domaine_dis& domaine_dis,
+                                                                          const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 }
 
 ////////////////////////////////////////////////////////////
@@ -124,26 +124,26 @@ void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const 
 //   moyen de la temperature
 ////////////////////////////////////////////////////////////
 
-DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(const Zone_VDF& zone_VDF, const DoubleTab& vit, const DoubleTab& visco_turb, DoubleTab& uiuj) const
+DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(const Domaine_VDF& domaine_VDF, const DoubleTab& vit, const DoubleTab& visco_turb, DoubleTab& uiuj) const
 {
   uiuj= 0;
 
   // Calcul des du/dy+dv/dx ...et des gradients par elements
 
-  //  const Zone& le_dom=zone_VDF.zone();
+  //  const Domaine& le_dom=domaine_VDF.domaine();
   //  int nb_faces_elem = le_dom.nb_faces_elem();
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_elem_tot = zone_VDF.nb_elem_tot();
-  int n_deb = zone_VDF.premiere_arete_interne();
-  int n_fin = zone_VDF.nb_aretes_internes() + n_deb;
-  //  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& Qdm = zone_VDF.Qdm();
-  const IntVect& orientation = zone_VDF.orientation();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_elem_tot = domaine_VDF.nb_elem_tot();
+  int n_deb = domaine_VDF.premiere_arete_interne();
+  int n_fin = domaine_VDF.nb_aretes_internes() + n_deb;
+  //  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& Qdm = domaine_VDF.Qdm();
+  const IntVect& orientation = domaine_VDF.orientation();
   IntTrav num(4);
   double sum,visco_moy,rac_visc;
   int i, num_elem, n_arete;
-  //  int premiere_face_int = zone_VDF.premiere_face_int();
+  //  int premiere_face_int = domaine_VDF.premiere_face_int();
 
   DoubleTrav du_dy(nb_elem_tot);
   DoubleTrav du_dz(nb_elem_tot);
@@ -175,8 +175,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
                                 + visco_turb(face_voisins(num[1],0))
                                 + visco_turb(face_voisins(num[1],1)));
           rac_visc=sqrt(visco_moy);
-          coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-          coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],1);
+          coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+          coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],1);
           dv_dx(face_voisins(num[0],0)) += coef[0];
           dv_dx(face_voisins(num[0],1)) += coef[0];
           dv_dx(face_voisins(num[1],0)) += coef[0];
@@ -225,8 +225,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
 
               if (orientation(num[2]) == 0)
                 {
-                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],2);
+                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],2);
                   dw_dx(face_voisins(num[0],0)) += coef[0];
                   dw_dx(face_voisins(num[0],1)) += coef[0];
                   dw_dx(face_voisins(num[1],0)) += coef[0];
@@ -238,8 +238,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
                 }
               else if (orientation(num[2]) == 1)
                 {
-                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],1);
-                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],2);
+                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],1);
+                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],2);
                   dw_dy(face_voisins(num[0],0)) += coef[0];
                   dw_dy(face_voisins(num[0],1)) += coef[0];
                   dw_dy(face_voisins(num[1],0)) += coef[0];
@@ -253,8 +253,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
 
           else if (orientation(num[0]) == 1)
             {
-              coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-              coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],1);
+              coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+              coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],1);
               dv_dx(face_voisins(num[0],0)) += coef[0];
               dv_dx(face_voisins(num[0],1)) += coef[0];
               dv_dx(face_voisins(num[1],0)) += coef[0];
@@ -283,26 +283,26 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_uiuj(cons
   return uiuj;
 }
 
-DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(const Zone_VDF& zone_VDF, const DoubleTab& vit, const DoubleTab& visco_turb, DoubleTab& Grad_U) const
+DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(const Domaine_VDF& domaine_VDF, const DoubleTab& vit, const DoubleTab& visco_turb, DoubleTab& Grad_U) const
 {
   Grad_U= 0;
 
   // Calcul des du/dy+dv/dx ...et des gradients par elements
 
-  //  const Zone& le_dom=zone_VDF.zone();
+  //  const Domaine& le_dom=domaine_VDF.domaine();
   //  int nb_faces_elem = le_dom.nb_faces_elem();
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_elem_tot = zone_VDF.nb_elem_tot();
-  int n_deb = zone_VDF.premiere_arete_interne();
-  int n_fin = zone_VDF.nb_aretes_internes() + n_deb;
-  //  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& Qdm = zone_VDF.Qdm();
-  const IntVect& orientation = zone_VDF.orientation();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_elem_tot = domaine_VDF.nb_elem_tot();
+  int n_deb = domaine_VDF.premiere_arete_interne();
+  int n_fin = domaine_VDF.nb_aretes_internes() + n_deb;
+  //  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& Qdm = domaine_VDF.Qdm();
+  const IntVect& orientation = domaine_VDF.orientation();
   IntTrav num(4);
   double visco_moy,rac_visc;
   int i, num_elem, n_arete;
-  //  int premiere_face_int = zone_VDF.premiere_face_int();
+  //  int premiere_face_int = domaine_VDF.premiere_face_int();
 
   DoubleTrav du_dy(nb_elem_tot);
   DoubleTrav du_dz(nb_elem_tot);
@@ -334,8 +334,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
                                 + visco_turb(face_voisins(num[1],0))
                                 + visco_turb(face_voisins(num[1],1)));
           rac_visc=sqrt(visco_moy);
-          coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-          coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],1);
+          coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+          coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],1);
           dv_dx(face_voisins(num[0],0)) += coef[0];
           dv_dx(face_voisins(num[0],1)) += coef[0];
           dv_dx(face_voisins(num[1],0)) += coef[0];
@@ -389,8 +389,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
 
               if (orientation(num[2]) == 0)
                 {
-                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],2);
+                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],2);
                   dw_dx(face_voisins(num[0],0)) += coef[0];
                   dw_dx(face_voisins(num[0],1)) += coef[0];
                   dw_dx(face_voisins(num[1],0)) += coef[0];
@@ -402,8 +402,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
                 }
               else if (orientation(num[2]) == 1)
                 {
-                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],1);
-                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],2);
+                  coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],1);
+                  coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],2);
                   dw_dy(face_voisins(num[0],0)) += coef[0];
                   dw_dy(face_voisins(num[0],1)) += coef[0];
                   dw_dy(face_voisins(num[1],0)) += coef[0];
@@ -417,8 +417,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
 
           else if (orientation(num[0]) == 1)
             {
-              coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/zone_VDF.dist_face(num[0],num[1],0);
-              coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/zone_VDF.dist_face(num[2],num[3],1);
+              coef[0] = rac_visc * (vit(num[1])-vit(num[0]))/domaine_VDF.dist_face(num[0],num[1],0);
+              coef[1] = rac_visc * (vit(num[3])-vit(num[2]))/domaine_VDF.dist_face(num[2],num[3],1);
               dv_dx(face_voisins(num[0],0)) += coef[0];
               dv_dx(face_voisins(num[0],1)) += coef[0];
               dv_dx(face_voisins(num[1],0)) += coef[0];
@@ -446,54 +446,54 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_Grad_U(co
 
 
 
-DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(const Zone_VDF& zone_VDF, DoubleTab& gteta2 ,const DoubleTab& fluctu_temp, double beta,const DoubleVect& gravite) const
+DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(const Domaine_VDF& domaine_VDF, DoubleTab& gteta2 ,const DoubleTab& fluctu_temp, double beta,const DoubleVect& gravite) const
 {
   //
   // gteta2 est discretise au centre des elements
   //
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_faces= domaine_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  //  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& le_dom=zone_VDF.zone();
+  const Domaine& le_dom=domaine_VDF.domaine();
   int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
-  //  const IntTab& les_elem_faces = zone_VDF.elem_faces();
+  //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++)
       gteta2(elem,dim) = beta*gravite(dim)*fluctu_temp(elem,0) ;
   return gteta2;
 }
-DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(const Zone_VDF& zone_VDF,DoubleTab& gteta2 ,const DoubleTab& fluctu_temp,const DoubleTab& beta,const DoubleVect& gravite) const
+DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(const Domaine_VDF& domaine_VDF,DoubleTab& gteta2 ,const DoubleTab& fluctu_temp,const DoubleTab& beta,const DoubleVect& gravite) const
 {
   //
   // gteta2 est discretise au centre des elements
   //
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_faces= domaine_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
-  //  const DoubleVect& porosite_face = zone_VDF.porosite_face();
+  //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Zone& le_dom=zone_VDF.zone();
+  const Domaine& le_dom=domaine_VDF.domaine();
   int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(dimension);
-  //  const IntTab& les_elem_faces = zone_VDF.elem_faces();
+  //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++)
@@ -504,10 +504,10 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
 
 DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntVect& orientation = domaine_VDF.orientation();
   const DoubleTab& temper = eq_thermique->inconnue().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
@@ -524,27 +524,27 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   const DoubleVect& g = eq_thermique->fluide().gravite().valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   const DoubleTab& tab_beta = ch_beta.valeurs();
-  const DoubleVect& volumes = zone_VDF.volumes();
-  int nb_elem = zone_VDF.nb_elem();
+  const DoubleVect& volumes = domaine_VDF.volumes();
+  int nb_elem = domaine_VDF.nb_elem();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
-  const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();
   int ori,ori1,num_face,elem1,elem2;
   double vol;
-  int nb_faces = zone_VDF.nb_faces();
+  int nb_faces = domaine_VDF.nb_faces();
   DoubleTab Grad_U(nb_elem,dimension,dimension);
   DoubleTab gteta2(nb_elem,dimension);
   DoubleTab uiuj(nb_elem);
 
   if (sub_type(Champ_Uniforme,ch_beta.valeur()))
-    calculer_gteta2(zone_VDF,gteta2 ,Fluctu_Temperature,tab_beta(0,0),g);
+    calculer_gteta2(domaine_VDF,gteta2 ,Fluctu_Temperature,tab_beta(0,0),g);
   else
-    calculer_gteta2(zone_VDF, gteta2 ,Fluctu_Temperature,tab_beta,g);
+    calculer_gteta2(domaine_VDF, gteta2 ,Fluctu_Temperature,tab_beta,g);
 
-  calculer_uiuj(zone_VDF,vit,visco_turb,uiuj);
-  calculer_Grad_U(zone_VDF,vit,visco_turb,Grad_U);
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  calculer_uiuj(domaine_VDF,vit,visco_turb,uiuj);
+  calculer_Grad_U(domaine_VDF,vit,visco_turb,Grad_U);
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VDF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
@@ -558,7 +558,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
           elem1 = face_voisins(num_face,0);
           if (elem1 != -1)
             {
-              double contrib = (-1*temper(elem1))/zone_VDF.dist_norm_bord(num_face)*uiuj(elem1)
+              double contrib = (-1*temper(elem1))/domaine_VDF.dist_norm_bord(num_face)*uiuj(elem1)
                                -(1-C2)*Flux_Chaleur_Turb(num_face)*Grad_U(elem1,ori,ori1)
                                -(1-C3)*gteta2(elem1,ori);
               if (K_Eps_Bas_Re(elem1,0)>1.e-10)
@@ -568,7 +568,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
           else
             {
               elem2 = face_voisins(num_face,1);
-              double contrib = (-1*temper(elem2))/zone_VDF.dist_norm_bord(num_face)*uiuj(elem2)
+              double contrib = (-1*temper(elem2))/domaine_VDF.dist_norm_bord(num_face)*uiuj(elem2)
                                -(1-C2)*Flux_Chaleur_Turb(num_face)*Grad_U(elem2,ori,ori1)
                                -(1-C3)*gteta2(elem2,ori);
               if (K_Eps_Bas_Re(elem2,0)>1.e-10)
@@ -579,7 +579,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
     }
 
   // Traitement des faces internes
-  for (num_face=zone_VDF.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (num_face=domaine_VDF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
 
       // vol et ori1 faux dans la ancienne version dans la suite
@@ -603,7 +603,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
       double b=volumes(elem2)/(volumes(elem1)+volumes(elem2));
 
       double reyn=a*uiuj(elem1)+b*uiuj(elem2);
-      double A=-1*(temper(elem2)-temper(elem1))/zone_VDF.dist_norm(num_face)*reyn;
+      double A=-1*(temper(elem2)-temper(elem1))/domaine_VDF.dist_norm(num_face)*reyn;
       double B=0;
       if (a*K_Eps_Bas_Re(elem1,0)+b*K_Eps_Bas_Re(elem2,0)>1.e-10)
         B=-C1*Flux_Chaleur_Turb(num_face)*((a*K_Eps_Bas_Re(elem1,1)+b*K_Eps_Bas_Re(elem2,1))

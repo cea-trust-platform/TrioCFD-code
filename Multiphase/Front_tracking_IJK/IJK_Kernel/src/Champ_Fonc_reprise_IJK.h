@@ -42,8 +42,8 @@ class Champ_Fonc_reprise_IJK: public Champ_Fonc_base
 
 public :
 
-  inline void associer_domaine_dis_base(const Zone_dis_base&) override;
-  const Zone_dis_base& zone_dis_base() const override;
+  inline void associer_domaine_dis_base(const Domaine_dis_base&) override;
+  const Domaine_dis_base& domaine_dis_base() const override;
   void mettre_a_jour(double ) override;
 
 
@@ -57,8 +57,8 @@ public :
                                             const IntVect& les_polys,
                                             DoubleVect& les_valeurs,
                                             int ncomp) const override ;
-  inline DoubleTab& valeur_aux_sommets(const Zone&, DoubleTab&) const override;
-  inline DoubleVect& valeur_aux_sommets_compo(const Zone&,
+  inline DoubleTab& valeur_aux_sommets(const Domaine&, DoubleTab&) const override;
+  inline DoubleVect& valeur_aux_sommets_compo(const Domaine&,
                                               DoubleVect&, int) const override;
   inline DoubleTab& remplir_coord_noeuds(DoubleTab& ) const override;
   inline int remplir_coord_noeuds_et_polys(DoubleTab&, IntVect&) const override;
@@ -69,16 +69,16 @@ protected:
 
 private:
 
-  REF(Zone_dis_base) zone_dis;
+  REF(Domaine_dis_base) domaine_dis;
 
   Champ_Inc vrai_champ_;
   inline virtual const Champ_Inc_base& le_champ() const;
   inline virtual Champ_Inc_base& le_champ();
 };
 
-inline void Champ_Fonc_reprise_IJK::associer_domaine_dis_base(const Zone_dis_base& le_dom_dis_base)
+inline void Champ_Fonc_reprise_IJK::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis_base)
 {
-  zone_dis=le_dom_dis_base;
+  domaine_dis=le_dom_dis_base;
 }
 inline const Champ_Inc_base& Champ_Fonc_reprise_IJK::le_champ() const
 {
@@ -114,12 +114,12 @@ inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_elems_compo(const DoubleTa
   return le_champ().valeur_aux_elems_compo(positions, les_polys, les_valeurs, ncomp);
 }
 
-inline DoubleTab& Champ_Fonc_reprise_IJK::valeur_aux_sommets(const Zone& dom, DoubleTab& sommets) const
+inline DoubleTab& Champ_Fonc_reprise_IJK::valeur_aux_sommets(const Domaine& dom, DoubleTab& sommets) const
 {
   return le_champ().valeur_aux_sommets(dom, sommets);
 }
 
-inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_sommets_compo(const Zone& dom,
+inline DoubleVect& Champ_Fonc_reprise_IJK::valeur_aux_sommets_compo(const Domaine& dom,
                                                                     DoubleVect& sommets, int compo) const
 {
   return le_champ().valeur_aux_sommets_compo(dom, sommets, compo);
@@ -138,9 +138,9 @@ inline DoubleVect&   Champ_Fonc_reprise_IJK::valeur_aux_compo(const DoubleTab& t
 {
   return le_champ().valeur_aux_compo(tab,les_valeurs,comp);
 }
-inline const Zone_dis_base& Champ_Fonc_reprise_IJK::zone_dis_base() const
+inline const Domaine_dis_base& Champ_Fonc_reprise_IJK::domaine_dis_base() const
 {
-  return zone_dis;
+  return domaine_dis;
 }
 
 #endif

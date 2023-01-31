@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Modele_Launder_Sharma_VEF.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Champ_Uniforme.h>
 #include <Champ_P1NC.h>
 
@@ -56,7 +56,7 @@ void Modele_Launder_Sharma_VEF::lire_distance_paroi( )
 }
 
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   double visco=-1;
@@ -64,17 +64,17 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  //  const Zone_Cl_VEF& le_dom_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   const DoubleVect& volumes = le_dom.volumes();
   //  int nb_faces = le_dom.nb_faces();
   int nb_faces_tot = le_dom.nb_faces();
   //  int nb_elem = le_dom.nb_elem();
   int nb_elem_tot = le_dom.nb_elem_tot();
   //  int nb_elem_tot = le_dom.nb_elem_tot();
-  const Zone& zone=le_dom.zone();
+  const Domaine& domaine=le_dom.domaine();
   const IntTab& elem_faces = le_dom.elem_faces();
-  const int nb_faces_elem = zone.nb_faces_elem();
+  const int nb_faces_elem = domaine.nb_faces_elem();
   const DoubleTab& face_normales = le_dom.face_normales();
   const DoubleVect& vol_ent = le_dom.volumes_entrelaces();
 
@@ -135,7 +135,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
 // Pour le calcul de la derivee seconde
 // 1/|v|*(Si,elem)ind_der*(Sj,elem)ind_der
 /* pas appele
-   static double viscA(const Zone_VEF& le_dom,int num_face,int num2,int dimension,
+   static double viscA(const Domaine_VEF& le_dom,int num_face,int num2,int dimension,
    int num_elem, int ind_der)
    {
    double pscal;
@@ -150,68 +150,68 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone
    }
 */
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  //const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
-  const Zone_VEF& zone_VEF =  ref_cast(Zone_VEF,zone_dis.valeur());
+  //const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_VEF& domaine_VEF =  ref_cast(Domaine_VEF,domaine_dis.valeur());
   E = 0;
   //return E;
-  //  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleVect& volumes = zone_VEF.volumes();
-  //const DoubleTab& face_normales = zone_VEF.face_normales();
-  //  const DoubleTab& facette_normales = zone_VEF.facette_normales();
-  //  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-  //  const Zone& zone = zone_VEF.zone();
-  const int nb_faces = zone_VEF.nb_faces();
-  //  int nb_faces_tot = zone_VEF.nb_faces_tot();
-  //  const int nfa7 = zone_VEF.type_elem().nb_facette();
-  const int nb_elem = zone_VEF.nb_elem();
-  //  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-  //int premiere_face_int = zone_VEF.premiere_face_int();
-  int premiere_face_int = zone_VEF.premiere_face_int();
+  //  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  //const DoubleTab& face_normales = domaine_VEF.face_normales();
+  //  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  //  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
+  //  const Domaine& domaine = domaine_VEF.domaine();
+  const int nb_faces = domaine_VEF.nb_faces();
+  //  int nb_faces_tot = domaine_VEF.nb_faces_tot();
+  //  const int nfa7 = domaine_VEF.type_elem().nb_facette();
+  const int nb_elem = domaine_VEF.nb_elem();
+  //  const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
+  //int premiere_face_int = domaine_VEF.premiere_face_int();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
 
   int i,j;
   int elem,elem0,elem2;
   //int n_bord;//alpha,beta,elem0;
-  //  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  //  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
 
   //  double val;
 
   const int ncomp_ch_transporte = transporte.line_size();
 
   DoubleTab gradient(0, ncomp_ch_transporte, dimension);
-  zone_VEF.creer_tableau_faces(gradient);
+  domaine_VEF.creer_tableau_faces(gradient);
 
   DoubleTab deriv_seconde_de_gradient_elem(0, ncomp_ch_transporte, dimension, dimension);
-  zone_VEF.zone().creer_tableau_elements(deriv_seconde_de_gradient_elem);
+  domaine_VEF.domaine().creer_tableau_elements(deriv_seconde_de_gradient_elem);
   deriv_seconde_de_gradient_elem=0.;
 
   DoubleTab champ_face(0,dimension);
-  zone_VEF.creer_tableau_faces(champ_face);
+  domaine_VEF.creer_tableau_faces(champ_face);
 
   // Calcul de la derivee premiere de U
   // stokage d'un gradient_elem par element.
   DoubleTab gradient_elem(0, ncomp_ch_transporte, dimension);
-  zone_VEF.zone().creer_tableau_elements(gradient_elem);
+  domaine_VEF.domaine().creer_tableau_elements(gradient_elem);
 
   DoubleTab champ_elem(0, ncomp_ch_transporte, dimension);
-  zone_VEF.zone().creer_tableau_elements(champ_elem);
+  domaine_VEF.domaine().creer_tableau_elements(champ_elem);
 
   DoubleTab deriv_seconde_de_gradient(0, ncomp_ch_transporte, dimension, dimension);
-  zone_VEF.creer_tableau_faces(deriv_seconde_de_gradient);
+  domaine_VEF.creer_tableau_faces(deriv_seconde_de_gradient);
   deriv_seconde_de_gradient=0.;
 
   int fac=-1,elem1,comp;
   // Rque methode non const Pourquoi ?
 
   const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,eq_hydraulique->inconnue().valeur());
-  ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(transporte,gradient_elem,ref_cast(Zone_Cl_VEF,eq_hydraulique->zone_Cl_dis().valeur()));
+  ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(transporte,gradient_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis().valeur()));
 
   gradient_elem.echange_espace_virtuel();
   // On a les gradient_elem par elements
@@ -260,7 +260,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
         for (fac=0; fac<nb_faces; fac++)
           champ_face(fac,comp)=gradient(fac, comp, i);
 
-      ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(champ_face,champ_elem,ref_cast(Zone_Cl_VEF,eq_hydraulique->zone_Cl_dis().valeur()));
+      ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(champ_face,champ_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis().valeur()));
 
       for (comp=0; comp<ncomp_ch_transporte; comp++)
         for ( elem=0; elem<nb_elem; elem++)
@@ -359,23 +359,23 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
   return E;
 }
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
 }
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -412,14 +412,14 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
   return F2;
 }
 
-DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -455,14 +455,14 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
 }
 
 
-DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -498,14 +498,14 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone
 }
 
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -544,9 +544,9 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
 
 
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
@@ -554,12 +554,12 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_d
 }
 
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
-  return Calcul_E( E,zone_dis,zone_Cl_dis,transporte,K_Bas_Re,ch_visco,visco_turb );
+  return Calcul_E( E,domaine_dis,domaine_Cl_dis,transporte,K_Bas_Re,ch_visco,visco_turb );
 }
 
-DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                    const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   double visco=-1;
@@ -567,17 +567,17 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& 
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Zone_VEF& le_dom = ref_cast(Zone_VEF,zone_dis.valeur());
-  //  const Zone_Cl_VEF& le_dom_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
   const DoubleVect& volumes = le_dom.volumes();
   //  int nb_faces = le_dom.nb_faces();
   int nb_faces_tot = le_dom.nb_faces();
   //  int nb_elem = le_dom.nb_elem();
   int nb_elem_tot = le_dom.nb_elem_tot();
   //  int nb_elem_tot = le_dom.nb_elem_tot();
-  const Zone& zone=le_dom.zone();
+  const Domaine& domaine=le_dom.domaine();
   const IntTab& elem_faces = le_dom.elem_faces();
-  const int nb_faces_elem = zone.nb_faces_elem();
+  const int nb_faces_elem = domaine.nb_faces_elem();
   const DoubleTab& face_normales = le_dom.face_normales();
   const DoubleVect& vol_ent = le_dom.volumes_entrelaces();
 

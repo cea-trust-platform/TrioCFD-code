@@ -14,7 +14,7 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Zone_ALE.h
+// File:        Domaine_ALE.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
 // Version:     /main/11
 //
@@ -23,19 +23,19 @@
 #ifndef Domaine_ALE_included
 #define Domaine_ALE_included
 
-#include <Zone.h>
+#include <Domaine.h>
 #include <TRUSTLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
 #include <Ref_Equation_base.h>
 #include <Beam_model.h>
 #include <Champs_front_ALE_projection.h>
-class Zone_dis;
+class Domaine_dis;
 class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Zone_ALE
+//    Classe Domaine_ALE
 //    Cette classe est un interprete qui sert a lire l'attribut axi.
 //    Directive:
 //        Domaine_ALE
@@ -45,21 +45,21 @@ class Beam_model;
 // .SECTION voir aussi
 //    Interprete Objet_U
 //////////////////////////////////////////////////////////////////////////////
-class Zone_ALE : public Zone
+class Domaine_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur_ni_destructeur(Zone_ALE);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
 
 public :
-  Zone_ALE();
-  ~Zone_ALE();
+  Domaine_ALE();
+  ~Domaine_ALE();
   inline const double& get_dt() const;
   void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
-  void mettre_a_jour (double temps, Zone_dis&, Probleme_base&) override;
-  void initialiser (double temps, Zone_dis&, Probleme_base&) override;
-  DoubleTab calculer_vitesse(double temps,Zone_dis&, Probleme_base&, bool&);
+  void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
+  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
@@ -67,7 +67,7 @@ public :
   void reading_projection_ALE_boundary(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
-  DoubleTab& laplacien(Zone_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+  DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   void resumptionJacobian(DoubleTab&, DoubleTab&);
@@ -79,7 +79,7 @@ public :
 
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initializationBeam (double velocity) ;
-  double computeDtBeam(Zone_dis&);
+  double computeDtBeam(Domaine_dis&);
   const DoubleTab& getBeamDisplacement(int i) const;
   const DoubleTab& getBeamRotation(int i) const;
   const int& getBeamDirection() const;
@@ -100,7 +100,7 @@ protected:
   Champs_front les_champs_front;
   int nb_bords_ALE;
   Bords les_bords_ALE;
-  int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Zone_ALE::calculer_vitesse).
+  int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
@@ -116,47 +116,47 @@ protected:
 };
 
 
-inline const DoubleTab& Zone_ALE::vitesse() const
+inline const DoubleTab& Domaine_ALE::vitesse() const
 {
   return ALE_mesh_velocity;
 }
 
-inline const double& Zone_ALE::get_dt() const
+inline const double& Domaine_ALE::get_dt() const
 {
   return dt_;
 }
 
-inline DoubleTab& Zone_ALE::vitesse_faces()
+inline DoubleTab& Domaine_ALE::vitesse_faces()
 {
   return vf;
 }
-inline const DoubleTab& Zone_ALE::vitesse_faces() const
+inline const DoubleTab& Domaine_ALE::vitesse_faces() const
 {
   return vf;
 }
-inline int Zone_ALE::update_or_not_matrix_coeffs() const
+inline int Domaine_ALE::update_or_not_matrix_coeffs() const
 {
   return update_or_not_matrix_coeffs_;
 }
-inline const DoubleTab& Zone_ALE::getOldJacobian()
+inline const DoubleTab& Domaine_ALE::getOldJacobian()
 {
   return ALEjacobian_old;
 }
-inline const DoubleTab& Zone_ALE::getOldJacobian() const
+inline const DoubleTab& Domaine_ALE::getOldJacobian() const
 {
   return ALEjacobian_old;
 }
 
-inline const DoubleTab& Zone_ALE::getNewJacobian()
+inline const DoubleTab& Domaine_ALE::getNewJacobian()
 {
   return ALEjacobian_new;
 }
-inline const DoubleTab& Zone_ALE::getNewJacobian() const
+inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 {
   return ALEjacobian_new;
 }
 
-inline void Zone_ALE::associer_equation(const Equation_base& une_eq)
+inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
 }

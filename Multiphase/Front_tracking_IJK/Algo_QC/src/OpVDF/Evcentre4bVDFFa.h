@@ -26,7 +26,7 @@
 
 #include <Eval_Conv_VDF.h>
 #include <Eval_VDF_Face.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 /*! @brief class Eval_centre4b_VDF_Face
  *
  *  Evaluateur VDF pour la convection

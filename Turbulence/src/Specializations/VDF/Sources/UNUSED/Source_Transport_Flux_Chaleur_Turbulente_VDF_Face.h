@@ -32,8 +32,8 @@
 #define c2_DEFAULT 0.5   // dans le calcul des termes sources des equations
 #define c3_DEFAULT 0.33  //  de transport du flux de chaleur turbulent.
 
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <Ref_Convection_Diffusion_Temperature.h>
 #include <Ref_Equation_base.h>
 #include <Ref_Transport_K_Eps_Bas_Reynolds.h>
@@ -49,9 +49,9 @@ class Probleme_base;
 class Champ_Don_base;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
+class Domaine_dis;
+class Domaine_Cl_dis;
+class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
 // La classe derive de Source_base et peut etre d'un terme source
@@ -65,11 +65,11 @@ public :
 
   DoubleTab& ajouter(DoubleTab& ) const override;
   DoubleTab& calculer(DoubleTab& ) const override;
-  DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
-  DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
+  DoubleTab& calculer_gteta2(const Domaine_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
+  DoubleTab& calculer_gteta2(const Domaine_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
 
-  DoubleTab& calculer_uiuj(const Zone_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
-  DoubleTab& calculer_Grad_U(const Zone_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  DoubleTab& calculer_uiuj(const Domaine_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  DoubleTab& calculer_Grad_U(const Domaine_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
 
   void mettre_a_jour(double temps) override {  }
 
@@ -77,8 +77,8 @@ public :
 protected :
 
   double C1, C2, C3;
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
   REF(Equation_base) eq_hydraulique;
   REF(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
   REF(Transport_Fluctuation_Temperature)  mon_eq_transport_Fluctu_Temp_;
@@ -87,7 +87,7 @@ protected :
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite_;
   REF(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
-  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
 
 };
 

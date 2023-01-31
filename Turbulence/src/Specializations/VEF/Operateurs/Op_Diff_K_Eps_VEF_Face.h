@@ -23,15 +23,15 @@
 
 #include <Op_Diff_K_Eps_VEF_base.h>
 #include <Ref_Champ_Fonc.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 #include <Ref_Champ_P1NC.h>
 #include <Op_VEF_Face.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Ref_Champ_Don_base.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Champ_Inc;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -47,14 +47,14 @@ class Op_Diff_K_Eps_VEF_Face : public Op_Diff_K_Eps_VEF_base, public Op_VEF_Face
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ,
                 const Champ_Inc& ) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline double viscA(int, int, int, double) const;
-  void calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& le_dom,int num_face,int num2,int dimension, int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const;
+  void calc_visc(ArrOfDouble& diffu_tot,const Domaine_VEF& le_dom,int num_face,int num2,int dimension, int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const;
   // Methodes pour l implicite.
 
   inline void dimensionner(Matrice_Morse& ) const override;
@@ -65,8 +65,8 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) le_dom_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+  REF(Domaine_VEF) le_dom_vef;
+  REF(Domaine_Cl_VEF) la_zcl_vef;
   REF(Champ_P1NC) inconnue_;
 };
 
@@ -75,10 +75,10 @@ protected :
 // mu <Si, Sj> / |K|
 inline double Op_Diff_K_Eps_VEF_Face::viscA(int num_face, int num2, int num_elem, double diffu) const
 {
-  const Zone_VEF& zone=le_dom_vef.valeur();
-  const IntTab& face_voisins=zone.face_voisins();
-  const DoubleTab& face_normales=zone.face_normales();
-  const DoubleVect& inverse_volumes=zone.inverse_volumes();
+  const Domaine_VEF& domaine=le_dom_vef.valeur();
+  const IntTab& face_voisins=domaine.face_voisins();
+  const DoubleTab& face_normales=domaine.face_normales();
+  const DoubleVect& inverse_volumes=domaine.inverse_volumes();
   double pscal = face_normales(num_face,0)*face_normales(num2,0)
                  + face_normales(num_face,1)*face_normales(num2,1);
   if (Objet_U::dimension == 3)

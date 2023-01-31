@@ -23,12 +23,12 @@
 #include <Champ_P1NC.h>
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Champ_Inc_P0_base.h>
 #include <Check_espace_virtuel.h>
 #include <Debog.h>
-#include <Zone.h>
-#include <Sous_Zone.h>
+#include <Domaine.h>
+#include <Sous_Domaine.h>
 #include <SFichier.h>
 #include <Param.h>
 #include <Constituant.h>
@@ -100,7 +100,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::set_param(Param& para
   param.ajouter("modele_cinetique",&modele_cinetique_);
   param.ajouter("constante_cinetique_nu_t",&constante_cinetique_nu_t_);
   param.ajouter("equation_nu_t",&nom_equation_nu_t_);
-  param.ajouter("zone_sortie",&nom_zone_sortie_);
+  param.ajouter("domaine_sortie",&nom_domaine_sortie_);
   param.ajouter("phase",&phase_a_conserver_);
   param.ajouter_condition("(value_of_phase_eq_0)_or_(value_of_phase_eq_1)","phase must be set to 0 or 1");
   param.ajouter_non_std("equation_interface",(this),Param::REQUIRED);
@@ -153,12 +153,12 @@ static double integrale(const Champ_base& ch)
   double somme = 0.;
   if (sub_type(Champ_P1NC, ch))
     {
-      const Zone_VF& zone_vf = ref_cast(Zone_VF, ch.zone_dis_base());
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ch.domaine_dis_base());
       const DoubleTab& val = ch.valeurs();
       assert(val.line_size() == 1);
       const int sz = val.dimension(0);
-      const DoubleVect& volumes = zone_vf.volumes_entrelaces();
-      const ArrOfInt& faces_doubles = zone_vf.faces_doubles();
+      const DoubleVect& volumes = domaine_vf.volumes_entrelaces();
+      const ArrOfInt& faces_doubles = domaine_vf.faces_doubles();
       for (int i = 0; i < sz; i++)
         {
           const double v = volumes[i];
@@ -187,9 +187,9 @@ static void calculer_indicatrice_comme(const Champ_base& src, DoubleTab& dest, c
   assert(sub_type(Champ_Inc_P0_base, src));
   if (sub_type(Champ_P1NC, champ_modele))
     {
-      const Zone_VF& zone_vf = ref_cast(Zone_VF, champ_modele.zone_dis_base());
-      const IntTab& face_voisins = zone_vf.face_voisins();
-      const int nb_faces = zone_vf.nb_faces();
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, champ_modele.domaine_dis_base());
+      const IntTab& face_voisins = domaine_vf.face_voisins();
+      const int nb_faces = domaine_vf.nb_faces();
       dest.resize(nb_faces);
       const DoubleTab& indic = src.valeurs();
       assert_espace_virtuel_vect(indic);
@@ -278,7 +278,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
   const double dt = pb.schema_temps().pas_de_temps();
   const int nb_faces = champ1.dimension(0);
 
-  const IntTab& face_voisins = ref_cast(Zone_VF, zone_dis().valeur()).face_voisins();
+  const IntTab& face_voisins = ref_cast(Domaine_VF, domaine_dis().valeur()).face_voisins();
   const DoubleTab *champ_nu_t = 0;
   if (nom_equation_nu_t_ != "??")
     {
@@ -299,7 +299,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
 
   const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant().valeur().valeurs();
   double coeff_diffusivite = tab_diffusivite(0,0);
-  const DoubleVect& volumes_entrelaces = ref_cast(Zone_VF, zone_dis().valeur()).volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF, domaine_dis().valeur()).volumes_entrelaces();
   const int dim = Objet_U::dimension;
 
   const Fluide_Diphasique& fluide = ref_cast(Fluide_Diphasique, pb.milieu());
@@ -423,12 +423,12 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
 //  et calcule l'integrale des valeurs avant modifications
 void Convection_Diffusion_Concentration_Turbulent_FT_Disc::multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab)
 {
-  const Zone_VEF&     zone_vef = ref_cast(Zone_VEF, zone_dis().valeur());
-  const DoubleVect& volumes = zone_vef.volumes_entrelaces();
-  const DoubleVect& volumes_cl = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur()).volumes_entrelaces_Cl();
-  const int nb_faces = zone_vef.nb_faces();
-  const int nb_faces_non_std = zone_vef.nb_faces_non_std();
-  const ArrOfInt& faces_doubles = zone_vef.faces_doubles();
+  const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+  const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
+  const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
+  const int nb_faces = domaine_vef.nb_faces();
+  const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
+  const ArrOfInt& faces_doubles = domaine_vef.faces_doubles();
   int modif = (facteur != 1.);
   double integrale = 0.;
   for (int i = 0; i < nb_faces; i++)
@@ -446,22 +446,22 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::multiplier_valeurs_fa
   integrale_avant = mp_sum(integrale);
 }
 
-void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_zone(const Nom& nom_sous_zone,
-                                                                                   ArrOfBit& marqueur,
-                                                                                   int sans_faces_non_std_volume_nul) const
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_domaine(const Nom& nom_sous_domaine,
+                                                                                      ArrOfBit& marqueur,
+                                                                                      int sans_faces_non_std_volume_nul) const
 {
-  const Zone_VEF& zone_vef = ref_cast(Zone_VEF, zone_dis().valeur());
-  const IntTab& elem_faces = zone_vef.elem_faces();
-  const int nb_faces_tot = zone_vef.nb_faces_tot();
-  const int nb_faces_non_std = zone_vef.nb_faces_non_std();
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+  const IntTab& elem_faces = domaine_vef.elem_faces();
+  const int nb_faces_tot = domaine_vef.nb_faces_tot();
+  const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
   const int nb_faces_elem = elem_faces.dimension(1);
   marqueur.resize_array(nb_faces_tot);
   marqueur = 0;
-  const Sous_Zone& sous_zone = zone_dis().valeur().zone().ss_zone(nom_sous_zone);
-  const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
-  const DoubleVect& volumes_cl = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur()).volumes_entrelaces_Cl();
+  const Sous_Domaine& sous_domaine = domaine_dis().valeur().domaine().ss_domaine(nom_sous_domaine);
+  const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
+  const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
   int i;
-  for (i = 0; i < nb_elem_sous_zone; i++)
+  for (i = 0; i < nb_elem_sous_domaine; i++)
     {
       if (sans_faces_non_std_volume_nul && i < nb_faces_non_std)
         {
@@ -469,7 +469,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_zo
             // Ne pas marquer les faces non std de volume nul
             continue;
         }
-      const int elem = sous_zone[i];
+      const int elem = sous_domaine[i];
       for (int j = 0; j < nb_faces_elem; j++)
         {
           const int face = elem_faces(elem,j);
@@ -508,11 +508,11 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double 
   double integrale0 = 0.;
   double integrale1 = 0.;
 
-  if (nom_zone_sortie_ != "??")
+  if (nom_domaine_sortie_ != "??")
     {
       ArrOfBit marqueur;
-      marquer_faces_sous_zone(nom_zone_sortie_, marqueur,
-                              0 /* annuler les valeurs sur les faces non std */);
+      marquer_faces_sous_domaine(nom_domaine_sortie_, marqueur,
+                                 0 /* annuler les valeurs sur les faces non std */);
       DoubleTab& tab = inconnue().valeurs();
       multiplier_valeurs_faces(marqueur, 0., integrale_sortie, tab);
     }
@@ -520,12 +520,12 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double 
     DoubleTab indic_faces;
     calculer_indicatrice_comme(ref_eq_transport_.valeur().inconnue().valeur(),
                                indic_faces, inconnue().valeur());
-    const Zone_VEF&     zone_vef = ref_cast(Zone_VEF, zone_dis().valeur());
-    const DoubleVect& volumes = zone_vef.volumes_entrelaces();
-    const DoubleVect& volumes_cl = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur()).volumes_entrelaces_Cl();
-    const int nb_faces = zone_vef.nb_faces();
-    const int nb_faces_non_std = zone_vef.nb_faces_non_std();
-    const ArrOfInt& faces_doubles = zone_vef.faces_doubles();
+    const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+    const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
+    const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
+    const int nb_faces = domaine_vef.nb_faces();
+    const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
+    const ArrOfInt& faces_doubles = domaine_vef.faces_doubles();
     const DoubleTab& inco = inconnue().valeurs();
     for (int i = 0; i < nb_faces; i++)
       {

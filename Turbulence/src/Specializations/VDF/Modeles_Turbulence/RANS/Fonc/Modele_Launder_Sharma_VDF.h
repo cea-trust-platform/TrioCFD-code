@@ -24,11 +24,11 @@
 
 #include <Modele_Jones_Launder_VDF.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-class Zone_Cl_VDF;
+class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
 class Modele_Launder_Sharma_VDF : public Modele_Jones_Launder_VDF
@@ -38,17 +38,17 @@ class Modele_Launder_Sharma_VDF : public Modele_Jones_Launder_VDF
 
 public :
 
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const override;
+  DoubleTab& Calcul_Fmu (DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don&) const override;
 
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
   Entree& lire(const Motcle&, Entree&);
 
 protected:
 
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 #endif

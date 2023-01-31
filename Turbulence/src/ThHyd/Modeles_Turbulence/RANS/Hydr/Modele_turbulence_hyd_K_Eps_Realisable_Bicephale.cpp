@@ -110,7 +110,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
 
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Cmu",Cmu);
 
-  // dans le cas d'une zone nulle on doit effectuer le dimensionnement
+  // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
   double non_prepare=1;
   if (visco_turb.size() == n)
     non_prepare=0.;
@@ -121,7 +121,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
       Champ_Inc visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
       Champ_Inc_base& ch_visco_turb_K_eps_Rea=visco_turb_au_format_K_eps_Rea.valeur();
-      ch_visco_turb_K_eps_Rea.associer_domaine_dis_base(eqn_transp_K().zone_dis().valeur());
+      ch_visco_turb_K_eps_Rea.associer_domaine_dis_base(eqn_transp_K().domaine_dis().valeur());
       ch_visco_turb_K_eps_Rea.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps_Rea.fixer_nb_comp(1);
       ch_visco_turb_K_eps_Rea.fixer_nb_valeurs_nodales(n);
@@ -208,7 +208,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temp
   Champ_Inc& ch_Eps = Eps();
   Schema_Temps_base& sch = eqn_transp_K().schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transp_K().zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K());
   eqn_transp_K().mettre_a_jour(temps);

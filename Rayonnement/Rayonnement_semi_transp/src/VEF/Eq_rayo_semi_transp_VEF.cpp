@@ -33,7 +33,7 @@
 #include <Modele_rayo_semi_transp.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Symetrie.h>
 #include <TRUSTTrav.h>
 
@@ -70,9 +70,9 @@ Entree& Eq_rayo_semi_transp_VEF::readOn(Entree& s )
  */
 void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_dis().valeur());
-  const DoubleVect& volumes_entrelaces =  zone_VF.volumes_entrelaces();
-  int nb_faces = zone_VF.nb_faces();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const DoubleVect& volumes_entrelaces =  domaine_VF.volumes_entrelaces();
+  int nb_faces = domaine_VF.nb_faces();
 
   //
   // Remarque : l'assemblage de la matrice est realise une fois pour toute au debut du
@@ -178,15 +178,15 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 void Eq_rayo_semi_transp_VEF::modifier_matrice()
 {
   // On fait une boucle sur les conditions aux limites associees a l'equations
-  Conds_lim& les_cl = zone_Cl_dis().les_conditions_limites();
-  const Zone_VEF& zvef = ref_cast(Zone_VEF,zone_dis().valeur());
+  Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis().valeur());
   const IntTab& face_voisins=zvef.face_voisins();
   const DoubleTab& face_normales = zvef.face_normales();
 
   int num_cl=0;
   for(num_cl = 0; num_cl<les_cl.size(); num_cl++)
     {
-      Cond_lim& la_cl = zone_Cl_dis().les_conditions_limites(num_cl);
+      Cond_lim& la_cl = domaine_Cl_dis().les_conditions_limites(num_cl);
       if (sub_type(Flux_radiatif_VEF,la_cl.valeur()))
         {
           Flux_radiatif_VEF& cl_radiatif = ref_cast(Flux_radiatif_VEF,la_cl.valeur());
@@ -250,18 +250,18 @@ void Eq_rayo_semi_transp_VEF::modifier_matrice()
 void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
 {
   // Boucle sur les conditions aux limites de l'equation de rayonnement
-  Conds_lim& les_cl_rayo = zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
   Probleme_base& pb = Modele().probleme();
   Equation_base& eq_temp = pb.equation(1);
 
-  Conds_lim& les_cl_temp = eq_temp.zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
 
   int num_cl_rayo=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo = zone_Cl_dis().les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo = domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
       if(sub_type(Flux_radiatif_VEF,la_cl_rayo.valeur()))
         {
           Flux_radiatif_VEF& la_cl_rayon = ref_cast(Flux_radiatif_VEF,la_cl_rayo.valeur());
@@ -273,7 +273,7 @@ void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
           int test_remplissage_Tb = 0;
           for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
             {
-              Cond_lim& la_cl_temp = eq_temp.zone_Cl_dis().les_conditions_limites(num_cl_temp);
+              Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
               Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
               if(nom_cl_temp == nom_cl_rayo)
                 {
@@ -321,7 +321,7 @@ void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
             // On n'a pas remplie le tableau des temperatures de bord !!!!
             Cerr<<"On n'a pas remplie le tableau des temperatures de bord !!!!"<<finl;
 
-          const Zone_VF& zvf = ref_cast(Zone_VF,zone_dis().valeur());
+          const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis().valeur());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(),fluide().kappa(), fluide().longueur_rayo(),
                                              fluide().indice(),zvf,Modele().valeur_sigma(),temps);
         }
@@ -342,9 +342,9 @@ void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
 void Eq_rayo_semi_transp_VEF::assembler_matrice()
 {
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_dis().valeur());
-  const DoubleVect& volumes_entrelaces =  zone_VF.volumes_entrelaces();
-  //int nb_faces = zone_VF.nb_faces();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const DoubleVect& volumes_entrelaces =  domaine_VF.volumes_entrelaces();
+  //int nb_faces = domaine_VF.nb_faces();
 
   const DoubleTab& irradi = irradiance_.valeurs();
 
@@ -361,7 +361,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
 
   Cerr<<"On verifie lors du calcul de la matrice de discretisation que "<<finl;
   Cerr<<"l'ordre de la matrice est bien egale au nombre de faces"<<finl;
-  if(la_matrice.ordre() != zone_VF.nb_faces_tot())
+  if(la_matrice.ordre() != domaine_VF.nb_faces_tot())
     exit();
   Cerr<<"Ordre de la matrice OK"<<finl;
 
@@ -387,13 +387,13 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
 
 void Eq_rayo_semi_transp_VEF::completer()
 {
-  const Zone_dis_base& une_zone_dis = zone_dis().valeur();
-  int n = une_zone_dis.nb_front_Cl();
+  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+  int n = une_domaine_dis.nb_front_Cl();
 
   int ii;
   for (ii =0; ii<n; ii++)
     {
-      const Frontiere_dis_base& la_fr_dis = une_zone_dis.frontiere_dis(ii);
+      const Frontiere_dis_base& la_fr_dis = une_domaine_dis.frontiere_dis(ii);
       le_dom_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
     }
 
@@ -414,12 +414,12 @@ void Eq_rayo_semi_transp_VEF::typer_op_grad()
 
 int Eq_rayo_semi_transp_VEF::nb_colonnes_tot()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis().valeur());
-  return zone_VF.nb_faces_tot();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  return domaine_VF.nb_faces_tot();
 }
 
 int Eq_rayo_semi_transp_VEF::nb_colonnes()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis().valeur());
-  return zone_VF.nb_faces();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  return domaine_VF.nb_faces();
 }

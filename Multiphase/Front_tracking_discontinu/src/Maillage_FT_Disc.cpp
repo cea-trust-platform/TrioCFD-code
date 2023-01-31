@@ -16,8 +16,8 @@
 #include <Maillage_FT_Disc.h>
 #include <TRUST_Deriv.h>
 #include <TRUSTVect.h>
-#include <Zone.h>
-#include <Zone_VF.h>
+#include <Domaine.h>
+#include <Domaine_VF.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Motcle.h>
 #include <Statistiques.h>
@@ -38,8 +38,8 @@
 #include <stat_counters.h>
 
 #if TCL_MODEL
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Schema_Temps_base.h>
@@ -104,8 +104,8 @@ Implemente_instanciable_sans_constructeur(Maillage_FT_Disc,"Maillage_FT_Disc",En
 void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 {
   const Equation_base& eq = equation_transport();
-  const Zone_Cl_dis_base& zone_cl = eq.zone_Cl_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF,eq.zone_dis().valeur());
+  const Domaine_Cl_dis_base& domaine_cl = eq.domaine_Cl_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,eq.domaine_dis().valeur());
 
   const int nb_som = nb_sommets();
   costheta.resize(nb_som, 2);
@@ -116,12 +116,12 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 
   for (int i = 0; i < nb_som; i++)
     {
-      // Indice de la face de bord dans la zone_VF
+      // Indice de la face de bord dans la domaine_VF
       const int num_face = sommet_face_bord_[i];
-      if ((num_face < 0) || (num_face>=zone_vf.nb_faces_bord()))
+      if ((num_face < 0) || (num_face>=domaine_vf.nb_faces_bord()))
         continue;
       const Cond_lim& cl =
-        zone_cl.la_cl_de_la_face(num_face);
+        domaine_cl.la_cl_de_la_face(num_face);
       const Cond_lim_base& cl_base = cl.valeur();
 
       double theta1 = 0., theta2 = 0.;
@@ -257,9 +257,9 @@ const Maillage_FT_Disc& Maillage_FT_Disc::operator=(const Maillage_FT_Disc&)
 //Lecture des informations necessaires a l initialisation des coordonnees
 //des points qui constituent un ensemble Lagrangien
 // - soit lecture dans un fichier (remplissage direct de sommets_)
-// - soit lecture des informations concernant la distribution dans les sous zones :
-//     nombre de sous zones a considerer
-//  Pour chaque sous zone :
+// - soit lecture des informations concernant la distribution dans les sous domaines :
+//     nombre de sous domaines a considerer
+//  Pour chaque sous domaine :
 //  lecture de son nom
 //   si repartition aleatoire des points
 //        lecture du nombre de marqueurs
@@ -268,10 +268,11 @@ const Maillage_FT_Disc& Maillage_FT_Disc::operator=(const Maillage_FT_Disc&)
 
 Entree& Maillage_FT_Disc::readOn(Entree& is)
 {
-  Motcles les_mots(2);
+  Motcles les_mots(3);
   {
     les_mots[0] = "fichier";
-    les_mots[1] = "sous_zones";
+    les_mots[1] = "sous_domaines";
+    les_mots[2] = "sous_zones";
   }
 
   Motcle motlu, accolade_fermee="}", accolade_ouverte="{";
@@ -306,6 +307,7 @@ Entree& Maillage_FT_Disc::readOn(Entree& is)
             break;
           }
         case 1 :
+        case 2 :
           {
             int nb_sz;
             is>>nb_sz;
@@ -573,28 +575,28 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   return is;
 }
 
-/*! @brief on remplit refequation_transport_, schema_comm_zone_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
+/*! @brief on remplit refequation_transport_, schema_comm_domaine_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
  *
- * Precondition: la zone_dis de l'equation doit etre complete (joints)
+ * Precondition: la domaine_dis de l'equation doit etre complete (joints)
  */
 void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation)
 {
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc,equation);
   refequation_transport_ = eq;
 
-  const Zone_dis& zone_dis = eq.zone_dis();
+  const Domaine_dis& domaine_dis = eq.domaine_dis();
   const Parcours_interface& parcours_interface = eq.parcours_interface();
-  associer_domaine_dis_parcours(zone_dis, parcours_interface);
+  associer_domaine_dis_parcours(domaine_dis, parcours_interface);
 }
 
-void Maillage_FT_Disc::associer_domaine_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours)
+void Maillage_FT_Disc::associer_domaine_dis_parcours(const Domaine_dis& domaine_dis, const Parcours_interface& parcours)
 {
-  refzone_dis_ = zone_dis;
+  refdomaine_dis_ = domaine_dis;
   refparcours_interface_ = parcours;
 
   // On recupere la liste des PE voisins
   ArrOfIntFT pe_list;
-  for (const auto& itr : zone_dis.zone().faces_joint())
+  for (const auto& itr : domaine_dis.domaine().faces_joint())
     {
       const Joint& joint = itr;
       const int pe_voisin = joint.PEvoisin();
@@ -603,7 +605,7 @@ void Maillage_FT_Disc::associer_domaine_dis_parcours(const Zone_dis& zone_dis, c
   // La liste des processeurs avec qui on communique dans ce schema sont tous
   // les voisins du maillage eulerien. Communications symetriques (on envoie
   // et on recoit a tous les processeurs voisins).
-  schema_comm_zone_.set_send_recv_pe_list(pe_list, pe_list);
+  schema_comm_domaine_.set_send_recv_pe_list(pe_list, pe_list);
 }
 
 /*! @brief vide toutes les structures du maillage, le statut passe a RESET.
@@ -640,9 +642,9 @@ void Maillage_FT_Disc::recopie(const Maillage_FT_Disc& source, Statut_Maillage n
 
   // Copie des membres qui definissent l'etat minimal:
   refequation_transport_ = source.refequation_transport_;
-  refzone_dis_ = source.refzone_dis_;
+  refdomaine_dis_ = source.refdomaine_dis_;
   refparcours_interface_ = source.refparcours_interface_;
-  schema_comm_zone_ = source.schema_comm_zone_;
+  schema_comm_domaine_ = source.schema_comm_domaine_;
   temps_physique_ = source.temps_physique_;
   sommets_ = source.sommets_;
   facettes_ = source.facettes_;
@@ -877,13 +879,13 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Calculer_Indicatrice", "FrontTracking");
   statistiques().begin_count(stat_counter);
 
-  const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone& lazone = zone_dis.zone();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-  const int nb_elem = lazone.nb_elem();
-  const int nb_elem_tot = lazone.nb_elem_tot();
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const int nb_elem = ladomaine.nb_elem();
+  const int nb_elem_tot = ladomaine.nb_elem_tot();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
 
   static ArrOfBit elements_calcules;
   elements_calcules.resize_array(nb_elem_tot);
@@ -1255,8 +1257,8 @@ void Maillage_FT_Disc::remplir_structure(const DoubleTab& soms)
 void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms)
 {
   int som;
-  const Zone& mazone = mon_dom_.valeur();
-  const int nb_elements_reels = mazone.nb_elem();
+  const Domaine& madomaine = mon_dom_.valeur();
+  const int nb_elements_reels = madomaine.nb_elem();
   const int nb_sommets_tot = soms.dimension(0);
 
   //Procedure pour determiner a quel processeur appartiennent les sommets (tmp3)
@@ -1298,7 +1300,7 @@ void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms
         for (int k = 0; k < dim; k++)
           tmp(j, k) = soms(i+j, k);
 
-      mazone.chercher_elements(tmp, tmp2);
+      madomaine.chercher_elements(tmp, tmp2);
       // Ne pas tenir compte des sommets dans les elements virtuels
       for (int j = 0; j < n_to_read; j++)
         if (tmp2[j] >= nb_elements_reels)
@@ -1895,9 +1897,9 @@ int Maillage_FT_Disc::calculer_voisinage_facettes(IntTab& fa7Voisines,
 
   ArrOfIntFT fa7s_elem;
   int i, nb_fa7, ifa70,ifa71,fa70,fa71, iarete0,iarete1;
-  const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone& lazone = zone_dis.zone();
-  const int nb_elem = lazone.nb_elem(); // Nombre d'elements reels
+  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
+  const int nb_elem = ladomaine.nb_elem(); // Nombre d'elements reels
   for (i=0 ; i<nb_elem ; i++)
     {
       ief->get_liste_facettes_traversantes(i,fa7s_elem);
@@ -2037,9 +2039,9 @@ int Maillage_FT_Disc::sauvegarder(Sortie& os) const
   const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
   if (format_xyz)
     {
-      const Zone_dis& zone_dis = refzone_dis_.valeur();
-      const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-      Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(*this, zone_vf, os);
+      const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+      Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(*this, domaine_vf, os);
       return 0;
     }
   else
@@ -2084,11 +2086,11 @@ int Maillage_FT_Disc::reprendre(Entree& is)
     EcritureLectureSpecial::is_lecture_special();
   if (format_xyz)
     {
-      if (refzone_dis_.non_nul())
+      if (refdomaine_dis_.non_nul())
         {
-          const Zone_dis& zone_dis = refzone_dis_.valeur();
-          const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-          Sauvegarde_Reprise_Maillage_FT::lire_xyz(*this, &zone_vf, &is, 0);
+          const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+          const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+          Sauvegarde_Reprise_Maillage_FT::lire_xyz(*this, &domaine_vf, &is, 0);
         }
       else
         {
@@ -2121,7 +2123,7 @@ int Maillage_FT_Disc::reprendre(Entree& is)
       is >> desc_facettes_;
       is >> drapeaux_sommets_;
       maillage_modifie(MINIMAL);
-      if (refzone_dis_.non_nul())
+      if (refdomaine_dis_.non_nul())
         {
           // L'equation de transport a ete associee : on reprend le vrai
           // maillage (c'est pas une lecture bidon pour passer au bloc suivant
@@ -2438,13 +2440,13 @@ void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
 
   // Creation des noeuds virtuels sur le processeur d'arrivee s'ils n'existent
   // pas encore.
-  const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone& lazone = zone_dis.zone();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-  const IntTab& elem_virt_pe_num = lazone.elem_virt_pe_num();
-  const IntTab& face_virt_pe_num = zone_vf.face_virt_pe_num();
-  const int nb_elements_reels = lazone.nb_elem();
-  const int nb_faces_reelles = zone_vf.nb_faces();
+  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const IntTab& elem_virt_pe_num = ladomaine.elem_virt_pe_num();
+  const IntTab& face_virt_pe_num = domaine_vf.face_virt_pe_num();
+  const int nb_elements_reels = ladomaine.nb_elem();
+  const int nb_faces_reelles = domaine_vf.nb_faces();
 
   for (i = 0; i < nechange; i++)
     {
@@ -2477,10 +2479,10 @@ void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
     }
 
   // Les echanges de sommets se font entre voisins par des joints du maillage
-  // fixe. On prend donc le schema de communication de la zone.
+  // fixe. On prend donc le schema de communication de la domaine.
   // Envoi des sommets aux destinataires (pour l'instant, creation de sommets
   // virtuels sur le processeur destination).
-  creer_sommets_virtuels(liste_sommets, liste_pe, schema_comm_zone_);
+  creer_sommets_virtuels(liste_sommets, liste_pe, schema_comm_domaine_);
 
   // Mise a jour du nouveau PE proprietaire, de l'element contenant le sommet et de la
   // face de bord :
@@ -3041,8 +3043,8 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
   // et conversion du numero de l'element virtuel en numero local sur ce pe.
   static ArrOfIntFT liste_pe_dest;
 
-  const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone& le_dom = zone_dis.zone();
+  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& le_dom = domaine_dis.domaine();
   const int nb_elem = le_dom.nb_elem(); // Nombre d'elements reels
   {
     liste_pe_dest.resize_array(nb_facettes_envoi);
@@ -3147,7 +3149,7 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
     BtoC_recv_pe_flags = 0;
 
     // A et C sont voisins au sens du maillage eulerien
-    const Schema_Comm_FT& comm = schema_comm_zone_;
+    const Schema_Comm_FT& comm = schema_comm_domaine_;
     comm.begin_comm();
     for (i = 0; i < nb_facettes_envoi; i++)
       {
@@ -3343,7 +3345,7 @@ int Maillage_FT_Disc::deplacer_un_point(double& x, double& y, double& z,
                                         int& element,
                                         int& face_bord,
                                         const Parcours_interface& parcours,
-                                        const Zone_VF& zone_vf,
+                                        const Domaine_VF& domaine_vf,
                                         const IntTab& face_voisins,
                                         int skip_facettes)
 {
@@ -3361,7 +3363,7 @@ int Maillage_FT_Disc::deplacer_un_point(double& x, double& y, double& z,
       // Si on ne trouve pas d'intersection, on recupere pos_intersection=1.
       double pos_intersection = 1.;
       const int face_sortie =
-        parcours.calculer_face_sortie_element(zone_vf, element,
+        parcours.calculer_face_sortie_element(domaine_vf, element,
                                               x, y, z,
                                               x1, y1, z1,
                                               pos_intersection);
@@ -3452,7 +3454,7 @@ int Maillage_FT_Disc::deplacer_un_sommet(double& x, double& y, double& z,
                                          int& face_bord,
                                          const int num_sommet,
                                          const Parcours_interface& parcours,
-                                         const Zone_VF& zone_vf,
+                                         const Domaine_VF& domaine_vf,
                                          const IntTab& face_voisins,
                                          ArrOfInt& sommets_envoyes,
                                          ArrOfInt& element_virtuel_arrivee,
@@ -3477,7 +3479,7 @@ int Maillage_FT_Disc::deplacer_un_sommet(double& x, double& y, double& z,
   face_suivante = face_bord;
   continuer = Maillage_FT_Disc::deplacer_un_point(x,y,z, x1,y1,z1,
                                                   element_suivant, face_suivante,
-                                                  parcours, zone_vf, face_voisins,
+                                                  parcours, domaine_vf, face_voisins,
                                                   skip_facettes);
 
   // On n'a rien oublie ?
@@ -3488,7 +3490,7 @@ int Maillage_FT_Disc::deplacer_un_sommet(double& x, double& y, double& z,
   // -------------------------------------------------------------
   if (continuer)
     {
-      const int nb_elem_reels = zone_vf.nb_elem();
+      const int nb_elem_reels = domaine_vf.nb_elem();
       if (element_suivant >= nb_elem_reels)
         {
           if (num_sommet>=0)
@@ -3552,9 +3554,9 @@ void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
   if (Comm_Group::check_enabled()) check_mesh(1,0,skip_facettes);
 
   const int dimension3 = (Objet_U::dimension == 3);
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
   const Parcours_interface& parcours = refparcours_interface_.valeur();
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
 
   //
   // ALGORITHME :
@@ -3633,7 +3635,7 @@ void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
                                                                face_bord,
                                                                num_sommet,
                                                                parcours,
-                                                               zone_vf,
+                                                               domaine_vf,
                                                                face_voisins,
                                                                sommets_envoyes,
                                                                element_virtuel_arrivee,
@@ -3706,9 +3708,9 @@ int Maillage_FT_Disc::check_sommets(int error_is_fatal) const
   const double invalid_value = DMAXFLOAT*0.9;
   const int dimension3 = (Objet_U::dimension == 3);
   const int moi = Process::me();
-  const Zone_dis& zone_dis = refzone_dis_.valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-  const int nb_elements_reels = zone_vf.nb_elem();
+  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const int nb_elements_reels = domaine_vf.nb_elem();
   int i, j;
 
   if (statut_ == RESET)
@@ -3899,7 +3901,7 @@ int Maillage_FT_Disc::check_sommets(int error_is_fatal) const
                 y = sommets_(i, 1);
                 if (dimension3)
                   z = sommets_(i, 2);
-                const double distance = parcours.distance_sommet_faces(zone_vf, num_element,
+                const double distance = parcours.distance_sommet_faces(domaine_vf, num_element,
                                                                        x, y, z);
                 if (distance > 2. * epsilon)
                   {
@@ -3926,7 +3928,7 @@ int Maillage_FT_Disc::check_sommets(int error_is_fatal) const
               exit();
             }
         }
-      const IntTab& face_voisins = zone_vf.face_voisins();
+      const IntTab& face_voisins = domaine_vf.face_voisins();
       for (i = 0; i < nbsommets; i++)
         {
           const int face = sommet_face_bord_[i];
@@ -4501,7 +4503,7 @@ void Maillage_FT_Disc::nettoyer_noeuds_virtuels_et_frontieres()
   //On ne retient pas les sommets virtuels et ceux situes sur des faces de frontiere ouverte
   for (int som=0; som<nb_sommets(); som++)
     {
-      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis().valeur();
       int face_loc;
       int face_bord = sommet_face_bord_[som];
       int face_fr_ouverte = 0;
@@ -5307,7 +5309,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
           //    vit(ii,jj) = 0.;
           eq_interfaces.get_champ_post_FT(nom_du_champ, loc, &vit); // HACK !!!! (warning, try debug to make sure it works if you want to remove it!!)
 
-          //  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_cl);
+          //  const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, domaine_cl);
           // It relies on the classical assumption in the FT module that the first equation is NS.
         }
       //Cerr <<"TCL Eq. 0 is " <<  equation_transport().get_probleme_base().equation(0).que_suis_je() << finl;
@@ -5929,7 +5931,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                     {
                       const double t=temps_physique_;
                       int face_loc;
-                      const Zone_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).zone_Cl_dis().valeur();
+                      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis().valeur();
                       const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
                       const Nom& bc_name = type_cl.frontiere_dis().le_nom();
                       // For each BC, we check its type to see if it's a wall:
@@ -6355,7 +6357,7 @@ int Maillage_FT_Disc::type_statut() const
   return -1;
 }
 
-/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Zone::creer_tableau_sommets()
+/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_sommets()
  *
  */
 void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_Options opt) const
@@ -6364,7 +6366,7 @@ void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_O
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
 }
 
-/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Zone::creer_tableau_elements()
+/*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_elements()
  *
  */
 void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, Array_base::Resize_Options opt) const

@@ -71,7 +71,7 @@ void Pb_Couple_rayo_semi_transp::initialize( )
       Probleme_base& pb=ref_cast(Probleme_base,probleme(i));
       for (int j=0; j<pb.nombre_d_equations(); j++)
         {
-          pb.equation(j).zone_Cl_dis()->calculer_coeffs_echange(presentTime());
+          pb.equation(j).domaine_Cl_dis()->calculer_coeffs_echange(presentTime());
         }
     }
 }
@@ -181,7 +181,7 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
   // Clonage et association du domaine (WEC)
   // Deviendra inutile avec la version de gomtrie de B. Mathieu
   der_domaine_clone.typer("Domaine");
-  Zone& dom_clone=ref_cast(Zone,der_domaine_clone.valeur());
+  Domaine& dom_clone=ref_cast(Domaine,der_domaine_clone.valeur());
   dom_clone=le_pb.domaine();
   Nom new_name=dom_clone.le_nom()+"_copy";
   dom_clone.nommer(new_name); // nommage

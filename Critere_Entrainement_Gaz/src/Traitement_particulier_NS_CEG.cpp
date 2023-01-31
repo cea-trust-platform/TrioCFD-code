@@ -22,7 +22,7 @@
 
 #include <Traitement_particulier_NS_CEG.h>
 #include <Navier_Stokes_Turbulent.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <sys/stat.h>
@@ -30,7 +30,7 @@
 #include <Param.h>
 #include <Milieu_base.h>
 #include <SFichier.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <TRUSTList.h>
 #include <Statistiques.h>
 #include <stat_counters.h>
@@ -139,20 +139,20 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
 {
   // Recherche de la frontiere surface libre:
   int trouve=0;
-  const Conds_lim& les_cls=mon_equation->zone_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cls=mon_equation->domaine_Cl_dis().les_conditions_limites();
   for (int num_cl=0; num_cl<les_cls.size(); num_cl++)
     {
       // Surface libre trouvee
       if (les_cls[num_cl].frontiere_dis().le_nom()==la_surface_libre_nom_)
         {
-          const Zone_VF& zone_VF = ref_cast(Zone_VF, mon_equation->inconnue().zone_dis_base());
+          const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
           la_surface_libre_ = ref_cast(Front_VF,les_cls[num_cl].frontiere_dis());
           trouve=1;
           int nb_faces=la_surface_libre_.valeur().nb_faces();
           for (int ind_face=0; ind_face<nb_faces; ind_face++)
             {
               int face = la_surface_libre_.valeur().num_face(ind_face);
-              if (zone_VF.face_normales(face,0)!=0 || zone_VF.face_normales(face,1)) error("The free surface should be normal to Z on all faces.");
+              if (domaine_VF.face_normales(face,0)!=0 || domaine_VF.face_normales(face,1)) error("The free surface should be normal to Z on all faces.");
             }
         }
     }
@@ -195,7 +195,7 @@ void Traitement_particulier_NS_CEG::post_traitement_particulier()
 
 void Traitement_particulier_NS_CEG::critere_areva()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, mon_equation->inconnue().zone_dis_base());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const DoubleTab& vorticite = mon_equation.valeur().get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
@@ -204,7 +204,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
   double gz = mon_equation->milieu().gravite()(0,2);
   double K_max_local=0;
   ArrOfDouble centre_vortex(3);
-  int nb_face_par_elem = zone_VF.elem_faces().dimension(1);
+  int nb_face_par_elem = domaine_VF.elem_faces().dimension(1);
   int nb_faces=la_surface_libre_.valeur().nb_faces();
 
   // On boucle sur les faces reelles
@@ -212,8 +212,8 @@ void Traitement_particulier_NS_CEG::critere_areva()
     {
       int face = la_surface_libre_.valeur().num_face(ind_face);
       // On recupere chaque maille adjacente
-      int elem = zone_VF.face_voisins(face,0);
-      if (elem<0) elem = zone_VF.face_voisins(face,1);
+      int elem = domaine_VF.face_voisins(face,0);
+      if (elem<0) elem = domaine_VF.face_voisins(face,1);
 
       // Interpolation des champs aux elements:
       double vz=0;
@@ -221,7 +221,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
       double epsilon=0;
       for (int i=0; i<nb_face_par_elem; i++)
         {
-          face = zone_VF.elem_faces(elem,i);
+          face = domaine_VF.elem_faces(elem,i);
           vz+=vitesse(face,2);
           k+=KEps(face,0);
           epsilon+=KEps(face,1);
@@ -244,7 +244,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
       if (K>K_max_local)
         {
           K_max_local=K;
-          for (int i=0; i<3; i++) centre_vortex[i] = zone_VF.xp(elem,i);
+          for (int i=0; i<3; i++) centre_vortex[i] = domaine_VF.xp(elem,i);
         }
     }
   // Parallelisme : Impression par le processeur le plus grand qui possede le vortex
@@ -272,9 +272,9 @@ int Traitement_particulier_NS_CEG::lpost(double temps_courant, double dt_post) c
 
 void Traitement_particulier_NS_CEG::critere_cea_jaea()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, mon_equation->inconnue().zone_dis_base());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
   int nb_faces=la_surface_libre_.valeur().nb_faces();
-  int nb_elem=zone_VF.nb_elem();
+  int nb_elem=domaine_VF.nb_elem();
 
   IntVect elements_surface_libre(nb_faces);	// Tableau donnant les elements au contact des faces de la surface libre
   elements_surface_libre=-1;
@@ -289,13 +289,13 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
 
 
   // On boucle sur les faces reelles
-  // ou Q>0 (zone potentielle de vortex)
+  // ou Q>0 (domaine potentielle de vortex)
   for (int ind_face=0; ind_face<nb_faces; ind_face++)
     {
       int face = la_surface_libre_.valeur().num_face(ind_face);
       // On recupere chaque maille adjacente
-      int elem = zone_VF.face_voisins(face,0);
-      if (elem<0) elem = zone_VF.face_voisins(face,1);
+      int elem = domaine_VF.face_voisins(face,0);
+      if (elem<0) elem = domaine_VF.face_voisins(face,1);
       // On marque:
       if (critereQ(elem)>0)
         {
@@ -355,14 +355,14 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           // https://fr.wikipedia.org/wiki/Cercles_inscrit_et_exinscrits_d%27un_triangle
           // Rayon d'un cercle inscrit dans un triangle: R=2*Surface(triangle)/perimetre(triangle)
           // Calcul du perimetre
-          double surface=zone_VF.face_surfaces(face_centre_fortex);
+          double surface=domaine_VF.face_surfaces(face_centre_fortex);
           const DoubleTab& coord=mon_equation->probleme().domaine().coord_sommets();
-          int nb_sommet_face=zone_VF.face_sommets().dimension(1);
+          int nb_sommet_face=domaine_VF.face_sommets().dimension(1);
           double perimetre=0;
           for (int i=0; i<nb_sommet_face; i++)
             {
-              int som1 = zone_VF.face_sommets(face_centre_fortex,i);
-              int som2 = (i!=nb_sommet_face-1 ? zone_VF.face_sommets(face_centre_fortex,i+1) : zone_VF.face_sommets(face_centre_fortex,0));
+              int som1 = domaine_VF.face_sommets(face_centre_fortex,i);
+              int som2 = (i!=nb_sommet_face-1 ? domaine_VF.face_sommets(face_centre_fortex,i+1) : domaine_VF.face_sommets(face_centre_fortex,0));
               double dx=coord(som2,0)-coord(som1,0);
               double dy=coord(som2,1)-coord(som1,1);
               perimetre+=sqrt(dx*dx+dy*dy);
@@ -371,7 +371,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           R0 = 0.6*0.75*(2*surface/perimetre);
 
           // Centre du vortex
-          for (int i=0; i<3; i++) centre_vortex[i]=zone_VF.xp(elem_centre_vortex,i);
+          for (int i=0; i<3; i++) centre_vortex[i]=domaine_VF.xp(elem_centre_vortex,i);
           // Envoi des donnees tous les autres processes:
           for (int p=0; p<nproc(); p++)
             if (p!=pe_mp_max)
@@ -411,7 +411,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               points(i_theta,2)=centre_vortex[2];
             }
           // On cherche les elements contenant le point x,y,z:
-          mon_equation->zone_dis().zone().chercher_elements(points,elements);
+          mon_equation->domaine_dis().domaine().chercher_elements(points,elements);
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
               int elem=elements[i_theta];
@@ -424,7 +424,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                 }
               if (elem>=0 && elem<nb_elem)
                 {
-                  // Point trouve dans la zone reelle
+                  // Point trouve dans la domaine reelle
                   points_trouves++;
                   if (critereQ(elem)<=min_critere_Q_sur_max_critere_Q_*critereQ_mp_max)
                     {
@@ -477,7 +477,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               Cerr << "-> CEA_JAEA criterion : Vortex " << nb_vortex << " de " << taille_vortex_mailles << " elements ";
               Cerr << "in (x,y,z)=(" << centre_vortex[0] << "," << centre_vortex[1] << "," << centre_vortex[2] << ") ";
               Cerr << "Radius=" << R << " std::max(critere_Q)=" << critereQ_mp_max;
-              //int e = mon_equation->zone_dis().zone().chercher_elements(centre_vortex(0),centre_vortex(1),centre_vortex(2));
+              //int e = mon_equation->domaine_dis().domaine().chercher_elements(centre_vortex(0),centre_vortex(1),centre_vortex(2));
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
           // On evalue la vitesse aux points:

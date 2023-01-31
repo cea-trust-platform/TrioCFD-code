@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Robin_Scalaire.h>
-#include <Zone_dis.h>
-#include <Zone_Cl_dis.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Equation_base.h>
 #include <Fluide_base.h>
 #include <distances_VEF.h>
@@ -86,8 +86,8 @@ void Source_Robin_Scalaire::completer()
 // ajouter
 DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& temperature = equation().inconnue().valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
   const Champ_Don& lambda = fluide.conductivite();
@@ -96,12 +96,12 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_th.get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_t = le_modele_scalaire.conductivite_turbulente().valeurs();
   const Paroi_scal_hyd_base_VEF& loi_de_paroi = ref_cast(Paroi_scal_hyd_base_VEF,le_modele_scalaire.loi_paroi().valeur());
-  const DoubleVect& surfaces_face = ref_cast_non_const(Zone_VEF,zone_VEF).face_surfaces();
+  const DoubleVect& surfaces_face = ref_cast_non_const(Domaine_VEF,domaine_VEF).face_surfaces();
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       int face;
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       int pos_Paroi = noms_parois.search(la_cl->frontiere_dis().le_nom());
       const DoubleVect& dist_equiv = loi_de_paroi.equivalent_distance(n_bord);
 
@@ -115,8 +115,8 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
 
           for (face=ndeb; face<nfin; face++)
             {
-              int elem = zone_VEF.face_voisins(face,0);
-              if (elem==-1) elem = zone_VEF.face_voisins(face,1);
+              int elem = domaine_VEF.face_voisins(face,0);
+              if (elem==-1) elem = domaine_VEF.face_voisins(face,1);
               double d_lambda = (lambda_uniforme ? lambda(0,0) : lambda(elem,0));
               double acc_loc = - (d_lambda + lambda_t(elem)) * (temperature(face) - Tw) / dist_equiv[face-ndeb] * surfaces_face(face);
               // acc_loc_tot += acc_loc;
@@ -138,8 +138,8 @@ DoubleTab& Source_Robin_Scalaire::calculer(DoubleTab& resu) const
 
 
 // associer_domaines
-void Source_Robin_Scalaire::associer_domaines(const Zone_dis& z, const Zone_Cl_dis& zcl)
+void Source_Robin_Scalaire::associer_domaines(const Domaine_dis& z, const Domaine_Cl_dis& zcl)
 {
-  le_dom_VEF = ref_cast(Zone_VEF,z.valeur());
-  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,z.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl.valeur());
 }

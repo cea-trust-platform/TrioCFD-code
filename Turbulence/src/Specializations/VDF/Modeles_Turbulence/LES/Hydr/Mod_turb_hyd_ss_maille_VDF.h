@@ -26,8 +26,8 @@
 
 
 #include <Mod_turb_hyd_ss_maille.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 
 /*! @brief classe Mod_turb_hyd_ss_maille_VDF Cette classe correspond a la mise en oeuvre des modeles sous
  *
@@ -44,13 +44,13 @@ class Mod_turb_hyd_ss_maille_VDF : public Mod_turb_hyd_ss_maille
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
   void calculer_longueurs_caracteristiques() override;
 
 protected :
 
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 #endif

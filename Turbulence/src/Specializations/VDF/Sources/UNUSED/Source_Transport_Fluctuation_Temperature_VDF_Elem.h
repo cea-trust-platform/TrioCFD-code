@@ -33,7 +33,7 @@
 #define Cd_DEFAULT 0.8
 
 #include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <Ref_Transport_Fluctuation_Temperature.h>
 #include <Ref_Transport_Flux_Chaleur_Turbulente.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
@@ -45,9 +45,9 @@ class Probleme_base;
 class Champ_Don_base;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
+class Domaine_dis;
+class Domaine_Cl_dis;
+class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
 // La classe derive de Source_base et peut etre d'un terme source
@@ -60,7 +60,7 @@ public :
 
   void associer_pb(const Probleme_base& ) override;
   inline Source_Transport_Fluctuation_Temperature_VDF_Elem(double ctea = Ca_DEFAULT, double cteb = Cb_DEFAULT,  double ctec = Cc_DEFAULT,  double cted = Cd_DEFAULT);
-  DoubleTab& calculer_Prod_uteta_T(const Zone_VDF&,const Zone_Cl_VDF&, const DoubleTab&,const  DoubleTab&, DoubleTab&) const;
+  DoubleTab& calculer_Prod_uteta_T(const Domaine_VDF&,const Domaine_Cl_VDF&, const DoubleTab&,const  DoubleTab&, DoubleTab&) const;
   DoubleTab& ajouter(DoubleTab& ) const override;
   DoubleTab& calculer(DoubleTab& ) const override;
   void mettre_a_jour(double temps) override { Calcul_Production_K_VDF::mettre_a_jour(temps); }
@@ -68,8 +68,8 @@ public :
 protected :
 
   double Ca, Cb, Cc, Cd;
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
   REF(Equation_base) eq_hydraulique;
   REF(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
   REF(Transport_Fluctuation_Temperature) mon_eq_transport_Fluctu_Temp;
@@ -77,7 +77,7 @@ protected :
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite;
-  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
 
 };
 

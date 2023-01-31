@@ -23,7 +23,7 @@
 #ifndef Marching_Cubes_included
 #define Marching_Cubes_included
 
-#include <Ref_Zone_VF.h>
+#include <Ref_Domaine_VF.h>
 #include <TRUSTTabs.h>
 #include <Maillage_FT_Disc.h>
 #include <TRUSTArray.h>
@@ -31,7 +31,7 @@
 #include <TRUSTTabs_forward.h>
 class ArrOfBit;
 class Desc_Structure_FT;
-class Zone;
+class Domaine;
 
 class Marching_Cubes : public Objet_U
 {
@@ -39,7 +39,7 @@ class Marching_Cubes : public Objet_U
 public:
   Marching_Cubes();
 
-  void associer_domaine_vf(const Zone_VF& zone_vf);
+  void associer_domaine_vf(const Domaine_VF& domaine_vf);
 
   int construire_iso(const DoubleVect& valeurs_sommets,
                      double isovaleur,
@@ -56,10 +56,10 @@ public:
                      int ignorer_collision = 0) const;
 
 protected:
-  void remplir_data_marching_cubes(const Zone& zone);
+  void remplir_data_marching_cubes(const Domaine& domaine);
 
-  // Ces deux fonctions seraient mieux a leur place dans Joint ou Zone...
-  void remplir_renum_virt_loc(const Zone& zone);
+  // Ces deux fonctions seraient mieux a leur place dans Joint ou Domaine...
+  void remplir_renum_virt_loc(const Domaine& domaine);
   void renum_sommets_dist_loc(const int pe_voisin,
                               ArrOfInt& num_sommets) const;
 
@@ -95,9 +95,9 @@ protected:
   void correspondance_espaces_distant_virtuel(const IntTab& def_noeud,
                                               Desc_Structure_FT& desc) const;
 
-  // Champs remplis lors de l'association avec la zone
+  // Champs remplis lors de l'association avec la domaine
   // *********** DEBUT
-  REF(Zone_VF) ref_zone_vf_;
+  REF(Domaine_VF) ref_domaine_vf_;
 
   int nb_sommets_element;
   // Definition des aretes de l'element de base eulerien

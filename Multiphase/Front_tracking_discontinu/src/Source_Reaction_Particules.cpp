@@ -22,8 +22,8 @@
 
 #include <Source_Reaction_Particules.h>
 #include <Transport_Marqueur_FT.h>
-#include <Zone.h>
-#include <Zone_VF.h>
+#include <Domaine.h>
+#include <Domaine_VF.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
 #include <Milieu_base.h>
@@ -42,7 +42,7 @@ Entree& Source_Reaction_Particules::readOn(Entree& is)
   return is;
 }
 
-void Source_Reaction_Particules::associer_domaines(const Zone_dis& zdis,const Zone_Cl_dis& zcldis)
+void Source_Reaction_Particules::associer_domaines(const Domaine_dis& zdis,const Domaine_Cl_dis& zcldis)
 {
   //Ne fait rien
 }

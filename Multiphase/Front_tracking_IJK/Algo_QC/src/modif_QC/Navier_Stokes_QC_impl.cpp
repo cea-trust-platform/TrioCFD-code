@@ -25,7 +25,7 @@
 #include <Fluide_Quasi_Compressible.h>
 #include <Debog.h>
 #include <Dirichlet.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <TRUSTTrav.h>
@@ -265,14 +265,14 @@ DoubleTab&  Navier_Stokes_QC_impl::derivee_en_temps_impl_p1(Navier_Stokes_std& e
       eqn.solv_masse()->set_name_of_coefficient_temporel("no_coeff");
     }
 
-  const Conds_lim& lescl=eqn.zone_Cl_dis().les_conditions_limites();
-  const IntTab& face_voisins = eqn.zone_dis().valeur().face_voisins();
+  const Conds_lim& lescl=eqn.domaine_Cl_dis().les_conditions_limites();
+  const IntTab& face_voisins = eqn.domaine_dis().valeur().face_voisins();
   int nbcondlim=lescl.size();
   int taille=vpoint.nb_dim();
   if (taille==1)
     {
       if (orientation_VDF_.size()==0)
-        orientation_VDF_.ref(ref_cast(Zone_VF,eqn.zone_dis().valeur()).orientation());
+        orientation_VDF_.ref(ref_cast(Domaine_VF,eqn.domaine_dis().valeur()).orientation());
     }
 
   double dt_reel= eqn.inconnue().valeur().recuperer_temps_futur(1)-eqn.schema_temps().temps_courant();
@@ -397,7 +397,7 @@ DoubleTab&  Navier_Stokes_QC_impl::derivee_en_temps_impl_projection(Navier_Stoke
     }
   bilan=Process::mp_sum(bilan);
 
-  const DoubleVect& volumes=ref_cast(Zone_VF,eqn.zone_dis().valeur()).volumes();
+  const DoubleVect& volumes=ref_cast(Domaine_VF,eqn.domaine_dis().valeur()).volumes();
   double vtot=0;
   int i;
 
@@ -555,7 +555,7 @@ void Navier_Stokes_QC_impl::assembler_avec_inertie_impl(const Navier_Stokes_std&
   // correction finale pour les dirichlets
   // on ne doit pas imposer un+1 mais rho_un+1
   // on multiplie dons le resu par rho_face_np1
-  const Conds_lim& lescl=eqn.zone_Cl_dis().les_conditions_limites();
+  const Conds_lim& lescl=eqn.domaine_Cl_dis().les_conditions_limites();
   int nbcondlim=lescl.size();
 
   for (int icl=0; icl<nbcondlim; icl++)

@@ -24,7 +24,7 @@
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Interprete.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Frontiere_dis_base.h>
 #include <communications.h>
 #include <Convert_ICoCoTrioField.h>
@@ -117,17 +117,17 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   //int nb_faces=front.nb_faces();
-  const Zone& zone=front.zone();
+  const Domaine& domaine=front.domaine();
   const Faces& faces=front.faces();
   //int nbsf=faces.nb_som_faces();
   int i,j;
-  int nb_som_tot=zone.nb_som_tot();
+  int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   //int nb_som=domaine.nb_som();
   //if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
   //  {
   //    vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
-  //    const MD_Vector& md = zone.domaine().md_vector_sommets();
+  //    const MD_Vector& md = domaine.domaine().md_vector_sommets();
   //    MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
   //  }
 
@@ -138,7 +138,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   // Construction de la liste des sommets
   int nn=0;
   ArrOfInt liste_sommets(nb_som_tot);
-  ArrOfInt marqueur(zone.les_sommets().dimension(0));
+  ArrOfInt marqueur(domaine.les_sommets().dimension(0));
   const IntTab& ffaces=faces.les_sommets() ;
   marqueur=-1;
   for (int f=0; f<ffaces.dimension(0); f++)

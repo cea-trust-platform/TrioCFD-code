@@ -25,8 +25,8 @@
 #include <Calcul_Production_K_VEF.h>
 #include <Source_Transport_proto.h>
 #include <Ref_Transport_K_Eps.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Zone_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
 
 class Source_Transport_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
 {
@@ -36,7 +36,7 @@ public :
   Source_Transport_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
-  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
@@ -49,8 +49,8 @@ protected :
   DoubleTab& ajouter_concen(DoubleTab& ) const;
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
-  REF(Zone_VEF) le_dom_VEF;
-  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
 private:
   // methodes a surcharger sinon throw !!

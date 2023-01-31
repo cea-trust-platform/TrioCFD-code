@@ -43,26 +43,26 @@ Entree& Connectivites_DWF::readOn(Entree& s )
 }
 
 
-void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
-                                                         Zone_VF& zoneg,
-                                                         Zone& domg)
+void Connectivites_DWF::calculer_connectivites_face_face(Domaine_VF& domainef,
+                                                         Domaine_VF& domaineg,
+                                                         Domaine& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
   const Elem_geom& type_elem = domg.type_elem();
-  const int nb_faces_bordF = zonef.nb_faces_bord();
-  const int nb_faces_bordG = zoneg.nb_faces_bord();
+  const int nb_faces_bordF = domainef.nb_faces_bord();
+  const int nb_faces_bordG = domaineg.nb_faces_bord();
 
   //coord du centre de gravite des faces fines
-  const DoubleTab& cg_face_fine = zonef.xv();
+  const DoubleTab& cg_face_fine = domainef.xv();
 
-  const int prem_face_bord_gros  =  zoneg.premiere_face_bord();
-  const int der_face_bord_gros  =  prem_face_bord_gros+zoneg.nb_faces_bord();
-  const int prem_face_int_gros  =  zoneg.premiere_face_int();
-  const int der_face_int_gros  = prem_face_int_gros + zoneg.nb_faces_internes();
+  const int prem_face_bord_gros  =  domaineg.premiere_face_bord();
+  const int der_face_bord_gros  =  prem_face_bord_gros+domaineg.nb_faces_bord();
+  const int prem_face_int_gros  =  domaineg.premiere_face_int();
+  const int der_face_int_gros  = prem_face_int_gros + domaineg.nb_faces_internes();
 
   //coordonnees des sommets grossiers
   const DoubleTab& som_gros = domg.coord_sommets();
-  const IntTab& faces_som = zoneg.face_sommets();
+  const IntTab& faces_som = domaineg.face_sommets();
 
   const double epsilon  = PRECISION;
 
@@ -840,14 +840,14 @@ void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
 
 /*! @brief Calcul des connectivites faces/faces
  *
- * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @param (Domaine& domaineG, Domaine& domaineF) domaine discretisee grossiere et fine
  * @throws da
  */
-void Connectivites_DWF::calculer_connectivites(Zone_VF& zonef,
-                                               Zone_VF& zoneg,
-                                               Zone& domg)
+void Connectivites_DWF::calculer_connectivites(Domaine_VF& domainef,
+                                               Domaine_VF& domaineg,
+                                               Domaine& domg)
 {
-  calculer_connectivites_face_face(zonef, zoneg, domg);
-  calculer_connectivites_elem_elem(zonef, zoneg);
+  calculer_connectivites_face_face(domainef, domaineg, domg);
+  calculer_connectivites_elem_elem(domainef, domaineg);
 }
 

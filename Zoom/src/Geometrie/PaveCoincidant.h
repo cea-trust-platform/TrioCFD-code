@@ -25,7 +25,7 @@
 #include <Pave.h>
 
 
-/*! @brief Classe PaveCoincidant Une zone particulierement facile a mailler!
+/*! @brief Classe PaveCoincidant Une domaine particulierement facile a mailler!
  *
  *     La structure du jeu de donnee pour specifier un PaveCoincidant est:
  *     PaveCoincidant nom_PaveCoincidant
@@ -49,7 +49,7 @@
  *      ...
  *      }
  *
- * @sa Zone Mailler, Actuellemnt c'est le seul type d'objet reconnu par Trio-U pour mailler, un domaine
+ * @sa Domaine Mailler, Actuellemnt c'est le seul type d'objet reconnu par Trio-U pour mailler, un domaine
  */
 class PaveCoincidant : public Pave
 {
@@ -60,7 +60,7 @@ public:
 
 private :
   double xmin, xmax, ymin, ymax, zmin, zmax;
-  REF(Zone) dom_qui_coincide;
+  REF(Domaine) dom_qui_coincide;
 
 };
 

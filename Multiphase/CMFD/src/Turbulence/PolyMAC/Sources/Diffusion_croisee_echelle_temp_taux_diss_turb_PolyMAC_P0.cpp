@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0.h>
-#include <Zone_PolyMAC_P0.h>
-#include <Zone_Cl_PolyMAC.h>
+#include <Domaine_PolyMAC_P0.h>
+#include <Domaine_Cl_PolyMAC.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
@@ -56,9 +56,9 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::completer()
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase,  equation().probleme());
 
   for (int i = 0 ; i <pb.nombre_d_equations() ; i++)
-    for (int j = 0 ; j<pb.equation(i).zone_Cl_dis()->nb_cond_lim(); j++)
+    for (int j = 0 ; j<pb.equation(i).domaine_Cl_dis()->nb_cond_lim(); j++)
       {
-        const Cond_lim& cond_lim_loc = pb.equation(i).zone_Cl_dis()->les_conditions_limites(j);
+        const Cond_lim& cond_lim_loc = pb.equation(i).domaine_Cl_dis()->les_conditions_limites(j);
         if      sub_type(Neumann_loi_paroi_faible_k, cond_lim_loc.valeur())         f_grad_k_fixe = 0;
         else if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_omega_fixe = 0;
       }
@@ -67,9 +67,9 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::completer()
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& 		zone 		= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& 		domaine 		= ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0& 	ch_diss 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau
-  const int N = ch_diss.valeurs().line_size(), nb_elem = zone.nb_elem();
+  const int N = ch_diss.valeurs().line_size(), nb_elem = domaine.nb_elem();
   int e, n;
 
   assert(N == 1); // si N > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
@@ -92,28 +92,28 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_bloc
           for (e = 0; e < nb_elem; e++)
             for (n = 0; n < N; n++)
               for (m = 0; m<M; m++) sten.append_line(N * e + n, M * e + m);
-        Matrix_tools::allocate_morse_matrix(N * zone.nb_elem_tot(), M * nc, sten, mat2);
+        Matrix_tools::allocate_morse_matrix(N * domaine.nb_elem_tot(), M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
 }
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& 		 zone 			= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& 		 domaine 			= ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0& 	ch_k 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
-  const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = zone.xp(), &xv = zone.xv();
-  const Conds_lim&          cls_k 			= ch_k.zone_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
-  const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
+  const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = domaine.xp(), &xv = domaine.xv();
+  const Conds_lim&          cls_k 			= ch_k.domaine_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
+  const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces();
 
   const Champ_Elem_PolyMAC_P0& 	ch_diss	= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau ou omega
   const DoubleTab& 			diss_passe			= ch_diss.passe();
   const DoubleTab& 			      diss			= ch_diss.valeurs();
 
-  const Conds_lim& 		   	cls_diss			= ch_diss.zone_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
+  const Conds_lim& 		   	cls_diss			= ch_diss.domaine_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
   const IntTab&				   fcl_diss 			= ch_diss.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
-  const int nf = zone.nb_faces(), D = dimension, nb_elem = zone.nb_elem(), nb_elem_tot = zone.nb_elem_tot() ;
+  const int nf = domaine.nb_faces(), D = dimension, nb_elem = domaine.nb_elem(), nb_elem_tot = domaine.nb_elem_tot() ;
   const int N = diss_passe.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -130,7 +130,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   DoubleTrav grad_f_diss(nf, N);
   if (f_grad_tau_omega_fixe) ch_diss.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   else ch_diss.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on peut devoir recalculer le fgrad a chaque pas de temps
-  const IntTab& f_d_tau = ch_diss.fgrad_d, &f_e_tau = ch_diss.fgrad_e; // Tables utilisees dans zone_PolyMAC_P0::fgrad pour le calcul du gradient
+  const IntTab& f_d_tau = ch_diss.fgrad_d, &f_e_tau = ch_diss.fgrad_e; // Tables utilisees dans domaine_PolyMAC_P0::fgrad pour le calcul du gradient
   const DoubleTab& f_w_tau = ch_diss.fgrad_w;
 
   for (int f = 0; f < nf; f++)
@@ -157,7 +157,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   DoubleTrav grad_f_k(nf, N);
   if (f_grad_k_fixe) ch_k.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   else ch_k.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on peut devoir recalculer le fgrad a chaque pas de temps
-  const IntTab& f_d_k = ch_k.fgrad_d, &f_e_k = ch_k.fgrad_e;  // Tables utilisees dans zone_PolyMAC_P0::fgrad pour le calcul du gradient
+  const IntTab& f_d_k = ch_k.fgrad_d, &f_e_k = ch_k.fgrad_e;  // Tables utilisees dans domaine_PolyMAC_P0::fgrad pour le calcul du gradient
   const DoubleTab& f_w_k = ch_k.fgrad_w;
 
   for (int n = 0; n < N; n++)

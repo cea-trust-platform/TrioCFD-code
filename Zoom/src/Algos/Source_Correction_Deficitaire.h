@@ -32,8 +32,8 @@
 
 class Equation_base;
 class Probleme_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -54,7 +54,7 @@ public:
   inline DoubleTab& calculer(DoubleTab& ) const override ;
   void completer() override;
   void associer_pb(const Probleme_base& ) override;
-  void associer_domaines(const Zone_dis&, const Zone_Cl_dis& ) override = 0;
+  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override = 0;
   void mettre_a_jour(double temps) override
   {
     ;

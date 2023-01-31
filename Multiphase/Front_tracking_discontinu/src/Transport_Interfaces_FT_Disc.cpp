@@ -29,9 +29,9 @@
 #include <Schema_Temps_base.h>
 #include <time.h>
 #include <Parser.h>
-#include <Zone_VF.h>
-#include <Zone_VDF.h>
-#include <Sous_Zone.h>
+#include <Domaine_VF.h>
+#include <Domaine_VDF.h>
+#include <Sous_Domaine.h>
 #include <Champ_Face_VDF.h>
 #include <Champ_P1NC.h>
 #include <Champ_Fonc_P1NC.h>
@@ -58,7 +58,7 @@
 #include <Param.h>
 #include <sys/stat.h>
 #include <TRUSTList.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <TRUSTTrav.h>
 #include <stat_counters.h>
 
@@ -320,11 +320,11 @@ Entree& Transport_Interfaces_FT_Disc::readOn(Entree& is)
   */
 
   Transport_Interfaces_base::readOn(is);
-  if (suppression_interfaces_sous_zone_!="??")
+  if (suppression_interfaces_sous_domaine_!="??")
     {
-      Cerr << "Name of subzone for interfaces deletion: " << suppression_interfaces_sous_zone_ << finl;
+      Cerr << "Name of subdomaine for interfaces deletion: " << suppression_interfaces_sous_domaine_ << finl;
       // Juste un test pour verifier que le nom existe:
-      zone_dis().zone().ss_zone(suppression_interfaces_sous_zone_);
+      domaine_dis().domaine().ss_domaine(suppression_interfaces_sous_domaine_);
     }
   return is;
 }
@@ -345,8 +345,8 @@ void Transport_Interfaces_FT_Disc::set_param(Param& param)
   param.ajouter_non_std("methode_interpolation_v",(this));
   param.ajouter("parcours_interface",&variables_internes_->parcours_interface_);
   param.ajouter_non_std("injecteur_interfaces",(this));
-  param.ajouter("suppression_sous_zone",&suppression_interfaces_sous_zone_);
-  param.ajouter("sous_zone_volume_impose",&variables_internes_->nom_zone_volume_impose_);
+  param.ajouter("suppression_sous_domaine",&suppression_interfaces_sous_domaine_);
+  param.ajouter("sous_domaine_volume_impose",&variables_internes_->nom_domaine_volume_impose_);
   param.ajouter_flag("interpolation_repere_local", &interpolation_repere_local_);
   param.ajouter_non_std("interpolation_champ_face",(this));
   param.ajouter("n_iterations_interpolation_ibc",&variables_internes_->n_iterations_interpolation_ibc);
@@ -736,8 +736,8 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
             // modified_indic_faces_* : Valeurs de la position et de l epaisseur de l indicatrice modifiee,
             // exprimees en multiples de taille de maille. Cette nouvelle indicatrice est calculee
             // a partir de la distance a l interface. La position represente une iso-ligne
-            // de distance a l interface, et l epaisseur, la zone de variation lineaire vis a vis de la distance,
-            // qui fait passer l indicatrice de 0 a 1 (la zone est centree sur l iso-ligne representee par la position).
+            // de distance a l interface, et l epaisseur, la domaine de variation lineaire vis a vis de la distance,
+            // qui fait passer l indicatrice de 0 a 1 (la domaine est centree sur l iso-ligne representee par la position).
             // Par defaut :
             variables_internes_->modified_indic_faces_position = 0. ;
             variables_internes_->modified_indic_faces_thickness= 1. ;
@@ -892,8 +892,8 @@ static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 
 void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 {
-  Zone dom;
-  REF(Zone) ref_dom;
+  Domaine dom;
+  REF(Domaine) ref_dom;
   Nom filename;
   ArrOfInt phase_specifiee;
   DoubleTab points;
@@ -1007,18 +1007,18 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   else
     {
       Cerr << "Reading interface in existing domain: " << domain_name << finl;
-      if (!sub_type(Zone, Interprete::objet(domain_name)))
+      if (!sub_type(Domaine, Interprete::objet(domain_name)))
         {
           Cerr << "Error : object " << domain_name << " is not a domain" << finl;
           exit();
         }
-      ref_dom = ref_cast(Zone, Interprete::objet(domain_name));
+      ref_dom = ref_cast(Domaine, Interprete::objet(domain_name));
     }
   if (reverse_normal)
     {
       Cerr << "Reversing mesh normal vectors" << finl;
-      Zone& zone = ref_dom.valeur();
-      IntTab& elems = zone.les_elems();
+      Domaine& domaine = ref_dom.valeur();
+      IntTab& elems = domaine.les_elems();
       const int nb_elem = elems.dimension(0);
       const int nb_som_elem = elems.line_size();
       if (nb_som_elem != 2 && nb_som_elem != 3)
@@ -1041,8 +1041,8 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   // Verification qu'il n'existe pas deux fois la meme facette
   {
     Scatter::uninit_sequential_domain(ref_dom.valeur());
-    Zone& zone = ref_dom.valeur();
-    IntTab& fa7 = zone.les_elems();
+    Domaine& domaine = ref_dom.valeur();
+    IntTab& fa7 = domaine.les_elems();
 
     // tri du tableau
     int * data = fa7.addr();
@@ -1073,15 +1073,15 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 
 
   Cerr << "Building interface mesh" << finl;
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
   Maillage_FT_Disc& maillage = maillage_interface();
-  Sauvegarde_Reprise_Maillage_FT::lire_xyz(maillage, &zone_vf, 0, &(ref_dom.valeur()));
+  Sauvegarde_Reprise_Maillage_FT::lire_xyz(maillage, &domaine_vf, 0, &(ref_dom.valeur()));
   Cerr << "Extracting connex components and assigning indicator function." << finl;
 
   maillage.parcourir_maillage();
-  const int nb_elem = zone_vf.zone().nb_elem();
+  const int nb_elem = domaine_vf.domaine().nb_elem();
   IntVect num_compo;
-  zone_vf.zone().creer_tableau_elements(num_compo);
+  domaine_vf.domaine().creer_tableau_elements(num_compo);
   // On marque avec -1 les elements traverses par une interface:
   const ArrOfInt& index_elem = maillage.intersections_elem_facettes().index_elem();
   {
@@ -1094,8 +1094,8 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
       }
   }
   num_compo.echange_espace_virtuel();
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_elem = zone_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_local_connex_components = search_connex_components_local(elem_faces, faces_elem, num_compo);
 
   const int nb_connex_components = compute_global_connex_components(num_compo, nb_local_connex_components);
@@ -1112,7 +1112,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   if (nb_pts!=0)
     {
       ArrOfInt elem_points;
-      zone_vf.zone().chercher_elements(points, elem_points);
+      domaine_vf.domaine().chercher_elements(points, elem_points);
       for (int i = 0; i < nb_pts; i++)
         {
           int composante_connexe = -2;
@@ -1160,7 +1160,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
     {
       Cerr << "Writing lata file" << finl;
       Format_Post_Lata lata;
-      const Zone& un_dom = zone_vf.zone();
+      const Domaine& un_dom = domaine_vf.domaine();
       constexpr double TEMPS = 0.;
       constexpr int FIRST_POST = 1;
       lata.initialize(lata_file, Format_Post_Lata::BINAIRE, "SIMPLE");
@@ -1375,7 +1375,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
 
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
   Nom fieldname;
@@ -1499,7 +1499,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   // Construction de la structure du tableau avec l'espace virtuel:
   {
     DoubleTab& d = variables_internes_->distance_interface_sommets;
-    const Zone& dom = zone_dis().zone();
+    const Domaine& dom = domaine_dis().domaine();
     d.resize(0);
     dom.creer_tableau_sommets(d);
   }
@@ -1542,31 +1542,31 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
 
   maillage_interface().changer_temps(0.);
   {
-    // On modifie la zone ici => on a besoin d'une reference non constante
-    Zone_dis_base& le_dom_dis2 = zone_dis().valeur();
-    le_dom_dis2.zone().construire_elem_virt_pe_num();
+    // On modifie la domaine ici => on a besoin d'une reference non constante
+    Domaine_dis_base& le_dom_dis2 = domaine_dis().valeur();
+    le_dom_dis2.domaine().construire_elem_virt_pe_num();
   }
   {
-    Zone_VF& zone_vf = ref_cast_non_const(Zone_VF, mon_dom_dis);
-    zone_vf.construire_face_virt_pe_num();
-    variables_internes_->connectivite_frontieres_.associer_domaine_vf(zone_vf);
+    Domaine_VF& domaine_vf = ref_cast_non_const(Domaine_VF, mon_dom_dis);
+    domaine_vf.construire_face_virt_pe_num();
+    variables_internes_->connectivite_frontieres_.associer_domaine_vf(domaine_vf);
   }
   {
     Parcours_interface& parcours = variables_internes_->parcours_interface_;
-    parcours.associer_domaine_dis(zone_dis());
+    parcours.associer_domaine_dis(domaine_dis());
     parcours.associer_connectivite_frontieres(connectivite_frontieres());
   }
   {
-    const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-    marching_cubes().associer_domaine_vf(zone_vf);
+    const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+    marching_cubes().associer_domaine_vf(domaine_vf);
   }
   maillage_interface().associer_equation_transport(*this);
-  remaillage_interface().associer_domaine(zone_dis());
+  remaillage_interface().associer_domaine(domaine_dis());
 
   variables_internes_->algorithmes_transport_.typer("Algorithmes_Transport_FT_Disc");
   // On n'appelle pas Equation_base::discretiser car on ne veut pas
   // de solveur masse.
-  discretisation().zone_Cl_dis(zone_dis(), le_dom_Cl_dis);
+  discretisation().domaine_Cl_dis(domaine_dis(), le_dom_Cl_dis);
   le_dom_Cl_dis->associer_eqn(*this);
   le_dom_Cl_dis->associer_inconnue(inconnue());
 }
@@ -1702,11 +1702,11 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
                                   FTd_vecteur3& vitesse)
 {
   const DoubleTab& valeurs_v = champ_vitesse.valeurs();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, champ_vitesse.zone_dis_base());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const DoubleTab& xv = zone_vf.xv();
-  const DoubleTab& xp = zone_vf.xp();
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, champ_vitesse.domaine_dis_base());
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const DoubleTab& xv = domaine_vf.xv();
+  const DoubleTab& xp = domaine_vf.xp();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
 
   // La vitesse est la moyenne ponderee des 4 ou 8 vitesses
   // aux faces qui encadrent le sommet.
@@ -1780,7 +1780,7 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
               // Indice local dans l'element de la face la plus proche dans la
               // direction i
               const int i_face_voisine = direction + ((x < centre_elem) ? 0 : dim);
-              // Indice de la face dans la zone
+              // Indice de la face dans la domaine
               const int face_voisine = elem_faces(element, i_face_voisine);
               // Indice de l'element voisin par cette face
               const int elem_voisin =
@@ -1965,9 +1965,9 @@ void interpoler_simple_vitesse_point_vdf(const Champ_base& champ_vitesse,
                                          FTd_vecteur3& vitesse)
 {
   const DoubleTab& valeurs_v = champ_vitesse.valeurs();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, champ_vitesse.zone_dis_base());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const DoubleTab& xv = zone_vf.xv();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, champ_vitesse.domaine_dis_base());
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const DoubleTab& xv = domaine_vf.xv();
 
   // Chaque composante de vitesse est la moyenne ponderee des 2 vitesses
   // aux faces de l'element qui encadrent le sommet.
@@ -2020,10 +2020,10 @@ void interpoler_simple_vitesse_point_vdf(const Champ_base& champ_vitesse,
 
 double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const DoubleVect& indicatrice, double& integrale_ph0) const
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-  const DoubleVect& volumes = zone_vf.volumes();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const DoubleVect& volumes = domaine_vf.volumes();
   int nd, nb_nd = indicatrice.size();
-  assert(nb_nd==zone_vf.nb_elem());
+  assert(nb_nd==domaine_vf.nb_elem());
 
   double integrale = 0.;
   integrale_ph0 = 0.;
@@ -2360,7 +2360,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
 //
 //Les etapes de la methode sont :
 //-Calcul de la vitesse imposee a l interface a un temps donne: calcul_vitesse(...)
-//-On determine le type de la zone discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
+//-On determine le type de la domaine discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
 // et le type  dequation traitee (is_QC vaut 0 pour  Navier_Stokes_FT_Disc et 1 sinon)
 //-Estimation de l increment de quantite de mouvement a ajouter a vpoint
 // puis ajout de cet increment : calcul_source_et_modifie_vpoint(...)
@@ -2385,8 +2385,8 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       calcul_vitesse(vit_imposee,inco_val,vpoint0,temps,dt); // vpoint0 au lieu de vpoint
       vit_imposee.echange_espace_virtuel() ;
 
-      // Etape 2.1 : determination de la zone de discretisation
-      const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
+      // Etape 2.1 : determination de la domaine de discretisation
+      const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
       const IntTab& face_voisins = mon_dom_dis.face_voisins();
       assert(inco_val.dimension(0) == face_voisins.dimension(0));
 
@@ -2441,7 +2441,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
                     is_QC,dt,is_explicite,eta); // vpoint0 au lieu de vpoint
       source_val.echange_espace_virtuel();
 
-      const DoubleVect& volumes_entrelaces = ref_cast(Zone_VF,mon_dom_dis).volumes_entrelaces();
+      const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF,mon_dom_dis).volumes_entrelaces();
       const Solveur_Masse& le_solveur_masse = eq.solv_masse();
       int i, j;
 
@@ -2504,10 +2504,10 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
       {
         // si on souhaite calculer l'indicatrice a partir de la distance :
         const DoubleTab& dist_face = get_update_distance_interface_faces().valeurs();
-        const Zone_dis_base& zone_dis_base = zone_dis().valeur();
-        const Zone_VDF&   zone_vdf       = ref_cast(Zone_VDF, zone_dis_base);
-        const DoubleVect& face_surfaces = zone_vdf.face_surfaces();
-        const DoubleVect& volumes_entrelaces = zone_vdf.volumes_entrelaces();
+        const Domaine_dis_base& domaine_dis_base = domaine_dis().valeur();
+        const Domaine_VDF&   domaine_vdf       = ref_cast(Domaine_VDF, domaine_dis_base);
+        const DoubleVect& face_surfaces = domaine_vdf.face_surfaces();
+        const DoubleVect& volumes_entrelaces = domaine_vdf.volumes_entrelaces();
         double& position  = variables_internes_->modified_indic_faces_position;
         double& thickness = variables_internes_->modified_indic_faces_thickness;
         for (int i = 0; i < nfaces; i++)
@@ -2529,7 +2529,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
         // WARNING : contrary to what is done in Navier_Stokes_FT_Disc::calculer_dI_dt, we compute chi_1 (ie same as indicatrice),
         // not the opposite chi_0 = 1-chi_1
         //
-        const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+        const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
         const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
         if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
           {
@@ -2566,7 +2566,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
                           }
                         else
                           {
-                            const double surface=zone_vf.face_surfaces(face);
+                            const double surface=domaine_vf.face_surfaces(face);
                             const double ai= interfacial_area(elem); // nx pointe vers le liquide (sortant de phase 0)
                             if (fabs(ai)>DMINFLOAT)
                               {
@@ -2575,7 +2575,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
                                   {
                                     for (int j = 0; j < dim; j++)
                                       {
-                                        const double nf = zone_vf.face_normales(face , j);
+                                        const double nf = domaine_vf.face_normales(face , j);
                                         const double nx = normale_elements(elem, j);
                                         // produit scalaire :
                                         x +=  nf*nx;
@@ -2589,7 +2589,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
                                 else
                                   {
                                     // En VDF, l'acces a orientation permet d'eviter le calcul du produit scalaire.
-                                    const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis().valeur());
+                                    const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_dis().valeur());
                                     const IntVect& orientation = zvdf.orientation();
                                     const int dir = orientation[face];
                                     const double nx = normale_elements(elem, dir);
@@ -2680,7 +2680,7 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_indicatrice_faces()
 const Champ_base& Transport_Interfaces_FT_Disc::get_compute_indicatrice_faces()
 {
   const DoubleTab& indicatrice = get_update_indicatrice().valeurs();
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
   const IntTab& face_voisins = mon_dom_dis.face_voisins();
   calcul_indicatrice_faces(indicatrice,face_voisins);
   return indicatrice_faces_;
@@ -2844,9 +2844,9 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
   const int nbdim1 = source_val.line_size() == 1; // VDF
   const int m = source_val.line_size();
 
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, zone_dis().valeur())) zvdf = &ref_cast(Zone_VDF, zone_dis().valeur());
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VDF * zvdf = 0;
+  if (sub_type(Domaine_VDF, domaine_dis().valeur())) zvdf = &ref_cast(Domaine_VDF, domaine_dis().valeur());
 
   DoubleTab termes_sources_face(source_val);
   DoubleTab termes_pressure_face(pressure_part);
@@ -2855,7 +2855,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
   DoubleTrav values(3,dimension);
   values=0.;
 
-  const DoubleVect& vol_entrelaces = ref_cast(Zone_VF,mon_dom_dis).volumes_entrelaces();
+  const DoubleVect& vol_entrelaces = ref_cast(Domaine_VF,mon_dom_dis).volumes_entrelaces();
   // Construction d'un tableau des items reels non communs
   ArrOfInt sequential_items_flags;
   MD_Vector_tools::get_sequential_items_flags(source_val.get_md_vector(), sequential_items_flags);
@@ -2951,8 +2951,8 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
       for(int k=0; k<dimension; k++)
         Force << espace << force_[k];
       Force << finl;
-      const Zone& zone=zone_dis().zone();
-      const int impr_mom = zone.moments_a_imprimer();
+      const Domaine& domaine=domaine_dis().domaine();
+      const int impr_mom = domaine.moments_a_imprimer();
       if (impr_mom)
         {
           SFichier Moment;
@@ -2991,7 +2991,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
   const int n = vpoint.dimension(0);
   const int m = vpoint.line_size();
   double c= 1./eta;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
 
   int is_QC=0;
   const Equation_base& eq = probleme_base_->equation(0);
@@ -3017,7 +3017,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
     }
 
   DoubleTab termes_sources_face(vpoint);
-  const DoubleVect& vol_entrelaces = ref_cast(Zone_VF,mon_dom_dis).volumes_entrelaces();
+  const DoubleVect& vol_entrelaces = ref_cast(Domaine_VF,mon_dom_dis).volumes_entrelaces();
 
   for (int face=0; face<n; face++)
     for (int dim=0; dim<m; dim++)
@@ -3034,15 +3034,15 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
     ArrOfDouble dforce(dimension);
     force_=0;
     moment_=0;
-    const Zone& zone=zone_dis().zone();
-    const int impr_mom = zone.moments_a_imprimer();
-    const ArrOfDouble& centre_gravite = zone.cg_moments();
-    const DoubleTab& centre_faces = ref_cast(Zone_VF,zone_dis().valeur()).xv();
+    const Domaine& domaine=domaine_dis().domaine();
+    const int impr_mom = domaine.moments_a_imprimer();
+    const ArrOfDouble& centre_gravite = domaine.cg_moments();
+    const DoubleTab& centre_faces = ref_cast(Domaine_VF,domaine_dis().valeur()).xv();
     ArrOfDouble xgr(dimension);
 
-    const Zone_VDF * zvdf = 0;
-    if (sub_type(Zone_VDF, zone_dis().valeur()))
-      zvdf = &ref_cast(Zone_VDF, zone_dis().valeur());
+    const Domaine_VDF * zvdf = 0;
+    if (sub_type(Domaine_VDF, domaine_dis().valeur()))
+      zvdf = &ref_cast(Domaine_VDF, domaine_dis().valeur());
 
     // Construction d'un tableau des items sequentiels
     ArrOfInt sequential_items_flags;
@@ -3101,13 +3101,13 @@ void Transport_Interfaces_FT_Disc::get_expression_vitesse_imposee(DoubleTab& vit
   const int dim = Objet_U::dimension;
   const int dimension3 = (dim==3);
   Parser parser_x, parser_y, parser_z;
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const IntTab& face_voisins = domaine_vf.face_voisins();
   const int nfaces = face_voisins.dimension(0);
-  const DoubleTab& xv = zone_vf.xv();
-  const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, zone_vf))
-    zvdf = &ref_cast(Zone_VDF, zone_vf);
+  const DoubleTab& xv = domaine_vf.xv();
+  const Domaine_VDF * zvdf = 0;
+  if (sub_type(Domaine_VDF, domaine_vf))
+    zvdf = &ref_cast(Domaine_VDF, domaine_vf);
 
   if (zvdf)
     vit_ibc.resize(nfaces,1);
@@ -3164,13 +3164,13 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
 {
   const int dim = Objet_U::dimension;
   const int dimension3 = (dim==3);
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
   const IntTab& face_voisins = mon_dom_dis.face_voisins();
   const int nfaces = face_voisins.dimension(0);
-  const DoubleTab& xv = ref_cast(Zone_VF, mon_dom_dis).xv();
-  const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, mon_dom_dis))
-    zvdf = &ref_cast(Zone_VDF, mon_dom_dis);
+  const DoubleTab& xv = ref_cast(Domaine_VF, mon_dom_dis).xv();
+  const Domaine_VDF * zvdf = 0;
+  if (sub_type(Domaine_VDF, mon_dom_dis))
+    zvdf = &ref_cast(Domaine_VDF, mon_dom_dis);
 
   if (zvdf)
     vitesse_imp.resize(nfaces,1);
@@ -3320,10 +3320,10 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_faces(
 
   static const double distance_faces_invalides = -1.e30;
 
-  const Zone_VF&    zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const DoubleTab& xv = zone_vf.xv();
-  const DoubleTab& xp = zone_vf.xp();
+  const Domaine_VF&    domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const DoubleTab& xv = domaine_vf.xv();
+  const DoubleTab& xp = domaine_vf.xp();
   const int nb_faces = dist_face.dimension_tot(0);
   ArrOfInt ncontrib(nb_faces);
   ncontrib = 0;
@@ -3446,21 +3446,21 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
   DoubleTab& gradient,
   const double t, const double dt)
 {
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, mon_dom_dis);
-  const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, mon_dom_dis))
-    zvdf = &ref_cast(Zone_VDF, mon_dom_dis);
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, mon_dom_dis);
+  const Domaine_VDF * zvdf = 0;
+  if (sub_type(Domaine_VDF, mon_dom_dis))
+    zvdf = &ref_cast(Domaine_VDF, mon_dom_dis);
 
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_elem = zone_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nfaces = faces_elem.dimension(0);
-  const int nb_elem = zone_vf.nb_elem() ;
-  const int nb_elem_tot = zone_vf.nb_elem_tot() ;
-  const IntVect& orientation = zone_vdf.orientation();
-  const DoubleTab& xv = zone_vf.xv();
-  const DoubleTab& xp = zone_vf.xp();
+  const int nb_elem = domaine_vf.nb_elem() ;
+  const int nb_elem_tot = domaine_vf.nb_elem_tot() ;
+  const IntVect& orientation = domaine_vdf.orientation();
+  const DoubleTab& xv = domaine_vf.xv();
+  const DoubleTab& xp = domaine_vf.xp();
   assert(champ.dimension(0) == nfaces);
   assert(gradient.dimension(0) == nfaces);
   assert(distance_interface_faces.dimension(0) == nfaces);
@@ -3495,7 +3495,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       //------- Calcul du nombre de fois qu'un rayon local (par direction) traverse l'IBC dans une cellule
       IntTab trav(nb_elem,dim) ;
       if( nb_elem < nb_elem_tot )
-        zone_vf.zone().creer_tableau_elements(trav, Array_base::NOCOPY_NOINIT) ;
+        domaine_vf.domaine().creer_tableau_elements(trav, Array_base::NOCOPY_NOINIT) ;
       trav = 0 ;
 
       DoubleTab xe(dim) ;
@@ -3511,7 +3511,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                 {
                   int a = elem_faces(i_elem, dir) ;
                   int b = elem_faces(i_elem, dir+dim) ;
-                  const double pas = std::fabs(zone_vdf.distance_face(a,b,dir)) ;
+                  const double pas = std::fabs(domaine_vdf.distance_face(a,b,dir)) ;
                   int traverse = 0 ;
                   calcul_nb_traverse(xe,pas,dim,dir,maillage,i_elem,traverse) ;
                   trav(i_elem,dir) = traverse ;
@@ -3543,10 +3543,10 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       DoubleTab typefacejoint ;
       IntList FACEJOINT  ;
 
-      int nbjoints=zone_vf.nb_joints();
+      int nbjoints=domaine_vf.nb_joints();
       for(int njoint=0; njoint<nbjoints; njoint++)
         {
-          const Joint& joint_temp = zone_vf.joint(njoint);
+          const Joint& joint_temp = domaine_vf.joint(njoint);
           const IntTab& indices_faces_joint = joint_temp.joint_item(Joint::FACE).renum_items_communs();
           const int nb_faces = indices_faces_joint.dimension(0);
           for (int j = 0; j < nb_faces; j++)
@@ -3772,12 +3772,12 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
               if( faces_elem(i_face,0) > -1 )
                 {
                   j_face = elem_faces(faces_elem(i_face,0), ori) + elem_faces(faces_elem(i_face,0), ori+dim) - i_face ;
-                  dxa = std::fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
+                  dxa = std::fabs(domaine_vdf.distance_face(i_face,j_face,ori)) ;
                 }
               if( faces_elem(i_face,1) > -1 )
                 {
                   j_face = elem_faces(faces_elem(i_face,1), ori) + elem_faces(faces_elem(i_face,1), ori+dim) - i_face ;
-                  dxb =  std::fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
+                  dxb =  std::fabs(domaine_vdf.distance_face(i_face,j_face,ori)) ;
                 }
               if( dxa < dxb )
                 {
@@ -3796,7 +3796,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                     {
                       int a = elem_faces(elem_voisin, k) ;
                       int b = elem_faces(elem_voisin, k+dim) ;
-                      double pas = std::fabs(zone_vdf.distance_face(a,b,k)) ;
+                      double pas = std::fabs(domaine_vdf.distance_face(a,b,k)) ;
                       Lref += 0.25*pas*pas ;
                     }
                 }
@@ -4195,17 +4195,17 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
           // Distribution des tableaux (uniquement en parallele)
           if( nb_elem < nb_elem_tot )
             {
-              zone_vf.zone().creer_tableau_elements(Tab100, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab101, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab102, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab103, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab110, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab111, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab112, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(Tab12, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.zone().creer_tableau_elements(CptFacette, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.creer_tableau_faces(Vertex, Array_base::NOCOPY_NOINIT) ;
-              zone_vf.creer_tableau_faces(PPP, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab100, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab101, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab102, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab103, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab110, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab111, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab112, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab12, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(CptFacette, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.creer_tableau_faces(Vertex, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.creer_tableau_faces(PPP, Array_base::NOCOPY_NOINIT) ;
             }
           CptFacette = 0 ;
           Tab100 = -1e+30 ;
@@ -4809,16 +4809,16 @@ void Transport_Interfaces_FT_Disc::PPP_face_interface( Maillage_FT_Disc& maillag
 
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const IntTab& faces_elem = zone_vf.face_voisins();
-  const int nb_elem = zone_vf.nb_elem() ;
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IntTab& faces_elem = domaine_vf.face_voisins();
+  const int nb_elem = domaine_vf.nb_elem() ;
   const int nfaces = faces_elem.dimension(0) ;
   const Intersections_Elem_Facettes& intersection = maillage.intersections_elem_facettes();
   const ArrOfInt& index_elem = intersection.index_elem() ;
   const IntTab& facettes = maillage.facettes() ;
   const DoubleTabFT& sommets = maillage.sommets() ;
-  const DoubleTab& xv = zone_vf.xv();
+  const DoubleTab& xv = domaine_vf.xv();
   DoubleTab coord(dim) ;
   coord = 0. ;
 
@@ -4917,12 +4917,12 @@ void Transport_Interfaces_FT_Disc::PPP_face_interface_voisin( const DoubleTab& i
 
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const IntTab& faces_elem = zone_vf.face_voisins();
-  const IntTab& elem_faces = zone_vf.elem_faces();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IntTab& faces_elem = domaine_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
   const int nfaces = faces_elem.dimension(0) ;
-  const DoubleTab& xv = zone_vf.xv();
+  const DoubleTab& xv = domaine_vf.xv();
 
   for( int i_face=0 ; i_face<nfaces ; i_face++ )
     {
@@ -5007,12 +5007,12 @@ void Transport_Interfaces_FT_Disc::PPP_face_voisin( const DoubleTab& indicatrice
 
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const IntTab& faces_elem = zone_vf.face_voisins();
-  const IntTab& elem_faces = zone_vf.elem_faces();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IntTab& faces_elem = domaine_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
   const int nfaces = faces_elem.dimension(0) ;
-  const DoubleTab& xv = zone_vf.xv();
+  const DoubleTab& xv = domaine_vf.xv();
 
   for( int i_face=0 ; i_face<nfaces ; i_face++ )
     {
@@ -5448,10 +5448,10 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_diphasique( const in
                                                                         const int voisin1, const DoubleTab& indicatrice, double& tol )
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, mon_dom_dis) ;
-  const IntTab& elem_faces = zone_vf.elem_faces();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, mon_dom_dis) ;
+  const IntTab& elem_faces = domaine_vf.elem_faces();
   int voisin = 0 ;
   DoubleTab L(dim) ;
   L = 0. ;
@@ -5460,13 +5460,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_diphasique( const in
     {
       voisin = voisin0 ;
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
-      L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
     }
   if( voisin1 > -1  && indicatrice(voisin1) != 0. && indicatrice(voisin1) != 1. )
     {
       voisin = voisin1 ;
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) - i_face ;
-      double xx = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      double xx = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
       L(ori) = std::max( L(ori), xx ) ;
     }
 
@@ -5476,7 +5476,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_diphasique( const in
         {
           const int face0 = elem_faces(voisin,k) ;
           const int face1 = elem_faces(voisin,k+dim) ;
-          L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+          L(k) = std::fabs(domaine_vdf.distance_face(face0,face1,k))/2. ;
         }
     }
   for( int k = 0 ; k<dim ; k++ )
@@ -5491,12 +5491,12 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                                                                           const DoubleTab& indicatrice, double& tol )
 {
   const int dim = Objet_U::dimension ;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur() ;
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis) ;
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, mon_dom_dis) ;
-  const IntVect& orientation = zone_vdf.orientation() ;
-  const IntTab& elem_faces = zone_vf.elem_faces() ;
-  const IntTab& faces_elem = zone_vf.face_voisins() ;
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur() ;
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis) ;
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, mon_dom_dis) ;
+  const IntVect& orientation = domaine_vdf.orientation() ;
+  const IntTab& elem_faces = domaine_vf.elem_faces() ;
+  const IntTab& faces_elem = domaine_vf.face_voisins() ;
 
   //------------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------
@@ -5510,13 +5510,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
       if( indicatrice_face(face_voisine) != 0. && indicatrice_face(face_voisine) != 1. )
         {
-          L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+          L(ori) = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
 
           const int voisin_voisin = faces_elem(face_voisine,0) + faces_elem(face_voisine,1) - voisin0 ;
           if( voisin_voisin > -1 )
             {
               const int face_voisine_voisine = elem_faces(voisin_voisin,ori) + elem_faces(voisin_voisin,ori+dim) - face_voisine ;
-              L(ori) += std::fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
+              L(ori) += std::fabs(domaine_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
             }
           for( int k = 0 ; k<dim ; k++ )
             {
@@ -5524,7 +5524,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin0,k) ;
                   const int face1 = elem_faces(voisin0,k+dim) ;
-                  L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+                  L(k) = std::fabs(domaine_vdf.distance_face(face0,face1,k))/2. ;
                 }
             }
           for( int k = 0 ; k<dim ; k++ )
@@ -5541,13 +5541,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) -i_face ;
       if( indicatrice_face(face_voisine) != 0. && indicatrice_face(face_voisine) != 1. )
         {
-          L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+          L(ori) = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
 
           const int voisin_voisin = faces_elem(face_voisine,0) + faces_elem(face_voisine,1) - voisin1 ;
           if( voisin_voisin > -1 )
             {
               const int face_voisine_voisine = elem_faces(voisin_voisin,ori) + elem_faces(voisin_voisin,ori+dim) - face_voisine ;
-              L(ori) += std::fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
+              L(ori) += std::fabs(domaine_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
             }
           for( int k = 0 ; k<dim ; k++ )
             {
@@ -5555,7 +5555,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin1,k) ;
                   const int face1 = elem_faces(voisin1,k+dim) ;
-                  L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+                  L(k) = std::fabs(domaine_vdf.distance_face(face0,face1,k))/2. ;
                 }
             }
           for( int k = 0 ; k<dim ; k++ )
@@ -5578,13 +5578,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
     {
       voisin = voisin0 ;
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
-      L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
     }
   if( voisin1 > -1 )
     {
       voisin = voisin1 ;
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) - i_face ;
-      double xx = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      double xx = std::fabs(domaine_vdf.distance_face(i_face,face_voisine,ori)) ;
       L(ori) = std::max( L(ori), xx ) ;
     }
 
@@ -5601,7 +5601,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
           const int voisin_voisin = faces_elem(autre_face,0) +  faces_elem(autre_face,1) - voisin ;
           const int ori_face = orientation[autre_face] ;
           const int autre_face_voisine = elem_faces(voisin_voisin,ori_face) + elem_faces(voisin_voisin,ori_face+dim) - autre_face ;
-          double xx = std::fabs(zone_vdf.distance_face(autre_face,autre_face_voisine,ori_face)) ;
+          double xx = std::fabs(domaine_vdf.distance_face(autre_face,autre_face_voisine,ori_face)) ;
           if( xx_max(ori_face) < xx )
             xx_max(ori_face) = xx ;
         }
@@ -5620,11 +5620,11 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin,k) ;
                   const int face1 = elem_faces(voisin,k+dim) ;
-                  double yy  = 0.5*std::fabs(zone_vdf.distance_face(face0,face1,k)) ;
+                  double yy  = 0.5*std::fabs(domaine_vdf.distance_face(face0,face1,k)) ;
                   double a = 0.5*yy + xx_max(k) ;
                   const int face3 = elem_faces(voisin,l) ;
                   const int face4 = elem_faces(voisin,l+dim) ;
-                  double b = 0.5*std::fabs(zone_vdf.distance_face(face3,face4,l)) ;
+                  double b = 0.5*std::fabs(domaine_vdf.distance_face(face3,face4,l)) ;
                   TOL_TMP(cpt) = L(ori)*L(ori) + a*a + b*b ;
                   cpt++ ;
                 }
@@ -5846,17 +5846,17 @@ void Transport_Interfaces_FT_Disc::projete_point_face_fluide( int& nb_proj_modif
                                                               IntTab& Tab12,IntTab& CptFacette,DoubleTab& v_imp,DoubleTab& Vertex,Parser& parser_x, Parser& parser_y, Parser& parser_z  )
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, mon_dom_dis))
-    zvdf = &ref_cast(Zone_VDF, mon_dom_dis) ;
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, mon_dom_dis);
-  const IntVect& orientation = zone_vdf.orientation();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_elem = zone_vf.face_voisins();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VDF * zvdf = 0;
+  if (sub_type(Domaine_VDF, mon_dom_dis))
+    zvdf = &ref_cast(Domaine_VDF, mon_dom_dis) ;
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, mon_dom_dis);
+  const IntVect& orientation = domaine_vdf.orientation();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nfaces = faces_elem.dimension(0) ;
-  const DoubleTab& xv = zone_vf.xv();
+  const DoubleTab& xv = domaine_vf.xv();
   const double invalid_test = -1.e30;
 
   Cerr << "CALCUL DU PROJETE POUR LES FACES FLUIDE ET d > invalid_test" << finl ;
@@ -6004,17 +6004,17 @@ void Transport_Interfaces_FT_Disc::projete_point_face_interface( int& nb_proj_mo
                                                                  Parser& parser_z )
 {
   const int dim = Objet_U::dimension;
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VDF * zvdf = 0 ;
-  if (sub_type(Zone_VDF, mon_dom_dis))
-    zvdf = &ref_cast(Zone_VDF, mon_dom_dis);
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, mon_dom_dis);
-  const IntVect& orientation = zone_vdf.orientation();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_elem = zone_vf.face_voisins();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VDF * zvdf = 0 ;
+  if (sub_type(Domaine_VDF, mon_dom_dis))
+    zvdf = &ref_cast(Domaine_VDF, mon_dom_dis);
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, mon_dom_dis);
+  const IntVect& orientation = domaine_vdf.orientation();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nfaces = faces_elem.dimension(0) ;
-  const DoubleTab& xv = zone_vf.xv() ;
+  const DoubleTab& xv = domaine_vf.xv() ;
   const double invalid_test = -1.e30;
 
   for( int i_face=0 ; i_face<nfaces ; i_face++ )
@@ -6483,11 +6483,11 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         Navier_Stokes_FT_Disc& ns = ref_cast_non_const(Navier_Stokes_FT_Disc, eqn_hydraulique);
 
         DoubleVect dI_dt;
-        zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
+        domaine_dis().valeur().domaine().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
 #if DEBUG_CONSERV_VOLUME
-        const int nb_elem = zone_dis().valeur().nb_elem();
+        const int nb_elem = domaine_dis().valeur().nb_elem();
         double sum_before_rm = 0.;
         double sum_before_rm_dvol = 0.;
         for (int i = 0; i < nb_elem; i++)
@@ -6556,21 +6556,21 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
           DoubleVect values(3);
           values=0.;
 //        volume_phase_1     ->   values(0)
-//        volume_sous_zone   ->   values(1)
+//        volume_sous_domaine   ->   values(1)
 //        volume_phase_0     ->   values(2)
-          if (variables_internes_->nom_zone_volume_impose_ == "??")
+          if (variables_internes_->nom_domaine_volume_impose_ == "??")
             values(0) = calculer_integrale_indicatrice(indicatrice_.valeurs(), values(2));
           else
             {
-              const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-              const DoubleVect& volumes = zone_vf.volumes();
-              const Sous_Zone& sous_zone = zone_dis().valeur().zone().ss_zone(variables_internes_->nom_zone_volume_impose_);
-              const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
+              const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+              const DoubleVect& volumes = domaine_vf.volumes();
+              const Sous_Domaine& sous_domaine = domaine_dis().valeur().domaine().ss_domaine(variables_internes_->nom_domaine_volume_impose_);
+              const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
               const DoubleTab& indic = indicatrice_.valeurs();
-              const int nb_elem = zone_vf.nb_elem();
-              for (int i = 0; i < nb_elem_sous_zone; i++)
+              const int nb_elem = domaine_vf.nb_elem();
+              for (int i = 0; i < nb_elem_sous_domaine; i++)
                 {
-                  const int elem = sous_zone[i];
+                  const int elem = sous_domaine[i];
                   if (elem < nb_elem)
                     {
                       values(0) += indic(elem) * volumes(elem);
@@ -6579,10 +6579,10 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
                     }
                 }
               mp_sum_for_each_item(values);
-              /*              Cerr << "Volume_sous_zone " << variables_internes_->nom_zone_volume_impose_ <<
-                                 mp_sum(volume_sous_zone) << finl;
+              /*              Cerr << "Volume_sous_domaine " << variables_internes_->nom_domaine_volume_impose_ <<
+                                 mp_sum(volume_sous_domaine) << finl;
                             volume_phase_1 = mp_sum(volume_phase_1); */
-              Cerr << "Volume_sous_zone " << variables_internes_->nom_zone_volume_impose_ <<
+              Cerr << "Volume_sous_domaine " << variables_internes_->nom_domaine_volume_impose_ <<
                    values(1) << finl;
 
             }
@@ -6717,9 +6717,9 @@ void Transport_Interfaces_FT_Disc::ajouter_contribution_saut_vitesse(DoubleTab& 
 
 int Transport_Interfaces_FT_Disc::calculer_composantes_connexes_pour_suppression(IntVect& num_compo)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
   const DoubleTab& indicatrice = get_update_indicatrice().valeurs();
-  const int nb_compo = topologie_interface().calculer_composantes_connexes_pour_suppression(zone_vf, indicatrice, num_compo);
+  const int nb_compo = topologie_interface().calculer_composantes_connexes_pour_suppression(domaine_vf, indicatrice, num_compo);
   return nb_compo;
 }
 
@@ -6732,38 +6732,38 @@ double Transport_Interfaces_FT_Disc::suppression_interfaces(const IntVect& num_c
   return volume;
 }
 
-void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_zone()
+void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_domaine()
 {
-  if (suppression_interfaces_sous_zone_ == "??")
+  if (suppression_interfaces_sous_domaine_ == "??")
     return;
 
   const DoubleTab& indicatrice = get_update_indicatrice().valeurs();
-  const Sous_Zone& sous_zone = zone_dis().zone().ss_zone(suppression_interfaces_sous_zone_);
-  // Construction de la liste des elements de la sous-zone contenant la phase a supprimer
-  ArrOfInt liste_elems_sous_zone;
-  liste_elems_sous_zone.set_smart_resize(1);
+  const Sous_Domaine& sous_domaine = domaine_dis().domaine().ss_domaine(suppression_interfaces_sous_domaine_);
+  // Construction de la liste des elements de la sous-domaine contenant la phase a supprimer
+  ArrOfInt liste_elems_sous_domaine;
+  liste_elems_sous_domaine.set_smart_resize(1);
   int i;
   const double phase_continue = topologie_interface().get_phase_continue();
 
-  const int nb_elems_sous_zone = sous_zone.nb_elem_tot();
-  for (i = 0; i < nb_elems_sous_zone; i++)
+  const int nb_elems_sous_domaine = sous_domaine.nb_elem_tot();
+  for (i = 0; i < nb_elems_sous_domaine; i++)
     {
-      const int i_elem = sous_zone[i];
+      const int i_elem = sous_domaine[i];
       const double indic = indicatrice[i_elem];
       if (indic != phase_continue)
-        liste_elems_sous_zone.append_array(i_elem);
+        liste_elems_sous_domaine.append_array(i_elem);
     }
-  const int sz_liste_elems_sous_zone = liste_elems_sous_zone.size_array();
-  if (mp_sum(sz_liste_elems_sous_zone) > 0)
+  const int sz_liste_elems_sous_domaine = liste_elems_sous_domaine.size_array();
+  if (mp_sum(sz_liste_elems_sous_domaine) > 0)
     {
       IntVect num_compo;
-      const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-      const int nb_compo = topologie_interface().calculer_composantes_connexes_pour_suppression(zone_vf, indicatrice, num_compo);
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+      const int nb_compo = topologie_interface().calculer_composantes_connexes_pour_suppression(domaine_vf, indicatrice, num_compo);
       // Tableau initialise a zero:
       ArrOfInt flags_compo_a_supprimer(nb_compo);
-      for (i = 0; i < sz_liste_elems_sous_zone; i++)
+      for (i = 0; i < sz_liste_elems_sous_domaine; i++)
         {
-          const int elem = liste_elems_sous_zone[i];
+          const int elem = liste_elems_sous_domaine[i];
           const int compo = num_compo[elem];
           flags_compo_a_supprimer[compo] = 1;
         }
@@ -6955,8 +6955,8 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
         }
     }
 
-  // Traitement des zones de suppression
-  test_suppression_interfaces_sous_zone();
+  // Traitement des domaines de suppression
+  test_suppression_interfaces_sous_domaine();
 
   // Remaillage de l'interface:
   remailler_interface();
@@ -7006,14 +7006,14 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
       }
     // Calcul du centre de gravite des phases 0 et 1 a partir de l'indicatrice
     // indicatrice de phase:
-    const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+    const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
     const DoubleTab& indic = indicatrice_.valeurs();
     // centre de gravite des elements euleriens:
-    const DoubleTab& xp = zone_vf.xp();
+    const DoubleTab& xp = domaine_vf.xp();
     // volumes des elements euleriens:
-    const DoubleVect& volumes = zone_vf.volumes();
+    const DoubleVect& volumes = domaine_vf.volumes();
 
-    const int nb_elem = zone_vf.nb_elem();
+    const int nb_elem = domaine_vf.nb_elem();
     const int dim = xp.line_size();
     DoubleTrav values(3,dim);
     values=0.;
@@ -7776,10 +7776,10 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
 {
   static const double distance_sommets_invalides = -1.e30;
 
-  const Zone_VF&    zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-  const IntTab&     elem_som = zone_vf.zone().les_elems();
-  const DoubleTab& xp = zone_vf.xp();
-  const DoubleTab& coord_som = zone_vf.zone().les_sommets();
+  const Domaine_VF&    domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const IntTab&     elem_som = domaine_vf.domaine().les_elems();
+  const DoubleTab& xp = domaine_vf.xp();
+  const DoubleTab& coord_som = domaine_vf.domaine().les_sommets();
 
   const int nb_sommets = dist_som.dimension_tot(0);
   ArrOfInt ncontrib(nb_sommets);
@@ -7870,16 +7870,16 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   static const double distance_sommets_invalides = -1.e30;
 
   // Coordonnees des sommets du maillage eulerien:
-  const Zone_dis_base& mon_dom_dis = zone_dis().valeur();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, mon_dom_dis);
-  const DoubleTab& centre_element = zone_vf.xp();
+  const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const DoubleTab& centre_element = domaine_vf.xp();
 
   // Tableau contenant une approximation de la normale aux sommets du maillage
   // eulerien :
   distance_elements = distance_sommets_invalides * 1.1;
   normale_elements  = 0.;
 
-  const int nb_elem = mon_dom_dis.zone().nb_elem();
+  const int nb_elem = mon_dom_dis.domaine().nb_elem();
   const int dim = Objet_U::dimension;
 
   // Calcul de la distance pour l'epaisseur 0 (sommets des elements traverses par
@@ -7970,8 +7970,8 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   DoubleTab terme_src(normale_elements);
   DoubleTab tmp(normale_elements);
 
-  const IntTab& face_voisins = zone_vf.face_voisins();
-  const IntTab& elem_faces   = zone_vf.elem_faces();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
+  const IntTab& elem_faces   = domaine_vf.elem_faces();
   const int nb_elem_voisins = elem_faces.line_size();
 
   // Calcul d'une normale aux elements :
@@ -8150,22 +8150,22 @@ void Transport_Interfaces_FT_Disc::calculer_derivee_volume_phase1(
   // Ancien codage (ne supporte pas le changement de phase)
 
   // Recuperation des tableaux et autres raccourcis pour le calcul :
-  const Zone_dis_base& zone_dis_base = zone_dis().valeur();
-  const Zone_VF&        zone_vf       = ref_cast(Zone_VF, zone_dis_base);
-  const Zone&           zone          = zone_dis_base.zone();
-  const int nb_faces_element = zone.nb_faces_elem();
+  const Domaine_dis_base& domaine_dis_base = domaine_dis().valeur();
+  const Domaine_VF&        domaine_vf       = ref_cast(Domaine_VF, domaine_dis_base);
+  const Domaine&           domaine          = domaine_dis_base.domaine();
+  const int nb_faces_element = domaine.nb_faces_elem();
   const int dim = Objet_U::dimension;
   // En vef : 2 ou 3 composantes de vitesse,
   // en vdf : composante normale a la face uniquement.
   const int   vitesse_n_composantes = (vitesse.line_size() > 1) ? 1 : 0; // 1 si VEF et 0 si VDF
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
   // Pour le vdf, on a besoin de la surface des faces...
   const DoubleVect * face_surfaces_ptr = 0;
-  if (sub_type(Zone_VDF, zone_vf))
+  if (sub_type(Domaine_VDF, domaine_vf))
     {
-      const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, zone_vf);
-      face_surfaces_ptr = & (zone_vdf.face_surfaces());
+      const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, domaine_vf);
+      face_surfaces_ptr = & (domaine_vdf.face_surfaces());
     }
   const IntTab& facettes = maillage.facettes();
   const Intersections_Elem_Facettes& intersections =
@@ -8178,7 +8178,7 @@ void Transport_Interfaces_FT_Disc::calculer_derivee_volume_phase1(
   const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
 
   // Boucle sur les elements euleriens
-  const int nb_elements = zone.nb_elem();
+  const int nb_elements = domaine.nb_elem();
   int element;
   for (element = 0; element < nb_elements; element++)
     {
@@ -8239,7 +8239,7 @@ void Transport_Interfaces_FT_Disc::calculer_derivee_volume_phase1(
               int i;
               for (i = 0; i < dim; i++)
                 {
-                  double n = zone_vf.face_normales(face, i);
+                  double n = domaine_vf.face_normales(face, i);
                   double v = vitesse(face, i);
                   vitesse_normale += v * n;
                 }
@@ -8461,14 +8461,14 @@ void Transport_Interfaces_FT_Disc::ramasse_miettes(const Maillage_FT_Disc& maill
   // Calcul d'un flux a travers chaque face, proportionnel a
   //  Surface_face * (normale_interface scalaire normale_face) * grandeur_amont_a_transporter
   const int dim = Objet_U::dimension;
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
-  const Zone& zone = zone_vf.zone();
-  const IntTab&   face_voisins = zone_vf.face_voisins();
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const int nb_faces_tot = zone_vf.nb_faces_tot();
-  //const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_faces_elem = zone_vf.zone().nb_faces_elem();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine& domaine = domaine_vf.domaine();
+  const IntTab&   face_voisins = domaine_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const int nb_faces_tot = domaine_vf.nb_faces_tot();
+  //const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_faces_elem = domaine_vf.domaine().nb_faces_elem();
   const DoubleVect& indic = get_update_indicatrice().valeurs();
   const DoubleTab& normale_interface =  get_update_normale_interface().valeurs();
   for (int i_face = 0; i_face < nb_faces_tot; i_face++)
@@ -8488,7 +8488,7 @@ void Transport_Interfaces_FT_Disc::ramasse_miettes(const Maillage_FT_Disc& maill
             {
               double n0 = normale_interface(elem0, i);
               double n1 = normale_interface(elem1, i);
-              prod_scal += (n0 + n1) * 0.5 * zone_vf.face_normales(i_face, i);
+              prod_scal += (n0 + n1) * 0.5 * domaine_vf.face_normales(i_face, i);
             }
           if (indic(elem0) == 1. || indic(elem1) == 1.)
             prod_scal = - prod_scal;

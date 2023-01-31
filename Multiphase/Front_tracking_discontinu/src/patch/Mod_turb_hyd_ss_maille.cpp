@@ -85,7 +85,7 @@ int Mod_turb_hyd_ss_maille::preparer_calcul()
 void Mod_turb_hyd_ss_maille::discretiser()
 {
   Mod_turb_hyd_base::discretiser();
-  discretiser_K(mon_equation->schema_temps(),mon_equation->zone_dis(),energie_cinetique_turb_);
+  discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
   champs_compris_.ajoute_champ(energie_cinetique_turb_);
 }
 
@@ -123,7 +123,7 @@ void Mod_turb_hyd_ss_maille::verifie_loi_paroi_diphasique()
           Process::exit(-1);
         }
       loipar.valeur().associer_modele(*this);
-      loipar.valeur().associer(equation().zone_dis(),equation().zone_Cl_dis());
+      loipar.valeur().associer(equation().domaine_dis(),equation().domaine_Cl_dis());
     }
 }
 

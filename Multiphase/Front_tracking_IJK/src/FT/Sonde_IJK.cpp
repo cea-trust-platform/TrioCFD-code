@@ -24,8 +24,8 @@
 #include <IJK_Field.h>
 #include <Ref_Probleme_FT_Disc_gen.h>
 #include <Probleme_FT_Disc_gen.h>
-#include <Zone.h>
-#include <Zone_VF.h>
+#include <Domaine.h>
+#include <Domaine_VF.h>
 #include <Champ_Generique_Interpolation.h>
 #include <communications.h>
 #include <IJK_FT.h>
@@ -471,20 +471,20 @@ void Sonde_IJK::initialiser()
     elem_.resize(nbre_points);
 
   const IJK_Splitting& splitting = ref_ijk_ft_.valeur().get_splitting_ft();
-  const Zone& zone_geom = ref_ijk_ft_.valeur().probleme(splitting).domaine();
+  const Domaine& domaine_geom = ref_ijk_ft_.valeur().probleme(splitting).domaine();
   if ( numero_elem_==-1)
     {
-      int nb_som = zone_geom.type_elem().nb_som();
+      int nb_som = domaine_geom.type_elem().nb_som();
       int nb_coord = les_positions_.dimension(1);
       if (nb_coord+1>nb_som)
         {
-          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<zone_geom.le_nom()<<finl;
-          Cerr << "which is constituted with cells of kind " << zone_geom.type_elem().valeur().que_suis_je() << "." << finl;
+          Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<domaine_geom.le_nom()<<finl;
+          Cerr << "which is constituted with cells of kind " << domaine_geom.type_elem().valeur().que_suis_je() << "." << finl;
           Cerr << "Change the probe coordinates or use numero_elem_sur_maitre keyword (see documentation)" << finl;
           Cerr << "to specify a cell containing the probe and not its coordinates." << finl;
           Process::exit();
         }
-      zone_geom.chercher_elements(les_positions_,elem_,1);
+      domaine_geom.chercher_elements(les_positions_,elem_,1);
     }
   else
     {
@@ -493,8 +493,8 @@ void Sonde_IJK::initialiser()
       if (0)
         {
           elem_[0]= numero_elem_;
-          const IntTab& les_elems=mon_champ->get_ref_zone_dis_base().zone().les_elems();
-          const DoubleTab& coord=mon_champ->get_ref_zone_dis_base().zone().les_sommets();
+          const IntTab& les_elems=mon_champ->get_ref_domaine_dis_base().domaine().les_elems();
+          const DoubleTab& coord=mon_champ->get_ref_domaine_dis_base().domaine().les_sommets();
           int nb_som=les_elems.dimension(1);
           if (numero_elem_<les_elems.dimension_tot(0))
             {
@@ -538,7 +538,7 @@ void Sonde_IJK::initialiser()
     }
   // PQ : 07/10/04 : nodes=1 || grav=1 : relocalisation des points de sondes aux centres de gravite ou aux noeuds les plus proches
 
-  const Zone& zone = zone_geom ; // mon_champ->get_ref_domain();
+  const Domaine& domaine = domaine_geom ; // mon_champ->get_ref_domain();
   Noms nom_champ;
   nom_champ.dimensionner(1);
   nom_champ[0] =  nom_champ_lu_; //mon_champ->get_property("nom");
@@ -546,8 +546,8 @@ void Sonde_IJK::initialiser()
   if (grav==1)
     {
       Cerr<<"The location of probes associated to "<<nom_champ[0]<<" are modified (to centers of gravity):"<<finl;
-      const Zone_VF& zoneVF = ref_cast(Zone_VF,mon_champ->get_ref_zone_dis_base());
-      const DoubleTab xp = zoneVF.xp();
+      const Domaine_VF& domaineVF = ref_cast(Domaine_VF,mon_champ->get_ref_domaine_dis_base());
+      const DoubleTab xp = domaineVF.xp();
       for (int i=0; i<nbre_points; i++)
         {
           if(elem_[i]!=-1)
@@ -563,12 +563,12 @@ void Sonde_IJK::initialiser()
     }
   else if (nodes==1)
     {
-      const Zone_VF& zoneVF = ref_cast(Zone_VF,mon_champ->get_ref_zone_dis_base());
-      const DoubleTab xv = zoneVF.xv();
-      const IntTab& elem_faces = zoneVF.elem_faces();
+      const Domaine_VF& domaineVF = ref_cast(Domaine_VF,mon_champ->get_ref_domaine_dis_base());
+      const DoubleTab xv = domaineVF.xv();
+      const IntTab& elem_faces = domaineVF.elem_faces();
       if (mp_max(elem_faces.size_array())==0)
         {
-          Cerr << "Error: the domain " << zoneVF.zone().le_nom() << " is not discretized." << finl;
+          Cerr << "Error: the domain " << domaineVF.domaine().le_nom() << " is not discretized." << finl;
           exit();
         }
       if (sub_type(Champ_Generique_Interpolation,mon_champ.valeur()))
@@ -581,7 +581,7 @@ void Sonde_IJK::initialiser()
           exit();
         }
       Cerr<<"The location of probes associated to "<<nom_champ[0]<<" are modified (to faces):"<<finl;
-      const int nfaces_par_element = zone.nb_faces_elem() ;
+      const int nfaces_par_element = domaine.nb_faces_elem() ;
       for (int i=0; i<nbre_points; i++)
         {
           double dist_min=DMAXFLOAT;
@@ -624,9 +624,9 @@ void Sonde_IJK::initialiser()
           exit();
         }
       Cerr<<"The location of probes associated to "<<nom_champ[0]<<" are modified (to vertexes):"<<finl;
-      const IntTab& sommet_elem = zone.les_elems();
-      const int sommets_par_element = zone.les_elems().dimension(1);
-      const DoubleTab& coord = zone_geom.les_sommets();
+      const IntTab& sommet_elem = domaine.les_elems();
+      const int sommets_par_element = domaine.les_elems().dimension(1);
+      const DoubleTab& coord = domaine_geom.les_sommets();
       for (int i=0; i<nbre_points; i++)
         {
           double dist_min=DMAXFLOAT;
@@ -851,7 +851,7 @@ void Sonde_IJK::postraiter()
             Cerr << " Error in Sonde_IJK::postraiter() "
                  << " L'extension est non-nulle donc splitting_ et splitting_ft_ different."
                  << " Le champ demande n'est pas discretise sur le domaine etendu "
-                 << "alors que la Zone_VF est construite sur ce domaine..."  << finl;
+                 << "alors que la Domaine_VF est construite sur ce domaine..."  << finl;
             Process::exit();
           }
         for (int idx =0; idx < nb_pts; idx++)

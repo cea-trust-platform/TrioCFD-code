@@ -22,7 +22,7 @@
 
 #include <Paroi_hyd_base_EF.h>
 #include <Scatter.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <EcrFicPartage.h>
 #include <Mod_turb_hyd_base.h>
 #include <Schema_Temps_base.h>
@@ -63,15 +63,15 @@ Entree& Paroi_hyd_base_EF::readOn(Entree& s)
 //
 /////////////////////////////////////////////////////////////////////
 
-void Paroi_hyd_base_EF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_hyd_base_EF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_EF = ref_cast(Zone_EF,zone_dis.valeur());
-  le_dom_Cl_EF = ref_cast(Zone_Cl_EF,zone_Cl_dis.valeur());
+  le_dom_EF = ref_cast(Domaine_EF,domaine_dis.valeur());
+  le_dom_Cl_EF = ref_cast(Domaine_Cl_EF,domaine_Cl_dis.valeur());
 }
 
 void Paroi_hyd_base_EF::init_lois_paroi_()
 {
-  const Zone_VF& zvf = le_dom_EF.valeur();
+  const Domaine_VF& zvf = le_dom_EF.valeur();
   const int nb_faces_bord = le_dom_EF->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
@@ -105,13 +105,13 @@ void Paroi_hyd_base_EF::imprimer_premiere_ligne_ustar(int boundaries_, const LIS
 {
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
-  const Zone_EF& zone_EF = le_dom_EF.valeur();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   Nom ligne, err;
 
   err="";
   ligne="# Time   \tMean(u*) \tMean(d+)";
 
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       const Nom& nom_bord = la_cl.frontiere_dis().le_nom();
@@ -148,7 +148,7 @@ void Paroi_hyd_base_EF::imprimer_premiere_ligne_ustar(int boundaries_, const LIS
 
 void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const
 {
-  const Zone_EF& zone_EF = le_dom_EF.valeur();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   const Probleme_base& pb=mon_modele_turb_hyd->equation().probleme();
   const Schema_Temps_base& sch=pb.schema_temps();
   int ndeb,nfin, size0, num_bord;
@@ -160,7 +160,7 @@ void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, co
     }
   else
     {
-      size0=zone_EF.nb_front_Cl();
+      size0=domaine_EF.nb_front_Cl();
     }
   DoubleTrav moy_bords(size0+1,3);
   moy_bords=0.;
@@ -168,7 +168,7 @@ void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, co
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
 
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
@@ -202,7 +202,7 @@ void Paroi_hyd_base_EF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, co
     }
 
   num_bord=0;
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||

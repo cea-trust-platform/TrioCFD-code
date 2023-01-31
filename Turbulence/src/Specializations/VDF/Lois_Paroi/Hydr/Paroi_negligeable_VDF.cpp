@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Paroi_negligeable_VDF.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Champ_Face_VDF.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Fluide_base.h>
 #include <Equation_base.h>
@@ -69,9 +69,9 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
 
-      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-      const IntTab& face_voisins = zone_VDF.face_voisins();
-      const IntVect& orientation = zone_VDF.orientation();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+      const IntTab& face_voisins = domaine_VDF.face_voisins();
+      const IntVect& orientation = domaine_VDF.orientation();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -85,7 +85,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
       else
         l_unif = 0;
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
@@ -107,18 +107,18 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
                   if ( dimension == 2 )
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                      norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val0);
                     }
                   else if ( dimension == 3)
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                      norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,val1,val2);
                     }
 
                   if ( axi )
-                    dist=zone_VDF.dist_norm_bord_axi(num_face);
+                    dist=domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist=zone_VDF.dist_norm_bord(num_face);
+                    dist=domaine_VDF.dist_norm_bord(num_face);
                   if ( l_unif )
                     d_visco = visco;
                   else
@@ -147,9 +147,9 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
 
-      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-      const IntTab& face_voisins = zone_VDF.face_voisins();
-      const IntVect& orientation = zone_VDF.orientation();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+      const IntTab& face_voisins = domaine_VDF.face_voisins();
+      const IntVect& orientation = domaine_VDF.orientation();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -163,7 +163,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       else
         l_unif = 0;
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
@@ -185,18 +185,18 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                   if ( dimension == 2 )
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                      norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val0);
                     }
                   else if ( dimension == 3)
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                      norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,val1,val2);
                     }
 
                   if ( axi )
-                    dist=zone_VDF.dist_norm_bord_axi(num_face);
+                    dist=domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist=zone_VDF.dist_norm_bord(num_face);
+                    dist=domaine_VDF.dist_norm_bord(num_face);
                   if ( l_unif )
                     d_visco = visco;
                   else

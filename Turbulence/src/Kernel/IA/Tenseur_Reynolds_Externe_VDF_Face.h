@@ -25,8 +25,8 @@
 
 #include <Source_base.h>
 #include <Terme_Source_Qdm.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <Equation.h>
 #include <Ref_Modele_turbulence_hyd_K_Eps.h>
 #include <Ref_Navier_Stokes_Turbulent.h>
@@ -65,9 +65,9 @@ protected:
   REF(Probleme_base)                     probleme_;
   REF(Transport_K_Eps)                   eqn_transport_K_Eps_;
 
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
-  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
 
   void Calcul_RSLambda();
   DoubleTab& Calcul_bij_TBNN(DoubleTab& resu) const;

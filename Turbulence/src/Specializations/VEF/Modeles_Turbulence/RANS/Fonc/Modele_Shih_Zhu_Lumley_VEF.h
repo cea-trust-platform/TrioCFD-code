@@ -23,18 +23,18 @@
 #define Modele_Shih_Zhu_Lumley_VEF_included
 
 #include <Modele_Fonc_Realisable_base.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Zone_Cl_dis.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
+#include <Domaine_Cl_dis.h>
 #include <Param.h>
 
 #define BR_EPS 1.e-20
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-class Zone_Cl_VEF;
+class Domaine_Cl_VEF;
 
 
 
@@ -47,29 +47,29 @@ public :
 
   virtual void set_param(Param& param);
   void mettre_a_jour(double) override;
-  void Calcul_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse) override ;
-  void Calcul_C1 (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
-  void Calcul_Cmu_et_S (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) override  ;
+  void Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) override ;
+  void Calcul_C1 (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
+  void Calcul_Cmu_et_S (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) override  ;
   // Transformation tenseur elem vers faces
-  virtual DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&,const Zone_VEF&, const Zone_Cl_VEF&) const;
-  void Contributions_Sources(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
-  void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+  virtual DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&,const Domaine_VEF&, const Domaine_Cl_VEF&) const;
+  void Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
+  void Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                    const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt) override ;
 
-  void Calcul_C1_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
-  void Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override  ;
-  void Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
-  void Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+  void Calcul_C1_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
+  void Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override  ;
+  void Contributions_Sources_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
+  void Contributions_Sources_Paroi_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
                                        const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) override ;
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
-  void init_tenseur_elem(DoubleTab&, const Zone_VEF&, const int) const;
-  void init_tenseur_face(DoubleTab&, const Zone_VEF&, const int) const;
-  void init_tenseur_elem(DoubleTab&, const Zone_VEF&, const int) ;
-  void init_tenseur_face(DoubleTab&, const Zone_VEF&, const int) ;
-  void Initialisation(const Zone_dis& zone_dis) ;
-  void Calcul_Tenseurs_S_et_R_elem(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse) ;
-  void Calcul_Tenseurs_S_et_R_elem_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
+  void init_tenseur_elem(DoubleTab&, const Domaine_VEF&, const int) const;
+  void init_tenseur_face(DoubleTab&, const Domaine_VEF&, const int) const;
+  void init_tenseur_elem(DoubleTab&, const Domaine_VEF&, const int) ;
+  void init_tenseur_face(DoubleTab&, const Domaine_VEF&, const int) ;
+  void Initialisation(const Domaine_dis& domaine_dis) ;
+  void Calcul_Tenseurs_S_et_R_elem(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) ;
+  void Calcul_Tenseurs_S_et_R_elem_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,
                                          const DoubleTab& visco_tab, const DoubleTab& visco_turb,
                                          const DoubleTab& tab_paroi,const int idt) ;
 
@@ -80,8 +80,8 @@ protected:
   DoubleTab S_elem_;
   DoubleTab R_elem_;
 
-  REF(Zone_VEF) le_dom_VEF;
-  REF(Zone_Cl_VEF) le_dom_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
   double A0_;
 };

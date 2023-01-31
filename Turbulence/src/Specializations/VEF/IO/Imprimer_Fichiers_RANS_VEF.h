@@ -26,14 +26,14 @@
 
 
 #include <Interprete.h>
-#include <Zone_VEF.h>
-#include <Zone_dis.h>
+#include <Domaine_VEF.h>
+#include <Domaine_dis.h>
 #include <Equation_base.h>
 #include <TRUSTVect.h>
-#include <Ref_Zone_VEF.h>
+#include <Ref_Domaine_VEF.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
+class Domaine_dis;
 
 class Imprimer_Fichiers_RANS_VEF : public Interprete
 {

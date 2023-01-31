@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <EDO_Pression_th_VDF.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Sortie_libre_pression_imposee_QC.h>
 #include <Debog.h>
 #include <Convection_Diffusion_Temperature.h>
@@ -44,12 +44,12 @@ Entree& EDO_Pression_th_VDF::readOn(Entree& is)
   return EDO_Pression_th_base::readOn(is);
 }
 
-void  EDO_Pression_th_VDF::associer_domaines(const Zone_dis& zone, const Zone_Cl_dis& zone_cl)
+void  EDO_Pression_th_VDF::associer_domaines(const Domaine_dis& domaine, const Domaine_Cl_dis& domaine_cl)
 {
-  le_dom = ref_cast(Zone_VDF,zone.valeur());
-  le_dom_Cl = zone_cl;
+  le_dom = ref_cast(Domaine_VDF,domaine.valeur());
+  le_dom_Cl = domaine_cl;
   Champ_Face toto;
-  toto.associer_domaine_dis_base(zone.valeur());
+  toto.associer_domaine_dis_base(domaine.valeur());
   toto.fixer_nb_comp(1);
   toto.fixer_nb_valeurs_nodales(le_dom->nb_faces());
   //tab_rhoFa=toto.valeurs();
@@ -113,7 +113,7 @@ void EDO_Pression_th_VDF::calculer_rho_face_np1(const DoubleTab& tab_rhoP0)
       tab_rho_face_np1(face) /= nb_comp;
     }
 
-  const Zone_Cl_dis_base& zcl_temp=le_dom_Cl.valeur().valeur().equation().probleme().equation(1).zone_Cl_dis();
+  const Domaine_Cl_dis_base& zcl_temp=le_dom_Cl.valeur().valeur().equation().probleme().equation(1).domaine_Cl_dis();
   const Conds_lim& lescl=zcl_temp.les_conditions_limites();
   int nbcondlim=lescl.size();
   for (int icl=0; icl<nbcondlim; icl++)

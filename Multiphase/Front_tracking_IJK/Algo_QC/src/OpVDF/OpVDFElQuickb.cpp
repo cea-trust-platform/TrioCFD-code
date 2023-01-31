@@ -45,12 +45,12 @@ Entree& Op_Conv_Quickb_VDF_Elem::readOn(Entree& s )
 /*! @brief complete l'iterateur et l'evaluateur
  *
  */
-void Op_Conv_Quickb_VDF_Elem::associer(const Zone_dis& zone_dis,
-                                       const Zone_Cl_dis& zone_cl_dis,
+void Op_Conv_Quickb_VDF_Elem::associer(const Domaine_dis& domaine_dis,
+                                       const Domaine_Cl_dis& domaine_cl_dis,
                                        const Champ_Inc& ch_transporte)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
   const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_transporte.valeur());
 
   iter.associer(zvdf, zclvdf, *this);
@@ -58,9 +58,9 @@ void Op_Conv_Quickb_VDF_Elem::associer(const Zone_dis& zone_dis,
   Eval_Quickb_VDF_Elem& eval_conv = (Eval_Quickb_VDF_Elem&) iter.evaluateur();
   eval_conv.associer_domaines(zvdf, zclvdf );          // Evaluateur_VDF::associer_domaines
   eval_conv.associer_inconnue(inco );        // Eval_VDF_Elem::associer_inconnue
-  if (Process::nproc()>1 && zvdf.zone().nb_joints() && zvdf.zone().joint(0).epaisseur()<2)
+  if (Process::nproc()>1 && zvdf.domaine().nb_joints() && zvdf.domaine().joint(0).epaisseur()<2)
     {
-      Cerr << "Overlapping width (given by larg_joint option) of  " << zvdf.zone().joint(0).epaisseur() << finl;
+      Cerr << "Overlapping width (given by larg_joint option) of  " << zvdf.domaine().joint(0).epaisseur() << finl;
       Cerr << "is not enough for Quickb scheme in VDF parallel calculation." << finl;
       Cerr << "Please, partition your mesh with an overlapping width of 2 with larg_joint option." << finl;
       Process::exit();

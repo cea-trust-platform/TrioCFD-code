@@ -20,16 +20,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Beam_model.h>
-#include <Zone_ALE.h>
+#include <Domaine_ALE.h>
 #include <TRUSTVects.h>
 #include <TRUSTTabs.h>
 #include <Probleme_base.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Frontiere.h>
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
-#include <Ref_Zone.h>
+#include <Ref_Domaine.h>
 #include <Faces.h>
 #include <fstream>
 #include <iostream>
@@ -117,7 +117,7 @@ Entree& Beam_model::readOn( Entree& is )
 Entree&  Beam_model::interpreter_(Entree& is)
 {
   associer_domaine(is);
-  Zone_ALE& dom=ref_cast(Zone_ALE, domaine());
+  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
   dom.reading_beam_model(is);
   return is;
 }

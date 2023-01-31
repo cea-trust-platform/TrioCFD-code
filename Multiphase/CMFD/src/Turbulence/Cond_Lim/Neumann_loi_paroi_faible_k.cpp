@@ -32,7 +32,7 @@
 #include <Navier_Stokes_std.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Energie_cinetique_turbulente.h>
 
 #include <math.h>
@@ -60,9 +60,9 @@ Entree& Neumann_loi_paroi_faible_k::readOn(Entree& s )
 
 void Neumann_loi_paroi_faible_k::completer()
 {
-  if (!sub_type(Energie_cinetique_turbulente, zone_Cl_dis().equation())) Process::exit("Neumann_loi_paroi_faible_k : equation must be k !");
+  if (!sub_type(Energie_cinetique_turbulente, domaine_Cl_dis().equation())) Process::exit("Neumann_loi_paroi_faible_k : equation must be k !");
 
-  if (zone_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
+  if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
 void Neumann_loi_paroi_faible_k::liste_faces_loi_paroi(IntTab& tab)
@@ -98,9 +98,9 @@ double Neumann_loi_paroi_faible_k::flux_impose(int i,int j) const
 
 int Neumann_loi_paroi_faible_k::initialiser(double temps)
 {
-  valeurs_flux_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  valeurs_flux_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_flux_);
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
 
   return 1;
 }
@@ -113,23 +113,23 @@ void Neumann_loi_paroi_faible_k::mettre_a_jour(double tps)
 void Neumann_loi_paroi_faible_k::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_VF& zone = ref_cast(Zone_VF, zone_Cl_dis().equation().zone_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() ;
+  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                             ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() ;
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  const IntTab& f_e = zone.face_voisins();
+  const IntTab& f_e = domaine.face_voisins();
 
   if (mu.nb_dim() >= 3) Process::exit("Neumann_loi_paroi_faible_k : transport of k must be SGDH !");
 
   for (int f =0 ; f < nf ; f++)
     {
-      int f_zone = f + f1; // number of the face in the zone
-      int e_zone = f_e(f_zone,0);
-      valeurs_flux_(f, 0) = -mu(e_zone, 0) * u_tau(f_zone, 0)*u_tau(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0) *calc_dyplus_kplus(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)); // flux de Neumann = -mu * dy_k car flux selon - grad
+      int f_domaine = f + f1; // number of the face in the domaine
+      int e_domaine = f_e(f_domaine,0);
+      valeurs_flux_(f, 0) = -mu(e_domaine, 0) * u_tau(f_domaine, 0)*u_tau(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0) *calc_dyplus_kplus(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)); // flux de Neumann = -mu * dy_k car flux selon - grad
     }
 
   valeurs_flux_.echange_espace_virtuel();

@@ -31,7 +31,7 @@ class Cond_Lim_Rayo
 
 public:
   virtual void completer();
-  void preparer_surface(const Frontiere_dis_base& ,const Zone_Cl_dis_base& );
+  void preparer_surface(const Frontiere_dis_base& ,const Domaine_Cl_dis_base& );
   virtual void associer_modele_rayo(Modele_Rayonnement_base& );
   //virtual const Cond_lim_base& la_cl() const =0;
   inline virtual double surface(int ) const ;

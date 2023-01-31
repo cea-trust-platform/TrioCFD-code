@@ -29,7 +29,7 @@ class Op_Conv_centre4IJK_VDF_Face : public Op_Conv_centre4_VDF_Face
 {
   Declare_instanciable(Op_Conv_centre4IJK_VDF_Face);
 public:
-  //void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& );
+  //void associer(const Domaine_dis& , const Domaine_Cl_dis& , const Champ_Inc& );
   void completer();
   void associer_vitesse(const Champ_base&) ;
   //const Champ_Inc_base& vitesse() const;

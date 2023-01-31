@@ -17,10 +17,10 @@
 #include <Champ_P1NC.h>
 #include <Porosites_champ.h>
 #include <stat_counters.h>
-#include <Zone_VEF_PreP1b.h>
+#include <Domaine_VEF_PreP1b.h>
 #include <CL_Types_include.h>
 
-extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Zone_Cl_VEF& zcl, const Zone_VEF& zone_VEF);
+extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
 Implemente_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face,"Op_Conv_RT_VEF_P1NC",Op_Conv_VEF_Face);
 // XD convection_RT convection_deriv RT 0 Keyword to use RT projection for P1NCP0RT discretization
 
@@ -57,35 +57,35 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
                                         DoubleTab& resu) const
 {
   //statistiques().begin_count(m1);
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, le_dom_vef.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Champ_Inc_base& la_vitesse=vitesse();
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
   DoubleTab transporte_face_;
   DoubleTab vitesse_face_;
 
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const Zone& zone = zone_VEF.zone();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_sommets = zone.les_elems();
-  const DoubleTab& coord_sommets=zone.les_sommets();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_sommets = domaine.les_elems();
+  const DoubleTab& coord_sommets=domaine.les_sommets();
 
   // Permet d'avoir un flux_bord coherent avec les CLs (mais parfois diverge?)
   // Active uniquement pour ordre 3
   //
 
   {
-    const DoubleVect& volumes = zone_VEF.volumes();
-    const DoubleTab& face_normales = zone_VEF.face_normales();
+    const DoubleVect& volumes = domaine_VEF.volumes();
+    const DoubleTab& face_normales = domaine_VEF.face_normales();
     double volume;
     // Cout<<"Op_Conv_RT_VEF_Face::ajouter RT\n";
     // Traitement des CL de Dirichlet
     int nb_face_diri=0;
     ArrOfInt indice_diri(dimension+1);
     int modif_traitement_diri=0;
-    if (sub_type(Zone_VEF_PreP1b,zone_VEF))
-      modif_traitement_diri=ref_cast(Zone_VEF_PreP1b,zone_VEF).get_modif_div_face_dirichlet();
+    if (sub_type(Domaine_VEF_PreP1b,domaine_VEF))
+      modif_traitement_diri=ref_cast(Domaine_VEF_PreP1b,domaine_VEF).get_modif_div_face_dirichlet();
     int elem,i,j,alfa,dim;
     i=0;
     if (dimension==2)
@@ -100,7 +100,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
               }
 
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,zone_Cl_VEF,zone_VEF);
+              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
             volume=volumes(elem);
             double invVol  = 1./(12*volume);
             double invVol2 = invVol/volume;
@@ -193,7 +193,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
             DoubleTab FacesNormales(dimension+1,dimension);
             DoubleVect vitFaceNormale(dimension+1);
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,zone_Cl_VEF,zone_VEF);
+              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
             volume=volumes(elem);
             for (dim=0; dim<dimension; dim++) rotVit(dim)=0.;
             for (i=0; i<=dimension; i++)
@@ -279,20 +279,20 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
 void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const
 {
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = le_dom_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   const Champ_Inc_base& la_vitesse=vitesse();
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& face_normales = zone_VEF.face_normales();
-  const Zone& zone = zone_VEF.zone();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& face_normales = domaine_VEF.face_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
-  int nfac = zone.nb_faces_elem();
-  int nsom = zone.nb_som_elem();
-  const IntTab& elem_sommets = zone.les_elems();
-  //const DoubleTab& coord_sommets=zone.domaine().les_sommets();
+  int nfac = domaine.nb_faces_elem();
+  int nsom = domaine.nb_som_elem();
+  const IntTab& elem_sommets = domaine.les_elems();
+  //const DoubleTab& coord_sommets=domaine.domaine().les_sommets();
   // Pour le traitement de la convection on distingue les polyedres
   // standard qui ne "voient" pas les conditions aux limites et les
   // polyedres non standard qui ont au moins une face sur le bord.
@@ -326,26 +326,26 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   ArrOfDouble vc(dimension);
   DoubleTab vsom(nsom,dimension);
   ArrOfDouble cc(dimension);
-  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
 
   Nom nom_elem=type_elemvef.que_suis_je();
 
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la zone
+  // dans la domaine
 
   // boucle sur les polys
   int phi_u_transportant_yes=phi_u_transportant(equation());
 
   {
     Cout<<"Op_Conv_RT_VEF_Face::ajouter_contribution RT\n";
-    const DoubleVect& volumes = zone_VEF.volumes();
-    const IntTab& face_voisins  = zone_VEF.face_voisins();
-    const DoubleTab& coord_sommets=zone_VEF.zone().les_sommets();
+    const DoubleVect& volumes = domaine_VEF.volumes();
+    const IntTab& face_voisins  = domaine_VEF.face_voisins();
+    const DoubleTab& coord_sommets=domaine_VEF.domaine().les_sommets();
     double volume=0.;
     int dim,elem,alfa,beta,k;
     if (dimension==2)
@@ -716,11 +716,11 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // Boucle sur les bords pour traiter les conditions aux limites
   // il y a prise en compte d'un terme de convection pour les
   // conditions aux limites de Neumann_sortie_libre seulement
-  int nb_bord = zone_VEF.nb_front_Cl();
+  int nb_bord = domaine_VEF.nb_front_Cl();
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
 
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {

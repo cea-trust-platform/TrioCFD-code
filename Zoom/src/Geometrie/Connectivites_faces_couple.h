@@ -25,10 +25,10 @@
 #define Connectivites_faces_couple_included
 
 
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Connectivites_base.h>
 
-#include <Zone.h>
+#include <Domaine.h>
 /*! @brief class Connectivites_faces_couple
  *
  */
@@ -45,8 +45,8 @@ class Connectivites_faces_couple : public Connectivites_base
   Declare_instanciable(Connectivites_faces_couple);
 
 public:
-  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                              Zone& domg) override;
+  void calculer_connectivites(Domaine_VF& domainef, Domaine_VF& domaineg,
+                              Domaine& domg) override;
   inline IntVect& nb_facesF();
   inline const IntVect& nb_facesF() const;
 
@@ -54,7 +54,7 @@ public:
 private:
   IntVect nb_facesF_; // tableau d'entier de taille NFACE__FRONT_GROS
 
-  void calculer_nb_facesF(Zone_VF& zoneg);
+  void calculer_nb_facesF(Domaine_VF& domaineg);
 
 };
 

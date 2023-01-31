@@ -23,8 +23,8 @@
 #include <Connectivites_base.h>
 #include <LecFicDistribueBin.h>
 #include <EcrFicCollecteBin.h>
-#include <Zone_VF.h>
-#include <Zone.h>
+#include <Domaine_VF.h>
+#include <Domaine.h>
 
 #define PRECISION 1.e-9
 
@@ -49,30 +49,30 @@ Entree& Connectivites_base::readOn(Entree& s )
 
 /*! @brief Calcul des connectivites entre faces fines et faces grossieres :
  *
- * @param (Zone_VF& zoneG, Zone_VF& zoneF) zones grossiere et fine
+ * @param (Domaine_VF& domaineG, Domaine_VF& domaineF) domaines grossiere et fine
  */
-void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
-                                                          Zone_VF& zoneg,
-                                                          Zone& domg)
+void Connectivites_base::calculer_connectivites_face_face(Domaine_VF& domainef,
+                                                          Domaine_VF& domaineg,
+                                                          Domaine& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites_face_face"<<finl;
-  Nom nom_domf = zonef.zone().le_nom();
-  Nom nom_domg = zoneg.zone().le_nom();
+  Nom nom_domf = domainef.domaine().le_nom();
+  Nom nom_domg = domaineg.domaine().le_nom();
 
   const Elem_geom& type_elem = domg.type_elem();
-  int nb_faces_bordF = zonef.nb_faces_bord();
+  int nb_faces_bordF = domainef.nb_faces_bord();
 
   //coord du centre de gravite des faces fines
-  const DoubleTab& cg_face_fine = zonef.xv();
+  const DoubleTab& cg_face_fine = domainef.xv();
 
-  const int prem_face_bord_gros  =  zoneg.premiere_face_bord();
-  const int der_face_bord_gros  =  prem_face_bord_gros+zoneg.nb_faces_bord();
-  const int prem_face_int_gros  =  zoneg.premiere_face_int();
-  const int der_face_int_gros  = prem_face_int_gros + zoneg.nb_faces_internes();
+  const int prem_face_bord_gros  =  domaineg.premiere_face_bord();
+  const int der_face_bord_gros  =  prem_face_bord_gros+domaineg.nb_faces_bord();
+  const int prem_face_int_gros  =  domaineg.premiere_face_int();
+  const int der_face_int_gros  = prem_face_int_gros + domaineg.nb_faces_internes();
 
   //coordonnees des sommets grossiers
   const DoubleTab& som_gros = domg.coord_sommets();
-  const IntTab& faces_som = zoneg.face_sommets();
+  const IntTab& faces_som = domaineg.face_sommets();
 
   const double epsilon  = PRECISION;
 
@@ -857,23 +857,23 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
  *     pour chaque element fin,
  *     l'element grossier contenant son centre de gravite
  *
- * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @param (Domaine& domaineG, Domaine& domaineF) domaine discretisee grossiere et fine
  * @throws da
  */
-void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
-                                                          Zone_VF& zone_vfG)
+void Connectivites_base::calculer_connectivites_elem_elem(Domaine_VF& domaine_vfF,
+                                                          Domaine_VF& domaine_vfG)
 {
   Cerr << "Creation of connectivites_elem in progress... " << finl;
-  Nom nom_domf = zone_vfF.zone().le_nom();
-  Nom nom_domg = zone_vfG.zone().le_nom();
+  Nom nom_domf = domaine_vfF.domaine().le_nom();
+  Nom nom_domg = domaine_vfG.domaine().le_nom();
 
   //centre de gravite des elements fins
-  Zone& zoneF = zone_vfF.zone();
-  Zone& zoneG = zone_vfG.zone();
+  Domaine& domaineF = domaine_vfF.domaine();
+  Domaine& domaineG = domaine_vfG.domaine();
 
-  const DoubleTab& xpF = zone_vfF.xp();
+  const DoubleTab& xpF = domaine_vfF.xp();
   //nb d'elements fins
-  int nb_elemF = zoneF.nb_elem();
+  int nb_elemF = domaineF.nb_elem();
 
   connect_elemF_elemG.resize(nb_elemF);
   connect_elemF_elemG = -1;
@@ -912,9 +912,9 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
         {
           //On trouve dans quel elementG se trouve le centre de gravite F
           if (dimension == 2)
-            zoneG.rang_elems_sommet(elems, xpF(nb_elementF, 0),  xpF(nb_elementF, 1), 0.);
+            domaineG.rang_elems_sommet(elems, xpF(nb_elementF, 0),  xpF(nb_elementF, 1), 0.);
           else if (dimension ==3)
-            zoneG.rang_elems_sommet(elems, xpF(nb_elementF, 0),  xpF(nb_elementF, 1), xpF(nb_elementF, 2));
+            domaineG.rang_elems_sommet(elems, xpF(nb_elementF, 0),  xpF(nb_elementF, 1), xpF(nb_elementF, 2));
 
           //On remplit le tableau de connectivites
           connect_elemF_elemG(nb_elementF) = elems[0];
@@ -934,16 +934,16 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
  *
  *     (simple appel aux 2 methodes precedentes)
  *
- * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @param (Domaine& domaineG, Domaine& domaineF) domaine discretisee grossiere et fine
  * @throws da
  */
-void Connectivites_base::calculer_connectivites(Zone_VF& zonef,
-                                                Zone_VF& zoneg,
-                                                Zone& domg)
+void Connectivites_base::calculer_connectivites(Domaine_VF& domainef,
+                                                Domaine_VF& domaineg,
+                                                Domaine& domg)
 {
   //Cerr<<"debut de Connectivites_base::calculer_connectivites"<<finl;
-  calculer_connectivites_face_face(zonef, zoneg, domg);
-  calculer_connectivites_elem_elem(zonef, zoneg);
+  calculer_connectivites_face_face(domainef, domaineg, domg);
+  calculer_connectivites_elem_elem(domainef, domaineg);
   //Cerr<<"fin de Connectivites_base::calculer_connectivites"<<finl;
 }
 

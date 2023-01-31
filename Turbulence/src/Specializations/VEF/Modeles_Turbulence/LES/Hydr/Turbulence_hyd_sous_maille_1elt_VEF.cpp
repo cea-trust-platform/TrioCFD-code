@@ -22,7 +22,7 @@
 #include <Turbulence_hyd_sous_maille_1elt_VEF.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Equation_base.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_1elt_VEF,"Modele_turbulence_hyd_sous_maille_1elt_VEF",Mod_turb_hyd_ss_maille_VEF);
@@ -55,11 +55,11 @@ Entree& Turbulence_hyd_sous_maille_1elt_VEF::readOn(Entree& s )
 
 Champ_Fonc& Turbulence_hyd_sous_maille_1elt_VEF::calculer_viscosite_turbulente()
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  const int nb_elem = zone_VEF.nb_elem();
-  DoubleVect volume = zone_VEF.volumes();
+  const int nb_elem = domaine_VEF.nb_elem();
+  DoubleVect volume = domaine_VEF.volumes();
   int num_elem;
 
   F2.resize(nb_elem);
@@ -86,14 +86,14 @@ Champ_Fonc& Turbulence_hyd_sous_maille_1elt_VEF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_1elt_VEF::calculer_fonction_structure()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& xv = zone_VEF.xv();
-  const DoubleTab& xp= zone_VEF.xp();
-  DoubleVect volume = zone_VEF.volumes();
-  const Zone& zone = zone_VEF.zone();
-  int nfac = zone.nb_faces_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& xv = domaine_VEF.xv();
+  const DoubleTab& xp= domaine_VEF.xp();
+  DoubleVect volume = domaine_VEF.volumes();
+  const Domaine& domaine = domaine_VEF.domaine();
+  int nfac = domaine.nb_faces_elem();
 
   int num_elem,num_face,i;
   double vit_x_elem ,vit_y_elem,vit_z_elem;

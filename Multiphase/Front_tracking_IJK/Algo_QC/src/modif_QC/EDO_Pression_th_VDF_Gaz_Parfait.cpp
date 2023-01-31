@@ -22,8 +22,8 @@
 
 #include <EDO_Pression_th_VDF_Gaz_Parfait.h>
 #include <Fluide_Quasi_Compressible.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Schema_Temps_base.h>
 #include <Loi_Etat_GP.h>
 //#include <Les_Cl.h>
@@ -88,11 +88,11 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
 
       // recuperation vitesse
       const DoubleTab& vitesse= pb.equation(0).inconnue().valeurs();
-      const Zone_VDF& zonevdf=ref_cast(Zone_VDF,pb.equation(1).zone_dis().valeur());
-      const DoubleVect& surface=zonevdf.face_surfaces();
+      const Domaine_VDF& domainevdf=ref_cast(Domaine_VDF,pb.equation(1).domaine_dis().valeur());
+      const DoubleVect& surface=domainevdf.face_surfaces();
       double int_divu=0;
-      const IntTab& face_voisins=zonevdf.face_voisins();
-      int nb_faces_bord=zonevdf.nb_faces_bord();
+      const IntTab& face_voisins=domainevdf.face_voisins();
+      int nb_faces_bord=domainevdf.nb_faces_bord();
       for(int face=0; face<nb_faces_bord; face++)
         {
 
@@ -139,13 +139,13 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
                   bilan_bis=+S(elem);
                 }
               vtot=mp_sum(vtot);
-              if (!est_egal(vtot,le_dom->zone().volume_total())) Process::exit();
+              if (!est_egal(vtot,le_dom->domaine().volume_total())) Process::exit();
             }
           bilan_bis+=bilan;
           bilan_bis-=int_divu*Pth_n*Cp/R;
 
           bilan_bis=mp_sum(bilan_bis);
-          vtot=le_dom->zone().volume_total();
+          vtot=le_dom->domaine().volume_total();
 
           //bilan*=R/Pth_n;
 //  Cerr<<" IIII "<< Pth_n ;

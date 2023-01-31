@@ -108,7 +108,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
-  const Zone_dis& le_dom_dis = eqn_transport_Fluctu_Temp->zone_dis();
+  const Domaine_dis& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
 
   const Probleme_base& mon_pb = mon_equation->probleme();
   const Equation_base& eqn_hydr = mon_pb.equation(0);
@@ -193,7 +193,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
 {
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp->schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp->zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp->domaine_Cl_dis().mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp.valeur());
   eqn_transport_Fluctu_Temp->mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->controler_grandeur();

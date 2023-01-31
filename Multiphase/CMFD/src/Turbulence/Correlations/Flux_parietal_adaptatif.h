@@ -29,7 +29,7 @@
 /*! @brief classe Flux_parietal_adaptatif classe qui implemente une correlation de flux parietal monophasique
  *
  *       pour un ecoulement turbulent avec une loi de paroi adaptative
- *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
+ *       (i.e. qui peut gerer la domaine visqueuse comme la domaine log en proche paroi)
  *
  *
  *

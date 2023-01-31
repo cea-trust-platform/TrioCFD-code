@@ -65,15 +65,15 @@ void Modele_Fonc_Bas_Reynolds_Base::discretiser()
   const Discretisation_base& dis=mon_equation->discretisation();
   double temps=0;
 
-  dis.discretiser_champ("temperature",mon_equation->zone_dis(),"D","?",1,temps,D_);
+  dis.discretiser_champ("temperature",mon_equation->domaine_dis(),"D","?",1,temps,D_);
   champs_compris_.ajoute_champ(D_);
-  dis.discretiser_champ("temperature",mon_equation->zone_dis(),"E","?",1,temps,E_);
+  dis.discretiser_champ("temperature",mon_equation->domaine_dis(),"E","?",1,temps,E_);
   champs_compris_.ajoute_champ(E_);
-  dis.discretiser_champ("temperature",mon_equation->zone_dis(),"F1","?",1,temps,F1_);
+  dis.discretiser_champ("temperature",mon_equation->domaine_dis(),"F1","?",1,temps,F1_);
   champs_compris_.ajoute_champ(F1_);
-  dis.discretiser_champ("temperature",mon_equation->zone_dis(),"F2","?",1,temps,F2_);
+  dis.discretiser_champ("temperature",mon_equation->domaine_dis(),"F2","?",1,temps,F2_);
   champs_compris_.ajoute_champ(F2_);
-  dis.discretiser_champ("champ_elem", mon_equation->zone_dis(),"distance_paroi","m",1,temps,BR_wall_length_);
+  dis.discretiser_champ("champ_elem", mon_equation->domaine_dis(),"distance_paroi","m",1,temps,BR_wall_length_);
   champs_compris_.ajoute_champ(BR_wall_length_);
 
 
@@ -114,14 +114,14 @@ int Modele_Fonc_Bas_Reynolds_Base::Calcul_is_Reynolds_stress_isotrope() const
 
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu(DoubleTab& Cmu,
-                                                     const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                     const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                      const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
   return Cmu;
 }
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi(DoubleTab& Cmu,
-                                                           const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                           const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                            const DoubleTab& visco, const DoubleTab& visco_turb,
                                                            const DoubleTab& loi_paroi,const int idt,
                                                            const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
@@ -138,14 +138,14 @@ bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re(const DoubleTab&, const Do
 
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_BiK(DoubleTab& Cmu,
-                                                         const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                         const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                          const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
   return Cmu;
 }
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
-                                                               const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                               const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                                const DoubleTab& visco, const DoubleTab& visco_turb,
                                                                const DoubleTab& loi_paroi,const int idt,
                                                                const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
@@ -181,7 +181,7 @@ void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi( )
   //exit();
 
 }
-/*DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+/*DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
 	return F1;
 }

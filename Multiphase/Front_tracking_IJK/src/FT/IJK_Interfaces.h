@@ -30,7 +30,7 @@
 #include <Objet_U.h>
 #include <Parcours_interface.h>
 #include <Ref_IJK_FT_double.h>
-#include <Ref_Zone_dis.h>
+#include <Ref_Domaine_dis.h>
 #include <Remaillage_FT_IJK.h>
 #include <SFichier.h>
 #include <Vecteur3.h>
@@ -57,7 +57,7 @@ public :
   IJK_Interfaces();
   void initialize(const IJK_Splitting& splitting_FT,
                   const IJK_Splitting& splitting_NS,
-                  const Zone_dis& zone_dis,
+                  const Domaine_dis& domaine_dis,
                   const bool compute_vint=true);
   void associer(const IJK_FT_double& ijk_ft);
   void posttraiter_tous_champs(Motcles& liste) const;
@@ -645,7 +645,7 @@ protected:
 
 // reference vers le splitting_ft_ pour les interfaces :
   REF(IJK_Splitting) ref_splitting_;
-  REF(Zone_dis) refzone_dis_;
+  REF(Domaine_dis) refdomaine_dis_;
   REF(IJK_FT_double) ref_ijk_ft_;
   // Interdit le constructeur par copie (car constructeurs par copie interdits
   // pour parcours_ et autres
@@ -714,7 +714,7 @@ protected:
   DoubleTab bounding_box_NS_domain_;
   bool perio_NS_[3];
 
-  // Zone autorise pour les bulles :
+  // Domaine autorise pour les bulles :
   // c'est le geom du splitting_FT reduit de ncells_forbidden_
   // dans toutes les direction ou le domaine NS est perio.
   int ncells_forbidden_;
@@ -723,7 +723,7 @@ protected:
   DoubleTab bounding_box_forbidden_criteria_;
   DoubleTab bounding_box_delete_criteria_;
 
-  // Zone a l'interieur duquel la duplication d'une bulle est inutile
+  // Domaine a l'interieur duquel la duplication d'une bulle est inutile
   DoubleTab bounding_box_duplicate_criteria_;
 
   // Distance max en metres a laquelle agit la force de repulsion entre les

@@ -25,7 +25,7 @@
 #include <Equation_base.h>
 #include <Fluide_base.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Debog.h>
 
 Implemente_base_sans_constructeur( Source_Transport_Realisable_VEF_Face_base, "Source_Transport_Realisable_VEF_Face_base", Source_Transport_VEF_Face_base ) ;
@@ -93,17 +93,17 @@ void Source_Transport_Realisable_VEF_Face_base::contribuer_a_avec(const DoubleTa
   double visco = -1;
   if (is_visco_const) visco = std::max(tab_visco(0, 0), DMINFLOAT);
 
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const DoubleVect& porosite_face = fluide.porosite_face(), &volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const DoubleVect& porosite_face = fluide.porosite_face(), &volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   for (int face = 0; face < size; face++)
     {
       if (!is_visco_const)
         {
-          const int elem0 = zone_VEF.face_voisins(face, 0), elem1 = zone_VEF.face_voisins(face, 1);
+          const int elem0 = domaine_VEF.face_voisins(face, 0), elem1 = domaine_VEF.face_voisins(face, 1);
           if (elem1 != -1)
             {
-              visco = tab_visco(elem0) * zone_VEF.volumes(elem0) + tab_visco(elem1) * zone_VEF.volumes(elem1);
-              visco /= zone_VEF.volumes(elem0) + zone_VEF.volumes(elem1);
+              visco = tab_visco(elem0) * domaine_VEF.volumes(elem0) + tab_visco(elem1) * domaine_VEF.volumes(elem1);
+              visco /= domaine_VEF.volumes(elem0) + domaine_VEF.volumes(elem1);
             }
           else visco = tab_visco(elem0);
         }

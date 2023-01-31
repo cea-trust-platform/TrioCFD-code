@@ -251,7 +251,7 @@ void Pb_Couple_Rayonnement::completer()
         }
       for (int j=0; j<le_pb.nombre_d_equations(); j++)
         {
-          Zone_Cl_dis& la_zcl = le_pb.equation(j).zone_Cl_dis();
+          Domaine_Cl_dis& la_zcl = le_pb.equation(j).domaine_Cl_dis();
           for (int num_cl=0; num_cl<la_zcl.nb_cond_lim(); num_cl++)
             {
               Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();

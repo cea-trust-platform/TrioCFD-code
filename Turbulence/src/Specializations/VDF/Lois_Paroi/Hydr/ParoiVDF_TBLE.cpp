@@ -21,7 +21,7 @@
 
 
 #include <ParoiVDF_TBLE.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Champ_Uniforme.h>
@@ -103,10 +103,10 @@ int ParoiVDF_TBLE::init_lois_paroi()
 {
   Cerr << "debut init_lois_paroi" << finl;
 
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -117,7 +117,7 @@ int ParoiVDF_TBLE::init_lois_paroi()
 
 
   init_lois_paroi_();
-  Paroi_TBLE_QDM::init_lois_paroi(zone_VDF, le_dom_Cl_VDF.valeur());
+  Paroi_TBLE_QDM::init_lois_paroi(domaine_VDF, le_dom_Cl_VDF.valeur());
 
 
 
@@ -127,7 +127,7 @@ int ParoiVDF_TBLE::init_lois_paroi()
 
 
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
@@ -150,7 +150,7 @@ int ParoiVDF_TBLE::init_lois_paroi()
 
 
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -185,9 +185,9 @@ int ParoiVDF_TBLE::init_lois_paroi()
 
                   //Distance a la paroi du 1er centre de maille
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   Diffu_totale_hyd_base& diffu_hyd = ref_cast_non_const(Diffu_totale_hyd_base, eq_vit[corresp[num_face]].get_diffu()); //modele de viscosite turbulente
                   diffu_hyd.setKappa(Kappa);
@@ -243,9 +243,9 @@ int ParoiVDF_TBLE::init_lois_paroi()
 
                   //Distance a la paroi du 1er centre de maille
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   eq_vit[corresp[num_face]].set_y0(0.); //ordonnee de la paroi
                   eq_vit[corresp[num_face]].set_yn(dist); //ordonnee du 1er centre de maille
@@ -350,11 +350,11 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 {
 // on est dans le cas k-eps
 
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -411,7 +411,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces(),1);
+  termes_sources.resize(domaine_VDF.nb_faces(),1);
   termes_sources = 0.;
   // On calcule les termes sources, sauf celui de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
   const Sources& les_sources=eqn_hydr.sources();
@@ -437,7 +437,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
   compteur_faces_paroi = 0; //Reinitialisation de compteur_faces_paroi
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -509,19 +509,19 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       if (loi_tble_T.est_initialise())
                         {
 
-                          double norm_n=zone_VDF.face_surfaces(num_face);
+                          double norm_n=domaine_VDF.face_surfaces(num_face);
                           double gn=0.;
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gn+=gravite(idim)*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gn+=gravite(idim)*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           DoubleVect gt_vect(dimension);
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gt_vect(idim) = gravite(idim)-gn*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gt_vect(idim) = gravite(idim)-gn*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           double g_t=gt_vect(1-ori);
@@ -597,9 +597,9 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                   double dist;
 
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   double d_visco;
 
@@ -739,19 +739,19 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
                       if (loi_tble_T.est_initialise())
                         {
-                          double norm_n=zone_VDF.face_surfaces(num_face);
+                          double norm_n=domaine_VDF.face_surfaces(num_face);
                           double gn=0.;
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gn+=gravite(idim)*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gn+=gravite(idim)*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           DoubleVect gt_vect(dimension);
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gt_vect(idim) = gravite(idim)-gn*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gt_vect(idim) = gravite(idim)-gn*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           for(int i=0; i<nb_pts+1; i++)
@@ -826,9 +826,9 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                   double dist;
 
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
                   double d_visco;
 
                   if (l_unif==1)
@@ -897,11 +897,11 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
       }
   */
 
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -958,7 +958,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces(),1);
+  termes_sources.resize(domaine_VDF.nb_faces(),1);
   termes_sources = 0.;
   // On calcule les termes sources, sauf celui de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
   const Sources& les_sources=eqn_hydr.sources();
@@ -984,7 +984,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   compteur_faces_paroi = 0; //Reinitialisation de compteur_faces_paroi
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -1056,19 +1056,19 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       if (loi_tble_T.est_initialise())
                         {
 
-                          double norm_n=zone_VDF.face_surfaces(num_face);
+                          double norm_n=domaine_VDF.face_surfaces(num_face);
                           double gn=0.;
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gn+=gravite(idim)*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gn+=gravite(idim)*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           DoubleVect gt_vect(dimension);
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gt_vect(idim) = gravite(idim)-gn*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gt_vect(idim) = gravite(idim)-gn*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           double g_t=gt_vect(1-ori);
@@ -1147,9 +1147,9 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                   double dist;
 
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   double d_visco;
 
@@ -1299,19 +1299,19 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
                       if (loi_tble_T.est_initialise())
                         {
-                          double norm_n=zone_VDF.face_surfaces(num_face);
+                          double norm_n=domaine_VDF.face_surfaces(num_face);
                           double gn=0.;
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gn+=gravite(idim)*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gn+=gravite(idim)*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           DoubleVect gt_vect(dimension);
 
                           for (int idim=0; idim<dimension; idim++)
                             {
-                              gt_vect(idim) = gravite(idim)-gn*zone_VDF.face_normales(num_face,idim)/norm_n;
+                              gt_vect(idim) = gravite(idim)-gn*domaine_VDF.face_normales(num_face,idim)/norm_n;
                             }
 
                           for(int i=0; i<nb_pts+1; i++)
@@ -1392,9 +1392,9 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                   double dist;
 
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
                   double d_visco;
 
                   if (l_unif==1)
@@ -1467,8 +1467,8 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
 int ParoiVDF_TBLE::calculer_stats()
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
@@ -1545,8 +1545,8 @@ void ParoiVDF_TBLE::imprimer_ustar(Sortie& os) const
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
 
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   for(int j=0; j<nb_post_pts; j++)
     {
@@ -1588,9 +1588,9 @@ void ParoiVDF_TBLE::imprimer_ustar(Sortie& os) const
 
 int ParoiVDF_TBLE::sauvegarder(Sortie& os) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   double tps =  mon_modele_turb_hyd->equation().inconnue().temps();
-  return Paroi_TBLE_QDM::sauvegarder(os, zone_VDF, le_dom_Cl_VDF.valeur(), tps);
+  return Paroi_TBLE_QDM::sauvegarder(os, domaine_VDF, le_dom_Cl_VDF.valeur(), tps);
 }
 
 
@@ -1598,9 +1598,9 @@ int ParoiVDF_TBLE::reprendre(Entree& is)
 {
   if (le_dom_VDF.non_nul()) // test pour ne pas planter dans "avancer_fichier(...)"
     {
-      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
       double tps_reprise = mon_modele_turb_hyd->equation().schema_temps().temps_courant();
-      return Paroi_TBLE_QDM::reprendre(is, zone_VDF, le_dom_Cl_VDF.valeur(), tps_reprise);
+      return Paroi_TBLE_QDM::reprendre(is, domaine_VDF, le_dom_Cl_VDF.valeur(), tps_reprise);
     }
   else return 1;
 }
@@ -1613,9 +1613,9 @@ const Probleme_base& ParoiVDF_TBLE::getPbBase() const
 
 void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int face3, int face4, int elem, int ndeb, int nfin, int ori, double gradient_de_pression0, double ts0, double gradient_de_pression1, double ts1)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   double d0d0_1=0;
   double d1d1_1=0;
   double d00d0 = 0., d0vdy= 0., d01d1= 0., d10d0= 0., d1vdy= 0., d11d1=0.;
@@ -1684,17 +1684,17 @@ void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int 
 
           if(eq_vit[corresp[num_face]].get_Unp1(0,1)>0)
             d0d0_1 = (eq_vit[corresp[face_droite0]].get_Unp1(0,1)-eq_vit[corresp[num_face]].get_Unp1(0,1))
-                     /zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
+                     /domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
           else
             d0d0_1 = (eq_vit[corresp[num_face]].get_Unp1(0,1)-eq_vit[corresp[face_gauche0]].get_Unp1(0,1))
-                     /zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
+                     /domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
 
           if(eq_vit[corresp[num_face]].get_Unp1(0,1)>0)
             d1d1_1 = (eq_vit[corresp[face_droite1]].get_Unp1(1,1)-eq_vit[corresp[num_face]].get_Unp1(1,1))
-                     /zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
+                     /domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
           else
             d1d1_1 = (eq_vit[corresp[num_face]].get_Unp1(1,1)-eq_vit[corresp[face_gauche1]].get_Unp1(1,1))
-                     /zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
+                     /domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3);
 
           v += -(d0d0_1+d1d1_1)
                *0.5*(eq_vit[corresp[num_face]].get_yc(1)-eq_vit[corresp[num_face]].get_yc(0));
@@ -1709,18 +1709,18 @@ void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int 
             {
               v += -(
                      (eq_vit[corresp[face_droite0]].get_Unp1(0,i)-eq_vit[corresp[face_gauche0]].get_Unp1(0,i))
-                     /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
+                     /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
                      +
                      (eq_vit[corresp[face_droite1]].get_Unp1(1,i)-eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                     /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
+                     /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
                    )
                    *0.5*(eq_vit[corresp[num_face]].get_yc(i)-eq_vit[corresp[num_face]].get_yc(i-1))
                    -(
                      (eq_vit[corresp[face_droite0]].get_Unp1(0,i-1)-eq_vit[corresp[face_gauche0]].get_Unp1(0,i-1))
-                     /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
+                     /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
                      +
                      (eq_vit[corresp[face_droite1]].get_Unp1(1,i-1)-eq_vit[corresp[face_gauche1]].get_Unp1(1,i-1))
-                     /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
+                     /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
                    )
                    *0.5*(eq_vit[corresp[num_face]].get_yc(i-1)-eq_vit[corresp[num_face]].get_yc(i-2));
 
@@ -1736,10 +1736,10 @@ void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int 
 
           v += -(
                  (eq_vit[corresp[face_droite0]].get_Unp1(0,i)-eq_vit[corresp[face_gauche0]].get_Unp1(0,i))
-                 /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
+                 /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)+domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3))
                  +
                  (eq_vit[corresp[face_droite1]].get_Unp1(1,i)-eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                 /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
+                 /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)+domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3))
                )
                *0.5*(eq_vit[corresp[num_face]].get_yc(nb_pts-1)-eq_vit[corresp[num_face]].get_yc(nb_pts-2));
 
@@ -1761,23 +1761,23 @@ void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int 
             {
               d00d0 = (eq_vit[corresp[face_droite0]].get_Unp1(0,i)*eq_vit[corresp[face_droite0]].get_Unp1(0,i)
                        -eq_vit[corresp[face_gauche0]].get_Unp1(0,i)*eq_vit[corresp[face_gauche0]].get_Unp1(0,i))
-                      /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
-                        +zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
+                      /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
+                        +domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
 
               d01d1 = (eq_vit[corresp[face_droite1]].get_Unp1(0,i)*eq_vit[corresp[face_droite1]].get_Unp1(1,i)
                        -eq_vit[corresp[face_gauche1]].get_Unp1(0,i)*eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                      /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
-                        +zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
+                      /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
+                        +domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
 
               d10d0 = (eq_vit[corresp[face_droite0]].get_Unp1(0,i)*eq_vit[corresp[face_droite0]].get_Unp1(1,i)
                        -eq_vit[corresp[face_gauche0]].get_Unp1(0,i)*eq_vit[corresp[face_gauche0]].get_Unp1(1,i))
-                      /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
-                        +zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
+                      /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
+                        +domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
 
               d11d1 = (eq_vit[corresp[face_droite1]].get_Unp1(1,i)*eq_vit[corresp[face_droite1]].get_Unp1(1,i)
                        -eq_vit[corresp[face_gauche1]].get_Unp1(1,i)*eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                      /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
-                        +zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
+                      /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
+                        +domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
 
               d0vdy = (eq_vit[corresp[num_face]].get_Unp1(0,i+1)*eq_vit[corresp[num_face]].get_v(i+1)
                        -eq_vit[corresp[num_face]].get_Unp1(0,i-1)*eq_vit[corresp[num_face]].get_v(i-1))
@@ -1796,23 +1796,23 @@ void ParoiVDF_TBLE::calculer_convection(int num_face, int face1, int face2, int 
 
           d00d0 = (eq_vit[corresp[face_droite0]].get_Unp1(0,i)*eq_vit[corresp[face_droite0]].get_Unp1(0,i)
                    -eq_vit[corresp[face_gauche0]].get_Unp1(0,i)*eq_vit[corresp[face_gauche0]].get_Unp1(0,i))
-                  /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
-                    +zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
+                  /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
+                    +domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
 
           d01d1 = (eq_vit[corresp[face_droite1]].get_Unp1(0,i)*eq_vit[corresp[face_droite1]].get_Unp1(1,i)
                    -eq_vit[corresp[face_gauche1]].get_Unp1(0,i)*eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                  /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
-                    +zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
+                  /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
+                    +domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
 
           d10d0 = (eq_vit[corresp[face_droite0]].get_Unp1(0,i)*eq_vit[corresp[face_droite0]].get_Unp1(1,i)
                    -eq_vit[corresp[face_gauche0]].get_Unp1(0,i)*eq_vit[corresp[face_gauche0]].get_Unp1(1,i))
-                  /(zone_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
-                    +zone_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
+                  /(domaine_VDF.dist_elem_period(elem_gauche0,elem,(ori+1)%3)
+                    +domaine_VDF.dist_elem_period(elem,elem_droite0,(ori+1)%3));
 
           d11d1 = (eq_vit[corresp[face_droite1]].get_Unp1(1,i)*eq_vit[corresp[face_droite1]].get_Unp1(1,i)
                    -eq_vit[corresp[face_gauche1]].get_Unp1(1,i)*eq_vit[corresp[face_gauche1]].get_Unp1(1,i))
-                  /(zone_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
-                    +zone_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
+                  /(domaine_VDF.dist_elem_period(elem_gauche1,elem,(ori+2)%3)
+                    +domaine_VDF.dist_elem_period(elem,elem_droite1,(ori+2)%3));
 
           d0vdy = (eq_vit[corresp[num_face]].get_Unp1(0,i)*eq_vit[corresp[num_face]].get_v(i)
                    -eq_vit[corresp[num_face]].get_Unp1(0,i-1)*eq_vit[corresp[num_face]].get_v(i-1))

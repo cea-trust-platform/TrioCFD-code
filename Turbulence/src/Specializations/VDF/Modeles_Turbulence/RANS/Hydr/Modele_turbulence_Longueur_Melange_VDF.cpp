@@ -23,11 +23,11 @@
 #include <Probleme_base.h>
 #include <Debog.h>
 #include <TRUSTTrav.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Champ_Face_VDF.h>
 #include <Schema_Temps_base.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Equation_base.h>
 #include <Param.h>
 
@@ -77,11 +77,11 @@ int Modele_turbulence_Longueur_Melange_VDF::preparer_calcul( )
 }
 
 void Modele_turbulence_Longueur_Melange_VDF::associer(
-  const Zone_dis& zone_dis,
-  const Zone_Cl_dis& zone_Cl_dis)
+  const Domaine_dis& domaine_dis,
+  const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulente()
@@ -92,12 +92,12 @@ Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulent
   double Cmu = CMU;
 
   double temps = mon_equation->inconnue().temps();
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
-  const int nb_elem = zone_VDF.nb_elem();
-  const int nb_elem_tot = zone_VDF.nb_elem_tot();
-  const DoubleTab& xp = zone_VDF.xp();
+  const int nb_elem = domaine_VDF.nb_elem();
+  const int nb_elem_tot = domaine_VDF.nb_elem_tot();
+  const DoubleTab& xp = domaine_VDF.xp();
 
   Sij2.resize(nb_elem_tot);
 
@@ -155,9 +155,9 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
 {
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
-  const Zone_Cl_VDF& zone_Cl_VDF = le_dom_Cl_VDF.valeur();
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
 
   DoubleTab duidxj(nb_elem,dimension,dimension);
   int i,j;
@@ -165,7 +165,7 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
 
   Sij2=0.;
 
-  ch.calcul_duidxj(vitesse,duidxj,zone_Cl_VDF);
+  ch.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 
   for (int elem=0 ; elem<nb_elem ; elem++)
     {

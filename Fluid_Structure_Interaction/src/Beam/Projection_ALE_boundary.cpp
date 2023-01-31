@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Projection_ALE_boundary.h>
-#include <Zone_ALE.h>
+#include <Domaine_ALE.h>
 
 Implemente_instanciable(Projection_ALE_boundary, "Projection_ALE_boundary", Interprete_geometrique_base ) ;
 //XD  Projection_ALE_boundary interprete Projection_ALE_boundary 0 block to compute the projection of a modal function on a mobile boundary. Use to compute modal added coefficients in FSI.
@@ -40,7 +40,7 @@ Entree& Projection_ALE_boundary::readOn( Entree& is )
 Entree& Projection_ALE_boundary::interpreter_(Entree& is)
 {
   associer_domaine(is);
-  Zone_ALE& dom=ref_cast(Zone_ALE, domaine());
+  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
   dom.reading_projection_ALE_boundary(is);
   return is;
 }

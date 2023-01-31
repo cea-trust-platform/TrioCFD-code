@@ -24,7 +24,7 @@
 #include <Pb_MG.h>
 #include <Champ_front_zoom.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Equation_base.h>
 
 
@@ -60,29 +60,29 @@ void Pb_2G::calculer_connectivites_2G()
   Probleme_base& pbF = pb_Fin();
   Probleme_base& pb_G = pbG();
 
-  Zone_dis& domF = pbF.domaine_dis();
-  Zone_dis_base& zone_disF = domF;
-  Zone_VF& zone_VFF = ref_cast(Zone_VF, zone_disF);
+  Domaine_dis& domF = pbF.domaine_dis();
+  Domaine_dis_base& domaine_disF = domF;
+  Domaine_VF& domaine_VFF = ref_cast(Domaine_VF, domaine_disF);
 
-  Zone& domaineG = pb_G.domaine();
-  Zone_dis& domG = pb_G.domaine_dis();
-  Zone_dis_base& zone_disG = domG;
-  Zone_VF& zone_VFG = ref_cast(Zone_VF, zone_disG);
+  Domaine& domaineG = pb_G.domaine();
+  Domaine_dis& domG = pb_G.domaine_dis();
+  Domaine_dis_base& domaine_disG = domG;
+  Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaine_disG);
 
 
   IntVect& connect_ff = connectivites().connectivites_faceF_faceG();
   IntVect& connect_ee = connectivites().connectivites_elemF_elemG();
 
-  connectivites_ff_ee.calculer_connectivites(zone_VFF, zone_VFG, domaineG);
+  connectivites_ff_ee.calculer_connectivites(domaine_VFF, domaine_VFG, domaineG);
   if (nb_prolongement_>0)
     {
       /*if (sub_type(Prolongement_elem_face_FMG,mon_prolongement_.valeur()))
         for(i=0; i<nb_prolongement_; i++)
-        mon_prolongement_(i).calculer(zone_VFF, zone_VFG, connect_ee);
+        mon_prolongement_(i).calculer(domaine_VFF, domaine_VFG, connect_ee);
         else */
       for(i=0; i<nb_prolongement_; i++)
         {
-          mon_prolongement_(i).calculer(zone_VFF, zone_VFG, connect_ff);
+          mon_prolongement_(i).calculer(domaine_VFF, domaine_VFG, connect_ff);
         }
     }
 
@@ -93,9 +93,9 @@ void Pb_2G::calculer_connectivites_2G()
         {
           Restriction_base& rest = ma_restriction_(j).valeur();
           /*if(sub_type(Restriction_elemF_faceG_1, rest))
-            rest.calculer(zone_VFG, zone_VFF, connect_ff);
+            rest.calculer(domaine_VFG, domaine_VFF, connect_ff);
             else */
-          rest.calculer(zone_VFG, zone_VFF, connect_ee);
+          rest.calculer(domaine_VFG, domaine_VFF, connect_ee);
         }
     }
   //Cerr<<"fin de Pb_2G::calculer_connectivites_2G"<<finl;
@@ -131,16 +131,16 @@ void Pb_2G::prolonger_2G(IntVect& connect, DoubleTab& valG, int nb_compo,
 
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis();
-  Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
+  Domaine_dis_base& domainef = pbF.domaine_dis();
+  Domaine_VF& domaine_VFF = ref_cast(Domaine_VF, domainef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis();
-  Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
+  Domaine_dis_base& domaineg = pb_G.domaine_dis();
+  Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaineg);
 
   //Cout << "Inco Grossiere = " << incoG.valeurs() << finl;
 
-  mon_prolongement_(num_prolongement).prolonger(zone_VFG, zone_VFF, frontF, connect, valG, tab, nb_compo);
+  mon_prolongement_(num_prolongement).prolonger(domaine_VFG, domaine_VFF, frontF, connect, valG, tab, nb_compo);
 
   //Cerr<<"fin de Pb_2G::prolonger_2G"<<finl;
 }
@@ -160,12 +160,12 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
 {
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis();
-  Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
+  Domaine_dis_base& domainef = pbF.domaine_dis();
+  Domaine_VF& domaine_VFF = ref_cast(Domaine_VF, domainef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis();
-  Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
+  Domaine_dis_base& domaineg = pb_G.domaine_dis();
+  Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaineg);
   //Tableau de connectivites necessaire a la restriction
   //   Connectivites& connections = connectivites();
   //   IntVect& connect = connections.connectivites_elemF_elemG();
@@ -175,7 +175,7 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
   //   Cerr<<"nom de l'incoG : "<<incoG.le_nom()<<finl;
   //   Cerr<<"nom de l'incoF : "<<incoF.le_nom()<<finl;
 
-  ma_restriction_(num_rest).restreindre(zone_VFG, zone_VFF,connect, val_incoG, val_incoF,nb_comp_incoG);
+  ma_restriction_(num_rest).restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG);
 }
 
 
@@ -187,14 +187,14 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
 {
   //probleme fin
   Probleme_base& pbF = pb_Fin();
-  Zone_dis_base& zonef = pbF.domaine_dis();
-  Zone_VF& zone_VFF = ref_cast(Zone_VF, zonef);
+  Domaine_dis_base& domainef = pbF.domaine_dis();
+  Domaine_VF& domaine_VFF = ref_cast(Domaine_VF, domainef);
   //probleme grossier
   Probleme_base& pb_G = pbG();
-  Zone_dis_base& zoneg = pb_G.domaine_dis();
-  Zone_VF& zone_VFG = ref_cast(Zone_VF, zoneg);
+  Domaine_dis_base& domaineg = pb_G.domaine_dis();
+  Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaineg);
 
-  ma_restriction_(num_rest).restreindre(zone_VFG, zone_VFF,connect, val_incoG, val_incoF,nb_comp_incoG, num_prem_face_frontG);
+  ma_restriction_(num_rest).restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG, num_prem_face_frontG);
 }
 
 

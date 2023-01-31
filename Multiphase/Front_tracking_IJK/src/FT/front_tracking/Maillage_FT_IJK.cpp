@@ -45,7 +45,7 @@ Entree& Maillage_FT_IJK::readOn(Entree& is)
   return is;
 }
 
-void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Zone_dis& zone_dis, const Parcours_interface& parcours)
+void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Domaine_dis& domaine_dis, const Parcours_interface& parcours)
 {
   ref_splitting_ = s;
   // Mise a jour des tableaux de processeurs voisins :
@@ -54,7 +54,7 @@ void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Zone_dis& zone_di
   nbmailles_euler_j_ = s.get_nb_elem_local(DIRECTION_J);
   nbmailles_euler_k_ = s.get_nb_elem_local(DIRECTION_K);
 
-  associer_domaine_dis_parcours(zone_dis, parcours);
+  associer_domaine_dis_parcours(domaine_dis, parcours);
 }
 
 // Deplace tous les sommets lagrangiens dont les indices locaux sont mentionnes dans liste_sommets_initiale

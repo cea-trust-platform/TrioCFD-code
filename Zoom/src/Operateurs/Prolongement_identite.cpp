@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_identite.h>
-#include <Zone.h>
-#include <Zone_VF.h>
+#include <Domaine.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Prolongement_identite,"Prolongement_identite",Prolongement_base);
 
@@ -48,8 +48,8 @@ Entree& Prolongement_identite::readOn(Entree& s )
 /*! @brief Prolongement du centre de gravite des faces grossieres au centre de gravite de TOUTES les faces fines
  *
  */
-void Prolongement_identite::prolonger(Zone_VF& zone_VFG,
-                                      Zone_VF& zone_VFF,
+void Prolongement_identite::prolonger(Domaine_VF& domaine_VFG,
+                                      Domaine_VF& domaine_VFF,
                                       const Frontiere& frontF,
                                       IntVect& connect,
                                       const DoubleTab& valG, DoubleTab& tab,
@@ -77,8 +77,8 @@ void Prolongement_identite::prolonger(Zone_VF& zone_VFG,
 
 
 //NE FAIT RIEN
-void Prolongement_identite::calculer(Zone_VF& zonef,
-                                     Zone_VF& zoneg,
+void Prolongement_identite::calculer(Domaine_VF& domainef,
+                                     Domaine_VF& domaineg,
                                      IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

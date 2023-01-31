@@ -33,8 +33,8 @@ class Motcle;
 class Champ_front_base;
 class Equation_base;
 class Milieu_base;
-class Zone_dis_base;
-class Zone_Cl_dis_base;
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
 class Champ_Inc_base;
 
 /*! @brief classe Champ_front_zoom Classe derivee de Champ_front_var.
@@ -64,8 +64,8 @@ public:
   const Champ_Inc_base& inconnue() const ;
   const Equation_base& equation() const;
   //  inline Nom& dirichlet_ou_neumann_();
-  const Zone_dis_base& zone_dis() const;
-  const Zone_Cl_dis_base& zone_Cl_dis() const;
+  const Domaine_dis_base& domaine_dis() const;
+  const Domaine_Cl_dis_base& domaine_Cl_dis() const;
   const Milieu_base& milieu() const;
   const Frontiere_dis_base& front_dis_exterieure() const;
 

@@ -158,13 +158,13 @@ void Pb_Phase_field::typer_lire_milieu(Entree& is)
  * Le test se fait sur les conditions
  *     aux limites discretisees de chaque equation.
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_concentration(const Zone_Cl_dis&,const Zone_Cl_dis&)
+ *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
  *
  * @return (int) code de retour propage
  */
 int Pb_Phase_field::verifier()
 {
-  const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();
-  const Zone_Cl_dis& zone_Cl_co = eq_concentration.zone_Cl_dis();
-  return tester_compatibilite_hydr_concentration(zone_Cl_hydr,zone_Cl_co);
+  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
+  return tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
 }

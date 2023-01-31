@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Traitement_particulier_NS_THI_thermo_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Navier_Stokes_std.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Convection_Diffusion_Chaleur_QC.h>
@@ -94,12 +94,12 @@ void Traitement_particulier_NS_THI_thermo_VDF::init_calc_spectre(void)
 void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
 {
 
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  int nb_elem = zone.nb_elem();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  int nb_elem = domaine.nb_elem();
   //  double nb=pow(nb_elem*1.,1./3.);
   //  int nb_elem_dir = (int)(nb)+1;
-  calcul_nb_elem_dir(zone);
+  calcul_nb_elem_dir(domaine);
 
   double temps_crt = mon_equation->inconnue().temps();
   const DoubleTab& Temp = mon_equation_NRJ.valeur().inconnue().valeurs();
@@ -135,9 +135,9 @@ void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
 
 void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
 {
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  int nb_elem = zone.nb_elem();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  int nb_elem = domaine.nb_elem();
   int i;
 
   double temps_crt = mon_equation->inconnue().temps();
@@ -218,12 +218,12 @@ void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
 
 double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie(void)
 {
-  const Zone_dis& zdis = mon_equation->zone_dis();
-  const Zone& zone = zdis.zone();
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,zdis.valeur());
-  int nb_elem = zone.nb_elem();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,zdis.valeur());
+  int nb_elem = domaine.nb_elem();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
 
   const DoubleTab& Temp = mon_equation_NRJ.valeur().inconnue().valeurs();
 
@@ -242,8 +242,8 @@ double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie(void)
           face1 = elem_faces(elem,ori+dimension);
           element0 = face_voisins(face0,0);
           element1 = face_voisins(face1,1);
-          gradT += pow((Temp(element0)-Temp(elem))/zone_VDF.dist_elem(element0,elem,ori),2);
-          gradT += pow((Temp(element1)-Temp(elem))/zone_VDF.dist_elem(element1,elem,ori),2);
+          gradT += pow((Temp(element0)-Temp(elem))/domaine_VDF.dist_elem(element0,elem,ori),2);
+          gradT += pow((Temp(element1)-Temp(elem))/domaine_VDF.dist_elem(element1,elem,ori),2);
 
           DT+=0.5*gradT;
         }

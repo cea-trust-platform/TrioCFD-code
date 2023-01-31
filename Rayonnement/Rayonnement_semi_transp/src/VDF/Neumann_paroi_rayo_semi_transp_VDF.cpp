@@ -26,7 +26,7 @@
 #include <Schema_Temps_base.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <communications.h>
 Implemente_instanciable(Neumann_paroi_rayo_semi_transp_VDF,"Paroi_flux_impose_rayo_semi_transp_VDF",Neumann_paroi);
 
@@ -57,7 +57,7 @@ Entree& Neumann_paroi_rayo_semi_transp_VDF::readOn(Entree& is)
 
 double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int ndeb = front_vf.num_premiere_face();
@@ -82,7 +82,7 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
 
 double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i,int j) const
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int ndeb = front_vf.num_premiere_face();
@@ -107,7 +107,7 @@ const Cond_lim_base& Neumann_paroi_rayo_semi_transp_VDF::la_cl() const
 
 void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const IntTab& face_voisins=zvdf.face_voisins();
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
@@ -208,7 +208,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
 
   // On initialise le tableau des temperatures de bord egale a la
   // temperature initiale du milieu courant
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   int ndeb = front_vf.num_premiere_face();
   const IntTab& face_voisins = zvdf.face_voisins();
   const DoubleTab& T = mon_dom_cl_dis->equation().inconnue().valeurs();

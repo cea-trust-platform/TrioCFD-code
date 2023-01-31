@@ -61,15 +61,15 @@ const Modele_Fonc_Bas_Reynolds& Source_Transport_K_VDF_Elem::get_modele_fonc_bas
 void Source_Transport_K_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  get_modele_fonc_bas_reyn().Calcul_D_BiK(D,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(),vit,K, Eps,ch_visco_cin);
-  get_modele_fonc_bas_reyn().Calcul_E_BiK(E,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(),vit,K, Eps,ch_visco_cin,visco_turb);
+  get_modele_fonc_bas_reyn().Calcul_D_BiK(D,mon_eq_transport_K->domaine_dis(),mon_eq_transport_K->domaine_Cl_dis(),vit,K, Eps,ch_visco_cin);
+  get_modele_fonc_bas_reyn().Calcul_E_BiK(E,mon_eq_transport_K->domaine_dis(),mon_eq_transport_K->domaine_Cl_dis(),vit,K, Eps,ch_visco_cin,visco_turb);
 }
 
 void Source_Transport_K_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& P_tab, DoubleTab& D, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  get_modele_fonc_bas_reyn().Calcul_F1_BiK(F1,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(), P_tab, K, Eps,ch_visco_cin_ou_dyn);
-  get_modele_fonc_bas_reyn().Calcul_F2_BiK(F2,D,mon_eq_transport_K->zone_dis(),K, Eps, ch_visco_cin_ou_dyn  );
+  get_modele_fonc_bas_reyn().Calcul_F1_BiK(F1,mon_eq_transport_K->domaine_dis(),mon_eq_transport_K->domaine_Cl_dis(), P_tab, K, Eps,ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn().Calcul_F2_BiK(F2,D,mon_eq_transport_K->domaine_dis(),K, Eps, ch_visco_cin_ou_dyn  );
 }
 
 void Source_Transport_K_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
@@ -107,9 +107,9 @@ void Source_Transport_K_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& 
     {
       DoubleTrav D(0);
       F2.resize(K.dimension_tot(0));
-      const Zone_dis& zone_dis_k =mon_eq_transport_K->zone_dis();
+      const Domaine_dis& domaine_dis_k =mon_eq_transport_K->domaine_dis();
       const Champ_base& ch_visco_cin_ou_dyn =ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
-      mon_modele_fonc.Calcul_F2_BiK(F2,D,zone_dis_k,K,Eps, ch_visco_cin_ou_dyn  );
+      mon_modele_fonc.Calcul_F2_BiK(F2,D,domaine_dis_k,K,Eps, ch_visco_cin_ou_dyn  );
     }
 
   for (int c=0; c<size; c++)

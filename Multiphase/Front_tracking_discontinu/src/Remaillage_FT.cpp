@@ -23,8 +23,8 @@
 #include <Remaillage_FT.h>
 #include <TRUST_Deriv.h>
 #include <Motcle.h>
-#include <Zone_VF.h>
-#include <Zone.h>
+#include <Domaine_VF.h>
+#include <Domaine.h>
 #include <Triangle.h>
 #include <Rectangle.h>
 #include <Rectangle_2D_axi.h>
@@ -195,15 +195,15 @@ void Remaillage_FT::set_param(Param& p)
   p.ajouter("lissage_courbure_iterations_si_remaillage", &lissage_courbure_iterations_si_remaillage_);
 }
 
-/*! @brief Cette fonction stocke la zone_dis dans refzone_dis_
+/*! @brief Cette fonction stocke la domaine_dis dans refdomaine_dis_
  *
- * @param (zone_dis) zone discretisee de calcul
+ * @param (domaine_dis) domaine discretisee de calcul
  * @return le flot d'entree
  */
-void Remaillage_FT::associer_domaine(const Zone_dis& zone_dis)
+void Remaillage_FT::associer_domaine(const Domaine_dis& domaine_dis)
 {
   Cerr<<"Remaillage_FT::associer_domaine_dis"<<finl;
-  refzone_VF_ = ref_cast(Zone_VF,zone_dis.valeur());
+  refdomaine_VF_ = ref_cast(Domaine_VF,domaine_dis.valeur());
 }
 
 int Remaillage_FT::a_remailler(double temps, const Maillage_FT_Disc& maillage) const
@@ -1561,7 +1561,7 @@ int Remaillage_FT::traite_decollement(Maillage_FT_Disc& maillage, const DoubleTa
   maillage.desc_sommets().collecter_espace_virtuel(nbSomVois_bord, MD_Vector_tools::EV_SOMME);
 
   const DoubleTab& sommets = maillage.sommets();
-  const DoubleTab& xp = refzone_VF_->xp();
+  const DoubleTab& xp = refdomaine_VF_->xp();
   double x,y,z=0., scal;
   for (som=0 ; som<nb_sommets ; som++)
     {
@@ -2275,18 +2275,18 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
       // elements euleriens.
       const int elem0 = maillage.sommet_elem_[som0];
 
-      const Elem_geom_base& elem_geom = refzone_VF_->zone().type_elem().valeur();
+      const Elem_geom_base& elem_geom = refdomaine_VF_->domaine().type_elem().valeur();
 
       if (sub_type(Triangle, elem_geom))
         {
-          double vol = refzone_VF_->volumes(elem0);
+          double vol = refdomaine_VF_->volumes(elem0);
           lgrId2 = 2. * vol;
 
         }
       else if (sub_type(Tetraedre, elem_geom))
         {
 
-          double vol = refzone_VF_->volumes(elem0);
+          double vol = refdomaine_VF_->volumes(elem0);
           lgrId2 = 2. * pow(vol,2./dimension);
 
         }
@@ -2295,8 +2295,8 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
         {
 
           const DoubleTab& sommets = maillage.sommets();
-          const DoubleTab& xv = refzone_VF_->xv();
-          const IntTab& elem_faces = refzone_VF_->elem_faces();
+          const DoubleTab& xv = refdomaine_VF_->xv();
+          const IntTab& elem_faces = refdomaine_VF_->elem_faces();
           int k;
           FTd_vecteur3 v = {0., 0., 0.};
           FTd_vecteur3 xyz = {x, y, z};

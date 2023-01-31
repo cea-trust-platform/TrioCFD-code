@@ -22,7 +22,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Source_Transport_K_VEF_Face.h>
 #include <Mod_turb_hyd_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Source_Transport_K_VEF_Face,"Source_Transport_K_VEF_P1NC",Source_Transport_VEF_Face_base);
 
@@ -66,7 +66,7 @@ void Source_Transport_K_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, cons
                                                        DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  get_modele_fonc_bas_reyn().Calcul_D_BiK(D, mon_eq_transport_K->zone_dis(), mon_eq_transport_K->zone_Cl_dis(), vit, K, Eps, ch_visco_cin);
+  get_modele_fonc_bas_reyn().Calcul_D_BiK(D, mon_eq_transport_K->domaine_dis(), mon_eq_transport_K->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin);
   D.echange_espace_virtuel();
 }
 

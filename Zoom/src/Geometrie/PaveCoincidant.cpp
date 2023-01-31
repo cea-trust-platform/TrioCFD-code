@@ -23,20 +23,20 @@
 #include <PaveCoincidant.h>
 #include <math.h>
 #include <Motcle.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <EChaine.h>
 #include <Interprete.h>
 
 Implemente_instanciable(PaveCoincidant,"PaveCoincidant",Pave);
 
-/*! @brief Simple appel a: Zone::printOn(Sortie&)
+/*! @brief Simple appel a: Domaine::printOn(Sortie&)
  *
  * @param (Sortie& s) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& PaveCoincidant::printOn(Sortie& s ) const
 {
-  return Zone::printOn(s) ;
+  return Domaine::printOn(s) ;
 }
 
 
@@ -83,7 +83,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
   is >> ledom;
   Cerr << "Lecture du pave " << nom_ << " qui doit coincider avec le domaine " << ledom << finl;
 
-  dom_qui_coincide=ref_cast(Zone, Interprete::objet(ledom));
+  dom_qui_coincide=ref_cast(Domaine, Interprete::objet(ledom));
 
   Motcle motlu;
   int rang,nmx,nmy,nmz;
@@ -373,7 +373,7 @@ void PaveCoincidant::determine_bornes()
               xg(k)+=les_coord(leselems(i,j),k);
           xg/=dom_qui_coincide->nb_som_elem();
 
-          if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans la zone a zoomer ...
+          if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans la domaine a zoomer ...
             {
               if ( dxm > std::fabs(xmin-les_coord(leselems(i,0),0)) )
                 {

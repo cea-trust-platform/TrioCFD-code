@@ -25,7 +25,7 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Constituant.h>
 #include <Champ_Face_VDF.h>
 #include <Debog.h>
@@ -35,10 +35,10 @@ Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Trans
 Sortie& Source_Transport_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VDF_Elem_base::associer_domaines(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
+void Source_Transport_VDF_Elem_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 void Source_Transport_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -51,13 +51,13 @@ DoubleTab& Source_Transport_VDF_Elem_base::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
 
   DoubleVect P; // Ajout d'un espace virtuel au tableu P
-  zone_VDF.zone().creer_tableau_elements(P);
+  domaine_VDF.domaine().creer_tableau_elements(P);
   calculer_terme_production(ch_vit,visco_turb,vit,P); // voir les classes filles
 
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = get_modele_fonc_bas_reyn();
@@ -97,7 +97,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Zone_Cl_VDF& zcl_VDF_th = ref_cast(Zone_Cl_VDF,eq_thermique->zone_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeurs();
@@ -106,7 +106,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
-  le_dom_VDF->zone().creer_tableau_elements(G);
+  le_dom_VDF->domaine().creer_tableau_elements(G);
 
 
   if (sub_type(Champ_Uniforme,beta_t->valeur())) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
@@ -118,7 +118,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
 
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 {
-  const Zone_Cl_VDF& zcl_VDF_co = ref_cast(Zone_Cl_VDF,eq_concentration->zone_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis().valeur());
   const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
@@ -129,7 +129,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
-  le_dom_VDF->zone().creer_tableau_elements(G);
+  le_dom_VDF->domaine().creer_tableau_elements(G);
 
   if (nb_consti == 1) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_co,G,concen,diffu_turb,ch_beta_concen(0,0),g);
   else
@@ -145,8 +145,8 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 // TODO : FIXME : on peut factoriser avec les 2 methodes ajouter_anisotherme et ajouter_concen
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab& resu) const
 {
-  const Zone_Cl_VDF& zcl_VDF_th = ref_cast(Zone_Cl_VDF,eq_thermique->zone_Cl_dis().valeur());
-  const Zone_Cl_VDF& zcl_VDF_co = ref_cast(Zone_Cl_VDF,eq_concentration->zone_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis().valeur());
   const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_base& le_modele_scal_co = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
@@ -167,8 +167,8 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
 
   // Ajout d'un espace virtuel au tableaux Gt et Gc
   DoubleVect G_t, G_c;
-  le_dom_VDF->zone().creer_tableau_elements(G_t);
-  le_dom_VDF->zone().creer_tableau_elements(G_c);
+  le_dom_VDF->domaine().creer_tableau_elements(G_t);
+  le_dom_VDF->domaine().creer_tableau_elements(G_c);
 
   if (sub_type(Champ_Uniforme,ch_beta_temper.valeur())) calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t(0,0),g);
   else calculer_terme_destruction_K(le_dom_VDF.valeur(),zcl_VDF_th,G_t,temper,alpha_turb,tab_beta_t,g);

@@ -22,7 +22,7 @@
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
-#include <Zone_ALE.h>
+#include <Domaine_ALE.h>
 #include <Postraitement.h>
 #include <stat_counters.h>
 #include <FichierHDFPar.h>
@@ -290,15 +290,15 @@ void Probleme_base::warn_old_syntax()
  */
 int Probleme_base::associer_(Objet_U& ob)
 {
-  // Schema_Temps_base Zone Milieu_base
+  // Schema_Temps_base Domaine Milieu_base
   if( sub_type(Schema_Temps_base, ob))
     {
       associer_sch_tps_base(ref_cast(Schema_Temps_base, ob));
       return 1;
     }
-  if( sub_type(Zone, ob))
+  if( sub_type(Domaine, ob))
     {
-      associer_domaine(ref_cast(Zone, ob));
+      associer_domaine(ref_cast(Domaine, ob));
       return 1;
     }
   if( sub_type(Milieu_base, ob))
@@ -356,11 +356,11 @@ int Probleme_base::verifier()
 /*! @brief Associe un domaine au probleme.
  *
  * Prend un_domaine comme support.
- *      apelle Zone_dis::associer_dom(const Zone& )
+ *      apelle Domaine_dis::associer_dom(const Domaine& )
  *
- * @param (Zone& un_domaine) le domaine
+ * @param (Domaine& un_domaine) le domaine
  */
-void Probleme_base::associer_domaine(const Zone& un_domaine)
+void Probleme_base::associer_domaine(const Domaine& un_domaine)
 {
   le_domaine_ = un_domaine;
 }
@@ -375,11 +375,11 @@ void Probleme_base::discretiser_equations()
     }
 }
 
-/*! @brief Affecte une discretisation au probleme Discretise le Zone associe au probleme avec la discretisation
+/*! @brief Affecte une discretisation au probleme Discretise le Domaine associe au probleme avec la discretisation
  *
- *      Associe la premiere zone du Zone aux equations du probleme
+ *      Associe la premiere domaine du Domaine aux equations du probleme
  *      Discretise les equations associees au probleme
- *      NOTE: TRUST V1 une seule Zone_dis pas Zone_dis est traitee
+ *      NOTE: TRUST V1 une seule Domaine_dis pas Domaine_dis est traitee
  *
  * @param (Discretisation_base& discretisation) une discretisation pour le probleme
  */
@@ -397,7 +397,7 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
 
   une_discretisation.associer_domaine(le_domaine_.valeur());
   une_discretisation.discretiser(le_domaine_dis);
-  // Can not do this before, since the Zone_dis is not typed yet:
+  // Can not do this before, since the Domaine_dis is not typed yet:
   le_domaine_dis.associer_domaine(le_domaine_);
 
   if (milieu_via_associer() || is_pb_FT())
@@ -613,18 +613,18 @@ Schema_Temps_base& Probleme_base::schema_temps()
  *
  * (version const)
  *
- * @return (Zone&) un domaine
+ * @return (Domaine&) un domaine
  */
-const Zone& Probleme_base::domaine() const
+const Domaine& Probleme_base::domaine() const
 {
   return le_domaine_.valeur();
 }
 
 /*! @brief Renvoie le domaine associe au probleme.
  *
- * @return (Zone&) un domaine
+ * @return (Domaine&) un domaine
  */
-Zone& Probleme_base::domaine()
+Domaine& Probleme_base::domaine()
 {
   return le_domaine_.valeur();
 }
@@ -633,18 +633,18 @@ Zone& Probleme_base::domaine()
  *
  * (version const)
  *
- * @return (Zone_dis&) un domaine discretise
+ * @return (Domaine_dis&) un domaine discretise
  */
-const Zone_dis& Probleme_base::domaine_dis() const
+const Domaine_dis& Probleme_base::domaine_dis() const
 {
   return le_domaine_dis;
 }
 
 /*! @brief Renvoie le domaine discretise associe au probleme.
  *
- * @return (Zone_dis&) un domaine discretise
+ * @return (Domaine_dis&) un domaine discretise
  */
-Zone_dis& Probleme_base::domaine_dis()
+Domaine_dis& Probleme_base::domaine_dis()
 {
   return le_domaine_dis;
 }
@@ -1000,11 +1000,11 @@ void Probleme_base::mettre_a_jour(double temps)
 void Probleme_base::preparer_calcul()
 {
   const double temps = schema_temps().temps_courant();
-  // Modification du tableau Qdm porte par la zone_dis() dans le cas
+  // Modification du tableau Qdm porte par la domaine_dis() dans le cas
   // ou il y a des conditions aux limites periodiques.
   // Rq : Si l'une des equations porte la condition a la limite periodique
   //      alors les autres doivent forcement la porter.
-  equation(0).zone_dis()->modifier_pour_Cl(equation(0).zone_Cl_dis().les_conditions_limites());
+  equation(0).domaine_dis()->modifier_pour_Cl(equation(0).domaine_Cl_dis().les_conditions_limites());
   milieu().initialiser(temps);
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).preparer_calcul();
@@ -1273,12 +1273,12 @@ int Probleme_base::postraiter(int force)
   statistiques().end_count(postraitement_counter_);
 
   //specific ALE postraitement
-  if(le_domaine_dis.zone().que_suis_je()=="Zone_ALE")
+  if(le_domaine_dis.domaine().que_suis_je()=="Domaine_ALE")
     {
       if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
         {
           //compute the projection on the ALE boundaries
-          Zone_ALE& dom_ale = ref_cast(Zone_ALE,le_domaine_dis.zone());
+          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis.domaine());
           double temps = le_schema_en_temps->temps_courant();
           dom_ale.update_ALE_projection(temps);
         }

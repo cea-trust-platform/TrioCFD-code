@@ -24,8 +24,8 @@
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Equation_base.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 
 Implemente_instanciable(Turbulence_hyd_sous_maille_VEF,"Modele_turbulence_hyd_sous_maille_VEF",Mod_turb_hyd_ss_maille_VEF);
 
@@ -57,14 +57,14 @@ Entree& Turbulence_hyd_sous_maille_VEF::readOn(Entree& s )
 Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
 {
   static const double Csm1 = CSM1;
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  const int nb_face = zone_VEF.nb_faces();
-  const int nb_face_tot = zone_VEF.nb_faces_tot();
-  const int nb_elem = zone_VEF.nb_elem();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const int nb_face = domaine_VEF.nb_faces();
+  const int nb_face_tot = domaine_VEF.nb_faces_tot();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   int elem1,elem2,fac=0,i;
   double temp;
 
@@ -82,7 +82,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
 
   // Traitement des bords
 
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
 
   for (i=0; i<les_cl.size(); i++)
     {
@@ -119,7 +119,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
       visco_turb(elem2)+=temp;
     }
 
-  visco_turb/=(zone_VEF.zone().nb_faces_elem());
+  visco_turb/=(domaine_VEF.domaine().nb_faces_elem());
 
   la_viscosite_turbulente.changer_temps(temps);
   return la_viscosite_turbulente;
@@ -128,13 +128,13 @@ Champ_Fonc& Turbulence_hyd_sous_maille_VEF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = le_dom_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
 
-  const int nb_face = zone_VEF.nb_faces();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleTab& xv = zone_VEF.xv();
+  const int nb_face = domaine_VEF.nb_faces();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleTab& xv = domaine_VEF.xv();
 
   DoubleVect d2(dimension+1),dv(dimension);
   DoubleTab  dd2(dimension+1,2);
@@ -146,7 +146,7 @@ void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
   // On calcule tout d'abord F2 pour les faces se trouvant sur
   // les bords du domaine
 
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
 
   for (int num_cl=0; num_cl<les_cl.size(); num_cl++)
     {

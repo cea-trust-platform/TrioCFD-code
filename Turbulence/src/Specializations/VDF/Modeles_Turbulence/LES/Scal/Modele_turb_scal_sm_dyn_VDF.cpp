@@ -62,11 +62,11 @@ void Modele_turb_scal_sm_dyn_VDF::set_param(Param& param)
 
 //////////////////////////////////////////////////////////////////////////
 void Modele_turb_scal_sm_dyn_VDF::associer(
-  const Zone_dis& zone_dis,
-  const Zone_Cl_dis& zone_Cl_dis)
+  const Domaine_dis& domaine_dis,
+  const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,20 +190,20 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
 
   Debog::verifier("la_viscosite_turbulente",champ.valeurs());
   double temps = champ.temps();
-  int nb_elem_tot = le_dom_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab l(nb_elem_tot);
   cell_cent_vel.resize(nb_elem_tot,dimension);
 
   DoubleTab filt_vel(0, dimension);
-  le_dom_VDF->zone().creer_tableau_elements(filt_vel);
+  le_dom_VDF->domaine().creer_tableau_elements(filt_vel);
 
   const DoubleTab& teta = equation().inconnue().valeurs();
   DoubleTab filt_teta;
-  le_dom_VDF->zone().creer_tableau_elements(filt_teta);
+  le_dom_VDF->domaine().creer_tableau_elements(filt_teta);
   DoubleTab Lj(filt_vel);
 
   DoubleTab Sij_grid_scale(0, dimension, dimension);
-  le_dom_VDF->zone().creer_tableau_elements(Sij_grid_scale);
+  le_dom_VDF->domaine().creer_tableau_elements(Sij_grid_scale);
   DoubleTab Sij_test_scale(Sij_grid_scale);
 
   DoubleTab S_test_scale_norme(nb_elem_tot);
@@ -220,8 +220,8 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
   calculer_Lj(teta,filt_teta,cell_cent_vel,filt_vel,Lj);
   Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(Sij_grid_scale,le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),eq_NS_turb.inconnue());
   Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(filt_vel,Sij_test_scale,le_dom_VDF.valeur());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,le_dom_VDF->zone().nb_elem_tot());
-  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_test_scale,S_test_scale_norme,le_dom_VDF->zone().nb_elem_tot());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
+  Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(Sij_test_scale,S_test_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
   calculer_grad_teta(teta,grad_teta);
   Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(grad_teta,filt_grad_teta,le_dom_VDF.valeur());
   calculer_Mj(S_grid_scale_norme,S_test_scale_norme,grad_teta,filt_grad_teta,l,Mj);
@@ -240,10 +240,10 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_filter_coeff(
   const DoubleTab& coeff,
   DoubleTab& filt_coeff)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4,num5;
   int f0,f1,f2,f3,f4,f5;
@@ -343,8 +343,8 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Lj(
   const DoubleTab& filt_vel,
   DoubleTab& Lj)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   int element_number;
 
   DoubleTab temp(nb_elem_tot,dimension);
@@ -373,9 +373,9 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
   const DoubleVect& teta,
   DoubleTab& grad_teta)
 {
-  const int nb_elem = le_dom_VDF->zone().nb_elem();
+  const int nb_elem = le_dom_VDF->domaine().nb_elem();
   const int nb_faces_tot = le_dom_VDF->nb_faces();
-  const int nb_faces_bord = le_dom_VDF->zone().nb_faces_bord();
+  const int nb_faces_bord = le_dom_VDF->domaine().nb_faces_bord();
 
   const Op_Dift_VDF_base& operateur_diff =  ref_cast(Op_Dift_VDF_base,(mon_equation->operateur(0)).l_op_base());
   const DoubleVect& flux_bords = operateur_diff.flux_bords();
@@ -477,8 +477,8 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_Mj(
   const DoubleTab& l,
   DoubleTab& Mj)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   int element_number;
   const double alpha=sqrt(6.0);
   int j;
@@ -504,7 +504,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_model_coefficient(
   const DoubleTab& Lj,
   const DoubleTab& Mj )
 {
-  int nb_elem_tot = le_dom_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab haut(nb_elem_tot);
   DoubleTab bas(nb_elem_tot);
   int i,j;
@@ -584,10 +584,10 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_6_points(
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4,num5;
   int f0,f1,f2,f3,f4,f5;
@@ -700,9 +700,9 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_plans_paralleles(
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
-  int nb_elem = zone_VDF.zone().nb_elem();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
   DoubleVect coeff_m_tmp(N_c_);
 
   // Evaluate the dynamic model coeficient C
@@ -739,8 +739,8 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_euler(
 {
   int nb_0=0;
   static int init = 1;
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
   double dt = mon_equation->schema_temps().pas_de_temps();
@@ -817,8 +817,8 @@ void Modele_turb_scal_sm_dyn_VDF::stabilise_moyenne_lagrange(
 {
   int nb_0=0;
   static int init = 1;
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
   double dt = mon_equation->schema_temps().pas_de_temps();
@@ -925,8 +925,8 @@ void Modele_turb_scal_sm_dyn_VDF::calcul_voisins(
       num[6]=elem_elem_(element_number,indice(0),indice(1),1);
       num[7]=elem_elem_(element_number,indice(0),indice(1),indice(2));
 
-      const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-      const DoubleTab& xp = zone_VDF.xp();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+      const DoubleTab& xp = domaine_VDF.xp();
       DoubleTab x(3);
       for (i=0; i<3; i++)
         x(i)=xp(element_number,i)-cell_cent_vel(element_number,i)*dt;
@@ -978,10 +978,10 @@ void Modele_turb_scal_sm_dyn_VDF::calcul_voisins(
 
 void Modele_turb_scal_sm_dyn_VDF::calc_elem_elem(void)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   int element_number,f,elem;
 
   //elem_elem(element_number,i,j,k) i-x, j-y k-z et 0-avant 1-meme_position, 2-apres
@@ -1098,10 +1098,10 @@ void Modele_turb_scal_sm_dyn_VDF::calcul_tableaux_correspondance(
   IntVect& corresp_c)
 {
   // Initialisation de : Yuv + compt_c + corresp_c
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
-  int nb_elems = zone_VDF.zone().nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
+  int nb_elems = domaine_VDF.domaine().nb_elem();
   DoubleTab Y_c ;
   int num_elem,j,indic_c,trouve;
   double y;

@@ -22,7 +22,7 @@
 
 #include <Source_rayo_semi_transp_VDF_P0_VDF.h>
 #include <Modele_rayo_semi_transp.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 
@@ -53,7 +53,7 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::calculer(DoubleTab& resu) const
 DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
 {
   const Equation_rayonnement& eq_rayo = Modele().eq_rayo();
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,eq_rayo.zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,eq_rayo.domaine_dis().valeur());
   int nb_elem = zvdf.nb_elem();
   const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa().valeurs();
@@ -96,8 +96,8 @@ void Source_rayo_semi_transp_VDF_P0_VDF::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VDF_P0_VDF::associer_domaines(const Zone_dis& zone_dis,
-                                                        const Zone_Cl_dis& zone_Cl_dis)
+void Source_rayo_semi_transp_VDF_P0_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+                                                           const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;
 }

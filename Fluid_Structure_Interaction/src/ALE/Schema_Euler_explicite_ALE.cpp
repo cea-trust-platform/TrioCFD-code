@@ -24,8 +24,8 @@
 
 #include <Debog.h>
 #include <Probleme_base.h>
-#include <Zone.h>
-#include <Zone_ALE.h>
+#include <Domaine.h>
+#include <Domaine_ALE.h>
 
 Implemente_instanciable(Schema_Euler_explicite_ALE,"Schema_euler_explicite_ALE|Scheme_euler_explicit_ALE",Schema_Euler_explicite);
 // XD scheme_euler_explicite_ALE schema_temps_base schema_euler_explicite_ALE -1 This is the Euler explicit scheme used for ALE problems.
@@ -52,7 +52,7 @@ int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eq
   Debog::verifier("Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base -futur avant", futur);
 
   // Boundary conditions applied on Un+1:
-  eqn.zone_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
   // On tourne la roue pour que les operateurs utilisent les champs au temps futur
   eqn.inconnue().avancer();
@@ -66,7 +66,7 @@ int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eq
   //Adding ALE Jacobians. Jacobians are renewed in Navier_Stokes_std::corriger_derivee_impl().
   // In ALE Un+1=(Jn/Jn+1)*Un+dt_*dU/dt
   Probleme_base& problem=pb_base();
-  Zone_ALE& domaineALE=ref_cast(Zone_ALE, problem.domaine());
+  Domaine_ALE& domaineALE=ref_cast(Domaine_ALE, problem.domaine());
   DoubleTab ALEjacobian_Old=domaineALE.getOldJacobian();
   DoubleTab ALEjacobian_New=domaineALE.getNewJacobian();
 
@@ -81,7 +81,7 @@ int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eq
   futur.echange_espace_virtuel();
   Debog::verifier("Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base -futur apres", futur);
 
-  eqn.zone_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   update_critere_statio(dudt, eqn);
 
   return 1;

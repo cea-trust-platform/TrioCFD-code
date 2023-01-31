@@ -21,9 +21,9 @@
 
 #include <Mod_turb_hyd_ss_maille_VEF.h>
 #include <distances_VEF.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
+#include <Domaine_Cl_dis.h>
 
 Implemente_base(Mod_turb_hyd_ss_maille_VEF,"Mod_turb_hyd_ss_maille_VEF",Mod_turb_hyd_ss_maille);
 
@@ -41,18 +41,18 @@ Entree& Mod_turb_hyd_ss_maille_VEF::readOn(Entree& is )
   return Mod_turb_hyd_ss_maille::readOn(is);
 }
 
-void Mod_turb_hyd_ss_maille_VEF::associer(const Zone_dis& zone_dis,
-                                          const Zone_Cl_dis& zone_Cl_dis)
+void Mod_turb_hyd_ss_maille_VEF::associer(const Domaine_dis& domaine_dis,
+                                          const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 }
 
 void Mod_turb_hyd_ss_maille_VEF::calculer_longueurs_caracteristiques()
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem_tot();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem_tot();
   l_.resize(nb_elem);
 
-  calcul_longueur_filtre(l_, methode, zone_VEF);
+  calcul_longueur_filtre(l_, methode, domaine_VEF);
 }

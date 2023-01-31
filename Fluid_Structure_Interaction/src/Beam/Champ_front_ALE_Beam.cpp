@@ -21,11 +21,11 @@
 
 #include <Champ_front_ALE_Beam.h>
 #include <Frontiere_dis_base.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Front_VF.h>
-#include <Zone_ALE.h>
-#include <Zone.h>
-#include <Zone_VEF.h>
+#include <Domaine_ALE.h>
+#include <Domaine.h>
+#include <Domaine_VEF.h>
 #include <Cond_lim.h>
 #include <TRUSTVects.h>
 #include <fstream>
@@ -55,10 +55,10 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Frontiere& front=la_frontiere_dis->frontiere();
   Cerr<<" front nom := "<<front.le_nom()<<finl;
   int nb_faces=front.nb_faces();
-  const Zone& zone=front.zone();
+  const Domaine& domaine=front.domaine();
   const Faces& faces=front.faces();
 
-  Zone_ALE& dom_ale=ref_cast_non_const(Zone_ALE, zone);
+  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, domaine);
 
   double dt = dom_ale.get_dt();
   const int nbModes=dom_ale.getBeamNbModes();
@@ -66,7 +66,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
-  int nb_som_tot=zone.nb_som_tot();
+  int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
   const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt);
@@ -76,11 +76,11 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
       x=y=z=0;
       for( k=0; k<nbsf; k++)
         {
-          x=zone.coord(faces.sommet(i,k),0);
+          x=domaine.coord(faces.sommet(i,k),0);
           if(dimension>1)
-            y=zone.coord(faces.sommet(i,k),1);
+            y=domaine.coord(faces.sommet(i,k),1);
           if(dimension>2)
-            z=zone.coord(faces.sommet(i,k),2);
+            z=domaine.coord(faces.sommet(i,k),2);
           DoubleVect value(3);
           value=0.;
           DoubleVect phi(3);

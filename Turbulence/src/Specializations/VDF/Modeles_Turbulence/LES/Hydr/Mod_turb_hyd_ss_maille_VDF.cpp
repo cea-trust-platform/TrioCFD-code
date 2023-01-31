@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Mod_turb_hyd_ss_maille_VDF.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_dis.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_Cl_VDF.h>
 
 Implemente_base(Mod_turb_hyd_ss_maille_VDF,"Mod_turb_hyd_ss_maille_VDF",Mod_turb_hyd_ss_maille);
 
@@ -39,19 +39,19 @@ Entree& Mod_turb_hyd_ss_maille_VDF::readOn(Entree& is )
   return Mod_turb_hyd_ss_maille::readOn(is);
 }
 
-void Mod_turb_hyd_ss_maille_VDF::associer(const Zone_dis& zone_dis,
-                                          const Zone_Cl_dis& zone_Cl_dis)
+void Mod_turb_hyd_ss_maille_VDF::associer(const Domaine_dis& domaine_dis,
+                                          const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 void Mod_turb_hyd_ss_maille_VDF::calculer_longueurs_caracteristiques()
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   l_.resize(nb_elem);
 
@@ -69,7 +69,7 @@ void Mod_turb_hyd_ss_maille_VDF::calculer_longueurs_caracteristiques()
   for(int elem=0 ; elem<nb_elem ; elem ++)
     {
       for (int i=0 ; i<dimension ; i++)
-        h[i]=zone_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
+        h[i]=domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
 
       if (dimension==2)
         l_(elem)=exp((log(h[0]*h[1]))/2);

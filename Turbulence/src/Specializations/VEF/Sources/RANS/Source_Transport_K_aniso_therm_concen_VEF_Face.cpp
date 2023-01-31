@@ -21,7 +21,7 @@
 
 #include <Source_Transport_K_aniso_therm_concen_VEF_Face.h>
 #include <Equation_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Source_Transport_K_aniso_therm_concen_VEF_Face,"Source_Transport_K_aniso_therm_concen_VEF_P1NC",Source_Transport_K_VEF_Face);
 

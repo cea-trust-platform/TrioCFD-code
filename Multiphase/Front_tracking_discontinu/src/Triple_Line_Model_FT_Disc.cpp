@@ -26,7 +26,7 @@
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Navier_Stokes_FT_Disc.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 
@@ -243,11 +243,11 @@ double Triple_Line_Model_FT_Disc::compute_capillary_number() const
   return 0.;
 }
 
-// Description : For a given elem in the zone, computes the crossing points of the interface and the averaged normal.
+// Description : For a given elem in the domaine, computes the crossing points of the interface and the averaged normal.
 //               The method is not const because it changes the value of old_xcl_.
 // 				 I believe there is a convention that y_in <= y_out
 // Parameters :
-// elem -> the id of the cell of interest in the zone
+// elem -> the id of the cell of interest in the domaine
 //
 // in_out(0,0) -> x_in
 // in_out(0,1) -> y_in
@@ -255,7 +255,7 @@ double Triple_Line_Model_FT_Disc::compute_capillary_number() const
 // in_out(1,1) -> y_out
 // norm_elem : the averaged normal into the element.
 // surface_tot : The local interfacial area.
-void Triple_Line_Model_FT_Disc::get_in_out_coords(const Zone_VDF& zvdf, const int elem,
+void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const int elem,
                                                   const double dt,
                                                   DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot)
 {
@@ -720,20 +720,20 @@ double Triple_Line_Model_FT_Disc::compute_Qint(const DoubleTab& in_out, const do
   double flux = 0.;
   double d=0;
   {
-    const Zone_VF& zone_vf = ref_cast(Zone_VF, ref_eq_temp_.valeur().zone_dis().valeur());
-    const IntTab& faces_elem = zone_vf.face_voisins();
+    const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+    const IntTab& faces_elem = domaine_vf.face_voisins();
     // On of the neighbours doesnot exist so it has "-1". We get the other elem by:
     const int elem = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;
 
     double P[3] = {0.,0.,0.}, xyz_face[3] = {0.,0.,0.};
-    xyz_face[0] =  zone_vf.xv(num_face,0);
-    xyz_face[1] =  zone_vf.xv(num_face,1);
-    P[0] = zone_vf.xp(elem, 0);
-    P[1] = zone_vf.xp(elem, 1);
+    xyz_face[0] =  domaine_vf.xv(num_face,0);
+    xyz_face[1] =  domaine_vf.xv(num_face,1);
+    P[0] = domaine_vf.xp(elem, 0);
+    P[1] = domaine_vf.xp(elem, 1);
     if (Objet_U::dimension == 3)
       {
-        xyz_face[2] =  zone_vf.xv(num_face,2);
-        P[2] = zone_vf.xp(elem, 2);
+        xyz_face[2] =  domaine_vf.xv(num_face,2);
+        P[2] = domaine_vf.xp(elem, 2);
       }
 
     for (int i=0; i<3; i++)
@@ -797,7 +797,7 @@ double Triple_Line_Model_FT_Disc::get_update_AAA()
 */
 
 // Arguments :
-//    elems_with_CL_contrib : The list of elements containing either the TCL itself, or the meso zone.
+//    elems_with_CL_contrib : The list of elements containing either the TCL itself, or the meso domaine.
 //                            In all of them, the flux_evap has to be modified.
 //    mpoint_from_CL : corresponding value to be assigned to each cell (as a mass flux m [unit?])
 //    Q_from_CL : corresponding value to be assigned to each cell (as a thermal flux Q [unit?])
@@ -818,8 +818,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // ArrOfDouble Q_from_CL;
   const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
   const double dt = ns.schema_temps().pas_de_temps();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, ns.zone_dis().valeur());
-  const DoubleVect& volumes = zone_vf.volumes();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ns.domaine_dis().valeur());
+  const DoubleVect& volumes = domaine_vf.volumes();
   const Fluide_Diphasique& fluide = ns.fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
@@ -878,7 +878,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   Q_from_CL.resize_array(0);
 
 //  DoubleVect dI_dt;
-//  ns.zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
+//  ns.domaine_dis().valeur().domaine().creer_tableau_elements(dI_dt);
 //  ns.calculer_dI_dt(dI_dt);
 
   // First loop on contact line cells:
@@ -918,11 +918,11 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
               }
             // We need to check on what boundary we are:
             Journal() << "iii " << num_bc_face << finl;
-            const int num_bord = zone_vf.face_numero_bord(num_bc_face);
+            const int num_bord = domaine_vf.face_numero_bord(num_bc_face);
             Journal() << "jjj " << num_bord << finl;
             assert(num_bord>=0); // Otherwise we're inside and there's a big problem
-            //const Frontiere_dis_base& la_cl =  zone_vf.frontiere_dis(num_bord);
-            const Zone_Cl_dis_base& zcldis = ns.zone_Cl_dis().valeur();
+            //const Frontiere_dis_base& la_cl =  domaine_vf.frontiere_dis(num_bord);
+            const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
             const Cond_lim& la_cl = zcldis.les_conditions_limites(num_bord);
             const Nom& bc_name = la_cl.frontiere_dis().le_nom();
 
@@ -986,9 +986,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                   // contains a node of the contact line) ends above the row of cells directly in contact with
                   // the wall. In that case, the contribution of the corresponding fraction of facette
                   // Should be transfered to the previous
-                  // const Zone_VF& zone_vf = ref_cast(Zone_VF, ref_eq_temp_.valeur().zone_dis().valeur());
-                  const IntTab& elem_faces = zone_vf.elem_faces();
-                  const IntTab& faces_elem = zone_vf.face_voisins();
+                  // const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+                  const IntTab& elem_faces = domaine_vf.elem_faces();
+                  const IntTab& faces_elem = domaine_vf.face_voisins();
                   const int nb_faces_voisins = elem_faces.dimension(1);
                   // Struggle to get the boundary face
                   int i;
@@ -1035,7 +1035,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 //    surface_tot +=surf;
                 {
                   // const double v = volumes[elem];
-                  //    Cerr << "Elem " << elem << " xp= " << zone_vf.xp(elem,0) << " vol= " << v << finl;
+                  //    Cerr << "Elem " << elem << " xp= " << domaine_vf.xp(elem,0) << " vol= " << v << finl;
                   double Qtot = get_Qtcl();
 //                     if (dI_dt(elem) > 0.)
 //                       {
@@ -1091,12 +1091,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 // The contact line is on several elements. We assume it's two, but it can be more!
                           // How can we know?
                           // We need to compute The fraction of TCL within each cell
-                          xyz_f0[0] =  zone_vf.xv(num_bc_face0,0);
-                          xyz_f0[1] =  zone_vf.xv(num_bc_face0,1);
-                          xyz_f0[2] =  zone_vf.xv(num_bc_face0,2);
-                          xyz_f1[0] =  zone_vf.xv(num_bc_face1,0);
-                          xyz_f1[1] =  zone_vf.xv(num_bc_face1,1);
-                          xyz_f1[2] =  zone_vf.xv(num_bc_face1,2);
+                          xyz_f0[0] =  domaine_vf.xv(num_bc_face0,0);
+                          xyz_f0[1] =  domaine_vf.xv(num_bc_face0,1);
+                          xyz_f0[2] =  domaine_vf.xv(num_bc_face0,2);
+                          xyz_f1[0] =  domaine_vf.xv(num_bc_face1,0);
+                          xyz_f1[1] =  domaine_vf.xv(num_bc_face1,1);
+                          xyz_f1[2] =  domaine_vf.xv(num_bc_face1,2);
                           f0f1[0] = xyz_f1[0] -  xyz_f0[0];
                           Cerr << "f0f1 " << f0f1[0] << finl;
                           // ...
@@ -1150,19 +1150,19 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   instant_Qmicro = mp_sum(instant_Qmicro);
 
   // Second loop to find meso cells:
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF, ns.zone_dis().valeur());
-  const Zone_Cl_dis_base& zcldis = ns.zone_Cl_dis().valeur();
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+  const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
 
-  //const Zone_dis& aa= zcldis.zone_dis();
-  const Zone_dis_base& zone_dis = ns.zone_dis().valeur();
-  const IntTab& face_voisins = zone_dis.face_voisins();
+  //const Domaine_dis& aa= zcldis.domaine_dis();
+  const Domaine_dis_base& domaine_dis = ns.domaine_dis().valeur();
+  const IntTab& face_voisins = domaine_dis.face_voisins();
   //const IntTab& face_voisins = ns.le_dom_dis.valeur().valeur().face_voisins();
-  //       const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zcldis);
+  //       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   // Boucle sur les bords pour traiter les conditions aux limites
   //            double m_evap = 0.;
   //            double instant_vmeso_evap_ = 0.;
   //            double Q_int = 0.;
-  //    const DoubleVect& volumes = zone_vf.volumes();
+  //    const DoubleVect& volumes = domaine_vf.volumes();
   int ndeb, nfin, num_face;
   for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
     {
@@ -1197,7 +1197,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 continue; // This element is not crossed by the interface. Go to the next face.
 
               //  Cerr << "Elem #" << elem << " is adjacent to the wall " << bc_name
-              //      << " and also contains an interface. So it belongs to meso zone." << finl;
+              //      << " and also contains an interface. So it belongs to meso domaine." << finl;
 
               double surface_tot = 0.;
               // const double v = volumes[elem];
@@ -1420,8 +1420,8 @@ void Triple_Line_Model_FT_Disc::corriger_mpoint(DoubleTab& mpoint) const
 void Triple_Line_Model_FT_Disc::corriger_secmem(const double coef, DoubleTab& secmem2) const
 {
 //  const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-//  const Zone_VF& zone_vf = ref_cast(Zone_VF, ns.zone_dis().valeur());
-//  const DoubleVect& volumes = zone_vf.volumes();
+//  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ns.domaine_dis().valeur());
+//  const DoubleVect& volumes = domaine_vf.volumes();
   const int nb_contact_line_contribution = elems_.size_array();
 // const double max_val_before = max_array(secmem2);
 //  const double min_val_before = min_array(secmem2);
@@ -1498,8 +1498,8 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
   const int elem = 0; //closest_liquid_neighbour has to be determined;
   Cerr << "Code unfinished in Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution" << finl;
   Process::exit();
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, ref_eq_temp_.valeur().zone_dis().valeur());
-  const double vol = zone_vf.volumes(elem);
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+  const double vol = domaine_vf.volumes(elem);
   // Minus sign because we want to compensate the disequilibrium
   const double deltaT = -disequilibrium/(rhocpl_*vol);
   temperature(elem) += deltaT;
@@ -1507,7 +1507,7 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
 
 void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_TCL_fluxes(DoubleTab& temperature) const
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, ref_eq_temp_.valeur().zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
   const int nb_contact_line_contribution = elems_.size_array();
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
@@ -1528,14 +1528,14 @@ void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_T
       double d=0;
       {
         double P[3] = {0.,0.,0.}, xyz_face[3] = {0.,0.,0.};
-        xyz_face[0] =  zone_vf.xv(num_face,0);
-        xyz_face[1] =  zone_vf.xv(num_face,1);
-        P[0] = zone_vf.xp(elem, 0);
-        P[1] = zone_vf.xp(elem, 1);
+        xyz_face[0] =  domaine_vf.xv(num_face,0);
+        xyz_face[1] =  domaine_vf.xv(num_face,1);
+        P[0] = domaine_vf.xp(elem, 0);
+        P[1] = domaine_vf.xp(elem, 1);
         if (Objet_U::dimension == 3)
           {
-            xyz_face[2] =  zone_vf.xv(num_face,2);
-            P[2] = zone_vf.xp(elem, 2);
+            xyz_face[2] =  domaine_vf.xv(num_face,2);
+            P[2] = domaine_vf.xp(elem, 2);
           }
         for (int i=0; i<3; i++)
           d += (xyz_face[i] - P[i])*(xyz_face[i] - P[i]);

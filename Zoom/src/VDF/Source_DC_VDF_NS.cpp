@@ -23,7 +23,7 @@
 #include <Dirichlet_entree_fluide_leaves.h>
 #include <Navier_Stokes_std.h>
 #include <Source_DC_VDF_NS.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 
 Implemente_instanciable(Source_DC_VDF_NS,"Source_DC_VDF_Face",Source_Correction_Deficitaire);
 
@@ -46,10 +46,10 @@ Entree& Source_DC_VDF_NS::readOn(Entree& s )
 }
 
 
-void Source_DC_VDF_NS::associer_domaines(const Zone_dis& zone_dis,
-                                      const Zone_Cl_dis& zone_cl_dis)
+void Source_DC_VDF_NS::associer_domaines(const Domaine_dis& domaine_dis,
+                                         const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
 
   int nb_face = zvdf.nb_faces();
   la_correction.resize(nb_face);
@@ -83,10 +83,10 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       Prolongement& P2 = P(1); //prolongement pour la pression
       Prolongement& P3 = P(2); //prolongement pour la vitesse sur les bords du domaine fin
 
-      /* Recuperation des equations de bases et des zones                     */
+      /* Recuperation des equations de bases et des domaines                     */
       Navier_Stokes_std& eqF = ref_cast(Navier_Stokes_std, equation());
-      Zone_VDF& le_dom = ref_cast(Zone_VDF, eqG.zone_dis().valeur());
-      Zone_VDF& le_dom_fine = ref_cast(Zone_VDF, eqF.zone_dis().valeur());
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
 
       /* Recuperation des inconnues vitesses fines et grossieres              */
       DoubleTab& presentG = eqG.inconnue().valeurs();
@@ -192,11 +192,11 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
                double t_fin = schF_temp.temps_courant();
       */
 
-      /* Recuperation de la zone fine de base */
-      Zone_Cl_dis_base& zoneCL_baseF = eqF.zone_Cl_dis().valeur();
+      /* Recuperation de la domaine fine de base */
+      Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis().valeur();
 
       /* recuperation des conditions limites existantes */
-      Conds_lim& conds_limF = zoneCL_baseF.les_conditions_limites();
+      Conds_lim& conds_limF = domaineCL_baseF.les_conditions_limites();
 
       /* Creation des conditions limites pour le laplacien du prolongement */
       /* en modifiant l'objet deja existant                                */
@@ -211,8 +211,8 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
 
       /* ---> On remplit ici les valeurs de la vitesse imposee en prenant celles de la grille grossiere prolongee */
       DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front().valeur().valeurs();
-      const int nb_faces_bords    = frontiereF.nb_faces();//eqF.zone_Cl_dis().nb_faces_Cl();
-      const int nb_faces_bords_tot    = eqF.zone_Cl_dis().nb_faces_Cl();
+      const int nb_faces_bords    = frontiereF.nb_faces();//eqF.domaine_Cl_dis().nb_faces_Cl();
+      const int nb_faces_bords_tot    = eqF.domaine_Cl_dis().nb_faces_Cl();
 
       Cerr << "nb_faces_bords :"<<nb_faces_bords<< finl;
 
@@ -249,7 +249,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
 
 
 
-      //             zoneCL_baseF.mettre_a_jour(t_fin);
+      //             domaineCL_baseF.mettre_a_jour(t_fin);
       //             Cerr << "vitesse imposee sur les bords : " << vitesse_imposeeF << finl;
 
 
@@ -276,7 +276,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
          }
       */
 
-      zoneCL_baseF.imposer_cond_lim(eqF.inconnue(),eqF.probleme().presentTime());
+      domaineCL_baseF.imposer_cond_lim(eqF.inconnue(),eqF.probleme().presentTime());
 
       {
         DoubleTab tmp(presentG);
@@ -335,10 +335,10 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       /* retour a la normale pour le reste */
 
       vitesse_imposeeF = 0.0;
-      //      zoneCL_baseF.mettre_a_jour(t_fin);
+      //      domaineCL_baseF.mettre_a_jour(t_fin);
       presentF = presentF_temp;
       pressionF = pressionF_temp;
-      zoneCL_baseF.imposer_cond_lim(eqF.inconnue(),eqF.probleme().presentTime());
+      domaineCL_baseF.imposer_cond_lim(eqF.inconnue(),eqF.probleme().presentTime());
     }
   else
     {

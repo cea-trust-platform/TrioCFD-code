@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Paroi_negligeable_EF.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 
 Implemente_instanciable_sans_constructeur(Paroi_negligeable_EF,"negligeable_EF",Paroi_hyd_base_EF);
 

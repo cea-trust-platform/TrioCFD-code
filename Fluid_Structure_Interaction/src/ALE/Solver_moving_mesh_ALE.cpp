@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Zone_ALE.h>
+#include <Domaine_ALE.h>
 #include <Solver_moving_mesh_ALE.h>
 
 
@@ -60,7 +60,7 @@ Entree& Solver_moving_mesh_ALE::readOn(Entree& is)
 Entree& Solver_moving_mesh_ALE::interpreter_(Entree& is)
 {
   associer_domaine(is);
-  Zone_ALE& dom=ref_cast(Zone_ALE, domaine());
+  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
   dom.reading_solver_moving_mesh_ALE(is);
   return is;
 }

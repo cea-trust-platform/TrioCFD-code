@@ -23,7 +23,7 @@
 #include <Paroi_ODVM_scal_VDF.h>
 #include <ParoiVDF_TBLE.h>
 #include <Paroi_std_hyd_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Echange_externe_impose.h>
 #include <Champ_Uniforme.h>
@@ -142,12 +142,12 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   int ndeb,nfin;
   int elem;
   double dist; //distance du premier centre de maille a la paroi
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
   const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
-  const Zone_Cl_VDF& zone_Cl_VDF_th = ref_cast(Zone_Cl_VDF,eqn_temp.zone_Cl_dis().valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
 
   const double t0 = eqn_temp.schema_temps().temps_courant();
   double T0=0.;
@@ -206,11 +206,11 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
     }
 
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
-      const Cond_lim& la_cl_th = zone_Cl_VDF_th.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl_th = domaine_Cl_VDF_th.les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -218,7 +218,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
-          eq_odvm.dimensionner(zone_VDF.nb_faces_bord());
+          eq_odvm.dimensionner(domaine_VDF.nb_faces_bord());
 
 
           //################
@@ -232,9 +232,9 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
                   T0 = la_cl_ech.T_ext(num_face-ndeb);
                   //Distance a la paroi du 1er centre de maille
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   eq_odvm[num_face].initialiser(N,gamma,dist,T0, Temp(elem), t0, 1., facteur);
                   // Construction du maillage, resize des tableaux
@@ -271,9 +271,9 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
 
                   //Distance a la paroi du 1er centre de maille
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   eq_odvm[num_face].initialiser(N,gamma,dist,Temp(elem), Temp(elem), t0, K, facteur);
                   // Construction du maillage, resize des tableaux
@@ -301,11 +301,11 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   // We initialize the values of the equivalent distance at the first time step
   //  with the geometrical distance.
   // if (axi)
-  //   for (int num_face=0; num_face<zone_VDF.nb_faces_bord(); num_face++)
-  //     tab_d_equiv_[num_face] = zone_VDF.dist_norm_bord_axi(num_face);
+  //   for (int num_face=0; num_face<domaine_VDF.nb_faces_bord(); num_face++)
+  //     tab_d_equiv_[num_face] = domaine_VDF.dist_norm_bord_axi(num_face);
   // else
-  //   for (int num_face=0; num_face<zone_VDF.nb_faces_bord(); num_face++)
-  //     tab_d_equiv_[num_face] = zone_VDF.dist_norm_bord(num_face);
+  //   for (int num_face=0; num_face<domaine_VDF.nb_faces_bord(); num_face++)
+  //     tab_d_equiv_[num_face] = domaine_VDF.dist_norm_bord(num_face);
 
 
   return 1;
@@ -317,9 +317,9 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
 
 int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elems = zone_VDF.nb_elem();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elems = domaine_VDF.nb_elem();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
@@ -335,7 +335,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   termes_sources /= rhoCp;
 
   // TEMP
-  const DoubleTab& xv = zone_VDF.xv();
+  const DoubleTab& xv = domaine_VDF.xv();
   // TEMP
   //  GF ne marche pas en // et les tests avec num_face==2402  bof..
   if (0)
@@ -403,7 +403,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
-  const Zone_Cl_VDF& zone_Cl_VDF_th = ref_cast(Zone_Cl_VDF,eqn_temp.zone_Cl_dis().valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
 
 
   const double tps = eqn_temp.schema_temps().temps_courant();
@@ -411,20 +411,20 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   double T0=0.;
 
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Cond_lim& la_cl_th = zone_Cl_VDF_th.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl_th = domaine_Cl_VDF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
           //find the associated boundary
           int boundary_index=-1;
-          if (zone_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
+          if (domaine_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
             boundary_index=n_bord;
           assert(boundary_index >= 0);
 
@@ -501,7 +501,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                   // Cela dit, c'est normale car c'est lors du calcul du flux que la
                   // turbulence est prise en compte.
                   int global_face=num_face;
-                  int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+                  int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
                   equivalent_distance_[boundary_index](local_face) = (Temp(elem)-Temp_w)*dy_w/(Temp_mean+Temp_prim - Temp_w);
                 }//fin boucle sur les faces de bords
               compt++;

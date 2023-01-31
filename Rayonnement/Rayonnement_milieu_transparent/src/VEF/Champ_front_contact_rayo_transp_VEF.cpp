@@ -24,7 +24,7 @@
 #include <Champ_Inc_base.h>
 #include <Equation_base.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Probleme_base.h>
 #include <Pb_Conduction.h>
 

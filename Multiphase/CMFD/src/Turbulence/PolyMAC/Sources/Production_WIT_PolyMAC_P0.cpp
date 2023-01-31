@@ -22,7 +22,7 @@
 
 #include <Production_WIT_PolyMAC_P0.h>
 
-#include <Zone_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Matrix_tools.h>
 #include <Pb_Multiphase.h>
@@ -69,16 +69,16 @@ void Production_WIT_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const ta
 
 void Production_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();
   const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").valeurs();
   const DoubleTab&                           nu = equation().probleme().get_champ("viscosite_cinematique").passe();
 
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = zone.nb_elem(), nf_tot = zone.nb_faces_tot(), D = dimension ;
+  int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
   if (Nk!=1) Process::exit("WIT is only in the liquid phase");
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 

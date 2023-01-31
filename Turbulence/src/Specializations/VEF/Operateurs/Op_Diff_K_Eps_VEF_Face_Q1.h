@@ -27,8 +27,8 @@
 #include <Op_Diff_K_Eps_VEF_base.h>
 #include <Ref_Champ_Q1NC.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Champ_Inc;
 
 
@@ -45,7 +45,7 @@ class Op_Diff_K_Eps_VEF_Face_Q1 : public Op_Diff_K_Eps_VEF_base, public Op_VEF_F
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ,
                 const Champ_Inc& ) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;
@@ -62,8 +62,8 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) le_dom_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+  REF(Domaine_VEF) le_dom_vef;
+  REF(Domaine_Cl_VEF) la_zcl_vef;
   REF(Champ_Q1NC) inconnue_;
   //DoubleVect porosite_face;
 };

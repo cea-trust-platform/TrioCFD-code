@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Qdm_VDF_Phase_field.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Convection_Diffusion_Phase_field.h>
 #include <Probleme_base.h>
 #include <Milieu_base.h>
@@ -133,27 +133,27 @@ void Source_Qdm_VDF_Phase_field::associer_pb(const Probleme_base& pb)
   eq_ns.getset_compressible_()=compressible;
 }
 
-void Source_Qdm_VDF_Phase_field::associer_domaines(const Zone_dis& zone_dis,
-                                                const Zone_Cl_dis& zone_Cl_dis)
+void Source_Qdm_VDF_Phase_field::associer_domaines(const Domaine_dis& domaine_dis,
+                                                   const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 }
 
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
   double cface;
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
+  int ndeb=domaine_VDF.premiere_face_int();
+  int nbfaces=domaine_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
 
@@ -269,9 +269,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
@@ -279,8 +279,8 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
   double cface;
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
+  int ndeb=domaine_VDF.premiere_face_int();
+  int nbfaces=domaine_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
 
@@ -352,9 +352,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
@@ -362,8 +362,8 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
   double cface;
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
+  int ndeb=domaine_VDF.premiere_face_int();
+  int nbfaces=domaine_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
 
@@ -464,9 +464,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
 {
-  const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
@@ -474,8 +474,8 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
   //   double cface;
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
+  int ndeb=domaine_VDF.premiere_face_int();
+  int nbfaces=domaine_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
   Sources list_sources = eq_c.sources();
@@ -550,9 +550,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
 
 DoubleTab& Source_Qdm_VDF_Phase_field::ajouter(DoubleTab& resu) const
 {
-  //   const Zone_VDF& zone_VDF = le_dom_VDF.valeur();
-  //   const IntTab& face_voisins = zone_VDF.face_voisins();
-  //   const DoubleVect& volumes = zone_VDF.volumes();
+  //   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  //   const IntTab& face_voisins = domaine_VDF.face_voisins();
+  //   const DoubleVect& volumes = domaine_VDF.volumes();
 
   (this->*methode)(resu);
 

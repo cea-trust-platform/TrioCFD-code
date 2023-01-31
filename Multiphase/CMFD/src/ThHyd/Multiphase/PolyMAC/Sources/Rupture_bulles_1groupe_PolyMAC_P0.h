@@ -42,7 +42,7 @@ public :
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_domaines(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:

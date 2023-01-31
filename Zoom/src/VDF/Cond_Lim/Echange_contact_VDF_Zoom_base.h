@@ -26,7 +26,7 @@
 
 #include <Echange_externe_impose.h>
 class Front_VF;
-class Zone_VDF;
+class Domaine_VDF;
 class Faces;
 
 /*! @brief classe : Echange_contact_VDF_Zoom_base
@@ -53,7 +53,7 @@ protected :
 int l_elem_bord(Faces& les_faces,int face);
 DoubleVect& trace_face_raccord_distant(const Front_VF& fr_vf,const DoubleVect& y,DoubleVect& x);
 
-DoubleTab& trace_raccord_distant(const Front_VF& fr_vf,const Zone_VDF& zvdf,const DoubleTab& y, DoubleTab& x);
+DoubleTab& trace_raccord_distant(const Front_VF& fr_vf,const Domaine_VDF& zvdf,const DoubleTab& y, DoubleTab& x);
 
 
 #endif

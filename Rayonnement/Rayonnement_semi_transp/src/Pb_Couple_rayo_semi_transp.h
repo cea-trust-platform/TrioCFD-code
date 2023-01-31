@@ -25,7 +25,7 @@
 
 #include <Probleme_Couple.h>
 #include <Ref_Modele_rayo_semi_transp.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Schema_Temps.h>
 class Cond_Lim_rayo_semi_transp;
 class Cond_lim_base;

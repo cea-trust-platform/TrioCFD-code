@@ -59,17 +59,17 @@ Equation_base& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::equation(int i)
  */
 int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
 {
-  const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();
-  const Zone_Cl_dis& zone_Cl_fm = eq_frac_mass.zone_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_fm = eq_frac_mass.domaine_Cl_dis();
   // Verification de la compatibilite des conditions aux limites:
-  tester_compatibilite_hydr_fraction_massique(zone_Cl_hydr,zone_Cl_fm);
+  tester_compatibilite_hydr_fraction_massique(domaine_Cl_hydr,domaine_Cl_fm);
 
   if ( sub_type(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur() ) )
     {
       const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Zone_Cl_dis& zone_Cl_turb = eqn.zone_Cl_dis();
-      tester_compatibilite_hydr_turb(zone_Cl_hydr, zone_Cl_turb);
+      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
   // Verification de la compatibilite des modeles de turbulence:

@@ -51,7 +51,7 @@ Entree& Modele_Fonc_Bas_Reynolds_Thermique::readOn(Entree& is )
   DERIV(Modele_Fonc_Bas_Reynolds_Thermique_Base)::typer(nom1);
   valeur().associer_eqn(equation());
 
-  valeur().associer(equation().zone_dis(), equation().zone_Cl_dis());
+  valeur().associer(equation().domaine_dis(), equation().domaine_Cl_dis());
   is >> valeur();
   return is;
 }

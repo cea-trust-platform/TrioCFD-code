@@ -24,8 +24,8 @@
 #include <LecFicDistribue.h>
 #include <EcrFicCollecte.h>
 // coordonees des points
-#include <Zone_VF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VF.h>
+#include <Domaine_VDF.h>
 // types specifiques de tableaux.
 #include <DoubleTrav.h>
 // communications mpi
@@ -341,11 +341,11 @@ Entree& Traitement_particulier_NS_plan::lire(Entree& is)
 
 void Traitement_particulier_NS_plan::preparer_calcul_particulier()
 {
-  const Zone_dis_base& zdisbase = mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF, zdisbase);
+  const Domaine_dis_base& zdisbase = mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, zdisbase);
   IJK_Grid_Geometry ijk_grid;
   // swap y and z in conversion:
-  ijk_grid.initialize_from_unstructured(zone_VDF.zone(), DIRECTION_I, DIRECTION_K, DIRECTION_J,
+  ijk_grid.initialize_from_unstructured(domaine_VDF.domaine(), DIRECTION_I, DIRECTION_K, DIRECTION_J,
                                         true, true, false /* not periodic in k */);
 
   // Create a splitting of the ijk mesh such that whole z planes are on each processor
@@ -357,7 +357,7 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
                             1 /* 1 slice in direction j */,
                             nslices_k);
 
-  vdf_to_ijk_.initialize(zone_VDF, ijk_splitting_, IJK_Splitting::ELEM,
+  vdf_to_ijk_.initialize(domaine_VDF, ijk_splitting_, IJK_Splitting::ELEM,
                          DIRECTION_I, DIRECTION_K, DIRECTION_J);
 
 
@@ -393,14 +393,14 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
 
   // cette portion de code sera a retirer apres traduction du code en tout ijk:
 
-  zone_VDF.zone().creer_tableau_elements(racinederho);
-  zone_VDF.creer_tableau_faces(Rrhouf);
+  domaine_VDF.domaine().creer_tableau_elements(racinederho);
+  domaine_VDF.creer_tableau_faces(Rrhouf);
 
   {
-    const IntTab& elem_faces = zone_VDF.elem_faces();
+    const IntTab& elem_faces = domaine_VDF.elem_faces();
 
     int face; //recepteur des faces
-    int nb_elems = zone_VDF.zone().nb_elem_tot(); // pour pouvoir faire les derivation le tableau doit comporter les adresses des fictifs.
+    int nb_elems = domaine_VDF.domaine().nb_elem_tot(); // pour pouvoir faire les derivation le tableau doit comporter les adresses des fictifs.
     int num_elem;
 
     // inutile apres tout ijk.
@@ -414,24 +414,24 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
         // si le voisin n'existe pas la valeur retourner est -1
         //faces X
         face                   =  elem_faces(num_elem,0);
-        Tab_recap(num_elem,0)  =  zone_VDF.elem_voisin(num_elem,face,0);
+        Tab_recap(num_elem,0)  =  domaine_VDF.elem_voisin(num_elem,face,0);
 
         face                   =  elem_faces(num_elem,0+dimension);
-        Tab_recap(num_elem,1)  =  zone_VDF.elem_voisin(num_elem,face,1);
+        Tab_recap(num_elem,1)  =  domaine_VDF.elem_voisin(num_elem,face,1);
 
         //faces Y
         face                   =  elem_faces(num_elem,1); //face inferieure
-        Tab_recap(num_elem,2)  =  zone_VDF.elem_voisin(num_elem,face,0);
+        Tab_recap(num_elem,2)  =  domaine_VDF.elem_voisin(num_elem,face,0);
 
         face                   =  elem_faces(num_elem,1+dimension); //face superieure
-        Tab_recap(num_elem,3)  =  zone_VDF.elem_voisin(num_elem,face,1);
+        Tab_recap(num_elem,3)  =  domaine_VDF.elem_voisin(num_elem,face,1);
 
         //face Z
         face                   =  elem_faces(num_elem,2);
-        Tab_recap(num_elem,4)  =  zone_VDF.elem_voisin(num_elem,face,0);
+        Tab_recap(num_elem,4)  =  domaine_VDF.elem_voisin(num_elem,face,0);
 
         face                   =  elem_faces(num_elem,2+dimension);
-        Tab_recap(num_elem,5)  =  zone_VDF.elem_voisin(num_elem,face,1);
+        Tab_recap(num_elem,5)  =  domaine_VDF.elem_voisin(num_elem,face,1);
 
       } //fin  for (num_elem=0;num_elem<nb_elems;num_elem++)
 
@@ -446,9 +446,9 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
         for (int i = 0; i < indice_k.ni(); i++)
           indice_k(i,j,k) = k + offset;
     DoubleVect ref_y_double;
-    mon_equation->inconnue().zone_dis_base().zone().creer_tableau_elements(ref_y_double);
+    mon_equation->inconnue().domaine_dis_base().domaine().creer_tableau_elements(ref_y_double);
     vdf_to_ijk_.convert_from_ijk(indice_k, ref_y_double);
-    mon_equation->inconnue().zone_dis_base().zone().creer_tableau_elements(Ref_Y);
+    mon_equation->inconnue().domaine_dis_base().domaine().creer_tableau_elements(Ref_Y);
     const int nb_elem = Ref_Y.size();
     for (int i = 0; i < nb_elem; i++)
       {
@@ -492,9 +492,9 @@ int Traitement_particulier_NS_plan::calculer_critere_post() const
 void Traitement_particulier_NS_plan::calculer_moyennes(DoubleTab& Moyennes, DoubleTab& rrhouf, DoubleTab& Racinederho) const
 {
   const DoubleTab&            						temperature	= ref_champ_temperature_.valeur().valeurs();
-  const Zone_dis_base&        						zdisbase	= mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF&            	 					zone_VDF	= ref_cast(Zone_VDF, zdisbase);
-  const IntTab&              	  					elem_faces 	= zone_VDF.elem_faces();
+  const Domaine_dis_base&        						zdisbase	= mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF&            	 					domaine_VDF	= ref_cast(Domaine_VDF, zdisbase);
+  const IntTab&              	  					elem_faces 	= domaine_VDF.elem_faces();
   const Fluide_Incompressible&  					le_fluide 	= ref_cast(Fluide_Incompressible,mon_equation->milieu());
   const DoubleTab& 									vitesse 	= mon_equation->inconnue().valeurs();
   const DoubleTab& 									visco_dyn 	= le_fluide.viscosite_dynamique();
@@ -505,7 +505,7 @@ void Traitement_particulier_NS_plan::calculer_moyennes(DoubleTab& Moyennes, Doub
 
   int REFY =0 ;
   int dimension  = Objet_U::dimension;
-  int nb_elems   = zone_VDF.zone().nb_elem();
+  int nb_elems   = domaine_VDF.domaine().nb_elem();
   int num_elem;
   int face_x_0, face_x_1, face_y_0, face_y_1, face_z_0, face_z_1;
   int Nyt = ijk_splitting_.get_grid_geometry().get_nb_elem_tot(DIRECTION_K);;
@@ -701,9 +701,9 @@ void Traitement_particulier_NS_plan::ecriture_val_post(const DoubleTab& val_post
   ijk_field.allocate(ijk_splitting_, IJK_Splitting::ELEM, 0 /* ghost size */);
 
   DoubleVect vdf_tmp;
-  const Zone_dis_base& zdisbase = mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF, zdisbase);
-  zone_VDF.zone().creer_tableau_elements(vdf_tmp);
+  const Domaine_dis_base& zdisbase = mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, zdisbase);
+  domaine_VDF.domaine().creer_tableau_elements(vdf_tmp);
 
   const int ni = ijk_field.ni();
   const int nj = ijk_field.nj();
@@ -771,12 +771,12 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
 {
   const Fluide_Incompressible& 		le_fluide 	= ref_cast(Fluide_Incompressible,mon_equation->milieu());
   const Fluide_Quasi_Compressible& 	fluide_QC   = ref_cast(Fluide_Quasi_Compressible,le_fluide);
-  const Zone_dis_base& 			zdisbase	= mon_equation->inconnue().zone_dis_base();
-  const Zone_VF& 			zone_VF		= ref_cast(Zone_VF, zdisbase);
-  const Zone_VDF&            	 	zone_VDF	= ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& 			xp 		= zone_VF.xp();
+  const Domaine_dis_base& 			zdisbase	= mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VF& 			domaine_VF		= ref_cast(Domaine_VF, zdisbase);
+  const Domaine_VDF&            	 	domaine_VDF	= ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& 			xp 		= domaine_VF.xp();
   const DoubleTab& 			vitesse 	= mon_equation->inconnue().valeurs();
-  int 					nb_elems 	= zone_VF.zone().nb_elem();
+  int 					nb_elems 	= domaine_VF.domaine().nb_elem();
 
   int num_elem	= 0; // compteur des elements
   int i,j,k,l;	  // compteurs des boucles
@@ -798,7 +798,7 @@ void Traitement_particulier_NS_plan::preparer_calcul_particulier()
       else
         envoyer_broadcast(oui_calcul,0);
     }
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot(); // nombre total d'elements (reel + fict)
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot(); // nombre total d'elements (reel + fict)
 
   racinederho.resize(nb_elem_tot) ;
   Rrhouf = vitesse ;
@@ -1004,10 +1004,10 @@ void Traitement_particulier_NS_plan::post_traitement_particulier()
 
       if ( post )
         {
-          const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-          const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
+          const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+          const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
 
-          int nb_elem_p = zone_VDF.zone().nb_elem();
+          int nb_elem_p = domaine_VDF.domaine().nb_elem();
           int Nxt  =X_tot.size() ;
           int Nzt  =Z_tot.size() ;
 

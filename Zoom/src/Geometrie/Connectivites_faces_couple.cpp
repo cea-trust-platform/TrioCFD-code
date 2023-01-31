@@ -41,11 +41,11 @@ Entree& Connectivites_faces_couple::readOn(Entree& s )
 }
 
 
-void Connectivites_faces_couple::calculer_nb_facesF(Zone_VF& zone_vfG)
+void Connectivites_faces_couple::calculer_nb_facesF(Domaine_VF& domaine_vfG)
 {
   Cerr<<"debut de Connectivites_faces_couple::calculer_nb_facesF"<<finl;
   //Cerr<<"CALCUL DU NOMBRE DE FACES FINES PAR FACE GROSSIERE"<<finl;
-  int nb_facesG = zone_vfG.nb_faces();
+  int nb_facesG = domaine_vfG.nb_faces();
   nb_facesF_.resize(nb_facesG);
   int nb_faces_fines = connect_faceF_faceG.size_array();
   int face, num_faceG;
@@ -67,14 +67,14 @@ void Connectivites_faces_couple::calculer_nb_facesF(Zone_VF& zone_vfG)
 
 /*! @brief Calcul des connectivites entre facesF et facesG Calcul du nombre de faces fines par face grossiere
  *
- * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @param (Domaine& domaineG, Domaine& domaineF) domaine discretisee grossiere et fine
  * @throws da
  */
-void Connectivites_faces_couple::calculer_connectivites(Zone_VF& zonef,
-                                                        Zone_VF& zoneg,
-                                                        Zone& domg)
+void Connectivites_faces_couple::calculer_connectivites(Domaine_VF& domainef,
+                                                        Domaine_VF& domaineg,
+                                                        Domaine& domg)
 {
   Cerr<<"debut de Connectivites_faces_couple::calculer_connectivites"<<finl;
-  Connectivites_base::calculer_connectivites_face_face(zonef, zoneg, domg);
-  calculer_nb_facesF(zoneg);
+  Connectivites_base::calculer_connectivites_face_face(domainef, domaineg, domg);
+  calculer_nb_facesF(domaineg);
 }

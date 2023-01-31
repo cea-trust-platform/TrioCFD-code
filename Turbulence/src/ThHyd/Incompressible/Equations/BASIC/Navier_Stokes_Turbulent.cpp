@@ -22,7 +22,7 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Op_Diff_Turbulent_base.h>
 #include <Probleme_base.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 #include <Avanc.h>

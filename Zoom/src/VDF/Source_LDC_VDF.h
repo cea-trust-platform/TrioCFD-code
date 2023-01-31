@@ -30,8 +30,8 @@
 #include <Champ_Inc.h>
 
 class Probleme_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -48,7 +48,7 @@ class Source_LDC_VDF : public  Source_Correction_Deficitaire
 
 public:
 
-  void associer_domaines(const Zone_dis&, const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
 
 
 

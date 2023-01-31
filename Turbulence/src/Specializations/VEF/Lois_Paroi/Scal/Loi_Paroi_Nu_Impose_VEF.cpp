@@ -21,7 +21,7 @@
 
 #include <Loi_Paroi_Nu_Impose_VEF.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Symetrie.h>
@@ -127,15 +127,15 @@ Entree& Loi_Paroi_Nu_Impose_VEF::readOn(Entree& s)
 
 int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
-  const DoubleTab& xv=zone_VEF.xv() ;                   // centres de gravite des faces
-  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const DoubleTab& xv=domaine_VEF.xv() ;                   // centres de gravite des faces
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
 
   ArrOfDouble v(dimension);
   static DoubleVect pos(dimension);
@@ -168,7 +168,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   DoubleTab alpha_t = diffusivite_turb.valeurs();
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
 
       // Pour chaque condition limite on regarde son type
@@ -209,8 +209,8 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               v=0.;
               double Ud = 0.;
               int Compte_face = 0;
-              for (int nfa=0; nfa<zone_VEF.zone().nb_faces_elem(); nfa++)
-                if (zone_VEF.premiere_face_int()<=elem_faces(elem,nfa))
+              for (int nfa=0; nfa<domaine_VEF.domaine().nb_faces_elem(); nfa++)
+                if (domaine_VEF.premiere_face_int()<=elem_faces(elem,nfa))
                   {
                     int face = elem_faces(elem,nfa);
                     for (int dim=0; dim<dimension; dim++)
@@ -254,8 +254,8 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
 void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
@@ -272,15 +272,15 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
   double dh_valeur=diam_hydr(0,0);
   DoubleVect pos(dimension);
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
            || (sub_type(Symetrie,la_cl.valeur())) )
         {
-          const Zone_Cl_VEF& zone_Cl_VEF_th = ref_cast(Zone_Cl_VEF, eqn.probleme().equation(1).zone_Cl_dis().valeur());
-          const Cond_lim& la_cl_th = zone_Cl_VEF_th.les_conditions_limites(n_bord);
+          const Domaine_Cl_VEF& domaine_Cl_VEF_th = ref_cast(Domaine_Cl_VEF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Cond_lim& la_cl_th = domaine_Cl_VEF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           if(je_suis_maitre())
@@ -333,14 +333,14 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
             {
               // Calcul de la position
               for (int i=0; i<dimension; i++)
-                pos[i]=zone_VEF.xv(num_face,i);
+                pos[i]=domaine_VEF.xv(num_face,i);
 
               // Calcul du diametre hydraulique
               if (!dh_constant)
                 dh_valeur=diam_hydr->valeur_a_compo(pos,0);
 
-              double x=zone_VEF.xv(num_face,0);
-              double y=zone_VEF.xv(num_face,1);
+              double x=domaine_VEF.xv(num_face,0);
+              double y=domaine_VEF.xv(num_face,1);
               double lambda,lambda_t;
               elem = face_voisins(num_face,0);
               if (elem == -1)
@@ -360,24 +360,24 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
                 Nusselt << x << "\t| " << y;
               if (dimension == 3)
                 {
-                  double z=zone_VEF.xv(num_face,2);
+                  double z=domaine_VEF.xv(num_face,2);
                   Nusselt << x << "\t| " << y << "\t| " << z;
                 }
 
               // on doit calculer Tfluide premiere maille sans prendre en compte Tparoi
               double tfluide=0.;
-              int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
-              double surface_face=zone_VEF.face_surfaces(num_face);
+              int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
+              double surface_face=domaine_VEF.face_surfaces(num_face);
               double surface_pond;
               int j;
               for (int i=0; i<nb_faces_elem; i++)
                 {
-                  if ( (j=zone_VEF.elem_faces(elem,i)) != num_face )
+                  if ( (j=domaine_VEF.elem_faces(elem,i)) != num_face )
                     {
                       surface_pond = 0.;
                       for (int kk=0; kk<dimension; kk++)
-                        surface_pond -= (zone_VEF.face_normales(j,kk)*zone_VEF.oriente_normale(j,elem)*zone_VEF.face_normales(num_face,kk)*
-                                         zone_VEF.oriente_normale(num_face,elem))/(surface_face*surface_face);
+                        surface_pond -= (domaine_VEF.face_normales(j,kk)*domaine_VEF.oriente_normale(j,elem)*domaine_VEF.face_normales(num_face,kk)*
+                                         domaine_VEF.oriente_normale(num_face,elem))/(surface_face*surface_face);
                       tfluide+=temperature(j)*surface_pond;
                     }
                 }

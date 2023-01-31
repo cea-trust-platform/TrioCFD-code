@@ -24,13 +24,13 @@
 #ifndef Paroi_hyd_base_VDF_included
 #define Paroi_hyd_base_VDF_included
 #include <Turbulence_paroi_base.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <distances_VDF.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_hyd_base_VDF
  *
@@ -45,7 +45,7 @@ class Paroi_hyd_base_VDF : public Turbulence_paroi_base
 
 public:
 
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   void init_lois_paroi_();
   void imprimer_premiere_ligne_ustar(int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const override;
   void imprimer_ustar_mean_only(Sortie&, int, const LIST(Nom)&, const Nom& ) const override;
@@ -71,8 +71,8 @@ public:
   */
 protected:
 
-  REF(Zone_VDF) le_dom_VDF;
-  REF(Zone_Cl_VDF) le_dom_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 ///////////////////////////////////////////////////////////

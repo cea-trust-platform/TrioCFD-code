@@ -22,7 +22,7 @@
 
 #include <Op_Grad_VDF_Face.h>
 #include <Champ_P0_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Neumann_sortie_libre.h>
 #include <Periodique.h>
 #include <Symetrie.h>
@@ -62,12 +62,12 @@ Entree& Op_Grad_VDF_Face::readOn(Entree& s)
 /*! @brief
  *
  */
-void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
-                                const Zone_Cl_dis& zone_Cl_dis,
+void Op_Grad_VDF_Face::associer(const Domaine_dis& domaine_dis,
+                                const Domaine_Cl_dis& domaine_Cl_dis,
                                 const Champ_Inc& )
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_dis.valeur());
-  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
   le_dom_vdf = zvdf;
   la_zcl_vdf = zclvdf;
 
@@ -82,8 +82,8 @@ void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
 DoubleTab& Op_Grad_VDF_Face::ajouter(const DoubleTab& inco, DoubleTab& resu) const
 {
   assert_espace_virtuel_vect(inco);
-  const Zone_VDF& zvdf = le_dom_vdf.valeur();
-  const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+  const Domaine_VDF& zvdf = le_dom_vdf.valeur();
+  const Domaine_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
 
   double coef;
@@ -173,12 +173,12 @@ DoubleTab& Op_Grad_VDF_Face::calculer(const DoubleTab& inco, DoubleTab& resu) co
 
 int Op_Grad_VDF_Face::impr(Sortie& os) const
 {
-  const int& impr_mom=le_dom_vdf->zone().Moments_a_imprimer();
-  const int impr_sum=(le_dom_vdf->zone().Bords_a_imprimer_sum().est_vide() ? 0:1);
-  const int impr_bord=(le_dom_vdf->zone().Bords_a_imprimer().est_vide() ? 0:1);
+  const int& impr_mom=le_dom_vdf->domaine().Moments_a_imprimer();
+  const int impr_sum=(le_dom_vdf->domaine().Bords_a_imprimer_sum().est_vide() ? 0:1);
+  const int impr_bord=(le_dom_vdf->domaine().Bords_a_imprimer().est_vide() ? 0:1);
   const Schema_Temps_base& sch = equation().probleme().schema_temps();
-  const Zone_VDF& zvdf = le_dom_vdf.valeur();
-  const Zone_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
+  const Domaine_VDF& zvdf = le_dom_vdf.valeur();
+  const Domaine_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
   const Equation_base& eqn = equation();
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,eqn);
@@ -193,7 +193,7 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
   if (impr_mom)
     {
       const DoubleTab& xgrav = zvdf.xv();
-      const ArrOfDouble& c_grav=zvdf.zone().cg_moments();
+      const ArrOfDouble& c_grav=zvdf.domaine().cg_moments();
       for (int num_face=0; num_face <nb_faces; num_face++)
         for (int i=0; i<dimension; i++)
           xgr(num_face,i)=xgrav(num_face,i)-c_grav(i);
@@ -214,7 +214,7 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
     {
       const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-      int impr_boundary = (zvdf.zone().Bords_a_imprimer_sum().contient(le_bord.le_nom()) ? 1 : 0);
+      int impr_boundary = (zvdf.domaine().Bords_a_imprimer_sum().contient(le_bord.le_nom()) ? 1 : 0);
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -335,7 +335,7 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
       if (impr_mom) Flux_grad_moment << finl;
     }
 
-  const LIST(Nom)& Liste_Bords_a_imprimer = zvdf.zone().Bords_a_imprimer();
+  const LIST(Nom)& Liste_Bords_a_imprimer = zvdf.domaine().Bords_a_imprimer();
   if (!Liste_Bords_a_imprimer.est_vide())
     {
       EcrFicPartage Flux_grad_face;
@@ -346,7 +346,7 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
-          if (zvdf.zone().Bords_a_imprimer().contient(le_bord.le_nom()))
+          if (zvdf.domaine().Bords_a_imprimer().contient(le_bord.le_nom()))
             {
               if (je_suis_maitre())
                 {

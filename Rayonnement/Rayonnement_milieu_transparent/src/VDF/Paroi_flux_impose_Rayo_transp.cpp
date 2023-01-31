@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Paroi_flux_impose_Rayo_transp.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Champ_Inc.h>
 #include <Equation_base.h>
 #include <Milieu_base.h>
@@ -50,16 +50,16 @@ void Paroi_flux_impose_Rayo_transp::mettre_a_jour(double temps)
 }
 void Paroi_flux_impose_Rayo_transp::completer()
 {
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
   is_VDF_=0;
 
-  if (sub_type(Zone_VDF,zone_Cl_dis().zone_dis().valeur()))
+  if (sub_type(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur()))
     {
       is_VDF_=1;
-      zone_VDF = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+      domaine_VDF = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
 
       // initialisation de Teta_i
-      const Zone_VDF& zvdf = zone_VDF.valeur();
+      const Domaine_VDF& zvdf = domaine_VDF.valeur();
 
       const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
@@ -106,7 +106,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 {
-  const Zone_VDF& le_dom_vdf = zone_VDF.valeur();
+  const Domaine_VDF& le_dom_vdf = domaine_VDF.valeur();
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
   ////double d_Lambda = Lambda(0,0);
@@ -114,7 +114,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
   int is_rho_unif=0;
   int is_conduc_unif=0;
@@ -202,7 +202,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
         }
     }
   // Impression:
-  if (zvdf.zone().bords_a_imprimer().contient(la_frontiere_VF.le_nom()) && sch.limpr())
+  if (zvdf.domaine().bords_a_imprimer().contient(la_frontiere_VF.le_nom()) && sch.limpr())
     {
       Cout << "Impression des temperatures de paroi sur la frontiere " << la_frontiere_VF.le_nom() << " :" << finl;
       Cout << "---------------------------------------------------------------------" << finl;

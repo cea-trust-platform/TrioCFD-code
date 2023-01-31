@@ -28,8 +28,8 @@
 #include <Paroi_UTAU_IMP_Impl.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief Ne pas utiliser cette classe.
  *

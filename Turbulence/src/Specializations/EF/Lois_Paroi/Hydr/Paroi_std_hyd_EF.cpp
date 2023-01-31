@@ -138,16 +138,16 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_EF& zone_EF = le_dom_EF.valeur();
-  const IntTab& face_voisins = zone_EF.face_voisins();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
+  const IntTab& face_voisins = domaine_EF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  int nsom = zone_EF.nb_som_face();
-  int nsom_elem = zone_EF.zone().nb_som_elem();
-  const IntTab& elems=zone_EF.zone().les_elems() ;
+  int nsom = domaine_EF.nb_som_face();
+  int nsom_elem = domaine_EF.domaine().nb_som_elem();
+  const IntTab& elems=domaine_EF.domaine().les_elems() ;
 
   ArrOfInt nodes_face(nsom);
   int nb_nodes_free = nsom_elem - nsom;
@@ -184,7 +184,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   ArrOfDouble vit_face(dimension);
 
   // Loop on boundaries
-  int nb_bords=zone_EF.nb_front_Cl();
+  int nb_bords=domaine_EF.nb_front_Cl();
   for (int n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
@@ -213,7 +213,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               nodes_face=0;
               for(int jsom=0; jsom<nsom; jsom++)
                 {
-                  int num_som = zone_EF.face_sommets(num_face, jsom);
+                  int num_som = domaine_EF.face_sommets(num_face, jsom);
                   nodes_face[jsom] = num_som;
                   for(int comp=0; comp<dimension; comp++) vit_face[comp]+=vitesse(num_som,comp)/nsom;
                 }
@@ -231,9 +231,9 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                     for (int j=0; j<dimension; j++)
                       vit[j]+=(vitesse(node,j)-vit_face[j])/nb_nodes_free; // permet de soustraire la vitesse de glissement eventuelle
                 }
-              double norm_v = norm_vit_lp(vit,num_face,zone_EF,val);
+              double norm_v = norm_vit_lp(vit,num_face,domaine_EF,val);
 
-              dist   = distance_face_elem(num_face,elem,zone_EF);
+              dist   = distance_face_elem(num_face,elem,domaine_EF);
               dist  *= dist_corr;
 
               if (l_unif)
@@ -355,7 +355,7 @@ double Paroi_std_hyd_EF::calculer_u_plus(const int ind_face,const double u_plus_
 
 void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
 {
-  const Zone_EF& zone_EF = le_dom_EF.valeur();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   int ndeb,nfin;
   double upmoy,dpmoy,utaumoy;
   double seuil_moy,iter_moy;
@@ -372,7 +372,7 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
   EcrFicPartage Ustar;
   ouvrir_fichier_partage(Ustar,"Ustar");
 
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
@@ -412,14 +412,14 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
           nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
-              double x=zone_EF.xv(num_face,0);
-              double y=zone_EF.xv(num_face,1);
+              double x=domaine_EF.xv(num_face,0);
+              double y=domaine_EF.xv(num_face,1);
               norme_L2= Cisaillement_paroi_(num_face,0)*Cisaillement_paroi_(num_face,0) + Cisaillement_paroi_(num_face,1)*Cisaillement_paroi_(num_face,1);
               if (dimension == 2)
                 Ustar << x << "\t| " << y;
               if (dimension == 3)
                 {
-                  double z=zone_EF.xv(num_face,2);
+                  double z=domaine_EF.xv(num_face,2);
                   Ustar << x << "\t| " << y << "\t| " << z;
                   norme_L2+= Cisaillement_paroi_(num_face,2)*Cisaillement_paroi_(num_face,2);
                 }

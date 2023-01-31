@@ -40,7 +40,7 @@ class Modele_Rayonnement_Milieu_Transparent: public Modele_Rayonnement_base
 
 public:
 
-  void discretiser(const Discretisation_base&, const Zone& ) override;
+  void discretiser(const Discretisation_base&, const Domaine& ) override;
   void mettre_a_jour (double temps) override;
   void preparer_calcul () override;
   double flux_radiatif( int num_face_global) const; // 0 < face < nb_faces_de_bord

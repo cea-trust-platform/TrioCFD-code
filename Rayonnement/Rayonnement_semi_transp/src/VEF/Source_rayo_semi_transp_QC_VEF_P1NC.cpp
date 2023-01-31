@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_rayo_semi_transp_QC_VEF_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Equation_base.h>
 #include <Milieu_base.h>
 #include <Champ_Uniforme.h>
@@ -70,8 +70,8 @@ void Source_rayo_semi_transp_QC_VEF_P1NC::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_QC_VEF_P1NC::associer_domaines(const Zone_dis& zone_dis,
-                                                         const Zone_Cl_dis& zone_Cl_dis)
+void Source_rayo_semi_transp_QC_VEF_P1NC::associer_domaines(const Domaine_dis& domaine_dis,
+                                                            const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;
 }

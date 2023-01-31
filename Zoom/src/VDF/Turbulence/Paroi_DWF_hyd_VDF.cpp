@@ -26,7 +26,7 @@
 #include <Mod_turb_hyd_base.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Source_DWF_VDF.h>
 #include <EChaine.h>
 #include <Connectivites_DWF.h>
@@ -136,7 +136,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
   // on doit retyper maintenant le champ de la CL "Interface" en Champ_front_zoom
   for(int i=0; i<pb_fin->nombre_d_equations(); i++)
     {
-      Conds_lim& les_cl = pb_fin->equation(i).zone_Cl_dis().les_conditions_limites();
+      Conds_lim& les_cl = pb_fin->equation(i).domaine_Cl_dis().les_conditions_limites();
       for (int icl = 0; icl<les_cl.size(); icl++)
         {
           const Frontiere_dis_base& cl = les_cl[icl].valeur().frontiere_dis();
@@ -151,7 +151,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
                   champ+=Nom(" ");
                   champ+=pb_thhyd.le_nom();
                   champ+=Nom(" ");
-                  champ+=Nom(mon_modele_turb_hyd->equation().zone_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
+                  champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
                   champ+=Nom(" vitesse ");
                   EChaine chp(champ);
                   chp >> les_cl[icl].valeur().champ_front();
@@ -171,8 +171,8 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
               champ+=pb_thhyd.le_nom();
               champ+=Nom(" ");
               // marchait avant
-              //          champ+=Nom(modele_turbulence().equation().zone_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
-              champ+=Nom(mon_modele_turb_hyd->equation().zone_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
+              //          champ+=Nom(modele_turbulence().equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
+              champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
               champ+=Nom(" temperature ");
               EChaine chp(champ);
               chp >> les_cl[icl].valeur().champ_front();
@@ -225,9 +225,9 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 //#################################################################
 {
 
-  Zone_VDF& zone_VDF = le_dom_VDF.valeur();
+  Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const int nb_face = zone_VDF.nb_faces();
+  const int nb_face = domaine_VDF.nb_faces();
 
   const double temps = eqn_hydr.schema_temps().temps_courant();
 
@@ -236,7 +236,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const int nb_compo = eqn_hydr.inconnue()->nb_comp();
 
   // Variables sur le probleme fin
-  Zone_VDF& zone_fine = ref_cast(Zone_VDF,pb_fin->domaine_dis().valeur());
+  Domaine_VDF& domaine_fine = ref_cast(Domaine_VDF,pb_fin->domaine_dis().valeur());
 
 
   // Calcul des termes sources grossiers
@@ -247,7 +247,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   // We must divide the source terms by the coarse embedded volumes.
   // In a few lines, we will multiply them by the embedded volumes
   // of the fine mesh.
-  const DoubleVect& volentre_G = zone_VDF.volumes_entrelaces();
+  const DoubleVect& volentre_G = domaine_VDF.volumes_entrelaces();
   for(int i=0; i<nb_face; i++) sources_grossiers(i)/=volentre_G(i);
 
   // Remplissage des termes sources fins
@@ -263,12 +263,12 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           DoubleTab& val  = mon_source.getValeurs();
           Prolongement_base& P = pbMG.pb_2G(0).mon_prolongement(2);
           const Bord front_fictive;
-          P.prolonger(zone_VDF, zone_fine,front_fictive,connect.connectivites_elemF_elemG(),sources_grossiers , val ,1);
+          P.prolonger(domaine_VDF, domaine_fine,front_fictive,connect.connectivites_elemF_elemG(),sources_grossiers , val ,1);
 
           // We now multiply the source terms by the embedded volumes
           // of the fine mesh.
-          const int nb_face_F = zone_fine.nb_faces();
-          const DoubleVect& volentre_F = zone_fine.volumes_entrelaces();
+          const int nb_face_F = domaine_fine.nb_faces();
+          const DoubleVect& volentre_F = domaine_fine.volumes_entrelaces();
           for(int i=0; i<nb_face_F; i++) val(i)*=volentre_F(i);
           break;
         }
@@ -279,7 +279,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
 
   // Remplissage de la CL sur le bord de nom "Interface" du probleme fin
-  Conds_lim& les_cl = pb_fin->equation(0).zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl = pb_fin->equation(0).domaine_Cl_dis().les_conditions_limites();
   Prolongement_base& P_cl = pbMG.pb_2G(0).mon_prolongement(1);
 
   int icl,i_de_la_cl=0;
@@ -300,7 +300,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   DoubleTab pente(val);
   DoubleTab& Gpoint_u  = ref_cast(Champ_front_var_instationnaire,les_cl[i_de_la_cl].valeur().champ_front().valeur()).Gpoint();
 
-  P_cl.prolonger(zone_VDF,zone_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, pente,nb_compo);
+  P_cl.prolonger(domaine_VDF,domaine_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, pente,nb_compo);
 
   if(dt_gros>-1e-6)
     {
@@ -312,7 +312,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // Le pas de temps est tres petit : ca veut peut-etre dire
       // que c'est la premiere iteration et que val n'est pas encore initialise.
       // ... Donc on le fait !
-      P_cl.prolonger(zone_VDF,zone_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, val,nb_compo);
+      P_cl.prolonger(domaine_VDF,domaine_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, val,nb_compo);
       // Et on met pente a 0.
       pente = 0;
     }
@@ -332,7 +332,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Probleme_base& pb_gros = mon_modele_turb_hyd->equation().probleme();
   const DoubleTab& tempiotte_grosse = pb_gros.equation(1).inconnue().valeurs();
 
-  Conds_lim& les_cl_th = eqn_NRJ_F.zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_th = eqn_NRJ_F.domaine_Cl_dis().les_conditions_limites();
   Prolongement_base& P_cl_th = pbMG.pb_2G(0).mon_prolongement(0);
 
   i_de_la_cl=0;
@@ -350,7 +350,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   DoubleTab pente_th(val_th);
 
-  P_cl_th.prolonger(zone_VDF,zone_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, pente_th,1);
+  P_cl_th.prolonger(domaine_VDF,domaine_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, pente_th,1);
 
   if(dt_gros>1e-6)
     {
@@ -362,7 +362,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // Le pas de temps est tres petit : ca veut peut-etre dire
       // que c'est la premiere iteration et que val_th n'est pas encore initialise.
       // ... Donc on le fait !
-      P_cl_th.prolonger(zone_VDF,zone_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, val_th,1);
+      P_cl_th.prolonger(domaine_VDF,domaine_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, val_th,1);
       // Et on met pente a 0.
       pente_th = 0;
     }
@@ -509,10 +509,10 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   // la bonne valeur du prolongement au temps (n+1) afin de repartir sur de bonnes
   // bases a la prochaine iteration pour etre sur de ne pas accumuler
   // les erreurs numeriques tout au long du calcul.
-  P_cl.prolonger(zone_VDF,zone_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, val,nb_compo);
+  P_cl.prolonger(domaine_VDF,domaine_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, val,nb_compo);
 
   // Pareil pour la temperature :
-  P_cl_th.prolonger(zone_VDF,zone_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, val_th,1);
+  P_cl_th.prolonger(domaine_VDF,domaine_fine,cl_th.frontiere(),connect.connectivites_elemF_elemG(),tempiotte_grosse, val_th,1);
 
 
   //////////////////////////////////////////////////////////////////////////

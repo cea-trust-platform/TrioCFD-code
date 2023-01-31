@@ -33,7 +33,7 @@
 #include <Ouvrir_fichier.h>
 #include <Param.h>
 #include <SFichier.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <algorithm>
 #include <communications.h>
 #include <iostream>
@@ -463,7 +463,7 @@ void IJK_Interfaces::compute_vinterp()
 
 void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                 const IJK_Splitting& splitting_NS,
-                                const Zone_dis& zone_dis,
+                                const Domaine_dis& domaine_dis,
                                 const bool compute_vint)
 {
   Cerr << "Entree dans IJK_Interfaces::initialize" << finl;
@@ -552,7 +552,7 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   if (!is_diphasique_)
     return;
 
-  refzone_dis_ = zone_dis;
+  refdomaine_dis_ = domaine_dis;
 
   const IJK_Grid_Geometry& geom_NS = splitting_NS.get_grid_geometry();
   const IJK_Grid_Geometry& geom_FT = splitting_FT.get_grid_geometry();
@@ -560,13 +560,13 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   // Calcul de la bounding box de Navier Stokes et stockage en memoire de la
   // perio.
   bounding_box_NS_domain_.resize(3, 2);
-  // Calcul de la zone au-dela de laquelle une bulle doit etre repliquee.
-  // Cette zone est une peu plus petite que la zone NS_domain, si la bulle
-  // depasse de cette zone elle est dupliquee.
+  // Calcul de la domaine au-dela de laquelle une bulle doit etre repliquee.
+  // Cette domaine est une peu plus petite que la domaine NS_domain, si la bulle
+  // depasse de cette domaine elle est dupliquee.
   bounding_box_duplicate_criteria_.resize(3, 2);
-  // Calcul de la zone au-dela de laquelle une bulle est detruite et remplacee
+  // Calcul de la domaine au-dela de laquelle une bulle est detruite et remplacee
   // par son duplicata a l'autre extremite du domaine.
-  // Cette zone est un peu plus petite que le domaine etendu ou evolue le
+  // Cette domaine est un peu plus petite que le domaine etendu ou evolue le
   // maillage FT.
   bounding_box_forbidden_criteria_.resize(3, 2);
   for (int direction = 0; direction < 3; direction++)
@@ -584,9 +584,9 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           const double oriFT = geom_FT.get_origin(direction);
           const double lenFT = geom_FT.get_domain_length(direction);
           const double delta = geom_FT.get_constant_delta(direction);
-          // largeur de la zone, au bord du domaine navier stokes, au sein de
+          // largeur de la domaine, au bord du domaine navier stokes, au sein de
           // laquelle on declanche la duplication des bulles (si une bulle depasse a
-          // l'exterieur de la zone, on duplique) Cette zone tient compte du stencil
+          // l'exterieur de la domaine, on duplique) Cette domaine tient compte du stencil
           // des forces de tension superficielle et de repulsion
           const double duplicate_stencil_width =
             std::max(1 * delta,
@@ -609,18 +609,18 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
         }
     }
 
-  parcours_.associer_domaine_dis(zone_dis);
-  Zone_VF& zone_vf = ref_cast_non_const(Zone_VF, zone_dis.valeur());
-  connectivite_frontieres_.associer_domaine_vf(zone_vf);
+  parcours_.associer_domaine_dis(domaine_dis);
+  Domaine_VF& domaine_vf = ref_cast_non_const(Domaine_VF, domaine_dis.valeur());
+  connectivite_frontieres_.associer_domaine_vf(domaine_vf);
   parcours_.associer_connectivite_frontieres(connectivite_frontieres_);
 
-  maillage_ft_ijk_.initialize(splitting_FT, zone_dis, parcours_);
+  maillage_ft_ijk_.initialize(splitting_FT, domaine_dis, parcours_);
   // Lecture du maillage initial:
   maillage_ft_ijk_.lire_maillage_ft_dans_lata(fichier_reprise_interface_,
                                               timestep_reprise_interface_,
                                               lata_interfaces_meshname_);
 
-  remaillage_ft_ijk_.associer_domaine(zone_dis);
+  remaillage_ft_ijk_.associer_domaine(domaine_dis);
 
   // Si des bulles ghost sont lues, on les detruit
   // pour etre sur de les creer toutes.
@@ -704,8 +704,8 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
       // le calcul optimise de la force de rappel. Cree un tableau parallele
       // structure comme un tableau aux elements du maillage vdf, initialise a
       // zero.
-      const Zone& zone = zone_vf.zone();
-      zone.creer_tableau_elements(num_compo_);
+      const Domaine& domaine = domaine_vf.domaine();
+      domaine.creer_tableau_elements(num_compo_);
     }
 }
 
@@ -844,7 +844,7 @@ int IJK_Interfaces::posttraiter_champs_instantanes(const Motcles& liste_post_ins
   return n;
 }
 
-// Suppression des bulles dans la zone a eliminer pres des bords periodiques
+// Suppression des bulles dans la domaine a eliminer pres des bords periodiques
 // definie par ncells_deleted_ Dans ce cas, le maillage est modifie:
 //  o Les ghosts sont supprimes de la sauvegarde.
 //  o Les bulles qui sortent du domaine defini via ncells_deleted_ sont
@@ -857,7 +857,7 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
   int flag = 0;
   if (Process::je_suis_maitre())
     {
-      // Calcul de la zone dans laquelle une bulle est supprimee:
+      // Calcul de la domaine dans laquelle une bulle est supprimee:
       bounding_box_delete_criteria_.resize(3, 2);
       const IJK_Grid_Geometry& geom_FT = ref_splitting_.valeur().get_grid_geometry();
       for (int direction = 0; direction < 3; direction++)
@@ -995,7 +995,7 @@ void IJK_Interfaces::sauvegarder_interfaces(const char *lata_name) // const
   timestep_sauvegarde_interface_ = 1;
   const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
 
-  // Suppression des bulles dans la zone a eliminer pres des bords periodiques
+  // Suppression des bulles dans la domaine a eliminer pres des bords periodiques
   // lors de la sauvegarde.
   if (ncells_deleted_ > 0)
     supprimer_certaines_bulles_reelles();
@@ -1936,7 +1936,7 @@ void IJK_Interfaces::transporter_maillage(const double dt_tot, ArrOfDouble& dvol
   if ((rk_step == -1) || (rk_step == 2))
     {
       // ca passe meme en laissant les ghost_bulles lors du lissage...car le
-      // Zone_VF sous-jacent est sur DOM_EXT.
+      // Domaine_VF sous-jacent est sur DOM_EXT.
       //   Attention : s'il faut les supprimer, le tableau var_volume n'est alors
       //   plus valide (nombre de sommet a change).
       remailler_interface(temps, mesh, var_volume, remaillage_ft_ijk_);
@@ -2250,7 +2250,7 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
   Maillage_FT_IJK& mesh = maillage_ft_ijk_;
   Maillage_FT_IJK maillage_temporaire; // Maillage ou on va cumuler les bulles
   // dupliquees deplacees.
-  maillage_temporaire.initialize(ref_splitting_.valeur(), refzone_dis_.valeur(), parcours_);
+  maillage_temporaire.initialize(ref_splitting_.valeur(), refdomaine_dis_.valeur(), parcours_);
   // dupliquer tout le maillage:
   Maillage_FT_IJK a_dupliquer;
   // On recopie tout le maillage dans a_dupliquer:
@@ -2880,7 +2880,7 @@ static int check_somme_drapeau(const ArrOfInt& drapeau_liquide)
 
 // The method have to recieve the extended field indic_ft because
 // the splitting and the conversion "num_elem = s.convert_ijk_cell_to_packed(i,
-// j, k);" are required for num_compo_ which is on zoneVDF which is on the
+// j, k);" are required for num_compo_ which is on domaineVDF which is on the
 // extended domain
 void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
 {
@@ -2888,9 +2888,9 @@ void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
     statistiques().new_counter(2, "calcul rho mu indicatrice: calcul de l'indicatrice");
   statistiques().begin_count(calculer_indicatrice_counter_);
 
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_voisins = domaine_vf.face_voisins();
   const Intersections_Elem_Facettes& intersec = maillage_ft_ijk_.intersections_elem_facettes();
   const IJK_Splitting& s = indic.get_splitting();
 
@@ -3156,10 +3156,10 @@ void IJK_Interfaces::calculer_indicatrices(FixedVector<IJK_Field_double, 3>& ind
     statistiques().new_counter(2, "calcul rho mu indicatrice: calcul des indicatrices");
   statistiques().begin_count(calculer_indicatrice_counter_);
 
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const Zone& zone = zone_vf.zone();
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
+  const Domaine& domaine = domaine_vf.domaine();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_voisins = domaine_vf.face_voisins();
   const Intersections_Elem_Facettes& intersec = maillage_ft_ijk_.intersections_elem_facettes();
   const IJK_Splitting& s = indic.get_splitting();
 
@@ -3182,7 +3182,7 @@ void IJK_Interfaces::calculer_indicatrices(FixedVector<IJK_Field_double, 3>& ind
   // Cree un tableau parallele structure comme un tableau aux elements
   // du maillage vdf, initialise a zero.
   for (int i = 0; i < nb_groups_; i++)
-    zone.creer_tableau_elements(num_compo[i]);
+    domaine.creer_tableau_elements(num_compo[i]);
 
   const int ni = indic[0].ni();
   const int nj = indic[0].nj();
@@ -3498,12 +3498,12 @@ void IJK_Interfaces::convert_to_IntVect(const ArrOfInt& in, IntVect& out) const
   // Cree un tableau parallele structure comme un tableau aux elements
   // du maillage vdf, initialise a zero.
 
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const Zone& zone = zone_vf.zone();
-  zone.creer_tableau_elements(out);
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
+  const Domaine& domaine = domaine_vf.domaine();
+  domaine.creer_tableau_elements(out);
 
-  const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
   Cerr << "nb_elem= " << nb_elem << " nb_elem_tot= " << nb_elem_tot;
 
   // Pour s'assurer que les tableaux ont la meme taille :
@@ -3970,9 +3970,9 @@ void IJK_Interfaces::compute_drapeaux_vapeur_v4(const IntVect& vecteur_composant
   const ArrOfInt& index_elem = maillage_ft_ijk_.intersections_elem_facettes().index_elem();
   const ArrOfInt& index_facette = maillage_ft_ijk_.intersections_elem_facettes().index_facette();
 
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, refzone_dis_.valeur().valeur());
-  const IntTab& elem_faces = zone_vf.elem_faces();
-  const IntTab& faces_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_voisins = domaine_vf.face_voisins();
 
 #ifdef COMPUTE_DRAPEAUX_VALIDATION
   ArrOfInt composantes_comptage_phase0(drapeau_vapeur.size_array());
@@ -4617,7 +4617,7 @@ void dump_elem(const IJK_Splitting& split, int ii, int jj, int kk, int append = 
     }
 }
 
-void dump_elem(const Zone_VF& zone, int elem, int append = 0)
+void dump_elem(const Domaine_VF& domaine, int elem, int append = 0)
 {
   SFichier f;
   if (append)
@@ -4632,8 +4632,8 @@ void dump_elem(const Zone_VF& zone, int elem, int append = 0)
   Vecteur3 p[2];
   for (int i = 0; i < 3; i++)
     {
-      p[0][i] = zone.xv(zone.elem_faces(elem, i), i);
-      p[1][i] = zone.xv(zone.elem_faces(elem, i+3), i);
+      p[0][i] = domaine.xv(domaine.elem_faces(elem, i), i);
+      p[1][i] = domaine.xv(domaine.elem_faces(elem, i+3), i);
     }
   for (int dir = 0; dir < 3; dir++)
     {
@@ -4748,7 +4748,7 @@ void IJK_Interfaces::detecter_et_supprimer_rejeton(bool duplicatas_etaient_prese
 }
 
 // Rempli le champ de force de rappel pour les bulles fixes.
-// coef_rayon_force_rappel : coef de taille de la zone de rappel const (attention aux superposition de bulles)
+// coef_rayon_force_rappel : coef de taille de la domaine de rappel const (attention aux superposition de bulles)
 void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& rappel_ft,
                                               FixedVector<IJK_Field_double, 3>& rappel,
                                               const FixedVector<IJK_Field_double, 3>& vitesse,
@@ -4918,7 +4918,7 @@ void IJK_Interfaces::compute_external_forces_color_function(FixedVector<IJK_Fiel
   // The values in num_compo are not related to the compo numbers of the bubbles.
   // Some reordering is required.
 
-  // Carefull : zone_vdf is built on splitting_ft_, so num_compo_ refers to these numbers
+  // Carefull : domaine_vdf is built on splitting_ft_, so num_compo_ refers to these numbers
   const IJK_Splitting& s_ft =indic_ft.get_splitting();
   Int3 ijk_global, ijk_local, ijk_processeur;
   for (int ib=0; ib < nb_bulles_reelles_+nb_bulles_ghost_; ib++)
@@ -4936,10 +4936,10 @@ void IJK_Interfaces::compute_external_forces_color_function(FixedVector<IJK_Fiel
 
       if (ijk_processeur[0] * ijk_processeur[1] * ijk_processeur[2] == 1)
         {
-          // num_elem_zvdf contient le numero de l'elem dans sa Zone_VF sur le proc num_proc.
+          // num_elem_zvdf contient le numero de l'elem dans sa Domaine_VF sur le proc num_proc.
           // Normalement, c'est cette cellule qui est au centre de la bulle ib.
           const int num_elem_zvdf = s_ft.convert_ijk_cell_to_packed(ijk_local);
-          const int icompo = num_compo_[num_elem_zvdf]; // la valeur dans le tableau eulerien (Zone i,j,k ecrit en non structure VDF)
+          const int icompo = num_compo_[num_elem_zvdf]; // la valeur dans le tableau eulerien (Domaine i,j,k ecrit en non structure VDF)
           assert(icompo>=0);
           decodeur_num_compo[icompo] = ib; // On remplit le decodeur avec le numero de la bulle.
           //Cerr << "Decodeur : ib=" << ib << " in icompo= " << icompo << " on proc: " << Process::me() << finl;

@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Mod_turb_hyd_base.h>
 #include <Equation_base.h>
 #include <Param.h>
@@ -89,8 +89,8 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_EF& zone_EF = le_dom_EF.valeur();
-  const IntTab& face_voisins = zone_EF.face_voisins();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
+  const IntTab& face_voisins = domaine_EF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
@@ -123,9 +123,9 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   ArrOfDouble vit(dimension);
   ArrOfDouble val(dimension);
 
-  int nsom = zone_EF.nb_som_face();
-  int nsom_elem = zone_EF.zone().nb_som_elem();
-  const IntTab& elems=zone_EF.zone().les_elems() ;
+  int nsom = domaine_EF.nb_som_face();
+  int nsom_elem = domaine_EF.domaine().nb_som_elem();
+  const IntTab& elems=domaine_EF.domaine().les_elems() ;
 
   ArrOfDouble vit_face(dimension);
   ArrOfInt nodes_face(nsom);
@@ -133,7 +133,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   // Boucle sur les bords
 
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
@@ -159,7 +159,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               nodes_face=0;
               for(int jsom=0; jsom<nsom; jsom++)
                 {
-                  int num_som = zone_EF.face_sommets(num_face, jsom);
+                  int num_som = domaine_EF.face_sommets(num_face, jsom);
                   nodes_face[jsom] = num_som;
                   for(int comp=0; comp<dimension; comp++) vit_face[comp]+=vitesse(num_som,comp)/nsom;
                 }
@@ -177,14 +177,14 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                     for (int j=0; j<dimension; j++)
                       vit[j]+=(vitesse(node,j)-vit_face[j])/nb_nodes_free; // permet de soustraire la vitesse de glissement eventuelle
                 }
-              norm_v = norm_vit_lp(vit,num_face,zone_EF,val);
+              norm_v = norm_vit_lp(vit,num_face,domaine_EF,val);
 
               if (l_unif)
                 d_visco = visco;
               else
                 d_visco = tab_visco[elem];
 
-              dist_G = distance_face_elem(num_face,elem,zone_EF);
+              dist_G = distance_face_elem(num_face,elem,domaine_EF);
               dist_som = 2.0*dist_G;
 
               // Calcul de u* et des grandeurs turbulentes:
@@ -227,13 +227,13 @@ int Paroi_loi_WW_hyd_EF::calculer_local(double d_visco,
       tab_nu_t(elem) = 0.;
       tab_k(elem) = 0.;
 
-      if (impr==1)  Cerr << "Zone lineaire" << finl;
+      if (impr==1)  Cerr << "Domaine lineaire" << finl;
     }
   else
     {
       calculer_u_star_couche_puissance(norm_vit,d_visco,dist_som,num_face);
       calculer_couche_puissance(tab_nu_t,tab_k,dist_som,elem,num_face);
-      if (impr==1)  Cerr << "Zone en puissance" << finl;
+      if (impr==1)  Cerr << "Domaine en puissance" << finl;
     }
   return 1;
 }

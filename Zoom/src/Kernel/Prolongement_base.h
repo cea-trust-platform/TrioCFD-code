@@ -26,7 +26,7 @@
 
 
 #include <Objet_U.h>
-class Zone_VF;
+class Domaine_VF;
 class Frontiere;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
@@ -47,8 +47,8 @@ class Prolongement_base : public Objet_U
 
 public:
 
-  virtual void calculer(Zone_VF& , Zone_VF& , IntVect&) =0;
-  virtual void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+  virtual void calculer(Domaine_VF& , Domaine_VF& , IntVect&) =0;
+  virtual void prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                          const Frontiere& frontF,
                          IntVect& connect,
                          const DoubleTab& incoG,

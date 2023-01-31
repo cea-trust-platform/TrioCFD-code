@@ -25,8 +25,8 @@
 #include <Static_Int_Lists.h>
 #include <Faces_builder.h>
 #include <TRUST_Deriv.h>
-#include <Sous_Zone.h>
-#include <Zone.h>
+#include <Sous_Domaine.h>
+#include <Domaine.h>
 
 Implemente_instanciable(ConstruireDomaine,"ConstruireDomaine",Interprete_geometrique_base);
 
@@ -41,13 +41,13 @@ Entree& ConstruireDomaine::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete Raffiner Triangule 1 a 1 toutes les zones du domaine
+/*! @brief Fonction principale de l'interprete Raffiner Triangule 1 a 1 toutes les domaines du domaine
  *
  *     specifie par la directive.
- *     On triangule la zone grace a la methode:
- *       void Raffiner::raffiner(Zone& zone) const
+ *     On triangule la domaine grace a la methode:
+ *       void Raffiner::raffiner(Domaine& domaine) const
  *     Raffiner signifie ici transformer en triangle des
- *     elements geometrique d'une zone.
+ *     elements geometrique d'une domaine.
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree
@@ -55,39 +55,39 @@ Entree& ConstruireDomaine::readOn(Entree& is)
  */
 Entree& ConstruireDomaine::interpreter_(Entree& is)
 {
-  Nom nom_dom, nom_sszone;
-  is >> nom_dom >> nom_sszone;
+  Nom nom_dom, nom_ssdomaine;
+  is >> nom_dom >> nom_ssdomaine;
   associer_domaine(nom_dom);
-  Zone& dom=domaine();
-  Sous_Zone& sszone=ref_cast(Sous_Zone, objet(nom_sszone));
+  Domaine& dom=domaine();
+  Sous_Domaine& ssdomaine=ref_cast(Sous_Domaine, objet(nom_ssdomaine));
 
-  Cout << "Type elem = " << sszone.zone().type_elem()->que_suis_je() << finl;
+  Cout << "Type elem = " << ssdomaine.domaine().type_elem()->que_suis_je() << finl;
 
   dom.typer("Rectangle");
 
   IntTab correspo_new_som;
-  creer_sommet_et_elem(dom,sszone,correspo_new_som);
+  creer_sommet_et_elem(dom,ssdomaine,correspo_new_som);
 
-  creer_bords(dom,sszone,correspo_new_som);
+  creer_bords(dom,ssdomaine,correspo_new_som);
 
   return is;
 }
 
 
 
-void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& correspo_newsom)
+void ConstruireDomaine::creer_sommet_et_elem(Domaine& dom, Sous_Domaine& ssz,IntTab& correspo_newsom)
 {
-  Zone& zone0 = ssz.zone();
-  Zone& dom0 = zone0;
+  Domaine& domaine0 = ssz.domaine();
+  Domaine& dom0 = domaine0;
 
   const int nb_poly = ssz.nb_elem_tot();
-  const int nb_som_poly = zone0.nb_som_elem();
+  const int nb_som_poly = domaine0.nb_som_elem();
   int i,j;
   const DoubleTab& les_coord = dom0.coord_sommets();
   DoubleTab newsom(nb_som_poly*nb_poly,Objet_U::dimension);
   int compteur = 0;
   IntTab new_elems(nb_poly, nb_som_poly); // les nouveaux elements
-  correspo_newsom.resize(zone0.nb_som_tot());
+  correspo_newsom.resize(domaine0.nb_som_tot());
   correspo_newsom = -1;
   IntTab& les_elems_= dom.les_elems();
   les_elems_.ref(new_elems);
@@ -99,16 +99,16 @@ void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& c
       for (j=0; j<nb_som_poly; j++)
         {
           DoubleTab un_som(1, 3);
-          //Cout << "som = " << j << " " << zone0.sommet_elem(i,j) << finl;
+          //Cout << "som = " << j << " " << domaine0.sommet_elem(i,j) << finl;
 
-          un_som(0,0) = les_coord(zone0.sommet_elem(ssz(i),j),0);
-          un_som(0,1) = les_coord(zone0.sommet_elem(ssz(i),j),1);
+          un_som(0,0) = les_coord(domaine0.sommet_elem(ssz(i),j),0);
+          un_som(0,1) = les_coord(domaine0.sommet_elem(ssz(i),j),1);
           //Cout << "coord   = " << un_som(0,0) << " " << un_som(0,1) << finl;
 
-          if (dimension==3)  un_som(0,2) = les_coord(zone0.sommet_elem(ssz(i),j),2);
+          if (dimension==3)  un_som(0,2) = les_coord(domaine0.sommet_elem(ssz(i),j),2);
           indice(j) = ajouterSom(dom,un_som,newsom,compteur);
           new_elems(i,j) = indice(j);
-          correspo_newsom(zone0.sommet_elem(ssz(i),j)) = indice(j);
+          correspo_newsom(domaine0.sommet_elem(ssz(i),j)) = indice(j);
         }
     }
 
@@ -116,7 +116,7 @@ void ConstruireDomaine::creer_sommet_et_elem(Zone& dom, Sous_Zone& ssz,IntTab& c
 
 }
 
-int ConstruireDomaine::ajouterSom(Zone& dom, const DoubleTab& un_som, DoubleTab& newsom, int& compteur)
+int ConstruireDomaine::ajouterSom(Domaine& dom, const DoubleTab& un_som, DoubleTab& newsom, int& compteur)
 {
   const DoubleTab& les_coord = dom.coord_sommets();
   const int nbsom = dom.nb_som();
@@ -168,14 +168,14 @@ int ConstruireDomaine::ajouterSom(Zone& dom, const DoubleTab& un_som, DoubleTab&
 }
 
 
-void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& correspo_ns)
+void ConstruireDomaine::creer_bords(Domaine& domaineraf, Sous_Domaine& ssz, IntTab& correspo_ns)
 {
-  Zone& zone0 = ssz.zone();
+  Domaine& domaine0 = ssz.domaine();
 
 
-  Bords& mes_faces_bord = zoneraf.faces_bord();
-  Elem_geom& elem = zoneraf.type_elem();
-  for (auto& itr : zone0.faces_bord())
+  Bords& mes_faces_bord = domaineraf.faces_bord();
+  Elem_geom& elem = domaineraf.type_elem();
+  for (auto& itr : domaine0.faces_bord())
     {
       Faces& les_faces=itr.faces();
       Bord& bord=mes_faces_bord.add(Bord());
@@ -183,7 +183,7 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
       //Cout << "Dans ConstruireDomaine  type face  = " << les_faces.type_face() << finl;
       bord.nommer(itr.le_nom());
       bord.typer_faces(les_faces.type_face());
-      bord.associer_domaine(zoneraf);
+      bord.associer_domaine(domaineraf);
 
       int nb_faces = les_faces.nb_faces_tot();
       int nb_som_faces = les_faces.nb_som_faces();
@@ -213,19 +213,19 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
   Bord& bord=mes_faces_bord.add(Bord());
   bord.nommer("interface");
   bord.typer_faces(elem.type_face());
-  bord.associer_domaine(zoneraf);
+  bord.associer_domaine(domaineraf);
   bord.dimensionner(0);
 
   Faces mes_faces;
   {
-    // bloc a factoriser avec Zone_VF.cpp :
-    Type_Face type_face = zone0.type_elem().type_face(0);
+    // bloc a factoriser avec Domaine_VF.cpp :
+    Type_Face type_face = domaine0.type_elem().type_face(0);
     mes_faces.typer(type_face);
-    mes_faces.associer_domaine(zone0);
+    mes_faces.associer_domaine(domaine0);
 
     Static_Int_Lists connectivite_som_elem;
-    const int     nb_sommets_tot = zone0.nb_som_tot();
-    const IntTab&    elements       = zone0.les_elems();
+    const int     nb_sommets_tot = domaine0.nb_som_tot();
+    const IntTab&    elements       = domaine0.les_elems();
 
     construire_connectivite_som_elem(nb_sommets_tot,
                                      elements,
@@ -234,15 +234,15 @@ void ConstruireDomaine::creer_bords(Zone& zoneraf, Sous_Zone& ssz, IntTab& corre
 
     Faces_builder faces_builder;
     IntTab elem_faces; // Tableau dont on aura pas besoin
-    faces_builder.creer_faces_reeles(zone0,
+    faces_builder.creer_faces_reeles(domaine0,
                                      connectivite_som_elem,
                                      mes_faces,
                                      elem_faces);
   }
 
-  Cerr << "Dans ConstruireDomaine  La zone construite nb elem ; nb som = " << zoneraf.nb_elem() << " " << zoneraf.nb_som() << finl;
-  Cerr << "Dans ConstruireDomaine  La zone construite nb bords = " << zoneraf.nb_faces_bord() << finl;
-  Cerr << "Dans ConstruireDomaine  La zone construite  bords = " << zoneraf.faces_bord() << finl;
-  //Cerr << "Dans ConstruireDomaine  La zone0  bords = " << zone0.faces_bord() << finl;
+  Cerr << "Dans ConstruireDomaine  La domaine construite nb elem ; nb som = " << domaineraf.nb_elem() << " " << domaineraf.nb_som() << finl;
+  Cerr << "Dans ConstruireDomaine  La domaine construite nb bords = " << domaineraf.nb_faces_bord() << finl;
+  Cerr << "Dans ConstruireDomaine  La domaine construite  bords = " << domaineraf.faces_bord() << finl;
+  //Cerr << "Dans ConstruireDomaine  La domaine0  bords = " << domaine0.faces_bord() << finl;
 
 }

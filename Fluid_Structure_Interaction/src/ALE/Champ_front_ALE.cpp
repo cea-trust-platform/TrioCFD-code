@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_front_ALE.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <Frontiere_dis_base.h>
 #include <MD_Vector_tools.h>
 
@@ -32,10 +32,10 @@ Implemente_instanciable(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instation
 /*Champ_front_ALE::Champ_front_ALE()
 {
   const Frontiere& front=la_frontiere_dis->frontiere();
-  const Zone& zone=front.zone();
-  const Zone& domaine=zone.domaine();
+  const Domaine& domaine=front.domaine();
+  const Domaine& domaine=domaine.domaine();
   vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
-  const MD_Vector& md = zone.domaine().md_vector_sommets();
+  const MD_Vector& md = domaine.domaine().md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
 }*/
 
@@ -160,17 +160,17 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
   //Cerr<<"Champ_front_ALE::remplir_vit_som_bord_ALE"<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
-  const Zone& zone=front.zone();
+  const Domaine& domaine=front.domaine();
   const Faces& faces=front.faces();
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
-  int nb_som_tot=zone.nb_som_tot();
+  int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   /*if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
     {
       vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
-      const MD_Vector& md = zone.domaine().md_vector_sommets();
+      const MD_Vector& md = domaine.domaine().md_vector_sommets();
       MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
     }*/
 
@@ -181,11 +181,11 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
       x=y=z=0;
       for( k=0; k<nbsf; k++)
         {
-          x=zone.coord(faces.sommet(i,k),0);
+          x=domaine.coord(faces.sommet(i,k),0);
           if(dimension>1)
-            y=zone.coord(faces.sommet(i,k),1);
+            y=domaine.coord(faces.sommet(i,k),1);
           if(dimension>2)
-            z=zone.coord(faces.sommet(i,k),2);
+            z=domaine.coord(faces.sommet(i,k),2);
           for( j=0; j<nb_comp(); j++)
             {
               fxyzt[j].setVar("x",x);

@@ -64,16 +64,16 @@ void Terme_Source_Constituant_Vortex_VEF_Face::associer_pb (const Probleme_base&
 DoubleTab& Terme_Source_Constituant_Vortex_VEF_Face::calculer(DoubleTab& tab) const
 {
   const Equation_base& eq = equation();
-  const Zone_VEF& zone_vef = ref_cast(Zone_VEF, eq.zone_dis().valeur());
-  const Zone_Cl_VEF& zone_cl_vef = ref_cast(Zone_Cl_VEF, eq.zone_Cl_dis().valeur());
-  const DoubleVect& volumes = zone_vef.volumes_entrelaces();
-  const DoubleVect& volumes_cl = zone_cl_vef.volumes_entrelaces_Cl();
-  const int premiere_face_std = zone_vef.premiere_face_std();
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis().valeur());
+  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, eq.domaine_Cl_dis().valeur());
+  const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
+  const DoubleVect& volumes_cl = domaine_cl_vef.volumes_entrelaces_Cl();
+  const int premiere_face_std = domaine_vef.premiere_face_std();
   const DoubleVect& porosites = equation().milieu().porosite_face();
-  const DoubleTab& xv = zone_vef.xv();  // Coord des centres des faces
-  const int nb_faces = zone_vef.nb_faces();
+  const DoubleTab& xv = domaine_vef.xv();  // Coord des centres des faces
+  const int nb_faces = domaine_vef.nb_faces();
   const int dim = Objet_U::dimension;
-  const ArrOfInt& faces_doubles = zone_vef.faces_doubles();
+  const ArrOfInt& faces_doubles = domaine_vef.faces_doubles();
 
   // Pour chaque colonne de xv, a quelle variable faut-il attribuer cette valeur ?
   // On met dans expr le terme source et on calcule l'integrale
@@ -134,10 +134,10 @@ void Terme_Source_Constituant_Vortex_VEF_Face::mettre_a_jour(double temps)
 void Terme_Source_Constituant_Vortex_VEF_Face::ajouter_terme_div_u(DoubleVect& secmem_pression, double dt) const
 {
   const Equation_base& eq = equation();
-  const Zone_VEF& zone_vef = ref_cast(Zone_VEF, eq.zone_dis().valeur());
-  const DoubleVect& volumes = zone_vef.volumes();
-  const DoubleTab& xp = zone_vef.xp();  // Centres des elements
-  const int nb_elem = zone_vef.zone().nb_elem();
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis().valeur());
+  const DoubleVect& volumes = domaine_vef.volumes();
+  const DoubleTab& xp = domaine_vef.xp();  // Centres des elements
+  const int nb_elem = domaine_vef.domaine().nb_elem();
   const int dim = xp.dimension(1);
 
   // GF mieux comme cela

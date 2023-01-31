@@ -90,7 +90,7 @@ void Transport_Fluctuation_Temperature_W::discretiser()
 {
   const Discret_Thermique& dis = ref_cast(Discret_Thermique,discretisation());
   Cerr <<que_suis_je()<<" equation discretization" << finl;
-  dis.Fluctu_Temperature(schema_temps(),zone_dis(),le_champ_Fluctu_Temperature);
+  dis.Fluctu_Temperature(schema_temps(),domaine_dis(),le_champ_Fluctu_Temperature);
   champs_compris_.ajoute_champ(le_champ_Fluctu_Temperature);
   Equation_base::discretiser();
 }
@@ -215,7 +215,7 @@ void Transport_Fluctuation_Temperature_W::associer_modele_turbulence(const Model
   const Equation_base& eqn_therm = modele.equation();
   Equation_base::associer_pb_base(eqn_therm.probleme());
   Equation_base::associer_sch_tps_base(eqn_therm.schema_temps());
-  Equation_base::associer_domaine_dis(eqn_therm.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_therm.domaine_dis());
   associer_milieu_base(eqn_therm.milieu());
   mon_modele_Fluctu_Temp = modele;
   discretiser();

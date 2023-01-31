@@ -23,7 +23,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Neumann_paroi.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 
 Implemente_instanciable(LoiParoiHybride_VDF,"Loi_Paroi_Hybride_VDF",Paroi_hyd_base_VDF);
 
@@ -46,7 +46,7 @@ Entree& LoiParoiHybride_VDF::readOn(Entree& s)
   return s ;
 }
 
-void LoiParoiHybride_VDF::associer(const Zone_dis& zd, const Zone_Cl_dis& zcl)
+void LoiParoiHybride_VDF::associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcl)
 {
   LoiParoiHybride::associer(zd,zcl);
   Paroi_hyd_base_VDF::associer(zd,zcl);

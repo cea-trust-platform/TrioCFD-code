@@ -50,10 +50,10 @@ Entree& Paroi_loi_WW_scal_VEF::readOn(Entree& s)
   return s ;
 }
 
-void Paroi_loi_WW_scal_VEF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_loi_WW_scal_VEF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  le_dom_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ void Paroi_loi_WW_scal_VEF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis&
 // Loi analytique avec raccordement des comportements
 // asymptotiques de la temperature adimensionnee T+
 // sous-couche conductrice : T+=Pr y+
-// zone logarithmique : T+=2.12*ln(y+)+Beta
+// domaine logarithmique : T+=2.12*ln(y+)+Beta
 
 //// POUR PASSAGE A V1.4.4
 //// PROBLEME COMPATIBILITE AVEC DEVELOPPEMENT
@@ -82,7 +82,7 @@ double FthparVEF_WW(double y_plus,double Pr,double Beta)
 
 int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VEF& zone_VEF = le_dom_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -129,7 +129,7 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
 
       // Pour chaque condition limite on regarde son type
@@ -149,7 +149,7 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
           for (int ind_face=0; ind_face<size; ind_face++)
             {
               int num_face = le_bord.num_face(ind_face);
-              const IntTab& face_voisins = zone_VEF.face_voisins();
+              const IntTab& face_voisins = domaine_VEF.face_voisins();
 
               // We search the element touching the wall on the face "num_face".
               elem = face_voisins(num_face,0);
@@ -158,9 +158,9 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // We calculate the distance to the wall of the center of gravity of the element.
               if (dimension == 2)
-                dist = distance_2D(num_face,elem,zone_VEF)*1.5;
+                dist = distance_2D(num_face,elem,domaine_VEF)*1.5;
               else
-                dist = distance_3D(num_face,elem,zone_VEF)*4./3.;
+                dist = distance_3D(num_face,elem,domaine_VEF)*4./3.;
 
               if (l_unif)
                 d_visco = visco;
