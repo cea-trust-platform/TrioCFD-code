@@ -458,10 +458,13 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
            << distance_utilisateur_ << " de l'interface" << finl;
       Cerr << "Sortie du programme." << finl;
       Process::exit();
-    
+
+      // bfa : necessary to avoid a compilation error "[-Werror=implicit-fallthrough=]"
+      return -1;
+
     case 0 :
       return 2;//pas de transport => sortie
-   
+
     case 1 :
 
       assert(nb_voisins_a_distance_plus_petite!=0 || elem>=nb_elem);
