@@ -128,7 +128,6 @@ void OpConvCentre4IJK_double::calculer(const IJK_Field_double& inputx, const IJK
                                        const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  std::cout << "calculer" << std::endl;
   OpConvIJKFacesCommon_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
 
@@ -139,7 +138,6 @@ void OpConvCentre4IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_
                                       const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  std::cout << "ajouter" << std::endl;
   OpConvIJKFacesCommon_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
 }
@@ -152,7 +150,6 @@ void OpConvCentre4IJK_double::calculer_div_rhou(const IJK_Field_double& rhovx, c
                                                 IJK_Field_double& resu, int k_layer, const Operateur_IJK_data_channel& channel)
 {
   statistiques().begin_count(convection_counter_);
-  std::cout << "calculer_div_rhou" << std::endl;
   const double surface_x = channel.get_delta_y() * channel.get_delta_z()[k_layer];
   const double surface_y = channel.get_delta_x() * channel.get_delta_z()[k_layer];
   const double surface_z = channel.get_delta_x() * channel.get_delta_y();
