@@ -242,7 +242,7 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
         }
       break;
     case 4:
-      temperature_convection_op_centre4_.initialize(splitting);
+      temperature_convection_op_centre4_.initialize(splitting, boundary_conditions_);
       break;
     default:
       Cerr << "Undefined operator for the convection of the temperature. " << finl;

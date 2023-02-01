@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Operateur_IJK_base.h>
-
+#include <iostream>
 // Definition of the fluxes
 //
 //  control volumes for velocity in x direction:
@@ -76,11 +76,26 @@ static void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Fie
           Simd_double r, a, b;
           fx.get_center_right(DIRECTION::X, i, a, b);
           r = a-b;
+//          if(a.data_ != b.data_)
+//            {
+//              std::cout << "DIV : direction_X" << a.data_ << " " << b.data_  << " " << r.data_ << " " << i << " " << j << " " << k_layer << std::endl;
+//            }
+
           fy.get_center_right(DIRECTION::Y,i, a, b);
           r += a-b;
+//          if(a.data_ != b.data_)
+//            {
+//              std::cout << "DIV : direction_Y" << a.data_ << " " << b.data_ << " " << r.data_  << " " << i << " " << j << " " << k_layer << std::endl;
+//            }
+
           fzmin.get_center(i, a);
           fzmax.get_center(i, b);
           r += a-b;
+//          if(a.data_ != b.data_)
+//            {
+//              std::cout << "DIV : direction_Z" << a.data_ << " " << b.data_ << " " << r.data_  << " " << i << " " << j << " " << k_layer << std::endl;
+//            }
+
           if(add)
             {
               resu_ptr.get_center(i, a);
@@ -193,8 +208,10 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_x_vz(*flux_x, k);
           compute_flux_y_vz(*flux_y, k);
           compute_flux_z_vz(*flux_zmax, k+1);
-          Operator_IJK_div(*flux_x, *flux_y, *flux_vz_zmin, *flux_zmax, dvz, k, add);
 
+          // std::cout << "div dv_z" << std::endl;
+          Operator_IJK_div(*flux_x, *flux_y, *flux_vz_zmin, *flux_zmax, dvz, k, add);
+          // std::cout << " " << std::endl;
           exec_after_divergence_flux_z(dvz, k);
           swap_data(flux_vz_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
         }
@@ -203,7 +220,9 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_x_vx(*flux_x, k);
           compute_flux_y_vx(*flux_y, k);
           compute_flux_z_vx(*flux_zmax, k+1);
+          // std::cout << "div dv_x" << std::endl;
           Operator_IJK_div(*flux_x, *flux_y, *flux_vx_zmin, *flux_zmax, dvx, k, add);
+          // std::cout << " " << std::endl;
           exec_after_divergence_flux_x(dvx, k);
           swap_data(flux_vx_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
         }
@@ -212,7 +231,9 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_x_vy(*flux_x, k);
           compute_flux_y_vy(*flux_y, k);
           compute_flux_z_vy(*flux_zmax, k+1);
+          // std::cout << "div dv_y" << std::endl;
           Operator_IJK_div(*flux_x, *flux_y, *flux_vy_zmin, *flux_zmax, dvy, k, add);
+          // std::cout << " " << std::endl;
           exec_after_divergence_flux_y(dvy, k);
           swap_data(flux_vy_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
         }
