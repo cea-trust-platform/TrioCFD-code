@@ -97,8 +97,6 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i,int j) const
     return le_champ_front(0,j)-flux_radiatif(i);
   else
     return le_champ_front(i,j)-flux_radiatif(i);
-
-  return 0;
 }
 
 

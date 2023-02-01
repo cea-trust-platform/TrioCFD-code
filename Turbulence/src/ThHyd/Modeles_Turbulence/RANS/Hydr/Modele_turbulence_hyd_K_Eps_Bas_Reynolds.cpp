@@ -72,7 +72,6 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
     }
   else
     return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
@@ -155,11 +154,12 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
   eqn_transp_K_Eps().preparer_calcul();
   return 1;
   // provisoire
+  /*
   Mod_turb_hyd_RANS::preparer_calcul();
   calculer_viscosite_turbulente(K_Eps().temps());
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   return 1;
-
+  */
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
@@ -219,7 +219,6 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
     }
 
   throw Champs_compris_erreur();
-  return ref_champ;
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_noms_champs_postraitables(Noms& nom,Option opt) const

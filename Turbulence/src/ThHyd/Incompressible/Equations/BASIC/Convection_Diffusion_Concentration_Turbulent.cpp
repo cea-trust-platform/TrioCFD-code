@@ -80,7 +80,6 @@ int Convection_Diffusion_Concentration_Turbulent::lire_motcle_non_standard(const
     }
   else
     return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Sauvergarde de l'equation sur un flot de sortie.

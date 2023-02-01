@@ -864,14 +864,6 @@ const IJK_Field_double& IJK_FT_double::get_IJK_field(const Nom& nom) const
     return pressure_;
 
   return post_.get_IJK_field(nom);
-
-
-  Cerr << "Erreur dans IJK_FT_double::get_IJK_field : "
-       << "Champ demande : " << nom
-       << "Liste des champs possibles : "  << finl;
-  Process::exit();
-  throw;
-
 }
 
 void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed)

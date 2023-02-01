@@ -169,3 +169,4 @@ double Cond_lim_tau_omega_simple_dix::calc_omega(double y, double u_tau, double 
     return blending * w_1 + (1-blending) * w_2 ;*/
   return 6 * visc / (beta_omega * y * y);
 }
+

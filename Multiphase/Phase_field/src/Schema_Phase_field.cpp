@@ -300,7 +300,6 @@ int Schema_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
       set_stationnaire_atteint()=sch3.valeur().isStationary();
       return 1;
     }
-  return 1;
 }
 
 

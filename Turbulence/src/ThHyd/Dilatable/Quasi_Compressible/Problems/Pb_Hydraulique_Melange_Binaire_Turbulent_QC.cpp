@@ -101,5 +101,4 @@ int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::expression_predefini(const Motc
     }
   else
     return Pb_QC_base::expression_predefini(motlu,expression);
-  return 0;
 }

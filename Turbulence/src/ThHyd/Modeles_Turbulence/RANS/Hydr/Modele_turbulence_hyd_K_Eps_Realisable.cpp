@@ -84,7 +84,6 @@ int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcl
     }
   else
     return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
@@ -366,7 +365,6 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
     }
 
   throw Champs_compris_erreur();
-  return ref_champ;
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms& nom,Option opt) const

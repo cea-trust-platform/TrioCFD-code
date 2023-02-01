@@ -78,7 +78,6 @@ int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     }
   else
     return Milieu_base::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Fluide_Diphasique::verifier_coherence_champs(int& err,Nom& msg)
@@ -184,7 +183,6 @@ const Champ& Fluide_Diphasique::masse_volumique() const
   assert(0);
   exit();
   throw;
-  return phase0_.masse_volumique();
 }
 
 Champ& Fluide_Diphasique::masse_volumique()
@@ -193,7 +191,6 @@ Champ& Fluide_Diphasique::masse_volumique()
   assert(0);
   exit();
   throw;
-  return masse_volumique();
 }
 
 const Champ_Don& Fluide_Diphasique::diffusivite() const
@@ -202,7 +199,6 @@ const Champ_Don& Fluide_Diphasique::diffusivite() const
   assert(0);
   exit();
   throw;
-  return diffusivite();
 }
 
 Champ_Don& Fluide_Diphasique::diffusivite()
@@ -211,7 +207,6 @@ Champ_Don& Fluide_Diphasique::diffusivite()
   assert(0);
   exit();
   throw;
-  return diffusivite();
 }
 
 const Champ_Don& Fluide_Diphasique::conductivite() const
@@ -220,7 +215,6 @@ const Champ_Don& Fluide_Diphasique::conductivite() const
   assert(0);
   exit();
   throw;
-  return conductivite();
 }
 
 Champ_Don& Fluide_Diphasique::conductivite()
@@ -229,7 +223,6 @@ Champ_Don& Fluide_Diphasique::conductivite()
   assert(0);
   exit();
   throw;
-  return conductivite();
 }
 
 const Champ_Don& Fluide_Diphasique::capacite_calorifique() const
@@ -238,7 +231,6 @@ const Champ_Don& Fluide_Diphasique::capacite_calorifique() const
   assert(0);
   exit();
   throw;
-  return capacite_calorifique();
 }
 
 Champ_Don& Fluide_Diphasique::capacite_calorifique()
@@ -247,7 +239,6 @@ Champ_Don& Fluide_Diphasique::capacite_calorifique()
   assert(0);
   exit();
   throw;
-  return capacite_calorifique();
 }
 
 const Champ_Don& Fluide_Diphasique::beta_t() const
@@ -256,7 +247,6 @@ const Champ_Don& Fluide_Diphasique::beta_t() const
   assert(0);
   exit();
   throw;
-  return beta_t();
 }
 
 Champ_Don& Fluide_Diphasique::beta_t()
@@ -265,6 +255,5 @@ Champ_Don& Fluide_Diphasique::beta_t()
   assert(0);
   exit();
   throw;
-  return beta_t();
 }
 

@@ -65,7 +65,6 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::lire_motcle_non_standard(const Mo
     }
   else
     return Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Temperature::sauvegarder(Sortie& );

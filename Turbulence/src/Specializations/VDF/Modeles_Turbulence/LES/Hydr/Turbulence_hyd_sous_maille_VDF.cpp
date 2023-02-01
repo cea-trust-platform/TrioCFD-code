@@ -89,7 +89,6 @@ int Turbulence_hyd_sous_maille_VDF::lire_motcle_non_standard(const Motcle& mot, 
     }
   else
     return Mod_turb_hyd_ss_maille_VDF::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

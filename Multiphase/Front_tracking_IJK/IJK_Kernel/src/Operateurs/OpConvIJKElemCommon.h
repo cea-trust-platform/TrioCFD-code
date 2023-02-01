@@ -41,13 +41,10 @@ protected:
       {
       case DIRECTION::X:
         return *input_velocity_x_;
-        break;
       case DIRECTION::Y:
         return *input_velocity_y_;
-        break;
       case DIRECTION::Z:
         return *input_velocity_z_;
-        break;
       default:
         Cerr << "Error in OpConvDiscIJKQuickScalar::get_input_velocity: wrong direction..." << finl;
         Process::exit();

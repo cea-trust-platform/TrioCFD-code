@@ -52,15 +52,11 @@ protected:
 inline Ensemble_Lagrange_base& Marqueur_FT::ensemble_points()
 {
   return ensemble_points_;
-  //temporaire
-  exit();
 }
 
 inline const Ensemble_Lagrange_base& Marqueur_FT::ensemble_points() const
 {
   return ensemble_points_;
-  //temporaire
-  exit();
 }
 
 #endif

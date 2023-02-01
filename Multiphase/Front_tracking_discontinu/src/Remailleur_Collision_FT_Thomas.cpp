@@ -459,14 +459,11 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
       Cerr << "Sortie du programme." << finl;
       Process::exit();
 
-      break;
-
+      // bfa : necessary to avoid a compilation error "[-Werror=implicit-fallthrough=]"
+      return -1;
 
     case 0 :
-
       return 2;//pas de transport => sortie
-
-      break;
 
     case 1 :
 
@@ -496,8 +493,6 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
 
       return 4;
 
-      break;
-
     default :
 
       assert(nb_voisins_a_distance_plus_petite!=0 || elem>=nb_elem);
@@ -519,11 +514,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
 
       return 3;
 
-      break;
-
     }//fin du "switch"
-
-  return -1;
 }
 
 

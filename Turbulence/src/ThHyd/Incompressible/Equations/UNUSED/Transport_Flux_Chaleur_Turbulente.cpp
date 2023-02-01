@@ -81,7 +81,6 @@ int Transport_Flux_Chaleur_Turbulente::lire_motcle_non_standard(const Motcle& mo
     }
   else
     return Convection_Diffusion_std::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief surcharge de la methode d'Equation_base.
