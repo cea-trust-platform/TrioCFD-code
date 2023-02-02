@@ -23,8 +23,10 @@
 #define Operateur_Conv_sensibility_VEF_included
 
 #include <Operateur_Conv_sensibility.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 /*! @brief : class Operateur_Conv_sensibility_VEF
  *

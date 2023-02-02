@@ -24,10 +24,10 @@
 #define Pb_Couple_Rayonnement_included
 
 #include <Probleme_Couple.h>
-#include <Ref_Modele_Rayonnement_base.h>
-
 #include <Modele_Rayonnement_base.h>
-#include <Ref_Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Cond_lim_base;
 
 class Schema_Temps_base;
 class Discretisation_base;

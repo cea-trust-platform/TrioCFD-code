@@ -25,8 +25,10 @@
 
 #include <Source_base.h>
 #include <SourceFiltree_FT_disc_base.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 /*! @brief class SourceFiltree_FT_disc_VEF_P1NC la Classe SourceFiltree permet d'ajouter un terme source agissant uniquement
  *

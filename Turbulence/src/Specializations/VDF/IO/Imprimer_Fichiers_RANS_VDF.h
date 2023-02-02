@@ -22,13 +22,10 @@
 #ifndef Imprimer_Fichiers_RANS_VDF_included
 #define Imprimer_Fichiers_RANS_VDF_included
 
-
-
-
 #include <Interprete.h>
 #include <Domaine_VDF.h>
 #include <Equation_base.h>
-#include <Ref_Domaine_VDF.h>
+#include <TRUST_Ref.h>
 
 class Champ_Fonc_base;
 class Domaine_dis;

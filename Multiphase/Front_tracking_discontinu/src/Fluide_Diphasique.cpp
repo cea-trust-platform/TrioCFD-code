@@ -20,12 +20,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Fluide_Diphasique.h>
-#include <Fluide_Incompressible.h>
 #include <Motcle.h>
 #include <Interprete.h>
-#include <Ref_Fluide_Diphasique.h>
 #include <Param.h>
 #include <Champ_Uniforme.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique,"Fluide_Diphasique",Milieu_base);
 

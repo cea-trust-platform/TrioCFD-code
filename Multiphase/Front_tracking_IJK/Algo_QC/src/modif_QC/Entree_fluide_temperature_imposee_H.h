@@ -25,7 +25,9 @@
 #define Entree_fluide_temperature_imposee_H_included
 
 #include <Dirichlet_entree_fluide_leaves.h>
-#include <Ref_Fluide_Quasi_Compressible.h>
+#include <TRUST_Ref.h>
+
+class Fluide_Quasi_Compressible;
 
 /*! @brief classe Entree_fluide_temperature_imposee_H Cas particulier de la classe Entree_fluide_temperature_imposee
  *

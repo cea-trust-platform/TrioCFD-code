@@ -23,17 +23,13 @@
 #define Modele_EASM_Baglietto_VEF_included
 
 #include <Modele_Lam_Bremhorst_VEF.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUSTTabs_forward.h>
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
-
-// ------ Constantes de Baglietto (NED 2006)
+#include <TRUST_Ref.h>
 
 class Domaine_dis;
 class Domaine_Cl_dis;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Domaine_Cl_VEF;
 
 class Modele_EASM_Baglietto_VEF : public Modele_Lam_Bremhorst_VEF

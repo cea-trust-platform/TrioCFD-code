@@ -23,7 +23,7 @@
 #define Diffu_k_included
 #include <Diffu_totale_hyd_base.h>
 #include <Eq_couch_lim.h>
-#include <Ref_Mod_echelle_LRM_base.h>
+#include <TRUST_Ref.h>
 
 class Mod_echelle_LRM_base ;
 

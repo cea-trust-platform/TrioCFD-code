@@ -24,12 +24,12 @@
 #define Paroi_flux_impose_Rayo_transp_included
 
 #include <Paroi_Rayo_transp.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <Champ_front_calc.h>
-#include <Ref_Domaine_VDF.h>
+#include <TRUST_Ref.h>
 
-//
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+
 class Paroi_flux_impose_Rayo_transp : public Paroi_Rayo_transp
 {
 

@@ -24,10 +24,12 @@
 #define RK3_FT_included
 
 #include <Schema_RK_Williamson.h>
-#include <Ref_Probleme_base.h>
 #include <Probleme_Couple.h>
 #include <TRUST_Vector.h>
 #include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
 
 
 /*! @brief classe RK3 Cette classe represente un schema en temps de Runge Kutta d'ordre 3

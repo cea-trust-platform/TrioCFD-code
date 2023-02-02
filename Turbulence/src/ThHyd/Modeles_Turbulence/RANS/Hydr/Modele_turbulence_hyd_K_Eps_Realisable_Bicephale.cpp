@@ -259,7 +259,6 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::equation_
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(const Motcle& nom) const
 {
-  REF(Champ_base) ref_champ;
   try
     {
       return Mod_turb_hyd_RANS_Bicephale::get_champ(nom);

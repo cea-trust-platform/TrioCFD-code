@@ -25,7 +25,9 @@
 #define PRDT_EPS_DEFAUT 1.3
 
 #include <Op_Diff_K_Eps_VEF_base.h>
-#include <Ref_Champ_Q1NC.h>
+#include <TRUST_Ref.h>
+
+class Champ_Q1NC;
 
 class Domaine_dis;
 class Domaine_Cl_dis;

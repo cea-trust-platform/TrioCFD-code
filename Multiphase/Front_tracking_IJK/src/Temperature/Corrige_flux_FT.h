@@ -44,7 +44,9 @@
 #include <IJK_Lata_writer.h>
 #include <Intersection_Interface_ijk.h>
 #include <Ouvrir_fichier.h>
-#include <Ref_IJK_FT_double.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
 
 /*! @brief : class Corrige_flux_FT
  *

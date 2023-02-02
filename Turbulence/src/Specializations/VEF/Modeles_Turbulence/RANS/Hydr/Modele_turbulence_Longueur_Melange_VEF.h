@@ -25,9 +25,10 @@
 
 
 #include <Mod_turb_hyd_RANS_0_eq.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
 
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 class Domaine_dis;
 class Domaine_Cl_dis;
 class Entree;

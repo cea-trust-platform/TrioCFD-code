@@ -23,8 +23,10 @@
 #define _RK3b_h
 
 #include <Schema_Temps_base.h>
-#include <Ref_Probleme_base.h>
 #include <TRUST_Vector.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
 class Pb_MG;
 class Pb_2G;
 

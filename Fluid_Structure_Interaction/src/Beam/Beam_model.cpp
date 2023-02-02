@@ -29,11 +29,13 @@
 #include <Frontiere.h>
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
-#include <Ref_Domaine.h>
 #include <Faces.h>
 #include <fstream>
 #include <iostream>
 #include <math.h>       /* sin */
+#include <TRUST_Ref.h>
+#include <Domaine.h>
+
 #define PI 3.14159265
 
 using namespace std;

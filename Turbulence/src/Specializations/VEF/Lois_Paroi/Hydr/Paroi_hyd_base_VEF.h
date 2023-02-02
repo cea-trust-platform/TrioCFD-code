@@ -27,8 +27,7 @@
 #include <Turbulence_paroi_base.h>
 #include <Domaine_VEF.h>
 #include <Domaine_Cl_VEF.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
 
 
 /*! @brief CLASS: Paroi_hyd_base_VEF Classe de base des lois de paroi hydraulique en VEF

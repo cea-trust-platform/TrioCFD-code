@@ -23,9 +23,10 @@
 #ifndef SourceFiltree_FT_disc_base_included
 #define SourceFiltree_FT_disc_base_included
 
-#include <Ref_Champ_Inc.h>
 #include <Motcle.h>
+#include <TRUST_Ref.h>
 
+class Champ_Inc;
 class Entree;
 class Sortie;
 class Parser;

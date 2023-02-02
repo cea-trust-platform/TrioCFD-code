@@ -24,7 +24,6 @@
 
 #include <Ch_front_var_instationnaire_dep.h>
 #include <Champ_front.h>
-//#include <Ref_Schema_Temps_base.h>
 
 class Boundary_field_keps_from_ud : public Ch_front_var_instationnaire_dep
 {

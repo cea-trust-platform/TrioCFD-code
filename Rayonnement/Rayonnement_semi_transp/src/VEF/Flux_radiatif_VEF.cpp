@@ -27,13 +27,13 @@
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Eq_rayo_semi_transp_VEF.h>
 #include <Champ_front_uniforme.h>
-#include <Ref_Champ_front.h>
 #include <Schema_Temps_base.h>
 #include <Debog.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Domaine_VEF.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Flux_radiatif_VEF,"Flux_radiatif_VEF",Flux_radiatif_base);
 

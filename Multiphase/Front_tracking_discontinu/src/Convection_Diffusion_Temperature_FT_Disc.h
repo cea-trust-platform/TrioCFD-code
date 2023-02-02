@@ -25,11 +25,13 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Champ_Fonc.h>
 #include <Champ_Don.h>
-#include <Ref_Transport_Interfaces_FT_Disc.h>
-#include <Ref_Navier_Stokes_std.h>
-#include <Ref_Fluide_Diphasique.h>
 #include <Assembleur.h>
 #include <Assembleur_base.h>
+#include <TRUST_Ref.h>
+
+class Fluide_Diphasique;
+class Navier_Stokes_std;
+class Transport_Interfaces_FT_Disc;
 
 
 class Convection_Diffusion_Temperature_FT_Disc: public Convection_Diffusion_Temperature

@@ -25,8 +25,10 @@
 
 #include <Turbulence_paroi_scal_base.h>
 #include <Domaine_VDF.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_Cl_dis;
 
 /*! @brief classe Paroi_scal_hyd_base_VDF
  *

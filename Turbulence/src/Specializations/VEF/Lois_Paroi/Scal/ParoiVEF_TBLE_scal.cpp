@@ -34,10 +34,11 @@
 #include <Mod_turb_hyd_base.h>
 #include <Probleme_base.h>
 #include <Diffu_totale_scal_base.h>
-#include <Ref_DoubleVect.h>
 #include <time.h>
 #include <verif_cast.h>
 #include <SFichier.h>
+#include <TRUST_Ref.h>
+
 
 Implemente_instanciable_sans_constructeur(ParoiVEF_TBLE_scal,"Paroi_TBLE_scal_VEF",Paroi_std_scal_hyd_VEF);
 

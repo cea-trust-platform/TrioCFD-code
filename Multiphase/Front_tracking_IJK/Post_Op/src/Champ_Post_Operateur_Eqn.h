@@ -17,20 +17,22 @@
 
 #include <Champ_Generique_Operateur_base.h>
 #include <Operateur.h>
-#include <Ref_Eqn_base.h>
+#include <TRUST_Ref.h>
+
+class Eqn_base;
 //
 // .DESCRIPTION class Champ_Post_Operateur_Eqn
-// Champ destine à post-traiter le gradient d un champ generique
+// Champ destine ï¿½ post-traiter le gradient d un champ generique
 // La classe porte un operateur statistique "gradient"
 
-//// Syntaxe à respecter pour jdd
+//// Syntaxe ï¿½ respecter pour jdd
 //
 // "nom_champ" Champ_Post_Statistiques_Eqn { 
 //		source Champ_Post...{ ...source Champ_Post_ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
 //	       }
 // "nom_champ" fixe par utilisateur sera le nom du champ generique
 //Ce type de champ implique que le champ source possede des conditions limites
-//Son application est restreinte à certains champs discrets (pression VDF et VEF ou temperature en VEF)
+//Son application est restreinte ï¿½ certains champs discrets (pression VDF et VEF ou temperature en VEF)
 
 class Champ_Post_Operateur_Eqn : public Champ_Generique_Operateur_base
 {

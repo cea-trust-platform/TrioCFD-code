@@ -24,10 +24,11 @@
 #define Remaillage_FT_included
 
 #include <TRUSTTabFT_forward.h>
-#include <Ref_Domaine_VF.h>
 #include <Objet_U.h>
 #include <Domaine_dis.h>
 #include <FTd_tools.h>
+#include <TRUST_Ref.h>
+
 class Maillage_FT_Disc;
 class Domaine_VF;
 class Param;

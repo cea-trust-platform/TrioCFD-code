@@ -23,9 +23,10 @@
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 
 #include <Eval_Diff_VDF.h>
-#include <Ref_Champ_Fonc.h>
-#include <Ref_Champ_Uniforme.h>
 #include <Champ_Fonc.h>
+#include <TRUST_Ref.h>
+
+class Champ_Uniforme;
 
 class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF
 {

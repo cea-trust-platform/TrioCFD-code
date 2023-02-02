@@ -23,9 +23,11 @@
 #define Paroi_scal_hyd_base_VEF_included
 
 #include <Turbulence_paroi_scal_base.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
 #include <TRUSTVects.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 //
 class Paroi_scal_hyd_base_VEF  : public Turbulence_paroi_scal_base
 {

@@ -203,7 +203,6 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const
 {
-  REF(Champ_base) ref_champ;
   try
     {
       return Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(nom);

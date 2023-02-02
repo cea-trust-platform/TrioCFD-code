@@ -23,14 +23,12 @@
 #include <Probleme_FT_Disc_gen.h>
 #include <Modele_turbulence_hyd_nul.h>
 #include <Discret_Thyd.h>
-#include <Ref_Navier_Stokes_FT_Disc.h>
 #include <Operateur_Diff_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Assembleur_base.h>
 #include <TRUST_Vector.h>
-#include <Ref_Champ_base.h>
 #include <Schema_Temps_base.h>
 #include <Domaine_VDF.h>
 #include <Debog.h>
@@ -38,7 +36,6 @@
 // specifiques au VDF et VEF
 #include <Domaine_VF.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
-#include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Terme_Source_Constituant_Vortex_VEF_Face.h>
 #include <TRUSTTrav.h>
 #include <Matrice_Morse_Sym.h>

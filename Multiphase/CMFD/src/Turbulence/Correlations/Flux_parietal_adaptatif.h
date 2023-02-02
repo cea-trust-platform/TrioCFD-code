@@ -22,9 +22,12 @@
 
 #ifndef Flux_parietal_adaptatif_included
 #define Flux_parietal_adaptatif_included
+
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief classe Flux_parietal_adaptatif classe qui implemente une correlation de flux parietal monophasique
  *

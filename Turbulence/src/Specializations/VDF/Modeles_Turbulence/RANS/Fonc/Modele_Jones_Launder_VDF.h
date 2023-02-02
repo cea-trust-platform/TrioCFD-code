@@ -23,16 +23,15 @@
 #define Modele_Jones_Launder_VDF_included
 
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
+#include <TRUSTTabs_forward.h>
 #include <Domaine_Cl_dis.h>
 #include <Equation_base.h>
+#include <TRUST_Ref.h>
 
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 class Domaine_dis;
 class Domaine_Cl_dis;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
 class Modele_Jones_Launder_VDF : public Modele_Fonc_Bas_Reynolds_Base

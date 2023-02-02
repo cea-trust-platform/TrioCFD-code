@@ -27,7 +27,10 @@
 #ifndef Algo_MG_base_included
 #define Algo_MG_base_included
 
-#include <Ref_Pb_MG.h>
+#include <Objet_U.h>
+#include <TRUST_Ref.h>
+
+class Pb_MG;
 
 /*! @brief classe Algo_MG_base Cette classe abstraite definit un algorithme de resolution
  *

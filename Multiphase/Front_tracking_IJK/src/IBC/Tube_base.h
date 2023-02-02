@@ -24,6 +24,7 @@
 #include <IJK_Splitting.h>
 #include <TRUST_Vector.h>
 #include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
 
 class Tube_base : public Objet_U
 {

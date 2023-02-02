@@ -33,16 +33,14 @@
 #define Cd_DEF 0.72
 
 #include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Transport_Fluctuation_Temperature_W_Bas_Re.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
+
 
 class Probleme_base;
 class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Domaine_dis;
 class Domaine_Cl_dis;
 class Domaine_Cl_VDF;

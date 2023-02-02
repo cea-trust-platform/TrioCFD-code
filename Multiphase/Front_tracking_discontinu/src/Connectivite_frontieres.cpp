@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Connectivite_frontieres.h>
 #include <TRUST_Deriv.h>
-#include <Ref_Connectivite_frontieres.h>
 #include <Domaine_VF.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Connectivite_frontieres,"Connectivite_frontieres",Objet_U);
 

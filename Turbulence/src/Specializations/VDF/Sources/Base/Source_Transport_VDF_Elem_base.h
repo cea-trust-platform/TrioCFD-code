@@ -25,10 +25,10 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Calcul_Production_K_VDF.h>
 #include <Source_Transport_proto.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Domaine_VDF.h>
 #include <Domaine_Cl_VDF.h>
 #include <Domaine_VDF.h>
+#include <TRUST_Ref.h>
+
 
 class Source_Transport_VDF_Elem_base : public Source_base, public Calcul_Production_K_VDF, public Source_Transport_proto
 {

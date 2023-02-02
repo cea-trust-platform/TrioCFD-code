@@ -25,10 +25,12 @@
 #include <Objet_U.h>
 #include <Domaine_VDF.h>
 #include <FTd_tools.h>
-#include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
-#include <Ref_Transport_Interfaces_FT_Disc.h>
-#include <Ref_Navier_Stokes_FT_Disc.h>
 #include <Transport_Interfaces_FT_Disc.h>
+#include <TRUST_Ref.h>
+
+class Navier_Stokes_FT_Disc;
+class Convection_Diffusion_Temperature_FT_Disc;
+
 //#include <Maillage_FT_Disc.h>
 class Param;
 class Parcours_interface;

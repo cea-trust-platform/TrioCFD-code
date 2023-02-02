@@ -27,11 +27,12 @@
 #include <Operateur_negligeable.h>
 #include <TRUST_Deriv.h>
 #include <Matrice_Morse.h>
-#include <Ref_Champ_Don.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
 
+class Champ_Don;
 class Champ_Fonc;
 class Champ_base;
-#include <TRUSTTabs_forward.h>
 
 
 

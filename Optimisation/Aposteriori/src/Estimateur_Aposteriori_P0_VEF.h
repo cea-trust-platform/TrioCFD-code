@@ -16,11 +16,13 @@
 #ifndef Estimateur_Aposteriori_P0_VEF_included
 #define Estimateur_Aposteriori_P0_VEF_included
 
-#include <Ref_Champ_P1_isoP1Bulle.h>
 #include <Champ_Fonc_P0_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
-#include <Ref_Champ_P1NC.h>
-#include <Ref_Champ_Don.h>
+#include <TRUST_Ref.h>
+
+class Champ_P1NC;
+class Champ_Don;
+class Champ_P1_isoP1Bulle;
+class Domaine_Cl_VEF;
 
 class Estimateur_Aposteriori_P0_VEF : public Champ_Fonc_P0_VEF
 {

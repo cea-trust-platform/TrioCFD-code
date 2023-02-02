@@ -25,8 +25,11 @@
 
 #include <Navier_Stokes_std.h>
 #include <Terme_Source_Qdm.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+
 
 /*! @brief class Source_Qdm_VDF_Phase_field
  *

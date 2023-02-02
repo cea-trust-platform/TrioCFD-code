@@ -18,7 +18,6 @@
 #include <Discretisation_base.h>
 #include <Loi_Fermeture_base.h>
 #include <EcrFicCollecteBin.h>
-#include <Ref_Postraitement.h>
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
@@ -28,6 +27,7 @@
 #include <FichierHDFPar.h>
 #include <Milieu_base.h>
 #include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
 #include <sys/stat.h>
 #include <Equation.h>
 #include <Debog.h>

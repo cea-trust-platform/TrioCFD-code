@@ -26,16 +26,18 @@
 
 #include <Source_Con_Phase_field_base.h>
 #include <Matrice_Morse.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <Champ_Don.h>
-#include <Ref_Champ_Don.h>
 #include <Table.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Equation_base.h>
 #include <math.h>
 #include <SolveurSys.h>
 #include <EChaine.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 
 #define PI 3.14159265

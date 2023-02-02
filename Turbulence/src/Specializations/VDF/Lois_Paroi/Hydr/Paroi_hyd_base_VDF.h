@@ -24,10 +24,11 @@
 #ifndef Paroi_hyd_base_VDF_included
 #define Paroi_hyd_base_VDF_included
 #include <Turbulence_paroi_base.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <distances_VDF.h>
+#include <TRUST_Ref.h>
 
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 class Champ_Fonc_base;
 class Domaine_dis;
 class Domaine_Cl_dis;

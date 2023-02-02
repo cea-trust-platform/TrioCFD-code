@@ -25,7 +25,9 @@
 #define Traitement_particulier_NS_CEG_included
 
 #include <Traitement_particulier_NS_base.h>
-#include <Ref_Front_VF.h>
+#include <TRUST_Ref.h>
+
+class Front_VF;
 
 class Traitement_particulier_NS_CEG : public Traitement_particulier_NS_base
 {

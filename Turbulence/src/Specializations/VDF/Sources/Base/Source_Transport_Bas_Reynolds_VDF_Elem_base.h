@@ -22,8 +22,10 @@
 #ifndef Source_Transport_Bas_Reynolds_VDF_Elem_base_included
 #define Source_Transport_Bas_Reynolds_VDF_Elem_base_included
 
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 #include <Source_Transport_VDF_Elem_base.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_Eps_Bas_Reynolds;
 
 class Source_Transport_Bas_Reynolds_VDF_Elem_base : public Source_Transport_VDF_Elem_base
 {

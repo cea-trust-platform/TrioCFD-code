@@ -23,20 +23,17 @@
 #define Modele_Shih_Zhu_Lumley_VDF_included
 
 #include <Modele_Fonc_Realisable_base.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
+#include <TRUSTTabs_forward.h>
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
 #include <Equation_base.h>
-
+#include <TRUST_Ref.h>
 
 #define BR_EPS 1.e-20
 
 class Domaine_dis;
-class Domaine_Cl_dis;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 
 

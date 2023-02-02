@@ -22,7 +22,6 @@
 #include <Sonde_IJK.h>
 
 #include <IJK_Field.h>
-#include <Ref_Probleme_FT_Disc_gen.h>
 #include <Probleme_FT_Disc_gen.h>
 #include <Domaine.h>
 #include <Domaine_VF.h>

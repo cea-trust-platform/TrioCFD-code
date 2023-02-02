@@ -23,9 +23,14 @@
 #define Source_Robin_Scalaire_included
 
 #include <Source_base.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
-#include <Ref_DoubleVect.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
+class Domaine_Cl_dis;
+class Domaine_dis;
+
 
 class Convection_Diffusion_std;
 

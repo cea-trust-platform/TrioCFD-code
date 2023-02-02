@@ -31,12 +31,14 @@
 #include <Force_ph.h>
 #include <random>
 #include <Objet_U.h>
-#include <Ref_Probleme_base.h>
 #include <Redistribute_Field.h>
 #include <Parser.h>
 #include <IJK_Splitting.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
 
 // #include <Force_sp.h>
 // #include <OpDiffTurbIJK.h>

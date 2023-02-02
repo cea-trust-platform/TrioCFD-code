@@ -25,7 +25,6 @@
 
 #include <Equation_base.h>
 #include <Transport_Interfaces_base.h>
-#include <Ref_Probleme_base.h>
 #include <Postraitement_base.h>
 #include <Champ_Inc.h>
 #include <Remaillage_FT.h>
@@ -36,11 +35,14 @@
 #include <Algorithmes_Transport_FT_Disc.h>
 #include <Champ_Fonc.h>
 #include <Navier_Stokes_FT_Disc.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Loi_horaire.h>
 #include <Proprietes_part_vol.h>
-#include <Ref_Navier_Stokes_FT_Disc.h>
 #include <TRUSTTabFT_forward.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
+class Milieu_base;
+class Navier_Stokes_FT_Disc;
+class Loi_horaire;
 
 class Transport_Interfaces_FT_Disc_interne;
 template <typename titi> class TRUSTTab;

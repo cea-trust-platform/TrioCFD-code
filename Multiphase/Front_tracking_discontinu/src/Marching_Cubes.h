@@ -23,12 +23,14 @@
 #ifndef Marching_Cubes_included
 #define Marching_Cubes_included
 
-#include <Ref_Domaine_VF.h>
 #include <TRUSTTabs.h>
 #include <Maillage_FT_Disc.h>
 #include <TRUSTArray.h>
 #include <TRUSTTabFT_forward.h>
 #include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
+
+class Domaine_VF;
 class ArrOfBit;
 class Desc_Structure_FT;
 class Domaine;

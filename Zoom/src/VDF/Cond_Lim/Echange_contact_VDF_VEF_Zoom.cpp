@@ -24,7 +24,9 @@
 #include <Conduction.h>
 #include <Connectivites_faces_couple.h>
 #include <Convection_Diffusion_std.h>
-#include <Ref_Milieu_base.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
+
 
 Implemente_instanciable(Echange_contact_VDF_VEF_Zoom,"Contact_VDF_VEF",Echange_contact_VDF_Zoom_base);
 
@@ -146,7 +148,6 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       const Front_VF& front_vf_ext=ref_cast(Front_VF, front_ext);
       const Front_VF& front_vf=ref_cast(Front_VF, front);
 
-      REF(Champ_base) ch_tampon;
       REF(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 

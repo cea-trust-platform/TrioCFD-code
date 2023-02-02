@@ -36,9 +36,11 @@
 #include <OpDiffTurbIJKScalar.h>
 #include <OpConvDiscIJKQuickScalar.h>
 #include <OpConvCentre2IJKScalar.h>
-#include <Ref_IJK_FT_double.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
 
 
 /*

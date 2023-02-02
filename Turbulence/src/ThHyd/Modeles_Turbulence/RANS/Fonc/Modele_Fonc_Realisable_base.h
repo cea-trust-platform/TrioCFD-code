@@ -23,21 +23,17 @@
 #define Modele_Fonc_Realisable_base_included
 
 
-#include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
-#include <Ref_Fluide_base.h>
-#include <Ref_Champ_Inc.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Champ_Don.h>
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
+#include <Champ_Don.h>
+#include <TRUST_Ref.h>
 
+class Champ_Inc;
+class Fluide_base;
 class Motcle;
 class Domaine_dis;
 class Domaine_Cl_dis;
-/* class Champ_Don_base; */
-#include <Champ_Don.h>
-
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;

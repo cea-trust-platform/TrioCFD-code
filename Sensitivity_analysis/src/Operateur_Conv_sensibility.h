@@ -23,7 +23,9 @@
 #define Operateur_Conv_sensibility_included
 
 #include <Operateur_Conv.h>
-#include <Ref_Champ_Inc_base.h>
+#include <TRUST_Ref.h>
+
+class Champ_Inc_base;
 
 /*! @brief : class Operateur_Conv_sensibility
  *

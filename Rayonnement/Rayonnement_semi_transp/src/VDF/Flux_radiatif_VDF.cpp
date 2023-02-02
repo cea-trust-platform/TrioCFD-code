@@ -28,7 +28,6 @@
 #include <Frontiere_ouverte_temperature_imposee_rayo_semi_transp.h>
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Eq_rayo_semi_transp_VDF.h>
-#include <Ref_Champ_front.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>

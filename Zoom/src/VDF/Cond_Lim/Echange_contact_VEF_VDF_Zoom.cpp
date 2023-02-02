@@ -27,7 +27,8 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Domaine_VDF.h>
-#include <Ref_Milieu_base.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Echange_contact_VEF_VDF_Zoom,"Contact_VEF_VDF",Temperature_imposee_paroi);
 

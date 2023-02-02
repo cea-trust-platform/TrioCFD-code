@@ -25,8 +25,9 @@
 
 #include <TRUSTTab.h>
 #include <Dirichlet_loi_paroi.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
 
+class Correlation;
 /*! @brief Classe Cond_lim_tau_omega_simple_demi
  *
  */

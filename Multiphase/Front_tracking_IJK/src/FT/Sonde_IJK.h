@@ -23,10 +23,11 @@
 #define Sonde_IJK_included
 
 #include <Sonde.h>
-// #include <IJK_FT.h>
-#include <Ref_IJK_FT_double.h>
-#include <Ref_IJK_Field_double.h>
 #include <Postraitement.h>
+#include <IJK_Field.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
 
 /*! @brief : class Sonde_IJK
  *

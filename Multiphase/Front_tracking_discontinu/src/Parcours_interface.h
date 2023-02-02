@@ -22,17 +22,14 @@
 #ifndef Parcours_interface_included
 #define Parcours_interface_included
 
-#include <Ref_Domaine_VF.h>
-#include <Ref_Domaine.h>
 #include <ArrOfBit.h>
-#include <Ref_Connectivite_frontieres.h>
 #include <FTd_tools.h>
 #include <Maillage_FT_Disc.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
 
+class Zone_VF;
 class Maillage_FT_Disc;
-class Domaine;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Domaine;
 class Domaine_dis;
 class Connectivite_frontieres;

@@ -32,24 +32,22 @@
 #define c2_DEFAULT 0.5   // dans le calcul des termes sources des equations
 #define c3_DEFAULT 0.33  //  de transport du flux de chaleur turbulent.
 
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
-#include <Ref_Transport_Fluctuation_Temperature.h>
-#include <Ref_Transport_Flux_Chaleur_Turbulente.h>
 #include <Transport_Fluctuation_Temperature.h>
 #include <Transport_Flux_Chaleur_Turbulente.h>
-#include <Ref_Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
-#include <Ref_Champ_Don.h>
-#include <Ref_Champ_Don_base.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
+
+class Convection_Diffusion_Temperature;
+class Equation_base;
+class Transport_K_Eps_Bas_Reynolds;
+class Modele_turbulence_hyd_K_Eps_Bas_Reynolds;
 
 class Probleme_base;
 class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
+class Champ_Don;
 class Domaine_dis;
+class Domaine_VDF;
 class Domaine_Cl_dis;
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;

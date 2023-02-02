@@ -23,8 +23,11 @@
 #ifndef Cond_Lim_Rayo_included
 #define Cond_Lim_Rayo_included
 
-#include <Ref_Modele_Rayonnement_Milieu_Transparent.h>
 #include <Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Modele_Rayonnement_Milieu_Transparent;
+
 class Modele_Rayonnement_base;
 class Cond_Lim_Rayo
 {
