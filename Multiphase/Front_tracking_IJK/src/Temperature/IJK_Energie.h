@@ -57,8 +57,6 @@
  */
 class IJK_FT_double;
 
-class IJK_Energie;
-Declare_ref(IJK_Energie);
 
 class IJK_Energie : public Objet_U
 {

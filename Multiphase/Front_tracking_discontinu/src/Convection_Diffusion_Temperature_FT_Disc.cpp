@@ -46,8 +46,6 @@ static const double TSAT_CONSTANTE = 0.;
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Temperature_FT_Disc,"Convection_Diffusion_Temperature_FT_Disc",Convection_Diffusion_Temperature);
 
-Implemente_ref(Convection_Diffusion_Temperature_FT_Disc);
-
 Convection_Diffusion_Temperature_FT_Disc::Convection_Diffusion_Temperature_FT_Disc()
 {
   phase_ = -1;

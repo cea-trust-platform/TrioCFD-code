@@ -59,8 +59,6 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc,"Navier_Stokes_FT_Disc",Navier_Stokes_Turbulent);
 
-Implemente_ref(Navier_Stokes_FT_Disc);
-
 class Navier_Stokes_FT_Disc_interne
 {
 public:

@@ -64,8 +64,6 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT_Disc,"Transport_Interfaces_FT_Disc",Transport_Interfaces_base);
 
-Implemente_ref(Transport_Interfaces_FT_Disc);
-
 /*! @brief Classe outil ou on stocke tout le bazar qui sert au fonctionnement de l'equation de transport.
  *
  * Permet de sauvegarder/reprendre les donnees d'interface

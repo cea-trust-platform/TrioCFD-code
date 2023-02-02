@@ -29,7 +29,6 @@
 
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique,"Fluide_Diphasique",Milieu_base);
 
-Implemente_ref(Fluide_Diphasique);
 //////////// XD fluide_diphasique milieu_v2_base fluide_diphasique -1 Two-phase fluid.
 // XD fluide_diphasique milieu_base fluide_diphasique -1 Two-phase fluid.
 

@@ -25,7 +25,6 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable(Connectivite_frontieres,"Connectivite_frontieres",Objet_U);
-Implemente_ref(Connectivite_frontieres);
 
 Entree& Connectivite_frontieres::readOn(Entree& is)
 {

@@ -31,8 +31,6 @@
 
 Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
 
-Implemente_ref(Probleme_FT_Disc_gen);
-
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
 {
   return Pb_Fluide_base::readOn(is);

@@ -105,7 +105,6 @@ protected:
   ArrOfInt indices_to_keep_;
 };
 
-// Declare_ref(Corrige_flux_FT); TODO: a mettre en place éventuellement
 
 // API pour modifier un champ de flux à partir de donnees à l'interface. Cette
 // classe est abstraite, elle est vouée à être héritée pour être adaptée aux

@@ -68,9 +68,6 @@ int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
 
 class IJK_FT_double;
 
-class IJK_Thermique;
-Declare_ref(IJK_Thermique);
-
 class IJK_Thermique : public Objet_U
 {
 
