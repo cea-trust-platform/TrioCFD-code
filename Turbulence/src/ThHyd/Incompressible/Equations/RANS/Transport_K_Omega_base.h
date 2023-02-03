@@ -37,7 +37,6 @@
  */
 class Transport_K_Omega_base: public Transport_2eq_base
 {
-
   Declare_base_sans_constructeur(Transport_K_Omega_base);
 
 public:
@@ -62,7 +61,6 @@ protected:
 
   Champ_Inc le_champ_K_Omega;
   REF(Mod_turb_hyd_RANS_komega) mon_modele;
-
 };
 
 /*! @brief Renvoie le champ inconnue de l'equation.

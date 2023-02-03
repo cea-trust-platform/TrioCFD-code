@@ -41,7 +41,6 @@ class Motcle;
  */
 class Transport_K_Omega: public Transport_K_Omega_base
 {
-
   Declare_instanciable(Transport_K_Omega);
 
 public:
@@ -54,7 +53,6 @@ public:
   Operateur& operateur(int) override;
   const Motcle& domaine_application() const override;
   DoubleTab& corriger_derivee_impl(DoubleTab& d) override;
-  /////
   virtual void corriger_derivee_impl_ALE(DoubleTab& d) { throw; } // pour ALE seulement
 
 protected :
@@ -68,7 +66,7 @@ protected :
 };
 
 
-/*! @brief Associe un champ de vitesse (transportante)a l'equation.
+/*! @brief Associe un champ de vitesse (transportante) a l'equation.
  *
  * @param (Champ_Inc& vit) le champ de vitesse a associer a l'equation
  */

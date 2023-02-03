@@ -50,10 +50,10 @@ public:
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
 
-  /* virtual const Equation_base& equation_k_eps(int) const=0 ; */ // for bicephale
+  // virtual const Equation_base& equation_k_omega(int) const=0;
 
   inline double get_Prandtl_K() const;
-  inline double get_Prandtl_Eps() const;
+  inline double get_Prandtl_Omega() const;
   inline double get_OMEGA_MIN() const;
   inline double get_OMEGA_MAX() const;
   inline double get_K_MIN() const;
@@ -63,12 +63,12 @@ public:
   /////////////////////////////////////////////////////
   //Methode creer_champ non codee a surcharger si necessaire
   //virtual void creer_champ(const Motcle& motlu);
-  // const Champ_base& get_champ(const Motcle& nom) const override;
-  // void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 protected:
-  double Prandtl_K, Prandtl_Eps; // cAlan beware! rename and put in 2eq ?
+  double Prandtl_K, Prandtl_Omega; // cAlan beware! rename and put in 2eq ?
   double OMEGA_MIN, OMEGA_MAX, K_MIN;
   int lquiet;
 
@@ -79,9 +79,9 @@ inline double Mod_turb_hyd_RANS_komega::get_Prandtl_K() const
   return Prandtl_K;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_Prandtl_Eps() const
+inline double Mod_turb_hyd_RANS_komega::get_Prandtl_Omega() const
 {
-  return Prandtl_Eps;
+  return Prandtl_Omega;
 }
 
 inline double Mod_turb_hyd_RANS_komega::get_OMEGA_MIN() const

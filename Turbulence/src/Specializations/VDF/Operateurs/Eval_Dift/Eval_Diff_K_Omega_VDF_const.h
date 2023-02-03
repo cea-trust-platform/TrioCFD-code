@@ -14,51 +14,32 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Transport_2eq_base.h
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Equations/RANS
+// File:        Eval_Diff_K_Omega_VDF_const.h
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VDF/Operateurs/Eval_Dift
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef Eval_Diff_K_Omega_VDF_const_included
+#define Eval_Diff_K_Omega_VDF_const_included
 
-#ifndef Transport_2eq_base_included
-#define Transport_2eq_base_included
+#include <Eval_Diff_K_Omega_VDF.h>
 
-#include <Ref_Mod_turb_hyd_RANS_2eq.h>
-#include <Mod_turb_hyd_RANS_2eq.h>
-#include <Ref_Champ_Inc_base.h>
-#include <Ref_Milieu_base.h>
-#include <Equation_base.h>
-#include <Ref_Champ_Inc.h>
-
-/*! @brief Classe Transport_2eq_base Classe de base pour les equations
- *
- *     de transport des modeles a deux equations type k-DISSIP
- *
- */
-class Transport_2eq_base: public Equation_base
+class Eval_Diff_K_Omega_VDF_const : public Eval_Diff_K_Omega_VDF
 {
-  Declare_base_sans_constructeur(Transport_2eq_base);
-
 public:
+  // Methods used by the flux computation in template class:
+  inline double nu_1_impl(int i, int compo) const
+  {
+    return db_diffusivite + dv_diffusivite_turbulente(i)/Prdt[compo];
+  }
 
-  Transport_2eq_base();
-  void set_param(Param&) override;
-  void associer(const Equation_base&);
-  inline void associer_vitesse(const Champ_base&);
-  void associer_milieu_base(const Milieu_base&) override;
-  Milieu_base& milieu() override;
-  const Milieu_base& milieu() const override;
-  double calculer_pas_de_temps() const override;
+  inline double nu_2_impl(int i, int compo) const { return nu_1_impl(i,compo); }
 
-protected:
-
-  REF(Milieu_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
+  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
+  {
+    return 0.5*(nu_1_impl(i,compo)+nu_1_impl(j,compo))/(d0+d1);
+  }
 };
 
-inline void Transport_2eq_base::associer_vitesse(const Champ_base& vit)
-{
-  la_vitesse_transportante = ref_cast(Champ_Inc_base, vit);
-}
 
-#endif
+#endif /* Eval_Diff_K_Omega_VDF_const_included */

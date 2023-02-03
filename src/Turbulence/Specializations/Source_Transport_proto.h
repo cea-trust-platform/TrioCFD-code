@@ -55,6 +55,8 @@ protected:
   void verifier_pb_keps_concen(const Probleme_base&, const Nom& );
   void verifier_pb_keps_anisotherme_concen(const Probleme_base&, const Nom& );
 
+  void verifier_pb_komega(const Probleme_base&, const Nom&);
+
   void verifier_milieu_anisotherme(const Probleme_base&, const Nom& );
   void verifier_milieu_concen(const Probleme_base&, const Nom& );
   void verifier_milieu_anisotherme_concen(const Probleme_base&, const Nom& );

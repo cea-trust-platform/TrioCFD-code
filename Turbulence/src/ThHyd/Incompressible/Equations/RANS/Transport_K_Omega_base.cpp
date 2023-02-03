@@ -170,26 +170,26 @@ int Transport_K_Omega_base::controler_K_Omega()
 
   // Changement: 13/12/07: en cas de valeurs negatives pour k OU omega
   // on fixe k ET omega a une valeur moyenne des 2 elements voisins
-  // cAlan, le 20/01/2023. Traitement identique que pour k-epsilon
+  // cAlan, le 20/01/2023. Traitement identique que pour k-epsilon. A verifier
 
   Nom position;
   Debog::verifier("Transport_K_Omega_base::controler_K_Omega K_Omega before", K_Omega);
 
   for (int n = 0; n < size; n++)
     {
-      double& k = K_Omega(n, 0);
+      double& enerK = K_Omega(n, 0);
       double& omega = K_Omega(n, 1);
-      if (k < 0 || omega < 0)
+      if (enerK < 0 || omega < 0)
         {
-          neg[0] += (  k<0 ? 1 : 0);
+          neg[0] += (enerK<0 ? 1 : 0);
           neg[1] += (omega<0 ? 1 : 0);
 
           get_position_faces(position, n);
 
           // On impose une valeur plus physique (moyenne des elements voisins)
-          k = 0;
+          enerK = 0;
           omega = 0;
-          int nk = 0;
+          int nenerK = 0;
           int nomega = 0;
           int nb_faces_elem = elem_faces.line_size();
           if (size == face_voisins.dimension(0))
@@ -206,8 +206,8 @@ int Transport_K_Omega_base::controler_K_Omega()
                           double& k_face = K_Omega(elem_faces(elem, j), 0);
                           if (k_face > K_MIN)
                             {
-                              k += k_face;
-                              nk++;
+                              enerK += k_face;
+                              nenerK++;
                             }
                           double& o_face = K_Omega(elem_faces(elem, j), 1);
                           if (o_face > OMEGA_MIN)
@@ -221,12 +221,12 @@ int Transport_K_Omega_base::controler_K_Omega()
           else // (size != face_voisins.dimension(0))
             {
               get_position_cells(position, n);
-              nk = 0;   // k -> k_min
+              nenerK = 0;   // k -> k_min
               nomega = 0; // omega -> omega_min
             } // fin de (size != face_voisins.dimension(0))
 
-          if (nk != 0) k /= nk;
-          else k = K_MIN;
+          if (nenerK != 0) enerK /= nenerK;
+          else enerK = K_MIN;
           if (nomega != 0) omega /= nomega;
           else omega = OMEGA_MIN;
 
@@ -234,11 +234,11 @@ int Transport_K_Omega_base::controler_K_Omega()
             {
               // Warnings printed:
               Cerr << (control ? "***Warning***: " : "***Error***: ");
-              Cerr << "k forced to " << k << " on node " << n << " : " << position << finl;
+              Cerr << "k forced to " << enerK << " on node " << n << " : " << position << finl;
               Cerr << (control ? "***Warning***: " : "***Error***: ");
               Cerr << "omega forced to " << omega << " on node " << n << " : " << position << finl;
             }
-        } // fin (k < 0 || omega < 0)
+        } // fin (enerK < 0 || omega < 0)
       else if (omega > OMEGA_MAX)
         {
           neg[2] += 1;

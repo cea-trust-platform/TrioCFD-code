@@ -22,7 +22,7 @@
 #ifndef Source_Transport_K_Omega_VDF_Elem_included
 #define Source_Transport_K_Omega_VDF_Elem_included
 
-#include <Source_Transport_VDF_Elem_base.h>
+#include <Source_Transport_K_Omega_VDF_Elem_base.h>
 #include <Ref_Transport_K_Omega.h>
 
 /*! @brief class Source_Transport_K_Omega_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du couple (k, omega) dans le cas ou les equations
@@ -36,11 +36,11 @@ class Source_Transport_K_Omega_VDF_Elem : public Source_Transport_K_Omega_VDF_El
 
 public:
 
-  Source_Transport_K_Omega_VDF_Elem();
+  Source_Transport_K_Omega_VDF_Elem() { };
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
-  REF(Transport_K_Omega)  mon_eq_transport_K_Omega;
+  REF(Transport_K_Omega) mon_eq_transport_K_Omega;
   void associer_pb(const Probleme_base& pb) override;
 
 private:

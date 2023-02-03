@@ -30,7 +30,7 @@ Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_komega,"Mod_turb_hyd_RANS_ko
 Mod_turb_hyd_RANS_komega::Mod_turb_hyd_RANS_komega()
 {
   Prandtl_K = 2.; // cAlan: carefull, it is the inverse of the classical definition for code purpose
-  Prandtl_Eps = 2.;
+  Prandtl_Omega = 2.;
   OMEGA_MIN = 1.e-20;
   OMEGA_MAX = 1.e+10;
   K_MIN = 1.e-20;
@@ -61,10 +61,10 @@ Entree& Mod_turb_hyd_RANS_komega::readOn(Entree& is)
 void Mod_turb_hyd_RANS_komega::set_param(Param& param)
 {
   Mod_turb_hyd_base::set_param(param);
-  param.ajouter("omega_min", &EPS_MIN); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
-  param.ajouter("omega_max", &EPS_MAX); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
+  param.ajouter("omega_min", &OMEGA_MIN); // XD_ADD_P double Lower limitation of omega (default value 1.e-10).
+  param.ajouter("omega_max", &OMEGA_MAX); // XD_ADD_P double Upper limitation of omega (default value 1.e+10).
   param.ajouter("k_min", &K_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet",b&lquiet); // XD_ADD_P flag To disable printing of information about k and epsilon.
+  param.ajouter_flag("quiet", &lquiet); // XD_ADD_P flag To disable printing of information about k and omega.
 }
 
 
@@ -98,17 +98,17 @@ const Champ_base& Mod_turb_hyd_RANS_komega::get_champ(const Motcle& nom) const
   catch (Champs_compris_erreur)
     {
     }
-  int nb_eq = nombre_d_equations();
-  for (int i = 0; i < nb_eq; i++)
-    {
-      try
-        {
-          return equation_k_omega(i).get_champ(nom);
-        }
-      catch (Champs_compris_erreur)
-        {
-        }
-    }
+  // int nb_eq = nombre_d_equations();
+  // for (int i = 0; i < nb_eq; i++)
+  //   {
+  //     try
+  //       {
+  //         return equation_k_omega(i).get_champ(nom);
+  //       }
+  //     catch (Champs_compris_erreur)
+  //       {
+  //       }
+  //   }
   throw Champs_compris_erreur();
   REF(Champ_base) ref_champ;
   return ref_champ;
@@ -118,8 +118,8 @@ void Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(Noms& nom, Option o
 {
   Mod_turb_hyd_base::get_noms_champs_postraitables(nom, opt);
 
-  for (int i = 0; i < nombre_d_equations(); i++)
-    equation_k_omega(i).get_noms_champs_postraitables(nom, opt);
+  // for (int i = 0; i < nombre_d_equations(); i++)
+  // equation_k_omega(i).get_noms_champs_postraitables(nom, opt);
 }
 
 /*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.

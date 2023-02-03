@@ -59,13 +59,13 @@ void Source_Transport_K_Omega_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab
   const DoubleVect& volumes = la_zone_VDF->volumes();
   const DoubleVect& porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
   const DoubleTab& K_Omega = mon_eq_transport_K_Omega->inconnue().valeurs();
-  const double K_MIN = mon_eq_transport_K_Omega->modele_turbulence().get_K_MIN();
+  // const double K_MIN = mon_eq_transport_K_Omega->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
     {
       // cAlan : enfin. A adapter.
       double volporo = volumes(elem)*porosite_vol(elem);
       resu(elem, 0) += (P(elem) - BETA_K*K_Omega(elem, 0)*K_Omega(elem, 1))*volporo;
-      resu(elem, 1) += (ALPHA_OMEGA*P(elem)*K_Omega(elem, 1)/K_Omega(elem, 0) - BETA_OMEGA*K_Omega(elem, 1)*K_Omega(elem, 1))
+      resu(elem, 1) += (ALPHA_OMEGA*P(elem)*K_Omega(elem, 1)/K_Omega(elem, 0) - BETA_OMEGA*K_Omega(elem, 1)*K_Omega(elem, 1));
       // if (K_eps(elem,0) >= LeK_MIN)
       //   resu(elem,1) += (C1*P(elem)- C2*K_eps(elem,1))*volumes(elem)*porosite_vol(elem)*K_eps(elem,1)/K_eps(elem,0);
     }
@@ -91,11 +91,11 @@ void Source_Transport_K_Omega_VDF_Elem::ajouter_blocs(matrices_t matrices, Doubl
       if (val(c, 0) > DMINFLOAT)
         {
           // cAlan : a adapter
-          // double coef_k = porosite(c)*volumes(c)*val(c, 1)/val(c, 0);
-          // (*mat)(c*2, c*2) += coef_k;
-          // double coef_eps = C2*coef_k;
+          double coef_k = porosite(c)*volumes(c)*val(c, 1)/val(c, 0);
+          (*mat)(c*2, c*2) += coef_k;
+          double coef_omega = ALPHA_OMEGA*coef_k;
           // if (is_modele_fonc) coef_eps*=F2(c);
-          // (*mat)(c*2+1,c*2+1)+=coef_eps;
+          (*mat)(c*2+1,c*2+1) += coef_omega;
         }
     }
 

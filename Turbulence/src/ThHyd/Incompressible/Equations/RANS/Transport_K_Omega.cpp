@@ -32,14 +32,14 @@
 #include <Debog.h>
 #include <Nom.h>
 
-Implemente_instanciable(Transport_K_Omega, "Transport_K_Omega",Transport_K_Omega_base);
+Implemente_instanciable(Transport_K_Omega, "Transport_K_Omega", Transport_K_Omega_base);
 
 /*! @brief Imprime le type de l'equation sur un flot de sortie.
  *
  * @param (Sortie& s) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Transport_K_Omega::printOn(Sortie& s ) const { return s << que_suis_je() << "\n"; }
+Sortie& Transport_K_Omega::printOn(Sortie& s) const { return s << que_suis_je() << "\n"; }
 
 void Transport_K_Omega::set_param(Param& param)
 {
@@ -75,13 +75,12 @@ Entree& Transport_K_Omega::readOn(Entree& s)
         {
           Nom typ = "Source_Transport_K_Omega";
           Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
-          so.typer(typ,*this);
+          so.typer(typ, *this);
         }
       so->associer_eqn(*this);
     }
   return s;
 }
-
 
 int Transport_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
@@ -124,7 +123,7 @@ int Transport_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       exit();
     }
   else
-    return Transport_K_Omega_base::lire_motcle_non_standard(mot,is);
+    return Transport_K_Omega_base::lire_motcle_non_standard(mot, is);
   return 1;
 }
 

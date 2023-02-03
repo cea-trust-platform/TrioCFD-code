@@ -49,7 +49,6 @@ public:
   inline int nombre_d_equations() const override;
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
-  // const Equation_base& equation_k_eps(int) const override ;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;

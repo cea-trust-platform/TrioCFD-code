@@ -64,6 +64,8 @@ void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
   Mod_turb_hyd_RANS_komega::set_param(param);
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
+  param.ajouter("PRANDTL_K", &Prandtl_K);
+  param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
 }
 
 int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -89,7 +91,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
 {
   const Champ_base& chK_Omega = eqn_transp_K_Omega().inconnue().valeur();
   Nom type = chK_Omega.que_suis_je();
-  const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Omega().zone_Cl_dis();
+  // const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Omega().zone_Cl_dis();
   const DoubleTab& tab_K_Omega = chK_Omega.valeurs();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
 
@@ -171,7 +173,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   return la_viscosite_turbulente;
 }
 
-void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_Temps_base& sch, double LeCmu, int avant)
+void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_Temps_base& sch, int avant)
 {
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {
@@ -377,7 +379,7 @@ const Champ_base& Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) co
 {
   try
     {
-      return Mod_turb_hyd_RANS_K_Omega::get_champ(nom);
+      return Mod_turb_hyd_RANS_komega::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -393,11 +395,5 @@ void Modele_turbulence_hyd_K_Omega::get_noms_champs_postraitables(Noms& nom, Opt
 void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()
 {
   Nom lp = loipar.valeur().que_suis_je();
-  if (lp == "negligeable_VEF" || lp == "negligeable_VDF")
-    if (!associe_modele_fonction().non_nul())
-      {
-        Cerr << "The turbulence model of type " << que_suis_je() << finl;
-        Cerr << "must not be used with a wall law of type negligeable or with a modele_function." << finl;
-        Cerr << "Another wall law must be selected with this kind of turbulence model." << finl;
-      }
+  Cerr << "We should probably do something here... Should be negligeable, isn't it?" << finl;
 }
