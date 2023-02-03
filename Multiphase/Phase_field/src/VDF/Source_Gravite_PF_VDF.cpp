@@ -92,7 +92,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
   const int boussi = eq_NS_PF.get_boussi_();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme->equation(1));
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire(); //si type_systeme_naire = 0 ou 1
 

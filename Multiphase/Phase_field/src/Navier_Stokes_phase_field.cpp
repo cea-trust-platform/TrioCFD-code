@@ -421,7 +421,7 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
 void Navier_Stokes_phase_field::calculer_rho(const bool init)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
 
@@ -437,7 +437,6 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       // normalement, quelque chose comme 'rho_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
-      //Sources list_sources = eq_c.sources();
       Source_Con_Phase_field_base& source_pf_base = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
       source_pf_base.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
       source_pf_base.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
@@ -522,7 +521,7 @@ void Navier_Stokes_phase_field::calculer_mu(const bool init)
       // normalement, quelque chose comme 'mu_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
-      Sources list_sources = eq_c.sources();
+      Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
       Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
       source_pf.calculer_champ_fonc_c(temps, mu_, eq_c.inconnue().futur(i));
       mu_.valeur().valeurs().echange_espace_virtuel();
