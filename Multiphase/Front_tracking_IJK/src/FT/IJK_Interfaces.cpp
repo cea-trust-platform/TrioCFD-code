@@ -5172,7 +5172,7 @@ void IJK_Interfaces::compute_external_forces_parser(FixedVector<IJK_Field_double
           // 1-ff is the code name for chi_v in our case :
           // on veut > 0.9999 pour ne pas changer la gravite dans les mailles ou il y a une interface, ce qui rend la methode instable
           // d'apres Thomas & Bolotnov.
-          noms_forces[idir] += ")_lt_0.)*(1.-ff)*((1.-ff)_gt_0.000001)*(" ;
+          noms_forces[idir] += ")_LT_0.)*(1.-ff)*((1.-ff)_GT_0.000001)*(" ;
           noms_forces[idir] += Nom(individual_forces(ib,idir), "%g");
           noms_forces[idir] += ")" ;
         }
@@ -5200,7 +5200,7 @@ void IJK_Interfaces::compute_external_forces_parser(FixedVector<IJK_Field_double
           noms_forces[idir] += Nom("-")+Nom(r2, "%g");
           // 1-ff is the code name for chi_v in our case :
           // on veut > 0.9999 pour ne pas changer la gravite dans les mailles ou il y a une interface, ce qui rend la methode instable
-          noms_forces[idir] += ")_lt_0.)*(1.-ff)*((1.-ff)_gt_0.000001)*(" ;
+          noms_forces[idir] += ")_LT_0.)*(1.-ff)*((1.-ff)_GT_0.000001)*(" ;
           noms_forces[idir] += Nom(individual_forces(ibulle_reelle,idir), "%g");
           noms_forces[idir] += ")" ;
         }
@@ -5237,7 +5237,7 @@ void IJK_Interfaces::compute_indicatrice_non_perturbe(IJK_Field_double& indic_np
       nom_indicatrices_np += Nom("+((Z-(")+Nom(z0, "%g")+Nom("))*(Z-(")+Nom(z0, "%g")+Nom("))/(")+Nom(c, "%g")+Nom("*")+Nom(c, "%g")+Nom("))");
       nom_indicatrices_np += Nom("-1.0");
       // 1-ff is the code name for chi_v in our case :
-      nom_indicatrices_np += ")_lt_0.)*(1.0)" ;
+      nom_indicatrices_np += ")_LT_0.)*(1.0)" ;
     }
   // Pour les bulles ghosts
   //Cerr << "Ghost_compo_converter : " << ghost_compo_converter_ << finl;
@@ -5266,7 +5266,7 @@ void IJK_Interfaces::compute_indicatrice_non_perturbe(IJK_Field_double& indic_np
       nom_indicatrices_np += Nom("+((Z-(")+Nom(z0, "%g")+Nom("))*(Z-(")+Nom(z0, "%g")+Nom("))/(")+Nom(c, "%g")+Nom("*")+Nom(c, "%g")+Nom("))");
       nom_indicatrices_np += Nom("-1.0");
       // 1-ff is the code name for chi_v in our case :
-      nom_indicatrices_np += ")_lt_0.)*(1.0)" ;
+      nom_indicatrices_np += ")_LT_0.)*(1.0)" ;
 
     }
   Cerr << "Setting indicatrice_non_perturbe :" << nom_indicatrices_np << finl;
