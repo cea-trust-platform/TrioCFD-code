@@ -81,7 +81,7 @@ void Neumann_paroi::verifie_ch_init_nb_comp()
 {
   if (le_champ_front.non_nul())
     {
-      const Equation_base& eq = zone_Cl_dis().equation();
+      const Equation_base& eq = domaine_Cl_dis().equation();
       const int nb_comp = le_champ_front.valeur().nb_comp();
       eq.verifie_ch_init_nb_comp(eq.inconnue(),nb_comp);
     }
@@ -90,10 +90,10 @@ void Neumann_paroi::verifie_ch_init_nb_comp()
 double Neumann_paroi::flux_impose(int i) const
 {
 
-  if (!sub_type(Convection_Diffusion_Concentration,ma_zone_cl_dis->equation()))
+  if (!sub_type(Convection_Diffusion_Concentration,mon_dom_cl_dis->equation()))
     {
-      const Milieu_base& mil=ma_zone_cl_dis->equation().milieu();
-      Nom nom_pb=ma_zone_cl_dis->equation().probleme().que_suis_je();
+      const Milieu_base& mil=mon_dom_cl_dis->equation().milieu();
+      Nom nom_pb=mon_dom_cl_dis->equation().probleme().que_suis_je();
       double d_Cp;
       double d_rho;
       const Champ_Don& rho=mil.masse_volumique();
@@ -155,10 +155,10 @@ double Neumann_paroi::flux_impose(int i) const
 double Neumann_paroi::flux_impose(int i,int j) const
 {
 
-  if (!sub_type(Convection_Diffusion_Concentration,ma_zone_cl_dis->equation()))
+  if (!sub_type(Convection_Diffusion_Concentration,mon_dom_cl_dis->equation()))
     {
-      const Milieu_base& mil=ma_zone_cl_dis->equation().milieu();
-      Nom nom_pb=ma_zone_cl_dis->equation().probleme().que_suis_je();
+      const Milieu_base& mil=mon_dom_cl_dis->equation().milieu();
+      Nom nom_pb=mon_dom_cl_dis->equation().probleme().que_suis_je();
       double d_Cp;
       double d_rho;
       const Champ_Don& rho=mil.masse_volumique();

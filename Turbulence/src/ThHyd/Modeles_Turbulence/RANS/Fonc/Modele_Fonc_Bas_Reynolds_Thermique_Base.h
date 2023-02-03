@@ -30,14 +30,14 @@
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
 /*
-  #include <Ref_Zone_VDF.h>
-  #include <Ref_Zone_Cl_VDF.h>
-  #include <Zone_VDF.h>
-  #include <Zone_Cl_VDF.h>
+  #include <Ref_Domaine_VDF.h>
+  #include <Ref_Domaine_Cl_VDF.h>
+  #include <Domaine_VDF.h>
+  #include <Domaine_Cl_VDF.h>
 */
 class Motcle;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 class Equation_base;
 class Probleme_base;
@@ -59,17 +59,17 @@ public:
   virtual void completer();
   virtual void associer_pb(const Probleme_base& ) = 0;
   virtual void associer_eqn(const Equation_base& );
-  virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
+  virtual void associer(const Domaine_dis& , const Domaine_Cl_dis& )= 0;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override;
 
-  virtual DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const = 0;
-  virtual DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const = 0;
-  virtual DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F2(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F3(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F4(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_Flambda ( DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const = 0;
+  virtual DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const = 0;
+  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F2(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F3(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F4(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_Flambda ( DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////

@@ -35,7 +35,7 @@
 #include <Neumann_paroi_rayo_semi_transp_VDF.h>
 #include <Symetrie.h>
 #include <Ref_Champ_front.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VDF,"Eq_rayo_semi_transp_VDF",Equation_rayonnement_base);
@@ -73,8 +73,8 @@ Entree& Eq_rayo_semi_transp_VDF::readOn(Entree& s )
 void Eq_rayo_semi_transp_VDF::resoudre(double temps)
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::resoudre : Debut"<<finl;
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_dis().valeur());
-  int nb_elem = zone_VF.nb_elem();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  int nb_elem = domaine_VF.nb_elem();
   const DoubleTab& kappa = fluide().kappa().valeurs();
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
@@ -102,7 +102,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
       else
         k = kappa(elem,0);
 
-      double vol = zone_VF.volumes(elem);
+      double vol = domaine_VF.volumes(elem);
       double T = temper(elem);
       secmem(elem) += +4*n*n*sigma*pow(T,4)*k*vol;
       //  Cerr<<"T = "<<T<<", n = "<<n<<", sigma = "<<sigma<<", vol = "<<vol<<", secmem(elem) = "<<secmem(elem)<<finl;
@@ -166,17 +166,17 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement : Debut"<<finl;
   // Boucle sur les conditions aux limites de l'equation de rayonnement
-  Conds_lim& les_cl_rayo = zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
   Equation_base& eq_temp = Modele().probleme().equation(1);
   assert(eq_temp.inconnue().le_nom()=="temperature");
 
-  Conds_lim& les_cl_temp = eq_temp.zone_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_rayo=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo =  zone_Cl_dis().les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo =  domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
       if(sub_type(Flux_radiatif_VDF,la_cl_rayo.valeur()))
         {
           Flux_radiatif_VDF& la_cl_rayon = ref_cast(Flux_radiatif_VDF,la_cl_rayo.valeur());
@@ -188,7 +188,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
           int test_remplissage_Tb = 0;
           for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
             {
-              Cond_lim& la_cl_temp =  eq_temp.zone_Cl_dis().les_conditions_limites(num_cl_temp);
+              Cond_lim& la_cl_temp =  eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
               Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
               if(nom_cl_temp == nom_cl_rayo)
                 {
@@ -251,7 +251,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
           if ( test_remplissage_Tb == 0)
             // On n'a pas remplie le tableau des temperatures de bord !!!!
             Cerr<<"On n'a pas remplie le tableau des temperatures de bord !!!!"<<finl;
-          const Zone_VF& zvf = ref_cast(Zone_VF,zone_dis().valeur());
+          const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis().valeur());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(), fluide().kappa(), fluide().longueur_rayo(),
                                              fluide().indice(),zvf,Modele().valeur_sigma(),temps);
         }
@@ -278,15 +278,15 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::modifier_matrice : Debut"<<finl;
   // On fait une boucle sur les conditions aux limites associees a l'equations
-  Conds_lim& les_cl = zone_Cl_dis().les_conditions_limites();
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis().valeur());
+  Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis().valeur());
   const IntTab& face_voisins=zvdf.face_voisins();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
 
   int num_cl=0;
   for(num_cl = 0; num_cl<les_cl.size(); num_cl++)
     {
-      Cond_lim& la_cl = zone_Cl_dis().les_conditions_limites(num_cl);
+      Cond_lim& la_cl = domaine_Cl_dis().les_conditions_limites(num_cl);
       if (sub_type(Flux_radiatif_VDF,la_cl.valeur()))
         {
           Flux_radiatif_VDF& cl_radiatif = ref_cast(Flux_radiatif_VDF,la_cl.valeur());
@@ -370,14 +370,14 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
 
 void Eq_rayo_semi_transp_VDF::completer()
 {
-  const Zone_dis_base& une_zone_dis = zone_dis().valeur();
-  int n = une_zone_dis.nb_front_Cl();
+  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+  int n = une_domaine_dis.nb_front_Cl();
 
   int ii;
   for (ii =0; ii<n; ii++)
     {
-      const Frontiere_dis_base& la_fr_dis = une_zone_dis.frontiere_dis(ii);
-      la_zone_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
+      const Frontiere_dis_base& la_fr_dis = une_domaine_dis.frontiere_dis(ii);
+      le_dom_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
     }
 
   Equation_rayonnement_base::completer();
@@ -390,8 +390,8 @@ void Eq_rayo_semi_transp_VDF::completer()
 
 void Eq_rayo_semi_transp_VDF::assembler_matrice()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_dis().valeur());
-  int nb_elem_tot = zone_VF.nb_elem_tot();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  int nb_elem_tot = domaine_VF.nb_elem_tot();
 
   const DoubleTab& irradi = irradiance_.valeurs();
 
@@ -422,7 +422,7 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
       else
         k = kappa(i,0);
 
-      double vol = zone_VF.volumes(i);
+      double vol = domaine_VF.volumes(i);
 
       la_matrice(i,i) = la_matrice(i,i) + k*vol;
     }
@@ -440,8 +440,8 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 /*
   void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
   {
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,zone_dis().valeur());
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis().valeur());
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   int elem1,elem2;
   int num_face,face;
@@ -465,8 +465,8 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
   IntVect& tab2RV=MBrv.get_set_tab2();
 
   // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
-  int ndeb = zone_VDF.premiere_face_int();
-  int nfin = zone_VDF.nb_faces();
+  int ndeb = domaine_VDF.premiere_face_int();
+  int nfin = domaine_VDF.nb_faces();
   //  int pourcent=0;
   //  int tmp;
 
@@ -511,7 +511,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
   // Prise en compte des conditions de type periodicite
   int i;
-  const Conds_lim& les_cl = zone_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
 
   for (i=0; i<les_cl.size(); i++)
   {
@@ -686,8 +686,8 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 /*
   void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse(Matrice& matrice_tmp)
   {
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,zone_dis().valeur());
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis().valeur());
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   int elem1,elem2;
   int num_face,face;
@@ -711,8 +711,8 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
   IntVect& tab2RV=MBrv.get_set_tab2();
 
   // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
-  int ndeb = zone_VDF.premiere_face_int();
-  int nfin = zone_VDF.nb_faces();
+  int ndeb = domaine_VDF.premiere_face_int();
+  int nfin = domaine_VDF.nb_faces();
   //  int pourcent=0;
   //  int tmp;
 
@@ -741,7 +741,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
   // Prise en compte des conditions de type periodicite
   int i;
-  const Conds_lim& les_cl = zone_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
 
   for (i=0; i<les_cl.size(); i++)
   {
@@ -881,12 +881,12 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
 int Eq_rayo_semi_transp_VDF::nb_colonnes_tot()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis().valeur());
-  return zone_VF.zone().nb_elem_tot();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  return domaine_VF.domaine().nb_elem_tot();
 }
 
 int Eq_rayo_semi_transp_VDF::nb_colonnes()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis().valeur());
-  return zone_VF.zone().nb_elem();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  return domaine_VF.domaine().nb_elem();
 }

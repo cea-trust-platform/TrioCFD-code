@@ -22,7 +22,7 @@
 #include <Connectivite_frontieres.h>
 #include <TRUST_Deriv.h>
 #include <Ref_Connectivite_frontieres.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Connectivite_frontieres,"Connectivite_frontieres",Objet_U);
 Implemente_ref(Connectivite_frontieres);
@@ -57,9 +57,9 @@ static True_int fonction_tri_lexicographique_3_colonnes(const void *ptr1,
   return delta;
 }
 
-void Connectivite_frontieres::remplir_def_face_aretes(const Zone_VF& zone_vf)
+void Connectivite_frontieres::remplir_def_face_aretes(const Domaine_VF& domaine_vf)
 {
-  const Nom& nom_elem = zone_vf.zone().type_elem().valeur().que_suis_je();
+  const Nom& nom_elem = domaine_vf.domaine().type_elem().valeur().que_suis_je();
 
   // Definition des aretes si la face est un segment
   static const int segment[2][2] = { { 0, -1 },
@@ -119,34 +119,34 @@ void Connectivite_frontieres::remplir_def_face_aretes(const Zone_VF& zone_vf)
     }
 }
 
-void Connectivite_frontieres::associer_zone_vf(const Zone_VF& zone_vf)
+void Connectivite_frontieres::associer_domaine_vf(const Domaine_VF& domaine_vf)
 {
-  refzone_vf_ = zone_vf;
+  refdomaine_vf_ = domaine_vf;
 
-  remplir_def_face_aretes(zone_vf);
-  remplir_faces_voisins(zone_vf);
+  remplir_def_face_aretes(domaine_vf);
+  remplir_faces_voisins(domaine_vf);
 }
 
 /*! @brief Remplissage de faces_voisins_
  *
  */
-void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
+void Connectivite_frontieres::remplir_faces_voisins(const Domaine_VF& domaine_vf)
 {
   int i_frontiere; // Un numero de frontiere (bord, raccord ou faces internes)
   int i;
-  const Zone& zone = zone_vf.zone();
-  const int nb_frontieres = zone.nb_front_Cl();
+  const Domaine& domaine = domaine_vf.domaine();
+  const int nb_frontieres = domaine.nb_front_Cl();
   assert(def_face_aretes_.dimension(0) > 0);
   const int nb_aretes_par_face = def_face_aretes_.dimension(0);
   // Nombre de faces de bord reelles
-  const int nb_faces_front = zone.nb_faces_frontiere();
+  const int nb_faces_front = domaine.nb_faces_frontiere();
 
   // Comptage des faces de bord virtuelles
   int nb_faces_frontiere_virt = 0;
   for (i_frontiere = 0; i_frontiere < nb_frontieres; i_frontiere++)
     {
       const ArrOfInt& liste_faces_virt =
-        zone.frontiere(i_frontiere).get_faces_virt();
+        domaine.frontiere(i_frontiere).get_faces_virt();
       nb_faces_frontiere_virt += liste_faces_virt.size_array();
     }
 
@@ -157,7 +157,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
   // faces frontiere (reelles et virtuelles)
   ArrOfInt liste_faces(nb_faces_front_tot);
 
-  // Faces reelles = les nb_faces_frontiere premieres faces de la zone
+  // Faces reelles = les nb_faces_frontiere premieres faces de la domaine
   // n = nombre de faces remplies dans liste_faces
   int n;
   for (n = 0; n < nb_faces_front; n++)
@@ -166,11 +166,11 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
 
   // Faces virtuelles :
   {
-    const int nb_frontieres_cl = zone.nb_front_Cl();
+    const int nb_frontieres_cl = domaine.nb_front_Cl();
     //int i_frontiere;
     for (i_frontiere = 0; i_frontiere < nb_frontieres_cl; i_frontiere++)
       {
-        const Frontiere& frontiere = zone.frontiere(i_frontiere);
+        const Frontiere& frontiere = domaine.frontiere(i_frontiere);
         const ArrOfInt& faces_virtuelles = frontiere.get_faces_virt();
         const int nb_faces_frontiere = faces_virtuelles.size_array();
         for (int ii = 0; ii < nb_faces_frontiere; ii++)
@@ -185,20 +185,20 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
   // 2, 3 ou 4 aretes. Pour chaque arete, on construit une ligne du tableau les_aretes
   // colonne 1 et 2 : numeros des deux sommets extremites, le + petit numero en premier
   //                  et en 2D, colonne2 = -1
-  // colonne 3 : indice de la face adjacente a l'arete dans zone_vf.face_voisins_
+  // colonne 3 : indice de la face adjacente a l'arete dans domaine_vf.face_voisins_
   // colonne 4 : numero de l'arete sur la face
 
   IntTab les_aretes(nb_faces_front_tot * nb_aretes_par_face, 4);
   int nb_aretes = 0; // Nombre d'aretes rangees dans le tableau
 
   {
-    const IntTab& face_sommets = zone_vf.face_sommets();
+    const IntTab& face_sommets = domaine_vf.face_sommets();
     int i_face;        // indice de la face dans liste_faces
 
     for (i_face = 0; i_face < nb_faces_front_tot; i_face++)
       {
 
-        // Indice de la face a traiter dans zone_vf.face_voisins_ :
+        // Indice de la face a traiter dans domaine_vf.face_voisins_ :
         const int face = liste_faces[i_face];
 
         // Boucle sur les aretes de la face (les aretes de la face sont definie
@@ -208,7 +208,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
             // Numeros des deux sommets de l'arete sur la face
             int i_sommet0 = def_face_aretes_(i_arete, 0);
             int i_sommet1 = def_face_aretes_(i_arete, 1);
-            // Numeros des deux sommets dans la zone
+            // Numeros des deux sommets dans la domaine
             int sommet0 = face_sommets(face, i_sommet0);
             int sommet1 = (i_sommet1 >= 0) ? face_sommets(face, i_sommet1) : -1;
             // On classe les deux sommets dans l'ordre croissant:
@@ -273,7 +273,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
           if (faces_voisins_(i,j) < 0)
             {
               Cerr << "(PE" << me();
-              Cerr << ") Erreur dans Connectivite_frontieres::associer_zone_vf\n";
+              Cerr << ") Erreur dans Connectivite_frontieres::associer_domaine_vf\n";
               Cerr << " faces_voisins_(" << i << "," << j << ") < 0" << finl;
               assert(0);
               exit();

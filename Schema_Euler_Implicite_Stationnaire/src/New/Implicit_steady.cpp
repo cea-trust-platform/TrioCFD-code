@@ -22,10 +22,10 @@
 
 #include <Implicit_steady.h>
 #include <Schema_Euler_Implicite_Stationnaire.h>
-#include <Zone_VF.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
+#include <Domaine_VDF.h>
 #include <Navier_Stokes_std.h>
 #include <EChaine.h>
 #include <Debog.h>
@@ -63,7 +63,7 @@ void test_impose_bound_cond(Equation_base& eqn,DoubleTab& current2,const char * 
   DoubleTab& present = eqn.inconnue().futur();
   DoubleTab sauv(present);
   const Schema_Temps_base& sch = eqn.probleme().schema_temps();
-  eqn.zone_Cl_dis()->imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
+  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
   present -= sauv;
   // BM, je remplace max_abs par mp_pax_abs: du coup la methode doit etre appelee simultanement par tous les procs.
   double ecart_max=mp_max_abs_vect(present);
@@ -239,10 +239,10 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
 //Calcule M/dt_locaux
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,eqnNS.zone_dis().valeur());
-  const DoubleVect& volumes_entrelaces_ref=la_zone.volumes_entrelaces();
-  const Zone_Cl_VEF& la_zone_cl = ref_cast(Zone_Cl_VEF,eqnNS.zone_Cl_dis().valeur());
-  const DoubleVect& volumes_entrelaces_cl=la_zone_cl.volumes_entrelaces_Cl();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
+  const DoubleVect& volumes_entrelaces_ref=le_dom.volumes_entrelaces();
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
+  const DoubleVect& volumes_entrelaces_cl=le_dom_cl.volumes_entrelaces_Cl();
   DoubleVect volumes_entrelaces(volumes_entrelaces_ref);
   int size_cl=volumes_entrelaces_cl.size();
 
@@ -276,8 +276,8 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Zone_VDF& la_zone = ref_cast(Zone_VDF,eqnNS.zone_dis().valeur());
-  const DoubleVect& volumes_entrelaces=la_zone.volumes_entrelaces();
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,eqnNS.domaine_dis().valeur());
+  const DoubleVect& volumes_entrelaces=le_dom.volumes_entrelaces();
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
   const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();
@@ -303,12 +303,12 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqn
 void Implicit_steady::test_periodic_solution(Navier_Stokes_std& eqnNS, DoubleTab& current) const
 {
 
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,eqnNS.zone_dis().valeur());
-  const Zone_Cl_VEF& la_zone_cl = ref_cast(Zone_Cl_VEF,eqnNS.zone_Cl_dis().valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
   int nb_comp=current.dimension(1);
-  for (int n_bord=0; n_bord<la_zone.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_cl.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_cl.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());

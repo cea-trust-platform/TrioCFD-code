@@ -26,12 +26,12 @@
 
 
 #include <Interprete.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Equation_base.h>
-#include <Ref_Zone_VDF.h>
+#include <Ref_Domaine_VDF.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
+class Domaine_dis;
 
 class Imprimer_Fichiers_RANS_VDF : public Interprete
 {

@@ -24,7 +24,7 @@
 #include <TRUSTTab.h>
 #include <Transport_Marqueur_FT.h>
 #include <Domaine.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Champ_implementation_P1.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
@@ -55,13 +55,12 @@ Entree& Source_Reaction_Particules_VEF::readOn(Entree& is)
 DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
 {
   const DoubleTab& source_action = eq_marqueur_->source_stockage();
-  const Zone_dis_base& zdis = equation().zone_dis();
-  const Zone_VF& zvf = ref_cast(Zone_VF,zdis);
-  const Zone_Cl_dis_base& zcldis = equation().zone_Cl_dis().valeur();
-  const Zone& zone_geom = zdis.zone();
-  const Domaine& dom = zone_geom.domaine();
-  const DoubleTab& coord = dom.coord_sommets();
-  const IntTab& sommet_poly = zone_geom.les_elems();
+  const Domaine_dis_base& zdis = equation().domaine_dis();
+  const Domaine_VF& zvf = ref_cast(Domaine_VF,zdis);
+  const Domaine_Cl_dis_base& zcldis = equation().domaine_Cl_dis().valeur();
+  const Domaine& domaine_geom = zdis.domaine();
+  const DoubleTab& coord = domaine_geom.coord_sommets();
+  const IntTab& sommet_poly = domaine_geom.les_elems();
   const IntTab& face_som = zvf.face_sommets();
   const Maillage_FT_Disc& maillage = eq_marqueur_->maillage_interface();
   const DoubleTab& positions = maillage.sommets();
@@ -70,20 +69,20 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   int nb_faces = zvf.nb_faces();
   int premiere_face_interne = zvf.premiere_face_int();
   int nb_pos = positions.dimension(0);
-  int nb_som_elem = zone_geom.nb_som_elem();
-  int nb_som_face = zone_geom.type_elem().nb_som_face();
+  int nb_som_elem = domaine_geom.nb_som_elem();
+  int nb_som_face = domaine_geom.type_elem().nb_som_face();
   int is_QC=0;
   int is_FT=0;
   double coord_b=0.;
   double x_pos,y_pos;
   double z_pos=0.;
   int elem,som_glob;
-  const int nb_elem_reels = zone_geom.nb_elem();
+  const int nb_elem_reels = domaine_geom.nb_elem();
 
 
   //creation d un espace virtuel pour source_som
   DoubleTab source_som(0, dim);
-  dom.creer_tableau_sommets(source_som);
+  domaine_geom.creer_tableau_sommets(source_som);
 
   //is_QC=0 le terme source est homogne a dv/dt sinon homogene a d(rho*v)/dt
   is_QC = equation().probleme().is_dilatable();

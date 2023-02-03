@@ -25,8 +25,8 @@
 
 #include <Op_VEF_Face.h>
 #include <Op_Conv_ALE.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ class Op_Conv_ALE_VEF : public Op_Conv_ALE, public Op_VEF_Face
   Declare_instanciable(Op_Conv_ALE_VEF);
 
 public :
-  void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& ) override;
+  void associer (const Domaine_dis& , const Domaine_Cl_dis& ,const Champ_Inc& ) override;
   double calculer_dt_stab() const override ;
   virtual void remplir_fluent_ALEincluded(DoubleVect& ) const;
   virtual void calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
@@ -51,15 +51,15 @@ public :
   void completer() override;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+  REF(Domaine_VEF) le_dom_vef;
+  REF(Domaine_Cl_VEF) la_zcl_vef;
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
 };
 
 inline  void Op_Conv_ALE_VEF::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice);
 }
 
 

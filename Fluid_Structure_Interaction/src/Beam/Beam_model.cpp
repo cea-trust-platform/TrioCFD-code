@@ -24,12 +24,12 @@
 #include <TRUSTVects.h>
 #include <TRUSTTabs.h>
 #include <Probleme_base.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Frontiere.h>
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
-#include <Ref_Zone.h>
+#include <Ref_Domaine.h>
 #include <Faces.h>
 #include <fstream>
 #include <iostream>

@@ -23,7 +23,7 @@
 #define Triple_Line_Model_FT_Disc_included
 
 #include <Objet_U.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <FTd_tools.h>
 #include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Ref_Transport_Interfaces_FT_Disc.h>
@@ -97,7 +97,7 @@ public :
     return tag_tcl_;
   };
   double compute_capillary_number() const;
-  void get_in_out_coords(const Zone_VDF& zvdf, const int elem,
+  void get_in_out_coords(const Domaine_VDF& zvdf, const int elem,
                          const double dt,
                          DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot);
 
@@ -156,7 +156,7 @@ protected :
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.
-  ArrOfInt elems_; // The list of elements containing either the TCL itself, or the meso zone.
+  ArrOfInt elems_; // The list of elements containing either the TCL itself, or the meso domaine.
   ArrOfInt boundary_faces_; // corresponding list of faces on the wall boundary.
   ArrOfDouble mp_; // corresponding value to be assigned to each cell (as a mass flux m [unit?])
   ArrOfDouble Q_;  // corresponding value to be assigned to each cell (as a thermal flux Q [unit?])

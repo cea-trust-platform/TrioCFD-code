@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0.h>
-#include <Zone_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Equation_base.h>
 #include <Pb_Multiphase.h>
@@ -49,8 +49,8 @@ Entree& Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is)
 
 void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
   assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
   for (auto &&n_m : matrices)
@@ -75,16 +75,16 @@ void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matr
 
 void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Zone_PolyMAC_P0& 		zone 			= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& 		domaine 			= ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0& 	ch_diss			= ref_cast(Champ_Elem_PolyMAC_P0,equation().inconnue().valeur()); // Champ tau ou omega
   const DoubleTab& 			diss 			= ch_diss.valeurs() ;
   const DoubleTab& 			pdiss 			= ch_diss.passe() ;
   const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
   const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  const int nb_elem = zone.nb_elem(), N = diss.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
+  const int nb_elem = domaine.nb_elem(), N = diss.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
   const int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
 
   std::string Type_diss = ""; // omega or tau dissipation

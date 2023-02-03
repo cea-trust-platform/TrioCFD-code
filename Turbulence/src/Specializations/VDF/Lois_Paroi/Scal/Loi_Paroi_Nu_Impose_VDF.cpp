@@ -23,7 +23,7 @@
 #include <Champ_Uniforme.h>
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Fonc_Tabule.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Neumann_paroi.h>
@@ -127,15 +127,15 @@ Entree& Loi_Paroi_Nu_Impose_VDF::readOn(Entree& s)
 
 int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const IntVect& orientation = zone_VDF.orientation();
-  const DoubleTab& xv=zone_VDF.xv() ;                   // centres de gravite des faces
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const DoubleTab& xv=domaine_VDF.xv() ;                   // centres de gravite des faces
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
 
   DoubleVect pos(dimension);
 
@@ -171,14 +171,14 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& alpha = le_fluide.diffusivite();
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // Pour chaque condition limite on regarde son type
       // On applique les lois de paroi thermiques uniquement
       // aux voisinages des parois ou l'on impose la temperature
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
         {
@@ -189,7 +189,7 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
           //find the associated boundary
           int boundary_index=-1;
-          if (zone_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
+          if (domaine_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
             boundary_index=n_bord;
           assert(boundary_index >= 0);
 
@@ -260,7 +260,7 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               // Ne pas uniformiser l'ecriture avec le VEF, car on tombe sur des problemes
               // au niveau des parois contacts entre plusieurs problemes (alpha_t pas recuperable !).
               int global_face=num_face;
-              int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+              int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
               equivalent_distance_[boundary_index](local_face)=dh_valeur/Nu;
               //Cout << "pos = " << pos[0] << " " << pos[1] << finl;
               //Cout << "Nu = " << Nu << finl;
@@ -276,8 +276,8 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
 void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
@@ -292,20 +292,20 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
   double dh_valeur=diam_hydr(0,0);
   DoubleVect pos(dimension);
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
-          const Zone_Cl_VDF& zone_Cl_VDF_th = ref_cast(Zone_Cl_VDF, eqn.probleme().equation(1).zone_Cl_dis().valeur());
-          const Cond_lim& la_cl_th = zone_Cl_VDF_th.les_conditions_limites(n_bord);
+          const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Cond_lim& la_cl_th = domaine_Cl_VDF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           //find the associated boundary
           int boundary_index=-1;
-          if (zone_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
+          if (domaine_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
             boundary_index=n_bord;
           assert(boundary_index >= 0);
 
@@ -340,14 +340,14 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                 {
                   // Calcul de la position
                   for (int i=0; i<dimension; i++)
-                    pos[i]=zone_VDF.xv(num_face,i);
+                    pos[i]=domaine_VDF.xv(num_face,i);
 
                   // Calcul du diametre hydraulique
                   if (!dh_constant)
                     dh_valeur=diam_hydr->valeur_a_compo(pos,0);
 
-                  double x=zone_VDF.xv(num_face,0);
-                  double y=zone_VDF.xv(num_face,1);
+                  double x=domaine_VDF.xv(num_face,0);
+                  double y=domaine_VDF.xv(num_face,1);
                   double lambda;
 
                   elem = face_voisins(num_face,0);
@@ -367,12 +367,12 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                     Nusselt << x << "\t| " << y;
                   if (dimension == 3)
                     {
-                      double z=zone_VDF.xv(num_face,2);
+                      double z=domaine_VDF.xv(num_face,2);
                       Nusselt << x << "\t| " << y << "\t| " << z;
                     }
 
                   int global_face=num_face;
-                  int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+                  int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
 
                   double flux = la_cl_neum.flux_impose(num_face-ndeb);
                   double tparoi = temperature(elem)+flux/lambda*equivalent_distance_[boundary_index](local_face);
@@ -411,14 +411,14 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                 {
                   // Calcul de la position
                   for (int i=0; i<dimension; i++)
-                    pos[i]=zone_VDF.xv(num_face,i);
+                    pos[i]=domaine_VDF.xv(num_face,i);
 
                   // Calcul du diametre hydraulique
                   if (!dh_constant)
                     dh_valeur=diam_hydr->valeur_a_compo(pos,0);
 
-                  double x=zone_VDF.xv(num_face,0);
-                  double y=zone_VDF.xv(num_face,1);
+                  double x=domaine_VDF.xv(num_face,0);
+                  double y=domaine_VDF.xv(num_face,1);
                   double lambda;
                   elem = face_voisins(num_face,0);
                   if (elem == -1)
@@ -436,11 +436,11 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                     Nusselt << x << "\t| " << y;
                   if (dimension == 3)
                     {
-                      double z=zone_VDF.xv(num_face,2);
+                      double z=domaine_VDF.xv(num_face,2);
                       Nusselt << x << "\t| " << y << "\t| " << z;
                     }
                   int global_face=num_face;
-                  int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+                  int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
                   Nusselt << "\t| " << equivalent_distance_[boundary_index](local_face) << "\t| "
                           << dh_valeur/equivalent_distance_[boundary_index](local_face) << "\t| "
                           << lambda/equivalent_distance_[boundary_index](local_face) << "\t| " << temperature(elem) << finl;

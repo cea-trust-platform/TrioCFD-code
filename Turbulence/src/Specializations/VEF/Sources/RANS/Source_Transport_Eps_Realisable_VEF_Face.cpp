@@ -25,7 +25,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_VEF_Face,"Source_Transport_Eps_Realisable_VEF_P1NC",Source_base);
 
@@ -53,7 +53,7 @@ const Modele_Fonc_Realisable_base& Source_Transport_Eps_Realisable_VEF_Face::get
 void Source_Transport_Eps_Realisable_VEF_Face::calculer_terme_production_real(const DoubleTab& vitesse_filtree,const DoubleTab& visco_turb, DoubleTrav& P) const
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), & eps_Rea = eqn_eps_Rea->inconnue().valeurs();
-  calculer_terme_production_K_BiK(la_zone_VEF.valeur(), la_zone_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb);
+  calculer_terme_production_K_BiK(le_dom_VEF.valeur(), le_dom_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb);
 }
 
 void Source_Transport_Eps_Realisable_VEF_Face::fill_resu_real(const int num_face, const DoubleVect& vol_ent, const DoubleTrav& P, const DoubleTab& CC1, const DoubleTab& S, const double visco,
@@ -88,10 +88,10 @@ void Source_Transport_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
   const DoubleTab& tab_paroi = mod_turb.loi_paroi().valeur().Cisaillement_paroi();
 
-  const Zone_Cl_dis& zcl_keps = eqn_k_Rea->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps = eqn_k_Rea->zone_dis();
+  const Domaine_Cl_dis& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
+  const Domaine_dis& domaine_dis_keps = eqn_k_Rea->domaine_dis();
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), & eps_Rea = eqn_eps_Rea->inconnue().valeurs();
-  mon_modele_fonc.Contributions_Sources_Paroi_BiK(zone_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
+  mon_modele_fonc.Contributions_Sources_Paroi_BiK(domaine_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
 
   Calcul_Production_K_VEF::mettre_a_jour(temps);
 }

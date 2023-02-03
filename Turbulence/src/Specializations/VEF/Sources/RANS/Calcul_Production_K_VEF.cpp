@@ -21,8 +21,8 @@
 
 #include <Calcul_Production_K_VEF.h>
 #include <TRUSTTab.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <TRUSTVect.h>
 #include <TRUSTTrav.h>
 #include <Champ_P1NC.h>
@@ -37,7 +37,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 DoubleTab& Calcul_Production_K_VEF::
-calculer_terme_production_K(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
+calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
                             DoubleTab& P,const DoubleTab& K_eps,
                             const DoubleTab& vit,const DoubleTab& visco_turb) const
 {
@@ -57,17 +57,17 @@ calculer_terme_production_K(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
   P= 0;
 
   // Calcul de F(u,v,w):
-  int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleVect& volumes = zone_VEF.volumes();
-  int premiere_face_int = zone_VEF.premiere_face_int();
-  //  const IntTab& les_Polys = zone.les_elems();
+  int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
+  //  const IntTab& les_Polys = domaine.les_elems();
   int fac=0;
   int poly1, poly2;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   int dimension=Objet_U::dimension;
-  //  const DoubleTab& xp = zone_VEF.xp();    // centre de gravite des elements
-  //  const DoubleTab& xv = zone_VEF.xv();    // centre de gravite des faces
+  //  const DoubleTab& xp = domaine_VEF.xp();    // centre de gravite des elements
+  //  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
 
   DoubleTab gradient_elem(nb_elem_tot,dimension,dimension);
   // (du/dx du/dy dv/dx dv/dy ...) pour un poly
@@ -107,7 +107,7 @@ calculer_terme_production_K(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
 
   // Boucle sur les bords pour traiter les faces de bord
   // en distinguant le cas periodicite
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -247,7 +247,7 @@ calculer_terme_production_K(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
 
 
 DoubleTab& Calcul_Production_K_VEF::
-calculer_terme_production_K_BiK(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
+calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
                                 DoubleTab& P,const DoubleTab& K,const DoubleTab& eps,
                                 const DoubleTab& vit,const DoubleTab& visco_turb) const
 {
@@ -267,17 +267,17 @@ calculer_terme_production_K_BiK(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_
   P= 0;
 
   // Calcul de F(u,v,w):
-  int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleVect& volumes = zone_VEF.volumes();
-  int premiere_face_int = zone_VEF.premiere_face_int();
-  //  const IntTab& les_Polys = zone.les_elems();
+  int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
+  //  const IntTab& les_Polys = domaine.les_elems();
   int fac=0;
   int poly1, poly2;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   int dimension=Objet_U::dimension;
-  //  const DoubleTab& xp = zone_VEF.xp();    // centre de gravite des elements
-  //  const DoubleTab& xv = zone_VEF.xv();    // centre de gravite des faces
+  //  const DoubleTab& xp = domaine_VEF.xp();    // centre de gravite des elements
+  //  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
 
   DoubleTab gradient_elem(nb_elem_tot,dimension,dimension);
   // (du/dx du/dy dv/dx dv/dy ...) pour un poly
@@ -317,7 +317,7 @@ calculer_terme_production_K_BiK(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_
 
   // Boucle sur les bords pour traiter les faces de bord
   // en distinguant le cas periodicite
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -456,7 +456,7 @@ calculer_terme_production_K_BiK(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_
 }
 
 DoubleTab& Calcul_Production_K_VEF::
-calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
+calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
                                  DoubleTab& P,const DoubleTab& K_eps,
                                  const DoubleTab& gradient_elem,const DoubleTab& visco_turb,const DoubleTab& Re) const
 {
@@ -465,12 +465,12 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
   // P : Production
   P= 0;
 
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  int premiere_face_int = zone_VEF.premiere_face_int();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
 
   int fac=0;
   int poly1, poly2;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   int dimension=Objet_U::dimension;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,9 +487,9 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
   int n_bord;
 
   DoubleTab gradient_face(nb_faces_,dimension,dimension);
-  calcul_tenseur_face(gradient_face,gradient_elem,zone_VEF,zcl_VEF);
+  calcul_tenseur_face(gradient_face,gradient_elem,domaine_VEF,zcl_VEF);
   DoubleTab Re_face(nb_faces_,dimension,dimension);
-  calcul_tenseur_face(Re_face,Re,zone_VEF,zcl_VEF);
+  calcul_tenseur_face(Re_face,Re,domaine_VEF,zcl_VEF);
   //gradient_face.echange_espace_virtuel();
   //Re_face.echange_espace_virtuel();
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,7 +498,7 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
 
   // Boucle sur les bords pour traiter les faces de bord
   // en distinguant le cas periodicite
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -564,34 +564,34 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
       // Pour Verification -----------------------------------------------------------------
       /*Cerr << "face " << fac << " gradient_elem1 --> " << gradient_elem(poly1,0,0) << " "
       <<  gradient_elem(poly1,0,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " gradient_elem1 --> " << gradient_elem(poly1,1,0) << " "
       <<  gradient_elem(poly1,1,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " visco1 --> " << visco_turb[poly1]
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " Re1 --> " << Re(poly1,0,0) << " " <<  Re(poly1,0,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " Re1 --> " << Re(poly1,1,0) << " " <<  Re(poly1,1,1)
-      	   << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      	   << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " gradient_elem2 --> " << gradient_elem(poly2,0,0) << " "
       <<  gradient_elem(poly2,0,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " gradient_elem2 --> " << gradient_elem(poly2,1,0) << " "
       <<  gradient_elem(poly2,1,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " visco2 --> " << visco_turb[poly2]
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " Re2 --> " << Re(poly2,0,0) << " " <<  Re(poly2,0,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " Re2 --> " << Re(poly2,1,0) << " " <<  Re(poly2,1,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " Re2 --> " << Re(poly2,1,0) << " " <<  Re(poly2,1,1)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << "face " << fac << " K = " << K_eps(fac,0) << " , Eps = " << K_eps(fac,1)
       << finl;
       Cerr << "face " << fac << " --> P = " << P(fac)
-      << " " << zone_VEF.xv(fac,0) << " " << zone_VEF.xv(fac,1) << finl;
+      << " " << domaine_VEF.xv(fac,0) << " " << domaine_VEF.xv(fac,1) << finl;
       Cerr << finl;*/
 
     }
@@ -599,8 +599,8 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
 }
 
 DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
-  const Zone_VEF& zone_VEF,
-  const Zone_Cl_VEF& zcl_VEF,
+  const Domaine_VEF& domaine_VEF,
+  const Domaine_Cl_VEF& zcl_VEF,
   DoubleTab& G,
   const DoubleTab& inconnue,
   const DoubleTab& alpha_turb,
@@ -611,11 +611,11 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   // G est discretise comme K et Eps i.e au centre des faces
   // G(face) = beta alpha_t(face) G . gradT(face)
 
-  int nb_elem_tot            = zone_VEF.nb_elem_tot();
-  int nb_faces_              = zone_VEF.nb_faces();
-  int nb_faces_tot           = zone_VEF.nb_faces_tot();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleVect& volumes  = zone_VEF.volumes();
+  int nb_elem_tot            = domaine_VEF.nb_elem_tot();
+  int nb_faces_              = domaine_VEF.nb_faces();
+  int nb_faces_tot           = domaine_VEF.nb_faces_tot();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleVect& volumes  = domaine_VEF.volumes();
   int elem1,elem2,fac=0;
   int n_bord;
   int nb_compo=0;
@@ -644,7 +644,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       if ( nb_compo==0 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -693,7 +693,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       else if ( nb_compo==1 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -742,7 +742,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       else if ( nb_compo>1 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -820,7 +820,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       if ( nb_compo==0 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -876,7 +876,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       else if ( nb_compo==1 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -932,7 +932,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
       else if ( nb_compo>1 )
         {
           // we treat the boundaries
-          for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+          for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1018,20 +1018,20 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
 
 // Calcul d'un tenseur aux faces a partir d'un tenseur aux elements
 DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face, const DoubleTab& Tenseur_elem,
-                                                        const Zone_VEF& zone_VEF, const Zone_Cl_VEF& zone_Cl_VEF) const
+                                                        const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& domaine_Cl_VEF) const
 {
 
   int dimension = Objet_U::dimension;
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  int nb_faces = zone_VEF.nb_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  int nb_faces = domaine_VEF.nb_faces();
 
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const DoubleVect& volumes = zone_VEF.volumes();
+  const DoubleVect& volumes = domaine_VEF.volumes();
 
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -1060,7 +1060,7 @@ DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face,
             }
         }
     }
-  int n0 = zone_VEF.premiere_face_int();
+  int n0 = domaine_VEF.premiere_face_int();
   for (int fac = n0; fac<nb_faces; fac++)
     {
       int poly1 = face_voisins(fac,0);

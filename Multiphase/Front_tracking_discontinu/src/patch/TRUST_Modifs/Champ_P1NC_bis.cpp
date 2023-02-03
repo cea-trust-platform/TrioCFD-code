@@ -21,7 +21,7 @@
 #include <Probleme_base.h>
 #include <Champ_P1NC.h>
 
-void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plus) const
+void Champ_P1NC::calcul_y_plus_diphasique(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect& y_plus) const
 {
   // On initialise le champ y_plus avec une valeur negative,
   // comme ca lorsqu'on veut visualiser le champ pres de la paroi,
@@ -34,9 +34,9 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
   y_plus = -1.;
 
   const Champ_P1NC& vit = *this;
-  const Zone_VEF& zone_VEF = zone_vef();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const Domaine_VEF& domaine_VEF = domaine_vef();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
   const Equation_base& eqn_hydr = equation();
 
   // Physical properties of both phases
@@ -50,8 +50,8 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
   const double delta_nu = tab_visco_ph1(0, 0) - tab_visco_ph0(0, 0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab
-  const Zone_Cl_dis_base& zone_Cl_dis_base = eqn_hydr.zone_Cl_dis().valeur();
-  const Equation_base& eqn_trans = zone_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
+  const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
   const DoubleTab& indic = eqn_interf.inconnue().valeurs();
 
@@ -80,15 +80,15 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
       // if( ! sub_type( Paroi_negligeable_VEF , loipar ) )
       if (loipar.use_shear())
         {
-          yplus_faces.resize(zone_VEF.nb_faces_tot());
+          yplus_faces.resize(domaine_VEF.nb_faces_tot());
           yplus_faces.ref(loipar.tab_d_plus());
           yplus_already_computed = 1;
         }
     }
 
-  for (int n_bord = 0; n_bord < zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur()))
         {
@@ -120,9 +120,9 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
                       else if (num[1] == num_face)
                         num[1] = elem_faces(elem, 2);
 
-                      dist = distance_2D(num_face, elem, zone_VEF);
+                      dist = distance_2D(num_face, elem, domaine_VEF);
                       dist *= 3. / 2.; // pour se ramener a distance paroi / milieu de num[0]-num[1]
-                      norm_v = norm_2D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], zone_VEF, val1, val2);
+                      norm_v = norm_2D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], domaine_VEF, val1, val2);
 
                     } // dim 2
                   else if (dimension == 3)
@@ -139,9 +139,9 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
                       else if (num[2] == num_face)
                         num[2] = elem_faces(elem, 3);
 
-                      dist = distance_3D(num_face, elem, zone_VEF);
+                      dist = distance_3D(num_face, elem, domaine_VEF);
                       dist *= 4. / 3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
-                      norm_v = norm_3D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      norm_v = norm_3D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
 
                     } // dim 3
 

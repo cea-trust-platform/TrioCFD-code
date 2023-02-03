@@ -33,7 +33,7 @@
 #include <EChaine.h>
 #include <SChaine.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Sonde_IJK.h>
 #include <Ouvrir_fichier.h>
 #include <EcritureLectureSpecial.h>
@@ -71,7 +71,7 @@ IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
 // Pour cela, deplacement vers IJK_Navier_Stokes_tools.cpp.P
 // static void extend_array(const IJK_Grid_Geometry &geom1, ...
 // void build_extended_splitting(const IJK_Splitting &split1, ...
-// Probleme_FT_Disc_gen & creer_zone_vdf(const IJK_Splitting & splitting, const Nom & nom_domaine)
+// Probleme_FT_Disc_gen & creer_domaine_vdf(const IJK_Splitting & splitting, const Nom & nom_domaine)
 
 #ifdef SMOOTHING_RHO
 static void smoothing_field(IJK_Field_double& field,
@@ -200,8 +200,8 @@ void copy_field_to_extended_domain(const IJK_Field_double& input_field,
           input_field2(i,j,k) = input_field(i,j,k);
         }
   // Echange espace virtuel pour avoir les valeurs sur nextension mailles
-  // autour de la zone locale initiale.
-  // On espere que la zone etendue sur ce processeur est a l'interieur...
+  // autour de la domaine locale initiale.
+  // On espere que la domaine etendue sur ce processeur est a l'interieur...
   // Il nous faut une epaisseur supplementaire car les faces de droite du
   // maillage etendu portent une inconnue qui n'existe pas dans le maillage
   // d'origine, s'il est periodique.
@@ -645,13 +645,13 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     }
   splitting_ = ref_cast(IJK_Splitting, Interprete_bloc::objet_global(ijk_splitting_name));
 
-  Cerr << "Construction de la zone VDF NS pour les sondes..." << finl;
-  refprobleme_ns_ = creer_zone_vdf(splitting_, "DOM_NS_VDF");
+  Cerr << "Construction de la domaine VDF NS pour les sondes..." << finl;
+  refprobleme_ns_ = creer_domaine_vdf(splitting_, "DOM_NS_VDF");
 
-  Cerr << "Construction de la zone VDF..." << finl;
+  Cerr << "Construction de la domaine VDF..." << finl;
   {
     build_extended_splitting(splitting_, splitting_ft_, ijk_splitting_ft_extension_);
-    refprobleme_ft_disc_ = creer_zone_vdf(splitting_ft_, "DOM_VDF");
+    refprobleme_ft_disc_ = creer_domaine_vdf(splitting_ft_, "DOM_VDF");
     for (int dir = 0; dir < 3; dir++)
       {
         VECT(IntTab) map(3);
@@ -671,7 +671,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
             else
               {
                 map[dir2].resize(3,3);
-                // copy NS field to central zone of extended field
+                // copy NS field to central domaine of extended field
                 map[dir2](0,0) = 0;
                 map[dir2](0,1) = n_ext;
                 map[dir2](0,2) = n;
@@ -728,7 +728,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
           else
             {
               map[dir2].resize(3,3);
-              // copy NS field to central zone of extended field
+              // copy NS field to central domaine of extended field
               map[dir2](0,0) = 0;
               map[dir2](0,1) = n_ext;
               map[dir2](0,2) = n;
@@ -1417,11 +1417,11 @@ int IJK_FT_double::initialise()
 
 
 
-  // On peut recuperer la zonevf:
-  const Zone_dis& zone_dis = refprobleme_ft_disc_.valeur().domaine_dis().zone_dis(0);
+  // On peut recuperer la domainevf:
+  const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
-  interfaces_.initialize(splitting_ft_, splitting_, zone_dis);
+  interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
 
   nalloc += post_.initialise(reprise_);
 
@@ -1927,7 +1927,7 @@ void IJK_FT_double::run()
 
   //GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
   // Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
-  // alors il faut une zone ghost de la taille de la longueur maximale des arretes.
+  // alors il faut une domaine ghost de la taille de la longueur maximale des arretes.
   //  allocate_velocity(velocity_ft_, splitting_ft_, 0);
   allocate_velocity(velocity_ft_, splitting_ft_, 4);
 

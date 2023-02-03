@@ -30,7 +30,7 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Operateur_Diff_base.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
@@ -38,7 +38,7 @@
 #include <Op_Diff_PolyMAC_P0_base.h>
 #include <Op_Diff_Tau_PolyMAC_P0_Elem.h>
 #include <TRUSTTrav.h>
-#include <Zone_Poly_base.h>
+#include <Domaine_Poly_base.h>
 
 #include <math.h>
 
@@ -93,10 +93,10 @@ void Cond_lim_k_simple_transition_constante_Dirichlet::mettre_a_jour(double tps)
 
 int Cond_lim_k_simple_transition_constante_Dirichlet::initialiser(double temps)
 {
-  d_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  d_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
 
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
 
   return 1;
 }
@@ -104,16 +104,16 @@ int Cond_lim_k_simple_transition_constante_Dirichlet::initialiser(double temps)
 void Cond_lim_k_simple_transition_constante_Dirichlet::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().zone_dis().valeur());
+  const Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() ,
-                             &nu_visc = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                             ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() ,
+                             &nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size();
-  const IntTab& f_e = zone.face_voisins();
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size();
+  const IntTab& f_e = domaine.face_voisins();
 
   if (mu.nb_dim() >= 3) Process::exit(que_suis_je() + " : transport of k must be SGDH !");
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
@@ -122,10 +122,10 @@ void Cond_lim_k_simple_transition_constante_Dirichlet::me_calculer()
 
   for (int f =0 ; f < nf ; f++)
     {
-      int f_zone = f + f1; // number of the face in the zone
-      int e_zone = f_e(f_zone,0);
+      int f_domaine = f + f1; // number of the face in the domaine
+      int e_domaine = f_e(f_domaine,0);
 
-      d_(f, n) = calc_k(y(f_zone, n), u_tau(f_zone, n), nu_visc(e_zone, n));
+      d_(f, n) = calc_k(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
     }
   d_.echange_espace_virtuel();
 }

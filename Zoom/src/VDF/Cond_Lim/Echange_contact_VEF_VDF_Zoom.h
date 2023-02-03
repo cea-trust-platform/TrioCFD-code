@@ -26,7 +26,7 @@
 #include <Echange_contact_VDF_Zoom_base.h>
 #include <Champ_front_zoom.h>
 #include <Pb_MG.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>

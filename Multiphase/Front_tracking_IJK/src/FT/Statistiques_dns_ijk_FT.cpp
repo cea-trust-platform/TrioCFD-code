@@ -2905,13 +2905,13 @@ double Statistiques_dns_ijk_FT::compute_desequil_alpha(const IJK_Grid_Geometry& 
           const double z = elem_coord_[j];
           if (z - zmin < portee_wall_repulsion)
             {
-              // Dans la zone de repulsion gauche
+              // Dans la domaine de repulsion gauche
               almoy_g +=moyenne_spatiale_instantanee_[i][j];
               ng++;
             }
           else if (zmax - z < portee_wall_repulsion )
             {
-              // Dans la zone de repulsion droite
+              // Dans la domaine de repulsion droite
               almoy_d +=moyenne_spatiale_instantanee_[i][j];
               nd++;
             }

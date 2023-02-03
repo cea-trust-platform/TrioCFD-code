@@ -93,30 +93,30 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl();
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
-  const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &n_f = zone.face_normales();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
+  const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                      &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
-                        &y_elem = zone.y_elem(),
-                         &y_faces = zone.y_faces(),
-                          &n_y_elem = zone.normale_paroi_elem(),
-                           &n_y_faces = zone.normale_paroi_faces(),
+                        &y_elem = domaine.y_elem(),
+                         &y_faces = domaine.y_faces(),
+                          &n_y_elem = domaine.normale_paroi_elem(),
+                           &n_y_faces = domaine.normale_paroi_faces(),
                             &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs(),
                              *k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : NULL ;
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   int N = pvit.line_size() , Np = press.line_size(), Nk = (k_turb) ? (*k_turb).dimension(1) : 1, D = dimension,
-      nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),
+      nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot(),
       cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), nut_l(N), k_l(Nk), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
 
-  DoubleTrav nut(zone.nb_elem_tot(), N); //viscosite turbulente
+  DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
   if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
 
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_->valeur());
@@ -232,10 +232,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
-  const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &n_f = zone.face_normales();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
+  const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
@@ -243,8 +243,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),
-                         &y_elem = zone.y_elem(),
-                          &y_faces = zone.y_faces(),
+                         &y_elem = domaine.y_elem(),
+                          &y_faces = domaine.y_faces(),
                            &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs(),
                             &grad_v = equation().probleme().get_champ("gradient_vitesse").valeurs(),
                              * k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : nullptr ;
@@ -252,7 +252,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   int N = pvit.line_size() , Np = press.line_size(), Nk = (k_turb) ? (*k_turb).dimension(1) : 1, D = dimension,
-      nf_tot = zone.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
+      nf_tot = domaine.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
 
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), k_l(Nk), d_b_l(N), dv(N, N), ddv_c(4), coeff(N, N), //arguments pour coeff
              vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Requis pour corrections vort et u_l-u-g
@@ -263,7 +263,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
 
   /* elements */
   int f;
-  for (int e = 0; e < zone.nb_elem_tot(); e++)
+  for (int e = 0; e < domaine.nb_elem_tot(); e++)
     {
       /* arguments de coeff */
       for (int n = 0; n < N; n++)
@@ -324,7 +324,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                 secmem(i+1, k )+= fac_e * coeff(n_l, k) * vr_l(k, 0) * vort(e, 0) ;
               } // 100% explicit
           for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-            if (f<zone.nb_faces())
+            if (f<domaine.nb_faces())
               if (fcl(f, 0) < 2)
                 for (int k = 0; k < N; k++)
                   if (k!= n_l) // gas phase
@@ -363,7 +363,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
               } // 100% explicit
 
           /*          for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-                      if (f<zone.nb_faces())
+                      if (f<domaine.nb_faces())
                         if (fcl(f, 0) < 2)
                           for (int k = 0; k < N; k++)
                             if (k!= n_l) // gas phase
@@ -391,7 +391,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
   double fac_f ;
 
   if (D==3)
-    for (f = 0 ; f<zone.nb_faces() ; f++)
+    for (f = 0 ; f<domaine.nb_faces() ; f++)
       if (fcl(f, 0) < 2)
         {
           a_l = 0;
@@ -450,7 +450,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
           for (d = 0 ; d<D ; d++)
             for (k = 0 ; k<N ; k++)
               for (c=0 ; c<2 && (e = f_e(f, c)) >= 0; c++)
-                pvit_l(k, d) += vf_dir(f, c)/vf(f)*pvit(zone.nb_faces_tot()+D*e+d, k) ;
+                pvit_l(k, d) += vf_dir(f, c)/vf(f)*pvit(domaine.nb_faces_tot()+D*e+d, k) ;
           scal_u = 0;
           for (k = 0 ; k<N ; k++)
             for (d = 0 ; d<D ; d++)

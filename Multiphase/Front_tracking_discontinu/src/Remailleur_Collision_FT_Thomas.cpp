@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Remailleur_Collision_FT_Thomas.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Domaine.h>
 #include <Param.h>
 #include <communications.h>
@@ -90,19 +90,18 @@ Sortie& Remailleur_Collision_FT_Thomas::printOn(Sortie& os) const
 //REMARQUE : pour le parallele, on stocke egalement les elements voisins qui sont virtuels
 int Remailleur_Collision_FT_Thomas::construire_voisinage_sommet(const Maillage_FT_Disc& maillage)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_som_elem = zone.nb_som_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_som_elem = domaine.nb_som_elem();
   const int end_liste = -1;
 
   //Tableau des sommets par element
-  const IntTab& elem_sommets = zone.les_elems();
+  const IntTab& elem_sommets = domaine.les_elems();
 
-  assert(voisinage_sommet_.dimension_tot(0) == zone.nb_som_tot());
-  assert(next_elem_.dimension_tot(0) == zone.nb_elem_tot()*zone.nb_som_elem());
+  assert(voisinage_sommet_.dimension_tot(0) == domaine.nb_som_tot());
+  assert(next_elem_.dimension_tot(0) == domaine.nb_elem_tot()*domaine.nb_som_elem());
 
   voisinage_sommet_ = end_liste;
 
@@ -149,16 +148,16 @@ int Remailleur_Collision_FT_Thomas::construire_voisinage_sommet(const Maillage_F
 //traversant ses voisins a distance 0 de l'interface
 int  Remailleur_Collision_FT_Thomas::mettre_a_jour_data(const Maillage_FT_Disc& maillage)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
   const Intersections_Elem_Facettes&  intersection_elem_facettes =
     maillage.intersections_elem_facettes();
 
   const ArrOfInt& index_facette = intersection_elem_facettes.index_facette();
 
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_elem = zone.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
   const int nb_facettes_interface = maillage.nb_facettes();
   const int seen = 1;
 
@@ -295,7 +294,7 @@ int  Remailleur_Collision_FT_Thomas::mettre_a_jour_data(const Maillage_FT_Disc& 
         {
           //Obtention des elements voisins de "elem"
           const int elem_glob = (*elem_proches)[elem_loc];
-          elements_voisins(elem_glob,elem_voisins,zone_VF);
+          elements_voisins(elem_glob,elem_voisins,domaine_VF);
           const int nb_elem_voisins = elem_voisins.size_array();
           const int distance_elem = distance_interface_element_eulerien_[elem_glob];
 
@@ -420,10 +419,10 @@ int  Remailleur_Collision_FT_Thomas::mettre_a_jour_data(const Maillage_FT_Disc& 
 //                   -1 => situation problematique (une erreur s'est produite)
 int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const int elem,const Maillage_FT_Disc& maillage)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem = zone.nb_elem();
+  const int nb_elem = domaine.nb_elem();
   const int distance_interface_elem = distance_interface_element_eulerien_[elem];
 
   //int distance_interface_elem_voisin = -2;
@@ -440,7 +439,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
   //Construction de la liste des elements voisins de "elem"
   //a distance de l'interface strictement plus petite que la distance
   //separant "elem" de l'interface.
-  elements_voisins(elem, voisins_a_distance_plus_petite, zone_VF);
+  elements_voisins(elem, voisins_a_distance_plus_petite, domaine_VF);
   elements_voisins_a_distance_plus_petite2(elem, voisins_a_distance_plus_petite);
 
   const int nb_voisins_a_distance_plus_petite = voisins_a_distance_plus_petite.size_array();
@@ -530,11 +529,11 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const in
 //REMARQUE : l'attribut "distance_interface_element_eulerien_" doit etre initialise
 double  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const Maillage_FT_Disc& maillage)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
   const int end_liste = -1;
 
   //Construction de la liste chainee distance->{ensemble des elements a cette distance}
@@ -611,18 +610,17 @@ double  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const
 //VOIR : Remailleur_Collision_FT_Thomas::voisinage_sommets()
 int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
                                                      ArrOfInt& liste_voisins,
-                                                     const Zone_dis_base& une_zone_dis) const
+                                                     const Domaine_dis_base& une_domaine_dis) const
 {
   //  const Maillage_FT_Disc& maillage = ;
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,une_zone_dis);
-  const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,une_domaine_dis);
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_som_elem = zone.nb_som_elem();
+  const int nb_som_elem = domaine.nb_som_elem();
   const int end_liste = -1;
 
   //Tableau des sommets par element
-  const IntTab& elem_sommets = zone.les_elems();
+  const IntTab& elem_sommets = domaine.les_elems();
 
 
   liste_voisins.set_smart_resize(1);
@@ -699,10 +697,10 @@ int  Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite2(co
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins()
-int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Zone_dis_base& une_zone_dis) const
+int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Domaine_dis_base& une_domaine_dis) const
 {
   ArrOfInt liste_voisins;
-  elements_voisins(elem,liste_voisins,une_zone_dis);
+  elements_voisins(elem,liste_voisins,une_domaine_dis);
   return liste_voisins.size_array();
 }
 
@@ -713,10 +711,10 @@ int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Z
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite()
-int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem, const Zone_dis_base& une_zone_dis) const
+int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem, const Domaine_dis_base& une_domaine_dis) const
 {
   ArrOfInt liste_voisins;
-  elements_voisins(elem,liste_voisins,une_zone_dis);
+  elements_voisins(elem,liste_voisins,une_domaine_dis);
   elements_voisins_a_distance_plus_petite2(elem,liste_voisins);
   return liste_voisins.size_array();
 }
@@ -738,13 +736,13 @@ int Remailleur_Collision_FT_Thomas::traite_RuptureCoalescenceInterfaces_Conserva
                                                                                     Champ_base& indicatrice)
 {
   Journal() << "Remailleur_Collision_FT_Thomas::traite_RuptureCoalescenceInterfaces_Conservatif" << finl;
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const DoubleVect& volumes_elements_euleriens = zone_VF.volumes();
+  const DoubleVect& volumes_elements_euleriens = domaine_VF.volumes();
 
-  const int nb_elements_euleriens = zone.nb_elem();
-  const int nb_elements_euleriens_tot = zone.nb_elem_tot();
+  const int nb_elements_euleriens = domaine.nb_elem();
+  const int nb_elements_euleriens_tot = domaine.nb_elem_tot();
 
   int ok_mise_a_jour = 0, ok_remailleur = 0;
 
@@ -880,7 +878,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int
 
   const int distance_interface_elem = distance_interface_element_eulerien_[elem];
 
-  assert(volume_perdu_.dimension_tot(0)==zone_dis(maillage).valeur().zone().nb_elem_tot());
+  assert(volume_perdu_.dimension_tot(0)==domaine_dis(maillage).valeur().domaine().nb_elem_tot());
 
   const double volume_perdu_elem = volume_perdu_[elem];
   const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
@@ -888,7 +886,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int
   //Boucle sur les faces qui traversent l'element:
   //ATTENTION : en parallele, le tableau "index_elem" est dimensionne
   //a nb_elem() et pas a nb_elem_tot()
-  assert(elem<zone_dis(maillage).valeur().zone().nb_elem());
+  assert(elem<domaine_dis(maillage).valeur().domaine().nb_elem());
   int index = index_elem[elem];
 
   const double somme_coefs = surface_interface_elements_voisins_[elem];
@@ -936,10 +934,10 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int
 //RETOUR : renvoie le volume perdu total qui a ete transporte jusqu'aux sommets du maillage de l'interface
 double Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(ArrOfDouble& volume_perdu_sommet, const Maillage_FT_Disc& maillage) const
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem = zone.nb_elem();
+  const int nb_elem = domaine.nb_elem();
   const int nb_sommets_interface = maillage.nb_sommets();
   // int ok = -1; //pour les assert()
 
@@ -992,7 +990,7 @@ double  Remailleur_Collision_FT_Thomas::surface_intersection(const int elem, con
   // Boucle sur les faces qui traversent l'element:
   //ATTENTION : en parallele, le tableau "index_elem" est dimensionne
   //a nb_elem() et pas a nb_elem_tot()
-  assert(elem<zone_dis(maillage).valeur().zone().nb_elem());
+  assert(elem<domaine_dis(maillage).valeur().domaine().nb_elem());
   int index = index_elem[elem];
 
   while (index >= 0)
@@ -1041,17 +1039,17 @@ void  Remailleur_Collision_FT_Thomas::tester_interface(const Maillage_FT_Disc& m
   nom+=".txt";
   SFichier fichier_elements_euleriens(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
   const IntTab& facettes = maillage.facettes();
   const ArrOfInt& sommet_elem = maillage.sommet_elem();
 
-  const DoubleVect& volumes_elements_euleriens = zone_VF.volumes();
+  const DoubleVect& volumes_elements_euleriens = domaine_VF.volumes();
   const DoubleTab& indicatrice =
     maillage.equation_transport().inconnue().valeurs();
 
-  const int nb_elements_euleriens = zone.nb_elem();
+  const int nb_elements_euleriens = domaine.nb_elem();
 
   //On va afficher les elements traverses par l'interface
   //Les facettes coupant ces elements
@@ -1141,18 +1139,17 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
   SFichier fichier_voisinage_sommet(nom_sommets.getChar());
   SFichier fichier_voisinage_element(nom_elements.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
   //Affichage des voisinages des sommets
-  const int nb_som_tot = zone.nb_som_tot();
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_som_elem = zone.nb_som_elem();
+  const int nb_som_tot = domaine.nb_som_tot();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_som_elem = domaine.nb_som_elem();
   const int end_liste = -1;
 
   fichier_voisinage_sommet << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
-  fichier_voisinage_sommet << "Nombre d'elements reels : " << zone.nb_elem() << finl;
+  fichier_voisinage_sommet << "Nombre d'elements reels : " << domaine.nb_elem() << finl;
   fichier_voisinage_sommet << "Nombre d'elements virtuels : " << nb_elem_tot << finl;
   fichier_voisinage_sommet << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
   fichier_voisinage_sommet << finl;
@@ -1167,7 +1164,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
           const int elem = p/nb_som_elem;
 
           assert(elem<nb_elem_tot);
-          assert(som==domaine.get_renum_som_perio(zone.les_elems()(elem,p%nb_som_elem)));
+          assert(som==domaine.get_renum_som_perio(domaine.les_elems()(elem,p%nb_som_elem)));
           fichier_voisinage_sommet << elem << " ";
         }
 
@@ -1186,7 +1183,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
 
   for (int elem=0; elem<nb_elem_tot; elem++)
     {
-      elements_voisins(elem, elem_voisins, zone_VF);
+      elements_voisins(elem, elem_voisins, domaine_VF);
       const int taille_liste_voisins = elem_voisins.size_array();
 
       //
@@ -1203,7 +1200,7 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
 
       taille_liste_voisins_plus_proches = elem_voisins.size_array();
       assert(taille_liste_voisins_plus_proches<=nombre_de_voisins_plus_proches_[elem]);
-      if (elem<zone.nb_elem()) assert(taille_liste_voisins_plus_proches==nombre_de_voisins_plus_proches_[elem]);
+      if (elem<domaine.nb_elem()) assert(taille_liste_voisins_plus_proches==nombre_de_voisins_plus_proches_[elem]);
 
       //
       //Affichage des voisins + proche de l'interface que "elem
@@ -1241,13 +1238,13 @@ void  Remailleur_Collision_FT_Thomas::tester_distance(const Maillage_FT_Disc& ma
 
   SFichier fichier_distance(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem_tot = domaine.nb_elem_tot();
 
   fichier_distance << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
-  fichier_distance << "Nombre d'elements reels : " << zone.nb_elem() << finl;
+  fichier_distance << "Nombre d'elements reels : " << domaine.nb_elem() << finl;
   fichier_distance << "Nombre d'elements virtuels : " << nb_elem_tot << finl;
   fichier_distance << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
   fichier_distance << finl;
@@ -1278,10 +1275,10 @@ void  Remailleur_Collision_FT_Thomas::tester_liste(const Maillage_FT_Disc& maill
 
   SFichier fichier_liste(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem_tot = domaine.nb_elem_tot();
 
   //
   //Test du chainage dans la fonction  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const Maillage_FT_Disc&)
@@ -1295,7 +1292,7 @@ void  Remailleur_Collision_FT_Thomas::tester_liste(const Maillage_FT_Disc& maill
 
 
   fichier_liste << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
-  fichier_liste << "Nombre d'elements reels : " << zone.nb_elem() << finl;
+  fichier_liste << "Nombre d'elements reels : " << domaine.nb_elem() << finl;
   fichier_liste << "Nombre d'elements virtuels : " << nb_elem_tot << finl;
   fichier_liste << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
   fichier_liste << finl;
@@ -1367,11 +1364,11 @@ void  Remailleur_Collision_FT_Thomas::tester_transport(const Maillage_FT_Disc& m
 
   SFichier fichier_transport(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
 
   if (volume_perdu_.dimension_tot(0) != nb_elem_tot)
     {
@@ -1416,7 +1413,7 @@ void  Remailleur_Collision_FT_Thomas::tester_transport(const Maillage_FT_Disc& m
           continue;
         }
 
-      elements_voisins(elem, voisins_a_distance_plus_petite,zone_VF);
+      elements_voisins(elem, voisins_a_distance_plus_petite,domaine_VF);
       elements_voisins_a_distance_plus_petite2(elem, voisins_a_distance_plus_petite);
       const int nb_voisins_a_distance_plus_petite = voisins_a_distance_plus_petite.size_array();
 
@@ -1543,11 +1540,11 @@ void  Remailleur_Collision_FT_Thomas::tester_transport_complet(const Maillage_FT
 
   SFichier fichier_transport(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
   const int end_liste = -1;
 
   //Construction de la liste chainee distance->{ensemble des elements a cette distance}
@@ -1617,7 +1614,7 @@ void  Remailleur_Collision_FT_Thomas::tester_transport_complet(const Maillage_FT
         {
           voisins_a_distance_plus_petite.resize_array(0);
 
-          elements_voisins(elem, voisins_a_distance_plus_petite,zone_VF);
+          elements_voisins(elem, voisins_a_distance_plus_petite,domaine_VF);
           elements_voisins_a_distance_plus_petite2(elem, voisins_a_distance_plus_petite);
           const int nb_voisins_a_distance_plus_petite = voisins_a_distance_plus_petite.size_array();
 
@@ -1798,8 +1795,8 @@ void  Remailleur_Collision_FT_Thomas::tester_volume_par_sommet(const Maillage_FT
 
   SFichier fichier_volume(nom.getChar());
 
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
   const Intersections_Elem_Facettes& intersections =
     maillage.intersections_elem_facettes();
@@ -1807,8 +1804,8 @@ void  Remailleur_Collision_FT_Thomas::tester_volume_par_sommet(const Maillage_FT
   const ArrOfInt& index_elem = intersections.index_elem();
   const IntTab& facettes = maillage.facettes();
 
-  const int nb_elem = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
+  const int nb_elem = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
   const int nb_sommets_interface = maillage.nb_sommets();
 
   ArrOfDoubleFT volume_perdu_par_sommet(nb_sommets_interface);
@@ -1920,13 +1917,12 @@ void  Remailleur_Collision_FT_Thomas::tester_volume_par_sommet(const Maillage_FT
 // Fonction qui dimensionne les attributs de type IntTab et DoubleTab
 int Remailleur_Collision_FT_Thomas::initialiser_data(const Maillage_FT_Disc& maillage)
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
-  const Zone& zone = zone_VF.zone();
-  const Domaine& domaine = zone.domaine();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis(maillage).valeur());
+  const Domaine& domaine = domaine_VF.domaine();
 
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_som_elem = zone.nb_som_elem();
-  const int nb_som_tot = zone.nb_som_tot();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_som_elem = domaine.nb_som_elem();
+  const int nb_som_tot = domaine.nb_som_tot();
 
   //On dimensionne les donnees
   distance_interface_element_eulerien_.reset();

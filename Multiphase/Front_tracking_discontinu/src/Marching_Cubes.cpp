@@ -25,7 +25,7 @@
 #include <Marching_Cubes_data.h>
 #include <ArrOfBit.h>
 #include <TRUSTVect.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Domaine.h>
 #include <Rectangle.h>
 #include <Rectangle_2D_axi.h>
@@ -80,15 +80,15 @@ Sortie& Marching_Cubes::printOn(Sortie& os) const
   return os;
 }
 
-void Marching_Cubes::associer_zone_vf(const Zone_VF& zone_vf)
+void Marching_Cubes::associer_domaine_vf(const Domaine_VF& domaine_vf)
 {
-  const Zone& zone = zone_vf.zone();
-  ref_zone_vf_ = zone_vf;
-  remplir_data_marching_cubes(zone);
-  remplir_renum_virt_loc(zone);
+  const Domaine& domaine = domaine_vf.domaine();
+  ref_domaine_vf_ = domaine_vf;
+  remplir_data_marching_cubes(domaine);
+  remplir_renum_virt_loc(domaine);
 }
 
-/*! @brief Construction d'un maillage en segments ou en triangles comme l'isovaleur d'une fonction discretisee aux sommets du maillage eulerien (associer_zone_vf).
+/*! @brief Construction d'un maillage en segments ou en triangles comme l'isovaleur d'une fonction discretisee aux sommets du maillage eulerien (associer_domaine_vf).
  *
  *   L'algorithme est un "marching cubes" generalise pour travailler avec un
  *   maillage vf en triangles, rectangles, cubes ou tetraedres.
@@ -139,10 +139,10 @@ int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
   //  Dans la version actuelle, c'est ok: on connait tous les elements voisins
   //  par au moins un sommet.
 
-  if (! ref_zone_vf_.non_nul())
+  if (! ref_domaine_vf_.non_nul())
     {
       Cerr << "Marching_Cubes::construire_iso : Erreur :" << finl;
-      Cerr << " Aucune zone n'a ete associee a Marching_Cubes" << finl;
+      Cerr << " Aucune domaine n'a ete associee a Marching_Cubes" << finl;
       assert(0);
       exit();
     }
@@ -165,7 +165,7 @@ int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
   //  Pour un sommet sur une face de bord
   //   def_noeud(i,2) = nproc()
   //   def_noeud(i,3) = i
-  //   def_noeud(i,4) = numero de la face de bord dans la zone
+  //   def_noeud(i,4) = numero de la face de bord dans la domaine
   // Un meme sommet (ie, meme segment) peut figurer plusieurs fois comme sommet
   // interne, sommet de bord et/ou sommet de joint.
   IntTab def_noeud;
@@ -290,10 +290,10 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
 {
   const int dimension3 = (dimension == 3);
 
-  if (! ref_zone_vf_.non_nul())
+  if (! ref_domaine_vf_.non_nul())
     {
       Cerr << "Marching_Cubes::construire_iso : Erreur :" << finl;
-      Cerr << " Aucune zone n'a ete associee a Marching_Cubes" << finl;
+      Cerr << " Aucune domaine n'a ete associee a Marching_Cubes" << finl;
       assert(0);
       exit();
     }
@@ -307,7 +307,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
   parser.parseString();
 
   // Construction d'un tableau de valeurs aux sommets euleriens
-  const Domaine& domaine = ref_zone_vf_.valeur().zone().domaine();
+  const Domaine& domaine = ref_domaine_vf_.valeur().domaine();
   const int nb_sommets = domaine.nb_som();
 
   for (int i = 0; i < nb_sommets; i++)
@@ -340,10 +340,10 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
 // (en gros, description des facettes a creer en fonction
 //  du type d'element eulerien et du signe de la fonction aux
 //  sommets de l'element, voir Marching_Cubes_data.h).
-void Marching_Cubes::remplir_data_marching_cubes(const Zone& zone)
+void Marching_Cubes::remplir_data_marching_cubes(const Domaine& domaine)
 {
   // Detection du type d'element eulerien
-  const Elem_geom_base& elem_geom = zone.type_elem().valeur();
+  const Elem_geom_base& elem_geom = domaine.type_elem().valeur();
 
   const int (*def_aretes)[2]=0;      // Pointeur sur un tableau de 2 entiers
   const int (*def_aretes_faces)[2]=0;
@@ -481,9 +481,9 @@ True_int fonction_tri_mcubes_renum_virt_loc(const void *pt1, const void *pt2)
 // La difference avec le tableau dans Joint est la suivante:
 // Propriete : le tableau est trie par ordre croissant des numeros distants
 //             (pour recherche binaire rapide dans renum_sommets_dist_loc).
-void Marching_Cubes::remplir_renum_virt_loc(const Zone& zone)
+void Marching_Cubes::remplir_renum_virt_loc(const Domaine& domaine)
 {
-  const int nb_joints = zone.nb_joints();
+  const int nb_joints = domaine.nb_joints();
   renum_virt_loc_.dimensionner(nb_joints);
   indice_joint_.resize_array(nproc());
   indice_joint_ = -1;
@@ -495,7 +495,7 @@ void Marching_Cubes::remplir_renum_virt_loc(const Zone& zone)
       //  renum_unsorted(i,0) = numero de sommet sur le PE voisin
       //  renum_unsorted(i,1) = numero local du sommet
 
-      const Joint& joint = zone.joint(num_joint);
+      const Joint& joint = domaine.joint(num_joint);
       const IntTab& renum_unsorted = joint.renum_virt_loc();
       const int nb_sommets_joint = renum_unsorted.dimension(0);
       IntTab& renum_sorted = renum_virt_loc_[num_joint];
@@ -571,7 +571,7 @@ void Marching_Cubes::calculer_signe(const DoubleVect& valeurs_sommets,
 {
   int i;
 
-  const int nb_sommets = ref_zone_vf_.valeur().nb_som();
+  const int nb_sommets = ref_domaine_vf_.valeur().nb_som();
   assert(valeurs_sommets.size() == nb_sommets);
   signe.resize_array(nb_sommets);
   signe = 0;
@@ -603,14 +603,14 @@ int Marching_Cubes::construire_noeuds_et_facettes(const ArrOfBit& signe,
   int resultat_ok = 1; // Valeur de retour de la fonction
   int arete, elem, sommet;
 
-  const Zone& zone = ref_zone_vf_.valeur().zone();
+  const Domaine& domaine = ref_domaine_vf_.valeur().domaine();
   // Pour chaque element virtuel, numero du PE proprietaire :
-  const IntTab& elem_virt_pe_num = zone.elem_virt_pe_num();
+  const IntTab& elem_virt_pe_num = domaine.elem_virt_pe_num();
   // Raccourci vers les numeros des sommets des elements
-  const IntTab& elem_sommets = zone.les_elems();
-  const int nb_elements_reels = zone.nb_elem();
-  const int nb_elem_tot = zone.nb_elem_tot();
-  const int nb_sommets_reels = zone.nb_som();
+  const IntTab& elem_sommets = domaine.les_elems();
+  const int nb_elements_reels = domaine.nb_elem();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_sommets_reels = domaine.nb_som();
   // Mon numero de PE
   const int mon_PE = Process::me();
 
@@ -793,7 +793,7 @@ int Marching_Cubes::construire_noeuds_et_facettes(const ArrOfBit& signe,
  *
  *   Soit faces_sommets est une liste de faces d'un joint, dans ce cas, numero_PE
  *   est le PE_voisin du joint.
- *   Soit faces_sommets est la liste des faces de la zone et nb_faces_a_traiter
+ *   Soit faces_sommets est la liste des faces de la domaine et nb_faces_a_traiter
  *   est le nombre de faces de bord. Dans ce cas, numero_PE = nproc().
  *
  */
@@ -877,14 +877,14 @@ void Marching_Cubes::construire_noeuds_liste_faces(const ArrOfBit& signe,
 void Marching_Cubes::construire_noeuds_joints(const ArrOfBit& signe,
                                               IntTab& def_noeud) const
 {
-  const Zone_VF& zone_vf = ref_zone_vf_.valeur();
+  const Domaine_VF& domaine_vf = ref_domaine_vf_.valeur();
   // Creation des sommets situes sur les faces de bord
   {
-    // Les faces de bord sont les premieres faces de la zone
+    // Les faces de bord sont les premieres faces de la domaine
 
-    const IntTab& faces_sommets = zone_vf.face_sommets();
+    const IntTab& faces_sommets = domaine_vf.face_sommets();
     const int numero_PE = Process::nproc();
-    const int nb_faces_bord = zone_vf.nb_faces_bord();
+    const int nb_faces_bord = domaine_vf.nb_faces_bord();
 
     construire_noeuds_liste_faces(signe,
                                   faces_sommets,
@@ -948,8 +948,8 @@ void Marching_Cubes::construire_noeuds_uniques(IntTab& def_noeud,
 {
   const int mon_PE   = Process::me();
   const int nb_procs = Process::nproc();
-  const Zone_VF& zone_vf = ref_zone_vf_.valeur();
-  const IntTab& face_voisins = zone_vf.face_voisins();
+  const Domaine_VF& domaine_vf = ref_domaine_vf_.valeur();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
   const int nb_noeuds = def_noeud.dimension(0);
   ArrOfInt renumerotation(nb_noeuds);
   IntTab& facettes = maillage.facettes_;
@@ -1245,7 +1245,7 @@ void Marching_Cubes::calculer_coord_noeuds(const DoubleVect& valeurs_sommets,
                                            Maillage_FT_Disc& maillage) const
 {
   // Raccourci vers les coordonnees des sommets du maillage eulerien
-  const DoubleTab& coord_ = ref_zone_vf_.valeur().zone().domaine().coord_sommets();
+  const DoubleTab& coord_ = ref_domaine_vf_.valeur().domaine().coord_sommets();
   const int nb_noeuds = def_noeud.dimension(0);
   DoubleTab& coord_noeuds = maillage.sommets_;
   coord_noeuds.resize(nb_noeuds, dimension);

@@ -83,8 +83,8 @@ void Op_Dift_IJK_VDF_Face::completer()
   dvy_.allocate(split, IJK_Splitting::FACES_J, 0);
   dvz_.allocate(split, IJK_Splitting::FACES_K, 0);
 
-  const Zone_VDF& zone_vdf = ref_cast(Zone_VDF, equation().zone_dis().valeur());
-  flux_bords_.resize(zone_vdf.nb_faces_bord(),dimension);
+  const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, equation().domaine_dis().valeur());
+  flux_bords_.resize(domaine_vdf.nb_faces_bord(),dimension);
 }
 
 void Op_Dift_IJK_VDF_Face::associer_diffusivite(const Champ_base& nu)

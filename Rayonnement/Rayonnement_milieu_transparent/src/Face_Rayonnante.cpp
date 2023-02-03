@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Face_Rayonnante.h>
-#include <Zone_VF.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_VF.h>
+#include <Domaine_Cl_dis_base.h>
 #include <EcrFicPartage.h>
 
 Implemente_instanciable_sans_destructeur(Face_Rayonnante,"Face_Rayonnante",Objet_U);
@@ -175,8 +175,8 @@ void  Face_Rayonnante::ecrire_temperature_bord() const
       if (faces_j.nb_faces_bord()!=0)
         {
           const Frontiere& le_bord =  faces_j.la_cl_base().frontiere_dis().frontiere();
-          const Zone_VF& zone_dis=ref_cast(Zone_VF, faces_j.la_cl_base().zone_Cl_dis().zone_dis().valeur());
-          const DoubleTab& xv=zone_dis.xv();
+          const Domaine_VF& domaine_dis=ref_cast(Domaine_VF, faces_j.la_cl_base().domaine_Cl_dis().domaine_dis().valeur());
+          const DoubleTab& xv=domaine_dis.xv();
           double surf;
           int nbfacesbord=le_bord.nb_faces();
           const IntVect& tables_faces =faces_j.Table_faces();

@@ -23,7 +23,7 @@
 #include <Discret_Thyd.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Param.h>
 #include <Debog.h>
 #include <communications.h>
@@ -71,7 +71,7 @@ void Transport_K_ou_Eps_base::discretiser()
   if (sub_type(Discret_Thyd,discretisation()))
     {
       Cerr << "K,Eps transport equation ("<< que_suis_je() <<") discretization" << finl;
-      discretiser_K_Eps(schema_temps(),zone_dis(),le_champ_);
+      discretiser_K_Eps(schema_temps(),domaine_dis(),le_champ_);
       champs_compris_.ajoute_champ(le_champ_);
       if (modele_turbulence().equation().calculate_time_derivative())
         {
@@ -91,7 +91,7 @@ void Transport_K_ou_Eps_base::discretiser()
 }
 
 void Transport_K_ou_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
-                                                Zone_dis& z, Champ_Inc& ch) const
+                                                Domaine_dis& z, Champ_Inc& ch) const
 {
   Cerr << "K_or_Eps field discretization" << finl;
   Noms noms(1);
@@ -168,7 +168,7 @@ void Transport_K_ou_Eps_base::associer(const Equation_base& eqn_hydr)
 {
   Equation_base::associer_pb_base(eqn_hydr.probleme());
   Equation_base::associer_sch_tps_base(eqn_hydr.schema_temps());
-  Equation_base::associer_zone_dis(eqn_hydr.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_hydr.domaine_dis());
 }
 
 /*! @brief Controle le champ inconnue K-epsilon en forcant a zero les valeurs du champ
@@ -184,7 +184,7 @@ int Transport_K_ou_Eps_base::controler_variable()
   if (size<0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_.valeur()))
-        size = le_champ_.valeur().equation().zone_dis().zone().nb_elem();
+        size = le_champ_.valeur().equation().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_ou_Eps field in Transport_K_ou_Eps_base::controler_variable()" << finl;
@@ -205,7 +205,7 @@ int Transport_K_ou_Eps_base::controler_variable()
      if (this->que_suis_je()=="Transport_K_Eps") control=0;
      #endif
   */
-  const Zone_VF& zone_vf = ref_cast(Zone_VF,zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
 
   double Le_MIN = modele_turbulence().get_LeEPS_MIN();
 
@@ -216,8 +216,8 @@ int Transport_K_ou_Eps_base::controler_variable()
       Le_MIN = modele_turbulence().get_LeK_MIN();
     }
 
-  const IntTab& face_voisins = zone_vf.face_voisins();
-  const IntTab& elem_faces = zone_vf.elem_faces();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
   // PL on ne fixe au seuil minimum que si negatifs
   // car la loi de paroi peut fixer a des valeurs tres petites
   // et le rapport K*K/eps est coherent
@@ -233,13 +233,13 @@ int Transport_K_ou_Eps_base::controler_variable()
           neg[0] += (  var<0 ? 1 : 0);
 
           position="x=";
-          position+=(Nom)zone_vf.xv(n,0);
+          position+=(Nom)domaine_vf.xv(n,0);
           position+=" y=";
-          position+=(Nom)zone_vf.xv(n,1);
+          position+=(Nom)domaine_vf.xv(n,1);
           if (dimension==3)
             {
               position+=" z=";
-              position+=(Nom)zone_vf.xv(n,2);
+              position+=(Nom)domaine_vf.xv(n,2);
             }
           // On impose une valeur plus physique (moyenne des elements voisins)
           var = 0;
@@ -268,13 +268,13 @@ int Transport_K_ou_Eps_base::controler_variable()
             {
               // K-Eps on cells (eg:VDF)
               position="x=";
-              position+=(Nom)zone_vf.xp(n,0);
+              position+=(Nom)domaine_vf.xp(n,0);
               position+=" y=";
-              position+=(Nom)zone_vf.xp(n,1);
+              position+=(Nom)domaine_vf.xp(n,1);
               if (dimension==3)
                 {
                   position+=" z=";
-                  position+=(Nom)zone_vf.xp(n,2);
+                  position+=(Nom)domaine_vf.xp(n,2);
                 }
               nvar = 0;   // var -> var_min
               /* Error in algorithm ?
@@ -320,26 +320,26 @@ int Transport_K_ou_Eps_base::controler_variable()
               // K-Eps on faces (eg:VEF)
 
               position="x=";
-              position+=(Nom)zone_vf.xv(n,0);
+              position+=(Nom)domaine_vf.xv(n,0);
               position+=" y=";
-              position+=(Nom)zone_vf.xv(n,1);
+              position+=(Nom)domaine_vf.xv(n,1);
               if (dimension==3)
                 {
                   position+=" z=";
-                  position+=(Nom)zone_vf.xv(n,2);
+                  position+=(Nom)domaine_vf.xv(n,2);
                 }
             }
           else
             {
               // K-Eps on cells (eg:VDF)
               position="x=";
-              position+=(Nom)zone_vf.xp(n,0);
+              position+=(Nom)domaine_vf.xp(n,0);
               position+=" y=";
-              position+=(Nom)zone_vf.xp(n,1);
+              position+=(Nom)domaine_vf.xp(n,1);
               if (dimension==3)
                 {
                   position+=" z=";
-                  position+=(Nom)zone_vf.xp(n,2);
+                  position+=(Nom)domaine_vf.xp(n,2);
                 }
             }
 

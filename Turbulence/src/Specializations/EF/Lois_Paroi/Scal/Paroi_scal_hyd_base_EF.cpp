@@ -58,20 +58,20 @@ Entree& Paroi_scal_hyd_base_EF::readOn(Entree& s)
 //  Implementation des fonctions de la classe Paroi_std_hyd_EF
 //
 /////////////////////////////////////////////////////////////////////
-void Paroi_scal_hyd_base_EF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_scal_hyd_base_EF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_EF = ref_cast(Zone_EF,zone_dis.valeur());
-  la_zone_Cl_EF = ref_cast(Zone_Cl_EF,zone_Cl_dis.valeur());
+  le_dom_EF = ref_cast(Domaine_EF,domaine_dis.valeur());
+  le_dom_Cl_EF = ref_cast(Domaine_Cl_EF,domaine_Cl_dis.valeur());
   // On initialise tout de suite la loi de paroi
   Paroi_scal_hyd_base_EF::init_lois_paroi();
 }
 
 DoubleVect& Paroi_scal_hyd_base_EF::equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const
 {
-  int nb_boundaries=la_zone_EF->zone().nb_front_Cl();
+  int nb_boundaries=le_dom_EF->domaine().nb_front_Cl();
   for (int n_bord=0; n_bord<nb_boundaries; n_bord++)
     {
-      const Front_VF& fr_vf = la_zone_EF->front_VF(n_bord);
+      const Front_VF& fr_vf = le_dom_EF->front_VF(n_bord);
       int nb_faces=fr_vf.nb_faces();
       if (fr_vf.le_nom() == nom_bord)
         {
@@ -85,15 +85,15 @@ DoubleVect& Paroi_scal_hyd_base_EF::equivalent_distance_name(DoubleVect& d_eq, c
 
 int Paroi_scal_hyd_base_EF::init_lois_paroi()
 {
-  int nb_faces_bord_reelles=la_zone_EF->nb_faces_bord();
+  int nb_faces_bord_reelles=le_dom_EF->nb_faces_bord();
   tab_d_reel_.resize(nb_faces_bord_reelles);
 
   // Initialisations de equivalent_distance_, tab_d_reel, positions_Pf, elems_plus
   // On initialise les distances equivalentes avec les distances geometriques
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
-  const IntTab& face_voisins = zone_EF.face_voisins();
-  const DoubleVect& volumes_maille = zone_EF.volumes();
-  const DoubleVect& surfaces_face = zone_EF.face_surfaces();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
+  const IntTab& face_voisins = domaine_EF.face_voisins();
+  const DoubleVect& volumes_maille = domaine_EF.volumes();
+  const DoubleVect& surfaces_face = domaine_EF.face_surfaces();
 
   if (axi)
     {
@@ -102,11 +102,11 @@ int Paroi_scal_hyd_base_EF::init_lois_paroi()
     }
   else
     {
-      int nb_front=zone_EF.nb_front_Cl();
+      int nb_front=domaine_EF.nb_front_Cl();
       equivalent_distance_.dimensionner(nb_front);
       for (int n_bord=0; n_bord<nb_front; n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           int size=le_bord.nb_faces();
@@ -143,8 +143,8 @@ int Paroi_scal_hyd_base_EF::init_lois_paroi()
 
 void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
 {
-  const Zone_EF& zone_EF = la_zone_EF.valeur();
-  const IntTab& face_voisins = zone_EF.face_voisins();
+  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
+  const IntTab& face_voisins = domaine_EF.face_voisins();
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
@@ -154,24 +154,24 @@ void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
 
   const DoubleTab& conductivite_turbulente = mon_modele_turb_scal->conductivite_turbulente().valeurs();
 
-  const IntTab& elems=zone_EF.zone().les_elems() ;
-  int nsom = zone_EF.nb_som_face();
-  int nsom_elem = zone_EF.zone().nb_som_elem();
+  const IntTab& elems=domaine_EF.domaine().les_elems() ;
+  int nsom = domaine_EF.nb_som_face();
+  int nsom_elem = domaine_EF.domaine().nb_som_elem();
   ArrOfInt nodes_face(nsom);
   int nb_nodes_free = nsom_elem - nsom;
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
 
-  for (int n_bord=0; n_bord<zone_EF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_EF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_EF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur())) )
         {
-          const Zone_Cl_EF& zone_Cl_EF_th = ref_cast(Zone_Cl_EF, eqn.probleme().equation(1).zone_Cl_dis().valeur());
-          const Cond_lim& la_cl_th = zone_Cl_EF_th.les_conditions_limites(n_bord);
+          const Domaine_Cl_EF& domaine_Cl_EF_th = ref_cast(Domaine_Cl_EF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Cond_lim& la_cl_th = domaine_Cl_EF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           if(je_suis_maitre())
@@ -221,8 +221,8 @@ void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
           nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
-              double x=zone_EF.xv(num_face,0);
-              double y=zone_EF.xv(num_face,1);
+              double x=domaine_EF.xv(num_face,0);
+              double y=domaine_EF.xv(num_face,1);
               double lambda,lambda_t;
               elem = face_voisins(num_face,0);
               if (elem == -1)
@@ -242,7 +242,7 @@ void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
                 Nusselt << x << "\t| " << y;
               if (dimension == 3)
                 {
-                  double z=zone_EF.xv(num_face,2);
+                  double z=domaine_EF.xv(num_face,2);
                   Nusselt << x << "\t| " << y << "\t| " << z;
                 }
 
@@ -251,7 +251,7 @@ void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
               nodes_face=0;
               for(int jsom=0; jsom<nsom; jsom++)
                 {
-                  int num_som = zone_EF.face_sommets(num_face, jsom);
+                  int num_som = domaine_EF.face_sommets(num_face, jsom);
                   nodes_face[jsom] = num_som;
                   tparoi+=temperature(num_som)/nsom;
                 }

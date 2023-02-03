@@ -28,7 +28,7 @@
 #include <Remailleur_Collision_FT.h>
 
 class Maillage_FT_Disc;
-class Zone_VF;
+class Domaine_VF;
 class Remailleur_Collision_FT;
 class Motcle;
 class Champ_base;
@@ -40,7 +40,7 @@ class Remaillage_FT;
  *
  * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
  */
-class Zone_VF;
+class Domaine_VF;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 
@@ -55,7 +55,7 @@ public:
                                    Champ_base& indicatrice,
                                    Remaillage_FT& algo_remaillage_local);
 
-  virtual int calculer_composantes_connexes_pour_suppression(const Zone_VF& zone_vf,
+  virtual int calculer_composantes_connexes_pour_suppression(const Domaine_VF& domaine_vf,
                                                              const DoubleTab& indicatrice,
                                                              IntVect& num_compo) const;
 

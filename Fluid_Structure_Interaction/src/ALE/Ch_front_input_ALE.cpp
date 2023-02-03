@@ -117,9 +117,8 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   //int nb_faces=front.nb_faces();
-  const Zone& zone=front.zone();
+  const Domaine& domaine=front.domaine();
   const Faces& faces=front.faces();
-  const Domaine& domaine=zone.domaine();
   //int nbsf=faces.nb_som_faces();
   int i,j;
   int nb_som_tot=domaine.nb_som_tot();
@@ -128,7 +127,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   //if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
   //  {
   //    vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
-  //    const MD_Vector& md = zone.domaine().md_vector_sommets();
+  //    const MD_Vector& md = domaine.domaine().md_vector_sommets();
   //    MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
   //  }
 

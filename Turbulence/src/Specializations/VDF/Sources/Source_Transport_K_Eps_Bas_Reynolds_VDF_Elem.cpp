@@ -32,9 +32,9 @@ Entree& Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::readOn(Entree& is) { retur
 void Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::fill_resu_bas_reyn(const DoubleTrav& P, const DoubleTrav& D, const DoubleTrav& E, const DoubleTrav& F1, const DoubleTrav& F2,DoubleTab& resu) const
 {
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
 
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if (K_eps_Bas_Re(elem,0) > 1.e-20 && K_eps_Bas_Re(elem,1) > 1.e-20)
         {

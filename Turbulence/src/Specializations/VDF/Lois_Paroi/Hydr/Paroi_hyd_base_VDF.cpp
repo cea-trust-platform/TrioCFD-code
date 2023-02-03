@@ -22,11 +22,11 @@
 
 #include <Paroi_hyd_base_VDF.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Fluide_Quasi_Compressible.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <EcrFicPartage.h>
 #include <Mod_turb_hyd_base.h>
 #include <Schema_Temps_base.h>
@@ -61,20 +61,20 @@ Entree& Paroi_hyd_base_VDF::readOn(Entree& s)
 //
 /////////////////////////////////////////////////////////////////////
 
-void Paroi_hyd_base_VDF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_hyd_base_VDF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 void Paroi_hyd_base_VDF::init_lois_paroi_()
 {
-  tab_u_star_.resize(la_zone_VDF->nb_faces_bord());
-  tab_d_plus_.resize(la_zone_VDF->nb_faces_bord());
+  tab_u_star_.resize(le_dom_VDF->nb_faces_bord());
+  tab_d_plus_.resize(le_dom_VDF->nb_faces_bord());
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
     {
       Cisaillement_paroi_.resize(0, dimension);
-      la_zone_VDF.valeur().creer_tableau_faces_bord(Cisaillement_paroi_);
+      le_dom_VDF.valeur().creer_tableau_faces_bord(Cisaillement_paroi_);
     }
 }
 
@@ -82,14 +82,14 @@ void Paroi_hyd_base_VDF::imprimer_premiere_ligne_ustar(int boundaries_, const LI
 {
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   Nom ligne, err;
   err="";
   ligne="# Time   \tMean(u*) \tMean(d+)";
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       const Nom& nom_bord = la_cl.frontiere_dis().le_nom();
       if( je_suis_maitre()
           && ( boundaries_list.contient(nom_bord) || boundaries_list.size()==0 ) )
@@ -124,7 +124,7 @@ void Paroi_hyd_base_VDF::imprimer_premiere_ligne_ustar(int boundaries_, const LI
 
 void Paroi_hyd_base_VDF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const Probleme_base& pb=mon_modele_turb_hyd->equation().probleme();
   const Schema_Temps_base& sch=pb.schema_temps();
   int ndeb,nfin, size0, num_bord;
@@ -136,7 +136,7 @@ void Paroi_hyd_base_VDF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
     }
   else
     {
-      size0=zone_VDF.nb_front_Cl();
+      size0=domaine_VDF.nb_front_Cl();
     }
   DoubleTrav moy_bords(size0+1,3);
   moy_bords=0.;
@@ -144,9 +144,9 @@ void Paroi_hyd_base_VDF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
@@ -178,9 +178,9 @@ void Paroi_hyd_base_VDF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
     }
 
   num_bord=0;
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {

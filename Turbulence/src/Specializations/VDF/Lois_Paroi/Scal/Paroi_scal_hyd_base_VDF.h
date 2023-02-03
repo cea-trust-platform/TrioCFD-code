@@ -24,9 +24,9 @@
 #define Paroi_scal_hyd_base_VDF_included
 
 #include <Turbulence_paroi_scal_base.h>
-#include <Zone_VDF.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 
 /*! @brief classe Paroi_scal_hyd_base_VDF
  *
@@ -42,15 +42,15 @@ class Paroi_scal_hyd_base_VDF : public Turbulence_paroi_scal_base
   Declare_base(Paroi_scal_hyd_base_VDF);
 
 public:
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   int init_lois_paroi() override;
   void imprimer_nusselt(Sortie&) const override;
   DoubleVect& equivalent_distance_name(DoubleVect& d_equiv, const Nom& nom_bord) const override;
 
 protected:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
   mutable int nb_impr_;        // Compteur d'impression
 

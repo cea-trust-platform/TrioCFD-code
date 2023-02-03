@@ -24,10 +24,10 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Probleme_base.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face,"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_P1NC",Source_Transport_K_Eps_Bas_Reynolds_VEF_Face);
 
@@ -52,12 +52,12 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::associer_pb(const
 // Elie Saikali : TODO : FIXME : a factoriser avec Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(DoubleTab& resu) const
 {
-  const Zone_Cl_dis& zcl = eq_hydraulique->zone_Cl_dis();
-  const Zone_Cl_dis& zcl_keps = eqn_keps_bas_re->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps = eqn_keps_bas_re->zone_dis();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, eq_hydraulique->zone_dis().valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zcl.valeur());
-  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF, eq_thermique->zone_Cl_dis().valeur());
+  const Domaine_Cl_dis& zcl = eq_hydraulique->domaine_Cl_dis();
+  const Domaine_Cl_dis& zcl_keps = eqn_keps_bas_re->domaine_Cl_dis();
+  const Domaine_dis& domaine_dis_keps = eqn_keps_bas_re->domaine_dis();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, eq_hydraulique->domaine_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, zcl.valeur());
+  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF, eq_thermique->domaine_Cl_dis().valeur());
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
@@ -69,20 +69,20 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
-  int nb_faces = zone_VEF.nb_faces();
-  const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
+  int nb_faces = domaine_VEF.nb_faces();
+  const DoubleVect& vol_ent = domaine_VEF.volumes_entrelaces();
 
   DoubleTrav P(nb_faces), G(nb_faces), G1(nb_faces), D(nb_faces), E(nb_faces), F1(nb_faces), F2(nb_faces);
 
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_D(D,domaine_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E,domaine_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  mon_modele_fonc.Calcul_F2(F2,D,domaine_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
-  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
+  calculer_terme_production_K(domaine_VEF,domaine_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
 
-  // C'est l'objet de type zone_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
+  // C'est l'objet de type domaine_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
-  calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
+  calculer_terme_destruction_K_gen(domaine_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
 
   for (int num_face=0; num_face<nb_faces; num_face++)
     {

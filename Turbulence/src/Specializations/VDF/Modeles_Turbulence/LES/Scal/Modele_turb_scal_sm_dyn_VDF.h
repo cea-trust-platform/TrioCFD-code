@@ -22,14 +22,14 @@
 #define Modele_turb_scal_sm_dyn_VDF_included
 
 #include <Modele_turbulence_scal_base.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <Motcle.h>
 #include <Champ_Fonc.h>
 #include <TRUSTTab.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 class Modele_turb_scal_sm_dyn_VDF : public Modele_turbulence_scal_base
 {
@@ -38,7 +38,7 @@ class Modele_turb_scal_sm_dyn_VDF : public Modele_turbulence_scal_base
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
   ////virtual Entree& lire(const Motcle&, Entree&);
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -87,8 +87,8 @@ protected:
 
 private:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 
 

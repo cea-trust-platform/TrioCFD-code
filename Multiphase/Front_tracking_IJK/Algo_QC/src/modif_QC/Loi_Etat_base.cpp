@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Champ_Fonc_Tabule.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Debog.h>
 
 Implemente_base_sans_constructeur(Loi_Etat_base,"Loi_Etat_base",Objet_U);
@@ -248,8 +248,8 @@ void Loi_Etat_base::calculer_nu()
     }
   else
     {
-      //const IntTab& elem_faces=ref_cast(Zone_VF,ref_cast(Champ_Fonc_P0_VEF,nu.valeur()).zone_dis_base()).elem_faces();
-      const IntTab& elem_faces=ref_cast(Zone_VF,le_fluide->vitesse().zone_dis_base()).elem_faces();
+      //const IntTab& elem_faces=ref_cast(Domaine_VF,ref_cast(Champ_Fonc_P0_VEF,nu.valeur()).domaine_dis_base()).elem_faces();
+      const IntTab& elem_faces=ref_cast(Domaine_VF,le_fluide->vitesse().domaine_dis_base()).elem_faces();
       double rhoelem;
       int nfe=elem_faces.dimension(1),face;
       if (sub_type(Champ_Uniforme,mu.valeur()))

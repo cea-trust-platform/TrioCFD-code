@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Modele_standard_KEps_VEF.h>
 
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Champ_Uniforme.h>
 #include <Scatter.h>
 #include <Champ_P1NC.h>
@@ -59,32 +59,32 @@ void Modele_standard_KEps_VEF::lire_distance_paroi( )
 
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_D(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_standard_KEps_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                               const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D = 0;
   return D;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   E = 0;
   return E;
 }
 
-/* DoubleTab& Modele_standard_KEps_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis) const
+/* DoubleTab& Modele_standard_KEps_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
 }
 */
-DoubleTab& Modele_standard_KEps_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   // Calcul de F1
   for (num_face=0; num_face <nb_faces; num_face ++ )
@@ -94,10 +94,10 @@ DoubleTab& Modele_standard_KEps_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& z
   return F1;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
 
   for (num_face=0; num_face<nb_faces  ; num_face++)
@@ -108,10 +108,10 @@ DoubleTab& Modele_standard_KEps_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   return F2;
 }
 
-DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
 
   for (num_face=0; num_face <nb_faces; num_face ++ )
@@ -122,10 +122,10 @@ DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
   return Fmu;
 }
 
-DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
 
   for (num_face=0; num_face <nb_faces; num_face ++ )
@@ -136,10 +136,10 @@ DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_
   return Fmu;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
 
   for (num_face=0; num_face<nb_faces  ; num_face++)
@@ -150,10 +150,10 @@ DoubleTab& Modele_standard_KEps_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
   return F2;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
-  int nb_faces = la_zone.nb_faces();
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  int nb_faces = le_dom.nb_faces();
   int num_face;
   // Calcul de F1
   for (num_face=0; num_face <nb_faces; num_face ++ )
@@ -163,13 +163,13 @@ DoubleTab& Modele_standard_KEps_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_di
   return F1;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_standard_KEps_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   E = 0;
   return E;
 }
 
-DoubleTab& Modele_standard_KEps_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+DoubleTab& Modele_standard_KEps_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                   const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D = 0;

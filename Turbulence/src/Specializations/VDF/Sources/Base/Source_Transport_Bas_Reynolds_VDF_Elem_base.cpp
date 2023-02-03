@@ -21,7 +21,7 @@
 
 #include <Source_Transport_Bas_Reynolds_VDF_Elem_base.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
 #include <Champ_Face_VDF.h>
@@ -49,21 +49,21 @@ void Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter_blocs(matrices_t matri
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const Zone_Cl_dis& zcl_keps=eqn_keps_bas_re->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps =eqn_keps_bas_re ->zone_dis();
+  const Domaine_Cl_dis& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
+  const Domaine_dis& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
-  const int nb_elem = la_zone_VDF->nb_elem();
+  const int nb_elem = le_dom_VDF->nb_elem();
 
   DoubleTrav P(visco_turb), D(visco_turb), E(visco_turb), F1(nb_elem), F2(nb_elem);
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_D(D,domaine_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
   D.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  mon_modele_fonc.Calcul_E(E,domaine_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
   E.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re, ch_visco_cin);
+  mon_modele_fonc.Calcul_F2(F2,D,domaine_dis_keps,K_eps_Bas_Re, ch_visco_cin);
 
-  // Rq : la distinction entre zone_cl est importante pour les deux equations pour l imposition des conditions aux limites!!!!!!
-  if (axi) calculer_terme_production_K_Axi(la_zone_VDF.valeur(),vitesse,P,K_eps_Bas_Re,visco_turb);
-  else calculer_terme_production_K(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_eps_Bas_Re,vit,vitesse,visco_turb);
+  // Rq : la distinction entre domaine_cl est importante pour les deux equations pour l imposition des conditions aux limites!!!!!!
+  if (axi) calculer_terme_production_K_Axi(le_dom_VDF.valeur(),vitesse,P,K_eps_Bas_Re,visco_turb);
+  else calculer_terme_production_K(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K_eps_Bas_Re,vit,vitesse,visco_turb);
   P.echange_espace_virtuel();
 
   fill_resu_bas_reyn(P,D,E,F1,F2,resu);

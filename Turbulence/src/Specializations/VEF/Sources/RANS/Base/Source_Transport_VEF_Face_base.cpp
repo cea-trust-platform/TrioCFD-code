@@ -26,19 +26,19 @@
 #include <Champ_Uniforme.h>
 #include <Constituant.h>
 #include <Fluide_base.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_base_sans_constructeur( Source_Transport_VEF_Face_base, "Source_Transport_VEF_Face_base", Source_base );
 
 Sortie& Source_Transport_VEF_Face_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VEF_Face_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VEF_Face_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis)
+void Source_Transport_VEF_Face_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
 }
 
 void Source_Transport_VEF_Face_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -51,15 +51,15 @@ DoubleTab& Source_Transport_VEF_Face_base::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF, eq_hydraulique->zone_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleVect& volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
-  const int nb_faces_ = la_zone_VEF->nb_faces();
+  const int nb_faces_ = le_dom_VEF->nb_faces();
   DoubleTrav P(nb_faces_);
   const DoubleTab& K = get_K_pour_production(); // voir les classes filles
-  calculer_terme_production_K(la_zone_VEF.valeur(), zone_Cl_VEF, P, K, vit, visco_turb);
+  calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, vit, visco_turb);
 
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = get_modele_fonc_bas_reyn(); // voir les classes filles
   const int is_modele_fonc = (mon_modele_fonc.non_nul());
@@ -76,7 +76,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
       calcul_tabs_bas_reyn(P, vit, visco_turb, ch_visco_cin, ch_visco_cin_ou_dyn, D, E, F1, F2); // voir les classes filles
 
       // Pour modele EASM
-      const int nb_elem_tot = la_zone_VEF->nb_elem_tot();
+      const int nb_elem_tot = le_dom_VEF->nb_elem_tot();
 
       int is_Reynolds_stress_isotrope = mon_modele_fonc.Calcul_is_Reynolds_stress_isotrope();
       if (is_Reynolds_stress_isotrope == 0)
@@ -88,12 +88,12 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
           visco_tab = visco_scal(0, 0);
           DoubleTab gradient_elem(nb_elem_tot, Objet_U::dimension, Objet_U::dimension);
           gradient_elem = 0.;
-          Champ_P1NC::calcul_gradient(vit, gradient_elem, zone_Cl_VEF);
+          Champ_P1NC::calcul_gradient(vit, gradient_elem, domaine_Cl_VEF);
           /*Paroi*/
           const Nom lp = get_type_paroi(); // voir les classes filles
           if (lp != "negligeable_VEF")
             if (mon_equation->schema_temps().nb_pas_dt() > 0)
-              Champ_P1NC::calcul_duidxj_paroi(gradient_elem, visco_tab, visco_turb, tab, zone_Cl_VEF);
+              Champ_P1NC::calcul_duidxj_paroi(gradient_elem, visco_tab, visco_turb, tab, domaine_Cl_VEF);
 
           gradient_elem.echange_espace_virtuel();
           DoubleTab Re(gradient_elem);
@@ -101,7 +101,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
           calcul_tenseur_reyn(visco_turb, gradient_elem, Re); // voir les classes filles
           Re.echange_espace_virtuel();
 
-          calculer_terme_production_K_EASM(la_zone_VEF.valeur(), zone_Cl_VEF, P, K, gradient_elem, visco_turb, Re);
+          calculer_terme_production_K_EASM(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, gradient_elem, visco_turb, Re);
         }  // Fin pour modele EASM
 
       fill_resu_bas_rey(volumes_entrelaces, P, D, E, F1, F2, resu); // voir les classes filles
@@ -114,18 +114,18 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF,eq_thermique->zone_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF,eq_thermique->domaine_Cl_dis().valeur());
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
   const DoubleTab& g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleVect& volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
-  const int nb_face = la_zone_VEF->nb_faces();
+  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
+  const int nb_face = le_dom_VEF->nb_faces();
   DoubleTrav G(nb_face);
 
-  // C'est l'objet de type zone_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
-  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(),zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
+  // C'est l'objet de type domaine_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
+  calculer_terme_destruction_K_gen(le_dom_VEF.valeur(),zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
 
   fill_resu_anisotherme(G,volumes_entrelaces,resu); // voir les classes filles
   return resu;
@@ -134,18 +134,18 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) 
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Zone_Cl_VEF& zcl_VEF_co = ref_cast(Zone_Cl_VEF, eq_concentration->zone_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis().valeur());
   const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
 //  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const DoubleVect& g = gravite->valeurs();
   const Champ_Don& ch_beta_concen = beta_c.valeur();
-  const DoubleVect& volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
-  const int nb_face = la_zone_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
+  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
+  const int nb_face = le_dom_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
   DoubleTrav G(nb_face);
 
-  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(), zcl_VEF_co, G, concen, lambda_turb, ch_beta_concen, g, nb_consti);
+  calculer_terme_destruction_K_gen(le_dom_VEF.valeur(), zcl_VEF_co, G, concen, lambda_turb, ch_beta_concen, g, nb_consti);
 
   fill_resu_concen(G,volumes_entrelaces,resu); // voir les classes filles
   return resu;
@@ -155,8 +155,8 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF, eq_thermique->zone_Cl_dis().valeur());
-  const Zone_Cl_VEF& zcl_VEF_co = ref_cast(Zone_Cl_VEF, eq_concentration->zone_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF, eq_thermique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis().valeur());
   const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
 
@@ -166,13 +166,13 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab&
   DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs());
   double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
   alpha_turb /= rhocp;
-  const DoubleVect& g = gravite->valeurs(), &volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
+  const DoubleVect& g = gravite->valeurs(), &volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   const Champ_Don& ch_beta_temper = beta_t.valeur(), &ch_beta_concen = beta_c.valeur();
-  const int nb_face = la_zone_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
+  const int nb_face = le_dom_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
   DoubleTrav P(nb_face), G_t(nb_face), G_c(nb_face);
 
-  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(), zcl_VEF_th, G_t, temper, alpha_turb, ch_beta_temper, g, 0);
-  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(), zcl_VEF_co, G_c, concen, alpha_turb, ch_beta_concen, g, nb_consti);
+  calculer_terme_destruction_K_gen(le_dom_VEF.valeur(), zcl_VEF_th, G_t, temper, alpha_turb, ch_beta_temper, g, 0);
+  calculer_terme_destruction_K_gen(le_dom_VEF.valeur(), zcl_VEF_co, G_c, concen, alpha_turb, ch_beta_concen, g, nb_consti);
 
   fill_resu_anisotherme_concen(G_t, G_c, volumes_entrelaces,resu); // voir les classes filles
   return resu;

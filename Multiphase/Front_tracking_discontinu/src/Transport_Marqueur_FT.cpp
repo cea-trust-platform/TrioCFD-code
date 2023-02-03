@@ -28,9 +28,10 @@
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_Diphasique.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Source_Reaction_Particules.h>
 #include <Domaine.h>
+#include <Sous_Domaine.h>
 #include <Source_Masse_Ajoutee.h>
 #include <communications.h>
 #include <Param.h>
@@ -261,7 +262,7 @@ Entree& Transport_Marqueur_FT::lire_injection(Entree& is)
 }
 
 //Lecture des informations specifiques a la transformation
-//-localisation       : nb_sz nom_sz1 ... (lecture des sous zones ou sont declenchees la transformation)
+//-localisation       : nb_sz nom_sz1 ... (lecture des sous domaines ou sont declenchees la transformation)
 //-taille               : diametre_min value ou beta_transfo value (diamtre minimum ou coefficient multiplicatif du volume de controle)
 //-t_debut_transfo    : Instant de la premiere injection
 //-dt_transfo              : Periodique de transformation
@@ -300,11 +301,11 @@ void Transport_Marqueur_FT::discretiser(void)
   suffix += le_nom();
   fieldname = "CHAMP_BIDON";
   fieldname += suffix;
-  const Zone_dis_base& une_zone_dis = zone_dis().valeur();
+  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
   const double temps = schema_temps().temps_courant();
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
-  discr.discretiser_champ("champ_elem", une_zone_dis,
+  discr.discretiser_champ("champ_elem", une_domaine_dis,
                           fieldname, "-",
                           1 /* composantes */, nb_valeurs_temps,
                           temps,
@@ -313,8 +314,8 @@ void Transport_Marqueur_FT::discretiser(void)
 
   Transport_Interfaces_FT_Disc::discretiser();
 
-  const Zone& zone = une_zone_dis.zone();
-  maillage_interface().associer_zone(zone);
+  const Domaine& domaine = une_domaine_dis.domaine();
+  maillage_interface().associer_domaine(domaine);
 }
 
 /*! @brief Complete la construction (initialisation) des objets : maillage_interface et proprietes_particules_
@@ -325,11 +326,11 @@ void Transport_Marqueur_FT::discretiser(void)
 void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
-  ////la_zone_Cl_dis->completer();
-  const Zone& zone = la_zone_dis.valeur().zone();
+  ////le_dom_Cl_dis->completer();
+  const Domaine& domaine = le_dom_dis.valeur().domaine();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
-  ens_points.associer_zone(zone);
+  ens_points.associer_domaine(domaine);
   ens_points.generer_structure();
   ens_points.associer_equation_transport(*this);
 
@@ -338,7 +339,7 @@ void Transport_Marqueur_FT::completer()
   proprietes_particules().nettoyer(som_init);
 
   Maillage_FT_Disc& ens_points_inject = maillage_inject();
-  ens_points_inject.associer_zone(zone);
+  ens_points_inject.associer_domaine(domaine);
   ens_points_inject.generer_structure();
   ens_points_inject.associer_equation_transport(*this);
 
@@ -668,7 +669,7 @@ void Transport_Marqueur_FT::transformer(double temps)
 
 //-Identification des groupes connexes
 //-calcul des proprietes geometriques equivalentes (positions, volumes et diametres) de ces goupes
-//-Detection des groupes a supprimer (situe dans une sous zone specifie par utilisateur
+//-Detection des groupes a supprimer (situe dans une sous domaine specifie par utilisateur
 //                                      ou de diametre inferieur a un diametre specifie par l utilsateur)
 //-Construction de l objet maillage (ensemble de points) et proprietes (proprietes materielles) a injecter
 //-Suppression des groupes connexes identifies a supprimer
@@ -726,8 +727,8 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
                                                            ArrOfDouble&         volumes,
                                                            DoubleTab&                 positions)
 {
-  const Zone_dis_base& zdis_base = zone_dis().valeur();
-  const Zone_VF& zvf = ref_cast(Zone_VF,zdis_base);
+  const Domaine_dis_base& zdis_base = domaine_dis().valeur();
+  const Domaine_VF& zvf = ref_cast(Domaine_VF,zdis_base);
   const DoubleVect& vol_elem = zvf.volumes();
   const DoubleTab& xp_elem = zvf.xp();
   int nb_elem = zvf.nb_elem();
@@ -765,8 +766,8 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
 
 //Parmi l ensemble des groupes connexes identifies, on detecte ceux qui sont a supprimer
 //Les criteres de suppression retenus sont :
-// -le centre de gravite du groupe est dans une sous zone definie par l utilisateur
-// (pour un groupe connexe donne, on parcours les sous zones pour tester si l une d entre elles
+// -le centre de gravite du groupe est dans une sous domaine definie par l utilisateur
+// (pour un groupe connexe donne, on parcours les sous domaines pour tester si l une d entre elles
 //  contient le centre de gravite du groupe)
 // -le diametre caracteristique du groupe connexe considere est plus petit qu un diametre_min
 // defini par l utilisateur ou plus petite que beta fois le volume elementaire contenant le
@@ -776,36 +777,35 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
                                                           const DoubleTab&    positions,
                                                           ArrOfInt&               flags_compo_a_supprimer)
 {
-  const Zone_VF& zvf = ref_cast(Zone_VF, zone_dis().valeur());
-  const Zone& zone_geom = zvf.zone();
-  const Domaine& dom = zone_geom.domaine();
+  const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine& domaine_geom = zvf.domaine();
   const DoubleVect& volume_elem = zvf.volumes();
 
   // Recherche de l'element contenant le centre de gravite de chaque composante connexe
   const int nb_compo = volumes.size_array();
   ArrOfInt elems;
 
-  zone_geom.chercher_elements(positions, elems);
+  domaine_geom.chercher_elements(positions, elems);
 
   flags_compo_a_supprimer.resize_array(nb_compo, Array_base::NOCOPY_NOINIT);
   flags_compo_a_supprimer = 0;
 
-  // Construction d'un tableau de flags des elements reels contenus dans les sous-zones de destruction
-  const int nb_elem = zone_geom.nb_elem();
-  ArrOfBit flag_sous_zone(nb_elem);
-  flag_sous_zone = 0;
+  // Construction d'un tableau de flags des elements reels contenus dans les sous-domaines de destruction
+  const int nb_elem = domaine_geom.nb_elem();
+  ArrOfBit flag_sous_domaine(nb_elem);
+  flag_sous_domaine = 0;
   {
-    const int nb_sous_zones = nom_sz_transfo_.size();
-    for (int i_sous_zone = 0; i_sous_zone < nb_sous_zones; i_sous_zone++)
+    const int nb_sous_domaines = nom_sz_transfo_.size();
+    for (int i_sous_domaine = 0; i_sous_domaine < nb_sous_domaines; i_sous_domaine++)
       {
-        const Sous_Zone& sous_zone = dom.ss_zone(nom_sz_transfo_[i_sous_zone]);
-        const int nb_elem_sous_zone = sous_zone.nb_elem_tot();
-        for (int i = 0; i < nb_elem_sous_zone; i++)
+        const Sous_Domaine& sous_domaine = domaine_geom.ss_domaine(nom_sz_transfo_[i_sous_domaine]);
+        const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
+        for (int i = 0; i < nb_elem_sous_domaine; i++)
           {
-            const int ielem = sous_zone[i];
-            // La sous_zone contient des indices d'elements virtuels
+            const int ielem = sous_domaine[i];
+            // La sous_domaine contient des indices d'elements virtuels
             if (ielem < nb_elem)
-              flag_sous_zone.setbit(sous_zone[i]);
+              flag_sous_domaine.setbit(sous_domaine[i]);
           }
       }
   }
@@ -816,14 +816,14 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
   for (int i = 0; i < nb_compo; i++)
     {
       // Test sur le centre de gravite: suppression des interfaces dont le centre de gravite
-      // est dans la sous-zone de suppression.
+      // est dans la sous-domaine de suppression.
       // Attention, seul le processeur qui a le centre de gravite peut mettre le flag a 1.
       // On synchronise les flags ensuite.
       const int num_elem = elems[i];
       if (num_elem >= 0 && num_elem < nb_elem)
         {
-          // L'element est chez moi. Est-il dans la sous_zone ?
-          if (flag_sous_zone[num_elem])
+          // L'element est chez moi. Est-il dans la sous_domaine ?
+          if (flag_sous_domaine[num_elem])
             {
               // Test sur le volume:
               //  (facteur 1/6 pour compatibilite avec codage precedent.
@@ -843,7 +843,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
 
 //Construction de la structure maillage (ensemble de points) et proprietes (proprietes materielles) a injecter
 // en remplacement des groupes connexes
-//Pour la structure maillage :   ens_points.associer_zone(...)
+//Pour la structure maillage :   ens_points.associer_domaine(...)
 //                                   ens_points.generer_structure(...)
 //                                   ens_points.associer_equation_transport(...)
 
@@ -873,8 +873,8 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
       size_new++;
 
   //remplir sommets_lu et proprietes
-  const Zone& zone = la_zone_dis->zone();
-  ens_points.associer_zone(zone);
+  const Domaine& domaine = le_dom_dis->domaine();
+  ens_points.associer_domaine(domaine);
 
   DoubleTab&   soms_tmp =  ens_points.sommets_lu();
   DoubleTab& vitesse_tmp = propri.vitesse_particules();
@@ -1040,7 +1040,7 @@ void Transport_Marqueur_FT::resoudre_edo(DoubleTab& vitesse_p, DoubleTab& une_so
 
 void Transport_Marqueur_FT::imposer_cond_lim()
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF,zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
   DoubleTab& vitesse_p =  proprietes_particules().vitesse_particules();
   const Maillage_FT_Disc& maillage = maillage_interface();
   const DoubleTab& pos = maillage.sommets();
@@ -1066,7 +1066,7 @@ void Transport_Marqueur_FT::imposer_cond_lim()
               if (dim==3)
                 z= pos(som,2);
               face_bord = som_face[som];
-              appliquer_reflexion_vitesse(x,y,z,som,face_bord,zone_vf,vitesse_p);
+              appliquer_reflexion_vitesse(x,y,z,som,face_bord,domaine_vf,vitesse_p);
             }
         }
     }
@@ -1080,24 +1080,24 @@ void Transport_Marqueur_FT::imposer_cond_lim()
 
 void Transport_Marqueur_FT::appliquer_reflexion_vitesse(const double x, const double y, const double z,
                                                         const int som,int& face_bord,
-                                                        const Zone_VF& zone_vf,
+                                                        const Domaine_VF& domaine_vf,
                                                         DoubleTab& vitesse_p)
 {
 
   int dim = Objet_U::dimension;
-  const DoubleTab& cg_faces = zone_vf.xv();
+  const DoubleTab& cg_faces = domaine_vf.xv();
   DoubleTab vecteur_base(dim,dim);
   DoubleVect vit_base1(dim);
 
   //calcul de la norme du vecteur normal a la face vecteur_base(0)
   double norme = 0.;
   for (int j=0; j<dim; j++)
-    norme += zone_vf.face_normales(face_bord,j)*zone_vf.face_normales(face_bord,j);
+    norme += domaine_vf.face_normales(face_bord,j)*domaine_vf.face_normales(face_bord,j);
   norme = sqrt(norme);
   if (!est_egal(norme,0.))
     {
       for (int j=0; j<dim; j++)
-        vecteur_base(0,j) = zone_vf.face_normales(face_bord,j)/norme;
+        vecteur_base(0,j) = domaine_vf.face_normales(face_bord,j)/norme;
     }
   else
     {
@@ -1230,11 +1230,11 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const & discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Zone_dis_base& une_zone_dis = zone_dis().valeur();
+          const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
           const double temps = schema_temps().temps_courant();
           Nom nom="densite_particules";
           Nom unite="sans_dimension";
-          discr.discretiser_champ("champ_elem",une_zone_dis,nom,unite,1,temps,densite_particules_);
+          discr.discretiser_champ("champ_elem",une_domaine_dis,nom,unite,1,temps,densite_particules_);
           champs_compris_.ajoute_champ(densite_particules_.valeur());
         }
     }
@@ -1245,11 +1245,11 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const Discret_Thyd& discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Zone_dis_base& une_zone_dis = zone_dis().valeur();
+          const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
           const double temps = schema_temps().temps_courant();
           Nom nom="volume_particules";
           Nom unite="sans_dimension";
-          discr.discretiser_champ("champ_elem",une_zone_dis,nom,unite,1,temps,volume_particules_);
+          discr.discretiser_champ("champ_elem",une_domaine_dis,nom,unite,1,temps,volume_particules_);
           champs_compris_.ajoute_champ(volume_particules_.valeur());
         }
     }

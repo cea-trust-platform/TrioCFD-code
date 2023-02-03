@@ -29,7 +29,7 @@
 #include <Champ_Uniforme.h>
 #include <Probleme_base.h>
 #include <Fluide_base.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Champ_Face_VDF.h>
 #include <TRUSTTrav.h>
 
@@ -46,16 +46,16 @@ void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
 
 void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_VDF& zone_VDF_NS = ref_cast(Zone_VDF,eq_hydraulique->zone_dis().valeur());
-  const Zone_Cl_VDF& zone_Cl_VDF_NS = ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur());
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF_NS = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const DoubleVect& volumes = domaine_VDF.volumes();
+  const DoubleVect& porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const int nbcouches = mon_eq_transport_K_Eps->get_nbcouches();
   int ndeb,nfin,elem,face_courante,elem_courant;
   double dist, d_visco,y_etoile, critere_switch=0.;
@@ -67,7 +67,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
   if ( typeswitch == 0 ) valswitch = mon_eq_transport_K_Eps->get_yswitch();
   else valswitch = mon_eq_transport_K_Eps->get_nutswitch();
 
-  const int nb_elem = zone_VDF.nb_elem(), nb_elem_tot = zone_VDF.nb_elem_tot();
+  const int nb_elem = domaine_VDF.nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot();
   DoubleTrav P(nb_elem_tot), Eps(nb_elem_tot), tab_couches(nb_elem_tot);
 
   //Extraction de la viscosite moleculaire
@@ -92,9 +92,9 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
     }
 
   // Boucle sur les bords
-  for (int n_bord=0; n_bord<zone_VDF_NS.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF_NS.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VDF_NS.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VDF_NS.les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -110,7 +110,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
                   d_visco = visco;
                 else
                   d_visco = tab_visco[elem];
-                dist=zone_VDF_NS.distance_normale(num_face);
+                dist=domaine_VDF_NS.distance_normale(num_face);
                 //Cerr << "dist = " << dist << finl;
 
                 face_courante = num_face;
@@ -156,15 +156,15 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
                       elem_courant = face_voisins(face_courante,0);
                     else
                       elem_courant = face_voisins(face_courante,1);
-                    dist+=zone_VDF_NS.distance_normale(face_courante);
+                    dist+=domaine_VDF_NS.distance_normale(face_courante);
 
                   }
                 if ((eq_hydraulique->schema_temps().limpr()) && (impr2 == 1) )
                   {
                     if ( (typeswitch == 0) )        //selon le critere de switch choisit:y* ou nu_t
-                      Cout << "Changement de couche a la maille " << icouche <<  " (" << zone_VDF_NS.xp(elem_courant,0) << ";" << zone_VDF_NS.xp(elem_courant,1) << ") y* = " << critere_switch << finl;
+                      Cout << "Changement de couche a la maille " << icouche <<  " (" << domaine_VDF_NS.xp(elem_courant,0) << ";" << domaine_VDF_NS.xp(elem_courant,1) << ") y* = " << critere_switch << finl;
                     else
-                      Cout << "Changement de couche a la maille " << icouche << " (" << zone_VDF_NS.xp(elem_courant,0) << ";" << zone_VDF_NS.xp(elem_courant,1)  << ") nu_t/nu = " << critere_switch << finl;
+                      Cout << "Changement de couche a la maille " << icouche << " (" << domaine_VDF_NS.xp(elem_courant,0) << ";" << domaine_VDF_NS.xp(elem_courant,1)  << ") nu_t/nu = " << critere_switch << finl;
                   }
 
               }
@@ -179,7 +179,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
                   d_visco = visco;
                 else
                   d_visco = tab_visco[elem];
-                dist=zone_VDF_NS.distance_normale(num_face);
+                dist=domaine_VDF_NS.distance_normale(num_face);
 
                 face_courante = num_face;
                 elem_courant = elem;
@@ -229,14 +229,14 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
                       elem_courant = face_voisins(face_courante,0);
                     else
                       elem_courant = face_voisins(face_courante,1);
-                    dist+=zone_VDF_NS.distance_normale(face_courante);
+                    dist+=domaine_VDF_NS.distance_normale(face_courante);
                   }
                 if ((eq_hydraulique->schema_temps().limpr()) && (impr2 == 1) && (elem_courant != -1))
                   {
                     if ( (typeswitch == 0) )        //selon le critere de switch choisit:y* ou nu_t
-                      Cout << "Changement de couche a la maille " << icouche << " (" << zone_VDF_NS.xp(elem_courant,0) << ";" << zone_VDF_NS.xp(elem_courant,1) << ";" << zone_VDF_NS.xp(elem_courant,2) << ") y* = " << critere_switch << finl;
+                      Cout << "Changement de couche a la maille " << icouche << " (" << domaine_VDF_NS.xp(elem_courant,0) << ";" << domaine_VDF_NS.xp(elem_courant,1) << ";" << domaine_VDF_NS.xp(elem_courant,2) << ") y* = " << critere_switch << finl;
                     else
-                      Cout << "Changement de couche a la maille " << icouche << " (" << zone_VDF_NS.xp(elem_courant,0) << ";" << zone_VDF_NS.xp(elem_courant,1) << ";" << zone_VDF_NS.xp(elem_courant,2) << ") nu_t/nu = " << critere_switch << finl;
+                      Cout << "Changement de couche a la maille " << icouche << " (" << domaine_VDF_NS.xp(elem_courant,0) << ";" << domaine_VDF_NS.xp(elem_courant,1) << ";" << domaine_VDF_NS.xp(elem_courant,2) << ") nu_t/nu = " << critere_switch << finl;
                   }
               }
         }
@@ -245,12 +245,12 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
   if (axi)
     {
       Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K_Axi(zone_VDF,vitesse,P,K_eps,visco_turb);
+      calculer_terme_production_K_Axi(domaine_VDF,vitesse,P,K_eps,visco_turb);
     }
   else
     {
       Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K(zone_VDF,zone_Cl_VDF_NS,P,K_eps,vit,vitesse,visco_turb);
+      calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF_NS,P,K_eps,vit,vitesse,visco_turb);
     }
 
   for (elem=0; elem<nb_elem; elem++)

@@ -83,7 +83,7 @@ void Neumann_paroi_rayo_semi_transp_VEF::calculer_temperature_bord(double temps)
   // Pour une discretisation VEF, la temperature est codee sur les faces
   // des elements, il suffit donc ici  de recuperer les valeurs des temperatures
   // sur les faces de bord.
-  DoubleTab& temperature = zone_Cl_dis().equation().inconnue().valeurs();
+  DoubleTab& temperature = domaine_Cl_dis().equation().inconnue().valeurs();
   DoubleTab& tab = temperature_bord_->valeurs_au_temps(temps);
 
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());

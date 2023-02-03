@@ -23,8 +23,8 @@
 #define Modele_turbulence_Longueur_Melange_VDF_included
 
 #include <Mod_turb_hyd_RANS_0_eq.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 
 /*! @brief Classe Modele_turbulence_Longueur_Melange_VDF Cette classe represente le modele de turbulence de longueur de melange de Prandtl.
  *
@@ -40,7 +40,7 @@ class Modele_turbulence_Longueur_Melange_VDF : public Mod_turb_hyd_RANS_0_eq
 public:
   void set_param(Param& param) override;
   Modele_turbulence_Longueur_Melange_VDF();
-  void associer(const Zone_dis&, const Zone_Cl_dis&) override;
+  void associer(const Domaine_dis&, const Domaine_Cl_dis&) override;
 
 protected:
 
@@ -51,8 +51,8 @@ protected:
 
   DoubleVect Sij2;
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 private:
 

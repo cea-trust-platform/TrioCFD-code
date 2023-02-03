@@ -25,7 +25,7 @@
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Fonc_Tabule.h>
 #include <Champ_Fonc_Tabule_P0_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Probleme_base.h>
@@ -89,8 +89,8 @@ int Paroi_std_scal_hyd_VDF::init_lois_paroi()
 
 int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -126,7 +126,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
   const DoubleVect& tab_u_star = loi.valeur().tab_u_star();
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
-  const IntVect& orientation = zone_VDF.orientation();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   // Recuperation de la diffusivite en fonction du type d'equation:
   int schmidt = (sub_type(Convection_Diffusion_Concentration,eqn) ? 1 : 0);
@@ -169,7 +169,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
     }
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // Pour chaque condition limite on regarde son type
@@ -179,7 +179,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       // Si l'on est a une paroi a flux impose, le flux est connu et il est
       // directement pris a la condition aux limites pour le calcul des flux diffusifs.
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
         {
@@ -190,7 +190,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
           //find the associated boundary
           int boundary_index=-1;
-          if (zone_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
+          if (domaine_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
             boundary_index=n_bord;
           assert(boundary_index >= 0);
 
@@ -200,15 +200,15 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               if (elem == -1)
                 elem = face_voisins(num_face,1);
               if (axi)
-                dist = zone_VDF.dist_norm_bord_axi(num_face);
+                dist = domaine_VDF.dist_norm_bord_axi(num_face);
               else
-                dist = zone_VDF.dist_norm_bord(num_face);
+                dist = domaine_VDF.dist_norm_bord(num_face);
 
               double u_star = tab_u_star(num_face);
               double d_alpha = (alpha_uniforme ? alpha(0,0) : alpha(elem,0) );
 
               int global_face=num_face;
-              int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+              int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
 
               if (u_star == 0 || d_alpha == 0)
                 {
@@ -232,7 +232,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                   // We modify the value of the eddy diffusivity in the first off-wall element
                   // to have the value given by the theoretical mixing length model.
                   int ori = orientation(num_face);
-                  double y0=0.5*zone_VDF.dim_elem(elem,ori)*u_star/d_visco;
+                  double y0=0.5*domaine_VDF.dim_elem(elem,ori)*u_star/d_visco;
                   if (y0<0.5)
                     alpha_t(elem)=0.; // It means we are in the laminar layer.
                   else
@@ -253,7 +253,7 @@ int Paroi_std_scal_hyd_VDF::init_lois_paroi_scalaire()
   /*
   // Initialisations de tab_d_equiv
   // On initialise les distances equivalentes avec les distances geometriques
-  const Zone_VDF& zvdf = la_zone_VDF.valeur();
+  const Domaine_VDF& zvdf = le_dom_VDF.valeur();
 
   if (axi)
   for (int num_face=0; num_face<zvdf.nb_faces_bord(); num_face++)

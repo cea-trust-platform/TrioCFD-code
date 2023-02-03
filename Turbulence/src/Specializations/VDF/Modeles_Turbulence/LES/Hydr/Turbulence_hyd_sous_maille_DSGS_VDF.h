@@ -43,7 +43,7 @@ class Turbulence_hyd_sous_maille_DSGS_VDF : public Turbulence_hyd_sous_maille_Sm
 public:
 
   Turbulence_hyd_sous_maille_DSGS_VDF();
-  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis) override;
+  void associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis) override;
 
   /////////////////////////////////////////////////////
 

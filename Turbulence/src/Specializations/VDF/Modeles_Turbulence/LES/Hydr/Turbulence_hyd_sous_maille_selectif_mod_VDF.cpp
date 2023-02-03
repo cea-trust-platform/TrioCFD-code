@@ -27,7 +27,7 @@
 #include <Param.h>
 #include <Paroi_log_QDM.h>
 #include <Equation_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_selectif_mod_VDF,"Modele_turbulence_hyd_sous_maille_selectif_mod_VDF",Turbulence_hyd_sous_maille_VDF);
 
@@ -92,7 +92,7 @@ void Turbulence_hyd_sous_maille_selectif_mod_VDF::discretiser()
   // Cerr << "Turbulence_hyd_sous_maille_selectif_mod_VDF::discretiser()" << finl;
   Mod_turb_hyd_ss_maille::discretiser();
   const VDF_discretisation& dis=ref_cast(VDF_discretisation, mon_equation->discretisation());
-  dis.vorticite(mon_equation->zone_dis(),mon_equation->inconnue(), la_vorticite);
+  dis.vorticite(mon_equation->domaine_dis(),mon_equation->inconnue(), la_vorticite);
 }
 
 int Turbulence_hyd_sous_maille_selectif_mod_VDF::a_pour_Champ_Fonc(const Motcle& mot,
@@ -146,11 +146,11 @@ void Turbulence_hyd_sous_maille_selectif_mod_VDF::cutoff()
 {
   double Sin2Angl;
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const DoubleTab& xp = zone_VDF.xp();
-  int nb_poly = zone_VDF.zone().nb_elem();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const DoubleTab& xp = domaine_VDF.xp();
+  int nb_poly = domaine_VDF.domaine().nb_elem();
   DoubleTab& vorticite = la_vorticite.valeurs();
 
   la_vorticite.mettre_a_jour(vitesse.temps());
@@ -209,7 +209,7 @@ void Turbulence_hyd_sous_maille_selectif_mod_VDF::cutoff()
             lm = 0.2*kappa*demi_h;
 
           // dy : pas de maillage local en y (largeur de filtre local)
-          dy = zone_VDF.dim_elem(num_elem,dir_par);
+          dy = domaine_VDF.dim_elem(num_elem,dir_par);
 
           // rapport pour la dependance de l angle
           rapport = lm/(2.*dy);
@@ -239,17 +239,17 @@ void Turbulence_hyd_sous_maille_selectif_mod_VDF::cutoff()
       for (i=0; i<3; i++)
         {
           if (elx0 != -1)
-            dx0 += zone_VDF.dist_elem_period(num_elem,elx0,i)*zone_VDF.dist_elem_period(num_elem,elx0,i);
+            dx0 += domaine_VDF.dist_elem_period(num_elem,elx0,i)*domaine_VDF.dist_elem_period(num_elem,elx0,i);
           if (elx1 != -1)
-            dx1 += zone_VDF.dist_elem_period(num_elem,elx1,i)*zone_VDF.dist_elem_period(num_elem,elx1,i);
+            dx1 += domaine_VDF.dist_elem_period(num_elem,elx1,i)*domaine_VDF.dist_elem_period(num_elem,elx1,i);
           if (ely0 != -1)
-            dy0 += zone_VDF.dist_elem_period(num_elem,ely0,i)*zone_VDF.dist_elem_period(num_elem,ely0,i);
+            dy0 += domaine_VDF.dist_elem_period(num_elem,ely0,i)*domaine_VDF.dist_elem_period(num_elem,ely0,i);
           if (ely1 != -1)
-            dy1 += zone_VDF.dist_elem_period(num_elem,ely1,i)*zone_VDF.dist_elem_period(num_elem,ely1,i);
+            dy1 += domaine_VDF.dist_elem_period(num_elem,ely1,i)*domaine_VDF.dist_elem_period(num_elem,ely1,i);
           if (elz0 != -1)
-            dz0 += zone_VDF.dist_elem_period(num_elem,elz0,i)*zone_VDF.dist_elem_period(num_elem,elz0,i);
+            dz0 += domaine_VDF.dist_elem_period(num_elem,elz0,i)*domaine_VDF.dist_elem_period(num_elem,elz0,i);
           if (elz1 != -1)
-            dz1 += zone_VDF.dist_elem_period(num_elem,elz1,i)*zone_VDF.dist_elem_period(num_elem,elz1,i);
+            dz1 += domaine_VDF.dist_elem_period(num_elem,elz1,i)*domaine_VDF.dist_elem_period(num_elem,elz1,i);
         }
 
       if (std::fabs(dx0)>DMINFLOAT)

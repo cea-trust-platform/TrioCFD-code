@@ -24,7 +24,7 @@
 #include <Champ_P1NC.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Turbulence_hyd_sous_maille_selectif_mod_VEF,"Modele_turbulence_hyd_sous_maille_selectif_VEF",Turbulence_hyd_sous_maille_VEF);
 
@@ -94,7 +94,7 @@ void Turbulence_hyd_sous_maille_selectif_mod_VEF::discretiser()
   // Cerr << "Turbulence_hyd_sous_maille_selectif_mod_VEF::discretiser()" << finl;
   Mod_turb_hyd_ss_maille::discretiser();
   const VEF_discretisation& dis=ref_cast(VEF_discretisation, mon_equation->discretisation());
-  dis.vorticite(mon_equation->zone_dis(),mon_equation->inconnue(), la_vorticite);
+  dis.vorticite(mon_equation->domaine_dis(),mon_equation->inconnue(), la_vorticite);
 }
 
 int Turbulence_hyd_sous_maille_selectif_mod_VEF::a_pour_Champ_Fonc(const Motcle& mot,
@@ -133,12 +133,12 @@ int Turbulence_hyd_sous_maille_selectif_mod_VEF::a_pour_Champ_Fonc(const Motcle&
 Champ_Fonc& Turbulence_hyd_sous_maille_selectif_mod_VEF::calculer_viscosite_turbulente()
 {
   static const double Csm1 = 0.086;
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  const int nb_elem = zone_VEF.nb_elem();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  DoubleVect volume = zone_VEF.volumes();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  DoubleVect volume = domaine_VEF.volumes();
   int num_elem;
 
   F2.resize(nb_elem_tot);
@@ -199,15 +199,15 @@ void Turbulence_hyd_sous_maille_selectif_mod_VEF::cutoff()
   //  static const double Sin2Angl = SIN2ANGL_new2;
   double Sin2Angl;
   const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  //  const Zone& zone = zone_VEF.zone();
-  //  int nfac = zone.nb_faces_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  //  const Domaine& domaine = domaine_VEF.domaine();
+  //  int nfac = domaine.nb_faces_elem();
   //  int nfac = 4; // en 3D 4 faces!!!
   DoubleTab& vorticite = la_vorticite.valeurs();
-  // const DoubleTab& xp = zone_VEF.xp();
+  // const DoubleTab& xp = domaine_VEF.xp();
 
   la_vorticite.mettre_a_jour(vitesse.temps());
   vorticite.echange_espace_virtuel();
@@ -364,7 +364,7 @@ void Turbulence_hyd_sous_maille_selectif_mod_VEF::cutoff()
 //  //  CSMS2 = 27/8*M_PI^2*CSMS1^2*C_k^3
 //  double temps = mon_equation->inconnue().temps();
 //  DoubleVect& k = energie_cinetique_turb_.valeurs();
-//  int nb_poly = la_zone_VEF->zone().nb_elem();
+//  int nb_poly = le_dom_VEF->domaine().nb_elem();
 //
 //  if (k.size() != nb_poly) {
 //    Cerr << "erreur dans la taille du DoubleVect valeurs de l'energie cinetique turbulente" << finl;

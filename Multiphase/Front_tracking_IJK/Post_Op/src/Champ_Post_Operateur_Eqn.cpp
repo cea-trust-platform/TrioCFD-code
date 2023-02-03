@@ -9,7 +9,7 @@
 #include <Champ_Post_Operateur_Eqn.h>
 #include <Pb_base.h>
 #include <Post.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Nom.h>
 #include <Champ_Generique_refChamp.h>
 #include <Discr_base.h>
@@ -113,18 +113,18 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
 
    int ok=0;
    const MD_Vector & md = ref_eq_.valeur().inconnue().valeurs().get_md_vector();
-   const Zone_VF& zvf= ref_cast( Zone_VF,ref_eq_.valeur().zone_dis().valeur());
+   const Domaine_VF& zvf= ref_cast( Domaine_VF,ref_eq_.valeur().domaine_dis().valeur());
    if (md== zvf.face_sommets().get_md_vector())
      {
        localisation_inco_=FACE;
        ok=1;
      }
-   if (md== zvf.zone().les_elems().get_md_vector())
+   if (md== zvf.domaine().les_elems().get_md_vector())
      {
        localisation_inco_=ELEMENT;
        ok=1;
      }
-   if (md == zvf.zone().domaine().les_sommets().get_md_vector())
+   if (md == zvf.domaine().domaine().les_sommets().get_md_vector())
      {
        ok=1;
        localisation_inco_=NODE;
@@ -149,7 +149,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ & espace_stockage) c
   Nom directive; directive=ref_eq_->inconnue().le_nom();
   // bidouille EF
   if (directive=="enthalpie") directive="temperature";
-  ref_eq_.valeur().discretisation().discretiser_champ(directive,ref_eq_->zone_dis().valeur(),"oooo","unit", -1,temps,espace_stockage_fonc);
+  ref_eq_.valeur().discretisation().discretiser_champ(directive,ref_eq_->domaine_dis().valeur(),"oooo","unit", -1,temps,espace_stockage_fonc);
   espace_stockage=espace_stockage_fonc;
   DoubleTab& es =(espace_stockage.valeurs());
   //if (ref_eq_->schema_temps().temps_courant()!=0)

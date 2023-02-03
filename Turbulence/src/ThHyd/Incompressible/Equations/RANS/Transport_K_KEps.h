@@ -124,7 +124,7 @@ inline int Transport_K_KEps::get_nutswitch() const
   return nut_switch;
 }
 
-/*! @brief indique si on doit ecrire la zone des 2 couches dans le .
+/*! @brief indique si on doit ecrire la domaine des 2 couches dans le .
  *
  * out. (version const)
  *

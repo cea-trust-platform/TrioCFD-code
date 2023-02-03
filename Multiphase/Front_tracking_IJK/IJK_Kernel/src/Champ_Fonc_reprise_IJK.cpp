@@ -27,7 +27,7 @@
 #include <Entree_complete.h>
 #include <LecFicDistribueBin.h>
 #include <EFichierBin.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <MD_Vector.h>
 #include <MD_Vector_std.h>
 #include <MD_Vector_tools.h>
@@ -60,7 +60,7 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
   s>>nom_fic;
   s>>nom_pb>>nom_champ_inc;
 
-  // On recupere le pb, puis ensuite on cherche le champ; on recupere la zone_dis
+  // On recupere le pb, puis ensuite on cherche le champ; on recupere la domaine_dis
   const Probleme_base& pb =ref_cast(Probleme_base,Interprete::objet(nom_pb));
   REF(Champ_base) ref_ch;
 
@@ -102,12 +102,12 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
 //      exit();
 //    }
 
-  associer_zone_dis_base(pb.domaine_dis().zone_dis(0));
+  associer_domaine_dis_base(pb.domaine_dis());
   // on cree un champ comme le ch_ref;
   vrai_champ_.typer(ref_ch.valeur().que_suis_je());
   const Champ_Inc_base& ch_inc=ref_cast(Champ_Inc_base,ref_ch.valeur());
   Champ_Inc_base& v_champ=vrai_champ_.valeur();
-  le_champ().associer_zone_dis_base(pb.domaine_dis().zone_dis(0));
+  le_champ().associer_domaine_dis_base(pb.domaine_dis());
 
   v_champ.fixer_nb_valeurs_temporelles(2);
   v_champ.nommer(ch_inc.le_nom());
@@ -321,11 +321,11 @@ void Champ_Fonc_reprise_IJK::reprendre_IJK(Entree& fich, Champ_base& ch)
 {
   int nb_val_nodales_old = nb_valeurs_nodales();
 
-  const Zone_VF& zvf=ref_cast(Zone_VF,ch.zone_dis_base());
+  const Domaine_VF& zvf=ref_cast(Domaine_VF,ch.domaine_dis_base());
   DoubleTab& val = ch.valeurs();
 
   /* [ABN] ce qui suit est une version allegee de
-         static int lecture_special_part2(const Zone_VF& zvf, Entree& fich, DoubleTab& val)
+         static int lecture_special_part2(const Domaine_VF& zvf, Entree& fich, DoubleTab& val)
      en depilant tous les appels sous-jacents.
    */
 
@@ -350,7 +350,7 @@ void Champ_Fonc_reprise_IJK::reprendre_IJK(Entree& fich, Champ_base& ch)
           exit();
         }
       const DoubleTab& coords = zvf.xv(); // Descripteur des face
-      const double epsilon = zvf.zone().domaine().epsilon();
+      const double epsilon = zvf.domaine().epsilon();
       ntot += lire_special(fich, coords, val, epsilon);
     }
   else

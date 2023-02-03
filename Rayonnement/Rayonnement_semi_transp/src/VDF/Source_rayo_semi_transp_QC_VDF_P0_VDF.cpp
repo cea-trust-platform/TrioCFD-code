@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_rayo_semi_transp_QC_VDF_P0_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Equation_base.h>
 #include <Milieu_base.h>
 #include <Champ_Uniforme.h>
@@ -69,8 +69,8 @@ void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_zones(const Zone_dis& zone_dis,
-                                                           const Zone_Cl_dis& zone_Cl_dis)
+void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+                                                              const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;
 }

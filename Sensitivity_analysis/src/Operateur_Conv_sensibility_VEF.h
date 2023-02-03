@@ -23,8 +23,8 @@
 #define Operateur_Conv_sensibility_VEF_included
 
 #include <Operateur_Conv_sensibility.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 
 /*! @brief : class Operateur_Conv_sensibility_VEF
  *
@@ -39,7 +39,7 @@ class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
   Declare_instanciable( Operateur_Conv_sensibility_VEF ) ;
 
 public :
-  void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& ) override;
+  void associer (const Domaine_dis& , const Domaine_Cl_dis& ,const Champ_Inc& ) override;
   DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
   void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
   void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0
@@ -53,8 +53,8 @@ public :
   double application_LIMITEUR(double, double, Motcle&) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+  REF(Domaine_VEF) le_dom_vef;
+  REF(Domaine_Cl_VEF) la_zcl_vef;
   mutable DoubleVect fluent;           // tableau qui sert pour le calcul du pas de temps de stabilite
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;

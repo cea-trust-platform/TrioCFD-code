@@ -31,7 +31,7 @@
  *
  *  Pour initialiser la classe il faut:
  *  - appeler le readOn pour lire les parametres (optionnels)
- *  - appeler associer_zone()
+ *  - appeler associer_domaine()
  *
  */
 class Maillage_FT_Disc;

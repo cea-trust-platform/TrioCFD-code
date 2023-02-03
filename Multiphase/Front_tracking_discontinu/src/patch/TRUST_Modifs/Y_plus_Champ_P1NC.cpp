@@ -51,13 +51,13 @@ void Y_plus_Champ_P1NC::me_calculer(double tps)
       const Nom& nom_loipar = loipar.que_suis_je();
 
       if (nom_loipar == "loi_standard_hydr_diphasique_VEF")
-        mon_champ_->calcul_y_plus_diphasique(la_zone_Cl_VEF.valeur(), valeurs());
+        mon_champ_->calcul_y_plus_diphasique(le_dom_Cl_VEF.valeur(), valeurs());
     }
   else
-    mon_champ_->calcul_y_plus(la_zone_Cl_VEF.valeur(), valeurs());
+    mon_champ_->calcul_y_plus(le_dom_Cl_VEF.valeur(), valeurs());
 }
 
-const Zone_Cl_dis_base& Y_plus_Champ_P1NC::zone_Cl_dis_base() const
+const Domaine_Cl_dis_base& Y_plus_Champ_P1NC::domaine_Cl_dis_base() const
 {
-  return la_zone_Cl_VEF.valeur();
+  return le_dom_Cl_VEF.valeur();
 }

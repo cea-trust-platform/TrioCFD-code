@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Robin.h>
-#include <Zone_dis.h>
-#include <Zone_Cl_dis.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Equation_base.h>
 #include <Fluide_base.h>
 #include <distances_VEF.h>
@@ -61,7 +61,7 @@ void Source_Robin::completer()
 {
   Source_base::completer();
   Cerr << "Dans Source_Robin::completer()" << finl;
-  const int nb_faces_bord = la_zone_VEF->nb_faces_bord();
+  const int nb_faces_bord = le_dom_VEF->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
   Cerr << "nb_faces_bord = " << nb_faces_bord << finl;
@@ -71,8 +71,8 @@ void Source_Robin::completer()
 // ajouter
 DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF             = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF       = la_zone_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF             = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF       = le_dom_Cl_VEF.valeur();
   const Navier_Stokes_Turbulent& eq_ns = ref_cast(Navier_Stokes_Turbulent,equation());
   const DoubleTab& cisaillement        = eq_ns.modele_turbulence().loi_paroi().valeur().Cisaillement_paroi();
 //  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi().valeur().tab_u_star();
@@ -83,9 +83,9 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 //  double utaumoy = 0.;
 //  int compt = 0;
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
@@ -96,12 +96,12 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 
           for (int face=ndeb; face<nfin; face++)
             {
-              int elem = zone_VEF.face_voisins(face,0);
-              if (elem==-1) elem = zone_VEF.face_voisins(face,1);
+              int elem = domaine_VEF.face_voisins(face,0);
+              if (elem==-1) elem = domaine_VEF.face_voisins(face,1);
 
               for (int compo=0; compo<dimension; compo++)
                 {
-                  resu(face,compo) -= cisaillement(face,compo)*zone_VEF.face_surfaces(face);
+                  resu(face,compo) -= cisaillement(face,compo)*domaine_VEF.face_surfaces(face);
                 }
 
 //              utaumoy += u_star(face);
@@ -143,9 +143,9 @@ DoubleTab& Source_Robin::calculer(DoubleTab& resu) const
 }
 
 
-// associer_zones
-void Source_Robin::associer_zones(const Zone_dis& z, const Zone_Cl_dis& zcl)
+// associer_domaines
+void Source_Robin::associer_domaines(const Domaine_dis& z, const Domaine_Cl_dis& zcl)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,z.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,z.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl.valeur());
 }

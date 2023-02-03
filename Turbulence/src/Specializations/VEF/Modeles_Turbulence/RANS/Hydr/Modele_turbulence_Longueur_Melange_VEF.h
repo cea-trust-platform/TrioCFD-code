@@ -25,11 +25,11 @@
 
 
 #include <Mod_turb_hyd_RANS_0_eq.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Entree;
 
 /*! @brief classe Turbulence_hyd_Longueur_Melange_VEF Cette classe correspond a la mise en oeuvre du modele
@@ -50,7 +50,7 @@ public:
   Modele_turbulence_Longueur_Melange_VEF();
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void associer(const Zone_dis&, const Zone_Cl_dis&) override;
+  void associer(const Domaine_dis&, const Domaine_Cl_dis&) override;
   void lire_distance_paroi( );
   void discretiser() override;
   int preparer_calcul() override;
@@ -71,8 +71,8 @@ protected :
   DoubleVect Sij2;
   DoubleVect f_amortissement;
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
 
 

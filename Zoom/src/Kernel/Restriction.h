@@ -47,11 +47,11 @@ class Restriction : public DERIV(Restriction_base)
 
 public :
 
-  inline void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect,
+  inline void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF, const IntVect& connect,
                           DoubleTab& incoG,
                           const DoubleTab& incoF,int nbcomp) ;
-  inline void calculer(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect) ;
-  inline void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+  inline void calculer(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF, const IntVect& connect) ;
+  inline void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                           const  IntVect& connect,
                           DoubleTab& incoG,
                           const DoubleTab& incoF, int nb_comp,
@@ -60,30 +60,30 @@ public :
 
 
 
-void Restriction::restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+void Restriction::restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                               const IntVect& connect,
                               DoubleTab& incoG,
                               const DoubleTab& incoF,int nbcomp)
 {
-  valeur().restreindre(zone_VFG, zone_VFF, connect, incoG, incoF,nbcomp);
+  valeur().restreindre(domaine_VFG, domaine_VFF, connect, incoG, incoF,nbcomp);
 }
 
 
 
-void Restriction::restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+void Restriction::restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                               const IntVect& connect,
                               DoubleTab& incoG,
                               const DoubleTab& incoF,int nbcomp,
                               int num_prem_face_frontG)
 {
-  valeur().restreindre(zone_VFG, zone_VFF, connect, incoG, incoF,nbcomp, num_prem_face_frontG);
+  valeur().restreindre(domaine_VFG, domaine_VFF, connect, incoG, incoF,nbcomp, num_prem_face_frontG);
 }
 
 
-void Restriction::calculer(const Zone_VF& zone_VFG,
-                           const Zone_VF& zone_VFF, const IntVect& connect)
+void Restriction::calculer(const Domaine_VF& domaine_VFG,
+                           const Domaine_VF& domaine_VFF, const IntVect& connect)
 {
-  valeur().calculer(zone_VFG, zone_VFF, connect);
+  valeur().calculer(domaine_VFG, domaine_VFF, connect);
 }
 
 #endif

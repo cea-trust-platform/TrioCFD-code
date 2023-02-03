@@ -38,7 +38,7 @@ class Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1 : public Op_Diff_K_Eps_Bas_Re_VEF_base, p
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ,
                 const Champ_Inc& ) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;
@@ -57,9 +57,9 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Zone_VEF) la_zone_vef;
+  REF(Domaine_VEF) le_dom_vef;
   REF(Champ_Uniforme) diffusivite_;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+  REF(Domaine_Cl_VEF) la_zcl_vef;
   REF(Champ_Q1NC) inconnue_;
 };
 /*! @brief on dimensionne notre matrice au moyen de la methode dimensionner de la classe Op_VEF_Face.
@@ -67,7 +67,7 @@ protected :
  */
 inline  void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
 /*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
@@ -75,7 +75,7 @@ inline  void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::dimensionner(Matrice_Morse& matri
  */
 inline void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+  Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
 }
 
 

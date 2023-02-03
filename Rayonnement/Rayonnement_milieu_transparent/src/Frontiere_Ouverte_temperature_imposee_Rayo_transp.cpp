@@ -23,7 +23,7 @@
 #include <Frontiere_Ouverte_temperature_imposee_Rayo_transp.h>
 #include <Equation_base.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp,"Frontiere_Ouverte_temperature_imposee_Rayo_transp",Entree_fluide_temperature_imposee);
 
@@ -71,7 +71,7 @@ void Frontiere_Ouverte_temperature_imposee_Rayo_transp::completer()
 {
   //  Paroi_Rayo_transp::completer();
   Entree_fluide_temperature_imposee::completer();
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
 }
 
 void Frontiere_Ouverte_temperature_imposee_Rayo_transp::mettre_a_jour(double temps)

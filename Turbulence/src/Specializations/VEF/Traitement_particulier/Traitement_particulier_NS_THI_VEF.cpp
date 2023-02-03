@@ -21,7 +21,7 @@
 
 #include <Traitement_particulier_NS_THI_VEF.h>
 #include <calcul_spectres.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Navier_Stokes_std.h>
 #include <Champ_P1NC.h>
 #include <Domaine.h>
@@ -277,21 +277,21 @@ void Traitement_particulier_NS_THI_VEF::init_calc_spectre(void)
 // Appelle les fonctions qui a priori ne doivent etre lancees qu'une fois
 // (sauf si le domaine de calcul change, raffinement, ...)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const int nb_faces = zone_VEF.nb_faces();
-  IntTab tab_zone;
-  DoubleTab coord_zone(nb_faces,dimension);
-  IntVect nb_coord_zone(dimension);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const int nb_faces = domaine_VEF.nb_faces();
+  IntTab tab_domaine;
+  DoubleTab coord_domaine(nb_faces,dimension);
+  IntVect nb_coord_domaine(dimension);
 
   if (cle_suppr_vit_moy)
     suppression_vitesse_moyenne();
 
   if ( (calc_sp_3D || calc_sp_1D) && nproc()==1)
-    determine_tab_fft_VEF_3D(tab_zone, coord_zone, nb_coord_zone, nb_spectres_3D, nb_points_3D);
+    determine_tab_fft_VEF_3D(tab_domaine, coord_domaine, nb_coord_domaine, nb_spectres_3D, nb_points_3D);
 
   if (calc_sp_1D && nproc()==1)
-    determine_tab_fft_VEF_1D(tab_zone, coord_zone, nb_coord_zone, nb_spectres_1D, nb_points_1D);
+    determine_tab_fft_VEF_1D(tab_domaine, coord_domaine, nb_coord_domaine, nb_spectres_1D, nb_points_1D);
 
   cle_premier_pas_dt=0;
   Ec_tot_old = 0;
@@ -299,13 +299,13 @@ void Traitement_particulier_NS_THI_VEF::init_calc_spectre(void)
 
 
 
-  const int nb_elem = zone_VEF.nb_elem();
+  const int nb_elem = domaine_VEF.nb_elem();
 
-  DoubleTab coord_zone_elem(nb_elem,dimension);
-  IntVect nb_coord_zone_elem(dimension);
+  DoubleTab coord_domaine_elem(nb_elem,dimension);
+  IntVect nb_coord_domaine_elem(dimension);
 
   if ( (calc_sp_3D || calc_sp_1D) && nproc()==1)
-    determine_tab_fft_VEF_3D(tab_zone, coord_zone_elem, nb_coord_zone_elem, nb_spectres_3D_elem, nb_points_3D_elem);
+    determine_tab_fft_VEF_3D(tab_domaine, coord_domaine_elem, nb_coord_domaine_elem, nb_spectres_3D_elem, nb_points_3D_elem);
 
 
 
@@ -378,9 +378,9 @@ void Traitement_particulier_NS_THI_VEF::renorm_Ec(void)
 
 void Traitement_particulier_NS_THI_VEF::calcul_spectre(void)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const int nb_faces = zone_VEF.nb_faces();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const int nb_faces = domaine_VEF.nb_faces();
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs(); // vitesse aux faces
   //  const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
   Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
@@ -471,9 +471,9 @@ void Traitement_particulier_NS_THI_VEF::sorties_globales(void)
 {
   // Pour les traitements effectues a chaque pas de temps
 
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const int nb_faces = zone_VEF.nb_faces();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const int nb_faces = domaine_VEF.nb_faces();
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs(); // vitesse aux faces
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
   double temps = mon_equation->inconnue().temps();
@@ -560,7 +560,7 @@ void Traitement_particulier_NS_THI_VEF::sorties_globales(void)
 
 
 
-void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zone, DoubleTab& coord_zone, IntVect& nb_coord_zone, int& nb_spectres, int& nb_points)
+void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_domaine, DoubleTab& coord_domaine, IntVect& nb_coord_domaine, int& nb_spectres, int& nb_points)
 // Remplit le tableau tab_calc_fft_3D contenant les centres de faces
 // reparties sur tout le domaine, ordonnes pour le calcul de spectre par FFT.
 // On ne peut pas utiliser tous les points pour un seul spectre (ils ne
@@ -577,10 +577,10 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 // Effet de bord : remplit le tableau tab_calc_fft_3D
 
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const int nb_faces = zone_VEF.nb_faces();
-  const DoubleTab& coord_centre = zone_VEF.xv();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const int nb_faces = domaine_VEF.nb_faces();
+  const DoubleTab& coord_centre = domaine_VEF.xv();
   const double epsilon = 1.e-8;
   // const double Pi = 3.14159265358979;
 
@@ -595,9 +595,9 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 
 
 
-  int nb_coord_zone_max = 0;
+  int nb_coord_domaine_max = 0;
 
-  // recuperer les differentes coordonnees trouvees dans la zone
+  // recuperer les differentes coordonnees trouvees dans la domaine
   for (int dim=0; dim<dimension; dim++)
     {
 
@@ -606,57 +606,57 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
           double coord = coord_centre(num_face,dim);
           int trouve_coord = 0; // booleen
 
-          for (int jj=0; jj<nb_coord_zone(dim); jj++)
+          for (int jj=0; jj<nb_coord_domaine(dim); jj++)
             {
-              if (std::fabs(coord - coord_zone(jj,dim)) < epsilon)
+              if (std::fabs(coord - coord_domaine(jj,dim)) < epsilon)
                 {
-                  // cette valeur de "coord" a deja ete trouvee dans la zone
+                  // cette valeur de "coord" a deja ete trouvee dans la domaine
                   trouve_coord = 1;
                 }
             }
 
           if ( !trouve_coord )
             {
-              // ajouter dans le tableau coord_zone
-              int jj=nb_coord_zone(dim)-1;
+              // ajouter dans le tableau coord_domaine
+              int jj=nb_coord_domaine(dim)-1;
 
-              while ( (jj > -1) && (coord_zone(jj,dim) > coord) )
+              while ( (jj > -1) && (coord_domaine(jj,dim) > coord) )
                 {
                   // decalage vers la droite des valeurs plus grandes
-                  coord_zone(jj+1,dim) = coord_zone(jj,dim);
+                  coord_domaine(jj+1,dim) = coord_domaine(jj,dim);
                   jj--;
                 }
 
               // insertion a la position voulue
-              coord_zone(jj+1,dim) = coord;
-              nb_coord_zone(dim)++;
+              coord_domaine(jj+1,dim) = coord;
+              nb_coord_domaine(dim)++;
 
             } // endif ( !trouve_coord )
 
         } // fin boucle sur les faces
 
-      if ( nb_coord_zone(dim) > nb_coord_zone_max )
+      if ( nb_coord_domaine(dim) > nb_coord_domaine_max )
         {
-          nb_coord_zone_max = nb_coord_zone(dim) ;
+          nb_coord_domaine_max = nb_coord_domaine(dim) ;
         }
 
     } // fin boucle sur dim
 
-  coord_zone.resize(nb_coord_zone_max,dimension);
+  coord_domaine.resize(nb_coord_domaine_max,dimension);
 
 
-  // remplir un tableau pour toutes les faces de la zone ordonnees selon leurs coordonnees, avec des vides a -1
-  tab_zone.resize(nb_coord_zone(0),nb_coord_zone(1),nb_coord_zone(2));
-  tab_zone = -1;
+  // remplir un tableau pour toutes les faces de la domaine ordonnees selon leurs coordonnees, avec des vides a -1
+  tab_domaine.resize(nb_coord_domaine(0),nb_coord_domaine(1),nb_coord_domaine(2));
+  tab_domaine = -1;
   IntVect index(3);
   for (int num_face=0; num_face<nb_faces; num_face++)
     {
       index = -1;
       for (int dim=0; dim<dimension; dim++)
         {
-          for (int ii=0; ii<nb_coord_zone(dim); ii++)
+          for (int ii=0; ii<nb_coord_domaine(dim); ii++)
             {
-              if ( std::fabs(coord_centre(num_face,dim) - coord_zone(ii,dim)) < epsilon )
+              if ( std::fabs(coord_centre(num_face,dim) - coord_domaine(ii,dim)) < epsilon )
                 {
                   index(dim) = ii;
                   break ;
@@ -664,7 +664,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
             }
         }
 
-      tab_zone(index(0),index(1),index(2)) = num_face;
+      tab_domaine(index(0),index(1),index(2)) = num_face;
     }
 
   if(je_suis_maitre())
@@ -684,9 +684,9 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 
   for (int dim=0; dim<dimension; dim++)
     {
-      for (int ii=0; ii<nb_coord_zone(dim)-1; ii++)
+      for (int ii=0; ii<nb_coord_domaine(dim)-1; ii++)
         {
-          double ecart = coord_zone(ii+1,dim) - coord_zone(ii,dim);
+          double ecart = coord_domaine(ii+1,dim) - coord_domaine(ii,dim);
           if ( ecart < ecart_min_dir(dim) )
             {
               ecart_min_dir(dim) = ecart ;
@@ -715,7 +715,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 
 
 
-  IntVect hexa(nb_faces); // correspondance indice des faces dans zone - dans hexa
+  IntVect hexa(nb_faces); // correspondance indice des faces dans domaine - dans hexa
   IntTab rempli(3);
   int fini = 0; // booleen
   nb_spectres = 0; // nombre de spectres qui vont etre calcules et donc nombre de sous-ensembles de points qui sont ici releves
@@ -747,25 +747,25 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
       tab_calc_fft_3D.resize(nb_dans_hexa, nb_points+1,nb_points+1,nb_points+1); // tableau avec les centres des faces ordonnees pour le calcul de spectre par FFT
       tab_calc_fft_3D = -1;
 
-      IntTab coord_zone_ok(nb_coord_zone_max, dimension);
+      IntTab coord_domaine_ok(nb_coord_domaine_max, dimension);
 
       // parcourir les faces contenues dans l'hexa-reference et tenter de construire des grilles cartesiennes
       for (int num_face=0; num_face<nb_dans_hexa; num_face++)
         {
           // chercher les coordonnees qui vont bien avec la face de l'hexa-reference pour construire une grille cartesienne avec le pas, en evitant les dernieres coordonnees, qui sont sur des faces periodiques
 
-          coord_zone_ok = 0;
+          coord_domaine_ok = 0;
 
           for (int dim=0; dim<dimension; dim++)
             {
-              for (int ii=0; ii<nb_coord_zone(dim)-1; ii++)
+              for (int ii=0; ii<nb_coord_domaine(dim)-1; ii++)
                 {
                   double ratio_double =
-                    ( coord_zone(ii,dim)-coord_centre(hexa(num_face),dim) ) / pas;
+                    ( coord_domaine(ii,dim)-coord_centre(hexa(num_face),dim) ) / pas;
                   int ratio_int = (int)(ratio_double + 0.5);
                   if ( std::fabs(ratio_double - ratio_int) < epsilon )
                     {
-                      coord_zone_ok(ii,dim) = 1;
+                      coord_domaine_ok(ii,dim) = 1;
                     }
                 }
 
@@ -777,27 +777,27 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
           // (et non pas nb_points*nb_points*nb_points pour une grille et nb_points+1*nb_points*nb_points pour une autre grille, et pour d'autres grilles nb_points*nb_points+1*nb_points ou nb_points+1*nb_points+1*nb_points ou ... )
 
           int ix = 0;
-          for (int ii=0; ii<nb_coord_zone(0)-1; ii++)
+          for (int ii=0; ii<nb_coord_domaine(0)-1; ii++)
             {
               rempli(0) = 0;
               int iy = 0;
-              for (int jj=0; jj<nb_coord_zone(1)-1; jj++)
+              for (int jj=0; jj<nb_coord_domaine(1)-1; jj++)
                 {
                   rempli(1) = 0;
                   int iz = 0;
-                  for (int kk=0; kk<nb_coord_zone(2)-1; kk++)
+                  for (int kk=0; kk<nb_coord_domaine(2)-1; kk++)
                     {
                       rempli(2) = 0;
 
-                      if ( coord_zone_ok(ii,0) == 1
-                           && coord_zone_ok(jj,1) == 1
-                           && coord_zone_ok(kk,2) == 1 )
+                      if ( coord_domaine_ok(ii,0) == 1
+                           && coord_domaine_ok(jj,1) == 1
+                           && coord_domaine_ok(kk,2) == 1 )
                         {
                           // a cette position devrait se trouver une face
-                          if ( tab_zone(ii,jj,kk) != -1 )
-                            // la face "tab_zone(ii,jj,kk)" existe et est sur la grille qui s'appuie sur la face "hexa(num_face)" contenue dans l'hexa-reference.
+                          if ( tab_domaine(ii,jj,kk) != -1 )
+                            // la face "tab_domaine(ii,jj,kk)" existe et est sur la grille qui s'appuie sur la face "hexa(num_face)" contenue dans l'hexa-reference.
                             {
-                              tab_calc_fft_3D(num_spectre,ix,iy,iz) = tab_zone(ii,jj,kk);
+                              tab_calc_fft_3D(num_spectre,ix,iy,iz) = tab_domaine(ii,jj,kk);
                               rempli = 1;
                             }
                           else
@@ -899,7 +899,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 }
 
 
-void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& tab_zone, const DoubleTab& coord_zone, const IntVect& nb_coord_zone, IntVect& nb_spectres, IntVect& nb_points)
+void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& tab_domaine, const DoubleTab& coord_domaine, const IntVect& nb_coord_domaine, IntVect& nb_spectres, IntVect& nb_points)
 
 // limitation : en cherchant les lignes les plus longues pour porter les spectres,
 //              la methode ne verifie pas si les points sont regulierement espaces
@@ -915,30 +915,30 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& t
     }
 
 
-  IntVect nb_coord_zone_tri(nb_coord_zone) ;
+  IntVect nb_coord_domaine_tri(nb_coord_domaine) ;
   // tri
   for (int ii=dimension ; ii>0; ii--)
     {
       for (int jj=1; jj<ii; jj++)
         {
-          if ( nb_coord_zone_tri(jj-1) > nb_coord_zone_tri(jj) )
+          if ( nb_coord_domaine_tri(jj-1) > nb_coord_domaine_tri(jj) )
             {
-              int temp = nb_coord_zone_tri(jj-1);
-              nb_coord_zone_tri(jj-1) = nb_coord_zone_tri(jj);
-              nb_coord_zone_tri(jj) = temp;
+              int temp = nb_coord_domaine_tri(jj-1);
+              nb_coord_domaine_tri(jj-1) = nb_coord_domaine_tri(jj);
+              nb_coord_domaine_tri(jj) = temp;
             }
         }
     }
 
 
-  int nb_coord_zone_max = nb_coord_zone_tri(2) ;
-  int nb_spectres_max = nb_coord_zone_tri(2) * nb_coord_zone_tri(1) ;
+  int nb_coord_domaine_max = nb_coord_domaine_tri(2) ;
+  int nb_spectres_max = nb_coord_domaine_tri(2) * nb_coord_domaine_tri(1) ;
 
 
-  tab_calc_fft_1D.resize(dimension, nb_spectres_max, nb_coord_zone_max) ;
+  tab_calc_fft_1D.resize(dimension, nb_spectres_max, nb_coord_domaine_max) ;
   tab_calc_fft_1D = -1 ;
 
-  tab_coord_1D.resize(dimension, nb_spectres_max, nb_coord_zone_max) ;
+  tab_coord_1D.resize(dimension, nb_spectres_max, nb_coord_domaine_max) ;
 
   IntVect num_spectre(dimension);
   nb_spectres.resize(dimension);
@@ -948,17 +948,17 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& t
   nb_points = 0 ;
 
   // pour chaque point, on cherche les points sur la meme ligne selon x
-  for (int jj=0; jj<nb_coord_zone(1)-1; jj++)
-    for (int kk=0; kk<nb_coord_zone(2)-1; kk++)
+  for (int jj=0; jj<nb_coord_domaine(1)-1; jj++)
+    for (int kk=0; kk<nb_coord_domaine(2)-1; kk++)
       {
         int ix = 0 ;
-        for (int ii=0; ii<nb_coord_zone(0)-1; ii++)
+        for (int ii=0; ii<nb_coord_domaine(0)-1; ii++)
           {
-            int num_face = tab_zone(ii, jj, kk);
+            int num_face = tab_domaine(ii, jj, kk);
             if ( num_face != -1 )
               {
                 tab_calc_fft_1D(0, num_spectre(0), ix) = num_face;
-                tab_coord_1D   (0, num_spectre(0), ix) = coord_zone(ii, 0);
+                tab_coord_1D   (0, num_spectre(0), ix) = coord_domaine(ii, 0);
                 ix++;
               }
           }
@@ -983,17 +983,17 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& t
       }
 
   // pour chaque point, on cherche les points sur la meme ligne selon y
-  for (int ii=0; ii<nb_coord_zone(0)-1; ii++)
-    for (int kk=0; kk<nb_coord_zone(2)-1; kk++)
+  for (int ii=0; ii<nb_coord_domaine(0)-1; ii++)
+    for (int kk=0; kk<nb_coord_domaine(2)-1; kk++)
       {
         int iy = 0 ;
-        for (int jj=0; jj<nb_coord_zone(1)-1; jj++)
+        for (int jj=0; jj<nb_coord_domaine(1)-1; jj++)
           {
-            int num_face = tab_zone(ii, jj, kk);
+            int num_face = tab_domaine(ii, jj, kk);
             if ( num_face != -1 )
               {
                 tab_calc_fft_1D(1, num_spectre(1), iy) = num_face;
-                tab_coord_1D   (1, num_spectre(1), iy) = coord_zone(jj, 1);
+                tab_coord_1D   (1, num_spectre(1), iy) = coord_domaine(jj, 1);
                 iy++;
               }
           }
@@ -1018,17 +1018,17 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_1D(const IntTab& t
       }
 
   // pour chaque point, on cherche les points sur la meme ligne selon z
-  for (int jj=0; jj<nb_coord_zone(1)-1; jj++)
-    for (int ii=0; ii<nb_coord_zone(0)-1; ii++)
+  for (int jj=0; jj<nb_coord_domaine(1)-1; jj++)
+    for (int ii=0; ii<nb_coord_domaine(0)-1; ii++)
       {
         int iz = 0 ;
-        for (int kk=0; kk<nb_coord_zone(2)-1; kk++)
+        for (int kk=0; kk<nb_coord_domaine(2)-1; kk++)
           {
-            int num_face = tab_zone(ii, jj, kk);
+            int num_face = tab_domaine(ii, jj, kk);
             if ( num_face != -1 )
               {
                 tab_calc_fft_1D(2, num_spectre(2), iz) = num_face;
-                tab_coord_1D   (2, num_spectre(2), iz) = coord_zone(kk, 2);
+                tab_coord_1D   (2, num_spectre(2), iz) = coord_domaine(kk, 2);
                 iz++;
               }
           }
@@ -1098,7 +1098,7 @@ void Traitement_particulier_NS_THI_VEF::ch_pour_fft_VEF_3D(const DoubleTab& tab_
 
 void Traitement_particulier_NS_THI_VEF::ch_pour_fft_VEF_1D(const DoubleTab& tab_global, DoubleVect& vect_u, DoubleVect& vect_v, DoubleVect& vect_w, int dir, int num_spectre ) const
 // Remplit les vecteurs (vect_u, vect_v et vect_w) avec les valeurs a envoyer
-// dans les routines FFT, en utilisant les valeurs du tableau tab_zone
+// dans les routines FFT, en utilisant les valeurs du tableau tab_domaine
 // et en tenant compte du tableau de relation tab_calc_fft_1D.
 // A faire tourner a chaque calcul de spectre 1D.
 {
@@ -1474,9 +1474,9 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
 void Traitement_particulier_NS_THI_VEF::calcul_correlations(const DoubleTab& vitesse)
 
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const int nb_faces = zone_VEF.nb_faces();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const int nb_faces = domaine_VEF.nb_faces();
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
 
   DoubleTab vitesse_bar(vitesse);
@@ -1601,13 +1601,13 @@ void Traitement_particulier_NS_THI_VEF::isotropie(const DoubleTab& vitesse, Nom 
 
 double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vitesse, Nom ext)
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,mon_equation->zone_Cl_dis().valeur());
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-  const int nb_faces = zone_VEF.nb_faces();
-  //  const int nb_faces_tot = zone_VF.nb_faces_tot();
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
+  const int nb_faces = domaine_VEF.nb_faces();
+  //  const int nb_faces_tot = domaine_VF.nb_faces_tot();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
   const int nb_comp=vitesse.line_size();
   double Ec = 0;
@@ -1615,12 +1615,12 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
   double Ec_max = 0;
 
   DoubleVect ec_face_vect;
-  zone_VEF.creer_tableau_faces(ec_face_vect);
+  domaine_VEF.creer_tableau_faces(ec_face_vect);
 
   // calcul de la moyenne, recherche du minimum et du maximum
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(num_cl);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
@@ -1664,8 +1664,8 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
         }
     } // fin du traitement des conditions limites
 
-  //  for (int num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
-  for (int num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+  //  for (int num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (int num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       for (int dim=0; dim<nb_comp; dim++)
         {
@@ -1673,7 +1673,7 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
         }
 
 
-    } // fin de la boucle pour les faces internes, incluant les zones de joints
+    } // fin de la boucle pour les faces internes, incluant les domaines de joints
 
   Ec_min = ec_face_vect.mp_min_vect();
   Ec_max = ec_face_vect.mp_max_vect();
@@ -1707,10 +1707,10 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF::calcul_Df_spatial(double& Df)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes = zone_VEF.volumes();
-  const int nb_elem = zone_VEF.nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  const int nb_elem = domaine_VEF.nb_elem();
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
 
   DoubleTab vorticite(nb_elem,dimension);
@@ -1786,11 +1786,11 @@ void Traitement_particulier_NS_THI_VEF::calcul_Df_spatial(double& Df)
 void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
 {
   // calcul du facteur de dissymetrie (skewness)
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes = zone_VEF.volumes();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const int nb_elem = zone_VEF.nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const int nb_elem = domaine_VEF.nb_elem();
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
 
   DoubleTab gradient(nb_elem_tot,dimension,dimension);
@@ -1857,10 +1857,10 @@ void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
 
 void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes = zone_VEF.volumes();
-  const int nb_elem = zone_VEF.nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes = domaine_VEF.volumes();
+  const int nb_elem = domaine_VEF.nb_elem();
   const Navier_Stokes_Turbulent& N_S_Turb  = ref_cast(Navier_Stokes_Turbulent,mon_equation.valeur());
   const DoubleTab& visc_turb = N_S_Turb.viscosite_turbulente().valeurs();
 
@@ -1922,13 +1922,13 @@ void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
 
 void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& tab_global , DoubleVect& moyenne)
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,mon_equation->zone_Cl_dis().valeur());
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   //  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VEF.nb_faces();
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const int nb_faces = domaine_VEF.nb_faces();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
 
   ArrOfInt flags;
@@ -1940,7 +1940,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
   // calcul de la moyenne, recherche du minimum et du maximum
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(num_cl);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
@@ -1982,7 +1982,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
         }
     } // fin du traitement des conditions limites
 
-  for (int num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (int num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       if (flags[num_face])
         {
@@ -2002,23 +2002,23 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
 
 void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_global , double& moyenne)
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,mon_equation->zone_Cl_dis().valeur());
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   //  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VEF.nb_faces();
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const int nb_faces = domaine_VEF.nb_faces();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
 
   DoubleVect moyenne_vect;
-  zone_VEF.creer_tableau_faces(moyenne_vect);
+  domaine_VEF.creer_tableau_faces(moyenne_vect);
   moyenne = 0;
 
   // calcul de la moyenne, recherche du minimum et du maximum
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(num_cl);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
@@ -2051,7 +2051,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_glob
         }
     } // fin du traitement des conditions limites
 
-  for (int num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (int num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       moyenne_vect(num_face) = tab_global(num_face) * volumes_entrelaces(num_face);
 
@@ -2102,10 +2102,10 @@ void Traitement_particulier_NS_THI_VEF::suppression_vitesse_moyenne(void)
 // Supprime la composante moyenne de la vitesse dans chaque direction,
 // travaille avec les vitesses aux faces
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VF& zone_VF=ref_cast(Zone_VF, zdisbase);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
   DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VF.nb_faces();
+  const int nb_faces = domaine_VF.nb_faces();
 
 
   if (je_suis_maitre())
@@ -2131,10 +2131,10 @@ void Traitement_particulier_NS_THI_VEF::conservation_Ec(void)
 // force la conservation de l'energie cinetique (THI forcee
 // par opposition a THI en decroissance libre)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VF& zone_VF=ref_cast(Zone_VF, zdisbase);
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
   DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const int nb_faces = zone_VF.nb_faces();
+  const int nb_faces = domaine_VF.nb_faces();
 
 
   if (je_suis_maitre())
@@ -2245,10 +2245,10 @@ void Traitement_particulier_NS_THI_VEF::post_traitement_particulier()
 
 double Traitement_particulier_NS_THI_VEF::calcul_volume_elem(void)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VF& zone_VF=ref_cast(Zone_VF, zdisbase);
-  const DoubleVect& volumes = zone_VF.volumes();
-  const int nb_elem = zone_VF.nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
+  const DoubleVect& volumes = domaine_VF.volumes();
+  const int nb_elem = domaine_VF.nb_elem();
 
   double volume = 0;
 

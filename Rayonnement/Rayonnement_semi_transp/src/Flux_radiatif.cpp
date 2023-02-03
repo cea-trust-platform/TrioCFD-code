@@ -40,7 +40,7 @@ Entree& Flux_radiatif::readOn(Entree& is)
 void Flux_radiatif::typer()
 {
   //Cerr<<"Flux_radiatif::typer()"<<finl;
-  Equation_base& eqn = zone_Cl_dis().equation();
+  Equation_base& eqn = domaine_Cl_dis().equation();
   Nom type = "Flux_radiatif";
   Nom disc = eqn.discretisation().que_suis_je();
   // les operateurs des sources sont communs aux discretisations VEF et VEFP1B

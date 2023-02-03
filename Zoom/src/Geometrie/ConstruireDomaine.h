@@ -26,16 +26,16 @@
 
 #include <Interprete_geometrique_base.h>
 class Domaine;
-class Sous_Zone;
+class Sous_Domaine;
 #include <TRUSTTabs_forward.h>
-class Zone;
+class Domaine;
 #include <TRUSTTabs_forward.h>
 /*! @brief Classe ConstruireDomaine Cette classe est un interprete qui sert a lire et executer
  *
  *     la directive ConstruireDomaine :
- *         ConstruireDomaine nom_domaine nom_sszone
+ *         ConstruireDomaine nom_domaine nom_ssdomaine
  *     Cette directive sert a construire un nouveau domaine a partir
- *     d 'une sous zone
+ *     d 'une sous domaine
  *
  * @sa Interprete Rectangle
  */
@@ -49,8 +49,8 @@ public :
 
 protected :
 
-  static void creer_sommet_et_elem(Domaine&, Sous_Zone&, IntTab&);
-  static void creer_bords(Zone&, Sous_Zone&, IntTab&);
+  static void creer_sommet_et_elem(Domaine&, Sous_Domaine&, IntTab&);
+  static void creer_bords(Domaine&, Sous_Domaine&, IntTab&);
   static int ajouterSom(Domaine& , const DoubleTab&, DoubleTab&, int& );
 
 };

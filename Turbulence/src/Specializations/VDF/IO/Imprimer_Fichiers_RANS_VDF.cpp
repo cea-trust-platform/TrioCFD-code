@@ -61,12 +61,12 @@ Entree& Imprimer_Fichiers_RANS_VDF::interpreter(Entree& is)
     }
   Probleme_base& pb=ref_cast(Probleme_base, objet(nom_pb));
 
-  const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,pb.equation(0).zone_dis().valeur());
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,pb.equation(0).domaine_dis().valeur());
   const Equation_base& eqn_hydr = pb.equation(0);
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs(); //vitesse
   SFichier fic_vit("vitesse_RANS.dat");
 
-  int ndeb = 0, nfin = zone_VDF.nb_faces_tot() ;
+  int ndeb = 0, nfin = domaine_VDF.nb_faces_tot() ;
 
   for(int num_face = ndeb ; num_face < nfin ; num_face ++)
     {
@@ -79,7 +79,7 @@ Entree& Imprimer_Fichiers_RANS_VDF::interpreter(Entree& is)
   const Equation_base& eqn_therm = pb.equation(1);
   const DoubleVect& temp = eqn_therm.inconnue().valeurs(); //temperature
 
-  int ndeb2 = 0, nfin2 = zone_VDF.nb_elem_tot() ;
+  int ndeb2 = 0, nfin2 = domaine_VDF.nb_elem_tot() ;
 
   for(int num_elem = ndeb2 ; num_elem < nfin2 ; num_elem++)
     {

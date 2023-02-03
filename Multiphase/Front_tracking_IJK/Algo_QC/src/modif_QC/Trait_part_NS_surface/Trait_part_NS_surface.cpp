@@ -25,14 +25,14 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Probleme_base.h>
 #include <Discretisation_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Fluide_Quasi_Compressible.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Schema_Temps_base.h>
 #include <DoubleTrav.h>
 #include <communications.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Loi_Etat_GP.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
@@ -167,10 +167,10 @@ Entree& Traitement_particulier_NS_surface::lire(Entree& is)
 
 void Traitement_particulier_NS_surface::preparer_calcul_particulier()
 {
-  const Zone_dis_base& 				zdisbase	= mon_equation->inconnue().zone_dis_base();
-  const Zone_VF& 					zone_VF		= ref_cast(Zone_VF, zdisbase);
-  const DoubleTab& 					xp 		= zone_VF.xp();
-  int 								nb_elems 	= zone_VF.zone().nb_elem();
+  const Domaine_dis_base& 				zdisbase	= mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VF& 					domaine_VF		= ref_cast(Domaine_VF, zdisbase);
+  const DoubleTab& 					xp 		= domaine_VF.xp();
+  int 								nb_elems 	= domaine_VF.domaine().nb_elem();
 
   int num_elem	= 0; // compteur des elements
   int i,j,l;	  // compteurs des boucles
@@ -405,10 +405,10 @@ void Traitement_particulier_NS_surface::post_traitement_particulier()
           // Calcul des Moyennes spatiales
           //////////////////////////////////////////////////////////
 
-          const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-          const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
+          const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+          const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
 
-          int nb_elem_p = zone_VDF.zone().nb_elem();
+          int nb_elem_p = domaine_VDF.domaine().nb_elem();
           int num_elem;
 
           int i=0,j=0,k =0;

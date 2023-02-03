@@ -27,7 +27,7 @@
 #include <Linear_algebra_tools.h>
 #include <IJK_Splitting.h>
 #include <TRUSTTab.h>
-class Zone_dis;
+class Domaine_dis;
 class Parcours_interface;
 /*! @brief : class Maillage_FT_IJK
  *
@@ -43,7 +43,7 @@ class Maillage_FT_IJK : public Maillage_FT_Disc
 
 public:
   Maillage_FT_IJK(const Maillage_FT_IJK&) = default;
-  void initialize(const IJK_Splitting&, const Zone_dis&, const Parcours_interface&);
+  void initialize(const IJK_Splitting&, const Domaine_dis&, const Parcours_interface&);
   const ArrOfInt&   compo_connexe_facettes() const
   {
     return compo_connexe_facettes_;

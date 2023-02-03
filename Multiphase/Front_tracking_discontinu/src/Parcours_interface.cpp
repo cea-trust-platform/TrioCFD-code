@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Parcours_interface.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Domaine.h>
 #include <TRUST_Deriv.h>
 #include <Comm_Group.h>
@@ -55,8 +55,8 @@ Sortie& Parcours_interface::printOn(Sortie& os) const
 
 Parcours_interface::Parcours_interface()
 {
-  zone_elem_ptr = 0;
-  zone_sommets_ptr = 0;
+  domaine_elem_ptr = 0;
+  domaine_sommets_ptr = 0;
   Valeur_max_coordonnees_ = 0.;
   Erreur_max_coordonnees_ = 0.;
   correction_parcours_thomas_ = 0;
@@ -79,34 +79,34 @@ const Parcours_interface& Parcours_interface::operator=(const Parcours_interface
   return *this;
 }
 
-/*! @brief Remplissage des variables persistantes de la classe (refzone_vf_, nb_faces_elem_, nb_elements_reels_, type_element_,
+/*! @brief Remplissage des variables persistantes de la classe (refdomaine_vf_, nb_faces_elem_, nb_elements_reels_, type_element_,
  *
  *    equations_plans_faces_).
  *
  */
-void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
+void Parcours_interface::associer_domaine_dis(const Domaine_dis& domaine_dis)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
-  assert(! refzone_vf_.non_nul());
-  refzone_vf_ = zone_vf;
-  nb_faces_elem_ = zone_vf.zone().nb_faces_elem();
-  nb_elements_reels_ = zone_vf.zone().nb_elem();
-  nb_sommets_par_face_ = zone_vf.nb_som_face();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  assert(! refdomaine_vf_.non_nul());
+  refdomaine_vf_ = domaine_vf;
+  nb_faces_elem_ = domaine_vf.domaine().nb_faces_elem();
+  nb_elements_reels_ = domaine_vf.domaine().nb_elem();
+  nb_sommets_par_face_ = domaine_vf.nb_som_face();
   drapeaux_elements_parcourus_.resize_array(nb_elements_reels_);
   drapeaux_elements_parcourus_ = 0;
-  zone_elem_ptr = 0;
-  zone_sommets_ptr = 0;
+  domaine_elem_ptr = 0;
+  domaine_sommets_ptr = 0;
 
   // Calcul de la valeur maximale des coordonnees du maillage fixe:
   {
-    const DoubleTab& coord_som = zone_vf.zone().domaine().coord_sommets();
+    const DoubleTab& coord_som = domaine_vf.domaine().coord_sommets();
     Valeur_max_coordonnees_ = mp_max_abs_vect(coord_som);
     Erreur_max_coordonnees_ = Valeur_max_coordonnees_ * Erreur_relative_maxi_;
   }
 
   // Remplissage du tableau equations_plans_faces_
   {
-    const int nb_faces = zone_vf.nb_faces();
+    const int nb_faces = domaine_vf.nb_faces();
     const int dimension3 = (Objet_U::dimension == 3);
     int i;
     double a, b, c = 0., d;
@@ -115,7 +115,7 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
     equations_plans_faces_.resize(nb_faces, 4);
     for (i = 0; i < nb_faces; i++)
       {
-        x = zone_vf.xv(i, 0);
+        x = domaine_vf.xv(i, 0);
         if (Objet_U::bidim_axi && x == 0.)
           {
             // Cas particulier: la normale est nulle sur l'axe (surface nulle)
@@ -125,13 +125,13 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
           }
         else
           {
-            a = zone_vf.face_normales(i, 0);
-            b = zone_vf.face_normales(i, 1);
-            y = zone_vf.xv(i, 1);
+            a = domaine_vf.face_normales(i, 0);
+            b = domaine_vf.face_normales(i, 1);
+            y = domaine_vf.xv(i, 1);
             if (dimension3)
               {
-                c = zone_vf.face_normales(i, 2);
-                z = zone_vf.xv(i, 2);
+                c = domaine_vf.face_normales(i, 2);
+                z = domaine_vf.xv(i, 2);
               }
             inverse_norme = 1. / sqrt(a*a + b*b + c*c);
             a *= inverse_norme;
@@ -145,7 +145,7 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
         equations_plans_faces_(i, 3) = d;
       }
   }
-  const Nom& nom_elem = zone_vf.zone().type_elem().valeur().que_suis_je();
+  const Nom& nom_elem = domaine_vf.domaine().type_elem().valeur().que_suis_je();
   if (nom_elem == "Rectangle")
     type_element_ = RECTANGLE;
   else if (nom_elem == "Rectangle_2D_axi")
@@ -158,7 +158,7 @@ void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
     type_element_ = HEXA;
   else
     {
-      Cerr << "Parcours_interface::associer_zone_vf\n";
+      Cerr << "Parcours_interface::associer_domaine_vf\n";
       Cerr << " Le type d'element " << nom_elem;
       Cerr << " n'est pas reconnu !\n";
       exit();
@@ -182,11 +182,11 @@ void Parcours_interface::associer_connectivite_frontieres(const Connectivite_fro
 
 void Parcours_interface::parcourir(Maillage_FT_Disc& maillage) const
 {
-  assert(refzone_vf_.non_nul());
+  assert(refdomaine_vf_.non_nul());
 
-  const Zone_VF& zone_vf = refzone_vf_.valeur();
-  zone_elem_ptr = & zone_vf.zone().les_elems();
-  zone_sommets_ptr = & zone_vf.zone().domaine().les_sommets();
+  const Domaine_VF& domaine_vf = refdomaine_vf_.valeur();
+  domaine_elem_ptr = & domaine_vf.domaine().les_elems();
+  domaine_sommets_ptr = & domaine_vf.domaine().les_sommets();
 
   DoubleTab copie_sommets_maillage;
   if (correction_parcours_thomas_)
@@ -207,7 +207,7 @@ void Parcours_interface::parcourir(Maillage_FT_Disc& maillage) const
 
   // RAZ des intersections elements-facettes
   {
-    const int nb_elem = zone_vf.nb_elem();
+    const int nb_elem = domaine_vf.nb_elem();
     const int nb_facettes = maillage.facettes_.dimension(0);
     maillage.intersections_elem_facettes_.reset(nb_elem, nb_facettes);
   }
@@ -255,7 +255,7 @@ void Parcours_interface::parcourir(Maillage_FT_Disc& maillage) const
               int premier_sommet = maillage.facettes_(i,0);
               int element_depart = maillage.sommet_elem_[premier_sommet];
               if (element_depart >= 0)
-                parcours_facette(zone_vf, maillage,
+                parcours_facette(domaine_vf, maillage,
                                  echange_facettes_numfacette,
                                  echange_facettes_numelement,
                                  i, element_depart);
@@ -269,7 +269,7 @@ void Parcours_interface::parcourir(Maillage_FT_Disc& maillage) const
             {
               int num_facette = facettes_a_traiter_numfacette[i];
               int element_depart = facettes_a_traiter_numelement[i];
-              parcours_facette(zone_vf, maillage,
+              parcours_facette(domaine_vf, maillage,
                                echange_facettes_numfacette,
                                echange_facettes_numelement,
                                num_facette, element_depart);
@@ -337,26 +337,26 @@ static void effacer_drapeaux_elements_parcourus(
 // Calcul de l'equation de plan d'une face d'un element eulerien. Pour un point (x,y,z),
 // la fonction (a*x+b*y+c*z+d) * signe est positive a l'interieur de l'element,
 // negative a l'exterieur. La normale (a,b,c) est unitaire.
-// Parametre:     zone_vf
-// Signification: reference a la Zone_VF. Attention, ce doit etre la meme zone que celle qui
+// Parametre:     domaine_vf
+// Signification: reference a la Domaine_VF. Attention, ce doit etre la meme domaine que celle qui
 //                a ete associee au parcours !!!
 // Parametre:     num_element
-// Signification: numero d'un element reel de la zone (0 <= num_element < elem_faces().dimension(0))
+// Signification: numero d'un element reel de la domaine (0 <= num_element < elem_faces().dimension(0))
 // Parametre:     num_face_element
 // Signification: numero d'une face de l'element (0 <= num_face_element < elem_faces().dimension(1))
 // Parametre:     a,b,c,d
 // Signification: on y met les coefficients du plan: normale (a,b,c) et constante d
 // Valeur de retour : signe (1. ou -1.)
-inline double Parcours_interface::calcul_eq_plan(const Zone_VF& zone_vf,
+inline double Parcours_interface::calcul_eq_plan(const Domaine_VF& domaine_vf,
                                                  const int num_element,
                                                  const int num_face_element,
                                                  double& a, double& b, double& c, double& d) const
 {
-  assert((&zone_vf) == (&(refzone_vf_.valeur())));
+  assert((&domaine_vf) == (&(refdomaine_vf_.valeur())));
   // Numero de la face i
-  const int num_face = zone_vf.elem_faces(num_element, num_face_element);
+  const int num_face = domaine_vf.elem_faces(num_element, num_face_element);
   // Numero du premier element voisin de la face
-  const int elem_voisin = zone_vf.face_voisins(num_face, 0);
+  const int elem_voisin = domaine_vf.face_voisins(num_face, 0);
   // Equation du plan contenant la face
   a = equations_plans_faces_(num_face, 0);
   b = equations_plans_faces_(num_face, 1);
@@ -372,7 +372,7 @@ inline double Parcours_interface::calcul_eq_plan(const Zone_VF& zone_vf,
 // Parcours des elements euleriens traverses par la facette specifiee,
 // de proche en proche, en commencant par l'element_depart.
 
-void Parcours_interface::parcours_facette(const Zone_VF& zone_vf,
+void Parcours_interface::parcours_facette(const Domaine_VF& domaine_vf,
                                           Maillage_FT_Disc& maillage,
                                           ArrOfInt& echange_facettes_numfacette,
                                           ArrOfInt& echange_facettes_numelement,
@@ -431,10 +431,10 @@ void Parcours_interface::parcours_facette(const Zone_VF& zone_vf,
           // Calcul de l'intersection facette_element
           int code_retour;
           if (dimension3)
-            code_retour = calcul_intersection_facelem_3D(zone_vf, maillage,
+            code_retour = calcul_intersection_facelem_3D(domaine_vf, maillage,
                                                          num_facette, element);
           else
-            code_retour = calcul_intersection_facelem_2D(zone_vf, maillage,
+            code_retour = calcul_intersection_facelem_2D(domaine_vf, maillage,
                                                          num_facette, element);
           // Decryptage du code retour
           // S'il est negatif, erreur grossiere dans l'algorithme...
@@ -453,9 +453,9 @@ void Parcours_interface::parcours_facette(const Zone_VF& zone_vf,
                 continue;
 
               // Numero de l'element voisin
-              const int num_face = zone_vf.elem_faces(element, j);
-              const int elem_voisin = zone_vf.face_voisins(num_face, 0)
-                                      + zone_vf.face_voisins(num_face, 1)
+              const int num_face = domaine_vf.elem_faces(element, j);
+              const int elem_voisin = domaine_vf.face_voisins(num_face, 0)
+                                      + domaine_vf.face_voisins(num_face, 1)
                                       - element;
 
               // S'il n'y a pas de voisin, on est au bord du domaine
@@ -506,7 +506,7 @@ void Parcours_interface::parcours_facette(const Zone_VF& zone_vf,
 //        bit 1 : deuxieme face, etc...)
 
 int Parcours_interface::calcul_intersection_facelem_2D(
-  const Zone_VF& zone_vf,
+  const Domaine_VF& domaine_vf,
   Maillage_FT_Disc& maillage,
   int num_facette, int num_element) const
 {
@@ -561,7 +561,7 @@ int Parcours_interface::calcul_intersection_facelem_2D(
     {
       // Coefficients de la fonction qui definit le plan (c est nul en 2D).
       double a, b, c, d;
-      double signe = calcul_eq_plan(zone_vf, num_element, num_plan, a, b, c, d);
+      double signe = calcul_eq_plan(domaine_vf, num_element, num_plan, a, b, c, d);
       // Calcul de la fonction f aux deux extremites du segment d'origine
       const double f_0 = (a * x0 + b * y0 + d) * signe;
       const double f_1 = (a * x1 + b * y1 + d) * signe;
@@ -628,7 +628,7 @@ int Parcours_interface::calcul_intersection_facelem_2D(
       switch(type_element_)
         {
         case RECTANGLE:
-          volume = volume_barycentre_rectangle(zone_vf, num_element,
+          volume = volume_barycentre_rectangle(domaine_vf, num_element,
                                                ix0, iy0, ix1, iy1,
                                                Erreur_max_coordonnees_,
                                                barycentre_phase1);
@@ -639,7 +639,7 @@ int Parcours_interface::calcul_intersection_facelem_2D(
               Cerr << "WARNING : barycentre_phase1 not filled properly!!" << finl;
               Cerr << "WARNING : Calculation of barycentre_phase1 not implemented yet." << finl;
             }
-          volume = volume_triangle(zone_vf, num_element,
+          volume = volume_triangle(domaine_vf, num_element,
                                    ix0, iy0, ix1, iy1,
                                    plan_coupe0, plan_coupe1);
           break;
@@ -690,7 +690,7 @@ int Parcours_interface::calcul_intersection_facelem_2D(
 //              plan_coupe0, plan_coupe1 : numeros de la face de l'element sur
 //                                           laquelle se trouve l'extremite.
 
-inline double Parcours_interface::volume_rectangle(const Zone_VF& zone_vf,
+inline double Parcours_interface::volume_rectangle(const Domaine_VF& domaine_vf,
                                                    int num_element,
                                                    double x0, double y0,
                                                    double x1, double y1,
@@ -704,14 +704,14 @@ inline double Parcours_interface::volume_rectangle(const Zone_VF& zone_vf,
   static const int NUM_FACE_BAS = 1;
   static const int NUM_FACE_HAUT = 3;
   static const int NUM_FACE_DROITE = 2;
-  int face_bas = zone_vf.elem_faces(num_element, NUM_FACE_BAS);
-  int face_gauche = zone_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
-  int face_droite = zone_vf.elem_faces(num_element, NUM_FACE_DROITE);
-  int face_haut = zone_vf.elem_faces(num_element, NUM_FACE_HAUT);
-  double y_bas = zone_vf.xv(face_bas, 1);
-  double x_gauche = zone_vf.xv(face_gauche, 0);
-  double x_droite = zone_vf.xv(face_droite, 0);
-  double y_haut = zone_vf.xv(face_haut, 1);
+  int face_bas = domaine_vf.elem_faces(num_element, NUM_FACE_BAS);
+  int face_gauche = domaine_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
+  int face_droite = domaine_vf.elem_faces(num_element, NUM_FACE_DROITE);
+  int face_haut = domaine_vf.elem_faces(num_element, NUM_FACE_HAUT);
+  double y_bas = domaine_vf.xv(face_bas, 1);
+  double x_gauche = domaine_vf.xv(face_gauche, 0);
+  double x_droite = domaine_vf.xv(face_droite, 0);
+  double y_haut = domaine_vf.xv(face_haut, 1);
 
   // Volume de l'element
   double v_elem = (x_droite - x_gauche) * (y_haut - y_bas);
@@ -769,7 +769,7 @@ inline double Parcours_interface::volume_rectangle(const Zone_VF& zone_vf,
  */
 // Comme volume_rectangle, cette methode calcul le barycentre
 // It is identical to volume, but with multiplication by x or y when needed to obtain the barycenter...
-double Parcours_interface::volume_barycentre_rectangle(const Zone_VF& zone_vf,
+double Parcours_interface::volume_barycentre_rectangle(const Domaine_VF& domaine_vf,
                                                        int num_element,
                                                        double x0, double y0,
                                                        double x1, double y1,
@@ -784,14 +784,14 @@ double Parcours_interface::volume_barycentre_rectangle(const Zone_VF& zone_vf,
   static const int NUM_FACE_BAS = 1;
   static const int NUM_FACE_HAUT = 3;
   static const int NUM_FACE_DROITE = 2;
-  int face_bas = zone_vf.elem_faces(num_element, NUM_FACE_BAS);
-  int face_gauche = zone_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
-  int face_droite = zone_vf.elem_faces(num_element, NUM_FACE_DROITE);
-  int face_haut = zone_vf.elem_faces(num_element, NUM_FACE_HAUT);
-  double y_bas = zone_vf.xv(face_bas, 1);
-  double x_gauche = zone_vf.xv(face_gauche, 0);
-  double x_droite = zone_vf.xv(face_droite, 0);
-  double y_haut = zone_vf.xv(face_haut, 1);
+  int face_bas = domaine_vf.elem_faces(num_element, NUM_FACE_BAS);
+  int face_gauche = domaine_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
+  int face_droite = domaine_vf.elem_faces(num_element, NUM_FACE_DROITE);
+  int face_haut = domaine_vf.elem_faces(num_element, NUM_FACE_HAUT);
+  double y_bas = domaine_vf.xv(face_bas, 1);
+  double x_gauche = domaine_vf.xv(face_gauche, 0);
+  double x_droite = domaine_vf.xv(face_droite, 0);
+  double y_haut = domaine_vf.xv(face_haut, 1);
 
   // Volume de l'element
   double v_elem = (x_droite - x_gauche) * (y_haut - y_bas);
@@ -902,17 +902,17 @@ inline void Parcours_interface::matrice_triangle(int num_element,
                                                  FTd_matrice22& matrice,
                                                  double& surface) const
 {
-  const int s0 = (*zone_elem_ptr)(num_element,0);
-  const int s1 = (*zone_elem_ptr)(num_element,1);
-  const int s2 = (*zone_elem_ptr)(num_element,2);
-  const double x0 = (*zone_sommets_ptr)(s0, 0);
-  const double y0 = (*zone_sommets_ptr)(s0, 1);
+  const int s0 = (*domaine_elem_ptr)(num_element,0);
+  const int s1 = (*domaine_elem_ptr)(num_element,1);
+  const int s2 = (*domaine_elem_ptr)(num_element,2);
+  const double x0 = (*domaine_sommets_ptr)(s0, 0);
+  const double y0 = (*domaine_sommets_ptr)(s0, 1);
   origine[0] = x0;
   origine[1] = y0;
-  const double dx1 = (*zone_sommets_ptr)(s1, 0) - x0;
-  const double dy1 = (*zone_sommets_ptr)(s1, 1) - y0;
-  const double dx2 = (*zone_sommets_ptr)(s2, 0) - x0;
-  const double dy2 = (*zone_sommets_ptr)(s2, 1) - y0;
+  const double dx1 = (*domaine_sommets_ptr)(s1, 0) - x0;
+  const double dy1 = (*domaine_sommets_ptr)(s1, 1) - y0;
+  const double dx2 = (*domaine_sommets_ptr)(s2, 0) - x0;
+  const double dy2 = (*domaine_sommets_ptr)(s2, 1) - y0;
 
   //                         [ dx1  dx2 ](-1)   [ matrice[0][0]  matrice[0][1] ]
   // Inversion de la matrice:[          ]     = [                              ]
@@ -967,7 +967,7 @@ inline void Parcours_interface::transformation_2d(const FTd_vecteur2& origine,
  *  sommet0  sommet1
  *
  */
-inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
+inline double Parcours_interface::volume_triangle(const Domaine_VF& domaine_vf,
                                                   int num_element,
                                                   double x0, double y0,
                                                   double x1, double y1,
@@ -1012,14 +1012,14 @@ inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
  *
  * Precondition: dimension = 3
  *
- * @param (zone_vf) zone du calcul
+ * @param (domaine_vf) domaine du calcul
  * @param (maillage) description du maillage de l'interface
  * @param (num_facette) indice de la facette intersectant
  * @param (num_element) indice de l'element intersecte
  * @return (int) 1 si ok, 0 si ??.
  */
 int Parcours_interface::calcul_intersection_facelem_3D(
-  const Zone_VF& zone_vf,
+  const Domaine_VF& domaine_vf,
   Maillage_FT_Disc& maillage,
   int num_facette, int num_element) const
 {
@@ -1106,7 +1106,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
       // Coefficients de la fonction qui definit le plan
       // "fonction plan" (x,y,z) = a*x + b*y + c*d + d
       double a, b, c, d;
-      double signe = calcul_eq_plan(zone_vf, num_element, num_plan, a, b, c, d);
+      double signe = calcul_eq_plan(domaine_vf, num_element, num_plan, a, b, c, d);
       // Calcul de la "fonction plan" aux sommets de la facette
       const double f0 = (a * coord_som[0][0] + b * coord_som[0][1] + c * coord_som[0][2] + d) * signe;
       const double f1 = (a * coord_som[1][0] + b * coord_som[1][1] + c * coord_som[1][2] + d) * signe;
@@ -1294,7 +1294,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
               Cerr << "WARNING : Calculation of barycentre_phase1 not implemented yet for TETRA." << finl;
               flag_warning_code_missing=0;
             }
-          volume = volume_tetraedre(zone_vf, num_element,num_facette,
+          volume = volume_tetraedre(domaine_vf, num_element,num_facette,
                                     maillage,
                                     poly_reelles_,
                                     centre_de_gravite,
@@ -1308,7 +1308,7 @@ int Parcours_interface::calcul_intersection_facelem_3D(
               flag_warning_code_missing=0;
             }
           maillage.calcul_normale_3D(num_facette,norme);
-          volume = volume_hexaedre(zone_vf, num_element,
+          volume = volume_hexaedre(domaine_vf, num_element,
                                    poly_reelles_,
                                    norme, centre_de_gravite,
                                    polygone_plan_coupe_,
@@ -1438,14 +1438,14 @@ void Parcours_interface::calcul_produit_matrice33_vecteur(const FTd_matrice33& m
  *
  * Precondition: dimension = 3
  *
- * @param (zone_vf) zone du calcul
+ * @param (domaine_vf) domaine du calcul
  * @param (num_element) indice de l'element intersecte
  * @param (poly_reelles) coordonnees (reelles) des sommets definissant une surface contenue dans l'element (en pratique : surface d'intersection entre une facette d'interface et l'element)
  * @param (centre_de_gravite) centre de gravite de la surface
  * @param (epsilon) erreur relative
  * @return (double) contribution du volume engendre par la surface dans l'element
  */
-double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
+double Parcours_interface::volume_tetraedre(const Domaine_VF& domaine_vf,
                                             int num_element,
                                             int num_facette,
                                             const Maillage_FT_Disc& maillage,
@@ -1458,25 +1458,25 @@ double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
   static const int SOM_B = 2;     // indice du sommet qui servira pour le second vecteur
   static const int SOM_C = 3;     // indice du sommet qui servira pour le troisieme vecteur
 
-  const int som_Z = (*zone_elem_ptr)(num_element,SOM_Z);
-  const int som_A = (*zone_elem_ptr)(num_element,SOM_A);
-  const int som_B = (*zone_elem_ptr)(num_element,SOM_B);
-  const int som_C = (*zone_elem_ptr)(num_element,SOM_C);
+  const int som_Z = (*domaine_elem_ptr)(num_element,SOM_Z);
+  const int som_A = (*domaine_elem_ptr)(num_element,SOM_A);
+  const int som_B = (*domaine_elem_ptr)(num_element,SOM_B);
+  const int som_C = (*domaine_elem_ptr)(num_element,SOM_C);
 
   FTd_matrice33 matrice, matrice_inv;
   //on commence par calculer la matrice de transformation de la base (OX,OY,OZ) vers (ZA,ZB,ZC)
   //colonne 0 : vecteur OA
-  matrice[0][0] = (*zone_sommets_ptr)(som_A, 0) - (*zone_sommets_ptr)(som_Z, 0); //OA(x)
-  matrice[1][0] = (*zone_sommets_ptr)(som_A, 1) - (*zone_sommets_ptr)(som_Z, 1); //OA(y)
-  matrice[2][0] = (*zone_sommets_ptr)(som_A, 2) - (*zone_sommets_ptr)(som_Z, 2); //OA(z)
+  matrice[0][0] = (*domaine_sommets_ptr)(som_A, 0) - (*domaine_sommets_ptr)(som_Z, 0); //OA(x)
+  matrice[1][0] = (*domaine_sommets_ptr)(som_A, 1) - (*domaine_sommets_ptr)(som_Z, 1); //OA(y)
+  matrice[2][0] = (*domaine_sommets_ptr)(som_A, 2) - (*domaine_sommets_ptr)(som_Z, 2); //OA(z)
   //colonne 1 : vecteur OB
-  matrice[0][1] = (*zone_sommets_ptr)(som_B, 0) - (*zone_sommets_ptr)(som_Z, 0); //OB(x)
-  matrice[1][1] = (*zone_sommets_ptr)(som_B, 1) - (*zone_sommets_ptr)(som_Z, 1); //OB(y)
-  matrice[2][1] = (*zone_sommets_ptr)(som_B, 2) - (*zone_sommets_ptr)(som_Z, 2); //OB(z)
+  matrice[0][1] = (*domaine_sommets_ptr)(som_B, 0) - (*domaine_sommets_ptr)(som_Z, 0); //OB(x)
+  matrice[1][1] = (*domaine_sommets_ptr)(som_B, 1) - (*domaine_sommets_ptr)(som_Z, 1); //OB(y)
+  matrice[2][1] = (*domaine_sommets_ptr)(som_B, 2) - (*domaine_sommets_ptr)(som_Z, 2); //OB(z)
   //colonne 2 : vecteur OC
-  matrice[0][2] = (*zone_sommets_ptr)(som_C, 0) - (*zone_sommets_ptr)(som_Z, 0); //OC(x)
-  matrice[1][2] = (*zone_sommets_ptr)(som_C, 1) - (*zone_sommets_ptr)(som_Z, 1); //OC(y)
-  matrice[2][2] = (*zone_sommets_ptr)(som_C, 2) - (*zone_sommets_ptr)(som_Z, 2); //OC(z)
+  matrice[0][2] = (*domaine_sommets_ptr)(som_C, 0) - (*domaine_sommets_ptr)(som_Z, 0); //OC(x)
+  matrice[1][2] = (*domaine_sommets_ptr)(som_C, 1) - (*domaine_sommets_ptr)(som_Z, 1); //OC(y)
+  matrice[2][2] = (*domaine_sommets_ptr)(som_C, 2) - (*domaine_sommets_ptr)(som_Z, 2); //OC(z)
 
   //on inverse ensuite la matrice de transformation
   calcul_inverse_matrice33(matrice,matrice_inv);
@@ -1491,7 +1491,7 @@ double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
     {
       for (k=0 ; k<3 ; k++)
         {
-          poly[k] = poly_reelles(i,k) - (*zone_sommets_ptr)(som_Z, k);
+          poly[k] = poly_reelles(i,k) - (*domaine_sommets_ptr)(som_Z, k);
         }
       calcul_produit_matrice33_vecteur(matrice_inv,poly, poly_ref);
       for (k=0 ; k<3 ; k++)
@@ -1786,7 +1786,7 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
  *
  * Precondition: dimension = 3
  *
- * @param (zone_vf) zone du calcul
+ * @param (domaine_vf) domaine du calcul
  * @param (num_element) indice de l'element intersecte
  * @param (poly_reelles) coordonnees (reelles) des sommets definissant une surface contenue dans l'element (en pratique : surface d'intersection entre une facette d'interface et l'element)
  * @param (norme) normale a la facette
@@ -1794,7 +1794,7 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
  * @param (epsilon) erreur relative
  * @return (double) contribution du volume engendre par la surface dans l'element
  */
-double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
+double Parcours_interface::volume_hexaedre(const Domaine_VF& domaine_vf,
                                            int num_element,
                                            const DoubleTab& poly_reelles,
                                            const FTd_vecteur3& norme,
@@ -1809,18 +1809,18 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
   static const int NUM_FACE_HAUT = 4;
   static const int NUM_FACE_ARRIERE = 2;
   static const int NUM_FACE_AVANT = 5;
-  int face_bas = zone_vf.elem_faces(num_element, NUM_FACE_BAS);
-  int face_haut = zone_vf.elem_faces(num_element, NUM_FACE_HAUT);
-  int face_gauche = zone_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
-  int face_droite = zone_vf.elem_faces(num_element, NUM_FACE_DROITE);
-  int face_arriere = zone_vf.elem_faces(num_element, NUM_FACE_ARRIERE);
-  int face_avant = zone_vf.elem_faces(num_element, NUM_FACE_AVANT);
-  double y_bas = zone_vf.xv(face_bas, 1);
-  double y_haut = zone_vf.xv(face_haut, 1);
-  double x_gauche = zone_vf.xv(face_gauche, 0);
-  double x_droite = zone_vf.xv(face_droite, 0);
-  double z_arriere = zone_vf.xv(face_arriere, 2);
-  double z_avant = zone_vf.xv(face_avant, 2);
+  int face_bas = domaine_vf.elem_faces(num_element, NUM_FACE_BAS);
+  int face_haut = domaine_vf.elem_faces(num_element, NUM_FACE_HAUT);
+  int face_gauche = domaine_vf.elem_faces(num_element, NUM_FACE_GAUCHE);
+  int face_droite = domaine_vf.elem_faces(num_element, NUM_FACE_DROITE);
+  int face_arriere = domaine_vf.elem_faces(num_element, NUM_FACE_ARRIERE);
+  int face_avant = domaine_vf.elem_faces(num_element, NUM_FACE_AVANT);
+  double y_bas = domaine_vf.xv(face_bas, 1);
+  double y_haut = domaine_vf.xv(face_haut, 1);
+  double x_gauche = domaine_vf.xv(face_gauche, 0);
+  double x_droite = domaine_vf.xv(face_droite, 0);
+  double z_arriere = domaine_vf.xv(face_arriere, 2);
+  double z_avant = domaine_vf.xv(face_avant, 2);
 
   //determination des signes pour les differentes composantes :
   double signe_princ, signe_compl0,signe_compl1;
@@ -1948,12 +1948,12 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
  *   barycentrique de l'intersection definie par I = (1-pos) * P0 + pos * P1
  *   Si on ne trouve pas d'intersection, pos_intersection est inchange.
  *  Valeur de retour:
- *   Si une intersection a ete trouvee, numero de la face de sortie dans la zone_vf
+ *   Si une intersection a ete trouvee, numero de la face de sortie dans la domaine_vf
  *   (peut servir d'index dans face_voisins par exemple).
  *   Sinon, renvoie -1.
  *
  */
-int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
+int Parcours_interface::calculer_face_sortie_element(const Domaine_VF& domaine_vf,
                                                      const int num_element,
                                                      double x0, double y0, double z0,
                                                      double x1, double y1, double z1,
@@ -1968,7 +1968,7 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
   for (int face = 0; face < n_faces; face++)
     {
       double a, b, c, d;
-      double signe = calcul_eq_plan(zone_vf, num_element, face, a, b, c, d);
+      double signe = calcul_eq_plan(domaine_vf, num_element, face, a, b, c, d);
 
       // f est toujours positif si le point est dans l'element,
       // sinon il est negatif pour au moins une face de l'element.
@@ -1997,7 +1997,7 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
   // Conversion du numero de la face de l'element en numero global de face
   if (face_sortie >= 0)
     {
-      face_sortie = zone_vf.elem_faces() (num_element, face_sortie);
+      face_sortie = domaine_vf.elem_faces() (num_element, face_sortie);
       pos_intersection = t_sortie;
     }
 
@@ -2016,7 +2016,7 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
  *   l'arete de la face qui est coupee par le segment [P0,p(P1)] (aretes
  *   telles qu'elles sont definies dans la classe Connectivite_frontieres).
  *
- * @param (zone_vf) la Zone_VF a laquelle se rapportent les indices de face et d'element
+ * @param (domaine_vf) la Domaine_VF a laquelle se rapportent les indices de face et d'element
  * @param (face_0) le numero de la face reelle sur laquelle se trouve le point P0
  * @param (num_element) un numero d'element voisin de la face face_0
  * @param (x0, y0, z0) Coordonnees du point P0 (en 2D, z0 est ignore)
@@ -2053,12 +2053,12 @@ int Parcours_interface::calculer_sortie_face_bord(const int face_0,
   }
 
   // Calcul de l'intersection avec l'element
-  const Zone_VF& zone_vf = refzone_vf_.valeur();
+  const Domaine_VF& domaine_vf = refdomaine_vf_.valeur();
   // Verifie que num_element est un voisin de face_0:
-  assert(zone_vf.face_voisins()(face_0,0) == num_element
-         || zone_vf.face_voisins()(face_0,1) == num_element);
+  assert(domaine_vf.face_voisins()(face_0,0) == num_element
+         || domaine_vf.face_voisins()(face_0,1) == num_element);
   double pos_intersection = 1.;
-  int face_sortie = calculer_face_sortie_element(zone_vf, num_element,
+  int face_sortie = calculer_face_sortie_element(domaine_vf, num_element,
                                                  x0, y0, z0,
                                                  x1, y1, z1,
                                                  pos_intersection);
@@ -2074,7 +2074,7 @@ int Parcours_interface::calculer_sortie_face_bord(const int face_0,
   // qui font qu'on sort par la mauvaise face (deja vu)
   if (face_sortie >= 0 && face_sortie != face_0)
     {
-      const IntTab& face_sommets = zone_vf.face_sommets();
+      const IntTab& face_sommets = domaine_vf.face_sommets();
       const int dimension2 = (Objet_U::dimension == 2);
       //
       // Calcul du numero de l'arete de bord coupee :
@@ -2083,7 +2083,7 @@ int Parcours_interface::calculer_sortie_face_bord(const int face_0,
       // ----------------------------------------------------
       assert(nb_sommets_par_face_ <= 4);
       // On met dans face_sortie_sommets les numeros des sommets de la face
-      // de sortie (indices de sommets dans zones_vf.zone().domaine().les_sommets()).
+      // de sortie (indices de sommets dans domaines_vf.domaine().domaine().les_sommets()).
       int face_sortie_sommets[4];
       int i;
       for (i = 0; i < nb_sommets_par_face_; i++)
@@ -2184,7 +2184,7 @@ int Parcours_interface::calculer_sortie_face_bord(const int face_0,
 //  Si cette distance est positive, le sommet est a l'exterieur de l'element,
 //  sinon il est a l'interieur. Une majoration de l'erreur sur ce resultat
 //  est donnee par get_erreur_geometrique.
-double Parcours_interface::distance_sommet_faces(const Zone_VF& zone_vf,
+double Parcours_interface::distance_sommet_faces(const Domaine_VF& domaine_vf,
                                                  const int num_element,
                                                  double x, double y, double z) const
 {
@@ -2193,7 +2193,7 @@ double Parcours_interface::distance_sommet_faces(const Zone_VF& zone_vf,
   for (int face = 0; face < n_faces; face++)
     {
       double a, b, c, d;
-      double signe = calcul_eq_plan(zone_vf, num_element, face, a, b, c, d);
+      double signe = calcul_eq_plan(domaine_vf, num_element, face, a, b, c, d);
       const double f = (a * x + b * y + c * z + d) * signe;
       if (f < f_min)
         f_min = f;
@@ -2245,7 +2245,7 @@ void Parcours_interface::projeter_vecteur_sur_face(const int num_face,
 void Parcours_interface::calculer_normale_face_bord(int num_face, double x, double y, double z,
                                                     double& nx_, double& ny_, double& nz_) const
 {
-  const IntTab& face_voisins = refzone_vf_.valeur().face_voisins();
+  const IntTab& face_voisins = refdomaine_vf_.valeur().face_voisins();
   double signe;
   if (face_voisins(num_face, 0) < 0)
     signe = 1.;
@@ -2256,18 +2256,18 @@ void Parcours_interface::calculer_normale_face_bord(int num_face, double x, doub
   nz_ = equations_plans_faces_(num_face, 2) * signe;
 }
 
-/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de la zone_vf a une
+/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de la domaine_vf a une
  *
  *   distance >= Erreur_max_coordonnees_ par un algorithme d'Uzawa.
  *  Valeur de retour: distance finale du sommet aux faces de l'element
  *   (positive si le sommet est a l'interieur)
  *
  */
-double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
+double Parcours_interface::uzawa2(const Domaine_VF& domaine_vf,
                                   const int elem,
                                   double& x, double& y, double& z) const
 {
-  const int nb_faces = zone_vf.elem_faces().dimension(1);
+  const int nb_faces = domaine_vf.elem_faces().dimension(1);
   ArrOfDouble coef_lagrange(nb_faces);
   int i;
   double somme_m_x = 0., somme_m_y = 0., somme_m_z = 0.;
@@ -2275,7 +2275,7 @@ double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
   for (i = 0; i < nb_faces; i++)
     {
       double a = 0., b = 0., c = 0., d = 0.;
-      calcul_eq_plan(zone_vf, elem, i, a, b, c, d);
+      calcul_eq_plan(domaine_vf, elem, i, a, b, c, d);
       a = std::fabs(a);
       b = std::fabs(b);
       c = std::fabs(c);
@@ -2304,7 +2304,7 @@ double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
       for (i = 0; i < nb_faces; i++)
         {
           double a = 0., b = 0., c = 0., d = 0.;
-          double s = calcul_eq_plan(zone_vf, elem, i, a, b, c, d);
+          double s = calcul_eq_plan(domaine_vf, elem, i, a, b, c, d);
           double dist = (a * solution_x + b * solution_y + c * solution_z + d) * s;
           // Le nombre suivant est un peu au pif: il ne faut pas prendre une valeur
           // qui risque de refaire des erreurs (si on prend 1., ca plante en vdf car
@@ -2350,7 +2350,7 @@ int Parcours_interface::eloigner_sommets_des_faces(Maillage_FT_Disc& maillage) c
   DoubleTab& sommets = maillage.sommets_;
   const ArrOfInt& som_elem = maillage.sommet_elem_;
   const int dim3 = (sommets.dimension(1) == 3);
-  const Zone_VF& zone_vf = refzone_vf_.valeur();
+  const Domaine_VF& domaine_vf = refdomaine_vf_.valeur();
   int count = 0;
   for (int i = 0; i < nb_sommets; i++)
     {
@@ -2365,11 +2365,11 @@ int Parcours_interface::eloigner_sommets_des_faces(Maillage_FT_Disc& maillage) c
       double x = sommets(i, 0);
       double y = sommets(i, 1);
       double z = dim3 ? sommets(i, 2) : 0.;
-      const double d = distance_sommet_faces(zone_vf, elem, x, y, z);
+      const double d = distance_sommet_faces(domaine_vf, elem, x, y, z);
       if (d < Erreur_max_coordonnees_)
         {
           // On deplace un peu ce sommet:
-          uzawa2(zone_vf, elem, x, y, z);
+          uzawa2(domaine_vf, elem, x, y, z);
           sommets(i, 0) = x;
           sommets(i, 1) = y;
           if (dim3)

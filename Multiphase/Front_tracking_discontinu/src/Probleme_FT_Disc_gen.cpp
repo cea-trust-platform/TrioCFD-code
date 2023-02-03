@@ -301,7 +301,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 }
 
 
-void Probleme_FT_Disc_gen::discretiser(const Discretisation_base& dis)
+void Probleme_FT_Disc_gen::discretiser(Discretisation_base& dis)
 {
   Pb_Fluide_base::discretiser(dis);
   if (la_chimie_.non_nul())

@@ -47,7 +47,7 @@ public :
   void associer_modele_rayo(Modele_rayo_semi_transp& modele) override;
 
 protected :
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
   Source le_source_rayo;
 

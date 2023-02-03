@@ -46,12 +46,12 @@ Entree& Restriction_elem_elem::readOn(Entree& s )
 /*! @brief calcul du nombre d'elements fins contenus dans chaque element grossier
  *
  */
-void Restriction_elem_elem::calculer(const Zone_VF& zone_VFG,
-                                     const Zone_VF& zone_VFF,
+void Restriction_elem_elem::calculer(const Domaine_VF& domaine_VFG,
+                                     const Domaine_VF& domaine_VFF,
                                      const IntVect& connect)
 {
   //Cerr<<"debut de  Restriction_elem_elem::calculer_nb_elemF_dans_chaque_elemG"<<finl;
-  int nb_elemG = zone_VFG.nb_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
   int nbelemsF;
   int num_elemG;
   int nombre_total_elemF = connect.size_array();
@@ -80,8 +80,8 @@ void Restriction_elem_elem::calculer(const Zone_VF& zone_VFG,
  *     car valeur
  *
  */
-void Restriction_elem_elem::restreindre(const Zone_VF& zone_VFG,
-                                        const Zone_VF& zone_VFF,
+void Restriction_elem_elem::restreindre(const Domaine_VF& domaine_VFG,
+                                        const Domaine_VF& domaine_VFF,
                                         const IntVect& connect,
                                         DoubleTab& valG,
                                         const DoubleTab& valF,int nb_comp)
@@ -92,8 +92,8 @@ void Restriction_elem_elem::restreindre(const Zone_VF& zone_VFG,
   int num_elemG;
   int comp;
   int nb_elem_fin;
-  int nb_elemG = zone_VFG.nb_elem();
-  int nb_elemFb = zone_VFF.nb_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
+  int nb_elemFb = domaine_VFF.nb_elem();
 
   //Mettre a 0 les valeurs grossieres a corriger
   for (nbG=0; nbG<nb_elemG; nbG++)

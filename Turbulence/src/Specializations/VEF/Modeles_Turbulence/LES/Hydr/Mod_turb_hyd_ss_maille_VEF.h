@@ -26,8 +26,8 @@
 
 
 #include <Mod_turb_hyd_ss_maille.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 
 /*! @brief classe Mod_turb_hyd_ss_maille_VEF Cette classe correspond a la mise en oeuvre des modeles sous
  *
@@ -44,13 +44,13 @@ class Mod_turb_hyd_ss_maille_VEF : public Mod_turb_hyd_ss_maille
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
   void calculer_longueurs_caracteristiques() override;
 
 protected :
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 };
 
 #endif

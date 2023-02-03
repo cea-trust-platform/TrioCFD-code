@@ -19,7 +19,7 @@
 #include <Ensemble_Lagrange_base.h>
 #include <TRUSTTabFT.h>
 #include <Descripteur_FT.h>
-#include <Ref_Zone_dis.h>
+#include <Ref_Domaine_dis.h>
 #include <Ref_Parcours_interface.h>
 #include <Ref_Transport_Interfaces_FT_Disc.h>
 #include <Intersections_Elem_Facettes_Data.h>
@@ -30,7 +30,7 @@ class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;
 class Maillage_Echange;
-class Zone_VF;
+class Domaine_VF;
 class Maillage_FT_Disc_Data_Cache;
 
 /*! @brief : class Maillage_FT_Disc Cette classe decrit un maillage:
@@ -97,7 +97,7 @@ public:
                                   const Intersections_Elem_Facettes* ief=NULL) const;
 
   void associer_equation_transport(const Equation_base& equation) override;
-  void associer_zone_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours);
+  void associer_domaine_dis_parcours(const Domaine_dis& domaine_dis, const Parcours_interface& parcours);
   Transport_Interfaces_FT_Disc& equation_transport();
   const Transport_Interfaces_FT_Disc& equation_transport() const;
   int type_statut() const;
@@ -150,7 +150,7 @@ public:
                                int& element_suivant,
                                int& face_suivante,
                                const Parcours_interface& parcours,
-                               const Zone_VF& zone_vf,
+                               const Domaine_VF& domaine_vf,
                                const IntTab& face_voisins,
                                int skip_facettes=0);
 
@@ -160,7 +160,7 @@ public:
                                 int& face_bord,
                                 const int num_sommet,
                                 const Parcours_interface& parcours,
-                                const Zone_VF& zone_vf,
+                                const Domaine_VF& domaine_vf,
                                 const IntTab& face_voisins,
                                 ArrOfInt& sommets_envoyes,
                                 ArrOfInt& element_virtuel_arrivee,
@@ -279,9 +279,9 @@ protected:
 
   REF(Transport_Interfaces_FT_Disc) refequation_transport_;
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
-  // a la zone_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
-  // C'est initialise dans associer_zone_dis.
-  REF(Zone_dis) refzone_dis_;
+  // a la domaine_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
+  // C'est initialise dans associer_domaine_dis.
+  REF(Domaine_dis) refdomaine_dis_;
   // Pour la meme raison, ajout d'une ref au parcours de l'interface:
   REF(Parcours_interface) refparcours_interface_;
 
@@ -290,7 +290,7 @@ protected:
 
   // Schema de communication permettant des echanges bidirectionnels avec
   // n'importe quel processeur voisin par un joint du maillage eulerien
-  Schema_Comm_FT schema_comm_zone_;
+  Schema_Comm_FT schema_comm_domaine_;
 
   // Cette variable indique l'etat de l'objet :
   // * RESET :   Maillage vide, non initialise.
@@ -335,7 +335,7 @@ protected:
   // mes_sommets(i,j)  = j-ieme composante de la position du i-eme sommet du maillage
   // La liste des sommets connus contient au minimum tous les sommets reels et
   // virtuels utilises dans la liste de facettes.
-  // Un sommet est reel s'il est situe a l'interieur de ma zone (c'est a dire
+  // Un sommet est reel s'il est situe a l'interieur de ma domaine (c'est a dire
   // si sommet_elem_ >= 0). Un sommet est reel pour exactement un processeur,
   // il est virtuel pour tous les autres. Pour les sommets situes a proximite d'un
   // joint (a epsilon pres), le choix du PE proprietaire est arbitraire.

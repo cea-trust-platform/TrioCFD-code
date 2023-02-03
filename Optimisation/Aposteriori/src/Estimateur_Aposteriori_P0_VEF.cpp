@@ -27,9 +27,9 @@ Sortie& Estimateur_Aposteriori_P0_VEF::printOn( Sortie& s ) const { return s << 
 
 Entree& Estimateur_Aposteriori_P0_VEF::readOn( Entree& s ) { return s; }
 
-void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Zone_Cl_dis_base& la_zone_Cl_dis_base)
+void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Domaine_Cl_dis_base& le_dom_Cl_dis_base)
 {
-  la_zone_Cl_VEF  = ref_cast(Zone_Cl_VEF, la_zone_Cl_dis_base);
+  le_dom_Cl_VEF  = ref_cast(Domaine_Cl_VEF, le_dom_Cl_dis_base);
   vitesse_= la_vitesse;
   pression_p1isop1b_ = la_pression;
   viscosite_cinematique_ = la_viscosite_cinematique;
@@ -37,18 +37,18 @@ void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse,
 
 void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
 {
-  const Zone_Cl_VEF& zone_cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = zone_cl_VEF.zone_VEF();
-  const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b, la_zone_VF.valeur());
-  const Zone& zone = zone_VEF_p.zone();
+  const Domaine_Cl_VEF& domaine_cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = domaine_cl_VEF.domaine_VEF();
+  const Domaine_VEF_PreP1b& domaine_VEF_p = ref_cast(Domaine_VEF_PreP1b, le_dom_VF.valeur());
+  const Domaine& domaine = domaine_VEF_p.domaine();
 
-  const DoubleTab& face_normales = zone_VEF.face_normales();
-  const DoubleVect& face_surfaces = zone_VEF.face_surfaces();
-  const int nb_faces = zone_VEF.nb_faces_tot();
+  const DoubleTab& face_normales = domaine_VEF.face_normales();
+  const DoubleVect& face_surfaces = domaine_VEF.face_surfaces();
+  const int nb_faces = domaine_VEF.nb_faces_tot();
   DoubleVect coeff_faces(nb_faces);
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  int premiere_face_int = zone_VEF.premiere_face_int();
-  const IntTab& som_elem=zone.les_elems();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
+  const IntTab& som_elem=domaine.les_elems();
 
   double sautdirectionnel;
   double estimtot;
@@ -61,10 +61,10 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   int i,j,ielem;
   int som_opp;
 
-  int nps=zone_VEF_p.numero_premier_sommet();
-  int nb_elem = zone_VEF.nb_elem();
-  int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const DoubleVect& inverse_volumes = zone_VEF.inverse_volumes();
+  int nps=domaine_VEF_p.numero_premier_sommet();
+  int nb_elem = domaine_VEF.nb_elem();
+  int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const DoubleVect& inverse_volumes = domaine_VEF.inverse_volumes();
   DoubleTab la_vitesse = vitesse_.valeur().valeurs();
   DoubleTab la_pression = pression_p1isop1b_.valeur().valeurs();
 
@@ -140,7 +140,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   vite_moye /= (dim+1.0);
 
   // Calcul du gradient des vitesses; sert à calculer "grad u" dans "u . grad u"
-  Champ_P1NC::calcul_gradient(la_vitesse, gradient_elem, la_zone_Cl_VEF.valeur());
+  Champ_P1NC::calcul_gradient(la_vitesse, gradient_elem, le_dom_Cl_VEF.valeur());
 
 
   // Calcul de "u . grad u"
@@ -158,7 +158,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   // Calcul du gradient de pression P1, si applicable
   DoubleTab grad_pression(nb_elem,dim);
   grad_pression = 0.;
-  if (zone_VEF_p.get_alphaS()) // On a une pression P1
+  if (domaine_VEF_p.get_alphaS()) // On a une pression P1
     {
       for (fac=0; fac<nb_faces; fac++)
         {
@@ -168,7 +168,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem1>=0)
             {
               signe=1.;
-              som_opp = la_zone_VF->get_num_fac_loc(fac, 0);
+              som_opp = le_dom_VF->get_num_fac_loc(fac, 0);
               som_opp = som_elem(elem1, som_opp);
               for (j=0; j<dim; j++)
                 {
@@ -179,7 +179,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem2>=0)
             {
               signe=-1.;
-              som_opp = la_zone_VF->get_num_fac_loc(fac, 1);
+              som_opp = le_dom_VF->get_num_fac_loc(fac, 1);
               som_opp = som_elem(elem2, som_opp);
               for (j=0; j<dim; j++)
                 {
@@ -240,7 +240,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
 
 
 //  Sauts au travers des faces - partie dans la direction de la normale (seules les faces internes contribuent)
-  if (zone_VEF_p.get_alphaE()) // Si on a une pression P0 elle est discontinue et donc contribue aux sauts au travers des faces
+  if (domaine_VEF_p.get_alphaE()) // Si on a une pression P0 elle est discontinue et donc contribue aux sauts au travers des faces
     {
       for (fac=premiere_face_int; fac<nb_faces; fac++)
         {

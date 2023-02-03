@@ -23,7 +23,7 @@
 #include <Taux_dissipation_turbulent.h>
 #include <Pb_Multiphase.h>
 #include <Discret_Thyd.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Domaine.h>
 #include <Avanc.h>
 #include <Debog.h>
@@ -105,7 +105,7 @@ void Taux_dissipation_turbulent::discretiser()
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Turbulent dissipation rate discretization" << finl;
   //On utilise temperature pour la directive car discretisation identique
-  dis.discretiser_champ("temperature",zone_dis(),"omega","s", 1,nb_valeurs_temp,temps,l_inco_ch);//une seule compo, meme en multiphase
+  dis.discretiser_champ("temperature",domaine_dis(),"omega","s", 1,nb_valeurs_temp,temps,l_inco_ch);//une seule compo, meme en multiphase
   l_inco_ch.valeur().fixer_nature_du_champ(scalaire);
   l_inco_ch.valeur().fixer_nom_compo(0, Nom("omega"));
   champs_compris_.ajoute_champ(l_inco_ch);
@@ -176,11 +176,11 @@ void Taux_dissipation_turbulent::calculer_alpha_rho_omega(const Objet_U& obj, Do
   for (i = 0; i < Nl; i++)
     for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * omega(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a une zone_dis_base */
+  /* on ne peut utiliser valeur_aux_bords que si ch_rho a une domaine_dis_base */
   DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab(), b_rho, b_omega = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_omega.dimension_tot(0);
-  if (ch_rho.a_une_zone_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Zone_VF, eqn.zone_dis().valeur()).xv_bord(), b_rho);
+  if (ch_rho.a_une_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
+  else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis().valeur()).xv_bord(), b_rho);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_omega(i, n);
 

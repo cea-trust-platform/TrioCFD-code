@@ -41,30 +41,30 @@ public:
   inline void completer();
   inline int sauvegarder(Sortie& os) const override;
   inline int reprendre(Entree& is) override;
-  inline DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
-  inline DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&,const DoubleTab& ) const;
-//  inline DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis& ) const;
-  inline DoubleTab& Calcul_F1( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
-  inline DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base& ) const;
-  inline DoubleTab& Calcul_Fmu(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don& ) const;
+  inline DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
+  inline DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&,const DoubleTab& ) const;
+//  inline DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis& ) const;
+  inline DoubleTab& Calcul_F1( DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_Fmu(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don& ) const;
   inline int Calcul_is_Cmu_constant() const;
   inline int Calcul_is_Reynolds_stress_isotrope() const;
-  inline DoubleTab& Calcul_Cmu(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const double) const;
-  inline DoubleTab& Calcul_Cmu_Paroi(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+  inline DoubleTab& Calcul_Cmu(DoubleTab&,const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&, const DoubleTab&, const double) const;
+  inline DoubleTab& Calcul_Cmu_Paroi(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,
                                      const DoubleTab& , const DoubleTab& ,
                                      const DoubleTab& ,const int,
                                      const DoubleTab&, const DoubleTab&,
                                      const double) const;
   inline void lire_distance_paroi();
 
-  inline DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
-  inline DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&,const DoubleTab& ) const;
-  inline DoubleTab& Calcul_F1_BiK( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
-  inline DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
-  inline DoubleTab& Calcul_Fmu_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& ) const;
+  inline DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
+  inline DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&,const DoubleTab& ) const;
+  inline DoubleTab& Calcul_F1_BiK( DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_Fmu_BiK(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& ) const;
 
-  inline DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
-  inline DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+  inline DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
+  inline DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,
                                          const DoubleTab& , const DoubleTab& ,
                                          const DoubleTab& ,const int,
                                          const DoubleTab&, const DoubleTab&, const DoubleTab&,
@@ -111,34 +111,34 @@ inline void Modele_Fonc_Bas_Reynolds::completer()
   valeur().completer();
 }
 
-inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_D(DoubleTab& D, const Zone_dis& zone_dis, const Zone_Cl_dis& zcl_VDF,
+inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_D(DoubleTab& D, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& zcl_VDF,
                                                      const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re,const Champ_Don& visco ) const
 {
-  return  valeur().Calcul_D(D, zone_dis, zcl_VDF, vitesse,K_eps_Bas_Re,visco);
+  return  valeur().Calcul_D(D, domaine_dis, zcl_VDF, vitesse,K_eps_Bas_Re,visco);
 }
 
-inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_E(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re,const Champ_Don& visco, const DoubleTab& visco_turb ) const
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re,const Champ_Don& visco, const DoubleTab& visco_turb ) const
 {
-  return valeur().Calcul_E(E, zone_dis,zone_Cl_dis,  vitesse,K_eps_Bas_Re,visco,visco_turb );
+  return valeur().Calcul_E(E, domaine_dis,domaine_Cl_dis,  vitesse,K_eps_Bas_Re,visco,visco_turb );
 }
 
-/*inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1(DoubleTab& F1, const Zone_dis& zone_dis) const
+/*inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1(DoubleTab& F1, const Domaine_dis& domaine_dis) const
 {
-  return valeur().Calcul_F1( F1, zone_dis);
+  return valeur().Calcul_F1( F1, domaine_dis);
 }
 */
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1(DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1(DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  return valeur().Calcul_F1( F1, zone_dis, zone_Cl_dis, P, K_eps_Bas_Re,ch_visco);
+  return valeur().Calcul_F1( F1, domaine_dis, domaine_Cl_dis, P, K_eps_Bas_Re,ch_visco);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F2(DoubleTab& F2, DoubleTab& D,const Zone_dis& zone_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& visco ) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F2(DoubleTab& F2, DoubleTab& D,const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& visco ) const
 {
-  return valeur().Calcul_F2(F2, D, zone_dis,K_eps_Bas_Re,visco );
+  return valeur().Calcul_F2(F2, D, domaine_dis,K_eps_Bas_Re,visco );
 }
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_Fmu(DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& visco ) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_Fmu(DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& visco ) const
 {
-  return valeur().Calcul_Fmu( Fmu, zone_dis, zone_Cl_dis, K_eps_Bas_Re, visco );
+  return valeur().Calcul_Fmu( Fmu, domaine_dis, domaine_Cl_dis, K_eps_Bas_Re, visco );
 }
 
 inline int Modele_Fonc_Bas_Reynolds::Calcul_is_Cmu_constant() const
@@ -152,18 +152,18 @@ inline int Modele_Fonc_Bas_Reynolds::Calcul_is_Reynolds_stress_isotrope() const
 }
 
 inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu(DoubleTab& Cmu,
-                                                       const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                       const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                        const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
-  return valeur().Calcul_Cmu(Cmu, zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN);
+  return valeur().Calcul_Cmu(Cmu, domaine_dis, domaine_Cl_dis, vitesse, K_Eps, EPS_MIN);
 }
 inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_Paroi(DoubleTab& Cmu,
-                                                             const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                             const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                              const DoubleTab& visco, const DoubleTab& visco_turb,
                                                              const DoubleTab& loi_paroi,const int idt,
                                                              const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
-  return valeur().Calcul_Cmu_Paroi(Cmu,zone_dis,zone_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K_Eps,EPS_MIN);
+  return valeur().Calcul_Cmu_Paroi(Cmu,domaine_dis,domaine_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K_Eps,EPS_MIN);
 }
 
 inline void Modele_Fonc_Bas_Reynolds::lire_distance_paroi()
@@ -172,43 +172,43 @@ inline void Modele_Fonc_Bas_Reynolds::lire_distance_paroi()
 }
 
 
-inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_D_BiK(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
 {
-  return valeur().Calcul_D_BiK(D, zone_dis,zone_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco );
+  return valeur().Calcul_D_BiK(D, domaine_dis,domaine_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco );
 }
 
-inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco, const DoubleTab& visco_turb ) const
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_E_BiK(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco, const DoubleTab& visco_turb ) const
 {
-  return valeur().Calcul_E_BiK(E, zone_dis,zone_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco,visco_turb );
+  return valeur().Calcul_E_BiK(E, domaine_dis,domaine_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco,visco_turb );
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1_BiK(DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1_BiK(DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  return valeur().Calcul_F1_BiK( F1, zone_dis, zone_Cl_dis, P, K_Bas_Re, eps_Bas_Re,ch_visco);
+  return valeur().Calcul_F1_BiK( F1, domaine_dis, domaine_Cl_dis, P, K_Bas_Re, eps_Bas_Re,ch_visco);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F2_BiK(DoubleTab& F2, DoubleTab& D,const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& visco ) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F2_BiK(DoubleTab& F2, DoubleTab& D,const Domaine_dis& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& visco ) const
 {
-  return valeur().Calcul_F2_BiK(F2, D, zone_dis,K_Bas_Re,eps_Bas_Re,visco );
+  return valeur().Calcul_F2_BiK(F2, D, domaine_dis,K_Bas_Re,eps_Bas_Re,visco );
 }
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_Fmu_BiK(DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_Fmu_BiK(DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
 {
-  return valeur().Calcul_Fmu_BiK( Fmu, zone_dis, zone_Cl_dis, K_Bas_Re, eps_Bas_Re, visco );
+  return valeur().Calcul_Fmu_BiK( Fmu, domaine_dis, domaine_Cl_dis, K_Bas_Re, eps_Bas_Re, visco );
 }
 
 inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_BiK(DoubleTab& Cmu,
-                                                           const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                           const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                            const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
-  return valeur().Calcul_Cmu_BiK(Cmu, zone_dis, zone_Cl_dis, vitesse, K, Eps, EPS_MIN);
+  return valeur().Calcul_Cmu_BiK(Cmu, domaine_dis, domaine_Cl_dis, vitesse, K, Eps, EPS_MIN);
 }
 inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
-                                                                 const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                                 const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                                  const DoubleTab& visco, const DoubleTab& visco_turb,
                                                                  const DoubleTab& loi_paroi,const int idt,
                                                                  const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
-  return valeur().Calcul_Cmu_Paroi_BiK(Cmu,zone_dis,zone_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K, Eps,EPS_MIN);
+  return valeur().Calcul_Cmu_Paroi_BiK(Cmu,domaine_dis,domaine_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K, Eps,EPS_MIN);
 }
 
 inline const Equation_base& Modele_Fonc_Bas_Reynolds::seconde_equation() const

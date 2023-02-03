@@ -108,11 +108,11 @@ int Modele_turbulence_Longueur_Melange_VEF::lire_motcle_non_standard(const Motcl
 }
 
 void Modele_turbulence_Longueur_Melange_VEF::associer(
-  const Zone_dis& zone_dis,
-  const Zone_Cl_dis& zone_Cl_dis)
+  const Domaine_dis& domaine_dis,
+  const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 }
 
 Champ_Fonc& Modele_turbulence_Longueur_Melange_VEF::calculer_viscosite_turbulente()
@@ -121,12 +121,12 @@ Champ_Fonc& Modele_turbulence_Longueur_Melange_VEF::calculer_viscosite_turbulent
   double Cmu = CMU;
 
   double temps = mon_equation->inconnue().temps();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
-  const int nb_elem = zone_VEF.nb_elem();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const DoubleTab& xp = zone_VEF.xp();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const DoubleTab& xp = domaine_VEF.xp();
 
   Sij2.resize(nb_elem_tot);
 
@@ -245,9 +245,9 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_Sij2()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
   const Champ_P1NC& ch= ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem_tot();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem_tot();
 
   DoubleTab duidxj(nb_elem,dimension,dimension);
   int i,j;
@@ -258,7 +258,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_Sij2()
   DoubleTab ubar(la_vitesse);
   //  ch.filtrer_L2(ubar);                // Patrick : on travaille sur le champ filtre.
 
-  ch.calcul_gradient(ubar,duidxj,zone_Cl_VEF);
+  ch.calcul_gradient(ubar,duidxj,domaine_Cl_VEF);
 
   for (int elem=0 ; elem<nb_elem ; elem++)
     {
@@ -277,7 +277,7 @@ void Modele_turbulence_Longueur_Melange_VEF::lire_distance_paroi( )
 
   // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   DoubleTab& wall_length = wall_length_.valeurs();
   wall_length=-1.;
 
@@ -302,10 +302,10 @@ void Modele_turbulence_Longueur_Melange_VEF::lire_distance_paroi( )
         {
           Cerr << nom_paroi[b]<< finl;
           //test pour s'assurer de la coherence de Wall_length.xyz avec le jeu de donnees :
-          zone_VEF.rang_frontiere(nom_paroi[b]);
+          domaine_VEF.rang_frontiere(nom_paroi[b]);
         }
     }
-  EcritureLectureSpecial::lecture_special(zone_VEF, fic, wall_length);
+  EcritureLectureSpecial::lecture_special(domaine_VEF, fic, wall_length);
 }
 
 void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
@@ -327,11 +327,11 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
   //                 f_vd^4 < 0.99          =>   u+.y+ < 2784
   //
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem();
   DoubleTab& wall_length = wall_length_.valeurs();
-  int nb_face_elem = zone_VEF.zone().nb_faces_elem();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
+  int nb_face_elem = domaine_VEF.domaine().nb_faces_elem();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, mon_equation->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();

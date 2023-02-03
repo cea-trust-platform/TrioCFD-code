@@ -26,8 +26,8 @@
 #include <Echange_externe_impose.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Conduction.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Domaine_VDF.h>
+#include <Ref_Domaine_Cl_VDF.h>
 #include <Champ_front_calc.h>
 #include <Fluide_Incompressible.h>
 #include <Front_VF.h>

@@ -22,7 +22,7 @@
 
 #include <Paroi_hyd_base_VEF.h>
 #include <Scatter.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <EcrFicPartage.h>
 #include <Mod_turb_hyd_base.h>
 #include <Schema_Temps_base.h>
@@ -63,16 +63,16 @@ Entree& Paroi_hyd_base_VEF::readOn(Entree& s)
 //
 /////////////////////////////////////////////////////////////////////
 
-void Paroi_hyd_base_VEF::associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void Paroi_hyd_base_VEF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 }
 
 void Paroi_hyd_base_VEF::init_lois_paroi_()
 {
-  const Zone_VF& zvf = la_zone_VEF.valeur();
-  const int nb_faces_bord = la_zone_VEF->nb_faces_bord();
+  const Domaine_VF& zvf = le_dom_VEF.valeur();
+  const int nb_faces_bord = le_dom_VEF->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
@@ -105,15 +105,15 @@ void Paroi_hyd_base_VEF::imprimer_premiere_ligne_ustar(int boundaries_, const LI
 {
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   Nom ligne, err;
 
   err="";
   ligne="# Time   \tMean(u*) \tMean(d+)";
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       const Nom& nom_bord = la_cl.frontiere_dis().le_nom();
       if( je_suis_maitre()
           && ( boundaries_list.contient(nom_bord) || boundaries_list.size()==0 ) )
@@ -148,7 +148,7 @@ void Paroi_hyd_base_VEF::imprimer_premiere_ligne_ustar(int boundaries_, const LI
 
 void Paroi_hyd_base_VEF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const Probleme_base& pb=mon_modele_turb_hyd->equation().probleme();
   const Schema_Temps_base& sch=pb.schema_temps();
   int ndeb,nfin, size0, num_bord;
@@ -160,7 +160,7 @@ void Paroi_hyd_base_VEF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
     }
   else
     {
-      size0=zone_VEF.nb_front_Cl();
+      size0=domaine_VEF.nb_front_Cl();
     }
   DoubleTrav moy_bords(size0+1,3);
   moy_bords=0.;
@@ -168,9 +168,9 @@ void Paroi_hyd_base_VEF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
   EcrFicPartage fichier;
   ouvrir_fichier_partage(fichier, nom_fichier_, "out");
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
@@ -202,9 +202,9 @@ void Paroi_hyd_base_VEF::imprimer_ustar_mean_only(Sortie& os, int boundaries_, c
     }
 
   num_bord=0;
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {

@@ -22,11 +22,11 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Op_Diff_K_Eps_VEF_Face_Q1.h>
 #include <Neumann_paroi.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Milieu_base.h>
 #include <Periodique.h>
 #include <Champ_Q1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Op_Diff_K_Eps_VEF_Face_Q1,"Op_Diff_K_Eps_VEF_Q1NC",Op_Diff_K_Eps_VEF_base);
 
@@ -50,15 +50,15 @@ Entree& Op_Diff_K_Eps_VEF_Face_Q1::readOn(Entree& s )
 /*! @brief complete l'evaluateur
  *
  */
-void Op_Diff_K_Eps_VEF_Face_Q1::associer(const Zone_dis& zone_dis,
-                                         const Zone_Cl_dis& zone_cl_dis,
+void Op_Diff_K_Eps_VEF_Face_Q1::associer(const Domaine_dis& domaine_dis,
+                                         const Domaine_Cl_dis& domaine_cl_dis,
                                          const Champ_Inc& ch_diffuse)
 {
   const Champ_Q1NC& inco = ref_cast(Champ_Q1NC,ch_diffuse.valeur());
-  const Zone_VEF& zVEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zclVEF = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
+  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
   inconnue_ = inco;
-  la_zone_vef = zVEF;
+  le_dom_vef = zVEF;
   la_zcl_vef=zclVEF;
 }
 
@@ -82,27 +82,27 @@ void Op_Diff_K_Eps_VEF_Face_Q1::associer_diffusivite_turbulente()
 // Fonction utile visc
 //
 
-static double viscA_Q1(const Zone_VEF& la_zone,int num_face,int num2,int dimension,
+static double viscA_Q1(const Domaine_VEF& le_dom,int num_face,int num2,int dimension,
                        int num_elem,double diffu)
 {
-  double constante = (diffu)/la_zone.volumes(num_elem);
+  double constante = (diffu)/le_dom.volumes(num_elem);
   double Valeur=0;
   // Cerr << "num_face " << num_face << " et num2 " << num2 << " et num_elem " << num_elem << finl;
   if(dimension==2)
     {
-      Valeur=la_zone.face_normales(num_face,0)*
-             la_zone.face_normales(num2,1) -
-             la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,0);
+      Valeur=le_dom.face_normales(num_face,0)*
+             le_dom.face_normales(num2,1) -
+             le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,0);
       Valeur=constante*std::fabs(Valeur);
     }
   else
     {
-      Valeur=(la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,2) -
-              la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,1)) +
-             (la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,0) -
-              la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,2)) +
-             (la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,1) -
-              la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,0));
+      Valeur=(le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,2) -
+              le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,1)) +
+             (le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,0) -
+              le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,2)) +
+             (le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,1) -
+              le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,0));
       Valeur=constante*std::fabs(Valeur);
     }
   return Valeur;
@@ -110,25 +110,25 @@ static double viscA_Q1(const Zone_VEF& la_zone,int num_face,int num2,int dimensi
 
 DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  DoubleTab& resu) const
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
-  const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const DoubleVect& porosite_face = domaine_Cl_VEF.equation().milieu().porosite_face();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
 
   int i,j,num_face;
-  int n1 = zone_VEF.nb_faces();
+  int n1 = domaine_VEF.nb_faces();
   int elem;
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, d_mu;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   // On traite les faces bord :
   int n_bord;
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -148,7 +148,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
                       if ( ( (j= elem_faces(elem,i)) > num_face ) && (j !=
                                                                       fac_asso) )
                         {
-                          valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                          valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
 
                           resu(num_face,0)+=valA*porosite_face(num_face)*inconnue(j,0)/Prdt_K;
                           resu(num_face,0)-=valA*porosite_face(num_face)*inconnue(num_face,0)/Prdt_K;
@@ -176,7 +176,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                      valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
 
                       resu(num_face,0)+=valA*porosite_face(num_face)*inconnue(j,0)/Prdt_K;
                       resu(num_face,0)-=valA*porosite_face(num_face)*inconnue(num_face,0)/Prdt_K;
@@ -198,7 +198,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
 
   // On traite les faces internes
 
-  for (num_face=zone_VEF.premiere_face_int(); num_face<n1; num_face++)
+  for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       for (int k=0; k<2; k++)
         {
@@ -208,7 +208,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
             {
               if ( (j= elem_faces(elem,i)) > num_face )
                 {
-                  valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                  valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
 
                   resu(num_face,0)+=valA*porosite_face(num_face)*inconnue(j,0)/Prdt_K;
                   resu(num_face,0)-=valA*porosite_face(num_face)*inconnue(num_face,0)/Prdt_K;
@@ -226,9 +226,9 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
     }
 
   // Prise en compte des conditions aux limites de Neumnan a la paroi
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -239,9 +239,9 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
           for (int face=ndeb; face<nfin; face++)
             {
               resu(face,0) +=
-                la_cl_paroi.flux_impose(face-ndeb,0)*zone_VEF.surface(face)*porosite_face(face);
+                la_cl_paroi.flux_impose(face-ndeb,0)*domaine_VEF.surface(face)*porosite_face(face);
               resu(face,1) +=
-                la_cl_paroi.flux_impose(face-ndeb,1)*zone_VEF.surface(face)*porosite_face(face);
+                la_cl_paroi.flux_impose(face-ndeb,1)*domaine_VEF.surface(face)*porosite_face(face);
             }
         }
     }
@@ -267,17 +267,17 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
                                                      Matrice_Morse& matrice ) const
 
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
-  const DoubleVect& porosite_face = zone_Cl_VEF.equation().milieu().porosite_face();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const DoubleVect& porosite_face = domaine_Cl_VEF.equation().milieu().porosite_face();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
 
   int i,j,k,nc,l,num_face;
-  int n1 = zone_VEF.nb_faces();
+  int n1 = domaine_VEF.nb_faces();
   int elem;
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, d_mu,Prdt;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
@@ -288,9 +288,9 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
   const int nb_comp = transporte.line_size();
 
   // On traite les faces bord
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -310,7 +310,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
                       if ( ( (j= elem_faces(elem,i)) > num_face ) && (j !=
                                                                       fac_asso) )
                         {
-                          valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                          valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
                           for ( nc=0; nc<nb_comp; nc++)
                             {
                               if (nc==0)
@@ -355,7 +355,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
                 {
                   if ( (j= elem_faces(elem,i)) > num_face )
                     {
-                      valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                      valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
                       for ( nc=0; nc<nb_comp; nc++)
                         {
                           if (nc==0)
@@ -393,7 +393,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
 
   // On traite les faces internes
 
-  for (num_face=zone_VEF.premiere_face_int(); num_face<n1; num_face++)
+  for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       for ( l=0; l<2; l++)
         {
@@ -403,7 +403,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
             {
               if ( (j= elem_faces(elem,i)) > num_face )
                 {
-                  valA = viscA_Q1(zone_VEF,num_face,j,dimension,elem,d_mu);
+                  valA = viscA_Q1(domaine_VEF,num_face,j,dimension,elem,d_mu);
                   for ( nc=0; nc<nb_comp; nc++)
                     {
                       if (nc==0)
@@ -443,21 +443,21 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
 void Op_Diff_K_Eps_VEF_Face_Q1::contribue_au_second_membre(DoubleTab& resu ) const
 {
 
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
-  //  const IntTab& elem_faces = zone_VEF.elem_faces();
-  //  const IntTab& face_voisins = zone_VEF.face_voisins();
+  //  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  //  const IntTab& face_voisins = domaine_VEF.face_voisins();
 
-  //  int n1 = zone_VEF.nb_faces();
+  //  int n1 = domaine_VEF.nb_faces();
   int n_bord;
-  //  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  //  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
 
 
   // Prise en compte des conditions aux limites de Neumnan a la paroi
-  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -468,9 +468,9 @@ void Op_Diff_K_Eps_VEF_Face_Q1::contribue_au_second_membre(DoubleTab& resu ) con
           for (int face=ndeb; face<nfin; face++)
             {
               resu(face,0) +=
-                la_cl_paroi.flux_impose(face-ndeb,0)*zone_VEF.surface(face);
+                la_cl_paroi.flux_impose(face-ndeb,0)*domaine_VEF.surface(face);
               resu(face,1) +=
-                la_cl_paroi.flux_impose(face-ndeb,1)*zone_VEF.surface(face);
+                la_cl_paroi.flux_impose(face-ndeb,1)*domaine_VEF.surface(face);
             }
         }
     }

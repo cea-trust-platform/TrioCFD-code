@@ -23,8 +23,8 @@
 #define Paroi_scal_hyd_base_VEF_included
 
 #include <Turbulence_paroi_scal_base.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ref_Domaine_VEF.h>
+#include <Ref_Domaine_Cl_VEF.h>
 #include <TRUSTVects.h>
 //
 class Paroi_scal_hyd_base_VEF  : public Turbulence_paroi_scal_base
@@ -33,7 +33,7 @@ class Paroi_scal_hyd_base_VEF  : public Turbulence_paroi_scal_base
   Declare_base(Paroi_scal_hyd_base_VEF);
 
 public:
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   int init_lois_paroi() override;
   void imprimer_nusselt(Sortie&) const override;
 
@@ -41,8 +41,8 @@ public:
   inline DoubleVect& tab_d_reel();
   DoubleVect& equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const override ;
 protected :
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
   DoubleVect tab_d_reel_;   // tableau des distances (dimenssionnelles) du
   // point y+ = 1

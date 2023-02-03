@@ -25,8 +25,8 @@
 #include <TRUSTTabs_forward.h>
 #include <Champ_Don.h>
 
-class Zone_Cl_VEF;
-class Zone_VEF;
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 //  CLASS Calcul_Production_K_VEF
 // Classe qui porte les fonctions de calcul des termes de production de l'energie cinetique turbulente et de destruction
@@ -36,15 +36,15 @@ class Calcul_Production_K_VEF
 protected:
   Calcul_Production_K_VEF() { }
 
-  DoubleTab& calculer_terme_production_K(const Zone_VEF&, const Zone_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleTab& calculer_terme_production_K_BiK(const Zone_VEF&, const Zone_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K_BiK(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleTab& calculer_terme_production_K_EASM(const Zone_VEF&, const Zone_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K_EASM(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&, const Zone_VEF&, const Zone_Cl_VEF&) const;
+  DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&, const Domaine_VEF&, const Domaine_Cl_VEF&) const;
 
-  DoubleTab& calculer_terme_destruction_K_gen(const Zone_VEF&, const Zone_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const Champ_Don&, const DoubleVect&, int) const;
+  DoubleTab& calculer_terme_destruction_K_gen(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const Champ_Don&, const DoubleVect&, int) const;
 
   void mettre_a_jour(double temps) { }
 };

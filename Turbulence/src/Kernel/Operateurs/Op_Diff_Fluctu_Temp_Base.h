@@ -61,7 +61,7 @@ class   Op_Diff_Fluctu_Temp_negligeable : public Operateur_negligeable, public O
 
 public:
 
-  inline void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& ) override;
+  inline void associer(const Domaine_dis&, const Domaine_Cl_dis&, const Champ_Inc& ) override;
   inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -102,11 +102,11 @@ public:
 //   Fonctions inline de la classe Op_Diff_Fluctu_Temp_negligeable
 ///////////////////////////////////////////////////////////////
 
-inline void Op_Diff_Fluctu_Temp_negligeable::associer(const Zone_dis& zone_dis,
-                                                      const Zone_Cl_dis& zone_cl_dis,
+inline void Op_Diff_Fluctu_Temp_negligeable::associer(const Domaine_dis& domaine_dis,
+                                                      const Domaine_Cl_dis& domaine_cl_dis,
                                                       const Champ_Inc& inco)
 {
-  Operateur_negligeable::associer(zone_dis,zone_cl_dis,inco);
+  Operateur_negligeable::associer(domaine_dis,domaine_cl_dis,inco);
 }
 
 inline DoubleTab& Op_Diff_Fluctu_Temp_negligeable::ajouter(const DoubleTab& x,  DoubleTab& y) const
