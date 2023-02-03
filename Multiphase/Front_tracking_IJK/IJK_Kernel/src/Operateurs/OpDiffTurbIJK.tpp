@@ -323,7 +323,7 @@ void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double 
               v4 = 0.;
             }
         }
-      if(top_wall && bc_type!=Boundary_Conditions::Mixte_shear)
+      if(bottom_wall && bc_type!=Boundary_Conditions::Mixte_shear)
         {
           if(_VCOMPO_ == DIRECTION::X)
             {
