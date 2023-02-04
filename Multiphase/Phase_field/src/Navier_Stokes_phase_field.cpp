@@ -386,7 +386,7 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
   Navier_Stokes_std::creer_champ(motlu);
   if (motlu == "masse_volumique")
     {
-      Cerr << "Navier_Stokes_phase_field::creer_champ " << motlu << " " << rho_.non_nul() << " " << rho_.le_nom() << finl;
+      Cerr << "Navier_Stokes_phase_field::creer_champ " << motlu << " " << (int)rho_.non_nul() << " " << rho_.le_nom() << finl;
       const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
       if (!rho_.non_nul())
         {
