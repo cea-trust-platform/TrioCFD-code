@@ -24,9 +24,11 @@
 
 #include <Calcul_Production_K_VEF.h>
 #include <Source_Transport_proto.h>
-#include <Ref_Transport_K_Eps.h>
-#include <Ref_Domaine_Cl_VEF.h>
-#include <Ref_Domaine_VEF.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_Eps;
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 class Source_Transport_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
 {

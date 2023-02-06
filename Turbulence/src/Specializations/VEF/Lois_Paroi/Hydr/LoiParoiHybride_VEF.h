@@ -26,10 +26,13 @@
 
 #include <Paroi_hyd_base_VEF.h>
 #include <LoiParoiHybride.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 class Domaine_dis_base;
 class Domaine_Cl_dis_base;
+
 
 
 /*! @brief CLASS: LoiParoiHybride_VEF

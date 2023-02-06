@@ -27,8 +27,9 @@
 #include <Turbulence_paroi_base.h>
 #include <Domaine_EF.h>
 #include <Domaine_Cl_EF.h>
-#include <Ref_Domaine_EF.h>
-#include <Ref_Domaine_Cl_EF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
 
 
 /*! @brief CLASS: Paroi_hyd_base_EF Classe de base des lois de paroi hydraulique en EF

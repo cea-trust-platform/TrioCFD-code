@@ -24,8 +24,10 @@
 #define Production_echelle_temp_taux_diss_turb_PolyMAC_P0_included
 
 #include <Source_base.h>
-#include <Ref_Correlation.h>
 #include <TRUSTTab.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Production_echelle_temp_taux_diss_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
  *

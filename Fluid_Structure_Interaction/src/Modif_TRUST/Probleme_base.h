@@ -18,24 +18,25 @@
 
 #include <Probleme_base_interface_proto.h>
 #include <Champs_compris_interface.h>
-#include <Ref_Loi_Fermeture_base.h>
-#include <Ref_Schema_Temps_base.h>
 #include <Sortie_Fichier_base.h>
 #include <Discretisation.h>
-#include <Ref_Field_base.h>
 #include <Postraitements.h>
 #include <Sortie_Brute.h>
 #include <TRUST_Deriv.h>
-#include <Ref_IntVect.h>
 #include <Domaine_dis.h>
 #include <TRUST_List.h>
 #include <Probleme_U.h>
+#include <TRUST_Ref.h>
 #include <Milieu.h>
 
+class Loi_Fermeture_base;
+class Schema_Temps_base;
 class EcrFicPartageBin;
 class Equation_base;
 class Postraitement;
+class Field_base;
 class Champ_Fonc;
+
 
 /*! @brief classe Probleme_base C'est un Probleme_U qui n'est pas un couplage.
  *

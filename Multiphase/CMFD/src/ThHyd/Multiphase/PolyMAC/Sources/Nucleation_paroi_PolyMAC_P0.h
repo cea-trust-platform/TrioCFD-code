@@ -22,8 +22,10 @@
 
 #ifndef Nucleation_paroi_PolyMAC_P0_included
 #define Nucleation_paroi_PolyMAC_P0_included
+
 #include <Source_base.h>
-#include <Ref_Source_base.h>
+#include <TRUST_Ref.h>
+
 
 /*! @brief classe Nucleation_paroi_PolyMAC_P0
  *     forme pi * d_nuc**2 * N_nuc

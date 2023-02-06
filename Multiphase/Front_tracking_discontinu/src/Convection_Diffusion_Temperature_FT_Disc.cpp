@@ -20,7 +20,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
-#include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Domaine_VF.h>
 #include <Discretisation_base.h>
@@ -41,12 +40,11 @@
 #include <Interprete_bloc.h>
 #include <Domaine_VDF.h>
 #include <stat_counters.h>
+#include <TRUST_Ref.h>
 
 static const double TSAT_CONSTANTE = 0.;
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Temperature_FT_Disc,"Convection_Diffusion_Temperature_FT_Disc",Convection_Diffusion_Temperature);
-
-Implemente_ref(Convection_Diffusion_Temperature_FT_Disc);
 
 Convection_Diffusion_Temperature_FT_Disc::Convection_Diffusion_Temperature_FT_Disc()
 {

@@ -24,18 +24,16 @@
 
 #include <Modele_Fonc_Bas_Reynolds_Thermique_Base.h>
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Fluide_base.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
 
-class Transport_Fluctuation_Temperature_W_Bas_Re;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+class Fluide_base;
+class Transport_K_Eps_Bas_Reynolds;
 class Domaine_dis;
 class Domaine_Cl_dis;
 class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
 class Modele_Jones_Launder_Thermique_VDF : public Modele_Fonc_Bas_Reynolds_Thermique_Base

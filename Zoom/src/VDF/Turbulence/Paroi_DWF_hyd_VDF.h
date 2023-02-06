@@ -27,10 +27,10 @@
 #include <Pb_MG.h>
 #include <Paroi_std_hyd_VDF.h>
 #include <Paroi_loi_WW_scal_VDF.h>
-#include <Ref_Champ_Fonc.h>
 #include <Probleme_Couple.h>
+#include <TRUST_Ref.h>
 
-
+class Champ_Fonc;
 class Champ_Fonc_base;
 class Domaine_dis;
 class Domaine_Cl_dis;

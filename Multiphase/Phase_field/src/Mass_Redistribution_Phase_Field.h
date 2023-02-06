@@ -25,12 +25,11 @@
 
 #include <Domaine_VDF.h>
 #include <Domaine_Cl_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Domaine_VDF.h>
 #include <Equation.h>
 #include <Process.h>
 #include <vector>
 #include <MD_Vector_tools.h>
+#include <TRUST_Ref.h>
 
 class Mass_Redistribution_Phase_Field
 {

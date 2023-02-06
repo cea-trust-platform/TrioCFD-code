@@ -26,7 +26,8 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Domaine_VDF.h>
-#include <Ref_Milieu_base.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Echange_contact_VDF_Zoom_grossier,"Paroi_Echange_contact_VDF_Zoom_grossier",Echange_contact_VDF_Zoom_base);
 
@@ -92,7 +93,6 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
       //ON VEUT LE MILIEU FIN !!!!!!!!!
       //const Milieu_base& le_milieu = ch.inconnue().equation().milieu();
-      REF(Champ_base) ch_tampon;
       REF(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 

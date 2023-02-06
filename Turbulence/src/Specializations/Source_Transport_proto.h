@@ -22,13 +22,14 @@
 #ifndef Source_Transport_proto_included
 #define Source_Transport_proto_included
 
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Champ_Don.h>
 #include <Source_base.h>
+#include <TRUST_Ref.h>
 
+class Convection_Diffusion_Concentration;
+class Convection_Diffusion_Temperature;
+class Champ_Don_base;
+class Equation_base;
+class Champ_Don;
 class Modele_Fonc_Realisable_base;
 class Modele_Fonc_Bas_Reynolds;
 class Fluide_base;

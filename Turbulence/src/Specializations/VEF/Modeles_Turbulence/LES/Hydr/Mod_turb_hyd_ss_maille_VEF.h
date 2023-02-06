@@ -22,12 +22,13 @@
 #ifndef Mod_turb_hyd_ss_maille_VEF_included
 #define Mod_turb_hyd_ss_maille_VEF_included
 
-
-
-
 #include <Mod_turb_hyd_ss_maille.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
+class Domaine_Cl_VEF;
+class Domaine_VEF;
+
 
 /*! @brief classe Mod_turb_hyd_ss_maille_VEF Cette classe correspond a la mise en oeuvre des modeles sous
  *

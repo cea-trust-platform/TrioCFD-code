@@ -21,9 +21,10 @@
 
 #ifndef Diffu_totale_base_included
 #define Diffu_totale_base_included
-#include <Ref_Eq_couch_lim.h>
 #include <TRUSTTab.h>
-#include <Ref_MuLambda_TBLE_base.h>
+#include <TRUST_Ref.h>
+
+class MuLambda_TBLE_base;
 class Eq_couch_lim ;
 
 /*! @brief Classe Diffu_totale_base Classe abstraite calculant la diffusivite totale (somme diffusivite

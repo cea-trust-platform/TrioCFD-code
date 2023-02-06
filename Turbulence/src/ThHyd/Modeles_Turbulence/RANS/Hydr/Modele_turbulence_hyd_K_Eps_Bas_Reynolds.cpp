@@ -198,7 +198,6 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::equation_k_eps(in
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motcle& nom) const
 {
-  REF(Champ_base) ref_champ;
   try
     {
       return Mod_turb_hyd_RANS::get_champ(nom);

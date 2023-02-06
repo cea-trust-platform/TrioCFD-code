@@ -24,8 +24,10 @@
 #define Dissipation_WIT_PolyMAC_P0_included
 
 #include <Source_base.h>
-#include <Ref_Correlation.h>
 #include <TRUSTTab.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Dissipation_WIT_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la dissipation de l'equation de WIT
  *

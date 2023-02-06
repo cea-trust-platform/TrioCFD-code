@@ -22,12 +22,12 @@
 #ifndef Mod_turb_hyd_ss_maille_VDF_included
 #define Mod_turb_hyd_ss_maille_VDF_included
 
-
-
-
 #include <Mod_turb_hyd_ss_maille.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 /*! @brief classe Mod_turb_hyd_ss_maille_VDF Cette classe correspond a la mise en oeuvre des modeles sous
  *

@@ -24,9 +24,10 @@
 #define Navier_Stokes_FT_Disc_included
 
 #include <Navier_Stokes_Turbulent.h>
-#include <Ref_Probleme_FT_Disc_gen.h>
 #include <Champ_Don.h>
+#include <TRUST_Ref.h>
 
+class Probleme_FT_Disc_gen;
 class Navier_Stokes_FT_Disc_interne;
 class Maillage_FT_Disc;
 class Fluide_Diphasique;

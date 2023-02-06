@@ -26,12 +26,14 @@
 #include <Echange_contact_VDF.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Conduction.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <Champ_front_calc.h>
 #include <Fluide_Incompressible.h>
 #include <Front_VF.h>
 #include <Cond_Lim_Rayo.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 class Echange_contact_Rayo_transp_VDF : public Cond_Lim_Rayo,public Echange_contact_VDF
 {

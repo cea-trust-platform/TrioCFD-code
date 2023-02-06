@@ -25,7 +25,7 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Fluide_base.h>
-#include <Ref_Fluide_base.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Energie_cinetique_turbulente_WIT Equation de transport d'une energie cinetique turbulente WIT pour la turbulence avec bulles
  *

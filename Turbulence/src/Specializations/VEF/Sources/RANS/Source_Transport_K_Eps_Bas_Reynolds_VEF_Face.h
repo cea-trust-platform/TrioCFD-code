@@ -22,8 +22,10 @@
 #ifndef Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included
 #define Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included
 
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 #include <Source_Transport_VEF_Face_base.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_Eps_Bas_Reynolds;
 
 class Source_Transport_K_Eps_Bas_Reynolds_VEF_Face : public Source_Transport_VEF_Face_base
 {

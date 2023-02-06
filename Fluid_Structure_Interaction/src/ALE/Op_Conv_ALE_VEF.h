@@ -25,8 +25,10 @@
 
 #include <Op_VEF_Face.h>
 #include <Op_Conv_ALE.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 
 //////////////////////////////////////////////////////////////////////////////

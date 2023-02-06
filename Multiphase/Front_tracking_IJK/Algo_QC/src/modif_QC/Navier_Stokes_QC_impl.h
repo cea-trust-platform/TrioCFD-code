@@ -24,7 +24,8 @@
 #define Navier_Stokes_QC_impl_included
 
 #include <Champ_Inc.h>
-#include <Ref_IntVect.h>
+#include <TRUST_Ref.h>
+
 class Navier_Stokes_std;
 class DoubleTab;
 class Entree;

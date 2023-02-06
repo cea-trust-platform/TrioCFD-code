@@ -36,9 +36,11 @@
 #include <OpDiffTurbIJKScalar.h>
 #include <OpConvDiscIJKQuickScalar.h>
 #include <OpConvCentre2IJKScalar.h>
-#include <Ref_IJK_FT_double.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
 
 
 /*
@@ -67,9 +69,6 @@ int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
                                 const bool bord_kmax);
 
 class IJK_FT_double;
-
-class IJK_Thermique;
-Declare_ref(IJK_Thermique);
 
 class IJK_Thermique : public Objet_U
 {

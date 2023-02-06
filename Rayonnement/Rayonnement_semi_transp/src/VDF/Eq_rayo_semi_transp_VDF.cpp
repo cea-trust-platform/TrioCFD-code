@@ -34,7 +34,6 @@
 #include <Flux_radiatif_VDF.h>
 #include <Neumann_paroi_rayo_semi_transp_VDF.h>
 #include <Symetrie.h>
-#include <Ref_Champ_front.h>
 #include <Domaine_VDF.h>
 #include <TRUSTTrav.h>
 

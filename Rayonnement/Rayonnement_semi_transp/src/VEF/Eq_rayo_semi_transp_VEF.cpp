@@ -27,7 +27,6 @@
 #include <Frontiere_ouverte_temperature_imposee_rayo_semi_transp.h>
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Champ_front_uniforme.h>
-#include <Ref_Champ_front.h>
 #include <Debog.h>
 #include <Operateur_Diff_base.h>
 #include <Modele_rayo_semi_transp.h>
@@ -35,6 +34,7 @@
 #include <Champ_Uniforme.h>
 #include <Domaine_VEF.h>
 #include <Symetrie.h>
+#include <TRUST_Ref.h>
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VEF,"Eq_rayo_semi_transp_VEF",Equation_rayonnement_base);

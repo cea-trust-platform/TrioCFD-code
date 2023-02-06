@@ -23,22 +23,19 @@
 #define Modele_Fonc_Bas_Reynolds_Thermique_Base_included
 
 
-#include <Ref_Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re.h>
-#include <Ref_Transport_Fluctuation_Temperature_W_Bas_Re.h>
-#include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
-/*
-  #include <Ref_Domaine_VDF.h>
-  #include <Ref_Domaine_Cl_VDF.h>
-  #include <Domaine_VDF.h>
-  #include <Domaine_Cl_VDF.h>
-*/
+#include <TRUST_Ref.h>
+
+class Champ_base;
+class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
+class Transport_Fluctuation_Temperature_W_Bas_Re;
+
+
 class Motcle;
 class Domaine_dis;
 class Domaine_Cl_dis;
-
 class Equation_base;
 class Probleme_base;
 class Modele_Fonc_Bas_Reynolds_Thermique_Base : public Champs_compris_interface, public Objet_U
@@ -82,7 +79,6 @@ protected :
 
   REF(Transport_Fluctuation_Temperature_W_Bas_Re) mon_equation;
   REF(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_turb_Bas_Re;
-  //REF(Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem) mes_sources;
 
 private :
 

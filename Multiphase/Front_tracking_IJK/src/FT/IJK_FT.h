@@ -34,7 +34,6 @@
 #include <Linear_algebra_tools.h>
 #include <Boundary_Conditions.h>
 #include <IJK_Interfaces.h>
-#include <Ref_Probleme_base.h>
 #include <Redistribute_Field.h>
 #include <Parser.h>
 #include <IJK_FT_Post.h>
@@ -44,6 +43,9 @@
 #include <Force_sp.h>
 #include <TRUST_List.h>
 #include <IJK_Energie.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
 
 // #define SMOOTHING_RHO
 

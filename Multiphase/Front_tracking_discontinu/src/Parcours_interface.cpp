@@ -32,7 +32,6 @@
 Implemente_instanciable_sans_constructeur(Parcours_interface,"Parcours_interface",Objet_U);
 
 static int flag_warning_code_missing=1;
-Implemente_ref(Parcours_interface);
 
 const double Parcours_interface::Erreur_relative_maxi_ = 1.E-13;
 

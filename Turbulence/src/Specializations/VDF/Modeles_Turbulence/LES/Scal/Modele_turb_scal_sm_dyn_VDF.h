@@ -22,14 +22,15 @@
 #define Modele_turb_scal_sm_dyn_VDF_included
 
 #include <Modele_turbulence_scal_base.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <Motcle.h>
 #include <Champ_Fonc.h>
 #include <TRUSTTab.h>
+#include <TRUST_Ref.h>
 
 class Domaine_dis;
 class Domaine_Cl_dis;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 class Modele_turb_scal_sm_dyn_VDF : public Modele_turbulence_scal_base
 {

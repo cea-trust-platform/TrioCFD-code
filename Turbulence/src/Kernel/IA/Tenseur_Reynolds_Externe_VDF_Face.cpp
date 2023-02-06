@@ -29,11 +29,9 @@
 #include <Dirichlet_homogene.h>
 #include <Symetrie.h>
 #include <Periodique.h>
-#include <Ref_Navier_Stokes_Turbulent.h>
 #include <Navier_Stokes_Turbulent.h>
 #include <Probleme_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
-#include <Ref_Modele_turbulence_hyd_K_Eps.h>
 #include <TRUSTTrav.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Echange_externe_impose.h>
@@ -41,6 +39,8 @@
 #include <Neumann_homogene.h>
 #include <Champ_Face_VDF.h>
 #include <Transport_K_Eps.h>
+#include <TRUST_Ref.h>
+
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Tenseur_Reynolds_Externe_VDF_Face,"Tenseur_Reynolds_Externe_VDF_Face",Source_base);
 

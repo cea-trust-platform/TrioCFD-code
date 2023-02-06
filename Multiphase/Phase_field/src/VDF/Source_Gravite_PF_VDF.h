@@ -25,9 +25,13 @@
 #define Source_Gravite_PF_VDF_included
 
 #include <Source_base.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
-#include <Ref_Probleme_base.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+class Domaine_Cl_dis;
+class Domaine_dis;
 
 
 /*! @brief class  Source_Gravite_PF_VDF

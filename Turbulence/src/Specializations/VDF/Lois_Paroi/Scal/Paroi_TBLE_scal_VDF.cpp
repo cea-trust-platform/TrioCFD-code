@@ -39,7 +39,6 @@
 #include <Probleme_base.h>
 #include <Echange_contact_VDF.h>
 #include <Diffu_totale_scal_base.h>
-#include <Ref_DoubleVect.h>
 #include <time.h>
 #include <verif_cast.h>
 #include <SFichier.h>

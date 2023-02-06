@@ -27,8 +27,9 @@
 #include <Source_base.h>
 #include <TRUSTTab.h>
 #include <Champ_Don.h>
+#include <TRUST_Ref.h>
 
-#include <Ref_Probleme_base.h>
+class Probleme_base;
 
 /*! @brief class Source_Con_Phase_field_base
  *

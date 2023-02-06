@@ -29,14 +29,16 @@
 #include <Maillage_FT_IJK.h>
 #include <Objet_U.h>
 #include <Parcours_interface.h>
-#include <Ref_IJK_FT_double.h>
-#include <Ref_Domaine_dis.h>
 #include <Remaillage_FT_IJK.h>
 #include <SFichier.h>
 #include <Vecteur3.h>
 #include <Linear_algebra_tools_impl.h>
 #include <SurfaceVapeurIJKComputation.h>
 #include <ComputeValParCompoInCell.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
+class Domaine_dis;
 
 #define VERIF_INDIC 0
 

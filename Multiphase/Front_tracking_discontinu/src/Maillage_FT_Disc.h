@@ -19,13 +19,13 @@
 #include <Ensemble_Lagrange_base.h>
 #include <TRUSTTabFT.h>
 #include <Descripteur_FT.h>
-#include <Ref_Domaine_dis.h>
-#include <Ref_Parcours_interface.h>
-#include <Ref_Transport_Interfaces_FT_Disc.h>
 #include <Intersections_Elem_Facettes_Data.h>
-#include <TRUST_Deriv.h>
-
 #include <TRUSTTabs_forward.h>
+#include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
+
+class Domaine_dis;
+class Transport_Interfaces_FT_Disc;
 class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;

@@ -26,11 +26,11 @@
 #include <Domaine_Cl_dis.h>
 #include <TRUST_Vector.h>
 #include <Eq_ODVM.h>
-#include <Ref_Convection_Diffusion_std.h>
-#include <Ref_DoubleVect.h>
+#include <TRUSTTabs_forward.h>
 #include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
-
+class Convection_Diffusion_std;
 class Champ_Fonc_base;
 class Domaine_dis;
 class Domaine_Cl_dis;

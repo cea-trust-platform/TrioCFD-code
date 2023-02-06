@@ -24,11 +24,12 @@
 #define Transport_K_ou_Eps_base_included
 
 #include <Equation_base.h>
-#include <Ref_Champ_Inc.h>
 #include <Mod_turb_hyd_RANS_Bicephale.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Mod_turb_hyd_RANS_Bicephale.h>
-#include <Ref_Champ_Inc_base.h>
+#include <TRUST_Ref.h>
+
+class Champ_Inc;
+class Milieu_base;
+class Champ_Inc_base;
 
 /*! @brief Classe Transport_K_ou_Eps_base Classe de base pour l'equation
  *

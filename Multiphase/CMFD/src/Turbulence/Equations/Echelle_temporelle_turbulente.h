@@ -25,7 +25,7 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Fluide_base.h>
-#include <Ref_Fluide_base.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Echelle_temporelle_turbulente Equation de transport de l'echelle temporelle turbulente (modele k-tau)
  *

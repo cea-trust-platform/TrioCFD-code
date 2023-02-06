@@ -37,7 +37,6 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Transport_Marqueur_FT,"Transport_Marqueur_FT",Transport_Interfaces_FT_Disc);
-Implemente_ref(Transport_Marqueur_FT);
 
 Transport_Marqueur_FT::Transport_Marqueur_FT()
 {

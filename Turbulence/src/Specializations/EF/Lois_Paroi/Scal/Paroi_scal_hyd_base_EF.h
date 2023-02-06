@@ -23,10 +23,13 @@
 #define Paroi_scal_hyd_base_EF_included
 
 #include <Turbulence_paroi_scal_base.h>
-#include <Ref_Domaine_EF.h>
-#include <Ref_Domaine_Cl_EF.h>
 #include <TRUSTVects.h>
-//
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
+class Domaine_Cl_EF;
+class Domaine_EF;
+
 class Paroi_scal_hyd_base_EF  : public Turbulence_paroi_scal_base
 {
 

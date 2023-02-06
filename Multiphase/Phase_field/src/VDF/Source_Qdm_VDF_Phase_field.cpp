@@ -169,7 +169,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 
   DoubleVect u_carre;
   DoubleTab mutilde_NS;
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
   mutilde_NS.resize(eq_c.get_mutilde_()->valeurs().dimension_tot(0), 1);
@@ -284,7 +284,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
   int el0,el1;
   double vol0,vol1;
 
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
 
@@ -367,7 +367,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
   int el0,el1;
   double vol0,vol1;
 
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
 
@@ -478,7 +478,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
   int nbfaces=domaine_VDF.nb_faces();
   int el0,el1;
   double vol0,vol1;
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
 

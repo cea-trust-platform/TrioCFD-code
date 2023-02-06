@@ -25,10 +25,12 @@
 #define Champ_front_zoom_included
 
 #include <Ch_front_var_instationnaire_dep.h>
-#include <Ref_Probleme_base.h>
-#include <Ref_Pb_MG.h>
-#include <Ref_Champ_Inc_base.h>
 #include <Frontiere_dis_base.h>
+#include <TRUST_Ref.h>
+#include <Motcle.h>
+
+class Pb_MG;
+class Probleme_base;
 class Motcle;
 class Champ_front_base;
 class Equation_base;

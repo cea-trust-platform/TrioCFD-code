@@ -25,10 +25,11 @@
 
 #include <Pb_Fluide_base.h>
 #include <TRUST_Vector.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Chimie.h>
 #include <Triple_Line_Model_FT_Disc.h>
+#include <TRUST_Ref.h>
 
+class Chimie;
+class Equation_base;
 class Milieu_base;
 class Navier_Stokes_FT_Disc;
 class Transport_Interfaces_FT_Disc;

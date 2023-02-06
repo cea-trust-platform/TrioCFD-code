@@ -25,13 +25,16 @@
 
 #include <Source_base.h>
 #include <Terme_Source_Qdm.h>
-#include <Ref_Domaine_VDF.h>
-#include <Ref_Domaine_Cl_VDF.h>
 #include <Equation.h>
-#include <Ref_Modele_turbulence_hyd_K_Eps.h>
-#include <Ref_Navier_Stokes_Turbulent.h>
-#include <Ref_Transport_K_Eps.h>
 #include <TBNN.h>
+#include <TRUST_Ref.h>
+
+class Modele_turbulence_hyd_K_Eps;
+class Navier_Stokes_Turbulent;
+class Transport_K_Eps;
+class Domaine_Cl_VDF;
+class Domaine_Cl_dis;
+class Domaine_VDF;
 class Probleme_base;
 
 /*! @brief class Tenseur_Reynolds_Externe_VDF_Face

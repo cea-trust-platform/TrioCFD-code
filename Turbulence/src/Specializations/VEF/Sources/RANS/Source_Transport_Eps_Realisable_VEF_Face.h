@@ -23,8 +23,8 @@
 #define Source_Transport_Eps_Realisable_VEF_Face_included
 
 #include <Source_Transport_Realisable_VEF_Face_base.h>
-#include <Ref_Transport_K_ou_Eps_Realisable.h>
 #include <Transport_K_ou_Eps_Realisable.h>
+#include <TRUST_Ref.h>
 
 class Source_Transport_Eps_Realisable_VEF_Face : public Source_Transport_Realisable_VEF_Face_base
 {

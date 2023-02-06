@@ -23,15 +23,14 @@
 #define Modele_Jones_Launder_VEF_included
 
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
-#include <Ref_Domaine_VEF.h>
-#include <Ref_Domaine_Cl_VEF.h>
 #include <Domaine_Cl_dis.h>
+#include <TRUST_Ref.h>
 
 class Domaine_dis;
 class Domaine_Cl_dis;
 #include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 class Modele_Jones_Launder_VEF : public Modele_Fonc_Bas_Reynolds_Base
 {

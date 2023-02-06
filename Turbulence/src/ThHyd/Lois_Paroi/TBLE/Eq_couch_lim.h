@@ -25,7 +25,9 @@
 
 #include <Diffu_totale.h>
 #include <Motcle.h>
-#include <Ref_Milieu_base.h>
+#include <TRUST_Ref.h>
+
+class Milieu_base;
 
 /*! @brief Classe Eq_couch_lim Classe resolvant les equations de couche limite simplifiees necessaires
  *

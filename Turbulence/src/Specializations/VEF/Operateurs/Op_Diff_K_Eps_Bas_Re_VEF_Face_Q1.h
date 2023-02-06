@@ -21,9 +21,11 @@
 #ifndef Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1_included
 #define Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1_included
 
-#include <Ref_Champ_Uniforme.h>
-#include <Ref_Champ_Q1NC.h>
 #include <Op_Diff_K_Eps_Bas_Re_VEF_base.h>
+#include <TRUST_Ref.h>
+
+class Champ_Uniforme;
+class Champ_Q1NC;
 
 //////////////////////////////////////////////////////////////////////////////
 //

@@ -26,7 +26,9 @@
 #include <TRUSTTab.h>
 #include <Echange_global_impose.h>
 #include <Cond_lim_base.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Cond_lim_tau_omega_simple_demi
  *

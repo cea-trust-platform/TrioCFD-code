@@ -24,7 +24,8 @@
 #define Convection_Diffusion_Concentration_FT_Disc_included
 
 #include <Convection_Diffusion_Concentration.h>
-#include <Ref_Equation_base.h>
+#include <TRUST_Ref.h>
+
 
 class ArrOfBit;
 /*! @brief Cette equation corrige le champ de concentration pour tenir compte de la presence d'une interface.

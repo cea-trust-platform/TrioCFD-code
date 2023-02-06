@@ -23,7 +23,9 @@
 #define Source_Transport_K_VDF_Elem_included
 
 #include <Source_Transport_VDF_Elem_base.h>
-#include <Ref_Transport_K_ou_Eps.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_ou_Eps;
 
 /*! @brief class Source_Transport_K_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du k dans le cas ou les equations de Navier-Stokes
  *

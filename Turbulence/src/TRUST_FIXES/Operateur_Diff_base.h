@@ -17,8 +17,10 @@
 #define Operateur_Diff_base_included
 
 #include <Operateur_base.h>
-#include <Ref_Champ_base.h>
 #include <Support_Champ_Masse_Volumique.h>
+#include <TRUST_Ref.h>
+
+class Champ_base;
 
 /*! @brief classe Operateur_Diff_base Cette classe est la base de la hierarchie des operateurs representant
  *

@@ -23,7 +23,7 @@
 #define Connectivite_frontieres_included
 
 #include <TRUSTTab.h>
-#include <Ref_Domaine_VF.h>
+#include <TRUST_Ref.h>
 
 class Domaine_VF;
 

@@ -102,7 +102,7 @@ void Sonde::completer()
   //On devrait acceder au domaine par le champ generique
   //Mais reference pas encore faite
   Probleme_base& Pb = mon_post->probleme();
-  const Motcle nom_domaine = Pb.domaine().le_nom();
+  const Motcle nom_domaine = mon_post->domaine()->le_nom();
 
   Motcle nom_champ_ref;
   Motcle nom_macro=nom_champ_lu_;
@@ -239,7 +239,7 @@ Entree& Sonde::readOn(Entree& is)
       //le nom du champ auquel on fait reference et non pas une composante de ce champ
       REF(Champ_base) champ_ref = Pb.get_champ(nom_champ_lu_);
       const Nom& le_nom_champ = champ_ref->le_nom();
-      const Motcle& nom_domaine = Pb.domaine().le_nom();
+      const Motcle nom_domaine = mon_post->domaine()->le_nom();
       Motcle identifiant;
 
       identifiant = Motcle(le_nom_champ)+"_natif_"+nom_domaine;
@@ -585,7 +585,7 @@ Entree& Sonde::readOn(Entree& is)
             int m=-1;
             const Sondes& les_sondes=mon_post->les_sondes();
             for (int i=0; i<les_sondes.size(); i++)
-              if (les_sondes(i).get_nom()==autre_sonde)
+              if (les_sondes(i)->get_nom()==autre_sonde)
                 {
                   m=i;
                   break;

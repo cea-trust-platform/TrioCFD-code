@@ -16,10 +16,10 @@
 #define Postraitement_ft_lata_included
 
 #include <Postraitement.h>
-#include <Ref_Transport_Interfaces_FT_Disc.h>
-
 #include <vector>
+#include <TRUST_Ref.h>
 
+class Transport_Interfaces_FT_Disc;
 class Motcle;
 class Maillage_FT_Disc;
 class Fichier_Lata;

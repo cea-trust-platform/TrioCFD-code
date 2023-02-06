@@ -24,8 +24,9 @@
 #define Cond_lim_k_simple_transition_constante_demi_included
 
 #include <Echange_global_impose.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
 
+class Correlation;
 
 /*! @brief Classe Cond_lim_k_simple:
  *

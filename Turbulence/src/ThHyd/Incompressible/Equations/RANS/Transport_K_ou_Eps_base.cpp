@@ -435,8 +435,6 @@ double Transport_K_ou_Eps_base::calculer_pas_de_temps() const
 
 const Champ_base& Transport_K_ou_Eps_base::get_champ( const Motcle& nom ) const
 {
-  REF( Champ_base ) ref_champ;
-
   double temps_init = schema_temps().temps_init();
 
   if (nom=="residu")

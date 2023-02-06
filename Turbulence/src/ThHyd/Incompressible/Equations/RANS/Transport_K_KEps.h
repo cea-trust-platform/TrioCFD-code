@@ -23,10 +23,11 @@
 #define Transport_K_KEps_included
 
 #include <Transport_K_Eps_non_std.h>
-#include <Ref_Modele_turbulence_hyd_K_Eps_2_Couches.h>
 #include <Loi_2couches.h>
 #include <Operateur_Conv.h>
+#include <TRUST_Ref.h>
 
+class Modele_turbulence_hyd_K_Eps_2_Couches;
 class Motcle;
 
 /*! @brief classe Transport_K_KEps Cette classe represente l'equation de transport de l'energie cinetique

@@ -199,7 +199,6 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::imprimer(Sortie& os) cons
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(const Motcle& nom) const
 {
-  REF(Champ_base) ref_champ;
   try
     {
       return Modele_turbulence_scal_base::get_champ(nom);
