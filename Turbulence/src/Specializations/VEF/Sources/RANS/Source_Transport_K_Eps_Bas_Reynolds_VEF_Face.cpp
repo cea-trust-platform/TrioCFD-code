@@ -54,7 +54,6 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
   const int nb_faces = zone_VEF.nb_faces();
-  const int interpol_visco = 0;
 
   DoubleTrav P(nb_faces), D(vol_ent), E(vol_ent), F1(nb_faces), F2(nb_faces);
 
@@ -63,7 +62,12 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   mon_modele_fonc.Calcul_E(E, zone_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin, visco_turb);
   mon_modele_fonc.Calcul_F2(F2, D, zone_dis_keps, K_eps_Bas_Re, ch_visco_cin);
 
-  calculer_terme_production_K(zone_VEF, zone_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb, interpol_visco);
+  if (_interpolation_viscosite_turbulente != 0)
+    {
+      Cerr << "Error 'interpolation_viscosite_turbulente' must be equal to '0' in this case." << finl;
+      Process::exit();
+    }
+  calculer_terme_production_K(zone_VEF, zone_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb, _interpolation_viscosite_turbulente);
 
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter P 0", P);
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter D 0", D);

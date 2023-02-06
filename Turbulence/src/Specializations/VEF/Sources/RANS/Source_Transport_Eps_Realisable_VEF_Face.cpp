@@ -54,7 +54,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::calculer_terme_production_real(co
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), & eps_Rea = eqn_eps_Rea->inconnue().valeurs();
 
-  calculer_terme_production_K_BiK(la_zone_VEF.valeur(), la_zone_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb, interpolation_viscosite_turbulente);
+  calculer_terme_production_K_BiK(la_zone_VEF.valeur(), la_zone_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb, _interpolation_viscosite_turbulente);
 }
 
 void Source_Transport_Eps_Realisable_VEF_Face::fill_resu_real(const int num_face, const DoubleVect& vol_ent, const DoubleTrav& P, const DoubleTab& CC1, const DoubleTab& S, const double visco,

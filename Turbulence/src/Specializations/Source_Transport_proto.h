@@ -67,9 +67,9 @@ protected:
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
   static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Pour realisable, Chabard et N3S
   static constexpr double C11__ = 1.55, C21__ = 2.; // pour Bas Re !
-  static constexpr int interpolation_viscosite_turbulente__ = 0.; // moyenne arithmetique par defaut
+  static constexpr int interpolation_viscosite_turbulente__ = 0; // moyenne arithmetique par defaut
   double C1 = C1__, C2 = C2__, C3 = C3__;
-  int interpolation_viscosite_turbulente = interpolation_viscosite_turbulente__;
+  int _interpolation_viscosite_turbulente = interpolation_viscosite_turbulente__;
 
   REF(Champ_Don) beta_t, beta_c;
   REF(Champ_Don_base) gravite;
