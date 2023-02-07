@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_turb_PolyMAC_P0.h
+// File:        Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0_included
-#define Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0_included
+#ifndef Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0_included
+#define Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0_included
 
 #include <Source_base.h>
 #include <TRUSTTab.h>
@@ -35,9 +35,9 @@ class Correlation;
  *
  * @sa Operateur_PolyMAC_P0_base Operateur_base
  */
-class Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0: public Source_base
+class Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0: public Source_base
 {
-  Declare_instanciable(Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0);
+  Declare_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0);
 public :
   int has_interface_blocs() const override
   {

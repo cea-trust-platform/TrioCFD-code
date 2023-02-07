@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0.cpp
+// File:        Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0.h>
+#include <Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0.h>
 
 #include <Domaine_PolyMAC_P0.h>
 #include <Domaine_Cl_PolyMAC.h>
@@ -47,19 +47,19 @@
 #include <cmath>
 #include <vector>
 
-Implemente_instanciable(Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0", Source_base);
+Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0|Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_base);
 
-Sortie& Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const
+Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is)
+Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is)
 {
   return is;
 }
 
-void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::completer()
+void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::completer()
 {
   for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
     {
@@ -69,7 +69,7 @@ void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::completer()
 
 }
 
-void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0&                   tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
@@ -107,7 +107,7 @@ void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::dimensionner_blo
       }
 }
 
-void Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_PolyMAC_P0&                   domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Domaine_Cl_PolyMAC&                    zcl = ref_cast(Domaine_Cl_PolyMAC, equation().domaine_Cl_dis().valeur());
