@@ -41,6 +41,7 @@ Entree& Transport_turbulent_SGDH::readOn(Entree& is)
   param.ajouter("Pr_t|Prandtl_turbulent|Schmitt_turbulent", &Pr_t);
   param.ajouter("sigma|sigma_turbulent", &sigma_);
   param.ajouter("no_alpha", &no_alpha_);
+  param.ajouter("gas_turb", &gas_turb_);
   param.lire_avec_accolades_depuis(is);
   if (Pr_t > 0 && sigma_ != 1) Process::exit(que_suis_je() + ": cannot specify both Pr_t and sigma!");
   if (Pr_t > 0) sigma_ = 1. / Pr_t;
@@ -60,8 +61,13 @@ void Transport_turbulent_SGDH::modifier_nu(const Convection_Diffusion_std& eq, c
   //formule pour passer de nu a mu : mu0 * sigma_ * nu_t / nu0
   if (nu.nb_dim() == 2)
     for (i = 0; i < nl; i++)
-      for (n = 0; n < N; n++) //isotrope
-        nu(i, n) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ * nu_t(i, n) / nu0(i, n);
+      {
+        for (n = 0; n < 1; n++) //isotrope
+          nu(i, n) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ * nu_t(i, n) / nu0(i, n);
+        if (gas_turb_)
+          for (n = 1; n < N; n++) //isotrope
+            nu(i, n) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ / nu0(i, n) * nu_t(i, 0.)  * std::min((*alp)(i,n)*10, 1.) ;
+      }
   else if (nu.nb_dim() == 3)
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
