@@ -36,7 +36,6 @@
 #include <Taux_dissipation_turbulent.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
-#include <Op_Diff_Tau_PolyMAC_P0_Elem.h>
 #include <TRUSTTrav.h>
 #include <Domaine_Poly_base.h>
 
