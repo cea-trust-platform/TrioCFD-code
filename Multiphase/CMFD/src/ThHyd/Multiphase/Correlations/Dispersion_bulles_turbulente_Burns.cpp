@@ -35,6 +35,12 @@ Sortie& Dispersion_bulles_turbulente_Burns::printOn(Sortie& os) const
 
 Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("minimum", &minimum_);
+  param.lire_avec_accolades_depuis(is);
+
+
+
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : NULL;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
@@ -65,7 +71,7 @@ void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, co
   for (int k = 0; k < N; k++)
     if (k!=n_l)
       {
-        coeff(k, n_l) = (alpha(k)  >1.e-4) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)/alpha(k)  : nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)*alpha(k)  *1.e8 ;
-        coeff(n_l, k) = (alpha(n_l)>1.e-4) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)/alpha(n_l): nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)*alpha(n_l)*1.e8 ;
+        coeff(k, n_l) = std::max( minimum_, (alpha(k)  >1.e-4) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)/alpha(k)  : nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)*alpha(k)  *1.e8 );
+        coeff(n_l, k) = std::max( minimum_, (alpha(n_l)>1.e-4) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)/alpha(n_l): nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)*alpha(n_l)*1.e8 );
       }
 }

@@ -46,6 +46,7 @@ Entree& Correction_Lubchenko_PolyMAC_P0::readOn(Entree& is)
   Param param(que_suis_je());
   param.ajouter("beta_lift", &beta_lift_);
   param.ajouter("beta_disp", &beta_disp_);
+  param.ajouter("portee_disp", &portee_disp_);
   param.lire_avec_accolades_depuis(is);
 
   //identification des phases
@@ -197,19 +198,19 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 
         double sum_alphag_wall = 0 ;
         for (int k = 0; k<N ; k++)
-          if (k!=n_l) sum_alphag_wall += (y_faces(f)<d_b_l(k)/2.) ? a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) :0 ;
+          if (k!=n_l) sum_alphag_wall += (y_faces(f)<portee_disp_*d_b_l(k)/2.) ? a_l(k) * (portee_disp_*d_b_l(k)-2*y_faces(f))/(portee_disp_*d_b_l(k)-y_faces(f)) :0 ;
 
         for (int k = 0; k < N; k++)
           if (k != n_l)
-            if (y_faces(f)<d_b_l(k)/2.)
+            if (y_faces(f)<portee_disp_*d_b_l(k)/2.)
               {
                 double fac = 0 ;
                 for (int d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
 
                 fac *= beta_disp_*pf(f) * vf(f) ;
-                secmem(f, k)   += fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
+                secmem(f, k)   += fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (portee_disp_*d_b_l(k)-2*y_faces(f))/(portee_disp_*d_b_l(k)-y_faces(f));
                 secmem(f, k)   += fac * coeff(n_l, k) * 1/y_faces(f) * sum_alphag_wall;
-                secmem(f, n_l) -= fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
+                secmem(f, n_l) -= fac * coeff(k, n_l) * 1/y_faces(f) * a_l(k) * (portee_disp_*d_b_l(k)-2*y_faces(f))/(portee_disp_*d_b_l(k)-y_faces(f));
                 secmem(f, n_l) -= fac * coeff(n_l, k) * 1/y_faces(f) * sum_alphag_wall;
               }
       }
@@ -244,17 +245,17 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 
       double sum_alphag_wall = 0 ;
       for (int k = 0; k<N ; k++)
-        if (k!=n_l) sum_alphag_wall += (y_elem(e)<d_b_l(k)/2.) ? a_l(k) *(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) :0 ;
+        if (k!=n_l) sum_alphag_wall += (y_elem(e)<portee_disp_*d_b_l(k)/2.) ? a_l(k) *(portee_disp_*d_b_l(k)-2*y_elem(e))/(portee_disp_*d_b_l(k)-y_elem(e)) :0 ;
       for (int d = 0, i = nf_tot + D * e; d < D; d++, i++)
         for (int k = 0; k < N; k++)
           if (k != n_l)
-            if (y_elem(e)<d_b_l(k)/2)
+            if (y_elem(e)<portee_disp_*d_b_l(k)/2)
               {
                 double fac = beta_disp_*pe(e) * ve(e);
 
-                secmem(i, k)   += fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
+                secmem(i, k)   += fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (portee_disp_*d_b_l(k)-2*y_elem(e))/(portee_disp_*d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
                 secmem(i, k)   += fac * coeff(n_l, k) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
-                secmem(i, n_l) -= fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
+                secmem(i, n_l) -= fac * coeff(k, n_l) * 1/y_elem(e) * a_l(k) * (portee_disp_*d_b_l(k)-2*y_elem(e))/(portee_disp_*d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
                 secmem(i, n_l) -= fac * coeff(n_l, k) * 1/y_elem(e) * sum_alphag_wall                                      * n_y_elem(e, d);
               }
     }
