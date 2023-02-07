@@ -22,80 +22,20 @@
 
 #include <Production_energie_cin_turb_PolyMAC_P0.h>
 
-#include <Domaine_PolyMAC_P0.h>
-#include <Champ_Elem_PolyMAC_P0.h>
-#include <Matrix_tools.h>
-#include <Probleme_base.h>
-#include <grad_Champ_Face_PolyMAC_P0.h>
-#include <Champ_Uniforme.h>
-#include <Flux_interfacial_base.h>
-#include <Milieu_composite.h>
-#include <Operateur_Diff.h>
 #include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
-#include <Navier_Stokes_std.h>
-#include <Viscosite_turbulente_base.h>
-#include <TRUSTTab_parts.h>
-#include <Loi_paroi_adaptative.h>
-#include <Pb_Multiphase.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
+#include <Viscosite_turbulente_base.h>
+#include <Domaine_PolyMAC_P0.h>
+#include <Navier_Stokes_std.h>
+#include <Pb_Multiphase.h>
 
-Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_base);
+Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_Production_energie_cin_turb);
 // XD Production_energie_cin_turb source_base Production_energie_cin_turb 1 Production source term for the TKE equation
 
 
-Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const
-{
-  return os;
-}
-
-Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("limiter_production", &limiter_prod_);
-  param.lire_avec_accolades_depuis(is);
-
-  return is;
-}
-
-void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
-{
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const DoubleTab& k 	 = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs();
-  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
-
-  std::string Type_diss = ""; // omega or tau dissipation
-  for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
-    {
-      if sub_type(Echelle_temporelle_turbulente, equation().probleme().equation(i)) Type_diss = "tau";
-      else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
-    }
-  if (Type_diss == "") return;
-
-  assert(Nk == 1); // si plus d'une phase turbulente, il vaut mieux iterer sur les id_composites des phases turbulentes modelisees par un modele k-tau
-  if (Type_diss == "tau") assert(ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ("tau")).valeurs().line_size() == 1);
-  if (Type_diss == "omega") assert(ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ("omega")).valeurs().line_size() == 1);
-
-  for (auto &&n_m : matrices)
-    if (n_m.first == "alpha" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "temperature" || n_m.first == "pression")
-      {
-        Matrice_Morse& mat = *n_m.second, mat2;
-        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
-        int nc = dep.dimension_tot(0),
-            M  = dep.line_size();
-        IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
-        if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "tau"|| n_m.first == "omega")
-          for (int e = 0; e < ne; e++)
-            for (int n = 0; n < Nk; n++)
-              if (n < M) sten.append_line(Nk * e + n, M * e + n);
-        if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++)
-            for (int n = 0, m = 0; n < Nk; n++, m+=(M>1)) sten.append_line(Nk * e + n, M * e + m);
-        Matrix_tools::allocate_morse_matrix(Nk * ne_tot, M * nc, sten, mat2);
-        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
-      }
-}
+Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
+Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
 
 void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {

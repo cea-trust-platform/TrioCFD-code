@@ -22,52 +22,28 @@
 
 #include <Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0.h>
 
+#include <Op_Diff_Turbulent_PolyMAC_P0_Elem.h>
+#include <Echelle_temporelle_turbulente.h>
+#include <Viscosite_turbulente_k_tau.h>
+#include <Champ_Elem_PolyMAC_P0.h>
+#include <Echange_impose_base.h>
 #include <Domaine_PolyMAC_P0.h>
 #include <Domaine_Cl_PolyMAC.h>
-#include <Champ_Elem_PolyMAC_P0.h>
-#include <Pb_Multiphase.h>
-#include <grad_Champ_Face_PolyMAC_P0.h>
-#include <Champ_Uniforme.h>
-#include <Flux_interfacial_base.h>
-#include <Milieu_composite.h>
-#include <Operateur_Diff.h>
-#include <Op_Diff_PolyMAC_P0_base.h>
-#include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
-#include <Op_Diff_Turbulent_PolyMAC_P0_Elem.h>
 #include <QDM_Multiphase.h>
-#include <Viscosite_turbulente_k_tau.h>
-#include <Energie_cinetique_turbulente.h>
-#include <Echelle_temporelle_turbulente.h>
-#include <Transport_turbulent_SGDH.h>
-#include <Array_tools.h>
+#include <Neumann_paroi.h>
+#include <Pb_Multiphase.h>
 #include <Matrix_tools.h>
+#include <Array_tools.h>
 #include <Dirichlet.h>
-#include <Neumann_loi_paroi_faible_tau_omega.h>
 
 #include <cmath>
 #include <vector>
 
-Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0|Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_base);
+Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0|Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_Diffusion_supplementaire_echelle_temp_turb);
 
-Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const{  return Source_Diffusion_supplementaire_echelle_temp_turb::printOn(os);}
 
-Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is)
-{
-  return is;
-}
-
-void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::completer()
-{
-  for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
-    {
-      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis()->les_conditions_limites(j);
-      if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_fixe = 1;
-    }
-
-}
+Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Diffusion_supplementaire_echelle_temp_turb::readOn(is);}
 
 void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {

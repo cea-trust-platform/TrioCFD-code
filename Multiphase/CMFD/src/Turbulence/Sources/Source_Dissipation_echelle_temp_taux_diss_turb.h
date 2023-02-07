@@ -14,22 +14,21 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0.h
-// Directory:   $TRUST_ROOT/src/PolyMAC_P0/Sources
+// File:        Source_Dissipation_echelle_temp_taux_diss_turb.h
+// Directory:   $TRUST_ROOT/src/Turbulence/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0_included
-#define Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0_included
+#ifndef Source_Dissipation_echelle_temp_taux_diss_turb_included
+#define Source_Dissipation_echelle_temp_taux_diss_turb_included
 
-#include <Source_Diffusion_croisee_echelle_temp_taux_diss_turb.h>
+#include <Sources_Multiphase_base.h>
 
 class Convection_Diffusion_std;
-/*! @brief class Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0
+/*! @brief class Source_Dissipation_echelle_temp_taux_diss_turb
  *
- *  Terme de diffusion croisee dans l'equation de transport de tau (tau = 1 / omega) ou de omega dans les modeles de turbulence k-tau et k-omega
- *  Cd = sigma_d * alpha * rho *tau * min(grad k, grad tau, 0)
+ *  Terme de dissipation beta_omega * alpha * rho et de -beta_omega * alpha * rho * omega**2 dans l'equation d'energie cinetique turbulente
  *
  *  la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
  *  Actuellement k et tau sont necessairement scalaires.
@@ -37,18 +36,17 @@ class Convection_Diffusion_std;
  *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0 : public Source_Diffusion_croisee_echelle_temp_taux_diss_turb 	// Terme_Source_PolyMAC_P0_base
+class Source_Dissipation_echelle_temp_taux_diss_turb : public Sources_Multiphase_base 	
 {
 
-  Declare_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0);
+  Declare_base(Source_Dissipation_echelle_temp_taux_diss_turb);
 
 public:
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
 protected:
-  double sigma_d = 0.; // Kok and Spekreijse (2000) Efficient and accurate implementation of the k-omega turbulence model in the NLR multi-block Navier-Stokes system
-  int f_grad_k_fixe = 1 ;
-  int f_grad_tau_omega_fixe = 1 ;
+  double beta_omega = 0.075; // Kok and Speikreijse (2000)
 };
 
 #endif

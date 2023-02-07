@@ -14,31 +14,32 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dissipation_energie_cin_turb_PolyMAC_P0.h
-// Directory:   $TRUST_ROOT/src/PolyMAC_P0/Sources
-// Version:     /main/16
+// File:        Source_Diffusion_supplementaire_echelle_temp_turb.cpp
+// Directory:   $TRUST_ROOT/src/Turbulence/Sources
+// Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dissipation_energie_cin_turb_PolyMAC_P0_included
-#define Dissipation_energie_cin_turb_PolyMAC_P0_included
+#include <Source_Diffusion_supplementaire_echelle_temp_turb.h>
 
-#include <Source_Dissipation_energie_cin_turb.h>
+#include <Neumann_loi_paroi_faible_tau_omega.h>
+#include <QDM_Multiphase.h>
+#include <Pb_Multiphase.h>
 
-class Convection_Diffusion_std;
-/*! @brief class Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0
- *
- *  Terme de dissipation -beta * (alpha * rho * k) * omega dans l'equation d'energie cinetique turbulente
- *
- *  la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
- *  Actuellement k est necessairement un scalaire.
- *  Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
- *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
- *
- */
-class Dissipation_energie_cin_turb_PolyMAC_P0 : public Source_Dissipation_energie_cin_turb 
+#include <cmath>
+#include <vector>
+
+Implemente_base(Source_Diffusion_supplementaire_echelle_temp_turb,"Source_Diffusion_supplementaire_lin_echelle_temp_turb|Source_Diffusion_supplementaire_echelle_temp_turb", Sources_Multiphase_base);
+
+Sortie& Source_Diffusion_supplementaire_echelle_temp_turb::printOn(Sortie& os) const { return os;}
+
+Entree& Source_Diffusion_supplementaire_echelle_temp_turb::readOn(Entree& is){  return is;}
+
+void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
 {
-  Declare_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0);
-};
-
-#endif
+  for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
+    {
+      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis()->les_conditions_limites(j);
+      if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_fixe = 1;
+    }
+}

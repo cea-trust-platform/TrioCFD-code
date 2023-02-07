@@ -22,68 +22,18 @@
 
 #include <Production_echelle_temp_taux_diss_turb_PolyMAC_P0.h>
 
-#include <Domaine_PolyMAC_P0.h>
-#include <Champ_Elem_PolyMAC_P0.h>
-#include <Probleme_base.h>
-#include <grad_Champ_Face_PolyMAC_P0.h>
-#include <Champ_Uniforme.h>
-#include <Flux_interfacial_base.h>
-#include <Milieu_composite.h>
-#include <Operateur_Diff.h>
-#include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
-#include <Navier_Stokes_std.h>
-#include <Viscosite_turbulente_k_tau.h>
-#include <Energie_cinetique_turbulente.h>
-#include <Array_tools.h>
-#include <Matrix_tools.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
+#include <grad_Champ_Face_PolyMAC_P0.h>
+#include <Champ_Elem_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
+#include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
 
+Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0,"Production_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_Production_echelle_temp_taux_diss_turb);
 
-Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0,"Production_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_base);
-
-Sortie& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::printOn(Sortie& os) const
-{
-  return os;
-}
-
-Entree& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("alpha_omega", &alpha_omega_, Param::REQUIRED);
-  param.lire_avec_accolades_depuis(is);
-  Cout << "alpha_omega = " << alpha_omega_ << finl ;
-
-  return is;
-}
-
-void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
-{
-  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = equation().inconnue().valeurs().line_size();
-  assert(Nk == 1); // si plus d'une phase turbulente, il vaut mieux iterer sur les id_composites des phases turbulentes modelisees par un modele k-tau
-
-  for (auto &&n_m : matrices)
-    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
-      {
-        Matrice_Morse& mat = *n_m.second, mat2;
-        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
-        int nc = dep.dimension_tot(0),
-            M  = dep.line_size();
-        IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
-        if (n_m.first == "alpha" || n_m.first == "temperature")
-          for (int e = 0; e < ne; e++)
-            for (int n = 0; n < Nk; n++)
-              if (n < M) sten.append_line(Nk * e + n, M * e + n);
-        if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++)
-            for (int n = 0, m = 0; n < Nk; n++, m+=(M>1)) sten.append_line(Nk * e + n, M * e + m);
-        Matrix_tools::allocate_morse_matrix(Nk * ne_tot, M * nc, sten, mat2);
-        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
-      }
-}
+Sortie& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::printOn(Sortie& os) const { return Source_Production_echelle_temp_taux_diss_turb::printOn(os); }
+Entree& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Production_echelle_temp_taux_diss_turb::readOn(is);}
 
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
