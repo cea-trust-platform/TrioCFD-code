@@ -660,7 +660,7 @@ calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl
         {
           visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
         }
-      if ( interpol_visco == 1 )
+      else if ( interpol_visco == 1 )
         {
           //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
