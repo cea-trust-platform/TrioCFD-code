@@ -22,16 +22,18 @@
 #ifndef Op_Diff_K_Omega_base_included
 #define Op_Diff_K_Omega_base_included
 
-#include <Operateur_Diff_base.h>
-#include <Operateur.h>
 #include <Operateur_negligeable.h>
+#include <Operateur_Diff_base.h>
+#include <TRUSTTabs_forward.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Deriv.h>
-#include <Ref_Champ_Don.h>
+#include <TRUST_Ref.h>
+#include <Operateur.h>
 
+class Champ_Don;
 class Champ_Fonc;
 class Champ_base;
-#include <TRUSTTabs_forward.h>
+
 // cAlan: 2023-01-30 : pardon pour ce vilain copier-coller, mais
 // j'aimerais que ça marche avant de modifier toute la structure des Operateurs.
 

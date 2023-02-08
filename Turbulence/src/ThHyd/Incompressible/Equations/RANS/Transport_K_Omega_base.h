@@ -23,12 +23,14 @@
 #ifndef Transport_K_Omega_base_included
 #define Transport_K_Omega_base_included
 
-#include <Ref_Mod_turb_hyd_RANS_komega.h>
 #include <Mod_turb_hyd_RANS_komega.h>
 #include <Transport_2eq_base.h>
-#include <Ref_Champ_Inc_base.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Champ_Inc.h>
+#include <TRUST_Ref.h>
+
+class Mod_turb_hyd_RANS_komega;
+class Champ_Inc_base;
+class Milieu_base;
+class Champ_Inc;
 
 /*! @brief Classe Transport_K_Omega_base Classe de base pour les equations
  *

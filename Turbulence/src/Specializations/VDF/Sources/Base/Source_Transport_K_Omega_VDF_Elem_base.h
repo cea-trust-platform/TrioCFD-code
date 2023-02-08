@@ -25,10 +25,9 @@
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Calcul_Production_K_VDF.h>
 #include <Source_Transport_proto.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <TRUST_Ref.h>
 
 class Source_Transport_K_Omega_VDF_Elem_base: public Source_base, public Calcul_Production_K_VDF, public Source_Transport_proto
 {
