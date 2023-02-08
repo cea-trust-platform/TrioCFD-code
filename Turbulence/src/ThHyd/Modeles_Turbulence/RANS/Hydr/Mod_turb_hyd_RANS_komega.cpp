@@ -99,17 +99,17 @@ const Champ_base& Mod_turb_hyd_RANS_komega::get_champ(const Motcle& nom) const
   catch (Champs_compris_erreur)
     {
     }
-  // int nb_eq = nombre_d_equations();
-  // for (int i = 0; i < nb_eq; i++)
-  //   {
-  //     try
-  //       {
-  //         return equation_k_omega(i).get_champ(nom);
-  //       }
-  //     catch (Champs_compris_erreur)
-  //       {
-  //       }
-  //   }
+  int nb_eq = nombre_d_equations();
+  for (int i = 0; i < nb_eq; i++)
+    {
+      try
+        {
+          return equation_k_omega(i).get_champ(nom);
+        }
+      catch (Champs_compris_erreur)
+        {
+        }
+    }
   throw Champs_compris_erreur();
   REF(Champ_base) ref_champ;
   return ref_champ;
@@ -119,8 +119,8 @@ void Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(Noms& nom, Option o
 {
   Mod_turb_hyd_base::get_noms_champs_postraitables(nom, opt);
 
-  // for (int i = 0; i < nombre_d_equations(); i++)
-  // equation_k_omega(i).get_noms_champs_postraitables(nom, opt);
+  for (int i = 0; i < nombre_d_equations(); i++)
+    equation_k_omega(i).get_noms_champs_postraitables(nom, opt);
 }
 
 /*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.

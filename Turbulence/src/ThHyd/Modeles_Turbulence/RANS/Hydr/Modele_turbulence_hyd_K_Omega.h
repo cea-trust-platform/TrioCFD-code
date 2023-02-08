@@ -50,6 +50,12 @@ public:
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
 
+  const Equation_base& equation_k_omega(int i) const override
+  {
+    assert ((i==0));
+    return eqn_transport_K_Omega;
+  }
+
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;
 

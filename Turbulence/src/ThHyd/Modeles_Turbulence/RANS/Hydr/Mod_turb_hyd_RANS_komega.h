@@ -44,6 +44,7 @@ public:
   virtual int nombre_d_equations() const = 0;
   virtual Transport_K_Omega_base& eqn_transp_K_Omega() = 0;
   virtual const Transport_K_Omega_base& eqn_transp_K_Omega() const = 0;
+  virtual const Equation_base& equation_k_omega(int) const=0 ;
   void completer() override;
 
   virtual void verifie_loi_paroi();
