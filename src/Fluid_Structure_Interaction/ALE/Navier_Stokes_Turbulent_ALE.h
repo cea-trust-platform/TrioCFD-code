@@ -23,10 +23,11 @@
 #ifndef Navier_Stokes_Turbulent_ALE_included
 #define Navier_Stokes_Turbulent_ALE_included
 
+#include <Mod_turb_hyd_RANS_keps.h>
 #include <Navier_Stokes_std_ALE.h>
 #include <Mod_turb_hyd.h>
 #include <Les_mod_turb.h>
-#include <Mod_turb_hyd_RANS.h>
+
 class Champ_Fonc;
 
 /*! @brief classe Navier_Stokes_Turbulent_ALE Cette classe represente l'equation de la dynamique pour un fluide

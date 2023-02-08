@@ -91,7 +91,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
 {
   const Champ_base& chK_Omega = eqn_transp_K_Omega().inconnue().valeur();
   Nom type = chK_Omega.que_suis_je();
-  // const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Omega().zone_Cl_dis();
+  // const Domaine_Cl_dis& la_domaine_Cl_dis = eqn_transp_K_Omega().domaine_Cl_dis();
   const DoubleTab& tab_K_Omega = chK_Omega.valeurs();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
 
@@ -106,11 +106,11 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
           Cerr << "Unsupported K_Omega field in Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente" << finl;
           Process::exit(-1);
         }
-      n = eqn_transp_K_Omega().zone_dis().zone().nb_elem();
+      n = eqn_transp_K_Omega().domaine_dis().domaine().nb_elem();
     }
 
   // cAlan, le 20/01/2023 : sortir cette partie et en faire une fonction à part ?
-  // dans le cas d'une zone nulle on doit effectuer le dimensionnement
+  // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
   double non_prepare = 1;
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before", la_viscosite_turbulente.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente tab_K_Omega", tab_K_Omega);
@@ -124,7 +124,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
 
       visco_turb_au_format_K_Omega.typer(type);
       Champ_Inc_base& ch_visco_turb_K_Omega = visco_turb_au_format_K_Omega.valeur();
-      ch_visco_turb_K_Omega.associer_zone_dis_base(eqn_transp_K_Omega().zone_dis().valeur());
+      ch_visco_turb_K_Omega.associer_domaine_dis_base(eqn_transp_K_Omega().domaine_dis().valeur());
       ch_visco_turb_K_Omega.nommer("diffusivite_turbulente");
       ch_visco_turb_K_Omega.fixer_nb_comp(1);
       ch_visco_turb_K_Omega.fixer_nb_valeurs_nodales(n);
@@ -191,7 +191,7 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
               Cerr << "Unsupported K_Omega field in Modele_turbulence_hyd_K_Omega::imprimer_evolution_komega()" << finl;
               Process::exit(-1);
             }
-          size = le_champ_K_Omega.valeur().equation().zone_dis().zone().nb_elem();
+          size = le_champ_K_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
         }
 
       ConstDoubleTab_parts parts(le_champ_K_Omega.valeurs());
@@ -338,7 +338,7 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   Schema_Temps_base& sch = eqn_transp_K_Omega().schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
 
-  eqn_transp_K_Omega().zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K_Omega().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Omega().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Omega());
   eqn_transp_K_Omega().mettre_a_jour(temps);

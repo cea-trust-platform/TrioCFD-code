@@ -103,32 +103,32 @@ void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
 // For VEF-like scheme
 void Transport_K_Eps_base::get_position_faces(Nom& position, int& n)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
 
   position = "x=";
-  position += (Nom)zone_vf.xv(n, 0);
+  position += (Nom)domaine_vf.xv(n, 0);
   position += " y=";
-  position += (Nom)zone_vf.xv(n, 1);
+  position += (Nom)domaine_vf.xv(n, 1);
   if (dimension == 3)
     {
       position += " z=";
-      position += (Nom)zone_vf.xv(n, 2);
+      position += (Nom)domaine_vf.xv(n, 2);
     }
 }
 
 // For VDF-like scheme
 void Transport_K_Eps_base::get_position_cells(Nom& position, int& n)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
 
   position = "x=";
-  position += (Nom)zone_vf.xp(n, 0);
+  position += (Nom)domaine_vf.xp(n, 0);
   position += " y=";
-  position += (Nom)zone_vf.xp(n, 1);
+  position += (Nom)domaine_vf.xp(n, 1);
   if (dimension == 3)
     {
       position += " z=";
-      position += (Nom)zone_vf.xp(n, 2);
+      position += (Nom)domaine_vf.xp(n, 2);
     }
 }
 

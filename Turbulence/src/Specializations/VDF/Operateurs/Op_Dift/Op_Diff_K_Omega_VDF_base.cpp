@@ -110,7 +110,7 @@ const Champ_Fonc& Op_Diff_K_Omega_VDF_base::diffusivite_turbulente() const
 
 void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem);
+  Op_VDF_Elem::modifier_pour_Cl(iter->domaine(), iter->domaine_Cl(), matrice, secmem);
 
   const Navier_Stokes_Turbulent& eqn_hydr = ref_cast(Navier_Stokes_Turbulent,equation().probleme().equation(0) ) ;
   const Mod_turb_hyd& mod_turb = eqn_hydr.modele_turbulence();
@@ -123,16 +123,16 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
       const IntVect& tab1=matrice.get_tab1();
       DoubleVect& coeff = matrice.get_set_coeff();
 
-      const IntTab& face_voisins = iter->zone().face_voisins();
+      const IntTab& face_voisins = iter->domaine().face_voisins();
 
       if(sub_type(Transport_K_Omega,mon_equation.valeur()))
         {
           const Transport_K_Omega& eqn_k_omega=ref_cast(Transport_K_Omega,equation());
           const DoubleTab& val=eqn_k_omega.inconnue().valeurs();
 
-          const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
 
-          const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+          const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
           for (int num_cl=0; num_cl<nb_cl; num_cl++)
             {
@@ -175,7 +175,7 @@ void Op_Diff_K_Omega_VDF_base::dimensionner_blocs(matrices_t matrices, const tab
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
-  Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), mat2);
+  Op_VDF_Elem::dimensionner(iter->domaine(), iter->domaine_Cl(), mat2);
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
 }
 

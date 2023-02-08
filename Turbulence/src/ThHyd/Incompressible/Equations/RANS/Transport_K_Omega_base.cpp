@@ -25,7 +25,7 @@
 #include <communications.h>
 #include <Probleme_base.h>
 #include <Discret_Thyd.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Param.h>
 #include <Debog.h>
 
@@ -67,7 +67,7 @@ void Transport_K_Omega_base::discretiser()
     }
 
   Cerr << "K-Omega transport equation (" << que_suis_je() << ") discretization" << finl;
-  discretiser_K_Omega(schema_temps(), zone_dis(), le_champ_K_Omega);
+  discretiser_K_Omega(schema_temps(), domaine_dis(), le_champ_K_Omega);
   champs_compris_.ajoute_champ(le_champ_K_Omega);
   if (modele_turbulence().equation().calculate_time_derivative())
     set_calculate_time_derivative(1);
@@ -76,7 +76,7 @@ void Transport_K_Omega_base::discretiser()
 }
 
 void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
-                                                 Zone_dis& z, Champ_Inc& ch) const
+                                                 Domaine_dis& z, Champ_Inc& ch) const
 {
   Cerr << "K_Omega field discretization" << finl;
   Noms noms(2);
@@ -95,37 +95,37 @@ void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
 }
 
 // cAlan : Mutualiser dans 2eq. Possibilité de faire un templace pour
-// avoir zone_vf.xv ou zone_vf.xp ?
+// avoir domaine_vf.xv ou domaine_vf.xp ?
 
 //For VEF-like scheme
 void Transport_K_Omega_base::get_position_faces(Nom& position, int& n)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
 
   position = "x=";
-  position += (Nom)zone_vf.xv(n, 0);
+  position += (Nom)domaine_vf.xv(n, 0);
   position += " y=";
-  position += (Nom)zone_vf.xv(n, 1);
+  position += (Nom)domaine_vf.xv(n, 1);
   if (dimension == 3)
     {
       position += " z=";
-      position += (Nom)zone_vf.xv(n, 2);
+      position += (Nom)domaine_vf.xv(n, 2);
     }
 }
 
 // For VDF-like scheme
 void Transport_K_Omega_base::get_position_cells(Nom& position, int& n)
 {
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
 
   position = "x=";
-  position += (Nom)zone_vf.xp(n, 0);
+  position += (Nom)domaine_vf.xp(n, 0);
   position += " y=";
-  position += (Nom)zone_vf.xp(n, 1);
+  position += (Nom)domaine_vf.xp(n, 1);
   if (dimension == 3)
     {
       position += " z=";
-      position += (Nom)zone_vf.xp(n, 2);
+      position += (Nom)domaine_vf.xp(n, 2);
     }
 }
 
@@ -146,7 +146,7 @@ int Transport_K_Omega_base::controler_K_Omega()
           Cerr << "Unsupported K_Omega field in Transport_K_Omega_base::controler_K_Omega()" << finl;
           Process::exit(-1);
         }
-      size = le_champ_K_Omega.valeur().equation().zone_dis().zone().nb_elem();
+      size = le_champ_K_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
     }
 
   //int size_tot=mp_sum(size);
@@ -158,12 +158,12 @@ int Transport_K_Omega_base::controler_K_Omega()
   int lquiet = modele_turbulence().get_lquiet(); // cAlan remonter ce lquiet dans modele_turbu
 
   // cAlan, le 20/01/2023 : on force les valeurs au min et max comme pour le K_Eps.
-  const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
   double OMEGA_MIN = modele_turbulence().get_OMEGA_MIN();
   double OMEGA_MAX = modele_turbulence().get_OMEGA_MAX();
   double K_MIN = modele_turbulence().get_K_MIN();
-  const IntTab& face_voisins = zone_vf.face_voisins();
-  const IntTab& elem_faces = zone_vf.elem_faces();
+  const IntTab& face_voisins = domaine_vf.face_voisins();
+  const IntTab& elem_faces = domaine_vf.elem_faces();
   // PL on ne fixe au seuil minimum que si negatifs
   // car la loi de paroi peut fixer a des valeurs tres petites
   // et le rapport K*K/eps est coherent

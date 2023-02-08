@@ -92,7 +92,7 @@ calculer_terme_production_K(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF
 }
 
 DoubleVect& Calcul_Production_K_VDF::
-calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& zone_Cl_VDF,
+calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF,
                                        DoubleVect& S, const DoubleTab& K_Omega,
                                        const DoubleTab& vitesse, const Champ_Face_VDF& vit,
                                        const DoubleTab& visco_turb) const
@@ -104,7 +104,7 @@ calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Dom
   // calcul_S_barre car on n a pas de loi de paroi. La fonction sera a
   // factoriser avec la precedente.
   S = 0.;
-  vit.calcul_S_barre(vitesse, S, zone_Cl_VDF);
+  vit.calcul_S_barre(vitesse, S, domaine_Cl_VDF);
 
   Debog::verifier("Source_Transport_K_Omega_VDF_P0_VDF::calculer_terme_production_K",
                   S);

@@ -25,7 +25,7 @@
 #include <communications.h>
 #include <Probleme_base.h>
 #include <Discret_Thyd.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Param.h>
 #include <Debog.h>
 
@@ -111,7 +111,7 @@ void Transport_2eq_base::associer(const Equation_base& eqn_hydr)
 {
   Equation_base::associer_pb_base(eqn_hydr.probleme());
   Equation_base::associer_sch_tps_base(eqn_hydr.schema_temps());
-  Equation_base::associer_zone_dis(eqn_hydr.zone_dis());
+  Equation_base::associer_domaine_dis(eqn_hydr.domaine_dis());
 }
 
 double Transport_2eq_base::calculer_pas_de_temps() const
