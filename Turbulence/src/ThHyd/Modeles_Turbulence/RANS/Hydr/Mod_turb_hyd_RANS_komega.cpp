@@ -24,7 +24,9 @@
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_komega,"Mod_turb_hyd_RANS_komega",Mod_turb_hyd_RANS_2eq);
+Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_komega,
+                                  "Mod_turb_hyd_RANS_komega",
+                                  Mod_turb_hyd_RANS_2eq);
 // XD mod_turb_hyd_rans_komega modele_turbulence_hyd_deriv mod_turb_hyd_rans_komega -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Mod_turb_hyd_RANS_komega::Mod_turb_hyd_RANS_komega()
@@ -66,7 +68,6 @@ void Mod_turb_hyd_RANS_komega::set_param(Param& param)
   param.ajouter("k_min", &K_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
   param.ajouter_flag("quiet", &lquiet); // XD_ADD_P flag To disable printing of information about k and omega.
 }
-
 
 /*! @brief
  *
@@ -133,11 +134,9 @@ void Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(Noms& nom, Option o
  */
 int Mod_turb_hyd_RANS_komega::sauvegarder(Sortie& os) const
 {
-
   Mod_turb_hyd_base::sauvegarder(os);
   return eqn_transp_K_Omega().sauvegarder(os);
 }
-
 
 /*! @brief Reprise du modele a partir d'un flot d'entree.
  *

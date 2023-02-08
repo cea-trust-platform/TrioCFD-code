@@ -25,9 +25,12 @@
 #include <Param.h>
 #include <MD_Vector_composite.h>
 #include <Transport_K_Eps_base.h>
+#include <Transport_K_Omega_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Mod_turb_hyd_RANS_keps.h>
+#include <Modele_turbulence_hyd_K_Omega.h>
+#include <Mod_turb_hyd_RANS_komega.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Post_Operateur_Eqn,"Operateur_Eqn|Champ_Post_Operateur_Eqn",Champ_Generique_Operateur_base);
 
@@ -95,7 +98,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
 
   const Probleme_base& Pb = ref_cast(Postraitement,post).probleme();
   int numero_eq_=-1;
-  bool iskeps = false;
+  bool iskeps = false, iskomega = false;
   if (sub_type(Champ_Generique_refChamp,get_source(0)))
     {
 
@@ -121,10 +124,10 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                     numero_eq_=i;
                     break;
                   }
-                else if (mon_champ_inc.le_nom() == "K_Eps")
+                else if (mon_champ_inc.le_nom() == "K_Eps" || mon_champ_inc.le_nom() == "K_Omega")
                   {
                     const RefObjU& modele_turbulence = eq_test.get_modele(TURBULENCE);
-                    if (sub_type(Modele_turbulence_hyd_K_Eps, modele_turbulence.valeur()) || sub_type(Modele_turbulence_hyd_K_Eps_Realisable, modele_turbulence.valeur()) )
+                    if (sub_type(Modele_turbulence_hyd_K_Eps, modele_turbulence.valeur()) || sub_type(Modele_turbulence_hyd_K_Eps_Realisable, modele_turbulence.valeur()))
                       {
                         const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Eps_base& transportkeps = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
@@ -132,6 +135,17 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                           {
                             numero_eq_=i;
                             iskeps = true;
+                            break;
+                          }
+                      }
+                    else if (sub_type(Modele_turbulence_hyd_K_Omega, modele_turbulence.valeur()))
+                      {
+                        const Mod_turb_hyd_RANS_komega& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_komega, eq_test.get_modele(TURBULENCE).valeur());
+                        const Transport_K_Omega_base& transportkomega = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
+                        if ((transportkomega.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                          {
+                            numero_eq_ = i;
+                            iskomega = true;
                             break;
                           }
                       }
@@ -147,14 +161,21 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
       exit();
     }
 
-  if (!iskeps)
+  if (!iskeps || !iskomega)
     ref_eq_=Pb.equation(numero_eq_);
-  else
+  else if (iskeps)
     {
       const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      ref_eq_= ref_cast(Equation_base,eqn);
+      ref_eq_ = ref_cast(Equation_base, eqn);
     }
+  else if (iskomega)
+    {
+      const Mod_turb_hyd_RANS_komega& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_komega, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
+      const Transport_K_Omega_base& eqn = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
+      ref_eq_ = ref_cast(Equation_base, eqn);
+    }
+
   int ok=0;
   const Equation_base& eqn=ref_eq_.valeur();
   const MD_Vector& mdf = eqn.inconnue().valeurs().get_md_vector(),
