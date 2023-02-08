@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0.h
+// File:        Dissipation_energie_cin_turb_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/PolyMAC_P0/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0_included
-#define Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0_included
+#ifndef Dissipation_energie_cin_turb_PolyMAC_P0_included
+#define Dissipation_energie_cin_turb_PolyMAC_P0_included
 
 #include <Source_base.h>
 
@@ -36,10 +36,10 @@ class Convection_Diffusion_std;
  *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
+class Dissipation_energie_cin_turb_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
 {
 
-  Declare_instanciable(Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0);
+  Declare_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0);
 
 public:
   int has_interface_blocs() const override

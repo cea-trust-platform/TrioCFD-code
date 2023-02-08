@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Travail_pression_PolyMAC_P0.cpp
+// File:        Dissipation_energie_cin_turb_PolyMAC_P0.cpp
 // Directory:   $TRUST_ROOT/src/Turbulence/PolyMAC_P0/Sources
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0.h>
+#include <Dissipation_energie_cin_turb_PolyMAC_P0.h>
 #include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Equation_base.h>
@@ -34,7 +34,7 @@
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 
-Implemente_instanciable(Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0,"Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0", Source_base);
+Implemente_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0,"Dissipation_energie_cin_turb_Elem_PolyMAC_P0|Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0", Source_base);
 // XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente -1 Dissipation source term used in the TKE equation
 // XD attr beta_k floattant beta_k 1 Constant for the used model
 
@@ -48,12 +48,12 @@ Implemente_instanciable(Terme_dissipation_energie_cinetique_turbulente_Elem_Poly
 // XD attr sigma_d floattant sigma_d 1 Constant for the used model
 
 
-Sortie& Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::printOn(Sortie& os) const
+Sortie& Dissipation_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::readOn(Entree& is)
+Entree& Dissipation_energie_cin_turb_PolyMAC_P0::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("beta_k", &beta_k);
@@ -61,7 +61,7 @@ Entree& Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::readOn(E
   return is;
 }
 
-void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Dissipation_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab& k 	 = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs();
@@ -100,7 +100,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionne
       }
 }
 
-void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
+void Dissipation_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
   const Domaine_PolyMAC_P0& 	         domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0&     ch_k = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());		// Champ k
