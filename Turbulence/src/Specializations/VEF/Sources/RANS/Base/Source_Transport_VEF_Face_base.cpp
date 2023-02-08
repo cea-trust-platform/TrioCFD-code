@@ -59,7 +59,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
   const int nb_faces_ = le_dom_VEF->nb_faces();
   DoubleTrav P(nb_faces_);
   const DoubleTab& K = get_K_pour_production(); // voir les classes filles
-  calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, vit, visco_turb);
+  calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, vit, visco_turb, _interpolation_viscosite_turbulente);
 
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = get_modele_fonc_bas_reyn(); // voir les classes filles
   const int is_modele_fonc = (mon_modele_fonc.non_nul());
@@ -101,7 +101,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
           calcul_tenseur_reyn(visco_turb, gradient_elem, Re); // voir les classes filles
           Re.echange_espace_virtuel();
 
-          calculer_terme_production_K_EASM(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, gradient_elem, visco_turb, Re);
+          calculer_terme_production_K_EASM(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, gradient_elem, visco_turb, Re, _interpolation_viscosite_turbulente);
         }  // Fin pour modele EASM
 
       fill_resu_bas_rey(volumes_entrelaces, P, D, E, F1, F2, resu); // voir les classes filles

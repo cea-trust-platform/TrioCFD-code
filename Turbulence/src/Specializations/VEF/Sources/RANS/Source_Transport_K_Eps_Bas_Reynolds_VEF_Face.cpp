@@ -62,7 +62,12 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   mon_modele_fonc.Calcul_E(E, domaine_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin, visco_turb);
   mon_modele_fonc.Calcul_F2(F2, D, domaine_dis_keps, K_eps_Bas_Re, ch_visco_cin);
 
-  calculer_terme_production_K(domaine_VEF, domaine_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb);
+  if (_interpolation_viscosite_turbulente != 0)
+    {
+      Cerr << "Error 'interpolation_viscosite_turbulente' must be equal to '0' in this case." << finl;
+      Process::exit();
+    }
+  calculer_terme_production_K(domaine_VEF, domaine_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb, _interpolation_viscosite_turbulente);
 
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter P 0", P);
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter D 0", D);

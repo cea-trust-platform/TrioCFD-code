@@ -36,11 +36,11 @@ class Calcul_Production_K_VEF
 protected:
   Calcul_Production_K_VEF() { }
 
-  DoubleTab& calculer_terme_production_K(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco) const;
 
-  DoubleTab& calculer_terme_production_K_BiK(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K_BiK(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco) const;
 
-  DoubleTab& calculer_terme_production_K_EASM(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
+  DoubleTab& calculer_terme_production_K_EASM(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco) const;
 
   DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&, const Domaine_VEF&, const Domaine_Cl_VEF&) const;
 
