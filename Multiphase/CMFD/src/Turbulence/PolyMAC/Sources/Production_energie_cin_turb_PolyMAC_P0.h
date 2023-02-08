@@ -49,13 +49,9 @@ public :
 
   void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override;
-  void completer() override ;
-  void calculer_fac() ;
+  void mettre_a_jour(double temps) override {};
 
 private :
-  REF(Correlation) correlation_loi_paroi_;
-
   double mon_temps_ = 1.e-8;
   double limiter_prod_ = 0. ;
 
