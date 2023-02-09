@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <arch.h>
 #include <Lois_eau_c3.h>
-
+#define HAVE_LIBC3 0
 /* prototypes des fonctions Fortran */
 #ifdef HAVE_LIBC3
 extern "C" {

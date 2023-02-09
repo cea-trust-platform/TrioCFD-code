@@ -5,7 +5,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #include <arch.h>
-#define HAVE_LIBC3 1
+#define HAVE_LIBC3 0
 /* prototypes des fonctions Fortran */
 #ifdef HAVE_LIBC3
 extern "C" {
