@@ -56,7 +56,7 @@ Entree& Source_Dissipation_energie_cin_turb::readOn(Entree& is)
   return is;
 }
 
-void Source_Dissipation_energie_cin_turb::completer() 
+void Source_Dissipation_energie_cin_turb::completer()
 {
   const Navier_Stokes_std&     eq_qdm 	= ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   if (ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()==nullptr) Process::exit(que_suis_je() + " : the momentum diffusion must be turbulent !");

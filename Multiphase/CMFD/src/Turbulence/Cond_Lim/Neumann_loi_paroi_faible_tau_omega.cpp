@@ -129,12 +129,12 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
   if (N > 1)  Process::exit("Neumann_loi_paroi_faible_tau : Only one phase for turbulent wall law is coded for now");
 
   if (is_tau_ == 1)
+    {
+      for (int f =0 ; f < nf ; f++)
         {
-          for (int f =0 ; f < nf ; f++)
-            {
-              int f_domaine = f + f1; // number of the face in the domaine
-              int e_domaine = f_e(f_domaine,0);
-              valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
+          int f_domaine = f + f1; // number of the face in the domaine
+          int e_domaine = f_e(f_domaine,0);
+          valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
         }
     }
   if (is_tau_ == 0)

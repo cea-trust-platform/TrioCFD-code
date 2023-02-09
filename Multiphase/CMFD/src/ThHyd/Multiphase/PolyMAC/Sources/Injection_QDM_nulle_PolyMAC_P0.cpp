@@ -202,5 +202,5 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                   }
               }
           }
-      }
+    }
 }

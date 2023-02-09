@@ -33,7 +33,7 @@ Implemente_base(Source_Diffusion_supplementaire_echelle_temp_turb,"Source_Diffus
 
 Sortie& Source_Diffusion_supplementaire_echelle_temp_turb::printOn(Sortie& os) const { return os;}
 
-Entree& Source_Diffusion_supplementaire_echelle_temp_turb::readOn(Entree& is){  return is;}
+Entree& Source_Diffusion_supplementaire_echelle_temp_turb::readOn(Entree& is) {  return is;}
 
 void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
 {

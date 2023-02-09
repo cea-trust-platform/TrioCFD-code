@@ -41,7 +41,7 @@
 
 Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0|Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_Diffusion_supplementaire_echelle_temp_turb);
 
-Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const{  return Source_Diffusion_supplementaire_echelle_temp_turb::printOn(os);}
+Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const {  return Source_Diffusion_supplementaire_echelle_temp_turb::printOn(os);}
 
 Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Diffusion_supplementaire_echelle_temp_turb::readOn(is);}
 

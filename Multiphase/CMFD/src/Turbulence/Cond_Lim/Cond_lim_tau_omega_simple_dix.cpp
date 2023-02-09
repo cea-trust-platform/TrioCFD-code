@@ -139,7 +139,7 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
           int e_domaine = f_e(f_domaine,0);
 
           d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
-       }
+        }
     }
   d_.echange_espace_virtuel();
 }

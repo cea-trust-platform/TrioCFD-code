@@ -37,7 +37,7 @@ class Convection_Diffusion_std;
  *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Source_Diffusion_croisee_echelle_temp_taux_diss_turb : public Sources_Multiphase_base 
+class Source_Diffusion_croisee_echelle_temp_taux_diss_turb : public Sources_Multiphase_base
 {
 
   Declare_base(Source_Diffusion_croisee_echelle_temp_taux_diss_turb);
