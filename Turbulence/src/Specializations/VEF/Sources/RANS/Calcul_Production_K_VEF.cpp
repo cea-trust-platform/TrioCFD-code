@@ -244,7 +244,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
           //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
             visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-          // TODO : what happens if visco_turb < 1.0e-10 ?? 
+          // TODO : what happens if visco_turb < 1.0e-10 ??
         }
       else if ( interpol_visco == 2 )
         {
@@ -596,9 +596,9 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
               double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
               double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
               double visco_face = 0.0;
-              
+
               if ( interpol_visco == 0 )
-                {              
+                {
                   visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
                 }
               else if ( interpol_visco == 1 )
@@ -673,12 +673,12 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
             visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
           // TODO : what happens if visco_turb < 1.0e-10 ??
-         }
-       else
-         {
-           Cerr << "Error in 'interpol_visco' value :" << interpol_visco << finl;
-           Process::exit();
-         }
+        }
+      else
+        {
+          Cerr << "Error in 'interpol_visco' value :" << interpol_visco << finl;
+          Process::exit();
+        }
 
       // Determination du terme de production
       for (int i=0; i<dimension; i++)

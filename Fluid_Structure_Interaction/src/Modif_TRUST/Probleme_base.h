@@ -37,7 +37,6 @@ class Postraitement;
 class Field_base;
 class Champ_Fonc;
 
-
 /*! @brief classe Probleme_base C'est un Probleme_U qui n'est pas un couplage.
  *
  *      Le role d'un Probleme_base est la resolution sur un domaine des

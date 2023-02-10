@@ -69,16 +69,16 @@ Entree& Source_Transport_proto::readOn_real(Entree& is, const Nom& nom)
   param.ajouter("interpolation_viscosite_turbulente", &_interpolation_viscosite_turbulente);
   param.lire_avec_accolades(is);
   Cerr << "C2_eps = " << C2 << finl;
-  
+
   // Checking of the value given in the data deck for "interpolation_viscosite_turbulente"
   if ( _interpolation_viscosite_turbulente == 0 ) { Cerr << "Interpolation arithmetique de la viscosite turbulente aux faces (si VEF) = " << finl; }
   else if ( _interpolation_viscosite_turbulente == 1 ) { Cerr << "Interpolation harmonique de la viscosite (si VEF) = " << finl; }
   else if ( _interpolation_viscosite_turbulente == 2 ) { Cerr << "Interpolation harmonique ponderee de la viscosite (si VEF) = " << finl; }
   else
-  {
-    Cerr << "Error in 'interpolation_viscosite_turbulente' input value :" << _interpolation_viscosite_turbulente << finl;
-    Process::exit();
-  }
+    {
+      Cerr << "Error in 'interpolation_viscosite_turbulente' input value :" << _interpolation_viscosite_turbulente << finl;
+      Process::exit();
+    }
 
   return is;
 }

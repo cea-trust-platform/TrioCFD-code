@@ -103,7 +103,6 @@ void Sonde::completer()
   //Mais reference pas encore faite
   Probleme_base& Pb = mon_post->probleme();
   const Motcle nom_domaine = mon_post->domaine()->le_nom();
-
   Motcle nom_champ_ref;
   Motcle nom_macro=nom_champ_lu_;
   Motcle nom_macro_test, nom1("_not_def"), nom2("_not_def");
@@ -667,10 +666,10 @@ void Sonde::associer_post(const Postraitement& le_post)
 /*! @brief Initialise la sonde.
  *
  * Dimensionne les tableaux, de valeurs, verifie si les points specifies sont
- *     bien dans la domaine de calcul.
+ *     bien dans le domaine de calcul.
  *
- * @param (Domaine& domaine_geom) la domaine de calcul qui sera sondee
- * @throws point de sondage en dehors de la domaine de calcul
+ * @param (Domaine& domaine_geom) le domaine de calcul qui sera sondee
+ * @throws point de sondage en dehors du domaine de calcul
  */
 void Sonde::initialiser()
 {
