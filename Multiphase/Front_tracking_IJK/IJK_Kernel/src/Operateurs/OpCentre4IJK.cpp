@@ -98,6 +98,7 @@ void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting, const B
 
 void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc)
 {
+  // Warning / TODO : This method shall be factorized with the previous one.
   OpConvIJKFacesCommon_double::initialize(splitting);
 
   // Fill 4-th order filtering coefficients for z direction:
@@ -174,7 +175,6 @@ void OpConvCentre4IJK_double::calculer_avec_u_div_rhou(const IJK_Field_double& r
                                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
                                                        IJK_Field_double& div_rho_u)
 {
-  std::cout << "calculer_avec_u_div_rhou" << std::endl;
   statistiques().begin_count(convection_counter_);
 
   vx_ = &vx;
@@ -200,7 +200,6 @@ void OpConvCentre4IJK_double::ajouter_avec_u_div_rhou(const IJK_Field_double& rh
                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
                                                       IJK_Field_double& div_rho_u)
 {
-  std::cout << "ajouter_avec_u_div_rhou" << std::endl;
   statistiques().begin_count(convection_counter_);
 
   vx_ = &vx;

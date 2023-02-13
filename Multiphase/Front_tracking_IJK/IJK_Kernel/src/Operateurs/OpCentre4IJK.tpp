@@ -14,7 +14,6 @@
 *****************************************************************************/
 #ifndef OpCentre4IJK_H_TPP
 #define OpCentre4IJK_H_TPP
-#include <iostream>
 
 // Methode appelee a chaque couche de vitesses calculees, apres le calcul de la divergence du flux
 //  div(u x rho_u) pour la composante _DIR_ de vitesse, par Operateur_IJK_faces_base_double::compute_
@@ -22,12 +21,9 @@
 template <DIRECTION _DIR_>
 void OpConvCentre4IJK_double::exec_after_divergence_flux_(IJK_Field_double& resu, const int k_layer)
 {
-
   if (div_rho_u_ == 0)
     return;
-  std::cout << " " << std::endl;
-  std::cout << "exec_after_divergence_flux_" << std::endl;
-  std::cout << " " << std::endl;
+
   if(_DIR_==DIRECTION::Z)
     {
       const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
@@ -64,7 +60,6 @@ void OpConvCentre4IJK_double::exec_after_divergence_flux_(IJK_Field_double& resu
         {
           Simd_double v, x_left, x_right;
           vitesse.get_center(i, v);
-          std::cout << v.data_  << std::endl;
           // on prend div(rho_u) dans les elements a gauche et a droite de la face
           // rappel: l'element a gauche de la face i est a l'indice i-1
           div_rhou.get_left_center(_DIR_, i, x_left, x_right);
@@ -175,7 +170,6 @@ void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const 
                     vit_0_0 +=DU_perio;
                     vit_0 +=DU_perio;
                   }
-
                 else if(global_k_layer == first_global_k_layer)
                   {
                     vit_0_0 +=DU_perio;
