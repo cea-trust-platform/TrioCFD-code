@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -107,7 +107,7 @@ Entree& VEFPreP1B::readOn(Entree& is )
  *  Cette methode determine le type du champ a creer en fonction du type d'element
  *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
  *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s), nature du champ et attribue un temps) et associe la Domaine_dis au champ.
+ *  nom(s), unite(s), nature du champ et attribue un temps) et associe le Domaine_dis au champ.
  *  Voir le code pour avoir la correspondance entre les directives et
  *  le type de champ cree.
  *
