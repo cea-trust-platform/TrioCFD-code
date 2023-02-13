@@ -53,14 +53,15 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
   const int first_global_k_layer = channel_data_.first_global_k_layer_flux(icompo, idir);
   const int last_global_k_layer = channel_data_.last_global_k_layer_flux(icompo, idir);
 
-  if(!perio_k_)
+  Boundary_Conditions::BCType bc_type = ref_bc_.valeur().get_bctype_k_min();
+
+  // for mixte_shear boundary condition >> need to localize to and bottom boundary even if perio_k
+  if(!perio_k_ || bc_type == Boundary_Conditions::Mixte_shear)
     {
       // For this direction and this component, we possibly have a wall boundary condition to treat:
       if(_DIR_ == DIRECTION::Z && _VCOMPO_ != DIRECTION::Z)
         {
           int top_wall = 0, bottom_wall = 0;
-          Boundary_Conditions::BCType bc_type = Boundary_Conditions::Perio; //dummy initialization, will be filled later on
-
           // We are at bottom wall: z=0
           if (global_k_layer == first_global_k_layer-1)
             {
@@ -78,6 +79,11 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
               switch(bc_type)
                 {
                 case Boundary_Conditions::Paroi:
+                  {
+                    flux_loop_<_DIR_, _VCOMPO_>(resu, k_layer, top_wall, bottom_wall);
+                    break;
+                  }
+                case Boundary_Conditions::Mixte_shear:
                   {
                     flux_loop_<_DIR_, _VCOMPO_>(resu, k_layer, top_wall, bottom_wall);
                     break;
@@ -103,6 +109,7 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
           return;
         }
     }
+
   flux_loop_<_DIR_, _VCOMPO_>(resu, k_layer);
 }
 
@@ -273,19 +280,24 @@ void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double 
     }
   else
     {
+
+      Boundary_Conditions::BCType bc_type = ref_bc_.valeur().get_bctype_k_min();
       // Interpolate diffusion coefficient from values at elements:
       Simd_double m_nu1, m_nu2, m_nu3, m_nu4;
       molecular_nu.get_left_center_c1c2(_DIR_, _VCOMPO_, i, m_nu1, m_nu2, m_nu3, m_nu4);
-
+      double DU_perio=ref_bc_.valeur().get_dU_perio() ;
       double mult_coeff = 0.25;
-      if(bottom_wall)
+
+      // for wall boundary conditions
+      if(bottom_wall && bc_type!=Boundary_Conditions::Mixte_shear)
         {
           // bottom wall (z=0)
           // nu1 and nu2 are "left" in direction z, hence in the wall:
           m_nu1 = 0., m_nu2 = 0.;
           mult_coeff = 0.5;
         }
-      if(top_wall)
+      // for wall boundary conditions
+      if(top_wall && bc_type!=Boundary_Conditions::Mixte_shear)
         {
           // top wall (z=zmax)
           // nu3 and nu4 are "center" in direction z, hence in the wall:
@@ -298,10 +310,43 @@ void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double 
       // gradient in direction DIR of component COMPO
       Simd_double v3, v4;
       vCOMPO_ptr.get_left_center(_DIR_, i, v3, v4);
-      if(top_wall)
-        v4 = 0.;
-      if(bottom_wall)  // bottom wall (z=0), v3 is left, hence in the wall)
-        v3 = 0.;
+
+      // for wall(or mooving wall) boundary conditions
+      if(top_wall && bc_type!=Boundary_Conditions::Mixte_shear)
+        {
+          if(_VCOMPO_ == DIRECTION::X)
+            {
+              v4 = ref_bc_.valeur().get_vx_kmax();
+            }
+          else
+            {
+              v4 = 0.;
+            }
+        }
+      if(bottom_wall && bc_type!=Boundary_Conditions::Mixte_shear)
+        {
+          if(_VCOMPO_ == DIRECTION::X)
+            {
+              v3 = ref_bc_.valeur().get_vx_kmin();
+            }
+          else
+            {
+              v3 = 0.;
+            }
+        }
+
+
+      // for mixte-shear boundary conditions
+      // perio_z + neuman condition dU/dZ = Shear at z=0
+      if(top_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
+        {
+          v4 -= DU_perio ;
+        }
+      if(bottom_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
+        {
+          v3 += DU_perio;
+        }
+
       Simd_double tau = (v4 - v3);
       if(!is_anisotropic_)
         tau *= inv_distance_DIR;
