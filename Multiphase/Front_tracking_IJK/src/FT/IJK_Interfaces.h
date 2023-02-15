@@ -57,7 +57,8 @@ class IJK_Interfaces : public Objet_U
 
 public :
   IJK_Interfaces();
-  void initialize(const IJK_Splitting& splitting_FT,
+  void initialize(const double DU_perio,
+		  	  	  const IJK_Splitting& splitting_FT,
                   const IJK_Splitting& splitting_NS,
                   const Domaine_dis& domaine_dis,
                   const bool compute_vint=true);
@@ -125,6 +126,16 @@ public :
   int get_nb_bulles_reelles() const
   {
     return nb_bulles_reelles_;
+  };
+
+  double get_current_time() const
+  {
+    return current_time_;
+  };
+
+  void set_current_time(double time)
+  {
+    current_time_=time;
   };
 
   int get_flag_positions_reference() const
@@ -672,6 +683,8 @@ protected:
   DoubleTab force_time_n_;
   DoubleTab positions_reference_;
   int flag_positions_reference_ = 0; // Pas de position de reference imposee
+  double current_time_;
+  double DU_perio_;
 
   Nom fichier_reprise_interface_;
   int timestep_reprise_interface_;
