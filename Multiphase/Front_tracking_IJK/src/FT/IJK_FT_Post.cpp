@@ -195,9 +195,9 @@ int IJK_FT_Post::initialise(int reprise)
             {
               integrated_velocity_[i].data() = 0.;
             }
-          velocity_[0].echange_espace_virtuel(velocity_[0].ghost());
-          velocity_[1].echange_espace_virtuel(velocity_[1].ghost());
-          velocity_[2].echange_espace_virtuel(velocity_[2].ghost());
+          velocity_[0].echange_espace_virtuel(velocity_[0].ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+          velocity_[1].echange_espace_virtuel(velocity_[1].ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+          velocity_[2].echange_espace_virtuel(velocity_[2].ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
 
           update_integral_velocity(velocity_, integrated_velocity_, interfaces_.In(), integrated_timescale_);
 
@@ -592,7 +592,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         {
           Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_P_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
         }
-      ecart_p_ana_.echange_espace_virtuel(ecart_p_ana_.ghost());
+      ecart_p_ana_.echange_espace_virtuel(ecart_p_ana_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
       Cerr << finl;
       n--, dumplata_scalar(lata_name, "ECART_P_ANA", ecart_p_ana_, latastep);
     }
@@ -1037,7 +1037,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
           // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
           IJK_Field_double& temperature_ft = itr.get_temperature_ft();
           ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
-          temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
+          temperature_ft.echange_espace_virtuel(temperature_ft.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
           //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin_ai, itr.get_storage());
           itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin_ai);
 
@@ -1279,7 +1279,7 @@ void IJK_FT_Post::update_stat_ft(const double dt)
       //  pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
       add_gradient_times_constant(pressure_, 1. /*constant*/, grad_P_[0], grad_P_[1], grad_P_[2]);
       for (int dir = 0; dir < 3; dir++)
-        grad_P_[dir].echange_espace_virtuel(1);
+        grad_P_[dir].echange_espace_virtuel(1, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
 
       statistiques_FT_.update_stat(ref_ijk_ft_, dt);
       return;
@@ -1730,8 +1730,8 @@ void IJK_FT_Post::calculer_gradient_indicatrice_et_pression(const IJK_Field_doub
 
   for (int dir = 0; dir < 3; dir++)
     {
-      grad_I_ns_[dir].echange_espace_virtuel(1);
-      grad_P_[dir].echange_espace_virtuel(1);
+      grad_I_ns_[dir].echange_espace_virtuel(1, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+      grad_P_[dir].echange_espace_virtuel(1, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
     }
 }
 
@@ -1945,10 +1945,10 @@ void IJK_FT_Post::postraiter_ci(const Nom& lata_name, const double current_time)
     {
       // FA AT 16/07/2013 pensent que necessaire pour le calcul des derivees dans statistiques_.update_stat_k(...)
       // Je ne sais pas si c'est utile, mais j'assure...
-      velocity_[0].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/);
-      velocity_[1].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
-      velocity_[2].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/);
-      pressure_.echange_espace_virtuel(1);
+      velocity_[0].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+      velocity_[1].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+      velocity_[2].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+      pressure_.echange_espace_virtuel(1, ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
 
       // C'est update_stat_ft qui gere s'il y a plusieurs groupes
       // pour faire la vraie indicatrice + les groupes
@@ -2262,7 +2262,7 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
 
   //pressure field has to be extended from ns to ft
   ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(pressure_, pressure_ft_);
-  pressure_ft_.echange_espace_virtuel(pressure_ft_.ghost()); // 5 ghost cells needed to avoid invalid points in the vapor phase
+  pressure_ft_.echange_espace_virtuel(pressure_ft_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_); // 5 ghost cells needed to avoid invalid points in the vapor phase
   //dP_ft_.echange_espace_virtuel(gradP_ft_.ghost());
 
   //initialisation
@@ -2502,8 +2502,8 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   ref_ijk_ft_.redistribute_from_splitting_ft_elem_.redistribute(extended_pv_ft_, extended_pv_);
   //ref_ijk_ft_.redistribute_from_splitting_ft_elem_.redistribute(dP_ft, dP_);
 
-  extended_pl_.echange_espace_virtuel(extended_pl_.ghost());
-  extended_pv_.echange_espace_virtuel(extended_pv_.ghost());
+  extended_pl_.echange_espace_virtuel(extended_pl_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+  extended_pv_.echange_espace_virtuel(extended_pv_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
   statistiques().end_count(postraitement_counter_);
 }
 
@@ -2627,8 +2627,8 @@ void IJK_FT_Post::compute_phase_pressures_based_on_poisson(const int phase)
             rho_field_(i,j,k)    = ref_ijk_ft_.rho_liquide_ * chi_l + (1.- chi_l) * ref_ijk_ft_.rho_vapeur_;
             molecular_mu_(i,j,k) = ref_ijk_ft_.mu_liquide_  * chi_l + (1.- chi_l) * ref_ijk_ft_.mu_vapeur_ ;
           }
-    rho_field_.echange_espace_virtuel(rho_field_.ghost());
-    molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost());
+    rho_field_.echange_espace_virtuel(rho_field_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
+    molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
   }
 }
 #endif
@@ -2890,7 +2890,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Mot
       // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
       IJK_Field_double& temperature_ft = itr.get_temperature_ft();
       ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
-      temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
+      temperature_ft.echange_espace_virtuel(temperature_ft.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
       // results are prop to the area :
       //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin, itr.get_storage());
       itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
@@ -2933,7 +2933,7 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcl
       // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
       IJK_Field_double& temperature_ft = itr.get_temperature_ft();
       ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
-      temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
+      temperature_ft.echange_espace_virtuel(temperature_ft.ghost(), ref_ijk_ft_.boundary_conditions_.get_dU_perio()*ref_ijk_ft_.current_time_);
       // results are prop to the area :
       //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin, itr.get_storage());
       itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
