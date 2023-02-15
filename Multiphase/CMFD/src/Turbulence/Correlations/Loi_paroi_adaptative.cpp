@@ -24,7 +24,7 @@
 #include <Pb_Multiphase.h>
 #include <QDM_Multiphase.h>
 #include <Navier_Stokes_std.h>
-#include <Domaine_Poly_base.h>
+#include <Domaine_VF.h>
 #include <TRUSTTrav.h>
 #include <Neumann_loi_paroi.h>
 #include <Dirichlet_loi_paroi.h>
@@ -57,7 +57,7 @@ Entree& Loi_paroi_adaptative::readOn(Entree& is)
 void Loi_paroi_adaptative::completer()
 {
   const DoubleTab& vit = pb_.valeur().get_champ("vitesse").valeurs() ;
-  Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, pb_.valeur().domaine_dis().valeur());
+  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_.valeur().domaine_dis().valeur());
   int nf_tot = domaine.nb_faces_tot();
 
   valeurs_loi_paroi_["y_plus"] = DoubleTab(0,1); // pour l'instant, turbulence dans seulement une phase
@@ -107,7 +107,7 @@ void Loi_paroi_adaptative::mettre_a_jour(double temps)
 
 void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
-  Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, pb_.valeur().domaine_dis().valeur());
+  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_.valeur().domaine_dis().valeur());
   DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"], &y = valeurs_loi_paroi_["y"], &u_p = valeurs_loi_paroi_["u_plus"], &d_u_p = valeurs_loi_paroi_["dyp_u_plus"];
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();
