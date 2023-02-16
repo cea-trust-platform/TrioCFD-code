@@ -285,7 +285,7 @@ void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double 
       // Interpolate diffusion coefficient from values at elements:
       Simd_double m_nu1, m_nu2, m_nu3, m_nu4;
       molecular_nu.get_left_center_c1c2(_DIR_, _VCOMPO_, i, m_nu1, m_nu2, m_nu3, m_nu4);
-      double DU_perio=ref_bc_.valeur().get_dU_perio() ;
+//      double DU_perio=ref_bc_.valeur().get_dU_perio() ;
       double mult_coeff = 0.25;
 
       // for wall boundary conditions
@@ -338,14 +338,14 @@ void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double 
 
       // for mixte-shear boundary conditions
       // perio_z + neuman condition dU/dZ = Shear at z=0
-      if(top_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
-        {
-          v4 -= DU_perio ;
-        }
-      if(bottom_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
-        {
-          v3 += DU_perio;
-        }
+//      if(top_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
+//        {
+//          v4 -= DU_perio ;
+//        }
+//      if(bottom_wall && bc_type==Boundary_Conditions::Mixte_shear && _VCOMPO_ == DIRECTION::X)
+//        {
+//          v3 += DU_perio;
+//        }
 
       Simd_double tau = (v4 - v3);
       if(!is_anisotropic_)

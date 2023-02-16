@@ -461,15 +461,12 @@ void IJK_Interfaces::compute_vinterp()
     }
 }
 
-void IJK_Interfaces::initialize(const double DU_perio,
-								const IJK_Splitting& splitting_FT,
+void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                 const IJK_Splitting& splitting_NS,
                                 const Domaine_dis& domaine_dis,
                                 const bool compute_vint)
 {
   Cerr << "Entree dans IJK_Interfaces::initialize" << finl;
-  current_time_=0.;
-  DU_perio_=DU_perio;
 
   // normale_par_compo_is_set_ = false;
   set_recompute_indicator(CLASSIC_METHOD);
@@ -481,18 +478,18 @@ void IJK_Interfaces::initialize(const double DU_perio,
 
   indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[old()].data() = 1.;
-  indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost(), DU_perio_*current_time_);
+  indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost());
   indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[next()].data() = 1.;
-  indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost(), DU_perio_*current_time_);
+  indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
   indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[old()].data() = 1.;
   allocate_cell_vector(groups_indicatrice_ns_[old()], splitting_NS, 1);
   allocate_cell_vector(groups_indicatrice_ns_[next()], splitting_NS, 1);
-  indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost(), DU_perio_*current_time_);
+  indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
   indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
   indicatrice_ns_[next()].data() = 1.;
-  indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost(), DU_perio_*current_time_);
+  indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
   allocate_cell_vector(groups_indicatrice_ft_[old()], splitting_FT, 1);
   allocate_cell_vector(groups_indicatrice_ft_[next()], splitting_FT, 1);
 #if VERIF_INDIC
@@ -3397,7 +3394,7 @@ int IJK_Interfaces::update_indicatrice(IJK_Field_double& indic)
   const int njtot = s.get_nb_items_global(loc, DIRECTION_J);
   const int nktot = s.get_nb_items_global(loc, DIRECTION_K);
 
-  indic.echange_espace_virtuel(indic.ghost(), DU_perio_*current_time_);
+  indic.echange_espace_virtuel(indic.ghost());
 
   //(l'algo peut etre optimise si on stocke les elements a phase indeterminee
   // plutot que de parcourir tous les elements du processeur a chaque passe)
@@ -5305,8 +5302,8 @@ void IJK_Interfaces::calculer_indicatrice_next(
     {
       indicatrice_ft_[next()].data() = 1.;
       indicatrice_ns_[next()].data() = 1.;
-      indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost(), DU_perio_*current_time_);
-      indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost(), DU_perio_*current_time_);
+      indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
+      indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
       if (parcourir)
         parcourir_maillage();
@@ -5324,12 +5321,12 @@ void IJK_Interfaces::calculer_indicatrice_next(
   else
     calculer_indicatrice_optim(indicatrice_ft_[next()]);
 
-  indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost(), DU_perio_*current_time_);
+  indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
 
   // Calcul de l'indicatrice sur le domaine NS :
   ref_ijk_ft_->redistrib_from_ft_elem().redistribute(
     indicatrice_ft_[next()], indicatrice_ns_[next()]);
-  indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost(), DU_perio_*current_time_);
+  indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
 
   // Calcul des indicatrices s'il y a des groupes :
   const int nb_grps = IJK_Interfaces::nb_groups();
@@ -5418,7 +5415,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
 void IJK_Interfaces::verif_indic()
 {
   calculer_indicatrice(indicatrice_ft_test_);
-  indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost(), DU_perio_*current_time_);
+  indicatrice_ft_test_.echange_espace_virtuel(indicatrice_ft_test_.ghost());
   SChaine indic;
   if (nb_grps > 1)
     {
@@ -5476,9 +5473,9 @@ void IJK_Interfaces::switch_indicatrice_next_old()
   // TODO: verifier la liste des echanges espace virtuels
   // TODO: il faut choisir, soit je les fait sur les next soit sur les old, mais
   // pas les deux.
-  indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost(), DU_perio_*current_time_);
+  indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost());
   groups_indicatrice_ft_[old()].echange_espace_virtuel();
-  nb_compo_traversante_[old()].echange_espace_virtuel(nb_compo_traversante_[old()].ghost(), DU_perio_*current_time_);
+  nb_compo_traversante_[old()].echange_espace_virtuel(nb_compo_traversante_[old()].ghost());
   normale_par_compo_[old()].echange_espace_virtuel();
   bary_par_compo_[old()].echange_espace_virtuel();
   surface_par_compo_[old()].echange_espace_virtuel();
@@ -5496,7 +5493,7 @@ void IJK_Interfaces::switch_indicatrice_next_old()
       barycentre_vapeur_par_face_ns_[old()][c].echange_espace_virtuel();
     }
 
-  indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost(), DU_perio_*current_time_);
+  indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
   groups_indicatrice_ns_[old()].echange_espace_virtuel();
 }
 

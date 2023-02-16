@@ -136,7 +136,7 @@ static void smoothing_field(IJK_Field_double& field,
         for (int j=0; j< ny; j++)
           for (int i=0; i < nx; i++)
             field(i,j,k) =  smooth_rho(i,j,k);
-      field.echange_espace_virtuel(ng, boundary_conditions_.get_dU_perio()*current_time_);
+      field.echange_espace_virtuel(ng);
       Cerr << "Counted cells : " << ncells << " -- Fin loop " << iloop << finl;
     }
 
@@ -205,7 +205,7 @@ void copy_field_to_extended_domain(const IJK_Field_double& input_field,
   // Il nous faut une epaisseur supplementaire car les faces de droite du
   // maillage etendu portent une inconnue qui n'existe pas dans le maillage
   // d'origine, s'il est periodique.
-  input_field2.echange_espace_virtuel(nextension+1, boundary_conditions_.get_dU_perio()*current_time_);
+  input_field2.echange_espace_virtuel(nextension+1);
   // On va recopier les donnees de input_field2 dans output_field, en
   // decalant comme il faut.
 
@@ -233,7 +233,7 @@ void copy_field_to_extended_domain(const IJK_Field_double& input_field,
   // L'espace virtuel de output_field doit etre rempli.
   // C'est delicat sur les ex-bords periodiques qui ne le sont plus.
   const int ghost = output_field.ghost();
-  output_field.echange_espace_virtuel(ghost, boundary_conditions_.get_dU_perio()*current_time_);
+  output_field.echange_espace_virtuel(ghost);
   // L'espace virtuel est a jour. Il est remplit correctement si les
   // flags periodiques sur l'extended splitting sont a faux.
 }
@@ -1412,7 +1412,7 @@ int IJK_FT_double::initialise()
     {
       Cout << "Initialisation pression \nPini = " << expression_pression_initiale_ << finl;
       set_field_data(pressure_, expression_pression_initiale_);
-      pressure_.echange_espace_virtuel(pressure_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      pressure_.echange_espace_virtuel(pressure_.ghost());
     }
 
 
@@ -1421,7 +1421,7 @@ int IJK_FT_double::initialise()
   const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
-  interfaces_.initialize(boundary_conditions_.get_dU_perio(), splitting_ft_, splitting_, domaine_dis);
+  interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
 
   nalloc += post_.initialise(reprise_);
 
@@ -1894,7 +1894,7 @@ void IJK_FT_double::run()
       allocate_velocity(laplacien_velocity_, splitting_, 1);
       unit_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       unit_.data() = 1.;
-      unit_.echange_espace_virtuel(unit_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      unit_.echange_espace_virtuel(unit_.ghost());
     }
 
   if (type_velocity_convection_form_ == Nom("non_conservative_rhou"))
@@ -2076,7 +2076,7 @@ void IJK_FT_double::run()
 
               // pressure gradient requires the "left" value in all directions:
               pressure_.echange_espace_virtuel(
-                1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/, boundary_conditions_.get_dU_perio()*current_time_);
+                1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
 
               // Mise a jour du champ de vitesse (avec dv = seulement le terme source)
               d_velocity_[0].data() = 0.;
@@ -2102,13 +2102,13 @@ void IJK_FT_double::run()
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
                                                    1., pressure_rhs_, check_divergence_,
-                                                   poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                                   poisson_solver_, boundary_conditions_.get_dU_perio());
                 }
               else
                 {
                   pressure_projection_with_rho(rho_field_, velocity_[0],
                                                velocity_[1], velocity_[2], pressure_, 1.,
-                                               pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
                 }
 
             }
@@ -2116,7 +2116,7 @@ void IJK_FT_double::run()
             {
               pressure_projection(velocity_[0], velocity_[1], velocity_[2],
                                   pressure_, 1., pressure_rhs_, check_divergence_,
-                                  poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                  poisson_solver_, boundary_conditions_.get_dU_perio());
             }
         }
     }
@@ -2554,9 +2554,20 @@ void IJK_FT_double::run()
                             }
                         }
                     }
-                  velocity_[dir].echange_espace_virtuel(
-                    velocity_[dir].ghost(), boundary_conditions_.get_dU_perio()*current_time_);
-                  //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
+                  if (dir==0)
+                  {
+                      velocity_[dir].echange_espace_virtuel(
+                        velocity_[dir].ghost(), boundary_conditions_.get_dU_perio());
+                      //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());}
+                      }
+                  else
+                  {
+                      velocity_[dir].echange_espace_virtuel(
+                        velocity_[dir].ghost());
+                      //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
+                      }
+
+
                 }
             }
           // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
@@ -2573,19 +2584,20 @@ void IJK_FT_double::run()
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
-      interfaces_.set_current_time(current_time_);
+      splitting_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
+      splitting_ft_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
           // FA AT 16/07/2013 pensent que necessaire pour le calcul des derivees dans statistiques_.update_stat_k(...)
           // Je ne sais pas si c'est utile, mais j'assure...
           velocity_[0].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, boundary_conditions_.get_dU_perio()*current_time_);
+            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, boundary_conditions_.get_dU_perio());
           velocity_[1].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/, boundary_conditions_.get_dU_perio()*current_time_);
+            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
           velocity_[2].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/, boundary_conditions_.get_dU_perio()*current_time_);
-          pressure_.echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/);
+          pressure_.echange_espace_virtuel(1);
 
           // C'est update_stat_ft qui gere s'il y a plusieurs groupes
           // pour faire la vraie indicatrice + les groupes
@@ -3162,7 +3174,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   if (include_pressure_gradient_in_ustar_)
     {
       // pressure gradient requires the "left" value in all directions:
-      pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/, boundary_conditions_.get_dU_perio()*current_time_);
+      pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
 #ifndef VARIABLE_DZ
       double volume = 1.;
       for (int i = 0; i < 3; i++)
@@ -3433,7 +3445,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                             }
                         }
                   // GAB, qdm
-                  d_velocity_[dir2].echange_espace_virtuel(d_velocity_[dir2].ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+                  d_velocity_[dir2].echange_espace_virtuel(d_velocity_[dir2].ghost());
                   //
                 }
             }
@@ -3650,7 +3662,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
                   d_velocity_[dir](i,j,k) += force[dir](i,j,k)*rho_field_(i,j,k)/rho_moyen_;
                 }
         }
-      d_velocity_[dir].echange_espace_virtuel(d_velocity_[dir].ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      d_velocity_[dir].echange_espace_virtuel(d_velocity_[dir].ghost());
     }
   statistiques().end_count(m3);
   Cout << "end of from_spect_to_phys_opti2_advection" << finl;
@@ -3664,9 +3676,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
       // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[1].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[2].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
+      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio());
+      velocity_[1].echange_espace_virtuel(2);
+      velocity_[2].echange_espace_virtuel(2);
     }
 
   for (auto& itr : thermique_)
@@ -3677,9 +3689,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
   if (!frozen_velocity_)
     {
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[1].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[2].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
+      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio());
+      velocity_[1].echange_espace_virtuel(2);
+      velocity_[2].echange_espace_virtuel(2);
       // GAB, qdm
       if (test_etapes_et_bilan)
         {
@@ -3704,13 +3716,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (!include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
               // GAB --> C'est plutot ici que l(on ajoute le terme_pression !!)
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           d_pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
 
               // Then update the pressure field :
               const int kmax = pressure_.nk();
@@ -3785,7 +3797,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (use_inv_rho_in_poisson_solver_)
             {
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                               pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
             }
           else
             {
@@ -3793,7 +3805,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
               // On l'a fait avant pour etre sur qu'elle soit bien dans la derivee stockee...
 #else
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                           pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
 #endif
             }
 
@@ -3816,14 +3828,14 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (use_inv_rho_in_poisson_solver_)
             {
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                               pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
             }
           else
             {
 #ifdef PROJECTION_DE_LINCREMENT_DV
 #else
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                           pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
 #endif
             }
         }
@@ -3875,9 +3887,9 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 
   if (!frozen_velocity_)
     {
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[1].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
-      velocity_[2].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio()*current_time_);
+      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio());
+      velocity_[1].echange_espace_virtuel(2);
+      velocity_[2].echange_espace_virtuel(2);
       // GAB TODO : voir dans euler_explicite ce qu'on a dit qu'on ferai pour voir
       // si le calculer_dv s'est bien passe
       Cout << "rk3ss: rk_step " << rk_step << finl;
@@ -3890,12 +3902,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           if (include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           d_pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
             }
         }
 #else
@@ -3969,7 +3981,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           Process::exit();
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
-                                           pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
         }
       else
         {
@@ -3978,7 +3990,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 #else
           pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                        fractionnal_timestep,
-                                       pressure_rhs_, check_divergence_, poisson_solver_, current_time_*boundary_conditions_.get_dU_perio());
+                                       pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
           // GAB TODO : cest a peu pres ici qu'il faudra travailler pour recuperer le
           // terme de pression
 #endif
@@ -4059,8 +4071,16 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     for (int i = 0; i < 3; i++)
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio()*current_time_);
-      }
+        if (i==0)
+        {
+        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio());
+        }
+        else
+        {
+        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
+        }
+        }
+
   }
 
   // On supprime les duplicatas avant le transport :
@@ -4118,8 +4138,15 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
     for (int i = 0; i < 3; i++)
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio()*current_time_);
-      }
+        if (i==0)
+        {
+        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio());
+        }
+        else
+        {
+        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
+        }
+        }
   }
 
   // On conserve les duplicatas que l'on transporte comme le reste.
@@ -4198,14 +4225,14 @@ void IJK_FT_double::maj_indicatrice_rho_mu(const bool parcourir)
   if (interfaces_.get_nb_bulles_reelles() == 0)
     {
       rho_field_.data() = rho_liquide_;
-      rho_field_.echange_espace_virtuel(rho_field_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      rho_field_.echange_espace_virtuel(rho_field_.ghost());
       if (use_inv_rho_)
         {
           inv_rho_field_.data() = 1./rho_liquide_;
-          inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+          inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
         }
       molecular_mu_.data() = mu_liquide_;
-      molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost());
 
       if (parcourir)
         interfaces_.parcourir_maillage();
@@ -4245,10 +4272,10 @@ void IJK_FT_double::maj_indicatrice_rho_mu(const bool parcourir)
     }
 
   //Mise a jour des espaces virtuels des champs :
-  rho_field_.echange_espace_virtuel(rho_field_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+  rho_field_.echange_espace_virtuel(rho_field_.ghost());
   if (use_inv_rho_)
-    inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
-  molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+    inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+  molecular_mu_.echange_espace_virtuel(molecular_mu_.ghost());
 
 #ifdef SMOOTHING_RHO
   if (smooth_density_)
@@ -4313,7 +4340,7 @@ void IJK_FT_double::fill_variable_source_and_potential_phi(const double time)
   if (expression_potential_phi_ != "??")
     {
       set_field_data(potential_phi_, expression_potential_phi_, time);
-      potential_phi_.echange_espace_virtuel(potential_phi_.ghost(), boundary_conditions_.get_dU_perio()*current_time_);
+      potential_phi_.echange_espace_virtuel(potential_phi_.ghost());
       add_gradient_times_constant(potential_phi_, 1.,variable_source_[0],variable_source_[1],variable_source_[2]);
     }
 }
@@ -4344,19 +4371,18 @@ Vecteur3 IJK_FT_double::calculer_inv_rho_grad_p_moyen(const IJK_Field_double& rh
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
-
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {
       champ[dir].data() = 0.;
       // je ne sais pas a quoi ca sert, mais il est appele avant add_gradient_times_constant_over_rho dans IJK_NS_tool
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   add_gradient_times_constant_over_rho(pression, rho, 1. /*constant*/,  champ[0], champ[1], champ[2]);
   for (int dir = 0; dir < 3; dir++)
     {
       // Je ne sais pas e quoi cette ligne sert. elle est dans calculer_gradient_indicatrice_et_pression, alors je copie
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   // calculer_rho_v(inv_rho, champ, inv_rho_champ);
   for (int dir=0; dir<3; dir++)
@@ -4372,19 +4398,18 @@ Vecteur3 IJK_FT_double::calculer_grad_p_moyen(const IJK_Field_double& pression)
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
-
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {
       champ[dir].data() = 0.;
       // je ne sais pas a quoi ca sert, mais il est appele avant add_gradient_times_constant_over_rho dans IJK_NS_tool
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   add_gradient_times_constant(pression, 1. /*constant*/,  champ[0], champ[1], champ[2]);
   for (int dir = 0; dir < 3; dir++)
     {
       // Je ne sais pas e quoi cette ligne sert. elle est dans calculer_gradient_indicatrice_et_pression, alors je copie
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   for (int dir=0; dir<3; dir++)
     {
@@ -4402,19 +4427,18 @@ Vecteur3 IJK_FT_double::calculer_grad_p_over_rho_moyen(const IJK_Field_double& p
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
-
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {
       champ[dir].data() = 0.;
       // je ne sais pas a quoi ca sert, mais il est appele avant add_gradient_times_constant_over_rho dans IJK_NS_tool
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   add_gradient_times_constant_over_rho(pression, rho_field_, 1. /*constant*/,  champ[0], champ[1], champ[2]);
   for (int dir = 0; dir < 3; dir++)
     {
       // Je ne sais pas e quoi cette ligne sert. elle est dans calculer_gradient_indicatrice_et_pression, alors je copie
-      champ[dir].echange_espace_virtuel(1, boundary_conditions_.get_dU_perio()*current_time_);
+      champ[dir].echange_espace_virtuel(1);
     }
   for (int dir=0; dir<3; dir++)
     {
