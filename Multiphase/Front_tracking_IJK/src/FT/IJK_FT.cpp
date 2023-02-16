@@ -1679,11 +1679,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
    *  o Si le parametre source_qdm_gr vaut 0, la source est determinee par :
    *          temre_force_init         --> temre_source_acceleration et par
    *          expression_derivee_force --> expression_derivee_acceleration
-   * REMARQUE : la correction pour source_qdm_gr = 1 suit le meme esprit que la correction orthogonale a g
-   *            appliquee pour patch_qdm_gr=1.
    * REMARQUE II : On peut envisager de faire une correction qui n'a pas besoin qu'on lui donne vx_terminale en
-   *               entree. C'est ce qui a ete legerment explore, mais qui n'a pas aboutit. La valeur a mettre est 8
-   *               desormais.
+   *               entree. C'est ce qui a ete explore, mais qui n'a pas aboutit.
    *  */
   statistiques().begin_count(source_counter_);
   double new_time = time;
@@ -2439,7 +2436,6 @@ void IJK_FT_double::run()
                 compute_and_add_qdm_corrections_monophasic();
               else
                 compute_and_add_qdm_corrections();
-              //compute_and_add_source_qdm_gr(0.6,0.2, 0.6, 0.1);
             }
 
         }
@@ -2588,79 +2584,9 @@ void IJK_FT_double::run()
       // Attention, en entree du solveur mass, il faut qqch homogene a rho*u*volume_cell...
       // On rempli donc psi_velocity avec vol * integrated_residu_
 
-      static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
-      statistiques().begin_count(bilanQdM_counter_);
-//       68 following lines commented by gr262753 on 30.09 : correction_bilan_qdm_ is not used anymore
-//       if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
-//         {
-//
-// #ifndef VARIABLE_DZ
-//           double volume = 1.;
-//           for (int i = 0; i < 3; i++)
-//             volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-// #endif
-//
-//           for (int dir = 0; dir < 3; dir++)
-//             {
-//               if ((dir == 2) && (correction_bilan_qdm_ == 4))
-//                 {
-//                   // passe, on ne traite pas z...
-//                 }
-//               else
-//                 {
-// #ifndef VARIABLE_DZ
-//                   const double x = volume * integrated_residu_[dir];
-//                   psi_velocity_[dir].data() = x;
-// #endif
-//                   const int kmax = psi_velocity_[dir].nk();
-//                   for (int k = 0; k < kmax; k++)
-//                     {
-// #ifdef VARIABLE_DZ
-//                       const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
-//                       const double x = volume*integrated_residu_[dir];
-//                       psi_velocity_[dir].data() = x;
-// #endif
-//                       if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-//                         {
-//                           Cerr
-//                               << "Verifier que inv_rho_field soit valide et a jour ici ... "
-//                               << finl;
-//                           Process::exit();
-//                           mass_solver_with_inv_rho(psi_velocity_[dir],
-//                                                    inv_rho_field_, delta_z_local_, k);
-//                         }
-//                       else
-//                         {
-//                           mass_solver_with_rho(psi_velocity_[dir], rho_field_,
-//                                                delta_z_local_, k);
-//                         }
-//                       const int imax = velocity_[dir].ni();
-//                       const int jmax = velocity_[dir].nj();
-//                       for (int j = 0; j < jmax; j++)
-//                         {
-//                           for (int i = 0; i < imax; i++)
-//                             {
-//                               velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
-//                                                                             j, k);
-//                             }
-//                         }
-//                     }
-//                   velocity_[dir].echange_espace_virtuel(
-//                     velocity_[dir].ghost());
-//                   //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
-//                 }
-//             }
-//           // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
-//           for (int dir = 0; dir < 3; dir++)
-//             {
-//               store_rhov_moy_[dir] -= integrated_residu_[dir];
-//             }
-//
-//           // Remise a zero du residu integre puisqu'il a ete corrige :
-//           integrated_residu_ = 0.;
-//
-//         }
-      statistiques().end_count(bilanQdM_counter_);
+      // static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
+      // statistiques().begin_count(bilanQdM_counter_);
+      // statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
@@ -4254,7 +4180,8 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
     rho_vapeur_,
     smooth_density_,
 #endif
-    current_time_, rk_step
+    current_time_,
+    get_timestep() //il faut le pas de temps. pas le SOUS pas de temps (rk_step)! gr262753:16.02.23
   );
 }
 
