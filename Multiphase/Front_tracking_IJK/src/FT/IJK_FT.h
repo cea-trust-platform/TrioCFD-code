@@ -83,7 +83,7 @@ public :
   {
     return current_time_ ;
   }
-  const int& get_timestep() const
+  const double& get_timestep() const
   {
     return timestep_ ;
   }

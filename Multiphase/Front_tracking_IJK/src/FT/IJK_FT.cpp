@@ -4181,7 +4181,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
     smooth_density_,
 #endif
     current_time_,
-    get_timestep() //il faut le pas de temps. pas le SOUS pas de temps (rk_step)! gr262753:16.02.23
+    tstep_ //il faut le pas de temps. pas le SOUS pas de temps (rk_step)! gr262753:16.02.23
   );
 }
 
