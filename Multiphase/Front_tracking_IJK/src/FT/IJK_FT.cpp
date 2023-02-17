@@ -1879,6 +1879,10 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       fic <<" "<< ftft; // F_THI.F_THI
       // u.rho*F_THI
       fic <<" "<< ptn; // velocity.F_THI
+      // Energie cinetique en diphasiqeu (double)
+      // u.rho.u (qui est aussi accessible par les .txt)
+      fic <<" "<< uru;
+      
       fic<<finl;
       fic.close();
       //	 << finl;
