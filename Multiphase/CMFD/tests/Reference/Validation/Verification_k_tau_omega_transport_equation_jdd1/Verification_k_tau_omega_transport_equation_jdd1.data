@@ -46,7 +46,7 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-	nb_pas_dt_max 1
+	nb_pas_dt_max 2
     dt_max 1.e-16
     solveur ice
     {
@@ -144,14 +144,14 @@ liquide_eau Fluide_Incompressible
         }
 	sources
 	{
-	Production_energie_cin_turb { } ,
+	Production_energie_cin_turb  ,
 	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 	}
     }
     echelle_temporelle_turbulente
     {
         equation_non_resolue	(t>0)
-        diffusion { tau SGDH { sigma 0.5 } }
+        diffusion { turbulent SGDH { sigma 0.5 } }
         convection { centre }
         initial_conditions { tau Champ_Fonc_xyz dom 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09 }
         boundary_conditions
@@ -165,6 +165,7 @@ liquide_eau Fluide_Incompressible
 	Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
 	Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
 	Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+	, diffusion_supplementaire_echelle_temp_turb
 	}
     }
     Postraitement
@@ -198,6 +199,10 @@ liquide_eau Fluide_Incompressible
 									numero_source 2
 									sources { refChamp { pb_champ pb tau } }
 									}
+					diff_sup_tau  operateur_eqn     {
+                                                                        numero_source 3
+                                                                        sources { refChamp { pb_champ pb tau } }
+                                                                        }
 					diff_tau	operateur_eqn	{
 									numero_op 0
 									sources { refChamp { pb_champ pb tau } }
@@ -229,7 +234,9 @@ liquide_eau Fluide_Incompressible
 					diss_tau 	diss_tau 		periode 1 position_like tau
 					diff_tau 	diff_tau 		periode 1 position_like tau
 					conv_tau 	conv_tau 		periode 1 position_like tau
-					diff_crois_tau diff_crois_tau		periode 1 position_like tau
+                                        diff_crois_tau diff_crois_tau           periode 1 position_like tau
+					diff_sup_tau diff_sup_tau		periode 1 position_like tau
+
 
 					grad_v		gradient_vitesse_liquide_eau periode 1 position_like tau
 					
