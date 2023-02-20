@@ -1882,7 +1882,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       // Energie cinetique en diphasiqeu (double)
       // u.rho.u (qui est aussi accessible par les .txt)
       fic <<" "<< uru;
-      
+
       fic<<finl;
       fic.close();
       //	 << finl;
@@ -2434,15 +2434,6 @@ void IJK_FT_double::run()
                     }
                 }
             }
-          if (!(qdm_corrections_.is_type_none()))
-            {
-              set_time_for_corrections();
-              if (disable_diphasique_)
-                compute_and_add_qdm_corrections_monophasic();
-              else
-                compute_and_add_qdm_corrections();
-            }
-
         }
       else if (get_time_scheme() == RK3_FT)
         {
@@ -2560,19 +2551,6 @@ void IJK_FT_double::run()
                   u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                 }
             }
-          if (!(qdm_corrections_.is_type_none()) )
-            {
-              set_time_for_corrections();
-              if (disable_diphasique_)
-                compute_and_add_qdm_corrections_monophasic();
-              else
-                compute_and_add_qdm_corrections();
-            }
-          else
-            {
-              Cout << "qdm_corrections_.is_type_none() : " << qdm_corrections_.is_type_none() << finl;
-              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
-            }
         }
       else
         {
@@ -2580,6 +2558,28 @@ void IJK_FT_double::run()
                << " inconnu!" << finl;
           Process::exit();
         }
+      // ------------------------------------------------------------------
+      // CORRECTION DE QUANTITE DE MOUVEMENT
+      // ------------------------------------------------------------------
+      // Correction de QdM : permet de controler la QdM globale, dans chaque direction
+      if (!(qdm_corrections_.is_type_none()) )
+        {
+          set_time_for_corrections();
+          if (disable_diphasique_)
+            compute_and_add_qdm_corrections_monophasic();
+          else
+            compute_and_add_qdm_corrections();
+        }
+      else
+        {
+          Cout << "qdm_corrections_.is_type_none() : " << qdm_corrections_.is_type_none() << finl;
+          Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
+        }
+      if (qdm_corrections_.write_me())
+        {write_qdm_corrections_information();}
+      else
+        {;}
+      // ------------------------------------------------------------------
 
       //ab-forcage-control-ecoulement-deb
       // Quel que soit le schema en temps, on corrige le bilan de qdm par le residu integre :
@@ -3319,11 +3319,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
 
   // On laisse l'ecriture de ce fichier de sortie A L'INTERIEUR de calculer_dv car on souhaite relever
   // la valeur des differents termes A CHAQUE sous-pas de temps du schema RK3. On peut en revanche,
-  // deplacer cette ecriture A LA FIN de calculer_dv.
-  Cout << "G bilan qdm " << finl;
-  if (test_etapes_et_bilan)
-    write_check_etapes_et_termes(rk_step);
-  //
 
   fill_variable_source_and_potential_phi(time);
 
@@ -3490,6 +3485,11 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
     }
   // verifier si mon terme de thi est bon en integrale
   ///////////////////////////////////////////////////////
+  Cout << "G bilan qdm " << finl;
+  if (test_etapes_et_bilan)
+    write_check_etapes_et_termes(rk_step);
+
+  //
 
 
   // Il est important de s'assurer a la fin que la derivee de la vitesse soit a zero sur les parois:
@@ -3537,10 +3537,13 @@ void IJK_FT_double::compute_add_external_forces(const int dir)
   return;
 }
 
-// GAB, THI /!\ REMPLACER PAR compute_add_THI_force_sur_d_velocity
+
+
+// -----------------------------------------------------------------------------------
+//  FORCAGE EXTERIEUR, DEFINI DANS L'ESPACE SPECTRAL
 void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>& vitesse,
                                           const int time_iteration,
-                                          const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparan sa valeur avec celle du dt_ev, je vois que c'est faux
+                                          const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux
                                           const double current_time,
                                           const IJK_Splitting& my_splitting
                                           // const int rk_step
@@ -3592,7 +3595,6 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
 
 }
 
-// GAB, THI
 void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_Field_double, 3>& vitesse,
                                                          const int time_iteration,
                                                          const double dt, //tstep,  /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux
@@ -3682,6 +3684,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
   statistiques().end_count(m3);
   Cout << "end of from_spect_to_phys_opti2_advection" << finl;
 }
+// -----------------------------------------------------------------------------------
 
 void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
@@ -4565,6 +4568,8 @@ void IJK_FT_double::write_check_etapes_et_termes(int rk_step)
     }
 }
 
+// -----------------------------------------------------------------------------------
+//  CORRECTION DE QdM
 double IJK_FT_double::calculer_true_moyenne_de_phase_liq(const IJK_Field_double& vx)
 {
   /* Au 04.11.21 : Renvoi vx_liq */
@@ -4717,19 +4722,17 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
        * plus de 10 doubles, sur un maillage a 40^3 mailles, une seule bulle... */
       if (qdm_corrections_.get_need_to_compute_correction_value_one_direction(dir))
         qdm_corrections_.compute_correction_value_one_direction(dir);
-      //TODO : coder le get_correction_value_one_direction(dir);
-      //double correction_value_one_direction = qdm_corrections_.get_correction_value_one_direction(dir);
-      for (int k=0; k<vel.nk(); k++)
-        for (int j=0; j<vel.nj(); j++)
-          for (int i=0; i<vel.ni(); i++)
+      for (int k=0; k<vel.nk(); ++k)
+        for (int j=0; j<vel.nj(); ++j)
+          for (int i=0; i<vel.ni(); ++i)
             {
               qdm_corrections_.compute_correct_velocity_one_direction(dir, vel(i,j,k));
               velocity_[dir](i,j,k) = qdm_corrections_.get_correct_velocitiy_one_direction(dir);
             }
     }
+
   Cout << "AF : compute_and_add_qdm_corrections" << finl;
 }
-
 
 void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
 {
@@ -4761,8 +4764,6 @@ void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
        * plus de 10 doubles, sur un maillage a 40^3 mailles, une seule bulle... */
       if (qdm_corrections_.get_need_to_compute_correction_value_one_direction(dir))
         qdm_corrections_.compute_correction_value_one_direction(dir);
-      //TODO : coder le get_correction_value_one_direction(dir);
-      //double correction_value_one_direction = qdm_corrections_.get_correction_value_one_direction(dir);
       for (int k=0; k<vel.nk(); k++)
         for (int j=0; j<vel.nj(); j++)
           for (int i=0; i<vel.ni(); i++)
@@ -4774,6 +4775,46 @@ void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
   Cout << "AF : compute_and_add_qdm_corrections_monophasic" << finl;
 }
 
+void IJK_FT_double::write_qdm_corrections_information()
+{
+  // Impression dans le fichier qdm_correction.out
+  if (get_time_scheme() == RK3_FT) // && (rk3_sub_step!=0)
+    Cout << "in write_qdm_corrections_information, rk_step_ = "<<rk_step_<<finl;
+  if (Process::je_suis_maitre())
+    {
+      Vecteur3 qdm_cible = qdm_corrections_.get_correction_values();
+      Vecteur3 velocity_correction = qdm_corrections_.get_velocity_corrections();
+      Vecteur3 rho_vel;
+      for (int dir=0; dir<3; ++dir) {rho_vel[dir] = calculer_v_moyen(rho_v_[dir]);}
+
+      int reset = (!reprise_) && (tstep_==0);
+      SFichier fic=Ouvrir_fichier("_qdm_correction.out",
+                                  "1.iteration\t2.time\t3.qdm_cible[0]\t4.qdm_cible[1]\t5.qdm_cible[2]\t6.velocity_correction[0]\t7.velocity_correction[1]\t8.velocity_correction[2]\t9.qdm[0]\t10.qdm[1]\t11.qdm[2]",
+                                  reset);
+      // temps
+      fic << tstep_ << " ";
+      fic << current_time_ << " ";
+      // CIBLE CONSTANE : qdm_cible = al.rl.u_cible
+      fic << qdm_cible[0] << " ";
+      fic << qdm_cible[1] << " ";
+      fic << qdm_cible[2] << " ";
+      // velocity_correction = (<r.u> - qdm_cible) / <r>
+      fic << velocity_correction[0] << " ";
+      fic << velocity_correction[1] << " ";
+      fic << velocity_correction[2] << " ";
+      // <r.u>
+      fic << rho_vel[0] << " ";
+      fic << rho_vel[1] << " ";
+      fic << rho_vel[2] << " ";
+      fic<<finl;
+      fic.close();
+      //	 << finl;
+    }
+}
+
+
+// -----------------------------------------------------------------------------------
+//  PRODUITS DE CHAMPS
 IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2)
 {
   /*

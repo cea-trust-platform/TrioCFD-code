@@ -150,6 +150,7 @@ public :
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
   void compute_and_add_qdm_corrections_monophasic();
+  void write_qdm_corrections_information();
   IJK_Field_double scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2);
   FixedVector<IJK_Field_double, 3> scalar_times_vector(const IJK_Field_double& Sca, const FixedVector<IJK_Field_double, 3>& Vec);
   IJK_Field_double scalar_fields_product(const IJK_Field_double& S1, const IJK_Field_double& S2, int dir);
@@ -301,10 +302,6 @@ protected :
   double pression_ap_proj;
   //
   // GAB qdm patch a posteriori
-  //TODO :  enum corrections_qdm::type_dict_ { GB, GR };
-  //int patch_qdm_gr_;  // flag
-  //ArrOfDouble qdm_patch_correction_ = 0.; // correction value
-  //ArrOfDouble qdm_patch_correction_deux_;
   // GAB source qdm a posteriori
   /*
   int source_qdm_gr_;
