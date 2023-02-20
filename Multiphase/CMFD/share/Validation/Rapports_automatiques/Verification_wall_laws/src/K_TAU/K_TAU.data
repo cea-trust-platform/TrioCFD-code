@@ -134,7 +134,7 @@ Lire pb
     }
     echelle_temporelle_turbulente
     {
-        diffusion { tau SGDH { sigma 0.5 } }
+        diffusion { turbulente SGDH { sigma 0.5 } }
         convection { amont }
         initial_conditions { tau Champ_Fonc_xyz dom 1 0.7 }
         boundary_conditions
