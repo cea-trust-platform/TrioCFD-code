@@ -49,8 +49,8 @@ public:
   mutable std::vector<const Operateur_Diff_base *> op_ext;
   virtual void init_op_ext() const {}    //remplissage de op_ext (ne peut pas etre fait dans completer(), trop tot)
 
-  virtual int is_turb() const {return 0 ;}
-  virtual const Correlation* correlation_viscosite_turbulente() const {return nullptr;}
+  virtual bool is_turb() const { return false; }
+  virtual const Correlation* correlation_viscosite_turbulente() const { return nullptr; }
 
 protected:
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;
