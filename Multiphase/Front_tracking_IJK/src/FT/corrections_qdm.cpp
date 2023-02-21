@@ -666,7 +666,7 @@ Sortie& corrections_qdm::printOn( Sortie& os ) const
   if (get_type_()==GR) os << "type " << " gr" << "\n";
   if (get_type_()==GB) os << "type " << " gb" << "\n";
   if (get_type_()==NONE_IJK) os << "type " << " none" << "\n";
-  os   << " write_infos " << write_me_ << "\n";
+  if (write_me_) os   << " write_infos " << "\n";
   os   << " correction_x " << correction_x_ << "\n"
        << " correction_y " << correction_y_ << "\n"
        << " correction_z " << correction_z_ << "\n";
