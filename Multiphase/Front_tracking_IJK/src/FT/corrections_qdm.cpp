@@ -666,7 +666,7 @@ Sortie& corrections_qdm::printOn( Sortie& os ) const
   if (get_type_()==GR) os << "type " << " gr" << "\n";
   if (get_type_()==GB) os << "type " << " gb" << "\n";
   if (get_type_()==NONE_IJK) os << "type " << " none" << "\n";
-  os   << " write_info " << write_me_ << "\n";
+  os   << " write_infos " << write_me_ << "\n";
   os   << " correction_x " << correction_x_ << "\n"
        << " correction_y " << correction_y_ << "\n"
        << " correction_z " << correction_z_ << "\n";
@@ -813,7 +813,6 @@ Vecteur3 corrections_qdm::get_correction_values()
   correction_values[2] = correction_z_.get_correction_value();
   return correction_values;
 }
-
 
 double corrections_qdm::get_correct_velocitiy_one_direction(int dir)
 {

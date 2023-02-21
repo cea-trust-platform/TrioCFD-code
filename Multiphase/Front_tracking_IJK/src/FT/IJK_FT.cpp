@@ -4780,36 +4780,41 @@ void IJK_FT_double::write_qdm_corrections_information()
   // Impression dans le fichier qdm_correction.out
   if (get_time_scheme() == RK3_FT) // && (rk3_sub_step!=0)
     Cout << "in write_qdm_corrections_information, rk_step_ = "<<rk_step_<<finl;
+  Vecteur3 qdm_cible = qdm_corrections_.get_correction_values();
+  Vecteur3 velocity_correction = qdm_corrections_.get_velocity_corrections();
+  Vecteur3 rho_vel;
+  for (int dir=0; dir<3; ++dir) 
+  {
+    double rv = calculer_v_moyen(scalar_fields_product(rho_field_,velocity_[dir],dir));
+    Cout << "here : " << rv << finl;
+    rho_vel[dir] =  calculer_v_moyen(scalar_fields_product(rho_field_,velocity_[dir],dir));
+    Cout << "there : " << rho_vel[dir] << finl;
+  } 
   if (Process::je_suis_maitre())
-    {
-      Vecteur3 qdm_cible = qdm_corrections_.get_correction_values();
-      Vecteur3 velocity_correction = qdm_corrections_.get_velocity_corrections();
-      Vecteur3 rho_vel;
-      for (int dir=0; dir<3; ++dir) {rho_vel[dir] = calculer_v_moyen(rho_v_[dir]);}
-
-      int reset = (!reprise_) && (tstep_==0);
-      SFichier fic=Ouvrir_fichier("_qdm_correction.out",
-                                  "1.iteration\t2.time\t3.qdm_cible[0]\t4.qdm_cible[1]\t5.qdm_cible[2]\t6.velocity_correction[0]\t7.velocity_correction[1]\t8.velocity_correction[2]\t9.qdm[0]\t10.qdm[1]\t11.qdm[2]",
-                                  reset);
-      // temps
-      fic << tstep_ << " ";
-      fic << current_time_ << " ";
-      // CIBLE CONSTANE : qdm_cible = al.rl.u_cible
-      fic << qdm_cible[0] << " ";
-      fic << qdm_cible[1] << " ";
-      fic << qdm_cible[2] << " ";
-      // velocity_correction = (<r.u> - qdm_cible) / <r>
-      fic << velocity_correction[0] << " ";
-      fic << velocity_correction[1] << " ";
-      fic << velocity_correction[2] << " ";
-      // <r.u>
-      fic << rho_vel[0] << " ";
-      fic << rho_vel[1] << " ";
-      fic << rho_vel[2] << " ";
-      fic<<finl;
-      fic.close();
-      //	 << finl;
-    }
+  {
+    int reset = (!reprise_) && (tstep_==0);
+    SFichier fic=Ouvrir_fichier("_qdm_correction.out",
+        "1.iteration\t2.time\t3.qdm_cible[0]\t4.qdm_cible[1]\t5.qdm_cible[2]\t6.velocity_correction[0]\t7.velocity_correction[1]\t8.velocity_correction[2]\t9.qdm[0]\t10.qdm[1]\t11.qdm[2]",
+        reset);
+    // temps
+    fic << tstep_ << " ";
+    fic << current_time_ << " ";
+    // CIBLE CONSTANE : qdm_cible = al.rl.u_cible
+    fic << qdm_cible[0] << " ";
+    fic << qdm_cible[1] << " ";
+    fic << qdm_cible[2] << " ";
+    // velocity_correction = (<r.u> - qdm_cible) / <r>
+    fic << velocity_correction[0] << " ";
+    fic << velocity_correction[1] << " ";
+    fic << velocity_correction[2] << " ";
+    // <r.u>
+    fic << rho_vel[0] << " ";
+    fic << rho_vel[1] << " ";
+    fic << rho_vel[2] << " ";
+    fic<<finl;
+    fic.close();
+    //	 << finl;
+  }
 }
 
 
