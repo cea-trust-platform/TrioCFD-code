@@ -52,10 +52,10 @@ public :
   const Motcle& domaine_application() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
-  static void calculer_alpha_rho_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
+  static void calculer_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
-    return { "alpha_rho_omega", calculer_alpha_rho_omega };
+    return { "omega", calculer_omega };
   }
 
   virtual int positive_unkown() override {return 1;};

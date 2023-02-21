@@ -45,6 +45,9 @@ public:
 
 private:
   double sigma_ = 1; //facteur multiplicatif
+  int no_alpha_ = 0; // no_alpha = 1 pour equation sur omega
+  int gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
+
 };
 
 #endif

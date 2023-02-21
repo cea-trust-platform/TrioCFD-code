@@ -14,16 +14,16 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0.h
+// File:        Dissipation_energie_cin_turb_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/PolyMAC_P0/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0_included
-#define Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0_included
+#ifndef Dissipation_energie_cin_turb_PolyMAC_P0_included
+#define Dissipation_energie_cin_turb_PolyMAC_P0_included
 
-#include <Source_base.h>
+#include <Source_Dissipation_energie_cin_turb.h>
 
 class Convection_Diffusion_std;
 /*! @brief class Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0
@@ -36,25 +36,9 @@ class Convection_Diffusion_std;
  *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
+class Dissipation_energie_cin_turb_PolyMAC_P0 : public Source_Dissipation_energie_cin_turb
 {
-
-  Declare_instanciable(Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0);
-
-public:
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override { }; //rien
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-
-protected:
-  double beta_k = 0.09; // Wilcox
+  Declare_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0);
 };
 
 #endif

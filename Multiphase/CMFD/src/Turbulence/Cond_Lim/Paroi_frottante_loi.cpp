@@ -33,6 +33,9 @@
 #include <Domaine_Poly_base.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
+#include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
+#include <Viscosite_turbulente_k_omega.h>
+#include <Viscosite_turbulente_k_tau.h>
 
 #include <math.h>
 
@@ -46,7 +49,7 @@ Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 
 Entree& Paroi_frottante_loi::readOn(Entree& s )
 {
-  if (app_domains.size() == 0) app_domains = { Motcle("indetermine") };
+  if (app_domains.size() == 0) app_domains = { Motcle("turbulence") };
 
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
@@ -62,6 +65,34 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
 
   return s;
 }
+
+void Paroi_frottante_loi::completer()
+{
+  if (!sub_type(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base())) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
+  if sub_type(Viscosite_turbulente_k_tau, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation())
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
+    }
+  else if sub_type(Viscosite_turbulente_k_omega, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation())
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .6;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+    }
+  else
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ =  0.;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ =  0.;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+    }
+
+}
+
 
 void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
 {

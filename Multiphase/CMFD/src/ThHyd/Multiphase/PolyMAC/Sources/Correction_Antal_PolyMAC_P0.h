@@ -14,47 +14,43 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Diff_Tau_PolyMAC_P0_Elem.h
-// Directory:   $TRUST_ROOT/src/Turbulence/PolyMAC_P0/Operateurs
-// Version:     1
+// File:        Correction_Antal_PolyMAC_P0.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
+// Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Op_Diff_Tau_PolyMAC_P0_Elem_included
-#define Op_Diff_Tau_PolyMAC_P0_Elem_included
+#ifndef Correction_Antal_PolyMAC_P0_included
+#define Correction_Antal_PolyMAC_P0_included
+#include <Source_base.h>
 
-#include <Op_Diff_PolyMAC_P0_Elem.h>
-#include <Op_Diff_Turbulent_PolyMAC_P0_Elem.h>
-#include <Correlation.h>
-#include <Transport_turbulent_base.h>
-
-/*! @brief : class Op_Diff_Tau_PolyMAC_P0_Elem
+/*! @brief classe Correction_Antal_PolyMAC_P0 Correction de répulsion en paroi d'Antal dans un ecoulement multiphase
  *
- *  Version de Op_Diff_PolyMAC_P0_Elem prenant en compte l'effet de la turbulence
- *  par le biais d'une correlation de type Transport_turbulent.
- *  (celle-ci reposera sur la modelisation de la viscosite turbulente fournie
- *   par la correlation Viscosite_turbulente de l'operateur de diffusion de la QDM)
  *
  *
  *
  */
-class Op_Diff_Tau_PolyMAC_P0_Elem : public Op_Diff_Turbulent_PolyMAC_P0_Elem
+class Correction_Antal_PolyMAC_P0: public Source_base
 {
-
-  Declare_instanciable( Op_Diff_Tau_PolyMAC_P0_Elem ) ;
+  Declare_instanciable(Correction_Antal_PolyMAC_P0);
 public :
-  virtual void completer() override;
-  virtual void modifier_nu(DoubleTab& ) const override; //prend en compte la diffusivite turbulente
-  virtual double calculer_dt_stab() const override;
-
+  int has_interface_blocs() const override
+  {
+    return 1;
+  };
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override {}; //of course
+  void completer() override;
 
-  double limiter_tau() const {return limiter_tau_;};
-
-protected :
-  double limiter_tau_ = 1.e-6 ;
-
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
+protected:
+  int n_l = -1; //phase liquide
+  int is_turb = 0;
+  double Cw1_ =  -.1 ; // To adjust the force in .data
+  double Cw2_ =  .147 ; // To adjust the force in .data
 };
 
-#endif /* Op_Diff_PolyMAC_P0_Elem_included */
+#endif

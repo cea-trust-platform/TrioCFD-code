@@ -55,7 +55,6 @@ void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const
   if (out.qpk) (*out.qpk)(0) = fac * (in.Tp - in.T[0]);
   if (out.dTf_qpk) (*out.dTf_qpk)(0,0) = -fac;
   if (out.dTp_qpk) (*out.dTp_qpk)(0)   = fac;
-  return;
 }
 
 double Flux_parietal_adaptatif::calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp,double Diam_hyd_) const

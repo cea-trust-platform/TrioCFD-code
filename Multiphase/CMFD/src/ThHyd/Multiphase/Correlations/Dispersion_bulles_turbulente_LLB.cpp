@@ -59,8 +59,7 @@ void Dispersion_bulles_turbulente_LLB::coefficient( const DoubleTab& alpha, cons
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
-      for (int i = 0 ; i<2 ; i++) // k gas phase
-        {
-          coeff(k, n_l, i) = C_td_*rho(n_l)*k_turb(n_l) ;
-        }
+      {
+        coeff(k, n_l) = C_td_*rho(n_l)*k_turb(n_l) ;
+      }
 }

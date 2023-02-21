@@ -14,48 +14,31 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_turb_PolyMAC_P0.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
+// File:        Source_Production_energie_cin_turb.h
+// Directory:   $TRUST_ROOT/src/Turbulence/Sources
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0_included
-#define Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0_included
+#ifndef Source_Production_energie_cin_turb_included
+#define Source_Production_energie_cin_turb_included
 
-#include <Source_base.h>
-#include <TRUSTTab.h>
-#include <TRUST_Ref.h>
+#include <Sources_Multiphase_base.h>
 
 class Correlation;
 
-/*! @brief Classe Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la diffusion supplementaire venant de l'introduction du temps tau
+/*! @brief Classe Source_Production_energie_cin_turb Classe de base pour les operateur de production d'énergie cinetique turbulente k
  *
  *
  *
- * @sa Operateur_PolyMAC_P0_base Operateur_base
+ * @sa Operateur_base
  */
-class Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0: public Source_base
+class Source_Production_energie_cin_turb: public Sources_Multiphase_base
 {
-  Declare_instanciable(Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0);
+  Declare_base(Source_Production_energie_cin_turb);
 public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  }
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
-
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-  void completer() override;
-
-protected :
-  double limiter_ = 5 ;
-  double limiter_tau_ = 1.e-6;
-  int f_grad_tau_fixe = 0 ;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override=0;
 };
 
 #endif

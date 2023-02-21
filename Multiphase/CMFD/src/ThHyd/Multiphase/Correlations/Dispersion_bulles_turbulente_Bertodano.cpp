@@ -62,10 +62,9 @@ void Dispersion_bulles_turbulente_Bertodano::coefficient( const DoubleTab& alpha
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
-      for (int i = 0 ; i<2 ; i++) // k gas phase
-        {
-          double t_c = nut(n_l) / k_turb(n_l) ;
-          double t_d = 4./3.*rho(k)*d_bulles(k)/(coeff_CD(k, n_l)*rho(n_l)*ndv(n_l,k));
-          coeff(k, n_l, i) = 2.*rho(n_l)*k_turb(n_l) * t_c*t_c/(t_d*(t_c+t_d));
-        }
+      {
+        double t_c = nut(n_l) / k_turb(n_l) ;
+        double t_d = 4./3.*rho(k)*d_bulles(k)/(coeff_CD(k, n_l)*rho(n_l)*ndv(n_l,k));
+        coeff(k, n_l) = 2.*rho(n_l)*k_turb(n_l) * t_c*t_c/(t_d*(t_c+t_d));
+      }
 }

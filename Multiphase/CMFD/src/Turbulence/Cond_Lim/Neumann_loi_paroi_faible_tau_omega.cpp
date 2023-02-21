@@ -36,7 +36,6 @@
 #include <Taux_dissipation_turbulent.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
-#include <Op_Diff_Tau_PolyMAC_P0_Elem.h>
 
 #include <math.h>
 
@@ -131,25 +130,11 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 
   if (is_tau_ == 1)
     {
-      if (sub_type(Op_Diff_Tau_PolyMAC_P0_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()))
+      for (int f =0 ; f < nf ; f++)
         {
-          double limiter = ref_cast(Op_Diff_Tau_PolyMAC_P0_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
-          const DoubleTab& tau = domaine_Cl_dis().equation().inconnue().passe();
-          for (int f =0 ; f < nf ; f++)
-            {
-              int f_domaine = f + f1; // number of the face in the domaine
-              int e_domaine = f_e(f_domaine,0);
-              valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) / ((tau(e_domaine,0) > limiter) ? limiter/(tau(e_domaine,0)*tau(e_domaine,0)) : 1/limiter); // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
-            }
-        }
-      else
-        {
-          for (int f =0 ; f < nf ; f++)
-            {
-              int f_domaine = f + f1; // number of the face in the domaine
-              int e_domaine = f_e(f_domaine,0);
-              valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
-            }
+          int f_domaine = f + f1; // number of the face in the domaine
+          int e_domaine = f_e(f_domaine,0);
+          valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
         }
     }
   if (is_tau_ == 0)

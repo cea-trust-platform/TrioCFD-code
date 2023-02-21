@@ -43,7 +43,7 @@ Read sch
     tinit 0
     dt_start dt_fixe 1e-6
     tmax 0.0032
-    seuil_statio  -1 
+    seuil_statio  -1
     # nb_pas_dt_max 5 #
     dt_impr 1e-8
     solveur ice
@@ -63,13 +63,13 @@ Discretize pb dis
 
 Read pb
 {
-	Milieu_composite
-	{
-		liquide_eau  fluide_eau_c3_liquide { } 
-		gaz_eau  fluide_eau_c3_gaz { } 
-		gaz_air stiffenedGas { gamma 1.43 pinf 0.0 Cv 1040.0 q 2030.0e3  }
-		saturation_eau Saturation_eau_c3 { }
-	}
+    Milieu_composite
+    {
+        liquide_eau  fluide_eau_c3_liquide { }
+        gaz_eau  fluide_eau_c3_gaz { }
+        gaz_air stiffenedGas { gamma 1.43 pinf 0.0 Cv 1040.0 q 2030.0e3  }
+        saturation_eau Saturation_eau_c3 { }
+    }
 
 
     QDM_Multiphase
@@ -79,8 +79,8 @@ Read pb
         diffusion  { negligeable }
         initial_conditions
         {
-           vitesse  Champ_fonc_xyz dom 6 2.0*(x>0.5)-2.0*(x[0.5) 2.0*(x>0.5)-2.0*(x[0.5) 2.0*(x>0.5)-2.0*(x[0.5) 0.0 0.0 0.0
-           pression Champ_fonc_xyz dom 1 1.0e5 
+            vitesse  Champ_fonc_xyz dom 6 2.0*(x>0.5)-2.0*(x[0.5) 2.0*(x>0.5)-2.0*(x[0.5) 2.0*(x>0.5)-2.0*(x[0.5) 0.0 0.0 0.0
+            pression Champ_fonc_xyz dom 1 1.0e5
         }
         boundary_conditions
         {
@@ -101,7 +101,7 @@ Read pb
             gauche frontiere_ouverte a_ext Champ_Front_Uniforme 3 0.99 0 0.01
             droite frontiere_ouverte a_ext Champ_Front_Uniforme 3 0.99 0 0.01
         }
-       sources { flux_interfacial } 
+        sources { flux_interfacial }
     }
     Energie_Multiphase
     {
@@ -115,24 +115,26 @@ Read pb
             gauche frontiere_ouverte T_ext Champ_Front_uniforme 3 81.578 81.578 81.578
             droite frontiere_ouverte T_ext Champ_Front_uniforme 3 81.578 81.578 81.578
         }
-          sources { travail_pression , 
-                    flux_interfacial } 
+        sources {
+            travail_pression ,
+            flux_interfacial
+        }
     }
     Post_processing
     {
         Probes
         {
-             alp grav alpha_gaz_eau periode 1e8 segment 5000 0 0.5 1 0.5
-             rho grav masse_volumique periode 1e8 segment 5000 0 0.5 1 0.5
-               v grav         vitesse periode 1e8 segment 5000 0 0.5 1 0.5
-               p grav        pression periode 1e8 segment 5000 0 0.5 1 0.5
+            alp grav alpha_gaz_eau periode 1e8 segment 5000 0 0.5 1 0.5
+            rho grav masse_volumique periode 1e8 segment 5000 0 0.5 1 0.5
+            v grav         vitesse periode 1e8 segment 5000 0 0.5 1 0.5
+            p grav        pression periode 1e8 segment 5000 0 0.5 1 0.5
             eint grav energie_interne periode 1e8 segment 5000 0 0.5 1 0.5
         }
-        Format lml 
+        Format lml
         fields dt_post 1e-2
         {
             alpha elem
-            vitesse elem 
+            vitesse elem
             pression elem
             temperature elem
             energie_interne elem
