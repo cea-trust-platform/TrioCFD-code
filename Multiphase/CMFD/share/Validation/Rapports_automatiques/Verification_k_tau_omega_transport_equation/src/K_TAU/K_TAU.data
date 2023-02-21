@@ -266,11 +266,15 @@ liquide_eau Fluide_Incompressible
 					tau elem
 					vitesse elem
 					viscosite_turbulente_liquide_eau elem
+                          		prod_k elem
+                                        diss_k elem
+                                        diss_tau elem
+                                        prod_tau elem
+                                        diff_crois_tau elem
+					diff_sup_tau elem
 					}
 	}
 }
-
-EcritureLectureSpecial EcrFicPartageBin
 
 Resoudre pb
 

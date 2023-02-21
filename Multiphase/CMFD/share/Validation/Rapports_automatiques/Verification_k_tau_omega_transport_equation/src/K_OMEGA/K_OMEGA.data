@@ -254,11 +254,14 @@ liquide_eau Fluide_Incompressible
 					omega elem
 					vitesse elem
 					viscosite_turbulente_liquide_eau elem
+					prod_k elem
+					diss_k elem
+					diss_omega elem
+					prod_omega elem
+					diff_crois_omega elem
 					}
 	}
 }
-
-EcritureLectureSpecial EcrFicPartageBin
 
 Resoudre pb
 
