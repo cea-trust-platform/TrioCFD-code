@@ -13,6 +13,7 @@ EOF
 	# CasTest . ijkft_monte_multi_repr_seq.data #
 	# CasTest . ijkft_monte_par8.data 8 #
 	# CasTest . ijkft_monte_multi_par8.data 8 #
+        # DISABLE_PARALLEL_RUN #
 }
 
 

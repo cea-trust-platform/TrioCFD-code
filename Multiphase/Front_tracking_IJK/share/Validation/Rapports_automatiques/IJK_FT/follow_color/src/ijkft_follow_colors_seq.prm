@@ -10,6 +10,7 @@ EOF
 	CasTest . ijkft_follow_colors_multi_repr_seq.data
 	CasTest . ijkft_follow_colors_par8.data 8
 	CasTest . ijkft_follow_colors_multi_par8.data 8
+        # DISABLE_PARALLEL_RUN #
 }
 
 
