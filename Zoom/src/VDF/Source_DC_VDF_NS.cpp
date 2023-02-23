@@ -192,7 +192,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
                double t_fin = schF_temp.temps_courant();
       */
 
-      /* Recuperation de la domaine fine de base */
+      /* Recuperation du domaine fin de base */
       Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis().valeur();
 
       /* recuperation des conditions limites existantes */

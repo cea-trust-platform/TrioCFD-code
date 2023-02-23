@@ -156,7 +156,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Domaine_VF& domaine_vf
   // faces frontiere (reelles et virtuelles)
   ArrOfInt liste_faces(nb_faces_front_tot);
 
-  // Faces reelles = les nb_faces_frontiere premieres faces de la domaine
+  // Faces reelles = les nb_faces_frontiere premieres faces du domaine
   // n = nombre de faces remplies dans liste_faces
   int n;
   for (n = 0; n < nb_faces_front; n++)
@@ -207,7 +207,7 @@ void Connectivite_frontieres::remplir_faces_voisins(const Domaine_VF& domaine_vf
             // Numeros des deux sommets de l'arete sur la face
             int i_sommet0 = def_face_aretes_(i_arete, 0);
             int i_sommet1 = def_face_aretes_(i_arete, 1);
-            // Numeros des deux sommets dans la domaine
+            // Numeros des deux sommets dans le domaine
             int sommet0 = face_sommets(face, i_sommet0);
             int sommet1 = (i_sommet1 >= 0) ? face_sommets(face, i_sommet1) : -1;
             // On classe les deux sommets dans l'ordre croissant:

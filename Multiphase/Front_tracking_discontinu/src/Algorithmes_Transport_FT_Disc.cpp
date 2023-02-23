@@ -52,9 +52,9 @@ Sortie& Algorithmes_Transport_FT_Disc::printOn(Sortie& os) const
  * On calcule la somme sur tous les processeurs.
  *
  * @param (indicatrice) le tableau des valeurs d'un champ aux elements de domaine_vf (entree) Le champ est suppose constant par element.
- * @param (volume_total) (sortie) le volume total de la domaine = INTEGRALE(d omega)
+ * @param (volume_total) (sortie) le volume total du domaine = INTEGRALE(d omega)
  * @param (volume_phase_1) (sortie) integrale de volume de l'indicatrice de phase, egale au volume de la phase 1 = INTEGRALE(indicatrice * d omega)
- * @param (barycentre) En entree: on attend un tableau de meme dimension que les coordonnees En sortie: iso-barycentre de la domaine = INTEGRALE(X * d omega) / volume_phase_1
+ * @param (barycentre) En entree: on attend un tableau de meme dimension que les coordonnees En sortie: iso-barycentre de la zone = INTEGRALE(X * d omega) / volume_phase_1
  * @param (barycentre_phase_1) En entree: idem que barycentre En sortie: barycentre de la phase_1 calcule comme INTEGRALE(indicatrice * X * d omega) / volume_phase_1
  */
 void Algorithmes_Transport_FT_Disc::calculer_moments_indicatrice(

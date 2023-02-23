@@ -300,11 +300,11 @@ void Transport_Marqueur_FT::discretiser(void)
   suffix += le_nom();
   fieldname = "CHAMP_BIDON";
   fieldname += suffix;
-  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
   const double temps = schema_temps().temps_courant();
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
-  discr.discretiser_champ("champ_elem", une_domaine_dis,
+  discr.discretiser_champ("champ_elem", un_domaine_dis,
                           fieldname, "-",
                           1 /* composantes */, nb_valeurs_temps,
                           temps,
@@ -313,7 +313,7 @@ void Transport_Marqueur_FT::discretiser(void)
 
   Transport_Interfaces_FT_Disc::discretiser();
 
-  const Domaine& domaine = une_domaine_dis.domaine();
+  const Domaine& domaine = un_domaine_dis.domaine();
   maillage_interface().associer_domaine(domaine);
 }
 
@@ -668,7 +668,7 @@ void Transport_Marqueur_FT::transformer(double temps)
 
 //-Identification des groupes connexes
 //-calcul des proprietes geometriques equivalentes (positions, volumes et diametres) de ces goupes
-//-Detection des groupes a supprimer (situe dans une sous domaine specifie par utilisateur
+//-Detection des groupes a supprimer (situe dans un sous domaine specifie par utilisateur
 //                                      ou de diametre inferieur a un diametre specifie par l utilsateur)
 //-Construction de l objet maillage (ensemble de points) et proprietes (proprietes materielles) a injecter
 //-Suppression des groupes connexes identifies a supprimer
@@ -765,7 +765,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
 
 //Parmi l ensemble des groupes connexes identifies, on detecte ceux qui sont a supprimer
 //Les criteres de suppression retenus sont :
-// -le centre de gravite du groupe est dans une sous domaine definie par l utilisateur
+// -le centre de gravite du groupe est dans un sous domaine definie par l utilisateur
 // (pour un groupe connexe donne, on parcours les sous domaines pour tester si l une d entre elles
 //  contient le centre de gravite du groupe)
 // -le diametre caracteristique du groupe connexe considere est plus petit qu un diametre_min
@@ -1229,11 +1229,11 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const & discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+          const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
           const double temps = schema_temps().temps_courant();
           Nom nom="densite_particules";
           Nom unite="sans_dimension";
-          discr.discretiser_champ("champ_elem",une_domaine_dis,nom,unite,1,temps,densite_particules_);
+          discr.discretiser_champ("champ_elem",un_domaine_dis,nom,unite,1,temps,densite_particules_);
           champs_compris_.ajoute_champ(densite_particules_.valeur());
         }
     }
@@ -1244,11 +1244,11 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const Discret_Thyd& discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+          const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
           const double temps = schema_temps().temps_courant();
           Nom nom="volume_particules";
           Nom unite="sans_dimension";
-          discr.discretiser_champ("champ_elem",une_domaine_dis,nom,unite,1,temps,volume_particules_);
+          discr.discretiser_champ("champ_elem",un_domaine_dis,nom,unite,1,temps,volume_particules_);
           champs_compris_.ajoute_champ(volume_particules_.valeur());
         }
     }

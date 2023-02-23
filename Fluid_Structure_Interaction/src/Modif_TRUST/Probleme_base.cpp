@@ -80,7 +80,6 @@ Probleme_base::~Probleme_base()
 Probleme_base::Probleme_base() : osauv_hdf_(0), reprise_effectuee_(0), reprise_version_(155), restart_file(0), coupled_(0)
 {
   resuming_in_progress_=0;
-  tstat_deb_ = tstat_fin_ = -1;
 }
 
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Ecriture d'un probleme sur un flot de sortie.
@@ -377,9 +376,8 @@ void Probleme_base::discretiser_equations()
 
 /*! @brief Affecte une discretisation au probleme Discretise le Domaine associe au probleme avec la discretisation
  *
- *      Associe la premiere domaine du Domaine aux equations du probleme
+ *      Associe le premier Domaine aux equations du probleme
  *      Discretise les equations associees au probleme
- *      NOTE: TRUST V1 une seule Domaine_dis pas Domaine_dis est traitee
  *
  * @param (Discretisation_base& discretisation) une discretisation pour le probleme
  */
@@ -905,27 +903,6 @@ int Probleme_base::comprend_champ_post(const Motcle& un_nom) const
         return 1;
     }
   return 0;
-}
-
-/*! @brief On verifie que le temps de debut et de fin des statistiques est identique sur tous les champsde tous les postraitements
- *
- */
-int Probleme_base::verifie_tdeb_tfin(const Motcle& un_nom) const
-{
-  for (const auto &itr : postraitements())
-    {
-      const Postraitement& post = ref_cast(Postraitement, itr.valeur());
-      if (tstat_deb_ == -1)
-        tstat_deb_ = post.tstat_deb();
-      else if (!est_egal(tstat_deb_, post.tstat_deb()) && post.tstat_deb() != -1)
-        Cerr << "Beginning times of statistics t_deb are differents but the calculation continues" << finl;
-
-      if (tstat_fin_ == -1)
-        tstat_fin_ = post.tstat_fin();
-      else if (!est_egal(tstat_fin_, post.tstat_fin()) && post.tstat_fin() != -1)
-        Cerr << "Ending times of statistics t_fin are differents but the calculation continues" << finl;
-    }
-  return 1;
 }
 
 const Champ_Generique_base& Probleme_base::get_champ_post(const Motcle& un_nom) const

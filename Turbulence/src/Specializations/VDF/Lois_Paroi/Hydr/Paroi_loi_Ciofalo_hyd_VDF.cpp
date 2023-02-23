@@ -454,7 +454,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_local(double u_plus_d_plus,double d_visc
 
       else
         // on va calculer la valeur de psi_E pour une couche limite a l'equilibre
-        // dans la domaine log
+        // dans la zone log
         {
 
           const int itmax  = 25;

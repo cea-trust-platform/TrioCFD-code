@@ -552,7 +552,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif( int num_face) const
 {
   if (corres.size()==0)
     {
-      // on recupere la domaine
+      // on recupere le domaine
       int i0=0;
       // on cherche la premiere cond_lim rayo
       while (((les_faces_rayonnantes[i0].ensembles_faces_bord(0).nb_faces_bord()==0)||(les_faces_rayonnantes[i0].emissivite()==-1))&&(i0<nb_faces_totales())) i0++;

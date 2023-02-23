@@ -174,11 +174,11 @@ void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, Doub
   for (i = 0; i < Nl; i++)
     for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * k(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a une domaine_dis_base */
+  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
   DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab();
   DoubleTab b_rho, b_k = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_k.dimension_tot(0);
-  if (ch_rho.a_une_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
+  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
   else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis().valeur()).xv_bord(), b_rho);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_k(i, n);

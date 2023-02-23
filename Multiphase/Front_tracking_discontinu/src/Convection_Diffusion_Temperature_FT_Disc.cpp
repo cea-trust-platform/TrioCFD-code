@@ -1285,34 +1285,34 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
 
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
-  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
   LIST(REF(Champ_base)) & champs_compris = liste_champs_compris_;
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
   Nom nom;
 
   nom = Nom("temperature_") + le_nom();
-  dis.discretiser_champ("temperature", une_domaine_dis, nom, "K", 1 /* composantes */, nb_valeurs_temps, temps, la_temperature);
+  dis.discretiser_champ("temperature", un_domaine_dis, nom, "K", 1 /* composantes */, nb_valeurs_temps, temps, la_temperature);
   champs_compris.add(la_temperature.valeur());
   champs_compris_.ajoute_champ(la_temperature);
 
   nom = Nom("temperature_grad_") + le_nom();
-  dis.discretiser_champ("temperature", une_domaine_dis, nom, "K/m", 1 /* composantes */, temps, grad_t_);
+  dis.discretiser_champ("temperature", un_domaine_dis, nom, "K/m", 1 /* composantes */, temps, grad_t_);
   champs_compris.add(grad_t_.valeur());
   champs_compris_.ajoute_champ(grad_t_);
 
   nom = Nom("mpoint_") + le_nom();
-  dis.discretiser_champ("temperature", une_domaine_dis, nom, "kg/(m2s)", 1 /* composante */, temps, mpoint_);
+  dis.discretiser_champ("temperature", un_domaine_dis, nom, "kg/(m2s)", 1 /* composante */, temps, mpoint_);
   champs_compris.add(mpoint_.valeur());
   champs_compris_.ajoute_champ(mpoint_);
 
   nom = Nom("mpoint_uncorrected_") + le_nom();
-  dis.discretiser_champ("temperature", une_domaine_dis, nom, "kg/(m2s)", 1 /* composante */, temps, mpoint_uncorrected_);
+  dis.discretiser_champ("temperature", un_domaine_dis, nom, "kg/(m2s)", 1 /* composante */, temps, mpoint_uncorrected_);
   champs_compris.add(mpoint_uncorrected_.valeur());
   champs_compris_.ajoute_champ(mpoint_uncorrected_);
 
   nom = Nom("vitesse_conv_") + le_nom();
-  dis.discretiser_champ("vitesse", une_domaine_dis, nom, "m/s", -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps, vitesse_convection_);
+  dis.discretiser_champ("vitesse", un_domaine_dis, nom, "m/s", -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps, vitesse_convection_);
   champs_compris.add(vitesse_convection_.valeur());
   champs_compris_.ajoute_champ(vitesse_convection_);
 
@@ -1321,7 +1321,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
     {
       Cerr << "Fake Pressure gradient discretization" << finl;
       nom = Nom("gradient_pression_") + le_nom();
-      dis.discretiser_champ("vitesse", une_domaine_dis,
+      dis.discretiser_champ("vitesse", un_domaine_dis,
                             nom, "",
                             -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps,
                             gradient_pression_);
@@ -1330,13 +1330,13 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
 
       Cerr << "Fake Pressure discretization" << finl;
       nom = Nom("fake_pressure_") + le_nom();
-      dis.discretiser_champ("pression",une_domaine_dis,nom,"Pa.m3/kg",1,1,temps,la_pression);
+      dis.discretiser_champ("pression",un_domaine_dis,nom,"Pa.m3/kg",1,1,temps,la_pression);
       champs_compris.add(la_pression.valeur());
       champs_compris_.ajoute_champ(la_pression);
 
       Cerr << "Velocity (delta_u) divergence discretization" << finl;
       nom = Nom("divergence_delta_U_") + le_nom();
-      dis.discretiser_champ("divergence_vitesse" /*directive */,une_domaine_dis, nom, "m3/s", 1,1,temps,divergence_delta_U);
+      dis.discretiser_champ("divergence_vitesse" /*directive */,un_domaine_dis, nom, "m3/s", 1,1,temps,divergence_delta_U);
       champs_compris.add(divergence_delta_U.valeur());
       champs_compris_.ajoute_champ(divergence_delta_U);
 

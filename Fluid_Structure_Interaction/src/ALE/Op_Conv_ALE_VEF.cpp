@@ -406,11 +406,11 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
           type_op_boucle = centre;
           gradient.ref(gradient_elem);
         }
-      // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+      // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
       //  - polyedres bords et joints
       //  - polyedres bords et non joints
       // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-      // dans la domaine
+      // dans le domaine
       // boucle sur les polys
       for (poly=0; poly<nb_elem_tot; poly++)
         {

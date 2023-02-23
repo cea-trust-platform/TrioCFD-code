@@ -817,7 +817,7 @@ int Convection_Diffusion_Chaleur_QC::preparer_calcul()
   operateur(1).ajouter(tmp,tmp);
   if (mode_convection_==0)
     return 1;
-  // remplissage de la domaine cl modifiee avec 1 partout au bord...
+  // remplissage du domaine cl modifie avec 1 partout au bord...
   zcl_modif_=(domaine_Cl_dis());
   Conds_lim& condlims=zcl_modif_.valeur().les_conditions_limites();
   int nb=condlims.size();

@@ -60,7 +60,7 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
   s>>nom_fic;
   s>>nom_pb>>nom_champ_inc;
 
-  // On recupere le pb, puis ensuite on cherche le champ; on recupere la domaine_dis
+  // On recupere le pb, puis ensuite on cherche le champ; on recupere le domaine_dis
   const Probleme_base& pb =ref_cast(Probleme_base,Interprete::objet(nom_pb));
   REF(Champ_base) ref_ch;
 
