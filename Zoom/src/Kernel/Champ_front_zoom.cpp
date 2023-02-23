@@ -236,9 +236,9 @@ const Champ_Inc_base& Champ_front_zoom::inconnue() const
 
 
 
-/*! @brief Renvoie la domaine discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace.
+/*! @brief Renvoie le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace.
  *
- * @return (Domaine_dis_base&) la domaine discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_dis_base&) le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace
  */
 const Domaine_dis_base& Champ_front_zoom::domaine_dis() const
 {
@@ -263,11 +263,11 @@ const Equation_base& Champ_front_zoom::equation() const
 {
   return inconnue().equation();
 }
-/*! @brief Renvoie la domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue
+/*! @brief Renvoie le domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue
  *
  *     dont on prend la trace
  *
- * @return (Domaine_Cl_dis_base&) la domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_Cl_dis_base&) le domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue dont on prend la trace
  */
 const Domaine_Cl_dis_base& Champ_front_zoom::domaine_Cl_dis() const
 {

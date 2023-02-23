@@ -132,7 +132,7 @@ private :
   //dans un element donne
   double surface_intersection(const int, const Maillage_FT_Disc&) const;
 
-  //Fonction qui renvoie la domaine discrete dans laquelle evolue l'interface
+  //Fonction qui renvoie le domaine discret dans lequel evolue l'interface
   inline const Domaine_dis& domaine_dis(const Maillage_FT_Disc&) const;
 
   //Fonction qui renvoie le Remaillage conservatif en volume

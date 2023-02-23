@@ -373,7 +373,7 @@ void PaveCoincidant::determine_bornes()
               xg(k)+=les_coord(leselems(i,j),k);
           xg/=dom_qui_coincide->nb_som_elem();
 
-          if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans la domaine a zoomer ...
+          if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans le domaine a zoomer ...
             {
               if ( dxm > std::fabs(xmin-les_coord(leselems(i,0),0)) )
                 {

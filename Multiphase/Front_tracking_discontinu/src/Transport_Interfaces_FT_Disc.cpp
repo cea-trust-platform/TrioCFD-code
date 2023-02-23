@@ -734,8 +734,8 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
             // modified_indic_faces_* : Valeurs de la position et de l epaisseur de l indicatrice modifiee,
             // exprimees en multiples de taille de maille. Cette nouvelle indicatrice est calculee
             // a partir de la distance a l interface. La position represente une iso-ligne
-            // de distance a l interface, et l epaisseur, la domaine de variation lineaire vis a vis de la distance,
-            // qui fait passer l indicatrice de 0 a 1 (la domaine est centree sur l iso-ligne representee par la position).
+            // de distance a l interface, et l epaisseur, le domaine de variation lineaire vis a vis de la distance,
+            // qui fait passer l indicatrice de 0 a 1 (le domaine est centre sur l iso-ligne representee par la position).
             // Par defaut :
             variables_internes_->modified_indic_faces_position = 0. ;
             variables_internes_->modified_indic_faces_thickness= 1. ;
@@ -1540,7 +1540,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
 
   maillage_interface().changer_temps(0.);
   {
-    // On modifie la domaine ici => on a besoin d'une reference non constante
+    // On modifie le domaine ici => on a besoin d'une reference non constante
     Domaine_dis_base& le_dom_dis2 = domaine_dis().valeur();
     le_dom_dis2.domaine().construire_elem_virt_pe_num();
   }
@@ -1778,7 +1778,7 @@ void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
               // Indice local dans l'element de la face la plus proche dans la
               // direction i
               const int i_face_voisine = direction + ((x < centre_elem) ? 0 : dim);
-              // Indice de la face dans la domaine
+              // Indice de la face dans le domaine
               const int face_voisine = elem_faces(element, i_face_voisine);
               // Indice de l'element voisin par cette face
               const int elem_voisin =
@@ -2358,7 +2358,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
 //
 //Les etapes de la methode sont :
 //-Calcul de la vitesse imposee a l interface a un temps donne: calcul_vitesse(...)
-//-On determine le type de la domaine discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
+//-On determine le type de le domaine discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
 // et le type  dequation traitee (is_QC vaut 0 pour  Navier_Stokes_FT_Disc et 1 sinon)
 //-Estimation de l increment de quantite de mouvement a ajouter a vpoint
 // puis ajout de cet increment : calcul_source_et_modifie_vpoint(...)
@@ -2383,7 +2383,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       calcul_vitesse(vit_imposee,inco_val,vpoint0,temps,dt); // vpoint0 au lieu de vpoint
       vit_imposee.echange_espace_virtuel() ;
 
-      // Etape 2.1 : determination de la domaine de discretisation
+      // Etape 2.1 : determination de le domaine de discretisation
       const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
       const IntTab& face_voisins = mon_dom_dis.face_voisins();
       assert(inco_val.dimension(0) == face_voisins.dimension(0));

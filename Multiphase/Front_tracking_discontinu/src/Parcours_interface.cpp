@@ -337,10 +337,10 @@ static void effacer_drapeaux_elements_parcourus(
 // la fonction (a*x+b*y+c*z+d) * signe est positive a l'interieur de l'element,
 // negative a l'exterieur. La normale (a,b,c) est unitaire.
 // Parametre:     domaine_vf
-// Signification: reference a la Domaine_VF. Attention, ce doit etre la meme domaine que celle qui
+// Signification: reference au Domaine_VF. Attention, ce doit etre la meme domaine que celle qui
 //                a ete associee au parcours !!!
 // Parametre:     num_element
-// Signification: numero d'un element reel de la domaine (0 <= num_element < elem_faces().dimension(0))
+// Signification: numero d'un element reel du domaine (0 <= num_element < elem_faces().dimension(0))
 // Parametre:     num_face_element
 // Signification: numero d'une face de l'element (0 <= num_face_element < elem_faces().dimension(1))
 // Parametre:     a,b,c,d
@@ -1947,7 +1947,7 @@ double Parcours_interface::volume_hexaedre(const Domaine_VF& domaine_vf,
  *   barycentrique de l'intersection definie par I = (1-pos) * P0 + pos * P1
  *   Si on ne trouve pas d'intersection, pos_intersection est inchange.
  *  Valeur de retour:
- *   Si une intersection a ete trouvee, numero de la face de sortie dans la domaine_vf
+ *   Si une intersection a ete trouvee, numero de la face de sortie dans le domaine_vf
  *   (peut servir d'index dans face_voisins par exemple).
  *   Sinon, renvoie -1.
  *
@@ -2015,7 +2015,7 @@ int Parcours_interface::calculer_face_sortie_element(const Domaine_VF& domaine_v
  *   l'arete de la face qui est coupee par le segment [P0,p(P1)] (aretes
  *   telles qu'elles sont definies dans la classe Connectivite_frontieres).
  *
- * @param (domaine_vf) la Domaine_VF a laquelle se rapportent les indices de face et d'element
+ * @param (domaine_vf) le Domaine_VF a laquelle se rapportent les indices de face et d'element
  * @param (face_0) le numero de la face reelle sur laquelle se trouve le point P0
  * @param (num_element) un numero d'element voisin de la face face_0
  * @param (x0, y0, z0) Coordonnees du point P0 (en 2D, z0 est ignore)
@@ -2255,7 +2255,7 @@ void Parcours_interface::calculer_normale_face_bord(int num_face, double x, doub
   nz_ = equations_plans_faces_(num_face, 2) * signe;
 }
 
-/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de la domaine_vf a une
+/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de le domaine_vf a une
  *
  *   distance >= Erreur_max_coordonnees_ par un algorithme d'Uzawa.
  *  Valeur de retour: distance finale du sommet aux faces de l'element

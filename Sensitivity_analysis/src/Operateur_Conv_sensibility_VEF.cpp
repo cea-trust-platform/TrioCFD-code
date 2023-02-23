@@ -490,11 +490,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
           type_op_boucle = centre;
           gradient.ref(gradient_elem);
         }
-      // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+      // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
       //  - polyedres bords et joints
       //  - polyedres bords et non joints
       // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-      // dans la domaine
+      // dans le domaine
       // boucle sur les polys
       for (poly=0; poly<nb_elem_tot; poly++)
         {
@@ -980,11 +980,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la domaine
+  // dans le domaine
   // boucle sur les polys
 
   for (poly=0; poly<nb_elem_tot; poly++)
@@ -1371,11 +1371,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
   const IntTab& KEL=type_elemvef.KEL();
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la domaine
+  // dans le domaine
   // boucle sur les polys
 
   for (poly=0; poly<nb_elem_tot; poly++)
@@ -1830,11 +1830,11 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
   // le calcul du pas de temps de stabilite
   fluent_ = 0;
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la domaine
+  // dans le domaine
 
   // boucle sur les polys
   for (poly=0; poly<nb_elem_tot; poly++)

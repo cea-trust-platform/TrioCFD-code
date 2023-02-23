@@ -179,7 +179,7 @@ protected:
   // suppose que les calculs geometriques ont la precision relative
   // suivante:
   static const double Erreur_relative_maxi_;
-  // On suppose que toutes les coordonnees de la domaine sont inferieures a cette valeur:
+  // On suppose que toutes les coordonnees du domaine sont inferieures a cette valeur:
   double Valeur_max_coordonnees_;
   // Cette valeur est egale a Erreur_relative_maxi_ * valeur_max_coordonnees_ :
   double Erreur_max_coordonnees_;

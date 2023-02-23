@@ -148,7 +148,7 @@ void Paroi_frottante_loi::me_calculer()
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, domaine_Cl_dis().equation().probleme().domaine_dis().valeur());
 
-  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la domaine
+  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces du domaine
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   const DoubleTab& vit   = domaine_Cl_dis().equation().probleme().get_champ("vitesse").valeurs(),
                    &rho = domaine_Cl_dis().equation().probleme().get_champ("masse_volumique").valeurs(),
@@ -204,7 +204,7 @@ void Paroi_frottante_loi::me_calculer()
         valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
 
         /*
-                // Test : faire frotter un peu quand même
+                // Test : faire frotter un peu quand meme
                 int f_domaine = f + f1; // number of the face in the domaine
                 int e = f_e(f_domaine,0);
                 valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;

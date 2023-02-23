@@ -127,7 +127,6 @@ public:
   //Pour acceder a un champ de la liste portee pas le postraitement.
   virtual const Champ_Generique_base& get_champ_post(const Motcle& nom) const;
   virtual int comprend_champ_post(const Motcle& nom) const;
-  virtual int verifie_tdeb_tfin(const Motcle& nom) const;
 
   // Fonctions de recherche de IntTab pour le postraitement
   virtual int a_pour_IntVect(const Motcle&, REF(IntVect)& ) const;
@@ -213,8 +212,6 @@ protected :
   int reprise_effectuee_, reprise_version_, restart_file, coupled_; // Flag to indicate it is a part of a coupled problem
   int resuming_in_progress_; //true variable only during the time step during which a resumption of computation is carried out
   Nom nom_fich, format_sauv;
-
-  mutable double tstat_deb_, tstat_fin_;
 
   static long int file_size;        // Espace disque pris par les sauvegarde XYZ
   static int bad_allocate;        // 1 si allocation reussi, 0 sinon

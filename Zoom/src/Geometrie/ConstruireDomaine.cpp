@@ -41,13 +41,13 @@ Entree& ConstruireDomaine::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete Raffiner Triangule 1 a 1 toutes les domaines du domaine
+/*! @brief Fonction principale de l'interprete Raffiner Triangule 1 a 1 tous les domaines
  *
  *     specifie par la directive.
- *     On triangule la domaine grace a la methode:
+ *     On triangule le domaine grace a la methode:
  *       void Raffiner::raffiner(Domaine& domaine) const
  *     Raffiner signifie ici transformer en triangle des
- *     elements geometrique d'une domaine.
+ *     elements geometrique d'un domaine.
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree
@@ -240,9 +240,9 @@ void ConstruireDomaine::creer_bords(Domaine& domaineraf, Sous_Domaine& ssz, IntT
                                      elem_faces);
   }
 
-  Cerr << "Dans ConstruireDomaine  La domaine construite nb elem ; nb som = " << domaineraf.nb_elem() << " " << domaineraf.nb_som() << finl;
-  Cerr << "Dans ConstruireDomaine  La domaine construite nb bords = " << domaineraf.nb_faces_bord() << finl;
-  Cerr << "Dans ConstruireDomaine  La domaine construite  bords = " << domaineraf.faces_bord() << finl;
-  //Cerr << "Dans ConstruireDomaine  La domaine0  bords = " << domaine0.faces_bord() << finl;
+  Cerr << "Dans ConstruireDomaine  Le domaine construit nb elem ; nb som = " << domaineraf.nb_elem() << " " << domaineraf.nb_som() << finl;
+  Cerr << "Dans ConstruireDomaine  Le domaine construit nb bords = " << domaineraf.nb_faces_bord() << finl;
+  Cerr << "Dans ConstruireDomaine  Le domaine construit  bords = " << domaineraf.faces_bord() << finl;
+  //Cerr << "Dans ConstruireDomaine  Le domaine0  bords = " << domaine0.faces_bord() << finl;
 
 }

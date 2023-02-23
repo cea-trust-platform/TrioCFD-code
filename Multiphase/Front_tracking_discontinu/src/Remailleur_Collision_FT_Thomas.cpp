@@ -610,10 +610,10 @@ double  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const
 //VOIR : Remailleur_Collision_FT_Thomas::voisinage_sommets()
 int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
                                                      ArrOfInt& liste_voisins,
-                                                     const Domaine_dis_base& une_domaine_dis) const
+                                                     const Domaine_dis_base& un_domaine_dis) const
 {
   //  const Maillage_FT_Disc& maillage = ;
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,une_domaine_dis);
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,un_domaine_dis);
   const Domaine& domaine = domaine_VF.domaine();
 
   const int nb_som_elem = domaine.nb_som_elem();
@@ -697,10 +697,10 @@ int  Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite2(co
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins()
-int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Domaine_dis_base& une_domaine_dis) const
+int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Domaine_dis_base& un_domaine_dis) const
 {
   ArrOfInt liste_voisins;
-  elements_voisins(elem,liste_voisins,une_domaine_dis);
+  elements_voisins(elem,liste_voisins,un_domaine_dis);
   return liste_voisins.size_array();
 }
 
@@ -711,10 +711,10 @@ int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const D
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite()
-int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem, const Domaine_dis_base& une_domaine_dis) const
+int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem, const Domaine_dis_base& un_domaine_dis) const
 {
   ArrOfInt liste_voisins;
-  elements_voisins(elem,liste_voisins,une_domaine_dis);
+  elements_voisins(elem,liste_voisins,un_domaine_dis);
   elements_voisins_a_distance_plus_petite2(elem,liste_voisins);
   return liste_voisins.size_array();
 }
