@@ -645,7 +645,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_dom
   coord_domaine.resize(nb_coord_domaine_max,dimension);
 
 
-  // remplir un tableau pour toutes les faces de le domaine ordonnes selon leurs coordonnees, avec des vides a -1
+  // remplir un tableau pour toutes les faces du domaine ordonnes selon leurs coordonnees, avec des vides a -1
   tab_domaine.resize(nb_coord_domaine(0),nb_coord_domaine(1),nb_coord_domaine(2));
   tab_domaine = -1;
   IntVect index(3);

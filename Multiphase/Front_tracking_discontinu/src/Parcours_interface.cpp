@@ -2255,7 +2255,7 @@ void Parcours_interface::calculer_normale_face_bord(int num_face, double x, doub
   nz_ = equations_plans_faces_(num_face, 2) * signe;
 }
 
-/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de le domaine_vf a une
+/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem du domaine_vf a une
  *
  *   distance >= Erreur_max_coordonnees_ par un algorithme d'Uzawa.
  *  Valeur de retour: distance finale du sommet aux faces de l'element

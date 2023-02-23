@@ -2358,7 +2358,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
 //
 //Les etapes de la methode sont :
 //-Calcul de la vitesse imposee a l interface a un temps donne: calcul_vitesse(...)
-//-On determine le type de le domaine discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
+//-On determine le type du domaine discretisee (is_VDF vaut 1 pour VDF et 0 pour VEF)
 // et le type  dequation traitee (is_QC vaut 0 pour  Navier_Stokes_FT_Disc et 1 sinon)
 //-Estimation de l increment de quantite de mouvement a ajouter a vpoint
 // puis ajout de cet increment : calcul_source_et_modifie_vpoint(...)
@@ -2383,7 +2383,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       calcul_vitesse(vit_imposee,inco_val,vpoint0,temps,dt); // vpoint0 au lieu de vpoint
       vit_imposee.echange_espace_virtuel() ;
 
-      // Etape 2.1 : determination de le domaine de discretisation
+      // Etape 2.1 : determination du domaine de discretisation
       const Domaine_dis_base& mon_dom_dis = domaine_dis().valeur();
       const IntTab& face_voisins = mon_dom_dis.face_voisins();
       assert(inco_val.dimension(0) == face_voisins.dimension(0));

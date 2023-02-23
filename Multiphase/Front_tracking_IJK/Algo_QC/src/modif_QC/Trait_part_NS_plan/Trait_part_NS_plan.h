@@ -75,7 +75,7 @@ protected :
   IntTab    for_each_plane_recv_flag_; // tableau de stokage des informations des plans qui post-traites
 #else
   // a revoir pour ijk:
-  IntVect Ref_Y; // pour chaque element de le domaine VDF sur ce processeur, indice global de l'element dans la direction k
+  IntVect Ref_Y; // pour chaque element du domaine VDF sur ce processeur, indice global de l'element dans la direction k
   DoubleTab  Rrhouf, racinederho;
   IntTab Tab_recap;
 #endif
