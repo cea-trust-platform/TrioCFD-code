@@ -55,23 +55,20 @@ Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
 }
 
 
-void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                                      const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                                                      const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                                                      const DoubleTab& ndv, DoubleTab& coeff) const
+void Dispersion_bulles_turbulente_Burns::coefficient(const input_t& in, output_t& out) const
 {
   const Frottement_interfacial_base& corr = ref_cast(Frottement_interfacial_base, correlation_drag_.valeur());
-  int N = ndv.dimension(0);
+  int N = out.Ctd.dimension(0);
 
   DoubleTrav coeff_drag(N, N, 2);
-  corr.coefficient( alpha, p, T, rho, mu, sigma, 0., ndv, d_bulles, coeff_drag);
+  corr.coefficient( in.alpha, in.p, in.T, in.rho, in.mu, in.sigma, in.dh, in.nv, in.d_bulles, coeff_drag);
 
-  coeff = 0;
+  out.Ctd = 0;
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
       {
-        coeff(k, n_l) = std::max( minimum_, (alpha(k)  >1.e-4) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)/alpha(k)  : nut(n_l)/Prt_ * coeff_drag(k, n_l, 0)*alpha(k)  *1.e8 );
-        coeff(n_l, k) = std::max( minimum_, (alpha(n_l)>1.e-4) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)/alpha(n_l): nut(n_l)/Prt_ * coeff_drag(n_l, k, 0)*alpha(n_l)*1.e8 );
+        out.Ctd(k, n_l) = std::max( minimum_, (in.alpha[k]  >1.e-4) ? in.nut[n_l]/Prt_ * coeff_drag(k, n_l, 0)/in.alpha[k]  : in.nut[n_l]/Prt_ * coeff_drag(k, n_l, 0)*in.alpha[k]  *1.e8 );
+        out.Ctd(n_l, k) = std::max( minimum_, (in.alpha[n_l]>1.e-4) ? in.nut[n_l]/Prt_ * coeff_drag(n_l, k, 0)/in.alpha[n_l]: in.nut[n_l]/Prt_ * coeff_drag(n_l, k, 0)*in.alpha[n_l]*1.e8 );
       }
 }

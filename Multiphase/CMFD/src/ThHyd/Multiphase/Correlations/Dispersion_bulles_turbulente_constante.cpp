@@ -14,26 +14,26 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dispersion_bulles_turbulente_LLB.cpp
+// File:        Dispersion_bulles_turbulente_constante.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Dispersion_bulles_turbulente_LLB.h>
+#include <Dispersion_bulles_turbulente_constante.h>
 #include <Pb_Multiphase.h>
 #include <TRUSTTrav.h>
 #include <Frottement_interfacial_base.h>
 #include <math.h>
 
-Implemente_instanciable(Dispersion_bulles_turbulente_LLB, "Dispersion_bulles_turbulente_LLB", Dispersion_bulles_base);
+Implemente_instanciable(Dispersion_bulles_turbulente_constante, "Dispersion_bulles_turbulente_constante", Dispersion_bulles_base);
 
-Sortie& Dispersion_bulles_turbulente_LLB::printOn(Sortie& os) const
+Sortie& Dispersion_bulles_turbulente_constante::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Dispersion_bulles_turbulente_LLB::readOn(Entree& is)
+Entree& Dispersion_bulles_turbulente_constante::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("C_td", &C_td_);
@@ -50,16 +50,13 @@ Entree& Dispersion_bulles_turbulente_LLB::readOn(Entree& is)
 }
 
 
-void Dispersion_bulles_turbulente_LLB::coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                                                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                                                    const DoubleTab& ndv, DoubleTab& coeff) const
+void Dispersion_bulles_turbulente_constante::coefficient(const input_t& in, output_t& out) const
 {
-  int N = ndv.dimension(0);
+  int N = out.Ctd.dimension(0);
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
       {
-        coeff(k, n_l) = C_td_*rho(n_l)*k_turb(n_l) ;
+        out.Ctd(k, n_l) = C_td_*in.rho[n_l]*in.k_turb[n_l] ;
       }
 }

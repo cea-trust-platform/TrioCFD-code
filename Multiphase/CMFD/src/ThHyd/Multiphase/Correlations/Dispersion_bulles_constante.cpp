@@ -50,17 +50,14 @@ Entree& Dispersion_bulles_constante::readOn(Entree& is)
 }
 
 
-void Dispersion_bulles_constante::coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                               const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                                               const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                                               const DoubleTab& ndv, DoubleTab& coeff) const
+void Dispersion_bulles_constante::coefficient(const input_t& in, output_t& out)  const
 {
-  int N = ndv.dimension(0);
+  int N = out.Ctd.dimension(0);
 
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
       {
-        coeff(k, n_l) = rho(n_l) * ndv(k,n_l) * ndv(k,n_l) * D_td_star_ ;
+        out.Ctd(k, n_l) = in.rho[n_l] * in.nv(n_l,k) * in.nv(n_l,k) * D_td_star_ ;
       }
 }
