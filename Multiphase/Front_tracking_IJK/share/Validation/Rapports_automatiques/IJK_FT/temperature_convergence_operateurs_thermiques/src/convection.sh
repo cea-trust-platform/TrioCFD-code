@@ -74,7 +74,7 @@ echo "---------------------"
 : > plot.gplot
 cat >> plot.gplot << EOF
 # #!/usr/bin/gnuplot
-set terminal png size 640,480 enhanced font "Helvetica,12"
+set terminal png large
 
 # set output '../cvgx_son.png'
 # set log xy
