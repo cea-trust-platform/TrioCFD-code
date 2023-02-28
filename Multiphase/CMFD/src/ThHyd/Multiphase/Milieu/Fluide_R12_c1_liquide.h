@@ -41,7 +41,7 @@ protected :
   void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 
 private :
-  int like_eos_ = 0;
+  // int like_eos_ = 0;
 };
 
 #endif /* Fluide_eau_c3_liquide_included */
