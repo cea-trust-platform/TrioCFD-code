@@ -32,7 +32,7 @@
 #include <Domaine_VF.h>
 
 Implemente_base(Source_Dissipation_echelle_temp_taux_diss_turb,"Source_Dissipation_echelle_temp_taux_diss_turb", Sources_Multiphase_base);
-// XD Source_Dissipation_echelle_temp_taux_diss_turb Sources_base Source_Dissipation_echelle_temp_taux_diss_turb 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
+// XD Source_Dissipation_echelle_temp_taux_diss_turb source_base Source_Dissipation_echelle_temp_taux_diss_turb 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
 
 Sortie& Source_Dissipation_echelle_temp_taux_diss_turb::printOn(Sortie& os) const {   return os;}
 
