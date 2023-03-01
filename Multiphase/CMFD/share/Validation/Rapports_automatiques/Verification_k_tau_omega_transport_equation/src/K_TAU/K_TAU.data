@@ -87,7 +87,7 @@ Lire pb
         equation_non_resolue	(t>0)
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
-        convection { centre }
+        convection { amont }
         diffusion  { turbulente k_tau { } }
         initial_conditions
         {
@@ -266,6 +266,7 @@ Lire pb
             tau elem
             vitesse elem
             viscosite_turbulente_liquide_eau elem
+	    gradient_vitesse_liquide_eau elem
             prod_k elem
             diss_k elem
             diss_tau elem

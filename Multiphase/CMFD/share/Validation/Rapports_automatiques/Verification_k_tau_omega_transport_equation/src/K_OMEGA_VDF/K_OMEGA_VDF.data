@@ -21,7 +21,6 @@ Mailler dom
     }
 }
 
-Polyedriser dom
 # END MESH #
 
 # BEGIN PARTITION
@@ -38,8 +37,13 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-PolyMAC_P0  dis
-option_PolyMAC_P0 {  }
+VDF  dis
+option_VDF 
+{
+traitement_coins oui
+traitement_gradients oui
+p_imposee_aux_faces oui
+}
 
 Schema_euler_implicite sch
 Read sch
@@ -254,7 +258,7 @@ Lire pb
             omega elem
             vitesse elem
             viscosite_turbulente_liquide_eau elem
-	    gradient_vitesse_liquide_eau elem
+	    gradient_vitesse elem
             prod_k elem
             diss_k elem
             diss_omega elem
