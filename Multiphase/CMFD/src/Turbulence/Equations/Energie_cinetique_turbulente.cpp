@@ -45,43 +45,31 @@
 
 #define old_forme
 
-Implemente_instanciable(Energie_cinetique_turbulente,"Energie_cinetique_turbulente",Convection_Diffusion_std);
+Implemente_instanciable(Energie_cinetique_turbulente,"Energie_cinetique_turbulente",Convection_diffusion_turbulence_multiphase);
 
-/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
+/*! @brief Simple appel a: Convection_diffusion_turbulence_multiphase::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Energie_cinetique_turbulente::printOn(Sortie& is) const
 {
-  return Convection_Diffusion_std::printOn(is);
+  return Convection_diffusion_turbulence_multiphase::printOn(is);
 }
 
-/*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
+/*! @brief Appelle Convection_diffusion_turbulence_multiphase::readOn(Entree&).
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree& is) le flot d'entree modifie
  */
 Entree& Energie_cinetique_turbulente::readOn(Entree& is)
 {
-  assert(l_inco_ch.non_nul());
-  assert(le_fluide.non_nul());
-  Convection_Diffusion_std::readOn(is);
+  Convection_diffusion_turbulence_multiphase::readOn(is);
   terme_convectif.set_fichier("Convection_energie_cinetique_turbulente");
   terme_convectif.set_description((Nom)"Turbulent kinetic energy transfer rate=Integral(-rho*k*ndS) [W] if SI units used");
   terme_diffusif.set_fichier("Diffusion_energie_cinetique_turbulente");
   terme_diffusif.set_description((Nom)"Turbulent kinetic energy transfer rate=Integral(mu*grad(k)*ndS) [W] if SI units used");
   return is;
-}
-
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base ou en Fluide_Ostwald.
- *
- * @param (Milieu_base& un_milieu)
- * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
- */
-void Energie_cinetique_turbulente::associer_milieu_base(const Milieu_base& un_milieu)
-{
-  le_fluide = ref_cast(Fluide_base,un_milieu);
 }
 
 const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport() const
@@ -110,54 +98,6 @@ void Energie_cinetique_turbulente::discretiser()
   champs_compris_.ajoute_champ(l_inco_ch);
   Equation_base::discretiser();
   Cerr << "Energie_cinetique_turbulente::discretiser() ok" << finl;
-}
-
-/*! @brief Renvoie le milieu physique de l'equation.
- *
- * (un Fluide_base upcaste en Milieu_base)
- *     (version const)
- *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
- */
-const Milieu_base& Energie_cinetique_turbulente::milieu() const
-{
-  return le_fluide.valeur();
-}
-
-
-/*! @brief Renvoie le milieu physique de l'equation.
- *
- * (un Fluide_base upcaste en Milieu_base)
- *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
- */
-Milieu_base& Energie_cinetique_turbulente::milieu()
-{
-  return le_fluide.valeur();
-}
-
-/*! @brief Impression des flux sur les bords sur un flot de sortie.
- *
- * Appelle Equation_base::impr(Sortie&)
- *
- * @param (Sortie& os) un flot de sortie
- * @return (int) code de retour propage
- */
-int Energie_cinetique_turbulente::impr(Sortie& os) const
-{
-  return Equation_base::impr(os);
-}
-
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
- *
- * Ici "Thermique".
- *
- * @return (Motcle&) le nom du domaine d'application de l'equation
- */
-const Motcle& Energie_cinetique_turbulente::domaine_application() const
-{
-  static Motcle mot("Turbulence");
-  return mot;
 }
 
 void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)

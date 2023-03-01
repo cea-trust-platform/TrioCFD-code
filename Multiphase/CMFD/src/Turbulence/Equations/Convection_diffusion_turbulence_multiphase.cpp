@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Taux_dissipation_turbulent.cpp
+// File:        Convection_diffusion_turbulence_multiphase.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Equations
 // Version:     /main/52
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Taux_dissipation_turbulent.h>
+#include <Convection_diffusion_turbulence_multiphase.h>
 #include <Pb_Multiphase.h>
 #include <Discret_Thyd.h>
 #include <Domaine_VF.h>
@@ -45,16 +45,16 @@
 
 #define old_forme
 
-Implemente_instanciable(Taux_dissipation_turbulent,"Taux_dissipation_turbulent",Convection_diffusion_turbulence_multiphase);
+Implemente_base(Convection_diffusion_turbulence_multiphase,"Convection_diffusion_turbulence_multiphase",Convection_Diffusion_std);
 
-/*! @brief Simple appel a: Convection_diffusion_turbulence_multiphase::printOn(Sortie&)
+/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Taux_dissipation_turbulent::printOn(Sortie& is) const
+Sortie& Convection_diffusion_turbulence_multiphase::printOn(Sortie& is) const
 {
-  return Convection_diffusion_turbulence_multiphase::printOn(is);
+  return Convection_Diffusion_std::printOn(is);
 }
 
 /*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
@@ -62,62 +62,85 @@ Sortie& Taux_dissipation_turbulent::printOn(Sortie& is) const
  * @param (Entree& is) un flot d'entree
  * @return (Entree& is) le flot d'entree modifie
  */
-Entree& Taux_dissipation_turbulent::readOn(Entree& is)
+Entree& Convection_diffusion_turbulence_multiphase::readOn(Entree& is)
 {
-  Convection_diffusion_turbulence_multiphase::readOn(is);
-  terme_convectif.set_fichier("Convection_taux_dissipation_turbulent");
-  terme_convectif.set_description((Nom)"Turbulent dissipation rate=Integral(-rho*omega*ndS) [kg] if SI units used");
-  terme_diffusif.set_fichier("Diffusion_taux_dissipation_turbulent");
-  terme_diffusif.set_description((Nom)"Turbulent dissipation rate=Integral(mu*grad(omega)*ndS) [kg] if SI units used");
+  assert(l_inco_ch.non_nul());
+  assert(le_fluide.non_nul());
+  Convection_Diffusion_std::readOn(is);
   return is;
 }
 
-const Champ_Don& Taux_dissipation_turbulent::diffusivite_pour_transport() const
+void Convection_diffusion_turbulence_multiphase::completer()
 {
-  return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
+  Convection_Diffusion_std::completer(); // en fait c'est Equation_base::completer() mais on sais pas un jour ...
+
+  const Domaine_dis& zdis = domaine_dis();
+  if (zdis.valeur().que_suis_je().debute_par("Domaine_VDF"))
+  {
+  // initialiser l'operateur grad SI VDF
+  Op_Grad_.associer_eqn(*this);
+  Op_Grad_.typer();
+  Op_Grad_.l_op_base().associer_eqn(*this);
+  const Domaine_Cl_dis& zcl = domaine_Cl_dis();
+  const Champ_Inc& inco = inconnue();
+  Op_Grad_->associer(zdis, zcl, inco);
+  }
 }
 
-const Champ_base& Taux_dissipation_turbulent::diffusivite_pour_pas_de_temps() const
-{
-  return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
-}
-
-/*! @brief Discretise l'equation.
+/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base ou en Fluide_Ostwald.
  *
+ * @param (Milieu_base& un_milieu)
+ * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
  */
-void Taux_dissipation_turbulent::discretiser()
+void Convection_diffusion_turbulence_multiphase::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
-  double temps = schema_temps().temps_courant();
-  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-  Cerr << "Turbulent dissipation rate discretization" << finl;
-  //On utilise temperature pour la directive car discretisation identique
-  dis.discretiser_champ("temperature",domaine_dis(),"omega","s", 1,nb_valeurs_temp,temps,l_inco_ch);//une seule compo, meme en multiphase
-  l_inco_ch.valeur().fixer_nature_du_champ(scalaire);
-  l_inco_ch.valeur().fixer_nom_compo(0, Nom("omega"));
-  champs_compris_.ajoute_champ(l_inco_ch);
-  Equation_base::discretiser();
-  Cerr << "Taux_dissipation_turbulent::discretiser() ok" << finl;
+  le_fluide = ref_cast(Fluide_base,un_milieu);
 }
 
-void Taux_dissipation_turbulent::calculer_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_base upcaste en Milieu_base)
+ *     (version const)
+ *
+ * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ */
+const Milieu_base& Convection_diffusion_turbulence_multiphase::milieu() const
 {
-  const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const DoubleTab& omega = eqn.inconnue().valeurs();
+  return le_fluide.valeur();
+}
 
-  /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
-  for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = omega(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_omega = eqn.inconnue()->valeur_aux_bords();
-  int Nb = b_omega.dimension_tot(0);
-  for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = b_omega(i, n);
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_base upcaste en Milieu_base)
+ *
+ * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ */
+Milieu_base& Convection_diffusion_turbulence_multiphase::milieu()
+{
+  return le_fluide.valeur();
+}
 
-  //derivee en omega : 1.
-  DoubleTab& d_omega = deriv["omega"];
-  for (d_omega.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_omega(i, n) = 1.;
+/*! @brief Impression des flux sur les bords sur un flot de sortie.
+ *
+ * Appelle Equation_base::impr(Sortie&)
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage
+ */
+int Convection_diffusion_turbulence_multiphase::impr(Sortie& os) const
+{
+  return Equation_base::impr(os);
+}
+
+/*! @brief Renvoie le nom du domaine d'application de l'equation.
+ *
+ * Ici "Turbulence".
+ *
+ * @return (Motcle&) le nom du domaine d'application de l'equation
+ */
+const Motcle& Convection_diffusion_turbulence_multiphase::domaine_application() const
+{
+  static Motcle mot("Turbulence");
+  return mot;
 }

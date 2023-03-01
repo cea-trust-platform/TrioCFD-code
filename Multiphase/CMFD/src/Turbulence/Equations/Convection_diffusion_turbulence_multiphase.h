@@ -14,42 +14,69 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Echelle_temporelle_turbulente.h
+// File:        Convection_diffusion_turbulence_multiphase.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Equations
 // Version:     /main/20
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Echelle_temporelle_turbulente_included
-#define Echelle_temporelle_turbulente_included
+#ifndef Convection_diffusion_turbulence_multiphase_included
+#define Convection_diffusion_turbulence_multiphase_included
 
-#include <Convection_diffusion_turbulence_multiphase.h>
+#include <Convection_Diffusion_std.h>
+#include <Operateur_Grad.h>
 #include <Fluide_base.h>
 #include <TRUST_Ref.h>
 
-/*! @brief classe Echelle_temporelle_turbulente Equation de transport de l'echelle temporelle turbulente (modele k-tau)
+/*! @brief classe Convection_diffusion_turbulence_multiphase Equation de transport des quantites turbulentes (k, omega, epsilon, tau)
  *
- * @sa Conv_Diffusion_std Convection_Diffusion_Temperature Convection_diffusion_turbulence_multiphase
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */
-class Echelle_temporelle_turbulente : public Convection_diffusion_turbulence_multiphase
+class Convection_diffusion_turbulence_multiphase : public Convection_Diffusion_std
 {
-  Declare_instanciable_sans_constructeur(Echelle_temporelle_turbulente);
+  Declare_base(Convection_diffusion_turbulence_multiphase);
 
 public :
 
-  Echelle_temporelle_turbulente();
+  void completer() override;
+  inline const Champ_Inc& inconnue() const override;
+  inline Champ_Inc& inconnue() override;
+  void associer_milieu_base(const Milieu_base& ) override;
+  const Milieu_base& milieu() const override;
+  Milieu_base& milieu() override;
+  int impr(Sortie& os) const override;
+  const Motcle& domaine_application() const override;
+  int positive_unkown() override {return 1;};
+  inline const Operateur_Grad& operateur_gradient_inconnue() const { return Op_Grad_;}
 
-  void discretiser() override;
+protected :
 
-  const Champ_Don& diffusivite_pour_transport() const override;
-  const Champ_base& diffusivite_pour_pas_de_temps() const override;
+  Champ_Inc l_inco_ch;
+  REF(Fluide_base) le_fluide;
+  Operateur_Grad Op_Grad_; // Pour calculer le gradient en VDF
 
-  /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
-  static void calculer_alpha_rho_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
-  std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
-  {
-    return { "alpha_rho_tau", calculer_alpha_rho_tau };
-  }
 };
+
+
+
+
+/*! @brief Renvoie le champ inconnue representant l'inconnue (k, omega, epsilon, tau) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
+inline const Champ_Inc& Convection_diffusion_turbulence_multiphase::inconnue() const
+{
+  return l_inco_ch;
+}
+
+
+/*! @brief Renvoie le champ inconnue representant l'inconnue (k, omega, epsilon, tau)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
+inline Champ_Inc& Convection_diffusion_turbulence_multiphase::inconnue()
+{
+  return l_inco_ch;
+}
 
 #endif
