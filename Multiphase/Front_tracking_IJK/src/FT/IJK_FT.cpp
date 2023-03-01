@@ -3265,6 +3265,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                     terme_repulsion_interfaces_ft_[dir],
                     terme_repulsion_interfaces_ns_[dir]);
                 }
+              post_.fill_surface_force();
               const int kmax = terme_source_interfaces_ns_[dir].nk();
               for (int k = 0; k < kmax; k++)
                 {

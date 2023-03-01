@@ -478,14 +478,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           }
       }
     }
-  if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
-    {
-      //source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
-    }
-  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
-    {
-      //source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
-    }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
       repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
@@ -718,12 +710,16 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
   if (liste_post_instantanes_.contient_("OP_CONV"))
     {
-      n--,dumplata_vector(lata_name,"DU_DT", op_conv_[0],op_conv_[1],op_conv_[2], latastep);
+      n--,dumplata_vector(lata_name,"OP_CONV", op_conv_[0],op_conv_[1],op_conv_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
     {
       n--,dumplata_cellvector(lata_name,"CELL_OP_CONV" /* AT CELL-CENTER */, cell_op_conv_, latastep);
     }
+  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
+    n--,dumplata_vector(lata_name,"RHO_SOURCE_QDM_INTERF", rho_Ssigma_[0],rho_Ssigma_[1],rho_Ssigma_[2], latastep);
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
+    n--,dumplata_cellvector(lata_name,"CELL_RHO_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_rho_Ssigma_, latastep);
 
   if ((liste_post_instantanes_.contient_("GRAD_P")) or (liste_post_instantanes_.contient_("CELL_GRAD_P")))
     n--,dumplata_vector(lata_name,"dPd", grad_P_[0], grad_P_[1], grad_P_[2], latastep);
@@ -873,7 +869,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
     {
       interpolate_to_center(cell_source_interface_,ref_ijk_ft_.terme_source_interfaces_ns_);
-      n--,dumplata_cellvector(lata_name,"SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
+      n--,dumplata_cellvector(lata_name,"CELL_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_source_interface_, latastep);
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
@@ -1856,6 +1852,18 @@ void IJK_FT_Post::fill_op_conv()
     }
 }
 
+void IJK_FT_Post::fill_surface_force()
+{
+  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
+    for (int i = 0; i < 3; i++)
+      rho_Ssigma_[i].data() = ref_ijk_ft_.terme_source_interfaces_ns_[i].data();
+
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
+    {
+      interpolate_to_center(cell_rho_Ssigma_,ref_ijk_ft_.terme_source_interfaces_ns_);
+    }
+}
+
 // Calcul du gradient de l'indicatrice et de pression :
 //   Attention, il faut que la pression et l'indicatrice soient a jour
 //   dans leur espaces virtuels avant d'appeler cette methode
@@ -2073,6 +2081,12 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
       n+=3,allocate_cell_vector(cell_op_conv_, splitting_, ref_ijk_ft_.d_velocity_[0].ghost()); // Il y a 1 ghost chez d_velocity_
       //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
     }
+
+  if (liste_post_instantanes_.contient_("OP_CONV"))
+    n+=3,allocate_velocity(rho_Ssigma_, splitting_, 0);
+  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
+    n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 0);
+
   // Pour le calcul des statistiques diphasiques :
   // (si le t_debut_stat a ete initialise... Sinon, on ne va pas les calculer au cours de ce calcul)
   if ((t_debut_statistiques_ <  1.e10) )

@@ -118,6 +118,7 @@ public:
   void reprendre_post(Param& param);
 
   void fill_op_conv();
+  void fill_surface_force();
   void calculer_gradient_indicatrice_et_pression(const IJK_Field_double& indic);
 
   // Part of the run() method in IJK_FT:
@@ -224,6 +225,9 @@ protected:
   FixedVector<IJK_Field_double, 3> ecart_ana_;
   FixedVector<IJK_Field_double, 3> op_conv_;
   FixedVector<IJK_Field_double, 3> cell_op_conv_;
+  FixedVector<IJK_Field_double, 3> rho_Ssigma_;
+  FixedVector<IJK_Field_double, 3> cell_rho_Ssigma_;
+
   FixedVector<IJK_Field_double, 3> d_velocity_ana_;
   IJK_Field_double pressure_ana_,ecart_p_ana_;
 
