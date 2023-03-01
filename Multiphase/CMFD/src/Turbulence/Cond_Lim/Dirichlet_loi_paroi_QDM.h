@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_dix.h
+// File:        Dirichlet_loi_paroi_QDM.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#ifndef Dirichlet_loi_paroi_QDM_included
+#define Dirichlet_loi_paroi_QDM_included
 
 #include <TRUSTTab.h>
 #include <Dirichlet_loi_paroi.h>
@@ -29,21 +29,19 @@
 
 class Correlation;
 
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
+/*! @brief Classe Dirichlet_loi_paroi_QDM
  *
  */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
+class Dirichlet_loi_paroi_QDM : public Dirichlet_loi_paroi
 {
 
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
+  Declare_instanciable(Dirichlet_loi_paroi_QDM);
 
 public :
   int compatible_avec_eqn(const Equation_base&) const override;
   virtual int initialiser(double temps) override;
   virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps) override;
-  double calc_tau(double y, double u_tau, double visc);
-  double calc_omega(double y, double u_tau, double visc);
   virtual void completer() override;
 
   virtual double val_imp(int i) const override {return d_(i,0);};
@@ -59,8 +57,13 @@ protected :
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
-  double facteur_paroi_=10.;
+
+  // Initialized at 0. and adapted in the readOn depending on turbulence selected
+  double y_p_prod_k_ = -1.e8 ;
+  double fac_prod_k_ = -1.e8 ;
+  double y_p_prod_k_grand_ = -1.e8 ;
+  double fac_prod_k_grand_ = -1.e8 ;
+
 };
 
 #endif

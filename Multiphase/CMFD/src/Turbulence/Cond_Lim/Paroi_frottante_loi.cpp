@@ -68,15 +68,15 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
 
 void Paroi_frottante_loi::completer()
 {
-  if (!sub_type(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base())) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
-  if sub_type(Viscosite_turbulente_k_tau, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation())
+  if (!ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb()) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
+  if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
     {
       if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
       if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
       if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
       if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
     }
-  else if sub_type(Viscosite_turbulente_k_omega, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation())
+  else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
     {
       if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
       if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
@@ -90,7 +90,6 @@ void Paroi_frottante_loi::completer()
       if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ =  0.;
       if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
     }
-
 }
 
 
@@ -104,25 +103,13 @@ void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
       tab(f + f1, n) |= 1;
 }
 
-double Paroi_frottante_loi::coefficient_frottement(int i) const
-{
-  return valeurs_coeff_(i,0);
-}
+double Paroi_frottante_loi::coefficient_frottement(int i) const {return valeurs_coeff_(i,0);}
 
-double Paroi_frottante_loi::coefficient_frottement(int i,int j) const
-{
-  return valeurs_coeff_(i,j);
-}
+double Paroi_frottante_loi::coefficient_frottement(int i,int j) const {return valeurs_coeff_(i,j);}
 
-double Paroi_frottante_loi::coefficient_frottement_grad(int i) const
-{
-  return valeurs_coeff_grad_(i,0);
-}
+double Paroi_frottante_loi::coefficient_frottement_grad(int i) const {return valeurs_coeff_grad_(i,0);}
 
-double Paroi_frottante_loi::coefficient_frottement_grad(int i,int j) const
-{
-  return valeurs_coeff_grad_(i,j);
-}
+double Paroi_frottante_loi::coefficient_frottement_grad(int i,int j) const {return valeurs_coeff_grad_(i,j);}
 
 int Paroi_frottante_loi::initialiser(double temps)
 {
