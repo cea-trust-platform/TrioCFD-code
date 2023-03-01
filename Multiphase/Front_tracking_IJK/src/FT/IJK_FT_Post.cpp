@@ -720,6 +720,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     {
       n--,dumplata_vector(lata_name,"DU_DT", op_conv_[0],op_conv_[1],op_conv_[2], latastep);
     }
+  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
+    {
+      n--,dumplata_cellvector(lata_name,"CELL_OP_CONV" /* AT CELL-CENTER */, cell_op_conv_, latastep);
+    }
 
   if ((liste_post_instantanes_.contient_("GRAD_P")) or (liste_post_instantanes_.contient_("CELL_GRAD_P")))
     n--,dumplata_vector(lata_name,"dPd", grad_P_[0], grad_P_[1], grad_P_[2], latastep);
@@ -1845,6 +1849,11 @@ void IJK_FT_Post::fill_op_conv()
   if (liste_post_instantanes_.contient_("OP_CONV"))
     for (int i = 0; i < 3; i++)
       op_conv_[i].data() = d_velocity_[i].data();
+
+  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
+    {
+      interpolate_to_center(cell_op_conv_,d_velocity_);
+    }
 }
 
 // Calcul du gradient de l'indicatrice et de pression :
@@ -2057,6 +2066,11 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
   if (liste_post_instantanes_.contient_("OP_CONV"))
     {
       n+=3,allocate_velocity(op_conv_, splitting_, ref_ijk_ft_.d_velocity_[0].ghost()); // Il y a 1 ghost chez d_velocity_
+      //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
+    }
+  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
+    {
+      n+=3,allocate_cell_vector(cell_op_conv_, splitting_, ref_ijk_ft_.d_velocity_[0].ghost()); // Il y a 1 ghost chez d_velocity_
       //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
     }
   // Pour le calcul des statistiques diphasiques :

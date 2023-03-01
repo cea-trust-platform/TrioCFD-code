@@ -223,6 +223,7 @@ protected:
   FixedVector<IJK_Field_double, 3> velocity_ana_;
   FixedVector<IJK_Field_double, 3> ecart_ana_;
   FixedVector<IJK_Field_double, 3> op_conv_;
+  FixedVector<IJK_Field_double, 3> cell_op_conv_;
   FixedVector<IJK_Field_double, 3> d_velocity_ana_;
   IJK_Field_double pressure_ana_,ecart_p_ana_;
 
