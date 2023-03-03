@@ -159,7 +159,7 @@ Chapitre {
 		labelX  "z"
 		labelY  "taux de vide"
 		Courbe {
-		   fichier diphasique_statistiques_1.944994.txt
+		   fichier diphasique_statistiques_1.951489.txt
 		   colonnes ($1) ($2)
 		}
 	}
@@ -188,7 +188,7 @@ Chapitre {
 		labelX  "z"
 		labelY  "ur"
 		Courbe {
-		   fichier diphasique_statistiques_1.944994.txt
+		   fichier diphasique_statistiques_1.951489.txt
 		   colonnes ($1) ((($7)/(1.-($2)))-(($3)/($2)))
 		}
 	}
