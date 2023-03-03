@@ -1,3 +1,4 @@
+# PARALLEL ONLY 4 #
 IJK_Grid_Geometry DOM
 
 Lire DOM
@@ -46,6 +47,7 @@ IJK_FT_double
                         VELOCITY CURL PRESSURE_LIQ PRESSURE INDICATRICE
   check_stop_file stop.txt
   dt_sauvegarde 50
+  tinit 0
   nb_pas_dt_max 100
   
   multigrid_solver {
