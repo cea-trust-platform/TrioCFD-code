@@ -141,12 +141,12 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_VDF::face_to_elem(const Domai
   tab_elems = 0.;
   for (int ele=0; ele<ne_tot; ele++)
     for (int n=0; n<N; n++)
-    for (int d=0; d<D; d++)
-    for (int s=0; s<nb_face_elem; s++) 
-    {
-      int f = elem_faces(ele, s);
-      if (fs[f]>1.e-12) tab_elems(ele, n, d) += tab_faces(f,n)*nf(f,d)/fs[f];
-    }
+      for (int d=0; d<D; d++)
+        for (int s=0; s<nb_face_elem; s++)
+          {
+            int f = elem_faces(ele, s);
+            if (fs[f]>1.e-12) tab_elems(ele, n, d) += tab_faces(f,n)*nf(f,d)/fs[f];
+          }
 
   tab_elems *= 0.5;
 }

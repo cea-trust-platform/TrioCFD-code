@@ -39,11 +39,11 @@ class Vitesse_derive_Spelt_Biesheuvel : public Vitesse_derive_base
 public:
   bool needs_grad_alpha() const override {return needs_grad_alpha_;};
   void completer() override;
-  
+
 protected:
   void evaluate_C0_vg0(const input_t& input) const override;
 
-  bool needs_grad_alpha_ = 0;  
+  bool needs_grad_alpha_ = 0;
   double Prt_ = 1.;
 };
 

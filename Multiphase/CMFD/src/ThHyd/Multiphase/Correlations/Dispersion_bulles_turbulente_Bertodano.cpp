@@ -49,7 +49,7 @@ Entree& Dispersion_bulles_turbulente_Bertodano::readOn(Entree& is)
 }
 
 
-void Dispersion_bulles_turbulente_Bertodano::coefficient(const input_t& in, output_t& out) const 
+void Dispersion_bulles_turbulente_Bertodano::coefficient(const input_t& in, output_t& out) const
 {
   const Frottement_interfacial_base& corr = ref_cast(Frottement_interfacial_base, correlation_drag_.valeur());
   int N = out.Ctd.dimension(0);

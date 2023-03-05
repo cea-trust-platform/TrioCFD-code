@@ -62,7 +62,7 @@ void Loi_paroi_adaptative::completer()
   int nf_tot = domaine.nb_faces_tot();
 
   valeurs_loi_paroi_["y_plus"] = DoubleTab(0,1); // pour l'instant, turbulence dans seulement une phase
-  valeurs_loi_paroi_["y_plus_elem"] = DoubleTab(0,1); 
+  valeurs_loi_paroi_["y_plus_elem"] = DoubleTab(0,1);
   valeurs_loi_paroi_["y"] = DoubleTab(0,1);
   valeurs_loi_paroi_["u_plus"] = DoubleTab(0,1);
   valeurs_loi_paroi_["dyp_u_plus"] = DoubleTab(0,1);
@@ -122,11 +122,11 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
   DoubleTab pvit_elem(0, N * dimension);
   if (nf_tot == vit.dimension_tot(0))
-  {
-  const Champ_Face_base& ch = ref_cast(Champ_Face_base, pb_->equation(0).inconnue().valeur());
-  domaine.domaine().creer_tableau_elements(pvit_elem);
-  ch.get_elem_vector_field(pvit_elem, true);
-  }
+    {
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, pb_->equation(0).inconnue().valeur());
+      domaine.domaine().creer_tableau_elements(pvit_elem);
+      ch.get_elem_vector_field(pvit_elem, true);
+    }
 
   int n=0; // pour l'instant, turbulence dans seulement une phase
 
@@ -140,15 +140,15 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
         double u_orth = 0 ;
         DoubleTrav u_parallel(D);
         if (nf_tot == vit.dimension_tot(0))
-        {
-        for (int d = 0; d <D ; d++) u_orth -= pvit_elem(e, n*D+d)*n_f(f,d)/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e, n*D+d) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        }
+          {
+            for (int d = 0; d <D ; d++) u_orth -= pvit_elem(e, n*D+d)*n_f(f,d)/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+            for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e, n*D+d) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          }
         else
-        {
-        for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e * D+d, n)*n_f(f,d)/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        }
+          {
+            for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e * D+d, n)*n_f(f,d)/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+            for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          }
 
         double residu = 0 ;
         for (int d = 0; d <D ; d++) residu += u_parallel(d)*n_f(f,d)/fs(f);

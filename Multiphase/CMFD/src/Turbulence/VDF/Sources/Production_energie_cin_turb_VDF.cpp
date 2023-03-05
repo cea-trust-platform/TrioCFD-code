@@ -38,7 +38,7 @@ Implemente_instanciable(Production_energie_cin_turb_VDF,"Production_energie_cin_
 Sortie& Production_energie_cin_turb_VDF::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
 Entree& Production_energie_cin_turb_VDF::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
 
-void Production_energie_cin_turb_VDF::completer() 
+void Production_energie_cin_turb_VDF::completer()
 {
   const Navier_Stokes_std&     eq_qdm 	= ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   if (ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()==nullptr) Process::exit(que_suis_je() + " : the momentum diffusion must be turbulent !");
@@ -69,7 +69,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
   int e, n, mp;
 
   const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_qdm.inconnue().valeur());
-  DoubleTrav    tab_grad(ne_tot, D, D);//, tab_vit_liq(nf_tot);  
+  DoubleTrav    tab_grad(ne_tot, D, D);//, tab_vit_liq(nf_tot);
 //  boucle remplit  tab_vit_liq;
   ch_vit.calcul_duidxj(ch_vit.passe(), tab_grad, ref_cast(Domaine_Cl_VDF, ch_vit.domaine_Cl_dis().valeur()));
 

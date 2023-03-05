@@ -36,7 +36,7 @@ Entree& Vitesse_derive_Spelt_Biesheuvel::readOn(Entree& is)
   return is;
 }
 
-void Vitesse_derive_Spelt_Biesheuvel::completer() 
+void Vitesse_derive_Spelt_Biesheuvel::completer()
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, pb_.valeur());
   if (!pbm.has_correlation("frottement_interfacial")) Process::exit(que_suis_je() + " : there must be an interfacial friction correlation in the problem !");
@@ -56,15 +56,16 @@ void Vitesse_derive_Spelt_Biesheuvel::evaluate_C0_vg0(const input_t& in) const
   const Frottement_interfacial_base& correlation_fi = ref_cast(Frottement_interfacial_base, pbm.get_correlation("frottement_interfacial").valeur());
   for (int n=0; n<N ; n++) alpha_l(n)= std::max(in.alpha(n), 1.e-3);
 
-	do
-	{
-    dv(n_g,n_l) = dv0;
-    dv(n_l,n_g) = dv0;
-    correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);		
-    dv0 = dv0 - (coeff(n_l, n_g, 0)*dv0 - norm_g*alpha_l(n_g)*(in.rho[n_l]*in.alpha[n_l]+in.rho[n_g]*in.alpha[n_g] - in.rho[n_g])) / (coeff(n_l, n_g, 1)*dv0 + coeff(n_l, n_g, 0));
-	  step = step+1;
-    if(step > iter_max) Process::exit(que_suis_je() + " : Newton algorithm not converging to find relative velocity !");
-  }while(std::abs(coeff(n_l, n_g, 0)*dv0 - norm_g*alpha_l(n_g)*(in.rho[n_l]*in.alpha[n_l]+in.rho[n_g]*in.alpha[n_g]- in.rho[n_g])) > epsilon);
+  do
+    {
+      dv(n_g,n_l) = dv0;
+      dv(n_l,n_g) = dv0;
+      correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);
+      dv0 = dv0 - (coeff(n_l, n_g, 0)*dv0 - norm_g*alpha_l(n_g)*(in.rho[n_l]*in.alpha[n_l]+in.rho[n_g]*in.alpha[n_g] - in.rho[n_g])) / (coeff(n_l, n_g, 1)*dv0 + coeff(n_l, n_g, 0));
+      step = step+1;
+      if(step > iter_max) Process::exit(que_suis_je() + " : Newton algorithm not converging to find relative velocity !");
+    }
+  while(std::abs(coeff(n_l, n_g, 0)*dv0 - norm_g*alpha_l(n_g)*(in.rho[n_l]*in.alpha[n_l]+in.rho[n_g]*in.alpha[n_g]- in.rho[n_g])) > epsilon);
 
   /* distribution parameter */
   C0 = 1;

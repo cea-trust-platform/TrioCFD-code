@@ -88,7 +88,8 @@ int Dirichlet_loi_paroi_QDM::compatible_avec_eqn(const Equation_base& eqn) const
   Motcle Turbulence="Hydraulique";
 
   if (dom_app==Turbulence) return 1;
-  else err_pas_compatible(eqn); return 0;
+  else err_pas_compatible(eqn);
+  return 0;
 }
 
 void Dirichlet_loi_paroi_QDM::mettre_a_jour(double tps)
@@ -128,19 +129,19 @@ void Dirichlet_loi_paroi_QDM::me_calculer()
   // Recuperation des vitesses aux elements
   DoubleTab pvit_elem(0, Nv * dimension);
   if (nf_tot == vit.dimension_tot(0))
-  {
-  const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue().valeur());
-  domaine.domaine().creer_tableau_elements(pvit_elem);
-  ch.get_elem_vector_field(pvit_elem, true);
-  }
+    {
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue().valeur());
+      domaine.domaine().creer_tableau_elements(pvit_elem);
+      ch.get_elem_vector_field(pvit_elem, true);
+    }
 
   // On recupere la diffusivite totale
   DoubleTab mu = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport().passe() ;  // Copie expres !!!
   if (ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb())
-  {
-  const Viscosite_turbulente_base& corr_visc = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
-  corr_visc.modifier_mu(mu) ;
-  }
+    {
+      const Viscosite_turbulente_base& corr_visc = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+      corr_visc.modifier_mu(mu) ;
+    }
 
   int n = 0 ; // la phase turbulente frotte
   for (int f =0 ; f < nf ; f++)
@@ -151,15 +152,15 @@ void Dirichlet_loi_paroi_QDM::me_calculer()
       double u_orth = 0 ;
       DoubleTrav u_parallel(D);
       if (nf_tot == vit.dimension_tot(0)) // PolyMAC
-      {
-        for (int d = 0; d <D ; d++) u_orth -= pvit_elem(e_domaine, Nv*d+n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e_domaine, Nv*d+n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-      }
+        {
+          for (int d = 0; d <D ; d++) u_orth -= pvit_elem(e_domaine, Nv*d+n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e_domaine, Nv*d+n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+        }
       else // VDF
-      {
-        for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e_domaine * D+d, n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-        for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e_domaine * D + d, n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-      }
+        {
+          for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e_domaine * D+d, n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e_domaine * D + d, n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+        }
       double norm_u_parallel = std::sqrt(domaine.dot(&u_parallel(0), &u_parallel(0)));
 
       double y_loc = y(f_domaine,  n);
@@ -174,8 +175,8 @@ void Dirichlet_loi_paroi_QDM::me_calculer()
     }
 
   for (n=1 ; n<N ; n++)
-   for (int d=0 ; d<D ; d++)
-    for (int f =0 ; f < nf ; f++) d_(f, N*d + n) = 0; // les phases non turbulentes sont non porteuses : dirichlet vitesse paroi = vitesse fluide
+    for (int d=0 ; d<D ; d++)
+      for (int f =0 ; f < nf ; f++) d_(f, N*d + n) = 0; // les phases non turbulentes sont non porteuses : dirichlet vitesse paroi = vitesse fluide
 
   d_.echange_espace_virtuel();
 }
