@@ -23,12 +23,7 @@ function updateTRAD2_ajout0()
   do
     if [[ $(diff ${TURB} ${f}) ]]
     then
-      # On recupere le resultat du diff et on fait plusieurs choses :
-      # 1 - on supprime les lignes qui commencent par "<" qui concernent le fichier de reference
-      # 2 - on supprime l'indication donneée par diff des lignes qui different
-      # 3 - on garde les lignes de diff du fichier 2 mais on enleve "> "
-      # Il y a surement moyen de faire plus simple et plus elegant... a revoir par la suite
-      diff ${TURB} ${f} | sed -r "/^</d" | sed -r "s/^[^>].*//gmi" | sed -r "s/^> (.*)/\1/gmi" >> ${RES} 
+      comm -13 ${TURB} ${f} >> ${RES}
     fi
   done
 }
