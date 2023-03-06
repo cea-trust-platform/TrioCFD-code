@@ -17,6 +17,7 @@
 #define Fluide_R12_c1_liquide_included
 
 #include <Fluide_reel_base.h>
+#include <Lois_R12_c1.h>
 
 class Fluide_R12_c1_liquide: public Fluide_reel_base
 {

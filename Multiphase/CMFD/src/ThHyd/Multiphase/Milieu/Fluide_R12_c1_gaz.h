@@ -17,6 +17,7 @@
 #define Fluide_R12_c1_gaz_included
 
 #include <Fluide_reel_base.h>
+#include <Lois_R12_c1.h>
 
 class Fluide_R12_c1_gaz: public Fluide_reel_base
 {
