@@ -142,7 +142,7 @@ void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
     {
       const Transport_turbulent_base& corr_transport = ref_cast(Transport_turbulent_base, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
       const Viscosite_turbulente_base& corr_visc = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().probleme().equation(0).operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
-      corr_transport.modifier_nu( ref_cast(Convection_Diffusion_std, domaine_Cl_dis().equation()), corr_visc, mu) ;
+      corr_transport.modifier_mu( ref_cast(Convection_Diffusion_std, domaine_Cl_dis().equation()), corr_visc, mu) ;
     }
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();

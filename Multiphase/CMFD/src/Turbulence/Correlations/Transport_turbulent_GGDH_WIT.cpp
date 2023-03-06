@@ -49,7 +49,7 @@ Entree& Transport_turbulent_GGDH_WIT::readOn(Entree& is)
   return is;
 }
 
-void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
+void Transport_turbulent_GGDH_WIT::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    alp = pb_->get_champ("alpha").passe(), diam = pb_->get_champ("diametre_bulles").valeurs(),
