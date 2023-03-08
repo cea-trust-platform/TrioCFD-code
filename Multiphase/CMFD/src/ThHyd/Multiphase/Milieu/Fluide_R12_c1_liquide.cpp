@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <Fluide_R12_c1_liquide.h>
-#include <Lois_R12_c1.h>
 
 Implemente_instanciable(Fluide_R12_c1_liquide, "Fluide_R12_c1_liquide", Fluide_reel_base);
 

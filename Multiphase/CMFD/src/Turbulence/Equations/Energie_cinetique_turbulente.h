@@ -23,15 +23,16 @@
 #ifndef Energie_cinetique_turbulente_included
 #define Energie_cinetique_turbulente_included
 
-#include <Convection_Diffusion_std.h>
+#include <Convection_diffusion_turbulence_multiphase.h>
+#include <Operateur_Grad.h>
 #include <Fluide_base.h>
 #include <TRUST_Ref.h>
 
 /*! @brief classe Energie_cinetique_turbulente Equation de transport d'une energie cinetique turbulente (modeles k-{eps,omega,tau})
  *
- * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature Convection_diffusion_turbulence_multiphase
  */
-class Energie_cinetique_turbulente : public Convection_Diffusion_std
+class Energie_cinetique_turbulente : public Convection_diffusion_turbulence_multiphase
 {
   Declare_instanciable_sans_constructeur(Energie_cinetique_turbulente);
 
@@ -39,17 +40,10 @@ public :
 
   Energie_cinetique_turbulente();
 
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
   void discretiser() override;
-  const Milieu_base& milieu() const override;
-  Milieu_base& milieu() override;
-  void associer_milieu_base(const Milieu_base& ) override;
-  int impr(Sortie& os) const override;
+
   const Champ_Don& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
-
-  const Motcle& domaine_application() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
   static void calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
@@ -57,35 +51,6 @@ public :
   {
     return { "alpha_rho_k", calculer_alpha_rho_k };
   }
-
-  int positive_unkown() override {return 1;};
-
-protected :
-
-  Champ_Inc l_inco_ch;
-  REF(Fluide_base) le_fluide;
 };
-
-
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline const Champ_Inc& Energie_cinetique_turbulente::inconnue() const
-{
-  return l_inco_ch;
-}
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline Champ_Inc& Energie_cinetique_turbulente::inconnue()
-{
-  return l_inco_ch;
-}
 
 #endif

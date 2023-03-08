@@ -40,7 +40,7 @@ public:
   {
     return 1; //isotrope
   }
-  void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
+  void modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
   inline double sigma() const {return sigma_;};
 
 private:

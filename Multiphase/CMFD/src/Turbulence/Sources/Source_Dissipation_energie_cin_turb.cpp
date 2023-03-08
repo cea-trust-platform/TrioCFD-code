@@ -62,7 +62,6 @@ void Source_Dissipation_energie_cin_turb::completer()
   if (ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()==nullptr) Process::exit(que_suis_je() + " : the momentum diffusion must be turbulent !");
 }
 
-
 void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());

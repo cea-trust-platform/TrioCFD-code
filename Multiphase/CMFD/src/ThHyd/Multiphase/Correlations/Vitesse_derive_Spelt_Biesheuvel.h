@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,53 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_dix.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
-// Version:     /main/13
+// File:        Vitesse_derive_Spelt_Biesheuvel.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
+// Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#ifndef Vitesse_derive_Spelt_Biesheuvel_included
+#define Vitesse_derive_Spelt_Biesheuvel_included
+#include <Vitesse_derive_base.h>
 
-#include <TRUSTTab.h>
-#include <Dirichlet_loi_paroi.h>
-#include <TRUST_Ref.h>
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    classe Vitesse_derive_Spelt_Biesheuvel
+//      vitesse de derive entre une phase gaz et une phase liquide
+//
+//////////////////////////////////////////////////////////////////////////////
 
-class Correlation;
-
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
- *
- */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
+class Vitesse_derive_Spelt_Biesheuvel : public Vitesse_derive_base
 {
+  Declare_instanciable(Vitesse_derive_Spelt_Biesheuvel);
 
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
+public:
+  bool needs_grad_alpha() const override {return needs_grad_alpha_;};
+  void completer() override;
 
-public :
-  int compatible_avec_eqn(const Equation_base&) const override;
-  virtual int initialiser(double temps) override;
-  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-  double calc_tau(double y, double u_tau, double visc);
-  double calc_omega(double y, double u_tau, double visc);
-  virtual void completer() override;
+protected:
+  void evaluate_C0_vg0(const input_t& input) const override;
 
-  virtual double val_imp(int i) const override {return d_(i,0);};
-  virtual double val_imp(int i, int j) const override {return d_(i,j);};
-  virtual double val_imp_au_temps(double temps, int i) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
-  virtual double val_imp_au_temps(double temps, int i, int j) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
-
-protected :
-  void me_calculer();
-
-  DoubleTab d_;
-
-  double von_karman_ = 0.41 ;
-  double beta_omega = 0.075;
-  double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
-  double facteur_paroi_=10.;
+  bool needs_grad_alpha_ = 0;
+  double Prt_ = 1.;
 };
 
 #endif

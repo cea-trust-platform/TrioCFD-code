@@ -14,36 +14,31 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dispersion_bulles_turbulente_GTD.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Production_energie_cin_turb_VDF.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dispersion_bulles_turbulente_GTD_included
-#define Dispersion_bulles_turbulente_GTD_included
-#include <Dispersion_bulles_base.h>
-#include <Correlation.h>
+#ifndef Production_energie_cin_turb_VDF_included
+#define Production_energie_cin_turb_VDF_included
 
-/*! @brief classe Dispersion_bulles_turbulente_GTD coefficients de dispersion turbulente de bulles slon le modele Lavieville et al 2017
+#include <Source_Production_energie_cin_turb.h>
+
+class Correlation;
+
+/*! @brief Classe Production_energie_cin_turb_VDF Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
  *
  *
  *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
  */
-class Dispersion_bulles_turbulente_GTD : public Dispersion_bulles_base
+class Production_energie_cin_turb_VDF: public Source_Production_energie_cin_turb
 {
-  Declare_instanciable(Dispersion_bulles_turbulente_GTD);
-public:
-  void coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                    const DoubleTab& ndv, DoubleTab& coeff) const override;
-
-protected:
-  Correlation correlation_drag_;
-  Correlation correlation_MA_;
-  int n_l = -1; //phase liquide
-  double Prt_ = .9 ; // Turbulent Prandtl number
+  Declare_instanciable(Production_energie_cin_turb_VDF);
+public :
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void completer() override;
 };
 
 #endif

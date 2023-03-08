@@ -14,52 +14,30 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dispersion_bulles_turbulente_LLB.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Production_echelle_temp_taux_diss_turb_VDF.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Dispersion_bulles_turbulente_LLB.h>
-#include <Pb_Multiphase.h>
-#include <TRUSTTrav.h>
-#include <Frottement_interfacial_base.h>
-#include <math.h>
+#ifndef Production_echelle_temp_taux_diss_turb_VDF_included
+#define Production_echelle_temp_taux_diss_turb_VDF_included
 
-Implemente_instanciable(Dispersion_bulles_turbulente_LLB, "Dispersion_bulles_turbulente_LLB", Dispersion_bulles_base);
+#include <Source_Production_echelle_temp_taux_diss_turb.h>
 
-Sortie& Dispersion_bulles_turbulente_LLB::printOn(Sortie& os) const
+class Correlation;
+
+/*! @brief Classe Production_echelle_temp_taux_diss_turb_VDF Cette classe implemente dans PolyMAC_P0 un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
+class Production_echelle_temp_taux_diss_turb_VDF: public Source_Production_echelle_temp_taux_diss_turb
 {
-  return os;
-}
+  Declare_instanciable(Production_echelle_temp_taux_diss_turb_VDF);
+public :
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+};
 
-Entree& Dispersion_bulles_turbulente_LLB::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("C_td", &C_td_);
-  param.lire_avec_accolades_depuis(is);
-
-  const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : NULL;
-
-  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
-    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
-  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
-
-  return is;
-}
-
-
-void Dispersion_bulles_turbulente_LLB::coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                                                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                                                    const DoubleTab& ndv, DoubleTab& coeff) const
-{
-  int N = ndv.dimension(0);
-
-  for (int k = 0; k < N; k++)
-    if (k!=n_l)
-      {
-        coeff(k, n_l) = C_td_*rho(n_l)*k_turb(n_l) ;
-      }
-}
+#endif

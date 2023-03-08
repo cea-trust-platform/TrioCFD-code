@@ -14,29 +14,26 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dispersion_bulles_turbulente_Burns.h
+// File:        Dispersion_bulles_turbulente_constante.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dispersion_bulles_turbulente_LLB_included
-#define Dispersion_bulles_turbulente_LLB_included
+#ifndef Dispersion_bulles_turbulente_constante_included
+#define Dispersion_bulles_turbulente_constante_included
 #include <Dispersion_bulles_base.h>
 
-/*! @brief classe Dispersion_bulles_turbulente_LLB coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
+/*! @brief classe Dispersion_bulles_turbulente_constante coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
  *
  *
  *
  */
-class Dispersion_bulles_turbulente_LLB : public Dispersion_bulles_base
+class Dispersion_bulles_turbulente_constante : public Dispersion_bulles_base
 {
-  Declare_instanciable(Dispersion_bulles_turbulente_LLB);
+  Declare_instanciable(Dispersion_bulles_turbulente_constante);
 public:
-  void coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                    const DoubleTab& ndv, DoubleTab& coeff) const override;
+  void coefficient(const input_t& input, output_t& output) const override;
 
 protected:
   int n_l = -1; //phase liquide

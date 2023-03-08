@@ -49,22 +49,19 @@ Entree& Dispersion_bulles_turbulente_Bertodano::readOn(Entree& is)
 }
 
 
-void Dispersion_bulles_turbulente_Bertodano::coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                                          const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                                                          const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                                                          const DoubleTab& ndv, DoubleTab& coeff) const
+void Dispersion_bulles_turbulente_Bertodano::coefficient(const input_t& in, output_t& out) const
 {
   const Frottement_interfacial_base& corr = ref_cast(Frottement_interfacial_base, correlation_drag_.valeur());
-  int N = ndv.dimension(0);
+  int N = out.Ctd.dimension(0);
 
   DoubleTrav coeff_CD(N, N);
-  corr.coefficient_CD( alpha, p, T, rho, mu, sigma, 0., ndv, d_bulles, coeff_CD);
+  corr.coefficient_CD( in.alpha, in.p, in.T, in.rho, in.mu, in.sigma, in.dh, in.nv, in.d_bulles, coeff_CD);
 
   for (int k = 0; k < N; k++)
     if (k!=n_l)
       {
-        double t_c = nut(n_l) / k_turb(n_l) ;
-        double t_d = 4./3.*rho(k)*d_bulles(k)/(coeff_CD(k, n_l)*rho(n_l)*ndv(n_l,k));
-        coeff(k, n_l) = 2.*rho(n_l)*k_turb(n_l) * t_c*t_c/(t_d*(t_c+t_d));
+        double t_c = in.nut[n_l] / in.k_turb[n_l] ;
+        double t_d = 4./3.*in.rho[k]*in.d_bulles[k]/(coeff_CD(k, n_l)*in.rho[n_l]*in.nv(n_l,k));
+        out.Ctd(k, n_l) = 2.*in.rho[n_l]*in.k_turb[n_l] * t_c*t_c/(t_d*(t_c+t_d));
       }
 }

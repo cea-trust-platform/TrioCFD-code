@@ -14,53 +14,41 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_dix.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
-// Version:     /main/13
+// File:        Diffusion_croisee_echelle_temp_taux_diss_turb_VDF_P0_VDF.h
+// Directory:   $TRUST_ROOT/src/VDF/Sources
+// Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#ifndef Diffusion_croisee_echelle_temp_taux_diss_turb_VDF_included
+#define Diffusion_croisee_echelle_temp_taux_diss_turb_VDF_included
 
-#include <TRUSTTab.h>
-#include <Dirichlet_loi_paroi.h>
-#include <TRUST_Ref.h>
+#include <Source_Diffusion_croisee_echelle_temp_taux_diss_turb.h>
 
-class Correlation;
-
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
+class Convection_Diffusion_std;
+/*! @brief class Diffusion_croisee_echelle_temp_taux_diss_turb_VDF
+ *
+ *  Terme de diffusion croisee dans l'equation de transport de tau (tau = 1 / omega) ou de omega dans les modeles de turbulence k-tau et k-omega
+ *  Cd = sigma_d * alpha * rho *tau * min(grad k, grad tau, 0)
+ *
+ *  la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
+ *  Actuellement k et tau sont necessairement scalaires.
+ *  Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
+ *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
+class Diffusion_croisee_echelle_temp_taux_diss_turb_VDF : public Source_Diffusion_croisee_echelle_temp_taux_diss_turb 	// Terme_Source_PolyMAC_P0_base
 {
 
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
+  Declare_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_VDF);
 
-public :
-  int compatible_avec_eqn(const Equation_base&) const override;
-  virtual int initialiser(double temps) override;
-  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-  double calc_tau(double y, double u_tau, double visc);
-  double calc_omega(double y, double u_tau, double visc);
-  virtual void completer() override;
+public:
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
-  virtual double val_imp(int i) const override {return d_(i,0);};
-  virtual double val_imp(int i, int j) const override {return d_(i,j);};
-  virtual double val_imp_au_temps(double temps, int i) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
-  virtual double val_imp_au_temps(double temps, int i, int j) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
+protected:
+  void face_to_elem(const Domaine_VF& domaine, const DoubleTab& tab_faces,DoubleTab& tab_elems) const;
 
-protected :
-  void me_calculer();
-
-  DoubleTab d_;
-
-  double von_karman_ = 0.41 ;
-  double beta_omega = 0.075;
-  double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
-  double facteur_paroi_=10.;
 };
 
 #endif
+

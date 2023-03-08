@@ -14,53 +14,16 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_dix.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
+// File:        Dissipation_echelle_temp_taux_diss_turb_VDF.cpp
+// Directory:   $TRUST_ROOT/src/Turbulence/PolyMAC_P0/Sources
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#include <Dissipation_echelle_temp_taux_diss_turb_VDF.h>
 
-#include <TRUSTTab.h>
-#include <Dirichlet_loi_paroi.h>
-#include <TRUST_Ref.h>
+Implemente_instanciable(Dissipation_echelle_temp_taux_diss_turb_VDF,"Dissipation_echelle_temp_taux_diss_turb_VDF_P0_VDF", Source_Dissipation_echelle_temp_taux_diss_turb);
+// XD Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyMAC_P0 source_base Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyMAC_P0 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
 
-class Correlation;
-
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
- *
- */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
-{
-
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
-
-public :
-  int compatible_avec_eqn(const Equation_base&) const override;
-  virtual int initialiser(double temps) override;
-  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-  double calc_tau(double y, double u_tau, double visc);
-  double calc_omega(double y, double u_tau, double visc);
-  virtual void completer() override;
-
-  virtual double val_imp(int i) const override {return d_(i,0);};
-  virtual double val_imp(int i, int j) const override {return d_(i,j);};
-  virtual double val_imp_au_temps(double temps, int i) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
-  virtual double val_imp_au_temps(double temps, int i, int j) const override {Process::exit(que_suis_je() + " : You shouldn't go through val_imp_au_temps but through val_imp ! ") ; return 1.;};
-
-protected :
-  void me_calculer();
-
-  DoubleTab d_;
-
-  double von_karman_ = 0.41 ;
-  double beta_omega = 0.075;
-  double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
-  double facteur_paroi_=10.;
-};
-
-#endif
+Sortie& Dissipation_echelle_temp_taux_diss_turb_VDF::printOn(Sortie& os) const {  return Source_Dissipation_echelle_temp_taux_diss_turb::printOn(os); }
+Entree& Dissipation_echelle_temp_taux_diss_turb_VDF::readOn(Entree& is) { return Source_Dissipation_echelle_temp_taux_diss_turb::readOn(is); }
