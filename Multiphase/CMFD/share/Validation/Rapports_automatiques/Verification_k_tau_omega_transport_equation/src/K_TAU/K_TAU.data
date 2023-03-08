@@ -151,7 +151,7 @@ Lire pb
     echelle_temporelle_turbulente
     {
         equation_non_resolue	(t>0)
-        diffusion { turbulent SGDH { sigma 0.5 } }
+        diffusion { turbulente SGDH { sigma 0.5 } }
         convection { centre }
         initial_conditions { tau Champ_Fonc_xyz dom 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09 }
         boundary_conditions

@@ -46,6 +46,9 @@
 #define old_forme
 
 Implemente_base(Convection_diffusion_turbulence_multiphase,"Convection_diffusion_turbulence_multiphase",Convection_Diffusion_std);
+// XD diffusion_turbulente_ktau diffusion_deriv turbulente 0 not_set
+// XD attr k_tau chaine(into=["k_tau","k_omega","SGDH"]) k_tau 1 not_set
+// XD attr titi bloc_lecture titi 1 not_set
 
 /*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
  *
