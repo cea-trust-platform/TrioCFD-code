@@ -38,17 +38,16 @@ Entree& Production_echelle_temp_taux_diss_turb_VDF::readOn(Entree& is) { return 
 void Production_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VF&                     domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
-  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const DoubleTab&                     tab_diss = equation().inconnue()->valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = equation().inconnue()->passe(); // tau ou omega selon l'equation
+  const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
   const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
-  int ne = domaine.nb_elem(), D = dimension, ne_tot = domaine.nb_elem_tot() ;
+  int ne = domaine.nb_elem(), D = dimension;
   int N = equation().inconnue()->valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),
       Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
@@ -60,11 +59,6 @@ void Production_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matric
   else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") Process::exit(que_suis_je() + " : you must have tau or omega dissipation ! ");
 
-  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_qdm.inconnue().valeur());
-  DoubleTrav    tab_grad(ne_tot, D, D, ch_vit.valeurs().line_size());//, tab_vit_liq(nf_tot);
-//  boucle remplit  tab_vit_liq;
-  ch_vit.calcul_duidxj(ch_vit.passe(), tab_grad, ref_cast(Domaine_Cl_VDF, ch_vit.domaine_Cl_dis().valeur()));
-
   // Second membre
   for(e = 0 ; e < ne ; e++)
     for(n = 0, mp = 0; n<N ; n++, mp += (Np > 1))
@@ -72,7 +66,7 @@ void Production_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matric
         double grad_grad = 0.;
         for (int d_U = 0; d_U < D; d_U++)
           for (int d_X = 0; d_X < D; d_X++)
-            grad_grad += ( tab_grad( e, d_U, d_X,n) + tab_grad( e, d_X, d_U,n) ) * tab_grad( e, d_U, d_X,n) ;
+            grad_grad += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
 
         double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) * alpha_omega_ ;
 

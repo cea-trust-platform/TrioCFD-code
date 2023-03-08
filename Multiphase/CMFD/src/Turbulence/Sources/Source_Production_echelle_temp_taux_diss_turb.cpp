@@ -41,6 +41,8 @@ Entree& Source_Production_echelle_temp_taux_diss_turb::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
   Cout << "alpha_omega = " << alpha_omega_ << finl ;
 
+  equation().probleme().creer_champ("gradient_vitesse"); // Besoin du gradient de vitesse
+
   return is;
 }
 
