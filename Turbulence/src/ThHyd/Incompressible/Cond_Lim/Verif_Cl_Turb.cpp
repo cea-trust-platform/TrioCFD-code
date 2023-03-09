@@ -14,11 +14,11 @@
 *****************************************************************************/
 
 #include <Verif_Cl_Turb.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Periodique.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Entree_fluide_vitesse_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Entree_fluide_K_Eps_impose.h>
 #include <Neumann_paroi.h>
 #include <Neumann_paroi_flux_nul.h>
@@ -53,28 +53,28 @@
  *     Periodique ======================> Periodique
  *     -----------------------------------------------------------------------
  *
- * @param (Zone_Cl_dis& zone_Cl_hydr)
- * @param (Zone_Cl_dis& zone_Cl_turb)
+ * @param (Domaine_Cl_dis& domaine_Cl_hydr)
+ * @param (Domaine_Cl_dis& domaine_Cl_turb)
  * @return (int) renvoie toujours 1
  * @throws nombres de conditions aux limites differents
  * @throws conditions aux limite hydraulique et turbulentes incompatible
  */
-int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_Cl_dis& zone_Cl_turb)
+int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const Domaine_Cl_dis& domaine_Cl_turb)
 {
 
-  int nb_Cl = zone_Cl_hydr.nb_cond_lim();
+  int nb_Cl = domaine_Cl_hydr.nb_cond_lim();
 
-  if (zone_Cl_turb.nb_cond_lim() != nb_Cl)
+  if (domaine_Cl_turb.nb_cond_lim() != nb_Cl)
     {
-      Cerr << "The two objects of Zone_Cl_dis type don't have" << finl;
+      Cerr << "The two objects of Domaine_Cl_dis type don't have" << finl;
       Cerr << "the same number of boundary conditions." << finl;
       Process::exit();
     }
 
   for (int num_Cl=0; num_Cl<nb_Cl; num_Cl++)
     {
-      const Cond_lim& la_cl_turb = zone_Cl_turb.les_conditions_limites(num_Cl);
-      const Cond_lim& la_cl_hydr = zone_Cl_hydr.les_conditions_limites(num_Cl);
+      const Cond_lim& la_cl_turb = domaine_Cl_turb.les_conditions_limites(num_Cl);
+      const Cond_lim& la_cl_hydr = domaine_Cl_hydr.les_conditions_limites(num_Cl);
 
       // on teste si une des deux CL est periodique
       // et s'il y en a une, on verifie que les CL des deux eq sont periodiques
@@ -109,7 +109,7 @@ int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_C
 
       // hyd (Entree_fluide_vitesse_imposee ou Frontiere_ouverte_vitesse_imposee)
       // et turb (Entree_fluide_K_Eps_impose ou Frontiere_ouverte_K_Eps_impose)
-      Nom pbb = zone_Cl_hydr->equation().probleme().que_suis_je();
+      Nom pbb = domaine_Cl_hydr->equation().probleme().que_suis_je();
       if ( sub_type(Entree_fluide_vitesse_imposee,la_cl_hydr.valeur()) &&
            ! ( sub_type(Neumann_sortie_libre,la_cl_turb.valeur()) ||
                sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ||
@@ -127,8 +127,8 @@ int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_C
 
 /*! @brief Affiche un message d'erreur pour la fonction precedente
  *
- * @param (Zone_Cl_dis& zone_Cl_hydr)
- * @param (Zone_Cl_dis& zone_Cl_turb)
+ * @param (Domaine_Cl_dis& domaine_Cl_hydr)
+ * @param (Domaine_Cl_dis& domaine_Cl_turb)
  * @param (int num_Cl) numero de la CL
  * @return (int) renvoie toujours 1
  */

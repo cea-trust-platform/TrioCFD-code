@@ -24,7 +24,9 @@
 #define Cond_lim_k_complique_transition_flux_nul_demi_included
 
 #include <Echange_global_impose.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 
 /*! @brief Classe Cond_lim_k_complique_transition_flux_nul_demi:
@@ -45,7 +47,7 @@ public :
   void mettre_a_jour(double tps) override;
 
   void associer_fr_dis_base(const Frontiere_dis_base& fr) override {la_frontiere_dis=fr;};
-  void associer_zone_cl_dis_base(const Zone_Cl_dis_base& zcl)  override { ma_zone_cl_dis=zcl;};
+  void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl)  override { mon_dom_cl_dis=zcl;};
 
   // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
   void fixer_nb_valeurs_temporelles(int nb_cases) override {};

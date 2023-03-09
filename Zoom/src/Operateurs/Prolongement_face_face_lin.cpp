@@ -51,7 +51,7 @@ Entree& Prolongement_face_face_lin::readOn(Entree& s )
  *     car valeur
  *
  */
-void Prolongement_face_face_lin::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement_face_face_lin::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,
                                            const DoubleTab& valG, DoubleTab& tab,
@@ -79,7 +79,7 @@ void Prolongement_face_face_lin::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
         {
           tab(nbFacesF, 0) = valG(num_faceG);
         }
-      else if(sub_type(Zone_VEF, zone_VFG))
+      else if(sub_type(Domaine_VEF, domaine_VFG))
         {
           for (comp=0; comp<nb_compo; comp++)
             {
@@ -89,23 +89,23 @@ void Prolongement_face_face_lin::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
       else
         /* <--- fin de partie non modifieee */
 
-        if(sub_type(Zone_VDF, zone_VFG) && sub_type(Zone_VDF, zone_VFF))
+        if(sub_type(Domaine_VDF, domaine_VFG) && sub_type(Domaine_VDF, domaine_VFF))
           {
 
             Cerr << "debut modif prolongement" << finl;
 
-            Zone_VDF& zone_vdfG = ref_cast(Zone_VDF, zone_VFG);
-            const IntVect& oriG = zone_vdfG.orientation();
-            const IntTab& face_voisG = zone_vdfG.face_voisins();
+            Domaine_VDF& domaine_vdfG = ref_cast(Domaine_VDF, domaine_VFG);
+            const IntVect& oriG = domaine_vdfG.orientation();
+            const IntTab& face_voisG = domaine_vdfG.face_voisins();
 
-            const Zone& zoneg = zone_vdfG.zone();
-            int nb_faces_elemG = zoneg.type_elem().nb_faces();
-            IntTab& elem_facesG =  zone_vdfG.elem_faces();
+            const Domaine& domaineg = domaine_vdfG.domaine();
+            int nb_faces_elemG = domaineg.type_elem().nb_faces();
+            IntTab& elem_facesG =  domaine_vdfG.elem_faces();
 
-            const DoubleTab& xvG = zone_vdfG.xv();
+            const DoubleTab& xvG = domaine_vdfG.xv();
 
-            Zone_VDF& zone_vdfF = ref_cast(Zone_VDF, zone_VFF);
-            const DoubleTab& xvF = zone_vdfF.xv();
+            Domaine_VDF& domaine_vdfF = ref_cast(Domaine_VDF, domaine_VFF);
+            const DoubleTab& xvF = domaine_vdfF.xv();
 
             int num_face_gros;
             int nbFacesG;
@@ -226,8 +226,8 @@ void Prolongement_face_face_lin::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
 
 //NE FAIT RIEN
-void Prolongement_face_face_lin::calculer(Zone_VF& zonef,
-                                          Zone_VF& zoneg,
+void Prolongement_face_face_lin::calculer(Domaine_VF& domainef,
+                                          Domaine_VF& domaineg,
                                           IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

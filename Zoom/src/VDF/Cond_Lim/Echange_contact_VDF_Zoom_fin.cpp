@@ -25,7 +25,7 @@
 #include <Conduction.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 
 Implemente_instanciable(Echange_contact_VDF_Zoom_fin,"Paroi_Echange_contact_VDF_Zoom_fin",Echange_contact_VDF_Zoom_base);
 
@@ -60,8 +60,8 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       const Frontiere_dis_base& front=ch.frontiere_dis();
       const Probleme_base& pbG = ch.le_pb_exterieur();
-      const Zone_dis_base& zone_disG = pbG.domaine_dis().zone_dis(0);
-      const Zone_VDF& zvdfG = ref_cast(Zone_VDF, zone_disG);
+      const Domaine_dis_base& domaine_disG = pbG.domaine_dis();
+      const Domaine_VDF& zvdfG = ref_cast(Domaine_VDF, domaine_disG);
       const IntTab& face_voisinsG = zvdfG.face_voisins();
       ///////////////////////////
       ///////////////////////////
@@ -87,7 +87,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       DoubleVect e;
 
-      Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
       //MODIF
@@ -99,16 +99,16 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
 
 
-      //Cerr << "Domaine : "<<zone_dis1.zone().domaine().le_nom()<<finl;
+      //Cerr << "Domaine : "<<domaine_dis1.domaine().domaine().le_nom()<<finl;
       //Cerr << "On traite le raccord de nom " << nom_racc1 << finl;
-      int nb_faces_raccord1 = zone_dis1.zone().raccord(nom_racc1).valeur().nb_faces();
+      int nb_faces_raccord1 = domaine_dis1.domaine().raccord(nom_racc1).valeur().nb_faces();
       tab.resize(nb_faces_raccord1,nb_comp);
       //Cerr<<"nb_faces_raccord1 = "<<nb_faces_raccord1<<finl;
       //Cerr << "Nb faces raccord 1: "<<nb_faces_raccord1<<finl;
 
 
 
-      if (zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;
@@ -206,7 +206,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
               //find the associated boundary
               int boundary_index=-1;
-              int nb_boundaries=zvdfG.zone().nb_front_Cl();
+              int nb_boundaries=zvdfG.domaine().nb_front_Cl();
               for (int n_bord=0; n_bord<nb_boundaries; n_bord++)
                 {
                   if (zvdfG.front_VF(n_bord).le_nom() == front_vf.le_nom())

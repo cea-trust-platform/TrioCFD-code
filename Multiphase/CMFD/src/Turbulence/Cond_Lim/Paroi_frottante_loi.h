@@ -12,21 +12,16 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Paroi_frottante_loi.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
-// Version:     /main/13
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #ifndef Paroi_frottante_loi_included
 #define Paroi_frottante_loi_included
 
 #include <TRUSTTab.h>
 #include <Frottement_global_impose.h>
-#include <Ref_Correlation.h>
 #include <Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Paroi_frottante_loi Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
  *
@@ -41,7 +36,7 @@ class Paroi_frottante_loi : public Frottement_global_impose
   Declare_instanciable(Paroi_frottante_loi);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const override;
+  void completer() override ;
   virtual int initialiser(double temps) override;
   virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps) override;
@@ -65,10 +60,11 @@ protected :
   double beta_omega = 0.075;
   double beta_k = 0.09;
 
-  double y_p_prod_k_ = 2. ;
-  double fac_prod_k_ = 1. ;
-  double y_p_prod_k_grand_ = 150. ;
-  double fac_prod_k_grand_ = .4 ;
+  // Initialized at 0. and adapted in the readOn depending on turbulence selected
+  double y_p_prod_k_ = -1.e8 ;
+  double fac_prod_k_ = -1.e8 ;
+  double y_p_prod_k_grand_ = -1.e8 ;
+  double fac_prod_k_grand_ = -1.e8 ;
 };
 
 #endif

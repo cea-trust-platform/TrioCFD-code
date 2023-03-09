@@ -26,12 +26,14 @@
 #include <Echange_externe_impose.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Conduction.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
 #include <Champ_front_calc.h>
 #include <Fluide_Incompressible.h>
 #include <Front_VF.h>
 #include <Cond_Lim_Rayo.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 class Echange_externe_impose_rayo_transp : public Cond_Lim_Rayo,public Echange_externe_impose
 {
@@ -39,7 +41,7 @@ class Echange_externe_impose_rayo_transp : public Cond_Lim_Rayo,public Echange_e
   Declare_instanciable(Echange_externe_impose_rayo_transp);
 
 public :
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void mettre_a_jour(double ) override;
   void calculer_Teta_i();

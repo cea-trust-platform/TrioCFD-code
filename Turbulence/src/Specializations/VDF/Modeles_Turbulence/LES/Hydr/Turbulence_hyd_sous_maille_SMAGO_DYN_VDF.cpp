@@ -19,9 +19,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h>
-#include <Zone.h>
+#include <Domaine.h>
 #include <TRUSTTrav.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_Fonc_P0_VDF.h>
 #include <Debog.h>
 #include <TRUSTTrav.h>
@@ -29,9 +29,9 @@
 #include <Schema_Temps_base.h>
 #include <stat_counters.h>
 #include <Param.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Equation_base.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_SMAGO_DYN_VDF,"Modele_turbulence_hyd_sous_maille_SMAGO_DYN_VDF",Turbulence_hyd_sous_maille_Smago_VDF);
 
@@ -126,24 +126,23 @@ int Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::lire_motcle_non_standard(const Mot
     }
   else
     return Turbulence_hyd_sous_maille_Smago_VDF::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::associer(
-  const Zone_dis& zone_dis,
-  const Zone_Cl_dis& zone_Cl_dis)
+  const Domaine_dis& domaine_dis,
+  const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF,zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 
   Cerr << "Discretisation de coeff_field" << finl;
   Cerr << "coeff_field discretization" << finl;
   coeff_field.typer("Champ_Fonc_P0_VDF");
   Champ_Fonc_P0_VDF& coeff=ref_cast(Champ_Fonc_P0_VDF, coeff_field.valeur());
-  coeff.associer_zone_dis_base(la_zone_VDF.valeur());
+  coeff.associer_domaine_dis_base(le_dom_VDF.valeur());
   coeff.nommer("dynamic_coefficient");
   coeff.fixer_nb_comp(1);
-  coeff.fixer_nb_valeurs_nodales(la_zone_VDF->nb_elem());
+  coeff.fixer_nb_valeurs_nodales(le_dom_VDF->nb_elem());
   coeff.fixer_unite("adim");
   coeff.changer_temps(0.);
 
@@ -163,9 +162,9 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::mettre_a_jour(double temps)
 {
   statistiques().begin_count(nut_counter_);
 
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab Sij_test_scale(0,dimension,dimension);
-  la_zone_VDF->zone().creer_tableau_elements(Sij_test_scale);
+  le_dom_VDF->domaine().creer_tableau_elements(Sij_test_scale);
   DoubleTrav Sij_grid_scale(Sij_test_scale);
 
   DoubleTrav S_test_scale_norme(nb_elem_tot);
@@ -173,21 +172,21 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::mettre_a_jour(double temps)
   cell_cent_vel_.resize(nb_elem_tot,dimension);
 
   DoubleTab filt_vel(0,dimension);
-  la_zone_VDF->zone().creer_tableau_elements(filt_vel);
+  le_dom_VDF->domaine().creer_tableau_elements(filt_vel);
   DoubleTrav Lij(Sij_test_scale);
   DoubleTrav Mij(Sij_test_scale);
   DoubleTrav l(nb_elem_tot);
 
-  calculer_length_scale(l,la_zone_VDF.valeur());
-  calculer_cell_cent_vel(cell_cent_vel_,la_zone_VDF.valeur(),mon_equation->inconnue());
-  calculer_filter_field(cell_cent_vel_,filt_vel,la_zone_VDF.valeur());
+  calculer_length_scale(l,le_dom_VDF.valeur());
+  calculer_cell_cent_vel(cell_cent_vel_,le_dom_VDF.valeur(),mon_equation->inconnue());
+  calculer_filter_field(cell_cent_vel_,filt_vel,le_dom_VDF.valeur());
   calculer_Lij(cell_cent_vel_,filt_vel,Lij);
 
-  calculer_Sij(Sij_grid_scale,la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),mon_equation->inconnue());
-  calculer_Sij_vel_filt(filt_vel,Sij_test_scale,la_zone_VDF.valeur());
+  calculer_Sij(Sij_grid_scale,le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),mon_equation->inconnue());
+  calculer_Sij_vel_filt(filt_vel,Sij_test_scale,le_dom_VDF.valeur());
 
-  calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,la_zone_VDF->zone().nb_elem_tot());
-  calculer_S_norme(Sij_test_scale,S_test_scale_norme,la_zone_VDF->zone().nb_elem_tot());
+  calculer_S_norme(Sij_grid_scale,S_grid_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
+  calculer_S_norme(Sij_test_scale,S_test_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
 
   calculer_Mij(Sij_grid_scale,Sij_test_scale,l,Mij);
   Debog::verifier("Lij",Lij);
@@ -208,11 +207,11 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::mettre_a_jour(double temps)
 
 //////////////////////////////////////////////////////////////////////
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_cell_cent_vel(
-  DoubleTab& cell_cent_vel, const Zone_VDF& zone_VDF, Champ_Inc& inco)
+  DoubleTab& cell_cent_vel, const Domaine_VDF& domaine_VDF, Champ_Inc& inco)
 {
   const DoubleTab& vitesse = inco.valeurs();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4=-1,num5=-1;
 
@@ -248,11 +247,11 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_cell_cent_vel(
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(
   const DoubleTab& in_vel,
   DoubleTab& out_vel,
-  const Zone_VDF& zone_VDF)
+  const Domaine_VDF& domaine_VDF)
 {
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4,num5;
   int f0,f1,f2,f3,f4,f5;
@@ -372,10 +371,10 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_field(
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_filter_tensor(
   DoubleTab& in_vel)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4,num5;
   int f0,f1,f2,f3,f4,f5;
@@ -500,8 +499,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Lij(
   const DoubleTab& filt_vel,
   DoubleTab& Lij)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   int element_number;
 
   DoubleTab uij_filt(Lij);
@@ -534,8 +533,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Mij(
   const DoubleVect& l,
   DoubleTab& Mij)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
 
   DoubleTrav Sij_grid_scale_norme(nb_elem_tot);
   DoubleTrav Sij_test_scale_norme(nb_elem_tot);
@@ -544,8 +543,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Mij(
 
   // This is to calculate the Mij term for the C coefficient
 
-  calculer_S_norme(Sij_grid_scale,Sij_grid_scale_norme,la_zone_VDF->zone().nb_elem_tot());
-  calculer_S_norme(Sij_test_scale,Sij_test_scale_norme,la_zone_VDF->zone().nb_elem_tot());
+  calculer_S_norme(Sij_grid_scale,Sij_grid_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
+  calculer_S_norme(Sij_test_scale,Sij_test_scale_norme,le_dom_VDF->domaine().nb_elem_tot());
   for (int element_number=0 ; element_number<nb_elem_tot ; element_number ++)
     for (int i=0 ; i<dimension ; i++)
       for (int j=0 ; j<dimension ; j++)
@@ -566,10 +565,10 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_model_coefficient(
   const DoubleTab& Mij)
 {
   DoubleVect& model_coeff = coeff_field->valeurs();
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab haut, bas;
-  la_zone_VDF->zone().creer_tableau_elements(haut);
-  la_zone_VDF->zone().creer_tableau_elements(bas);
+  le_dom_VDF->domaine().creer_tableau_elements(haut);
+  le_dom_VDF->domaine().creer_tableau_elements(bas);
   Debog::verifier("bas",bas);
   Debog::verifier("haut",haut);
   // Evaluate the dynamic model coeficient C
@@ -609,11 +608,11 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_model_coefficient(
 
 //////////////////////////////////////////////////////////////////////
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(
-  DoubleVect& l, const Zone_VDF& zone_VDF)
+  DoubleVect& l, const Domaine_VDF& domaine_VDF)
 {
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntVect& orientation = zone_VDF.orientation();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
   int elem;
 
   // calcul de la longueur caracteristique de l'element
@@ -623,15 +622,15 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_length_scale(
       double l_int;
       if (dimension==3)
         {
-          l_int = zone_VDF.dim_elem(elem,orientation(elem_faces(elem,0)));
-          l_int *= zone_VDF.dim_elem(elem,orientation(elem_faces(elem,1)));
-          l_int *= zone_VDF.dim_elem(elem,orientation(elem_faces(elem,2)));
+          l_int = domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,0)));
+          l_int *= domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,1)));
+          l_int *= domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,2)));
           l(elem)=exp((log(l_int)/3));
         }
       else
         {
-          l_int = zone_VDF.dim_elem(elem,orientation(elem_faces(elem,0)));
-          l_int *= zone_VDF.dim_elem(elem,orientation(elem_faces(elem,1)));
+          l_int = domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,0)));
+          l_int *= domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,1)));
           l[elem]=sqrt(l_int);
         }
     }
@@ -648,9 +647,9 @@ Champ_Fonc& Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_viscosite_turbule
   DoubleVect& model_coeff = coeff_field->valeurs();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  int nb_elem = la_zone_VDF->zone().nb_elem();
+  int nb_elem = le_dom_VDF->domaine().nb_elem();
 
-  if (visco_turb.size() != la_zone_VDF->zone().nb_elem())
+  if (visco_turb.size() != le_dom_VDF->domaine().nb_elem())
     {
       Cerr << "Size error for the array containing the values of the turbulent viscosity." << finl;
       exit();
@@ -681,7 +680,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_energie_cinetique
   DoubleVect& model_coeff = coeff_field->valeurs();
   double temps = mon_equation->inconnue().temps();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   static double co_mu = 1./(0.094*0.094);
 
   for (int elem=0 ; elem<nb_elem_tot; elem++)
@@ -701,7 +700,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_energie_cinetique_turb()
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::controler_grandeurs_turbulentes()
 {
   static const double Cmu = CMU;
-  int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   DoubleVect& energie_turb = energie_cinetique_turb_.valeurs();
   double k,eps;
@@ -739,15 +738,15 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_S_norme(
 
 //////////////////////////////////////////////////////////////////////
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(
-  DoubleTab& Sij, const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF, Champ_Inc& inco)
+  DoubleTab& Sij, const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF, Champ_Inc& inco)
 {
-  Champ_Face& vit = ref_cast(Champ_Face, inco.valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, inco.valeur());
   const DoubleTab& vitesse = inco.valeurs();
-  const int nb_elem_tot = zone_VDF.nb_elem_tot();
-  const int nb_elem = zone_VDF.nb_elem();
+  const int nb_elem_tot = domaine_VDF.nb_elem_tot();
+  const int nb_elem = domaine_VDF.nb_elem();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
 
-  vit.calcul_duidxj(vitesse,gij,zone_Cl_VDF);
+  vit.calcul_duidxj(vitesse,gij,domaine_Cl_VDF);
   // Calcul de Sij
   for(int elem=0 ; elem<nb_elem ; elem ++)
     for(int i=0 ; i<dimension ; i++)
@@ -761,11 +760,11 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(
   const DoubleTab& in_vel,
   DoubleTab& out_vel,
-  const Zone_VDF& zone_VDF)
+  const Domaine_VDF& domaine_VDF)
 {
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
 
   int element_number;
   int num0,num1,num2,num3,num4,num5;
@@ -792,14 +791,14 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(
           if (num3 == -1)
             num3 = element_number;
           out_vel(element_number,0,0)=0.5*((in_vel(num2,0)-in_vel(num0,0))/
-                                           zone_VDF.dim_elem(element_number,0));
+                                           domaine_VDF.dim_elem(element_number,0));
           out_vel(element_number,0,1)=out_vel(element_number,1,0)=0.25*
                                                                   ((in_vel(num3,0)-in_vel(num1,0))/
-                                                                   zone_VDF.dim_elem(element_number,1)+
+                                                                   domaine_VDF.dim_elem(element_number,1)+
                                                                    (in_vel(num2,1)-in_vel(num0,1))/
-                                                                   zone_VDF.dim_elem(element_number,0));
+                                                                   domaine_VDF.dim_elem(element_number,0));
           out_vel(element_number,1,1)=0.5*((in_vel(num3,1)-in_vel(num1,1))/
-                                           zone_VDF.dim_elem(element_number,1));
+                                           domaine_VDF.dim_elem(element_number,1));
         }
     }
   else
@@ -831,26 +830,26 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij_vel_filt(
           if (num5 == -1)
             num5 = element_number;
           out_vel(element_number,0,0)=0.5*((in_vel(num3,0)-in_vel(num0,0))/
-                                           zone_VDF.dim_elem(element_number,0));
+                                           domaine_VDF.dim_elem(element_number,0));
           out_vel(element_number,0,1)=out_vel(element_number,1,0)=0.25*
                                                                   ((in_vel(num4,0)-in_vel(num1,0))/
-                                                                   zone_VDF.dim_elem(element_number,1)+
+                                                                   domaine_VDF.dim_elem(element_number,1)+
                                                                    (in_vel(num3,1)-in_vel(num0,1))/
-                                                                   zone_VDF.dim_elem(element_number,0));
+                                                                   domaine_VDF.dim_elem(element_number,0));
           out_vel(element_number,0,2)=out_vel(element_number,2,0)=0.25*
                                                                   ((in_vel(num5,0)-in_vel(num2,0))/
-                                                                   zone_VDF.dim_elem(element_number,2)+
+                                                                   domaine_VDF.dim_elem(element_number,2)+
                                                                    (in_vel(num3,2)-in_vel(num0,2))/
-                                                                   zone_VDF.dim_elem(element_number,0));
+                                                                   domaine_VDF.dim_elem(element_number,0));
           out_vel(element_number,1,1)=0.5*((in_vel(num4,1)-in_vel(num1,1))/
-                                           zone_VDF.dim_elem(element_number,1));
+                                           domaine_VDF.dim_elem(element_number,1));
           out_vel(element_number,1,2)=out_vel(element_number,2,1)=0.25*
                                                                   ((in_vel(num5,1)-in_vel(num2,1))/
-                                                                   zone_VDF.dim_elem(element_number,2)+
+                                                                   domaine_VDF.dim_elem(element_number,2)+
                                                                    (in_vel(num4,2)-in_vel(num1,2))/
-                                                                   zone_VDF.dim_elem(element_number,1));
+                                                                   domaine_VDF.dim_elem(element_number,1));
           out_vel(element_number,2,2)=0.5*((in_vel(num5,2)-in_vel(num2,2))/
-                                           zone_VDF.dim_elem(element_number,2));
+                                           domaine_VDF.dim_elem(element_number,2));
         }
     }
   out_vel.echange_espace_virtuel();
@@ -882,11 +881,11 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_6_points(
   const DoubleTab& bas )
 {
   DoubleVect& model_coeff = coeff_field->valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
   int num0,num1,num2,num3,num4,num5;
   int f0,f1,f2,f3,f4,f5;
@@ -995,9 +994,9 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_plans_parallele
   const DoubleTab& bas )
 {
   DoubleVect& model_coeff = coeff_field->valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   DoubleVect model_coeff_tmp(N_c_);
 
   // Evaluate the dynamic model coeficient C
@@ -1052,8 +1051,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_euler_lagrange(
 
       int nb_0=0;
       DoubleVect l;
-      la_zone_VDF.valeur().zone().creer_tableau_elements(l);
-      calculer_length_scale(l, la_zone_VDF.valeur());
+      le_dom_VDF.valeur().domaine().creer_tableau_elements(l);
+      calculer_length_scale(l, le_dom_VDF.valeur());
 
       const int nmax = haut.size_totale();
       const double dt = mon_equation->schema_temps().pas_de_temps();
@@ -1163,8 +1162,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calcul_voisins(
       num[6]=elem_elem_(element_number,indice(0),indice(1),1);
       num[7]=elem_elem_(element_number,indice(0),indice(1),indice(2));
 
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-      const DoubleTab& xp = zone_VDF.xp();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+      const DoubleTab& xp = domaine_VDF.xp();
       DoubleTrav x(3);
       for (i=0; i<3; i++)
         x(i)=xp(element_number,i)-cell_cent_vel_(element_number,i)*dt;
@@ -1221,10 +1220,10 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::interpole(
 //////////////////////////////////////////////////////////////////////
 void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calc_elem_elem()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   int element_number,f,elem;
 
   //elem_elem(element_number,i,j,k) i-x, j-y k-z et 0-avant 1-meme_position, 2-apres
@@ -1350,10 +1349,10 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calcul_tableaux_correspondance(
   IntVect& corresp_c)
 {
   // Initialisation de : Yuv + compt_c + corresp_c
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
-  int nb_elems = zone_VDF.zone().nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
+  int nb_elems = domaine_VDF.domaine().nb_elem();
   DoubleTrav Y_c ;
   int num_elem,j,indic_c,trouve;
   double y;
@@ -1363,7 +1362,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calcul_tableaux_correspondance(
   // dimensionnement aux valeurs rentrees dans le jeu de donnees
   Y_c.resize(N_c);
   compt_c.resize(N_c);
-  zone_VDF.zone().creer_tableau_elements(corresp_c);
+  domaine_VDF.domaine().creer_tableau_elements(corresp_c);
 
   // initialisation
   Y_c = -100.;

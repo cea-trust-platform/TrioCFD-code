@@ -20,16 +20,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Fluide_Diphasique.h>
-#include <Fluide_Incompressible.h>
 #include <Motcle.h>
 #include <Interprete.h>
-#include <Ref_Fluide_Diphasique.h>
 #include <Param.h>
 #include <Champ_Uniforme.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique,"Fluide_Diphasique",Milieu_base);
 
-Implemente_ref(Fluide_Diphasique);
 //////////// XD fluide_diphasique milieu_v2_base fluide_diphasique -1 Two-phase fluid.
 // XD fluide_diphasique milieu_base fluide_diphasique -1 Two-phase fluid.
 
@@ -59,7 +57,7 @@ void Fluide_Diphasique::set_param(Param& param)
   param.ajouter_non_std("fluide1",(this),Param::REQUIRED); // XD_ADD_P chaine second phase fluid
   param.ajouter("chaleur_latente",&chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
   param.ajouter("formule_mu",&formule_mu_); // XD_ADD_P chaine (into=[standard,arithmetic,harmonic]) formula used to calculate average
-  Milieu_base::set_additional_params(param);
+  Milieu_base::set_additional_params(param); // XD ref gravite field_base
 }
 
 int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -78,7 +76,6 @@ int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     }
   else
     return Milieu_base::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Fluide_Diphasique::verifier_coherence_champs(int& err,Nom& msg)
@@ -184,7 +181,6 @@ const Champ& Fluide_Diphasique::masse_volumique() const
   assert(0);
   exit();
   throw;
-  return phase0_.masse_volumique();
 }
 
 Champ& Fluide_Diphasique::masse_volumique()
@@ -193,7 +189,6 @@ Champ& Fluide_Diphasique::masse_volumique()
   assert(0);
   exit();
   throw;
-  return masse_volumique();
 }
 
 const Champ_Don& Fluide_Diphasique::diffusivite() const
@@ -202,7 +197,6 @@ const Champ_Don& Fluide_Diphasique::diffusivite() const
   assert(0);
   exit();
   throw;
-  return diffusivite();
 }
 
 Champ_Don& Fluide_Diphasique::diffusivite()
@@ -211,7 +205,6 @@ Champ_Don& Fluide_Diphasique::diffusivite()
   assert(0);
   exit();
   throw;
-  return diffusivite();
 }
 
 const Champ_Don& Fluide_Diphasique::conductivite() const
@@ -220,7 +213,6 @@ const Champ_Don& Fluide_Diphasique::conductivite() const
   assert(0);
   exit();
   throw;
-  return conductivite();
 }
 
 Champ_Don& Fluide_Diphasique::conductivite()
@@ -229,7 +221,6 @@ Champ_Don& Fluide_Diphasique::conductivite()
   assert(0);
   exit();
   throw;
-  return conductivite();
 }
 
 const Champ_Don& Fluide_Diphasique::capacite_calorifique() const
@@ -238,7 +229,6 @@ const Champ_Don& Fluide_Diphasique::capacite_calorifique() const
   assert(0);
   exit();
   throw;
-  return capacite_calorifique();
 }
 
 Champ_Don& Fluide_Diphasique::capacite_calorifique()
@@ -247,7 +237,6 @@ Champ_Don& Fluide_Diphasique::capacite_calorifique()
   assert(0);
   exit();
   throw;
-  return capacite_calorifique();
 }
 
 const Champ_Don& Fluide_Diphasique::beta_t() const
@@ -256,7 +245,6 @@ const Champ_Don& Fluide_Diphasique::beta_t() const
   assert(0);
   exit();
   throw;
-  return beta_t();
 }
 
 Champ_Don& Fluide_Diphasique::beta_t()
@@ -265,6 +253,5 @@ Champ_Don& Fluide_Diphasique::beta_t()
   assert(0);
   exit();
   throw;
-  return beta_t();
 }
 

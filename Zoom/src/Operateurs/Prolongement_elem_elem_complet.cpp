@@ -22,7 +22,7 @@
 
 #include <Prolongement_elem_elem_complet.h>
 #include <Domaine.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Prolongement_elem_elem_complet,"Prolongement_elem_elem_complet",Prolongement_base);
 
@@ -53,8 +53,8 @@ Entree& Prolongement_elem_elem_complet::readOn(Entree& s )
  *     EN VDF pour la temperature
  *
  */
-void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
-                                               Zone_VF& zone_VFF,
+void Prolongement_elem_elem_complet::prolonger(Domaine_VF& domaine_VFG,
+                                               Domaine_VF& domaine_VFF,
                                                const Frontiere& frontF,
                                                IntVect& connect,
                                                const DoubleTab& valG, DoubleTab& tab,
@@ -66,8 +66,8 @@ void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
   int nbelemsF;
   int num_elemG;
   int nbfaceG;
-  Zone& zoneg = zone_VFG.zone();
-  int nb_faceG = zoneg.nb_faces_elem();
+  Domaine& domaineg = domaine_VFG.domaine();
+  int nb_faceG = domaineg.nb_faces_elem();
 
   IntVect numerosG1;
   DoubleVect numerosG1_dist;
@@ -78,7 +78,7 @@ void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
   numerosG1_dist.resize(nb_faceG+1);
   numerosG2_dist.resize(nb_faceG+1);
   int numG, num_faceG;
-  IntTab& num_face_elemG = zone_VFG.elem_faces();
+  IntTab& num_face_elemG = domaine_VFG.elem_faces();
 
   //coord des centres de gravite des elems
   tab = 0.;
@@ -91,7 +91,7 @@ void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
   int nb_elemG_pour_prolongement;
 
   //elemG voisins de chaque face grossiere
-  IntTab& voisins = zone_VFG.face_voisins();
+  IntTab& voisins = domaine_VFG.face_voisins();
 
   //Pour chaque elemF
   for (nbelemsF=0; nbelemsF<nb_elemF; nbelemsF++)
@@ -160,8 +160,8 @@ void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
 
 
 //NE FAIT RIEN
-void Prolongement_elem_elem_complet::calculer(Zone_VF& zonef,
-                                              Zone_VF& zoneg,
+void Prolongement_elem_elem_complet::calculer(Domaine_VF& domainef,
+                                              Domaine_VF& domaineg,
                                               IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

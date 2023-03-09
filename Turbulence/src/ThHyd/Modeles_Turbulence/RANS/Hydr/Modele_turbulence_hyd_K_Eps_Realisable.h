@@ -27,8 +27,8 @@
 #include <Transport_K_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 
 class Modele_turbulence_hyd_K_Eps_Realisable : public  Mod_turb_hyd_RANS
@@ -71,6 +71,7 @@ private :
   Modele_Fonc_Realisable mon_modele_fonc;
   Transport_K_Eps_Realisable  eqn_transport_K_Eps_Rea;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void imprimer_evolution_keps_realisable(int avant) const;
 
 };
 

@@ -18,7 +18,10 @@
 #include <Champ_P1_isoP1Bulle.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
+#include <Postraitements.h>
+#include <Probleme_base.h>
 #include <Champ_P1NC.h>
+#include <EChaine.h>
 
 Implemente_instanciable_sans_constructeur(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
 // XD Navier_Stokes_Aposteriori navier_stokes_standard Navier_Stokes_Aposteriori -1 Modification of the Navier_Stokes_standard class in order to accept the estimateur_aposteriori post-processing. To post-process estimateur_aposteriori, add this keyword into the list of fields to be post-processed. This estimator whill generate a map of aposteriori error estimators; it is defined on each mesh cell and is a measure of the local discretisation error. This will serve for adaptive mesh refinement
@@ -47,6 +50,13 @@ void Navier_Stokes_Aposteriori::creer_champ(const Motcle& motlu)
         {
           estimateur_aposteriori();
           champs_compris_.ajoute_champ(estimateur_aposteriori_);
+
+          Nom chaine = "{ numero_source 0 sources { refChamp { pb_champ ";
+          chaine += probleme().le_nom();
+          chaine += "  vitesse } } }";
+          EChaine echaine(chaine);
+          echaine >> champ_src_;
+          champ_src_.completer(probleme().postraitements().front());
         }
     }
 }
@@ -69,17 +79,17 @@ const Champ_base& Navier_Stokes_Aposteriori::get_champ(const Motcle& nom) const
 
 void Navier_Stokes_Aposteriori::estimateur_aposteriori()
 {
-  const Zone_VEF_PreP1b& zone_vef = ref_cast(Zone_VEF_PreP1b, zone_dis().valeur());
-  const Zone_Cl_VEF& zone_cl_vef = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur());
+  const Domaine_VEF_PreP1b& domaine_vef = ref_cast(Domaine_VEF_PreP1b, domaine_dis().valeur());
+  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur());
   estimateur_aposteriori_.typer("Estimateur_Aposteriori_P0_VEF");
   Estimateur_Aposteriori_P0_VEF& ch = ref_cast(Estimateur_Aposteriori_P0_VEF, estimateur_aposteriori_.valeur());
-  ch.associer_zone_dis_base(zone_vef);
+  ch.associer_domaine_dis_base(domaine_vef);
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, la_vitesse.valeur());
   const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, la_pression.valeur());
-  ch.associer_champ(vit, pres, diffusivite_pour_transport() /* viscosite_cinematique */, zone_cl_vef);
+  ch.associer_champ(vit, pres, diffusivite_pour_transport() /* viscosite_cinematique */, domaine_cl_vef);
   ch.nommer("estimateur_aposteriori");
   ch.fixer_nb_comp(1);
-  ch.fixer_nb_valeurs_nodales(zone_vef.nb_elem());
+  ch.fixer_nb_valeurs_nodales(domaine_vef.nb_elem());
   ch.fixer_unite("sans");
   ch.changer_temps(la_vitesse.temps());
 }

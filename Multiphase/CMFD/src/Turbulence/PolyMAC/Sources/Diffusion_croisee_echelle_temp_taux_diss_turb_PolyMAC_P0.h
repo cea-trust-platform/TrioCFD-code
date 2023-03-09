@@ -23,8 +23,7 @@
 #ifndef Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0_included
 #define Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0_included
 
-#include <Source_base.h>
-#include <Champ_Elem_PolyMAC_P0.h>	// a retirer plus tard
+#include <Source_Diffusion_croisee_echelle_temp_taux_diss_turb.h>
 
 class Convection_Diffusion_std;
 /*! @brief class Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0
@@ -38,26 +37,15 @@ class Convection_Diffusion_std;
  *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
  */
-class Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
+class Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0 : public Source_Diffusion_croisee_echelle_temp_taux_diss_turb 	// Terme_Source_PolyMAC_P0_base
 {
 
   Declare_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0);
 
 public:
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const  override { }; //rien
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& )  override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-  void completer() override;
 
 protected:
-  double sigma_d = 0.; // Kok and Spekreijse (2000) Efficient and accurate implementation of the k-omega turbulence model in the NLR multi-block Navier-Stokes system
   int f_grad_k_fixe = 1 ;
   int f_grad_tau_omega_fixe = 1 ;
 };

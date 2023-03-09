@@ -22,9 +22,9 @@
 #include <Source_Transport_K_Eps_Bas_Reynolds_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Fluide_base.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <TRUSTTrav.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Debog.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VEF_Face,"Source_Transport_K_Eps_Bas_Reynolds_VEF_P1NC",Source_Transport_VEF_Face_base);
@@ -41,10 +41,10 @@ void Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::associer_pb(const Probleme_ba
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu) const
 {
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter resu 0", resu);
-  const Zone_Cl_dis& zcl_keps = eqn_keps_bas_re->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps = eqn_keps_bas_re->zone_dis();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Domaine_Cl_dis& zcl_keps = eqn_keps_bas_re->domaine_Cl_dis();
+  const Domaine_dis& domaine_dis_keps = eqn_keps_bas_re->domaine_dis();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
@@ -52,17 +52,22 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
-  const int nb_faces = zone_VEF.nb_faces();
+  const DoubleVect& vol_ent = domaine_VEF.volumes_entrelaces();
+  const int nb_faces = domaine_VEF.nb_faces();
 
   DoubleTrav P(nb_faces), D(vol_ent), E(vol_ent), F1(nb_faces), F2(nb_faces);
 
-  mon_modele_fonc.Calcul_D(D, zone_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin);
+  mon_modele_fonc.Calcul_D(D, domaine_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin);
   D.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_E(E, zone_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin, visco_turb);
-  mon_modele_fonc.Calcul_F2(F2, D, zone_dis_keps, K_eps_Bas_Re, ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E, domaine_dis_keps, zcl_keps, vit, K_eps_Bas_Re, ch_visco_cin, visco_turb);
+  mon_modele_fonc.Calcul_F2(F2, D, domaine_dis_keps, K_eps_Bas_Re, ch_visco_cin);
 
-  calculer_terme_production_K(zone_VEF, zone_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb);
+  if (_interpolation_viscosite_turbulente != 0)
+    {
+      Cerr << "Error 'interpolation_viscosite_turbulente' must be equal to '0' in this case." << finl;
+      Process::exit();
+    }
+  calculer_terme_production_K(domaine_VEF, domaine_Cl_VEF, P, K_eps_Bas_Re, vit, visco_turb, _interpolation_viscosite_turbulente);
 
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter P 0", P);
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter D 0", D);

@@ -52,7 +52,7 @@ static void compare(const IJK_Field_double& ref, const IJK_Field_double& x, cons
           if (/*fabs(x(i,j,k)) > 1e-15 || fabs(ref(i,j,k))>1e-15*/ d > 1e-15)
             {
               char s[100];
-              sprintf(s, "%10g  %10g      %5g", ref(i,j,k), x(i,j,k), d);
+              snprintf(s, 100, "%10g  %10g      %5g", ref(i,j,k), x(i,j,k), d);
               Process::Journal() << "check centre4 " << msg << " (i,j,k)="
                                  << i << "," << j << "," << k
                                  << " ref val=" << s << finl;
@@ -190,7 +190,7 @@ void Op_Conv_centre4IJK_VDF_Face::completer()
   op_ijk_.initialize(split);
 
 
-  const Zone_VDF& zone_vf = ref_cast(Zone_VDF, equation().zone_dis().valeur());
+  const Domaine_VDF& domaine_vf = ref_cast(Domaine_VDF, equation().domaine_dis().valeur());
 
   op_ijk_.initialize(split);
   vx_.allocate(split, IJK_Splitting::FACES_I, 1);
@@ -203,7 +203,7 @@ void Op_Conv_centre4IJK_VDF_Face::completer()
   dvy_.allocate(split, IJK_Splitting::FACES_J, 0);
   dvz_.allocate(split, IJK_Splitting::FACES_K, 0);
 
-  flux_bords_.resize(zone_vf.nb_faces_bord(),dimension);
+  flux_bords_.resize(domaine_vf.nb_faces_bord(),dimension);
 
   Op_Conv_centre4_VDF_Face::completer();
 }

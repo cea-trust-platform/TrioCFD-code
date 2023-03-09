@@ -5,20 +5,20 @@ Domaine dom
 # BEGIN MESH #
 Mailler dom
 {
-	pave bloc
-	{
-		origine 0 0 0
-		longueurs 1 1 1
-		nombre_de_noeuds 21 21 21
-		}
-		{
-		bord periox	X = 0	0 <= Y <= 1	0 <= Z <= 1
-		bord periox	X = 1	0 <= Y <= 1	0 <= Z <= 1
-		bord perioy	Y = 0	0 <= X <= 1	0 <= Z <= 1
-		bord perioy	Y = 1	0 <= X <= 1	0 <= Z <= 1
-		bord perioz	Z = 0	0 <= X <= 1	0 <= Y <= 1
-		bord perioz	Z = 1	0 <= X <= 1	0 <= Y <= 1
-		}
+    pave bloc
+    {
+        origine 0 0 0
+        longueurs 1 1 1
+        nombre_de_noeuds 21 21 21
+    }
+    {
+        bord periox	X = 0	0 <= Y <= 1	0 <= Z <= 1
+        bord periox	X = 1	0 <= Y <= 1	0 <= Z <= 1
+        bord perioy	Y = 0	0 <= X <= 1	0 <= Z <= 1
+        bord perioy	Y = 1	0 <= X <= 1	0 <= Z <= 1
+        bord perioz	Z = 0	0 <= X <= 1	0 <= Y <= 1
+        bord perioz	Z = 1	0 <= X <= 1	0 <= Y <= 1
+    }
 }
 
 Polyedriser dom
@@ -45,7 +45,7 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-	nb_pas_dt_max 1
+	nb_pas_dt_max 2
     dt_max 1.e-16
     solveur ice
     {
@@ -64,18 +64,18 @@ Discretize pb dis
 
 Lire pb
 {
-	Milieu_composite
-	{
-liquide_eau Fluide_Incompressible
-{
-	mu champ_uniforme 1 0.001
- 	rho champ_uniforme 1 1000
-	lambda Champ_Uniforme  1 1.
-        Cp Champ_Uniforme      1 1.
-        beta_th Champ_Uniforme 1 0.
-}
+    Milieu_composite
+    {
+        liquide_eau Fluide_Incompressible
+        {
+            mu champ_uniforme 1 0.001
+            rho champ_uniforme 1 1000
+            lambda Champ_Uniforme  1 1.
+            Cp Champ_Uniforme      1 1.
+            beta_th Champ_Uniforme 1 0.
+        }
 
-	}
+    }
     correlations
     {
     }
@@ -84,31 +84,31 @@ liquide_eau Fluide_Incompressible
         equation_non_resolue	(t>0)
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
-        convection { centre }
+        convection { amont }
         diffusion  { turbulente k_omega { } }
         initial_conditions
         {
-            vitesse  champ_fonc_xyz dom 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z) 
+            vitesse  champ_fonc_xyz dom 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
             pression Champ_Fonc_xyz dom 1 1e5
         }
-	conditions_limites	
-	{
-	    periox	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
-	    perioy	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
-	    perioz	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
-	}
+        conditions_limites
+        {
+            periox	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+            perioy	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+            perioz	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+        }
     }
     Masse_Multiphase
     {
         equation_non_resolue	(t>0)
         initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
         convection { amont }
-	conditions_limites	
-	{
-	    periox	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
-	    perioy	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
-	    perioz	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
-	}
+        conditions_limites
+        {
+            periox	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            perioy	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            perioz	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+        }
         sources { }
     }
     Energie_Multiphase
@@ -119,9 +119,9 @@ liquide_eau Fluide_Incompressible
         initial_conditions { temperature Champ_Uniforme 1 0 }
         boundary_conditions
         {
-	    periox	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
-	    perioy	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
-	    perioz	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            periox	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            perioy	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            perioz	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
         }
         sources
         {
@@ -135,15 +135,15 @@ liquide_eau Fluide_Incompressible
         initial_conditions { k champ_fonc_xyz dom 1 cos(2*3.14*y)+2 }
         boundary_conditions
         {
-	    periox	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
-	    perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
-	    perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+            periox	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+            perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+            perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
         }
-	sources
-	{
-	Production_energie_cin_turb { } ,
-	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
-	}
+        sources
+        {
+            Production_energie_cin_turb  ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
     }
     taux_dissipation_turbulent
     {
@@ -153,112 +153,116 @@ liquide_eau Fluide_Incompressible
         initial_conditions { omega Champ_Fonc_xyz dom 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09) }
         boundary_conditions
         {
-	    periox	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
-	    perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
-	    perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
+            periox	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
+            perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
+            perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
         }
-	sources
-	{
-	Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
-	Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
-	Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
-	}
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+        }
     }
     Postraitement
-	{
-		Definition_champs	{
-					prod_k 	operateur_eqn	{
-									numero_source 0
-									sources { refChamp { pb_champ pb k } }
-									}
-					diss_k 	operateur_eqn	{
-									numero_source 1
-									sources { refChamp { pb_champ pb k } }
-									}
-					diff_k	       operateur_eqn	{
-									numero_op 0
-									sources { refChamp { pb_champ pb k } }
-									}
-					conv_k 	operateur_eqn	{
-									numero_op 1
-									sources { refChamp { pb_champ pb k } }
-									}
-					prod_omega 	operateur_eqn	{
-									numero_source 0
-									sources { refChamp { pb_champ pb omega } }
-									}
-					diss_omega 	operateur_eqn	{
-									numero_source 1
-									sources { refChamp { pb_champ pb omega } }
-									}
-					diff_crois_omega operateur_eqn	{
-									numero_source 2
-									sources { refChamp { pb_champ pb omega } }
-									}
-					diff_omega	operateur_eqn	{
-									numero_op 0
-									sources { refChamp { pb_champ pb omega } }
-									}
-					conv_omega 	operateur_eqn	{
-									numero_op 1
-									sources { refChamp { pb_champ pb omega } }
-									}					
-					epsilon         transformation {
-							                methode formule expression 1 0.09*k_loc*omega_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb omega nom_source omega_loc  } }
-							               }
-					}
-		sondes			{
-					vitesseX	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
-					vitesseY	vitesseY		periode 1 position_like vitesseX
-					vitesseZ	vitesseZ		periode 1 position_like vitesseX
+    {
+        Definition_champs	{
+            prod_k 	operateur_eqn	{
+                numero_source 0
+                sources { refChamp { pb_champ pb k } }
+            }
+            diss_k 	operateur_eqn	{
+                numero_source 1
+                sources { refChamp { pb_champ pb k } }
+            }
+            diff_k	       operateur_eqn	{
+                numero_op 0
+                sources { refChamp { pb_champ pb k } }
+            }
+            conv_k 	operateur_eqn	{
+                numero_op 1
+                sources { refChamp { pb_champ pb k } }
+            }
+            prod_omega 	operateur_eqn	{
+                numero_source 0
+                sources { refChamp { pb_champ pb omega } }
+            }
+            diss_omega 	operateur_eqn	{
+                numero_source 1
+                sources { refChamp { pb_champ pb omega } }
+            }
+            diff_crois_omega operateur_eqn	{
+                numero_source 2
+                sources { refChamp { pb_champ pb omega } }
+            }
+            diff_omega	operateur_eqn	{
+                numero_op 0
+                sources { refChamp { pb_champ pb omega } }
+            }
+            conv_omega 	operateur_eqn	{
+                numero_op 1
+                sources { refChamp { pb_champ pb omega } }
+            }
+            epsilon         transformation {
+                methode formule expression 1 0.09*k_loc*omega_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb omega nom_source omega_loc  } }
+            }
+        }
+        sondes			{
+            vitesseX	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
+            vitesseY	vitesseY		periode 1 position_like vitesseX
+            vitesseZ	vitesseZ		periode 1 position_like vitesseX
 
-					k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
-					omega		omega			periode 1 position_like k
-					epsilon	epsilon		periode 1 position_like k
-					nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
+            k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
+            omega		omega			periode 1 position_like k
+            epsilon	epsilon		periode 1 position_like k
+            nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
 
-					prod_k 	prod_k 		periode 1 position_like k
-					diss_k 	diss_k 		periode 1 position_like k
-					diff_k 	diff_k 		periode 1 position_like k
-					conv_k 	conv_k 		periode 1 position_like k
+            prod_k 	prod_k 		periode 1 position_like k
+            diss_k 	diss_k 		periode 1 position_like k
+            diff_k 	diff_k 		periode 1 position_like k
+            conv_k 	conv_k 		periode 1 position_like k
 
-					prod_omega 	prod_omega 		periode 1 position_like omega
-					diss_omega 	diss_omega 		periode 1 position_like omega
-					diff_omega 	diff_omega 		periode 1 position_like omega
-					conv_omega 	conv_omega 		periode 1 position_like omega
-					diff_crois_omega diff_crois_omega		periode 1 position_like omega
-					
-					vitesseX_bord	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
-					vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
-					vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
+            prod_omega 	prod_omega 		periode 1 position_like omega
+            diss_omega 	diss_omega 		periode 1 position_like omega
+            diff_omega 	diff_omega 		periode 1 position_like omega
+            conv_omega 	conv_omega 		periode 1 position_like omega
+            diff_crois_omega diff_crois_omega		periode 1 position_like omega
 
-					k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
-					omega_bord	omega			periode 1 position_like k_bord
-					epsilon_bord	epsilon		periode 1 position_like k_bord
-					nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
+            vitesseX_bord	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
+            vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
+            vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
 
-					prod_k_bord 	prod_k 		periode 1 position_like k_bord
-					diss_k_bord 	diss_k 		periode 1 position_like k_bord
-					diff_k_bord 	diff_k 		periode 1 position_like k_bord
-					conv_k_bord 	conv_k 		periode 1 position_like k_bord
+            k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
+            omega_bord	omega			periode 1 position_like k_bord
+            epsilon_bord	epsilon		periode 1 position_like k_bord
+            nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
 
-					prod_omega_bord 	prod_omega 		periode 1 position_like omega_bord
-					diss_omega_bord 	diss_omega 		periode 1 position_like omega_bord
-					diff_omega_bord 	diff_omega 		periode 1 position_like omega_bord
-					conv_omega_bord 	conv_omega 		periode 1 position_like omega_bord
-					}
-		format lml
-		champs binaire dt_post 1e6
-					{
-					k elem
-					omega elem
-					vitesse elem
-					viscosite_turbulente_liquide_eau elem
-					}
-	}
+            prod_k_bord 	prod_k 		periode 1 position_like k_bord
+            diss_k_bord 	diss_k 		periode 1 position_like k_bord
+            diff_k_bord 	diff_k 		periode 1 position_like k_bord
+            conv_k_bord 	conv_k 		periode 1 position_like k_bord
+
+            prod_omega_bord 	prod_omega 		periode 1 position_like omega_bord
+            diss_omega_bord 	diss_omega 		periode 1 position_like omega_bord
+            diff_omega_bord 	diff_omega 		periode 1 position_like omega_bord
+            conv_omega_bord 	conv_omega 		periode 1 position_like omega_bord
+        }
+        format lml
+        champs binaire dt_post 1e6
+        {
+            k elem
+            omega elem
+            vitesse elem
+            viscosite_turbulente_liquide_eau elem
+	    gradient_vitesse_liquide_eau elem
+            prod_k elem
+            diss_k elem
+            diss_omega elem
+            prod_omega elem
+            diff_crois_omega elem
+        }
+    }
 }
-
-EcritureLectureSpecial EcrFicPartageBin
 
 Resoudre pb
 

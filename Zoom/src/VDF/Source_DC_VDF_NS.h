@@ -29,8 +29,8 @@
 #include <Probleme_base.h>
 
 class Probleme_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -47,7 +47,7 @@ class Source_DC_VDF_NS : public Source_Correction_Deficitaire
 
 public:
 
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
 
 
 
@@ -65,7 +65,6 @@ inline DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_IndGros& conne
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_DC_VDF_NS !!"<<finl;
   exit();
   throw;
-  return calculer_residu( connect,  rest, eq_fine);
 }
 
 

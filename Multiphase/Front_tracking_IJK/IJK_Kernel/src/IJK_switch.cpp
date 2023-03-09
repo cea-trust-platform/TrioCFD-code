@@ -517,16 +517,10 @@ void Switch_double::write_velocity(const Nom lata_name) const
           n = ((long long) geom.get_nb_elem_tot(DIRECTION_I)+1)
               * ((long long) geom.get_nb_elem_tot(DIRECTION_J)+1)
               * ((long long) geom.get_nb_elem_tot(DIRECTION_K)+1);
-          sprintf(sz_string, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
+          snprintf(sz_string, 100, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
           f << "Champ VELOCITY " << (lata_name + Nom(".VELOCITY.data")) <<  " geometrie=" << geom.le_nom() << " size=" << sz_string
             << " localisation=FACES composantes=3 nature=vector" << finl;
 
-          //          LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-          //          if (curseur)
-          //            {
-          //              Cerr << "direct_write not yet supported with thermique " << finl ;
-          //              Process::exit();
-          //            }
         }
     }
 }

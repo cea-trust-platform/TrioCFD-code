@@ -82,7 +82,12 @@ Read pb
 			Entree frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 1.
 			Sortie frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
 		}
+        sources {
+			source_qdm champ_uniforme_morceaux dom 2
+			{ defaut 0. 0. }
+        }
 	}
+	
 	Postraitement
 	{
 		Sondes

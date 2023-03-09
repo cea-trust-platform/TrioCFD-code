@@ -25,7 +25,6 @@
 #include <Discretisation_base.h>
 
 
-Implemente_deriv(Modele_Fonc_Bas_Reynolds_Thermique_Base);
 Implemente_instanciable(Modele_Fonc_Bas_Reynolds_Thermique,"Modele_Fonc_Bas_Reynolds_Thermique",DERIV(Modele_Fonc_Bas_Reynolds_Thermique_Base));
 
 //
@@ -52,7 +51,7 @@ Entree& Modele_Fonc_Bas_Reynolds_Thermique::readOn(Entree& is )
   DERIV(Modele_Fonc_Bas_Reynolds_Thermique_Base)::typer(nom1);
   valeur().associer_eqn(equation());
 
-  valeur().associer(equation().zone_dis(), equation().zone_Cl_dis());
+  valeur().associer(equation().domaine_dis(), equation().domaine_Cl_dis());
   is >> valeur();
   return is;
 }

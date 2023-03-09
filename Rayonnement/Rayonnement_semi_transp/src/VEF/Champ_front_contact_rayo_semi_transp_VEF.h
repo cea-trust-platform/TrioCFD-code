@@ -24,8 +24,9 @@
 #define Champ_front_contact_rayo_semi_transp_VEF_included
 
 #include <Champ_front_contact_VEF.h>
-#include <Ref_Modele_rayo_semi_transp.h>
+#include <TRUST_Ref.h>
 
+class Modele_rayo_semi_transp;
 
 /*! @brief classe Champ_front_contact_rayo_semi_transp_VEF
  *

@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Marqueur_FT.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Transport_Interfaces_FT_Disc.h>
 
 Implemente_instanciable(Marqueur_FT,"Marqueur_FT",Marqueur_Lagrange_base);
@@ -35,7 +35,7 @@ Sortie& Marqueur_FT::printOn(Sortie& os) const
 //Lecture d un marqueur
 // ensemble_points         : On lit les informations necessaires pour localiser les particules
 //                          -soit lues dans un fichier
-//                          -soit generees dans des sous zones
+//                          -soit generees dans des sous domaines
 // t_debut_integration  : temps de debut d integration des trajectoires (fixe a t_init par defaut)
 
 Entree& Marqueur_FT::readOn(Entree& is)
@@ -84,7 +84,7 @@ Entree& Marqueur_FT::readOn(Entree& is)
 //Surcharge de Marqueur_Lagrange_base::discretiser()
 //Les coordonnees des points a suivre sont :
 //  -soit lues dans un fichier
-//  -soit generees dans des sous zones
+//  -soit generees dans des sous domaines
 
 void Marqueur_FT::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
@@ -108,7 +108,7 @@ void Marqueur_FT::discretiser(const Probleme_base& pb, const  Discretisation_bas
     sommets_tmp(i,j)=sommets(i,j);
     }
     else
-    //Deuxieme cas : les sommets sont crees dans des sous zones
+    //Deuxieme cas : les sommets sont crees dans des sous domaines
     //On remplit le tableau temporaire
     maillage.generer_marqueurs_sz(sommets_tmp);
 

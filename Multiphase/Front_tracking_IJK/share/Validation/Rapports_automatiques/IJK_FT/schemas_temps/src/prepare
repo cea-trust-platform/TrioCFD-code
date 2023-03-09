@@ -1,36 +1,17 @@
 #!/bin/bash
 # Ce script est execute avant de lancer les cas tests
 
-# Generation des interfaces pour l'etat initial:
-# On suppose que gmsh a deja ete execute avec cette commande:
-# gmsh bulle3.geo -2
-
-# Generation d'un bulle  :
-cat >deplacements.txt <<EOF
-0.0015823 0.0015798 0.00151354 bulle3.msh
-EOF
-
-./cree_multi_bulles.sh deplacements.txt init.lata
-
-# cat >deplacements3.txt <<EOF
-# 0.0015823 0.0015798 0.00151354 bulle3.msh
-# 0.0045867 0.0010343 0.00155486 bulle3.msh
-# 0.0055337 0.0029443 0.00155486 bulle3.msh
-# EOF
-# ./cree_multi_bulles.sh deplacements3.txt init_multi.lata
-
 declare -A schemes=( ["EULER"]="euler_explicit" ["RK3"]="RK3_FT")
 list_n="1 5 10 20 50 100"
-for fold in "PRESSION_SEULE" "PRESSION_UNIFORME" "PRESSION_SINUSOIDALE"
+for fold in "01_PHI" "02_PSI_NO_POISSON_SOLVER" "03_PSI_AND_POISSON_SOLVER" "04_PHI_AND_PSI"
 do
    echo "********* $fold *********"
    mkdir -p $fold
-   if [ $fold == "PRESSION_SEULE" ] ; then
-      sed -e "s@expression_variable_source_x .*@expression_variable_source_x sin(x)*cos(t*0.)@g" \
-          -e "s@expression_variable_source_y .*@expression_variable_source_y sin(y)*cos(t*0.)@g" \
-          -e "s@expression_variable_source_z .*@expression_variable_source_z 0.@g" \
-          -e "s@expression_p_ana .*@expression_p_ana   (cos(x)+cos(y)+0.*sin(z))*cos(t*0.)@g" \
-          -e "s@expression_p_init .*@expression_p_init (cos(x)+cos(y)+0.*sin(z))*cos(0.)@g" \
+   if [ $fold == "01_PHI" ] ; then
+      sed -e "/expression_variable_source/d" \
+          -e "s@expression_potential_phi .*@expression_potential_phi (sin(x)+sin(y)+sin(z))*cos(t)@g" \
+          -e "s@expression_p_ana .*@expression_p_ana   (sin(x)+sin(y)+sin(z))*cos(t)@g" \
+          -e "s@expression_p_init .*@expression_p_init (sin(x)+sin(y)+sin(z))*cos(0.)@g" \
           -e "s@expression_vx_ana .*@expression_vx_ana 0.@g" \
           -e "s@expression_vx_init .*@expression_vx_init 0.@g" \
           -e "s@expression_vy_ana .*@expression_vy_ana 0.@g" \
@@ -38,16 +19,51 @@ do
           -e "s@expression_vz_ana .*@expression_vz_ana 0.@g" \
           -e "s@expression_vz_init .*@expression_vz_init 0.@g" \
 	     template.data > $fold/template.data
-   elif [ $fold == "PRESSION_UNIFORME" ] ; then
-      sed -e "s/expression_variable_source_z .*/expression_variable_source_z 0./g" \
-          -e "s/expression_p_ana .*/expression_p_ana 0./g" \
-          -e "s/expression_p_init .*/expression_p_init 0./g" \
+   elif [ $fold == "02_PSI_NO_POISSON_SOLVER" ] ; then
+      sed -e "s@expression_potential_phi .*@disable_solveur_poisson@g" \
+          -e "/expression_potential_phi/d" \
+          -e "s@expression_variable_source_x .*@expression_variable_source_x (-cos(x)*sin(y))*cos(t)@g" \
+          -e "s@expression_variable_source_y .*@expression_variable_source_y (-sin(y)*sin(z)+sin(x)*cos(y))*cos(t)@g" \
+          -e "s@expression_variable_source_z .*@expression_variable_source_z (-cos(y)*cos(z))*cos(t)@g" \
+          -e "s@expression_p_ana .*@expression_p_ana   0.@g" \
+          -e "s@expression_p_init .*@expression_p_init 0.@g" \
+          -e "s@expression_vx_ana .*@expression_vx_ana (-cos(x)*sin(y))*sin(t)@g" \
+          -e "s@expression_vx_init .*@expression_vx_init 0.@g" \
+          -e "s@expression_vy_ana .*@expression_vy_ana (-sin(y)*sin(z)+sin(x)*cos(y))*sin(t)@g" \
+          -e "s@expression_vy_init .*@expression_vy_init 0.@g" \
+          -e "s@expression_vz_ana .*@expression_vz_ana (-cos(y)*cos(z))*sin(t)@g" \
+          -e "s@expression_vz_init .*@expression_vz_init 0.@g" \
+	     template.data > $fold/template.data
+   elif [ $fold == "03_PSI_AND_POISSON_SOLVER" ] ; then
+      sed -e "/expression_potential_phi/d" \
+          -e "s@expression_variable_source_x .*@expression_variable_source_x (-cos(x)*sin(y))*cos(t)@g" \
+          -e "s@expression_variable_source_y .*@expression_variable_source_y (-sin(y)*sin(z)+sin(x)*cos(y))*cos(t)@g" \
+          -e "s@expression_variable_source_z .*@expression_variable_source_z (-cos(y)*cos(z))*cos(t)@g" \
+          -e "s@expression_p_ana .*@expression_p_ana   0.@g" \
+          -e "s@expression_p_init .*@expression_p_init 0.@g" \
+          -e "s@expression_vx_ana .*@expression_vx_ana (-cos(x)*sin(y))*sin(t)@g" \
+          -e "s@expression_vx_init .*@expression_vx_init 0.@g" \
+          -e "s@expression_vy_ana .*@expression_vy_ana (-sin(y)*sin(z)+sin(x)*cos(y))*sin(t)@g" \
+          -e "s@expression_vy_init .*@expression_vy_init 0.@g" \
+          -e "s@expression_vz_ana .*@expression_vz_ana (-cos(y)*cos(z))*sin(t)@g" \
+          -e "s@expression_vz_init .*@expression_vz_init 0.@g" \
 	     template.data > $fold/template.data
    else
-      \cp -f template.data $fold/
+      sed -e "s@expression_potential_phi .*@expression_potential_phi (sin(x)+sin(y)+sin(z))*cos(t)@g" \
+          -e "s@expression_p_ana .*@expression_p_ana   (sin(x)+sin(y)+sin(z))*cos(t)@g" \
+          -e "s@expression_p_init .*@expression_p_init (sin(x)+sin(y)+sin(z))*cos(0.)@g" \
+          -e "s@expression_variable_source_x .*@expression_variable_source_x (-cos(x)*sin(y))*cos(t)@g" \
+          -e "s@expression_variable_source_y .*@expression_variable_source_y (-sin(y)*sin(z)+sin(x)*cos(y))*cos(t)@g" \
+          -e "s@expression_variable_source_z .*@expression_variable_source_z (-cos(y)*cos(z))*cos(t)@g" \
+          -e "s@expression_vx_ana .*@expression_vx_ana (-cos(x)*sin(y))*sin(t)@g" \
+          -e "s@expression_vx_init .*@expression_vx_init 0.@g" \
+          -e "s@expression_vy_ana .*@expression_vy_ana (-sin(y)*sin(z)+sin(x)*cos(y))*sin(t)@g" \
+          -e "s@expression_vy_init .*@expression_vy_init 0.@g" \
+          -e "s@expression_vz_ana .*@expression_vz_ana (-cos(y)*cos(z))*sin(t)@g" \
+          -e "s@expression_vz_init .*@expression_vz_init 0.@g" \
+	     template.data > $fold/template.data
    fi
    cd $fold
-   ln -sf ../init.lata* .
    for sch in "${!schemes[@]}"
    do
       echo "${schemes[$sch]}"
@@ -55,8 +71,7 @@ do
       do
          echo -n "Niveau $n "
          mkdir -p $sch/Niv$n
-         \cp -f init*.lata* $sch/Niv$n
-         nit=`echo 500/$n|bc`
+         nit=`echo 500/$n+1|bc`
          dt=`echo 0.002*$n|bc` # Soit un tfin de 1.0s
          echo " ${schemes[$sch]} $nit $dt"
          sed -e "s/time_scheme .*/  time_scheme ${schemes[$sch]} /g" \

@@ -26,9 +26,10 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Op_Diff_Fluctu_Temp_Base.h>
-#include <Ref_Fluide_base.h>
-#include <Ref_Modele_turbulence_scal_Fluctuation_Temperature_W.h>
+#include <TRUST_Ref.h>
 
+class Fluide_base;
+class Modele_turbulence_scal_Fluctuation_Temperature_W;
 class Motcle;
 
 class Transport_Fluctuation_Temperature_W : public Convection_Diffusion_std

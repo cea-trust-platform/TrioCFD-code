@@ -26,7 +26,7 @@
 #include <Schema_Temps_base.h>
 #include <Param.h>
 #include <Equation_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_Wale_VEF,"Modele_turbulence_hyd_sous_maille_Wale_VEF",Mod_turb_hyd_ss_maille_VEF);
 
@@ -67,12 +67,12 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Wale_VEF::calculer_viscosite_turbulente()
 {
   // cw est la constante du modele WALE qui correspond a une correction
   //  de la constante Cs du modele de Smagorinsky.
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  const int nb_elem = zone_VEF.nb_elem();
+  const int nb_elem = domaine_VEF.nb_elem();
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
 
   if (visco_turb.size() != nb_elem)
     {
@@ -85,9 +85,9 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Wale_VEF::calculer_viscosite_turbulente()
   //const Champ_P1NC& ch=(const Champ_P1NC&) mon_equation->inconnue().valeur();
   DoubleTab ubar(la_vitesse);
   //  ch.filtrer_L2(ubar);
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   DoubleTab duidxj(nb_elem_tot,dimension,dimension);
-  Champ_P1NC::calcul_gradient(ubar,duidxj,zone_Cl_VEF);
+  Champ_P1NC::calcul_gradient(ubar,duidxj,domaine_Cl_VEF);
 
   // OpenMP ToDo:
   // l_ passe une seule fois dans une region

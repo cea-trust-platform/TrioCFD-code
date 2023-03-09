@@ -14,60 +14,50 @@
 *****************************************************************************/
 
 #include <Y_plus_Champ_P1NC.h>
-#include <Champ_P1NC.h>
-#include <Milieu_base.h>
 #include <Mod_turb_hyd_base.h>
+#include <Milieu_base.h>
+#include <Champ_P1NC.h>
 
-Implemente_instanciable(Y_plus_Champ_P1NC,"Y_plus_Champ_P1NC",Champ_Fonc_P0_VEF);
+Implemente_instanciable(Y_plus_Champ_P1NC, "Y_plus_Champ_P1NC", Champ_Fonc_P0_VEF);
 
+Sortie& Y_plus_Champ_P1NC::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 
+Entree& Y_plus_Champ_P1NC::readOn(Entree& s) { return s; }
 
-Sortie& Y_plus_Champ_P1NC::printOn(Sortie& s) const
+void Y_plus_Champ_P1NC::mettre_a_jour(double tps)
 {
-  return s << que_suis_je() << " " << le_nom();
+  me_calculer(tps);
+  changer_temps(tps);
+  Champ_Fonc_base::mettre_a_jour(tps);
 }
-
-
-
-Entree& Y_plus_Champ_P1NC::readOn(Entree& s)
-{
-  return s ;
-}
-
-
 
 void Y_plus_Champ_P1NC::associer_champ(const Champ_P1NC& un_champ)
 {
-  mon_champ_= un_champ;
+  mon_champ_ = un_champ;
 }
-
-
 
 void Y_plus_Champ_P1NC::me_calculer(double tps)
 {
 
-  const Nom& nom_eq = mon_champ ().equation().que_suis_je();
-  const Milieu_base& mil = mon_champ ().equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
+  const Nom& nom_eq = mon_champ().equation().que_suis_je();
+  const Milieu_base& mil = mon_champ().equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
   const Nom& nom_mil = mil.que_suis_je();
 
-  if ( nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique" )
+  if (nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique")
     {
-      const RefObjU& modele_turbulence = mon_champ ().equation().get_modele(TURBULENCE);
-      const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base,modele_turbulence.valeur());
+      const RefObjU& modele_turbulence = mon_champ().equation().get_modele(TURBULENCE);
+      const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
       const Nom& nom_loipar = loipar.que_suis_je();
 
-      if ( nom_loipar =="loi_standard_hydr_diphasique_VEF")
-        mon_champ_->calcul_y_plus_diphasique(la_zone_Cl_VEF.valeur(),valeurs());
+      if (nom_loipar == "loi_standard_hydr_diphasique_VEF")
+        mon_champ_->calcul_y_plus_diphasique(le_dom_Cl_VEF.valeur(), valeurs());
     }
   else
-    {
-      mon_champ_->calcul_y_plus(la_zone_Cl_VEF.valeur(),valeurs());
-    }
-
+    mon_champ_->calcul_y_plus(le_dom_Cl_VEF.valeur(), valeurs());
 }
 
-const Zone_Cl_dis_base& Y_plus_Champ_P1NC::zone_Cl_dis_base() const
+const Domaine_Cl_dis_base& Y_plus_Champ_P1NC::domaine_Cl_dis_base() const
 {
-  return la_zone_Cl_VEF.valeur();
+  return le_dom_Cl_VEF.valeur();
 }

@@ -33,8 +33,8 @@
 #include <Paroi_log_QDM.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_std_hyd_EF
  *

@@ -88,7 +88,7 @@ done
 ##################
 cat >> plot.gplot << EOF
 #!/usr/bin/gnuplot
-set terminal png size 640,480 enhanced font "Helvetica,12"
+set terminal png large
 set output './cvgt_son.png'
 set log xy
 set xlabel "DT/0.001953125"

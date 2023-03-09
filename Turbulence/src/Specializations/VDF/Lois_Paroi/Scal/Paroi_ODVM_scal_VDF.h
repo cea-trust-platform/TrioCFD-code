@@ -23,16 +23,17 @@
 #define Paroi_ODVM_scal_VDF_included
 
 #include <Paroi_scal_hyd_base_VDF.h>
-#include <Zone_Cl_dis.h>
-#include <Vect_Eq_ODVM.h>
-#include <Ref_Convection_Diffusion_std.h>
-#include <Ref_DoubleVect.h>
+#include <Domaine_Cl_dis.h>
+#include <TRUST_Vector.h>
+#include <Eq_ODVM.h>
+#include <TRUSTTabs_forward.h>
 #include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
-
+class Convection_Diffusion_std;
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_ODVM_scal_VDF
  *

@@ -83,9 +83,9 @@ void Viscosite_turbulente_k_tau::k_over_eps(DoubleTab& k_sur_eps) const
   const DoubleTab& tau = pb_->get_champ("tau").passe();
   int i, nl = k_sur_eps.dimension(0), n, N = k_sur_eps.dimension(1), Nt = tau.dimension(1);
   assert(nl == tau.dimension(0) && Nt <= N);
-  /* comme tau = 1 / omega et omega = epsilon / k, k / epsilon = tau ! */
+  /* comme tau = 1 / omega et omega = epsilon / (k*beta_k), k / epsilon = tau/beta_k ! */
   for (i = 0; i < nl; i++)
-    for (n = 0; n < N; n++) k_sur_eps(i, n) = n < Nt ? tau(i, n) : 0;
+    for (n = 0; n < N; n++) k_sur_eps(i, n) = n < Nt ? tau(i, n)/beta_k_  : 0;
 }
 
 void Viscosite_turbulente_k_tau::eps(DoubleTab& eps_) const
@@ -95,7 +95,7 @@ void Viscosite_turbulente_k_tau::eps(DoubleTab& eps_) const
                     &nu = pb_->get_champ("viscosite_cinematique").passe();
   int i, nl = eps_.dimension(0), n, N = eps_.dimension(1), Nt = tau.dimension(1);
   assert(nl == tau.dimension(0) && Nt <= N);
-  /* comme tau = 1 / omega et omega = epsilon / k, epsilon = k / tau ! */
+  /* comme tau = 1 / omega et omega = epsilon / (k*beta_k), epsilon = beta_k_ * k / tau ! */
   for (i = 0; i < nl; i++)
     for (n = 0; n < N; n++) eps_(i, n) = beta_k_ * ( ((n < Nt) && (k(i, n)>1.e-8) ) ? k(i, n)*k(i, n)/ std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0 );
 }

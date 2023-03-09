@@ -22,8 +22,8 @@
 
 #include <Cond_Lim_Rayo.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Zone_VF.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_VF.h>
+#include <Domaine_Cl_dis_base.h>
 
 void Cond_Lim_Rayo::associer_modele_rayo(Modele_Rayonnement_base& mod)
 {
@@ -36,7 +36,7 @@ void Cond_Lim_Rayo::completer()
   assert(0);
   Process::exit();
 }
-void  Cond_Lim_Rayo::preparer_surface(const Frontiere_dis_base& fr ,const Zone_Cl_dis_base& zcl)
+void  Cond_Lim_Rayo::preparer_surface(const Frontiere_dis_base& fr ,const Domaine_Cl_dis_base& zcl)
 {
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,fr);
   int ndeb = la_frontiere_VF.num_premiere_face();
@@ -45,7 +45,7 @@ void  Cond_Lim_Rayo::preparer_surface(const Frontiere_dis_base& fr ,const Zone_C
   Surf_i.resize(nb_faces_bord);
   Teta_i.resize(nb_faces_bord);
   // recuperation des surfaces de bords.
-  const Zone_VF& zone=ref_cast(Zone_VF,zcl.zone_dis().valeur());
+  const Domaine_VF& domaine=ref_cast(Domaine_VF,zcl.domaine_dis().valeur());
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
-    Surf_i[numfa]= zone.face_surfaces(numfa+ndeb);
+    Surf_i[numfa]= domaine.face_surfaces(numfa+ndeb);
 }

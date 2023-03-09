@@ -38,7 +38,7 @@
 #include <EChaine.h>
 #include <SChaine.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Sonde_IJK.h>
 #include <Ouvrir_fichier.h>
 #include <EcritureLectureSpecial.h>

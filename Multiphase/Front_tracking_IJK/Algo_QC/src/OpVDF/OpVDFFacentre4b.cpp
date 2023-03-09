@@ -45,22 +45,22 @@ Entree& Op_Conv_centre4b_VDF_Face::readOn(Entree& s )
 /*! @brief complete l'iterateur et l'evaluateur
  *
  */
-void Op_Conv_centre4b_VDF_Face::associer(const Zone_dis& zone_dis,
-                                         const Zone_Cl_dis& zone_cl_dis,
+void Op_Conv_centre4b_VDF_Face::associer(const Domaine_dis& domaine_dis,
+                                         const Domaine_Cl_dis& domaine_cl_dis,
                                          const Champ_Inc& ch_vit)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
-  const Champ_Face& vit = ref_cast(Champ_Face,ch_vit.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
+  const Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF,ch_vit.valeur());
 
   iter.associer(zvdf, zclvdf, *this);
 
   Eval_centre4b_VDF_Face& eval_conv = (Eval_centre4b_VDF_Face&) iter.evaluateur();
-  eval_conv.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
+  eval_conv.associer_domaines(zvdf, zclvdf );          // Evaluateur_VDF::associer_domaines
   eval_conv.associer_inconnue(vit);        // Eval_VDF_Face::associer_inconnue
-  if (Process::nproc()>1 && zvdf.zone().nb_joints() && zvdf.zone().joint(0).epaisseur()<2)
+  if (Process::nproc()>1 && zvdf.domaine().nb_joints() && zvdf.domaine().joint(0).epaisseur()<2)
     {
-      Cerr << "Overlapping width (given by larg_joint option) of  " << zvdf.zone().joint(0).epaisseur() << finl;
+      Cerr << "Overlapping width (given by larg_joint option) of  " << zvdf.domaine().joint(0).epaisseur() << finl;
       Cerr << "is not enough for centre4b scheme in VDF parallel calculation." << finl;
       Cerr << "Please, partition your mesh with an overlapping width of 2 with larg_joint option." << finl;
       Process::exit();

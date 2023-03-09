@@ -26,8 +26,8 @@
 #define Equation_rayonnement_included
 
 #include <Equation_rayonnement_base.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Equation_rayonnement_base);
 
 class Equation_rayonnement : public DERIV(Equation_rayonnement_base)
 {
@@ -35,7 +35,7 @@ class Equation_rayonnement : public DERIV(Equation_rayonnement_base)
 
 public :
 
-  inline void associer_zone_dis(const Zone_dis& Zd);
+  inline void associer_domaine_dis(const Domaine_dis& Zd);
   inline void associer_milieu_base(const Milieu_base&);
   inline void associer_fluide(const Fluide_base&);
   inline void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
@@ -57,10 +57,10 @@ public :
   inline Operateur_Grad& operateur_gradient();
   inline const Operateur_Grad& operateur_gradient() const;
 
-  inline Zone_Cl_dis& zone_Cl_dis();
-  inline const Zone_Cl_dis& zone_Cl_dis() const;
-  inline Zone_dis& zone_dis();
-  inline const Zone_dis& zone_dis() const;
+  inline Domaine_Cl_dis& domaine_Cl_dis();
+  inline const Domaine_Cl_dis& domaine_Cl_dis() const;
+  inline Domaine_dis& domaine_dis();
+  inline const Domaine_dis& domaine_dis() const;
 
   inline void mettre_a_jour(double temps);
   inline void modifier_matrice();
@@ -101,14 +101,14 @@ inline void Equation_rayonnement::completer()
   valeur().completer();
 }
 
-inline Zone_dis& Equation_rayonnement::zone_dis()
+inline Domaine_dis& Equation_rayonnement::domaine_dis()
 {
-  return valeur().zone_dis();
+  return valeur().domaine_dis();
 }
 
-inline const Zone_dis& Equation_rayonnement::zone_dis() const
+inline const Domaine_dis& Equation_rayonnement::domaine_dis() const
 {
-  return valeur().zone_dis();
+  return valeur().domaine_dis();
 }
 
 
@@ -215,19 +215,19 @@ inline void Equation_rayonnement::mettre_a_jour(double temps)
   valeur().mettre_a_jour(temps);
 }
 
-inline Zone_Cl_dis& Equation_rayonnement::zone_Cl_dis()
+inline Domaine_Cl_dis& Equation_rayonnement::domaine_Cl_dis()
 {
-  return valeur().zone_Cl_dis();
+  return valeur().domaine_Cl_dis();
 }
 
-inline const Zone_Cl_dis& Equation_rayonnement::zone_Cl_dis() const
+inline const Domaine_Cl_dis& Equation_rayonnement::domaine_Cl_dis() const
 {
-  return valeur().zone_Cl_dis();
+  return valeur().domaine_Cl_dis();
 }
 
-inline void Equation_rayonnement::associer_zone_dis(const Zone_dis& Zd)
+inline void Equation_rayonnement::associer_domaine_dis(const Domaine_dis& Zd)
 {
-  valeur().associer_zone_dis(Zd);
+  valeur().associer_domaine_dis(Zd);
 }
 
 #endif

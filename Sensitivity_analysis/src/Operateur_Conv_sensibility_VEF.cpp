@@ -60,18 +60,18 @@ Entree&  Operateur_Conv_sensibility_VEF::readOn(Entree& is)
   return is;
 }
 
-void  Operateur_Conv_sensibility_VEF::associer (const Zone_dis& zone_dis ,
-                                                const Zone_Cl_dis& zone_cl_dis,
+void  Operateur_Conv_sensibility_VEF::associer (const Domaine_dis& domaine_dis ,
+                                                const Domaine_Cl_dis& domaine_cl_dis,
                                                 const Champ_Inc& inco )
 {
   Cerr << " Operateur_Conv_sensibility_VEF::associer" << finl;
-  const Zone_VEF& zvef = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zclvef = ref_cast(Zone_Cl_VEF,zone_cl_dis.valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
 
-  la_zone_vef = zvef;
+  le_dom_vef = zvef;
   la_zcl_vef = zclvef;
-  la_zone_vef.valeur().creer_tableau_faces(fluent);
-  Operateur_Conv_sensibility::associer(zone_dis,zone_cl_dis,inco);
+  le_dom_vef.valeur().creer_tableau_faces(fluent);
+  Operateur_Conv_sensibility::associer(domaine_dis,domaine_cl_dis,inco);
 }
 
 DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, DoubleTab& resu) const
@@ -83,7 +83,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   int convectionSchemeDiscrType; // amont=0, muscl=1, centre=2
   opConvVEFFace.get_type_op(convectionSchemeDiscrType);
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
 
   if(convectionSchemeDiscrType==0 || convectionSchemeDiscrType==1 || convectionSchemeDiscrType==2) // Convection scheme discr "amont".
     {
@@ -95,7 +95,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
           // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
           DoubleTab& flux_b = flux_bords_;
-          int nb_faces_bord=zone_VEF.nb_faces_bord();
+          int nb_faces_bord=domaine_VEF.nb_faces_bord();
           flux_b.resize(nb_faces_bord,inco.dimension(1));
           flux_b = 0.;
           ajouter_conv_term(state,inco ,resu, flux_b);
@@ -116,7 +116,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
 
           DoubleTab& flux_b = flux_bords_;
-          int nb_faces_bord=zone_VEF.nb_faces_bord();
+          int nb_faces_bord=domaine_VEF.nb_faces_bord();
           flux_b.resize(nb_faces_bord,inco.dimension(0));
           flux_b = 0.;
 
@@ -167,8 +167,8 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
 void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& velocity, const DoubleTab& transporte, DoubleTab& resu,  DoubleTab& flux_b) const
 {
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Op_Conv_VEF_base& opConvVEFbase = ref_cast(Op_Conv_VEF_base, op_conv.valeur());
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
 
@@ -201,23 +201,23 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   const DoubleTab& transporte_face = modif_par_porosite_si_flag(transporte,transporte_face_,!marq,porosite_face);
   const DoubleTab& vitesse_face    = modif_par_porosite_si_flag(vitesse_face_absolue,vitesse_face_,marq,porosite_face);
 
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& facenormales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
-  const Zone& zone = zone_VEF.zone();
-  const int nfa7 = zone_VEF.type_elem().nb_facette();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
-  int premiere_face_int = zone_VEF.premiere_face_int();
-  int nfac = zone.nb_faces_elem();
-  int nsom = zone.nb_som_elem();
-  const IntTab& sommet_elem = zone.les_elems();
-  const DoubleTab& vecteur_face_facette = ref_cast_non_const(Zone_VEF,zone_VEF).vecteur_face_facette();
-  const  DoubleTab& vecteur_face_facette_Cl = zone_Cl_VEF.vecteur_face_facette_Cl();
-  int nb_bord = zone_VEF.nb_front_Cl();
-  const IntTab& les_elems=zone.les_elems();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& facenormales = domaine_VEF.face_normales();
+  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nfa7 = domaine_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
+  int premiere_face_int = domaine_VEF.premiere_face_int();
+  int nfac = domaine.nb_faces_elem();
+  int nsom = domaine.nb_som_elem();
+  const IntTab& sommet_elem = domaine.les_elems();
+  const DoubleTab& vecteur_face_facette = ref_cast_non_const(Domaine_VEF,domaine_VEF).vecteur_face_facette();
+  const  DoubleTab& vecteur_face_facette_Cl = domaine_Cl_VEF.vecteur_face_facette_Cl();
+  int nb_bord = domaine_VEF.nb_front_Cl();
+  const IntTab& les_elems=domaine.les_elems();
 
   // Permet d'avoir un flux_bord coherent avec les CLs (mais parfois diverge?)
   // Active uniquement pour ordre 3
@@ -233,7 +233,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
         {
           for (int n_bord=0; n_bord<nb_bord; n_bord++)
             {
-              const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+              const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
               if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
                 {
                   const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -251,20 +251,20 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
         {
           // Pour le muscl/centre actuels on utilise un calcul de flux a l'ordre 1
           // aux mailles de bord ou aux mailles ayant un sommet de Dirichlet
-          ArrOfInt est_un_sommet_de_bord_(zone_VEF.nb_som_tot());
+          ArrOfInt est_un_sommet_de_bord_(domaine_VEF.nb_som_tot());
           for (int n_bord=0; n_bord<nb_bord; n_bord++)
             {
-              const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+              const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
               if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
                 {
                   const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
                   int nb_faces_tot = le_bord.nb_faces_tot();
-                  int size = zone_VEF.face_sommets().dimension(1);
+                  int size = domaine_VEF.face_sommets().dimension(1);
                   for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                     for (int som=0; som<size; som++)
                       {
                         int face = le_bord.num_face(ind_face);
-                        est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
+                        est_un_sommet_de_bord_[domaine_VEF.face_sommets(face,som)]=1;
                       }
                 }
             }
@@ -281,11 +281,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
             }
         }
       // Construction du tableau est_une_face_de_dirichlet_
-      est_une_face_de_dirichlet_.resize_array(zone_VEF.nb_faces_tot());
+      est_une_face_de_dirichlet_.resize_array(domaine_VEF.nb_faces_tot());
       est_une_face_de_dirichlet_=0;
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -309,7 +309,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -326,7 +326,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -343,7 +343,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   nb_faces_perio=0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -362,7 +362,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
     }
 
   int fac=0,elem1,elem2,comp0;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   ArrOfInt face(nfac);
   //statistiques().end_count(m1);
   //statistiques().begin_count(m2);
@@ -371,7 +371,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   DoubleTab gradient_elem(nb_elem_tot,ncomp_ch_transporte,dimension);  // (du/dx du/dy dv/dx dv/dy) pour un poly
   if(op_conv.type()=="CENTRE" || op_conv.type()=="MUSCL")
     {
-      Champ_P1NC::calcul_gradient(transporte_face,gradient_elem,zone_Cl_VEF);
+      Champ_P1NC::calcul_gradient(transporte_face,gradient_elem,domaine_Cl_VEF);
     }
   DoubleTab gradient;
   if (op_conv.type()=="CENTRE")
@@ -382,10 +382,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
     {
       //  application du limiteur
       gradient.resize(0, ncomp_ch_transporte, dimension);     // (du/dx du/dy dv/dx dv/dy) pour une face
-      zone_VEF.creer_tableau_faces(gradient);
+      domaine_VEF.creer_tableau_faces(gradient);
       for (n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
@@ -417,7 +417,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
                     {
                       // On enleve la composante normale (on pourrait le faire pour les autres schemas...)
                       // mais pour le moment, on ne veut pas changer le comportement par defaut du muscl...
-                      //const DoubleTab& facenormales = zone_VEF.face_normales();
+                      //const DoubleTab& facenormales = domaine_VEF.face_normales();
                       for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
                         for (i=0; i<dimension; i++)
                           {
@@ -464,10 +464,9 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   DoubleTab xsom(nsom,dimension);
 
 
-  int nb_faces_bord=zone_VEF.nb_faces_bord();
+  int nb_faces_bord=domaine_VEF.nb_faces_bord();
   const IntTab& KEL=type_elemvef.KEL();
-  const DoubleTab& xv=zone_VEF.xv();
-  const Domaine& domaine=zone.domaine();
+  const DoubleTab& xv=domaine_VEF.xv();
   const DoubleTab& coord_sommets=domaine.coord_sommets();
 
   // Boucle ou non selon la valeur de alpha (uniquement a l'ordre 3 pour le moment)
@@ -491,11 +490,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
           type_op_boucle = centre;
           gradient.ref(gradient_elem);
         }
-      // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+      // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
       //  - polyedres bords et joints
       //  - polyedres bords et non joints
       // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-      // dans la zone
+      // dans le domaine
       // boucle sur les polys
       for (poly=0; poly<nb_elem_tot; poly++)
         {
@@ -538,7 +537,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
 
               // Determination du type de CL selon le rang
               rang = rang_elem_non_std(poly);
-              int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
+              int itypcl = (rang==-1 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang));
 
               // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la porosite
               type_elemvef.calcul_vc(face,vc,vs,vsom,velocity,itypcl,porosite_face);
@@ -737,7 +736,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   // conditions aux limites de Neumann_sortie_libre seulement
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
@@ -828,20 +827,20 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
 void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state_field, const DoubleTab& inco, DoubleTab& resu ) const
 {
   Cout<<"ajouter_Lstate_sensibility "<<finl;
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& facenormales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
-  const Zone& zone = zone_VEF.zone();
-  const int nfa7 = zone_VEF.type_elem().nb_facette();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
-  int nfac = zone.nb_faces_elem();
-  int nsom = zone.nb_som_elem();
-  int nb_bord = zone_VEF.nb_front_Cl();
-  const IntTab& les_elems=zone.les_elems();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& facenormales = domaine_VEF.face_normales();
+  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nfa7 = domaine_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
+  int nfac = domaine.nb_faces_elem();
+  int nsom = domaine.nb_som_elem();
+  int nb_bord = domaine_VEF.nb_front_Cl();
+  const IntTab& les_elems=domaine.les_elems();
   int option_appliquer_cl_dirichlet = 0 ;
 
   // Definition d'un tableau pour un traitement special des schemas pres des bords
@@ -849,20 +848,20 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
     {
       traitement_pres_bord_.resize_array(nb_elem_tot);
       traitement_pres_bord_=0;
-      ArrOfInt est_un_sommet_de_bord_(zone_VEF.nb_som_tot());
+      ArrOfInt est_un_sommet_de_bord_(domaine_VEF.nb_som_tot());
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int nb_faces_tot = le_bord.nb_faces_tot();
-              int size = zone_VEF.face_sommets().dimension(1);
+              int size = domaine_VEF.face_sommets().dimension(1);
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 for (int som=0; som<size; som++)
                   {
                     int face = le_bord.num_face(ind_face);
-                    est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
+                    est_un_sommet_de_bord_[domaine_VEF.face_sommets(face,som)]=1;
                   }
             }
         }
@@ -878,11 +877,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
             }
         }
       // Construction du tableau est_une_face_de_dirichlet_
-      est_une_face_de_dirichlet_.resize_array(zone_VEF.nb_faces_tot());
+      est_une_face_de_dirichlet_.resize_array(domaine_VEF.nb_faces_tot());
       est_une_face_de_dirichlet_=0;
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -906,7 +905,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -922,7 +921,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -939,7 +938,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   nb_faces_perio=0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -958,7 +957,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
     }
 
   int comp0;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   ArrOfInt face(nfac);
   ArrOfDouble vs(dimension);
   ArrOfDouble vs_inco(dimension);
@@ -973,7 +972,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
   DoubleTab& flux_b = flux_bords_;
-  int nb_faces_bord=zone_VEF.nb_faces_bord();
+  int nb_faces_bord=domaine_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;
 
@@ -981,11 +980,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la zone
+  // dans le domaine
   // boucle sur les polys
 
   for (poly=0; poly<nb_elem_tot; poly++)
@@ -1029,7 +1028,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
           // Determination du type de CL selon le rang
           rang = rang_elem_non_std(poly);
-          int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
+          int itypcl = (rang==-1 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang));
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,state_field,itypcl);
@@ -1132,7 +1131,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   // conditions aux limites de Neumann_sortie_libre seulement
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
@@ -1219,20 +1218,20 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state_field, DoubleTab& resu ) const
 {
   Cout<<"ajouter_Lsensibility_state "<<finl;
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& facenormales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
-  const Zone& zone = zone_VEF.zone();
-  const int nfa7 = zone_VEF.type_elem().nb_facette();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
-  int nfac = zone.nb_faces_elem();
-  int nsom = zone.nb_som_elem();
-  int nb_bord = zone_VEF.nb_front_Cl();
-  const IntTab& les_elems=zone.les_elems();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& facenormales = domaine_VEF.face_normales();
+  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nfa7 = domaine_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
+  int nfac = domaine.nb_faces_elem();
+  int nsom = domaine.nb_som_elem();
+  int nb_bord = domaine_VEF.nb_front_Cl();
+  const IntTab& les_elems=domaine.les_elems();
   int option_appliquer_cl_dirichlet = 0 ;
 
 
@@ -1241,20 +1240,20 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
     {
       traitement_pres_bord_.resize_array(nb_elem_tot);
       traitement_pres_bord_=0;
-      ArrOfInt est_un_sommet_de_bord_(zone_VEF.nb_som_tot());
+      ArrOfInt est_un_sommet_de_bord_(domaine_VEF.nb_som_tot());
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int nb_faces_tot = le_bord.nb_faces_tot();
-              int size = zone_VEF.face_sommets().dimension(1);
+              int size = domaine_VEF.face_sommets().dimension(1);
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 for (int som=0; som<size; som++)
                   {
                     int face = le_bord.num_face(ind_face);
-                    est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
+                    est_un_sommet_de_bord_[domaine_VEF.face_sommets(face,som)]=1;
                   }
             }
         }
@@ -1271,11 +1270,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
         }
 
       // Construction du tableau est_une_face_de_dirichlet_
-      est_une_face_de_dirichlet_.resize_array(zone_VEF.nb_faces_tot());
+      est_une_face_de_dirichlet_.resize_array(domaine_VEF.nb_faces_tot());
       est_une_face_de_dirichlet_=0;
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
-          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          const Cond_lim_base& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1299,7 +1298,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -1315,7 +1314,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1332,7 +1331,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   nb_faces_perio=0;
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1351,7 +1350,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
     }
 
   int comp0;
-  int nb_faces_ = zone_VEF.nb_faces();
+  int nb_faces_ = domaine_VEF.nb_faces();
   ArrOfInt face(nfac);
   ArrOfDouble vs(dimension);
   ArrOfDouble vs_state(dimension);
@@ -1366,17 +1365,17 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
   DoubleTab& flux_b = flux_bords_;
-  int nb_faces_bord=zone_VEF.nb_faces_bord();
+  int nb_faces_bord=domaine_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;
 
   const IntTab& KEL=type_elemvef.KEL();
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la zone
+  // dans le domaine
   // boucle sur les polys
 
   for (poly=0; poly<nb_elem_tot; poly++)
@@ -1420,7 +1419,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
           // Determination du type de CL selon le rang
           rang = rang_elem_non_std(poly);
-          int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
+          int itypcl = (rang==-1 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang));
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,inco,itypcl);
@@ -1526,7 +1525,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   // conditions aux limites de Neumann_sortie_libre seulement
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
@@ -1788,25 +1787,25 @@ void Operateur_Conv_sensibility_VEF::calcul_vc(const ArrOfInt& Face, ArrOfDouble
 void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) const
 {
 
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Champ_Inc_base& velocity=vitesse();
   const DoubleTab& vitesse_face=velocity.valeurs();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const DoubleTab& face_normales = zone_VEF.face_normales();
-  const DoubleTab& facette_normales = zone_VEF.facette_normales();
-  const Zone& zone = zone_VEF.zone();
-  const int nfa7 = zone_VEF.type_elem().nb_facette();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
-  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
-  int nfac = zone.nb_faces_elem();
-  int nsom = zone.nb_som_elem();
-  const IntTab& sommet_elem = zone.les_elems();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const DoubleTab& face_normales = domaine_VEF.face_normales();
+  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const int nfa7 = domaine_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
+  int nfac = domaine.nb_faces_elem();
+  int nsom = domaine.nb_som_elem();
+  const IntTab& sommet_elem = domaine.les_elems();
   DoubleVect& fluent_ = tab_fluent;
 
 
-  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -1831,11 +1830,11 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
   // le calcul du pas de temps de stabilite
   fluent_ = 0;
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la zone
+  // dans le domaine
 
   // boucle sur les polys
   for (poly=0; poly<nb_elem_tot; poly++)
@@ -1847,7 +1846,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
       if (rang==-1)
         itypcl=0;
       else
-        itypcl=zone_Cl_VEF.type_elem_Cl(rang);
+        itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
       // calcul des numeros des faces du polyedre
       for (face_adj=0; face_adj<nfac; face_adj++)
@@ -1939,10 +1938,10 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
   // Boucle sur les bords pour traiter les conditions aux limites
   // il y a prise en compte d'un terme de convection pour les
   // conditions aux limites de Neumann_sortie_libre seulement
-  int nb_bord = zone_VEF.nb_front_Cl();
+  int nb_bord = domaine_VEF.nb_front_Cl();
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -1966,19 +1965,19 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 
   return DMAXFLOAT; //on resout la sensibilite avec le meme dt que l'etat
 
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-  const DoubleVect& volumes_entrelaces_Cl = zone_Cl_VEF.volumes_entrelaces_Cl();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces_Cl = domaine_Cl_VEF.volumes_entrelaces_Cl();
   remplir_fluent(fluent);
   double dt_face,dt_stab =1.e30;
 
   // On traite les conditions aux limites
   // Si une face porte une condition de Dirichlet on n'en tient pas compte
   // dans le calcul de dt_stab
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet,la_cl.valeur()))
            ||
            (sub_type(Dirichlet_homogene,la_cl.valeur()))
@@ -1998,8 +1997,8 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
     }
 
   // On traite les faces internes non standard
-  int ndeb = zone_VEF.premiere_face_int();
-  int nfin = zone_VEF.premiere_face_std();
+  int ndeb = domaine_VEF.premiere_face_int();
+  int nfin = domaine_VEF.premiere_face_std();
 
   for (int num_face=ndeb; num_face<nfin; num_face++)
     {
@@ -2009,7 +2008,7 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 
   // On traite les faces internes standard
   ndeb = nfin;
-  nfin = zone_VEF.nb_faces();
+  nfin = domaine_VEF.nb_faces();
   for (int num_face=ndeb; num_face<nfin; num_face++)
     {
       dt_face = volumes_entrelaces(num_face)/(fluent[num_face]+DMINFLOAT);
@@ -2028,8 +2027,8 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state, DoubleTab& resu) const
 {
   Cerr << "add_diffusion_term" << finl;
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 
   int nb_comp = 1;
   int nb_dim = resu.nb_dim();
@@ -2038,29 +2037,29 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 
   DoubleTab& tab_flux_bords = flux_bords_;
 
-  const IntTab& elemfaces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const IntTab& elemfaces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   int i0,j,num_face;
-  int nb_faces = zone_VEF.nb_faces();
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int nb_faces = domaine_VEF.nb_faces();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   int n_bord0;
   double valA;//,flux;
   DoubleVect n(Objet_U::dimension);
   DoubleTrav Tgrad(Objet_U::dimension,Objet_U::dimension);
 
   // On dimensionne et initialise le tableau des bilans de flux:
-  tab_flux_bords.resize(zone_VEF.nb_faces_bord(),nb_comp);
+  tab_flux_bords.resize(domaine_VEF.nb_faces_bord(),nb_comp);
   tab_flux_bords=0.;
 
   assert(nb_comp>1);
-  int nb_bords=zone_VEF.nb_front_Cl();
+  int nb_bords=domaine_VEF.nb_front_Cl();
   int ind_face;
 
   for (n_bord0=0; n_bord0<nb_bords; n_bord0++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord0);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord0);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-      // const IntTab& elemfaces = zone_VEF.elem_faces();
+      // const IntTab& elemfaces = domaine_VEF.elem_faces();
       int num1 = 0;
       int num2 = le_bord.nb_faces_tot();
       int nb_faces_bord_reel = le_bord.nb_faces();
@@ -2131,7 +2130,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 
   // On traite les faces internes
 
-  for (num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+  for (num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       for (int k=0; k<2; k++)
         {
@@ -2174,7 +2173,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 
   for (int n_bord=0; n_bord<nb_bords; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Symetrie,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -2191,10 +2190,10 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 
 inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem, double diffu) const
 {
-  const Zone_VEF& zone=la_zone_vef.valeur();
-  const IntTab& face_voisins=zone.face_voisins();
-  const DoubleTab& face_normales=zone.face_normales();
-  const DoubleVect& inverse_volumes=zone.inverse_volumes();
+  const Domaine_VEF& domaine=le_dom_vef.valeur();
+  const IntTab& face_voisins=domaine.face_voisins();
+  const DoubleTab& face_normales=domaine.face_normales();
+  const DoubleVect& inverse_volumes=domaine.inverse_volumes();
   double pscal = face_normales(i,0)*face_normales(j,0)
                  + face_normales(i,1)*face_normales(j,1);
   if (Objet_U::dimension == 3)
@@ -2212,29 +2211,29 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
 {
 
   Cerr << "add_diffusion_scalar_term" << finl;
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
-  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   DoubleTab& tab_flux_bords = flux_bords_;
 
-  const IntTab& elemfaces = zone_VEF.elem_faces();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const IntTab& elemfaces = domaine_VEF.elem_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   int i,j,num_face;
-  int nb_faces = zone_VEF.nb_faces();
-  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int nb_faces = domaine_VEF.nb_faces();
+  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA,flux;
   int n_bord, ind_face;
-  int nb_bords=zone_VEF.nb_front_Cl();
+  int nb_bords=domaine_VEF.nb_front_Cl();
   // On dimensionne et initialise le tableau des bilans de flux:
-  tab_flux_bords.resize(zone_VEF.nb_faces_bord(),1);
+  tab_flux_bords.resize(domaine_VEF.nb_faces_bord(),1);
   tab_flux_bords=0.;
-  const int premiere_face_int=zone_VEF.premiere_face_int();
+  const int premiere_face_int=domaine_VEF.premiere_face_int();
 
   // On traite les faces bord
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-      //const IntTab& elemfaces = zone_VEF.elem_faces();
+      //const IntTab& elemfaces = domaine_VEF.elem_faces();
       int num1=0;
       int num2=le_bord.nb_faces_tot();
       int nb_faces_bord_reel = le_bord.nb_faces();
@@ -2348,7 +2347,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
   // Neumann :
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -2358,7 +2357,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
             {
-              flux=la_cl_paroi.flux_impose(face-ndeb)*zone_VEF.surface(face);
+              flux=la_cl_paroi.flux_impose(face-ndeb)*domaine_VEF.surface(face);
               resu[face] += flux;
               tab_flux_bords(face,0) = flux;
             }
@@ -2371,7 +2370,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
             {
-              flux=la_cl_paroi.h_imp(face-ndeb)*(la_cl_paroi.T_ext(face-ndeb)-inconnue(face))*zone_VEF.surface(face);
+              flux=la_cl_paroi.h_imp(face-ndeb)*(la_cl_paroi.T_ext(face-ndeb)-inconnue(face))*domaine_VEF.surface(face);
               resu[face] += flux;
               tab_flux_bords(face,0) = flux;
             }

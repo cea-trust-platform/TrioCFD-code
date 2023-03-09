@@ -26,7 +26,8 @@
 
 
 #include <Connectivites_base.h>
-class Zone_VF;
+#include <TRUST_Deriv.h>
+class Domaine_VF;
 class Domaine;
 #include <TRUSTTabs_forward.h>
 
@@ -39,14 +40,13 @@ class Domaine;
 // CLASS: Connectivites
 //
 /////////////////////////////////////////////////////////////////////////////////
-Declare_deriv(Connectivites_base);
 
 class Connectivites : public DERIV(Connectivites_base)
 {
   Declare_instanciable(Connectivites);
 
 public:
-  inline void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg, Domaine& domg);
+  inline void calculer_connectivites(Domaine_VF& domainef, Domaine_VF& domaineg, Domaine& domg);
   inline IntVect& connectivites_faceF_faceG();
   inline IntVect& connectivites_elemF_elemG();
   inline const IntVect& connectivites_faceF_faceG() const;
@@ -55,10 +55,10 @@ public:
 
 // Fonctions inline
 
-inline void Connectivites::calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+inline void Connectivites::calculer_connectivites(Domaine_VF& domainef, Domaine_VF& domaineg,
                                                   Domaine& domg)
 {
-  valeur().calculer_connectivites(zonef,zoneg, domg);
+  valeur().calculer_connectivites(domainef,domaineg, domg);
 }
 
 inline IntVect& Connectivites::connectivites_faceF_faceG()

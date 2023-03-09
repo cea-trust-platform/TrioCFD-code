@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Variation_rho_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Pb_Multiphase.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Matrix_tools.h>
@@ -46,8 +47,8 @@ void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
   for (auto &&n_m : matrices)
     if (n_m.first == "interfacial_area" || n_m.first == "temperature" || n_m.first == "pression")
@@ -76,8 +77,8 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
                    &rho = (*pch_rho).valeurs(),
@@ -94,7 +95,7 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
 
   /* elements */
   int n_l = 0 ; // phase porteuse
-  for (int e = 0; e < zone.nb_elem(); e++)
+  for (int e = 0; e < domaine.nb_elem(); e++)
     for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1))
       if (k != n_l) //phase gazeuse
         {

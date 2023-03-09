@@ -21,10 +21,13 @@ EOF
     CasTest CANAL CANAL_par8.data 8
     CasTest CANAL CANAL_repr.data 1
     CasTest CANAL CANAL_repr_par8.data 8
+    ExtraUsedFile CANAL/CANAL_*TEMPERATURE_0
+    ExtraUsedFile CANAL/CANAL_*TEMPERATURE_1   
+    # DISABLE_PARALLEL_RUN #
 }
 
 Chapitre {
-	Titre "Temperature diffusion in a channel flowwith fixed wall temperature"
+	Titre "Temperature diffusion in a channel flow with fixed wall temperature"
 	Description <<EOF
 We validate the code in channel conditions for the temperature.
 

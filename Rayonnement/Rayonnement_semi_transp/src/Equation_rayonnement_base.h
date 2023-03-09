@@ -25,9 +25,10 @@
 
 #include <Operateur_Diff.h>
 #include <Matrice_Morse.h>
-#include <Ref_Fluide_base.h>
-#include <Ref_Modele_rayo_semi_transp.h>
 #include <Operateur_Grad.h>
+#include <TRUST_Ref.h>
+
+class Modele_rayo_semi_transp;
 class Motcle;
 class Milieu_base;
 class Fluide_base;

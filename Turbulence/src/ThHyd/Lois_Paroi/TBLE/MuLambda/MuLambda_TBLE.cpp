@@ -22,7 +22,6 @@
 #include <MuLambda_TBLE.h>
 
 
-Implemente_deriv(MuLambda_TBLE_base);
 Implemente_instanciable(MuLambda_TBLE,"MuLambda_TBLE",DERIV(MuLambda_TBLE_base));
 
 /*! @brief

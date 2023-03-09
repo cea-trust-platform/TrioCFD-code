@@ -22,7 +22,7 @@
 
 #include <Prolongement_elem_elem_FMG.h>
 #include <Domaine.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Prolongement_elem_elem_FMG,"Prolongement_elem_elem_FMG",Prolongement_base);
 
@@ -48,8 +48,8 @@ Entree& Prolongement_elem_elem_FMG::readOn(Entree& s )
 /*! @brief Prolongement du centre de gravite des faces grossieres au centre de gravite de TOUTES les faces fines
  *
  */
-void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
-                                           Zone_VF& zone_VFF,
+void Prolongement_elem_elem_FMG::prolonger(Domaine_VF& domaine_VFG,
+                                           Domaine_VF& domaine_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,
                                            const DoubleTab& valG, DoubleTab& tab,
@@ -60,12 +60,12 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
   int num_elemG;
   double epsilonP = 0;
   int nbfaceG;
-  Zone& zoneg = zone_VFG.zone();
-  int nb_faceG = zoneg.nb_faces_elem();
-  Zone& zonef = zone_VFF.zone();
-  Elem_geom& elem_geomF = zonef.type_elem();
+  Domaine& domaineg = domaine_VFG.domaine();
+  int nb_faceG = domaineg.nb_faces_elem();
+  Domaine& domainef = domaine_VFF.domaine();
+  Elem_geom& elem_geomF = domainef.type_elem();
 
-  int nb_sommets_elemG = zoneg.nb_som_elem();
+  int nb_sommets_elemG = domaineg.nb_som_elem();
   IntVect numerosG1;
   DoubleVect numerosG1_dist;
   IntVect numerosG2;
@@ -75,26 +75,25 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
   numerosG1_dist.resize(nb_faceG+1);
   numerosG2_dist.resize(nb_faceG+1);
   int numG, num_faceG;
-  IntTab& num_face_elemG = zone_VFG.elem_faces();
+  IntTab& num_face_elemG = domaine_VFG.elem_faces();
 
   //coord des centres de gravite des elems
-  DoubleTab& cgF = zone_VFF.xp();
-  DoubleTab& cgG = zone_VFG.xp();
+  DoubleTab& cgF = domaine_VFF.xp();
+  DoubleTab& cgG = domaine_VFG.xp();
   double dist;
   tab = 0.;
 
-  Domaine& domG = zoneg.domaine();
-  const DoubleTab& coordG = domG.coord_sommets();
+  const DoubleTab& coordG = domaineg.coord_sommets();
   DoubleVect coord_somG;
   coord_somG.resize(dimension);
   int dim;
   ArrOfInt elem;
   int compo;
   int numG2 = -1;
-  IntTab& sommet_elemG = zoneg.les_elems();
+  IntTab& sommet_elemG = domaineg.les_elems();
 
   //elemG voisins de chaque face grossiere
-  IntTab& voisins = zone_VFG.face_voisins();
+  IntTab& voisins = domaine_VFG.face_voisins();
 
   //Pour chaque elemF
   for (nbelemsF=0; nbelemsF<nb_elemF; nbelemsF++)
@@ -221,9 +220,9 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
       if (trouve == 1)
         {
           if(dimension == 2)
-            zoneg.rang_elems_sommet(elem, coord_somG(0), coord_somG(1), 0);
+            domaineg.rang_elems_sommet(elem, coord_somG(0), coord_somG(1), 0);
           else if (dimension == 3)
-            zoneg.rang_elems_sommet(elem, coord_somG(0), coord_somG(1), coord_somG(2));
+            domaineg.rang_elems_sommet(elem, coord_somG(0), coord_somG(1), coord_somG(2));
         }
 
       //on trouve le numG different de ceux deja utilises
@@ -281,8 +280,8 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
 
 
 //NE FAIT RIEN
-void Prolongement_elem_elem_FMG::calculer(Zone_VF& zonef,
-                                          Zone_VF& zoneg,
+void Prolongement_elem_elem_FMG::calculer(Domaine_VF& domainef,
+                                          Domaine_VF& domaineg,
                                           IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

@@ -24,8 +24,8 @@
 
 #include <MorEqn.h>
 #include <Modele_Fonc_Bas_Reynolds_Thermique_Base.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Modele_Fonc_Bas_Reynolds_Thermique_Base);
 
 
 
@@ -41,13 +41,13 @@ public:
   inline void completer();
   inline int sauvegarder(Sortie& os) const override;
   inline int reprendre(Entree& is) override;
-  inline DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const;
-  inline DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const;
-  inline DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  inline DoubleTab& Calcul_F2(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  inline DoubleTab& Calcul_F3(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  inline DoubleTab& Calcul_F4(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  inline DoubleTab& Calcul_Flambda ( DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  inline DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const;
+  inline DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const;
+  inline DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  inline DoubleTab& Calcul_F2(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  inline DoubleTab& Calcul_F3(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  inline DoubleTab& Calcul_F4(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  inline DoubleTab& Calcul_Flambda ( DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
 
 private :
 
@@ -87,40 +87,40 @@ inline void Modele_Fonc_Bas_Reynolds_Thermique::completer()
   valeur().completer();
 }
 
-inline DoubleTab& Modele_Fonc_Bas_Reynolds_Thermique::Calcul_D(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+inline DoubleTab& Modele_Fonc_Bas_Reynolds_Thermique::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                                const DoubleTab& vitesse,const DoubleTab& FluctuTemp_Bas_Re,double diffu ) const
 {
-  return  valeur().Calcul_D(D,zone_dis, zone_Cl_dis, vitesse,FluctuTemp_Bas_Re,diffu);
+  return  valeur().Calcul_D(D,domaine_dis, domaine_Cl_dis, vitesse,FluctuTemp_Bas_Re,diffu);
 }
 
-inline  DoubleTab& Modele_Fonc_Bas_Reynolds_Thermique::Calcul_E(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& FluctuTemp_Bas_Re,double diffu, const DoubleTab& diffu_turb ) const
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds_Thermique::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& vitesse,const DoubleTab& FluctuTemp_Bas_Re,double diffu, const DoubleTab& diffu_turb ) const
 {
-  return valeur().Calcul_E(E, zone_dis,zone_Cl_dis,  vitesse,FluctuTemp_Bas_Re,diffu,diffu_turb );
+  return valeur().Calcul_E(E, domaine_dis,domaine_Cl_dis,  vitesse,FluctuTemp_Bas_Re,diffu,diffu_turb );
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F1(DoubleTab& F1, const Zone_dis& zone_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F1(DoubleTab& F1, const Domaine_dis& domaine_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  return valeur().Calcul_F1( F1, zone_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
+  return valeur().Calcul_F1( F1, domaine_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F2(DoubleTab& F1, const Zone_dis& zone_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F2(DoubleTab& F1, const Domaine_dis& domaine_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  return valeur().Calcul_F2( F1, zone_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
+  return valeur().Calcul_F2( F1, domaine_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F3(DoubleTab& F1, const Zone_dis& zone_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F3(DoubleTab& F1, const Domaine_dis& domaine_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  return valeur().Calcul_F3( F1, zone_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
+  return valeur().Calcul_F3( F1, domaine_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F4(DoubleTab& F1, const Zone_dis& zone_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_F4(DoubleTab& F1, const Domaine_dis& domaine_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  return valeur().Calcul_F4( F1, zone_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
+  return valeur().Calcul_F4( F1, domaine_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu);
 }
 
-inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_Flambda(DoubleTab& Flambda,const Zone_dis& zone_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco, double diffu ) const
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds_Thermique::Calcul_Flambda(DoubleTab& Flambda,const Domaine_dis& domaine_dis,const DoubleTab& KEps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco, double diffu ) const
 {
-  return valeur().Calcul_Flambda( Flambda,zone_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu );
+  return valeur().Calcul_Flambda( Flambda,domaine_dis, KEps_Bas_Re, FluctuTemp_Bas_Re, visco, diffu );
 }
 
 #endif

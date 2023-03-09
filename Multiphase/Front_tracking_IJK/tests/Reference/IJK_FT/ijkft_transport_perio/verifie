@@ -6,14 +6,34 @@ cd reference
 tar xzf ../${n}.lata.tgz
 cd ..
 
+[ ! -f $1.lata ] && echo "File $1.lata is missing. Test Failed" && exit 1
 # cherche le fichier lata le plus recent 
-src=`ls -rt *${n}.lata | tail -n 1`
-echo Comparaison $src reference/${n}.lata
-if compare_lata $src reference/${n}.lata
-then
-  exit 0
-else
-  echo Comparaison avec le lata de reference echouee.
-  exit 1
-fi
+# src=`ls -rt *${n}.lata | tail -n 1`
+# echo Comparaison ${n} reference/${n}.lata
+# if compare_lata ${n} reference/${n}.lata
+# then
+#   exit 0
+# else
+#   echo Comparaison avec le lata de reference echouee.
+#   exit 1
+# fi
+# 
+# Pour les interfaces, on fait pour l'instant une compa
+# seq/ref_seq et par/ref_par : 
+
+for cas in "" "PAR_"
+do
+	if [ -f ${cas}${n}.lata ] ; then 
+		echo Comparaison ${cas}${n}.lata reference/${cas}${n}.lata
+		if compare_lata ${cas}${n}.lata reference/${cas}${n}.lata 
+		then
+			echo "ok"
+		else
+			echo Comparaison avec le lata de reference echouee.
+			exit 1
+		fi
+	fi
+done
+exit 0
+
 

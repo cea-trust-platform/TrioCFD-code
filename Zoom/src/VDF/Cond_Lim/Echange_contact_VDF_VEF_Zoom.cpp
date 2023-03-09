@@ -24,71 +24,64 @@
 #include <Conduction.h>
 #include <Connectivites_faces_couple.h>
 #include <Convection_Diffusion_std.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
 
 Implemente_instanciable(Echange_contact_VDF_VEF_Zoom,"Contact_VDF_VEF",Echange_contact_VDF_Zoom_base);
-
-
-
-
-
-
-
-
-
 
 // Fonctions hors classe pour le pdt scal n_i.n_j
 // Attention : la normal a la face num_face est suppose sortante
 // tandis que celle a la face num2 est reorientee dans la methode
 // afin d etre sortante.
-double pdt_scal(const Zone_VEF& la_zone,int num_face,int num2,
+double pdt_scal(const Domaine_VEF& le_dom,int num_face,int num2,
                 int num_elem,int dimension,double diffu)
 {
   double pscal;
-  const IntTab& face_voisinsF = la_zone.face_voisins();
+  const IntTab& face_voisinsF = le_dom.face_voisins();
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,2);
 
   //if (!(face_voisinsF(num2,0) == num_elem)) pscal = -pscal;
   if ( (face_voisinsF(num_face,0) == face_voisinsF(num2,0)) ||
        (face_voisinsF(num_face,1) == face_voisinsF(num2,1))) pscal = -pscal;
 
-  return (pscal*diffu)/la_zone.volumes(num_elem);
+  return (pscal*diffu)/le_dom.volumes(num_elem);
 }
 
 
 // Attention : la normal a la face num_face est suppose sortante
 // tandis que celle a la face num2 est reorientee dans la methode
 // afin d etre sortante.
-double pdt_scalSqrt(const Zone_VEF& la_zone,int num_face,int num2,
+double pdt_scalSqrt(const Domaine_VEF& le_dom,int num_face,int num2,
                     int num_elem,int dimension,double diffu)
 {
   double pscal;
-  //const IntTab& face_voisinsF = la_zone.face_voisins();
+  //const IntTab& face_voisinsF = le_dom.face_voisins();
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num2,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num2,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num2,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num2,2);
   pscal = sqrt(std::fabs(pscal));
   //if (!(face_voisinsF(num2,0) == num_elem)) pscal = -pscal;
   //  if ( (face_voisinsF(num_face,0) == face_voisinsF(num2,0)) ||
   //     (face_voisinsF(num_face,1) == face_voisinsF(num2,1))) pscal = -pscal;
 
-  return (pscal*diffu)/la_zone.volumes(num_elem);
+  return (pscal*diffu)/le_dom.volumes(num_elem);
 }
 
-double surfacesVEF(const Zone_VEF& la_zone,int num_face,int dimension)
+double surfacesVEF(const Domaine_VEF& le_dom,int num_face,int dimension)
 {
   double pscal;
 
-  pscal = la_zone.face_normales(num_face,0)*la_zone.face_normales(num_face,0)
-          + la_zone.face_normales(num_face,1)*la_zone.face_normales(num_face,1);
+  pscal = le_dom.face_normales(num_face,0)*le_dom.face_normales(num_face,0)
+          + le_dom.face_normales(num_face,1)*le_dom.face_normales(num_face,1);
   if (dimension == 3)
-    pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num_face,2);
+    pscal += le_dom.face_normales(num_face,2)*le_dom.face_normales(num_face,2);
   pscal = sqrt(pscal);
 
   return pscal;
@@ -138,8 +131,8 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       int indice_pb=pbMG.indice_probleme(pbF.le_nom());
       le_pb2G=pbMG.pb_2G(indice_pb);
 
-      const Zone_dis_base& zone_disF = pbF.domaine_dis().zone_dis(0);
-      const Zone_VEF& zvef = ref_cast(Zone_VEF, zone_disF); // ce doit etre en principe une zone VEF !!!
+      const Domaine_dis_base& domaine_disF = pbF.domaine_dis();
+      const Domaine_VEF& zvef = ref_cast(Domaine_VEF, domaine_disF); // ce doit etre en principe un domaine VEF !!!
       const IntTab& face_voisinsF = zvef.face_voisins();
 
 
@@ -155,7 +148,6 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       const Front_VF& front_vf_ext=ref_cast(Front_VF, front_ext);
       const Front_VF& front_vf=ref_cast(Front_VF, front);
 
-      REF(Champ_base) ch_tampon;
       REF(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
@@ -168,7 +160,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       DoubleTab& tab= h_imp_->valeurs();
 
 
-      const Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 
@@ -190,7 +182,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       tab = 0.;
 
 
-      if (zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;

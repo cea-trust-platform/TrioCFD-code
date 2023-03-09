@@ -22,10 +22,11 @@
 
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Uniforme.h>
-#include <Sous_Zone.h>
+#include <Sous_Domaine.h>
 #include <Domaine.h>
 #include <Interprete.h>
-#include <Vect_Parser_U.h>
+#include <Parser_U.h>
+#include <TRUST_Vector.h>
 
 Implemente_instanciable(Champ_Uniforme_Morceaux,"Champ_Uniforme_Morceaux",Champ_Don_base);
 
@@ -34,8 +35,8 @@ Implemente_instanciable(Champ_Uniforme_Morceaux,"Champ_Uniforme_Morceaux",Champ_
 
 /*! @brief Imprime les valeurs du champs sur un flot de sortie
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Champ_Uniforme_Morceaux::printOn(Sortie& os) const
 {
@@ -47,15 +48,15 @@ Sortie& Champ_Uniforme_Morceaux::printOn(Sortie& os) const
  *
  *     On lit le nom du domaine (nom_domaine) le nombre de
  *     composantes du champ (nb_comp) la valeur par defaut
- *     du champ ainsi que les valeurs sur les sous zones.
+ *     du champ ainsi que les valeurs sur les sous domaines.
  *     Format:
  *      Champ_Uniforme_Morceaux nom_domaine nb_comp
- *      { Defaut val_def sous_zone_1 val_1 ... sous_zone_i val_i }
+ *      { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i }
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le champ d'entree modifie 
- * @throws accolade ouvrante attendue 
- * @throws mot clef "defaut" attendu 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le champ d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws mot clef "defaut" attendu
  */
 Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
 {
@@ -66,8 +67,8 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
   is >> nom;
   mon_domaine = ref_cast(Domaine, Interprete::objet(nom));
   Domaine& le_domaine=mon_domaine.valeur();
-  const IntTab& les_elems=le_domaine.zone(0).les_elems();
-  const int nb_som_elem = le_domaine.zone(0).nb_som_elem();
+  const IntTab& les_elems=le_domaine.les_elems();
+  const int nb_som_elem = le_domaine.nb_som_elem();
   double x=0,y=0,z=0;
   int num_som;
 
@@ -108,7 +109,7 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
       fxyz[k].parseString();
     }
 
-  for( poly=0; poly<le_domaine.zone(0).nb_elem(); poly++)
+  for( poly=0; poly<le_domaine.nb_elem(); poly++)
     {
       x = le_domaine.coord(les_elems(poly,0),0);
       y = le_domaine.coord(les_elems(poly,0),1);
@@ -136,8 +137,8 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
   motlu=nom;
   while (motlu != Motcle("}") )
     {
-      REF(Sous_Zone) refssz=les_sous_zones.add(le_domaine.ss_zone(nom));
-      Sous_Zone& ssz = refssz.valeur();
+      REF(Sous_Domaine) refssz=les_sous_domaines.add(le_domaine.ss_domaine(nom));
+      Sous_Domaine& ssz = refssz.valeur();
       for( k=0; k< dim; k++)
         {
           Nom tmp;
@@ -192,7 +193,7 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
  *
  * (version const)
  *
- * @return (REF(Domaine)&) reference sur le domaine associe 
+ * @return (REF(Domaine)&) reference sur le domaine associe
  */
 const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
 {
@@ -201,45 +202,45 @@ const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
 
 /*! @brief Renvoie une reference sur le domaine associe.
  *
- * @return (REF(Domaine)&) reference sur le domaine associe 
+ * @return (REF(Domaine)&) reference sur le domaine associe
  */
 REF(Domaine)& Champ_Uniforme_Morceaux::domaine()
 {
   return mon_domaine;
 }
 
-/*! @brief Renvoie la liste des sous_zones associees.
+/*! @brief Renvoie la liste des sous_domaines associees.
  *
  * (version const)
  *
- * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ * @return (LIST(REF(Sous_Domaine))&) la liste des sous_domaines associees
  */
-const LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones() const
+const LIST(REF(Sous_Domaine))& Champ_Uniforme_Morceaux::sous_domaines() const
 {
-  return les_sous_zones;
+  return les_sous_domaines;
 }
 
-/*! @brief Renvoie la liste des sous_zones associees.
+/*! @brief Renvoie la liste des sous_domaines associees.
  *
- * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ * @return (LIST(REF(Sous_Domaine))&) la liste des sous_domaines associees
  */
-LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones()
+LIST(REF(Sous_Domaine))& Champ_Uniforme_Morceaux::sous_domaines()
 {
-  return les_sous_zones;
+  return les_sous_domaines;
 }
 
 
 /*! @brief NE FAIT RIEN
  *
- * @param (mp_base& ch)  
- * @return (Champ_base&)  
+ * @param (mp_base& ch)
+ * @return (Champ_base&)
  */
 Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 {
   if(sub_type(Champ_Uniforme_Morceaux, ch))
     {
       const Champ_Uniforme_Morceaux& chum=ref_cast( Champ_Uniforme_Morceaux, ch);
-      les_sous_zones=chum.sous_zones();
+      les_sous_domaines=chum.sous_domaines();
       mon_domaine=chum.domaine();
       valeurs_=chum.valeurs();
     }
@@ -275,16 +276,16 @@ Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 
 /*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees.
  *
- * @param (DoubleVect& positions) les coordonnees du point de calcul 
- * @param (DoubleVect& valeurs) la valeur du champ au point specifie 
- * @return (DoubleVect&) la valeur du champ au point specifie 
+ * @param (DoubleVect& positions) les coordonnees du point de calcul
+ * @param (DoubleVect& valeurs) la valeur du champ au point specifie
+ * @return (DoubleVect&) la valeur du champ au point specifie
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
                                               DoubleVect& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
+  const Domaine& le_dom = mon_domaine;
   IntVect le_poly(1);
-  la_zone.chercher_elements(positions,le_poly);
+  le_dom.chercher_elements(positions,le_poly);
   return valeur_a_elem(positions,tab_valeurs,le_poly[0]);
 }
 
@@ -293,11 +294,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
  *
  *     situe dans un element specifie.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul 
- * @param (DoubleVect& val) la valeur du champ au point specifie 
- * @param (int le_poly) l'element dans lequel est situe le point de calcul 
- * @return (DoubleVect&) la valeur du champ au point specifie 
- * @throws tableau stockant la valeur du champ de taille incorrecte 
+ * @param (DoubleVect&) les coordonnees du point de calcul
+ * @param (DoubleVect& val) la valeur du champ au point specifie
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @return (DoubleVect&) la valeur du champ au point specifie
+ * @throws tableau stockant la valeur du champ de taille incorrecte
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
                                                    DoubleVect& val,
@@ -326,11 +327,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
  *
  *     situe dans un element specifie.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul 
- * @param (int le_poly) l'element dans lequel est situe le point de calcul 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (double) la valeur de la composante du champ specifiee au point specifie 
- * @throws index de la composante du champ a calculer trop grand 
+ * @param (DoubleVect&) les coordonnees du point de calcul
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (double) la valeur de la composante du champ specifiee au point specifie
+ * @throws index de la composante du champ a calculer trop grand
  */
 double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
                                                     int le_poly,
@@ -357,33 +358,33 @@ double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
 
 /*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
- * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies 
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
+ * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
  */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
                                                DoubleTab& tab_valeurs) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
-  IntVect les_polys(la_zone.nb_elem());
-  la_zone.chercher_elements(positions,les_polys);
+  const Domaine& le_dom = mon_domaine;
+  IntVect les_polys(le_dom.nb_elem());
+  le_dom.chercher_elements(positions,les_polys);
   return valeur_aux_elems(positions,les_polys,tab_valeurs);
 }
 
 
 /*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
- * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
+ * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies
  */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions,
                                                       DoubleVect& tab_valeurs, int ncomp) const
 {
-  const Zone& la_zone = mon_domaine->zone(0);
-  IntVect les_polys(la_zone.nb_elem());
-  la_zone.chercher_elements(positions,les_polys);
+  const Domaine& le_dom = mon_domaine;
+  IntVect les_polys(le_dom.nb_elem());
+  le_dom.chercher_elements(positions,les_polys);
   return valeur_aux_elems_compo(positions,les_polys,tab_valeurs,ncomp);
 }
 
@@ -392,11 +393,11 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions
  *
  *     calculs sont situes dans les elements indiques.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
- * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies 
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
- * @throws le tableau des valeurs a plus de 2 entrees (rang > 2) 
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
+ * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
+ * @throws le tableau des valeurs a plus de 2 entrees (rang > 2)
  */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
                                                      const IntVect& les_polys,
@@ -494,11 +495,11 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
  *
  *     calculs sont situes dans les elements indiques.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
- * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies 
- * @param (int ncomp) l'index de la composante du champ a calculer 
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
+ * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies
+ * @param (int ncomp) l'index de la composante du champ a calculer
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies
  */
 DoubleVect& Champ_Uniforme_Morceaux::
 valeur_aux_elems_compo(const DoubleTab&,

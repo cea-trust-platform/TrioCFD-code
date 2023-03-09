@@ -23,29 +23,29 @@
 #define Connectivite_frontieres_included
 
 #include <TRUSTTab.h>
-#include <Ref_Zone_VF.h>
+#include <TRUST_Ref.h>
 
-class Zone_VF;
+class Domaine_VF;
 
 class Connectivite_frontieres : public Objet_U
 {
   Declare_instanciable(Connectivite_frontieres);
 public:
-  virtual void     associer_zone_vf(const Zone_VF& zone_vf);
+  virtual void     associer_domaine_vf(const Domaine_VF& domaine_vf);
   const IntTab&    faces_voisins() const;
   const ArrOfInt& face_cond_lim() const;
   const IntTab&    def_face_aretes() const;
 
 protected:
-  void remplir_def_face_aretes(const Zone_VF& zone_vf);
-  void remplir_faces_voisins(const Zone_VF& zone_vf);
+  void remplir_def_face_aretes(const Domaine_VF& domaine_vf);
+  void remplir_faces_voisins(const Domaine_VF& domaine_vf);
 
-  REF(Zone_VF) refzone_vf_;
+  REF(Domaine_VF) refdomaine_vf_;
 
   // Tableau faces_voisins_ :
-  //  dimension(0) = zone.nb_faces_frontiere()
+  //  dimension(0) = domaine.nb_faces_frontiere()
   //  dimension(1) = nombres d'aretes d'une face de bord
-  //  Contenu : faces_voisins_(i,j) est l'indice dans la zone
+  //  Contenu : faces_voisins_(i,j) est l'indice dans le domaine
   //            de la face voisine de la face frontiere i par l'arete j.
   //            L'indice i est le numero d'une face frontiere reelle.
   //            L'indice j est un numero d'arete tel qu'il est defini dans
@@ -57,7 +57,7 @@ protected:
   // Tableau face_cond_lim_ :
   //  size_array() = nb_faces_frontiere()
   //  Contenu : numero de la condition aux limites de la face
-  //            ( entre 0 et zone.nb_front_Cl() ) pour les faces reelles.
+  //            ( entre 0 et domaine.nb_front_Cl() ) pour les faces reelles.
   ArrOfInt face_cond_lim_;
 
   // Tableau def_face_aretes_ :
@@ -70,7 +70,7 @@ protected:
   //   Le numero du sommet est un numero local sur la face (compris entre 0
   //   et le nombre de sommets par face). Exemple:
   //    i_sommet   = def_face_arete_(i_arete, 0); // numero du sommet sur la face
-  //    num_sommet = zone_vf.face_sommets(num_face, i_sommet); // numero du sommet dans la zone
+  //    num_sommet = domaine_vf.face_sommets(num_face, i_sommet); // numero du sommet dans le domaine
   IntTab def_face_aretes_;
 
 private:
@@ -80,13 +80,13 @@ private:
 
 inline const IntTab& Connectivite_frontieres::faces_voisins() const
 {
-  assert(refzone_vf_.non_nul());
+  assert(refdomaine_vf_.non_nul());
   return faces_voisins_;
 }
 
 inline const IntTab& Connectivite_frontieres::def_face_aretes() const
 {
-  assert(refzone_vf_.non_nul());
+  assert(refdomaine_vf_.non_nul());
   return def_face_aretes_;
 }
 

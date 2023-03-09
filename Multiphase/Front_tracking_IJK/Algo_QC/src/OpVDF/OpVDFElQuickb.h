@@ -35,7 +35,7 @@
  *   Le schema de convection est du type Quickb
  *   L'iterateur associe est de type Iterateur_VDF_Elem
  *   L'evaluateur associe est de type Eval_Quickb_VDF_Elem
- * 
+ *
  *
  */
 declare_It_VDF_Elem(Eval_Quickb_VDF_Elem)
@@ -53,7 +53,7 @@ class Op_Conv_Quickb_VDF_Elem : public Op_Conv_VDF_base, Op_VDF_Elem
 public:
 
   Op_Conv_Quickb_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc&  );
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& , const Champ_Inc&  );
   inline void associer_vitesse(const Champ_base& );
   const Champ_Inc_base& vitesse() const;
   Champ_Inc_base& vitesse();
@@ -80,7 +80,7 @@ inline Op_Conv_Quickb_VDF_Elem::Op_Conv_Quickb_VDF_Elem(const Iterateur_VDF_base
  */
 inline void Op_Conv_Quickb_VDF_Elem::associer_vitesse(const Champ_base& ch_vit)
 {
-  const Champ_Face& vit = (Champ_Face&) ch_vit;
+  const Champ_Face_VDF& vit = (Champ_Face_VDF&) ch_vit;
 
   Eval_Quickb_VDF_Elem& eval_conv = (Eval_Quickb_VDF_Elem&) iter.evaluateur();
   eval_conv.associer(vit );                // Eval_Conv_VDF::associer
@@ -88,12 +88,12 @@ inline void Op_Conv_Quickb_VDF_Elem::associer_vitesse(const Champ_base& ch_vit)
 
 inline void Op_Conv_Quickb_VDF_Elem::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VDF_Elem::dimensionner(iter.zone(), iter.zone_Cl(), matrice);
+  Op_VDF_Elem::dimensionner(iter.domaine(), iter.domaine_Cl(), matrice);
 }
 
 inline void Op_Conv_Quickb_VDF_Elem::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VDF_Elem::modifier_pour_Cl(iter.zone(), iter.zone_Cl(), matrice, secmem);
+  Op_VDF_Elem::modifier_pour_Cl(iter.domaine(), iter.domaine_Cl(), matrice, secmem);
 }
 
 #endif

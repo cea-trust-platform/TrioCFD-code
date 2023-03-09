@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Turbulence_hyd_sous_maille_Smago_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Param.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Equation_base.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_Smago_VDF,"Modele_turbulence_hyd_sous_maille_Smago_VDF",Mod_turb_hyd_ss_maille_VDF);
@@ -66,11 +66,11 @@ void Turbulence_hyd_sous_maille_Smago_VDF::set_param(Param& param)
 
 Champ_Fonc& Turbulence_hyd_sous_maille_Smago_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const int nb_elem_tot = zone_VDF.nb_elem_tot();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const int nb_elem_tot = domaine_VDF.nb_elem_tot();
 
   SMA_barre_.resize(nb_elem_tot);
   calculer_S_barre();
@@ -93,11 +93,11 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Smago_VDF::calculer_viscosite_turbulente(
 
 void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
 {
-  Champ_Face& vit = ref_cast(Champ_Face, mon_equation->inconnue().valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation->inconnue().valeur());
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const int nb_elem_tot = zone_VDF.nb_elem_tot();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const int nb_elem_tot = domaine_VDF.nb_elem_tot();
 
   int i,j;
   int elem;
@@ -105,7 +105,7 @@ void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
 
   DoubleTab duidxj(nb_elem_tot,dimension,dimension);
 
-  vit.calcul_duidxj(vitesse,duidxj,zone_Cl_VDF);
+  vit.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 
   double Sij,temp;
   for (elem=0 ; elem<nb_elem_tot; elem++)

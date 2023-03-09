@@ -26,12 +26,14 @@
 #include <Echange_contact_VDF.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Conduction.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
 #include <Champ_front_calc.h>
 #include <Fluide_Incompressible.h>
 #include <Front_VF.h>
 #include <Cond_Lim_Rayo.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_VDF;
 
 class Echange_contact_Rayo_transp_VDF : public Cond_Lim_Rayo,public Echange_contact_VDF
 {
@@ -39,7 +41,7 @@ class Echange_contact_Rayo_transp_VDF : public Cond_Lim_Rayo,public Echange_cont
   Declare_instanciable(Echange_contact_Rayo_transp_VDF);
 
 public :
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void mettre_a_jour(double ) override;
   void calculer_Teta_paroi(DoubleTab& tab_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;

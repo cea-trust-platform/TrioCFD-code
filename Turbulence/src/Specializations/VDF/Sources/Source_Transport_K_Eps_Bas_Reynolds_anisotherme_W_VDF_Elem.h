@@ -38,11 +38,11 @@ public:
   void associer_pb(const Probleme_base& ) override;
 
 protected:
-  DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
-  DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
-  DoubleTab& calculer_u_teta_W(const Zone_VDF&,const Zone_Cl_VDF&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,DoubleTab&) const;
-  DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
-  DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleVect&) const;
+  DoubleTab& calculer_gteta2(const Domaine_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
+  DoubleTab& calculer_gteta2(const Domaine_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
+  DoubleTab& calculer_u_teta_W(const Domaine_VDF&,const Domaine_Cl_VDF&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,DoubleTab&) const;
+  DoubleTab& calculer_terme_destruction_K_W(const Domaine_VDF&,const Domaine_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
+  DoubleTab& calculer_terme_destruction_K_W(const Domaine_VDF&,const Domaine_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleVect&) const;
 };
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem_included */

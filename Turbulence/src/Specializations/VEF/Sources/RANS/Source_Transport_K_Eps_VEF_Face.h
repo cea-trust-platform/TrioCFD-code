@@ -23,7 +23,9 @@
 #define Source_Transport_K_Eps_VEF_Face_included
 
 #include <Source_Transport_VEF_Face_base.h>
-#include <Ref_Transport_K_Eps.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_Eps;
 
 /*! @brief class Source_Transport_K_Eps_VEF_Face Cette classe represente le terme source qui figure dans l'equation
  *

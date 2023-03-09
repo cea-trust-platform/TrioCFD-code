@@ -21,13 +21,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Topologie_Maillage_FT.h>
-#include <Deriv_Topologie_Maillage_FT.h>
+#include <TRUST_Deriv.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Motcle.h>
 #include <Remailleur_Collision_FT_Juric.h>
 #include <time.h>
 #include <SFichier.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Connex_components.h>
 #include <Array_tools.h>
 #include <Param.h>
@@ -36,7 +36,6 @@
 
 Implemente_instanciable_sans_constructeur(Topologie_Maillage_FT,"Topologie_Maillage_FT",Objet_U);
 
-Implemente_deriv(Topologie_Maillage_FT);
 
 Topologie_Maillage_FT::Topologie_Maillage_FT() :
   active_(0),
@@ -577,14 +576,14 @@ int Topologie_Maillage_FT::test_collision_facettes(const Maillage_FT_Disc& maill
  *
  * @param (num_compo) output: resized, md_vector setup, filled with -1 <= num_compo[i] < Nmax, and virtual space updated. Valeur de retour: Returns Nmax, global number of connex components found.
  */
-int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const Zone_VF& zone_vf,
+int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const Domaine_VF& domaine_vf,
                                                                           const DoubleTab& indicatrice,
                                                                           IntVect& num_compo) const
 {
-  zone_vf.zone().creer_tableau_elements(num_compo);
+  domaine_vf.domaine().creer_tableau_elements(num_compo);
 
   double phase_cont = get_phase_continue();
-  const int nb_elem = zone_vf.zone().nb_elem();
+  const int nb_elem = domaine_vf.domaine().nb_elem();
   // On marque les elements dont on veut avoir les composantes connexes:
   //  -1 pour la phase a conserver (ne pas ranger ces elements dans une compo connexe)
   //  1 pour la phase a supprimer
@@ -597,7 +596,7 @@ int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const 
       num_compo[i] = (indic == phase_cont) ? -1 : 1;
     }
   num_compo.echange_espace_virtuel();
-  const int nb_local_components = search_connex_components_local(zone_vf.elem_faces(), zone_vf.face_voisins(), num_compo);
+  const int nb_local_components = search_connex_components_local(domaine_vf.elem_faces(), domaine_vf.face_voisins(), num_compo);
   const int nb_compo_glob = compute_global_connex_components(num_compo, nb_local_components);
 
   return nb_compo_glob;
@@ -721,10 +720,10 @@ void Topologie_Maillage_FT::remailler_interface(const double temps,
               // On fait une copie car on va modifier indicatrice et on veut avoir acces a la valeur precedente:
               DoubleTab indicatrice_partie_non_remaillee = indicatrice.valeurs();
               // Supprimer les triangles des composantes connexes ou se trouvent les collisions
-              const Zone_VF& zone_vf = ref_cast(Zone_VF, indicatrice.zone_dis_base());
+              const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, indicatrice.domaine_dis_base());
               {
                 IntVect num_compo;
-                const int nb_compo = calculer_composantes_connexes_pour_suppression(zone_vf, indicatrice_partie_non_remaillee, num_compo);
+                const int nb_compo = calculer_composantes_connexes_pour_suppression(domaine_vf, indicatrice_partie_non_remaillee, num_compo);
                 // Selection des composantes a supprimer, initialisation a zero
                 ArrOfInt flags_compo_a_supprimer(nb_compo);
                 const int n = liste_elements_collision.size_array();

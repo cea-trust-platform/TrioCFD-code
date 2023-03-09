@@ -25,9 +25,11 @@
 #define Transport_Fluctuation_Temperature_W_Bas_Re_included
 
 #include <Fluide_Incompressible.h>
-#include <Ref_Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re.h>
 #include <Transport_Fluctuation_Temperature_W.h>
-#include <Ref_Modele_Fonc_Bas_Reynolds_Thermique.h>
+#include <TRUST_Ref.h>
+
+class Modele_Fonc_Bas_Reynolds_Thermique;
+class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
 
 class Motcle;
 

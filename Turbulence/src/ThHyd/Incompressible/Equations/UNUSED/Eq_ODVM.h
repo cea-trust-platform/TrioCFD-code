@@ -23,7 +23,9 @@
 #define Eq_ODVM_included
 #include <TRUSTTab.h>
 #include <Motcle.h>
-#include <Ref_Milieu_base.h>
+#include <TRUST_Ref.h>
+
+class Milieu_base;
 
 /*! @brief Classe Eq_ODVM Classe resolvant l'equation de temperature moyenne, l'equation de
  *

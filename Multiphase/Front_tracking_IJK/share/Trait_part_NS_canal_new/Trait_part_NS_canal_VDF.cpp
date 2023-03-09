@@ -7,9 +7,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Trait_part_NS_canal_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 //FA 3/02/11
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 #include <Pave.h>
 
@@ -62,10 +62,10 @@ void Traitement_particulier_NS_canal_VDF::remplir_Y(DoubleVect& Y,  DoubleVect& 
   // utiles au calcul des differentes moyennes
   // Initialisation de : Y, compt
   
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();     
-  const Zone_VF& zone_VF=ref_cast(Zone_VF, zdisbase); 
-  const DoubleTab& xp = zone_VF.xp();
-  entier nb_elems = zone_VF.zone().nb_elem();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();     
+  const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase); 
+  const DoubleTab& xp = domaine_VF.xp();
+  entier nb_elems = domaine_VF.domaine().nb_elem();
   entier num_elem,j,indic,trouve;
   double y;
   
@@ -124,15 +124,15 @@ void Traitement_particulier_NS_canal_VDF::remplir_Y(DoubleVect& Y,  DoubleVect& 
 
 void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(DoubleTab& Tab_recap)
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();     
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();     
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
  
   int face; //recepteur des faces
   int elem_test,elem_test2; // element de test pour les ficitfs
-  int nb_elem_tot = zone_VDF.zone().nb_elem_tot(); // nombre total d'elements (reel + fict)
-  int nb_elems = zone_VDF.zone().nb_elem();
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot(); // nombre total d'elements (reel + fict)
+  int nb_elems = domaine_VDF.domaine().nb_elem();
   int dimension=Objet_U::dimension;
   
   IntTab trouve(1);// tableau des elements deja effectue
@@ -147,9 +147,9 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(DoubleTab& Tab_recap
     for (num_elem=nb_elems;num_elem<nb_elem_tot;num_elem++) // boucle sur les elements fictifs
       {
     	face = elem_faces(num_elem,1+dimension);	
-	elem_test=zone_VDF.elem_voisin(num_elem,face,0);
+	elem_test=domaine_VDF.elem_voisin(num_elem,face,0);
 	face = elem_faces(num_elem,1);
-	elem_test2=zone_VDF.elem_voisin(num_elem,face,1);
+	elem_test2=domaine_VDF.elem_voisin(num_elem,face,1);
 	
 	if ((elem_test>0) && (elem_test<nb_elems)) // si l'element en dessus est un element reel alors
 	{
@@ -195,17 +195,17 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(DoubleTab& Tab_recap
 	 if(q==0) //       
 	 {
 	face=elem_faces(num_elem,1); //face inferieure
-	elem_test=zone_VDF.elem_voisin(num_elem,face,1);
+	elem_test=domaine_VDF.elem_voisin(num_elem,face,1);
 	
 	
 	if (elem_test+1) {Tab_recap(num_elem,1)=elem_test;} // faux si elem_test=-1 sinon remplit avec l'element en dessous
-	else {Tab_recap(num_elem,1)=zone_VDF.elem_voisin(num_elem,elem_faces(num_elem,1+dimension),0);} // on le traite alors comme un virtuel 
+	else {Tab_recap(num_elem,1)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1+dimension),0);} // on le traite alors comme un virtuel 
 	
 	face= elem_faces(num_elem,1+dimension); //face superieure
-	elem_test=zone_VDF.elem_voisin(num_elem,face,0);
+	elem_test=domaine_VDF.elem_voisin(num_elem,face,0);
 	
 	if (elem_test+1) {Tab_recap(num_elem,0)=elem_test;} // faux si elem_test=-1 sinon remplit avec l'element au dessus
-	else {Tab_recap(num_elem,0)=zone_VDF.elem_voisin(num_elem,elem_faces(num_elem,1),1);} // on le traite alors comme un virtuel 
+	else {Tab_recap(num_elem,0)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1),1);} // on le traite alors comme un virtuel 
 	
 	 y = xp(num_elem,1);	 
 	 for (i=0;i<Ny;i++)
@@ -220,13 +220,13 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(DoubleTab& Tab_recap
 
 void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_vitesse_rho_mu(DoubleTab& val_moy) const
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();     
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();     
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   double y,u,v,w;
-  entier nb_elems = zone_VDF.zone().nb_elem();
+  entier nb_elems = domaine_VDF.domaine().nb_elem();
   entier num_elem,i;
   entier face_x_0,face_x_1,face_y_0,face_y_1,face_z_0,face_z_1;
   
@@ -294,12 +294,12 @@ void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_vitesse_rho_
 
 void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_nut(DoubleTab& val_moy) const
 {
-  const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();     
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();     
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
   const Navier_Stokes_Turbulent& N_S_Turb  = ref_cast(Navier_Stokes_Turbulent,mon_equation.valeur());
   const DoubleTab& nu_t = N_S_Turb.viscosite_turbulente().valeurs();
-  entier nb_elems = zone_VDF.zone().nb_elem();
+  entier nb_elems = domaine_VDF.domaine().nb_elem();
   entier num_elem,i;
   double y;
 
@@ -345,10 +345,10 @@ void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_Temp(DoubleT
 }
 void Traitement_particulier_NS_canal_VDF::calculer_Temp(DoubleTab& val_moy,const DoubleTab& diffusivite_turb) const
 {
-const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();     
-  const Zone_VDF& zone_VDF=ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab& xp = zone_VDF.xp();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();     
+  const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab& xp = domaine_VDF.xp();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const DoubleTab& temperature = Temp.valeur().valeurs();
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
 
@@ -358,7 +358,7 @@ const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
   double y,u,v,v_nm1,v_np1,w,T,lambda_sm,rho,Tb,Th,dyb,dyh; //modified YB 29/06/09
   double lambdah,lambdab,lambdae,lambda_smh,lambda_smb,nuth,nutb; //modified AT 03/09/09
   
-  entier nb_elems = zone_VDF.zone().nb_elem();
+  entier nb_elems = domaine_VDF.domaine().nb_elem();
   entier num_elem,i;
   entier face_x_0,face_x_1,face_y_0,face_y_1,face_z_0,face_z_1;
   

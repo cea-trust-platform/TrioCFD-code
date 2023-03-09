@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Prolongement_face_face.h>
-#include <Zone_VDF.h>
-#include <Zone_VEF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_VEF.h>
 Implemente_instanciable(Prolongement_face_face,"Prolongement_face_face",Prolongement_base);
 
 //// printOn
@@ -47,7 +47,7 @@ Entree& Prolongement_face_face::readOn(Entree& s )
 /*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue VITESSE
  *
  */
-void Prolongement_face_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement_face_face::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                                        const Frontiere& frontF,
                                        IntVect& connect,
                                        const DoubleTab& valG, DoubleTab& tab,
@@ -72,22 +72,22 @@ void Prolongement_face_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
         {
           tab(nbFacesF, 0) = valG(num_faceG);
         }
-      else if(sub_type(Zone_VEF, zone_VFG))
+      else if(sub_type(Domaine_VEF, domaine_VFG))
         {
           for (comp=0; comp<nb_compo; comp++)
             {
               tab(nbFacesF, comp) = valG(num_faceG, comp);
             }
         }
-      else if(sub_type(Zone_VDF, zone_VFG) && sub_type(Zone_VDF, zone_VFF))
+      else if(sub_type(Domaine_VDF, domaine_VFG) && sub_type(Domaine_VDF, domaine_VFF))
         {
-          Zone_VDF& zone_vdfG = ref_cast(Zone_VDF, zone_VFG);
+          Domaine_VDF& domaine_vdfG = ref_cast(Domaine_VDF, domaine_VFG);
 
-          const IntVect& oriG = zone_vdfG.orientation();
-          const IntTab& face_voisG = zone_vdfG.face_voisins();
-          const Zone& zoneg = zone_vdfG.zone();
-          const int nb_faces_elemG = zoneg.type_elem().nb_faces();
-          const IntTab& elem_facesG =  zone_vdfG.elem_faces();
+          const IntVect& oriG = domaine_vdfG.orientation();
+          const IntTab& face_voisG = domaine_vdfG.face_voisins();
+          const Domaine& domaineg = domaine_vdfG.domaine();
+          const int nb_faces_elemG = domaineg.type_elem().nb_faces();
+          const IntTab& elem_facesG =  domaine_vdfG.elem_faces();
           int num_face_gros;
           int num_elemG;
           if(oriG(num_faceG) == 0)
@@ -175,8 +175,8 @@ void Prolongement_face_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
 
 //NE FAIT RIEN
-void Prolongement_face_face::calculer(Zone_VF& zonef,
-                                      Zone_VF& zoneg,
+void Prolongement_face_face::calculer(Domaine_VF& domainef,
+                                      Domaine_VF& domaineg,
                                       IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

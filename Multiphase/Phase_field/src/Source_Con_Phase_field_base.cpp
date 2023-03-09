@@ -22,43 +22,8 @@
 
 #include <Source_Con_Phase_field_base.h>
 
-
 Implemente_base(Source_Con_Phase_field_base,"Source_Con_Phase_field_base",Source_base);
 
+Sortie& Source_Con_Phase_field_base::printOn(Sortie& os) const { return Source_base::printOn(os); }
 
-/*! @brief Surcharge Source_base::printOn(Sortie&) Ecriture d'un probleme sur un flot de sortie.
- *
- *     !! Attention n'est pas symetrique de la lecture !!
- *     On ecrit les equations, le postraitement et le domaine
- *     discretise.
- *
- * @param (Sortie& os) flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
-Sortie& Source_Con_Phase_field_base::printOn(Sortie& os) const
-{
-  return Source_base::printOn(os);
-}
-
-/*! @brief Lecture d'un probleme dans un flot d'entree, et ouverture du flot de sauvegarde.
- *
- *     Format:
- *      {
- *      nom_equation bloc de lecture d'une equation
- *      Postraitement bloc de lecture postraitement
- *      reprise | sauvegarde
- *      formatte | binaire
- *      nom_de_fichier
- *      }
- *
- * @param (Entree& is) flot d'entree
- * @return (Entree&) le flot d'entre modifie
- * @throws pas d'accolade ouvrante en debut de format
- * @throws mot clef "Postraitement" n'est pas la
- * @throws format de sauvegarde doit etre "binaire" ou "formatte"
- * @throws pas d'accolade fermante en fin de jeu de donnee
- */
-Entree& Source_Con_Phase_field_base::readOn(Entree& is)
-{
-  return Source_base::readOn(is);
-}
+Entree& Source_Con_Phase_field_base::readOn(Entree& is) { return Source_base::readOn(is); }

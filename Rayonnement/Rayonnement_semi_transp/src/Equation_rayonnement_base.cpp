@@ -126,10 +126,12 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   type+=nb_inc;
 
   Nom type_diff;
-  if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-    type_diff="const_";
+  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
   else
-    type_diff="var_";
+    {
+      if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite())) type_diff="const_";
+      else type_diff="var_";
+    }
   type+=type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
@@ -140,8 +142,6 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
 
   terme_diffusif.typer(type);
   terme_diffusif.l_op_base().associer_eqn(*this);
-  terme_diffusif.completer();
-  terme_diffusif.valeur().dimensionner(la_matrice);
 
 
   if (sub_type(Fluide_base,fluide()))
@@ -149,6 +149,8 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
       {
         const Champ_Don& long_rayo = fluide().longueur_rayo();
         terme_diffusif.valeur().associer_diffusivite(long_rayo);
+        terme_diffusif.completer();
+        terme_diffusif.valeur().dimensionner(la_matrice);
       }
     else
       {
@@ -366,9 +368,9 @@ void Equation_rayonnement_base::discretiser()
   Cerr <<"Radiation equation discretisation" << finl;
   Cerr <<"Do not matter with the fact that discretization of the temperature"<<finl;
   Cerr <<"is indicated indeed it is the irradiance wich is discretized."<<finl;
-  dis.temperature(schema_temps(), zone_dis(), irradiance_);
+  dis.temperature(schema_temps(), domaine_dis(), irradiance_);
 
-  // La methode temperature(schema_temps(), zone_dis(), irradiance_) permet
+  // La methode temperature(schema_temps(), domaine_dis(), irradiance_) permet
   // d'associer tout la bonne discretisation au champ de l'irradiance
   // toutefois, il faut modifier certaines grandeurs telles que le nom ou l'unite
   // de l'irradiance.

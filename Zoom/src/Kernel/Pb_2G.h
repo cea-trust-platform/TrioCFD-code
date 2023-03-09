@@ -27,17 +27,19 @@
 #define Pb_2G_included
 
 
+#include <TRUSTTabs_forward.h>
 #include <Connectivites.h>
-#include <List_Prolongement.h>
-#include <List_Restriction.h>
-#include <Ref_Pb_MG.h>
+#include <TRUST_List.h>
+#include <Prolongement.h>
+#include <Restriction.h>
+#include <TRUST_Ref.h>
+
+class Pb_MG;
 class Prolongement;
 class Restriction;
 class Pb_grossier;
 class Champ_front_zoom;
 class Pb_1G;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 class Frontiere;
 class Probleme_base;
 /*! @brief class Pb_2G

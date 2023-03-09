@@ -30,15 +30,14 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Operateur_Diff_base.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
-#include <Op_Diff_Tau_PolyMAC_P0_Elem.h>
 #include <TRUSTTrav.h>
-#include <Zone_Poly_base.h>
+#include <Domaine_VF.h>
 
 #include <math.h>
 
@@ -55,6 +54,7 @@ Entree& Cond_lim_tau_omega_simple_dix::readOn(Entree& s )
   param.ajouter("beta_omega", &beta_omega);
   param.ajouter("beta_k", &beta_k);
   param.ajouter("von_karman", &von_karman_);
+  param.ajouter("facteur_paroi", &facteur_paroi_);
   param.lire_avec_accolades_depuis(s);
 
   le_champ_front.typer("Champ_front_vide");
@@ -64,22 +64,12 @@ Entree& Cond_lim_tau_omega_simple_dix::readOn(Entree& s )
 
 void Cond_lim_tau_omega_simple_dix::completer()
 {
-  if (sub_type(Echelle_temporelle_turbulente, zone_Cl_dis().equation())) is_tau_ = 1;
-  else if (sub_type(Taux_dissipation_turbulent, zone_Cl_dis().equation())) is_tau_ = 0;
+  if (sub_type(Echelle_temporelle_turbulente, domaine_Cl_dis().equation())) is_tau_ = 1;
+  else if (sub_type(Taux_dissipation_turbulent, domaine_Cl_dis().equation())) is_tau_ = 0;
   else Process::exit(que_suis_je() + " : equation must be tau/omega !");
 
-  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size();
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size();
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
-}
-
-void Cond_lim_tau_omega_simple_dix::liste_faces_loi_paroi(IntTab& tab)
-{
-  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  int N = tab.line_size();
-
-  for (int f =0 ; f < nf ; f++)
-    for (int n = 0 ; n<N ; n++)
-      tab(f + f1, n) |= 1;
 }
 
 int Cond_lim_tau_omega_simple_dix::compatible_avec_eqn(const Equation_base& eqn) const
@@ -100,10 +90,10 @@ void Cond_lim_tau_omega_simple_dix::mettre_a_jour(double tps)
 
 int Cond_lim_tau_omega_simple_dix::initialiser(double temps)
 {
-  d_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  d_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
 
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
 
   return 1;
 }
@@ -111,13 +101,13 @@ int Cond_lim_tau_omega_simple_dix::initialiser(double temps)
 void Cond_lim_tau_omega_simple_dix::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().zone_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&      nu_visc = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  const IntTab& f_e = zone.face_voisins();
+  const IntTab& f_e = domaine.face_voisins();
 
   int n = 0 ; // Carrying phase is 0 for turbulent flows
 
@@ -125,20 +115,20 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
     {
       for (int f =0 ; f < nf ; f++)
         {
-          int f_zone = f + f1; // number of the face in the zone
-          int e_zone = f_e(f_zone,0);
+          int f_domaine = f + f1; // number of the face in the domaine
+          int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = 10.*calc_tau(y(f_zone, n), u_tau(f_zone, n), nu_visc(e_zone, n));
+          d_(f, n) = facteur_paroi_*calc_tau(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
         }
     }
   if (is_tau_ == 0)
     {
       for (int f =0 ; f < nf ; f++)
         {
-          int f_zone = f + f1; // number of the face in the zone
-          int e_zone = f_e(f_zone,0);
+          int f_domaine = f + f1; // number of the face in the domaine
+          int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = 10.*calc_omega(y(f_zone, n), u_tau(f_zone, n), nu_visc(e_zone, n));
+          d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
         }
     }
   d_.echange_espace_virtuel();
@@ -169,3 +159,4 @@ double Cond_lim_tau_omega_simple_dix::calc_omega(double y, double u_tau, double 
     return blending * w_1 + (1-blending) * w_2 ;*/
   return 6 * visc / (beta_omega * y * y);
 }
+

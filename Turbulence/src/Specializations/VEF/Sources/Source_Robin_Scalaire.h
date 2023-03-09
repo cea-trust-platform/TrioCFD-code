@@ -23,9 +23,14 @@
 #define Source_Robin_Scalaire_included
 
 #include <Source_base.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_DoubleVect.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
+class Domaine_Cl_dis;
+class Domaine_dis;
+
 
 class Convection_Diffusion_std;
 
@@ -41,9 +46,9 @@ public:
   void completer() override;
 
 protected:
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
-  void associer_zones(const Zone_dis& , const Zone_Cl_dis&) override;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  void associer_domaines(const Domaine_dis& , const Domaine_Cl_dis&) override;
 //  double dt_post;
   Noms noms_parois;
   DoubleVect T_parois;

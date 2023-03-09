@@ -24,12 +24,12 @@
 #define Paroi_flux_impose_Rayo_transp_included
 
 #include <Paroi_Rayo_transp.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
 #include <Champ_front_calc.h>
-#include <Ref_Zone_VDF.h>
+#include <TRUST_Ref.h>
 
-//
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+
 class Paroi_flux_impose_Rayo_transp : public Paroi_Rayo_transp
 {
 
@@ -43,7 +43,7 @@ public :
 protected:
   void calculer_Teta_i_VDF();
   void calculer_Teta_i_VEF();
-  REF(Zone_VDF) zone_VDF;
+  REF(Domaine_VDF) domaine_VDF;
   int is_VDF_;
 };
 #endif

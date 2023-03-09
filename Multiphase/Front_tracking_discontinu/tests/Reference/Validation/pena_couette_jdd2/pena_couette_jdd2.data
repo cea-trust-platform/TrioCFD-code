@@ -248,7 +248,7 @@ Read pb
     format Lata 
     fichier lata/post_dom 
     champs dt_post 0.01 { 
-        vitesse faces 
+        vitesse elem 
         pression elem 
         divergence_u elem 
         indicatrice_cylind_1 elem 
@@ -267,7 +267,7 @@ Read pb
     format Lata 
     fichier lata/post_cylind_1 
     champs dt_post 0.01 { 
-        vitesse faces 
+        vitesse elem 
         pression elem 
         indicatrice_cylind_1 elem 
         indicatrice_cylind_2 elem 

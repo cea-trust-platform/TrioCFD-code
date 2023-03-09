@@ -46,12 +46,12 @@ Entree& Restriction_face_elem::readOn(Entree& s )
 /*! @brief calcul du nombre de faces fines contenues dans chaque element grossier
  *
  */
-void Restriction_face_elem::calculer(const Zone_VF& zone_VFG,
-                                     const Zone_VF& zone_VFF,
+void Restriction_face_elem::calculer(const Domaine_VF& domaine_VFG,
+                                     const Domaine_VF& domaine_VFF,
                                      const IntVect& connect)
 {
   //Cerr<<"debut de  Restriction_face_elem::calculer_nb_faceF_dans_chaque_elemG"<<finl;
-  int nb_elemG = zone_VFG.nb_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
   int max1, max2, max3;
   int nbelemsF;
   int nbelemsG;
@@ -59,12 +59,12 @@ void Restriction_face_elem::calculer(const Zone_VF& zone_VFG,
   IntTab tab_facesF;
   int num_elemG;
   int nbfacesF;
-  int nb_facesF_par_elemF = zone_VFF.zone().nb_faces_elem();
+  int nb_facesF_par_elemF = domaine_VFF.domaine().nb_faces_elem();
   int nombre_total_elemF = connect.size_array();
   nb_elemF_.resize(nb_elemG);
   nb_faceF_.resize(nb_elemG+1);
   nb_faceF_ = 0;
-  const IntTab& num_facesF = zone_VFF.elem_faces();
+  const IntTab& num_facesF = domaine_VFF.elem_faces();
   //On va stocker dans nb_faceF_
   //le nb de faces fines par element grossier
   //et dans la derniere case : le nombre maximal de faces
@@ -153,16 +153,16 @@ void Restriction_face_elem::calculer(const Zone_VF& zone_VFG,
  *     car valeur
  *
  */
-void Restriction_face_elem::restreindre(const Zone_VF& zone_VFG,
-                                        const Zone_VF& zone_VFF,
+void Restriction_face_elem::restreindre(const Domaine_VF& domaine_VFG,
+                                        const Domaine_VF& domaine_VFF,
                                         const IntVect& connect,
                                         DoubleTab& valG,
                                         const DoubleTab& valF,int nb_comp)
 {
   //Cerr<<"debut de  Restriction_face_elem::restreindre"<<finl;
-  int nb_facesF_par_elemF = zone_VFF.zone().nb_faces_elem();
-  int nb_elemG = zone_VFG.nb_elem();
-  int nb_elemF = zone_VFF.nb_elem();
+  int nb_facesF_par_elemF = domaine_VFF.domaine().nb_faces_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
+  int nb_elemF = domaine_VFF.nb_elem();
   int nb_faces_fines;
   int max = nb_faceF_(nb_elemG);
   IntTab tab_facesF;
@@ -173,7 +173,7 @@ void Restriction_face_elem::restreindre(const Zone_VF& zone_VFG,
   int comp;
   int num_elemG;
   int nbfacesF;
-  const IntTab& num_facesF = zone_VFF.elem_faces();
+  const IntTab& num_facesF = domaine_VFF.elem_faces();
 
   //Mettre a 0 les valeurs grossieres a corriger
   //  Cerr<<"Valeurs grossieres mise a zero"<<finl;

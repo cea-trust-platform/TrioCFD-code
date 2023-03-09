@@ -21,14 +21,14 @@
 
 #include <Turbulence_hyd_sous_maille_axi_VDF.h>
 #include <Periodique.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Neumann_sortie_libre.h>
 #include <Symetrie.h>
 #include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Equation_base.h>
 
 Implemente_instanciable(Turbulence_hyd_sous_maille_axi_VDF,"Modele_turbulence_hyd_sous_maille_axi_VDF",Turbulence_hyd_sous_maille_VDF);
@@ -62,13 +62,13 @@ Entree& Turbulence_hyd_sous_maille_axi_VDF::readOn(Entree& s )
 
 Champ_Fonc& Turbulence_hyd_sous_maille_axi_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   static const double Csm1 = CSM1;
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  int nb_poly = zone_VDF.zone().nb_elem();
-  int nb_poly_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_poly = domaine_VDF.domaine().nb_elem();
+  int nb_poly_tot = le_dom_VDF->domaine().nb_elem_tot();
   int numfa[6];
   double delta_C_axi ;
   double h_x,h_y,h_z;
@@ -90,9 +90,9 @@ Champ_Fonc& Turbulence_hyd_sous_maille_axi_VDF::calculer_viscosite_turbulente()
     {
       for (int i=0; i<6; i++)
         numfa[i] = elem_faces(elem,i);
-      h_x = zone_VDF.dist_face_axi(numfa[0],numfa[3],0);
-      h_y = zone_VDF.dist_face_axi(numfa[1],numfa[4],1);
-      h_z = zone_VDF.dist_face_axi(numfa[2],numfa[5],2);
+      h_x = domaine_VDF.dist_face_axi(numfa[0],numfa[3],0);
+      h_y = domaine_VDF.dist_face_axi(numfa[1],numfa[4],1);
+      h_z = domaine_VDF.dist_face_axi(numfa[2],numfa[5],2);
       // filter width by bardina
       // delta_C_axi = sqrt(h_x*h_x + h_y*h_y + h_z*h_z) ;
       // filter lesieur
@@ -110,12 +110,12 @@ Champ_Fonc& Turbulence_hyd_sous_maille_axi_VDF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
 {
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  int nb_poly = zone_VDF.zone().nb_elem();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& Qdm = zone_VDF.Qdm();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_poly = domaine_VDF.domaine().nb_elem();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& Qdm = domaine_VDF.Qdm();
+  const IntVect& orientation = domaine_VDF.orientation();
   DoubleTrav F_Elem(nb_poly,dimension);
   int num0,num1,num2,num3;
   int k1,k2;
@@ -152,8 +152,8 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
           F_Elem(num_elem,2) = diff*diff;
         }
 
-      int ndeb0 = zone_VDF.premiere_arete_interne();
-      int nfin0 = ndeb0 + zone_VDF.nb_aretes_internes();
+      int ndeb0 = domaine_VDF.premiere_arete_interne();
+      int nfin0 = ndeb0 + domaine_VDF.nb_aretes_internes();
       int num_arete0;
 
       for (num_arete0=ndeb0; num_arete0<nfin0; num_arete0++)
@@ -181,8 +181,8 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
 
         }
 
-      ndeb0 = zone_VDF.premiere_arete_mixte();
-      nfin0 = ndeb0 + zone_VDF.nb_aretes_mixtes();
+      ndeb0 = domaine_VDF.premiere_arete_mixte();
+      nfin0 = ndeb0 + domaine_VDF.nb_aretes_mixtes();
 
       for (num_arete0=ndeb0; num_arete0<nfin0; num_arete0++)
         {
@@ -220,29 +220,29 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
       // ATTENTION!!!!!!!!!!!  Modifs periodicite      DEBUT
       //
       // Les aretes bords sont considerees comme des faces internes
-      // par modification du tableau Qdm ( dans Zone_VDF.cpp )
+      // par modification du tableau Qdm ( dans Domaine_VDF.cpp )
 
 
-      const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
-      const int nb_cond_lim = zone_Cl_VDF.nb_cond_lim();
+      const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+      const int nb_cond_lim = domaine_Cl_VDF.nb_cond_lim();
 
       for(int i=0; i<nb_cond_lim; i++)
         {
-          const Cond_lim_base& cl = la_zone_Cl_VDF->les_conditions_limites(i).valeur();
+          const Cond_lim_base& cl = le_dom_Cl_VDF->les_conditions_limites(i).valeur();
 
           // Cerr << "les_conditions_limites(i).valeur() : " << cl << finl;
 
           if (sub_type(Periodique, cl))
             {
-              //            const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+              //            const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
 
-              int ndeb = zone_VDF.premiere_arete_bord();
-              int nfin = ndeb + zone_VDF.nb_aretes_bord();
+              int ndeb = domaine_VDF.premiere_arete_bord();
+              int nfin = ndeb + domaine_VDF.nb_aretes_bord();
               int num_arete;
 
               for (num_arete=ndeb; num_arete<nfin; num_arete++)
                 {
-                  int n_type=zone_Cl_VDF.type_arete_bord(num_arete-ndeb);
+                  int n_type=domaine_Cl_VDF.type_arete_bord(num_arete-ndeb);
 
                   if (n_type == TypeAreteBordVDF::PERIO_PERIO) // arete de type periodicite
                     {
@@ -288,9 +288,9 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
         {
           for (int i=0; i<6; i++)
             numfa[i] = elem_faces(num_elem,i);
-          h_x = zone_VDF.dist_face_axi(numfa[0],numfa[3],0);
-          h_y = zone_VDF.dist_face_axi(numfa[1],numfa[4],1);
-          h_z = zone_VDF.dist_face_axi(numfa[2],numfa[5],2);
+          h_x = domaine_VDF.dist_face_axi(numfa[0],numfa[3],0);
+          h_y = domaine_VDF.dist_face_axi(numfa[1],numfa[4],1);
+          h_z = domaine_VDF.dist_face_axi(numfa[2],numfa[5],2);
           // filter width by bardina
           // delta_C_axi = sqrt(h_x*h_x + h_y*h_y + h_z*h_z) ;
           // filter lesieur
@@ -312,12 +312,12 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
       int num_face;
       int elem,n0,n1;
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
 
           // pour chaque Condition Limite on regarde son type
 
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_entree_fluide,la_cl.valeur()) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -326,13 +326,13 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
               for (num_face=ndeb0; num_face<nfin0; num_face++)
                 if ( (n0 = face_voisins(num_face,0)) != -1)
                   {
-                    elem = zone_VDF.elem_voisin(n0,num_face,0);
+                    elem = domaine_VDF.elem_voisin(n0,num_face,0);
                     F2[n0] = F2[elem] ;
                   }
                 else
                   {
                     n1 = face_voisins(num_face,1);
-                    elem = zone_VDF.elem_voisin(n1,num_face,1);
+                    elem = domaine_VDF.elem_voisin(n1,num_face,1);
                     F2[n1] = F2[elem] ;
                   }
             }
@@ -344,13 +344,13 @@ void Turbulence_hyd_sous_maille_axi_VDF::calculer_fonction_structure()
               for (num_face=ndeb0; num_face<nfin0; num_face++)
                 if ( (n0 = face_voisins(num_face,0)) != -1)
                   {
-                    elem = zone_VDF.elem_voisin(n0,num_face,0);
+                    elem = domaine_VDF.elem_voisin(n0,num_face,0);
                     F2[n0] = F2[elem] ;
                   }
                 else
                   {
                     n1 = face_voisins(num_face,1);
-                    elem = zone_VDF.elem_voisin(n1,num_face,1);
+                    elem = domaine_VDF.elem_voisin(n1,num_face,1);
                     F2[n1] = F2[elem] ;
                   }
             }

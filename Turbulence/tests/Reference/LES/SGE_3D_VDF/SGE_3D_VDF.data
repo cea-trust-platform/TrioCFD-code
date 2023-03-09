@@ -48,7 +48,7 @@ Lire pb
 {
    
    fluide_incompressible {
-    	mu Champ_Uniforme 1 0.002
+    	mu Champ_Uniforme 1 0.02
    	rho Champ_Uniforme 1 2
    }
    

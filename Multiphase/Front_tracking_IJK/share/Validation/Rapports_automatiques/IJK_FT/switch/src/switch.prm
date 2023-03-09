@@ -18,6 +18,7 @@ EOF
 	CasTest . switch_varDZ_wall.data
 	CasTest . precurseur_3D.data
 	Prerequisite python post.py 
+        # DISABLE_PARALLEL_RUN #
 }
 
 

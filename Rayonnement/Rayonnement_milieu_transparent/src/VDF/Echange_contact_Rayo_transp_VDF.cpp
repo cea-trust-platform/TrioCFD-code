@@ -22,7 +22,7 @@
 
 #include <Echange_contact_Rayo_transp_VDF.h>
 #include <Probleme_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Champ_front_uniforme.h>
 #include <TRUSTTabs.h>
 #include <Champ_Uniforme.h>
@@ -68,13 +68,13 @@ Entree& Echange_contact_Rayo_transp_VDF::readOn(Entree& s )
 void Echange_contact_Rayo_transp_VDF::completer()
 {
   Echange_contact_VDF::completer();
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
 
   // calcul de Teta_i 0
 
-  const Equation_base& mon_eqn = zone_Cl_dis().equation();
+  const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
-  const Zone_VDF& ma_zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   int ndeb = ma_front_vf.num_premiere_face();
@@ -113,7 +113,7 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
       T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
       // on regarde qui est le pb fluide
       const Equation_base* eqn=NULL;
-      const Equation_base& mon_eqn = zone_Cl_dis().equation();
+      const Equation_base& mon_eqn = domaine_Cl_dis().equation();
 
       const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb().valeur());
       const  Equation_base& autre_eqn=chcal.inconnue().equation();
@@ -144,11 +144,11 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
           exit();
         }
 
-      const Front_VF& frontvf=ref_cast(Front_VF,eqn->zone_dis().valeur().frontiere_dis(frontiere_dis().le_nom()));
+      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis().valeur().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide=frontvf.num_premiere_face();
-      Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
-      if (zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
     }
   else
@@ -202,9 +202,9 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   //mon_h(monT-Tw)=autre_h*(Tw-Tautre)
   // Tautre=Text;
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
-  const Equation_base& mon_eqn = zone_Cl_dis().equation();
+  const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
-  const Zone_VDF& ma_zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   //DoubleTab& mon_h=h_imp_->valeurs();
@@ -235,9 +235,9 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
       flux_radia_fluide(nfluide)=modrayo.flux_radiatif(nfluide+ndebfluide);
     }
   DoubleVect fluxradia;
-  Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+  Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
   Nom nom_racc1=frontiere_dis().frontiere().le_nom();
-  if ((ispbfluide)||(zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene"))
+  if ((ispbfluide)||(domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene"))
     {
       fluxradia=flux_radia_fluide;
     }

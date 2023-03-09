@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Turbulence_hyd_sous_maille_VDF.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Neumann_sortie_libre.h>
 #include <Symetrie.h>
 #include <Dirichlet_paroi_fixe.h>
@@ -31,7 +31,7 @@
 #include <Schema_Temps_base.h>
 #include <Param.h>
 #include <Equation_base.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_VDF,"Modele_turbulence_hyd_sous_maille_VDF",Mod_turb_hyd_ss_maille_VDF);
 
@@ -89,7 +89,6 @@ int Turbulence_hyd_sous_maille_VDF::lire_motcle_non_standard(const Motcle& mot, 
     }
   else
     return Mod_turb_hyd_ss_maille_VDF::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,11 +100,11 @@ int Turbulence_hyd_sous_maille_VDF::lire_motcle_non_standard(const Motcle& mot, 
 
 Champ_Fonc& Turbulence_hyd_sous_maille_VDF::calculer_viscosite_turbulente()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  int nb_poly = zone_VDF.zone().nb_elem();
-  int nb_poly_tot = la_zone_VDF->zone().nb_elem_tot();
+  int nb_poly = domaine_VDF.domaine().nb_elem();
+  int nb_poly_tot = le_dom_VDF->domaine().nb_elem_tot();
 
   F2.resize(nb_poly_tot);
 
@@ -134,7 +133,7 @@ void Turbulence_hyd_sous_maille_VDF::calculer_energie_cinetique_turb()
 {
   double temps = mon_equation->inconnue().temps();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
-  int nb_poly = la_zone_VDF->zone().nb_elem();
+  int nb_poly = le_dom_VDF->domaine().nb_elem();
 
   if (k.size() != nb_poly)
     {
@@ -152,14 +151,14 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
 {
 
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  int nb_poly = zone_VDF.zone().nb_elem();
-  int nb_poly_tot = zone_VDF.zone().nb_elem_tot();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& Qdm = zone_VDF.Qdm();
-  const IntVect& orientation = zone_VDF.orientation();
-  //  int nb_face_entier = zone_VDF.nb_faces_internes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  int nb_poly = domaine_VDF.domaine().nb_elem();
+  int nb_poly_tot = domaine_VDF.domaine().nb_elem_tot();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& Qdm = domaine_VDF.Qdm();
+  const IntVect& orientation = domaine_VDF.orientation();
+  //  int nb_face_entier = domaine_VDF.nb_faces_internes();
   DoubleTrav F_Elem(nb_poly_tot,dimension);
   int num0,num1,num2,num3;
   int k1,k2;
@@ -203,8 +202,8 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       //*******************************
       // Traitement des aretes internes
       //*******************************
-      int ndeb = zone_VDF.premiere_arete_interne();
-      int nfin = ndeb + zone_VDF.nb_aretes_internes();
+      int ndeb = domaine_VDF.premiere_arete_interne();
+      int nfin = ndeb + domaine_VDF.nb_aretes_internes();
       int num_arete;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
@@ -235,8 +234,8 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       //*******************************
       // Traitement des aretes mixtes
       //*******************************
-      ndeb = zone_VDF.premiere_arete_mixte();
-      nfin = ndeb + zone_VDF.nb_aretes_mixtes();
+      ndeb = domaine_VDF.premiere_arete_mixte();
+      nfin = ndeb + domaine_VDF.nb_aretes_mixtes();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -274,21 +273,21 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       //*******************************
       //Prise en compte des CL
       //*******************************
-      const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
-      //      const int nb_cond_lim = zone_Cl_VDF.nb_cond_lim();
+      const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+      //      const int nb_cond_lim = domaine_Cl_VDF.nb_cond_lim();
       //      int indic_perio =0;
 
       //*******************************
       //On parcourt les aretes bords
       //*******************************
 
-      ndeb = zone_VDF.premiere_arete_bord();
-      nfin = ndeb + zone_VDF.nb_aretes_bord();
+      ndeb = domaine_VDF.premiere_arete_bord();
+      nfin = ndeb + domaine_VDF.nb_aretes_bord();
       int n_type;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=zone_Cl_VDF.type_arete_bord(num_arete-ndeb);
+          n_type=domaine_Cl_VDF.type_arete_bord(num_arete-ndeb);
 
           //**********************************
           // Traitement des aretes bords periodiques
@@ -357,12 +356,12 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       //On parcourt les aretes coins
       //*******************************
 
-      ndeb = zone_VDF.premiere_arete_coin();
-      nfin = ndeb + zone_VDF.nb_aretes_coin();
+      ndeb = domaine_VDF.premiere_arete_coin();
+      nfin = ndeb + domaine_VDF.nb_aretes_coin();
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
-          n_type=zone_Cl_VDF.type_arete_coin(num_arete-ndeb);
+          n_type=domaine_Cl_VDF.type_arete_coin(num_arete-ndeb);
           //***************************************
           // Traitement des aretes coin perio-perio
           //***************************************
@@ -441,9 +440,9 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
           for (num_elem=0; num_elem<nb_poly; num_elem++)
             {
               delta_C = l_(num_elem);
-              F2[num_elem]  = un_tiers*(F_Elem(num_elem,0)*pow(delta_C/zone_VDF.dim_elem(num_elem,0),deux_tiers)
-                                        + F_Elem(num_elem,1)*pow(delta_C/zone_VDF.dim_elem(num_elem,1),deux_tiers)
-                                        + F_Elem(num_elem,2)*pow(delta_C/zone_VDF.dim_elem(num_elem,2),deux_tiers));
+              F2[num_elem]  = un_tiers*(F_Elem(num_elem,0)*pow(delta_C/domaine_VDF.dim_elem(num_elem,0),deux_tiers)
+                                        + F_Elem(num_elem,1)*pow(delta_C/domaine_VDF.dim_elem(num_elem,1),deux_tiers)
+                                        + F_Elem(num_elem,2)*pow(delta_C/domaine_VDF.dim_elem(num_elem,2),deux_tiers));
 
             }
         }
@@ -454,8 +453,8 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
           for (num_elem=0; num_elem<nb_poly; num_elem++)
             {
               delta_C = l_(num_elem);
-              F2[num_elem]  = un_demi*(F_Elem(num_elem,dir1)*pow(delta_C/zone_VDF.dim_elem(num_elem,dir1),deux_tiers)
-                                       + F_Elem(num_elem,dir2)*pow(delta_C/zone_VDF.dim_elem(num_elem,dir2),deux_tiers));
+              F2[num_elem]  = un_demi*(F_Elem(num_elem,dir1)*pow(delta_C/domaine_VDF.dim_elem(num_elem,dir1),deux_tiers)
+                                       + F_Elem(num_elem,dir2)*pow(delta_C/domaine_VDF.dim_elem(num_elem,dir2),deux_tiers));
             }
         }
 
@@ -465,12 +464,12 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
       int num_face;
       int elem,n0,n1;
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
 
           // pour chaque Condition Limite on regarde son type
 
-          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_entree_fluide,la_cl.valeur()) )
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -479,13 +478,13 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
               for (num_face=ndeb; num_face<nfin; num_face++)
                 if ( (n0 = face_voisins(num_face,0)) != -1)
                   {
-                    elem = zone_VDF.elem_voisin(n0,num_face,0);
+                    elem = domaine_VDF.elem_voisin(n0,num_face,0);
                     F2[n0] = F2[elem] ;
                   }
                 else
                   {
                     n1 = face_voisins(num_face,1);
-                    elem = zone_VDF.elem_voisin(n1,num_face,1);
+                    elem = domaine_VDF.elem_voisin(n1,num_face,1);
                     F2[n1] = F2[elem] ;
                   }
             }
@@ -497,13 +496,13 @@ void Turbulence_hyd_sous_maille_VDF::calculer_fonction_structure()
               for (num_face=ndeb; num_face<nfin; num_face++)
                 if ( (n0 = face_voisins(num_face,0)) != -1)
                   {
-                    elem = zone_VDF.elem_voisin(n0,num_face,0);
+                    elem = domaine_VDF.elem_voisin(n0,num_face,0);
                     F2[n0] = F2[elem] ;
                   }
                 else
                   {
                     n1 = face_voisins(num_face,1);
-                    elem = zone_VDF.elem_voisin(n1,num_face,1);
+                    elem = domaine_VDF.elem_voisin(n1,num_face,1);
                     F2[n1] = F2[elem] ;
                   }
             }

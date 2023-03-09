@@ -21,26 +21,26 @@
 
 #include <Tenseur_Reynolds_Externe_VDF_Face.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_dis.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Neumann_sortie_libre.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
 #include <Symetrie.h>
 #include <Periodique.h>
-#include <Ref_Navier_Stokes_Turbulent.h>
 #include <Navier_Stokes_Turbulent.h>
 #include <Probleme_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
-#include <Ref_Modele_turbulence_hyd_K_Eps.h>
 #include <TRUSTTrav.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Echange_externe_impose.h>
 #include <Neumann.h>
 #include <Neumann_homogene.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Transport_K_Eps.h>
+#include <TRUST_Ref.h>
+
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Tenseur_Reynolds_Externe_VDF_Face,"Tenseur_Reynolds_Externe_VDF_Face",Source_base);
 
@@ -160,24 +160,24 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
     }
 }
 
-void Tenseur_Reynolds_Externe_VDF_Face::associer_zones(const Zone_dis& zone_dis,
-                                                       const Zone_Cl_dis& zone_Cl_dis)
+void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Domaine_dis& domaine_dis,
+                                                          const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 
-  nelem_ = la_zone_VDF.valeur().nb_elem();
+  nelem_ = le_dom_VDF.valeur().nb_elem();
 }
 
 
 void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntVect& orientation = zone_VDF.orientation();
-  const DoubleVect& porosite_surf = zone_Cl_VDF.equation().milieu().porosite_face();
-  const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const DoubleVect& porosite_surf = domaine_Cl_VDF.equation().milieu().porosite_face();
+  const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();
 
   int ndeb,nfin,ncomp,num_face,elem1,elem2;
   double vol;
@@ -188,14 +188,14 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
       // Boucle sur les conditions limites pour traiter les faces de bord
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
 
           // pour chaque Condition Limite on regarde son type
           // Si face de Dirichlet ou de Symetrie on ne fait rien
           // Si face de Neumann on calcule la contribution au terme source
 
-          const Cond_lim& la_cl = zone_Cl_VDF.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
           if (sub_type(Periodique,la_cl.valeur()))
             {
@@ -241,8 +241,8 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
       // Boucle sur les faces internes
 
-      ndeb = zone_VDF.premiere_face_int();
-      for (num_face =zone_VDF.premiere_face_int(); num_face<zone_VDF.nb_faces(); num_face++)
+      ndeb = domaine_VDF.premiere_face_int();
+      for (num_face =domaine_VDF.premiere_face_int(); num_face<domaine_VDF.nb_faces(); num_face++)
         {
           vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
           ncomp = orientation(num_face);
@@ -256,14 +256,14 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
       // Boucle sur les conditions limites pour traiter les faces de bord
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
         {
 
           // pour chaque Condition Limite on regarde son type
           // Si face de Dirichlet ou de Symetrie on ne fait rien
           // Si face de Neumann on calcule la contribution au terme source
 
-          const Cond_lim& la_cl = zone_Cl_VDF.les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
           if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
             {
@@ -317,8 +317,8 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
       // Boucle sur les faces internes
 
       double s_face;
-      ndeb = zone_VDF.premiere_face_int();
-      for (num_face =zone_VDF.premiere_face_int(); num_face<zone_VDF.nb_faces(); num_face++)
+      ndeb = domaine_VDF.premiere_face_int();
+      for (num_face =domaine_VDF.premiere_face_int(); num_face<domaine_VDF.nb_faces(); num_face++)
         {
 
           vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
@@ -338,10 +338,10 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::calculer(DoubleTab& resu) const
 
 void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 {
-  int nb_elem_tot = la_zone_VDF.valeur().nb_elem_tot();
-  int nb_faces_tot = la_zone_VDF.valeur().nb_faces_tot();
-  const IntTab& face_vois = la_zone_VDF.valeur().face_voisins();
-  const DoubleVect& volumes = la_zone_VDF.valeur().volumes();
+  int nb_elem_tot = le_dom_VDF.valeur().nb_elem_tot();
+  int nb_faces_tot = le_dom_VDF.valeur().nb_faces_tot();
+  const IntTab& face_vois = le_dom_VDF.valeur().face_voisins();
+  const DoubleVect& volumes = le_dom_VDF.valeur().volumes();
 
   DoubleTab valeurs_source(nb_elem_tot,dimension);
   valeurs_source = 0;
@@ -386,9 +386,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
           }
     }
 
-  const IntTab& elem_faces   = la_zone_VDF.valeur().elem_faces();
-  const IntTab& face_voisins = la_zone_VDF.valeur().face_voisins();
-  const DoubleVect& inverse_vol  = la_zone_VDF.valeur().inverse_volumes();
+  const IntTab& elem_faces   = le_dom_VDF.valeur().elem_faces();
+  const IntTab& face_voisins = le_dom_VDF.valeur().face_voisins();
+  const DoubleVect& inverse_vol  = le_dom_VDF.valeur().inverse_volumes();
   const int nb_faces_elem=elem_faces.line_size();
 
   int facei;
@@ -408,7 +408,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 
               for (int j=0; j<Objet_U::dimension; j++)
                 {
-                  div+=signe*la_zone_VDF.valeur().face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
+                  div+=signe*le_dom_VDF.valeur().face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
                 }
             }
           div*= inverse_vol(elem);
@@ -430,14 +430,14 @@ void Tenseur_Reynolds_Externe_VDF_Face::completer()
 
 void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
 
-  int nb_elem_tot=zone_VDF.nb_elem_tot();
+  int nb_elem_tot=domaine_VDF.nb_elem_tot();
   DoubleTab gij(nb_elem_tot,dimension,dimension);
-  const Champ_Face& vitesse = ref_cast( Champ_Face,eqn_NS_->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   DoubleTab lambda_1(nb_elem_tot);
   DoubleTab lambda_2(nb_elem_tot);

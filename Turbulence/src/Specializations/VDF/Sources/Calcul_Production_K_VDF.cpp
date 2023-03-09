@@ -26,12 +26,12 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Probleme_base.h>
 #include <TRUSTTrav.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Entree_fluide_concentration_imposee.h>
 #include <Champ_Uniforme.h>
-#include <Zone_VDF.h>
-#include <Champ_Face.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Champ_Face_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Debog.h>
 #include <TRUSTTrav.h>
@@ -42,12 +42,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 DoubleVect& Calcul_Production_K_VDF::
-calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF , DoubleVect& S,  const DoubleTab& K_eps,
-                            const DoubleTab& vitesse,const Champ_Face& vit,  const DoubleTab& visco_turb )  const
+calculer_terme_production_K(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF , DoubleVect& S,  const DoubleTab& K_eps,
+                            const DoubleTab& vitesse,const Champ_Face_VDF& vit,  const DoubleTab& visco_turb )  const
 {
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntVect& orientation = zone_VDF.orientation();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
   IntVect element(4);
@@ -64,7 +64,7 @@ calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl
   //Dans la methode calcul_S_barre_sans_contrib_paroi, contribution_paroi
   //est fixe a 0 par defaut
 
-  vit.calcul_S_barre_sans_contrib_paroi(vitesse,S,zone_Cl_VDF);
+  vit.calcul_S_barre_sans_contrib_paroi(vitesse,S,domaine_Cl_VDF);
 
   double coef;
 
@@ -77,7 +77,7 @@ calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl
       coef = 0. ;
       for (int i=0; i<Objet_U::dimension; i++)
         {
-          coef +=  (vitesse[elem_faces(elem,i)]  - vitesse[elem_faces(elem,i+Objet_U::dimension)]) /zone_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
+          coef +=  (vitesse[elem_faces(elem,i)]  - vitesse[elem_faces(elem,i+Objet_U::dimension)]) /domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
         }
       //Corrections pour prendre en compte la divergence de u
       //non nulle en Quasi-Compressible
@@ -92,8 +92,8 @@ calculer_terme_production_K(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl
 }
 
 DoubleVect& Calcul_Production_K_VDF::
-calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
-                                const Champ_Face& vitesse,
+calculer_terme_production_K_Axi(const Domaine_VDF& domaine_VDF,
+                                const Champ_Face_VDF& vitesse,
                                 DoubleVect& P,
                                 const DoubleTab& K_Eps,
                                 const DoubleTab& visco_turb) const
@@ -108,10 +108,10 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
 
   P= 0;
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_aretes = zone_VDF.nb_aretes();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& Qdm = zone_VDF.Qdm();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_aretes = domaine_VDF.nb_aretes();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& Qdm = domaine_VDF.Qdm();
   const DoubleTab& tau_diag = vitesse.tau_diag();
   const DoubleTab& tau_croises = vitesse.tau_croises();
   double d_visco_turb,k_elem,P_arete;
@@ -134,8 +134,8 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
   // Boucle sur les aretes bord
 
   int ndeb,nfin,n_arete;
-  ndeb = zone_VDF.premiere_arete_bord();
-  nfin = ndeb + zone_VDF.nb_aretes_bord();
+  ndeb = domaine_VDF.premiere_arete_bord();
+  nfin = ndeb + domaine_VDF.nb_aretes_bord();
   int fac1,fac2,fac3,fac4;
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
@@ -153,8 +153,8 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
 
   // Boucle sur les aretes internes
 
-  ndeb = zone_VDF.premiere_arete_interne();
-  nfin = zone_VDF.nb_aretes();
+  ndeb = domaine_VDF.premiere_arete_interne();
+  nfin = domaine_VDF.nb_aretes();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {
@@ -176,8 +176,8 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
         P(num_elem) -= Rey_diag(num_elem,i)*tau_diag(num_elem,i);
     }
 
-  ndeb = zone_VDF.premiere_arete_bord();
-  nfin = ndeb + zone_VDF.nb_aretes_bord();
+  ndeb = domaine_VDF.premiere_arete_bord();
+  nfin = ndeb + domaine_VDF.nb_aretes_bord();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {
@@ -188,8 +188,8 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
       P[face_voisins(fac3,1)] += 0.25*P_arete;
     }
 
-  ndeb = zone_VDF.premiere_arete_interne();
-  nfin = zone_VDF.nb_aretes();
+  ndeb = domaine_VDF.premiere_arete_interne();
+  nfin = domaine_VDF.nb_aretes();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {
@@ -207,8 +207,8 @@ calculer_terme_production_K_Axi(const Zone_VDF& zone_VDF,
 }
 
 
-DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
-                                                    const Zone_Cl_VDF& zcl_VDF,
+DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Domaine_VDF& domaine_VDF,
+                                                    const Domaine_Cl_VDF& zcl_VDF,
                                                     const DoubleTab& temper,
                                                     const DoubleTab& alpha_turb,
                                                     DoubleTab& u_teta) const
@@ -218,18 +218,18 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
   //
   // Sur chaque face on calcule la composante de u_teta normale a la face
 
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_faces= domaine_VDF.nb_faces();
   int n0,n1;
   double alpha,dist;
   int face;
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   u_teta = 0;
 
   // Traitement des faces internes
 
 
-  int premiere_face_int=zone_VDF.premiere_face_int();
-  nb_faces=zone_VDF.nb_faces();
+  int premiere_face_int=domaine_VDF.premiere_face_int();
+  nb_faces=domaine_VDF.nb_faces();
 
   if (Objet_U::axi)
 
@@ -237,7 +237,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
       {
         n0 = face_voisins(face,0);
         n1 = face_voisins(face,1);
-        dist = zone_VDF.dist_norm_axi(face);
+        dist = domaine_VDF.dist_norm_axi(face);
         alpha = 0.5*(alpha_turb(n0)+alpha_turb(n1));
         u_teta[face] = alpha*(temper[n1] - temper[n0])/dist;
       }
@@ -247,14 +247,14 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
       {
         n0 = face_voisins(face,0);
         n1 = face_voisins(face,1);
-        dist = zone_VDF.dist_norm(face);
+        dist = domaine_VDF.dist_norm(face);
         alpha = 0.5*(alpha_turb(n0)+alpha_turb(n1));
         u_teta[face] = alpha*(temper[n1] - temper[n0])/dist;
       }
 
   // Traitement des conditions limites de type Entree_fluide_K_Eps_impose :
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       const Cond_lim& la_cl = zcl_VDF.les_conditions_limites(n_bord);
@@ -271,9 +271,9 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
               n0 = face_voisins(face,0);
               n1 = face_voisins(face,1);
               if (Objet_U::axi)
-                dist = 2*zone_VDF.dist_norm_bord_axi(face);
+                dist = 2*domaine_VDF.dist_norm_bord_axi(face);
               else
-                dist = 2*zone_VDF.dist_norm_bord(face);
+                dist = 2*domaine_VDF.dist_norm_bord(face);
               if (n0 != -1)
                 {
                   alpha = alpha_turb(n0);
@@ -290,8 +290,8 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Zone_VDF& zone_VDF,
   return u_teta;
 }
 
-DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
-                                                    const Zone_Cl_VDF& zcl_VDF,
+DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Domaine_VDF& domaine_VDF,
+                                                    const Domaine_Cl_VDF& zcl_VDF,
                                                     const DoubleTab& conc,
                                                     const DoubleTab& alpha_turb,
                                                     DoubleTab& u_conc,int nb_consti) const
@@ -302,18 +302,18 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
   //
   // Sur chaque face on calcule la composante de u_conc normale a la face
 
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_faces= domaine_VDF.nb_faces();
   int n0,n1;
   double alpha,dist;
   int face;
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   u_conc = 0;
 
   // Traitement des faces internes
 
 
-  int premiere_face_int=zone_VDF.premiere_face_int();
-  nb_faces=zone_VDF.nb_faces();
+  int premiere_face_int=domaine_VDF.premiere_face_int();
+  nb_faces=domaine_VDF.nb_faces();
   int k;
 
   if (Objet_U::axi)
@@ -322,7 +322,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
       {
         n0 = face_voisins(face,0);
         n1 = face_voisins(face,1);
-        dist = zone_VDF.dist_norm_axi(face);
+        dist = domaine_VDF.dist_norm_axi(face);
         alpha = 0.5*(alpha_turb(n0)+alpha_turb(n1));
         for (k=0; k<nb_consti; k++)
           u_conc(face,k) = alpha*(conc(n1,k) - conc(n0,k))/dist;
@@ -333,7 +333,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
       {
         n0 = face_voisins(face,0);
         n1 = face_voisins(face,1);
-        dist = zone_VDF.dist_norm(face);
+        dist = domaine_VDF.dist_norm(face);
         alpha = 0.5*(alpha_turb(n0)+alpha_turb(n1));
         for (k=0; k<nb_consti; k++)
           u_conc(face,k) = alpha*(conc(n1,k) - conc(n0,k))/dist;
@@ -341,7 +341,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
 
   // Traitement des conditions limites de type Entree_fluide_K_Eps_impose :
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       const Cond_lim& la_cl = zcl_VDF.les_conditions_limites(n_bord);
@@ -357,9 +357,9 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
               n0 = face_voisins(face,0);
               n1 = face_voisins(face,1);
               if (Objet_U::axi)
-                dist = 2*zone_VDF.dist_norm_bord_axi(face);
+                dist = 2*domaine_VDF.dist_norm_bord_axi(face);
               else
-                dist = 2*zone_VDF.dist_norm_bord(face);
+                dist = 2*domaine_VDF.dist_norm_bord(face);
               if (n0 != -1)
                 {
                   alpha = alpha_turb(n0);
@@ -379,8 +379,8 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Zone_VDF& zone_VDF,
 }
 
 
-DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF& zone_VDF,
-                                                                  const Zone_Cl_VDF& zcl_VDF,
+DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Domaine_VDF& domaine_VDF,
+                                                                  const Domaine_Cl_VDF& zcl_VDF,
                                                                   DoubleVect& G,const DoubleTab& temper,
                                                                   const DoubleTab& alpha_turb,
                                                                   double beta,const DoubleVect& gravite) const
@@ -392,8 +392,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   // G(elem) = beta alpha_t(elem) G . gradT(elem)
   //
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_faces= domaine_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
   const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
@@ -403,7 +403,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   // Appel a la fonction qui calcule sur chaque face la composante
   // de u_teta normale a la face
 
-  calculer_u_teta(zone_VDF,zcl_VDF,temper,alpha_turb,u_teta);
+  calculer_u_teta(domaine_VDF,zcl_VDF,temper,alpha_turb,u_teta);
 
   //                                          ------> ----->
   // On calcule ensuite une valeur moyenne de gravite.u_teta sur chaque
@@ -414,12 +414,12 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Domaine& le_dom=domaine_VDF.domaine();
+  int nb_faces_elem = le_dom.nb_faces_elem();
 
   IntTrav numfa(nb_faces_elem);
   DoubleVect coef(Objet_U::dimension);
-  const IntTab& les_elem_faces = zone_VDF.elem_faces();
+  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
     {
@@ -446,8 +446,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   return G;
 }
 
-DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF& zone_VDF,
-                                                                  const Zone_Cl_VDF& zcl_VDF,
+DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Domaine_VDF& domaine_VDF,
+                                                                  const Domaine_Cl_VDF& zcl_VDF,
                                                                   DoubleVect& G,const DoubleTab& temper,
                                                                   const DoubleTab& alpha_turb,
                                                                   const DoubleTab& beta,const DoubleVect& gravite) const
@@ -459,8 +459,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   // G(elem) = beta(elem) alpha_t(elem) G . gradT(elem)
   //
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_faces= domaine_VDF.nb_faces();
   DoubleTrav u_teta(nb_faces);
   const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
@@ -470,7 +470,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   // Appel a la fonction qui calcule sur chaque face la composante
   // de u_teta normale a la face
 
-  calculer_u_teta(zone_VDF,zcl_VDF,temper,alpha_turb,u_teta);
+  calculer_u_teta(domaine_VDF,zcl_VDF,temper,alpha_turb,u_teta);
 
   //                                          ------> ----->
   // On calcule ensuite une valeur moyenne de gravite.u_teta sur chaque
@@ -481,10 +481,10 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ------>
   // Calcul de beta.gravite . u_teta
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Domaine& le_dom=domaine_VDF.domaine();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
-  const IntTab& les_elem_faces = zone_VDF.elem_faces();
+  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
   DoubleVect coef(Objet_U::dimension);
 
   for (int elem=0; elem<nb_elem; elem++)
@@ -512,8 +512,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   return G;
 }
 
-DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF& zone_VDF,
-                                                                  const Zone_Cl_VDF& zcl_VDF,
+DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Domaine_VDF& domaine_VDF,
+                                                                  const Domaine_Cl_VDF& zcl_VDF,
                                                                   DoubleVect& G,const DoubleTab& temper,
                                                                   const DoubleTab& alpha_turb,
                                                                   const DoubleVect& beta,
@@ -530,8 +530,8 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //      Gk(i,k) = beta_c(k).alpha_t(i).G.gradC(i,k)
   //
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_faces= zone_VDF.nb_faces();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_faces= domaine_VDF.nb_faces();
   DoubleTrav u_conc(nb_faces,nb_consti);
   const DoubleVect& porosite_face = zcl_VDF.equation().milieu().porosite_face();
 
@@ -541,7 +541,7 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   // Appel a la fonction qui calcule sur chaque face la composante
   // de u_conc normale a la face
 
-  calculer_u_conc(zone_VDF,zcl_VDF,temper,alpha_turb,u_conc,nb_consti);
+  calculer_u_conc(domaine_VDF,zcl_VDF,temper,alpha_turb,u_conc,nb_consti);
 
   //                                          ------> ----->
   // On calcule ensuite une valeur moyenne de gravite.u_conc sur chaque
@@ -552,10 +552,10 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   //                ------->  ----->
   // Calcul de beta.gravite . u_conc
 
-  const Zone& la_zone=zone_VDF.zone();
-  int nb_faces_elem = la_zone.nb_faces_elem();
+  const Domaine& le_dom=domaine_VDF.domaine();
+  int nb_faces_elem = le_dom.nb_faces_elem();
   IntTrav numfa(nb_faces_elem);
-  const IntTab& les_elem_faces = zone_VDF.elem_faces();
+  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
   DoubleVect coef(Objet_U::dimension);
   int k;
 
@@ -586,12 +586,12 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
 }
 
 DoubleVect& Calcul_Production_K_VDF::
-calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF , DoubleVect& S,  const DoubleTab& K,
-                                const DoubleTab& vitesse,const Champ_Face& vit,  const DoubleTab& visco_turb )  const
+calculer_terme_production_K_BiK(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF , DoubleVect& S,  const DoubleTab& K,
+                                const DoubleTab& vitesse,const Champ_Face_VDF& vit,  const DoubleTab& visco_turb )  const
 {
-  int nb_elem = zone_VDF.zone().nb_elem();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntVect& orientation = zone_VDF.orientation();
+  int nb_elem = domaine_VDF.domaine().nb_elem();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
   IntVect element(4);
@@ -608,7 +608,7 @@ calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zon
   //Dans la methode calcul_S_barre_sans_contrib_paroi, contribution_paroi
   //est fixe a 0 par defaut
 
-  vit.calcul_S_barre_sans_contrib_paroi(vitesse,S,zone_Cl_VDF);
+  vit.calcul_S_barre_sans_contrib_paroi(vitesse,S,domaine_Cl_VDF);
 
   double coef;
 
@@ -621,7 +621,7 @@ calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zon
       coef = 0. ;
       for (int i=0; i<Objet_U::dimension; i++)
         {
-          coef +=  (vitesse[elem_faces(elem,i)]  - vitesse[elem_faces(elem,i+Objet_U::dimension)]) /zone_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
+          coef +=  (vitesse[elem_faces(elem,i)]  - vitesse[elem_faces(elem,i+Objet_U::dimension)]) /domaine_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
         }
       //Corrections pour prendre en compte la divergence de u
       //non nulle en Quasi-Compressible
@@ -636,8 +636,8 @@ calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zon
 }
 
 DoubleVect& Calcul_Production_K_VDF::
-calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
-                                    const Champ_Face& vitesse,
+calculer_terme_production_K_BiK_Axi(const Domaine_VDF& domaine_VDF,
+                                    const Champ_Face_VDF& vitesse,
                                     DoubleVect& P,
                                     const DoubleTab& K,
                                     const DoubleTab& visco_turb) const
@@ -652,10 +652,10 @@ calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
 
   P= 0;
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_aretes = zone_VDF.nb_aretes();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& Qdm = zone_VDF.Qdm();
+  int nb_elem = domaine_VDF.nb_elem();
+  int nb_aretes = domaine_VDF.nb_aretes();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& Qdm = domaine_VDF.Qdm();
   const DoubleTab& tau_diag = vitesse.tau_diag();
   const DoubleTab& tau_croises = vitesse.tau_croises();
   double d_visco_turb,k_elem,P_arete;
@@ -678,8 +678,8 @@ calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
   // Boucle sur les aretes bord
 
   int ndeb,nfin,n_arete;
-  ndeb = zone_VDF.premiere_arete_bord();
-  nfin = ndeb + zone_VDF.nb_aretes_bord();
+  ndeb = domaine_VDF.premiere_arete_bord();
+  nfin = ndeb + domaine_VDF.nb_aretes_bord();
   int fac1,fac2,fac3,fac4;
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
@@ -697,8 +697,8 @@ calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
 
   // Boucle sur les aretes internes
 
-  ndeb = zone_VDF.premiere_arete_interne();
-  nfin = zone_VDF.nb_aretes();
+  ndeb = domaine_VDF.premiere_arete_interne();
+  nfin = domaine_VDF.nb_aretes();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {
@@ -720,8 +720,8 @@ calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
         P(num_elem) -= Rey_diag(num_elem,i)*tau_diag(num_elem,i);
     }
 
-  ndeb = zone_VDF.premiere_arete_bord();
-  nfin = ndeb + zone_VDF.nb_aretes_bord();
+  ndeb = domaine_VDF.premiere_arete_bord();
+  nfin = ndeb + domaine_VDF.nb_aretes_bord();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {
@@ -732,8 +732,8 @@ calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
       P[face_voisins(fac3,1)] += 0.25*P_arete;
     }
 
-  ndeb = zone_VDF.premiere_arete_interne();
-  nfin = zone_VDF.nb_aretes();
+  ndeb = domaine_VDF.premiere_arete_interne();
+  nfin = domaine_VDF.nb_aretes();
 
   for (n_arete=ndeb; n_arete<nfin; n_arete++)
     {

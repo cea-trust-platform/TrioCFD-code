@@ -47,19 +47,15 @@ const IJK_Field_local_double& OpDiffIJKScalarGeneric_double::get_lambda_vectoria
     {
     case DIRECTION::X:
       return *lambda_vector_x_;
-      break;
     case DIRECTION::Y:
       return *lambda_vector_y_;
-      break;
     case DIRECTION::Z:
       return *lambda_vector_z_;
-      break;
     default:
       Cerr << "Error in OpDiffIJKScalarGeneric_double::get_lambda_vectorial: wrong direction..." << finl;
       Process::exit();
-      // for compilation only...
-      return *lambda_vector_x_;
     }
+  return *lambda_vector_x_;
 }
 
 const IJK_Field_local_double& OpDiffIJKScalarGeneric_double::get_structural_model(DIRECTION _DIR_)
@@ -69,19 +65,15 @@ const IJK_Field_local_double& OpDiffIJKScalarGeneric_double::get_structural_mode
     {
     case DIRECTION::X:
       return *structural_model_x_;
-      break;
     case DIRECTION::Y:
       return *structural_model_y_;
-      break;
     case DIRECTION::Z:
       return *structural_model_z_;
-      break;
     default:
       Cerr << "Error in OpDiffIJKScalarGeneric_double::get_strucutral_model: wrong direction..." << finl;
       Process::exit();
-      // for compilation only...
-      return *structural_model_x_;
     }
+  return *structural_model_x_;
 }
 
 void OpDiffIJKScalarGeneric_double::initialize(const IJK_Splitting& splitting)

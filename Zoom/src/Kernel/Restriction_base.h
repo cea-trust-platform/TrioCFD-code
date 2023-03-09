@@ -28,7 +28,7 @@
 
 #include <Objet_U.h>
 #include <TRUSTTabs_forward.h>
-class Zone_VF;
+class Domaine_VF;
 #include <TRUSTTabs_forward.h>
 
 /*! @brief class Restriction_base
@@ -47,11 +47,11 @@ class Restriction_base : public Objet_U
 
 public:
 
-  virtual void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect,
+  virtual void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF, const IntVect& connect,
                            DoubleTab& incoG,
                            const DoubleTab& incoF,int nbcomp) =0;
-  virtual void calculer(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect) =0;
-  virtual void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+  virtual void calculer(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF, const IntVect& connect) =0;
+  virtual void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                            const  IntVect& connect,
                            DoubleTab& incoG,
                            const DoubleTab& incoF, int nb_comp,

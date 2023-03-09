@@ -40,7 +40,7 @@ void Source_Transport_K_aniso_therm_concen_VDF_Elem::associer_pb(const Probleme_
 
 void Source_Transport_K_aniso_therm_concen_VDF_Elem::fill_resu_anisotherme_concen(const DoubleVect& G_t, const DoubleVect& G_c, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
 {
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) resu(elem) += (G_t(elem) + G_c(elem))*volumes(elem)*porosite_vol(elem);
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++) resu(elem) += (G_t(elem) + G_c(elem))*volumes(elem)*porosite_vol(elem);
 }
 
 void Source_Transport_K_aniso_therm_concen_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const

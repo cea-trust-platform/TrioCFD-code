@@ -26,7 +26,7 @@
 
 #include <Eval_Amont_VDF_Elem.h>
 #include <Eval_VDF_Elem.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Champ_P0_VDF.h>
 
 /*! @brief class Eval_Quickb_VDF_Elem
@@ -37,9 +37,9 @@
  *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
  *  convectif qui figure au second membre de l'equation d'evolution
  *  c.a.d l'oppose du flux convectif
- * 
  *
- * @sa Eval_Conv_VDF 
+ *
+ * @sa Eval_Conv_VDF
  */
 class Eval_Quickb_VDF_Elem : public Eval_Amont_VDF_Elem
 {
@@ -655,7 +655,7 @@ inline double Fram(const double& s1,const double& s2,
 
 inline int Eval_Quickb_VDF_Elem::amont_amont(int face, int i) const
 {
-  return la_zone->amont_amont(face, i);
+  return le_dom->amont_amont(face, i);
 }
 
 
@@ -739,13 +739,13 @@ inline void Eval_Quickb_VDF_Elem::quickb_fram(const double& psc, const int num0,
 
 inline double Eval_Quickb_VDF_Elem::dim_elem(int n1, int k) const
 {
-  return la_zone->dim_elem(n1,k);
+  return le_dom->dim_elem(n1,k);
 }
 
 
 inline double Eval_Quickb_VDF_Elem::dist_elem(int n1, int n2, int k) const
 {
-  return la_zone->dist_elem_period(n1,n2,k);
+  return le_dom->dist_elem_period(n1,n2,k);
 }
 
 #endif

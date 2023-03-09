@@ -126,6 +126,8 @@ Sortie& IJK_Thermique::printOn( Sortie& os ) const
   return os;
 }
 
+// XD thermique listobj thermique -1 thermique_bloc 1 to add energy equation resolution if needed
+// XD thermique_bloc interprete nul 1 not_set
 Entree& IJK_Thermique::readOn( Entree& is )
 {
   rang_ = 0; // default value
@@ -168,12 +170,12 @@ Entree& IJK_Thermique::readOn( Entree& is )
 
   Param param(que_suis_je());
 
-  param.ajouter("cp_liquid", &cp_liquid_, Param::REQUIRED);
-  param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED);
-  param.ajouter("cp_vapor", &cp_vapor_, Param::REQUIRED);
-  param.ajouter("lambda_vapor", &lambda_vapor_, Param::REQUIRED);
-  param.ajouter("fo", &fo_);
-  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED);
+  param.ajouter("cp_liquid", &cp_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid specific heat at constant pressure
+  param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid thermal conductivity
+  param.ajouter("cp_vapor", &cp_vapor_, Param::REQUIRED); // XD_ADD_P floattant Vapor specific heat at constant pressure
+  param.ajouter("lambda_vapor", &lambda_vapor_, Param::REQUIRED); // XD_ADD_P floattant Vapor thermal conductivity
+  param.ajouter("fo", &fo_); // XD_ADD_P floattant not_set
+  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // XD_ADD_P bloc_lecture boundary conditions
   /*	  param.ajouter("type_convection_op", &type_convection_op_);
   	  param.dictionnaire("Quick",0);
   	  param.dictionnaire("Centre",1);
@@ -183,28 +185,28 @@ Entree& IJK_Thermique::readOn( Entree& is )
   param.ajouter("T0l_source", &T0l_);
   param.ajouter("T0v_source", &T0v_);
 
-  param.ajouter("expression_T_init", &expression_T_init_);
+  param.ajouter("expression_T_init", &expression_T_init_); // XD_ADD_P chaine Expression of initial temperature (parser of x,y,z)
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
-  param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_);
-  param.ajouter("type_temperature_convection_op", &type_temperature_convection_op_);
+  param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
+  param.ajouter("type_temperature_convection_op", &type_temperature_convection_op_); // XD_ADD_P chaine(into=["Amont","Quick","Centre2","Centre4"]) convection operator
   param.dictionnaire("Amont",1);
   param.dictionnaire("Quick",3);
   param.dictionnaire("Centre2",2);
   param.dictionnaire("Centre4",4);
-  param.ajouter_flag("diff_temp_negligible", &diff_temp_negligible_);
+  param.ajouter_flag("diff_temp_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
 
   param.ajouter_flag("lambda_variable", &lambda_variable_);
-  param.ajouter_flag("wall_flux", &wall_flux_);
+  param.ajouter_flag("wall_flux", &wall_flux_); // XD_ADD_P rien not_set
   param.ajouter_flag("depracated_rho_cp", &depracated_rho_cp_);
   param.ajouter_flag("conserv_energy_global", &conserv_energy_global_);
   param.ajouter_flag("lambda_moy_arith", &lambda_moy_arith_);
   param.ajouter_flag("rho_cp_inv", &rho_cp_inv_);
 
   // Expression analytique de la temperature
-  param.ajouter("expression_T_ana", &expression_T_ana_);
-  param.ajouter("type_T_source", &type_T_source_);
-  param.ajouter("expression_source_temperature", &expression_source_temperature_);
+  param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
+  param.ajouter("type_T_source", &type_T_source_); // XD_ADD_P chaine(into=["dabiri","patch_dabiri","unweighted_dabiri"]) source term
+  param.ajouter("expression_source_temperature", &expression_source_temperature_); // XD_ADD_P chaine source terms
 
   param.ajouter("type_temperature_convection_form", &type_temperature_convection_form_);
   param.dictionnaire("non conservative",1);
@@ -240,7 +242,7 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
         }
       break;
     case 4:
-      temperature_convection_op_centre4_.initialize(splitting);
+      temperature_convection_op_centre4_.initialize(splitting, boundary_conditions_);
       break;
     default:
       Cerr << "Undefined operator for the convection of the temperature. " << finl;
@@ -450,7 +452,8 @@ double IJK_Thermique::compute_timestep(const double timestep,
 {
   // alpha = lambda/(rho*cp)
   const double alpha_max = std::max(lambda_liquid_/(rho_l*cp_liquid_), lambda_vapor_/(rho_v*cp_vapor_));
-  const double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  if (diff_temp_negligible_) dt_fo = 1.e20;
   return dt_fo;
 }
 
@@ -1838,7 +1841,7 @@ void IJK_Thermique::compute_T_rust(const FixedVector<IJK_Field_double, 3>& veloc
   const double rho_l = ref_ijk_ft_->rho_liquide_;
   const double rho_v = ref_ijk_ft_->rho_vapeur_;
 
-  // DONE: remplacer rho_cp par un champ rho_cp_ mis à jour dans update_thermal_properties. Necessaire pour que ça marche.
+  // DONE: remplacer rho_cp par un champ rho_cp_ mis a jour dans update_thermal_properties. Necessaire pour que ca marche.
   //On calcule div(rho_cp*v) qu'on stocke dans T_rust
   switch (type_temperature_convection_op_)
     {

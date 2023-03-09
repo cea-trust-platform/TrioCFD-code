@@ -26,9 +26,9 @@
 #include <Paroi_TBLE_QDM_Scal.h>
 
 class Motcle;
-class Zone_dis_base;
-class Zone_Cl_dis_base;
-class Zone_VF;
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
+class Domaine_VF;
 class Probleme_base;
 class Param;
 
@@ -50,15 +50,15 @@ public:
   /**
    * Initialise les tableaux (dimensionnement) : a appeler dans init_lois_paroi() des classes filles
    */
-  int init_lois_paroi(const Zone_VF&, const Zone_Cl_dis_base&);
+  int init_lois_paroi(const Domaine_VF&, const Domaine_Cl_dis_base&);
 
 
 
   /**
    * Methodes d'arret/reprise a appeler pour les quantites TBLE
    */
-  int reprendre(Entree&, const Zone_dis_base&, const Zone_Cl_dis_base&, double tps);
-  int sauvegarder(Sortie&, const Zone_dis_base&, const Zone_Cl_dis_base&, double tps) const ;
+  int reprendre(Entree&, const Domaine_dis_base&, const Domaine_Cl_dis_base&, double tps);
+  int sauvegarder(Sortie&, const Domaine_dis_base&, const Domaine_Cl_dis_base&, double tps) const ;
 
 
   /**

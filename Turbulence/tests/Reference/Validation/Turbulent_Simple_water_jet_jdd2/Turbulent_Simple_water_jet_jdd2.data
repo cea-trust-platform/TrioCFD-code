@@ -169,6 +169,8 @@ coefficient_diffusion Champ_Uniforme 1 2.8e-10
 
 	Postraitement {
 
+		Domaine dom
+
 		Sondes {
 			Sonde_CentraleVelocity_50  VitesseZ periode 0.1 segment 51  0.0 0.0 0.0 0.0 0.0 0.150 
 
@@ -201,8 +203,6 @@ coefficient_diffusion Champ_Uniforme 1 2.8e-10
 		}
 
 		Format lml
-		Domaine dom
-
 		champs dt_post 1.0
 		{
 		

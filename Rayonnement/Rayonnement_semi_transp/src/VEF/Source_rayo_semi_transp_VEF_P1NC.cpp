@@ -22,7 +22,7 @@
 
 #include <Source_rayo_semi_transp_VEF_P1NC.h>
 #include <Modele_rayo_semi_transp.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 
@@ -53,7 +53,7 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::calculer(DoubleTab& resu) const
 DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
   const Equation_rayonnement& eq_rayo = Modele().eq_rayo();
-  const Zone_VEF& zvef = ref_cast(Zone_VEF,eq_rayo.zone_dis().valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis().valeur());
   int nb_faces = zvef.nb_faces();
 
   const Fluide_base& fluide = eq_rayo.fluide();
@@ -98,8 +98,8 @@ void Source_rayo_semi_transp_VEF_P1NC::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VEF_P1NC::associer_zones(const Zone_dis& zone_dis,
-                                                      const Zone_Cl_dis& zone_Cl_dis)
+void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis& domaine_dis,
+                                                         const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;
 }

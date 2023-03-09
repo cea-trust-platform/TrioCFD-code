@@ -42,7 +42,7 @@ void Source_Transport_Eps_concen_VDF_Elem::fill_resu_concen(const DoubleVect& G,
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   double C3_loc, LeK_MIN = mon_eq_transport_Eps->modele_turbulence().get_LeK_MIN();
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if (K(elem) >= LeK_MIN)
         {

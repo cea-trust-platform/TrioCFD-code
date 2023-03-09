@@ -48,6 +48,15 @@ Entree& Postraitement_ft_lata::readOn(Entree& is)
     }
 
   Postraitement::readOn(is);
+  if (!champs_demande_)
+    {
+      Cerr << "*********************************************************************" << finl;
+      Cerr << "Warning: in Postraitement_ft_lata block, you specified interfaces to post-process" << finl;
+      Cerr << "without specifying fields. Interfaces will not be post-processed unless you post-process a field also." << finl;
+      Cerr << "Contact TRUST/TrioCFD support team or look for examples in TrioCFD databases" << finl;
+      Cerr << "*********************************************************************" << finl;
+    }
+
   if (!sub_type(Format_Post_Lata, format_post.valeur()))
     Process::exit("ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'.");
 
@@ -180,7 +189,7 @@ int Postraitement_ft_lata::filter_out_virtual_fa7(IntTab& new_fa7)
 {
   const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
   const IntTab& fa7 = mesh.facettes();
-  int nl=fa7.dimension(0), nc=fa7.dimension(1), cnt=0;
+  int nl=fa7.dimension(0), nc=fa7.dimension(1);
   new_fa7.resize(0, nc);
   int sz = 0;
 
@@ -271,7 +280,6 @@ void Postraitement_ft_lata::postprocess_field_values()
   const Maillage_FT_Disc& mesh = eq_interfaces.maillage_interface_pour_post();
   const int nb_sommets_local = mesh.sommets().dimension(0);
   const int nb_facettes_local = mesh.facettes().dimension(0);
-  const IntTab& elements = mesh.facettes();
 
   for (int num_loc = 0; num_loc < 2; num_loc++)
     {

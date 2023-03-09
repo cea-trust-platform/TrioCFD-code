@@ -35,9 +35,9 @@ class Navier_Stokes_Turbulent;
  *      pour le calcul d'un canal plan :
  *          * conservation du debit
  *          * calculs de moyennes
- * 
  *
- * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_VDF 
+ *
+ * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_VDF
  */
 class Traitement_particulier_NS_plan : public Traitement_particulier_NS_base
 {
@@ -75,7 +75,7 @@ protected :
   IntTab    for_each_plane_recv_flag_; // tableau de stokage des informations des plans qui post-traites
 #else
   // a revoir pour ijk:
-  IntVect Ref_Y; // pour chaque element de la zone VDF sur ce processeur, indice global de l'element dans la direction k
+  IntVect Ref_Y; // pour chaque element du domaine VDF sur ce processeur, indice global de l'element dans la direction k
   DoubleTab  Rrhouf, racinederho;
   IntTab Tab_recap;
 #endif

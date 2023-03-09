@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_DC_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Operateur.h>
 #include <Equation_base.h>
 #include <Schema_Temps_base.h>
@@ -47,13 +47,13 @@ Entree& Source_DC_VDF::readOn(Entree& s )
 }
 
 
-void Source_DC_VDF::associer_zones(const Zone_dis& zone_dis,
-                                   const Zone_Cl_dis& zone_cl_dis)
+void Source_DC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+                                      const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-  // const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
 
-  // const Zone& ma_zone = zvdf.zone();
+  // const Domaine& mon_dom = zvdf.domaine();
 
 
   int nb_elem = zvdf.nb_elem();
@@ -80,16 +80,16 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       Prolongement& P1 = P(0);
 
       Equation_base& eqF = equation();
-      Zone_VDF& la_zone = ref_cast(Zone_VDF, eqG.zone_dis().valeur());
-      Zone_VDF& la_zone_fine = ref_cast(Zone_VDF, eqF.zone_dis().valeur());
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
       DoubleTab& present = eqG.inconnue().valeurs();
       DoubleTab& passe = eqG.inconnue().passe();
       //int tailleG = present.dimension(0);
       DoubleTab& presentF = eqF.inconnue().valeurs();
       //DoubleTab& passeF = eqF.inconnue().passe();
       int tailleF = presentF.dimension(0);
-      const DoubleVect& volumes_fin = la_zone_fine.volumes();
-      //const DoubleVect& volumes_gros = la_zone.volumes();
+      const DoubleVect& volumes_fin = le_dom_fine.volumes();
+      //const DoubleVect& volumes_gros = le_dom.volumes();
       double dtGros = eqG.schema_temps().pas_de_temps();
       //double dtGros = eqG.schema_temps().pas_de_temps();
 
@@ -108,13 +108,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       Cerr<<"tailleF = "<<tailleF<<finl;
       Cerr<<"presentG = "<<present<<finl;
       //Prolongement de l'inconnue grossiere present et passe
-      P1.prolonger(la_zone, la_zone_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
+      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
       Cerr<<"presentG_prol = "<<presentG_prol<<finl;
 
 
 
       Cerr<<"passeG = "<<passe<<finl;
-      P1.prolonger(la_zone, la_zone_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
+      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
       Cerr<<"passeG_prol = "<<passeG_prol<<finl;
 
 
@@ -176,16 +176,16 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       Prolongement& P1 = P(2);
 
       Equation_base& eqF = equation();
-      Zone_VDF& la_zone = ref_cast(Zone_VDF, eqG.zone_dis().valeur());
-      Zone_VDF& la_zone_fine = ref_cast(Zone_VDF, eqF.zone_dis().valeur());
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
       DoubleTab& present = eqG.inconnue().valeurs();
       DoubleTab& passe = eqG.inconnue().passe();
       //int tailleG = present.dimension(0);
       DoubleTab& presentF = eqF.inconnue().valeurs();
       //DoubleTab& passeF = eqF.inconnue().passe();
       int tailleF = presentF.dimension(0);
-      const DoubleVect& volumes_fin = la_zone_fine.volumes();
-      //const DoubleVect& volumes_gros = la_zone.volumes();
+      const DoubleVect& volumes_fin = le_dom_fine.volumes();
+      //const DoubleVect& volumes_gros = le_dom.volumes();
       double dtGros = eqG.schema_temps().pas_de_temps();
       //double dtGros = eqG.schema_temps().pas_de_temps();
 
@@ -204,13 +204,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       //   Cerr<<"tailleF = "<<tailleF<<finl;
       //       Cerr<<"presentG = "<<present<<finl;
       //Prolongement de l'inconnue grossiere present et passe
-      P1.prolonger(la_zone, la_zone_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
+      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
       //  Cerr<<"presentG_prol = "<<presentG_prol<<finl;
 
 
 
       //       Cerr<<"passeG = "<<passe<<finl;
-      P1.prolonger(la_zone, la_zone_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
+      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
       // Cerr<<"passeG_prol = "<<passeG_prol<<finl;
 
       //somme des operateurs fins appliques a l'inconnue grossiere prolongee

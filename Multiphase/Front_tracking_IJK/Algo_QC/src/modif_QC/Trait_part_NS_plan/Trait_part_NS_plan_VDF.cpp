@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Trait_part_NS_plan_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Pave.h>
 
 #include <Fluide_Incompressible.h>
@@ -46,10 +46,10 @@ Implemente_instanciable(Traitement_particulier_NS_plan_VDF,"Traitement_particuli
 
 #define CERR(x)					\
   Cerr << " oooo " << x << finl;
-/*! @brief 
+/*! @brief
  *
- * @param (Sortie& is) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Traitement_particulier_NS_plan_VDF::printOn(Sortie& is) const
 {
@@ -57,10 +57,10 @@ Sortie& Traitement_particulier_NS_plan_VDF::printOn(Sortie& is) const
 }
 
 
-/*! @brief 
+/*! @brief
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& Traitement_particulier_NS_plan_VDF::readOn(Entree& is)
 {
@@ -76,9 +76,9 @@ void Traitement_particulier_NS_plan_VDF::calculer_valeur_spatiale_vitesse_rho_mu
 {
   cerr.setf(ios::scientific);
   const DoubleTab&            						temperature	= ref_champ_temperature_.valeur().valeurs();
-  const Zone_dis_base&        						zdisbase	= mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF&            	 					zone_VDF	= ref_cast(Zone_VDF, zdisbase);
-  const IntTab&              	  					elem_faces 	= zone_VDF.elem_faces();
+  const Domaine_dis_base&        						zdisbase	= mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF&            	 					domaine_VDF	= ref_cast(Domaine_VDF, zdisbase);
+  const IntTab&              	  					elem_faces 	= domaine_VDF.elem_faces();
   const Fluide_Incompressible&  					le_fluide 	= ref_cast(Fluide_Incompressible,mon_equation->milieu());
   const DoubleTab& 									vitesse 	= mon_equation->inconnue().valeurs();
   const DoubleTab& 									pression 	= mon_equation->pression().valeurs();
@@ -89,7 +89,7 @@ void Traitement_particulier_NS_plan_VDF::calculer_valeur_spatiale_vitesse_rho_mu
   const Loi_Etat_GP& 								loi_ 		= ref_cast(Loi_Etat_GP,fluide_QC.loi_etat().valeur());
   const Navier_Stokes_Turbulent& 					N_S_Turb 	= ref_cast(Navier_Stokes_Turbulent,mon_equation.valeur());
   const DoubleTab& 									nu_t		= N_S_Turb.viscosite_turbulente().valeurs();
-  const DoubleTab&     								xv        	= zone_VDF.xv();
+  const DoubleTab&     								xv        	= domaine_VDF.xv();
   const Probleme_base& 								pb 			= mon_equation->probleme();
   const Equation_base& 								eqn_th 		= pb.equation(1);
   const DoubleTab& cond_turb =ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur()).diffusivite_turbulente().valeurs();
@@ -101,8 +101,8 @@ void Traitement_particulier_NS_plan_VDF::calculer_valeur_spatiale_vitesse_rho_mu
   double unsurcp = 1/CP;
 
   int dimension  = Objet_U::dimension;
-  int nb_elem= zone_VDF.zone().nb_elem(); // nombre total d'elements (reel + fict)
-  int nb_elem_tot= zone_VDF.zone().nb_elem_tot(); // nombre total d'elements (reel + fict)
+  int nb_elem= domaine_VDF.domaine().nb_elem(); // nombre total d'elements (reel + fict)
+  int nb_elem_tot= domaine_VDF.domaine().nb_elem_tot(); // nombre total d'elements (reel + fict)
   int num_elem = 0,i,j;
   int REFY = 0 ;
 
@@ -154,9 +154,9 @@ void Traitement_particulier_NS_plan_VDF::calculer_valeur_spatiale_vitesse_rho_mu
   	///////////////////////////
   	if (!ival)
   	{
-  		const Zone_dis_base& zdis2base=mon_equation->inconnue().zone_dis_base();
-  		const Zone_VF& zone_VF=ref_cast(Zone_VF, zdis2base);
-  		const DoubleTab& xp = zone_VF.xp();
+  		const Domaine_dis_base& zdis2base=mon_equation->inconnue().domaine_dis_base();
+  		const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdis2base);
+  		const DoubleTab& xp = domaine_VF.xp();
   		DoubleTab test_para(vitesse);
   		DoubleTab test_xp(xp);
   	if (me())
@@ -814,10 +814,10 @@ double Traitement_particulier_NS_plan_VDF::derivee_deux_vitesse_coli(const Doubl
       Cerr << " x=0 y=1 z=2" << finl;
       exit();
     }
-  const Zone_dis_base&  zdisbase          =  mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF&       zone_VDF          =  ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab&      xv                =  zone_VDF.xv();
-  const IntTab&         elem_faces        =  zone_VDF.elem_faces();
+  const Domaine_dis_base&  zdisbase          =  mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF&       domaine_VDF          =  ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab&      xv                =  domaine_VDF.xv();
+  const IntTab&         elem_faces        =  domaine_VDF.elem_faces();
 
   double derivee;  // valeur retournee par la fonction
   double derivee_0; // valeur de la derivee premiere en 0
@@ -957,11 +957,11 @@ double Traitement_particulier_NS_plan_VDF::derivee_deux_vitesse_nonco(DoubleTab&
 
 double Traitement_particulier_NS_plan_VDF::distance_elem(int elem,int pos) const
 {
-  const Zone_dis_base&  zdisbase  	=  mon_equation->inconnue().zone_dis_base();
-  const Zone_VDF&       zone_VDF 	 	=  ref_cast(Zone_VDF, zdisbase);
-  const DoubleTab&      xp       		=  zone_VDF.xp();
-  const DoubleTab&      xv        	=  zone_VDF.xv();
-  const IntTab&         elem_faces 	=  zone_VDF.elem_faces();
+  const Domaine_dis_base&  zdisbase  	=  mon_equation->inconnue().domaine_dis_base();
+  const Domaine_VDF&       domaine_VDF 	 	=  ref_cast(Domaine_VDF, zdisbase);
+  const DoubleTab&      xp       		=  domaine_VDF.xp();
+  const DoubleTab&      xv        	=  domaine_VDF.xv();
+  const IntTab&         elem_faces 	=  domaine_VDF.elem_faces();
   // on code ici une methode pour calculer la distance entre deux element voisin tenant compte de la periodicite ou des bords.
   // si on cherche la distance avec un element qui n'existe pas, on revois la distance dans la direction opposee avec le deuxieme element.
   // vois schema ci dessous

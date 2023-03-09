@@ -6,7 +6,8 @@
 cas=`echo $1`
 \rm -fr CONVERGENCE 
 mkdir CONVERGENCE
-echo "Début post traitement"
+echo "Début post traitement into $1/CONVERGENCE"
+echo "Actually runs the convergence cases"
 cd CONVERGENCE/
 cp ../$cas.data .
 cp ../$cas.sh .

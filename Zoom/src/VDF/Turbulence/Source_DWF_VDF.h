@@ -26,11 +26,11 @@
 
 
 #include <Source_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 
 class Probleme_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -47,7 +47,7 @@ class Source_DWF_VDF : public Source_base
 
 public:
 
-  inline void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
+  inline void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
 
   inline DoubleTab& ajouter(DoubleTab& ) const override ;
   inline DoubleTab& calculer(DoubleTab& ) const override ;
@@ -83,10 +83,10 @@ inline DoubleTab& Source_DWF_VDF::calculer(DoubleTab& resu) const
   return resu;
 }
 
-void Source_DWF_VDF::associer_zones(const Zone_dis& zone_dis,
-                                    const Zone_Cl_dis& zone_cl_dis)
+void Source_DWF_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+                                       const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
 
   int nb_face = zvdf.nb_faces();
   les_valeurs.resize(nb_face);

@@ -22,7 +22,6 @@
 #include <Sondes_IJK.h>
 #include <stat_counters.h>
 
-Implemente_liste(Sonde_IJK);
 Implemente_instanciable(Sondes_IJK,"Sondes_IJK",LIST(Sonde_IJK));
 
 Sortie& Sondes_IJK::printOn( Sortie& os ) const
@@ -74,12 +73,8 @@ void Sondes_IJK::postraiter()
 {
   statistiques().begin_count(postraitement_counter_);
 
-  LIST_CURSEUR(Sonde_IJK) curseur=*this;
-  while(curseur)
-    {
-      curseur->postraiter();
-      ++curseur;
-    }
+  for (auto& itr : *this) itr.postraiter();
+
   statistiques().end_count(postraitement_counter_);
 
 }
@@ -88,12 +83,8 @@ void Sondes_IJK::mettre_a_jour(double temps, double tinit)
 {
   statistiques().begin_count(postraitement_counter_);
 
-  LIST_CURSEUR(Sonde_IJK) curseur=*this;
-  while(curseur)
-    {
-      curseur->mettre_a_jour(temps,tinit);
-      ++curseur;
-    }
+  for(auto& itr : *this) itr.mettre_a_jour(temps,tinit);
+
   statistiques().end_count(postraitement_counter_);
 
 }

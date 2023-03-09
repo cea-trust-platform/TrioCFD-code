@@ -24,7 +24,7 @@
 #include <Champ_Inc_base.h>
 #include <Equation_base.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Probleme_base.h>
 #include <Pb_Conduction.h>
 
@@ -92,8 +92,8 @@ void Champ_front_contact_rayo_transp_VEF::mettre_a_jour(double temps)
 
   Champ_front_contact_VEF::mettre_a_jour(temps);
   return;
-  calculer_temperature_bord(temps);
-  verifier_scalaire_bord(temps);
+  //calculer_temperature_bord(temps);
+  //verifier_scalaire_bord(temps);
 }
 
 void Champ_front_contact_rayo_transp_VEF::calculer_coeffs_echange(double temps)

@@ -158,6 +158,10 @@ Lire pb
 	       postraitement_ft_lata marqueurs { 
     format Lata 
     fichier transport_marqueur 
+    Champs dt_post 2.
+		{
+			densite_particules elem
+		}
     interfaces transport_marqueur { 
         vitesse som 
     } 

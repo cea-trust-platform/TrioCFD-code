@@ -80,7 +80,7 @@ void Navier_Stokes_Turbulent_QC::discretiser()
 {
   Navier_Stokes_Turbulent::discretiser();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-  dis.vitesse(schema_temps(), zone_dis(), rho_la_vitesse_);
+  dis.vitesse(schema_temps(), domaine_dis(), rho_la_vitesse_);
   rho_la_vitesse_.nommer("rho_u");
   rho_la_vitesse_.valeur().nommer("rho_u");
 }
@@ -128,6 +128,7 @@ void Navier_Stokes_Turbulent_QC::completer()
 int Navier_Stokes_Turbulent_QC::preparer_calcul()
 {
   return Navier_Stokes_Turbulent::preparer_calcul();
+  /*
   // Cerr << "Navier_Stokes_Fluide_Dilatable_Proto::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
   //solveur_pression->assembler_QC(le_fluide->masse_volumique().valeurs());
@@ -145,7 +146,7 @@ int Navier_Stokes_Turbulent_QC::preparer_calcul()
   projeter();
   le_modele_turbulence.preparer_calcul();
 
-  return 1;
+  return 1;*/
 }
 
 

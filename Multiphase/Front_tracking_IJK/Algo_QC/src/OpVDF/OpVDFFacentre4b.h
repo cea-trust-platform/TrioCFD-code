@@ -36,7 +36,7 @@
  *   Le schema de convection est du type centre4b (centre sur 4 points)
  *   L'iterateur associe est de type Iterateur_VDF_Face
  *   L'evaluateur associe est de type Eval_centre4b_VDF_Face
- * 
+ *
  *
  */
 declare_It_VDF_Face(Eval_centre4b_VDF_Face)
@@ -56,7 +56,7 @@ class Op_Conv_centre4b_VDF_Face : public Op_Conv_VDF_base
 public:
 
   Op_Conv_centre4b_VDF_Face();
-  void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& );
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& , const Champ_Inc& );
   inline void associer_vitesse(const Champ_base&) ;
   const Champ_Inc_base& vitesse() const;
   Champ_Inc_base& vitesse();
@@ -67,7 +67,7 @@ public:
  */
 inline void Op_Conv_centre4b_VDF_Face::associer_vitesse(const Champ_base& ch_vit)
 {
-  const Champ_Face& vit = (Champ_Face&) ch_vit;
+  const Champ_Face_VDF& vit = (Champ_Face_VDF&) ch_vit;
 
   Eval_centre4b_VDF_Face& eval_conv = (Eval_centre4b_VDF_Face&) iter.evaluateur();
   eval_conv.associer(vit );                // Eval_Conv_VDF::associer

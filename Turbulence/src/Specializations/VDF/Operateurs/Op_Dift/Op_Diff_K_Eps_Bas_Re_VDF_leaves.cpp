@@ -22,30 +22,27 @@
 #include <Op_Diff_K_Eps_Bas_Re_VDF_leaves.h>
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi,"Op_Diff_K_Eps_Bas_Re_VDF_const_P0_VDF_Axi",Op_Diff_K_Eps_Bas_Re_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)
 Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)()) { }
+Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi() : Op_Diff_K_Eps_Bas_Re_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>()) { }
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem,"Op_Diff_K_Eps_Bas_Re_VDF_const_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)
 Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)()) { }
+Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>()) { }
 
 ///////////////////////////////////
 // VAR
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_var_Elem,"Op_Diff_K_Eps_Bas_Re_VDF_var_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem)
 Sortie& Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::readOn(Entree& s ) { return s ; }
 
 double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
 {
   double dt_stab, coef;
-  const Zone_VDF& zone_VDF = iter->zone();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = iter->domaine();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const DoubleVect& alpha = diffusivite().valeurs(), &alpha_t = diffusivite_turbulente().valeurs();
 
   // Calcul du pas de temps de stabilite :
@@ -60,12 +57,12 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
   if (dimension == 2)
     {
       int numfa[4];
-      for (int elem=0; elem<zone_VDF.nb_elem(); elem++)
+      for (int elem=0; elem<domaine_VDF.nb_elem(); elem++)
         {
           for (int i=0; i<4; i++) numfa[i] = elem_faces(elem,i);
 
-          h_x = zone_VDF.dist_face(numfa[0],numfa[2],0);
-          h_y = zone_VDF.dist_face(numfa[1],numfa[3],1);
+          h_x = domaine_VDF.dist_face(numfa[0],numfa[2],0);
+          h_y = domaine_VDF.dist_face(numfa[1],numfa[3],1);
           alpha_local = (alpha(elem)+alpha_t(elem))*(1/(h_x*h_x) + 1/(h_y*h_y));
           coef = std::max(coef,alpha_local);
         }
@@ -73,13 +70,13 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
   else if (dimension == 3)
     {
       int numfa[6];
-      for (int elem=0; elem<zone_VDF.nb_elem(); elem++)
+      for (int elem=0; elem<domaine_VDF.nb_elem(); elem++)
         {
           for (int i=0; i<6; i++) numfa[i] = elem_faces(elem,i);
 
-          h_x = zone_VDF.dist_face(numfa[0],numfa[3],0);
-          h_y = zone_VDF.dist_face(numfa[1],numfa[4],1);
-          h_z = zone_VDF.dist_face(numfa[2],numfa[5],2);
+          h_x = domaine_VDF.dist_face(numfa[0],numfa[3],0);
+          h_y = domaine_VDF.dist_face(numfa[1],numfa[4],1);
+          h_z = domaine_VDF.dist_face(numfa[2],numfa[5],2);
           alpha_local = (alpha(elem)+alpha_t(elem))*(1/(h_x*h_x) + 1/(h_y*h_y) + 1/(h_z*h_z));
           coef = std::max(coef,alpha_local);
         }
@@ -91,4 +88,4 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
   return dt_stab;
 }
 
-Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::Op_Diff_K_Eps_Bas_Re_VDF_var_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem)()) { }
+Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::Op_Diff_K_Eps_Bas_Re_VDF_var_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>()) { }

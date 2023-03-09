@@ -29,14 +29,14 @@
 
 Implemente_instanciable(PaveCoincidant,"PaveCoincidant",Pave);
 
-/*! @brief Simple appel a: Zone::printOn(Sortie&)
+/*! @brief Simple appel a: Domaine::printOn(Sortie&)
  *
  * @param (Sortie& s) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& PaveCoincidant::printOn(Sortie& s ) const
 {
-  return Zone::printOn(s) ;
+  return Domaine::printOn(s) ;
 }
 
 
@@ -79,9 +79,9 @@ Entree& PaveCoincidant::readOn(Entree& is)
 {
   Nom ledom,bh,bb,bd,bg,bder,bdev;
 
-  is >> nom;
+  is >> nom_;
   is >> ledom;
-  Cerr << "Lecture du pave " << nom << " qui doit coincider avec le domaine " << ledom << finl;
+  Cerr << "Lecture du pave " << nom_ << " qui doit coincider avec le domaine " << ledom << finl;
 
   dom_qui_coincide=ref_cast(Domaine, Interprete::objet(ledom));
 
@@ -90,7 +90,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
   is >> motlu;
   if (motlu!="{")
     {
-      Cerr << "On attendait une { apres " << nom << finl;
+      Cerr << "On attendait une { apres " << nom_ << finl;
       exit();
     }
 
@@ -177,7 +177,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
     {
       Nom nom_nx(nmx);
       Nom nom_ny(nmy);
-      desc_pave = nom;
+      desc_pave = nom_;
       desc_pave+=" { Origine ";
       desc_pave+= (Nom)xmin;
       desc_pave+= " ";
@@ -229,7 +229,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
       Nom nom_nx(nmx);
       Nom nom_ny(nmy);
       Nom nom_nz(nmz);
-      desc_pave = nom;
+      desc_pave = nom_;
       desc_pave+= " { Origine " ;
       desc_pave+= (Nom)xmin ;
       desc_pave+= " " ;
@@ -337,102 +337,93 @@ Entree& PaveCoincidant::readOn(Entree& is)
 
 void PaveCoincidant::determine_bornes()
 {
-  for(int iz=0; iz<dom_qui_coincide->nb_zones() ; iz++)
+  if(dom_qui_coincide->type_elem()->que_suis_je() == "Rectangle" || dom_qui_coincide->type_elem()->que_suis_je() == "Hexaedre" )
     {
-      Zone& zone = dom_qui_coincide->zone(iz);
-
-      if(zone.type_elem()->que_suis_je() == "Rectangle" || zone.type_elem()->que_suis_je() == "Hexaedre" )
-        {
-          if (dimension == 2)
-            zone.typer("Rectangle");
-          else
-            zone.typer("Hexaedre");
-
-          IntTab& leselems=zone.les_elems();
-          int oldsz=leselems.dimension(0);
-          const DoubleTab& les_coord = zone.domaine().coord_sommets();
-
-
-          double xm=0, xM=0, ym=0, yM=0, zm=0, zM=0; // bornes trouvees coincidantes avec le domaine souhaite
-          double dxm, dxM, dym, dyM, dzm=0, dzM=0; // variables tempos pour determiner les bornes
-
-
-          // init
-          dxm = std::fabs(xmin-les_coord(leselems(0,0),0));
-          dxM = std::fabs(xmin-les_coord(leselems(0,0),0));
-          dym = std::fabs(xmin-les_coord(leselems(0,0),1));
-          dyM = std::fabs(xmin-les_coord(leselems(0,0),1));
-          if (dimension == 3)
-            {
-              dzm = std::fabs(xmin-les_coord(leselems(0,0),2));
-              dzM = std::fabs(xmin-les_coord(leselems(0,0),2));
-            }
-
-          // Determination du nouveau nb d'elements
-          for(int i=0; i< oldsz; i++)
-            {
-              DoubleTab xg(Objet_U::dimension);
-              for(int j=0; j<zone.nb_som_elem(); j++)
-                for(int k=0; k<Objet_U::dimension; k++)
-                  xg(k)+=les_coord(leselems(i,j),k);
-              xg/=zone.nb_som_elem();
-
-              if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans la zone a zoomer ...
-                {
-                  if ( dxm > std::fabs(xmin-les_coord(leselems(i,0),0)) )
-                    {
-                      dxm = std::fabs(xmin-les_coord(leselems(i,0),0));
-                      xm = les_coord(leselems(i,0),0);
-                    }
-                  if ( dxM > std::fabs(xmax-les_coord(leselems(i,3),0)) )
-                    {
-                      dxM = std::fabs(xmax-les_coord(leselems(i,3),0));
-                      xM = les_coord(leselems(i,3),0);
-                    }
-                  if ( dym > std::fabs(ymin-les_coord(leselems(i,0),1)) )
-                    {
-                      dym = std::fabs(ymin-les_coord(leselems(i,0),1));
-                      ym = les_coord(leselems(i,0),1);
-                    }
-                  if ( dyM > std::fabs(ymax-les_coord(leselems(i,3),1)) )
-                    {
-                      dyM = std::fabs(ymax-les_coord(leselems(i,3),1));
-                      yM = les_coord(leselems(i,3),1);
-                    }
-                  if (dimension == 3)
-                    {
-                      if ( dzm > std::fabs(zmin-les_coord(leselems(i,0),2)) )
-                        {
-                          dzm = std::fabs(zmin-les_coord(leselems(i,0),2));
-                          zm = les_coord(leselems(i,0),2);
-                        }
-                      if ( dzM > std::fabs(zmax-les_coord(leselems(i,3),2)) )
-                        {
-                          dzM = std::fabs(zmax-les_coord(leselems(i,3),2));
-                          zM = les_coord(leselems(i,3),2);
-                        }
-                    }
-
-                }
-            }
-
-          xmin = xm;
-          xmax = xM;
-          ymin = ym;
-          ymax = yM;
-          zmin = zm;
-          zmax = zM;
-
-
-        }
+      if (dimension == 2)
+        dom_qui_coincide->typer("Rectangle");
       else
+        dom_qui_coincide->typer("Hexaedre");
+
+      IntTab& leselems=dom_qui_coincide->les_elems();
+      int oldsz=leselems.dimension(0);
+      const DoubleTab& les_coord = dom_qui_coincide->coord_sommets();
+
+
+      double xm=0, xM=0, ym=0, yM=0, zm=0, zM=0; // bornes trouvees coincidantes avec le domaine souhaite
+      double dxm, dxM, dym, dyM, dzm=0, dzM=0; // variables tempos pour determiner les bornes
+
+
+      // init
+      dxm = std::fabs(xmin-les_coord(leselems(0,0),0));
+      dxM = std::fabs(xmin-les_coord(leselems(0,0),0));
+      dym = std::fabs(xmin-les_coord(leselems(0,0),1));
+      dyM = std::fabs(xmin-les_coord(leselems(0,0),1));
+      if (dimension == 3)
         {
-          Cerr << "On ne sait pas encore creer un pave coincidant avec un "
-               << zone.type_elem()->que_suis_je() <<"s"<<finl;
+          dzm = std::fabs(xmin-les_coord(leselems(0,0),2));
+          dzM = std::fabs(xmin-les_coord(leselems(0,0),2));
         }
 
-    }
+      // Determination du nouveau nb d'elements
+      for(int i=0; i< oldsz; i++)
+        {
+          DoubleTab xg(Objet_U::dimension);
+          for(int j=0; j<dom_qui_coincide->nb_som_elem(); j++)
+            for(int k=0; k<Objet_U::dimension; k++)
+              xg(k)+=les_coord(leselems(i,j),k);
+          xg/=dom_qui_coincide->nb_som_elem();
 
+          if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans le domaine a zoomer ...
+            {
+              if ( dxm > std::fabs(xmin-les_coord(leselems(i,0),0)) )
+                {
+                  dxm = std::fabs(xmin-les_coord(leselems(i,0),0));
+                  xm = les_coord(leselems(i,0),0);
+                }
+              if ( dxM > std::fabs(xmax-les_coord(leselems(i,3),0)) )
+                {
+                  dxM = std::fabs(xmax-les_coord(leselems(i,3),0));
+                  xM = les_coord(leselems(i,3),0);
+                }
+              if ( dym > std::fabs(ymin-les_coord(leselems(i,0),1)) )
+                {
+                  dym = std::fabs(ymin-les_coord(leselems(i,0),1));
+                  ym = les_coord(leselems(i,0),1);
+                }
+              if ( dyM > std::fabs(ymax-les_coord(leselems(i,3),1)) )
+                {
+                  dyM = std::fabs(ymax-les_coord(leselems(i,3),1));
+                  yM = les_coord(leselems(i,3),1);
+                }
+              if (dimension == 3)
+                {
+                  if ( dzm > std::fabs(zmin-les_coord(leselems(i,0),2)) )
+                    {
+                      dzm = std::fabs(zmin-les_coord(leselems(i,0),2));
+                      zm = les_coord(leselems(i,0),2);
+                    }
+                  if ( dzM > std::fabs(zmax-les_coord(leselems(i,3),2)) )
+                    {
+                      dzM = std::fabs(zmax-les_coord(leselems(i,3),2));
+                      zM = les_coord(leselems(i,3),2);
+                    }
+                }
+
+            }
+        }
+
+      xmin = xm;
+      xmax = xM;
+      ymin = ym;
+      ymax = yM;
+      zmin = zm;
+      zmax = zM;
+    }
+  else
+    {
+      Cerr << "On ne sait pas encore creer un pave coincidant avec un "
+           << dom_qui_coincide->type_elem()->que_suis_je() <<"s"<<finl;
+    }
 }
 
 

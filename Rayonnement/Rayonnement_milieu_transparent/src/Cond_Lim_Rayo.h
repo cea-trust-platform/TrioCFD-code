@@ -23,15 +23,18 @@
 #ifndef Cond_Lim_Rayo_included
 #define Cond_Lim_Rayo_included
 
-#include <Ref_Modele_Rayonnement_Milieu_Transparent.h>
 #include <Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Modele_Rayonnement_Milieu_Transparent;
+
 class Modele_Rayonnement_base;
 class Cond_Lim_Rayo
 {
 
 public:
   virtual void completer();
-  void preparer_surface(const Frontiere_dis_base& ,const Zone_Cl_dis_base& );
+  void preparer_surface(const Frontiere_dis_base& ,const Domaine_Cl_dis_base& );
   virtual void associer_modele_rayo(Modele_Rayonnement_base& );
   //virtual const Cond_lim_base& la_cl() const =0;
   inline virtual double surface(int ) const ;

@@ -23,7 +23,9 @@
 #define Source_Transport_K_KEps_VDF_Elem_included
 
 #include <Source_Transport_VDF_Elem_base.h>
-#include <Ref_Transport_K_KEps.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_KEps;
 
 /*! @brief class Source_Transport_K_KEps_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) avec le modele a deux couches et dans
  *

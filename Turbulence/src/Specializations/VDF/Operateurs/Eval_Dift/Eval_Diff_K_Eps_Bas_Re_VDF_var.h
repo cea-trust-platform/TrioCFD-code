@@ -22,12 +22,13 @@
 #ifndef Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 
-#include <Eval_Diff_VDF_var.h>
-#include <Ref_Champ_Fonc.h>
-#include <Ref_Champ_Uniforme.h>
+#include <Eval_Diff_VDF.h>
 #include <Champ_Fonc.h>
+#include <TRUST_Ref.h>
 
-class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var
+class Champ_Uniforme;
+
+class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF
 {
 public:
   Eval_Diff_K_Eps_Bas_Re_VDF_var(double Prandt_K = PRDT_K_DEFAUT , double Prandt_Eps =PRDT_EPS_DEFAUT ) : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps)
@@ -43,7 +44,7 @@ public:
   // pour CRTP
   inline double nu_1_impl(int i, int compo) const
   {
-    return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
+    return tab_diffusivite_(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
   }
 
   inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const

@@ -22,6 +22,7 @@ EOF
 	CasTest . test_24.data 1
         CasTest . test_48.data 1
         CasTest . test_24_par8_trans.data 8 
+        ExtraUsedFile test_24.lata*
 }
 
 #################################################################

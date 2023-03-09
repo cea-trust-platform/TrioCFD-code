@@ -145,12 +145,10 @@ void Pb_QC_base::mettre_a_jour(double temps)
   //     equation(i).mettre_a_jour(temps);
   les_postraitements.mettre_a_jour(temps);
   domaine().mettre_a_jour(temps,domaine_dis(),*this);
-  LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
-  while (curseur)
+  for  (auto& itr : liste_loi_fermeture_)
     {
-      Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      Loi_Fermeture_base& loi=itr.valeur();
       loi.mettre_a_jour(temps);
-      ++curseur;
     }
 }
 
@@ -161,7 +159,7 @@ void equation_base_mettre_a_jour(double temps, Equation_base& mon_eq)
   mon_eq.milieu().mettre_a_jour(temps);
   mon_eq.inconnue().mettre_a_jour(temps);
   return;
-  mon_eq.zone_Cl_dis()->avancer(temps);
+  mon_eq.domaine_Cl_dis()->avancer(temps);
 }
 
 
@@ -277,7 +275,7 @@ bool Pb_QC_base::iterateTimeStep(bool& converged)
               Frho*=a[dti];
               Frho+=dIdt;
               futur.ajoute(dt*b[dti],Frho);
-              eqn.zone_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
+              eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
 
               schema_temps().update_critere_statio(dIdt, eqn);
 
@@ -308,7 +306,7 @@ bool Pb_QC_base::iterateTimeStep(bool& converged)
           DoubleTab& present   = eqn.inconnue().valeurs();
           futur=present;
 
-          eqn.zone_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
+          eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
           //	 { int i=0; Cerr<<i <<" la"<<dti<<" "<< futur(i)<<" "<< present(i)<<" "<<Uref(i)<<endl; }
           int nbval=futur.dimension_tot(0);
           // pour l instant on n essaye pas les val interpolees pour u
@@ -350,7 +348,7 @@ bool Pb_QC_base::iterateTimeStep(bool& converged)
           futur.ajoute(dt_intermediaire[dti],dudt);
 
           sch.set_dt()=dt;
-          //eqn.zone_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
+          //eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_futur);
           schema_temps().update_critere_statio(dudt, eqn);
           present=futur;
 
@@ -377,7 +375,7 @@ bool Pb_QC_base::iterateTimeStep(bool& converged)
   double tps=schema_temps().temps_defaut();
   for(int i=0; i<nombre_d_equations(); i++)
     {
-      equation(i).zone_Cl_dis()->calculer_coeffs_echange(tps);
+      equation(i).domaine_Cl_dis()->calculer_coeffs_echange(tps);
     }
 
   converged=true;

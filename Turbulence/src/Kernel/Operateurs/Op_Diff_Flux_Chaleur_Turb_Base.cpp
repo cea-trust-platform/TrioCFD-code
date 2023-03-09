@@ -25,7 +25,6 @@
 // GF je ne sais pas si cette classe sert vraiment, mais elle herite pas de Op_Diff_base
 Implemente_base(Op_Diff_Flux_Chaleur_Turb_Base,"Op_Diff_Flux_Chaleur_Turb_Base",Operateur_base);
 Implemente_instanciable(Op_Diff_Flux_Chaleur_Turb_negligeable,"Op_Diff_Flux_Chaleur_Turb_negligeable",Op_Diff_Flux_Chaleur_Turb_Base);
-Implemente_deriv(Op_Diff_Flux_Chaleur_Turb_Base);
 Implemente_instanciable(Op_Diff_Flux_Chaleur_Turb,"Op_Diff_Flux_Chaleur_Turb",DERIV(Op_Diff_Flux_Chaleur_Turb_Base));
 
 

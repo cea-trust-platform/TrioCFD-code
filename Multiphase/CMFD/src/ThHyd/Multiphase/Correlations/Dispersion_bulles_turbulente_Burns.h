@@ -34,15 +34,13 @@ class Dispersion_bulles_turbulente_Burns : public Dispersion_bulles_base
 {
   Declare_instanciable(Dispersion_bulles_turbulente_Burns);
 public:
-  void coefficient( const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
-                    const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
-                    const DoubleTab& ndv, DoubleTab& coeff) const override;
+  void coefficient(const input_t& input, output_t& output) const override;
 
 protected:
   Correlation correlation_drag_;
   int n_l = -1; //phase liquide
   double Prt_ = .9 ; // Turbulent Prandtl number
+  double minimum_ = -1.;
 };
 
 #endif

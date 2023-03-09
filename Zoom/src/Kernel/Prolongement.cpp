@@ -22,7 +22,6 @@
 
 #include <Prolongement.h>
 
-Implemente_deriv(Prolongement_base);
 Implemente_instanciable(Prolongement,"Prolongement",DERIV(Prolongement_base));
 
 

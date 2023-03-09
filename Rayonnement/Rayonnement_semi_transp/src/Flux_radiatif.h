@@ -24,9 +24,9 @@
 #define Flux_radiatif_included
 
 #include <Flux_radiatif_base.h>
-class Zone_Cl_dis_base;
+#include <TRUST_Deriv.h>
+class Domaine_Cl_dis_base;
 
-Declare_deriv(Flux_radiatif_base);
 
 /*! @brief classe Flux_radiatif Classe generique de la hierarchie des flux radiatifs
  *
@@ -53,16 +53,16 @@ public :
 
   inline double flux_impose(int i) const;
   inline double flux_impose(int i,int j) const;
-  inline Zone_Cl_dis_base& zone_Cl_dis();
+  inline Domaine_Cl_dis_base& domaine_Cl_dis();
 
   void typer();
   inline void typer(const Nom& type);
 };
 
 
-inline Zone_Cl_dis_base& Flux_radiatif::zone_Cl_dis()
+inline Domaine_Cl_dis_base& Flux_radiatif::domaine_Cl_dis()
 {
-  return valeur().zone_Cl_dis();
+  return valeur().domaine_Cl_dis();
 }
 
 

@@ -24,7 +24,6 @@
 #include <Equation.h>
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
-#include <Ref_Champ_Inc_base.h>
 #include <TRUSTTabs.h>
 
 Implemente_instanciable(RK3_FT,"RK3_FT",RK3);
@@ -106,9 +105,9 @@ bool RK3_FT::iterateTimeStep(bool& converged)
       // Astuce pour calculer la derivee gpoint de la vitesse imposee au bord:
       //  gpoint est calcule par difference finie entre les deux derniers
       //  "mettre_a_jour". On fait une difference finie avec un delta_t tout petit:
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).zone_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*1./3.;
@@ -144,9 +143,9 @@ bool RK3_FT::iterateTimeStep(bool& converged)
 
   for(i=0; i<nb_eqn; i++)
     {
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).zone_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*5./12.;
@@ -186,9 +185,9 @@ bool RK3_FT::iterateTimeStep(bool& converged)
 
   for(i=0; i<nb_eqn; i++)
     {
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
-      prob.equation(i).zone_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).zone_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
+      prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*1./4.;
@@ -299,7 +298,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       for(int j=0; j<nb_eqn; j++)
         {
           Equation_base& eqn = pb.equation(j);
-          eqn.zone_Cl_dis().mettre_a_jour(temps_courant_);
+          eqn.domaine_Cl_dis().mettre_a_jour(temps_courant_);
         }
     }
   temps_courant_ += dt_*1./3.;
@@ -350,7 +349,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       for(int j=0; j<nb_eqn; j++)
         {
           Equation_base& eqn = pb.equation(j);
-          eqn.zone_Cl_dis().mettre_a_jour(temps_courant_);
+          eqn.domaine_Cl_dis().mettre_a_jour(temps_courant_);
         }
     }
   temps_courant_ += dt_*5./12.;
@@ -396,7 +395,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       for(int j=0; j<nb_eqn; j++)
         {
           Equation_base& eqn = pb.equation(j);
-          eqn.zone_Cl_dis().mettre_a_jour(temps_courant_);
+          eqn.domaine_Cl_dis().mettre_a_jour(temps_courant_);
         }
     }
   temps_courant_ += dt_*1./4.;

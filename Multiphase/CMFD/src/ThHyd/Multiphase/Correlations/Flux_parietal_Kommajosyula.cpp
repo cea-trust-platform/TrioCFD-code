@@ -26,7 +26,7 @@
 #include <Correlation.h>
 #include <Pb_Multiphase.h>
 #include <Domaine_dis.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <TRUSTTrav.h>
 #include <Milieu_composite.h>
 #include <Saturation_base.h>
@@ -67,6 +67,21 @@ void Flux_parietal_Kommajosyula::completer()
 
 void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
 {
+  // On met tout a 0 a tout hasard
+  if (out.qpk)     (*out.qpk)    = 0.;
+  if (out.da_qpk)  (*out.da_qpk) = 0.;
+  if (out.dp_qpk)  (*out.dp_qpk) = 0.;
+  if (out.dv_qpk)  (*out.dv_qpk) = 0.;
+  if (out.dTf_qpk) (*out.dTf_qpk)= 0.;
+  if (out.dTp_qpk) (*out.dTp_qpk)= 0.;
+  if (out.qpi)     (*out.qpi)    = 0.;
+  if (out.da_qpi)  (*out.da_qpi) = 0.;
+  if (out.dp_qpi)  (*out.dp_qpi) = 0.;
+  if (out.dv_qpi)  (*out.dv_qpi) = 0.;
+  if (out.dTf_qpi) (*out.dTf_qpi)= 0.;
+  if (out.dTp_qpi) (*out.dTp_qpi)= 0.;
+  if (out.nonlinear) (*out.nonlinear) = 1;
+
   // On remplit le monophasique ; pas besoin du flux interfacial normalement
   ref_cast(Flux_parietal_base, correlation_monophasique_.valeur()).qp(in, out);
 
@@ -78,28 +93,28 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
     if (n_l != k)
       if (milc.has_saturation(n_l, k))
         {
-          Saturation_base& sat = milc.get_saturation(n_l, k);
+          int ind_sat = k<n_l ? ( k *(in.N-1)-( k -1)*( k )/2) + (n_l- k -1) :
+                        (n_l*(in.N-1)-(n_l-1)*(n_l)/2) + ( k -n_l-1);
 
-          double Delta_T_sup = in.Tp - sat.Tsat(in.p); // Wall superheat
+          double Delta_T_sup = in.Tp - in.Tsat[ind_sat]; // Wall superheat
 
           if (Delta_T_sup > 0) // Else : no wall superheat => no nucleation => single phase heat transfer only
             {
-              double Delta_T_sub = std::max(sat.Tsat(in.p) - in.T[n_l], 1.e-8) ; // Subcooling ; non negative for numerical reasons
+
+              double Delta_T_sub = std::max(in.Tsat[ind_sat] - in.T[n_l], 1.e-8) ; // Subcooling ; non negative for numerical reasons
               double dTp_Delta_T_sup = 1.;
               double dTl_Delta_T_sub = -1.;
-              double Ja_sup = in.rho[n_l]*in.Cp[n_l]*Delta_T_sup/(in.rho[k] * sat.Lvap(in.p));// Superheat Jakob number
-              double Ja_sub = in.rho[n_l]*in.Cp[n_l]*Delta_T_sub/(in.rho[k] * sat.Lvap(in.p));// Subcooling Jakob number
-              double dTp_Ja_sup = in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * sat.Lvap(in.p));
-              double dTl_Ja_sub =-in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * sat.Lvap(in.p));
+              double Ja_sup = in.rho[n_l]*in.Cp[n_l]*Delta_T_sup/(in.rho[k] * in.Lvap[ind_sat]);// Superheat Jakob number
+              double Ja_sub = in.rho[n_l]*in.Cp[n_l]*Delta_T_sub/(in.rho[k] * in.Lvap[ind_sat]);// Subcooling Jakob number
+              double dTp_Ja_sup = in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * in.Lvap[ind_sat]);
+              double dTl_Ja_sub =-in.rho[n_l]*in.Cp[n_l]/(in.rho[k] * in.Lvap[ind_sat]);
 
               // Nucleation site density (Hibiki Ishii 2003)
-              double N_sites =                Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp,         sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_);
-              double dTp_N_sites = 1.e6*(     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp + .5e-7, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_)
-                                              - Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp - .5e-7, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_));
-              double dTl_N_sites = 1.e6*(     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l] + .5e-7, in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_)
-                                              - Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l] - .5e-7, in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_));
-              double dTk_N_sites = 1.e6*(     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k] + .5e-7, in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_)
-                                              - Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k] - .5e-7, in.T[n_l], in.p, in.Tp, sat.Lvap(in.p), sat.Tsat(in.p), sat.sigma(sat.Tsat(in.p), in.p), theta_, molar_mass_));
+              double N_sites, dTp_N_sites, dTl_N_sites, dTk_N_sites;
+              N_sites     =     Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTp_N_sites = dTp_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTl_N_sites = dTl_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
+              dTk_N_sites = dTk_Hibiki_Ishii_Site_density(in.rho[k], in.rho[n_l], in.T[k], in.T[n_l], in.p, in.Tp, in.Lvap[ind_sat], in.Tsat[ind_sat], in.Sigma[ind_sat], theta_, molar_mass_);
 
               double u_bulk = 0;
               if (sub_type(Flux_parietal_adaptatif, correlation_monophasique_.valeur()))
@@ -128,17 +143,17 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               double dTp_chi =  - 0.05 * Delta_T_sub     * -dTp_Delta_T_sup / std::pow(Delta_T_sup, 2);
               double dTl_chi =  - 0.05 * dTl_Delta_T_sub / Delta_T_sup;
 
-              double K     = chi     * 2*std::sqrt(3/M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
-              double dTp_K = dTp_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])
-                             + chi   * 2*std::sqrt(3/M_PI) *dTp_Ja_sup*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
-              double dTl_K = dTl_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
+              double K     = chi     * 2.*std::sqrt(3./M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
+              double dTp_K = dTp_chi * 2.*std::sqrt(3./M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l])
+                             + chi   * 2.*std::sqrt(3./M_PI) *dTp_Ja_sup*in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
+              double dTl_K = dTl_chi * 2.*std::sqrt(3./M_PI) *Ja_sup    *in.lambda[n_l]/(in.rho[n_l]*in.Cp[n_l]);
 
               // Bubble growth time (page 44 Kommajosyula PhD)
-              double t_g     = D_d*D_d       / (16*K*K) ;
-              double dTp_t_g = 2*dTp_D_d*D_d / (16*K*K)
-                               + D_d*D_d     * -2*dTp_K / (16*K*K*K) ;
+              double t_g     = D_d*D_d       / (16.*K*K) ;
+              double dTp_t_g = 2*dTp_D_d*D_d / (16.*K*K)
+                               + D_d*D_d     * -2.*dTp_K / (16.*K*K*K) ;
               double dTl_t_g = 2*dTl_D_d*D_d / (16*K*K)
-                               + D_d*D_d     * -2*dTl_K / (16*K*K*K) ;
+                               + D_d*D_d     * -2.*dTl_K / (16.*K*K*K) ;
 
               // Bubble wait time (page 56 Kommajosyula PhD)
               double t_w     = 0.0061 *                std::pow(Ja_sub, 0.63) / Delta_T_sup;
@@ -154,29 +169,31 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               double t_star = in.lambda[n_l] * in.rho[n_l]*in.Cp[n_l]/(h_fc*h_fc*M_PI) ;
 
               // Active nucleation site density (page 66 Kommajosyula PhD)
-              double N_0     = f_dep * t_g * M_PI * D_d*D_d/4;
-              double dTp_N_0 = dTp_f_dep * t_g     * M_PI *       D_d*D_d/4
-                               + f_dep   * dTp_t_g * M_PI *       D_d*D_d/4
-                               + f_dep   * t_g     * M_PI * 2*dTp_D_d*D_d/4;
-              double dTl_N_0 = dTl_f_dep * t_g     * M_PI *       D_d*D_d/4
-                               + f_dep   * dTl_t_g * M_PI *       D_d*D_d/4
-                               + f_dep   * t_g     * M_PI * 2*dTl_D_d*D_d/4;
+              double N_0     =   f_dep   * t_g     * M_PI *        D_d*D_d/4.;
+              double dTp_N_0 = dTp_f_dep * t_g     * M_PI *        D_d*D_d/4.
+                               + f_dep   * dTp_t_g * M_PI *        D_d*D_d/4.
+                               + f_dep   * t_g     * M_PI * 2.*dTp_D_d*D_d/4.;
+              double dTl_N_0 = dTl_f_dep * t_g     * M_PI *        D_d*D_d/4.
+                               + f_dep   * dTl_t_g * M_PI *        D_d*D_d/4.
+                               + f_dep   * t_g     * M_PI * 2.*dTl_D_d*D_d/4.;
 
-              double N_active     = Lambert_W_function(N_0 * N_sites)/N_0;
-              double dLoc_Lambert = 1e6*(Lambert_W_function(N_0*N_sites + 5e-7)-Lambert_W_function(N_0*N_sites-5e-7)); // Super elegant !
+              double N_active     =    Lambert_W_function(N_0 * N_sites)/N_0;
+              double dLoc_Lambert = dx_Lambert_W_function(N_0 * N_sites);
               double dTp_N_active = (dTp_N_0*N_sites + N_0*dTp_N_sites)*dLoc_Lambert / N_0
                                     +                Lambert_W_function(N_0*N_sites) * -dTp_N_0/std::pow(N_0,2);
               double dTl_N_active = (dTl_N_0*N_sites + N_0*dTl_N_sites)*dLoc_Lambert / N_0
                                     +                Lambert_W_function(N_0*N_sites) * -dTl_N_0/std::pow(N_0,2);
               double dTk_N_active =                     N_0*dTk_N_sites*dLoc_Lambert / N_0;
 
+              if (N_active < 0) Cerr << "nsite " << N_sites << "N0 " << N_0 ;
+
               // Single bubble sliding area
-              double A_sl     =                  std::pow(N_active, -.5)*(D_d+D_lo)        /2;
-              double dTp_A_sl = -.5*dTp_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2
-                                +                  std::pow(N_active, -.5)*(dTp_D_d+dTp_D_lo)/2;
-              double dTl_A_sl = -.5*dTl_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2
-                                +                  std::pow(N_active, -.5)*(dTl_D_d+dTl_D_lo)/2;
-              double dTk_A_sl = -.5*dTk_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2;
+              double A_sl     =                  std::pow(N_active, -.5)*(D_d+D_lo)        /2.;
+              double dTp_A_sl = -.5*dTp_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2.
+                                +                std::pow(N_active, -.5)*(dTp_D_d+dTp_D_lo)/2.;
+              double dTl_A_sl = -.5*dTl_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2.
+                                +                std::pow(N_active, -.5)*(dTl_D_d+dTl_D_lo)/2.;
+              double dTk_A_sl = -.5*dTk_N_active*std::pow(N_active,-1.5)*(D_d+D_lo)        /2.;
 
               // Percentage of the surface occupied by sliding bubbles
               double S_sl     = std::min(1., A_sl * N_active * f_dep * t_star) ;
@@ -209,32 +226,33 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               if (out.dTf_qpk)
                 {
                   (*out.dTf_qpk)         *= (1-S_sl);
-                  (*out.dTf_qpk)(n_l,n_l)+= -dTl_S_sl*qpk_loc(n_l,n_l);
-                  (*out.dTf_qpk)(n_l, k )+= -dTk_S_sl*qpk_loc(n_l, k );
+                  (*out.dTf_qpk)(n_l,n_l)+= -dTl_S_sl*qpk_loc(n_l);
+                  (*out.dTf_qpk)(n_l, k )+= -dTk_S_sl*qpk_loc( k );
                 }
-              if (out.dTp_qpk) (*out.dTp_qpk) = (1-S_sl); // Non !
-              {
-                (*out.dTp_qpk)         *= (1-S_sl);
-                (*out.dTp_qpk)(n_l)    += -dTp_S_sl*qpk_loc(n_l,n_l);
-              }
+              if (out.dTp_qpk)
+                {
+                  (*out.dTp_qpk)         *= (1-S_sl);
+                  (*out.dTp_qpk)(n_l)    += -dTp_S_sl*qpk_loc(n_l);
+                }
 
               // Bubble sliding
-              if (out.qpk)     (*out.qpk)(n_l)          += S_sl*2*h_fc*(in.Tp-in.T[n_l]);
-              if (out.dTf_qpk) (*out.dTf_qpk)(n_l, n_l) +=-S_sl*2*h_fc + dTl_S_sl*2*h_fc*(in.Tp-in.T[n_l]) ;
-              if (out.dTf_qpk) (*out.dTf_qpk)(n_l, k)   +=               dTk_S_sl*2*h_fc*(in.Tp-in.T[n_l]) ;
-              if (out.dTp_qpk) (*out.dTp_qpk)(n_l, k)   += S_sl*2*h_fc + dTp_S_sl*2*h_fc*(in.Tp-in.T[n_l]) ;
+              if (out.qpk)     (*out.qpk)(n_l)          += S_sl*2.*h_fc*(in.Tp-in.T[n_l]);
+              if (out.dTf_qpk) (*out.dTf_qpk)(n_l, n_l) +=-S_sl*2.*h_fc + dTl_S_sl*2.*h_fc*(in.Tp-in.T[n_l]) ;
+              if (out.dTf_qpk) (*out.dTf_qpk)(n_l, k)   +=                dTk_S_sl*2.*h_fc*(in.Tp-in.T[n_l]) ;
+              if (out.dTp_qpk) (*out.dTp_qpk)( k )      += S_sl*2.*h_fc + dTp_S_sl*2.*h_fc*(in.Tp-in.T[n_l]) ;
 
               // Evaporation (calculer les derivees/T apres)
-              if (out.qpi)         (*out.qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) *              std::pow(D_lo,3) *     f_dep *     N_active;
-              if (out.dTp_qpi) (*out.dTp_qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * ( 3*dTp_D_lo*std::pow(D_lo,2) *     f_dep *     N_active
-                                                                                                           +        std::pow(D_lo,3) * dTp_f_dep *     N_active
-                                                                                                           +        std::pow(D_lo,3) *     f_dep * dTp_N_active);
-              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k, n_l) = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * ( 3*dTl_D_lo*std::pow(D_lo,2) *     f_dep *     N_active
-                                                                                                           +        std::pow(D_lo,3) * dTl_f_dep *     N_active
-                                                                                                           +        std::pow(D_lo,3) *     f_dep * dTl_N_active);
-              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k,   k) = 1./6.*M_PI * in.rho[k] * sat.Lvap(in.p) * (            std::pow(D_lo,3) *     f_dep * dTk_N_active);
+              if (out.qpi)         (*out.qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] *              std::pow(D_lo,3.) *     f_dep *     N_active;
+              if (out.dTp_qpi) (*out.dTp_qpi)(n_l, k)      = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (3.*dTp_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) * dTp_f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) *     f_dep * dTp_N_active);
+              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k, n_l) = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (3.*dTl_D_lo*std::pow(D_lo,2.) *     f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) * dTl_f_dep *     N_active
+                                                                                                            +        std::pow(D_lo,3.) *     f_dep * dTl_N_active);
+              if (out.dTf_qpi) (*out.dTf_qpi)(n_l, k,   k) = 1./6.*M_PI * in.rho[k] * in.Lvap[ind_sat] * (            std::pow(D_lo,3.) *     f_dep * dTk_N_active);
 
               if (out.d_nuc) (*out.d_nuc)(k) = D_lo;
+
             }
         }
 }
@@ -242,8 +260,15 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
 double Flux_parietal_Kommajosyula::Lambert_W_function(double x)  const
 {
   if (x < 1/M_E) return x;
-  else if (x > M_E) return std::log(x) - std::log(log(x));
+  else if (x > M_E) return std::log(x) - std::log(std::log(x));
   else return 0.2689*x+0.2690;
+}
+
+double Flux_parietal_Kommajosyula::dx_Lambert_W_function(double x)  const
+{
+  if (x < 1/M_E) return 1.;
+  else if (x > M_E) return 1./x - 1./(x*std::log(x));
+  else return 0.2689;
 }
 
 // See Hibiki, Ishii 2003
@@ -259,7 +284,37 @@ double Flux_parietal_Kommajosyula::Hibiki_Ishii_Site_density(double rho_v, doubl
   double lambda_prime = 2.5e-6;
   double R = 8.314462618 / molar_mass ;
 
-  double inv_Rc = p * (-1 + std::exp(L_vap*(T_v-T_sat)/( R * T_v * T_sat ))) / (2 * sigma * (1+rho_v/rho_l));
+  double inv_Rc = p * (-1 + std::exp(L_vap*std::max(Tp-T_sat, 0.)/( R * Tp * T_sat ))) / (2 * sigma * (1+rho_v/rho_l)); // T_p is put here rather than T_v as we need T_v at the wall, not in first element.
 
-  return N_bar * (1 - std::exp(-theta*theta/(8*mu2))) * (-1 + std::exp(f_rho_plus * lambda_prime * inv_Rc));
+  return N_bar * (1 - std::exp(-theta*theta/(8.*mu2))) * (-1. + std::exp(f_rho_plus * lambda_prime * inv_Rc));
+}
+
+double Flux_parietal_Kommajosyula::dTp_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double L_vap, double T_sat, double sigma, double theta, double molar_mass) const
+{
+  double N_bar = 4.72e5;
+  double mu2 = 0.722*180/M_PI;
+  mu2 *= mu2;
+
+  double rho_p = std::log( (rho_l-rho_v)/rho_v);
+  double f_rho_plus = -0.01064 + 0.48246*rho_p - 0.22712*rho_p*rho_p + 0.05468*rho_p*rho_p*rho_p;
+
+  double lambda_prime = 2.5e-6;
+  double R = 8.314462618 / molar_mass ;
+
+  double inv_Rc = p * (-1 + std::exp(L_vap*std::max(Tp-T_sat, 0.)/( R * Tp * T_sat ))) / (2. * sigma * (1+rho_v/rho_l)); // T_p is put here rather than T_v as we need T_v at the wall, not in first element.
+  double dTp_inv_Rc = 0.;
+  if (Tp-T_sat> 0.)
+    dTp_inv_Rc = p * L_vap / ( R * Tp*Tp ) * std::exp(L_vap*(Tp-T_sat)/(R*Tp*T_sat)) / (2. * sigma * (1+rho_v/rho_l)); // T_p is put here rather than T_v as we need T_v at the wall, not in first element.
+
+  return N_bar * (1 - std::exp(-theta*theta/(8.*mu2))) * (0. + f_rho_plus * lambda_prime * dTp_inv_Rc* std::exp(f_rho_plus * lambda_prime * inv_Rc));
+}
+
+double Flux_parietal_Kommajosyula::dTl_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double L_vap, double T_sat, double sigma, double theta, double molar_mass) const
+{
+  return 0.;
+}
+
+double Flux_parietal_Kommajosyula::dTk_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double L_vap, double T_sat, double sigma, double theta, double molar_mass) const
+{
+  return 0.;
 }

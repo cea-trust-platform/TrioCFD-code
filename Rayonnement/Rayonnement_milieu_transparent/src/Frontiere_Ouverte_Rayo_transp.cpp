@@ -23,7 +23,7 @@
 #include <Frontiere_Ouverte_Rayo_transp.h>
 #include <Equation_base.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 
 
@@ -43,7 +43,7 @@ Entree& Frontiere_Ouverte_Rayo_transp::readOn(Entree& s )
 void Frontiere_Ouverte_Rayo_transp::completer()
 {
   Neumann_sortie_libre::completer();
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
 }
 
 void Frontiere_Ouverte_Rayo_transp::mettre_a_jour(double temps)

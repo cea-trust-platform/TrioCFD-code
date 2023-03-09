@@ -22,7 +22,7 @@
 #include <Paroi_loi_Ciofalo_hyd_VDF.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Turbulence_paroi_base.h>
@@ -82,9 +82,9 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 
 int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
@@ -131,13 +131,13 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
 
 
   // Boucle sur les bords
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
 
       //**********************
@@ -162,18 +162,18 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
                 // 1er cas le bord est 'a droite' de la face de bord
                 // 2e cas le bord est 'a gauche'
                 if ( (elem =face_voisins(num_face,0)) != -1)
-                  norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
+                  norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
                 else
                   {
                     elem = face_voisins(num_face,1);
-                    norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
+                    norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
                   }
 
                 // dist correspondt a la distance entre le centre de la cellule et le bord
                 if (axi)
-                  dist=zone_VDF.dist_norm_bord_axi(num_face);
+                  dist=domaine_VDF.dist_norm_bord_axi(num_face);
                 else
-                  dist=zone_VDF.dist_norm_bord(num_face);
+                  dist=domaine_VDF.dist_norm_bord(num_face);
 
                 // evaluation de la viscosite
                 if (l_unif)
@@ -189,10 +189,10 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
                 calculer_local(u_plus_d_plus,d_visco,tab_nu_t,tab_k,norm_v,dist,elem,num_face);
                 // RQ : Pbls : signe negatif pour le cisaillement pour la paroi sup du canal
                 Cerr << "ATTENTION!!! MODIFS FAITE POUR 3D ETENDUE A 2D MAIS NON VERIFIEE POUR 2D!!!!" << finl;
-                int num_elem = zone_VDF.elem_faces(num_face,0);
+                int num_elem = domaine_VDF.elem_faces(num_face,0);
                 if (num_elem == -1)
-                  num_elem = zone_VDF.elem_faces(num_face,1);
-                //            double diff =  zone_VDF.xp(num_elem,ori)- zone_VDF.xv(num_face,ori);
+                  num_elem = domaine_VDF.elem_faces(num_face,1);
+                //            double diff =  domaine_VDF.xp(num_elem,ori)- domaine_VDF.xv(num_face,ori);
                 //              Cerr << "diff=" << diff << finl;
                 //            double signe = diff / std::fabs(diff);
                 //              Cerr << "signe=" << signe << finl;
@@ -211,18 +211,18 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
 
                 // face_voisin contient les deux elements voisins d'une face
                 if ( (elem = face_voisins(num_face,0)) != -1)
-                  norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                  norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,val1,val2);
                 else
                   {
                     elem = face_voisins(num_face,1);
-                    norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                    norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,val1,val2);
                   }
 
                 // dist correspondt a la distance entre le centre de la cellule et le bord
                 if (axi)
-                  dist = zone_VDF.dist_norm_bord_axi(num_face);
+                  dist = domaine_VDF.dist_norm_bord_axi(num_face);
                 else
-                  dist = zone_VDF.dist_norm_bord(num_face);
+                  dist = domaine_VDF.dist_norm_bord(num_face);
 
                 // evaluation de la viscosite
                 if (l_unif)
@@ -240,10 +240,10 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
                 // Calcul des deux composantes de la contrainte tangentielle:
                 double vit_frot = tab_u_star(num_face)*tab_u_star(num_face);
                 // RQ : Pbls : signe negatif pour le cisaillement pour la paroi sup du canal
-                int num_elem = zone_VDF.elem_faces(num_face,0);
+                int num_elem = domaine_VDF.elem_faces(num_face,0);
                 if (num_elem == -1)
-                  num_elem = zone_VDF.elem_faces(num_face,1);
-                //              double diff =  zone_VDF.xp(num_elem,ori)- zone_VDF.xv(num_face,ori);
+                  num_elem = domaine_VDF.elem_faces(num_face,1);
+                //              double diff =  domaine_VDF.xp(num_elem,ori)- domaine_VDF.xv(num_face,ori);
                 //              Cerr << "diff=" << diff << finl;
                 //              double signe = diff / std::fabs(diff);
                 //              Cerr << "signe=" << signe << finl;
@@ -300,20 +300,20 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
 
                 // face_voisin contient les deux elements voisins d'une face
                 if ( (elem = face_voisins(num_face,0)) != -1)
-                  norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,vitesse_imposee_face_bord(rang,0),
+                  norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,vitesse_imposee_face_bord(rang,0),
                                      vitesse_imposee_face_bord(rang,1),val);
                 else
                   {
                     elem = face_voisins(num_face,1);
-                    norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,vitesse_imposee_face_bord(rang,0),
+                    norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,vitesse_imposee_face_bord(rang,0),
                                        vitesse_imposee_face_bord(rang,1),val);
                   }
 
                 // dist correspondt a la distance entre le centre de la cellule et le bord
                 if (axi)
-                  dist = zone_VDF.dist_norm_bord_axi(num_face);
+                  dist = domaine_VDF.dist_norm_bord_axi(num_face);
                 else
-                  dist = zone_VDF.dist_norm_bord(num_face);
+                  dist = domaine_VDF.dist_norm_bord(num_face);
 
                 // evaluation de la viscosite
                 if (l_unif)
@@ -349,22 +349,22 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
 
                 // face_voisin contient les deux elements voisins d'une face
                 if ( (elem = face_voisins(num_face,0)) != -1)
-                  norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,vitesse_imposee_face_bord(rang,0),
+                  norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,vitesse_imposee_face_bord(rang,0),
                                      vitesse_imposee_face_bord(rang,1),
                                      vitesse_imposee_face_bord(rang,2),val1,val2);
                 else
                   {
                     elem =  face_voisins(num_face,1);
-                    norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,vitesse_imposee_face_bord(rang,0),
+                    norm_v=norm_3D_vit(vit,elem,ori,domaine_VDF,vitesse_imposee_face_bord(rang,0),
                                        vitesse_imposee_face_bord(rang,1),
                                        vitesse_imposee_face_bord(rang,2),val1,val2);
                   }
 
                 // dist correspondt a la distance entre le centre de la cellule et le bord
                 if (axi)
-                  dist = zone_VDF.dist_norm_bord_axi(num_face);
+                  dist = domaine_VDF.dist_norm_bord_axi(num_face);
                 else
-                  dist = zone_VDF.dist_norm_bord(num_face);
+                  dist = domaine_VDF.dist_norm_bord(num_face);
 
                 // evaluation de la viscosite
                 if (l_unif)

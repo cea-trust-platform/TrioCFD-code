@@ -27,13 +27,13 @@
 #include <Pb_MG.h>
 #include <Paroi_std_hyd_VDF.h>
 #include <Paroi_loi_WW_scal_VDF.h>
-#include <Ref_Champ_Fonc.h>
 #include <Probleme_Couple.h>
+#include <TRUST_Ref.h>
 
-
+class Champ_Fonc;
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief class Paroi_DWF_hyd_VDF cette classe derive de turbulence_paroi_base
  *

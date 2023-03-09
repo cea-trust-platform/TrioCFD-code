@@ -31,7 +31,8 @@
 #include <Op_Diff_K_Eps_base.h>
 #include <Operateur_Conv.h>
 #include <Modele_Fonc_Realisable.h>
-#include <Ref_Modele_Fonc_Realisable.h>
+#include <TRUST_Ref.h>
+
 
 class Motcle;
 

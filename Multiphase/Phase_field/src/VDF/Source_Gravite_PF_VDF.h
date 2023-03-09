@@ -25,9 +25,13 @@
 #define Source_Gravite_PF_VDF_included
 
 #include <Source_base.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Probleme_base.h>
+#include <TRUST_Ref.h>
+
+class Probleme_base;
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+class Domaine_Cl_dis;
+class Domaine_dis;
 
 
 /*! @brief class  Source_Gravite_PF_VDF
@@ -47,15 +51,12 @@ public:
   DoubleTab& calculer(DoubleTab& ) const override;
   inline void associer_pb(const Probleme_base& ) override;
   DoubleTab& ajouter(DoubleTab& ) const override;
-  void mettre_a_jour(double temps) override
-  {
-    ;
-  }
+  void mettre_a_jour(double temps) override { }
 
 protected :
-  void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& ) override;
-  REF(Zone_VDF) la_zone;
-  REF(Zone_Cl_VDF) la_zone_Cl;
+  void associer_domaines(const Domaine_dis& domaine,const Domaine_Cl_dis& ) override;
+  REF(Domaine_VDF) le_dom;
+  REF(Domaine_Cl_VDF) le_dom_Cl;
   REF(Probleme_base) le_probleme;
 };
 
@@ -65,3 +66,5 @@ inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& pb )
 }
 
 #endif
+
+

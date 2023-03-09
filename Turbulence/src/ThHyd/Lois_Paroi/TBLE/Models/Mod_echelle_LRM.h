@@ -22,10 +22,9 @@
 #ifndef Mod_echelle_LRM_included
 #define Mod_echelle_LRM_included
 
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <Mod_echelle_LRM_base.h>
 
-Declare_deriv(Mod_echelle_LRM_base);
 
 /*! @brief Classe Mod_echelle_LRM Classe generique calculant les echelle de vitesse et de longueur pour le
  *

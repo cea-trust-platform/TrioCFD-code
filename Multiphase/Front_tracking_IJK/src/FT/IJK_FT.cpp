@@ -33,7 +33,7 @@
 #include <EChaine.h>
 #include <SChaine.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Sonde_IJK.h>
 #include <Ouvrir_fichier.h>
 #include <EcritureLectureSpecial.h>
@@ -54,9 +54,6 @@
 #define get_velocity_convection_op(type) (((type)==0)?(velocity_convection_op_sharp_):(velocity_convection_op_centre_))
 //#define SMOOTHING_RHO
 
-Implemente_liste(IJK_Thermique);
-Implemente_liste(IJK_Energie);
-
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
@@ -74,7 +71,7 @@ IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
 // Pour cela, deplacement vers IJK_Navier_Stokes_tools.cpp.P
 // static void extend_array(const IJK_Grid_Geometry &geom1, ...
 // void build_extended_splitting(const IJK_Splitting &split1, ...
-// Probleme_FT_Disc_gen & creer_zone_vdf(const IJK_Splitting & splitting, const Nom & nom_domaine)
+// Probleme_FT_Disc_gen & creer_domaine_vdf(const IJK_Splitting & splitting, const Nom & nom_domaine)
 
 #ifdef SMOOTHING_RHO
 static void smoothing_field(IJK_Field_double& field,
@@ -203,8 +200,8 @@ void copy_field_to_extended_domain(const IJK_Field_double& input_field,
           input_field2(i,j,k) = input_field(i,j,k);
         }
   // Echange espace virtuel pour avoir les valeurs sur nextension mailles
-  // autour de la zone locale initiale.
-  // On espere que la zone etendue sur ce processeur est a l'interieur...
+  // autour du domaine local initial.
+  // On espere que le domaine etendu sur ce processeur est a l'interieur...
   // Il nous faut une epaisseur supplementaire car les faces de droite du
   // maillage etendu portent une inconnue qui n'existe pas dans le maillage
   // d'origine, s'il est periodique.
@@ -278,6 +275,8 @@ IJK_FT_double::TimeScheme IJK_FT_double::get_time_scheme() const
 {
   return (TimeScheme) time_scheme_;
 }
+
+// XD IJK_FT_double interprete IJK_FT_double 1 not_set
 Entree& IJK_FT_double::interpreter(Entree& is)
 {
   tstep_ = 0;
@@ -287,6 +286,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   Objet_U::dimension=3;
 
   check_divergence_ = 0;
+  rk_step_ = -1; // default value
 
   expression_pression_initiale_ = "??"; // par defaut, invalide
   fichier_reprise_vitesse_ = "??"; // par defaut, invalide
@@ -412,120 +412,165 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   coef_rayon_force_rappel_ = 0.;
   p_seuil_max_ = 10000000 ;
   p_seuil_min_ = -10000000 ;
-  param.ajouter("p_seuil_max", &p_seuil_max_);
-  param.ajouter("p_seuil_min", &p_seuil_min_);
-  param.ajouter("coef_ammortissement", &coef_ammortissement_);
-  param.ajouter("coef_immobilisation", &coef_immobilisation_);
-  param.ajouter("coef_mean_force", &coef_mean_force_);
-  param.ajouter("coef_force_time_n", &coef_force_time_n_);
-  param.ajouter("coef_rayon_force_rappel", &coef_rayon_force_rappel_);
-  param.ajouter("tinit", &current_time_);
-  param.ajouter("ijk_splitting", &ijk_splitting_name, Param::REQUIRED);
-  param.ajouter("timestep", &timestep_, Param::REQUIRED);
-  param.ajouter("timestep_facsec", &timestep_facsec_);
-  param.ajouter("cfl", &cfl_);
-  param.ajouter("fo", &fo_);
-  param.ajouter("oh", &oh_);
-  param.ajouter("nb_pas_dt_max", &nb_timesteps_, Param::REQUIRED);
-  param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED);
-  param.ajouter_flag("check_divergence", &check_divergence_);
-  param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED);
-  param.ajouter("vitesse_entree", &vitesse_entree_);
-  param.ajouter("vitesse_upstream", &vitesse_upstream_);
-  param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
-  param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED);
-  param.ajouter("check_stop_file", &check_stop_file_);
-  param.ajouter("dt_sauvegarde", &dt_sauvegarde_);
-  param.ajouter("nom_sauvegarde", &nom_sauvegarde_);
-  param.ajouter_flag("sauvegarder_xyz", &sauvegarder_xyz_);
-  param.ajouter("nom_reprise", &nom_reprise_);
-  param.ajouter("gravite", &gravite_);
+  param.ajouter("p_seuil_max", &p_seuil_max_); // XD_ADD_P floattant not_set, default 10000000
+  param.ajouter("p_seuil_min", &p_seuil_min_); // XD_ADD_P floattant not_set, default -10000000
+  param.ajouter("coef_ammortissement", &coef_ammortissement_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_immobilisation", &coef_immobilisation_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_mean_force", &coef_mean_force_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_force_time_n", &coef_force_time_n_); // XD_ADD_P floattant not_set
+  param.ajouter("coef_rayon_force_rappel", &coef_rayon_force_rappel_); // XD_ADD_P floattant not_set
+  param.ajouter("tinit", &current_time_); // XD_ADD_P floattant initial time
+  param.ajouter("ijk_splitting", &ijk_splitting_name, Param::REQUIRED); // XD_ADD_P chaine(into=["grid_splitting"]) Definition of domain decomposition for parallel computations
+  param.ajouter("timestep", &timestep_, Param::REQUIRED); // XD_ADD_P floattant Upper limit of the timestep
+  param.ajouter("timestep_facsec", &timestep_facsec_); // XD_ADD_P floattant Security factor on timestep
+  param.ajouter("cfl", &cfl_); // XD_ADD_P floattant  To provide a value of the limiting CFL number used for setting the timestep
+  param.ajouter("fo", &fo_); // XD_ADD_P floattant not_set
+  param.ajouter("oh", &oh_); // XD_ADD_P floattant not_set
+  param.ajouter("nb_pas_dt_max", &nb_timesteps_, Param::REQUIRED); // XD_ADD_P entier maximum limit for the number of timesteps
+  param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
+  param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
+  param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
+  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P chaine not_set
+  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
+  param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
+  param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
+  param.ajouter("nom_sauvegarde", &nom_sauvegarde_); // XD_ADD_P chaine Definition of filename to save the calculation
+  param.ajouter_flag("sauvegarder_xyz", &sauvegarder_xyz_); // XD_ADD_P rien save in xyz format
+  param.ajouter("nom_reprise", &nom_reprise_); // XD_ADD_P chaine Enable restart from filename given
+  param.ajouter("gravite", &gravite_); // XD_ADD_P list gravity vector [gx, gy, gz]
   expression_vitesse_initiale_.dimensionner_force(3);
-  param.ajouter("expression_vx_init", &expression_vitesse_initiale_[0]);
-  param.ajouter("expression_vy_init", &expression_vitesse_initiale_[1]);
-  param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]);
-  param.ajouter("expression_derivee_force", &expression_derivee_acceleration_);
-  param.ajouter("terme_force_init", &terme_source_acceleration_);
-  param.ajouter("correction_force", &correction_force_);
-  param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_);
-  param.ajouter("vol_bulles", &vol_bulles_);
-  param.ajouter("time_scheme", &time_scheme_);
+  param.ajouter("expression_vx_init", &expression_vitesse_initiale_[0]); // XD_ADD_P chaine initial field for x-velocity component (parser of x,y,z)
+  param.ajouter("expression_vy_init", &expression_vitesse_initiale_[1]); // XD_ADD_P chaine initial field for y-velocity component (parser of x,y,z)
+  param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]); // XD_ADD_P chaine initial field for z-velocity component (parser of x,y,z)
+  param.ajouter("expression_derivee_force", &expression_derivee_acceleration_); // XD_ADD_P chaine expression of the time-derivative of the X-component of a source-term (see terme_force_ini for the initial value). terme_force_ini : initial value of the X-component of the source term (see expression_derivee_force  for time evolution)
+  param.ajouter("terme_force_init", &terme_source_acceleration_); // XD_ADD_P chaine not_set
+  param.ajouter("correction_force", &correction_force_); // XD_ADD_P chaine not_set
+  param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_); // XD_ADD_P chaine not_set
+  param.ajouter("vol_bulles", &vol_bulles_); // XD_ADD_P chaine not_set
+  param.ajouter("time_scheme", &time_scheme_); // XD_ADD_P chaine(into=["euler_explicit","RK3_FT"]) Type of time scheme
   param.dictionnaire("euler_explicit", EULER_EXPLICITE);
   param.dictionnaire("RK3_FT", RK3_FT);
 
   // GAB question : pourquoi expression_variable_source_ est de type nom et pas de type Vecteur3 ??
   expression_variable_source_.dimensionner_force(3);
-  param.ajouter("expression_variable_source_x", &expression_variable_source_[0]);
-  param.ajouter("expression_variable_source_y", &expression_variable_source_[1]);
-  param.ajouter("expression_variable_source_z", &expression_variable_source_[2]);
-  param.ajouter("facteur_variable_source_init", &facteur_variable_source_);
-  param.ajouter("expression_derivee_facteur_variable_source", &expression_derivee_facteur_variable_source_);
+  param.ajouter("expression_variable_source_x", &expression_variable_source_[0]); // XD_ADD_P chaine not_set
+  param.ajouter("expression_variable_source_y", &expression_variable_source_[1]); // XD_ADD_P chaine not_set
+  param.ajouter("expression_variable_source_z", &expression_variable_source_[2]); // XD_ADD_P chaine not_set
+  param.ajouter("facteur_variable_source_init", &facteur_variable_source_); // XD_ADD_P chaine not_set
+  param.ajouter("expression_derivee_facteur_variable_source", &expression_derivee_facteur_variable_source_); // XD_ADD_P chaine not_set
 
 
-  param.ajouter("expression_p_init", &expression_pression_initiale_);
+  param.ajouter("expression_p_init", &expression_pression_initiale_); // XD_ADD_P chaine initial pressure field (optional)
 
-  param.ajouter("expression_potential_phi", &expression_potential_phi_);
+  param.ajouter("expression_potential_phi", &expression_potential_phi_); // XD_ADD_P chaine parser to define phi and make a momentum source Nabla phi.
 
-  param.ajouter("type_velocity_diffusion_form", &type_velocity_diffusion_form_);
-  param.ajouter("type_velocity_convection_form", &type_velocity_convection_form_);
-  param.ajouter("type_velocity_convection_op", &type_velocity_convection_op_);
+  param.ajouter("type_velocity_diffusion_form", &type_velocity_diffusion_form_); // XD_ADD_P chaine not_set
+  param.ajouter("type_velocity_convection_form", &type_velocity_convection_form_); // XD_ADD_P chaine not_set
+  param.ajouter("type_velocity_convection_op", &type_velocity_convection_op_); // XD_ADD_P chaine not_set
   param.dictionnaire("Quick",0);
   param.dictionnaire("Centre",1);
   param.dictionnaire("Amont",2);
 
-  param.ajouter("interfaces", &interfaces_);
+  param.ajouter("interfaces", &interfaces_); // XD_ADD_P interfaces not_set
   // GAB, THI
-  param.ajouter("forcage", &forcage_); // X_D forcage_ forcage_ forcage_ 1 attr type 0 description
-  param.ajouter("corrections_qdm", &qdm_corrections_);
+  param.ajouter("forcage", &forcage_);  // XD_ADD_P chaine not_set
+  param.ajouter("corrections_qdm", &qdm_corrections_); // XD_ADD_P chaine not_set
   // Read list of thermic equations:
-  param.ajouter("thermique", &thermique_);
-  param.ajouter("energie", &energie_);
+  param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
+  param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
 
-  param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED);
+  param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
-  param.ajouter("fichier_post", &fichier_post_);
+  param.ajouter("fichier_post", &fichier_post_); // XD_ADD_P chaine name of the post-processing file (lata file)
   // ATTENTION les fichiers reprises sont des fichiers .lata ou sauv.lata
   // On peut reprendre uniquement la vitesse ou uniquement rho dans un fichier de post:
-  param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
-  param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
+  param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_); // XD_ADD_P chaine not_set
+  param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_); // XD_ADD_P chaine not_set
 
-  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED);
-  param.ajouter_flag("disable_solveur_poisson", &disable_solveur_poisson_);
-  param.ajouter_flag("disable_diffusion_qdm", &disable_diffusion_qdm_);
-  param.ajouter_flag("disable_source_interf", &disable_source_interf_);
-  param.ajouter_flag("disable_convection_qdm", &disable_convection_qdm_);
-  param.ajouter_flag("disable_diphasique", &disable_diphasique_);
-  param.ajouter_flag("frozen_velocity", &frozen_velocity_);
-  param.ajouter_flag("velocity_reset", &velocity_reset_);
-  param.ajouter_flag("improved_initial_pressure_guess", &improved_initial_pressure_guess_);
-  param.ajouter_flag("include_pressure_gradient_in_ustar", &include_pressure_gradient_in_ustar_);
+  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // XD_ADD_P bloc_lecture BC
+  param.ajouter_flag("disable_solveur_poisson", &disable_solveur_poisson_); // XD_ADD_P rien Disable pressure poisson solver
+  param.ajouter_flag("disable_diffusion_qdm", &disable_diffusion_qdm_); // XD_ADD_P rien Disable diffusion operator in momentum
+  param.ajouter_flag("disable_source_interf", &disable_source_interf_); // XD_ADD_P rien Disable computation of the interfacial source term
+  param.ajouter_flag("disable_convection_qdm", &disable_convection_qdm_); // XD_ADD_P rien Disable convection operator in momentum
+  param.ajouter_flag("disable_diphasique", &disable_diphasique_); // XD_ADD_P rien Disable all calculations related to interfaces (phase properties, interfacial force, ... )
+  param.ajouter_flag("frozen_velocity", &frozen_velocity_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("velocity_reset", &velocity_reset_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("improved_initial_pressure_guess", &improved_initial_pressure_guess_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("include_pressure_gradient_in_ustar", &include_pressure_gradient_in_ustar_); // XD_ADD_P chaine not_set
   //  param.ajouter_flag("use_inv_rho", &use_inv_rho_);
-  param.ajouter_flag("use_inv_rho_for_mass_solver_and_calculer_rho_v", &use_inv_rho_for_mass_solver_and_calculer_rho_v_);
-  param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_);
-  param.ajouter_flag("diffusion_alternative", &diffusion_alternative_);
-  param.ajouter_flag("suppression_rejetons", &suppression_rejetons_);
-  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_);
-  param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_);
+  param.ajouter_flag("use_inv_rho_for_mass_solver_and_calculer_rho_v", &use_inv_rho_for_mass_solver_and_calculer_rho_v_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("diffusion_alternative", &diffusion_alternative_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("suppression_rejetons", &suppression_rejetons_); // XD_ADD_P chaine not_set
+  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_); // XD_ADD_P chaine not_set
+  param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_); // XD_ADD_P rien experimental Keyword, not for use
   // GAB; qdm
-  param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan);
+  param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan); // XD_ADD_P chaine not_set
   //
   // GAB, champ de reprise + champ initial
-  param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_);
+  param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_); // XD_ADD_P chaine not_set
   //
 
-  param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
-  param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
+  param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_); // XD_ADD_P chaine not_set
+  param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_); // XD_ADD_P chaine not_set
   vap_velocity_tmoy_ = reprise_vap_velocity_tmoy_;
   liq_velocity_tmoy_ = reprise_liq_velocity_tmoy_;
 
   //
-  param.ajouter("sigma", &sigma_);
-  param.ajouter("rho_vapeur", &rho_vapeur_);
-  param.ajouter("mu_vapeur", &mu_vapeur_);
-
+  param.ajouter("sigma", &sigma_); // XD_ADD_P floattant surface tension
+  param.ajouter("rho_vapeur", &rho_vapeur_); // XD_ADD_P floattant vapour density
+  param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
   post_.complete_interpreter(param, is);
-
+// XD attr check_stats rien check_stats 1 Flag to compute additional (xy)-plane averaged statistics
+// XD attr dt_post entier dt_post 1 Post-processing frequency (for lata output)
+// XD attr dt_post_stats_plans entier dt_post_stats_plans 1 Post-processing frequency for averaged statistical files (txt files containing averaged information on (xy) planes for each z-center) both instantaneous, or cumulated time-integration (see file header for variables list)
+// XD attr dt_post_stats_bulles entier dt_post_stats_bulles 1 Post-processing frequency for bubble information (for out files as bubble area, centroid position, etc...)
+// XD attr champs_a_postraiter listchaine champs_a_postraiter 1 List of variables to post-process in lata files.
+// XD attr expression_vx_ana chaine expression_vx_ana 1 Analytical Vx (parser of x,y,z, t) used for post-processing only
+// XD attr expression_vy_ana chaine expression_vy_ana 1 Analytical Vy (parser of x,y,z, t) used for post-processing only
+// XD attr expression_vz_ana chaine expression_vz_ana 1 Analytical Vz (parser of x,y,z, t) used for post-processing only
+// XD attr expression_p_ana chaine expression_p_ana 1 analytical pressure solution (parser of x,y,z, t) used for post-processing only
+// XD attr expression_dPdx_ana chaine expression_dPdx_ana 1 analytical expression dP/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dPdy_ana chaine expression_dPdy_ana 1 analytical expression dP/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dPdz_ana chaine expression_dPdz_ana 1 analytical expression dP/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdx_ana chaine expression_dUdx_ana 1 analytical expression dU/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdy_ana chaine expression_dUdy_ana 1 analytical expression dU/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dUdz_ana chaine expression_dUdz_ana 1 analytical expression dU/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdx_ana chaine expression_dVdx_ana 1 analytical expression dV/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdy_ana chaine expression_dVdy_ana 1 analytical expression dV/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dVdz_ana chaine expression_dVdz_ana 1 analytical expression dV/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdx_ana chaine expression_dWdx_ana 1 analytical expression dW/dx=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdy_ana chaine expression_dWdy_ana 1 analytical expression dW/dy=f(x,y,z,t), for post-processing only
+// XD attr expression_dWdz_ana chaine expression_dWdz_ana 1 analytical expression dW/dz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdx_ana chaine expression_ddPdxdx_ana 1 analytical expression d2P/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdydy_ana chaine expression_ddPdydy_ana 1 analytical expression d2P/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdzdz_ana chaine expression_ddPdzdz_ana 1 analytical expression d2P/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdy_ana chaine expression_ddPdxdy_ana 1 analytical expression d2P/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdxdz_ana chaine expression_ddPdxdz_ana 1 analytical expression d2P/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddPdydz_ana chaine expression_ddPdydz_ana 1 analytical expression d2P/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdx_ana chaine expression_ddUdxdx_ana 1 analytical expression d2U/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdydy_ana chaine expression_ddUdydy_ana 1 analytical expression d2U/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdzdz_ana chaine expression_ddUdzdz_ana 1 analytical expression d2U/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdy_ana chaine expression_ddUdxdy_ana 1 analytical expression d2U/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdxdz_ana chaine expression_ddUdxdz_ana 1 analytical expression d2U/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddUdydz_ana chaine expression_ddUdydz_ana 1 analytical expression d2U/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdx_ana chaine expression_ddVdxdx_ana 1 analytical expression d2V/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdydy_ana chaine expression_ddVdydy_ana 1 analytical expression d2V/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdzdz_ana chaine expression_ddVdzdz_ana 1 analytical expression d2V/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdy_ana chaine expression_ddVdxdy_ana 1 analytical expression d2V/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdxdz_ana chaine expression_ddVdxdz_ana 1 analytical expression d2V/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddVdydz_ana chaine expression_ddVdydz_ana 1 analytical expression d2V/dydz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdx_ana chaine expression_ddWdxdx_ana 1 analytical expression d2W/dx2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdydy_ana chaine expression_ddWdydy_ana 1 analytical expression d2W/dy2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdzdz_ana chaine expression_ddWdzdz_ana 1 analytical expression d2W/dz2=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdy_ana chaine expression_ddWdxdy_ana 1 analytical expression d2W/dxdy=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdxdz_ana chaine expression_ddWdxdz_ana 1 analytical expression d2W/dxdz=f(x,y,z,t), for post-processing only
+// XD attr expression_ddWdydz_ana chaine expression_ddWdydz_ana 1 analytical expression d2W/dydz=f(x,y,z,t), for post-processing only
+// XD attr t_debut_statistiques floattant t_debut_statistiques 1 Initial time for computation, printing and accumulating time-integration
+// XD attr sondes bloc_lecture sondes 1 probes
   param.lire_avec_accolades(is);
   // GAB, rotation
   direction_gravite_ = get_direction(gravite_);
@@ -538,6 +583,16 @@ Entree& IJK_FT_double::interpreter(Entree& is)
           Cout << "The option frozen_velocity automatically freeze the interface motion "
                <<  "by activating the flag interfaces_.frozen_" << finl;
         }
+    }
+
+  if ((expression_potential_phi_ != "??") &&
+      ((expression_variable_source_[0] != "??") ||
+       (expression_variable_source_[1] != "??")
+       || (expression_variable_source_[2] != "??")))
+    {
+      Cerr << "expression_potential_phi and expression_variable_source are used together"
+           << "nabla(phi) will be added to the expression given for the variable source" << finl;
+      //Process::exit();
     }
 
   if ((include_pressure_gradient_in_ustar_) && (expression_pression_initiale_ == "??"))
@@ -590,13 +645,13 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     }
   splitting_ = ref_cast(IJK_Splitting, Interprete_bloc::objet_global(ijk_splitting_name));
 
-  Cerr << "Construction de la zone VDF NS pour les sondes..." << finl;
-  refprobleme_ns_ = creer_zone_vdf(splitting_, "DOM_NS_VDF");
+  Cerr << "Construction du domaine VDF NS pour les sondes..." << finl;
+  refprobleme_ns_ = creer_domaine_vdf(splitting_, "DOM_NS_VDF");
 
-  Cerr << "Construction de la zone VDF..." << finl;
+  Cerr << "Construction du domaine VDF..." << finl;
   {
     build_extended_splitting(splitting_, splitting_ft_, ijk_splitting_ft_extension_);
-    refprobleme_ft_disc_ = creer_zone_vdf(splitting_ft_, "DOM_VDF");
+    refprobleme_ft_disc_ = creer_domaine_vdf(splitting_ft_, "DOM_VDF");
     for (int dir = 0; dir < 3; dir++)
       {
         VECT(IntTab) map(3);
@@ -616,7 +671,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
             else
               {
                 map[dir2].resize(3,3);
-                // copy NS field to central zone of extended field
+                // copy NS field to central domaine of extended field
                 map[dir2](0,0) = 0;
                 map[dir2](0,1) = n_ext;
                 map[dir2](0,2) = n;
@@ -673,7 +728,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
           else
             {
               map[dir2].resize(3,3);
-              // copy NS field to central zone of extended field
+              // copy NS field to central domaine of extended field
               map[dir2](0,0) = 0;
               map[dir2](0,1) = n_ext;
               map[dir2](0,2) = n;
@@ -743,18 +798,11 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   interfaces_.associer(*this);
 
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  while(curseur)
-    {
-      curseur->associer(*this);
-      ++curseur;
-    }
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  while(curseur_en)
-    {
-      curseur_en->associer(*this);
-      ++curseur_en;
-    }
+  for (auto& itr : thermique_)
+    itr.associer(*this);
+
+  for (auto& itr : energie_)
+    itr.associer(*this);
 
   run();
   return is;
@@ -816,14 +864,6 @@ const IJK_Field_double& IJK_FT_double::get_IJK_field(const Nom& nom) const
     return pressure_;
 
   return post_.get_IJK_field(nom);
-
-
-  Cerr << "Erreur dans IJK_FT_double::get_IJK_field : "
-       << "Champ demande : " << nom
-       << "Liste des champs possibles : "  << finl;
-  Process::exit();
-  throw;
-
 }
 
 void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed)
@@ -1061,23 +1101,19 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
     interfaces_.sauvegarder_interfaces(lata_name);
 
 //thermique_->sauvegarder_temperature(lata_name);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
   int idx =0;
   //TODO sauvegarde des champs surfaces (vapeur) et barycentre,
   //eventuellement du med pour voir si la conversion marche.
-  while(curseur)
+  for (auto& itr : thermique_)
     {
-      curseur->sauvegarder_temperature(lata_name, idx);
-      ++curseur;
+      itr.sauvegarder_temperature(lata_name, idx);
       ++idx;
     }
 
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   int idx2 =0;
-  while(curseur_en)
+  for (auto& itr : energie_)
     {
-      curseur_en->sauvegarder_temperature(lata_name, idx2);
-      ++curseur_en;
+      itr.sauvegarder_temperature(lata_name, idx2);
       ++idx2;
     }
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
@@ -1119,17 +1155,16 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       fichier << " forcage " << forcage_
               << " corrections_qdm " << qdm_corrections_;
       int flag_list_not_empty = 0;
-      LIST_CURSEUR(IJK_Thermique) curseur_bis(thermique_);
-      if (curseur_bis)
+      if (thermique_.size() > 0)
         {
           fichier << " thermique {\n" ;
           flag_list_not_empty = 1;
         }
-      while(curseur_bis)
+      for(auto itr = thermique_.begin(); itr != thermique_.end(); )
         {
-          fichier << curseur_bis.valeur() ;
-          ++curseur_bis;
-          if (curseur_bis)
+          fichier << *itr ;
+          ++itr;
+          if (itr != thermique_.end())
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -1138,17 +1173,16 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         fichier << " } \n" ;
 
       int flag_list_not_empty_en = 0;
-      LIST_CURSEUR(IJK_Energie) curseur_bis_en(energie_);
-      if (curseur_bis_en)
+      if (energie_.size() > 0)
         {
           fichier << " energie {\n" ;
           flag_list_not_empty_en = 1;
         }
-      while(curseur_bis_en)
+      for(auto itr = energie_.begin(); itr != energie_.end(); )
         {
-          fichier << curseur_bis_en.valeur() ;
-          ++curseur_bis_en;
-          if (curseur_bis_en)
+          fichier << *itr ;
+          ++itr;
+          if (itr != energie_.end())
             fichier << ", \n" ;
           else
             fichier << "\n" ;
@@ -1192,14 +1226,6 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
    */
 //  param.ajouter("last_source_qdm_update_time", &last_source_qdm_update_time_);
 //  param.ajouter("offset_list_index_", &offset_list_index_);
-  /*
-    LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-    while(curseur)
-      {
-        param.ajouter("fichier_reprise_temperature", &curseur->fichier_reprise_temperature_);
-        ++curseur;
-      }
-  */
   post_.reprendre_post(param);
 
   param.lire_avec_accolades(fichier);
@@ -1263,32 +1289,29 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     }
   dt_cfl *= cfl;
   const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
-  const double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  if (disable_diffusion_qdm_) dt_fo = 1.e20;
   // Au cas ou sigma = 0, on utilise (sigma + 1e-20) :
   const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
-  const double dt_eq_velocity = std::min(max_timestep, 1./(1./dt_cfl+1./dt_fo+1./dt_oh) * timestep_facsec_);
+  const double dt_eq_velocity = 1./(1./dt_cfl+1./dt_fo+1./dt_oh);
 
   double dt_thermique = 1.e20;
-  CONST_LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  while(curseur)
+  for (const auto& itr : thermique_)
     {
-      const double dt_th = curseur->compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
+      const double dt_th = itr.compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_thermique= std::min(dt_thermique, dt_th);
-      ++curseur;
     }
 
-  CONST_LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   double dt_energie = 1.e20;
-  while(curseur_en)
+  for (const auto& itr : energie_)
     {
-      const double dt_en = curseur_en->compute_timestep(dt_energie, dxmin);
+      const double dt_en = itr.compute_timestep(dt_energie, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_energie= std::min(dt_energie, dt_en);
-      ++curseur_en;
     }
 
-  const double dt = std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie);
+  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie));
 
   if (Process::je_suis_maitre())
     {
@@ -1382,7 +1405,6 @@ int IJK_FT_double::initialise()
 #endif
     }
 #endif
-  nalloc += post_.initialise(reprise_);
 
 // Pour le check_stats_ :
   // Pour le check_stats_ ou pour travailler en increment de pression, il faut connaitre la pression initiale :
@@ -1395,11 +1417,13 @@ int IJK_FT_double::initialise()
 
 
 
-  // On peut recuperer la zonevf:
-  const Zone_dis& zone_dis = refprobleme_ft_disc_.valeur().domaine_dis().zone_dis(0);
+  // On peut recuperer le domainevf:
+  const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
-  interfaces_.initialize(splitting_ft_, splitting_, zone_dis);
+  interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
+
+  nalloc += post_.initialise(reprise_);
 
   // statistiques...
   nalloc += post_.initialise_stats(splitting_, vol_bulles_, vol_bulle_monodisperse_);
@@ -1445,37 +1469,27 @@ int IJK_FT_double::initialise()
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
   statistiques().begin_count(calculer_thermique_prop_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
   int idx =0;
-  while(curseur)
+  for (auto& itr : thermique_)
     {
-      nalloc += curseur->initialize(splitting_, idx);
+      nalloc += itr.initialize(splitting_, idx);
       if (!disable_diphasique_)
-        {
-          curseur->update_thermal_properties();
-        }
-      ++curseur;
+        itr.update_thermal_properties();
       idx++;
     }
 
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
   int idx2 =0;
-  while(curseur_en)
+  for (auto& itr : energie_)
     {
-      nalloc += curseur_en->initialize(splitting_, idx2);
+      nalloc += itr.initialize(splitting_, idx2);
       if (!disable_diphasique_)
-        {
-          curseur_en->update_thermal_properties();
-        }
-      ++curseur_en;
+        itr.update_thermal_properties();
       idx2++;
     }
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
-  LIST_CURSEUR(IJK_Energie) curseur_en2(energie_);
-  LIST_CURSEUR(IJK_Thermique) curseur2(thermique_);
-  if ((curseur2) or (curseur_en2))
+  if ((energie_.size() > 0) or (thermique_.size() >0))
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -1913,7 +1927,7 @@ void IJK_FT_double::run()
 
   //GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
   // Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
-  // alors il faut une zone ghost de la taille de la longueur maximale des arretes.
+  // alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
   //  allocate_velocity(velocity_ft_, splitting_ft_, 0);
   allocate_velocity(velocity_ft_, splitting_ft_, 4);
 
@@ -1966,7 +1980,7 @@ void IJK_FT_double::run()
       velocity_convection_op_sharp_.initialize(splitting_);
       break;
     case 1:
-      velocity_convection_op_centre_.initialize(splitting_);
+      velocity_convection_op_centre_.initialize(splitting_, boundary_conditions_);
       break;
     case 2:
       velocity_convection_op_amont_.initialize(splitting_);
@@ -2007,18 +2021,11 @@ void IJK_FT_double::run()
           maj_indicatrice_rho_mu();
           if (!disable_diphasique_)
             {
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              while(curseur)
-                {
-                  curseur->update_thermal_properties();
-                  ++curseur;
-                }
-              LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              while(curseur_en)
-                {
-                  curseur_en->update_thermal_properties();
-                  ++curseur_en;
-                }
+              for (auto& itr : thermique_)
+                itr.update_thermal_properties();
+
+              for (auto& itr : energie_)
+                itr.update_thermal_properties();
             }
           // La pression n'est pas encore initialisee. elle est donc nulle.
           // Avec cette option, on essaye une initialisation basee sur le champ de pression diphasique
@@ -2125,37 +2132,26 @@ void IJK_FT_double::run()
       // C'est deja fait dans l'initialize (aucune raison de ne pas le faire)
       // indicatrice_ns_.data() = 1.;
       // indicatrice_ns_next_.data() = 1.;
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      while(curseur)
+
+      for (auto& itr : thermique_)
         {
           // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
-          curseur->update_thermal_properties();
-          ++curseur;
+          itr.update_thermal_properties();
         }
-      LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-      while(curseur_en)
+      for (auto& itr : energie_)
         {
           // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
-          curseur_en->update_thermal_properties();
-          ++curseur_en;
+          itr.update_thermal_properties();
         }
     }
   else
     {
       Cerr << "Cas normal diphasique l2158" << finl;
-      LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-      while(curseur)
-        {
-          curseur->update_thermal_properties();
-          ++curseur;
-        }
+      for (auto& itr : thermique_)
+        itr.update_thermal_properties();
 
-      LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-      while(curseur_en)
-        {
-          curseur_en->update_thermal_properties();
-          ++curseur_en;
-        }
+      for (auto& itr : energie_)
+        itr.update_thermal_properties();
 
       const double indic_moyen = calculer_v_moyen(interfaces_.I());
       rho_moyen_ = indic_moyen*rho_liquide_ + (1-indic_moyen)*rho_vapeur_;
@@ -2293,7 +2289,7 @@ void IJK_FT_double::run()
           if (!disable_diphasique_)
             {
               // TODO: aym pour GAB, si tu veux gagner en memoire et virer le doublon n/np1 il faut
-              // insérer une méthode ici style "mettre_a_jour_valeur_interface_temps_n()"
+              // inserer une methode ici style "mettre_a_jour_valeur_interface_temps_n()"
               deplacer_interfaces(timestep_,
                                   -1 /* le numero du sous pas de temps est -1 si on n'est pas en rk3 */,
                                   var_volume_par_bulle);
@@ -2327,21 +2323,15 @@ void IJK_FT_double::run()
                     rho_u_euler_av_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_av_rho_mu_ind_champ[dir]);
                 }
               maj_indicatrice_rho_mu();
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              // LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              // if ((curseur) || (curseur_en))
-              //   {
-              //     interfaces_.compute_surf_and_barys();
-              //   }
-              while(curseur)
+
+              for (auto& itr : thermique_)
                 {
-                  curseur->update_thermal_properties();
-                  if (curseur->conserv_energy_global_)
+                  itr.update_thermal_properties();
+                  if (itr.conserv_energy_global_)
                     {
-                      const double dE = curseur->E0_ - curseur->compute_global_energy();
-                      curseur->euler_rustine_step(timestep_, dE);
+                      const double dE = itr.E0_ - itr.compute_global_energy();
+                      itr.euler_rustine_step(timestep_, dE);
                     }
-                  ++curseur;
                 }
 
               // GAB, qdm rho_n+1 v_n+1 :
@@ -2351,7 +2341,6 @@ void IJK_FT_double::run()
                   for (int dir=0; dir<3; dir++)
                     {
                       rho_u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir]);
-//                      rho_u_euler_ap_rho_mu_ind[dir] += 7;
                       u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                     }
                 }
@@ -2364,32 +2353,10 @@ void IJK_FT_double::run()
                   for (int dir=0; dir<3; dir++)
                     {
                       rho_u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir]);
-//                      rho_u_euler_ap_rho_mu_ind[dir] += 7;
                       u_euler_ap_rho_mu_ind[dir] = calculer_v_moyen(velocity_[dir]);
                     }
                 }
             }
-          /* A SUPPRIMER
-          // GAB qdm patch a posteriori, choix 1 : v* = v - < \r u >/< \r >
-          // choix 10 : on evalue qdm_patch_correction_ sans l'appliquer
-          if (patch_qdm_gr_ == 1 || patch_qdm_gr_ == 10)
-            {
-              calculer_rho_v(rho_field_,velocity_,rho_u_euler_ap_rho_mu_ind_champ);
-              for (int dir=0; dir<3; dir++)
-                if(dir != direction_gravite_)
-                  {
-                    qdm_patch_correction_[dir] = calculer_v_moyen(rho_u_euler_ap_rho_mu_ind_champ[dir])/calculer_v_moyen(rho_field_);
-                    if (patch_qdm_gr_ == 1)
-                      {
-                        IJK_Field_double& vel = velocity_[dir];
-                        for (int k=0; k<vel.nk(); k++)
-                          for (int j=0; j<vel.nj(); j++)
-                            for (int i=0; i<vel.ni(); i++)
-                              vel(i,j,k) -= qdm_patch_correction_[dir];
-                      }
-                  }
-            }
-          */
           if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()))
             {
               set_time_for_corrections();
@@ -2412,23 +2379,23 @@ void IJK_FT_double::run()
             {
               interfaces_.creer_duplicata_bulles();
             }
-          for (int rk_step = 0; rk_step < 3; rk_step++)
+          for (rk_step_ = 0; rk_step_ < 3; rk_step_++)
             {
               const double fractionnal_timestep =
                 compute_fractionnal_timestep_rk3(timestep_ /* total*/,
-                                                 rk_step);
+                                                 rk_step_);
 
               // Mise a jour des positions des marqueurs.
               // Deplacement des interfaces par le champ de vitesse au sous pas de temps k :
               if (!disable_diphasique_)
                 {
-                  deplacer_interfaces_rk3(timestep_ /* total */, rk_step,
+                  deplacer_interfaces_rk3(timestep_ /* total */, rk_step_,
                                           var_volume_par_bulle);
                   parcourir_maillage();
                 }
               // Cerr << "RK3 : step " << rk_step << finl;
               // Mise a jour de la temperature et de la vitesse :
-              rk3_sub_step(rk_step, timestep_, fractionnal_timestep,
+              rk3_sub_step(rk_step_, timestep_, fractionnal_timestep,
                            current_time_at_rk3_step);
 
               // GAB patch qdm : choix 1
@@ -2445,21 +2412,19 @@ void IJK_FT_double::run()
               // (sauf au dernier sous pas de temps pour lequel c'est fait a la fin du pas de temps)
               // TODO: verifier qu'on doit bien le faire aussi au dernier sous pas de temps : rk_step != 2 &&
               // TODO aym: verifier ce bloc, qui applique les sous pas de temps RK3 de la rustine a la temperature
-              if (rk_step != 2 && !disable_diphasique_)
+              if (rk_step_ != 2 && !disable_diphasique_)
                 {
                   // Attention, il faut que les duplicatas soient present pour faire maj_indicatrice_rho_mu :
                   maj_indicatrice_rho_mu();
-                  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-                  while(curseur)
+                  for (auto& itr : thermique_)
                     {
-                      curseur->update_thermal_properties();
-                      if (curseur->conserv_energy_global_)
+                      itr.update_thermal_properties();
+                      if (itr.conserv_energy_global_)
                         {
-                          const double dE = curseur->E0_ - curseur->compute_global_energy();
-                          curseur->rk3_rustine_sub_step(rk_step, timestep_, fractionnal_timestep,
-                                                        current_time_at_rk3_step, dE);
+                          const double dE = itr.E0_ - itr.compute_global_energy();
+                          itr.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
+                                                   current_time_at_rk3_step, dE);
                         }
-                      ++curseur;
                     }
                 }
               // Calcul du terme source force acceleration :
@@ -2468,7 +2433,7 @@ void IJK_FT_double::run()
               // /!\ On laisse ce calcul du temre_source_aceleration car il ecrit aussi le fichier acceleration.out qui nous est chere
               Cout << "BF : calculer_terme_source_acceleration" <<finl;
               calculer_terme_source_acceleration(velocity_[direction_gravite_],
-                                                 current_time_at_rk3_step, timestep_ /*total*/, rk_step);
+                                                 current_time_at_rk3_step, timestep_ /*total*/, rk_step_);
               Cout << "AF : calculer_terme_source_acceleration" <<finl;
 
 
@@ -2478,7 +2443,7 @@ void IJK_FT_double::run()
               // On ne postraite pas le sous-dt 2 car c'est fait plus bas si on post-traite le pas de temps :
               if (post_.postraiter_sous_pas_de_temps()
                   && (tstep_ % post_.dt_post() == post_.dt_post() - 1)
-                  && (rk_step != 2))
+                  && (rk_step_ != 2))
                 {
                   post_.posttraiter_champs_instantanes(lata_name, current_time_at_rk3_step, tstep_);
                 }
@@ -2495,18 +2460,12 @@ void IJK_FT_double::run()
 
               // Mise a jour rho, mu et l'indicatrice a partir de la nouvelle position de l'interface :
               maj_indicatrice_rho_mu();
-              LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-              while(curseur)
-                {
-                  curseur->update_thermal_properties();
-                  ++curseur;
-                }
-              LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-              while(curseur_en)
-                {
-                  curseur_en->update_thermal_properties();
-                  ++curseur_en;
-                }
+
+              for (auto& itr : thermique_)
+                itr.update_thermal_properties();
+
+              for (auto& itr : energie_)
+                itr.update_thermal_properties();
             }
           // GAB, qdm rho_n+1 v_n+1 :
           if (test_etapes_et_bilan)
@@ -2718,8 +2677,13 @@ void IJK_FT_double::run()
         }
 
     }
-
-
+  if (Process::je_suis_maitre())
+    {
+      SFichier master_file;
+      master_file.ouvrir(lata_name, ios::app);
+      master_file << "FIN" << finl;
+      master_file.close();
+    }
 // Pour forcer l'ecriture du dernier pas de temps dans la sonde (peut-etre deja ecrit...)
 // Alan 2020/03/02 : effectivement, deja ecrit
 // post_.postraiter_sondes();
@@ -3694,9 +3658,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  if ((curseur) || (curseur_en))
+  if ((thermique_.size() > 0) || (energie_.size()))
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
       // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
@@ -3704,16 +3666,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
       velocity_[1].echange_espace_virtuel(2);
       velocity_[2].echange_espace_virtuel(2);
     }
-  while(curseur)
-    {
-      curseur->euler_time_step(timestep_);
-      ++curseur;
-    }
-  while(curseur_en)
-    {
-      curseur_en->euler_time_step(velocity_);
-      ++curseur_en;
-    }
+
+  for (auto& itr : thermique_)
+    itr.euler_time_step(timestep_);
+
+  for (auto& itr : energie_)
+    itr.euler_time_step(velocity_);
+
   if (!frozen_velocity_)
     {
       velocity_[0].echange_espace_virtuel(2);
@@ -3899,14 +3858,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
   assert(rk_step>=0 && rk_step<3);
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  LIST_CURSEUR(IJK_Thermique) curseur(thermique_);
-  LIST_CURSEUR(IJK_Energie) curseur_en(energie_);
-  while(curseur)
+
+  for (auto& itr : thermique_)
     {
-      curseur->rk3_sub_step(rk_step, total_timestep, time);
-      ++curseur;
+      itr.rk3_sub_step(rk_step, total_timestep, time);
     }
-  while(curseur_en)
+  for (auto&& itr = energie_.begin(); itr != energie_.begin(); ++itr)
     {
       // curseur->rk3_sub_step(rk_step, total_timestep, time);
       // ++curseur;
@@ -4122,7 +4079,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // Comme ca, ils seront visibles a la visu.
   interfaces_.creer_duplicata_bulles();
 
-  // On met à jour l'indicatrice du pas de temps d'apres.
+  // On met a jour l'indicatrice du pas de temps d'apres.
   // On met aussi a jour le surf et bary des faces mouillees,
   // les valeurs moyennes en ijk, les val moy en ijkf, etc
   const double delta_rho = rho_liquide_ - rho_vapeur_;
@@ -4175,7 +4132,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 
   // On a conserve les duplicatas donc pas besoin de les re-creer...
   // On calcule l'indicatrice du prochain pas de temps (qui correspond aux interfaces qu'on
-  // vient de déplacer.
+  // vient de deplacer.
 
   const double delta_rho = rho_liquide_ - rho_vapeur_;
   interfaces_.switch_indicatrice_next_old();

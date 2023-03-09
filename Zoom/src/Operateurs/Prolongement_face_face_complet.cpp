@@ -22,7 +22,7 @@
 
 
 #include <Prolongement_face_face_complet.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 Implemente_instanciable(Prolongement_face_face_complet,"Prolongement_face_face_complet",Prolongement_base);
 
 //// printOn
@@ -47,8 +47,8 @@ Entree& Prolongement_face_face_complet::readOn(Entree& s )
 /*! @brief Prolongement du centre de gravite des faces grossieres au centre de gravite de TOUTES les faces fines
  *
  */
-void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
-                                               Zone_VF& zone_VFF,
+void Prolongement_face_face_complet::prolonger(Domaine_VF& domaine_VFG,
+                                               Domaine_VF& domaine_VFF,
                                                const Frontiere& frontF,
                                                IntVect& connect,
                                                const DoubleTab& valG, DoubleTab& tab,
@@ -56,17 +56,16 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
 {
   //Cerr<<"debut de Prolongement_face_face_complet::prolonger"<<finl;
   int nb_elemF = connect.size_array();
-  Zone& zonef = zone_VFF.zone();
-  Zone& zoneg = zone_VFG.zone();
-  Domaine& domg = zoneg.domaine();
-  int nb_faces_elem_fin = zonef.nb_faces_elem();
-  int nb_faces_elem_gros = zoneg.nb_faces_elem();
-  const DoubleTab& cg_face_fine = zone_VFF.xv();
-  const DoubleTab& som_gros = domg.coord_sommets();
-  const IntTab& faces_som = zone_VFG.face_sommets();
+  Domaine& domainef = domaine_VFF.domaine();
+  Domaine& domaineg = domaine_VFG.domaine();
+  int nb_faces_elem_fin = domainef.nb_faces_elem();
+  int nb_faces_elem_gros = domaineg.nb_faces_elem();
+  const DoubleTab& cg_face_fine = domaine_VFF.xv();
+  const DoubleTab& som_gros = domaineg.coord_sommets();
+  const IntTab& faces_som = domaine_VFG.face_sommets();
   int trouve, i, nbj;
-  IntTab& num_face_elemF = zone_VFF.elem_faces();
-  IntTab& num_face_elemG = zone_VFG.elem_faces();
+  IntTab& num_face_elemF = domaine_VFF.elem_faces();
+  IntTab& num_face_elemG = domaine_VFG.elem_faces();
   DoubleVect coord_vect_faceF;
   DoubleVect coord_vect_faceG;
   coord_vect_faceF.resize(2);
@@ -80,11 +79,11 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
   double prod;
   double p0, p1, p2;
 
-  Zone_VDF& zone_vdff = ref_cast(Zone_VDF, zone_VFF);
-  Zone_VDF& zone_vdfg = ref_cast(Zone_VDF, zone_VFG);
+  Domaine_VDF& domaine_vdff = ref_cast(Domaine_VDF, domaine_VFF);
+  Domaine_VDF& domaine_vdfg = ref_cast(Domaine_VDF, domaine_VFG);
 
-  IntVect& oriF = zone_vdff.orientation();
-  IntVect& oriG = zone_vdfg.orientation();
+  IntVect& oriF = domaine_vdff.orientation();
+  IntVect& oriG = domaine_vdfg.orientation();
 
 
   //ATTENTION
@@ -315,8 +314,8 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
 
 
 //NE FAIT RIEN
-void Prolongement_face_face_complet::calculer(Zone_VF& zonef,
-                                              Zone_VF& zoneg,
+void Prolongement_face_face_complet::calculer(Domaine_VF& domainef,
+                                              Domaine_VF& domaineg,
                                               IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

@@ -25,7 +25,9 @@
 
 #include <TRUSTTab.h>
 #include <Dirichlet_loi_paroi.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Cond_lim_tau_omega_simple_demi
  *
@@ -42,7 +44,6 @@ public :
   void mettre_a_jour(double tps) override;
   double calc_tau(double y, double u_tau, double visc);
   double calc_omega(double y, double u_tau, double visc);
-  virtual void liste_faces_loi_paroi(IntTab&) override;
   virtual void completer() override;
 
   virtual double val_imp(int i) const override {return d_(i,0);};
@@ -59,6 +60,7 @@ protected :
   double beta_omega = 0.075;
   double beta_k = 0.09;
   double is_tau_=-1 ; // 0 : omega ; 1 : tau
+  double facteur_paroi_=10.;
 };
 
 #endif

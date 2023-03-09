@@ -5,6 +5,7 @@ Parameters {
 	Testcase R single_Re01
 	Testcase REFINE switch
 	Testcase REFINE single_Re01 8
+        # DISABLE_PARALLEL_RUN #
 }
 Chapitre {
         Titre ""

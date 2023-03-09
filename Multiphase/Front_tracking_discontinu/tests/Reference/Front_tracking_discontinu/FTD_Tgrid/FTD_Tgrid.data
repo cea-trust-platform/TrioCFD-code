@@ -156,6 +156,10 @@ Lire pb
 		postraitement_ft_lata post2 { 
     format Lata 
     fichier plot 
+    Champs dt_post 0.01
+		{
+			indicatrice_interf elem
+		}
     interfaces interf { 
     } 
 }

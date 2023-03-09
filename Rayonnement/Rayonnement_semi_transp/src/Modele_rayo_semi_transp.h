@@ -58,10 +58,7 @@ public:
   //                                           //
   ///////////////////////////////////////////////
 
-  void terminate() override
-  {
-    finir();
-  }
+  void terminate() override  {  finir(); }
 
   double computeTimeStep(bool& stop) const override
   {
@@ -84,22 +81,13 @@ public:
   //                                                 //
   /////////////////////////////////////////////////////
 
-  void completer() override
-  {
-    ;
-  }
-  int nombre_d_equations() const override
-  {
-    return 1;
-  }
+  void completer() override { }
+  int nombre_d_equations() const override   { return 1; }
   const Equation_base& equation(int i) const override;
   Equation_base& equation(int i) override;
   const Equation_base& get_equation_by_name(const Nom&) const override;
   Equation_base& getset_equation_by_name(const Nom&) override;
-  double calculer_pas_de_temps() const override
-  {
-    return DMAXFLOAT;
-  }
+  double calculer_pas_de_temps() const override  {  return DMAXFLOAT;  }
 
   // Cette methode ne doivent pas servir : on passe par l'interface de Problem
   void mettre_a_jour(double temps) override
@@ -108,7 +96,7 @@ public:
   }
 
   void preparer_calcul() override;
-  void discretiser(const Discretisation_base&) override;
+  void discretiser(Discretisation_base&) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
 
   //////////////////////////////////////////////////////////////
@@ -127,12 +115,10 @@ public:
   const Champ_front& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
-
 protected :
   REF(Probleme_base) mon_probleme_;
   Equation_rayonnement Eq_rayo_;
   static const double sigma;
-
 };
 
 
@@ -185,7 +171,6 @@ inline void Modele_rayo_semi_transp::associer_probleme(Probleme_base& Pb)
 inline Probleme_base& Modele_rayo_semi_transp::probleme()
 {
   return mon_probleme_.valeur();
-
 }
 
 inline const Probleme_base& Modele_rayo_semi_transp::probleme() const

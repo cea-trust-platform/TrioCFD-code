@@ -1,6 +1,6 @@
 #!/bin/bash
 # Yannick & Elie
-# tester codage Operateur diff 
+# tester codage Operateur diff
 
 LISTE_CAS="CONST_LAM VAR_LAM CONST_TURB VAR_TURB"
 SRCDATA=CAS.data
@@ -19,7 +19,7 @@ for CAS in $LISTE_CAS; do
 
   elif test "$CAS" = "VAR_LAM"; then
 
-    sed "s~Champ_Uniforme 1 0.002~Champ_fonc_xyz dom_pb1 1 0.002~" $SRCDATA > $DESTDATA
+    sed "s~Champ_Uniforme 1 0.2~Champ_fonc_xyz dom_pb1 1 0.2~" $SRCDATA > $DESTDATA
 
   elif test "$CAS" = "CONST_TURB"; then
 
@@ -30,7 +30,7 @@ for CAS in $LISTE_CAS; do
 
  else # VAR_TURB
    sed "s~Pb_Hydraulique~Pb_Hydraulique_turbulent~;
-       s~Champ_Uniforme 1 0.002~Champ_fonc_xyz dom_pb1 1 0.002~;
+       s~Champ_Uniforme 1 0.2~Champ_fonc_xyz dom_pb1 1 0.2~;
        s~Navier_Stokes_standard~Navier_Stokes_turbulent~;
        s~/\* modele_turbulence~modele_turbulence~;
        s~negligeable } \*/~negligeable }~" $SRCDATA > $DESTDATA

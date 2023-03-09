@@ -80,7 +80,6 @@ int Convection_Diffusion_Concentration_Turbulent::lire_motcle_non_standard(const
     }
   else
     return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Sauvergarde de l'equation sur un flot de sortie.
@@ -201,14 +200,12 @@ bool Convection_Diffusion_Concentration_Turbulent::initTimeStep(double dt)
 
 const RefObjU& Convection_Diffusion_Concentration_Turbulent::get_modele(Type_modele type) const
 {
-  CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
-  while(curseur)
+  for (const auto& itr : liste_modeles_)
     {
-      const RefObjU&  mod = curseur.valeur();
+      const RefObjU&  mod = itr;
       if (mod.non_nul())
         if ((sub_type(Modele_turbulence_scal_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
-      ++curseur;
     }
   return Equation_base::get_modele(type);
 }

@@ -29,8 +29,8 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-class Zone_dis;
-class Zone_dis_base;
+class Domaine_dis;
+class Domaine_dis_base;
 
 /*! @brief : class Remailleur_Collision_FT_Thomas Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
  *
@@ -94,7 +94,7 @@ protected:
   double transport_volume_perdu_sur_sommet(ArrOfDouble&, const Maillage_FT_Disc&) const;
 
   //Fonction qui donne la liste des elements voisins a un element "elem" (numero global) donne
-  int elements_voisins(const int, ArrOfInt&, const Zone_dis_base&) const;
+  int elements_voisins(const int, ArrOfInt&, const Domaine_dis_base&) const;
 
   //Fonction qui donne la liste des elements voisins a un element "elem" (numero global) donne et
   //situes a une distance de l'interface strictement plus petite que la distance separant "elem"
@@ -102,11 +102,11 @@ protected:
   int elements_voisins_a_distance_plus_petite2(const int, ArrOfInt&) const;
 
   // Fonction qui donne le nombre d'elements voisins a un element "elem" donne
-  int nb_elements_voisins(const int, const Zone_dis_base&) const;
+  int nb_elements_voisins(const int, const Domaine_dis_base&) const;
 
   //Soit "elem" (numero global) un element du maillage eulerien a distance "n" de l'interface
   //La fonction renvoie le nombre d'elements voisins de "elem" a distance "n-1"
-  int nb_elements_voisins_a_distance_plus_petite(const int, const Zone_dis_base&) const;
+  int nb_elements_voisins_a_distance_plus_petite(const int, const Domaine_dis_base&) const;
   int nb_elements_voisins_a_distance_plus_petite(const int) const;
 
 
@@ -132,8 +132,8 @@ private :
   //dans un element donne
   double surface_intersection(const int, const Maillage_FT_Disc&) const;
 
-  //Fonction qui renvoie la zone discrete dans laquelle evolue l'interface
-  inline const Zone_dis& zone_dis(const Maillage_FT_Disc&) const;
+  //Fonction qui renvoie le domaine discret dans lequel evolue l'interface
+  inline const Domaine_dis& domaine_dis(const Maillage_FT_Disc&) const;
 
   //Fonction qui renvoie le Remaillage conservatif en volume
   inline const Remaillage_FT& remaillage_FT(const Maillage_FT_Disc&) const;
@@ -196,9 +196,9 @@ inline int Remailleur_Collision_FT_Thomas::plus_grande_distance_interface_elemen
   return plus_grande_distance_interface_element_eulerien_;
 }
 
-inline const Zone_dis& Remailleur_Collision_FT_Thomas::zone_dis(const Maillage_FT_Disc& maillage) const
+inline const Domaine_dis& Remailleur_Collision_FT_Thomas::domaine_dis(const Maillage_FT_Disc& maillage) const
 {
-  return maillage.equation_transport().zone_dis();
+  return maillage.equation_transport().domaine_dis();
 }
 
 inline const Remaillage_FT& Remailleur_Collision_FT_Thomas::remaillage_FT(const Maillage_FT_Disc& maillage) const

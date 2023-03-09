@@ -75,7 +75,7 @@ void Mod_turb_hyd_RANS_0_eq::set_param(Param& param)
 void Mod_turb_hyd_RANS_0_eq::discretiser()
 {
   Mod_turb_hyd_base::discretiser();
-  discretiser_K(mon_equation->schema_temps(),mon_equation->zone_dis(),energie_cinetique_turb_);
+  discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
   champs_compris_.ajoute_champ(energie_cinetique_turb_);
 }
 
@@ -161,7 +161,7 @@ void Mod_turb_hyd_RANS_0_eq::completer()
     {
       // 1) on cree le fichier med et on postraite le domaine
       EcrMED ecr_med;
-      const Domaine& dom=mon_equation->zone_dis().zone().domaine();
+      const Domaine& dom=mon_equation->domaine_dis().domaine();
       ecr_med.ecrire_domaine(fichier_K_eps_sortie_.nom_me(me()),dom,dom.le_nom(),-1);
       //2 on discretise le champ K_eps_pour_la_sortie
       const Discretisation_base& dis = mon_equation->discretisation();
@@ -173,7 +173,7 @@ void Mod_turb_hyd_RANS_0_eq::completer()
       unit[1]="m2/s3";
       int nb_case_tempo=1;
       double temps=mon_equation->schema_temps().temps_courant();
-      dis.discretiser_champ("CHAMP_ELEM",mon_equation->zone_dis().valeur(),scalaire ,noms,unit,2,nb_case_tempo,temps,K_eps_sortie_);
+      dis.discretiser_champ("CHAMP_ELEM",mon_equation->domaine_dis().valeur(),scalaire ,noms,unit,2,nb_case_tempo,temps,K_eps_sortie_);
       K_eps_sortie_.nommer("K_eps_from_nut");
       K_eps_sortie_.valeur().nommer("K_eps_from_nut");
       K_eps_sortie_->fixer_unites(unit);
@@ -240,15 +240,15 @@ void Mod_turb_hyd_RANS_0_eq::imprimer (Sortie& os )  const
           }
 
         // enfin ecriture du champ aux elems (il y est deja)
-        const Domaine& dom=mon_equation->zone_dis().zone().domaine();
+        const Domaine& dom=mon_equation->domaine_dis().domaine();
         Nom fic=fichier_K_eps_sortie_.nom_me(me());
 
         EcrMED ecr_med;
         Nom nom_post=K_eps_sortie_.le_nom();
         Nom nom_dom=dom.le_nom();
         Nom nom_dom_inc= dom.le_nom();
-        Nom type_elem=dom.zone(0).type_elem()->que_suis_je();
-        assert(K_eps_sortie_.valeurs().dimension(0)==dom.zone(0).nb_elem());
+        Nom type_elem=dom.type_elem()->que_suis_je();
+        assert(K_eps_sortie_.valeurs().dimension(0)==dom.nb_elem());
         ecr_med.ecrire_champ("CHAMPMAILLE",fic,dom,nom_post,K_eps_sortie_.valeurs(),K_eps_sortie_->unites(),K_eps_sortie_->noms_compo(),type_elem,temps,0);
       }
   return Mod_turb_hyd_base::imprimer(os);

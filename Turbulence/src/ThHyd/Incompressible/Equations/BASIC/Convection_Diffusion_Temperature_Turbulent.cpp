@@ -75,7 +75,6 @@ int Convection_Diffusion_Temperature_Turbulent::lire_motcle_non_standard(const M
     }
   else
     return Convection_Diffusion_Temperature::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Temperature::sauvegarder(Sortie& );
@@ -160,8 +159,6 @@ const Champ_base& Convection_Diffusion_Temperature_Turbulent::get_champ(const Mo
       {
       }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
-  return ref_champ;
 }
 
 
@@ -200,14 +197,12 @@ void Convection_Diffusion_Temperature_Turbulent::imprimer(Sortie& os) const
 
 const RefObjU& Convection_Diffusion_Temperature_Turbulent::get_modele(Type_modele type) const
 {
-  CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
-  while(curseur)
+  for (const auto& itr : liste_modeles_)
     {
-      const RefObjU&  mod = curseur.valeur();
+      const RefObjU&  mod = itr;
       if (mod.non_nul())
         if ((sub_type(Modele_turbulence_scal_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
-      ++curseur;
     }
   return Equation_base::get_modele(type);
 }

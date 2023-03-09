@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Motcle.h>
 #include <Parser_U.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable_sans_constructeur(Modele_turbulence_scal_Prandtl,"Modele_turbulence_scal_Prandtl",Mod_Turb_scal_diffturb_base);
 
@@ -153,9 +153,9 @@ Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
   const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
 
-  //Zone& zone = mon_equation->zone_dis().zone();
-  const DoubleTab& xp= ref_cast(Zone_VF,mon_equation->zone_dis().valeur()).xp();
-  //zone.calculer_centres_gravite(xp);
+  //Domaine& domaine = mon_equation->domaine_dis().domaine();
+  const DoubleTab& xp= ref_cast(Domaine_VF,mon_equation->domaine_dis().valeur()).xp();
+  //domaine.calculer_centres_gravite(xp);
 
   // if (temps != la_diffusivite_turbulente.temps())
   {

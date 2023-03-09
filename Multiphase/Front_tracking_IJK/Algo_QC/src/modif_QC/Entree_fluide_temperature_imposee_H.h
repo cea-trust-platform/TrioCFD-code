@@ -24,14 +24,16 @@
 #ifndef Entree_fluide_temperature_imposee_H_included
 #define Entree_fluide_temperature_imposee_H_included
 
-#include <Entree_fluide_temperature_imposee.h>
-#include <Ref_Fluide_Quasi_Compressible.h>
+#include <Dirichlet_entree_fluide_leaves.h>
+#include <TRUST_Ref.h>
+
+class Fluide_Quasi_Compressible;
 
 /*! @brief classe Entree_fluide_temperature_imposee_H Cas particulier de la classe Entree_fluide_temperature_imposee
  *
  *     pour une equation ayant l'enthalpie en inconnue
  *
- * @sa Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC 
+ * @sa Dirichlet_entree_fluide Convection_Diffusion_Enthalpie_QC
  */
 class Entree_fluide_temperature_imposee_H  : public Entree_fluide_temperature_imposee
 {

@@ -35,16 +35,16 @@ public:
   Turbulence_hyd_sous_maille_SMAGO_DYN_VDF();
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis) override;
+  void associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis) override;
   void mettre_a_jour(double) override;
   int preparer_calcul() override;
 
 
-  static void calculer_length_scale(DoubleVect& ,const Zone_VDF& );
-  static void calculer_cell_cent_vel(DoubleTab& ,const Zone_VDF& ,Champ_Inc& );
-  static void calculer_filter_field(const DoubleTab& ,DoubleTab& ,const Zone_VDF& );
-  static void calculer_Sij( DoubleTab& ,const Zone_VDF& ,const Zone_Cl_VDF& ,Champ_Inc& );
-  static void calculer_Sij_vel_filt(const DoubleTab& ,DoubleTab& ,const Zone_VDF& );
+  static void calculer_length_scale(DoubleVect& ,const Domaine_VDF& );
+  static void calculer_cell_cent_vel(DoubleTab& ,const Domaine_VDF& ,Champ_Inc& );
+  static void calculer_filter_field(const DoubleTab& ,DoubleTab& ,const Domaine_VDF& );
+  static void calculer_Sij( DoubleTab& ,const Domaine_VDF& ,const Domaine_Cl_VDF& ,Champ_Inc& );
+  static void calculer_Sij_vel_filt(const DoubleTab& ,DoubleTab& ,const Domaine_VDF& );
   static void calculer_S_norme(const DoubleTab& ,DoubleVect& ,int );
   static void interpole(const IntVect&, const DoubleVect&, const DoubleVect&, double& );
 

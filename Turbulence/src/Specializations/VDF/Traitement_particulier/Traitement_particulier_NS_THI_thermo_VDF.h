@@ -24,7 +24,9 @@
 #define Traitement_particulier_NS_THI_thermo_VDF_included
 
 #include <Traitement_particulier_NS_THI_VDF.h>
-#include <Ref_Convection_Diffusion_std.h>
+#include <TRUST_Ref.h>
+
+class Convection_Diffusion_std;
 
 
 /*! @brief classe Traitement_particulier_NS_THI_thermo_VDF Cette classe permet de faire les traitements particuliers

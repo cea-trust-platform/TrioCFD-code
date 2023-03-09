@@ -28,7 +28,7 @@
 #include <EChaine.h>
 #include <Discretisation_base.h>
 #include <Loi_Etat_Melange_GP.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Sortie_libre_pression_imposee_QC.h>
 #include <SFichier.h>
 #include <Param.h>
@@ -53,8 +53,8 @@ Fluide_Quasi_Compressible::Fluide_Quasi_Compressible()
 
 /*! @brief Ecrit les proprietes du fluide sur un flot de sortie.
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
 {
@@ -78,9 +78,9 @@ Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const
  *      }
  *  cd Fluide_Incompressible::readOn
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
- * @throws accolade ouvrante attendue 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
  */
 Entree& Fluide_Quasi_Compressible::readOn(Entree& is)
 {
@@ -232,7 +232,7 @@ int Fluide_Quasi_Compressible::lire_motcle_non_standard(const Motcle& mot, Entre
 
 /*! @brief Complete le fluide avec les champs inconnus associes au probleme
  *
- * @param (Pb_Thermohydraulique& pb) le probleme a resoudre 
+ * @param (Pb_Thermohydraulique& pb) le probleme a resoudre
  */
 void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 {
@@ -250,7 +250,7 @@ void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
   typ += loi_etat_->type_fluide();
   //typ+="Gaz_Parfait";
   EDO_Pth_.typer(typ);
-  EDO_Pth_->associer_zones(pb.equation(0).zone_dis(),pb.equation(0).zone_Cl_dis());
+  EDO_Pth_->associer_domaines(pb.equation(0).domaine_dis(),pb.equation(0).domaine_Cl_dis());
   EDO_Pth_->associer_fluide(*this);
 
   EDO_Pth_->mettre_a_jour_CL(Pth_);
@@ -273,7 +273,7 @@ void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 
 /*! @brief Complete le fluide avec un Cp constant
  *
- * @param (double Cp) le cp du fluide 
+ * @param (double Cp) le cp du fluide
  */
 void Fluide_Quasi_Compressible::set_Cp(double Cp_)
 {
@@ -325,44 +325,44 @@ void Fluide_Quasi_Compressible::abortTimeStep()
 void Fluide_Quasi_Compressible::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   Motcle nom_var("temperature");
-  const Zone_dis_base& zone_dis=pb.equation(0).zone_dis();
+  const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();
   double temps=pb.schema_temps().temps_courant();
   //
   Cerr<<"Fluide_Quasi_Compressible::discretiser"<<finl;
   // les champs seront nommes par le milieu_base
-  dis.discretiser_champ("temperature",zone_dis,"masse_volumique_p","neant",1,temps,rho);
+  dis.discretiser_champ("temperature",domaine_dis,"masse_volumique_p","neant",1,temps,rho);
   Champ_Don& ch_TK = ch_temperature();
-  dis.discretiser_champ("temperature",zone_dis,"temperature_QC","K",1,temps,ch_TK);
+  dis.discretiser_champ("temperature",domaine_dis,"temperature_QC","K",1,temps,ch_TK);
   //if (type_fluide()!="Gaz_Parfait")
   loi_etat().valeur().champs_compris().ajoute_champ(ch_TK);
   Champ_Don& cp = capacite_calorifique();
   if (!cp.non_nul() || !sub_type(Champ_Uniforme,cp.valeur()))    //ie Cp non constant : gaz reels
     {
       Cerr<<"Heat capacity Cp is discretized once more for space variable case."<<finl;
-      dis.discretiser_champ("temperature",zone_dis,"cp_prov","neant",1,temps,cp);
+      dis.discretiser_champ("temperature",domaine_dis,"cp_prov","neant",1,temps,cp);
     }
   if (!lambda.non_nul() || ((!sub_type(Champ_Uniforme,lambda.valeur())) && (!sub_type(Champ_Fonc_Tabule,lambda.valeur()))))
     {
       // cas particulier etait faux en VEF voir quand cela sert (FM slt)
       // sera nomme par milieu_base
-      dis.discretiser_champ("champ_elem",zone_dis,"neant","neant",1,temps,lambda);
+      dis.discretiser_champ("champ_elem",domaine_dis,"neant","neant",1,temps,lambda);
 
     }
-  dis.discretiser_champ("vitesse", zone_dis,"rho_comme_v","kg/m3",1,temps,rho_comme_v);
+  dis.discretiser_champ("vitesse", domaine_dis,"rho_comme_v","kg/m3",1,temps,rho_comme_v);
   champs_compris_.ajoute_champ(rho_comme_v);
 
-  dis.discretiser_champ("temperature", zone_dis,"rho_cp","",1,temps,rho_cp);
+  dis.discretiser_champ("temperature", domaine_dis,"rho_cp","",1,temps,rho_cp);
   champs_compris_.ajoute_champ(rho_cp);
   // mu_sur_Schmidt
-  dis.discretiser_champ("champ_elem",zone_dis,"mu_sur_Schmidt","kg/(m.s)",1,temps,mu_sur_Sc);
+  dis.discretiser_champ("champ_elem",domaine_dis,"mu_sur_Schmidt","kg/(m.s)",1,temps,mu_sur_Sc);
   champs_compris_.ajoute_champ(mu_sur_Sc);
 
   // pression_tot
   //  pas comme la pression !!!
   Champ_Don& ptot = pression_tot();
-  dis.discretiser_champ("champ_elem",zone_dis,"pression_tot","Pa",1,temps,ptot);
+  dis.discretiser_champ("champ_elem",domaine_dis,"pression_tot","Pa",1,temps,ptot);
   champs_compris_.ajoute_champ(ptot);
-  dis.discretiser_champ("temperature",zone_dis,"rho_gaz","kg/m3",1,temps,rho_gaz);
+  dis.discretiser_champ("temperature",domaine_dis,"rho_gaz","kg/m3",1,temps,rho_gaz);
   champs_compris_.ajoute_champ(rho_gaz);
 
   Fluide_Incompressible::discretiser(pb,dis);
@@ -370,7 +370,7 @@ void Fluide_Quasi_Compressible::discretiser(const Probleme_base& pb, const  Disc
 
 /*! @brief Verifie que les champs lus l'ont ete correctement.
  *
- * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie 
+ * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie
  */
 void Fluide_Quasi_Compressible::verifier_coherence_champs(int& err,Nom& msg)
 {
@@ -481,7 +481,7 @@ void Fluide_Quasi_Compressible::creer_champs_non_lus()
  *     nouveau temps specifie, les autres sont mis a
  *     par un appel a CLASSE_DU_CHAMP::mettre_a_jour(double temps).
  *
- * @param (double temps) le temps de mise a jour 
+ * @param (double temps) le temps de mise a jour
  */
 void Fluide_Quasi_Compressible::mettre_a_jour(double temps)
 {
@@ -600,16 +600,16 @@ void Fluide_Quasi_Compressible::get_noms_champs_postraitables(Noms& nom,Option o
   loi_etat_->get_noms_champs_postraitables(nom,opt);
 }
 
-void Fluide_Quasi_Compressible::checkTraitementPth(const Zone_Cl_dis& zone_cl)
+void Fluide_Quasi_Compressible::checkTraitementPth(const Domaine_Cl_dis& domaine_cl)
 {
   // Pas de verification si EDO choisi (traitement_PTh=0)
   if (traitement_PTh==0) return;
   int pression_imposee=0;
-  int size=zone_cl.les_conditions_limites().size();
+  int size=domaine_cl.les_conditions_limites().size();
   assert(size!=0);
   for (int n=0; n<size; n++)
     {
-      const Cond_lim& la_cl = zone_cl.les_conditions_limites(n);
+      const Cond_lim& la_cl = domaine_cl.les_conditions_limites(n);
       if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
         {
           pression_imposee=1;

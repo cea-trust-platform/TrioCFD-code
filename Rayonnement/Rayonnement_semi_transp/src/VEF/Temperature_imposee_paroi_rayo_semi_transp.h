@@ -42,7 +42,6 @@ public :
   const Cond_lim_base& la_cl() const override;
   Champ_front& temperature_bord();
   void calculer_temperature_bord(double temps);
-
   void completer() override;
 
 protected :

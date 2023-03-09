@@ -77,17 +77,17 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_
 
 int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const Zone& zone = zone_VEF.zone();
-  int nfac = zone.nb_faces_elem();
-  const DoubleTab& xv = zone_VEF.xv();    // centre de gravite des faces
-  const DoubleTab& face_normale = zone_VEF.face_normales();
+  const Domaine& domaine = domaine_VEF.domaine();
+  int nfac = domaine.nb_faces_elem();
+  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
 
   ArrOfDouble v(dimension);
   DoubleVect pos(dimension);
@@ -95,8 +95,8 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   int l_unif;
   int n_bord;
 
-  tab_u_star_.resize(la_zone_VEF->nb_faces_tot());
-  tab_d_plus_.resize(la_zone_VEF->nb_faces_tot());
+  tab_u_star_.resize(le_dom_VEF->nb_faces_tot());
+  tab_d_plus_.resize(le_dom_VEF->nb_faces_tot());
 
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
@@ -120,18 +120,18 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   double d_visco;
 
   // Boucle sur les bords
-  int nb_bords=zone_VEF.nb_front_Cl();
+  int nb_bords=domaine_VEF.nb_front_Cl();
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const IntTab& elem_faces = zone_VEF.elem_faces();
+          const IntTab& elem_faces = domaine_VEF.elem_faces();
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -145,7 +145,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
                   v=0.;
                   int Compte_face = 0;
                   for (int i=0; i<nfac; i++)
-                    if (zone_VEF.premiere_face_int()<=elem_faces(elem,i))
+                    if (domaine_VEF.premiere_face_int()<=elem_faces(elem,i))
                       {
                         int face = elem_faces(elem,i);
                         for (int dim=0; dim<dimension; dim++)
@@ -184,7 +184,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
                   exit();
                 }
 
-              double dist=distance_face_elem(num_face,elem,zone_VEF);
+              double dist=distance_face_elem(num_face,elem,domaine_VEF);
               if (l_unif)
                 d_visco = visco;
               else

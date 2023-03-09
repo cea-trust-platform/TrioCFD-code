@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Probleme_FT_Disc_gen.h>
-#include <List_Nom.h>
+#include <TRUST_List.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Constituant.h>
@@ -30,8 +30,6 @@
 #include <Triple_Line_Model_FT_Disc.h>
 
 Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
-
-Implemente_ref(Probleme_FT_Disc_gen);
 
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
 {
@@ -301,7 +299,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 }
 
 
-void Probleme_FT_Disc_gen::discretiser(const Discretisation_base& dis)
+void Probleme_FT_Disc_gen::discretiser(Discretisation_base& dis)
 {
   Pb_Fluide_base::discretiser(dis);
   if (la_chimie_.non_nul())

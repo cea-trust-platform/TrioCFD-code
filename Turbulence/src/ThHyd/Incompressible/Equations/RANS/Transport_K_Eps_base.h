@@ -24,11 +24,12 @@
 #define Transport_K_Eps_base_included
 
 #include <Equation_base.h>
-#include <Ref_Champ_Inc.h>
 #include <Mod_turb_hyd_RANS.h>
-#include <Ref_Milieu_base.h>
-#include <Ref_Mod_turb_hyd_RANS.h>
-#include <Ref_Champ_Inc_base.h>
+#include <TRUST_Ref.h>
+
+class Champ_Inc;
+class Milieu_base;
+class Champ_Inc_base;
 
 /*! @brief Classe Transport_K_Eps_base Classe de base pour les equations
  *
@@ -52,7 +53,7 @@ public:
   Milieu_base& milieu() override ;
   void associer(const Equation_base&);
   void discretiser() override;
-  void discretiser_K_Eps(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const;
+  void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
   int controler_K_Eps();
   void valider_iteration() override;

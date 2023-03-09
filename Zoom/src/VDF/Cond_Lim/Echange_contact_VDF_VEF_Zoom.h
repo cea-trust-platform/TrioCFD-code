@@ -26,7 +26,7 @@
 #include <Echange_contact_VDF_Zoom_base.h>
 #include <Champ_front_zoom.h>
 #include <Pb_MG.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>
@@ -51,13 +51,14 @@ class Echange_contact_VDF_VEF_Zoom  : public Echange_contact_VDF_Zoom_base
 public :
   void mettre_a_jour(double ) override ;
   int compatible_avec_discr(const Discretisation_base& ) const override;
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
 };
 
 // Fonctions hors classes
-double pdt_scal(const Zone_VEF& la_zone,int num_face,int num2,int num_elem,int dimension,double diffu);
-double pdt_scalSqrt(const Zone_VEF& la_zone,int num_face,int num2,int num_elem,int dimension,double diffu);
-double surfacesVEF(const Zone_VEF& la_zone,int num_face,int dimension);
+double pdt_scal(const Domaine_VEF& le_dom,int num_face,int num2,int num_elem,int dimension,double diffu);
+double pdt_scalSqrt(const Domaine_VEF& le_dom,int num_face,int num2,int num_elem,int dimension,double diffu);
+double surfacesVEF(const Domaine_VEF& le_dom,int num_face,int dimension);
 
 
 #endif

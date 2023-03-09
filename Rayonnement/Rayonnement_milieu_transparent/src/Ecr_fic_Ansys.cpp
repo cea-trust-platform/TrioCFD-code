@@ -42,10 +42,10 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
 {
   Cerr << "Debut Ecr_fic_Ansys::interpreter" << finl;
   Nom nom_dom, nom_fic;
-  // Option faces non cachees, nombre de zones (precision), decoupage en teta si axi
-  int non_hidden,zones,tetas;
+  // Option faces non cachees, nombre de domaines (precision), decoupage en teta si axi
+  int non_hidden,domaines,tetas;
   int i,j,k;
-  is >> nom_dom >> nom_fic >> non_hidden >> zones >> tetas;
+  is >> nom_dom >> nom_fic >> non_hidden >> domaines >> tetas;
   if(! sub_type(Domaine, objet(nom_dom)))
     {
       Cerr << nom_dom << " est du type " << objet(nom_dom).que_suis_je() << finl;
@@ -54,7 +54,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
     }
   // On recupere le domaine a partir du nom de domaine
   const Domaine& dom=ref_cast(Domaine, objet(nom_dom));
-  const Zone& zone=dom.zone(0);
+  const Domaine& domaine=dom;
   SFichier fic(nom_fic);
   // On ecrit l'en tete du fichier Ansys
   fic << "/BATCH" << finl;
@@ -80,7 +80,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
   int z=1;
   if (non_hidden>1 && dimension==2)
     z=1;
-  int nb_som=zone.nb_som();
+  int nb_som=domaine.nb_som();
   for (j=0; j<z; j++)
     {
       for (i=0; i<nb_som; i++)
@@ -104,7 +104,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
           fic << finl;
         }
     }
-  Nom type=dom.zone(0).type_elem()->que_suis_je();
+  Nom type=dom.type_elem()->que_suis_je();
   if (non_hidden>1)
     {
       // Quel que soit le type et la dimension du probleme
@@ -154,10 +154,10 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
   int num_globale=0;
   const DoubleTab& c=dom.coord_sommets();
   // Nombre de faces rayonnantes, total des bords et des raccords !
-  int nombre_faces_rayonnantes=zone.nb_bords()+zone.nb_raccords();
+  int nombre_faces_rayonnantes=domaine.nb_bords()+domaine.nb_raccords();
   for (i=0; i<nombre_faces_rayonnantes; i++)
     {
-      const IntTab& som=(i<zone.nb_bords()?zone.bord(i).faces().les_sommets():zone.raccord(i-zone.nb_bords()).valeur().faces().les_sommets());
+      const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords()).valeur().faces().les_sommets());
       int nb_faces=som.dimension(0);
       for (j=0; j<nb_faces; j++)
         {
@@ -202,7 +202,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                   pos(0,0)=0.5*(x0+x1)+alpha*nx;
                   pos(0,1)=0.5*(y0+y1)+alpha*ny;
                 }
-              dom.zone(0).chercher_elements(pos,elem);
+              dom.chercher_elements(pos,elem);
               if (elem(0)!=-1)
                 {
                   fic<<"EN,"<<num_globale+j+1<<","<<som(j,0)+1<<","<<som(j,1)+1;
@@ -258,7 +258,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                       else
                         pos(0,1)=(1-e)*t0;
                     }
-                  dom.zone(0).chercher_elements(pos,elem);
+                  dom.chercher_elements(pos,elem);
                   if (elem(0)!=-1)
                     fic<<"EN,"<<num_globale+j+1<<","<<som(j,0)+1<<","<<som(j,1)+1<<","<<som(j,3)+1<<","<<som(j,2)+1<<finl;
                   else
@@ -283,7 +283,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                   pos(0,0)=(x0+x1+x2)/3.+alpha*nx;
                   pos(0,1)=(y0+y1+y2)/3.+alpha*ny;
                   pos(0,2)=(z0+z1+z2)/3.+alpha*nz;
-                  dom.zone(0).chercher_elements(pos,elem);
+                  dom.chercher_elements(pos,elem);
                   if (elem(0)!=-1)
                     {
                       if (type=="Tetraedre")
@@ -304,7 +304,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
                       pos(0,0)=(x0+x1+x2)/3.-alpha*nx;
                       pos(0,1)=(y0+y1+y2)/3.-alpha*ny;
                       pos(0,2)=(z0+z1+z2)/3.-alpha*nz;
-                      dom.zone(0).chercher_elements(pos,elem);
+                      dom.chercher_elements(pos,elem);
                       if (elem(0)!=-1)
                         {
                           Cerr << "Cas non prevu dans l'algorithme de Ecr_fic_Ansys::interpreter ! " << finl;
@@ -338,9 +338,9 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
       Cerr << "Methode Radiation Matrix" << finl;
       Cerr << "La RAM necessaire pour le calcul va etre de " << 16*num_globale*num_globale/1024/1024 << " Mo." << finl;
       fic << "/AUX12" << finl;
-      // A tester le nombre de zones sur la precision...
+      // A tester le nombre de domaines sur la precision...
       if (non_hidden==0)
-        fic << "VTYPE,0," << zones << finl;
+        fic << "VTYPE,0," << domaines << finl;
       else if (non_hidden==1)
         fic << "VTYPE,1" << finl;
       // A tester le nombre de camenberts pour l'axi RZ (entre 6 et 90)...
@@ -360,7 +360,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
       // No Space Temperature or Space Node specified for open Enclosure 1.
       fic << "SPCTEMP,1,0.E+00" << finl;
       //if (dimension==2) fic << "SPCTEMP,1,0.E+00" << finl;
-      fic << "HEMIOPT,"<<zones<< finl;
+      fic << "HEMIOPT,"<<domaines<< finl;
       fic << "TOFFST,100" << finl;
       fic << "VFOPT,NEW" << finl;
       if (non_hidden==3)
@@ -382,7 +382,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
           num_globale=0;
           for (i=0; i<nombre_faces_rayonnantes; i++)
             {
-              const IntTab& som=(i<zone.nb_bords()?zone.bord(i).faces().les_sommets():zone.raccord(i-zone.nb_bords()).valeur().faces().les_sommets());
+              const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords()).valeur().faces().les_sommets());
               int nb_faces=som.dimension(0);
               fic<<"ESEL,S,,,"<<num_globale+1<<","<<num_globale+nb_faces<<finl;
               fic<<"CM,B"<<i<<",ELEM"<<finl;

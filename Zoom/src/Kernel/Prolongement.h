@@ -27,10 +27,9 @@
 #ifndef Prolongement_included
 #define Prolongement_included
 
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <Prolongement_base.h>
 
-Declare_deriv(Prolongement_base);
 
 /*! @brief classe Prolongement Classe generique de la hierarchie des algorithmes, un objet
  *
@@ -48,8 +47,8 @@ class Prolongement : public DERIV(Prolongement_base)
 
 public :
 
-  inline void calculer(Zone_VF& , Zone_VF& , IntVect&) ;
-  inline void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+  inline void calculer(Domaine_VF& , Domaine_VF& , IntVect&) ;
+  inline void prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                         const Frontiere& frontF,
                         IntVect& connect,
                         const DoubleTab& incoG,
@@ -59,21 +58,21 @@ public :
 
 
 
-void Prolongement::calculer(Zone_VF& zone_VFG,
-                            Zone_VF& zone_VFF,
+void Prolongement::calculer(Domaine_VF& domaine_VFG,
+                            Domaine_VF& domaine_VFF,
                             IntVect& connect)
 {
-  valeur().calculer(zone_VFG, zone_VFF, connect);
+  valeur().calculer(domaine_VFG, domaine_VFF, connect);
 }
 
 
-void Prolongement::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                              const Frontiere& frontF,
                              IntVect& connect,
                              const DoubleTab& incoG,
                              DoubleTab& tab, int nb_comp)
 {
-  valeur().prolonger(zone_VFG, zone_VFF, frontF, connect, incoG, tab, nb_comp);
+  valeur().prolonger(domaine_VFG, domaine_VFF, frontF, connect, incoG, tab, nb_comp);
 }
 
 

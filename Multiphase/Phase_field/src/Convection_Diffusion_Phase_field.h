@@ -28,7 +28,8 @@
 #include <Debog.h>
 #include <Champ_Fonc.h>
 #include <Champ_Don.h>
-#include <Ref_Champ_Don.h>
+#include <Constituant.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Convection_Diffusion_Phase_field Cas particulier de Convection_Diffusion_Concentration
  *
@@ -41,106 +42,42 @@
 class Convection_Diffusion_Phase_field : public Convection_Diffusion_Concentration
 {
   Declare_instanciable_sans_constructeur(Convection_Diffusion_Phase_field);
-
-public :
+public:
 
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   Convection_Diffusion_Phase_field();
   void discretiser() override;
-  Champ_Fonc& set_mutilde_()
-  {
-    return ch_mutilde;
-  };
-  DoubleTab& set_mutilde()
-  {
-    return mutilde;
-  };
-  DoubleTab& set_mutilde_demi()
-  {
-    return mutilde_demi;
-  };
-  DoubleTab& set_c_demi()
-  {
-    return c_demi;
-  };
-  DoubleTab& set_div_alpha_rho_gradC()
-  {
-    return div_alpha_rho_gradC;
-  };
-  DoubleTab& set_div_alpha_gradC()
-  {
-    return div_alpha_gradC;
-  };
-  DoubleTab& set_alpha_gradC_carre()
-  {
-    return alpha_gradC_carre;
-  };
-  DoubleTab& set_pression_thermo()
-  {
-    return pression_thermo;
-  };
-  const Champ_Fonc& get_mutilde_() const
-  {
-    return ch_mutilde;
-  };
-  const DoubleTab& get_mutilde() const
-  {
-    return mutilde;
-  };
-  const DoubleTab& get_mutilde_demi() const
-  {
-    return mutilde_demi;
-  };
-  const DoubleTab& get_c_demi() const
-  {
-    return c_demi;
-  };
-  const DoubleTab& get_div_alpha_rho_gradC() const
-  {
-    return div_alpha_rho_gradC;
-  };
-  const DoubleTab& get_div_alpha_gradC() const
-  {
-    return div_alpha_gradC;
-  };
-  const DoubleTab& get_alpha_gradC_carre() const
-  {
-    return alpha_gradC_carre;
-  };
-  const DoubleTab& get_pression_thermo() const
-  {
-    return pression_thermo;
-  };
+  Champ_Fonc& set_mutilde_() { return ch_mutilde; }
+  DoubleTab& set_mutilde() { return mutilde; }
+  DoubleTab& set_mutilde_demi() { return mutilde_demi; }
+  DoubleTab& set_c_demi() { return c_demi; }
+  DoubleTab& set_div_alpha_rho_gradC() { return div_alpha_rho_gradC; }
+  DoubleTab& set_div_alpha_gradC() { return div_alpha_gradC; }
+  DoubleTab& set_alpha_gradC_carre() { return alpha_gradC_carre; }
+  DoubleTab& set_pression_thermo() { return pression_thermo; }
+  const Champ_Fonc& get_mutilde_() const { return ch_mutilde; }
+  const DoubleTab& get_mutilde() const { return mutilde; }
+  const DoubleTab& get_mutilde_demi() const { return mutilde_demi; }
+  const DoubleTab& get_c_demi() const { return c_demi; }
+  const DoubleTab& get_div_alpha_rho_gradC() const { return div_alpha_rho_gradC; }
+  const DoubleTab& get_div_alpha_gradC() const { return div_alpha_gradC; }
+  const DoubleTab& get_alpha_gradC_carre() const { return alpha_gradC_carre; }
+  const DoubleTab& get_pression_thermo() const { return pression_thermo; }
   int preparer_calcul() override;
   Operateur_Grad& operateur_gradient();
   const Operateur_Grad& operateur_gradient() const;
   void completer() override;
 
-  /////////////////////////////////////////////////////
-
-  inline int& get_mutype_()
-  {
-    return mutype_;
-  };
-  inline int get_mutype_() const
-  {
-    return mutype_;
-  };
-protected :
-
+  inline int& get_mutype_() { return mutype_; }
+  inline int get_mutype_() const { return mutype_; }
+protected:
   Champ_Fonc ch_mutilde;
   Operateur_Grad gradient;
-  DoubleTab div_alpha_gradC;
-  DoubleTab div_alpha_rho_gradC;
-  DoubleTab alpha_gradC_carre;
-  DoubleTab pression_thermo;
-  DoubleTab mutilde;
-  DoubleTab c_demi;
-  DoubleTab mutilde_demi;
+  DoubleTab div_alpha_gradC, div_alpha_rho_gradC, alpha_gradC_carre;
+  DoubleTab pression_thermo, mutilde, c_demi, mutilde_demi;
 
   int mutype_;
-
 };
 
 #endif

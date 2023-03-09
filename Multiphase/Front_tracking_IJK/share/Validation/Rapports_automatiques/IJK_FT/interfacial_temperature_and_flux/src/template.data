@@ -122,7 +122,7 @@ IJK_FT_double
 
  Sondes
  {
-    sonde_temp temperature periode 1e-10 segment @N@ 0.0 0.0015 0.0015 0.003 0.0015 0.0015
+    sonde_temp temperature_0 periode 1e-10 segment @N@ 0.0 0.0015 0.0015 0.003 0.0015 0.0015
  }    
 }  
 # Lata_to_other lml NOM_DU_CAS NOM_DU_CAS #

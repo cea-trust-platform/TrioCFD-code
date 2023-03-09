@@ -23,7 +23,9 @@
 #define Source_Transport_Eps_Realisable_VDF_Elem_included
 
 #include <Source_Transport_Realisable_VDF_Elem_base.h>
-#include <Ref_Transport_K_ou_Eps_Realisable.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_ou_Eps_Realisable;
 
 class Source_Transport_Eps_Realisable_VDF_Elem : public Source_Transport_Realisable_VDF_Elem_base
 {
@@ -41,7 +43,7 @@ protected :
 private:
   const DoubleTab& get_visc_turb() const override;
   const Modele_Fonc_Realisable_base& get_modele_fonc() const override;
-  void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const override;
+  void calculer_terme_production_real(const Champ_Face_VDF&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const override;
   void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const override;
   void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const override;
 };

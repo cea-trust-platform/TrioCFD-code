@@ -29,70 +29,63 @@ class Op_Diff_K_Eps_VDF_leaves { };
 /// \endcond
 
 // const
-declare_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)
 class Op_Diff_K_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem);
 public:
   Op_Diff_K_Eps_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_VDF_Elem>(zd,zcd,inc); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem_Axi)
 class Op_Diff_K_Eps_VDF_Elem_Axi : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_VDF_Elem_Axi>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem_Axi);
 public:
   Op_Diff_K_Eps_VDF_Elem_Axi();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_VDF_Elem_Axi>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_VDF_Elem_Axi>(zd,zcd,inc); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_QC_VDF_Elem)
 class Op_Diff_K_Eps_QC_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_QC_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_QC_VDF_Elem);
 public:
   Op_Diff_K_Eps_QC_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_QC_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_QC_VDF_Elem>(zd,zcd,inc); }
 };
 
 // var
-declare_It_VDF_Elem(Eval_Diff_K_Eps_var_VDF_Elem)
 class Op_Diff_K_Eps_var_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_var_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_var_VDF_Elem);
 public:
   Op_Diff_K_Eps_var_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_var_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_var_VDF_Elem>(zd,zcd,inc); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_QC_var_VDF_Elem)
 class Op_Diff_K_Eps_var_QC_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_var_QC_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_var_QC_VDF_Elem);
 public:
   Op_Diff_K_Eps_var_QC_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_QC_var_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Eps_QC_var_VDF_Elem>(zd,zcd,inc); }
 };
 
 // Bicephale
 
-declare_It_VDF_Elem(Eval_Diff_K_VDF_Elem)
 class Op_Diff_K_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem);
 public:
   Op_Diff_K_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_VDF_Elem>(zd,zcd,inc); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)
 class Op_Diff_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_Eps_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_Eps_VDF_Elem);
 public:
   Op_Diff_Eps_VDF_Elem();
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_Eps_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_Eps_VDF_Elem>(zd,zcd,inc); }
 };
 
 #endif /* Op_Diff_K_Eps_VDF_leaves_included */

@@ -23,7 +23,7 @@
 #ifndef Loi_Paroi_Nu_Impose_VEF_included
 #define Loi_Paroi_Nu_Impose_VEF_included
 
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Paroi_std_scal_hyd_VEF.h>
 #include <Champ_Don.h>
 #include <Parser_U.h>

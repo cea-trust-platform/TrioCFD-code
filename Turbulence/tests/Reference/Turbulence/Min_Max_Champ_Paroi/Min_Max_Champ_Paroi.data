@@ -155,6 +155,7 @@ Read pb
 		}
 		surfacique
 		{
+			domaine paroi_chauf
 	     		Definition_champs
         		{
         		  temperature_paroi_chauf Interpolation 
@@ -186,7 +187,6 @@ Read pb
 			    sonde_t_phys_paroi_moy_ponderee 	temperature_moy_ponderee_paroi_chauf 	periode 10. numero_elem_sur_maitre 0
              		}
                		format lata
-			domaine paroi_chauf
 	       		fields dt_post 150.0
 	       		{
  			       temperature_paroi_chauf

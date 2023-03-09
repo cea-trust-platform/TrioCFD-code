@@ -25,7 +25,7 @@
 #define Frontiere_ouverte_temperature_imposee_rayo_semi_transp_included
 
 #include <Cond_Lim_rayo_semi_transp.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 class Champ_front;
 
 /*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
@@ -42,7 +42,7 @@ public :
 
   const Cond_lim_base& la_cl() const override;
   void completer() override;
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   inline Champ_front& temperature_bord();
   inline const Champ_front& temperature_bord() const;
   void calculer_temperature_bord(double temps);

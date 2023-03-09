@@ -22,7 +22,8 @@
 #ifndef Diffu_totale_scal_base_included
 #define Diffu_totale_scal_base_included
 #include <Diffu_totale_base.h>
-#include <Ref_Diffu_totale_base.h>
+#include <TRUST_Ref.h>
+
 class Eq_couch_lim ;
 
 /*! @brief Classe Diffu_totale_scal_base Classe abstraite calculant la diffusivite totale (somme diffusivite

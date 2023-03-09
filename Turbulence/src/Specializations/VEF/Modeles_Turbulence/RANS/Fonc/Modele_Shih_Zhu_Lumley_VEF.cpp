@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Champ_Uniforme.h>
 #include <Champ_P1NC.h>
 #include <Periodique.h>
@@ -62,27 +62,27 @@ void Modele_Shih_Zhu_Lumley_VEF::set_param(Param& param)
 }
 
 
-void Modele_Shih_Zhu_Lumley_VEF::Initialisation(const Zone_dis& zone_dis)
+void Modele_Shih_Zhu_Lumley_VEF::Initialisation(const Domaine_dis& domaine_dis)
 {
-  const Zone_VEF&  zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  init_tenseur_elem(S_elem_,zone_VEF,2);
-  init_tenseur_elem(R_elem_,zone_VEF,2);
+  const Domaine_VEF&  domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  init_tenseur_elem(S_elem_,domaine_VEF,2);
+  init_tenseur_elem(R_elem_,domaine_VEF,2);
 
-  nfaces_ = zone_VEF.nb_faces();
+  nfaces_ = domaine_VEF.nb_faces();
   S_.resize_tab( nfaces_ );
   Cmu_.resize_tab( nfaces_ );
   C1_.resize_tab( nfaces_ );
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse)
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse)
 {
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
   DoubleTab gradient_elem;
-  init_tenseur_elem(gradient_elem,zone_VEF,2);
+  init_tenseur_elem(gradient_elem,domaine_VEF,2);
 
-  Champ_P1NC::calcul_gradient(vitesse,gradient_elem,zone_Cl_VEF);
+  Champ_P1NC::calcul_gradient(vitesse,gradient_elem,domaine_Cl_VEF);
 
   int nelem = S_elem_.dimension(0);
 
@@ -108,20 +108,20 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem(const Zone_dis& zon
 }
 
 
-void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,
                                                                    const DoubleTab& visco_tab, const DoubleTab& visco_turb,
                                                                    const DoubleTab& tab_paroi,const int idt)
 {
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
   DoubleTab gradient_elem;
-  init_tenseur_elem(gradient_elem,zone_VEF,2);
+  init_tenseur_elem(gradient_elem,domaine_VEF,2);
 
-  Champ_P1NC::calcul_gradient(vitesse,gradient_elem,zone_Cl_VEF);
+  Champ_P1NC::calcul_gradient(vitesse,gradient_elem,domaine_Cl_VEF);
 
   if (idt>0)
-    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab_paroi,zone_Cl_VEF);
+    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab_paroi,domaine_Cl_VEF);
 
   int nelem = S_elem_.dimension(0);
 
@@ -148,14 +148,14 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem_Paroi(const Zone_di
 
 
 // Calcul de la norme S SUR LES FACES
-void Modele_Shih_Zhu_Lumley_VEF::Calcul_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse)
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse)
 {
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
   DoubleTab S_face;
-  init_tenseur_face(S_face,zone_VEF,2);
-  calcul_tenseur_face(S_face,S_elem_,zone_VEF,zone_Cl_VEF);
+  init_tenseur_face(S_face,domaine_VEF,2);
+  calcul_tenseur_face(S_face,S_elem_,domaine_VEF,domaine_Cl_VEF);
 
 
   for (int face=0; face<nfaces_; face++)
@@ -170,19 +170,19 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_S(const Zone_dis& zone_dis, const Zone_C
 
 // Calcul d'un tenseur aux faces a partir d'un tenseur aux elements
 DoubleTab& Modele_Shih_Zhu_Lumley_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face, const DoubleTab& Tenseur_elem,
-                                                           const Zone_VEF& zone_VEF, const Zone_Cl_VEF& zone_Cl_VEF) const
+                                                           const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& domaine_Cl_VEF) const
 {
   assert_espace_virtuel_vect(Tenseur_elem);
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  int nb_faces = zone_VEF.nb_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  int nb_faces = domaine_VEF.nb_faces();
 
-  const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  const DoubleVect& volumes = zone_VEF.volumes();
+  const DoubleVect& volumes = domaine_VEF.volumes();
 
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
@@ -211,7 +211,7 @@ DoubleTab& Modele_Shih_Zhu_Lumley_VEF::calcul_tenseur_face(DoubleTab& Tenseur_fa
             }
         }
     }
-  int n0 = zone_VEF.premiere_face_int();
+  int n0 = domaine_VEF.premiere_face_int();
   for (int fac = n0; fac<nb_faces; fac++)
     {
       int poly1 = face_voisins(fac,0);
@@ -227,7 +227,7 @@ DoubleTab& Modele_Shih_Zhu_Lumley_VEF::calcul_tenseur_face(DoubleTab& Tenseur_fa
 }
 
 // Initialisation d'une matrice aux elements
-void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Zone_VEF& zone_VEF, const int ndim)  const
+void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Domaine_VEF& domaine_VEF, const int ndim)  const
 {
   if(!Tenseur.get_md_vector().non_nul())
     {
@@ -235,13 +235,13 @@ void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Zon
         Tenseur.resize(0, Objet_U::dimension);
       else if (ndim==2)
         Tenseur.resize(0, Objet_U::dimension, Objet_U::dimension);
-      zone_VEF.zone().creer_tableau_elements(Tenseur);
+      domaine_VEF.domaine().creer_tableau_elements(Tenseur);
     }
   Tenseur = 0.;
 }
 
 // Initialisation d'une matrice aux elements
-void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Zone_VEF& zone_VEF, const int ndim)
+void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Domaine_VEF& domaine_VEF, const int ndim)
 {
   if(!Tenseur.get_md_vector().non_nul())
     {
@@ -249,14 +249,14 @@ void Modele_Shih_Zhu_Lumley_VEF::init_tenseur_elem(DoubleTab& Tenseur, const Zon
         Tenseur.resize(0, Objet_U::dimension);
       else if (ndim==2)
         Tenseur.resize(0, Objet_U::dimension, Objet_U::dimension);
-      zone_VEF.zone().creer_tableau_elements(Tenseur);
+      domaine_VEF.domaine().creer_tableau_elements(Tenseur);
     }
   Tenseur = 0.;
 }
 
 
 // Initialisation d'une matrice aux faces
-void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Zone_VEF& zone_VEF, const int ndim) const
+void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Domaine_VEF& domaine_VEF, const int ndim) const
 {
   if(!Tenseur.get_md_vector().non_nul())
     {
@@ -264,13 +264,13 @@ void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Zon
         Tenseur.resize(0, Objet_U::dimension);
       else if (ndim==2)
         Tenseur.resize(0, Objet_U::dimension, Objet_U::dimension);
-      zone_VEF.creer_tableau_faces(Tenseur);
+      domaine_VEF.creer_tableau_faces(Tenseur);
     }
   Tenseur = 0.;
 }
 
 // Initialisation d'une matrice aux faces
-void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Zone_VEF& zone_VEF, const int ndim)
+void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Domaine_VEF& domaine_VEF, const int ndim)
 {
   if(!Tenseur.get_md_vector().non_nul())
     {
@@ -278,12 +278,12 @@ void  Modele_Shih_Zhu_Lumley_VEF::init_tenseur_face(DoubleTab& Tenseur,const Zon
         Tenseur.resize(0, Objet_U::dimension);
       else if (ndim==2)
         Tenseur.resize(0, Objet_U::dimension, Objet_U::dimension);
-      zone_VEF.creer_tableau_faces(Tenseur);
+      domaine_VEF.creer_tableau_faces(Tenseur);
     }
   Tenseur = 0.;
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1 (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1 (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
   for (int face=0; face<nfaces_; face++)
     {
@@ -301,7 +301,7 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1 (const Zone_dis& zone_dis, const Zone
 
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1_BiK (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1_BiK (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
 {
   for (int face=0; face<nfaces_; face++)
     {
@@ -314,23 +314,23 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1_BiK (const Zone_dis& zone_dis, const 
 
 }
 
-void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)
+void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
   DoubleTab S_face;
-  init_tenseur_face(S_face,zone_VEF,2);
+  init_tenseur_face(S_face,domaine_VEF,2);
   DoubleTab R_face;
-  init_tenseur_face(R_face,zone_VEF,2);
+  init_tenseur_face(R_face,domaine_VEF,2);
 
-  calcul_tenseur_face(S_face,S_elem_,zone_VEF,zone_Cl_VEF);
-  calcul_tenseur_face(R_face,R_elem_,zone_VEF,zone_Cl_VEF);
+  calcul_tenseur_face(S_face,S_elem_,domaine_VEF,domaine_Cl_VEF);
+  calcul_tenseur_face(R_face,R_elem_,domaine_VEF,domaine_Cl_VEF);
 
   DoubleTab U_etoile_face;
-  zone_VEF.creer_tableau_faces(U_etoile_face);
+  domaine_VEF.creer_tableau_faces(U_etoile_face);
   DoubleTab As_face;
-  zone_VEF.creer_tableau_faces(As_face);
+  domaine_VEF.creer_tableau_faces(As_face);
 
   for (int face=0; face<nfaces_; face++)
     {
@@ -378,23 +378,23 @@ void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S(const Zone_dis& zone_dis, cons
     }
 }
 
-void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
 {
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
   DoubleTab S_face;
-  init_tenseur_face(S_face,zone_VEF,2);
+  init_tenseur_face(S_face,domaine_VEF,2);
   DoubleTab R_face;
-  init_tenseur_face(R_face,zone_VEF,2);
+  init_tenseur_face(R_face,domaine_VEF,2);
 
-  calcul_tenseur_face(S_face,S_elem_,zone_VEF,zone_Cl_VEF);
-  calcul_tenseur_face(R_face,R_elem_,zone_VEF,zone_Cl_VEF);
+  calcul_tenseur_face(S_face,S_elem_,domaine_VEF,domaine_Cl_VEF);
+  calcul_tenseur_face(R_face,R_elem_,domaine_VEF,domaine_Cl_VEF);
 
   DoubleTab U_etoile_face;
-  zone_VEF.creer_tableau_faces(U_etoile_face);
+  domaine_VEF.creer_tableau_faces(U_etoile_face);
   DoubleTab As_face;
-  zone_VEF.creer_tableau_faces(As_face);
+  domaine_VEF.creer_tableau_faces(As_face);
 
   for (int face=0; face<nfaces_; face++)
     {
@@ -443,13 +443,13 @@ void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, 
 }
 
 
-void  Modele_Shih_Zhu_Lumley_VEF::associer(const Zone_dis& zone_dis,
-                                           const Zone_Cl_dis& zone_Cl_dis)
+void  Modele_Shih_Zhu_Lumley_VEF::associer(const Domaine_dis& domaine_dis,
+                                           const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 
-  Initialisation( zone_dis );
+  Initialisation( domaine_dis );
 }
 
 void  Modele_Shih_Zhu_Lumley_VEF::mettre_a_jour(double temps)
@@ -457,34 +457,34 @@ void  Modele_Shih_Zhu_Lumley_VEF::mettre_a_jour(double temps)
   ;
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  Calcul_Tenseurs_S_et_R_elem(zone_dis,zone_Cl_dis,vitesse);
-  Calcul_Cmu_et_S(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
-  Calcul_C1(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
+  Calcul_Tenseurs_S_et_R_elem(domaine_dis,domaine_Cl_dis,vitesse);
+  Calcul_Cmu_et_S(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
+  Calcul_C1(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                                              const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
 {
-  Calcul_Tenseurs_S_et_R_elem_Paroi(zone_dis,zone_Cl_dis,vitesse,visco,visco_turb,loi_paroi,idt);
-  Calcul_Cmu_et_S(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
-  Calcul_C1(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
+  Calcul_Tenseurs_S_et_R_elem_Paroi(domaine_dis,domaine_Cl_dis,vitesse,visco,visco_turb,loi_paroi,idt);
+  Calcul_Cmu_et_S(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
+  Calcul_C1(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
 {
-  Calcul_Tenseurs_S_et_R_elem(zone_dis,zone_Cl_dis,vitesse);
-  Calcul_Cmu_et_S_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
-  Calcul_C1_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_Tenseurs_S_et_R_elem(domaine_dis,domaine_Cl_dis,vitesse);
+  Calcul_Cmu_et_S_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_C1_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
 }
 
-void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
                                                                  const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
 {
-  Calcul_Tenseurs_S_et_R_elem_Paroi(zone_dis,zone_Cl_dis,vitesse,visco,visco_turb,loi_paroi,idt);
-  Calcul_Cmu_et_S_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
-  Calcul_C1_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_Tenseurs_S_et_R_elem_Paroi(domaine_dis,domaine_Cl_dis,vitesse,visco,visco_turb,loi_paroi,idt);
+  Calcul_Cmu_et_S_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_C1_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
 }
 
 

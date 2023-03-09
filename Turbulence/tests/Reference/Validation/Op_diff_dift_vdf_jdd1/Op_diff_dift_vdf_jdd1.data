@@ -32,7 +32,6 @@ Lire sch
 	dt_min 1.e-9
 	dt_max 1.e-1
 	dt_impr 0.125
-	seuil_statio 1.e-18
 }
 
 
@@ -43,12 +42,12 @@ Discretize pb dis
 
 Lire pb
 {
-   
+
    fluide_incompressible {
-    	mu Champ_Uniforme 1 0.002
+    	mu Champ_Uniforme 1 0.2
    	rho Champ_Uniforme 1 2
    }
-   
+
    	Navier_Stokes_standard
 	{
 		solveur_pression  GCP { precond ssor { omega 1.5 } seuil 1.e-13  impr }
@@ -87,4 +86,3 @@ Lire pb
 
 Solve pb
 Fin
- 

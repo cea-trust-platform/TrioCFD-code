@@ -7,7 +7,7 @@ Lire DOM
   nbelem_k 5 # 24 plutot 5 #
   uniform_domain_size_i 0.006
   uniform_domain_size_j 0.006
-  uniform_domain_size_k 0.003
+  uniform_domain_size_k 0.006
   perio_i
   perio_j
   perio_k
@@ -26,8 +26,9 @@ IJK_FT_double
 {
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 0
-  timestep 2.40e-4
+  timestep 1.10e-5
   timestep_facsec 1.e12
+  # time_scheme RK3_FT #
   dt_post 20
    Boundary_Conditions {
                 # bctype_kmin Paroi
@@ -59,9 +60,9 @@ IJK_FT_double
   sigma 0.07
 
   # plutot utiliser une vitesse imposée #
-  expression_vx_init 1.0
-  expression_vy_init 1.0
-  expression_vz_init 1.0
+  expression_vx_init 0.1
+  expression_vy_init 0.1
+  expression_vz_init 0.1
  
  thermique
   {
@@ -79,11 +80,12 @@ IJK_FT_double
     # Etude de la diffusion #
     # DIFF expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
     expression_T_ana 0.5*exp(-0.1/4000.*(2*(2*Pi/0.006)^2)*t)*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006) 
+    fo 1.0
     DIFF #
 
     # Etude de la convection #
     # CONV  expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
-    expression_T_ana 0.5*cos(x*2*Pi/0.006)*cos((y-0.1*t)*2*Pi/0.006)
+    expression_T_ana 0.5*cos((x-0.1*t)*2*Pi/0.006)*cos((y-0.1*t)*2*Pi/0.006)
     CONV #
 
     # Etude du schéma temps #
@@ -93,7 +95,6 @@ IJK_FT_double
     TEMPS #
     cp_vapor 1.
     lambda_vapor 1.
-    fo 0.5
     cp_liquid 4.
     lambda_liquid 0.1
     }

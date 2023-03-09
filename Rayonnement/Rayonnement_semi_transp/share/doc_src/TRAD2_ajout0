@@ -1,29 +1,3 @@
-frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
-paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.
-paroi_flux_impose_rayo_semi_transp_vdf paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vdf -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VDF).
-paroi_flux_impose_rayo_semi_transp_vef paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vef -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VEF).
-paroi_temperature_imposee_rayo_semi_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in semi transparent gas.
-champ_front_contact_rayo_semi_transp_vef champ_front_contact_vef champ_front_contact_rayo_semi_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in semi transparent fluid.
-paroi_echange_contact_rayo_semi_transp_vdf paroi_echange_contact_vdf paroi_echange_contact_rayo_semi_transp_vdf -1 Exchange boundary condition in VDF between the semi transparent fluid and the solid for a problem coupled with radiation.
-frontiere_ouverte_rayo_semi_transp frontiere_ouverte frontiere_ouverte_rayo_semi_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with semi transparent gas.
-eq_rayo_semi_transp objet_lecture nul -1 Irradiancy equation.
-  attr solveur solveur_sys_base solveur 0 Solver of the irradiancy equation.
-  attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
-modele_rayo_semi_transp Pb_base modele_rayo_semi_transp -3 Radiation model for semi transparent gas. The model should be associated to the coupling problem BEFORE the time scheme.
-  attr eq_rayo_semi_transp eq_rayo_semi_transp eq_rayo_semi_transp 1 Irradiancy G equation. Radiative flux equals -grad(G)/3/kappa.
-pb_couple_rayo_semi_transp coupled_problem pb_couple_rayo_semi_transp -1 Problem coupling several other problems to which radiation coupling is added (for semi transparent gas). NL2 You have to associate a modele_rayo_semi_transpNL2 You have to add a radiative term source in energy equation NL2 Warning: Calculation with semi transparent gas model may lead to divergence when high temperature differences are used. Indeed, the calculation of the stability time step of the equation does not take in account the source term. In semi transparent gas model, energy equation source term depends strongly of temperature via irradiance and stability is not guaranteed by the calculated time step. Reducing the facsec of the time scheme is a good tip to reach convergence when divergence is encountered.
-  ref modele modele_rayo_semi_transp
-  ref scheme schema_temps_base
-  ref scheme_2 schema_temps_base
-source_rayo_semi_transp source_base source_rayo_semi_transp 0 Radiative term source in energy equation.
-flux_radiatif condlim_base flux_radiatif 0 Boundary condition for radiation equation.
-  attr na chaine(into=["A"]) na 0 Keyword for constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
-  attr a floattant a 0 Value of constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
-  attr ne chaine(into=["emissivite"]) ne 0 Keyword for wall emissivity.
-  attr emissivite front_field_base emissivite 0 Wall emissivity, value between 0 and 1.
-flux_radiatif_vdf flux_radiatif flux_radiatif_vdf -1 Boundary condition for radiation equation in VDF.
-flux_radiatif_vef flux_radiatif flux_radiatif_vef -1 Boundary condition for radiation equation in VEF.
-
 floatentier objet_lecture nul 0 A real and an integer.
   attr the_float floattant the_float 0 Real.
   attr the_int entier the_int 0 Integer.
@@ -68,35 +42,45 @@ brech traitement_particulier_base brech 0 non documente
   attr bloc bloc_lecture bloc 0 not_set
 
 pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
 pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
 pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
+  attr constituant constituant constituant 1 Constituents.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
 pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
+  attr constituant constituant constituant 1 Constituents.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
 pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
+  attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
   attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
   attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
 pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
+  attr constituant constituant constituant 1 Constituents.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
 pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
+  attr constituant constituant constituant 1 Constituents.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
 pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
+  attr constituant constituant constituant 1 Constituents.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
 pb_thermohydraulique_especes_turbulent_qc pb_avec_passif pb_thermohydraulique_especes_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+  attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
   attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
   attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
 navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
@@ -229,4 +213,34 @@ bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the syn
   attr KeOverKmin floattant KeOverKmin 0 ratio of the most energetic wavenumber Ke over the minimum wavenumber Kmin representing the largest turbulent eddies
   attr timeScale floattant timeScale 0 turbulent time scale
   attr dir_fluct listf dir_fluct 0 directions for the velocity fluctations (e.g 1 0 0 generates velocity fluctuations in the x-direction only)
+
+frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
+paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.
+paroi_flux_impose_rayo_semi_transp_vdf paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vdf -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VDF).
+paroi_flux_impose_rayo_semi_transp_vef paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vef -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VEF).
+paroi_temperature_imposee_rayo_semi_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in semi transparent gas.
+champ_front_contact_rayo_semi_transp_vef champ_front_contact_vef champ_front_contact_rayo_semi_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in semi transparent fluid.
+paroi_echange_contact_rayo_semi_transp_vdf paroi_echange_contact_vdf paroi_echange_contact_rayo_semi_transp_vdf -1 Exchange boundary condition in VDF between the semi transparent fluid and the solid for a problem coupled with radiation.
+frontiere_ouverte_rayo_semi_transp frontiere_ouverte frontiere_ouverte_rayo_semi_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with semi transparent gas.
+eq_rayo_semi_transp objet_lecture nul -1 Irradiancy equation.
+  attr solveur solveur_sys_base solveur 0 Solver of the irradiancy equation.
+  attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
+modele_rayo_semi_transp Pb_base modele_rayo_semi_transp -3 Radiation model for semi transparent gas. The model should be associated to the coupling problem BEFORE the time scheme.
+  attr eq_rayo_semi_transp eq_rayo_semi_transp eq_rayo_semi_transp 1 Irradiancy G equation. Radiative flux equals -grad(G)/3/kappa.
+pb_couple_rayo_semi_transp coupled_problem pb_couple_rayo_semi_transp -1 Problem coupling several other problems to which radiation coupling is added (for semi transparent gas). NL2 You have to associate a modele_rayo_semi_transpNL2 You have to add a radiative term source in energy equation NL2 Warning: Calculation with semi transparent gas model may lead to divergence when high temperature differences are used. Indeed, the calculation of the stability time step of the equation does not take in account the source term. In semi transparent gas model, energy equation source term depends strongly of temperature via irradiance and stability is not guaranteed by the calculated time step. Reducing the facsec of the time scheme is a good tip to reach convergence when divergence is encountered.
+  ref modele modele_rayo_semi_transp
+  ref scheme schema_temps_base
+  ref scheme_2 schema_temps_base
+source_rayo_semi_transp source_base source_rayo_semi_transp 0 Radiative term source in energy equation.
+flux_radiatif condlim_base flux_radiatif 0 Boundary condition for radiation equation.
+  attr na chaine(into=["A"]) na 0 Keyword for constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
+  attr a floattant a 0 Value of constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
+  attr ne chaine(into=["emissivite"]) ne 0 Keyword for wall emissivity.
+  attr emissivite front_field_base emissivite 0 Wall emissivity, value between 0 and 1.
+flux_radiatif_vdf flux_radiatif flux_radiatif_vdf -1 Boundary condition for radiation equation in VDF.
+flux_radiatif_vef flux_radiatif flux_radiatif_vef -1 Boundary condition for radiation equation in VEF.
+paroi_contact_rayo condlim_base paroi_contact_rayo -1 Thermal condition between two domains.
+  attr autrepb ref_Pb_base autrepb 0 Name of other problem.
+  attr nameb chaine nameb 0 boundary name of the remote problem which should be the same than the local name
+  attr type chaine(into=["TRANSP","SEMI_TRANSP"]) type 0 not_set
 

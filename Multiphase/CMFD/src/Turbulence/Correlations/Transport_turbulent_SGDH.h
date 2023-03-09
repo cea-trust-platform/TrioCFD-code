@@ -40,11 +40,14 @@ public:
   {
     return 1; //isotrope
   }
-  void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
+  void modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
   inline double sigma() const {return sigma_;};
 
 private:
   double sigma_ = 1; //facteur multiplicatif
+  int no_alpha_ = 0; // no_alpha = 1 pour equation sur omega
+  int gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
+
 };
 
 #endif

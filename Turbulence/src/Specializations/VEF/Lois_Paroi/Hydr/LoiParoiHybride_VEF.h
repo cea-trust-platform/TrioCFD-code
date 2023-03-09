@@ -26,10 +26,13 @@
 
 #include <Paroi_hyd_base_VEF.h>
 #include <LoiParoiHybride.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
-class Zone_dis_base;
-class Zone_Cl_dis_base;
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
+
 
 
 /*! @brief CLASS: LoiParoiHybride_VEF
@@ -45,7 +48,7 @@ class LoiParoiHybride_VEF : public Paroi_hyd_base_VEF, LoiParoiHybride
 
 public:
 
-  void associer(const Zone_dis&, const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis&, const Domaine_Cl_dis& ) override;
   int init_lois_paroi() override;
   int calculer_hyd(DoubleTab& ) override;
   int calculer_hyd(DoubleTab& , DoubleTab& ) override;
@@ -56,8 +59,8 @@ protected:
 
 private:
 
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  REF(Domaine_VEF) le_dom_VEF;
+  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
 };
 

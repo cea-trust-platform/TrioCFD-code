@@ -23,9 +23,11 @@
 #ifndef Senseur_Interface_included
 #define Senseur_Interface_included
 #include <Objet_U.h>
-#include <Ref_Probleme_base.h>
-#include <Ref_Equation_base.h>
 #include <TRUSTArray.h>
+#include <TRUST_Ref.h>
+#include <Nom.h>
+
+class Equation_base;
 class Probleme_base;
 
 // Senseur permettant de trouver l'intersection entre un segment

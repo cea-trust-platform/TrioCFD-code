@@ -50,7 +50,7 @@ Entree& Prolongement_elem_elem_DWF::readOn(Entree& s )
  *  Les connectivites a passer sont du type elemF->elemG
  *
  */
-void Prolongement_elem_elem_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement_elem_elem_DWF::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,
                                            const DoubleTab& valG, DoubleTab& tab,
@@ -60,9 +60,9 @@ void Prolongement_elem_elem_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
   const int prem_face_bord_fin  =  frontF.num_premiere_face();
   const int nb_faces_front_fine = frontF.nb_faces();
-  const IntTab& face_voisinsF = zone_VFF.face_voisins();
+  const IntTab& face_voisinsF = domaine_VFF.face_voisins();
 
-  if(sub_type(Zone_VDF, zone_VFG) && sub_type(Zone_VDF, zone_VFF))
+  if(sub_type(Domaine_VDF, domaine_VFG) && sub_type(Domaine_VDF, domaine_VFF))
     {
       for (int ifaceF=0; ifaceF<nb_faces_front_fine; ifaceF++)
         {
@@ -78,8 +78,8 @@ void Prolongement_elem_elem_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
 
 //NE FAIT RIEN
-void Prolongement_elem_elem_DWF::calculer(Zone_VF& zonef,
-                                          Zone_VF& zoneg,
+void Prolongement_elem_elem_DWF::calculer(Domaine_VF& domainef,
+                                          Domaine_VF& domaineg,
                                           IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

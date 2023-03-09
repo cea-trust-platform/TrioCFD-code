@@ -116,7 +116,6 @@ int Navier_Stokes_Turbulent::lire_motcle_non_standard(const Motcle& mot, Entree&
     }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 const Champ_Don& Navier_Stokes_Turbulent::diffusivite_pour_transport() const
@@ -150,10 +149,14 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
   type+= nb_inc ;
 
   Nom type_diff;
-  if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-    type_diff="";
+
+  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
   else
-    type_diff="var_";
+    {
+      if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
+      else type_diff = "var_";
+    }
+
   type+= type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
@@ -403,14 +406,12 @@ void Navier_Stokes_Turbulent::imprimer(Sortie& os) const
 
 const RefObjU& Navier_Stokes_Turbulent::get_modele(Type_modele type) const
 {
-  CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
-  while(curseur)
+  for (const auto& itr : liste_modeles_)
     {
-      const RefObjU&  mod = curseur.valeur();
+      const RefObjU&  mod = itr;
       if (mod.non_nul())
         if ((sub_type(Mod_turb_hyd_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
-      ++curseur;
     }
   return Equation_base::get_modele(type);
 }

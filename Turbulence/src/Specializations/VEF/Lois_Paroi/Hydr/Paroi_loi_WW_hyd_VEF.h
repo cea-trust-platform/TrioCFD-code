@@ -63,14 +63,14 @@ protected :
   int impr;
 };
 inline Paroi_loi_WW_hyd_VEF::Paroi_loi_WW_hyd_VEF():impr(0) { }
-double norm_2D_vit(const DoubleTab& vit,int num1,int num2,int fac,const Zone_VEF& zone,double& u,double& val1, double& val2);
-double norm_2D_vit3(const DoubleTab& vit,int num1,int num2,int num3,int fac,const Zone_VEF& zone,double& u,double& val1, double& val2);
-double norm_3D_vit(const DoubleTab& vit,int fac,int num1,int num2,int num3,const Zone_VEF& zone,double& val1,double& val2,double& val3);
-double norm_3D_vit4(const DoubleTab& vit,int fac,int num1,int num2,int num3,int num4,const Zone_VEF& zone,double& val1,double& val2,double& val3);
-double distance_2D(int fac,int elem,const Zone_VEF& zone,double& signe);
-double distance_2D_som(int fac,int elem,const Zone_VEF& zone);
-double distance_3D(int fac,int elem,const Zone_VEF& zone,double& signe);
-double distance_3D_som(int fac,int elem,const Zone_VEF& zone);
+double norm_2D_vit(const DoubleTab& vit,int num1,int num2,int fac,const Domaine_VEF& domaine,double& u,double& val1, double& val2);
+double norm_2D_vit3(const DoubleTab& vit,int num1,int num2,int num3,int fac,const Domaine_VEF& domaine,double& u,double& val1, double& val2);
+double norm_3D_vit(const DoubleTab& vit,int fac,int num1,int num2,int num3,const Domaine_VEF& domaine,double& val1,double& val2,double& val3);
+double norm_3D_vit4(const DoubleTab& vit,int fac,int num1,int num2,int num3,int num4,const Domaine_VEF& domaine,double& val1,double& val2,double& val3);
+double distance_2D(int fac,int elem,const Domaine_VEF& domaine,double& signe);
+double distance_2D_som(int fac,int elem,const Domaine_VEF& domaine);
+double distance_3D(int fac,int elem,const Domaine_VEF& domaine,double& signe);
+double distance_3D_som(int fac,int elem,const Domaine_VEF& domaine);
 
 
 #endif

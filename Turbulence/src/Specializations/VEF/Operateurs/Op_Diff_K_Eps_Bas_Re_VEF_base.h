@@ -25,14 +25,15 @@
 #define PRDT_EPS_DEFAUT 1.3
 
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
-#include <Ref_Champ_Fonc.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Champ_P1NC.h>
 #include <Op_VEF_Face.h>
+#include <TRUST_Ref.h>
 
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_Cl_VEF;
+class Domaine_VEF;
+class Champ_Fonc;
+class Champ_P1NC;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Champ_Inc;
 
 //////////////////////////////////////////////////////////////////////////////

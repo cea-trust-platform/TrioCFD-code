@@ -22,7 +22,7 @@
 #ifndef Frontiere_ouverte_vitesse_vortex_included
 #define Frontiere_ouverte_vitesse_vortex_included
 
-#include <Entree_fluide_vitesse_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 
 class Frontiere_ouverte_vitesse_vortex : public Entree_fluide_vitesse_imposee
 {
@@ -30,8 +30,8 @@ class Frontiere_ouverte_vitesse_vortex : public Entree_fluide_vitesse_imposee
 public:
   void mettre_a_jour(double temps) override;
 protected:
-  // Sous-zone sur laquelle on veut calculer "integrale"
-  Nom nom_sous_zone_;
+  // Sous-domaine sur laquelle on veut calculer "integrale"
+  Nom nom_sous_domaine_;
   // Equation interface
   Nom nom_equation_;
   // La vitesse de sortie est (integrale-integrale_reference)*coeff_vitesse_

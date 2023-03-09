@@ -26,8 +26,8 @@
 
 #include <MorEqn.h>
 #include <Modele_Rayonnement_base.h>
+#include <TRUST_Deriv.h>
 
-Declare_deriv(Modele_Rayonnement_base);
 
 class Modele_Rayonnement : public MorEqn, public DERIV(Modele_Rayonnement_base)
 {

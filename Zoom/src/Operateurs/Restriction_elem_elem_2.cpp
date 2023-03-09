@@ -46,12 +46,12 @@ Entree& Restriction_elem_elem_2::readOn(Entree& s )
 /*! @brief calcul du nombre d'elements fins contenus dans chaque element grossier
  *
  */
-void Restriction_elem_elem_2::calculer(const Zone_VF& zone_VFG,
-                                       const Zone_VF& zone_VFF,
+void Restriction_elem_elem_2::calculer(const Domaine_VF& domaine_VFG,
+                                       const Domaine_VF& domaine_VFF,
                                        const IntVect& connect)
 {
   //Cerr<<"debut de  Restriction_elem_elem_2::calculer_nb_elemF_pour_chaque_elemG"<<finl;
-  int nb_elemG = zone_VFG.nb_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
   int nbelemsF;
   int num_elemG;
   int est_dedans;
@@ -59,15 +59,15 @@ void Restriction_elem_elem_2::calculer(const Zone_VF& zone_VFG,
   nb_elemF_.resize(nb_elemG);
   nb_elemF_ = 0;
   int nbfacesF;
-  const Zone& zonef = zone_VFF.zone();
-  const Zone& zoneg = zone_VFG.zone();
-  int nombre_face_elemF = zonef.nb_faces_elem();
-  const Elem_geom& elem_geomG = zoneg.type_elem();
+  const Domaine& domainef = domaine_VFF.domaine();
+  const Domaine& domaineg = domaine_VFG.domaine();
+  int nombre_face_elemF = domainef.nb_faces_elem();
+  const Elem_geom& elem_geomG = domaineg.type_elem();
   int num_elem_voisin;
-  const IntTab& voisinsF = zone_VFF.face_voisins();
+  const IntTab& voisinsF = domaine_VFF.face_voisins();
   int num_face;
-  const IntTab& num_face_elemF = zone_VFF.elem_faces();
-  const DoubleTab& cg_elem_fin = zone_VFF.xp();
+  const IntTab& num_face_elemF = domaine_VFF.elem_faces();
+  const DoubleTab& cg_elem_fin = domaine_VFF.xp();
   DoubleVect coordF;
   coordF.resize(dimension);
   int dim;
@@ -128,8 +128,8 @@ void Restriction_elem_elem_2::calculer(const Zone_VF& zone_VFG,
  *     les elemF autour de l'elemG
  *
  */
-void Restriction_elem_elem_2::restreindre(const Zone_VF& zone_VFG,
-                                          const Zone_VF& zone_VFF,
+void Restriction_elem_elem_2::restreindre(const Domaine_VF& domaine_VFG,
+                                          const Domaine_VF& domaine_VFF,
                                           const IntVect& connect,
                                           DoubleTab& valG,
                                           const DoubleTab& valF,int nb_comp)
@@ -140,25 +140,25 @@ void Restriction_elem_elem_2::restreindre(const Zone_VF& zone_VFG,
   int num_elemG;
   int comp;
   int nb_elem_fin;
-  int nb_elemG = zone_VFG.nb_elem();
-  int nb_elemFb = zone_VFF.nb_elem();
+  int nb_elemG = domaine_VFG.nb_elem();
+  int nb_elemFb = domaine_VFF.nb_elem();
   int nbelemsF;
   int nombre_total_elemF = connect.size_array();
   int nbfacesF;
 
-  const Zone& zonef = zone_VFF.zone();
-  const Zone& zoneg = zone_VFG.zone();
-  int nombre_face_elemF = zonef.nb_faces_elem();
-  const Elem_geom& elem_geomG = zoneg.type_elem();
+  const Domaine& domainef = domaine_VFF.domaine();
+  const Domaine& domaineg = domaine_VFG.domaine();
+  int nombre_face_elemF = domainef.nb_faces_elem();
+  const Elem_geom& elem_geomG = domaineg.type_elem();
 
   int num_face;
-  const IntTab& num_face_elemF = zone_VFF.elem_faces();
+  const IntTab& num_face_elemF = domaine_VFF.elem_faces();
   int num_elem_voisin;
-  const IntTab& voisinsF = zone_VFF.face_voisins();
+  const IntTab& voisinsF = domaine_VFF.face_voisins();
   int dim;
   DoubleVect coordF;
   coordF.resize(dimension);
-  const DoubleTab& cg_elem_fin = zone_VFF.xp();
+  const DoubleTab& cg_elem_fin = domaine_VFF.xp();
   int est_dedans;
 
 

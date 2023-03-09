@@ -54,3 +54,4 @@ void Rupture_bulles_1groupe_Yao_Morel::coefficient(const DoubleTab& alpha, const
           coeff(n_l, k) = coeff(k, n_l);
         }
 }
+

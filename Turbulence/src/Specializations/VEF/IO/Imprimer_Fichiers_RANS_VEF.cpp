@@ -23,7 +23,7 @@
 #include <SFichier.h>
 #include <EFichier.h>
 #include <Probleme_base.h>
-#include <Zone.h>
+#include <Domaine.h>
 
 Implemente_instanciable(Imprimer_Fichiers_RANS_VEF,"Imprimer_Fichiers_RANS_VEF",Interprete);
 
@@ -63,14 +63,14 @@ Entree& Imprimer_Fichiers_RANS_VEF::interpreter(Entree& is)
   Probleme_base& pb=ref_cast(Probleme_base, objet(nom_pb));
 
 
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,pb.equation(0).zone_dis().valeur());
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF,pb.equation(0).domaine_dis().valeur());
   const Equation_base& eqn_hydr = pb.equation(0);
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
 
-  //   const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();
-  //   const Zone_VEF& zone_VEF=ref_cast(Zone_VEF, zdisbase);
+  //   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  //   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   //   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  int nb_faces = zone_VEF.nb_faces();
+  int nb_faces = domaine_VEF.nb_faces();
 
   SFichier fic("vitesse_RANS.dat");
 

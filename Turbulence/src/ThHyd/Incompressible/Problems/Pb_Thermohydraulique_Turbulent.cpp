@@ -136,7 +136,7 @@ void Pb_Thermohydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil
  *     modeles de turbulences respectifs des equations
  *     de l'hydraulique et de la thermique (qui doivent etre de la meme famille).
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_thermique(const Zone_Cl_dis&,const Zone_Cl_dis&)
+ *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
  *
  * @return (int) renvoie toujours 1
  * @throws modeles de turbulence de famille differente pour
@@ -144,17 +144,17 @@ void Pb_Thermohydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil
  */
 int Pb_Thermohydraulique_Turbulent::verifier()
 {
-  const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();
-  const Zone_Cl_dis& zone_Cl_th = eq_thermique.zone_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
 
   // Verification de la compatibilite des conditions aux limites:
-  tester_compatibilite_hydr_thermique(zone_Cl_hydr,zone_Cl_th);
+  tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
   if ( sub_type(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
       const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Zone_Cl_dis& zone_Cl_turb = eqn.zone_Cl_dis();
-      tester_compatibilite_hydr_turb(zone_Cl_hydr, zone_Cl_turb);
+      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
   /*
     // Verification de la compatibilite des modeles de turbulence:

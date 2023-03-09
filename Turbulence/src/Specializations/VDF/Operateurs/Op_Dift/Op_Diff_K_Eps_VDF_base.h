@@ -24,11 +24,11 @@
 
 #include <Eval_Diff_K_Eps_VDF_leaves.h>
 #include <Op_Diff_K_Eps_base.h>
+#include <Iterateur_VDF_Elem.h>
 #include <Op_VDF_Elem.h>
-#include <ItVDFEl.h>
 
-class Zone_Cl_dis;
-class Zone_dis;
+class Domaine_Cl_dis;
+class Domaine_dis;
 class Champ_Inc;
 
 class Op_Diff_K_Eps_VDF_base : public Op_Diff_K_Eps_base, public Op_VDF_Elem
@@ -46,7 +46,6 @@ public:
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
 
-  inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
   inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override
   {
     mettre_a_jour_diffusivite();
@@ -71,14 +70,14 @@ class Op_Diff_K_Eps_VDF_Generique
 protected:
 
   template <typename EVAL_TYPE>
-  inline void associer_impl(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_cl_dis, const Champ_Inc& ch_diffuse)
+  inline void associer_impl(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_cl_dis, const Champ_Inc& ch_diffuse)
   {
     const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
-    const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-    const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+    const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+    const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
     iter_()->associer(zvdf, zclvdf,static_cast<OP_TYPE&>(*this));
     EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter_()->evaluateur());
-    eval_diff.associer_zones(zvdf, zclvdf );
+    eval_diff.associer_domaines(zvdf, zclvdf );
     eval_diff.associer_inconnue(inco );
   }
 

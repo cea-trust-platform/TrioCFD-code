@@ -43,7 +43,7 @@ Entree& Transport_turbulent_GGDH::readOn(Entree& is)
   return is;
 }
 
-void Transport_turbulent_GGDH::modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
+void Transport_turbulent_GGDH::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : NULL; //produit par alpha si Pb_Multiphase

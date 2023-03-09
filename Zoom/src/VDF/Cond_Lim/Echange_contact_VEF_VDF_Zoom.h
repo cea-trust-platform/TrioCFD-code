@@ -26,7 +26,7 @@
 #include <Echange_contact_VDF_Zoom_base.h>
 #include <Champ_front_zoom.h>
 #include <Pb_MG.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>
@@ -51,7 +51,7 @@ class Echange_contact_VEF_VDF_Zoom  : public Temperature_imposee_paroi
 
 public :
   void mettre_a_jour(double ) override ;
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 };
 
 

@@ -37,4 +37,4 @@ private:
   void sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
 };
 
-#endif /* Saturation_eau_c3_included */
+#endif /* Saturation_R12_c3_included */

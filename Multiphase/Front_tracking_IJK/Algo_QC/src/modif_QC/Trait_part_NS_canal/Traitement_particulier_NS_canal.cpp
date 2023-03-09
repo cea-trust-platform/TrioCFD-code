@@ -26,9 +26,9 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Probleme_base.h>
 #include <Discretisation_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Fluide_Quasi_Compressible.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Schema_Temps_base.h>
 #include <DoubleTrav.h>
@@ -37,10 +37,10 @@
 Implemente_base(Traitement_particulier_NS_canal,"Traitement_particulier_NS_canal",Traitement_particulier_NS_base);
 
 
-/*! @brief 
+/*! @brief
  *
- * @param (Sortie& is) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Traitement_particulier_NS_canal::printOn(Sortie& is) const
 {
@@ -48,10 +48,10 @@ Sortie& Traitement_particulier_NS_canal::printOn(Sortie& is) const
 }
 
 
-/*! @brief 
+/*! @brief
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& Traitement_particulier_NS_canal::readOn(Entree& is)
 {
@@ -776,9 +776,9 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
               Process::exit();
             }
 
-          const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
 
-          const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+          const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
           int num_cl,fac;
           int num_cl_rep=0;

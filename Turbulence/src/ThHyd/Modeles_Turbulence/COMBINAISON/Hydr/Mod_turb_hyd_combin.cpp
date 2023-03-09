@@ -22,7 +22,7 @@
 #include <Mod_turb_hyd_combin.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <TRUSTTabs.h>
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <stat_counters.h>
@@ -68,7 +68,7 @@ void Mod_turb_hyd_combin::set_param(Param& param)
 void Mod_turb_hyd_combin::discretiser()
 {
   Mod_turb_hyd_base::discretiser();
-  discretiser_K(mon_equation->schema_temps(),mon_equation->zone_dis(),energie_cinetique_turb_);
+  discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
 }
 
 // Precondition:
@@ -119,12 +119,12 @@ void Mod_turb_hyd_combin::mettre_a_jour(double temps)
 
 Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
 {
-  const Zone_VF& zone_VF = ref_cast(Zone_VF,equation().zone_dis().valeur());
-  const DoubleTab& xp = zone_VF.xp();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,equation().domaine_dis().valeur());
+  const DoubleTab& xp = domaine_VF.xp();
   DoubleTab& viscosite_valeurs =  la_viscosite_turbulente.valeurs();
   const Probleme_base& mon_pb = equation().probleme();
   double temps = equation().inconnue().temps();
-  int nb_ddl = zone_VF.nb_elem();
+  int nb_ddl = domaine_VF.nb_elem();
   double x=0;
   double y=0;
   double z=0;

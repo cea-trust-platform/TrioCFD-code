@@ -25,7 +25,7 @@
 #include <EFichierBin.h>
 #include <Discretisation_base.h>
 #include <sys/stat.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Frontiere_dis_base.h>
 #include <communications.h>
 #include <Probleme_base.h>
@@ -552,7 +552,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif( int num_face) const
 {
   if (corres.size()==0)
     {
-      // on recupere la zone
+      // on recupere le domaine
       int i0=0;
       // on cherche la premiere cond_lim rayo
       while (((les_faces_rayonnantes[i0].ensembles_faces_bord(0).nb_faces_bord()==0)||(les_faces_rayonnantes[i0].emissivite()==-1))&&(i0<nb_faces_totales())) i0++;
@@ -563,7 +563,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif( int num_face) const
       else
         {
           //Cerr<<me()<<" io "<< i0<<" "<<les_faces_rayonnantes[i0].ensembles_faces_bord(0).nb_faces_bord()<<finl;
-          nbre_face_de_bord=  les_faces_rayonnantes[i0].ensembles_faces_bord(0).la_cl_base().zone_Cl_dis().nb_faces_Cl();
+          nbre_face_de_bord=  les_faces_rayonnantes[i0].ensembles_faces_bord(0).la_cl_base().domaine_Cl_dis().nb_faces_Cl();
         }
       corres.resize(nbre_face_de_bord);
       corres=-1;

@@ -29,27 +29,25 @@
 class Op_Diff_K_Eps_Bas_Re_VDF_leaves { };
 /// \endcond
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)
 class Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi);
 public:
   Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi();
   inline void associer_diffusivite_turbulente() override { associer_diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(); }
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(zd,zcd,ch); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(zd,zcd,ch); }
   inline void associer_diffusivite(const Champ_base& ch) override { associer_diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(ch); }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(); }
   inline const Champ_base& diffusivite() const override { return diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>(); }
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)
 class Op_Diff_K_Eps_Bas_Re_VDF_Elem : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem);
 public:
   Op_Diff_K_Eps_Bas_Re_VDF_Elem();
   inline void associer_diffusivite_turbulente() override { associer_diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(); }
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(zd,zcd,ch); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(zd,zcd,ch); }
   inline void associer_diffusivite(const Champ_base& ch) override { associer_diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(ch); }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(); }
   inline const Champ_base& diffusivite() const override { return diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(); }
@@ -58,7 +56,6 @@ public:
 ///////////////////////////////////
 // VAR
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem)
 class Op_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Op_Diff_K_Eps_Bas_Re_VDF_base, public Op_Diff_K_Eps_VDF_Generique<Op_Diff_K_Eps_Bas_Re_VDF_var_Elem>
 {
   Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_var_Elem);
@@ -66,7 +63,7 @@ public:
   Op_Diff_K_Eps_Bas_Re_VDF_var_Elem();
   double calculer_dt_stab() const override;
   inline void associer_diffusivite_turbulente() override { associer_diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem,Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>(); }
-  inline void associer(const Zone_dis& zd, const Zone_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(zd,zcd,ch); }
+  inline void associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcd, const Champ_Inc& ch) override { associer_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(zd,zcd,ch); }
   inline void associer_diffusivite(const Champ_base& ch) override { associer_diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(ch); }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(); }
   inline const Champ_base& diffusivite() const override { return diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(); }

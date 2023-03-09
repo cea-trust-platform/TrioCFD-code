@@ -24,9 +24,11 @@
 #define Cond_Lim_rayo_semi_transp_included
 
 
-#include <Ref_Modele_rayo_semi_transp.h>
 #include <Neumann_sortie_libre.h>
 #include <Champ_front.h>
+#include <TRUST_Ref.h>
+
+class Modele_rayo_semi_transp;
 
 /*! @brief classe Cond_Lim_rayo_semi_transp
  *

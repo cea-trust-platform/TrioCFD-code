@@ -26,7 +26,9 @@
 #include <Connectivites_faces_couple.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Echange_contact_VEF_VDF_Zoom,"Contact_VEF_VDF",Temperature_imposee_paroi);
 
@@ -65,13 +67,13 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       int indice_pb=pbMG.indice_probleme(pbF.le_nom());
       le_pb2G=pbMG.pb_2G(indice_pb);
 
-      const Zone_dis_base& zone_disG = pbG.domaine_dis().zone_dis(0);
-      const Zone_VDF& zvdf = ref_cast(Zone_VDF, zone_disG); // ce doit etre en principe une zone VDF !!!
+      const Domaine_dis_base& domaine_disG = pbG.domaine_dis();
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_disG); // ce doit etre en principe un domaine VDF !!!
       const IntTab& face_voisinsG = zvdf.face_voisins();
       const DoubleVect& surfacesVDF = zvdf.face_surfaces();
 
-      const Zone_dis_base& zone_disF = pbF.domaine_dis().zone_dis(0);
-      const Zone_VEF& zvef = ref_cast(Zone_VEF, zone_disF); // ce doit etre en principe une zone VEF !!!
+      const Domaine_dis_base& domaine_disF = pbF.domaine_dis();
+      const Domaine_VEF& zvef = ref_cast(Domaine_VEF, domaine_disF); // ce doit etre en principe un domaine VEF !!!
       const IntTab& face_voisinsF = zvef.face_voisins();
 
 
@@ -100,7 +102,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       int i;
 
 
-      const Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 
@@ -130,7 +132,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
 
 
-      if (zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;
@@ -151,7 +153,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
               //find the associated boundary
               int boundary_index=-1;
-              int nb_boundaries=zvdf.zone().nb_front_Cl();
+              int nb_boundaries=zvdf.domaine().nb_front_Cl();
               for (int n_bord=0; n_bord<nb_boundaries; n_bord++)
                 {
                   if (zvdf.front_VF(n_bord).le_nom() == front_vf.le_nom())

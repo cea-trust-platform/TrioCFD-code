@@ -23,15 +23,16 @@
 #ifndef Taux_dissipation_turbulent_included
 #define Taux_dissipation_turbulent_included
 
-#include <Convection_Diffusion_std.h>
+#include <Convection_diffusion_turbulence_multiphase.h>
+#include <Operateur_Grad.h>
 #include <Fluide_base.h>
-#include <Ref_Fluide_base.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Taux_dissipation_turbulent Equation de transport du taux de dissipation turbulen (modele k-omega)
  *
- * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature Convection_diffusion_turbulence_multiphase
  */
-class Taux_dissipation_turbulent : public Convection_Diffusion_std
+class Taux_dissipation_turbulent : public Convection_diffusion_turbulence_multiphase
 {
   Declare_instanciable_sans_constructeur(Taux_dissipation_turbulent);
 
@@ -39,53 +40,17 @@ public :
 
   Taux_dissipation_turbulent();
 
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
   void discretiser() override;
-  const Milieu_base& milieu() const override;
-  Milieu_base& milieu() override;
-  void associer_milieu_base(const Milieu_base& ) override;
-  int impr(Sortie& os) const override;
+
   const Champ_Don& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
 
-  const Motcle& domaine_application() const override;
-
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
-  static void calculer_alpha_rho_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
+  static void calculer_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
-    return { "alpha_rho_omega", calculer_alpha_rho_omega };
+    return { "omega", calculer_omega };
   }
-
-  virtual int positive_unkown() override {return 1;};
-
-protected :
-
-  Champ_Inc l_inco_ch;
-  REF(Fluide_base) le_fluide;
 };
-
-
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline const Champ_Inc& Taux_dissipation_turbulent::inconnue() const
-{
-  return l_inco_ch;
-}
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline Champ_Inc& Taux_dissipation_turbulent::inconnue()
-{
-  return l_inco_ch;
-}
 
 #endif

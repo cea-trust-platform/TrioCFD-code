@@ -27,9 +27,10 @@
 
 Implemente_instanciable(Pb_Phase_field,"Pb_Phase_field",Pb_Fluide_base);
 // XD pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous incompressible-two-phase-flows. Complete description of the Phase Field model for incompressible and immiscible fluids can be found into this PDF: TRUST_ROOT/doc/TRUST/phase_field_non_miscible_manuel.pdf
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
+// XD attr constituant constituant constituant 1 Constituents.
 // XD attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
 // XD attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
-// XD ref constituant constituant
 
 /*! @brief Simple appel a: Pb_Fluide_base::printOn(Sortie&) Ecrit le probleme sur un flot de sortie.
  *
@@ -157,13 +158,13 @@ void Pb_Phase_field::typer_lire_milieu(Entree& is)
  * Le test se fait sur les conditions
  *     aux limites discretisees de chaque equation.
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_concentration(const Zone_Cl_dis&,const Zone_Cl_dis&)
+ *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
  *
  * @return (int) code de retour propage
  */
 int Pb_Phase_field::verifier()
 {
-  const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();
-  const Zone_Cl_dis& zone_Cl_co = eq_concentration.zone_Cl_dis();
-  return tester_compatibilite_hydr_concentration(zone_Cl_hydr,zone_Cl_co);
+  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
+  return tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
 }

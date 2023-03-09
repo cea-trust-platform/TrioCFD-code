@@ -14,6 +14,7 @@ prog_test : test_ftsatp.cpp
 librairies_flag : -lC3
 EOF
   sed 's/HAVE_LIBC3 0/HAVE_LIBC3 1/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+  sed 's/HAVE_LIBC3 0/HAVE_LIBC3 1/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_R12_c1.h
 else
   cat > $project_directory/project.cfg <<EOF
 # description section (required)
@@ -24,4 +25,5 @@ executable : CMFD
 
 EOF
   sed 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+  sed 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_R12_c1.h
 fi

@@ -24,7 +24,6 @@
 #include <Equation_base.h>
 #include <Discretisation_base.h>
 
-Implemente_deriv(Modele_Fonc_Bas_Reynolds_Base);
 Implemente_instanciable(Modele_Fonc_Bas_Reynolds,"Modele_Fonc_Bas_Reynolds",DERIV(Modele_Fonc_Bas_Reynolds_Base));
 
 //
@@ -53,11 +52,11 @@ Entree& Modele_Fonc_Bas_Reynolds::readOn(Entree& is )
   }
   DERIV(Modele_Fonc_Bas_Reynolds_Base)::typer(nom1);
   valeur().associer_eqn(equation());
-  valeur().associer(equation().zone_dis(), equation().zone_Cl_dis());
+  valeur().associer(equation().domaine_dis(), equation().domaine_Cl_dis());
   if ( valeur().ma_seconde_equation.non_nul() )
     {
       valeur().associer_eqn_2(seconde_equation());
-      valeur().associer(seconde_equation().zone_dis(), seconde_equation().zone_Cl_dis());
+      valeur().associer(seconde_equation().domaine_dis(), seconde_equation().domaine_Cl_dis());
     }
   valeur().associer_pb(equation().probleme());
   is >> valeur();

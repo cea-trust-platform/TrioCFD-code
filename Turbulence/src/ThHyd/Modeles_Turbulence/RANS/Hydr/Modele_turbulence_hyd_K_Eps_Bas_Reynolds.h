@@ -26,8 +26,8 @@
 
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 
 class Modele_turbulence_hyd_K_Eps_Bas_Reynolds : public  Mod_turb_hyd_RANS

@@ -105,12 +105,12 @@ int ParoiVEF_TBLE::init_lois_paroi()
       Cerr << "ParoiVEF_TBLE::init_lois_paroi()" << finl;
     }
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const Zone& zone = zone_VEF.zone();
-  const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int nfac = zone.nb_faces_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
+  const int nfac = domaine.nb_faces_elem();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
@@ -122,7 +122,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
 
   Paroi_hyd_base_VEF::init_lois_paroi_();
 
-  Paroi_TBLE_QDM::init_lois_paroi(la_zone_VEF, la_zone_Cl_VEF.valeur());
+  Paroi_TBLE_QDM::init_lois_paroi(le_dom_VEF, le_dom_Cl_VEF.valeur());
 
   int elem;
 
@@ -135,13 +135,13 @@ int ParoiVEF_TBLE::init_lois_paroi()
   DoubleVect n(dimension),t1(dimension),t2(dimension); // vecteurs orthonomes du repere local associe a la face paroi
   DoubleVect v_tang(nb_comp);
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -179,7 +179,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
                   t1[0] = -n[1];
                   t1[1] =  n[0];
 
-                  dist = distance_2D(num_face,elem,zone_VEF)*3./2.;
+                  dist = distance_2D(num_face,elem,domaine_VEF)*3./2.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1))*t1[1])/2.;
@@ -215,7 +215,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
                   t2[1] =  n[2]*t1[0] - n[0]*t1[2];
                   t2[2] =  n[0]*t1[1] - n[1]*t1[0];
 
-                  dist = distance_3D(num_face,elem,zone_VEF)*4./3.;
+                  dist = distance_3D(num_face,elem,domaine_VEF)*4./3.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0)+vit(num[2],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1)+vit(num[2],1))*t1[1]
@@ -316,13 +316,13 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab_k_eps)
 int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 {
   // on est en K-eps
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const Zone& zone = zone_VEF.zone();
-  const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int nfac = zone.nb_faces_elem();
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
+  const int nfac = domaine.nb_faces_elem();
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -342,7 +342,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 
   int methode=-1;
   int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
-  remplir_face_keps_imposee( flag_face_keps_imposee_, methode, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode, face_keps_imposee_, domaine_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
 
   double visco=-1;
   int l_unif;
@@ -400,13 +400,13 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   DoubleTab ts_boussi(nb_comp, nb_pts+1);
   ts_boussi=0.;
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -441,7 +441,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
                   t1[0] = -n[1];
                   t1[1] =  n[0];
 
-                  dist = distance_2D(num_face,elem,zone_VEF)*3./2.;
+                  dist = distance_2D(num_face,elem,domaine_VEF)*3./2.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1))*t1[1])/2.;
@@ -509,7 +509,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
                   t2[1] =  n[2]*t1[0] - n[0]*t1[2];
                   t2[2] =  n[0]*t1[1] - n[1]*t1[0];
 
-                  dist = distance_3D(num_face,elem,zone_VEF)*4./3.;
+                  dist = distance_3D(num_face,elem,domaine_VEF)*4./3.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0)+vit(num[2],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1)+vit(num[2],1))*t1[1]
@@ -697,13 +697,13 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   // Ca coince ici alors car le tble_scal n est pas initialise.
   // pas propre mais on laisse pour l'instant :
   // si isKeps=1, on est dans le cas k-eps
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  const Zone& zone = zone_VEF.zone();
-  const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int nfac = zone.nb_faces_elem();
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
+  const int nfac = domaine.nb_faces_elem();
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -726,7 +726,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
       // on prend la methode par defaut
       int methode=-1;
       int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
-      remplir_face_keps_imposee( flag_face_keps_imposee_, methode, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+      remplir_face_keps_imposee( flag_face_keps_imposee_, methode, face_keps_imposee_, domaine_VEF,le_dom_Cl_VEF,!is_champ_Q1NC);
     }
 
   double visco=-1;
@@ -779,7 +779,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
        }
        }
   */
-  //  termes_sources.resize(zone_VEF.nb_faces(),dimension);
+  //  termes_sources.resize(domaine_VEF.nb_faces(),dimension);
   //  eqn_hydr.sources().calculer(termes_sources); //les termes sources : commente : Pour ne pas prendre en compte lambda.uprime dans un premier temps
 
 
@@ -800,13 +800,13 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   DoubleTab ts_boussi(nb_comp, nb_pts+1);
   ts_boussi=0.;
 
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -841,7 +841,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                   t1[0] = -n[1];
                   t1[1] =  n[0];
 
-                  dist = distance_2D(num_face,elem,zone_VEF)*3./2.;
+                  dist = distance_2D(num_face,elem,domaine_VEF)*3./2.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1))*t1[1])/2.;
@@ -909,7 +909,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                   t2[1] =  n[2]*t1[0] - n[0]*t1[2];
                   t2[2] =  n[0]*t1[1] - n[1]*t1[0];
 
-                  dist = distance_3D(num_face,elem,zone_VEF)*4./3.;
+                  dist = distance_3D(num_face,elem,domaine_VEF)*4./3.;
 
                   v_tang[0] = ((vit(num[0],0)+vit(num[1],0)+vit(num[2],0))*t1[0]
                                +(vit(num[0],1)+vit(num[1],1)+vit(num[2],1))*t1[1]
@@ -1285,10 +1285,10 @@ int ParoiVEF_TBLE::calculer_k_eps(double& k, double& eps , double yp, double u_s
 
 int ParoiVEF_TBLE::calculer_stats()
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone& zone = zone_VEF.zone();
-  const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int nfac = zone.nb_faces_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
+  const int nfac = domaine.nb_faces_elem();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
@@ -1398,10 +1398,10 @@ void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
 
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone& zone = zone_VEF.zone();
-  const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int nfac = zone.nb_faces_elem();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine& domaine = domaine_VEF.domaine();
+  const DoubleTab& face_normale = domaine_VEF.face_normales();
+  const int nfac = domaine.nb_faces_elem();
 
   int num_face, num_face_global;
   double surf;
@@ -1427,8 +1427,8 @@ void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
       SFichier fic_post(tmp, ios::app);
 
       fic_post << "# t="<< tps << " " ;
-      fic_post << "x= " << zone_VEF.xv(num_face_global,0) << " " << "y= " << zone_VEF.xv(num_face_global,1) ;
-      if (dimension==3) fic_post << " "<< "z= " << zone_VEF.xv(num_face_global,2);
+      fic_post << "x= " << domaine_VEF.xv(num_face_global,0) << " " << "y= " << domaine_VEF.xv(num_face_global,1) ;
+      if (dimension==3) fic_post << " "<< "z= " << domaine_VEF.xv(num_face_global,2);
       fic_post << " " << "u*= " << tab_u_star(num_face_global)  ;
       //fic_post << " " << "dp/dt1= " << eq_vit[num_face].get_F0(0)  ;
       //if (dimension==3) fic_post << " " << "dp/dt2= " << eq_vit[num_face].get_F0(1)  ;
@@ -1516,19 +1516,19 @@ void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
 
 int ParoiVEF_TBLE::sauvegarder(Sortie& os) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   double tps =  mon_modele_turb_hyd->equation().inconnue().temps();
-  return Paroi_TBLE_QDM::sauvegarder(os, zone_VEF, la_zone_Cl_VEF.valeur(), tps);
+  return Paroi_TBLE_QDM::sauvegarder(os, domaine_VEF, le_dom_Cl_VEF.valeur(), tps);
 }
 
 
 int ParoiVEF_TBLE::reprendre(Entree& is)
 {
-  if (la_zone_VEF.non_nul()) // test pour ne pas planter dans "avancer_fichier(...)"
+  if (le_dom_VEF.non_nul()) // test pour ne pas planter dans "avancer_fichier(...)"
     {
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
       double tps_reprise = mon_modele_turb_hyd->equation().schema_temps().temps_courant();
-      return Paroi_TBLE_QDM::reprendre(is, zone_VEF, la_zone_Cl_VEF.valeur(), tps_reprise);
+      return Paroi_TBLE_QDM::reprendre(is, domaine_VEF, le_dom_Cl_VEF.valeur(), tps_reprise);
     }
   return 1;
 }

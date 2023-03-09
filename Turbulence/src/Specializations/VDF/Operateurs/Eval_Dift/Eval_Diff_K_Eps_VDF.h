@@ -22,11 +22,11 @@
 #ifndef Eval_Diff_K_Eps_VDF_included
 #define Eval_Diff_K_Eps_VDF_included
 
-#include <Ref_Champ_Fonc.h>
-#include <Ref_Champ_base.h>
 #include <Champ_Uniforme.h>
 #include <Champ_Fonc.h>
 #include <Champ_base.h>
+#include <TRUST_Ref.h>
+
 
 class Eval_Diff_K_Eps_VDF
 {

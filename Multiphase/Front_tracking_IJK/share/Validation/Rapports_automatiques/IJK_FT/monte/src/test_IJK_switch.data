@@ -44,7 +44,7 @@ Lire grid_splitting_NEW
 }
 
 
-switch_double
+switch_ft_double
 {
    direct_write 0
    old_ijk_splitting_ft_extension 20
