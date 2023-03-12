@@ -72,7 +72,7 @@ void Production_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matric
         double grad_grad = 0.;
         for (int d_U = 0; d_U < D; d_U++)
           for (int d_X = 0; d_X < D; d_X++)
-            grad_grad += ( tab_grad( e, d_U, d_X) + tab_grad( e, d_X, d_U) ) * tab_grad( e, d_U, d_X) ;
+            grad_grad += ( tab_grad( e, d_U, d_X,n) + tab_grad( e, d_X, d_U,n) ) * tab_grad( e, d_U, d_X,n) ;
 
         double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) * alpha_omega_ ;
 

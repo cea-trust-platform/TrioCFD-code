@@ -85,7 +85,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis& domaine_dis, const 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
   assert (vitesse.valeurs().line_size() == 1);
-   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
+  DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   for (int elem=0; elem<nelem_; elem++)
@@ -95,14 +95,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis& domaine_dis, const 
       for (int i=0; i<Objet_U::dimension; i++)
         for (int j=0; j<Objet_U::dimension; j++)
           {
-            double Sij = 0.5*( gij(elem,i,j) + gij(elem,j,i) ) ;
-//             if (i==j)
-//               {
-//                 for (int l=0; l<Objet_U::dimension; l++)
-//                   {
-//                     Sij -= 1/3 * gij(elem,l,l);
-//                   }
-//               }
+            double Sij = 0.5*( gij(elem,i,j,0) + gij(elem,j,i,0) ) ;
             somme2 += Sij*Sij;
           }
 
@@ -160,7 +153,7 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
   assert (vitesse.valeurs().line_size() == 1);
-   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
+  DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   DoubleTab U_etoile( nelem_);
@@ -175,23 +168,16 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis
       for (int i=0; i<Objet_U::dimension; i++)
         for (int j=0; j<Objet_U::dimension; j++)
           {
-            double Sij = 0.5*( gij(elem,i,j) + gij(elem,j,i) ) ;
-            double Rij = 0.5*( gij(elem,i,j) - gij(elem,j,i) ) ;
-//             if (i==j)
-//               {
-//                 for (int l=0; l<Objet_U::dimension; l++)
-//                   {
-//                     Sij -= 1/3 * gij(elem,l,l);
-//                   }
-//               }
+            double Sij = 0.5*( gij(elem,i,j,0) + gij(elem,j,i,0) ) ;
+            double Rij = 0.5*( gij(elem,i,j,0) - gij(elem,j,i,0) ) ;
 
             somme  += Sij*Sij+Rij*Rij;
             somme2 += Sij*Sij;
 
             for (int k=0; k<Objet_U::dimension; k++)
               {
-                double Sjk = 0.5*( gij(elem,j,k) + gij(elem,k,j) ) ;
-                double Ski = 0.5*( gij(elem,k,i) + gij(elem,i,k) ) ;
+                double Sjk = 0.5*( gij(elem,j,k,0) + gij(elem,k,j,0) ) ;
+                double Ski = 0.5*( gij(elem,k,i,0) + gij(elem,i,k,0) ) ;
 
                 somme3 += Sij*Sjk*Ski;
               }
@@ -247,23 +233,16 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine
       for (int i=0; i<Objet_U::dimension; i++)
         for (int j=0; j<Objet_U::dimension; j++)
           {
-            double Sij = 0.5*( gij(elem,i,j) + gij(elem,j,i) ) ;
-            double Rij = 0.5*( gij(elem,i,j) - gij(elem,j,i) ) ;
-//             if (i==j)
-//               {
-//                 for (int l=0; l<Objet_U::dimension; l++)
-//                   {
-//                     Sij -= 1/3 * gij(elem,l,l);
-//                   }
-//               }
+            double Sij = 0.5*( gij(elem,i,j,0) + gij(elem,j,i,0) ) ;
+            double Rij = 0.5*( gij(elem,i,j,0) - gij(elem,j,i,0) ) ;
 
             somme  += Sij*Sij+Rij*Rij;
             somme2 += Sij*Sij;
 
             for (int k=0; k<Objet_U::dimension; k++)
               {
-                double Sjk = 0.5*( gij(elem,j,k) + gij(elem,k,j) ) ;
-                double Ski = 0.5*( gij(elem,k,i) + gij(elem,i,k) ) ;
+                double Sjk = 0.5*( gij(elem,j,k,0) + gij(elem,k,j,0) ) ;
+                double Ski = 0.5*( gij(elem,k,i,0) + gij(elem,i,k,0) ) ;
 
                 somme3 += Sij*Sjk*Ski;
               }

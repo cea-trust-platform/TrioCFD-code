@@ -101,7 +101,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
             double secmem_en = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                secmem_en += ( tab_grad( e, d_U, d_X) + tab_grad( e, d_X, d_U) ) * tab_grad( e, d_U, d_X) ;
+                secmem_en += ( tab_grad( e, d_U, d_X,n) + tab_grad( e, d_X, d_U,n) ) * tab_grad( e, d_U, d_X,n) ;
             secmem_en *= pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) * nut(e, n) ;
 
             secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
@@ -118,7 +118,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
             double grad_grad = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                grad_grad += ( tab_grad( e, d_U, d_X) + tab_grad( e, d_X, d_U) ) * tab_grad( e, d_U, d_X) ;
+                grad_grad += ( tab_grad( e, d_U, d_X,n) + tab_grad( e, d_X, d_U,n) ) * tab_grad( e, d_U, d_X,n) ;
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 

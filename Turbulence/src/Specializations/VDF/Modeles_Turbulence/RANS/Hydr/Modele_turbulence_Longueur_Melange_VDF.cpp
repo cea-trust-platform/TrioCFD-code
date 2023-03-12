@@ -174,7 +174,7 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
         for ( j=0 ; j<dimension ; j++)
           {
             //Deplacement du calcul de Sij
-            Sij=0.5*(duidxj(elem,i,j) + duidxj(elem,j,i));
+            Sij=0.5*(duidxj(elem,i,j,0) + duidxj(elem,j,i,0));
             Sij2(elem)+=Sij*Sij;
           }
     }

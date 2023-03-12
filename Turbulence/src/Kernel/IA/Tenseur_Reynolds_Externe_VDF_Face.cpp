@@ -490,8 +490,8 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
       for (int i=0; i<Objet_U::dimension; i++)
         for (int j=0; j<Objet_U::dimension; j++)
           {
-            S_etoile(elem,i,j) = 0.5*( gij(elem,i,j) + gij(elem,j,i) ) * k_sur_eps;
-            R_etoile(elem,i,j) = 0.5*( gij(elem,i,j) - gij(elem,j,i) ) * k_sur_eps;
+            S_etoile(elem,i,j) = 0.5*( gij(elem,i,j,0) + gij(elem,j,i,0) ) * k_sur_eps;
+            R_etoile(elem,i,j) = 0.5*( gij(elem,i,j,0) - gij(elem,j,i,0) ) * k_sur_eps;
           }
 
       for (int i=0; i<Objet_U::dimension; i++)

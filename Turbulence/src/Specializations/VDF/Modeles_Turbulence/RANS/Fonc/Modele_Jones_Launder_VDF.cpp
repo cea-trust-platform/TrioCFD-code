@@ -296,7 +296,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Domaine_dis& do
             for (int j=0; j<dimension; j++)
               for (int k=0; k<dimension; k++)
                 {
-                  der_seconde(i,j,k)=0.5*(gij(num[k+dimension],i,j)-gij(num[k],i,j))/le_dom.dim_elem(elem,k);
+                  der_seconde(i,j,k)=0.5*(gij(num[k+dimension],i,j,0)-gij(num[k],i,j,0))/le_dom.dim_elem(elem,k);
                 }
 
           if (!is_visco_const)
