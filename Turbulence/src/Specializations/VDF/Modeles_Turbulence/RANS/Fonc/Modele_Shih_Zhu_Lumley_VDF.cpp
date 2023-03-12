@@ -83,9 +83,9 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis& domaine_dis, const 
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  DoubleTab gij(nb_elem_tot,dimension,dimension);
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
-
+  assert (vitesse.valeurs().line_size() == 1);
+   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   for (int elem=0; elem<nelem_; elem++)
@@ -158,9 +158,9 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  DoubleTab gij(nb_elem_tot,dimension,dimension);
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
-
+  assert (vitesse.valeurs().line_size() == 1);
+   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   DoubleTab U_etoile( nelem_);
@@ -230,9 +230,9 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  DoubleTab gij(nb_elem_tot,dimension,dimension);
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
-
+  assert (vitesse.valeurs().line_size() == 1);
+  DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   DoubleTab U_etoile( nelem_);

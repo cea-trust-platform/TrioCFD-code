@@ -69,7 +69,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
   int e, n, mp;
 
   const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_qdm.inconnue().valeur());
-  DoubleTrav    tab_grad(ne_tot, D, D);//, tab_vit_liq(nf_tot);
+  DoubleTrav    tab_grad(ne_tot, D, D, ch_vit.valeurs().line_size());//, tab_vit_liq(nf_tot);
 //  boucle remplit  tab_vit_liq;
   ch_vit.calcul_duidxj(ch_vit.passe(), tab_grad, ref_cast(Domaine_Cl_VDF, ch_vit.domaine_Cl_dis().valeur()));
 

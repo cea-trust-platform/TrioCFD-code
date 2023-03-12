@@ -132,8 +132,8 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
   double sd2;
   double Sij,Sij2;
 
-
-  DoubleTab duidxj(nb_elem_tot,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab duidxj(nb_elem_tot,dimension,dimension, vitesse.line_size());
 
   vit.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 

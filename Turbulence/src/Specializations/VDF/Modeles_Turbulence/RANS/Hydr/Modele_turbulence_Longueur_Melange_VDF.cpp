@@ -159,7 +159,8 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const int nb_elem = domaine_VDF.nb_elem_tot();
 
-  DoubleTab duidxj(nb_elem,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab duidxj(nb_elem,dimension,dimension, vitesse.line_size());
   int i,j;
   double Sij;
 

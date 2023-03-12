@@ -272,7 +272,8 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Domaine_dis& do
 
       const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       int nb_elem_tot=le_dom.nb_elem_tot();
-      DoubleTab gij(nb_elem_tot,dimension,dimension);
+      assert (vitesse.valeurs().line_size() == 1);
+      DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
       // Rque methode non const Pourquoi ?
 
       ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj(vitesse.valeurs(),gij,ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur()));

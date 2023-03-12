@@ -744,7 +744,8 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_Sij(
   const DoubleTab& vitesse = inco.valeurs();
   const int nb_elem_tot = domaine_VDF.nb_elem_tot();
   const int nb_elem = domaine_VDF.nb_elem();
-  DoubleTab gij(nb_elem_tot,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.line_size());
 
   vit.calcul_duidxj(vitesse,gij,domaine_Cl_VDF);
   // Calcul de Sij

@@ -103,7 +103,8 @@ void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
   int elem;
   DoubleTab psc(dimension,dimension);
 
-  DoubleTab duidxj(nb_elem_tot,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab duidxj(nb_elem_tot,dimension,dimension, vitesse.line_size());
 
   vit.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 
