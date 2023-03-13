@@ -23,18 +23,6 @@
 #include <Dissipation_energie_cin_turb_PolyMAC_P0.h>
 
 Implemente_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0,"Dissipation_energie_cin_turb_Elem_PolyMAC_P0|Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0", Source_Dissipation_energie_cin_turb);
-// XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente -1 Dissipation source term used in the TKE equation
-// XD attr beta_k floattant beta_k 1 Constant for the used model
-
-// XD Production_echelle_temp_taux_diss_turb source_base Production_echelle_temp_taux_diss_turb -1 Production source term used in the tau and omega equations
-// XD attr alpha_omega floattant alpha_omega 1 Constant for the used model
-
-// XD Dissipation_echelle_temp_taux_diss_turb source_base Dissipation_echelle_temp_taux_diss_turb -1 Dissipation source term used in the tau and omega equations
-// XD attr beta_omega floattant beta_omega 1 Constant for the used model
-
-// XD Diffusion_croisee_echelle_temp_taux_diss_turb source_base Diffusion_croisee_echelle_temp_taux_diss_turb -1 Cross-diffusion source term used in the tau and omega equations
-// XD attr sigma_d floattant sigma_d 1 Constant for the used model
-
 
 Sortie& Dissipation_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const { return Source_Dissipation_energie_cin_turb::printOn(os); }
 Entree& Dissipation_energie_cin_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Dissipation_energie_cin_turb::readOn(is); }

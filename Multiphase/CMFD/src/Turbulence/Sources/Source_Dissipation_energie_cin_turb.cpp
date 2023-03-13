@@ -30,7 +30,7 @@
 #include <Matrix_tools.h>
 
 Implemente_base(Source_Dissipation_energie_cin_turb,"Source_Dissipation_energie_cin_turb", Sources_Multiphase_base);
-// XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente -1 Dissipation source term used in the TKE equation
+// XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente 1 Dissipation source term used in the TKE equation
 // XD attr beta_k floattant beta_k 1 Constant for the used model
 
 // XD Production_echelle_temp_taux_diss_turb source_base Production_echelle_temp_taux_diss_turb -1 Production source term used in the tau and omega equations

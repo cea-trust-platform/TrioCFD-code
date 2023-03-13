@@ -393,7 +393,7 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   param.ajouter("parcours_interface",&parcours_);
 
   // param.ajouter_non_std("terme_gravite",(this));
-  param.ajouter("terme_gravite", &terme_gravite_);
+  param.ajouter("terme_gravite", &terme_gravite_); // XD_ADD_P chaine(into=["rho_g","grad_i"]) not_set
   param.dictionnaire("rho_g", GRAVITE_RHO_G);
   param.dictionnaire("grad_i", GRAVITE_GRAD_I);
 

@@ -30,6 +30,7 @@
 #include <vector>
 
 Implemente_base(Source_Diffusion_supplementaire_echelle_temp_turb,"Source_Diffusion_supplementaire_lin_echelle_temp_turb|Source_Diffusion_supplementaire_echelle_temp_turb", Sources_Multiphase_base);
+// XD Diffusion_supplementaire_lin_echelle_temp_turb source_base Diffusion_supplementaire_echelle_temp_turb 0 not_set
 
 Sortie& Source_Diffusion_supplementaire_echelle_temp_turb::printOn(Sortie& os) const { return os;}
 
