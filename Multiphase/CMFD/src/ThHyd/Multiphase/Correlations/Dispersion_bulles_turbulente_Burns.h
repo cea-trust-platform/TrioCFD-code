@@ -24,6 +24,7 @@
 #define Dispersion_bulles_turbulente_Burns_included
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Dispersion_bulles_turbulente_Burns
  *     coefficients de dispersion selon le modele Burns et al 2004
@@ -35,12 +36,14 @@ class Dispersion_bulles_turbulente_Burns : public Dispersion_bulles_base
   Declare_instanciable(Dispersion_bulles_turbulente_Burns);
 public:
   void coefficient(const input_t& input, output_t& output) const override;
-
+  void completer() override;
+  
 protected:
-  Correlation correlation_drag_;
+  REF(Correlation) correlation_drag_;
   int n_l = -1; //phase liquide
   double Prt_ = .9 ; // Turbulent Prandtl number
   double minimum_ = -1.;
+  double a_res_ = -1.;
 };
 
 #endif
