@@ -33,6 +33,7 @@
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
+#include <Dispersion_bulles_turbulente_Burns.h>
 
 Implemente_instanciable(Correction_Lubchenko_PolyMAC_P0, "Correction_Lubchenko_Face_PolyMAC_P0", Source_base);
 
@@ -47,6 +48,7 @@ Entree& Correction_Lubchenko_PolyMAC_P0::readOn(Entree& is)
   param.ajouter("beta_lift", &beta_lift_);
   param.ajouter("beta_disp", &beta_disp_);
   param.ajouter("portee_disp", &portee_disp_);
+  param.ajouter("portee_lift", &portee_lift_);
   param.lire_avec_accolades_depuis(is);
 
   //identification des phases
@@ -370,9 +372,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
             if (k!= n_l) // gas phase
               {
                 // Damping of the lift force close to the wall;
-                if      (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
-                else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
-                else                                   fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
+                if      (y_elem(e) < .5*d_bulles(e,k)*portee_lift_) fac_e *= -1 ; // suppresses lift
+                else if (y_elem(e) >    d_bulles(e,k)*portee_lift_) fac_e *=  0 ; // no effect
+                else   fac_e *= (3*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 2) - 2*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 3)) - 1; // partial damping
 
                 secmem(i, n_l) += fac_e * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
                 secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
@@ -388,9 +390,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                       int c = (e == f_e(f, 0)) ? 0 : 1 ;
                       double fac_f = beta_lift_*pf(f) * vf_dir(f, c);  // Coherence with portance_interfaciale that calculates the correlation at the element
 
-                      if   (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
-                      else if (y_elem(e) > d_bulles(e,k)) fac_f *=  0 ; // no effect
-                      else                                fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
+                      if   (y_elem(e) < .5*d_bulles(e,k)*portee_lift_) fac_f *= -1 ; // suppresses lift
+                      else if (y_elem(e) > d_bulles(e,k)*portee_lift_) fac_f *=  0 ; // no effect
+                      else fac_f *= (3*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 2) - 2*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 3)) - 1; // partial damping
 
                       secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
                       secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * vr_l(k, 1) * vort(e, 0) ;
@@ -406,9 +408,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
             if (k!= n_l) // gas phase
               {
                 // Damping of the lift force close to the wall;
-                if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
-                else if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
-                else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-1, 3)) - 1; // partial damping
+                if (y_elem(e) < .5*d_bulles(e,k)*portee_lift_) fac_e *= -1 ; // suppresses lift
+                else if (y_elem(e) >    d_bulles(e,k)*portee_lift_) fac_e *=  0 ; // no effect
+                else fac_e *= (3*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 2) - 2*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 3)) - 1; // partial damping
 
                 secmem(i, n_l) += fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
                 secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
@@ -518,9 +520,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
               {
                 fac_f = beta_lift_*pf(f) * vf(f);
 
-                if   (y_faces(f) < .5*d_b_l(k)) fac_f *= -1 ; // suppresses lift
-                else if (y_faces(f) > d_b_l(k)) fac_f *=  0 ; // no effect
-                else                            fac_f *= (3*std::pow(2*y_faces(f)/d_b_l(k)-1, 2) - 2*std::pow(2*y_faces(f)/d_b_l(k)-1, 3)) - 1; // partial damping
+                if   (y_faces(f) < .5*d_b_l(k)*portee_lift_) fac_f *= -1 ; // suppresses lift
+                else if (y_faces(f) > d_b_l(k)*portee_lift_) fac_f *=  0 ; // no effect
+                else  fac_f *= (3*std::pow(2*y_faces(f)/(d_b_l(k)*portee_lift_)-1, 2) - 2*std::pow(2*y_faces(f)/(d_b_l(k)*portee_lift_)-1, 3)) - 1; // partial damping
 
                 secmem(f, n_l) += fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
                 secmem(f,  k ) -= fac_f * n_f(f, 0)/fs(f) * out.Cl(n_l, k) * (vr_l(k, 1) * vort_l(2) - vr_l(k, 2) * vort_l(1)) ;
