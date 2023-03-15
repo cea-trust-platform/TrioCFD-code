@@ -38,7 +38,7 @@ Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("minimum", &minimum_);
-  //param.ajouter("a_res", &a_res_here_);
+  param.ajouter("a_res", &a_res_);
   param.lire_avec_accolades_depuis(is);
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : NULL;
@@ -56,8 +56,9 @@ Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
 
 void Dispersion_bulles_turbulente_Burns::completer()
 {
- if (a_res_ == -1)
-      a_res_ = std::max(1.e-4, ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()*100.);
+ if ((a_res_ == -1) && (ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()<0.99) ) // Pas en homogene
+      a_res_ = std::min(1., std::max(1.e-4, ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()*100.));
+  else if (a_res_ == -1) a_res_ = 1.e-6;
 }
 
 void Dispersion_bulles_turbulente_Burns::coefficient(const input_t& in, output_t& out) const
