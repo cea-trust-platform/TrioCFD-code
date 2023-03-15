@@ -51,7 +51,7 @@ void Portance_interfaciale_Sugrue_Modifiee::coefficient(const input_t& in, outpu
         int ind_trav = (k>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (k-n_l-1) : (k*(N-1)-(k-1)*(k)/2) + (n_l-k-1);
 
         double Eo = g_ * std::abs(in.rho[n_l]-in.rho[k]) * in.d_bulles[k]*in.d_bulles[k]/in.sigma[ind_trav];
-        double Wo = std::min(Eo * in.k_turb[n_l]/std::max(in.nv[N*n_l+k]*in.nv[N*n_l+k], 1.e-8) , 6.); // Experimental validation up to Wo=6
+        double Wo = std::min(Eo * in.k_turb[n_l]/std::max(in.nv(n_l,k)*in.nv(n_l,k), 1.e-8) , 6.); // Experimental validation up to Wo=6
         double f_Wo = std::min(0.03, 5.0404 - 5.0781*std::pow(Wo, 0.0108));
         double f_alp= in.alpha[k] < .5 ? 1 : ( in.alpha[k] > .8 ? 0 : (.8-in.alpha[k])/.3 );
         double Cl = f_Wo*f_alp ;
