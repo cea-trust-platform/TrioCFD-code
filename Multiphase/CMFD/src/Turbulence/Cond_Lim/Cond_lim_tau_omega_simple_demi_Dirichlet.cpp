@@ -21,23 +21,17 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Cond_lim_tau_omega_simple_demi_Dirichlet.h>
-#include <Motcle.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Loi_paroi_adaptative.h>
-#include <Frontiere_dis_base.h>
-#include <Frontiere.h>
-#include <Pb_Multiphase.h>
-#include <Navier_Stokes_std.h>
-#include <Domaine_VF.h>
-#include <Operateur_Diff_base.h>
+
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 #include <Op_Diff_PolyMAC_base.h>
-#include <Op_Diff_PolyMAC_P0_base.h>
-#include <TRUSTTrav.h>
+#include <Loi_paroi_adaptative.h>
+#include <Champ_Face_base.h>
+#include <Equation_base.h>
+#include <Pb_Multiphase.h>
 #include <Domaine_VF.h>
+#include <TRUSTTrav.h>
+#include <Motcle.h>
 
 #include <math.h>
 
@@ -72,66 +66,64 @@ void Cond_lim_tau_omega_simple_demi_Dirichlet::completer()
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
 }
 
-int Cond_lim_tau_omega_simple_demi_Dirichlet::compatible_avec_eqn(const Equation_base& eqn) const
-{
-  Motcle dom_app=eqn.domaine_application();
-  Motcle Turbulence="Turbulence";
-
-  if (dom_app==Turbulence)
-    return 1;
-  else err_pas_compatible(eqn);
-  return 0;
-}
-
-void Cond_lim_tau_omega_simple_demi_Dirichlet::mettre_a_jour(double tps)
-{
-  if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
-}
-
-int Cond_lim_tau_omega_simple_demi_Dirichlet::initialiser(double temps)
-{
-  d_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
-
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
-
-  return 1;
-}
-
 void Cond_lim_tau_omega_simple_demi_Dirichlet::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
-  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
-  const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&      nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab& y = corr_loi_paroi.get_tab("y");
+  const DoubleTab& nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe(),
+                   &vit = domaine_Cl_dis().equation().probleme().get_champ("vitesse").passe();
 
-  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
+
+  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), nf_tot = domaine.nb_faces_tot(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face(), D = dimension;
   const IntTab& f_e = domaine.face_voisins();
+  const DoubleTab& n_f = domaine.face_normales();
+  const DoubleVect& fs = domaine.face_surfaces();
+
+  int Nv = vit.line_size();
+
+  DoubleTab pvit_elem(0, Nv * dimension);
+  if (nf_tot == vit.dimension_tot(0))
+    {
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue().valeur());
+      domaine.domaine().creer_tableau_elements(pvit_elem);
+      ch.get_elem_vector_field(pvit_elem, true);
+    }
 
   int n = 0 ; // Carrying phase is 0 for turbulent flows
 
-  if (is_tau_ == 1)
+  for (int f =0 ; f < nf ; f++)
     {
-      for (int f =0 ; f < nf ; f++)
-        {
-          int f_domaine = f + f1; // number of the face in the domaine
-          int e_domaine = f_e(f_domaine,0);
+      int f_domaine = f + f1; // number of the face in the domaine
+      int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
 
-          d_(f, n) = .5*facteur_paroi_*calc_tau(y(f_domaine, n)/2., u_tau(f_domaine, n), nu_visc(e_domaine, n));
-        }
-    }
-  if (is_tau_ == 0)
-    {
-      for (int f =0 ; f < nf ; f++)
+      double u_orth = 0 ;
+      DoubleTrav u_parallel(D);
+      if (nf_tot == vit.dimension_tot(0)) // <=> VDF
         {
-          int f_domaine = f + f1; // number of the face in the domaine
-          int e_domaine = f_e(f_domaine,0);
-
-          d_(f, n) = 2. * facteur_paroi_*calc_omega(y(f_domaine, n)/2., u_tau(f_domaine, n), nu_visc(e_domaine, n));
+          for (int d = 0; d <D ; d++) u_orth -= pvit_elem(e_domaine, Nv*d+n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e_domaine, Nv*d+n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
         }
+      else // <=> PolyMAC
+        {
+          for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e_domaine * D+d, n)*n_f(f_domaine,d)/fs(f_domaine); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e_domaine * D + d, n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+        }
+      double norm_u_parallel = std::sqrt(domaine.dot(&u_parallel(0), &u_parallel(0)));
+
+      if (is_tau_ == 1)
+        {
+          double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_domaine, 0), y(f_domaine, 0)/2.);
+          d_(f, n) = .5*facteur_paroi_*calc_tau(y(f_domaine, n)/2., u_tau_demi, nu_visc(e_domaine, n));
+        }
+      if (is_tau_ == 0)
+        {
+          double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_domaine, 0), y(f_domaine, 0)/2.);
+          d_(f, n) = 2. * facteur_paroi_*calc_omega(y(f_domaine, n)/2., u_tau_demi, nu_visc(e_domaine, n));
+        }
+      d_.echange_espace_virtuel();
     }
-  d_.echange_espace_virtuel();
+
 }
 
 double Cond_lim_tau_omega_simple_demi_Dirichlet::calc_tau(double y, double u_tau, double visc)
@@ -149,13 +141,13 @@ double Cond_lim_tau_omega_simple_demi_Dirichlet::calc_tau(double y, double u_tau
 
 double Cond_lim_tau_omega_simple_demi_Dirichlet::calc_omega(double y, double u_tau, double visc)
 {
-    double y_p = y * u_tau / visc;
-    double w_vis = 6 * visc / (beta_omega * y * y);
-    double w_log = u_tau / ( std::sqrt(beta_k) * von_karman_ * y);
-    double w_1 = w_vis + w_log ;
-    double w_2 = std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2 );
-    double blending = std::tanh( y_p/10*y_p/10*y_p/10*y_p/10);
+  double y_p = y * u_tau / visc;
+  double w_vis = 6 * visc / (beta_omega * y * y);
+  double w_log = u_tau / ( std::sqrt(beta_k) * von_karman_ * y);
+  double w_1 = w_vis + w_log ;
+  double w_2 = std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2 );
+  double blending = std::tanh( y_p/10*y_p/10*y_p/10*y_p/10);
 
-    return blending * w_1 + (1-blending) * w_2 ;
+  return blending * w_1 + (1-blending) * w_2 ;
 }
 

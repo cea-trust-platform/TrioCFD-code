@@ -40,9 +40,10 @@ class Cond_lim_tau_omega_simple_demi : public Echange_global_impose_turbulent
 
 public :
   virtual void completer() override;
-  void me_calculer() override;
 
 protected :
+  void me_calculer() override;
+
   double calc_tau(double y, double u_tau, double visc);
   double calc_omega(double y, double u_tau, double visc);
 

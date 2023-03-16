@@ -40,9 +40,10 @@ class Cond_lim_k_simple_flux_nul  : public Echange_global_impose_turbulent
 public :
   void completer() override;
   int initialiser(double temps) override;
-  void me_calculer() override ;
 
 protected :
+  void me_calculer() override ;
+
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
 
 };

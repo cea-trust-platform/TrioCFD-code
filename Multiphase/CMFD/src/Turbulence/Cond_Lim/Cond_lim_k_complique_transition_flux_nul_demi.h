@@ -40,9 +40,9 @@ class Cond_lim_k_complique_transition_flux_nul_demi  : public Echange_global_imp
 public :
 
   void completer() override;
-  void me_calculer() override;
 
 protected :
+  void me_calculer() override;
   double calc_k(double y, double u_tau, double visc);
 
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
