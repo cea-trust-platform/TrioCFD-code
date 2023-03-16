@@ -644,7 +644,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
       exit();
     }
   splitting_ = ref_cast(IJK_Splitting, Interprete_bloc::objet_global(ijk_splitting_name));
-
   Cerr << "Construction de la domaine VDF NS pour les sondes..." << finl;
   refprobleme_ns_ = creer_domaine_vdf(splitting_, "DOM_NS_VDF");
 
@@ -2584,8 +2583,10 @@ void IJK_FT_double::run()
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
-      splitting_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
-      splitting_ft_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
+      //IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_;
+
+      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_;
+      //splitting_ft_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
