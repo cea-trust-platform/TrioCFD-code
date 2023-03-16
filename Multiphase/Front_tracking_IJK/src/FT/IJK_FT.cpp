@@ -644,6 +644,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
       exit();
     }
   splitting_ = ref_cast(IJK_Splitting, Interprete_bloc::objet_global(ijk_splitting_name));
+
   Cerr << "Construction de la domaine VDF NS pour les sondes..." << finl;
   refprobleme_ns_ = creer_domaine_vdf(splitting_, "DOM_NS_VDF");
 
@@ -2583,10 +2584,7 @@ void IJK_FT_double::run()
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
-      //IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_;
-
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_;
-      //splitting_ft_.set_shear_x_time(boundary_conditions_.get_dU_perio()*current_time_);
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -4372,6 +4370,7 @@ Vecteur3 IJK_FT_double::calculer_inv_rho_grad_p_moyen(const IJK_Field_double& rh
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
+
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {
@@ -4399,6 +4398,7 @@ Vecteur3 IJK_FT_double::calculer_grad_p_moyen(const IJK_Field_double& pression)
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
+
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {
@@ -4428,6 +4428,7 @@ Vecteur3 IJK_FT_double::calculer_grad_p_over_rho_moyen(const IJK_Field_double& p
   FixedVector<IJK_Field_double, 3> champ;
   allocate_velocity(champ, splitting_, 1);
   Vecteur3 resu;
+
   // Remise a zero :
   for (int dir = 0; dir < 3; dir++)
     {

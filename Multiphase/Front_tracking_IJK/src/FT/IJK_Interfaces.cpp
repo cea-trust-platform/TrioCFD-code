@@ -1804,7 +1804,7 @@ void IJK_Interfaces::transporter_maillage(const double dt_tot, ArrOfDouble& dvol
 #endif
       // Pas necessaire de mettre a jour l'EV car le transport n'utilise pas les
       // sommets virt :
-      // mesh.desc_sommets().(vinterp);
+      // mesh.desc_sommets().echange_espace_virtuel(vinterp);
       runge_kutta3_update(vinterp_, RK3_G_store_vi_, deplacement, rk_step, dt_tot, mesh);
 
       // La mise a jour de l'espace virt me semble inutile car mesh.transporter ne

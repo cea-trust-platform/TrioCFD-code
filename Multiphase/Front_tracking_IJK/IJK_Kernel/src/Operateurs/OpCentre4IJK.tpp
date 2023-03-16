@@ -111,8 +111,6 @@ void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const 
   //  (assume one walls at zmin and zmax)
   const int first_global_k_layer = channel_data_.first_global_k_layer_flux(icompo, idir);
   const int last_global_k_layer = channel_data_.last_global_k_layer_flux(icompo, idir);
-//  Boundary_Conditions::BCType bc_type = ref_bc_.valeur().get_bctype_k_min();
-//  double DU_perio=ref_bc_.valeur().get_dU_perio() ;
 
   if (!perio_k_ && (global_k_layer <= first_global_k_layer || global_k_layer >= last_global_k_layer))
     {
@@ -160,48 +158,11 @@ void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const 
             Simd_double vit_0_0,vit_0,vit_1,vit_1_1; // 4 adjacent velocity values
             src_ptr.get_leftleft_left_center_right(_DIR_,i,vit_0_0,vit_0,vit_1,vit_1_1);
 
-            // For Mixte_shear boundary condition
-            // perio_z + velocity jump DU_perio at z=0
-            // --> change value of velocity for 4th order interpolation of Ux un Z-direction
-//            if(_DIR_ == DIRECTION::Z && _VCOMPO_ == DIRECTION::X && bc_type==Boundary_Conditions::Mixte_shear)
-//              {
-//                if(global_k_layer == first_global_k_layer-1)
-//                  {
-//                    vit_0_0 +=DU_perio;
-//                    vit_0 +=DU_perio;
-//                  }
-//                else if(global_k_layer == first_global_k_layer)
-//                  {
-//                    vit_0_0 +=DU_perio;
-//                  }
-//
-//                else if(global_k_layer == last_global_k_layer + 1)
-//                  {
-//                    vit_1_1 -=DU_perio;
-//                    vit_1 -=DU_perio;
-//                  }
-//                else if(global_k_layer == last_global_k_layer)
-//                  {
-//                    vit_1_1 -=DU_perio;
-//                  }
-//              }
-
             Simd_double order4_velocity = g1 * vit_0_0 + g2 * vit_0 + g3 * vit_1 + g4 * vit_1_1;
 
             // get convecting velocity
             Simd_double vconv0, vconv1;
             vconv_ptr.get_left_center(_VCOMPO_,i, vconv0, vconv1);
-
-            // For Mixte_shear boundary condition
-            // perio_z + velocity jump DU_perio at z=0
-            // --> change value of convecting velocity for 2th order interpolation of Ux un Z-direction
-//            if(_DIR_ == DIRECTION::X && _VCOMPO_ == DIRECTION::Z && bc_type==Boundary_Conditions::Mixte_shear)
-//              {
-//                if(global_k_layer == first_global_k_layer-1)
-//                  {
-//                    vconv0 +=DU_perio;
-//                  }
-//              }
 
             Simd_double psc = vconv0 * constant_factor0 + vconv1 * constant_factor1;
             // with porosity we would code this: vconv = (vconv0 * porosity0 + vconv1 * porosity1) * constant_factor;
