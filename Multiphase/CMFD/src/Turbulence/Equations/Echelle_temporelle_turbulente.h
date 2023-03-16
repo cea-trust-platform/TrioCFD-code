@@ -45,10 +45,10 @@ public :
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
-  static void calculer_alpha_rho_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
+  static void calculer_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
-    return { "alpha_rho_tau", calculer_alpha_rho_tau };
+    return { "tau", calculer_tau };
   }
 };
 

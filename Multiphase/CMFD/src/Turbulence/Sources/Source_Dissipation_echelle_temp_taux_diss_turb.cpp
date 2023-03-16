@@ -44,82 +44,38 @@ Entree& Source_Dissipation_echelle_temp_taux_diss_turb::readOn(Entree& is)
   return is;
 }
 
-void Source_Dissipation_echelle_temp_taux_diss_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
-{
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
-
-  assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
-  for (auto &&n_m : matrices)
-    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
-      {
-        Matrice_Morse& mat = *n_m.second, mat2;
-        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
-        int nc = dep.dimension_tot(0),
-            M  = dep.line_size();
-        IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
-        if (n_m.first == "alpha" || n_m.first == "temperature") // N <= M
-          for (int e = 0; e < ne; e++)
-            for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
-        if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++)
-            for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
-        Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
-        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
-      }
-}
-
 void Source_Dissipation_echelle_temp_taux_diss_turb::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Domaine_VF& 		domaine 			= ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& 			diss 			= equation().inconnue().valeur().valeurs() ;
-  const DoubleTab& 			pdiss 			= equation().inconnue().valeur().passe() ;
-  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
-  const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
-  const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const DoubleTab& diss     = equation().inconnue().valeur().valeurs() ;
+  const DoubleTab& pdiss    = equation().inconnue().valeur().passe() ;
+  const DoubleVect& pe      = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  const int nb_elem = domaine.nb_elem(), N = diss.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
-  const int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
+  const int nb_elem = domaine.nb_elem(), N = diss.line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
   if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
   else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") abort();
 
-  int m, mp;
+  int n;
 
-  assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
+  assert( N == 1 ); 
 
   for (int e = 0; e < nb_elem; e++)
-    for (m = 0, mp = 0; m < N; m++, mp += (Np > 1))
+    for (n = 0; n<N; n++)
       {
         if (Type_diss == "tau")
           {
-            double secmem_en  = pe(e) * ve(e) * beta_omega * alpha_rho(e, m) ;
-            secmem(e, m) += secmem_en ;
-            for (auto &&i_m : matrices)
-              {
-                Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m)   -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, m) : 0 );			// derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m) -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp)  -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		// derivee par rapport a la pression
-              }
+            double secmem_en  = pe(e) * ve(e) * beta_omega ;
+            secmem(e, n) += secmem_en ;
           }
         else if (Type_diss == "omega")
           {
-            double secmem_en  = - pe(e) * ve(e) * beta_omega * pdiss(e,m) * (  pdiss(e,m) + 2 * (diss(e,m) - pdiss(e,m) )  );
-            secmem(e, m) += secmem_en ;
+            double secmem_en  = - pe(e) * ve(e) * beta_omega * pdiss(e,n) * (  pdiss(e,n) + 2 * (diss(e,n) - pdiss(e,n) ) );
+            secmem(e, n) += secmem_en ;
             for (auto &&i_m : matrices)
-              {
-                Matrice_Morse& mat = *i_m.second;
-                /*                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m)  += pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, m) : 0 )       * pdiss(e,m) * (  pdiss(e,m) + 2 * (diss(e,m) - pdiss(e,m) )  );			// derivee par rapport au taux de vide
-                                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m)+= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 ) * pdiss(e,m) * (  pdiss(e,m) + 2 * (diss(e,m) - pdiss(e,m) )  );// derivee par rapport a la temperature
-                                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp) += pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 )   * pdiss(e,m) * (  pdiss(e,m) + 2 * (diss(e,m) - pdiss(e,m) )  );		// derivee par rapport a la pression
-                */
-                if (i_m.first == "omega")   mat(N * e + m, N * e + m)   	+= pe(e) * ve(e) * beta_omega * 2* pdiss(e,m) ;
-              }
+                if (i_m.first == "omega") (*i_m.second)(N*e+n, N*e+n) += pe(e) * ve(e) * beta_omega * 2* pdiss(e,n) ;
           }
       }
 }
