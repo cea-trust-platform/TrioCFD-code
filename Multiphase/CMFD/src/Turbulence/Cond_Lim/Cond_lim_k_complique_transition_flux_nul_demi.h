@@ -23,7 +23,7 @@
 #ifndef Cond_lim_k_complique_transition_flux_nul_demi_included
 #define Cond_lim_k_complique_transition_flux_nul_demi_included
 
-#include <Echange_global_impose.h>
+#include <Echange_global_impose_turbulent.h>
 #include <TRUST_Ref.h>
 
 class Correlation;
@@ -32,56 +32,20 @@ class Correlation;
 /*! @brief Classe Cond_lim_k_complique_transition_flux_nul_demi:
  *
  */
-class Cond_lim_k_complique_transition_flux_nul_demi  : public Echange_global_impose
+class Cond_lim_k_complique_transition_flux_nul_demi  : public Echange_global_impose_turbulent
 {
 
   Declare_instanciable(Cond_lim_k_complique_transition_flux_nul_demi);
 
 public :
 
-  int compatible_avec_eqn(const Equation_base&) const override;
   void completer() override;
-  void liste_faces_loi_paroi(IntTab&) override;
-  int initialiser(double temps) override;
-  int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-
-  void associer_fr_dis_base(const Frontiere_dis_base& fr) override {la_frontiere_dis=fr;};
-  void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl)  override { mon_dom_cl_dis=zcl;};
-
-  // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
-  void fixer_nb_valeurs_temporelles(int nb_cases) override {};
-  inline Frontiere_dis_base& frontiere_dis() override {return la_frontiere_dis;};
-  inline const Frontiere_dis_base& frontiere_dis() const override {return la_frontiere_dis;};
-  void changer_temps_futur(double temps,int i) override {};
-  void set_temps_defaut(double temps) override {};
-  void calculer_coeffs_echange(double temps) override {};
-  void verifie_ch_init_nb_comp() const override {};
-
-  Champ_front& T_ext() override {Process::exit("Cond_lim_k_simple : You shouldn't go through T_ext ! ") ; return Echange_impose_base::T_ext();};
-  const Champ_front& T_ext() const override {Process::exit("Cond_lim_k_simple : You shouldn't go through T_ext ! ") ; return Echange_impose_base::T_ext();};
-  inline virtual Champ_front& h_imp() override {Process::exit("Cond_lim_k_simple : You shouldn't go through h_imp ! ") ; return Echange_impose_base::h_imp();};
-  inline virtual const Champ_front& h_imp() const override {Process::exit("Cond_lim_k_simple : You shouldn't go through h_imp ! ") ; return Echange_impose_base::h_imp();};
-  double h_imp(int num) const override ;
-  double h_imp(int num,int k) const override;
-  double h_imp_grad(int num) const override ;
-  double h_imp_grad(int num,int k) const override;
-  double T_ext(int num) const override;
-  double T_ext(int num,int k) const override;
+  void me_calculer() override;
 
 protected :
-  void me_calculer();
   double calc_k(double y, double u_tau, double visc);
 
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
-  double mon_temps = -1.e8;
-
-  REF(Correlation) correlation_loi_paroi_;
-  REF(Frontiere_dis_base) la_frontiere_dis;
-  DoubleTab h_;
-  DoubleTab h_grad_;
-  DoubleTab K_;
-
   double beta_k_ = 0.09;
 };
 

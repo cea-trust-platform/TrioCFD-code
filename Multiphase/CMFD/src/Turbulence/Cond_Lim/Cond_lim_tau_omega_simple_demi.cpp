@@ -21,24 +21,18 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Cond_lim_tau_omega_simple_demi.h>
-#include <Motcle.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Loi_paroi_adaptative.h>
-#include <Frontiere_dis_base.h>
-#include <Frontiere.h>
-#include <Pb_Multiphase.h>
-#include <Navier_Stokes_std.h>
-#include <Domaine_VF.h>
-#include <Operateur_Diff_base.h>
+
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
-#include <TRUSTTrav.h>
-#include <Domaine_VF.h>
-#include <Transport_turbulent_base.h>
 #include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_base.h>
+#include <Loi_paroi_adaptative.h>
+#include <Operateur_Diff_base.h>
+#include <Navier_Stokes_std.h>
 #include <Champ_Face_base.h>
+#include <Pb_Multiphase.h>
+#include <Domaine_VF.h>
+#include <TRUSTTrav.h>
 
 #include <math.h>
 
@@ -57,70 +51,14 @@ Entree& Cond_lim_tau_omega_simple_demi::readOn(Entree& s )
   param.ajouter("von_karman", &von_karman_);
   param.lire_avec_accolades_depuis(s);
 
-  le_champ_front.typer("Champ_front_vide");
-
-  return s;
+  return Echange_global_impose_turbulent::readOn(s);
 }
 
 void Cond_lim_tau_omega_simple_demi::completer()
 {
   if (sub_type(Echelle_temporelle_turbulente, domaine_Cl_dis().equation())) is_tau_ = 1;
   else if (sub_type(Taux_dissipation_turbulent, domaine_Cl_dis().equation())) is_tau_ = 0;
-  else Process::exit("Neumann_loi_paroi_faible_tau_omega : equation must be tau/omega !");
-}
-
-void Cond_lim_tau_omega_simple_demi::liste_faces_loi_paroi(IntTab& tab)
-{
-  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  int N = tab.line_size();
-
-  for (int f =0 ; f < nf ; f++)
-    for (int n = 0 ; n<N ; n++)
-      tab(f + f1, n) |= 1;
-}
-
-int Cond_lim_tau_omega_simple_demi::compatible_avec_eqn(const Equation_base& eqn) const
-{
-  Motcle dom_app=eqn.domaine_application();
-  Motcle Turbulence="Turbulence";
-
-  if (dom_app==Turbulence)
-    return 1;
-  else err_pas_compatible(eqn);
-  return 0;
-}
-
-double Cond_lim_tau_omega_simple_demi::T_ext(int i) const {return d_(i,0);}
-
-double Cond_lim_tau_omega_simple_demi::T_ext(int i, int j) const {return d_(i,j);}
-
-double Cond_lim_tau_omega_simple_demi::h_imp(int i) const {return h_(i,0);}
-
-double Cond_lim_tau_omega_simple_demi::h_imp(int i, int j) const {return h_(i,j);}
-
-double Cond_lim_tau_omega_simple_demi::h_imp_grad(int i) const {return h_grad_(i,0);}
-
-double Cond_lim_tau_omega_simple_demi::h_imp_grad(int i, int j) const {return h_grad_(i,j);}
-
-void Cond_lim_tau_omega_simple_demi::mettre_a_jour(double tps)
-{
-  if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
-}
-
-int Cond_lim_tau_omega_simple_demi::initialiser(double temps)
-{
-  h_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
-
-  h_grad_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
-
-  d_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
-
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
-
-  return 1;
+  else Process::exit("Cond_lim_tau_omega_simple_demi : equation must be tau/omega !");
 }
 
 void Cond_lim_tau_omega_simple_demi::me_calculer()
@@ -147,8 +85,8 @@ void Cond_lim_tau_omega_simple_demi::me_calculer()
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
 
-  if (mu.nb_dim() >= 3) Process::exit("Neumann_loi_paroi_faible_tau_omega : transport of tau/omega must be SGDH !");
-  if (N > 1)  Process::exit("Neumann_loi_paroi_faible_tau : Only one phase for turbulent wall law is coded for now");
+  if (mu.nb_dim() >= 3) Process::exit("Cond_lim_tau_omega_simple_demi : transport of tau/omega must be SGDH !");
+  if (N > 1)  Process::exit("Cond_lim_tau_omega_simple_demi : Only one phase for turbulent wall law is coded for now");
 
   int n = 0 ; // Carrying phase is 0 for turbulent flows
 
@@ -184,20 +122,20 @@ void Cond_lim_tau_omega_simple_demi::me_calculer()
           double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_domaine, 0), y(f_domaine, 0)/2.);
           h_(f, 0) = 2.*mu(e_domaine, 0)/y(f_domaine, 0) ;
           h_grad_(f, 0) = 2./y(f_domaine, 0) ;
-          d_(f, 0) = calc_tau(y(f_domaine, 0)/2., u_tau_demi, nu_visc(e_domaine, 0));
+          T_(f, 0) = calc_tau(y(f_domaine, 0)/2., u_tau_demi, nu_visc(e_domaine, 0));
         }
       if (is_tau_ == 0)
         {
           double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_domaine, 0), y(f_domaine, 0)/2.);
           h_(f, 0) = 2.*mu(e_domaine, 0)/y(f_domaine, 0) ;
           h_grad_(f, 0) = 2./y(f_domaine, 0) ;
-          d_(f, 0) = calc_omega(y(f_domaine, 0)/2., u_tau_demi, nu_visc(e_domaine, 0));
+          T_(f, 0) = calc_omega(y(f_domaine, 0)/2., u_tau_demi, nu_visc(e_domaine, 0));
         }
     }
 
   h_.echange_espace_virtuel();
   h_grad_.echange_espace_virtuel();
-  d_.echange_espace_virtuel();
+  T_.echange_espace_virtuel();
 }
 
 double Cond_lim_tau_omega_simple_demi::calc_tau(double y, double u_tau, double visc)

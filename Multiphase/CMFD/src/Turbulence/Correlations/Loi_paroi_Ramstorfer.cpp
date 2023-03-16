@@ -27,7 +27,6 @@
 #include <Navier_Stokes_std.h>
 #include <Domaine_Poly_base.h>
 #include <TRUSTTrav.h>
-#include <Neumann_loi_paroi.h>
 #include <Dirichlet_loi_paroi.h>
 #include <Paroi_frottante_loi.h>
 #include <Echange_impose_base.h>
@@ -78,8 +77,6 @@ void Loi_paroi_Ramstorfer::completer()
     for (int j = 0 ; j<pb_.valeur().equation(i).domaine_Cl_dis()->nb_cond_lim(); j++)
       {
         Cond_lim& cond_lim_loc = pb_.valeur().equation(i).domaine_Cl_dis()->les_conditions_limites(j);
-        if sub_type(Neumann_loi_paroi, cond_lim_loc.valeur())
-          ref_cast(Neumann_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         if sub_type(Dirichlet_loi_paroi, cond_lim_loc.valeur())
           ref_cast(Dirichlet_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         else if sub_type(Paroi_frottante_loi, cond_lim_loc.valeur())
