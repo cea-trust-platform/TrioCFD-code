@@ -18,7 +18,7 @@
 #include <Sources_Multiphase_base.h>
 #include <Champ_Don.h>
 
-/*! @brief 
+/*! @brief
  *
  *
  *
@@ -30,7 +30,7 @@ class Source_injection_masse_base : public Sources_Multiphase_base
 
 public:
   // full explicit for now as only for mass equation, will add in the future effects on energy, qdm and ia
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override {} ; 
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override {} ;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void mettre_a_jour(double temps) override;
 

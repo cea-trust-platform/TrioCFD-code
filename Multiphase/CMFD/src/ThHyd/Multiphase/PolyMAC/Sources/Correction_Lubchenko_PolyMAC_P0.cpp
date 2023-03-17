@@ -329,23 +329,23 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
   for (int e = 0; e < ne_tot; e++)
     {
       /* arguments de coeff */
-      for (int n=0;n<N;n++)
-      {
-      in.alpha[n] = alpha(e, n);
-      in.p[n]     = press(e, n * (Np > 1));
-      in.T[n]     = temp(e, n);
-      in.rho[n]   = rho(!cR * e, n);
-      in.mu[n]    = mu(!cM * e, n);
-      in.d_bulles[n] = d_bulles(e,n) ;
-      for (int k = n+1; k < N; k++)
-        if (milc.has_interface(n,k))
-          {
-            const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (k-n-1);
-            in.sigma[ind_trav] = Sigma_tab(e, ind_trav);
-          }
-      for (int k = 0; k < N; k++)
-        in.nv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, nullptr, nullptr);
-      }
+      for (int n=0; n<N; n++)
+        {
+          in.alpha[n] = alpha(e, n);
+          in.p[n]     = press(e, n * (Np > 1));
+          in.T[n]     = temp(e, n);
+          in.rho[n]   = rho(!cR * e, n);
+          in.mu[n]    = mu(!cM * e, n);
+          in.d_bulles[n] = d_bulles(e,n) ;
+          for (int k = n+1; k < N; k++)
+            if (milc.has_interface(n,k))
+              {
+                const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (k-n-1);
+                in.sigma[ind_trav] = Sigma_tab(e, ind_trav);
+              }
+          for (int k = 0; k < N; k++)
+            in.nv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, nullptr, nullptr);
+        }
       for (int n = 0; n <Nk; n++) in.k_turb[n]   = (k_turb) ? (*k_turb)(e,0) : 0;
 
       correlation_pi.coefficient(in, out);
@@ -432,28 +432,28 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
     for (f = 0 ; f<domaine.nb_faces() ; f++)
       if (fcl(f, 0) < 2)
         {
-        in.alpha=0., in.T=0., in.p=0., in.rho=0., in.mu=0., in.sigma=0., in.k_turb=0., in.d_bulles=0., in.nv=0.;
-        for ( c = 0; c < 2 && (e = f_e(f, c)) >= 0; c++)
-          {
-            for (n = 0; n < N; n++)
-              {
-                in.alpha[n] += vf_dir(f, c)/vf(f) * alpha(e, n);
-                in.p[n]     += vf_dir(f, c)/vf(f) * press(e, n * (Np > 1));
-                in.T[n]     += vf_dir(f, c)/vf(f) * temp(e, n);
-                in.rho[n]   += vf_dir(f, c)/vf(f) * rho(!cR * e, n);
-                in.mu[n]    += vf_dir(f, c)/vf(f) * mu(!cM * e, n);
-                in.d_bulles[n] += vf_dir(f, c)/vf(f) *d_bulles(e,n) ;
-                for (k = n+1; k < N; k++)
-                  if (milc.has_interface(n,k))
-                    {
-                      const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (k-n-1);
-                      in.sigma[ind_trav] += vf_dir(f, c) / vf(f) * Sigma_tab(e, ind_trav);
-                    }
-                for (k = 0; k < N; k++)
-                  in.nv(k, n) += vf_dir(f, c)/vf(f) * ch.v_norm(pvit, pvit, e, f, k, n, nullptr, nullptr);
-              }
-            for (n = 0; n <Nk; n++) in.k_turb[n]   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
-          }
+          in.alpha=0., in.T=0., in.p=0., in.rho=0., in.mu=0., in.sigma=0., in.k_turb=0., in.d_bulles=0., in.nv=0.;
+          for ( c = 0; c < 2 && (e = f_e(f, c)) >= 0; c++)
+            {
+              for (n = 0; n < N; n++)
+                {
+                  in.alpha[n] += vf_dir(f, c)/vf(f) * alpha(e, n);
+                  in.p[n]     += vf_dir(f, c)/vf(f) * press(e, n * (Np > 1));
+                  in.T[n]     += vf_dir(f, c)/vf(f) * temp(e, n);
+                  in.rho[n]   += vf_dir(f, c)/vf(f) * rho(!cR * e, n);
+                  in.mu[n]    += vf_dir(f, c)/vf(f) * mu(!cM * e, n);
+                  in.d_bulles[n] += vf_dir(f, c)/vf(f) *d_bulles(e,n) ;
+                  for (k = n+1; k < N; k++)
+                    if (milc.has_interface(n,k))
+                      {
+                        const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (k-n-1);
+                        in.sigma[ind_trav] += vf_dir(f, c) / vf(f) * Sigma_tab(e, ind_trav);
+                      }
+                  for (k = 0; k < N; k++)
+                    in.nv(k, n) += vf_dir(f, c)/vf(f) * ch.v_norm(pvit, pvit, e, f, k, n, nullptr, nullptr);
+                }
+              for (n = 0; n <Nk; n++) in.k_turb[n]   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
+            }
 
           correlation_pi.coefficient(in, out);
 

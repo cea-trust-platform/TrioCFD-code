@@ -70,7 +70,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           {
             secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ; // tau has negative production
             for (auto &&i_m : matrices)
-                if (i_m.first == "tau")  (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) ;
+              if (i_m.first == "tau")  (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) ;
           }
         else if (Type_diss == "omega")
           {

@@ -60,7 +60,7 @@ void Source_Dissipation_echelle_temp_taux_diss_turb::ajouter_blocs(matrices_t ma
 
   int n;
 
-  assert( N == 1 ); 
+  assert( N == 1 );
 
   for (int e = 0; e < nb_elem; e++)
     for (n = 0; n<N; n++)
@@ -75,7 +75,7 @@ void Source_Dissipation_echelle_temp_taux_diss_turb::ajouter_blocs(matrices_t ma
             double secmem_en  = - pe(e) * ve(e) * beta_omega * pdiss(e,n) * (  pdiss(e,n) + 2 * (diss(e,n) - pdiss(e,n) ) );
             secmem(e, n) += secmem_en ;
             for (auto &&i_m : matrices)
-                if (i_m.first == "omega") (*i_m.second)(N*e+n, N*e+n) += pe(e) * ve(e) * beta_omega * 2* pdiss(e,n) ;
+              if (i_m.first == "omega") (*i_m.second)(N*e+n, N*e+n) += pe(e) * ve(e) * beta_omega * 2* pdiss(e,n) ;
           }
       }
 }

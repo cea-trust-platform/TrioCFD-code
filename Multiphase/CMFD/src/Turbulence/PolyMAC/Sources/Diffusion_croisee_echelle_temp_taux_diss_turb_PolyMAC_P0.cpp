@@ -168,12 +168,12 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
             if (!(M==nullptr)) (*M)(N*e+n, N*e+n) -= pe(e) * ve(e) * sigma_d * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
           }
         else if (Type_diss == "omega")
-            if (diss(e,n)>1.e-8) // Else everything = 0
-              {
-                double dp = std::max(diss_passe(e, n), 1.e-6);
-                secmem(e, n) += pe(e) * ve(e) * sigma_d / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
-                if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= pe(e) * ve(e) * sigma_d * (-1/(dp*dp)) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
-              }
+          if (diss(e,n)>1.e-8) // Else everything = 0
+            {
+              double dp = std::max(diss_passe(e, n), 1.e-6);
+              secmem(e, n) += pe(e) * ve(e) * sigma_d / dp*(2-diss(e, n)/dp)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
+              if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= pe(e) * ve(e) * sigma_d * (-1/(dp*dp)) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
+            }
       }
 }
 

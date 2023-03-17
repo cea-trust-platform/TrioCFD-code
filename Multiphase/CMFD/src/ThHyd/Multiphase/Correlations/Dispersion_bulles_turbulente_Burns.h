@@ -37,7 +37,7 @@ class Dispersion_bulles_turbulente_Burns : public Dispersion_bulles_base
 public:
   void coefficient(const input_t& input, output_t& output) const override;
   void completer() override;
-  
+
 protected:
   REF(Correlation) correlation_drag_;
   int n_l = -1; //phase liquide

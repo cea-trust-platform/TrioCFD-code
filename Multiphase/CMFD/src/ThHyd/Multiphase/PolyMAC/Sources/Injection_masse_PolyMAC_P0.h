@@ -18,7 +18,7 @@
 #include <Source_injection_masse_base.h>
 #include <Champ_Don.h>
 
-/*! @brief 
+/*! @brief
  *
  *
  *

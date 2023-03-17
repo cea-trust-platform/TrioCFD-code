@@ -121,7 +121,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
                 if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
               }
 
-            if (Type_diss == "tau") 
+            if (Type_diss == "tau")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;

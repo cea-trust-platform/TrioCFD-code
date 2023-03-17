@@ -56,8 +56,8 @@ Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
 
 void Dispersion_bulles_turbulente_Burns::completer()
 {
- if ((a_res_ == -1) && (ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()<0.99) ) // Pas en homogene
-      a_res_ = std::min(1., std::max(1.e-4, ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()*100.));
+  if ((a_res_ == -1) && (ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()<0.99) ) // Pas en homogene
+    a_res_ = std::min(1., std::max(1.e-4, ref_cast(QDM_Multiphase, pb_->equation(0)).alpha_res()*100.));
   else if (a_res_ == -1) a_res_ = 1.e-6;
 }
 
