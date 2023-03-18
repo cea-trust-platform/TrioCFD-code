@@ -25,8 +25,8 @@
 #include <Viscosite_turbulente_k_omega.h>
 #include <Op_Dift_Multiphase_VDF_Face.h>
 #include <Viscosite_turbulente_k_tau.h>
+#include <Op_Diff_PolyMAC_P0_base.h>
 #include <Loi_paroi_adaptative.h>
-#include <Op_Diff_PolyMAC_base.h>
 #include <Frontiere_dis_base.h>
 #include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
@@ -140,7 +140,7 @@ void Paroi_frottante_loi::me_calculer()
                       *alp = sub_type(Pb_Multiphase, domaine_Cl_dis().equation().probleme()) ? &domaine_Cl_dis().equation().probleme().get_champ("alpha").passe() : NULL;
 
   // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
-  const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,
+  const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,
                    *mu_vdf = domaine.que_suis_je().debute_par("Domaine_VDF") ? &ref_cast(Op_Dift_Multiphase_VDF_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).get_diffusivite_turbulente() : nullptr;
   assert((mu_poly) || (mu_vdf));
 
