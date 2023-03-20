@@ -1015,6 +1015,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                       if (nb_elems_so_far==0)
                         {
                           Cerr << "Let's cry... what should we do? how can I report it to the next element?" << finl;
+                          Cerr << "We will have to search it in the following fractions if none has been seen already?" << finl;
                           Process::exit();
                         }
                       else
@@ -1024,7 +1025,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                           // On reporte totalement la contribution sur cet autre elem:
                           elem = previous_elem;
                           num_face = num_faces[nb_elems_so_far-1];
-                          fraction = 1.;
+                          // The good fraction is already set;
                         }
                     }
                 }
