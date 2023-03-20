@@ -132,8 +132,8 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
   double sd2;
   double Sij,Sij2;
 
-
-  DoubleTab duidxj(nb_elem_tot,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab duidxj(nb_elem_tot,dimension,dimension, vitesse.line_size());
 
   vit.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 
@@ -148,7 +148,7 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
 
             for(k=0; k<dimension; k++)
               {
-                gij2(i,j)+=duidxj(elem,i,k)*duidxj(elem,k,j);
+                gij2(i,j)+=duidxj(elem,i,k,0)*duidxj(elem,k,j,0);
               }
           }
 
@@ -182,7 +182,7 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
           {
             sd2+=sd(i,j)*sd(i,j);
             //Deplacement du calcul de sij
-            Sij=0.5*(duidxj(elem,i,j) + duidxj(elem,j,i));
+            Sij=0.5*(duidxj(elem,i,j,0) + duidxj(elem,j,i,0));
 
 
             // PQ : 24/01/07 : le stencil de Sij est par contruction de :
@@ -210,7 +210,7 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
                 // si pas de bord a proximite on passe au stencil de 3 mailles
                 // sinon on reste au stencil a 1 maille
 
-                if( elem1>=0 && elem2>=0 ) Sij = ((duidxj(elem1,i,i)+duidxj(elem,i,i)+duidxj(elem2,i,i)))/3.;
+                if( elem1>=0 && elem2>=0 ) Sij = ((duidxj(elem1,i,i,0)+duidxj(elem,i,i,0)+duidxj(elem2,i,i,0)))/3.;
               }
 
 

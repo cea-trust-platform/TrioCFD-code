@@ -61,6 +61,7 @@ protected:
   double beta_lift_ =  1. ; // To adjust the force in .data
   double beta_disp_ =  1. ; // To adjust the force in .data
   double portee_disp_= 1. ; // To push further than the diameter
+  double portee_lift_= 1. ; // To supress further than the diameter
 };
 
 #endif

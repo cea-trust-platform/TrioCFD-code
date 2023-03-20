@@ -43,14 +43,11 @@ class Source_Diffusion_croisee_echelle_temp_taux_diss_turb : public Sources_Mult
   Declare_base(Source_Diffusion_croisee_echelle_temp_taux_diss_turb);
 
 public:
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { };
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override = 0;
-  void completer() override;
 
 protected:
   double sigma_d = 0.; // Kok and Spekreijse (2000) Efficient and accurate implementation of the k-omega turbulence model in the NLR multi-block Navier-Stokes system
-  int f_grad_k_fixe = 1 ;
-  int f_grad_tau_omega_fixe = 1 ;
 };
 
 #endif

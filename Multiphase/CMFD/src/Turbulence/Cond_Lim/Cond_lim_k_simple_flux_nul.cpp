@@ -21,29 +21,19 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Cond_lim_k_simple_flux_nul.h>
+
 #include <Energie_cinetique_turbulente.h>
-#include <Loi_paroi_adaptative.h>
-#include <Frontiere_dis_base.h>
-#include <Pb_Multiphase.h>
-#include <Domaine_VF.h>
+#include <Op_Dift_Multiphase_VDF_Elem.h>
 #include <Op_Diff_PolyMAC_base.h>
-#include <Op_Diff_PolyMAC_P0_base.h>
+#include <Loi_paroi_adaptative.h>
+#include <Domaine_VF.h>
 
-Implemente_instanciable(Cond_lim_k_simple_flux_nul,"Cond_lim_k_simple_flux_nul",Echange_global_impose);
+Implemente_instanciable(Cond_lim_k_simple_flux_nul,"Cond_lim_k_simple_flux_nul",Echange_global_impose_turbulent);
 
 
-Sortie& Cond_lim_k_simple_flux_nul::printOn(Sortie& s ) const
-{
-  return s << que_suis_je() << "\n";
-}
+Sortie& Cond_lim_k_simple_flux_nul::printOn(Sortie& s ) const {return Echange_global_impose_turbulent::printOn(s);}
 
-Entree& Cond_lim_k_simple_flux_nul::readOn(Entree& s )
-{
-  h_imp_.typer("Champ_front_vide");
-  le_champ_front.typer("Champ_front_vide");
-
-  return s;
-}
+Entree& Cond_lim_k_simple_flux_nul::readOn(Entree& s ) {return Echange_global_impose_turbulent::readOn(s);}
 
 void Cond_lim_k_simple_flux_nul::completer()
 {
@@ -51,79 +41,14 @@ void Cond_lim_k_simple_flux_nul::completer()
   if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
-void Cond_lim_k_simple_flux_nul::liste_faces_loi_paroi(IntTab& tab)
-{
-  int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
-  int N = tab.line_size();
-
-  for (int f =0 ; f < nf ; f++)
-    for (int n = 0 ; n<N ; n++)
-      tab(f + f1, n) |= 1;
-}
-
-int Cond_lim_k_simple_flux_nul::compatible_avec_eqn(const Equation_base& eqn) const
-{
-  Motcle dom_app=eqn.domaine_application();
-  Motcle Turbulence="Turbulence";
-
-  if (dom_app==Turbulence)
-    return 1;
-  else err_pas_compatible(eqn);
-  return 0;
-}
-
 int Cond_lim_k_simple_flux_nul::initialiser(double temps)
 {
-  h_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
-
-  h_grad_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
-
-  K_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(K_);
-
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  int init = Echange_global_impose_turbulent::initialiser(temps);
 
   int nf = la_frontiere_dis->frontiere().nb_faces();
-  for (int f =0 ; f < nf ; f++) K_(f, 0) = 0 ; // K is 0 on the wall
+  for (int f =0 ; f < nf ; f++) T_(f, 0) = 0 ; // K is 0 on the wall
 
-  return 1;
-}
-
-double Cond_lim_k_simple_flux_nul::T_ext(int i) const
-{
-  return K_(i,0);
-}
-
-double Cond_lim_k_simple_flux_nul::T_ext(int i, int j) const
-{
-  return K_(i,j);
-}
-
-double Cond_lim_k_simple_flux_nul::h_imp(int i) const
-{
-  return h_(i,0);
-}
-
-double Cond_lim_k_simple_flux_nul::h_imp(int i, int j) const
-{
-  return h_(i,j);
-}
-
-double Cond_lim_k_simple_flux_nul::h_imp_grad(int i) const
-{
-  return h_grad_(i,0);
-}
-
-double Cond_lim_k_simple_flux_nul::h_imp_grad(int i, int j) const
-{
-  return h_grad_(i,j);
-}
-
-void Cond_lim_k_simple_flux_nul::mettre_a_jour(double tps)
-{
-  if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
+  return init;
 }
 
 void Cond_lim_k_simple_flux_nul::me_calculer()
@@ -132,21 +57,26 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu();
+  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe(),
+                    &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport().passe();
+
+  // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
+  const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,
+                   *mu_vdf = domaine.que_suis_je().debute_par("Domaine_VDF") ? &ref_cast(Op_Dift_Multiphase_VDF_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()).get_diffusivite_turbulente() : nullptr;
+  assert((mu_poly) || (mu_vdf));
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
   const IntTab& f_e = domaine.face_voisins();
 
-  if (mu.nb_dim() >= 3) Process::exit("Cond_lim_k_simple : transport of k must be SGDH !");
+  int n=0; // Turbulence only in first phase for now
 
   for (int f =0 ; f < nf ; f++)
     {
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = f_e(f_domaine,0);
+      double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(e_domaine,n) : -1;
 
-      h_(f, 0) = mu(e_domaine, 0) / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
+      h_(f, 0) = mu_tot_loc / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
       h_grad_(f, 0) = 1. / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2)));
     }
 

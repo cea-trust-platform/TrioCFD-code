@@ -46,6 +46,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
 protected:
+  void completer() override ;
   int f_grad_k_fixe = 1 ;
   int f_grad_tau_omega_fixe = 1 ;
 };

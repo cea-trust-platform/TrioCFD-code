@@ -39,7 +39,6 @@
 #include <Schema_Implicite_base.h>
 #include <SETS.h>
 #include <EChaine.h>
-#include <Neumann_paroi.h>
 #include <Scalaire_impose_paroi.h>
 #include <Echange_global_impose.h>
 
@@ -66,9 +65,9 @@ Entree& Taux_dissipation_turbulent::readOn(Entree& is)
 {
   Convection_diffusion_turbulence_multiphase::readOn(is);
   terme_convectif.set_fichier("Convection_taux_dissipation_turbulent");
-  terme_convectif.set_description((Nom)"Turbulent dissipation rate=Integral(-rho*omega*ndS) [kg] if SI units used");
+  terme_convectif.set_description((Nom)"Turbulent dissipation rate=Integral(-omega*ndS)");
   terme_diffusif.set_fichier("Diffusion_taux_dissipation_turbulent");
-  terme_diffusif.set_description((Nom)"Turbulent dissipation rate=Integral(mu*grad(omega)*ndS) [kg] if SI units used");
+  terme_diffusif.set_description((Nom)"Turbulent dissipation rate=Integral(nu*grad(omega)*ndS)");
   return is;
 }
 
@@ -111,7 +110,7 @@ void Taux_dissipation_turbulent::calculer_omega(const Objet_U& obj, DoubleTab& v
     for (n = 0; n < N; n++) val(i, n) = omega(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_omega = eqn.inconnue()->valeur_aux_bords();
+  const DoubleTab& b_omega = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_omega.dimension_tot(0);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = b_omega(i, n);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,46 +12,11 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Cond_lim_tau_omega_simple_dix.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
-// Version:     /main/13
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#include <Injection_masse_PolyMAC_P0.h>
 
-#include <TRUSTTab.h>
-#include <Dirichlet_loi_paroi.h>
-#include <TRUST_Ref.h>
+Implemente_instanciable(Injection_masse_PolyMAC_P0, "Injection_masse_Elem_PolyMAC_P0", Source_injection_masse_base);
 
-class Correlation;
+Sortie& Injection_masse_PolyMAC_P0::printOn(Sortie& os) const {return Source_injection_masse_base::printOn(os);}
 
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
- *
- */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
-{
-
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
-
-public :
-  virtual void completer() override;
-
-protected :
-  void me_calculer() override;
-  double calc_tau(double y, double u_tau, double visc);
-  double calc_omega(double y, double u_tau, double visc);
-
-  DoubleTab d_;
-
-  double von_karman_ = 0.41 ;
-  double beta_omega = 0.075;
-  double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
-  double facteur_paroi_=10.;
-};
-
-#endif
+Entree& Injection_masse_PolyMAC_P0::readOn(Entree& is) {return Source_injection_masse_base::readOn(is);}

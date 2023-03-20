@@ -21,23 +21,17 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Cond_lim_tau_omega_simple_dix.h>
-#include <Motcle.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Loi_paroi_adaptative.h>
-#include <Frontiere_dis_base.h>
-#include <Frontiere.h>
-#include <Pb_Multiphase.h>
-#include <Navier_Stokes_std.h>
-#include <Domaine_VF.h>
-#include <Operateur_Diff_base.h>
+
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
+#include <Loi_paroi_adaptative.h>
 #include <Op_Diff_PolyMAC_base.h>
-#include <Op_Diff_PolyMAC_P0_base.h>
-#include <TRUSTTrav.h>
+#include <Navier_Stokes_std.h>
+#include <Equation_base.h>
+#include <Pb_Multiphase.h>
 #include <Domaine_VF.h>
+#include <TRUSTTrav.h>
+#include <Motcle.h>
 
 #include <math.h>
 
@@ -70,32 +64,8 @@ void Cond_lim_tau_omega_simple_dix::completer()
 
   int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size();
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
-}
-
-int Cond_lim_tau_omega_simple_dix::compatible_avec_eqn(const Equation_base& eqn) const
-{
-  Motcle dom_app=eqn.domaine_application();
-  Motcle Turbulence="Turbulence";
-
-  if (dom_app==Turbulence)
-    return 1;
-  else err_pas_compatible(eqn);
-  return 0;
-}
-
-void Cond_lim_tau_omega_simple_dix::mettre_a_jour(double tps)
-{
-  if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
-}
-
-int Cond_lim_tau_omega_simple_dix::initialiser(double temps)
-{
-  d_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
 
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
-
-  return 1;
 }
 
 void Cond_lim_tau_omega_simple_dix::me_calculer()
@@ -104,7 +74,7 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&      nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      nu_visc = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   const IntTab& f_e = domaine.face_voisins();
@@ -112,25 +82,21 @@ void Cond_lim_tau_omega_simple_dix::me_calculer()
   int n = 0 ; // Carrying phase is 0 for turbulent flows
 
   if (is_tau_ == 1)
-    {
-      for (int f =0 ; f < nf ; f++)
-        {
-          int f_domaine = f + f1; // number of the face in the domaine
-          int e_domaine = f_e(f_domaine,0);
+    for (int f =0 ; f < nf ; f++)
+      {
+        int f_domaine = f + f1; // number of the face in the domaine
+        int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = facteur_paroi_*calc_tau(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
-        }
-    }
+        d_(f, n) = facteur_paroi_*calc_tau(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
+      }
   if (is_tau_ == 0)
-    {
-      for (int f =0 ; f < nf ; f++)
-        {
-          int f_domaine = f + f1; // number of the face in the domaine
-          int e_domaine = f_e(f_domaine,0);
+    for (int f =0 ; f < nf ; f++)
+      {
+        int f_domaine = f + f1; // number of the face in the domaine
+        int e_domaine = f_e(f_domaine,0);
 
-          d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
-        }
-    }
+        d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
+      }
   d_.echange_espace_virtuel();
 }
 

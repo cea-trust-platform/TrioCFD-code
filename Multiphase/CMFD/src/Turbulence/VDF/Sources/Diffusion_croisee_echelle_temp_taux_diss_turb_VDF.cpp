@@ -30,7 +30,6 @@
 #include <Domaine_VF.h>
 #include <Domaine_Cl_PolyMAC.h>
 #include <Pb_Multiphase.h>
-#include <Neumann_paroi.h>
 #include <Dirichlet.h>
 
 Implemente_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_VDF,"Diffusion_croisee_echelle_temp_taux_diss_turb_VDF_P0_VDF", Source_Diffusion_croisee_echelle_temp_taux_diss_turb);

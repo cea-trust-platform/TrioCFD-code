@@ -40,6 +40,7 @@ Sortie& Source_Production_energie_cin_turb::printOn(Sortie& os) const
 
 Entree& Source_Production_energie_cin_turb::readOn(Entree& is)
 {
+  equation().probleme().creer_champ("gradient_vitesse"); // Besoin du gradient de vitesse
   return is;
 }
 
