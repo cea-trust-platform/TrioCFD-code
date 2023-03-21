@@ -14,43 +14,39 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_demi.h
+// File:        Cond_lim_omega_demi.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_demi_included
-#define Cond_lim_tau_omega_simple_demi_included
+#ifndef Cond_lim_omega_demi_included
+#define Cond_lim_omega_demi_included
 
 #include <TRUSTTab.h>
-#include <Echange_global_impose_turbulent.h>
-#include <Cond_lim_base.h>
+#include <Dirichlet_loi_paroi.h>
 #include <TRUST_Ref.h>
 
 class Correlation;
 
-/*! @brief Classe Cond_lim_tau_omega_simple_demi
+/*! @brief Classe Cond_lim_omega_demi
  *
  */
-class Cond_lim_tau_omega_simple_demi : public Echange_global_impose_turbulent
+class Cond_lim_omega_demi : public Dirichlet_loi_paroi
 {
 
-  Declare_instanciable(Cond_lim_tau_omega_simple_demi);
+  Declare_instanciable(Cond_lim_omega_demi);
 
 public :
   virtual void completer() override;
 
 protected :
   void me_calculer() override;
-
-  double calc_tau(double y, double u_tau, double visc);
   double calc_omega(double y, double u_tau, double visc);
 
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
 };
 
 #endif

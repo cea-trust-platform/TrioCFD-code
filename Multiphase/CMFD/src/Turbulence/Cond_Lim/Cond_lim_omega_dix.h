@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_tau_omega_simple_dix.h
+// File:        Cond_lim_omega_dix.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_tau_omega_simple_dix_included
-#define Cond_lim_tau_omega_simple_dix_included
+#ifndef Cond_lim_omega_dix_included
+#define Cond_lim_omega_dix_included
 
 #include <TRUSTTab.h>
 #include <Dirichlet_loi_paroi.h>
@@ -32,25 +32,21 @@ class Correlation;
 /*! @brief Classe Cond_lim_tau_omega_simple_demi
  *
  */
-class Cond_lim_tau_omega_simple_dix : public Dirichlet_loi_paroi
+class Cond_lim_omega_dix : public Dirichlet_loi_paroi
 {
 
-  Declare_instanciable(Cond_lim_tau_omega_simple_dix);
+  Declare_instanciable(Cond_lim_omega_dix);
 
 public :
   virtual void completer() override;
 
 protected :
   void me_calculer() override;
-  double calc_tau(double y, double u_tau, double visc);
   double calc_omega(double y, double u_tau, double visc);
-
-  DoubleTab d_;
 
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
-  double is_tau_=-1 ; // 0 : omega ; 1 : tau
   double facteur_paroi_=10.;
 };
 
