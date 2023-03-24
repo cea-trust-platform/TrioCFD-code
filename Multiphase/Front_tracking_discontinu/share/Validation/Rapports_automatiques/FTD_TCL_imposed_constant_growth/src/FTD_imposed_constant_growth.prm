@@ -1,0 +1,209 @@
+Parameters {
+	Title "Bubble constant growth : volume conservation"
+	Description "Checking the validity of the volume evolution with a given phase-change rate"
+	Author "G.B."
+	TestCase "2D/VoF0" "cst_growth.data"
+	TestCase "2D/VoF1" "cst_growth.data"
+	TestCase 2D_axi/VoF1/BEST best.data
+	TestCase "2D_axi/VoF0" "cst_growth.data"
+	TestCase "2D_axi/VoF1" "cst_growth.data"
+	TestCase 2D_axi/VoF1/ItCV1-lissCV1 cst_growth.data
+#	TestCase "FTD_remaillage_vef" "PAR_FTD_remaillage_vef.data" 4
+#	Prerequisite "./prerequisite.sh" #
+	Description "Comparing the validity of the volume evolution with a given phase-change rate in different cases: 2D and bidim_axi." <<EOF
+\latex_(The test-case is not related to temperature resolution as the new keyword\latex_) triokeyword(prescribed_mpoint) \latex_(is used to set mp to -10kg/m2s.
+Therefore, the growth is imposed, and the radius evolves as 
+$$r_{ana} = r0-mp/\rho_v t$$
+which leads to a constant interface velocity
+$$vi_{ana} =-mp/\rho_v$$
+\latex_)
+EOF
+}
+
+Chapter {
+	Title "VDF, bubble constant growth : volume conservation"
+
+Figure {
+	Title "2D: VoF0 vs VoF1"
+	Description "Effect of the option triokeyword(VOFlike_correction_volume)".
+	Picture ./2D/VoF0/plot.png
+}
+Figure {
+	Picture ./2D/VoF1/plot.png
+}
+
+visu {
+	Title "2D case"
+	Description "VoF=0 in black, VoF=1 in red"
+	nb_img_without_newline 2
+	width 5cm
+	mesh ./2D/VoF0/lata/post.lata INTERFACES
+	mesh ./2D/VoF1/lata/post.lata INTERFACES
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit SetPlotOptions(m2)
+#	normal3D 0. 1. 0.
+#	up3D 0. 0. 1.
+	cycles 1 3 5 
+      }
+
+}
+
+Chapter {
+        Title "2D_axi"
+	Description "A little too fast on the symetry axis, but some regularization can deal with it (see below)."
+
+Figure {
+	Title "2D_axi: VoF0 vs VoF1"
+	Description "Effect of the option triokeyword(VOFlike_correction_volume)." 
+	Picture ./2D_axi/VoF0/plot.png
+}
+Figure {
+	Picture ./2D_axi/VoF1/plot.png
+}
+
+visu {
+	Title "2D_axi case"
+	Description "VoF=0 in black, VoF=1 in red"
+	nb_img_without_newline 3
+	width 6cm
+	mesh ./2D_axi/VoF0/lata/post.lata INTERFACES
+	mesh ./2D_axi/VoF1/lata/post.lata INTERFACES
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit SetPlotOptions(m2)
+#	normal3D 0. 1. 0.
+#	up3D 0. 0. 1.
+	cycles 1 3 5 
+      }
+
+        Description "The option triokeyword(VOFlike_correction_volume) globally " <<EOF
+enables to correct the bubble growth rate to match the theory. But it has the tendency to overact on the symetry axis.
+To hinder this drawback, the keyword triokeyword(nb_lissage_correction_volume) can be set in the range 1-4 (the actual value
+does not make much difference). 
+
+In this case (for the purpose of this validation sheet), it is used along with 
+triokeyword(nb_iterations_correction_volume) increased from 0 to 1 but it may not be necessary or very significant.
+Actually, even when triokeyword(nb_iterations_correction_volume) is 0, the (potentially smoothed) volume-correction is applied at least once anyway.
+It is then performed several times until either the triokeyword(nb_iterations_correction_volume) is overtaken or until the dvolume is below the
+threshold.
+EOF
+
+visu {
+        Title "2D_axi case"
+        Description "(VoF=1,smoothing corr. vol.=0) in black, (VoF=1,smoothing corr. vol.=1) in red" <<EOF
+We can see the effect of the smoothing of volume-correction.
+EOF
+        width 9cm
+        mesh ./2D_axi/VoF1/lata/post.lata INTERFACES
+        mesh ./2D_axi/VoF1/ItCV1-lissCV1/lata/post.lata INTERFACES
+        instruction_visit SetActivePlots((0))
+        instruction_visit m=MeshAttributes()
+        instruction_visit m.opaqueMode=m.Off
+        instruction_visit SetPlotOptions(m)
+
+        instruction_visit SetActivePlots((1))
+        instruction_visit m2=MeshAttributes()
+        instruction_visit m2.opaqueMode=m2.Off
+        instruction_visit m2.foregroundFlag=0
+        instruction_visit m2.meshColor=(255,0,0,255)
+        instruction_visit SetPlotOptions(m2)
+        cycles 5
+      }
+
+	Description "Lastly, we can test to increase the number of triokeyword(nb_iter_barycentrage)" <<EOF
+from 0 to 1 (along with a non-zero triokeyword(relax_barycentrage) to be effective. It reduces slightly 
+the curvature range from [-16160:-3431] to [-13540:-3360] at the 10th post-processing.
+
+The best spherical growth with a curvature in range [-10270:-5494] at the 10th post-pro is achieved by best.data which includes: 
+
+triokeyword(nb_iter_barycentrage) 2
+
+triokeyword(relax_barycentrage) 1.
+
+triokeyword(pas) = triokeyword(pas_lissage) = 1.e-12  (to enable/activate both remeshing and smoothing frequency)
+
+triokeyword(lissage_courbure_coeff) -0.02 (negative and not too large for stability)
+
+triokeyword(nb_iter_correction_volume) 3
+
+The triokeyword(facteur_longueur_ideale) 1.0 is small compared to standard recommendations, but it is stable
+in this rather canonical case. 
+EOF 
+
+visu {
+        Title "2D_axi best case"
+        Description "Best set of remeshing options for a spherical growth (VoF=0 in black, VoF=1 but (almost)no-remesh in blue, all-to-best in red)"
+        width 9cm
+        mesh ./2D_axi/VoF0/lata/post.lata INTERFACES
+	mesh ./2D_axi/VoF1/lata/post.lata INTERFACES
+        mesh ./2D_axi/VoF1/BEST/lata/post.lata INTERFACES
+        instruction_visit SetActivePlots((0))
+        instruction_visit m=MeshAttributes()
+        instruction_visit m.opaqueMode=m.Off
+        instruction_visit SetPlotOptions(m)
+
+        instruction_visit SetActivePlots((1))
+        instruction_visit m2=MeshAttributes()
+        instruction_visit m2.opaqueMode=m2.Off
+        instruction_visit m2.foregroundFlag=0
+        instruction_visit m2.meshColor=(0,0,255,255)
+        instruction_visit SetPlotOptions(m2)
+
+        instruction_visit SetActivePlots((2))
+        instruction_visit m3=MeshAttributes()
+        instruction_visit m3.opaqueMode=m3.Off
+        instruction_visit m3.foregroundFlag=0
+        instruction_visit m3.meshColor=(255,0,0,255)
+        instruction_visit SetPlotOptions(m3)
+        cycles 10
+      }
+}
+
+Chapter {
+        Title Computer performance
+        Tableau_performance {
+        }
+}
+
+#Figure {
+#        Title "Surface"
+#        Description "La surface decroit a cause du lissage et saute lors du remaillage global (coalescence)"
+#        Dimension 2
+#        LabelX "s"
+#        LabelY "m2"
+#        Curve {
+#                legend "VDF sequentiel"
+#                origin "Trio_U"
+#                Version ""
+#                file vdf_s.txt
+#                columns $1 $2
+#                Style linespoints
+#                PointSize 2
+#        }
+#        Curve {
+#                legend "VDF parallele"
+#                origin "Trio_U"
+#                Version ""
+#                file par_vdf_s.txt
+#                columns $1 $2
+#                Style linespoints
+#                PointSize 2
+#        }
+#}

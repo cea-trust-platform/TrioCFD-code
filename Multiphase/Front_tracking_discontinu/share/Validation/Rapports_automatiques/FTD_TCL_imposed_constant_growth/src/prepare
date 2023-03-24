@@ -1,0 +1,49 @@
+#!/bin/bash
+
+cwd=$PWD
+jdd=cst_growth.data
+
+echo '#!/usr/bin/bash' > post_run
+echo """
+cas="cst_growth"
+err=\$cas".err"
+lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata
+grep VITESSE.SOM.INTERFACES lata/post-ascii.lata | awk '{print \$3}' > vifiles.txt
+\rm -f sum_dIdt_or_dV.txt ai.txt vol_vap.txt sum_dIdt_after-PCH.txt vi.txt
+grep \"^Volume_phase_0\" \$err | awk '{print \$4, \$2}' > vol_vap.txt
+grep \"^Surface_Totale_Interface\" \$err | awk '{print \$4, \$6}' > ai.txt
+grep \"^Interfacial_velocity\" \$err | awk '{print \$6, \$8, \$9, \$10, \$12, \$13, \$14}' > vi.txt
+grep \"sum_dI_dt\" \$err | awk '{print \$2, \$4, \$6, \$8, \$10, \$12}' > sum_dIdt_or_dV.txt
+grep \"AFTER-PCH].*sum is\" \$err | awk '{print \$2, \$7}' >  sum_dIdt_after-PCH.txt
+config=\`dirname \$PWD| xargs basename\`
+"""  >> post_run
+echo "python $cwd/plot.py \$1 \$config" >> post_run
+chmod +x post_run
+
+for case in "2D" "2D_axi"
+do
+  for VOF in 0 1
+  do 
+    dest=$cwd/$case/VoF$VOF
+    mkdir -p $dest
+    sed -e "/VOFlike_correction_volume/s/VOFlike_correction_volume.*/VOFlike_correction_volume $VOF/g" $jdd > $dest/$jdd
+    [ $case == "2D_axi" ] && sed -i -e "/bidim_axi/s/#//g" $dest/$jdd
+    \cp -f post_run $dest/post_run
+    [ $case == "2D_axi" ] && [ $VOF == 1 ] && mkdir -p ${dest}/ItCV1-lissCV1 &&  sed \
+	    -e "s/nb_iterations_correction_volume [0-9]/nb_iterations_correction_volume 1/;s/nb_lissage_correction_volume [0-9]/nb_lissage_correction_volume 1/" \
+	    $dest/$jdd > ${dest}/ItCV1-lissCV1/$jdd
+    # Other options : 
+    p=$dest/NEW_MASS_SOURCE_AND_INTERP_AI_BASED
+    mkdir -p $p
+    sed -e "s/# new_mass_source #/new_mass_source /" \
+        -e "s/interpol_indic_pour_dI_dt.*/interpol_indic_pour_dI_dt interp_ai_based/" \
+         $dest/$jdd > $p/$jdd
+  done
+done
+
+mkdir -p 2D_axi/VoF1/BEST
+\cp -f best.data 2D_axi/VoF1/BEST/
+
+mkdir -p 2D_axi/VoF1/BEST-INTERP-STD
+sed -e "s/interpol_indic_pour_dI_dt.*/interpol_indic_pour_dI_dt interp_standard/" best.data > 2D_axi/VoF1/BEST-INTERP-STD/best.data
+echo "end of prepare"
