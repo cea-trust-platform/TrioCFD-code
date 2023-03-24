@@ -1378,6 +1378,7 @@ int IJK_FT_double::initialise()
               // Cette methode parcours ni(), nj() et nk() et donc pas les ghost...
               set_field_data(velocity_[i], expression_vitesse_initiale_[i]);
             }
+          update_sheared_velocity();
         }
     }
   else
@@ -1396,6 +1397,7 @@ int IJK_FT_double::initialise()
 //          velocity_[1].data() += expression_vitesse_initiale_;
 //          velocity_[2].data() += expression_vitesse_initiale_;
         }
+      update_sheared_velocity();
 
 
 #ifdef CONVERT_AT_READING_FROM_NURESAFE_TO_ADIM_TRYGGVASON_FOR_LIQUID_VELOCITY
@@ -2583,8 +2585,10 @@ void IJK_FT_double::run()
       statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
+
       current_time_ += timestep_;
-      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_;
+      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_ + boundary_conditions_.get_t0_shear();
+
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -4303,7 +4307,65 @@ void IJK_FT_double::update_rho_v()
     }
 }
 
-// Transfert du maillage ft vers ns de champs aux faces :
+
+void IJK_FT_double::update_sheared_velocity()
+{
+  // Construit un champ de vitesse deforme par le cisaillement moyen
+  // a utiliser dans le cadre de conditions periodique mouvante f(x,y,z+Lz)=f(x-StLz,y,z) pour initialiser le champ de vitesse si t0 != 0
+  // probleme : on deplace certaine valeur d'un proc a l'autre dans la direction i.
+  // Non local --> complique en multiproc
+  FixedVector<IJK_Field_double, 3> velocity_tmp = velocity_;
+  for ( int compo = 0 ; compo < 3 ; compo++)
+    {
+
+      const IJK_Splitting& splitting = velocity_[compo].get_splitting();
+      const int ni = velocity_[compo].ni();
+      const int nj = velocity_[compo].nj();
+      const int nk = velocity_[compo].nk();
+      double Lz =  splitting.get_coords_of_dof(ni,nj,nk,IJK_Splitting::FACES_K)[2];
+      double Lx =  splitting.get_coords_of_dof(ni,nj,nk,IJK_Splitting::FACES_I)[0];
+      double DX = Lx/ni ;
+
+      for (int k = 0 ; k < nk; k++)
+        {
+          for (int j = 0 ; j < nj; j++)
+            {
+              for (int i = 0 ; i < ni; i++)
+                {
+                  // z_global pas le meme si compo_x, _y, ou _z
+                  Vecteur3 xyz;
+                  if (compo == 0) {xyz = splitting.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_I);}
+                  else if (compo == 1) {xyz = splitting.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_J);}
+                  else if (compo == 2) {xyz = splitting.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_K);}
+
+                  // on fait en sorte que le point fixe soit au centre du domaine
+                  // deplacement negatif en z=0
+                  // positif en z=Lz
+                  double x_deplacement = -IJK_Splitting::shear_x_time_*(xyz[2]-Lz/2.)/Lz;
+                  double ishear_double = i+x_deplacement/DX;
+                  int ifloor = (int) floor(ishear_double);
+            	  ifloor = (ifloor % ni + ni) % ni;
+				  int iceil = (int) ceil(ishear_double) ;
+            	  iceil = (iceil % ni + ni) % ni;
+
+                  double v_min = velocity_[compo](ifloor,j,k);
+                  double v_max = velocity_[compo](iceil,j,k);
+
+                  double weight = ishear_double - floor(ishear_double);
+                  velocity_tmp[compo](i,j,k) = weight * v_max + (1.- weight)* v_min ;
+                }
+            }
+        }
+      velocity_=velocity_tmp;
+      velocity_[compo].echange_espace_virtuel(velocity_[compo].ghost());
+      if (compo==2)
+    	  velocity_[compo].echange_espace_virtuel(velocity_[compo].ghost(),0.,3);
+      if (compo==1)
+    	  velocity_[compo].echange_espace_virtuel(velocity_[compo].ghost(),0.,2);
+    }
+}
+
+
 void IJK_FT_double::transfer_ft_to_ns()
 {
   for (int dir = 0; dir < 3; dir++)

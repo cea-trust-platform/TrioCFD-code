@@ -207,6 +207,7 @@ protected :
 
   const IJK_FT_double& operator=(const IJK_FT_double&);
   void update_rho_v();
+  void update_sheared_velocity();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
   void rk3_sub_step(const int rk_step, const double total_timestep,
