@@ -191,7 +191,7 @@ Chapter {
 	Figure {
 		Width 7.5cm
 		Dimension 2
-		LabelX "d [$\\mu m$"
+		LabelX "d [$\\mu m$]"
 		LabelY "W+"
 		legend below title " at the interface"
 		Include_Description_Curves 0
@@ -199,19 +199,48 @@ Chapter {
 			legend "Reference case"
 			file CAS_OFFSET0.0/dTdni.xyz
 			columns (1e6*sqrt($2*$2+$3*$3)) ($5)
-			Style lines
+			Style linepoints
 			TypeLigne 1
 			LineWidth 2
+			PointSize 3
 		}
 	}
 	Figure {
-		nb_img_without_newline 1
+		nb_img_without_newline 2
+		Title "Example of the (final) flux"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "s [$\mu$m]"
+		LabelY "$\phi$ [W/m²]"
+		legend below title "at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference case"
+			file CAS_OFFSET0.0/s_qi_qiana.txt
+			columns (1e6*($1)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 3
+		}
+		Curve {
+			legend "Analytical solution"
+			file CAS_OFFSET0.0/s_qi_qiana.txt
+			columns (1e6*($1)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 3
+		}
+	}
+	Figure {
 		Title "Example of the (final) integrated flux"
 		Width 7.5cm
 		Dimension 2
 		RangeX 0 20.
 		LabelX "x [$\mu$m]"
-		LabelY "$P$ [W]"
+		LabelY "$Q$ [W]"
 		legend below title "at the bottom wall"
 		Include_Description_Curves 0
 		Curve {
@@ -229,7 +258,7 @@ Chapter {
 Chapter {
 	Title "Sensitivity to the offset"
 	Description "How does the flux evolves when the contact line crosses to a new Eulerian cell at the wall? "
-	Description "Strangely, all calculations are stables except OFFSET-0.2 which requires to set the TIMESTEP to 2e-07. "
+	Description "Strangely, all calculations are stables except OFFSET-0.2 which requires to set the TIMESTEP to 2e-07 and OFFSET0.2 which is even more demanding (dt=1e-7). "
 	Figure {
 		nb_img_without_newline 2
 		Title "(final) flux at the bottom wall"

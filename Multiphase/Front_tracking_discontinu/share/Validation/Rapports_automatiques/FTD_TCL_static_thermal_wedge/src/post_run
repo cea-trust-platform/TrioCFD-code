@@ -1,8 +1,8 @@
 #!/bin/bash
 if [ ${1} != "fake" ] ; then 
-  echo "[post_run] Running postpro_flux" && python ../postpro_flux.py &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
   echo "[post_run] Running data_extract" && ../data_extract.sh || (echo "data_extract failed" && exit -1)
   echo "[post_run] Running postpro" && visit -nowin -cli -s ../postpro.py&> postpro.log || [ $? == 250 ] || (echo "postpro failed" && exit -1)
+  echo "[post_run] Running postpro_flux" && python ../postpro_flux.py &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
   if [ $(basename $PWD) == "CAS_OFFSET-0.5" ] ; then
     echo "[post_run] Running visit_Re_Nu2" &&  visit -nowin -cli -s ../visit_Re_Nu2.py&> visit_Re_Nu2.log || [ $? == 250 ] || (echo "visit_Re_Nu2 failed" && exit -1)
   fi

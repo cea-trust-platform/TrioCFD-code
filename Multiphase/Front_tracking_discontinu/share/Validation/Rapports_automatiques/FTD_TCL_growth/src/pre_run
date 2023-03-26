@@ -1,0 +1,4 @@
+#!/bin/bash
+
+make_PAR.data COA_source.data 9
+

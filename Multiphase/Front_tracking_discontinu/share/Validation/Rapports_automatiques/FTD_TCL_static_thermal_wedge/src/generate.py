@@ -33,6 +33,12 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
    with open(os.path.join(dest,'calc.data'),'w') as f:
       f.write(data)
    #
+   # Write it back out:
+   with open(os.path.join(dest,'info.txt'),'w') as f:
+      f.write("lda=0.67897\n")
+      f.write("DT=%s\n"%str(dt))
+      f.write("theta=%s\n"%str(degliq))
+   #
    n=1
    print("\tCasTest %s calc %d"%(dest,1))
    shutil.copy("post_run", dest)

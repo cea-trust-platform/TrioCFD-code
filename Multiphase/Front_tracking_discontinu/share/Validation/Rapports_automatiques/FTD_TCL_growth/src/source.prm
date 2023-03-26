@@ -1,0 +1,166 @@
+Parameters {
+	Title "source 2D calculation"
+	Author "gb218285"
+	VersionTrio_U 1.9.2_beta
+ 	TestCase . PAR_COA_source.data 9
+}
+
+Chapter {
+   Title "Time evolution"	
+	Figure {
+		nb_img_without_newline 2
+		Title "Equivalent bubble diameter"
+		Width 7.5cm
+		Dimension 2
+#		RangeX 0 20.
+		LabelX "t [ms]"
+		LabelY "$D_{eq}$ [mm]"
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "Equivalent diameter"
+			file dia_full.txt
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "Base diameter"
+			file base_dia.txt
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "micro diameter"
+			file dia_micro.txt
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "CL diameter"
+			file dia_tcl.txt
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+	}
+	Figure {
+		Title "Heat flux"
+		Width 7.5cm
+		Dimension 2
+#		RangeX 0 20.
+		LabelX "t [ms]"
+		LabelY "$Q$ [W/m]"
+		Logy
+#		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "Qmicro"
+			file instant_Qmic_meso.txt
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "Qmeso"
+			file instant_Qmic_meso.txt
+			columns ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}	
+	}
+}
+
+Chapter {
+	Title "Visualization via VisIt" 
+
+	visu {
+		width 7cm
+		title "VITESSE_REPERE_LOCAL SOM"
+		mesh lata/post.lata INTERFACES
+		nb_img_without_newline 2
+		Operator no_databaseinfo
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		vector lata/post.lata INTERFACES VITESSE_REPERE_LOCAL SOM
+		cycles 1 -1
+	}
+
+	visu {
+		width 7cm
+		title "COURBURE SOM"
+		nb_img_without_newline 2
+		Operator no_databaseinfo
+		cycles 1 -1
+		pseudocolor lata/post.lata INTERFACES COURBURE SOM
+	}
+
+	visu {
+		width 7cm
+		title "TL ELEM"
+		nb_img_without_newline 2
+		Origin Visit
+		mesh lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+		Operator no_databaseinfo
+		instruction_visit DefineScalarExpression("TL_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		Pseudocolor_with_range lata/post.lata dom TL ELEM min max
+		cycles 1 -1
+	}
+	
+	visu {
+		width 7cm
+		title "VITESSE FACES"
+		vector lata/post.lata dom_dual VITESSE FACES
+	}
+
+	visu {
+		width 7cm
+		title "MPOINT_THERMIQUE ELEM"
+		pseudocolor lata/post.lata dom MPOINT_THERMIQUE ELEM
+	}
+
+	visu {
+		width 7cm
+		title "VITESSE_CONV_THERMIQUE FACES"
+		vector lata/post.lata dom_dual VITESSE_CONV_THERMIQUE FACES
+	}
+
+	visu {
+		width 7cm
+		title "VITESSE_DELTA_INTERFACE FACES"
+		vector lata/post.lata dom_dual VITESSE_DELTA_INTERFACE FACES
+	}
+
+	visu {
+		width 7cm
+		title "TERME_CONVECTION_VITESSE FACES"
+		vector lata/post.lata dom_dual TERME_CONVECTION_VITESSE FACES
+	}
+
+	visu {
+		width 7cm
+		title "TERME_DIFFUSION_VITESSE FACES"
+		vector lata/post.lata dom_dual TERME_DIFFUSION_VITESSE FACES
+	}
+}
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

@@ -60,13 +60,24 @@ print("saving last step : t_end=",t[nt-1])
 savetxt('xphi_last.txt', np.c_[xx,mat[-1,:,3],cum[-1,:,4]])
 
 f = figure()
-
 for it in range(nt):
    plot(mat[it,:,0],mat[it,:,3],'k-', label=r'$t=%g'%t[it])
    pass
 
 legend(loc=0)
 # f.savefig("fig.png")
+close(f)
+
+s, phi, phi_ana = np.loadtxt("s_qi_qiana.txt").T
+
+
+f = figure()
+xlabel("s [m]")
+ylabel("Flux [W/m²]")
+plot(s,phi,'ro', label=r'qi')
+plot(s,phi_ana,'k-', label=r'ana')
+savefig("flux.png")
+
 close(f)
 show()
 
