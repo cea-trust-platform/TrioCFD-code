@@ -148,9 +148,9 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
               for (d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
 
               fac *= pf(f) * vf(f) ;
-              a_l = (    alpha(f_e(f, 0), k)*vf_dir(f,0) +    alpha(f_e(f, 1), k)*vf_dir(f,1) ) / vf(f);
-              rho_l=(    rho(f_e(f, 0), n_l)*vf_dir(f,0) +    rho(f_e(f, 1), n_l)*vf_dir(f,1) ) / vf(f);
-              db_l= ( d_bulles(f_e(f, 0), k)*vf_dir(f,0) + d_bulles(f_e(f, 1), k)*vf_dir(f,1) ) / vf(f);
+              a_l = (    alpha(f_e(f, 0), k)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? alpha(e, k)*vf_dir(f,1) : 0)  ) / vf(f);
+              rho_l=(    rho(f_e(f, 0), n_l)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? rho(e, n_l)*vf_dir(f,1) : 0)  ) / vf(f);
+              db_l= ( d_bulles(f_e(f, 0), k)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? d_bulles(e, k)*vf_dir(f,1):0) ) / vf(f);
 
               secmem_l = fac * 2. * a_l * rho_l * dv(k,n_l) * dv(k,n_l) / db_l * std::max(0., Cw1_ + Cw2_*db_l/(2.*y_faces(f))) ;
 
@@ -162,6 +162,7 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
 
   for ( e = 0; e < ne_tot; e++)
     {
+      pvit_l = 0;
       // Fill velocity at the element
       for (d = 0 ; d<D ; d++)
         for (k = 0 ; k<N ; k++)
