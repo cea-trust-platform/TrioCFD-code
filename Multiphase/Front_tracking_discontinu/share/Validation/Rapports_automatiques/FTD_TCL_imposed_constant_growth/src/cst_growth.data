@@ -159,7 +159,7 @@ Lire pb
 		nb_iterations_correction_volume 0 # to get the correct dI/dt #
 		nb_lissage_correction_volume 0 # To smooth the dI/dt correction to avoid pikes on the interface #
 # Bloc Ok #
-        	n_iterations_distance 8
+      n_iterations_distance 8
 		remaillage {
                 pas 1e12 # 1e-12 # 
                 nb_iter_remaillage 3

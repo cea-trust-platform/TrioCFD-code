@@ -1,0 +1,42 @@
+#!/bin/bash
+for i in 0 1 5
+do
+   mkdir -p BARY$i
+   sed -e "s/nb_iter_barycentrage .*/nb_iter_barycentrage $i/" \
+       remaillage_bidim_axi.data > BARY$i/bary$i.data
+   cp post_run BARY$i
+done
+
+sed -i -e "s/# BLOC POST2//g" \
+       -e "s/champs dt_post 1.5e-6/champs dt_post 5.0e-6/g" \
+       -e "s/BLOC POST2 #//g" BARY5/bary5.data
+
+       
+# For the growing case:
+#    -e "s/tmax .*/tmax 1.4e-5/g" \
+cd BARY1
+sed -e "/prescribed_mpoint/s/#//g" \
+    -e "s/dt_post .*/dt_post 1.0e-6/" \
+    -e "s/tmax .*/tmax 0.8e-4/g" \
+       bary1.data > growth.data
+       
+sed -i -e "s/# BLOC POST2//g" \
+       -e "s/champs dt_post 1.5e-6/champs dt_post 5.0e-6/g" \
+       -e "s/BLOC POST2 #//g" bary1.data
+for fs in 0.1 0.05
+do
+   for vof in 000 100 111 133
+   do
+     v=${vof:0:1}
+     o=${vof:1:1}
+     f=${vof:2:1}
+     mkdir -p GROWTH0.3/VoF$vof/FACSEC$fs
+     cp post_run GROWTH0.3/VoF$vof/FACSEC$fs/
+     sed -e "s/facsec .*/facsec $fs/g" \
+         -e "s/VOFlike_correction_volume .*/VOFlike_correction_volume $v/" \
+         -e "s/nb_iterations_correction_volume 0/nb_iterations_correction_volume $o/" \
+         -e "s/nb_lissage_correction_volume 0/nb_lissage_correction_volume $f/" \
+         growth.data > GROWTH0.3/VoF$vof/FACSEC$fs/growth.data
+   done
+done
+

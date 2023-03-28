@@ -1,0 +1,387 @@
+Parameters {
+	Title "Tests for remeshing algorithms in bidim-axi case"
+	Description "Test du comportement du lissage, du barycentrage et de la conservation du volume"
+	Author "G.B."
+	TestCase BARY0 "bary0.data"
+	TestCase BARY1 "bary1.data"
+	TestCase BARY5 "bary5.data"
+	TestCase BARY1/GROWTH0.3/VoF111/FACSEC0.1 growth.data
+   TestCase BARY1/GROWTH0.3/VoF111/FACSEC0.05 growth.data
+   TestCase BARY1/GROWTH0.3/VoF000/FACSEC0.05 growth.data
+   TestCase BARY1/GROWTH0.3/VoF100/FACSEC0.05 growth.data
+   TestCase BARY1/GROWTH0.3/VoF133/FACSEC0.05 growth.data
+}
+
+Chapter {
+	Title "VDF, bidim-axi, impact of barycentring on a steady-interface."
+	Description "Check the effect of remeshing on an hemisphere (cut by BC), radius r=0.2mm" <<EOF
+\latex_( Several values are tested for the number of barycentrage iterations (0,1,5) with a constant parametrisation for the VoF part (VoF:100; 
+besides \latex_)triokeyword(nb_iter_correction_volume) in triokeyword(remaillage)\latex_( which represents the nb\_iter\_bary\_volume\_seul is always set to 3).
+Most issues are near rotation axis.
+Visualization are from the last timestep. 
+Theoretical value of curvature is -10000 but depending on the number of barycentring iterations we get : 
+\begin{itemize}
+ \item $n=0$ : curvature in [-10011:-9993] which is perfect. 
+ \item $n=1$ : curvature in [-15002:-9633] which is still reasonable. Nontheless, over long times, barycentring affects 
+nodes close to the symetry axis mostly. It may be due to the linearization performed in the calculation of the volume differential?
+ \item $n=5$ : curvature in [-39587:-8920] which is even worst. 
+\end{itemize}
+\latex_)
+
+If the timestep is decreased, more barycentrage will be performed and it will be getting worst.
+EOF
+	visu {
+      nb_img_without_newline 3
+	 	Description "No barycentring"
+		cycles -1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+#                mesh        BARY0/lata/post.lata dom
+                pseudocolor BARY0/lata/post.lata INTERFACES COURBURE SOM
+        	instruction_visit SetActivePlots((0))
+        	instruction_visit p=PseudocolorAttributes()
+		instruction_visit p.lineWidth = 3
+        	instruction_visit SetPlotOptions(p)
+		vector      BARY0/lata/post.lata INTERFACES normals/NORMALE ELEM
+		Width 3.5cm
+        }
+	visu {
+	 	Description "triokeyword(nb_iter_barycentrage) 1"
+		cycles -1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+#                mesh        BARY1/lata/post.lata dom
+                pseudocolor BARY1/lata/post.lata INTERFACES COURBURE SOM
+        	instruction_visit SetActivePlots((0))
+        	instruction_visit p=PseudocolorAttributes()
+		instruction_visit p.lineWidth = 3
+        	instruction_visit SetPlotOptions(p)
+		vector      BARY1/lata/post.lata INTERFACES normals/NORMALE ELEM
+		Width 3.5cm
+        }
+	visu {
+	 	Description "5 iterations barycentring"
+		cycles -1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+#                mesh        BARY5/lata/post.lata dom
+                pseudocolor BARY5/lata/post.lata INTERFACES COURBURE SOM
+        	instruction_visit SetActivePlots((0))
+        	instruction_visit p=PseudocolorAttributes()
+		instruction_visit p.lineWidth = 3
+        	instruction_visit SetPlotOptions(p)
+		vector      BARY5/lata/post.lata INTERFACES normals/NORMALE ELEM
+		Width 3.5cm
+        }
+
+visu {
+        Title "Various barycentring iterations (0: black, 1:red, 5:blue)"
+	mesh        BARY1/lata/post.lata dom
+        mesh ./BARY0/lata/post.lata INTERFACES
+        mesh ./BARY1/lata/post.lata INTERFACES
+        mesh ./BARY5/lata/post.lata INTERFACES
+        instruction_visit SetActivePlots((1))
+        instruction_visit m=MeshAttributes()
+        instruction_visit m.lineWidth = 3
+        instruction_visit m.meshColor=(255,255,255,255)
+        instruction_visit m.opaqueMode=m.Off
+        instruction_visit SetPlotOptions(m)
+
+        instruction_visit SetActivePlots((2))
+        instruction_visit m2=MeshAttributes()
+        instruction_visit m2.lineWidth = 3
+        instruction_visit m2.foregroundFlag=0
+        instruction_visit m2.legendFlag = 0
+        instruction_visit m2.meshColor=(255,0,0,255)
+        instruction_visit SetPlotOptions(m2)
+
+        instruction_visit SetActivePlots((3))
+        instruction_visit m3=MeshAttributes()
+        instruction_visit m3.lineWidth = 3
+        instruction_visit m3.opaqueMode=m2.Off
+        instruction_visit m3.legendFlag = 0
+        instruction_visit m3.foregroundFlag=0
+        instruction_visit m3.meshColor=(0,0,255,255)
+        instruction_visit SetPlotOptions(m3)
+        normal3D 0. 1. 0.
+        up3D 0. 0. 1.
+        cycles -1
+      }
+
+	Table {
+         Title "Curvature extracted from the last lata (impact of triokeyword(nb_iter_barycentrage))"
+         description "Interface curvature evolves depending on positions and triokeyword(nb_iter_barycentrage)"
+         description " "
+         nb_columns 3
+         Label min|max|mean
+         lines {
+	         nb_columns_file 4
+        	 file BARY0/curvature.txt
+         }
+         lines {
+         	nb_columns_file 4
+         	file BARY1/curvature.txt
+         }
+         lines {
+            nb_columns_file 4
+            file BARY5/curvature.txt
+         }
+	}
+	Figure {
+        Title "Iterface shape"
+        Description "The maximal radius is obtained on the y-axis. ymax is increasing with time due to the barycentrage (set to 1, except for the last curve where bary=5). The interface is no longer spherical."
+        Dimension 2
+        LabelX "time [s]"
+        LabelY "position [mm]"
+        Curve {
+                legend "rmin"
+                Version ""
+                file ./BARY1/interface-position.txt
+                columns $1 $2*1000
+                Style lines
+                LineWidth 2
+        }
+        Curve {
+                legend "rmax"
+                Version ""
+                file ./BARY1/interface-position.txt
+                columns $1 $3*1000
+                Style lines
+                LineWidth 2
+        }
+        Curve {
+                legend "xmax"
+                Version ""
+                file ./BARY1/interface-position.txt
+                columns $1 $4*1000
+                Style points
+                PointSize 1
+        }
+        Curve {
+                legend "ymax"
+                Version ""
+                file ./BARY1/interface-position.txt
+                columns $1 $5*1000
+                Style points
+                PointSize 1
+        }
+        Curve {
+                legend "ymax (bary=5)"
+                Version ""
+                file ./BARY5/interface-position.txt
+                columns $1 $5*1000
+                Style points
+                PointSize 1
+        }
+   }
+	Description "\latex_(\clearpage ~\\\latex_) " <<EOF
+Be careful, these tests were performed with enough smoothing iterations 
+(ie. triokeyword(lissage_courbure_iterations_systematique) and triokeyword(lissage_courbure_iterations_si_remaillage) 
+both set to 5). In addition, the threshold on volume correction triokeyword(seuil_dvolume_residuel) was low enough (1.e-15)
+and the corresponding iterations sufficient (triokeyword(VOFlike_correction_volume) 1 to activate the VoF correction 
+and triokeyword(nb_iterations_correction_volume) 0, which means that no more 
+correction are done after the end of barycentrage and lissage) to have a constant volume.
+
+It is possible that the error on the interfacial shape close to the symetry axis can be explained as follows. 
+Barycentring is performed in the tangential direction. The tangent vector is estimated with respect to the normal
+by a first order approximation of the volume differential. It is not perfect and therefore, even barycentring 
+(that is theoretically in the tangential plane) creates slight volume variations. They are collected by the code 
+along the interface (each vertex has a theoretical volume correction). Lissage can also generate volume variations
+that differs from the theoretical one (due to sequential vertex motion, but also to the differential approximation). 
+After lissage and barycentrage are finished, additional iterations for volume correction only can be performed, 
+but only if the global error on volume variation is above triokeyword(seuil_dvolume_residuel) AND if 
+triokeyword(nb_iterations_correction_volume) is not set to 0.
+In any case, there is no guarantee that the volume correction is satisfied locally. It seems possible then that the
+unexpected-volume-variation generated by the barycentrage (which is given as a reference to the lissage correction)
+or by the difference between expected and real volume-variation during lissage
+is NOT corrected perfectly locally, but the loop will stop on the GLOBAL threshold triokeyword(seuil_dvolume_residuel)
+or on lack of triokeyword(nb_iterations_correction_volume).
+Apparently, the activation of triokeyword(VOFlike_correction_volume) is insignificant on that static case.
+
+Even with enough iterations, we don't know if the local error can be decreased.  
+EOF
+
+}
+
+
+Chapter {
+	Title "VDF, bidim-axi, case of moving interface."
+	Description "So far, the effect of barycentring operations have been assessed." <<EOF
+It was done with triokeyword(nb_iterations_correction_volume) and triokeyword(nb_lissage_correction_volume) both set to 0 
+(but triokeyword(VOFlike_correction_volume) 1 to activate volume correction during lissage and barycentrage and 
+besides triokeyword(nb_iter_correction_volume) in triokeyword(remaillage) which represents the triokeyword(nb_iter_bary_volume_seul) is always set to 3)
+to minimize side-effects from other parameters. 
+
+Now, we investigate bubble growth. 
+The rate of growth is not taken from energy resolution but enforced by triokeyword(prescribed_mpoint) -0.3. 
+On this new case, we can clearly see the importance of the timestep (controlled here by the facsec).
+With facsec=0.1, the solver is unstable, unphysical vortices appears (see spurrious currents on figure below). 
+With facsec=0.05, the solution remains stable. Reasonable/moderate vortices develops (only seen in the vapor where 
+the velocity is theoretically zero). Subsequent tests are thus performed with facsec=0.05.
+
+Regarding the triplet of keywords (triokeyword(VOFlike_correction_volume), triokeyword(nb_iterations_correction_volume), triokeyword(nb_lissage_correction_volume))
+we set them to several values (among 000 100 111 133), to (i) iterate a few times times to get the correct dI/dt 
+(the second iteration probably already has a very weak impact compared to the first), and also to (ii) 
+smooth the dI/dt correction to avoid pikes on the interface. This parameter triokeyword(nb_lissage_correction_volume) 
+is expected to be important when dealing with growth due to non-uniform phase-change.
+But in fact here, these 3 parameters have no impact at all. It is probably because for any keyword combination, as long as triokeyword(nb_iter_barycentrage) 
+or triokeyword(lissage_courbure_iterations_*) are not zero, there will be as much volume correction (and here, there will also be 3 additional corrections
+as triokeyword(nb_iter_correction_volume) in triokeyword(remaillage) which represents the triokeyword(nb_iter_bary_volume_seul) is always set to 3).
+
+EOF
+	visu {
+                nb_img_without_newline 1
+	 	Description "facsec0.1: Unstable from 1st post-pro -> Unstable/Spurious! (almost, some perturbations are visible in the bubble but insignificant)"
+		cycles 1
+      Normal3d 0 0 1
+      Up3D 1 0 0
+      zoom3D 0 0 1.
+      mesh        BARY1/GROWTH0.3/VoF111/FACSEC0.1/lata/post.lata INTERFACES black
+		Vector      BARY1/GROWTH0.3/VoF111/FACSEC0.1/lata/post.lata dom_dual VITESSE FACES
+	   instruction_visit SetActivePlots((1))
+		instruction_visit v = VectorAttributes()
+		instruction_visit v.autoScale = 0
+		instruction_visit v.useStride = 1
+		instruction_visit v.stride = 1
+		instruction_visit v.scale = 0.0001
+		instruction_visit v.colorByMag = 1
+		instruction_visit v.useLegend = 1
+#		instruction_visit v.vectorColor = (0, 0, 0, 255)
+	   instruction_visit SetPlotOptions(v)
+		Width 8cm
+        }
+	visu {
+                nb_img_without_newline 2
+	 	Description "facsec0.05: illustration at 2 different times -> stable/no-Spurious!"
+		cycles 1 14
+      Normal3d 0 0 1
+      Up3D 1 0 0
+      zoom3D 0 0 1.
+      mesh        BARY1/GROWTH0.3/VoF111/FACSEC0.05/lata/post.lata INTERFACES black
+		Vector      BARY1/GROWTH0.3/VoF111/FACSEC0.05/lata/post.lata dom_dual VITESSE FACES 
+	   instruction_visit SetActivePlots((1))
+		instruction_visit v = VectorAttributes()
+		instruction_visit v.autoScale = 0
+		instruction_visit v.useStride = 1
+		instruction_visit v.stride = 1
+		instruction_visit v.scale = 0.0001
+		instruction_visit v.colorByMag = 1
+		instruction_visit v.useLegend = 1
+	        instruction_visit SetPlotOptions(v)
+		Width 5cm
+        }
+        
+        visu {
+        Title "Various mass conservation (VoF000: black, VoF100:red, VoF111:blue, VoF133:orange) (barycentring iterations always to 1)"
+	 	  Description "All interfaces overlap"
+        mesh BARY1/lata/post.lata dom
+        mesh ./BARY1/GROWTH0.3/VoF000/FACSEC0.05/lata/post.lata INTERFACES
+        mesh ./BARY1/GROWTH0.3/VoF100/FACSEC0.05/lata/post.lata INTERFACES
+        mesh ./BARY1/GROWTH0.3/VoF111/FACSEC0.05/lata/post.lata INTERFACES
+        mesh ./BARY1/GROWTH0.3/VoF133/FACSEC0.05/lata/post.lata INTERFACES
+        BlackVector ./BARY1/GROWTH0.3/VoF100/FACSEC0.05/lata/post.lata INTERFACES VITESSE SOM 
+        instruction_visit SetActivePlots((1))
+        instruction_visit m=MeshAttributes()
+        instruction_visit m.lineWidth = 7
+        instruction_visit m.meshColor=(255,255,255,255)
+        instruction_visit m.legendFlag = 0
+        instruction_visit m.opaqueMode=m.Off
+        instruction_visit SetPlotOptions(m)
+
+        instruction_visit SetActivePlots((2))
+        instruction_visit m2=MeshAttributes()
+        instruction_visit m2.lineWidth = 5
+        instruction_visit m2.foregroundFlag=0
+        instruction_visit m2.legendFlag = 0
+        instruction_visit m2.meshColor=(255,0,0,255)
+        instruction_visit SetPlotOptions(m2)
+
+        instruction_visit SetActivePlots((3))
+        instruction_visit m3=MeshAttributes()
+        instruction_visit m3.lineWidth = 3
+        instruction_visit m3.opaqueMode=m2.Off
+        instruction_visit m3.legendFlag = 0
+        instruction_visit m3.foregroundFlag=0
+        instruction_visit m3.meshColor=(0,0,255,255)
+        instruction_visit SetPlotOptions(m3)
+
+        instruction_visit SetActivePlots((4))
+        instruction_visit m4=MeshAttributes()
+        instruction_visit m4.lineWidth = 1
+        instruction_visit m4.opaqueMode=m2.Off
+        instruction_visit m4.legendFlag = 0
+        instruction_visit m4.foregroundFlag=0
+        instruction_visit m4.meshColor=(255,255,0,255)
+        instruction_visit SetPlotOptions(m4)
+
+        normal3D 0. 1. 0.
+        up3D 0. 0. 1.
+        cycles -1
+      }
+      
+	Table {
+         Title "Curvature extracted from the last lata"
+         description ""
+         description " "
+         nb_columns 3
+         Label min|max|mean
+         lines {
+                nb_columns_file 4
+                file BARY1/GROWTH0.3/VoF000/FACSEC0.05/curvature.txt
+         }
+         lines {
+                nb_columns_file 4
+                file BARY1/GROWTH0.3/VoF100/FACSEC0.05/curvature.txt
+         }
+         lines {
+                nb_columns_file 4
+                file BARY1/GROWTH0.3/VoF111/FACSEC0.05/curvature.txt
+         }
+         lines {
+                nb_columns_file 4
+                file BARY1/GROWTH0.3/VoF133/FACSEC0.05/curvature.txt
+         }
+     }
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "From this study on remeshing algorithms in 2D axi configurations," <<EOF
+it can be concluded that barycentring iterations should be used carefully or maybe not at all. 
+A tentative remshing bloc could be : 
+\latex_(
+\begin{verbatim}
+   VOFlike_correction_volume 1 # Flag to activate the VOF-like volume conservation (dI/dt) #
+   nb_iterations_correction_volume 0 # to get the correct dI/dt #
+   nb_lissage_correction_volume 0 # To smooth the dI/dt correction to avoid pikes on the interface #
+   n_iterations_distance 8
+   remaillage {
+      pas 1e-12
+      nb_iter_remaillage 3
+      critere_arete 0.35
+      critere_remaillage 0.35
+      pas_lissage 1e-12
+      relax_barycentrage 0.1
+      facteur_longueur_ideale 1.0
+      nb_iter_barycentrage 1
+      nb_iter_correction_volume 3
+      seuil_dvolume_residuel 1e-15
+      lissage_courbure_coeff -0.01
+      lissage_courbure_iterations_systematique 1
+      lissage_courbure_iterations_si_remaillage 5
+   }
+\end{verbatim}
+
+In the growth case, stability issues were also clearly demonstrated with a facsec=0.05 to reduce the timestep and eliminate currents.
+\latex_)
+EOF
+}
+Chapter {
+        Title Computer performance
+        Tableau_performance {
+        }
+}
+

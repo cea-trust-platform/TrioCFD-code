@@ -1,6 +1,6 @@
 Parameters {
-	Title "Bubble constant growth : volume conservation"
-	Description "Checking the validity of the volume evolution with a given phase-change rate"
+	Title "Bubble constant growth : volume conservation in VDF"
+	Description "Checking the validity of the volume evolution with a given phase-change rate in 2D and 2D_axi cases"
 	Author "G.B."
 	TestCase "2D/VoF0" "cst_growth.data"
 	TestCase "2D/VoF1" "cst_growth.data"
@@ -11,17 +11,23 @@ Parameters {
 #	TestCase "FTD_remaillage_vef" "PAR_FTD_remaillage_vef.data" 4
 #	Prerequisite "./prerequisite.sh" #
 	Description "Comparing the validity of the volume evolution with a given phase-change rate in different cases: 2D and bidim_axi." <<EOF
-\latex_(The test-case is not related to temperature resolution as the new keyword\latex_) triokeyword(prescribed_mpoint) \latex_(is used to set mp to -10kg/m2s.
+\latex_(The test-case is not related to temperature resolution as the keyword\latex_) triokeyword(prescribed_mpoint) \latex_(is used to set $\dot{m}=-10kg/m2s$.
 Therefore, the growth is imposed, and the radius evolves as 
-$$r_{ana} = r0-mp/\rho_v t$$
+$$r_{ana} = r_0-\dot{m}/\rho_v t$$
 which leads to a constant interface velocity
-$$vi_{ana} =-mp/\rho_v$$
+$$v_{i,ana} =-\dot{m}/\rho_v$$
 \latex_)
 EOF
 }
 
 Chapter {
-	Title "VDF, bubble constant growth : volume conservation"
+	Title "Case 2D, bubble constant growth : volume conservation"
+   Description "" <<EOF
+\latex_(
+Theoretical volume, interface velocity and interfacial area are compared to the calculation.
+SOMETHING IS OFF!!
+\latex_) 
+EOF
 
 Figure {
 	Title "2D: VoF0 vs VoF1"
