@@ -630,6 +630,9 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
   if (liste_post_instantanes_.contient_("D_VELOCITY"))
     {
+//      d_velocity_[0].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/);
+//      d_velocity_[1].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
+//      d_velocity_[2].echange_espace_virtuel(2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/);
       n--, dumplata_vector(lata_name, "D_VELOCITY", d_velocity_[0], d_velocity_[1], d_velocity_[2], latastep);
     }
   if (liste_post_instantanes_.contient_("OP_CONV"))
