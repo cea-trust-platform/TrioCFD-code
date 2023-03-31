@@ -1,0 +1,116 @@
+Parameters {
+	newvalidTrio
+	Title "3D oscillating cylindrical beam into a confined space"	
+	Author "M. A. Puscas"
+	
+	TestCase  . 3dOscillatingBeamALE.data 40   /*jdd en annexe*/ 
+
+
+	ParametersTRUST Problem: Pb_hydraulique_ALE
+	ParametersTRUST Dimension: 3D
+	ParametersTRUST Domain: Domaine_ALE
+	ParametersTRUST Pressure solver: Solver_moving_mesh_ALE PETSC GCP
+	ParametersTRUST Discretization: VEFPre1B
+	ParametersTRUST Time scheme: Scheme_euler_implicit with solver implicite_ALE GMRES
+	ParametersTRUST Medium: Fluide_Incompressible
+	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
+	ParametersTRUST Convection scheme: ALE muscl
+	ParametersTRUST Location: ALE/share/Validation/Rapports_automatiques/3dOscillatingBeamALE
+
+	
+	IncludeData 2
+
+	Reference "1. S. S. Chen, M. W. Wambsganss, and J. A. Jendrzejczyk. Added Mass and Damping of a Vibrating Rod in Confined Viscous Fluids, 1976."	
+	Reference "2. CFD numerical simulation of a single-phase flow around a vibrating cylindrical tube, D. Panunzio, DES/ISAS/DM2S/SEMT/DYN/RS/2020-67015/A"
+
+}
+
+Purpose {
+	Description "A 3D fluid annulus region, confined between an inner cylindrical beam moving with an harmonic motion and an outer fixed cylindrical wall, has been numerically simulated."
+	Description "This validation test case has been created to compare the ALE framework results with the analytical solution of such a problem [1]."
+	Description "We investigate the force exerted by the fluid on the cylindrical beam subjected to a transverse excitation. We will seek, in particular, on the characteristics of the fluid force, represented by the added mass and damping coefficients."
+	Description "This is the 3d version of the test case presented in [2]." 
+}
+Pb_description {
+	Description "The domain used for the numerical simulations is the one in Figure 1.  
+	geometry {
+		Figure {
+			Title "The domain"
+			Width 16cm
+			picture geometry.png
+			}
+		Description "Fluid domain : cut in the plane (x, y). In black the fixed boundaries of the domain and in blue the mobile ones."
+		Description "Geometry composed of two coaxial cylinders: \latex_($C_{int}$\latex_) and \latex_($C_{ext}$\latex_)."
+		Description "\latex_($C_{int}$\latex_) with radius \latex_($ R_{int} = 0.02$\latex_)m and length  \latex_($L_{int}=0.7 $\latex_) m."
+		Description ""\latex_($C_{ext}$\latex_) with radius \latex_($ R_{ext} = 0.022$\latex_)m and length  \latex_($L_{ext}=0.8 $\latex_) m. "
+		}
+	icbc {
+		Description " The inner cylinder moves with an harmonic motion: \latex_($\textbf{u} = U*sin(\omega*t) \textbf{e}_y $\latex_), where \latex_($ U $\latex_) : amplitude of displacement and \latex_($ \omega $\latex_) : angular frequency of displacement.
+
+		Description "The outer cylinder fixed."
+		Description "Initially, the fluid is at rest."
+	}
+	
+	fluidprop {
+		Description "The tube bundle is immersed in an incompressible Newtonian and homogeneous fluid, with mass density \latex_($\rho \,(1000 \,Kg/m^3 )$\latex_) and kinematic viscosity \latex_($\nu \,(1.007*10^{-6}\, m^2/s)$\latex_). 
+	}
+}
+
+Casesetup {
+	model_options {
+		Description "The fluid problem with moving boundaries is handled by the Arbitrary Lagrangian-Eulerian (ALE) method."
+		Description "In the ALE approach, the fluid flow is computed in a domain that is deformed in order to follow the movement of the fluid-solid interface. It provides a hybrid description not associated with the fluid particles and the laboratory coordinates. We associate the description with a moving imaginary mesh that follows the fluid domain."
+	}
+}
+
+Results {
+	Description "In this section the analytcal solution [1] for the force per unit length exerted by the fluid over the inner cylinder and the added coefficients are compared with the TrioCFD results."
+	Description "According to Chen et al. [1], the analytical solution of the fluid force acting on the inner cylinder is: \latex_( \begin{equation} \textbf{F} = \rho \pi  U L_{int} R_{int}^2 \omega^2 \bigg[m_{self} \sin(\omega t) - c_{self} \cos(\omega t)\bigg] \textbf{e}_y \end{equation} \latex_) where \latex_( $\rho=1000~kg/m^3$ \latex_), \latex_($C_{int}= 0.02 m$\latex_) (diameter of the inner cylinder), \latex_($L_{int}=0.7 $\latex_) m (the length of the inner cylinder), \latex_( $U=0.5*10^{-4}$ \latex_) (displacement amplitude), \latex_( $\omega=1000.9~rad/s$ \latex_) (angular frequency of motion) and \latex_( $m_{self}$ \latex_) and \latex_( $c_{self}$ \latex_) the added mass and damping coefficients, respectively."
+Description "The analytical solution (Chen et al. [1]) is here depicted and compared with the numerical one, obtained by the sum of the pressure and viscous force acting on the inner cylinder along y. Simulations have been performed for \latex_( $t = [0, 5T]$ \latex_) where \latex_( $T = 2\pi/\omega$ \latex_)."
+	Figure {
+		Title "Fluid force exerted on the inner cylindrical beam"
+		
+		LabelX "t [s]"
+		LabelY "F [N]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "Chen et al. [1]"
+			Fichier Theoretical_force.txt
+			Style lines
+		}
+
+		Courbe {
+			legend "TrioCFD"
+			file Numerical_force.txt
+			columns $1 $2
+			Style linespoints
+		}
+
+	}
+			Description "For the analytical calculation of the added coefficients, the reader is referred to [1]. The theory presented in Chen et al. [1] is a potential theory. Thus, we have no theoretical estimates for the added damping coefficient on this 3D configuration.  Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{self} &= \dfrac{\langle\sin(\omega t), F(t)\rangle}{\rho \pi U R_{int}^2 L_{int} \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F(t) dt\\c_{self} &= \dfrac{\langle\cos(\omega t), F(t)\rangle}{\rho \pi U R_{int}^2 L_{int} \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F(t) dt \end{split} \end{equation}\latex_) and are reported in the following table: " 
+	Table {
+		Title "Added mass and damping coefficients"
+	
+		nb_columns 2
+		label \latex_($m_{self}$\latex_) | \latex_($c_{self}$\latex_)
+		include_description_lines 0
+
+		Line {
+			legend "Chen et al. [1]"
+			values 10.16 --
+		}
+		
+		Line {
+			legend "TrioCFD"
+			file Numerical_coefficients.txt
+		}
+
+	}
+		
+}
+
+Conclusion {
+	Description "The harmonic motion of 3D oscillating cylindrical beam in a quiescent viscous fluid, enclosed by a concentric fixed wall, has been  numerically simulated. A FEV method is applied to solve such a problem in conjunction with the ALE approach. The numerical results for the fluid force and the added mass coefficient successfully confirmed the analytical solution [1]. Remark: in order to reduce the numerical error a much more refined mesh must be used!
+}

@@ -45,7 +45,6 @@ Entree& Force_sp::readOn( Entree& is )
   return is;
 }
 
-
 Force_sp::Force_sp() : nl(0),nm(0),nn(0),n_lmn(nl*nn*nm),kmin(0),kmax(0), energie(0)
 {
 
@@ -96,7 +95,6 @@ void Force_sp::initialise(int a_nl,int a_nn,int a_nm, int a_momin, int a_momax, 
 
 }
 
-
 void Force_sp::initialise(int a_nl,int a_nn,int a_nm, int a_momin, int a_momax, double a_kmin, double a_kmax, double a_amplitude, std::string nom_fichier)
 {
 
@@ -133,71 +131,6 @@ void Force_sp::initialise(int a_nl,int a_nn,int a_nm, int a_momin, int a_momax, 
       Spectral_flux << std::endl << "l,m,n \t : f_x, \tf_y, \tf_z,\t";
     }
 
-}
-
-
-
-void Force_sp::compute_step2(ArrOfDouble& process_flt)
-{
-  if (Process::je_suis_maitre())
-    {
-      /*
-      Version avancée du calcul du processus aléatoire :
-        - Les champs sont stockés dans des tableaux à une dimension,
-          l'indice est reconstruit.
-      */
-      int n_dir(3);
-      double kappa[3];
-      double terme[2];
-      for (int n=0; n<2*nn+1; n++)
-        for (int m=0; m<2*nm+1; m++)
-          for (int l=nl; l<2*nl+1; l++) // La TF-1 de cette force est réelle. Donc cette force est à symétrie Hermitienne
-            {
-              int ind_lmn = (n*(2*nm+1) + m) * (2*nl+1) +l;
-              int ind_lmn_moins = (n*(2*nm+1) + m) * (2*nl+1) + (2*nl-l);
-              // Position dans l'espace spectral. k_x va de -kmin a +kmin,
-              // d'ou le l-nl
-              kappa[0] = - kmax + (l)*(2*kmax)/(2*nl);
-              kappa[1] = - kmax + (m)*(2*kmax)/(2*nm);
-              kappa[2] = - kmax + (n)*(2*kmax)/(2*nn);
-
-              if (std::fabs(kappa[0])<kmin && std::fabs(kappa[1])<kmin && std::fabs(kappa[2])<kmin)
-                {
-                  /* Le nombre d'onde est trop petit pour etre dans le domaine force*/
-                  for (int cpx=0; cpx<2; cpx++)
-                    {
-                      for (int dir=0; dir<3; dir++)
-                        {
-                          int ind_CDI((cpx*n_dir+dir)*n_lmn+ind_lmn);
-                          force_flt[ind_CDI] = 0;
-                          force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn_moins)] =   force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn)];
-                          force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn_moins)] = - force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn)];
-                        }
-                    }
-                }
-              else
-                {
-                  /* On est dans le domaine force */
-                  double norme_kappa = sqrt(kappa[0]*kappa[0] + kappa[1]*kappa[1] + kappa[2]*kappa[2]);
-                  for (int cpx=0; cpx<2; cpx++)
-                    {
-                      terme[cpx] =  kappa[0]*process_flt[(cpx*n_dir+0)*n_lmn+ind_lmn];
-                      terme[cpx] += kappa[1]*process_flt[(cpx*n_dir+1)*n_lmn+ind_lmn];
-                      terme[cpx] += kappa[2]*process_flt[(cpx*n_dir+2)*n_lmn+ind_lmn];
-                      terme[cpx] /= pow(norme_kappa,2);
-                      for (int dir=0; dir<3; dir++)
-                        {
-                          int ind_CDI((cpx*n_dir+dir)*n_lmn+ind_lmn);
-                          force_flt[ind_CDI] = process_flt[ind_CDI] - kappa[dir]*terme[cpx];
-                          // Symétrie Hermitienne : Sous nos conventions, -k[ind] = k[n_lmn - ind]
-                          force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn_moins)] =   force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn)];
-                          force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn_moins)] = - force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn)];
-                        }
-                    }
-                }
-            }
-    }
-  envoyer_broadcast(force_flt,0);
 }
 
 void Force_sp::field_advection(const ArrOfDouble& advection_length, const double dt, const int it)
@@ -266,7 +199,6 @@ void Force_sp::field_advection(const ArrOfDouble& advection_length, const double
     }
 }
 
-
 void Force_sp::set_zero()
 {
   /*Mise à zero de tout le champ de force spectral*/
@@ -275,7 +207,7 @@ void Force_sp::set_zero()
   force_flt.resize(2*3*n_lmn);//,0.0);
 }
 
-
+// --------------------------------------
 void Force_sp::compute_force_kappa()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
@@ -356,9 +288,6 @@ void Force_sp::compute_dirac_board()
   envoyer_broadcast(force_flt,0);
 }
 
-
-
-
 void Force_sp::compute_dirac_point()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
@@ -392,11 +321,12 @@ void Force_sp::compute_dirac_point_div_nulle()
       /*
       Fonction de test. Operationnelle
       Construit la force spectrale qui vaut 1 en deux point et 0 ailleurs
-      de sorte à ce que la fonction de forçage physique soit : cos(x-y) (ex + ey)
+      de sorte à ce que la fonction de forçage physique soit : cos(x-z) (ex + ez)
+      f_sp(k) = dirac() + dirac()
       */
 
       int n_dir(3);
-      int roc(momin+0);
+      int roc(momin);
       int n_ind_lmn(n_lmn);
 
       int l_moins(nl-roc), l_plus(nl+roc);
@@ -468,13 +398,12 @@ void Force_sp::compute_dirac_point_uniZ()
   envoyer_broadcast(force_flt,0);
 }
 
-
 void Force_sp::compute_dirac_point_uniY()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
   if (Process::je_suis_maitre())
     {
-      // donne cos(y) (ex)
+      // donne cos(momin*2pi/L*(y)) (ex)
       int dir(1);
       int n_dir(3);
       int roc(momin+0);
@@ -505,6 +434,109 @@ void Force_sp::compute_dirac_point_uniY()
   envoyer_broadcast(force_flt,0);
 }
 
+void Force_sp::compute_diracs_for_cos_squarred()
+{
+  // -------------------------------------------
+  // cos(ax)  <--------------------------  delta(k-a) + delta(k+a)
+  // cos(ax)cos(ax) = 0.5*(1+cos(2ax)) <-  0.5*(delta(k-2a) + 2delta(k) + delta(k+2a))
+  // -------------------------------------------
+  // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
+  if (Process::je_suis_maitre())
+    {
+      // donne cos(momin*2pi/L*(y)) (ex)
+      int dir(1);
+      int n_dir(3);
+      int roc(momin);
+      int n_ind_lmn(n_lmn);
+
+      // int l_moins(nl-roc);
+      int l_zero(nl);
+      // int l_plus(nl+roc);
+      int m_moins(nm-2*roc); // k-2a
+      int m_zero(nm);        // k
+      int m_plus(nm+2*roc);  // k+2a
+      // int n_moins(nn-roc);
+      int n_zero(nn);
+      // int n_plus(nn+roc);
+
+      // - Stands for 0.5*(delta(k-2ko) + delta(k+2a))
+      int ind_moins((n_zero*(2*nm+1) + m_moins) * (2*nl+1) +l_zero);
+      int ind_plus((n_zero*(2*nm+1) + m_plus) * (2*nl+1) +l_zero);
+
+      int ind_RDImoins((0*n_dir+dir)*n_ind_lmn+ind_moins);
+      int ind_RDIplus((0*n_dir+dir)*n_ind_lmn+ind_plus);
+
+      force_flt[ind_RDImoins]=0.5*amplitude;
+      force_flt[ind_RDIplus]=0.5*amplitude;
+
+      force[0][dir][ind_moins]=0.5*amplitude;
+      force[0][dir][ind_plus]=0.5*amplitude;
+      // -----------------------------------------------------------
+
+      // - Stands for delta(k)
+      int ind_zero((n_zero*(2*nm+1) + m_zero) * (2*nl+1) +l_zero);
+
+      int ind_RDIzero((0*n_dir+dir)*n_ind_lmn+ind_zero);
+
+      force_flt[ind_RDIzero]=amplitude;
+
+      force[0][dir][ind_zero]=amplitude;
+      // -----------------------------------------------------------
+    }
+  envoyer_broadcast(force_flt,0);
+}
+
+void Force_sp::compute_diracs_for_t_times_cos_squarred(double time)
+{
+  // -------------------------------------------
+  // cos(ax)  <--------------------------  delta(k-a) + delta(k+a)
+  // cos(ax)cos(ax) = 0.5*(1+cos(2ax)) <-  0.5*(delta(k-2a) + 2delta(k) + delta(k+2a))
+  // -------------------------------------------
+  // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
+  if (Process::je_suis_maitre())
+    {
+      // donne cos(momin*2pi/L*(y)) (ex)
+      int dir(1);
+      int n_dir(3);
+      int roc(momin);
+      int n_ind_lmn(n_lmn);
+
+      // int l_moins(nl-roc);
+      int l_zero(nl);
+      // int l_plus(nl+roc);
+      int m_moins(nm-2*roc); // k-2a
+      int m_zero(nm);        // k
+      int m_plus(nm+2*roc);  // k+2a
+      // int n_moins(nn-roc);
+      int n_zero(nn);
+      // int n_plus(nn+roc);
+
+      // - Stands for 0.5*(delta(k-2ko) + delta(k+2a))
+      int ind_moins((n_zero*(2*nm+1) + m_moins) * (2*nl+1) +l_zero);
+      int ind_plus((n_zero*(2*nm+1) + m_plus) * (2*nl+1) +l_zero);
+
+      int ind_RDImoins((0*n_dir+dir)*n_ind_lmn+ind_moins);
+      int ind_RDIplus((0*n_dir+dir)*n_ind_lmn+ind_plus);
+
+      force_flt[ind_RDImoins]=time*0.5*amplitude;
+      force_flt[ind_RDIplus]=time*0.5*amplitude;
+
+      force[0][dir][ind_moins]=time*0.5*amplitude;
+      force[0][dir][ind_plus]=time*0.5*amplitude;
+      // -----------------------------------------------------------
+
+      // - Stands for delta(k)
+      int ind_zero((n_zero*(2*nm+1) + m_zero) * (2*nl+1) +l_zero);
+
+      int ind_RDIzero((0*n_dir+dir)*n_ind_lmn+ind_zero);
+
+      force_flt[ind_RDIzero]=time*amplitude;
+
+      force[0][dir][ind_zero]=time*amplitude;
+      // -----------------------------------------------------------
+    }
+  envoyer_broadcast(force_flt,0);
+}
 
 void Force_sp::compute_dirac_point_uniX_alongX()
 {
@@ -543,7 +575,6 @@ void Force_sp::compute_dirac_point_uniX_alongX()
   envoyer_broadcast(force_flt,0);
 }
 
-
 void Force_sp::compute_dirac_point_uniX_alongY()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
@@ -581,9 +612,6 @@ void Force_sp::compute_dirac_point_uniX_alongY()
   envoyer_broadcast(force_flt,0);
 }
 
-
-
-
 void Force_sp::compute_door_rope()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
@@ -619,8 +647,6 @@ void Force_sp::compute_door_rope()
   envoyer_broadcast(force_flt,0);
 }
 
-
-
 void Force_sp::compute_door_cube()
 {
   // Seul le proc 0 fait le calcul, comme c'est le mm clc pour tous les procs
@@ -628,7 +654,7 @@ void Force_sp::compute_door_cube()
     {
       int cpx, dir, l, m, n, ind;
 
-      int roc(momin+0);
+      int roc(momin);
 
       int l1(nl-roc), l2(nl+roc);
       // int fsp_m1(nm-roc), fsp_m2(nm+roc);
@@ -656,8 +682,70 @@ void Force_sp::compute_door_cube()
   envoyer_broadcast(force_flt,0);
 }
 
+void Force_sp::compute_step2(ArrOfDouble& process_flt)
+{
+  if (Process::je_suis_maitre())
+    {
+      /*
+      Version avancée du calcul du processus aléatoire :
+        - Les champs sont stockés dans des tableaux à une dimension,
+          l'indice est reconstruit.
+      */
+      int n_dir(3);
+      double kappa[3];
+      double terme[2];
+      for (int n=0; n<2*nn+1; n++)
+        for (int m=0; m<2*nm+1; m++)
+          for (int l=nl; l<2*nl+1; l++) // La TF-1 de cette force est réelle. Donc cette force est à symétrie Hermitienne
+            {
+              int ind_lmn = (n*(2*nm+1) + m) * (2*nl+1) +l;
+              int ind_lmn_moins = (n*(2*nm+1) + m) * (2*nl+1) + (2*nl-l);
+              // Position dans l'espace spectral. k_x va de -kmin a +kmin,
+              // d'ou le l-nl
+              kappa[0] = - kmax + (l)*(2*kmax)/(2*nl);
+              kappa[1] = - kmax + (m)*(2*kmax)/(2*nm);
+              kappa[2] = - kmax + (n)*(2*kmax)/(2*nn);
 
+              if (std::fabs(kappa[0])<kmin && std::fabs(kappa[1])<kmin && std::fabs(kappa[2])<kmin)
+                {
+                  /* Le nombre d'onde est trop petit pour etre dans le domaine force*/
+                  for (int cpx=0; cpx<2; cpx++)
+                    {
+                      for (int dir=0; dir<3; dir++)
+                        {
+                          int ind_CDI((cpx*n_dir+dir)*n_lmn+ind_lmn);
+                          force_flt[ind_CDI] = 0;
+                          force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn_moins)] =   force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn)];
+                          force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn_moins)] = - force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn)];
+                        }
+                    }
+                }
+              else
+                {
+                  /* On est dans le domaine force */
+                  double norme_kappa = sqrt(kappa[0]*kappa[0] + kappa[1]*kappa[1] + kappa[2]*kappa[2]);
+                  for (int cpx=0; cpx<2; cpx++)
+                    {
+                      terme[cpx] =  kappa[0]*process_flt[(cpx*n_dir+0)*n_lmn+ind_lmn];
+                      terme[cpx] += kappa[1]*process_flt[(cpx*n_dir+1)*n_lmn+ind_lmn];
+                      terme[cpx] += kappa[2]*process_flt[(cpx*n_dir+2)*n_lmn+ind_lmn];
+                      terme[cpx] /= pow(norme_kappa,2);
+                      for (int dir=0; dir<3; dir++)
+                        {
+                          int ind_CDI((cpx*n_dir+dir)*n_lmn+ind_lmn);
+                          force_flt[ind_CDI] = process_flt[ind_CDI] - kappa[dir]*terme[cpx];
+                          // Symétrie Hermitienne : Sous nos conventions, -k[ind] = k[n_lmn - ind]
+                          force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn_moins)] =   force_flt[(0*n_dir+dir)*n_lmn+(ind_lmn)];
+                          force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn_moins)] = - force_flt[(1*n_dir+dir)*n_lmn+(ind_lmn)];
+                        }
+                    }
+                }
+            }
+    }
+  envoyer_broadcast(force_flt,0);
+}
 
+// --------------------------------------
 void Force_sp::write(std::string nom_fichier_sortie, double t)
 {
   // TODO :  il faut certainement mettre du envoyer_broadcast ou quoi
@@ -688,7 +776,6 @@ void Force_sp::write(std::string nom_fichier_sortie, double t)
             }
     }
 }
-
 
 void Force_sp::write_separate(std::string nom_fichier_sortie, double t)
 {
@@ -725,6 +812,7 @@ void Force_sp::write_separate(std::string nom_fichier_sortie, double t)
     }
 }
 
+// --------------------------------------
 void Force_sp::compute_energie()
 {
   // Pas vérifié pour parallèle
@@ -740,6 +828,7 @@ void Force_sp::compute_energie()
         }
 }
 
+// --------------------------------------
 double Force_sp::get_energie()
 {
   return energie;

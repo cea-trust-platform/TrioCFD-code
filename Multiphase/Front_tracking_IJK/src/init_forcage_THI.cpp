@@ -176,17 +176,19 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
     }
   if (type_forcage_active==100)
     {
-      Cout << "On force un dirac en spectral, uniX" << finl;
+      Cout << "On force un dirac en spectral, uniX : cos(kx) ex" << finl;
       f_sp_THI.compute_dirac_point_uniX_alongX();
     }
   if (type_forcage_active==200)
     {
-      Cout << "On force un dirac en spectral, uniX" << finl;
+      Cout << "On force un dirac en spectral, uniX : cos(kx) ey" << finl;
       f_sp_THI.compute_dirac_point_uniX_alongY();
     }
   if (type_forcage_active==010)
     {
-      Cout << "On force un dirac en spectral, uniY" << finl;
+      Cout << "On force un dirac en spectral, uniY : cos(k(x-z)) ey" << finl;
+      Cout << "f_sp = 1/sq(2) (d(k-k_0)+d(k+k_0)) . [0;1;0]" << finl;
+      Cout << "f_ph = sq(2) cos(nk_0(x-z))        . [0;1;0]" << finl;
       f_sp_THI.compute_dirac_point_uniY();
     }
   if (type_forcage_active==001 || type_forcage_active==1)
@@ -197,12 +199,25 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
   if (type_forcage_active==101)
     {
       Cout << "On force un dirac en spectral, uniXZ" << finl;
+      Cout << "f_sp = 1/sq(2) (d(k-k_0)+d(k+k_0)) . [1;0;-1]" << finl;
+      Cout << "f_ph = sq(2) cos(nk_0(x-z))        . [1;0;-1]" << finl;
+      // k_0 = nk0 [1, 0, -1], nk0 = minimal_forced_mode
       f_sp_THI.compute_dirac_point_div_nulle();
     }
   if (type_forcage_active==2)
     {
       Cout << "On force une porte en spectral, soit un cube" << finl;
       f_sp_THI.compute_door_cube();
+    }
+  if (type_forcage_active==66)
+    {
+      Cout << "On force des diracs de sorte a avoir : cos^2(ky) ex" << finl;
+      f_sp_THI.compute_diracs_for_cos_squarred();
+    }
+  if (type_forcage_active==166)
+    {
+      Cout << "On force des diracs de sorte a avoir : t*cos^2(ky) ex" << finl;
+      f_sp_THI.compute_diracs_for_t_times_cos_squarred(current_time);
     }
   if (type_forcage_active==3)
     {
@@ -216,7 +231,6 @@ void init_forcage_THI::compute_THI_force(const int time_iteration,
     {
       f_ph_THI.cheat_function();
     }
-
   /* PASSAGE DU DOMAINE SPECTRAL AU DOMAINE PHYSIQUE */
   if (type_forcage_active!=20 && type_forcage_active!=0)
     {

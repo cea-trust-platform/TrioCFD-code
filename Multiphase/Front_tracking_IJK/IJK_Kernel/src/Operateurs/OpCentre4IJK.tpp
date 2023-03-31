@@ -92,7 +92,7 @@ template <DIRECTION _DIR_, DIRECTION _VCOMPO_>
 void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
   // convected field
-  const IJK_Field_local_double& src = get_input(_DIR_);
+  const IJK_Field_local_double& src = get_input(_VCOMPO_);
   // Convected vector field:
   ConstIJK_double_ptr src_ptr(src, 0, 0, k_layer);
   // Velocity in direction _DIR_ (convecting velocity)

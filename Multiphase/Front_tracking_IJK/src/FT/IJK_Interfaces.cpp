@@ -322,26 +322,26 @@ Sortie& IJK_Interfaces::printOn(Sortie& os) const
 
 Entree& IJK_Interfaces::readOn(Entree& is)
 {
-  is_diphasique_ = false;
+  is_diphasique_ = true;
   lata_interfaces_meshname_ = nom_par_defaut_interfaces;
   reprise_ = 0;
   timestep_reprise_interface_ = 1;
-  timestep_sauvegarde_interface_ = 1;
+  //timestep_sauvegarde_interface_ = 1;
   fichier_sauvegarde_interface_ = "??";
   portee_force_repulsion_ = 1e-8;
-  delta_p_max_repulsion_ = 0.; // desactive par defaut
+  //delta_p_max_repulsion_ = 0.; // desactive par defaut
   portee_wall_repulsion_ = 1e-8;
-  delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
-  active_repulsion_paroi_ = 0;      // La repulsion paroi est desactive par defaut,
+  //delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
+  //active_repulsion_paroi_ = 0;      // La repulsion paroi est desactive par defaut,
   // meme si l'inter-bulles l'est
-  follow_colors_ = 0;
+  //follow_colors_ = 0;
   RK3_G_store_vi_.set_smart_resize(1);
   vinterp_.set_smart_resize(1);
   distance_autres_interfaces_.set_smart_resize(1);
   ghost_compo_converter_.set_smart_resize(1);
-  nb_bulles_ghost_ = 0;
+  //nb_bulles_ghost_ = 0;
   nb_bulles_ghost_before_ = 0;
-  nb_bulles_reelles_ = 0;
+  //nb_bulles_reelles_ = 0;
   compute_distance_autres_interfaces_ = 0;
   recompute_indicator_ = 1; // doit-on calculer l'indicatrice avec une methode
   // de debug (1) ou optimisee (0) ?
@@ -353,7 +353,7 @@ Entree& IJK_Interfaces::readOn(Entree& is)
 
   // Pour calculer le terme source comme grad(potentiel*I) au lieu de
   // potentiel_face*gradI
-  correction_gradient_potentiel_ = 0;
+  //correction_gradient_potentiel_ = 0;
   terme_gravite_ = GRAVITE_GRAD_I; // Par defaut terme gravite ft sans courants parasites
 
   // ncells_forbidden_ est le nombre de mailles au bord du domaine etendu ou on
@@ -363,13 +363,13 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   // Suppression des bulles sur le pourtour du domaine lors de la sauvegarde
   // finale.
   ncells_deleted_ = -1;           // Valeur recommandee par defaut. On ne veut pas supprimer de bulles.
-  frozen_ = 0;                    // By default, we want the motion of the interfaces.
-  flag_positions_reference_ = 0;  // Pas de position de reference imposee
+  //frozen_ = 0;                    // By default, we want the motion of the interfaces.
+  //flag_positions_reference_ = 0;  // Pas de position de reference imposee
   positions_reference_.resize(0); // Par defaut, a dimensionner ensuite
   mean_force_.resize(0);          // Par defaut, a dimensionner ensuite
 
   Param param(que_suis_je());
-  nb_groups_ = 1;            // Par defaut toutes les bulles sont dans le meme group.
+  //nb_groups_ = 1;            // Par defaut toutes les bulles sont dans le meme group.
   compo_to_group_.resize(0); // Par defaut, a dimensionner ensuite par nb_bulles
   param.ajouter("bubble_groups", &compo_to_group_);
   param.ajouter("fichier_reprise_interface", &fichier_reprise_interface_, Param::REQUIRED);
@@ -476,10 +476,10 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   surface_vapeur_par_face_computation_.initialize(splitting_FT);
   val_par_compo_in_cell_computation_.initialize(splitting_FT, maillage_ft_ijk_);
 
-  indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
+  indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[old()].data() = 1.;
   indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost());
-  indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 5);
+  indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[next()].data() = 1.;
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
   indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
@@ -5264,7 +5264,7 @@ void IJK_Interfaces::compute_indicatrice_non_perturbe(IJK_Field_double& indic_np
   set_field_data(indic_np, nom_indicatrices_np, indic, 0. /* could be time... */ );
 }
 
-// Dans cette méthode on calcule l'indicatrice_next_ en fonction de
+// Dans cette methode on calcule l'indicatrice_next_ en fonction de
 // la variable interfaces_.
 // /!\ Si l'interface n'a pas ete deplacee on recalcule la mm chose.
 // A n'appeler qu'apres un deplacement d'interface donc ou pour
@@ -5336,7 +5336,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
 
   // Aux cellules diphasiques, calcule toutes les moyennes de l'interface
   // dans les cellules pour chaque compo. Le but est de le faire une fois
-  // pour toute de manière synchronisee (et pas au moment ou on calcule la
+  // pour toute de maniere synchronisee (et pas au moment ou on calcule la
   // force par exemple).
   val_par_compo_in_cell_computation_.calculer_valeur_par_compo(
 #ifdef SMOOTHING_RHO
@@ -5367,7 +5367,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
   verif_indic();
 #endif
 
-  // Calcul normale_of_interf_ bary_of_interf_ et passage à NS
+  // Calcul normale_of_interf_ bary_of_interf_ et passage a NS
   mean_over_compo(normale_par_compo_[next()], nb_compo_traversante_[next()], normal_of_interf_[next()]);
   mean_over_compo(bary_par_compo_[next()], nb_compo_traversante_[next()], bary_of_interf_[next()]);
 
@@ -5460,7 +5460,7 @@ void IJK_Interfaces::switch_indicatrice_next_old()
 
   old_en_premier_ = not old_en_premier_;
 
-  // TODO: vérifier la liste des échanges espace virtuels
+  // TODO: verifier la liste des echanges espace virtuels
   // TODO: il faut choisir, soit je les fait sur les next soit sur les old, mais
   // pas les deux.
   indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost());

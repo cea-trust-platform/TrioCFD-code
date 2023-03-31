@@ -43,10 +43,10 @@
 Implemente_instanciable(Traitement_particulier_NS_canal_VDF,"Traitement_particulier_NS_canal_VDF",Traitement_particulier_NS_canal);
 
 
-/*! @brief 
+/*! @brief
  *
- * @param (Sortie& is) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Traitement_particulier_NS_canal_VDF::printOn(Sortie& is) const
 {
@@ -54,10 +54,10 @@ Sortie& Traitement_particulier_NS_canal_VDF::printOn(Sortie& is) const
 }
 
 
-/*! @brief 
+/*! @brief
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& Traitement_particulier_NS_canal_VDF::readOn(Entree& is)
 {

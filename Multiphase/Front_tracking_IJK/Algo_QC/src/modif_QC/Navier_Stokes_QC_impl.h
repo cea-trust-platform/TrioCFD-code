@@ -50,7 +50,7 @@ class Matrice_Morse;
  *          convectif, tel ou tel terme source).
  *     L'inconnue est le champ de vitesse.
  *
- * @sa Equation_base Pb_Thermohydraulique_QC Navier_Stokes_std 
+ * @sa Equation_base Pb_Thermohydraulique_QC Navier_Stokes_std
  */
 class Navier_Stokes_QC_impl
 {

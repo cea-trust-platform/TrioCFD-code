@@ -1,11 +1,4 @@
 [ -f dom_0031.Zones ] && exit 0
 
-env prod=0 trust decoupage
+env prod=0 trust decoupage || exit -1
 exit 0
-cd model
-Xprep=$TRUST_ROOT/Outils/PRE_3DVDF/xprepro
-$Xprep boite.prep 2
-cd -
-ln -s prepro/Probleme1/Pb1.geom boite.geom
-trust decoupage
-export prod=1

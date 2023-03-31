@@ -167,6 +167,25 @@ public:
                                     const double& duidx, const double& duidy, const double& duidz,
                                     const double& dujdx, const double& dujdy, const double& dujdz,
                                     const double& dukdx, const double& dukdy, const double& dukdz) const;
+
+  double calculer_produit_scalaire_faces_to_center(const IJK_Field_double& ui,
+                                                   const IJK_Field_double& uj,
+                                                   const IJK_Field_double& uk,
+                                                   const IJK_Field_double& vi,
+                                                   const IJK_Field_double& vj,
+                                                   const IJK_Field_double& vk,
+                                                   const int i,
+                                                   const int j,
+                                                   const int k
+                                                  );
+  IJK_Field_double compute_and_store_scalar_product_face_to_face(
+    const IJK_Field_double& v1_i,
+    const IJK_Field_double& v1_j,
+    const IJK_Field_double& v1_k,
+    const IJK_Field_double& v2_i,
+    const IJK_Field_double& v2_j,
+    const IJK_Field_double& v2_k);
+  void compute_vecA_minus_vecB_in_vecA(FixedVector<IJK_Field_double, 3>& vecA, const FixedVector<IJK_Field_double, 3>& vecB);
 protected:
   // Z coordinates of statistics points
   ArrOfDouble elem_coord_;

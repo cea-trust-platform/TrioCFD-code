@@ -243,6 +243,10 @@ liste_postraitements
 	postraitement_ft_lata interface { 
     format Lata 
     fichier interface 
+    Champs dt_post 0.001
+		{
+			indicatrice_interf elem
+		}
     interfaces interf { 
     } 
 }	

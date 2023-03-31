@@ -27,9 +27,10 @@
 
 Implemente_instanciable(Pb_Phase_field,"Pb_Phase_field",Pb_Fluide_base);
 // XD pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous incompressible-two-phase-flows. Complete description of the Phase Field model for incompressible and immiscible fluids can be found into this PDF: TRUST_ROOT/doc/TRUST/phase_field_non_miscible_manuel.pdf
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
+// XD attr constituant constituant constituant 1 Constituents.
 // XD attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
 // XD attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
-// XD ref constituant constituant
 
 /*! @brief Simple appel a: Pb_Fluide_base::printOn(Sortie&) Ecrit le probleme sur un flot de sortie.
  *

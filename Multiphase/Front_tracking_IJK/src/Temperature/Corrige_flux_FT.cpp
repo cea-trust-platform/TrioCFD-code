@@ -387,11 +387,6 @@ void Corrige_flux_FT_temperature_conv::corrige_flux_faceIJ(
         const double frac_vapeur = s_vap / s_face;
         const double frac_liquide = 1.- frac_vapeur;
 
-        const bool face_monophasique = frac_liquide * frac_vapeur < EPS_;
-        const bool stencil_liquide = test_if_stencil_inclut_bout_interface_liquide();
-        const bool stencil_vapeur = test_if_stencil_inclut_bout_interface_vapeur();
-        const bool stencil_inclut_interface = stencil_liquide & stencil_vapeur;
-
         multiplie_par_rho_cp_de_la_face_monophasique(frac_liquide, flux);
         // if ((face_monophasique) && (not stencil_inclut_interface))
         //   {
@@ -469,6 +464,13 @@ void Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
   const int n_point_interp = positions.dimension(0);
   temperature_interp.resize_array(n_point_interp);
   flux_normal_interp.resize_array(n_point_interp);
+  if ((ldal + ldav) == 0.)
+    {
+      Cerr << "Corrige flux used with no conductivity. Ti and Qi set to 0. " << finl;
+      temperature_interp = 0.;
+      flux_normal_interp = 0.;
+      return;
+    }
   for (int i_point_interp = 0; i_point_interp < n_point_interp; i_point_interp++)
     {
       const double Ti =
@@ -509,16 +511,13 @@ void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDoub
   for (int i_diph = 0; i_diph < n_diph; i_diph++)
     {
       const double di_vap = std::abs(intersection_ijk_face_.dist_interf()(2*i_diph));
-      const double di_liqu = std::abs(intersection_ijk_face_.dist_interf()(2*i_diph+1));
       assert(d1 - di_vap > 0.);
-      assert(d1 - di_liqu > 0.);
+      assert(d1 - std::abs(intersection_ijk_face_.dist_interf()(2*i_diph+1)) > 0.);
       // La distance entre le point a l'interface et le point d'interpolation de
       // la temperature monophasique vaut bien d1 - di. Aucun cas n'est censé
       // donner une valeur négative.
       const double d1_vap_inv = 1. / (d1 - di_vap + EPS_);
       const double di_vap_inv = 1. / (di_vap + EPS_);
-      const double d1_liqu_inv = 1. / (d1 - di_liqu + EPS_);
-      const double di_liqu_inv = 1. / (di_liqu + EPS_);
       temperature_barys_(i_diph, 1) =
         (temp_interface_face_(2*i_diph) * di_vap_inv + temp_vap(2*i_diph) * d1_vap_inv) /
         (di_vap_inv + d1_vap_inv);

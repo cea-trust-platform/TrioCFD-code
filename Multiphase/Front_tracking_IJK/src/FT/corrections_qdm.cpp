@@ -653,7 +653,8 @@ int correction_one_direction::get_need_to_compute_correction_value()
 Implemente_instanciable_sans_constructeur( corrections_qdm, "corrections_qdm", Objet_U ) ;
 
 corrections_qdm::corrections_qdm() :
-  type_(2) // type_ mis a none (-> NONE) par defaut
+  type_(2),    // type_ mis a none (-> NONE) par defaut
+  write_me_(0) // par defaut on n'ecrit pas les informations
 {
 }
 
@@ -665,6 +666,7 @@ Sortie& corrections_qdm::printOn( Sortie& os ) const
   if (get_type_()==GR) os << "type " << " gr" << "\n";
   if (get_type_()==GB) os << "type " << " gb" << "\n";
   if (get_type_()==NONE_IJK) os << "type " << " none" << "\n";
+  if (write_me_) os   << " write_infos " << "\n";
   os   << " correction_x " << correction_x_ << "\n"
        << " correction_y " << correction_y_ << "\n"
        << " correction_z " << correction_z_ << "\n";
@@ -681,6 +683,7 @@ Entree& corrections_qdm::readOn( Entree& is )
   param.dictionnaire("gb",GB);
   param.dictionnaire("gr",GR);
   param.dictionnaire("none",NONE_IJK);
+  param.ajouter_flag("write_infos",&write_me_);
   param.ajouter("correction_x",&correction_x_ );
   param.ajouter("correction_y",&correction_y_ );
   param.ajouter("correction_z",&correction_z_ );
@@ -779,6 +782,8 @@ void corrections_qdm::compute_correct_velocity_one_direction(int dir, double vel
 
 Vecteur3 corrections_qdm::get_correct_velocities()
 {
+  /* Donne acces a correct_velocity_,
+   * ->  correct_velocity_ = v_ijk_t - value_correction */
   Vecteur3 correct_velocities;
   correct_velocities[0] = correction_x_.get_correct_velocity();
   correct_velocities[1] = correction_y_.get_correct_velocity();
@@ -788,22 +793,26 @@ Vecteur3 corrections_qdm::get_correct_velocities()
 
 Vecteur3 corrections_qdm::get_velocity_corrections()
 {
-  Vecteur3 correct_velocities;
-  correct_velocities[0] = correction_x_.get_velocity_correction();
-  correct_velocities[1] = correction_y_.get_velocity_correction();
-  correct_velocities[2] = correction_z_.get_velocity_correction();
-  return correct_velocities;
+  /* Donne acces a value_correction_,
+   * -> value_correction_ =  (rho_vel_moyen_ - qdm_cible_) / rho_moyen_*/
+  Vecteur3 velocity_corrections;
+  velocity_corrections[0] = correction_x_.get_velocity_correction();
+  velocity_corrections[1] = correction_y_.get_velocity_correction();
+  velocity_corrections[2] = correction_z_.get_velocity_correction();
+  return velocity_corrections;
 }
 
 Vecteur3 corrections_qdm::get_correction_values()
 {
-  Vecteur3 correct_velocities;
-  correct_velocities[0] = correction_x_.get_correction_value();
-  correct_velocities[1] = correction_y_.get_correction_value();
-  correct_velocities[2] = correction_z_.get_correction_value();
-  return correct_velocities;
+  /* Donne acces a qdm_cible_,
+   * dont l'expression depend du type de correction choisi
+   * -> pour VITESSE_CIBLE :  qdm_cible_ = alpha_l rho_l u_cible */
+  Vecteur3 correction_values;
+  correction_values[0] = correction_x_.get_correction_value();
+  correction_values[1] = correction_y_.get_correction_value();
+  correction_values[2] = correction_z_.get_correction_value();
+  return correction_values;
 }
-
 
 double corrections_qdm::get_correct_velocitiy_one_direction(int dir)
 {
@@ -917,6 +926,9 @@ int corrections_qdm::is_type_none() const
   else
     return 0;
 }
+
+int corrections_qdm::write_me() const
+{return write_me_;}
 /////////////////////////////////////////////////////////////////////////////////////////
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////

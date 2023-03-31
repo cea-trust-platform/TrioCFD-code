@@ -207,6 +207,9 @@ liste_postraitements
 	postraitement_ft_lata post2 { 
     format Lata 
     fichier lata/post2 
+    champs dt_post 0.005 { 
+        indicatrice_interf elem
+    } 
     interfaces interf { 
         courbure som 
     } 
