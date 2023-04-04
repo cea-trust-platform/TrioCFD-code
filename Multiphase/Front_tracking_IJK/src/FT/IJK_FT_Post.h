@@ -118,7 +118,10 @@ public:
   void reprendre_post(Param& param);
 
   void fill_op_conv();
-  void fill_surface_force();
+  void fill_surface_force();//const Nom lata_name, double instant, int iteration);
+  void fill_surface_force_bis(const char * lata_name, double time, int time_iteration);
+  FixedVector<IJK_Field_double, 3> get_rho_Ssigma();
+
   void calculer_gradient_indicatrice_et_pression(const IJK_Field_double& indic);
 
   // Part of the run() method in IJK_FT:

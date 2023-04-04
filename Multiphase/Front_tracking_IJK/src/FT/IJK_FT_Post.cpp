@@ -478,10 +478,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           }
       }
     }
-  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
-    {
-      repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
-    }
+  // if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+  //   {
+  //     repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
+  //   }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
     {
@@ -526,7 +526,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
   // GAB
   if (liste_post_instantanes_.contient_("FORCE_PH"))
     {
-      cout << "6a" << endl;
       if (ref_ijk_ft_.forcage_.get_type_forcage() > 0)
         {
           n--,dumplata_vector(lata_name,"FORCE_PH", source_spectrale_[0],source_spectrale_[1], source_spectrale_[2], latastep);
@@ -536,7 +535,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           n--;
           Cerr << "Post-processing of FORCE_PH demanded, but the spectral force is not present, not initialized" << endl;
         }
-      cout << "7a" << endl;
     }
   //
   if (liste_post_instantanes_.contient_("INTEGRATED_VELOCITY"))
@@ -717,9 +715,15 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       n--,dumplata_cellvector(lata_name,"CELL_OP_CONV" /* AT CELL-CENTER */, cell_op_conv_, latastep);
     }
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
-    n--,dumplata_vector(lata_name,"RHO_SOURCE_QDM_INTERF", rho_Ssigma_[0],rho_Ssigma_[1],rho_Ssigma_[2], latastep);
+    {
+      // rho_Ssigma est cree dans fill_surface_force
+      n--,dumplata_vector(lata_name,"RHO_SOURCE_QDM_INTERF", rho_Ssigma_[0],rho_Ssigma_[1],rho_Ssigma_[2], latastep);
+    }
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
-    n--,dumplata_cellvector(lata_name,"CELL_RHO_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_rho_Ssigma_, latastep);
+    {
+      // cell_rho_Ssigma est cree dans fill_surface_force
+      n--,dumplata_cellvector(lata_name,"CELL_RHO_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_rho_Ssigma_, latastep);
+    }
 
   if ((liste_post_instantanes_.contient_("GRAD_P")) or (liste_post_instantanes_.contient_("CELL_GRAD_P")))
     n--,dumplata_vector(lata_name,"dPd", grad_P_[0], grad_P_[1], grad_P_[2], latastep);
@@ -873,7 +877,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
   if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
     {
-      interpolate_to_center(cell_repulsion_interface_,repulsion_interface_ns_);
+      interpolate_to_center(cell_repulsion_interface_,ref_ijk_ft_.terme_repulsion_interfaces_ns_);
       n--,dumplata_cellvector(lata_name,"SHIELD_REPULSION" /* AT CELL-CENTER */, cell_repulsion_interface_, latastep);
     }
   //
@@ -1854,13 +1858,55 @@ void IJK_FT_Post::fill_op_conv()
 
 void IJK_FT_Post::fill_surface_force()
 {
+  // int ni=ref_ijk_ft_.terme_source_interfaces_ns_[0].ni();
+  // int nj=ref_ijk_ft_.terme_source_interfaces_ns_[0].nj();
+  // int nk=ref_ijk_ft_.terme_source_interfaces_ns_[0].nk();
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
-    for (int i = 0; i < 3; i++)
-      rho_Ssigma_[i].data() = ref_ijk_ft_.terme_source_interfaces_ns_[i].data();
-
+    for (int dir = 0; dir < 3; dir++)
+      {
+        rho_Ssigma_[dir] = ref_ijk_ft_.terme_source_interfaces_ns_[dir];
+        //rho_Ssigma_[dir].data() = ref_ijk_ft_.terme_source_interfaces_ns_[dir].data();
+        /*
+        cout << "--- #################################################" << endl;
+        for (int i = 0; i < ni ; i++)
+          {
+            for (int j = 0; j < nj; j++)
+              {
+                cout <<endl<< " i,j : " << i << "," << j << endl;
+                for (int k = 0; k < nk; k++)
+                  {
+                    cout <<"code 1113" << ref_ijk_ft_.terme_source_interfaces_ns_[dir](i,j,k);
+                    cout <<", code 1114" << rho_Ssigma_[dir](i,j,k) << endl;
+                  }
+              }
+          }
+        cout << "--- #################################################" << endl;
+        */
+      }
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     {
-      interpolate_to_center(cell_rho_Ssigma_,ref_ijk_ft_.terme_source_interfaces_ns_);
+      interpolate_to_center(cell_rho_Ssigma_,rho_Ssigma_);
+    }
+
+  //n--,dumplata_cellvector("test.lata","RS", rho_Ssigma, 2);
+}
+
+FixedVector<IJK_Field_double, 3> IJK_FT_Post::get_rho_Ssigma()
+{
+  return rho_Ssigma_;
+}
+
+void IJK_FT_Post::fill_surface_force_bis(const char * lata_name, double time, int time_iteration)
+{
+  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
+    for (int i = 0; i < 3; i++)
+      {
+        rho_Ssigma_[i].data() = ref_ijk_ft_.terme_source_interfaces_ns_[i].data();
+        //rho_Ssigma_[i] = ref_ijk_ft_.terme_source_interfaces_ns_[i];
+      }
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
+    {
+      interpolate_to_center(cell_rho_Ssigma_,rho_Ssigma_);
     }
 }
 
@@ -2050,6 +2096,11 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(cell_repulsion_interface_,splitting_, 0);
       nalloc +=3;
     }
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
+    {
+      allocate_cell_vector(cell_rho_Ssigma_,splitting_, 0);
+      nalloc +=3;
+    }
   return nalloc;
 }
 
@@ -2082,10 +2133,10 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
       //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
     }
 
-  if (liste_post_instantanes_.contient_("OP_CONV"))
-    n+=3,allocate_velocity(rho_Ssigma_, splitting_, 0);
-  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
-    n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 0);
+  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
+    n+=3,allocate_velocity(rho_Ssigma_, splitting_, 1);
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
+    n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 1);
 
   // Pour le calcul des statistiques diphasiques :
   // (si le t_debut_stat a ete initialise... Sinon, on ne va pas les calculer au cours de ce calcul)
@@ -2172,7 +2223,7 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
 {
   if (tstep % dt_post_ == dt_post_-1 || stop)
     {
-      cout << "tstep : " << tstep << endl;
+      if (post_par_paires_ ==1) { cout << "tstep : " << tstep << endl;}
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
     }
   // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :

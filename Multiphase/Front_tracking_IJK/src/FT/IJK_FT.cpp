@@ -3265,7 +3265,19 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                     terme_repulsion_interfaces_ft_[dir],
                     terme_repulsion_interfaces_ns_[dir]);
                 }
+              // ecriture des fichiers (CELL_)RHO_SOURCE_QDM_INTERF
+              //  --> correspondent a : sigma*courbure (+phi*Delta_rho) (+repu)
+              //                        normal           GRAVITE_GRAD_I   bouclier de repulsion
+              //post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
+              Nom lata_name = nom_du_cas();
+              if (fichier_post_ != "??")
+                {
+                  lata_name = fichier_post_;
+                }
+              lata_name += Nom(".lata");
               post_.fill_surface_force();
+              //cout << "code 1111 " << post_.get_rho_Ssigma()[0](6,9,10)<<endl;
+              //cout << "code 1112 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
               const int kmax = terme_source_interfaces_ns_[dir].nk();
               for (int k = 0; k < kmax; k++)
                 {
@@ -3280,6 +3292,11 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                     {
                       // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
                       mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                      if (k==10)
+                        {
+                          //cout << "code 2111 " << post_.get_rho_Ssigma()[0](6,9,10);
+                          //cout << ", code 2112 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
+                        }
                       if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
                           post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
                         {
@@ -3309,9 +3326,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                   // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
                   if (test_etapes_et_bilan)
                     {
-                      // Cout << "BF terme_interfaces_af_mass_solver" << finl;
                       terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                      // Cout << "AF terme_interfaces_af_mass_solver" << finl;
                     }
                 }
             }
