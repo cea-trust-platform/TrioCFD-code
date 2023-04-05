@@ -36,14 +36,11 @@ if is_non_zero_file("sum_dIdt_after-PCH.txt"):
 else:
   dIdt2 = np.array([])
 
-vof=os.path.basename(os.getcwd())
-cas=sys.argv[2]
 show=False
 if (len(sys.argv)==4):
    show=True
    pass
 
-print("python dealing with ", cas)
 t = np.r_[0.,t]
 
 mp=-10.
@@ -56,6 +53,8 @@ r_ana = r0-mp/rhov*t
 tlata = np.r_[0.,tlata]
 vi_ana =-mp/rhov*np.ones(len(tlata)) # dr/dt
 
+pwd=os.getcwd().split('/')
+cas=pwd[-5]
 if (cas=="2D_axi"):
    v0=4./3.*math.pi*pow(r0,3)
    v_ana=4./3.*math.pi*pow(r_ana,3)
@@ -85,8 +84,15 @@ else:
    vbis = vbis_brm = v_dIdt2 = vlagrange = np.array([])
    pass
 
+
+remesh=pwd[-1].replace("Remesh","").replace("Nothing", "None").replace("Best", "Opt.")
+interp=pwd[-2].replace("Interp","").replace("AiBased", "ai").replace("Standard", "Std.")
+mass_source=pwd[-3].replace("MassSource","").replace("Historical", "Hist.")
+vof=pwd[-4]
+name="%s/%s - MS:%s - Int:%s - Rem:%s"%(cas,vof,mass_source,interp,remesh)
+print("python dealing with ", name)
 plt.figure(figsize=(10,5))
-plt.suptitle("Comparisons to analytical solutions. Case %s/%s"%(cas,vof))
+plt.suptitle("Comparisons to analytical solutions. Case %s"%(name))
 plt.subplot(131)
 plt.plot(t,v,label='resu')
 plt.plot(tt,v_dIdt2,'-.',label='theory VoF (dIdt_after-PCH)')

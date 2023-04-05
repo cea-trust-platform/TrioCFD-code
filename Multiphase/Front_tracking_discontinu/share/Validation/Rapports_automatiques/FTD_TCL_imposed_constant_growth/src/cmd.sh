@@ -16,7 +16,7 @@ python plot.py && display plot.png
 
 echo """
 Many new options in development : 
-If ns.newi_mass_source, secmem2 is computed from ai*mp in the cell instead of div(delta_u0). 
+If ns.new_mass_source, secmem2 is computed from ai*mp in the cell instead of div(delta_u0). 
                 (and also ajouter_contribution_saut_vitesse(deplacement) is modified to use a 1D-interp 
                  per component instead of the standard MultiD).
 Local extension of gas velocity : vitesse_0_
