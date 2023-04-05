@@ -44,7 +44,8 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft):
   pressure_(ijk_ft.pressure_),
   velocity_(ijk_ft.velocity_),
   source_spectrale_(ijk_ft.forcage_.get_force_ph2()),
-//  source_spectrale_(ijk_ft.forcage_.f_ph_THI.force_),
+  bk_tsi_ns_(ijk_ft.backup_terme_source_interfaces_ns_),
+  //  source_spectrale_(ijk_ft.forcage_.f_ph_THI.force_),
   d_velocity_(ijk_ft.d_velocity_),
   splitting_(ijk_ft.splitting_),
   splitting_ft_(ijk_ft.splitting_ft_),
@@ -865,6 +866,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     n--,dumplata_scalar(lata_name,"PRESSURE_RHS", ref_ijk_ft_.pressure_rhs_, latastep);
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
     n--,dumplata_vector(lata_name,"VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
+  if (liste_post_instantanes_.contient_("BK_SOURCE_QDM_INTERF"))
+    n--,dumplata_vector(lata_name,"BK_SOURCE_QDM_INTERF", ref_ijk_ft_.backup_terme_source_interfaces_ft_[0],
+                        ref_ijk_ft_.backup_terme_source_interfaces_ft_[1],
+                        ref_ijk_ft_.backup_terme_source_interfaces_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
     n--,dumplata_vector(lata_name,"SOURCE_QDM_INTERF", ref_ijk_ft_.terme_source_interfaces_ft_[0],
                         ref_ijk_ft_.terme_source_interfaces_ft_[1],
@@ -879,6 +884,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     {
       interpolate_to_center(cell_repulsion_interface_,ref_ijk_ft_.terme_repulsion_interfaces_ns_);
       n--,dumplata_cellvector(lata_name,"SHIELD_REPULSION" /* AT CELL-CENTER */, cell_repulsion_interface_, latastep);
+    }
+  if (liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF"))
+    {
+      interpolate_to_center(cell_backup_source_interface_,ref_ijk_ft_.backup_terme_source_interfaces_ns_);
+      n--,dumplata_cellvector(lata_name,"CELL_BK_SOURCE_QDM_INTERF" /* AT CELL-CENTER */, cell_backup_source_interface_, latastep);
     }
   //
   if (liste_post_instantanes_.contient_("GRAD_INDICATRICE_FT"))
@@ -1598,6 +1608,33 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
         }
       return cell_source_interface_[2];
     }
+  if (nom== "CELL_BK_SOURCE_QDM_INTERF_X")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_BK_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
+          Process::exit();
+        }
+      return cell_backup_source_interface_[0];
+    }
+  if (nom== "CELL_BK_SOURCE_QDM_INTERF_Y")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_BK_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
+          Process::exit();
+        }
+      return cell_backup_source_interface_[1];
+    }
+  if (nom== "CELL_BK_SOURCE_QDM_INTERF_Z")
+    {
+      if (!liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF"))
+        {
+          Cerr << "A probe is attempting to access a field CELL_BK_SOURCE_QDM_INTERF while it has not been computed in the post-processed fields" << endl;
+          Process::exit();
+        }
+      return cell_backup_source_interface_[2];
+    }
 
   if (nom== "CELL_SHIELD_REPULSION_X")
     {
@@ -1606,7 +1643,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
           Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
-      return cell_source_interface_[0];
+      return cell_repulsion_interface_[0];
     }
   if (nom== "CELL_SHIELD_REPULSION_Y")
     {
@@ -1615,7 +1652,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
           Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
-      return cell_source_interface_[1];
+      return cell_repulsion_interface_[1];
     }
   if (nom== "CELL_SHIELD_REPULSION_Z")
     {
@@ -1624,7 +1661,7 @@ const IJK_Field_double& IJK_FT_Post::get_IJK_field(const Nom& nom) const
           Cerr << "A probe is attempting to access a field CELL_SHIELD_REPULSION while it has not been computed in the post-processed fields" << endl;
           Process::exit();
         }
-      return cell_source_interface_[2];
+      return cell_repulsion_interface_[2];
     }
   //
 
@@ -1856,32 +1893,43 @@ void IJK_FT_Post::fill_op_conv()
     }
 }
 
-void IJK_FT_Post::fill_surface_force()
+void IJK_FT_Post::fill_surface_force(FixedVector<IJK_Field_double, 3>& the_field_you_know)
 {
-  // int ni=ref_ijk_ft_.terme_source_interfaces_ns_[0].ni();
-  // int nj=ref_ijk_ft_.terme_source_interfaces_ns_[0].nj();
-  // int nk=ref_ijk_ft_.terme_source_interfaces_ns_[0].nk();
+  int ni = the_field_you_know[0].ni();
+  int nj = the_field_you_know[0].nj();
+  int nk = the_field_you_know[0].nk();
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
     for (int dir = 0; dir < 3; dir++)
       {
-        rho_Ssigma_[dir] = ref_ijk_ft_.terme_source_interfaces_ns_[dir];
-        //rho_Ssigma_[dir].data() = ref_ijk_ft_.terme_source_interfaces_ns_[dir].data();
-        /*
+        //rho_Ssigma_[dir] = the_field_you_know[dir];
+        //rho_Ssigma_[dir].data() = the_field_you_know[dir].data();
+
         cout << "--- #################################################" << endl;
+
         for (int i = 0; i < ni ; i++)
           {
             for (int j = 0; j < nj; j++)
               {
-                cout <<endl<< " i,j : " << i << "," << j << endl;
                 for (int k = 0; k < nk; k++)
                   {
-                    cout <<"code 1113" << ref_ijk_ft_.terme_source_interfaces_ns_[dir](i,j,k);
-                    cout <<", code 1114" << rho_Ssigma_[dir](i,j,k) << endl;
+                    rho_Ssigma_[dir](i,j,k)=the_field_you_know[dir](i,j,k);
+                    //Passage par reference, comme dans interpolate_to_center
+                    //double& rFs = rho_Ssigma_[dir](i,j,k);
+                    //rFs = the_field_you_know[dir](i,j,k);
+                    if (the_field_you_know[dir](i,j,k) != 0.)
+                      {
+
+                        cout << "dir,i,j,k : "<<dir<<", "<<i<<", "<<j<<", "<<k<<endl;
+                        cout <<"code 1113:" << the_field_you_know[dir](i,j,k);
+                        cout <<", code 1114:" << rho_Ssigma_[dir](i,j,k) << endl;
+                      }
+
                   }
               }
           }
+
         cout << "--- #################################################" << endl;
-        */
+
       }
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     {
@@ -2086,6 +2134,11 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(cell_grad_p_,splitting_, 0);
       nalloc +=3;
     }
+  if (liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
+    {
+      allocate_cell_vector(cell_backup_source_interface_,splitting_, 0);
+      nalloc +=3;
+    }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
     {
       allocate_cell_vector(cell_source_interface_,splitting_, 0);
@@ -2098,7 +2151,9 @@ int IJK_FT_Post::alloc_fields()
     }
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
     {
-      allocate_cell_vector(cell_rho_Ssigma_,splitting_, 0);
+      allocate_cell_vector(cell_bk_tsi_ns_,splitting_, 1);
+      nalloc +=3;
+      allocate_cell_vector(cell_rho_Ssigma_,splitting_, 1);
       nalloc +=3;
     }
   return nalloc;

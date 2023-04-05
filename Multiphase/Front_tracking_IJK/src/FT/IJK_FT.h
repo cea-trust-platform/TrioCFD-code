@@ -429,6 +429,8 @@ protected :
 
   // Celui la est discretise sur le maillage ns:
   FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
+  FixedVector<IJK_Field_double, 3> backup_terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
+  FixedVector<IJK_Field_double, 3> backup_terme_source_interfaces_ft_; // [ dt (rho u )/dt = N/m^3 ]
   FixedVector<IJK_Field_double, 3> terme_repulsion_interfaces_ns_;
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ns_;
 

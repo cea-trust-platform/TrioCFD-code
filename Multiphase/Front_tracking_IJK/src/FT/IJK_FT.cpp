@@ -1985,8 +1985,10 @@ void IJK_FT_double::run()
   if (!disable_diphasique_)
     {
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
+      allocate_velocity(backup_terme_source_interfaces_ft_, splitting_, 2);
       // Seulement pour le calcul du bilan de forces :
       allocate_velocity(terme_source_interfaces_ns_, splitting_, 1);
+      allocate_velocity(backup_terme_source_interfaces_ns_, splitting_, 1);
       // Seulement pour le calcul des statistiques :
       allocate_velocity(terme_repulsion_interfaces_ns_, splitting_, 1);
       allocate_velocity(terme_repulsion_interfaces_ft_, splitting_ft_, 1);
@@ -3268,16 +3270,11 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
               // ecriture des fichiers (CELL_)RHO_SOURCE_QDM_INTERF
               //  --> correspondent a : sigma*courbure (+phi*Delta_rho) (+repu)
               //                        normal           GRAVITE_GRAD_I   bouclier de repulsion
-              //post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
-              Nom lata_name = nom_du_cas();
-              if (fichier_post_ != "??")
-                {
-                  lata_name = fichier_post_;
-                }
-              lata_name += Nom(".lata");
-              post_.fill_surface_force();
+              post_.fill_surface_force(terme_source_interfaces_ns_);
               //cout << "code 1111 " << post_.get_rho_Ssigma()[0](6,9,10)<<endl;
               //cout << "code 1112 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
+              backup_terme_source_interfaces_ft_[dir] = terme_source_interfaces_ft_[dir];
+              backup_terme_source_interfaces_ns_[dir] = terme_source_interfaces_ns_[dir];
               const int kmax = terme_source_interfaces_ns_[dir].nk();
               for (int k = 0; k < kmax; k++)
                 {
@@ -3291,17 +3288,31 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                   else
                     {
                       // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
+                      //cout << " code Delta : "<<terme_repulsion_interfaces_ns_[0](6,9,10);
+                      //cout << " code Delta : "<<backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //cout << " code Delta : "<<post_.get_rho_Ssigma()[2](6,11,11);
+                      //cout << endl;
                       mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-                      if (k==10)
-                        {
-                          //cout << "code 2111 " << post_.get_rho_Ssigma()[0](6,9,10);
-                          //cout << ", code 2112 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
-                        }
+                      //cout << " code Nabla : "<<terme_repulsion_interfaces_ns_[0](6,9,10);
+                      //cout << " code Nabla : "<<backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //cout << " code Nabla : "<<post_.get_rho_Ssigma()[2](6,11,11);
+                      //cout << endl;
+                      //if (k==10)
+                      //  {
+                      //    cout << "code 2211 " << rho_field_(5,9,10) << " & " << rho_field_(6,9,10) << " & " << rho_field_(7,9,10)<<endl;
+                      //    cout << "code Z,611 " << post_.get_rho_Ssigma()[2](6,11,11);
+                      //    cout << ", code Z,611 " << backup_terme_source_interfaces_ns_[2](6,11,11);
+                      //    cout << ", code Z,611 " << terme_source_interfaces_ns_[2](6,11,11)<<endl;
+                      //    cout << "code X,6910 " << post_.get_rho_Ssigma()[0](6,9,10);
+                      //    cout << ", code X,6910 " << backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //    cout << ", code X,6910 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
+                      //  }
                       if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
                           post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
                         {
                           // Division de terme_repulsion_interfaces_ns_ par rho_field_ et par volume cellule
                           mass_solver_with_rho(terme_repulsion_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                          //terme_repulsion_interfaces_ns_[0](6,9,10)=50;
                         }
                       // Egalite aux dimensions :
                       // [terme_source_interfaces_ns_]=[terme_repulsion_interfaces_ns_]=[du/dt / Vcell] = m/s^2/m^3
@@ -3329,6 +3340,21 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                       terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
                     }
                 }
+
+              //const int kmax = terme_source_interfaces_ns_[0].nk();
+              //for (int ii = 0; ii < kmax; ++ii)
+              //  {
+              //    for (int jj = 0; jj < kmax; ++jj)
+              //      {
+              //        for (int kk = 0; kk < kmax; ++kk)
+              //          {
+              //            if (backup_terme_source_interfaces_ns_[dir](ii,jj,kk) != terme_source_interfaces_ns_[dir](ii,jj,kk) )
+              //              {
+              //                cout << "change after mass solver for : dir,i,j,k = "<<dir<<", "<<ii<<", "<<jj<<", "<<kk<<endl;
+              //              }
+              //          }
+              //      }
+              //  }
             }
         }
     }

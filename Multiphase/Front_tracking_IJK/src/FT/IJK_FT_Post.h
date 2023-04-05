@@ -118,7 +118,7 @@ public:
   void reprendre_post(Param& param);
 
   void fill_op_conv();
-  void fill_surface_force();//const Nom lata_name, double instant, int iteration);
+  void fill_surface_force(FixedVector<IJK_Field_double, 3>& the_field_you_know);//const Nom lata_name, double instant, int iteration);
   void fill_surface_force_bis(const char * lata_name, double time, int time_iteration);
   FixedVector<IJK_Field_double, 3> get_rho_Ssigma();
 
@@ -307,9 +307,11 @@ protected:
   IJK_Field_double lambda2_, dudy_, dvdx_, dwdy_;
   FixedVector<IJK_Field_double, 3> cell_velocity_;
   FixedVector<IJK_Field_double, 3> cell_source_spectrale_;
+  FixedVector<IJK_Field_double, 3> cell_bk_tsi_ns_;
   //  FixedVector<IJK_Field_double, 3> cell_source_interface_totale_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> cell_grad_p_;
   FixedVector<IJK_Field_double, 3> cell_source_interface_; // toujours en _ns_
+  FixedVector<IJK_Field_double, 3> cell_backup_source_interface_; // toujours en _ns_
   FixedVector<IJK_Field_double, 3> cell_repulsion_interface_; // toujours en _ns_
 
 
@@ -326,6 +328,7 @@ protected:
   IJK_Field_double& pressure_;                   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3>& velocity_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3>& source_spectrale_;   // non-const because some echange_espace_virtuel()
+  FixedVector<IJK_Field_double, 3>& bk_tsi_ns_;
   FixedVector<IJK_Field_double, 3> source_interface_ft_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_interface_ns_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> repulsion_interface_ns_;   // non-const because some echange_espace_virtuel()
