@@ -1327,7 +1327,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     }
   statistiques().end_count(dt_counter_);
 
-  return dt;
+  return  1.e-4 ;//dt;
 }
 
 // Methode appelee par run() une fois la memoire alouee pour les champs.
@@ -2964,6 +2964,21 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   static Stat_Counter_Id calcul_dv_counter_ = statistiques().new_counter(2, "maj vitesse : calcul derivee vitesse");
   statistiques().begin_count(calcul_dv_counter_);
   // Calcul d_velocity = convection
+
+//  for (int dir = 0; dir < 4; dir++)
+//  {
+//	  for (int i = -2; i < velocity_[dir].ni() + 2; i++)
+//	  {
+//		  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
+//		  {
+//			  for (int k = -2; k < velocity_[dir].nk() + 2; k++)
+//			  {
+//				  if (velocity_[0](i,j,k) != 1.)
+//				  {
+//					 std::cout << i << " " << j << " " << k<< " " << velocity_[0](i,j,k) << std::endl;
+//				  }
+//			  }}}}
+
   if (!disable_convection_qdm_)
     {
       if (type_velocity_convection_form_== Nom("non_conservative_simple"))

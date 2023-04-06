@@ -88,6 +88,23 @@ static void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Fie
               resu_ptr.get_center(i, a);
               r += a;
             }
+          if (r.data_!=0.){
+			  std::cout << " k_layer = " << k_layer << std::endl;
+			  std::cout << " div u = " << r.data_  << std::endl;
+			  fx.get_center_right(DIRECTION::X, i, a, b);
+			  std::cout << " flux_x = " << (a-b).data_ << std::endl;
+			  std::cout << " flux_xmin = " << a.data_ << std::endl;
+			  std::cout << " flux_xmax = " << b.data_  << std::endl;
+			  fy.get_center_right(DIRECTION::Y,i, a, b);
+			  std::cout << " flux_y = " << (a-b).data_ << std::endl;
+			  std::cout << " flux_ymin = " << a.data_ << std::endl;
+			  std::cout << " flux_ymax = " << b.data_  << std::endl;
+			  fzmin.get_center(i, a);
+			  fzmax.get_center(i, b);
+			  std::cout << " flux_z = " << (a-b).data_<< std::endl;
+			  std::cout << " flux_zmin = " << a.data_ << std::endl;
+			  std::cout << " flux_zmax = " << b.data_  << std::endl;
+          }
           resu_ptr.put_val(i, r);
         }
       // do not execute end_iloop at last iteration (because of assert on valid j+1)
@@ -99,7 +116,6 @@ static void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Fie
       fzmax.next_j();
       resu_ptr.next_j();
     }
-
 }
 
 // Compute the maximum stable timestep for a convection scheme on the local processor.
@@ -191,10 +207,12 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
     {
       if (k < dvz.nk())
         {
-
-          compute_flux_x_vz(*flux_x, k);
+    	  std::cout << "compute_flux_x_vz" << std::endl;
+          compute_flux_x_vz(*flux_x, k); // pb k=0
           compute_flux_y_vz(*flux_y, k);
           compute_flux_z_vz(*flux_zmax, k+1);
+
+          std::cout << "dvz" << std::endl;
 
           Operator_IJK_div(*flux_x, *flux_y, *flux_vz_zmin, *flux_zmax, dvz, k, add);
 
@@ -205,7 +223,9 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
         {
           compute_flux_x_vx(*flux_x, k);
           compute_flux_y_vx(*flux_y, k);
-          compute_flux_z_vx(*flux_zmax, k+1);
+          std::cout << "compute_flux_z_vx  max" << std::endl;
+          compute_flux_z_vx(*flux_zmax, k+1); // pb k=kmax
+          std::cout << "dvx" << std::endl;
 
           Operator_IJK_div(*flux_x, *flux_y, *flux_vx_zmin, *flux_zmax, dvx, k, add);
 
@@ -216,7 +236,9 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
         {
           compute_flux_x_vy(*flux_x, k);
           compute_flux_y_vy(*flux_y, k);
-          compute_flux_z_vy(*flux_zmax, k+1);
+          std::cout << "compute_flux_z_vy  max" << std::endl;
+          compute_flux_z_vy(*flux_zmax, k+1); // pb k=kmax
+          std::cout << "dvy" << std::endl;
 
           Operator_IJK_div(*flux_x, *flux_y, *flux_vy_zmin, *flux_zmax, dvy, k, add);
 
