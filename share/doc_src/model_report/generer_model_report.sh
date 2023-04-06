@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##generation documentation des modeles format note CEA
 #pdflatex TrioCFD_Modeles_clsDM2S.tex
 #bibtex TrioCFD_Modeles_clsDM2S

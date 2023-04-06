@@ -1,3 +1,5 @@
+#!/bin/bash
+
 pdflatex plan-de-dev-TrioCFD_2020_2025.tex
 bibtex plan-de-dev-TrioCFD_2020_2025
 pdflatex plan-de-dev-TrioCFD_2020_2025.tex

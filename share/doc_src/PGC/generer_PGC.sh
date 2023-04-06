@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #generation PGC format document utilisateur
 pdflatex PGC_TrioCFD.tex
 bibtex PGC_TrioCFD
