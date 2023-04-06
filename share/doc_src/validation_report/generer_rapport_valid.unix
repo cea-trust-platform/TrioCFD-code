@@ -1,5 +1,14 @@
 #!/bin/bash
 
+function usage()
+{
+  echo -e "Usage : ${0} path_to_validation_directory"
+  echo -e "This script allows to generate the TrioCFD validation report."
+  echo -e "The first argument must be the path to the validation directory"
+  echo -e "which contains an 'archives' directory".
+  echo -e "For example : ${0} /volatile/projets/trust-trio/validation/v1.9.1"
+}
+
 function performModif()
 {
   local theTest=$1
@@ -25,7 +34,6 @@ function performModif()
   # Specific action for "Channel_T1_T2_incompressible"
   # The name is too long and goes out the LaTeX table => it is cut !
   sed -ri "s|^Incompressible/.*/Canal.*_(M[01bistetraedrse_\\\]*) &|\1 \&|gmi" ${theCorps}
-  
 }
 
 # ------------------------------------------------------------------------------
@@ -33,6 +41,13 @@ function performModif()
 # ------------------------------------------------------------------------------
 ARCHIVES="$1/archives"
 LOCAL_DIR="archives"
+
+if [[ $1 == "" ]]
+then
+  echo -e "Error: the first argument is mandatory !"
+  usage
+  exit 1
+fi
 
 if [[ ! -d  "${ARCHIVES}" ]]
 then
