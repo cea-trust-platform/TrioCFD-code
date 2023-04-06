@@ -1,15 +1,18 @@
 #!/bin/bash
 
-##generation documentation des modeles format note CEA
-#pdflatex TrioCFD_Modeles_clsDM2S.tex
-#bibtex TrioCFD_Modeles_clsDM2S
-#pdflatex TrioCFD_Modeles_clsDM2S.tex
-#pdflatex TrioCFD_Modeles_clsDM2S.tex
-#mv TrioCFD_Modeles_clsDM2S.pdf ../../doc/.
+# Generation documentation des modeles format note CEA
+#DOC="TrioCFD_Modeles_clsDM2S"
 
-#generation documentation des modeles format document utilisateur
-pdflatex models_report_TrioCFD.tex
-bibtex models_report_TrioCFD
-pdflatex models_report_TrioCFD.tex
-pdflatex models_report_TrioCFD.tex
-mv models_report_TrioCFD.pdf ../../doc/TrioCFD_models_report.pdf
+# Generation documentation des modeles format document utilisateur
+DOC="TrioCFD_models_report"
+
+# Generation of the pdf report
+pdflatex ${DOC}.tex
+bibtex ${DOC}
+pdflatex ${DOC}.tex
+pdflatex ${DOC}.tex
+
+# Installation of the final pdf report
+mv ${DOC}.pdf ../../doc
+
+exit 0

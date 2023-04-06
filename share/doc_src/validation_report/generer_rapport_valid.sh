@@ -107,7 +107,7 @@ do
 done
 
 # Generation of the pdf report
-DOC="validation_report_TrioCFD"
+DOC="TrioCFD_validation_report"
 pdflatex ${DOC}.tex
 pdflatex ${DOC}.tex
 pdflatex ${DOC}.tex
@@ -119,6 +119,6 @@ do
 done
 
 # Installation of the final pdf report
-mv ${DOC}.pdf ../../doc/TrioCFD_validation_report.pdf
+mv ${DOC}.pdf ../../doc
 
 exit 0

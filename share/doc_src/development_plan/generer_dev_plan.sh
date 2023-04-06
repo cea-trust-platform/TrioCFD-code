@@ -1,7 +1,14 @@
 #!/bin/bash
 
-pdflatex plan-de-dev-TrioCFD_2020_2025.tex
-bibtex plan-de-dev-TrioCFD_2020_2025
-pdflatex plan-de-dev-TrioCFD_2020_2025.tex
-pdflatex plan-de-dev-TrioCFD_2020_2025.tex
-mv plan-de-dev-TrioCFD_2020_2025.pdf ../../doc/.
+DOC="plan-de-dev-TrioCFD_2020_2025"
+
+# Generation of the pdf report
+pdflatex ${DOC}.tex
+bibtex ${DOC}
+pdflatex ${DOC}.tex
+pdflatex ${DOC}.tex
+
+# Installation of the final pdf report
+mv ${DOC}.pdf ../../doc
+
+exit 0

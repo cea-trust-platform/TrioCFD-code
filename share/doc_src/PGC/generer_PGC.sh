@@ -1,8 +1,14 @@
 #!/bin/bash
 
-#generation PGC format document utilisateur
-pdflatex PGC_TrioCFD.tex
-bibtex PGC_TrioCFD
-pdflatex PGC_TrioCFD.tex
-pdflatex PGC_TrioCFD.tex
-mv PGC_TrioCFD.pdf ../../doc/TrioCFD_PGC.pdf
+DOC="TrioCFD_PGC"
+
+# Generation of the pdf report
+pdflatex ${DOC}.tex
+bibtex ${DOC}
+pdflatex ${DOC}.tex
+pdflatex ${DOC}.tex
+
+# Installation of the final pdf report
+mv ${DOC}.pdf ../../doc
+
+exit 0
