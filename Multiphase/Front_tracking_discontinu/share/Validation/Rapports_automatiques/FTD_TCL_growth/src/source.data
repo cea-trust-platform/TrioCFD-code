@@ -227,7 +227,7 @@ Lire pb
   		 temperature_thermique
 		 vitesse
 		 pression
-		 temperature_mpoint	
+		 mpoint_thermique	
 		}
                 Probes 
                {

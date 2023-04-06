@@ -242,7 +242,7 @@ Lire pb
          temperature_thermique
        vitesse
        pression
-       temperature_mpoint
+       mpoint_thermique
       }
    }
    
@@ -258,7 +258,7 @@ Lire pb
         vitesse elem 
         vitesse faces 
         pression elem 
-        temperature_mpoint elem 
+        mpoint_thermique elem 
         distance_interface_elem_interf elem 
         derivee_temporelle_indicatrice elem 
         pression_laplacien_d elem 

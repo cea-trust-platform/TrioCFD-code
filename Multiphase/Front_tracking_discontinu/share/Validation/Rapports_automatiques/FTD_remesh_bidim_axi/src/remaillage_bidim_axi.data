@@ -219,7 +219,7 @@ Lire pb
 -                        temperature_thermique
 -                        pression
 -                        VOLUME_MAILLE 
--                        temperature_mpoint
+-                        temperature_mpoint -> it's not the one used. Prefer mpoint_thermique.
 -                        mpoint_thermique
 -                        mpoint_uncorrected_thermique
 -                        distance_interface_elem_interf

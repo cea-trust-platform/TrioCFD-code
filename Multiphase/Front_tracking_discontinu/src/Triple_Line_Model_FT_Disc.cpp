@@ -799,7 +799,7 @@ double Triple_Line_Model_FT_Disc::get_update_AAA()
 // Arguments :
 //    elems_with_CL_contrib : The list of elements containing either the TCL itself, or the meso domaine.
 //                            In all of them, the flux_evap has to be modified.
-//    mpoint_from_CL : corresponding value to be assigned to each cell (as a mass flux m [unit?])
+//    mpoint_from_CL : corresponding value to be assigned to each cell (as a surface mass flux [kg/(m2s)] of total interface area within the cell)
 //    Q_from_CL : corresponding value to be assigned to each cell (as a thermal flux Q [unit?])
 //
 // Note that the same elem may appear twice (or more when contribution has to be displaced...) in the list,
@@ -863,7 +863,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     }
 
   const Parcours_interface& parcours = eq_transport.parcours_interface();
-  //const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
 
   // We store the elements (eulerian) crossed by a contact line.
   // As the specific source term is introduced here, a contribution of mdot should not be included afterwards.
@@ -917,11 +917,11 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 num_bc_face = maillage.sommet_face_bord(sommet1);
               }
             // We need to check on what boundary we are:
-            Journal() << "iii " << num_bc_face << finl;
             const int num_bord = domaine_vf.face_numero_bord(num_bc_face);
-            Journal() << "jjj " << num_bord << finl;
+            Journal() << "Contact line on face # " << num_bc_face
+                      << " belonging to border # " << num_bord
+                      << " at front sommet # " << num_som << finl;
             assert(num_bord>=0); // Otherwise we're inside and there's a big problem
-            //const Frontiere_dis_base& la_cl =  domaine_vf.frontiere_dis(num_bord);
             const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
             const Cond_lim& la_cl = zcldis.les_conditions_limites(num_bord);
             const Nom& bc_name = la_cl.frontiere_dis().le_nom();
@@ -941,7 +941,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 // We're on the symmetry axis, or something else but not at the wall...
                 continue;
               }
-// 2D axisymetric case :
+            // 2D axisymetric case :
             double contact_line_length = 1.0;
             if (Objet_U::bidim_axi)
               {
@@ -964,22 +964,27 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     Process::exit();
                   }
               }
-            /* double surface_tot = 0.;
-            int index = index_facette_elem[fa7];
-            while (index >= 0)
-              {
-                const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-                const double surface_facette = surface_facettes[fa7];
-                const double surf = data.fraction_surface_intersection_ * surface_facette;
-                surface_tot +=surf;
-                index = data.index_element_suivant_;
-              } */
             int index = index_facette_elem[fa7];
             while (index >= 0)
               {
                 const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
                 double fraction = data.fraction_surface_intersection_; // this gives a weight... It is the fraction of the facette in contact with the wall (ie the CL facette)
                 int elem = data.numero_element_;
+
+                // Compute the total surface within the element elem:
+                double surface_tot = 0.;
+                {
+                  int indextmp=intersections.index_elem()[elem];
+                  while (indextmp >= 0)
+                    {
+                      const Intersections_Elem_Facettes_Data& datatmp = intersections.data_intersection(indextmp);
+                      const int fa7tmp = datatmp.numero_facette_;
+                      const double surface_facette = surface_facettes[fa7tmp];
+                      const double surf = datatmp.fraction_surface_intersection_ * surface_facette;
+                      surface_tot +=surf;
+                      indextmp = datatmp.index_facette_suivante_;
+                    }
+                }
                 int num_face=-1;
                 {
                   // If the contact angle is high enough, it may happen that the first front element (that
@@ -1030,13 +1035,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     }
                 }
                 const double temps = ns.schema_temps().temps_courant();
-                //   Cerr << "temps= "<< temps << " dI_dt[TCL]= " << dI_dt(elem) << finl;
-                //const double surface_facette = surface_facettes[fa7];
-                //const double surf = data.fraction_surface_intersection_ * surface_facette;
-                //    surface_tot +=surf;
                 {
                   // const double v = volumes[elem];
-                  //    Cerr << "Elem " << elem << " xp= " << domaine_vf.xp(elem,0) << " vol= " << v << finl;
                   double Qtot = get_Qtcl();
 //                     if (dI_dt(elem) > 0.)
 //                       {
@@ -1044,16 +1044,14 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 //                         Cerr << "Qtot =" << Qtot <<finl;
 //                         Cerr << "  -> advancing contact line : disable TCL contribution to phase change" << finl;
 //                       }
-
 //                      else
 //                        {
 //                          Cerr << "  -> advancing contact line : disable TCL contribution to phase change" << finl;
 //                          //    continue;
 //                          const double Qtot = 0.;
-                  //   Cerr << "Qtot=" << Qtot << " time_Qtot= " << temps << finl;
+//                          //   Cerr << "Qtot=" << Qtot << " time_Qtot= " << temps << finl;
 //                        }
 
-// NEW COMMENT
                   if (dim3)
                     {
                       // We look for the two nodes on the contact line:
@@ -1089,7 +1087,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                         }
                       else
                         {
-// The contact line is on several elements. We assume it's two, but it can be more!
+                          // The contact line is on several elements. We assume it's two, but it can be more!
                           // How can we know?
                           // We need to compute The fraction of TCL within each cell
                           xyz_f0[0] =  domaine_vf.xv(num_bc_face0,0);
@@ -1105,7 +1103,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                           // Let's do a simplification : assume we put half of the contribution
                           // to each of the two elem containing the FT contact line vertex:
                           contact_line_length = 0.5*sqrt(s0s1[0]*s0s1[0] + s0s1[1]*s0s1[1] + s0s1[2]*s0s1[2]);
-
                         }
                       //contact_line_length = pow(v, 1./3.); // if a cube... we should do better later.
                     }
@@ -1115,11 +1112,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                   //   const double value = jump_inv_rho*contact_line_length*Qtot/Lvap;
                   //  Cerr << "[TCL-micro] Local source in elem=["  << elem << "] with value= " << value << "[m3.s-1]" << finl;
                   //   Cerr << "contact_line_length= " << contact_line_length << " "  << v << " "  << Qtot << " "  << Lvap << " " << jump_inv_rho << finl;
-
-//                      Cerr << "Secmem= "<< secmem(elem)*schema_temps().pas_de_temps() ;
-//                      Cerr << " Secmem2 before= "<< secmem2(elem) ;
-                  // @Vinod : See meso-scale model and comments. Should it be "+=" to be added on top of mpoint or simply setting "="?
-                  //secmem2(elem) += fraction*value;
+                  //                      Cerr << "Secmem= "<< secmem(elem)*schema_temps().pas_de_temps() ;
+                  //                      Cerr << " Secmem2 before= "<< secmem2(elem) ;
                   //   Cerr << "surface for tcl = " << surface_tot << " Volume of tcl cell = " << v << finl;
 
                   // BEWARE : If the front-element containing the TCL is overlapping two cells,
@@ -1130,16 +1124,14 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     {
                       // We update values and integrals only at the first call
                       instant_mmicro_evap_ += fraction*Qtot*contact_line_length/Lvap*dt;
-                      instant_vmicro_evap_ = instant_mmicro_evap_*jump_inv_rho; // VP - I think it should be '=' not '+='
+                      instant_vmicro_evap_ = instant_mmicro_evap_*jump_inv_rho; // '=' not '+=' because the '+=' is already in instant_mmicro_evap_
                     }
-                  // no_elem += 1;
-                  //      }
-                  // instant_vmicro_evap_ += value*dt;
                   elems_with_CL_contrib.append_array(elem);
-                  // mpoint_from_CL.append_array(fraction*Qtot*surface_tot/v/Lvap);  // GB 2019.11.11 Correction as Lvap was missing.
-                  mpoint_from_CL.append_array(fraction*Qtot/(sm_*Lvap));  // GB 2021.05.27 Correction surface_tot/v replaced by 1/sm.
+                  // mpoint_from_CL.append_array(fraction*Qtot/(sm_*Lvap));  // GB 2019.11.11 Correction as Lvap was missing.
+                  //                                                         GB 2021.05.27 Correction surface_tot/v replaced by 1/sm.
+                  mpoint_from_CL.append_array(fraction*Qtot*contact_line_length/(surface_tot*Lvap));  // GB 2023.04.05 Correction to compute a mean weighted by surface_tot
                   instant_Qmicro += fraction*Qtot;
-                  Q_from_CL.append_array(fraction*Qtot*contact_line_length); // I'm not sure, but I believe "*contact_line_length" should be in it, as it is now.
+                  Q_from_CL.append_array(fraction*Qtot*contact_line_length);
                   num_faces.append_array(num_face);
                   Cerr << "temps = " << temps << " Instantaneous tcl-evaporation = "<< instant_vmicro_evap_ << finl;
                 }
@@ -1153,25 +1145,16 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // Second loop to find meso cells:
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
   const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
-
-  //const Domaine_dis& aa= zcldis.domaine_dis();
   const Domaine_dis_base& domaine_dis = ns.domaine_dis().valeur();
   const IntTab& face_voisins = domaine_dis.face_voisins();
-  //const IntTab& face_voisins = ns.le_dom_dis.valeur().valeur().face_voisins();
-  //       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
+  // const IntTab& face_voisins = ns.le_dom_dis.valeur().valeur().face_voisins();
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   // Boucle sur les bords pour traiter les conditions aux limites
-  //            double m_evap = 0.;
-  //            double instant_vmeso_evap_ = 0.;
-  //            double Q_int = 0.;
-  //    const DoubleVect& volumes = domaine_vf.volumes();
   int ndeb, nfin, num_face;
   for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
     {
-      // Cerr << "I entered the loop" << finl;
-      // break;
-      //  const double v = volumes[elem];
       const Cond_lim& la_cl = zcldis.les_conditions_limites(n_bord);
-      //         const Cond_lim& la_cl_face = zclvdf.la_cl_de_la_face(num_face);
+      // const Cond_lim& la_cl_face = zclvdf.la_cl_de_la_face(num_face);
       const Nom& bc_name = la_cl.frontiere_dis().le_nom();
       Cerr << que_suis_je() << "::derivee_en_temps_inco() computing near TCL contrib "
            << "at CL " << la_cl.valeur();// << finl;
@@ -1184,14 +1167,10 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
-          // Vecteur3& normale = 0.; // added vp
-
           for (num_face=ndeb; num_face<nfin; num_face++)
             {
               // Tricky way to find the element (one of the neighbour doesn't exists and contains -1...)
               const int elem = -face_voisins(num_face, 0) * face_voisins(num_face, 1);
-              //   const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(elem);
-              //   const double fraction = data.fraction_surface_intersection_; // this gives a weight...
               const double vol = volumes[elem];
               int index=intersections.index_elem()[elem];
               if (index < 0)
@@ -1199,55 +1178,39 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 
               //  Cerr << "Elem #" << elem << " is adjacent to the wall " << bc_name
               //      << " and also contains an interface. So it belongs to meso domaine." << finl;
-
               double surface_tot = 0.;
-              // const double v = volumes[elem];
               DoubleTab in_out; // The coords of left and right points where the interface cross the cell boundary
               FTd_vecteur3 norm_elem = {0., 0., 0.};
               get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
               double factor = surface_tot/pow(vol, 2./3.);
-              //   Cerr << "factor= " << factor << finl;
               if (factor < 1.e-6)
                 {
                   Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
                   continue; // skip cells crossed by almost no interface.
                 }
-              // /*
               const double xl = in_out(0,0);
               const double yl = in_out(0,1);
               const double xr = in_out(1,0);
               const double yr = in_out(1,1);
-              Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
-              // */
+              // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
               double theta_app_loc = compute_local_cos_theta(parcours, num_face, norm_elem);
               double Q_meso = 0.;
               double Q_int = compute_Qint(in_out, theta_app_loc, num_face, Q_meso);
-              // const double v = volumes[elem];
               //  const double value = jump_inv_rho*Q_int/Lvap;
-              //     Cerr << "[TCL-meso] Local source in elem=["  << elem << "] with value= " << value << "[m2.s-1]" << finl;
-
-              // @Vinod : to analyze closely... At first, I thought it should be "+=", but it seems we want to replace the mpoint
-              // contribution totally. Is it enough to change from "+=" to simply setting secmem2 (=) in that cell?
-              // That way, mpoint remains has it is from the extrapolation and is ok for the neighbors but is not used in that cell...
-              // secmem2(elem) += value;
-              //     Cerr << "surface_total for meso cell = " << surface_tot << " Volume of meso cell = " << v << finl;
-              //     Cerr << "Qint= " << Q_int << finl;
+              //  Cerr << "[TCL-meso] Local source in elem=["  << elem << "] with value= " << value << "[m2.s-1]" << finl;
+              //  Cerr << "Qint= " << Q_int << finl;
 
               if (first_call_for_this_mesh)
                 {
                   // We update values and integrals only at the first call
-                  //  instant_mmeso_evap_ += (Q_int*surface_tot/Lvap)*dt;          // total mass of liquid evaporated
-                  instant_mmeso_evap_ += (Q_int/Lvap)*dt;          // total mass of liquid evaporated
-                  instant_vmeso_evap_ = (instant_mmeso_evap_*jump_inv_rho);   // total volume of liquid evaporated
-                  // VP - '+=' or '='?
-                  integrated_vmeso_evap_ = instant_vmeso_evap_; // ?*dt;
-                  //  Cerr << "Qint= " << Q_int << "dt = " << dt << finl;
-                  //    Cerr << "time = " << integration_time_ << " Qmeso= " << Q_meso << " Qint " << Q_int << finl;
+                  instant_mmeso_evap_ += (Q_int/Lvap)*dt;                   // total mass of liquid evaporated
+                  instant_vmeso_evap_ = (instant_mmeso_evap_*jump_inv_rho); // total volume of liquid evaporated
+                  integrated_vmeso_evap_ = instant_vmeso_evap_;
                 }
               Cerr.precision(16);
               Cerr << "time = " << integration_time_ << " Qmeso= " << Q_meso << " Qint " << Q_int << finl;
               Cerr.precision(7);
-              //   Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
+              // Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
               elems_with_CL_contrib.append_array(elem);
               //mpoint_from_CL.append_array((Q_meso*surface_tot/v)/Lvap); // VP: replaced Q_int by Q_meso....unit--kg/m^2.s
               double x1=0., y1=0.;
@@ -1297,12 +1260,14 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
               if (s_meso<DMINFLOAT)
                 {
                   // Qmeso is probably zero too
-                  // Cerr << Q_meso << finl;
-                  // Process::exit();
                   mpoint_from_CL.append_array(0.);
                 }
               else
-                mpoint_from_CL.append_array(Q_meso/(s_meso*Lvap));  // GB 2021.05.27 Correction surface_tot/v replaced by 1/s_meso.
+                {
+                  // mpoint_from_CL.append_array(Q_meso/(s_meso*Lvap));  // GB 2021.05.27 Correction surface_tot/v replaced by 1/s_meso.
+                  const double contact_line_length = Maillage_FT_Disc::angle_bidim_axi()*x_cl_;
+                  mpoint_from_CL.append_array(Q_meso*contact_line_length/(surface_tot*Lvap));  // GB 2023.04.05 Correction to compute a mean weighted by surface_tot
+                }
               instant_Qmeso += Q_meso;
               {
                 // comparison s_meso as dist_LR to the reconstruction based on surface_tot
@@ -1318,21 +1283,17 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     Cerr.precision(7);
                   }
               }
-              // mpoint_from_CL.append_array((Q_int*surface_tot/v)/Lvap);
-              //    Q_from_CL.append_array(Q_meso*surface_tot); //VP: corrections (1. Q_int replaced by Q_meso and multiplied by surface_tot)...unit--W
               Q_from_CL.append_array(Q_int);
               num_faces.append_array(num_face);
             }
-
-          //      instant_vmeso_evap_ += value*dt
           Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
         }
       else
         {
           Cerr << "Nothing specific for this type of BC " << bc_name << " near TCL. " << finl;
         }
-//                  instant_mmeso_evap_ += Q_int/Lvap;          // total mass of liquid evaporated
-//                  instant_vmeso_evap_ += instant_mmeso_evap_/rho_phase_1;   // total volume of liquid evaporated
+      // instant_mmeso_evap_ += Q_int/Lvap;                      // total mass of liquid evaporated
+      // instant_vmeso_evap_ += instant_mmeso_evap_/rho_phase_1; // total volume of liquid evaporated
     }
   instant_Qmeso = mp_sum(instant_Qmeso);
 
@@ -1349,7 +1310,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
         {
           Cerr << elems_with_CL_contrib[idx] << " \t " <<  num_faces[idx] << " \t "
                << Q_from_CL[idx] << " \t " << mpoint_from_CL[idx] << " \t " << finl;
-//          Cerr << elems_with_CL_contrib[idx] << " \t " <<  Q_from_CL[idx] << " \t " << mpoint_from_CL[idx] << " \t " << finl;
         }
       Cerr << " ************************************************************* " << finl;
       Cerr << "[instant-Q] time micro meso " << t << " " <<
@@ -1357,15 +1317,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
       Cerr << " ************************************************************* " << finl;
     }
 
-//  if (first_call_for_this_mesh)
-//    {
-
-//                      integrated_vmicro_evap_ += instant_vmicro_evap_; //?
-//   }
-
   // double micro_mevap = instant_mmicro_evap_ + instant_mmeso_evap_;
   vevap_int_ += instant_vmicro_evap_ + instant_vmeso_evap_;
-//    vevap_int += vevap;
   // You want the total value on all processors:
   // micro_mevap = Process::mp_sum(micro_mevap);
 
@@ -1385,9 +1338,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
       mp_.append_array(mpoint_from_CL[idx]);
       Q_.append_array(Q_from_CL[idx]);
     }
-  // vevap = Process::mp_sum(vevap);
-//  Cerr << "vevap(micro+meso) = " << vevap << " time = " << integration_time_ << finl;
-//  vevap_int_ = Process::mp_sum(vevap_int_);
+  // GB 2023: There is probably an issue with the mp_sum used on a time integral. Dont you get the
+  // old value many times (NPROC actually... unless only proc 0 has the old value?).
+  vevap_int_ = Process::mp_sum(vevap_int_);
   Cerr << "vevap_int_(micro+meso) = " << vevap_int_ << " time = " << integration_time_ << finl;
 }
 
@@ -1401,32 +1354,27 @@ void Triple_Line_Model_FT_Disc::corriger_mpoint(DoubleTab& mpoint) const
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
       const int elem = elems_[idx];
-      //secmem2(elem) =0.;
       mpoint(elem) = 0.;
     }
 
   // Then, we can sum our micro and meso contributions :
+  // Unit: kg/(m2s)
+  // The area on which mp_ should be applied is by definition the total interface area within that cell.
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
       const int elem = elems_[idx];
-      //const double Q = Q_from_CL[idx];
-      //const double value = jump_inv_rho/Lvap*Q;
-      //secmem2(elem) += value;
       mpoint(elem) += mp_[idx];
-      Cerr << "contrib added to mpoint for cell " << elem << " with value= " << mp_[idx] << finl;
+      Cerr << "[TCL] contrib added to mpoint for cell " << elem << " with value= " << mp_[idx] << finl;
     }
 }
 
 // correct secmem2 with values from TCL model.
 void Triple_Line_Model_FT_Disc::corriger_secmem(const double coef, DoubleTab& secmem2) const
 {
-//  const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-//  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ns.domaine_dis().valeur());
-//  const DoubleVect& volumes = domaine_vf.volumes();
   const int nb_contact_line_contribution = elems_.size_array();
-// const double max_val_before = max_array(secmem2);
-//  const double min_val_before = min_array(secmem2);
-  // I believe it is required to put zero in all cells first to remove any possible macroscopic contribution.
+  // const double max_val_before = max_array(secmem2);
+  // const double min_val_before = min_array(secmem2);
+  // I believe it is required to put zero in all cells with TCL model first to remove any possible macroscopic contribution.
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
       const int elem = elems_[idx];
@@ -1438,12 +1386,11 @@ void Triple_Line_Model_FT_Disc::corriger_secmem(const double coef, DoubleTab& se
     {
       const int elem = elems_[idx];
       const double Q_val = Q_[idx];
-//      const double v = volumes[elem];
       const double value = coef*Q_val;
-      secmem2(elem) += value; // '+=' or '='? - VP
+      secmem2(elem) += value; // '+=' because several contribs are in the same cell element.
     }
-// Cerr << "[secmem2] max before/after TCL model: " << max_val_before << " / " << max_array(secmem2) << finl;
-// Cerr << "[secmem2] min before/after TCL model: " << min_val_before << " / " << min_array(secmem2) << finl;
+  // Cerr << "[secmem2] max before/after TCL model: " << max_val_before << " / " << max_array(secmem2) << finl;
+  // Cerr << "[secmem2] min before/after TCL model: " << min_val_before << " / " << min_array(secmem2) << finl;
 }
 
 // In cells where the TCL model is activated, the mean liquid temperature in each cell should be
@@ -1460,13 +1407,12 @@ void Triple_Line_Model_FT_Disc::set_wall_adjacent_temperature_according_to_TCL_m
   for (int idx = 0; idx < elems_.size_array(); idx++)
     {
       const int elem = elems_[idx];
-      //const double Twall =ref_eq_temp_.valeur().get_Twall_at_elem(elem);
       const int num_face = boundary_faces_[idx];
       const double Twall =ref_eq_temp_.valeur().get_Twall_at_face(num_face);
       const double DeltaT = TSAT_CONSTANTE-Twall;
       const double Tbefore =  temperature(elem);
       temperature(elem) =Twall + 0.5*DeltaT;
-      Cerr << "[Temperature correction] elem= " << elem << " before/after: " << Tbefore << " / " << temperature(elem) << finl;
+      Cerr << "[Temperature correction] elem= " << elem << " Tbefore/Tafter: " << Tbefore << " / " << temperature(elem) << finl;
     }
 }
 

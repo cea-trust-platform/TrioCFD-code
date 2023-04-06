@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cwd=$PWD
+jdd=Qmicro_only.data
+
+for cas in "20" "40" "80"
+do
+   mkdir -p THETA$cas
+   sed -e "s/@angle@/$cas/g" $jdd > THETA$cas/$jdd
+   for vof in 0000 1000 1110 1330 1003 1113 1333
+   do
+     v=${vof:0:1}
+     o=${vof:1:1}
+     f=${vof:2:1}
+     r=${vof:3:1}
+     mkdir -p THETA$cas/VoF$vof/
+     \cp -f post_run THETA$cas/VoF$vof/
+     sed -e "s/VOFlike_correction_volume [0-9]/VOFlike_correction_volume $v/" \
+         -e "s/nb_iterations_correction_volume [0-9]/nb_iterations_correction_volume $o/" \
+         -e "s/nb_lissage_correction_volume [0-9]/nb_lissage_correction_volume $f/" \
+         -e "s/nb_iter_correction_volume [0-9]/nb_iter_correction_volume $r/" \
+         THETA$cas/$jdd > THETA$cas/VoF$vof/$jdd
+   done
+   \cp -f post_run THETA$cas/VoF$vof/
+done
+echo "End of prepare"

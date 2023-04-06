@@ -95,6 +95,16 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
   nom+=num;
   terme_diffusif.set_fichier(nom);
   terme_diffusif.set_description((Nom)"Conduction heat transfer rate=Integral(lambda*grad(T)*ndS) [W] if SI units used");
+
+  // If keyword correction_mpoint_diff_conv_energy_ has not been read, the table should be properly set:
+  if (correction_mpoint_diff_conv_energy_.size_array() != 3)
+    {
+      Cerr << "We account for no energy correction!!" << finl;
+      correction_mpoint_diff_conv_energy_.resize_array(3);
+      correction_mpoint_diff_conv_energy_[0] = 0;
+      correction_mpoint_diff_conv_energy_[1] = 0;
+      correction_mpoint_diff_conv_energy_[2] = 0;
+    }
   return is;
 }
 
@@ -643,16 +653,8 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
          << " imbalance= " << total_derivee_energy-total_flux_lost+mpai_tot << finl;
   }
 
-  if (correction_mpoint_diff_conv_energy_.size_array() != 3)
-    {
-      Cerr << "We account for no energy correction!!" << finl;
-      correction_mpoint_diff_conv_energy_.resize_array(3);
-      correction_mpoint_diff_conv_energy_[0] = 0;
-      correction_mpoint_diff_conv_energy_[1] = 0;
-      correction_mpoint_diff_conv_energy_[2] = 0;
-    }
   // Energy balance correction. Loop on mixed elems only :
-  const int option=3;
+  const int option=-1; // To disable that
   {
     const int account_for_diff = correction_mpoint_diff_conv_energy_[0];
     const int account_for_conv = correction_mpoint_diff_conv_energy_[1];
@@ -1187,8 +1189,12 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
         const double mean_mp_before_corr = mp_sum_before_corr/int_ai_before;
         Cerr << " mp_sum_before_corr= " << mp_sum_before_corr << " mean_mp_before_corr= " << mean_mp_before_corr << " time= " << temps << finl;
       }
-    if ((!is_prescribed_mpoint_) && (correction_mpoint_diff_conv_energy_.size_array()) && (max_array(correction_mpoint_diff_conv_energy_)))
-      correct_mpoint();
+    if ((!is_prescribed_mpoint_) && (max_array(correction_mpoint_diff_conv_energy_)))
+      {
+        // WARNING!!  We don't correct mpoint if correction_mpoint_diff_conv_energy_ are all set to 0
+        // this method is not related to TCL model but rather to attempting energy conserving Ghost Fluid Method.
+        correct_mpoint();
+      }
   }
 
 #if TCL_MODEL
@@ -1207,7 +1213,8 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
         toto ce code n est pas lu
       }
 #endif
-      //assert(tcl.tag_tcl() != ref_eq_interface_.valeur().maillage_interface().get_mesh_tag());
+      // Ne compile pas, pourquoi?
+      // assert(tcl.tag_tcl() == ref_eq_interface_.valeur().maillage_interface().get_mesh_tag());
 
       // We are late enough within the timestep for the correction not to affect the velocities reconstructions (delta_u)
       // because we expect it has been done before. Nonetheless, we need to do it before the post-pro to see our corrected fields

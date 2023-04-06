@@ -292,7 +292,7 @@ Lire pb
     champs dt_post 5.0e-5 { 
         temperature_grad_thermique elem 
         temperature_thermique elem
-        temperature_mpoint elem 
+        mpoint_thermique elem 
         volume_maille elem 
         indicatrice_interf elem 
         vitesse elem
