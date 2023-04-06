@@ -112,13 +112,15 @@ pdflatex ${DOC}.tex
 pdflatex ${DOC}.tex
 pdflatex ${DOC}.tex
 
+# Installation of the final pdf report
+cp ${DOC}.pdf ../../doc
+
 # Cleaning
-for ext in aux idx lof log lot toc
+for ext in aux idx lof log lot toc pdf
 do
   rm "${DOC}.${ext}"
 done
 
-# Installation of the final pdf report
-mv ${DOC}.pdf ../../doc
+rm -rf ${LOCAL_DIR}
 
 exit 0
