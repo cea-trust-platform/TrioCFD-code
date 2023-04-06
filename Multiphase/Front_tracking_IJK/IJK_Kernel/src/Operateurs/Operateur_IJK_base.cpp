@@ -104,7 +104,7 @@ static void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Fie
 //			  std::cout << " flux_z = " << (a-b).data_<< std::endl;
 //			  std::cout << " flux_zmin = " << a.data_ << std::endl;
 //			  std::cout << " flux_zmax = " << b.data_  << std::endl;
-          }
+//          }
           resu_ptr.put_val(i, r);
         }
       // do not execute end_iloop at last iteration (because of assert on valid j+1)
