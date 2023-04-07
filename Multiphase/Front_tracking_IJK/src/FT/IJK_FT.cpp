@@ -1386,6 +1386,31 @@ int IJK_FT_double::initialise()
           velocity_[0].change_to_sheared_reference_frame(1, 1);
           velocity_[1].change_to_sheared_reference_frame(1, 2);
           velocity_[2].change_to_sheared_reference_frame(1, 3);
+
+          velocity_[0].echange_espace_virtuel(2);
+          velocity_[1].echange_espace_virtuel(2);
+          velocity_[2].echange_espace_virtuel(2);
+
+          for (int dir = 0; dir < 3; dir++)
+          {
+			  std::cout << std::endl;
+			  std::cout << " ########### DIR = " << dir <<"  #############" << std::endl;
+			  std::cout << std::endl;
+        	  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
+        	  {
+        		  for (int i = velocity_[dir].ni() + 2; i > -2; i--)
+        		  {
+        			  for (int k = -2; k < velocity_[dir].nk() + 2; k++)
+        			  {
+        				  std::cout << velocity_[dir](i,j,k) << " ";
+        			  }
+        			  std::cout << std::endl;
+        		  }
+    			  std::cout << std::endl;
+    			  std::cout << std::endl;
+        	  }
+          }
+
         }
     }
   else
@@ -2599,7 +2624,7 @@ void IJK_FT_double::run()
 
       current_time_ += timestep_;
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
-      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*current_time_ + boundary_conditions_.get_t0_shear();
+      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
 
       if (current_time_ >= post_.t_debut_statistiques())
