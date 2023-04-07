@@ -74,7 +74,6 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   post_par_paires_ = 0;
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
-  param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
   param.ajouter_flag("postraiter_sous_pas_de_temps", &postraiter_sous_pas_de_temps_);
@@ -437,6 +436,22 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
   const int latastep = compteur_post_instantanes_;
   dumplata_newtime(lata_name,current_time);
+  if ((liste_post_instantanes_.contient_("FORCE_PH")) or (liste_post_instantanes_.contient_("CELL_FORCE_PH")))
+    {
+      source_spectrale_=ref_ijk_ft_.forcage_.get_force_ph2();
+    }
+  if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))
+    {
+      source_interface_ft_=ref_ijk_ft_.terme_source_interfaces_ft_;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF"))
+    {
+      source_interface_ns_=ref_ijk_ft_.terme_source_interfaces_ns_;
+    }
+  if (liste_post_instantanes_.contient_("CELL_SHIELD_REPULSION"))
+    {
+      repulsion_interface_ns_=ref_ijk_ft_.terme_repulsion_interfaces_ns_;
+    }
   if (liste_post_instantanes_.contient_("TOUS"))
     {
       liste_post_instantanes_.dimensionner_force(0);
@@ -1895,66 +1910,31 @@ void IJK_FT_Post::fill_op_conv()
 
 void IJK_FT_Post::fill_surface_force(FixedVector<IJK_Field_double, 3>& the_field_you_know)
 {
-  int ni = the_field_you_know[0].ni();
-  int nj = the_field_you_know[0].nj();
-  int nk = the_field_you_know[0].nk();
+  double volume = 1.;
+  for (int i = 0; i < 3; i++)
+    volume *= splitting_.get_grid_geometry().get_constant_delta(i);
+  
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
     for (int dir = 0; dir < 3; dir++)
       {
-        //rho_Ssigma_[dir] = the_field_you_know[dir];
-        //rho_Ssigma_[dir].data() = the_field_you_know[dir].data();
-
-        cout << "--- #################################################" << endl;
-
-        for (int i = 0; i < ni ; i++)
-          {
-            for (int j = 0; j < nj; j++)
-              {
-                for (int k = 0; k < nk; k++)
-                  {
-                    rho_Ssigma_[dir](i,j,k)=the_field_you_know[dir](i,j,k);
-                    //Passage par reference, comme dans interpolate_to_center
-                    //double& rFs = rho_Ssigma_[dir](i,j,k);
-                    //rFs = the_field_you_know[dir](i,j,k);
-                    if (the_field_you_know[dir](i,j,k) != 0.)
-                      {
-
-                        cout << "dir,i,j,k : "<<dir<<", "<<i<<", "<<j<<", "<<k<<endl;
-                        cout <<"code 1113:" << the_field_you_know[dir](i,j,k);
-                        cout <<", code 1114:" << rho_Ssigma_[dir](i,j,k) << endl;
-                      }
-
-                  }
-              }
-          }
-
-        cout << "--- #################################################" << endl;
-
+        IJK_Field_double& source = ref_ijk_ft_.terme_source_interfaces_ns_[dir];
+        for (int k = 0; k < source.nk(); k++)
+          for (int j = 0; j < source.nj(); j++)
+            for (int i = 0; i < source.ni(); i++)
+              rho_Ssigma_[dir](i,j,k) = source(i,j,k)/volume;
       }
+  
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     {
-      interpolate_to_center(cell_rho_Ssigma_,rho_Ssigma_);
-    }
-
-  //n--,dumplata_cellvector("test.lata","RS", rho_Ssigma, 2);
-}
-
-FixedVector<IJK_Field_double, 3> IJK_FT_Post::get_rho_Ssigma()
-{
-  return rho_Ssigma_;
-}
-
-void IJK_FT_Post::fill_surface_force_bis(const char * lata_name, double time, int time_iteration)
-{
-  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
-    for (int i = 0; i < 3; i++)
-      {
-        rho_Ssigma_[i].data() = ref_ijk_ft_.terme_source_interfaces_ns_[i].data();
-        //rho_Ssigma_[i] = ref_ijk_ft_.terme_source_interfaces_ns_[i];
-      }
-  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
-    {
-      interpolate_to_center(cell_rho_Ssigma_,rho_Ssigma_);
+      interpolate_to_center(cell_rho_Ssigma_,ref_ijk_ft_.terme_source_interfaces_ns_);
+      for (int dir = 0; dir < 3; dir++)
+        {
+          IJK_Field_double& source = cell_rho_Ssigma_[dir];
+          for (int k = 0; k < source.nk(); k++)
+            for (int j = 0; j < source.nj(); j++)
+              for (int i = 0; i < source.ni(); i++)
+                cell_rho_Ssigma_[dir](i,j,k) = source(i,j,k)/volume;
+        }
     }
 }
 
@@ -2134,11 +2114,6 @@ int IJK_FT_Post::alloc_fields()
       allocate_cell_vector(cell_grad_p_,splitting_, 0);
       nalloc +=3;
     }
-  if (liste_post_instantanes_.contient_("CELL_BK_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
-    {
-      allocate_cell_vector(cell_backup_source_interface_,splitting_, 0);
-      nalloc +=3;
-    }
   if (liste_post_instantanes_.contient_("CELL_SOURCE_QDM_INTERF")||liste_post_instantanes_.contient_("TOUS"))
     {
       allocate_cell_vector(cell_source_interface_,splitting_, 0);
@@ -2189,9 +2164,9 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
     }
 
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
-    n+=3,allocate_velocity(rho_Ssigma_, splitting_, 1);
+    n+=3,allocate_velocity(rho_Ssigma_, splitting_, 0);
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
-    n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 1);
+    n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 0);
 
   // Pour le calcul des statistiques diphasiques :
   // (si le t_debut_stat a ete initialise... Sinon, on ne va pas les calculer au cours de ce calcul)
@@ -3509,6 +3484,31 @@ if (liste_post_instantanes.contient_("TEMPERATURE_ADIMENSIONNELLE_THETA"))
 /////////////////
   //MR: ecart source temperature analytique
     if (liste_post_instantanes_.contient_("ECART_SOURCE_TEMPERATURE_ANA"))
+    {
+      if (!liste_post_instantanes.contient_("SOURCE_TEMPERATURE_ANA"))
+         {
+           set_field_data(source_temperature_ana_, curseur->expression_source_temperature_, velocity_[0], current_time);
+         }
+       // do some work
+
+       double ct = current_time;
+       Cerr << "MR: ERROR SOURCE T FIELD " << ct;
+       double err = 0.;
+       //set_field_data(source_temperature_ana_, curseur->expression_source_T_ana_, ct);
+       const int ni = curseur->source_temperature_.ni();
+       const int nj = curseur->source_temperature_.nj();
+       const int nk = curseur->source_temperature_.nk();
+       const int ntot=Process::mp_sum(ni*nj*nk);
+       // La temperature est definie a une constante pres:
+       //const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
+       for (int k = 0; k < nk; k++)
+         for (int j = 0; j < nj; j++)
+           for (int i = 0; i < ni; i++)
+             {
+               const double val =   source_temperature_ana_(i,j,k) - curseur->source_temperature_(i,j,k); //- cst_temp;
+               ecart_source_t_ana_(i,j,k) = val;
+               err += val*val;
+             }
     {
       if (!liste_post_instantanes.contient_("SOURCE_TEMPERATURE_ANA"))
          {
