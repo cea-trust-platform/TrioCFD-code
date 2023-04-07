@@ -1854,13 +1854,30 @@ void IJK_FT_Post::fill_op_conv()
 
 void IJK_FT_Post::fill_surface_force()
 {
+  double volume = 1.;
+  for (int i = 0; i < 3; i++)
+    volume *= splitting_.get_grid_geometry().get_constant_delta(i);
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
-    for (int i = 0; i < 3; i++)
-      rho_Ssigma_[i].data() = ref_ijk_ft_.terme_source_interfaces_ns_[i].data();
+    for (int dir = 0; dir < 3; dir++)
+      {
+        IJK_Field_double& source = ref_ijk_ft_.terme_source_interfaces_ns_[dir];
+        for (int k = 0; k < source.nk(); k++)
+          for (int j = 0; j < source.nj(); j++)
+            for (int i = 0; i < source.ni(); i++)
+              rho_Ssigma_[dir](i,j,k) = source(i,j,k)/volume;
+      }
 
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     {
       interpolate_to_center(cell_rho_Ssigma_,ref_ijk_ft_.terme_source_interfaces_ns_);
+      for (int dir = 0; dir < 3; dir++)
+        {
+          IJK_Field_double& source = cell_rho_Ssigma_[dir];
+          for (int k = 0; k < source.nk(); k++)
+            for (int j = 0; j < source.nj(); j++)
+              for (int i = 0; i < source.ni(); i++)
+                cell_rho_Ssigma_[dir](i,j,k) = source(i,j,k)/volume;
+        }
     }
 }
 
@@ -2082,9 +2099,9 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
       //                                          On veut qqch d'aligne pour copier les data() l'un dans l'autre
     }
 
-  if (liste_post_instantanes_.contient_("OP_CONV"))
+  if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
     n+=3,allocate_velocity(rho_Ssigma_, splitting_, 0);
-  if (liste_post_instantanes_.contient_("CELL_OP_CONV"))
+  if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     n+=3,allocate_cell_vector(cell_rho_Ssigma_, splitting_, 0);
 
   // Pour le calcul des statistiques diphasiques :

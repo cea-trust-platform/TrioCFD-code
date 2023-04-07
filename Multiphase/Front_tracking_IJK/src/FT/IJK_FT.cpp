@@ -3251,6 +3251,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                   terme_interfaces_bf_mass_solver_bis[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
                 }
             }
+          post_.fill_surface_force();
           // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
           compute_correction_for_momentum_balance(rk_step);
           for (int dir = 0; dir < 3; dir++)
@@ -3265,7 +3266,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                     terme_repulsion_interfaces_ft_[dir],
                     terme_repulsion_interfaces_ns_[dir]);
                 }
-              post_.fill_surface_force();
               const int kmax = terme_source_interfaces_ns_[dir].nk();
               for (int k = 0; k < kmax; k++)
                 {
