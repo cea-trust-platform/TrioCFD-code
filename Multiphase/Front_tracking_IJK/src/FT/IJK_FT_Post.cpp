@@ -75,6 +75,7 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
+  param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
   param.ajouter_flag("postraiter_sous_pas_de_temps", &postraiter_sous_pas_de_temps_);
   // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
@@ -1913,7 +1914,7 @@ void IJK_FT_Post::fill_surface_force(FixedVector<IJK_Field_double, 3>& the_field
   double volume = 1.;
   for (int i = 0; i < 3; i++)
     volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-  
+
   if (liste_post_instantanes_.contient_("RHO_SOURCE_QDM_INTERF"))
     for (int dir = 0; dir < 3; dir++)
       {
@@ -1923,7 +1924,7 @@ void IJK_FT_Post::fill_surface_force(FixedVector<IJK_Field_double, 3>& the_field
             for (int i = 0; i < source.ni(); i++)
               rho_Ssigma_[dir](i,j,k) = source(i,j,k)/volume;
       }
-  
+
   if (liste_post_instantanes_.contient_("CELL_RHO_SOURCE_QDM_INTERF"))
     {
       interpolate_to_center(cell_rho_Ssigma_,ref_ijk_ft_.terme_source_interfaces_ns_);
