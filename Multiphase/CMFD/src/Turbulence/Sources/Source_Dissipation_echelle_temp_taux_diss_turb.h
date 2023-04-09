@@ -42,7 +42,7 @@ class Source_Dissipation_echelle_temp_taux_diss_turb : public Sources_Multiphase
   Declare_base(Source_Dissipation_echelle_temp_taux_diss_turb);
 
 public:
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { };
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
 protected:

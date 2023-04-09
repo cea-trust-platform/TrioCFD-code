@@ -67,14 +67,14 @@ Entree& Remaillage_FT_IJK::readOn(Entree& is)
   Param p(que_suis_je());
   p.ajouter("pas_remaillage", &dt_remaillage_); // XD_ADD_P floattant not_set
   p.ajouter("nb_iter_barycentrage", &nb_iter_barycentrage_); // XD_ADD_P entier not_set
-  p.ajouter("relax_barycentrage", &relax_barycentrage_); // XD_ADD_P entier not_set
-  p.ajouter("critere_arete", &critere_arete_); // XD_ADD_P entier not_set
-  p.ajouter("seuil_dvolume_residuel", &seuil_dvolume_residuel_); // XD_ADD_P entier not_set
+  p.ajouter("relax_barycentrage", &relax_barycentrage_); // XD_ADD_P floattant not_set
+  p.ajouter("critere_arete", &critere_arete_); // XD_ADD_P floattant not_set
+  p.ajouter("seuil_dvolume_residuel", &seuil_dvolume_residuel_); // XD_ADD_P floattant not_set
   p.ajouter("nb_iter_correction_volume",  &nb_iter_bary_volume_seul_); // XD_ADD_P entier not_set
   p.ajouter("nb_iter_remaillage", &nb_iter_remaillage_); // XD_ADD_P entier not_set
-  p.ajouter("facteur_longueur_ideale", &facteur_longueur_ideale_); // XD_ADD_P entier not_set
+  p.ajouter("facteur_longueur_ideale", &facteur_longueur_ideale_); // XD_ADD_P floattant not_set
   p.ajouter("equilateral", &equilateral_); // XD_ADD_P entier not_set
-  p.ajouter("lissage_courbure_coeff", &lissage_courbure_coeff_); // XD_ADD_P entier not_set
+  p.ajouter("lissage_courbure_coeff", &lissage_courbure_coeff_); // XD_ADD_P floattant not_set
   p.ajouter("lissage_courbure_iterations_systematique", &lissage_courbure_iterations_systematique_); // XD_ADD_P entier not_set
   p.ajouter("lissage_courbure_iterations_si_remaillage", &lissage_courbure_iterations_si_remaillage_); // XD_ADD_P entier not_set
   p.lire_avec_accolades_depuis(is);

@@ -146,7 +146,6 @@
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/spectral_cosX_PAR NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/schemas_temps NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/spec_adv_bulle_light NNR
-./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/test_import_pytools NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/stat_diph_gradUP NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/compaTrioCFD_and_CPU NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/temperature_bulle_conv NNR

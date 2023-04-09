@@ -39,13 +39,15 @@
 #include <Schema_Implicite_base.h>
 #include <SETS.h>
 #include <EChaine.h>
-#include <Neumann_paroi.h>
 #include <Scalaire_impose_paroi.h>
 #include <Echange_global_impose.h>
 
 #define old_forme
 
 Implemente_base(Convection_diffusion_turbulence_multiphase,"Convection_diffusion_turbulence_multiphase",Convection_Diffusion_std);
+// XD diffusion_turbulente_ktau diffusion_deriv turbulente 0 not_set
+// XD attr k_tau chaine(into=["k_tau","k_omega","SGDH"]) k_tau 1 not_set
+// XD attr titi bloc_lecture titi 1 not_set
 
 /*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
  *
