@@ -21,7 +21,6 @@
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
-#include <Domaine_ALE.h>
 #include <Postraitement.h>
 #include <stat_counters.h>
 #include <FichierHDFPar.h>
@@ -1228,7 +1227,7 @@ int Probleme_base::postraiter(int force)
       const double t_max = sch.temps_max();
 
       //Test pour eviter de repeter le postraitement a l instant initial
-      //Cela evite un plantage dans le cas d un postraitement au format meshtv
+      //Cela evite un plane dans le cas d un postraitement au format meshtv
 
       if (!((indice_nb_pas_dt) && (nb_pas_dt_max == 0)) && (!((indice_tps_final) && (est_egal(t_init, t_max)))))
         {
@@ -1249,18 +1248,14 @@ int Probleme_base::postraiter(int force)
     }
   statistiques().end_count(postraitement_counter_);
 
-  //specific ALE postraitement
-  if(le_domaine_dis->domaine().que_suis_je()=="Domaine_ALE")
+  //Start specific postraitements for mobile domain (like ALE)
+  if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
     {
-      if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
-        {
-          //compute the projection on the ALE boundaries
-          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis->domaine());
-          double temps = le_schema_en_temps->temps_courant();
-          dom_ale.update_ALE_projection(temps);
-        }
-      resuming_in_progress_=0; //reset to false in order to make the following projections
+      double temps = le_schema_en_temps->temps_courant();
+      le_domaine_dis->domaine().update_after_post(temps);
     }
+  resuming_in_progress_=0; //reset to false in order to make the following projections
+  // end specific postraitements for mobile domain (like ALE)
 
   return 1;
 }

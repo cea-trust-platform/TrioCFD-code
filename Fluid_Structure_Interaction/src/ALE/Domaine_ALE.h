@@ -60,6 +60,7 @@ public :
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
   void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void update_after_post(double temps) override;
   void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
   DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
