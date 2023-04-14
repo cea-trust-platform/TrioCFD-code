@@ -22,6 +22,7 @@
 #include <Pb_Thermohydraulique_sensibility.h>
 #include <Fluide_Ostwald.h>
 #include <Verif_Cl.h>
+#include <Probleme_base.h>
 
 Implemente_instanciable( Pb_Thermohydraulique_sensibility, "Pb_Thermohydraulique_sensibility", Pb_Fluide_base ) ;
 // XD Pb_Thermohydraulique_sensibility pb_thermohydraulique Pb_Thermohydraulique_sensibility -1 Resolution of Resolution of thermohydraulic sensitivity problem
@@ -146,4 +147,60 @@ int Pb_Thermohydraulique_sensibility::verifier()
   return tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
 }
 
+/*void Pb_Hydraulique_sensibility::finir()
+{
 
+  Probleme_base::finir();
+
+  Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std,equation(0));
+  const  DoubleTab& vitesse=  eqnNS.inconnue().valeur();
+  if( equation(0).que_suis_je() == "Navier_Stokes_standard")
+    {
+      Nom   nom_fichier_vitesse("Velocity_state.txt");
+      SFichier file_vitesse(nom_fichier_vitesse);
+      Nom   nom_fichier_centre_faces("Center_gravity_faces.txt");
+      SFichier file_c_faces(nom_fichier_centre_faces);
+      const Zone_VEF& la_zone = ref_cast(Zone_VEF,eqnNS.zone_dis().valeur());
+      const DoubleTab& xv= la_zone.xv();
+      assert(xv.dimension(0)==vitesse.dimension(0));
+      for(int face=0; face<vitesse.dimension(0); face++)
+        {
+          file_vitesse<<vitesse(face, 0)<<"  "<<vitesse(face, 1)<<finl;
+          file_c_faces<<xv(face, 0)<<"  "<<xv(face, 1)<<finl;
+        }
+    }
+  else  if( equation(0).que_suis_je() == "Navier_Stokes_standard_sensibility")
+    {
+      Nom   nom_fichier_vitesse("Velocity_sensibility.txt");
+      SFichier file_vitesse(nom_fichier_vitesse);
+      for(int face=0; face<vitesse.dimension(0); face++)
+        {
+          file_vitesse<<vitesse(face, 0)<<"  "<<vitesse(face, 1)<<finl;
+        }
+    }
+  if(nombre_d_equations() == 2 )
+    {
+      Convection_Diffusion_Temperature& eqnCDT = ref_cast(Convection_Diffusion_Temperature,equation(1));
+      const  DoubleTab& temperature=  eqnCDT.inconnue().valeur();
+      if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature")
+        {
+          Nom   nom_fichier_temp("Temperature_state.txt");
+          SFichier file_temp(nom_fichier_temp);
+          for(int face=0; face<temperature.size(); face++)
+            {
+              file_temp<<temperature(face)<<finl;
+            }
+
+        }
+      else if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature_sensibility")
+        {
+          Nom   nom_fichier_temp("Temperature_sensibility.txt");
+          SFichier file_temp(nom_fichier_temp);
+          for(int face=0; face<temperature.size(); face++)
+            {
+              file_temp<<temperature(face)<<finl;
+            }
+        }
+    }
+
+} */
