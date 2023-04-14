@@ -21,7 +21,6 @@
 
 #include <Pb_Hydraulique_sensibility.h>
 #include <Fluide_Incompressible.h>
-#include <Probleme_base.h>
 
 Implemente_instanciable(Pb_Hydraulique_sensibility,"Pb_Hydraulique_sensibility",Pb_Fluide_base);
 // XD Pb_Hydraulique_sensibility Pb_base Pb_Hydraulique_sensibility -1 Resolution of hydraulic sensibility problems
