@@ -1318,7 +1318,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     }
 
   // double micro_mevap = instant_mmicro_evap_ + instant_mmeso_evap_;
-  vevap_int_ += instant_vmicro_evap_ + instant_vmeso_evap_;
   // You want the total value on all processors:
   // micro_mevap = Process::mp_sum(micro_mevap);
 
@@ -1338,10 +1337,13 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
       mp_.append_array(mpoint_from_CL[idx]);
       Q_.append_array(Q_from_CL[idx]);
     }
-  // GB 2023: There is probably an issue with the mp_sum used on a time integral. Dont you get the
-  // old value many times (NPROC actually... unless only proc 0 has the old value?).
-  vevap_int_ = Process::mp_sum(vevap_int_);
-  Cerr << "vevap_int_(micro+meso) = " << vevap_int_ << " time = " << integration_time_ << finl;
+  // GB 2023.04.07: a time integral. Formulae modified but not validated.
+  const double collect_vevap = Process::mp_sum(instant_vmicro_evap_ + instant_vmeso_evap_)*dt;
+  if (Process::je_suis_maitre())
+    {
+      vevap_int_ +=collect_vevap;
+      Cerr << "vevap_int_(micro+meso) = " << vevap_int_ << " time = " << integration_time_ << finl;
+    }
 }
 
 // correct mpoint with values from TCL model.

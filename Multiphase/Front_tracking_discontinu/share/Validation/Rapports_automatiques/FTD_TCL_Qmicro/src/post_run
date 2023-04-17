@@ -17,7 +17,7 @@ if [ -f lata/post-ascii.lata ] ; then
    do
       time=$(echo $fic | awk -FFACES. '{print $2}')
       sed '1d;$d' $fic | awk 'NR == 1 { xmax=$1; xcl=$1; ymax=$2; ymin=$2; rmin=sqrt($1*$1+$2*$2) ; rmax=sqrt($1*$1+$2*$2) }
-      { r=sqrt($1*$1+$2*$2); if ($1>xmax) xmax=$1; if ($2>ymax) ymax=$2; if ($2<ymin) {ymin=$2; rcl=$1}; if (r>rmax) rmax=r; if (r<rmin) rmin=r; }
+      { r=sqrt($1*$1+$2*$2); if ($1>xmax) xmax=$1; if ($2>ymax) ymax=$2; if ($2<ymin) {ymin=$2; xcl=$1}; if (r>rmax) rmax=r; if (r<rmin) rmin=r; }
       END {printf "%g %g %g %g %g %g %g\n", "'$time'", rmin, rmax, xmax, ymax, ymin, xcl}' >> interface-position.txt
       echo -n "."
    done

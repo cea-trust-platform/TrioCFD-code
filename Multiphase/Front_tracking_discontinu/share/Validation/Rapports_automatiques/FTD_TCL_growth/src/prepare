@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# Coarsening/Lightening case and reducing domain :
-sed -e "s/nombre_de_noeuds 601 901/nombre_de_noeuds 151 251/" \
-    -e "s/transformer dom x*0.006 y*0.009/transformer dom x*0.003 y*0.005/" \
-    -e "s/ dt_max .*/ dt_max 5E-7/"  \
-    -e "s/ tmax .*/ tmax 5e-3/" source.data > COA_source.data
-
-
