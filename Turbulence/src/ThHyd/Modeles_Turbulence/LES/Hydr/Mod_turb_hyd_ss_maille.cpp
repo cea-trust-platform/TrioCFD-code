@@ -23,9 +23,13 @@
 #include <Equation_base.h>
 #include <Probleme_base.h>
 #include <Param.h>
+#include <Discretisation_base.h>
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Debog.h>
 #include <stat_counters.h>
+#include <Paroi_std_hyd_VEF_diphasique.h>
+#include <Paroi_std_hyd_VDF_diphasique.h>
+#include <Milieu_base.h>
 
 Implemente_base_sans_constructeur(Mod_turb_hyd_ss_maille,"Mod_turb_hyd_ss_maille",Mod_turb_hyd_base);
 
@@ -84,6 +88,43 @@ void Mod_turb_hyd_ss_maille::discretiser()
   champs_compris_.ajoute_champ(energie_cinetique_turb_);
 }
 
+// E.Saikali
+// In the current version of TrioCFD and the FT part in particular, it is possible only to use LES WALE (Smagorinsky,1963,Mon.Weather Rev. 91,99)
+// For this reason, associating the wall laws of multi-phase flows is done in this method Mod_turb_hyd_ss_maille::completer()
+// We only go inside if the user defines the wall law as loi_standard_hydr, for both discretizations VEF and VDF
+// Otherwise, in the case of negligeable, the multiphase wall law is not used
+void Mod_turb_hyd_ss_maille::verifie_loi_paroi_diphasique()
+{
+  const Milieu_base& mil = equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
+  const Nom& nom_mil = mil.que_suis_je();
+  const Nom& nom_loipar = loipar.valeur().que_suis_je();
+  const Nom& nom_eq = equation().que_suis_je();
+
+  if ( ( nom_loipar  == "loi_standard_hydr_VEF" || nom_loipar == "loi_standard_hydr_VDF" ) &&
+       nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique")
+    {
+      const Nom& discr = equation().discretisation().que_suis_je();
+      if (discr == "VEF" || discr == "VEFPreP1B")
+        {
+          loipar.typer("loi_standard_hydr_diphasique_VEF");
+          Paroi_std_hyd_VEF_diphasique& lp = ref_cast(Paroi_std_hyd_VEF_diphasique,loipar.valeur());
+          Cerr << "Associating the two-phase hydraulic wall turbulence model : " << lp.que_suis_je() << finl;
+        }
+      else if (discr == "VDF")
+        {
+          loipar.typer("loi_standard_hydr_diphasique_VDF");
+          Paroi_std_hyd_VDF_diphasique& lp = ref_cast(Paroi_std_hyd_VDF_diphasique,loipar.valeur());
+          Cerr << "Associating the two-phase hydraulic wall turbulence model : " << lp.que_suis_je() << finl;
+        }
+      else
+        {
+          Cerr << "Unknown discretization type !!!";
+          Process::exit(-1);
+        }
+      loipar.valeur().associer_modele(*this);
+      loipar.valeur().associer(equation().domaine_dis(),equation().domaine_Cl_dis());
+    }
+}
 
 // Precondition:
 // Parametre:
@@ -99,8 +140,9 @@ void Mod_turb_hyd_ss_maille::discretiser()
 // Postcondition:
 void Mod_turb_hyd_ss_maille::completer()
 {
+  Cerr << "Mod_turb_hyd_ss_maille::completer()" << finl;
+  verifie_loi_paroi_diphasique();
 }
-
 
 void Mod_turb_hyd_ss_maille::mettre_a_jour(double )
 {

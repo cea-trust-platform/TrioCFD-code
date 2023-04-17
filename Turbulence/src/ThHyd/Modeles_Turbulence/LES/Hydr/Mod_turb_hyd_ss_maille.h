@@ -44,7 +44,8 @@ public:
   Mod_turb_hyd_ss_maille();
   void set_param(Param& param) override;
   void discretiser() override;
-  int preparer_calcul()  override;
+  void verifie_loi_paroi_diphasique();
+  int preparer_calcul() override;
   void completer() override;
   void mettre_a_jour(double ) override;
   inline virtual Champ_Fonc& energie_cinetique_turbulente() { return energie_cinetique_turb_; }
