@@ -1,21 +1,15 @@
-*.log
-build/
-.check_sources.ok
+# Temporary files (editors or configuration files)
+*~
+.*
+
 configure
+Makefile
 env_TrioCFD.sh
 full_env_TrioCFD.sh
-TrioCFD
-TrioCFD_opt
-TrioCFD_semi_opt
-Makefile
+triocfd
+triocfd_opt
+triocfd_semi_opt
 README.BALTIK
 index.html
-.test*
-Lois_eau_c3.h.bak
-Lois_R12_c1.h.bak
+build/
 local/
-
-# Eclipse
-.cproject
-.project
-.settings/
