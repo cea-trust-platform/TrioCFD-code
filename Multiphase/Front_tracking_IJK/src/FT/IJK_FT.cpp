@@ -1327,7 +1327,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     }
   statistiques().end_count(dt_counter_);
 
-  return  dt;
+  return dt;
 }
 
 // Methode appelee par run() une fois la memoire alouee pour les champs.
@@ -1380,45 +1380,43 @@ int IJK_FT_double::initialise()
               // Cette methode parcours ni(), nj() et nk() et donc pas les ghost...
               set_field_data(velocity_[i], expression_vitesse_initiale_[i]);
             }
-
+          // duCluzeau 
     	  // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
     	  // si on commence le calcul à t !=0 avec un decallage
 
-          std::cout << " ########### INITITATE VELOCITY #############" << std::endl;
-
-          //velocity_[0].change_to_sheared_reference_frame(1, 1);
-          //velocity_[1].change_to_sheared_reference_frame(1, 2);
-          //velocity_[2].change_to_sheared_reference_frame(1, 3);
-
-
+          velocity_[0].change_to_sheared_reference_frame(1, 1);
+          velocity_[1].change_to_sheared_reference_frame(1, 2);
+          velocity_[2].change_to_sheared_reference_frame(1, 3);
 
           velocity_[0].echange_espace_virtuel(2);
           velocity_[1].echange_espace_virtuel(2);
           velocity_[2].echange_espace_virtuel(2);
 
-          for (int dir = 0; dir < 3; dir++)
-          {
-			  std::cout << std::endl;
-			  std::cout << " ########### DIR = " << dir <<"  #############" << std::endl;
-			  std::cout << std::endl;
-        	  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
-        	  {
-        		  std::cout << "j=" << j << std::endl;
-    			  std::cout << std::endl;
+          // permet de checker les espaces_virtuel
 
-        		  for (int i = velocity_[dir].ni() + 1; i > -3; i--)
-        		  {
-        			  std::cout << "i=" << i << " : ";
-        			  for (int k = -2; k < velocity_[dir].nk() + 2; k++)
-        			  {
-        				  std::cout << velocity_[dir](i,j,k) - 1. << " ";
-        			  }
-        			  std::cout << std::endl;
-        		  }
-
-    			  std::cout << std::endl;
-        	  }
-          }
+//          for (int dir = 0; dir < 3; dir++)
+//          {
+//			  std::cout << std::endl;
+//			  std::cout << " ########### DIR = " << dir <<"  #############" << std::endl;
+//			  std::cout << std::endl;
+//        	  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
+//        	  {
+//        		  std::cout << "j=" << j << std::endl;
+//    			  std::cout << std::endl;
+//
+//        		  for (int i = velocity_[dir].ni() + 1; i > -3; i--)
+//        		  {
+//        			  std::cout << "i=" << i << " : ";
+//        			  for (int k = -2; k < velocity_[dir].nk() + 2; k++)
+//        			  {
+//        				  std::cout << velocity_[dir](i,j,k) - 1. << " ";
+//        			  }
+//        			  std::cout << std::endl;
+//        		  }
+//
+//    			  std::cout << std::endl;
+//        	  }
+//          }
 
         }
     }
@@ -1438,11 +1436,6 @@ int IJK_FT_double::initialise()
 //          velocity_[1].data() += expression_vitesse_initiale_;
 //          velocity_[2].data() += expression_vitesse_initiale_;
         }
-	  // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
-	  // si on commence le calcul à t !=0 avec un decallage
-      velocity_[0].change_to_sheared_reference_frame(1, 1);
-      velocity_[1].change_to_sheared_reference_frame(1, 2);
-      velocity_[2].change_to_sheared_reference_frame(1, 3);
 
 
 #ifdef CONVERT_AT_READING_FROM_NURESAFE_TO_ADIM_TRYGGVASON_FOR_LIQUID_VELOCITY
@@ -2630,7 +2623,6 @@ void IJK_FT_double::run()
       statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
-
       current_time_ += timestep_;
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
@@ -2998,21 +2990,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   static Stat_Counter_Id calcul_dv_counter_ = statistiques().new_counter(2, "maj vitesse : calcul derivee vitesse");
   statistiques().begin_count(calcul_dv_counter_);
   // Calcul d_velocity = convection
-
-//  for (int dir = 0; dir < 4; dir++)
-//  {
-//	  for (int i = -2; i < velocity_[dir].ni() + 2; i++)
-//	  {
-//		  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
-//		  {
-//			  for (int k = -2; k < velocity_[dir].nk() + 2; k++)
-//			  {
-//				  if (velocity_[0](i,j,k) != 1.)
-//				  {
-//					 std::cout << i << " " << j << " " << k<< " " << velocity_[0](i,j,k) << std::endl;
-//				  }
-//			  }}}}
-
   if (!disable_convection_qdm_)
     {
       if (type_velocity_convection_form_== Nom("non_conservative_simple"))
@@ -3844,12 +3821,12 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 	  // advecter le champ de vitesse fluctuantes par le champ de vitesse moyen cisaille pendant la duree du pas de temps
 	  // a n'utiliser que si on resoud le systeme en u' et pas en U.
 	  // on n'advecte pas la pression car ce n'est pas une grandeur transportée
-	  if (resolution_fluctuations_)
-	  {
-	  velocity_[0].change_to_sheared_reference_frame(1., 1, 0);
-	  velocity_[1].change_to_sheared_reference_frame(1., 2, 0);
-	  velocity_[2].change_to_sheared_reference_frame(1., 3, 0);
-	  }
+	  // if (resolution_fluctuations_)
+	  //{
+	  //velocity_[0].change_to_sheared_reference_frame(1., 1, 0);
+	  //velocity_[1].change_to_sheared_reference_frame(1., 2, 0);
+	  //velocity_[2].change_to_sheared_reference_frame(1., 3, 0);
+	  //}
       //statistiques().begin_count(projection_counter_);
       if (include_pressure_gradient_in_ustar_)
         {
@@ -4378,7 +4355,7 @@ void IJK_FT_double::update_rho_v()
     }
 }
 
-
+// Transfert du maillage ft vers ns de champs aux faces :
 void IJK_FT_double::transfer_ft_to_ns()
 {
   for (int dir = 0; dir < 3; dir++)

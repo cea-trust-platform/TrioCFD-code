@@ -91,8 +91,6 @@ void OpConvCentre4IJK_double::exec_after_divergence_flux_(IJK_Field_double& resu
 template <DIRECTION _DIR_, DIRECTION _VCOMPO_>
 void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
-
-
   // convected field
   const IJK_Field_local_double& src = get_input(_VCOMPO_);
   // Convected vector field:
@@ -160,7 +158,6 @@ void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const 
       {
         for (int i = 0; i < imax; i += vsize)     // specific coding for uniform mesh in x and y: surfaces are constant on an xy plane
           {
-
             Simd_double vit_0_0,vit_0,vit_1,vit_1_1; // 4 adjacent velocity values
             src_ptr.get_leftleft_left_center_right(_DIR_,i,vit_0_0,vit_0,vit_1,vit_1_1);
 
@@ -175,26 +172,6 @@ void OpConvCentre4IJK_double::compute_flux_(IJK_Field_local_double& resu, const 
             Simd_double psc = vconv0 * constant_factor0 + vconv1 * constant_factor1;
             // with porosity we would code this: vconv = (vconv0 * porosity0 + vconv1 * porosity1) * constant_factor;
             Simd_double flux_conv = order4_velocity * psc;
-
-			// if((_DIR_ == DIRECTION::X && _VCOMPO_==DIRECTION::Z))// || (_DIR_ == DIRECTION::Z && _VCOMPO_==DIRECTION::X))
-			// {
-			//if(k_layer==first_global_k_layer || k_layer==last_global_k_layer )
-
-//            if (flux_conv.data_ == 1.25e-7)
-//			  {
-//			  std::cout << "k_layer = " << k_layer <<std::endl;
-////			  std::cout << "_DIR_ = " << _DIR_ <<std::endl;
-////			  std::cout << "_VCOMPO_ = " << _VCOMPO_ <<std::endl;
-//			  std::cout << "flux_conv  = " << flux_conv.data_  <<std::endl;
-//			  std::cout << "vit_0_0 = " << vit_0_0.data_ <<std::endl;
-//			  std::cout << "vit_0 = " << vit_0.data_ <<std::endl;
-//			  std::cout << "vit_1 = " << vit_1.data_ <<std::endl;
-//			  std::cout << "vit_1_1 = " << vit_1_1.data_ <<std::endl;
-//			  std::cout << "vconv0 = " << vconv0.data_ <<std::endl;
-//			  std::cout << "vconv1 = " << vconv1.data_ <<std::endl;
-//			  std::cout << " " <<std::endl;
-//			  }
-
 
             resu_ptr.put_val(i, flux_conv);
           }
