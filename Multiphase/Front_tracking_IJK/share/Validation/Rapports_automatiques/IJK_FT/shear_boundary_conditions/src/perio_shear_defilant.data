@@ -2,14 +2,15 @@ IJK_Grid_Geometry DOM
 
 Lire DOM
 {
-  nbelem_i 12
-  nbelem_j 12
-  nbelem_k 48 
+  nbelem_i 48 # 96 #
+  nbelem_j 12 # 24 #
+  nbelem_k 12 # 24 #
   uniform_domain_size_i 0.006
   uniform_domain_size_j 0.006
   uniform_domain_size_k 0.003
   perio_i
   perio_j
+  perio_k # need perio_k for mixte shear condition, only DU at z=0(z=Lz) is imposed #
 }
 
 IJK_Splitting grid_splitting
@@ -17,31 +18,33 @@ Lire grid_splitting
 {
   ijk_grid_geometry DOM
   nproc_i 1
-  nproc_j 1
-  nproc_k 1
+  nproc_j 2
+  nproc_k 2
 }
 
 IJK_FT_double
 {
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 0 # To be checked.. #
-  timestep 0.9e-4
+  timestep 1.e-1
   time_scheme euler_explicit  # RK3_FT #
-  type_velocity_convection_op Centre
+  type_velocity_convection_op Centre 
   Boundary_Conditions {
-    bctype_kmin Paroi
-    bctype_kmax Paroi
-    vx_kmin -1.
-    vx_kmax 1.
+    bctype_kmin Mixte_shear
+    bctype_kmax Mixte_shear
+    dU_perio 0.625 
+    t0_shear 0.0
+    defilement 1
+    resolution_u_prime 0
   }
 
-  timestep_facsec 1.0
+  timestep_facsec 0.1
   cfl 1.0
   fo  1.0
   oh  1.0
   dt_post 10
-  dt_post_stats_bulles 1
-  dt_post_stats_plans 1
+  dt_post_stats_bulles 100
+  dt_post_stats_plans 100
   t_debut_statistiques 0.0
 
   disable_diphasique
@@ -50,10 +53,11 @@ IJK_FT_double
   # ajouter disable solver poisson #
   # disable_solveur_poisson #
 
-  champs_a_postraiter 3 VELOCITY PRESSURE D_VELOCITY
+
+  champs_a_postraiter 4 VELOCITY PRESSURE D_VELOCITY PRESSURE_RHS 
   check_stop_file stop.txt
   dt_sauvegarde 5000
-  nb_pas_dt_max 10
+  nb_pas_dt_max 100
   
   multigrid_solver {
     solver_precision mixed
@@ -68,17 +72,14 @@ IJK_FT_double
   }
 
   check_divergence
-  # gravite 3 -9.81 0.0 0.0 #
-  # terme_force_init 10855.866965787514 = (0.059688461999999984*87.545+(1.0-0.059688461999999984)*1171.3)*9.81 terme_force_init 10.  #
   rho_liquide 1000.
   mu_liquide 1e-3
-  # sigma 0.07 #
 
-  # plutot utiliser une vitesse imposee #
-  # expression_vx_init 0.001*(4*z/0.003-4*z*z/0.000009) #
-  expression_vx_init 1.-2*z/0.003
+  expression_vx_init -(0.625/2.)*(1.-2*z/0.003)
   expression_vy_init 0.
-  expression_vz_init 0. 
+  expression_vz_init x*(1.-x/0.006)
+
+
   
 }
 Fin

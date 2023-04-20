@@ -18,8 +18,8 @@ Lire grid_splitting
 {
   ijk_grid_geometry DOM
   nproc_i 1
-  nproc_j 1  
-  nproc_k 1
+  nproc_j 2
+  nproc_k 2
 }
 
 IJK_FT_double
@@ -42,6 +42,9 @@ IJK_FT_double
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear
     dU_perio 0.1
+    t0_shear 0.0
+    defilement 1
+    resolution_u_prime 0
   }
   timestep_facsec 1.0
   cfl 1.0
@@ -106,7 +109,7 @@ IJK_FT_double
   # REPRISE #
   # nom_reprise diph_init.sauv 
  timestep_reprise_vitesse 1 #
-  expression_vx_init 0.2-0.1*z/0.001
+  expression_vx_init 0.1*z/0.001
   expression_vy_init 0.0
   expression_vz_init 0.0 
 }
