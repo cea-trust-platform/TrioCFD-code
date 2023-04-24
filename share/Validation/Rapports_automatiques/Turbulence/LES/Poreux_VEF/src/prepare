@@ -1,9 +1,26 @@
 #!/bin/bash
 
+TCFD_REP_TEST=${project_directory}/tests/Reference/Turbulence/LES
+TRUS_REP_TEST=${TRUST_ROOT}/tests/Reference
+
 for cas in Poreux_VEF_2D Poreux_VEF_3D Poreux_VEF_3D_EFstab Poreux_VEF_3D_turb Poreux_VEF_Poiseuille
 do
-    [ ! -d $cas ] && copie_cas_test $cas
-    [ ! -d $cas ] && copie_cas_test $cas $TRUST_ROOT/tests
+    if [ ! -d $cas ]
+    then
+      if [[ -d ${TCFD_REP_TEST}/${cas} ]]
+      then
+        # copie_cas_test $cas
+        cp -R ${TCFD_REP_TEST}/${cas} ./
+      elif [[ -d ${TRUS_REP_TEST}/${cas} ]]
+      then
+        # copie_cas_test $cas $TRUST_ROOT/tests
+        cp -R ${TRUS_REP_TEST}/${cas} ./
+      else
+        echo -e "Error: the test cas ${cas} has not been found !"
+        exit 1
+      fi
+    fi
+
     (cd $cas ; sed "s/champs dt_post/format lata champs dt_post/" $cas.data > p; mv p $cas.data )
     # echo "	CasTest \"$cas\" \"$cas.data\""
 done

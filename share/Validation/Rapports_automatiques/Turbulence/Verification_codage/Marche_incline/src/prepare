@@ -1,8 +1,11 @@
 #!/bin/bash
+
 if [ ! -d Marche_incline ]
 then
-   copie_cas_test Marche_incline || exit -1
+  # copie_cas_test Marche_incline || exit -1
+  cp -R ${project_directory}/tests/Reference/Turbulence/Turbulence/Marche_incline ./ || exit 1
 fi
+
 cd Marche_incline
 rm -f verifie
 for cas in Marche Marche_y Marche_incline
