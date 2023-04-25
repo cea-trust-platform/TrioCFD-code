@@ -6,9 +6,9 @@ configure
 Makefile
 env_TrioCFD.sh
 full_env_TrioCFD.sh
-triocfd
-triocfd_opt
-triocfd_semi_opt
+TrioCFD
+TrioCFD_opt
+TrioCFD_semi_opt
 README.BALTIK
 index.html
 build/
