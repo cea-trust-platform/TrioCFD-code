@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function useLibC3()
+{
+  project_directory="$( cd -- "$(dirname "$0")/../.." >/dev/null 2>&1 ; pwd -P )"
+
+  if [[ ${project_directory} == "" ]]
+  then
+    echo -e "Error: 'project_directory' is not defined!" 
+  fi
+
+  if [ -e "${project_directory}/share/archives/libC3.tar.gz" ]
+  then
+
+    # The number of prerequisite is gotten and incremented
+    NB=$(grep -riE "\[prerequisite[0-9]+\]" ${project_directory}/project.cfg | wc -l)
+    NB=$(($NB + 1))
+
+   # Modification of the 'project.cfg' configuration file
+   echo -e "
+[prerequisite${NB}]
+name : libC3
+prog_test : test_ftsatp.cpp 
+librairies_flag : -lC3" >> ${project_directory}/project.cfg
+
+    sed -i 's/HAVE_LIBC3 0/HAVE_LIBC3 1/g' ${project_directory}/src/Multiphase/CMFD/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+    sed -i 's/HAVE_LIBC3 0/HAVE_LIBC3 1/g' ${project_directory}/src/Multiphase/CMFD/ThHyd/Multiphase/Milieu/Lois_R12_c1.h
+  else
+    sed -i 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' ${project_directory}/src/Multiphase/CMFD/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+    sed -i 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' ${project_directory}/src/Multiphase/CMFD/ThHyd/Multiphase/Milieu/Lois_R12_c1.h
+  fi
+}
+
+# ------------------------------------------------------------------------------ 
+# Beginnig of the script
+# ------------------------------------------------------------------------------
+
+useLibC3
+
+exit 0
