@@ -266,7 +266,7 @@ do
     git mv ${rep}/share/archives/* ./share/archives
     [[ $? -ne 0 ]] && exitOnError "Problem during mv share/archives"
     rmdir ${rep}/share/archives
-    monTexte="[prerequisite1]\nname : fftw-3.3.8\nprog_test : test_fftw3.cpp\nlibrairies_flag : -lfftw3_mpi -lfftw3\nconfigure_flag : --enable-mpi --enable-shared\n"
+    monTexte="[prerequisite1]\nname : fftw-3.3.8\nprog_test : test_fftw3.cpp\nlibrairies_flag : -lfftw3_mpi -lfftw3\nconfigure_flag : --enable-mpi --enable-shared --with-pic\n"
     sed -ri "s/(^\[dependencies\]$)/${monTexte}\1/gmi" ./project.cfg
   fi
   
