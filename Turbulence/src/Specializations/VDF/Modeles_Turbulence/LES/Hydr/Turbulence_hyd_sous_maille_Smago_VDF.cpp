@@ -103,7 +103,8 @@ void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
   int elem;
   DoubleTab psc(dimension,dimension);
 
-  DoubleTab duidxj(nb_elem_tot,dimension,dimension);
+  assert (vitesse.line_size() == 1);
+  DoubleTab duidxj(nb_elem_tot,dimension,dimension, vitesse.line_size());
 
   vit.calcul_duidxj(vitesse,duidxj,domaine_Cl_VDF);
 
@@ -115,7 +116,7 @@ void Turbulence_hyd_sous_maille_Smago_VDF::calculer_S_barre()
         for ( j=0 ; j<dimension ; j++)
           //Deplacement du calcul de Sij
           {
-            Sij=0.5*(duidxj(elem,i,j) + duidxj(elem,j,i));
+            Sij=0.5*(duidxj(elem,i,j,0) + duidxj(elem,j,i,0));
             temp+=Sij*Sij;
           }
       SMA_barre_(elem)=2.*temp;

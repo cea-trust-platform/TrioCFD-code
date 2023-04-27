@@ -850,7 +850,7 @@ void Sonde_IJK::postraiter()
             Cerr << " Error in Sonde_IJK::postraiter() "
                  << " L'extension est non-nulle donc splitting_ et splitting_ft_ different."
                  << " Le champ demande n'est pas discretise sur le domaine etendu "
-                 << "alors que la Domaine_VF est construite sur ce domaine..."  << finl;
+                 << "alors que le Domaine_VF est construit sur ce domaine..."  << finl;
             Process::exit();
           }
         for (int idx =0; idx < nb_pts; idx++)

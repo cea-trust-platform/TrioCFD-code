@@ -43,7 +43,7 @@ public:
   {
     return 1; /* on a besoin de grad u */
   };
-  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
+  virtual void modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
 private:
   double delta_ = 1.3 ; // rapport volume perturbe par la bulle / volume de la bulle
   double gamma_ = 1. ; //rapport d'aspect des bulles

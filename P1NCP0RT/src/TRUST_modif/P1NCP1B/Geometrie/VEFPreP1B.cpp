@@ -62,7 +62,6 @@ Entree& VEFPreP1B::readOn(Entree& is )
   param.ajouter_flag("RT", &alphaRT_); // XD_ADD_P rien For P1NCP1B
   param.ajouter("modif_div_face_dirichlet",&modif_div_face_dirichlet_); // XD_ADD_P  int (into=[0,1]) This option (by default 0) is used to extend control volumes for the momentum equation.
   param.ajouter("CL_pression_sommet_faible", &cl_pression_sommet_faible_); // XD_ADD_P  int (into=[0,1]) This option is used to specify a strong formulation (value set to 0, the default) or a weak formulation (value set to 1) for an imposed pressure boundary condition. The first formulation converges quicker and is stable in general cases. The second formulation should be used if there are several outlet boundaries with Neumann condition (see Ecoulement_Neumann test case for example).
-
   param.lire_avec_accolades(is);
 
   // Quelques verifications
@@ -297,9 +296,9 @@ void VEFPreP1B::domaine_Cl_dis(Domaine_dis& z,
   Cerr << "discretisation des conditions limites OK" << finl;
 }
 
-void VEFPreP1B::discretiser(Domaine_dis& dom) const
+void VEFPreP1B::discretiser(REF(Domaine_dis)& dom) const
 {
   Discretisation_base::discretiser(dom);
-  Domaine_VEF_PreP1b& zvef = ref_cast(Domaine_VEF_PreP1b, dom.valeur());
+  Domaine_VEF_PreP1b& zvef = ref_cast(Domaine_VEF_PreP1b, dom.valeur().valeur());
   zvef.discretiser_suite(*this);
 }

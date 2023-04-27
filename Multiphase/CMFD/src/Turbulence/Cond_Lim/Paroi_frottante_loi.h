@@ -36,6 +36,7 @@ class Paroi_frottante_loi : public Frottement_global_impose
   Declare_instanciable(Paroi_frottante_loi);
 
 public :
+  void completer() override ;
   virtual int initialiser(double temps) override;
   virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps) override;
@@ -59,10 +60,11 @@ protected :
   double beta_omega = 0.075;
   double beta_k = 0.09;
 
-  double y_p_prod_k_ = 2. ;
-  double fac_prod_k_ = 1. ;
-  double y_p_prod_k_grand_ = 150. ;
-  double fac_prod_k_grand_ = .4 ;
+  // Initialized at 0. and adapted in the readOn depending on turbulence selected
+  double y_p_prod_k_ = -1.e8 ;
+  double fac_prod_k_ = -1.e8 ;
+  double y_p_prod_k_grand_ = -1.e8 ;
+  double fac_prod_k_grand_ = -1.e8 ;
 };
 
 #endif

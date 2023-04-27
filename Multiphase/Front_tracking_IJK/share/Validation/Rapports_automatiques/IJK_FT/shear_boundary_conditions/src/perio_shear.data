@@ -56,6 +56,7 @@ IJK_FT_double
   champs_a_postraiter 3 VELOCITY PRESSURE D_VELOCITY
   check_stop_file stop.txt
   dt_sauvegarde 5000
+  tinit 0
   nb_pas_dt_max 10
   
   multigrid_solver {
@@ -85,4 +86,5 @@ IJK_FT_double
   expression_vz_init 0. 
   
 }
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 Fin

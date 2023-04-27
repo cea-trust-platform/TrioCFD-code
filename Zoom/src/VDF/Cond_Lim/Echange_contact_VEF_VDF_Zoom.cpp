@@ -68,12 +68,12 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       le_pb2G=pbMG.pb_2G(indice_pb);
 
       const Domaine_dis_base& domaine_disG = pbG.domaine_dis();
-      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_disG); // ce doit etre en principe une domaine VDF !!!
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_disG); // ce doit etre en principe un domaine VDF !!!
       const IntTab& face_voisinsG = zvdf.face_voisins();
       const DoubleVect& surfacesVDF = zvdf.face_surfaces();
 
       const Domaine_dis_base& domaine_disF = pbF.domaine_dis();
-      const Domaine_VEF& zvef = ref_cast(Domaine_VEF, domaine_disF); // ce doit etre en principe une domaine VEF !!!
+      const Domaine_VEF& zvef = ref_cast(Domaine_VEF, domaine_disF); // ce doit etre en principe un domaine VEF !!!
       const IntTab& face_voisinsF = zvef.face_voisins();
 
 

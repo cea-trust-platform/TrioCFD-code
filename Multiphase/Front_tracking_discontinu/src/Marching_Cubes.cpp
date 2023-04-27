@@ -142,7 +142,7 @@ int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
   if (! ref_domaine_vf_.non_nul())
     {
       Cerr << "Marching_Cubes::construire_iso : Erreur :" << finl;
-      Cerr << " Aucune domaine n'a ete associee a Marching_Cubes" << finl;
+      Cerr << " Aucun domaine n'a ete associe a Marching_Cubes" << finl;
       assert(0);
       exit();
     }
@@ -165,7 +165,7 @@ int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
   //  Pour un sommet sur une face de bord
   //   def_noeud(i,2) = nproc()
   //   def_noeud(i,3) = i
-  //   def_noeud(i,4) = numero de la face de bord dans la domaine
+  //   def_noeud(i,4) = numero de la face de bord dans le domaine
   // Un meme sommet (ie, meme segment) peut figurer plusieurs fois comme sommet
   // interne, sommet de bord et/ou sommet de joint.
   IntTab def_noeud;
@@ -293,7 +293,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
   if (! ref_domaine_vf_.non_nul())
     {
       Cerr << "Marching_Cubes::construire_iso : Erreur :" << finl;
-      Cerr << " Aucune domaine n'a ete associee a Marching_Cubes" << finl;
+      Cerr << " Aucun domaine n'a ete associe a Marching_Cubes" << finl;
       assert(0);
       exit();
     }
@@ -793,7 +793,7 @@ int Marching_Cubes::construire_noeuds_et_facettes(const ArrOfBit& signe,
  *
  *   Soit faces_sommets est une liste de faces d'un joint, dans ce cas, numero_PE
  *   est le PE_voisin du joint.
- *   Soit faces_sommets est la liste des faces de la domaine et nb_faces_a_traiter
+ *   Soit faces_sommets est la liste des faces du domaine et nb_faces_a_traiter
  *   est le nombre de faces de bord. Dans ce cas, numero_PE = nproc().
  *
  */
@@ -880,7 +880,7 @@ void Marching_Cubes::construire_noeuds_joints(const ArrOfBit& signe,
   const Domaine_VF& domaine_vf = ref_domaine_vf_.valeur();
   // Creation des sommets situes sur les faces de bord
   {
-    // Les faces de bord sont les premieres faces de la domaine
+    // Les faces de bord sont les premieres faces du domaine
 
     const IntTab& faces_sommets = domaine_vf.face_sommets();
     const int numero_PE = Process::nproc();

@@ -195,7 +195,7 @@ void Remaillage_FT::set_param(Param& p)
   p.ajouter("lissage_courbure_iterations_si_remaillage", &lissage_courbure_iterations_si_remaillage_);
 }
 
-/*! @brief Cette fonction stocke la domaine_dis dans refdomaine_dis_
+/*! @brief Cette fonction stocke le domaine_dis dans refdomaine_dis_
  *
  * @param (domaine_dis) domaine discretisee de calcul
  * @return le flot d'entree

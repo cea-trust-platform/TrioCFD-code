@@ -332,11 +332,11 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
 
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans la Domaine_VEF:
+  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
   //  - polyedres bords et joints
   //  - polyedres bords et non joints
   // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans la domaine
+  // dans le domaine
 
   // boucle sur les polys
   int phi_u_transportant_yes=phi_u_transportant(equation());

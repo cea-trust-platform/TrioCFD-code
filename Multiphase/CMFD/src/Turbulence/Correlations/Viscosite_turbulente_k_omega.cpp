@@ -21,10 +21,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Viscosite_turbulente_k_omega.h>
-#include <Param.h>
+#include <Pb_Multiphase.h>
+#include <Masse_ajoutee_base.h>
+#include <TRUSTTab_parts.h>
 #include <Probleme_base.h>
 #include <Champ_base.h>
-#include <TRUSTTab_parts.h>
+#include <Param.h>
 
 Implemente_instanciable(Viscosite_turbulente_k_omega, "Viscosite_turbulente_k_omega", Viscosite_turbulente_base);
 
@@ -39,21 +41,50 @@ Entree& Viscosite_turbulente_k_omega::readOn(Entree& is)
   param.ajouter("limiter|limiteur", &limiter_);
   param.ajouter("sigma", &sigma_);
   param.ajouter("beta_k", &beta_k_);
+  param.ajouter("gas_turb", &gas_turb_);
   param.lire_avec_accolades_depuis(is);
+
   return is;
+}
+
+void Viscosite_turbulente_k_omega::completer()
+{
+  const Pb_Multiphase* pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr ;
+  if ( (gas_turb_) && !(pbm) ) Process::exit(que_suis_je() + " : there must be multiphase problem if you want gas phase turbulence !");
+  if ( (gas_turb_) && (!pbm->has_correlation("masse_ajoutee")) ) Process::exit(que_suis_je() + " : there must be an added mass correlation if you want gas phase turbulence !");
+  if ( (gas_turb_) && (!int(pbm->has_champ("alpha"))) ) Process::exit(que_suis_je() + " : there must be void fraction if you want gas phase turbulence !");
+  if (pbm->has_correlation("masse_ajoutee")) correlation_ = pbm->get_correlation("masse_ajoutee");
 }
 
 void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
 {
   //tout en explicite
   const DoubleTab& k = pb_->get_champ("k").passe(), &omega = pb_->get_champ("omega").passe(),
-                   &nu = pb_->get_champ("viscosite_cinematique").passe();
+                   &nu = pb_->get_champ("viscosite_cinematique").passe(),
+                    &rho = pb_->get_champ("masse_volumique").passe(),
+                     *alpha = pb_->has_champ("alpha") ? &(pb_->get_champ("alpha").passe()) : nullptr ;
   //il faut que nu_t et k aient la meme localisation et que nu_t ait au moins autant de composantes que k
   assert(k.dimension(1) <= nu_t.dimension(1));
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = (n < k.dimension(1)) ?  sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) )   : 0;
+      //      nu_t(i, n) = sigma_ * ( (omega(i,n*(k.dimension(1)-1)) > 0.) ?
+      //                   std::max(k(i, n*(k.dimension(1)-1)) / omega(i, n*(k.dimension(1)-1)), limiter_ * nu(i, n)):
+      //                   limiter_ * nu(i, n) )  ;
+      nu_t(i, n) = (n<k.dimension(1)) ? sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ) : 0. ;
+
+  if (gas_turb_)
+    {
+      DoubleTab coeff = DoubleTab(nu_t.dimension(1));
+      for (int i = 0; i < nu_t.dimension(0); i++)
+        {
+          const Masse_ajoutee_base& corr_ma_ = ref_cast(Masse_ajoutee_base, correlation_.valeur());
+          corr_ma_.coefficient( & (*alpha)(i,0), &rho(i,0), coeff);
+          for (int n = k.dimension(1) ; n < nu_t.dimension(1) ; n++)
+            nu_t(i, n) =  nu_t(i, 0.)  * (1. + coeff(n)* rho(i,0)/rho(i,n)) * std::min((*alpha)(i,n)*10, 1.) ;
+        }
+    }
+
 }
 
 void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
@@ -84,7 +115,7 @@ void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const
   int i, nl = k_sur_eps.dimension(0), n, N = k_sur_eps.dimension(1), Nt = omega.dimension(1);
   assert(nl == omega.dimension(0) && Nt <= N);
   for (i = 0; i < nl; i++)
-    for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/omega(i, n) : 0) : 0;
+    for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/(omega(i, n)*beta_k_) : 0) : 0;
 }
 
 void Viscosite_turbulente_k_omega::eps(DoubleTab& eps_) const

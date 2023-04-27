@@ -597,7 +597,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_dom
 
   int nb_coord_domaine_max = 0;
 
-  // recuperer les differentes coordonnees trouvees dans la domaine
+  // recuperer les differentes coordonnees trouvees dans le domaine
   for (int dim=0; dim<dimension; dim++)
     {
 
@@ -610,7 +610,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_dom
             {
               if (std::fabs(coord - coord_domaine(jj,dim)) < epsilon)
                 {
-                  // cette valeur de "coord" a deja ete trouvee dans la domaine
+                  // cette valeur de "coord" a deja ete trouvee dans le domaine
                   trouve_coord = 1;
                 }
             }
@@ -645,7 +645,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_dom
   coord_domaine.resize(nb_coord_domaine_max,dimension);
 
 
-  // remplir un tableau pour toutes les faces de la domaine ordonnees selon leurs coordonnees, avec des vides a -1
+  // remplir un tableau pour toutes les faces du domaine ordonnes selon leurs coordonnees, avec des vides a -1
   tab_domaine.resize(nb_coord_domaine(0),nb_coord_domaine(1),nb_coord_domaine(2));
   tab_domaine = -1;
   IntVect index(3);

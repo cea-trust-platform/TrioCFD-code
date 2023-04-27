@@ -14,7 +14,7 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_turb_PolyMAC_P0.h
+// File:        Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
 // Version:     /main/12
 //
@@ -23,9 +23,7 @@
 #ifndef Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0_included
 #define Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0_included
 
-#include <Source_base.h>
-#include <TRUSTTab.h>
-#include <TRUST_Ref.h>
+#include <Source_Diffusion_supplementaire_echelle_temp_turb.h>
 
 class Correlation;
 
@@ -35,27 +33,17 @@ class Correlation;
  *
  * @sa Operateur_PolyMAC_P0_base Operateur_base
  */
-class Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0: public Source_base
+class Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0: public Source_Diffusion_supplementaire_echelle_temp_turb
 {
   Declare_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0);
 public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  }
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
-
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-  void completer() override;
 
 protected :
   double limiter_ = 5 ;
   double limiter_tau_ = 1.e-6;
-  int f_grad_tau_fixe = 1 ;
+  int f_grad_tau_fixe = 0 ;
 };
 
 #endif

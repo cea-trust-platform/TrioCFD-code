@@ -30,7 +30,7 @@
 /*! @brief classe Flux_parietal_Kommajosyula classe qui implemente une correlation de flux parietal monophasique
  *
  *       pour un ecoulement turbulent avec une loi de paroi adaptative
- *       (i.e. qui peut gerer la domaine visqueuse comme la domaine log en proche paroi)
+ *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
  *       cf page 123 de la these de Kommajosyula
  *
  *
@@ -44,14 +44,19 @@ public:
   virtual void completer() override;
 
   int calculates_bubble_nucleation_diameter() const override {return 1;} ;
+  int needs_saturation() const override {return 1;} ;
 
 protected :
   Correlation correlation_monophasique_;
   double theta_ ; //contact angle on the surface
-  double molar_mass_ ; //contact angle on the surface
+  double molar_mass_ ; //molar mass (unit: kg/mol)
 
   double Lambert_W_function(double x) const;
+  double dx_Lambert_W_function(double x) const;
   double Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
+  double dTp_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
+  double dTl_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
+  double dTk_Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
 };
 
 #endif

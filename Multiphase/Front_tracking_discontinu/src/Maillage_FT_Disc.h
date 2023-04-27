@@ -279,7 +279,7 @@ protected:
 
   REF(Transport_Interfaces_FT_Disc) refequation_transport_;
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
-  // a la domaine_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
+  // au domaine_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
   // C'est initialise dans associer_domaine_dis.
   REF(Domaine_dis) refdomaine_dis_;
   // Pour la meme raison, ajout d'une ref au parcours de l'interface:

@@ -393,7 +393,7 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   param.ajouter("parcours_interface",&parcours_);
 
   // param.ajouter_non_std("terme_gravite",(this));
-  param.ajouter("terme_gravite", &terme_gravite_);
+  param.ajouter("terme_gravite", &terme_gravite_); // XD_ADD_P chaine(into=["rho_g","grad_i"]) not_set
   param.dictionnaire("rho_g", GRAVITE_RHO_G);
   param.dictionnaire("grad_i", GRAVITE_GRAD_I);
 
@@ -560,11 +560,11 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   // Calcul de la bounding box de Navier Stokes et stockage en memoire de la
   // perio.
   bounding_box_NS_domain_.resize(3, 2);
-  // Calcul de la domaine au-dela de laquelle une bulle doit etre repliquee.
-  // Cette domaine est une peu plus petite que la domaine NS_domain, si la bulle
+  // Calcul du domaine au-dela duquel une bulle doit etre repliquee.
+  // Cette domaine est une peu plus petite que le domaine NS_domain, si la bulle
   // depasse de cette domaine elle est dupliquee.
   bounding_box_duplicate_criteria_.resize(3, 2);
-  // Calcul de la domaine au-dela de laquelle une bulle est detruite et remplacee
+  // Calcul du domaine au-dela duquel une bulle est detruite et remplacee
   // par son duplicata a l'autre extremite du domaine.
   // Cette domaine est un peu plus petite que le domaine etendu ou evolue le
   // maillage FT.
@@ -584,9 +584,9 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           const double oriFT = geom_FT.get_origin(direction);
           const double lenFT = geom_FT.get_domain_length(direction);
           const double delta = geom_FT.get_constant_delta(direction);
-          // largeur de la domaine, au bord du domaine navier stokes, au sein de
+          // largeur du domaine, au bord du domaine navier stokes, au sein de
           // laquelle on declanche la duplication des bulles (si une bulle depasse a
-          // l'exterieur de la domaine, on duplique) Cette domaine tient compte du stencil
+          // l'exterieur du domaine, on duplique) Cette domaine tient compte du stencil
           // des forces de tension superficielle et de repulsion
           const double duplicate_stencil_width =
             std::max(1 * delta,
@@ -844,7 +844,7 @@ int IJK_Interfaces::posttraiter_champs_instantanes(const Motcles& liste_post_ins
   return n;
 }
 
-// Suppression des bulles dans la domaine a eliminer pres des bords periodiques
+// Suppression des bulles dans le domaine a eliminer pres des bords periodiques
 // definie par ncells_deleted_ Dans ce cas, le maillage est modifie:
 //  o Les ghosts sont supprimes de la sauvegarde.
 //  o Les bulles qui sortent du domaine defini via ncells_deleted_ sont
@@ -857,7 +857,7 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
   int flag = 0;
   if (Process::je_suis_maitre())
     {
-      // Calcul de la domaine dans laquelle une bulle est supprimee:
+      // Calcul du domaine dans lequelle une bulle est supprimee:
       bounding_box_delete_criteria_.resize(3, 2);
       const IJK_Grid_Geometry& geom_FT = ref_splitting_.valeur().get_grid_geometry();
       for (int direction = 0; direction < 3; direction++)
@@ -995,7 +995,7 @@ void IJK_Interfaces::sauvegarder_interfaces(const char *lata_name) // const
   timestep_sauvegarde_interface_ = 1;
   const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
 
-  // Suppression des bulles dans la domaine a eliminer pres des bords periodiques
+  // Suppression des bulles dans le domaine a eliminer pres des bords periodiques
   // lors de la sauvegarde.
   if (ncells_deleted_ > 0)
     supprimer_certaines_bulles_reelles();
@@ -4748,7 +4748,7 @@ void IJK_Interfaces::detecter_et_supprimer_rejeton(bool duplicatas_etaient_prese
 }
 
 // Rempli le champ de force de rappel pour les bulles fixes.
-// coef_rayon_force_rappel : coef de taille de la domaine de rappel const (attention aux superposition de bulles)
+// coef_rayon_force_rappel : coef de taille du domaine de rappel const (attention aux superposition de bulles)
 void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& rappel_ft,
                                               FixedVector<IJK_Field_double, 3>& rappel,
                                               const FixedVector<IJK_Field_double, 3>& vitesse,

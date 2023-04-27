@@ -434,9 +434,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  DoubleTab gij(nb_elem_tot,dimension,dimension);
   const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue().valeur() );
-
+  assert (vitesse.valeurs().line_size() == 1);
+  DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
 
   DoubleTab lambda_1(nb_elem_tot);
@@ -490,8 +490,8 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
       for (int i=0; i<Objet_U::dimension; i++)
         for (int j=0; j<Objet_U::dimension; j++)
           {
-            S_etoile(elem,i,j) = 0.5*( gij(elem,i,j) + gij(elem,j,i) ) * k_sur_eps;
-            R_etoile(elem,i,j) = 0.5*( gij(elem,i,j) - gij(elem,j,i) ) * k_sur_eps;
+            S_etoile(elem,i,j) = 0.5*( gij(elem,i,j,0) + gij(elem,j,i,0) ) * k_sur_eps;
+            R_etoile(elem,i,j) = 0.5*( gij(elem,i,j,0) - gij(elem,j,i,0) ) * k_sur_eps;
           }
 
       for (int i=0; i<Objet_U::dimension; i++)

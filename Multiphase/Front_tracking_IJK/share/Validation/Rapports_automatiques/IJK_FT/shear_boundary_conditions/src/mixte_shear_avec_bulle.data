@@ -59,6 +59,7 @@ IJK_FT_double
   champs_a_postraiter 11 COMPO_CONNEXE INDICATRICE VELOCITY PRESSURE COURBURE INTERFACES EXTERNAL_FORCE INTEGRATED_VELOCITY INTEGRATED_PRESSURE INTEGRATED_TIMESCALE INDICATRICE_PERTURBE
   check_stop_file stop.txt
   dt_sauvegarde 5000
+  tinit 0
   nb_pas_dt_max 10
   
   multigrid_solver {
@@ -113,4 +114,5 @@ IJK_FT_double
   expression_vy_init 0.0
   expression_vz_init 0.0 
 }
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 Fin

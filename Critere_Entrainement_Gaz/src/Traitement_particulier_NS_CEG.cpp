@@ -424,7 +424,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                 }
               if (elem>=0 && elem<nb_elem)
                 {
-                  // Point trouve dans la domaine reelle
+                  // Point trouve dans le domaine reel
                   points_trouves++;
                   if (critereQ(elem)<=min_critere_Q_sur_max_critere_Q_*critereQ_mp_max)
                     {

@@ -45,7 +45,7 @@ protected:
   // Tableau faces_voisins_ :
   //  dimension(0) = domaine.nb_faces_frontiere()
   //  dimension(1) = nombres d'aretes d'une face de bord
-  //  Contenu : faces_voisins_(i,j) est l'indice dans la domaine
+  //  Contenu : faces_voisins_(i,j) est l'indice dans le domaine
   //            de la face voisine de la face frontiere i par l'arete j.
   //            L'indice i est le numero d'une face frontiere reelle.
   //            L'indice j est un numero d'arete tel qu'il est defini dans
@@ -70,7 +70,7 @@ protected:
   //   Le numero du sommet est un numero local sur la face (compris entre 0
   //   et le nombre de sommets par face). Exemple:
   //    i_sommet   = def_face_arete_(i_arete, 0); // numero du sommet sur la face
-  //    num_sommet = domaine_vf.face_sommets(num_face, i_sommet); // numero du sommet dans la domaine
+  //    num_sommet = domaine_vf.face_sommets(num_face, i_sommet); // numero du sommet dans le domaine
   IntTab def_face_aretes_;
 
 private:

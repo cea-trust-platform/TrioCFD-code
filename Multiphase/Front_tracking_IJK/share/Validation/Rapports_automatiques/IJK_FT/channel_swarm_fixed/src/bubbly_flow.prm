@@ -7,7 +7,8 @@ Parametres {
 	CasTest . DNS_fixe_reprise.data 4
 	CasTest . DNS_fixe_reprise_reset.data 4
 	CasTest . switch.data
-        CasTest . DNS_canal_refine.data 4
+	CasTest . DNS_canal_refine.data 4
+	# DISABLE_PARALLEL_RUN #
 }
 
 
@@ -158,7 +159,7 @@ Chapitre {
 		labelX  "z"
 		labelY  "taux de vide"
 		Courbe {
-		   fichier diphasique_statistiques_1.944994.txt
+		   fichier diphasique_statistiques_1.951489.txt
 		   colonnes ($1) ($2)
 		}
 	}
@@ -187,7 +188,7 @@ Chapitre {
 		labelX  "z"
 		labelY  "ur"
 		Courbe {
-		   fichier diphasique_statistiques_1.944994.txt
+		   fichier diphasique_statistiques_1.951489.txt
 		   colonnes ($1) ((($7)/(1.-($2)))-(($3)/($2)))
 		}
 	}
