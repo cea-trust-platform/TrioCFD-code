@@ -1380,9 +1380,9 @@ int IJK_FT_double::initialise()
               // Cette methode parcours ni(), nj() et nk() et donc pas les ghost...
               set_field_data(velocity_[i], expression_vitesse_initiale_[i]);
             }
-          // duCluzeau 
-    	  // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
-    	  // si on commence le calcul à t !=0 avec un decallage
+          // duCluzeau
+          // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
+          // si on commence le calcul à t !=0 avec un decallage
 
           velocity_[0].change_to_sheared_reference_frame(1, 1);
           velocity_[1].change_to_sheared_reference_frame(1, 2);
@@ -2595,17 +2595,17 @@ void IJK_FT_double::run()
                         }
                     }
                   if (dir==0)
-                  {
+                    {
                       velocity_[dir].echange_espace_virtuel(
                         velocity_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
                       //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());}
-                      }
+                    }
                   else
-                  {
+                    {
                       velocity_[dir].echange_espace_virtuel(
                         velocity_[dir].ghost());
                       //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
-                      }
+                    }
 
 
                 }
@@ -3818,15 +3818,15 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 #endif
     {
 
-	  // advecter le champ de vitesse fluctuantes par le champ de vitesse moyen cisaille pendant la duree du pas de temps
-	  // a n'utiliser que si on resoud le systeme en u' et pas en U.
-	  // on n'advecte pas la pression car ce n'est pas une grandeur transportée
-	  // if (resolution_fluctuations_)
-	  //{
-	  //velocity_[0].change_to_sheared_reference_frame(1., 1, 0);
-	  //velocity_[1].change_to_sheared_reference_frame(1., 2, 0);
-	  //velocity_[2].change_to_sheared_reference_frame(1., 3, 0);
-	  //}
+      // advecter le champ de vitesse fluctuantes par le champ de vitesse moyen cisaille pendant la duree du pas de temps
+      // a n'utiliser que si on resoud le systeme en u' et pas en U.
+      // on n'advecte pas la pression car ce n'est pas une grandeur transportée
+      // if (resolution_fluctuations_)
+      //{
+      //velocity_[0].change_to_sheared_reference_frame(1., 1, 0);
+      //velocity_[1].change_to_sheared_reference_frame(1., 2, 0);
+      //velocity_[2].change_to_sheared_reference_frame(1., 3, 0);
+      //}
       //statistiques().begin_count(projection_counter_);
       if (include_pressure_gradient_in_ustar_)
         {
@@ -4123,14 +4123,14 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
         if (i==0)
-        {
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-        }
+          {
+            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          }
         else
-        {
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
-        }
-        }
+          {
+            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
+          }
+      }
 
   }
 
@@ -4190,14 +4190,14 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
         if (i==0)
-        {
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-        }
+          {
+            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          }
         else
-        {
-        velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
-        }
-        }
+          {
+            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
+          }
+      }
   }
 
   // On conserve les duplicatas que l'on transporte comme le reste.
