@@ -433,7 +433,7 @@ bool Modele_turbulence_hyd_K_Eps::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
 {
   Champ_Inc& ch_K_Eps = K_Eps();
-  Schema_Temps_base& sch =eqn_transp_K_Eps().schema_temps();
+  Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
