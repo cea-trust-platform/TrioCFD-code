@@ -505,6 +505,7 @@ protected :
 #endif
   Redistribute_Field redistribute_to_splitting_ft_elem_;
   int disable_solveur_poisson_;
+  int resolution_fluctuations_;
   int disable_diffusion_qdm_;
   int disable_convection_qdm_;
   int disable_source_interf_;
