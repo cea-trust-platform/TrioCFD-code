@@ -39,8 +39,7 @@ Partition dom
 	Nom_Zones DOM
 }
 Fin 
-END PARTITION 
-#
+END PARTITION #
 
 # BEGIN SCATTER
 Scatter DOM.Zones dom

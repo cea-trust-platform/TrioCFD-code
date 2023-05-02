@@ -28,7 +28,7 @@ Read sch
 {
 	tmax 1
 	seuil_statio -1
-	seuil_statio_relatif_deconseille 1
+	residuals { relative 1 }
 	dt_impr -1
 	facsec 20. facsec_max 30. Solveur Implicite { solveur petsc gmres { precond diag { } seuil 1.e-12 impr } }
 }
