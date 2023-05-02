@@ -160,9 +160,9 @@ void Mod_turb_hyd_RANS_0_eq::completer()
   if (fichier_K_eps_sortie_!=Nom())
     {
       // 1) on cree le fichier med et on postraite le domaine
-      EcrMED ecr_med;
       const Domaine& dom=mon_equation->domaine_dis().domaine();
-      ecr_med.ecrire_domaine(fichier_K_eps_sortie_.nom_me(me()),dom,dom.le_nom(),-1);
+      EcrMED ecr_med(fichier_K_eps_sortie_.nom_me(me()), dom);
+      ecr_med.ecrire_domaine(false);
       //2 on discretise le champ K_eps_pour_la_sortie
       const Discretisation_base& dis = mon_equation->discretisation();
       Noms noms(2);
@@ -243,13 +243,13 @@ void Mod_turb_hyd_RANS_0_eq::imprimer (Sortie& os )  const
         const Domaine& dom=mon_equation->domaine_dis().domaine();
         Nom fic=fichier_K_eps_sortie_.nom_me(me());
 
-        EcrMED ecr_med;
         Nom nom_post=K_eps_sortie_.le_nom();
         Nom nom_dom=dom.le_nom();
         Nom nom_dom_inc= dom.le_nom();
         Nom type_elem=dom.type_elem()->que_suis_je();
         assert(K_eps_sortie_.valeurs().dimension(0)==dom.nb_elem());
-        ecr_med.ecrire_champ("CHAMPMAILLE",fic,dom,nom_post,K_eps_sortie_.valeurs(),K_eps_sortie_->unites(),K_eps_sortie_->noms_compo(),type_elem,temps,0);
+        EcrMED ecr_med(fic, dom);
+        ecr_med.ecrire_champ("CHAMPMAILLE",nom_post,K_eps_sortie_.valeurs(),K_eps_sortie_->unites(),K_eps_sortie_->noms_compo(),type_elem,temps);
       }
   return Mod_turb_hyd_base::imprimer(os);
 }

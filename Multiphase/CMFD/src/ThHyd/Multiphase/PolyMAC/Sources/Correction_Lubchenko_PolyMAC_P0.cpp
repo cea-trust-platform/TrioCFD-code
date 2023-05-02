@@ -147,12 +147,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
             // Aussi, on passe le Span le nbelem pour le champ de pression et pas nbelem_tot ....
             assert(press.line_size() == 1);
             assert(temp.line_size() == N);
-
-            std::map<std::string, SpanD> sats_all = { { "pressure", press.get_span_tot() /* elem reel */}, {"temperature", temp.get_span_tot() } };
-
-            sats_all.insert( { "sigma", Sigma_tab.get_span_tot() });
-
-            z_sat.compute_all_frottement_interfacial(sats_all, nb_max_sat, ind_trav);
+            z_sat.get_sigma(temp.get_span_tot(), press.get_span_tot(), Sigma_tab.get_span_tot(), nb_max_sat, ind_trav);
           }
         else if (milc.has_interface(k, l))
           {
@@ -309,12 +304,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
             // Aussi, on passe le Span le nbelem pour le champ de pression et pas nbelem_tot ....
             assert(press.line_size() == 1);
             assert(temp.line_size() == N);
-
-            std::map<std::string, SpanD> sats_all = { { "pressure", press.get_span_tot() /* elem reel */}, {"temperature", temp.get_span_tot() } };
-
-            sats_all.insert( { "sigma", Sigma_tab.get_span_tot() });
-
-            z_sat.compute_all_frottement_interfacial(sats_all, nb_max_sat, ind_trav);
+            z_sat.get_sigma(temp.get_span_tot(), press.get_span_tot(), Sigma_tab.get_span_tot(), nb_max_sat, ind_trav);
           }
         else if (milc.has_interface(k, l))
           {
