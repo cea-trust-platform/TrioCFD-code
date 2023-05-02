@@ -44,7 +44,7 @@ Read mon_schema
 	dt_impr 1.e-6
 	dt_sauv 100
 	seuil_statio 1.e-4
-	seuil_statio_relatif_deconseille 1
+	residuals { relative 1 }
 	facsec 20
 	facsec_max 30
 	solveur implicite { solveur gmres { diag nb_it_max 5 seuil 1.e-20 impr } }

@@ -129,7 +129,6 @@ Solve pb
 Fin
 
 /*************************************************/
-# END MESH #
 # BEGIN PARTITION
 Partition dom
 {
