@@ -1,0 +1,31 @@
+#!/bin/bash
+[ ! -f lata/post.lata ] && echo "lata is missing in $PWD" && exit -1
+
+lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata
+fic=`ls -rt lata/post-ascii.lata.COURBURE.SOM.INTERFACES.0.*[0-9] | tail -n1`
+sed '1d;$d' $fic | awk 'NR == 1 { max=$1; min=$1; sum=0 }
+   { if ($1>max) max=$1; if ($1<min) min=$1; sum+=$1;}
+   END {printf "Min: %d\tMax: %d\tAverage: %f\n", min, max, sum/NR}' > courbure.txt
+d=`basename $PWD`
+awk '{printf "'$d' %g %g %g\n",$2,$4,$6}' courbure.txt > curvature.txt
+
+echo "# time vol_vap" > vol.txt
+grep Volume_phase_0 $1.err | awk '{print $4, $2}' > vol.txt
+
+# Specific for case BARY1 or BARY5
+if [ $(basename $PWD) == "BARY1" ] || [ $(basename $PWD) == "BARY5" ]  ; then
+   echo "Specific post_run for $(basename $PWD)  (lata_analyzer may be long)"
+   [ ! -f lata/post-interf.lata ] && echo "lata/post-interf.lata is missing in $PWD" && exit -1
+   lata_analyzer lata/post-interf.lata asciiout writelata_convert=lata/post-interf-ascii.lata
+   echo "lata_analyzer done"
+   echo "t    rmin rmax xmax ymax" > interface-position.txt
+   for fic in `ls -rt lata/post-interf-ascii.lata.INTERFACES.0.*[0-9]`
+   do
+      time=$(echo $fic | awk -FFACES. '{print $2}')
+      sed '1d;$d' $fic | awk 'NR == 1 { xmax=$1; ymax=$2; rmin=sqrt($1*$1+$2*$2) ; rmax=sqrt($1*$1+$2*$2) }
+      { r=sqrt($1*$1+$2*$2); if ($1>xmax) xmax=$1; if ($2>ymax) ymax=$2; if (r>rmax) rmax=r; if (r<rmin) rmin=r}
+      END {printf "%g %g %g %g %g\n", "'$time'", rmin, rmax, xmax, ymax}' >> interface-position.txt
+      echo -n "."
+   done
+   echo ""
+fi

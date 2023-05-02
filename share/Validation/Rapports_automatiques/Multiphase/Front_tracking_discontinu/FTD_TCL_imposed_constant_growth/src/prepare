@@ -1,0 +1,43 @@
+#!/bin/bash
+
+cwd=$PWD
+jdd=cst_growth.data
+for case in "2D" "2D_axi"
+do
+  for VOF in 000 111
+  do 
+    v=${VOF:0:1}
+    o=${VOF:1:1}
+    f=${VOF:2:1}
+    for ms in "Historical" "New"
+    do
+       for i in "Standard" "AiBased"
+       do
+          for remesh in "Nothing" "Best"
+          do
+             dest=$cwd/$case/VoF$VOF/MassSource$ms/Interp$i/Remesh$remesh
+             mkdir -p $dest
+             \cp -f post_run $dest/post_run
+             sed -e "/  VOFlike_correction_volume/s/VOFlike_correction_volume.*/VOFlike_correction_volume $v/g" \
+	              -e "s/  nb_iterations_correction_volume [0-9]/  nb_iterations_correction_volume $o/" \
+	              -e "s/  nb_lissage_correction_volume [0-9]/  nb_lissage_correction_volume $f/" \
+                 $jdd > $dest/$jdd
+             [ $case == "2D_axi" ] && sed -i -e "/bidim_axi/s/#//g" $dest/$jdd
+             [ $ms == "New" ] && sed -i -e "s/# new_mass_source #/new_mass_source /" $dest/$jdd
+             [ $i == "AiBased" ] && sed -i -e "s/interpol_indic_pour_dI_dt.*/interpol_indic_pour_dI_dt interp_ai_based/" $dest/$jdd
+             [ $remesh == "Best" ] && sed -i -e "s/Bloc Remesh Nothing #/Bloc Remesh Nothing/" \
+                 -e "s/# End Remesh Nothing/End Remesh Nothing/" \
+                 -e "s/# Bloc Remesh Best/# Bloc Remesh Best #/" \
+                 -e "s/ End Remesh Best/# End Remesh Best/" $dest/$jdd
+	       done
+       done
+    done
+  done
+done
+
+mkdir -p 2D_axi/BEST
+\cp -f best.data 2D_axi/BEST/
+
+mkdir -p 2D_axi/BEST/INTERP-STD
+sed -e "s/interpol_indic_pour_dI_dt.*/interpol_indic_pour_dI_dt interp_standard/" best.data > 2D_axi/BEST/INTERP-STD/best.data
+echo "End of prepare"

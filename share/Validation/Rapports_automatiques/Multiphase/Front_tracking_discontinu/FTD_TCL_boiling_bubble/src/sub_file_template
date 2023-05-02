@@ -1,0 +1,76 @@
+#!/bin/bash
+#MSUB -r @case@
+#MSUB -q rome
+#MSUB -Q normal
+#MSUB -T 86400
+#MSUB -o myjob.%J.o
+#MSUB -e myjob.%J.e
+#MSUB -A gen7712
+#MSUB -E "--no-requeue"
+#MSUB -n 54
+# #MSUB -x
+#MSUB -m work,scratch
+##MSUB -@ email:begin,end
+set -x
+cd $BRIDGE_MSUB_PWD
+[ -f ld_env.sh ] && . ./ld_env.sh # To load an environment file if necessary
+source $project_directory/env_Front_tracking_discontinu.sh
+jdd=PAR_source
+nmax=15
+JOBID_NEXT=0
+touch .not_reprise && echo "HACK FOR TEST PHASE" # Hack temporary
+if [ ! -f .not_reprise ] ; then 
+    echo "Restart creation"
+    dir=$(basename $PWD) 
+    n=${dir:1}
+    let n--
+    before=$n
+    let n++
+    let n++
+    next=$n
+    let n--
+    #
+    if -f ${jdd}.dt_ev ; then 
+       num1=$(tail -n1 *ev | awk '{print $1}')
+       num2=$(grep tmax *data | awk '{print $2}')
+       if awk "BEGIN {exit !($num1 >= 0.99*$num2)}"; then
+          echo "Maximal time reached"
+          exit
+       fi
+    fi
+    # In the next folder:
+    mkdir -p ../R$next && cp sub_file ${jdd}.data ../R$next && cd ../R$next/ 
+    sed -i "s/R$n/R$next/" sub_file
+    sed -i "s/R$before/R$n/;s/nb_pas_dt_max 10$/nb_pas_dt_max 10000000/" ${jdd}.data
+    [ $n == 0 ] && sed -i "/resume_last_time/s/#//g" ${jdd}.data
+    if -f ${jdd}.err ; then 
+       if grep "Unexpected error during TRUST calculation" ${jdd}.err; then
+          echo "Unexpected TRUST error"
+          echo "Restart R$next created but not submitted"
+          exit
+       fi
+    fi
+    if [ $next -gt $nmax ] ; then
+       echo "Restart R$next created but not submitted"
+    else   
+       ccc_msub -E "--dependency=afterok:$BRIDGE_MSUB_JOBID" sub_file > thisjob.txt
+       JOBID_NEXT=$(awk '{print $4}' thisjob.txt)
+       echo "Restart R$next created and submitted as $JOBID_NEXT"
+    fi
+    # Back to current case:
+    cd ../R$n
+fi
+echo ccc_mprun -n $BRIDGE_MSUB_NPROC $exec $jdd $BRIDGE_MSUB_NPROC -journal=0 
+ccc_mprun -n $BRIDGE_MSUB_NPROC $exec $jdd $BRIDGE_MSUB_NPROC 1>${jdd}.out -journal=0 2>${jdd}.err
+[ $? != 0 ] && echo "Job $BRIDGE_MSUB_JOBID failure" && failure=1
+
+sauv=$(grep sauvegarde PAR_source.data | awk '{print $3}')
+sauv=$(basename $sauv .sauv)
+if ! ls $sauv*.sauv &> /dev/null ; then  echo "No sauv found for next restart -> failure"; failure=1; fi
+
+[ -f post_run ] && "Running post_run" && ./post_run
+[ $failure -eq 1 ] && [ $JOBID_NEXT != 0 ] && scancel $JOBID_NEXT
+[ $failure -eq 1 ] && touch ../R$next/.not_reprise && exit -1 
+
+[ -f post_run ] && cp -f post_run ../R$next/
+[ -f ${jdd}.dt_ev ] && cp -f ${jdd}.dt_ev ../R$next/
