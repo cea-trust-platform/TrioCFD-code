@@ -2049,6 +2049,7 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box) const
 // domaine NS et entrent dans le domaine geom_FT...
 void IJK_Interfaces::creer_duplicata_bulles()
 {
+
   // Evaluation du cube contenant chaque bulle :
   DoubleTab bounding_box;
   calculer_bounding_box_bulles(bounding_box);
@@ -2070,7 +2071,7 @@ void IJK_Interfaces::creer_duplicata_bulles()
 //            Dans les 2 cas, on ne retiendra dans code_deplacement que
 //            l'encodage pure du deplacement.
 // Retourne 0, -1 ou +1 selon le deplacement necessaire dans la direction dir :
-static int decoder_deplacement(const int code, const int dir)
+static int decoder_deplacement(const int code, const int dir, int compo_bulle_reel = 0)
 {
   // decodage du deplacement :
   const int code_deplacement = code & 63;        // 63 = 111111b est le  masque ne conservant que les 6 derniers bits.
@@ -2083,10 +2084,11 @@ static int decoder_deplacement(const int code, const int dir)
   int signe = (tmp == 0) ? -1 /*deplacement negatif*/ : 1 /*deplacement positif*/;
   tmp = code_deplacement & (1 << dir); // retourne le code deplacement pour la direction consideree
   // (sur le 'dir'ieme bit)
-  int index = tmp >> dir;              // ramene ce bit en derniere position.
+  int index = tmp >> (dir + compo_bulle_reel*0);              // ramene ce bit en derniere position.
   //         index = 0 si pas de deplacement, 1 sinon.
 
-  // const int num_bulle = code >>6;
+
+  compo_bulle_reel = code >> 6;
   // Cerr << "Deplacer bulle " << num_bulle << " Direction: " << dir
   //     << " Code_deplacement : " << code_deplacement
   //     << " Move : " << signe*index << finl;
@@ -2096,9 +2098,9 @@ static int decoder_deplacement(const int code, const int dir)
 // Le code pour le deplacement est code dans la compo connexe. Il faut le
 // recuperer et le decoder. Le maillage transmis doit avoir son tableau des
 // composantes connexes a jour.
-static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& m,
+static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& m, const IJK_Splitting& split,
                                                          DoubleTab& deplacement,
-                                                         DoubleTab& bounding_box_NS)
+                                                         DoubleTab& bounding_box_NS, DoubleTab position)
 {
   // Creation du tableau deplacement pour le maillage m :
   const int nbsom = m.nb_sommets();
@@ -2114,9 +2116,25 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
       for (int dir = 0; dir < 3; dir++)
         {
           // decodage du deplacement :
-          int decode = decoder_deplacement(code, dir);
+          int compo_bulle_reel = 0;
+          int decode = decoder_deplacement(code, dir, compo_bulle_reel);
+          // duCluzeau
+          // decode donne le signe (vers la gauche, ou la droite)
           double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
           deplacement(i_sommet, dir) = depl;
+          if (dir==2 && depl != 0. && IJK_Splitting::defilement_ == 1)
+            {
+
+
+              double Lx =  split.get_grid_geometry().get_domain_length(0);
+              double offset = decode * IJK_Splitting::shear_x_time_;
+              // position du barycentre de la bulle de reference a laquelle appartient le sommet
+              double pos_ref = position(compo_bulle_reel,0);
+              // on veut le barycentre de la bulle decallee dans le domaine reel
+              double pos = std::fmod(std::fmod(pos_ref + offset, Lx) + Lx, Lx);
+              // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
+              deplacement(i_sommet, 0) = pos - pos_ref;
+            }
         }
     }
 }
@@ -2158,6 +2176,9 @@ static void calculer_deplacement_from_code_compo_connexe_negatif(const Maillage_
               int decode = decoder_deplacement(code, dir);
               double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
               deplacement(i_sommet, dir) = depl;
+              // duCluzeau
+              // Shear_perio_conditions
+              // ajouter le deplacement selon x pour dir == z.
             }
         }
     }
@@ -2229,6 +2250,9 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
           int decode = decoder_deplacement(code, dir);
           double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
           deplacement(isom, dir) = depl;
+          // duCluzeau
+          // Shear_perio_conditions
+          // ajouter le deplacement selon x pour dir == z.
         }
     }
 }
@@ -2269,9 +2293,16 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
     }
   // Boucle sur les duplications:
   // Exemple :
-  // Composante connexe 0 : masque = 001
-  // Composante connexe 1 : masque = 010
-  // Composante connexe 2 : masque = 011
+
+  // ducluzeau
+  // masque = 001 ? chiffres binaires representant les 3 directions
+  // 0 --> pas sortie du domaine NS
+  // 1 --> sortie (par la droite ou la gauche ?)
+  // ducluzeau
+  // Composante connexe 0 : masque sans les bit de signes = 001 : sortie sur z --> 1 ghost (pas vrai en shear-perio)
+  // Composante connexe 1 : masque sans les bit de signes = 010 : sortie sur y --> 1 ghost (pas vrai en shear-perio)
+  // Composante connexe 2 : masque sans les bit de signes = 011 : sortie sur z et z --> 3 ghost (pas vrai en shear-perio)
+  // pour shear_periodic_conditions : si sortie en z --> nb de ghost depend de la position du point periodique en face
   // Premiere iteration, je vais dupliquer les compo
   //  0 -> direction 001
   //  1 -> direction 010
@@ -2294,6 +2325,8 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
       ArrOfInt liste_facettes_pour_suppression;
       liste_facettes_pour_suppression.set_smart_resize(1);
       int reste_a_faire = 0;
+
+      //ducluzeau : determination de index_copie a modifier (boucle ci-dessous) pour le shear-perio
       for (icompo = 0; icompo < nbulles; icompo++)
         {
           // Si on a epuise toutes les copies a faire pour cette composante,
@@ -2305,6 +2338,9 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
             {
               if ((masque & index) == index)
                 compteur++; // Cette copie est a creer
+              // else if () critere pour le shear periodic
+              // compteur++;
+              // compteur--;
 
               if (compteur == mon_numero_iteration)
                 {
@@ -2384,6 +2420,10 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
       // fin de l'iteration mon_numero_iteration.
     }
 
+  // ducluzeau
+  // a ce niveau, maillage_temporaire contient toutes les facettes duplique, mais pas transportee.
+  // Le numero de composante connexe de chaque facette contient l information sur son deplacement (encode)
+
   // Si le maillage temporaire contient des facettes, on les deplace :
   int nbf = maillage_temporaire.nb_facettes();
   const int max_nbf = ::mp_max(nbf);
@@ -2393,9 +2433,13 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
       // Le maillage_temporaire transmis a son tableau des composantes connexes a
       // jour. le tableau contient l'encodage pour le deplacement que l'on va
       // decoder :
-      calculer_deplacement_from_code_compo_connexe(maillage_temporaire,
+      const IJK_Splitting& split = ref_splitting_.valeur();
+      ArrOfDouble volume_reel;
+      DoubleTab position;
+      calculer_volume_bulles(volume_reel, position);
+      calculer_deplacement_from_code_compo_connexe(maillage_temporaire, split,
                                                    deplacement,
-                                                   bounding_box_NS_domain_);
+                                                   bounding_box_NS_domain_, position);
       // La methode transporter gere les compo connexes.
       maillage_temporaire.transporter(deplacement);
       maillage_temporaire.nettoyer_maillage();
@@ -2549,6 +2593,8 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
 
           // Stocke le masque dans le tableau resultat :
           masque_duplicata_pour_compo[icompo] = masque_sortie_domaine;
+          // duCluzeau : pour shear-perio, il faut stocker un autre tableau avec le nombre de duplicata par bulles.
+          // pour ça, il faut tester la position de la bulle ghost en z, et verifier si elle sort en x
         }
     }
   // Le proc maitre a fini de remplir le tableau de masque.
