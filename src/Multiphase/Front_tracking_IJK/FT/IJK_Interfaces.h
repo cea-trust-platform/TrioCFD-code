@@ -74,11 +74,14 @@ public :
                             ArrOfDouble& dvol,
                             const int rk_step,
                             const double temps);
-  void calculer_bounding_box_bulles(DoubleTab& bounding_box) const;
+  void calculer_bounding_box_bulles(DoubleTab& bounding_box, int option_shear = 0) const;
   void preparer_duplicata_bulles(const DoubleTab& bounding_box_of_bubbles,
+                                 const DoubleTab& bounding_box_offsetp,
+                                 const DoubleTab& bounding_box_offsetm,
                                  const DoubleTab& authorized_bounding_box,
-                                 ArrOfInt& masque_duplicata_pour_compo);
-  void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo);
+                                 ArrOfInt& masque_duplicata_pour_compo_reel,
+                                 ArrOfInt& masque_duplicata_pour_compo_ghost);
+  void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo, ArrOfInt& masque_duplicata_pour_compo_ghost);
   void creer_duplicata_bulles();
   void supprimer_duplicata_bulles();
   void supprimer_certaines_bulles_reelles();

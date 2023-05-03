@@ -891,7 +891,7 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
   // masque_duplicata_pour_compo un encodage du deplacement maximal pour toutes
   // les bulles qui sortent de delete_criteria:
   ArrOfInt masque_delete_pour_compo;
-  preparer_duplicata_bulles(bounding_box, bounding_box_delete_criteria_, masque_delete_pour_compo);
+  preparer_duplicata_bulles(bounding_box, bounding_box, bounding_box, bounding_box_delete_criteria_, masque_delete_pour_compo, masque_delete_pour_compo);
   // Le masque reste a zero pour les bulles qui sont dans la
   // box_delete_criteria. Il faut donc supprimer les bulles en dehors, dont le
   // masque est different de 0.
@@ -1998,7 +1998,7 @@ void IJK_Interfaces::remailler_interface(const double temps,
 //      b -> Numero de la composante connexe de la bulle.
 //      dir -> Direction i,j ou k.
 //      m   -> min (0) ou max (1)
-void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box) const
+void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int option_shear) const
 {
   const int nbulles = get_nb_bulles_reelles();
   bounding_box.resize(nbulles, 3, 2);
@@ -2014,12 +2014,32 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box) const
   mesh.calculer_compo_connexe_sommets(compo_connex_som);
   const DoubleTab& sommets = mesh.sommets(); // Tableau des coordonnees des marqueurs.
   const int nbsom = sommets.dimension(0);
+  ArrOfDouble volume_reel;
+  DoubleTab position;
+  calculer_volume_bulles(volume_reel, position);
+
   for (int i_sommet = 0; i_sommet < nbsom; i_sommet++)
     {
       for (direction=0; direction<3; direction++)
         {
           double coord = sommets(i_sommet, direction);
           int iconnex = compo_connex_som[i_sommet];
+
+          if (direction==0 && option_shear != 0 && IJK_Splitting::defilement_ == 1)
+            {
+              const IJK_Splitting& split = ref_splitting_.valeur();
+              double Lx =  split.get_grid_geometry().get_domain_length(0);
+              double offset = option_shear * IJK_Splitting::shear_x_time_;
+              // position du barycentre de la bulle de reference a laquelle appartient le sommet
+              double pos_ref = position(iconnex,0);
+              // on veut le barycentre de la bulle decallee dans le domaine reel
+              double pos = std::fmod(std::fmod(pos_ref + offset, Lx) + Lx, Lx);
+              // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
+              coord += (pos - pos_ref);
+            }
+
+
+
           if (iconnex >= 0)
             {
               double mmin = bounding_box(iconnex, direction, 0);
@@ -2050,19 +2070,35 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box) const
 void IJK_Interfaces::creer_duplicata_bulles()
 {
 
+
   // Evaluation du cube contenant chaque bulle :
   DoubleTab bounding_box;
   calculer_bounding_box_bulles(bounding_box);
 
+  // Evaluation du cube contenant chaque bulle offset par le shear positif
+  DoubleTab bounding_box_offsetp;
+  calculer_bounding_box_bulles(bounding_box_offsetp, 1);
+
+  // Evaluation du cube contenant chaque bulle offset par le shear negatif
+  DoubleTab bounding_box_offsetm;
+  calculer_bounding_box_bulles(bounding_box_offsetm, -1);
+
+
   // Pour chaque compo_connexe, remplir dans le tableau
-  // masque_duplicata_pour_compo un encodage du deplacement maximal pour toutes
-  // les bulles qui sortent de NS: Le critere pour declancher la duplication des
+  // masque_duplicata_pour_compo_reel un encodage du deplacement maximal pour toutes
+  // les bulles reelles qui sortent de NS: Le critere pour declancher la duplication des
   // bulles est bounding_box_duplicate_criteria_
-  ArrOfInt masque_duplicata_pour_compo;
-  preparer_duplicata_bulles(bounding_box, bounding_box_duplicate_criteria_, masque_duplicata_pour_compo);
+  // Pour les conditions shear-periodic, besoin d'un autre
+  // masque_duplicata_pour_compo_ghost, un encodage du deplacement maximal pour toutes
+  // les bulles duplique/decalle par le cisaillement qui sortent de NS: Le critere pour declancher la duplication des
+  // bulles est le meme que pour les bulles reelles.
+
+  ArrOfInt masque_duplicata_pour_compo_reel;
+  ArrOfInt masque_duplicata_pour_compo_ghost;
+  preparer_duplicata_bulles(bounding_box, bounding_box_offsetp, bounding_box_offsetm, bounding_box_duplicate_criteria_, masque_duplicata_pour_compo_reel, masque_duplicata_pour_compo_ghost);
 
   // Duplique et deplace les bulles de la liste :
-  dupliquer_bulle_perio(masque_duplicata_pour_compo);
+  dupliquer_bulle_perio(masque_duplicata_pour_compo_reel, masque_duplicata_pour_compo_ghost);
 }
 
 // Input :
@@ -2131,7 +2167,7 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               double pos_ref = position(compo_bulle_reel,0);
               // on veut le barycentre de la bulle decallee dans le domaine reel
-              double pos = std::fmod(std::fmod(pos_ref + offset, Lx) + Lx, Lx);
+              double pos = std::fmod(std::fmod(deplacement(i_sommet, 0)+ pos_ref + offset, Lx) + Lx, Lx);
               // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
               deplacement(i_sommet, 0) = pos - pos_ref;
             }
@@ -2268,7 +2304,7 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
 //             (ou code contient l'info du numero de bulle et du deplacement
 //             realise a ce moment)
 //   o  on ajoute les duplicatas au maillage actuel.
-void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo)
+void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo, ArrOfInt& masque_duplicata_pour_compo_ghost)
 {
   // Algorithme alternatif: optimise pour eviter de copier le maillage tout int.
   Maillage_FT_IJK& mesh = maillage_ft_ijk_;
@@ -2556,17 +2592,21 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
 //   - masque_duplicata_pour_compo : Encodage du deplacement a appliquer aux bulles sortant
 //                                   du domaine autorise.
 void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
+                                               const DoubleTab& bounding_box_offsetp,
+                                               const DoubleTab& bounding_box_offsetm,
                                                const DoubleTab& authorized_bounding_box,
-                                               ArrOfInt& masque_duplicata_pour_compo)
+                                               ArrOfInt& masque_duplicata_pour_compo_reel,
+                                               ArrOfInt& masque_duplicata_pour_compo_ghost)
 {
 
   if (Process::je_suis_maitre())
     {
       const int nbulles = get_nb_bulles_reelles();
-      masque_duplicata_pour_compo.resize_array(nbulles);
+      masque_duplicata_pour_compo_reel.resize_array(nbulles);
       for (int icompo = 0; icompo < nbulles; icompo++)
         {
-          int masque_sortie_domaine = 0;
+          int masque_sortie_domaine_reel = 0;
+          int masque_sortie_domaine_ghost = 0;
           // Masque sortie est un chiffre binaire qui dit dans quelles directions
           // la bulle sort du domaine (et le domaine est periodique)
           for (int direction = 0; direction < 3; direction++)
@@ -2576,23 +2616,63 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
                   // Est-ce qu'on sort par la gauche ?
                   if (bounding_box(icompo, direction, 0) < authorized_bounding_box(direction, 0))
                     {
-                      masque_sortie_domaine |= (1 << direction); // met le bit "direction" a 1 dans le masque
-                      masque_sortie_domaine |= (8 << direction); // met le bit de signe a 1 dans le masque
+                      masque_sortie_domaine_reel |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                      masque_sortie_domaine_reel |= (8 << direction); // met le bit de signe a 1 dans le masque
                       // il faudra deplacer la copie vers la droite
+                      if(direction!=2 || IJK_Splitting::defilement_ == 0)
+                        {
+                          masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                          masque_sortie_domaine_ghost |= (8 << direction); // met le bit de signe a 1 dans le masque
+                        }
+                      if(direction==2 && IJK_Splitting::defilement_ == 1)
+                        // si sortie de la bulle en z, verifier la sortie en x de la bulle ghost
+                        // ici, sortie par la gauche, donc shear positif dans bounding_box_offsetp
+                        {
+                          if (bounding_box_offsetp(icompo, 0, 0) < authorized_bounding_box(0, 0))
+                            {
+                              masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                              masque_sortie_domaine_ghost |= (8 << direction); // met le bit de signe a 1 dans le masque
+                            }
+                          if (bounding_box_offsetp(icompo, 0, 1) > authorized_bounding_box(0, 1))
+                            {
+                              masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                              // le bit de signe reste a zero, qui signifie un deplacement vers
+                              // les coord negatives.
+                            }
+                        }
                     }
                   if (bounding_box(icompo, direction, 1) > authorized_bounding_box(direction, 1))
                     {
                       // On sort par la droite, il faudra deplacer la copie vers la
                       // gauche.
-                      masque_sortie_domaine |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                      masque_sortie_domaine_reel |= (1 << direction); // met le bit "direction" a 1 dans le masque
                       // le bit de signe reste a zero, qui signifie un deplacement vers
                       // les coord negatives.
+                      if(direction!=2 || IJK_Splitting::defilement_ == 0)
+                        {
+                          masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                        }
+                      if(direction==2 && IJK_Splitting::defilement_ == 1)
+                        {
+                          if (bounding_box_offsetm(icompo, 0, 0) < authorized_bounding_box(0, 0))
+                            {
+                              masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                              masque_sortie_domaine_ghost |= (8 << direction); // met le bit de signe a 1 dans le masque
+                            }
+                          if (bounding_box_offsetm(icompo, 0, 1) > authorized_bounding_box(0, 1))
+                            {
+                              masque_sortie_domaine_ghost |= (1 << direction); // met le bit "direction" a 1 dans le masque
+                              // le bit de signe reste a zero, qui signifie un deplacement vers
+                              // les coord negatives.
+                            }
+                        }
                     }
                 }
             }
 
           // Stocke le masque dans le tableau resultat :
-          masque_duplicata_pour_compo[icompo] = masque_sortie_domaine;
+          masque_duplicata_pour_compo_reel[icompo] = masque_sortie_domaine_reel;
+          masque_duplicata_pour_compo_ghost[icompo] = masque_sortie_domaine_ghost;
           // duCluzeau : pour shear-perio, il faut stocker un autre tableau avec le nombre de duplicata par bulles.
           // pour ça, il faut tester la position de la bulle ghost en z, et verifier si elle sort en x
         }
@@ -2600,7 +2680,8 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
   // Le proc maitre a fini de remplir le tableau de masque.
   // Il les communiques a tous les procs.
   // broadcast to all mpi processes:
-  envoyer_broadcast(masque_duplicata_pour_compo, 0);
+  envoyer_broadcast(masque_duplicata_pour_compo_reel, 0);
+  envoyer_broadcast(masque_duplicata_pour_compo_ghost, 0);
 }
 
 // Methode supprimant toutes les bulles dupliquees (reconnues par compo_connex <
@@ -2645,7 +2726,7 @@ void IJK_Interfaces::transferer_bulle_perio()
   ArrOfInt masque;
   // Recherche des bulles qui sortent du domaine authorise et remplit
   // dans le tableau masque un encodage du deplacement :
-  preparer_duplicata_bulles(bounding_box, bounding_box_forbidden_criteria_, masque);
+  preparer_duplicata_bulles(bounding_box, bounding_box, bounding_box, bounding_box_forbidden_criteria_, masque, masque);
 
   // Deplace les bulles de la liste :
   deplacer_bulle_perio(masque);
