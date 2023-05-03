@@ -113,5 +113,3 @@ void Pb_Hydraulique_sensibility::associer_milieu_base(const Milieu_base& mil)
       exit();
     }
 }
-
-

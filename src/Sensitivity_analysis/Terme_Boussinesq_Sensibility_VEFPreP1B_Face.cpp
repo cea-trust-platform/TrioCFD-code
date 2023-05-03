@@ -12,7 +12,14 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : Terme_Boussinesq_Sensibility_VEFPreP1B_Face.cpp
+// Directory : $SENSITIVITY_ANALYSIS_ROOT/src
+//
+/////////////////////////////////////////////////////////////////////////////
 
+#include <Terme_Boussinesq_Sensibility_VEFPreP1B_Face.h>
 #include <Terme_Boussinesq_VEFPreP1B_Face.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
 #include <Fluide_Incompressible.h>
@@ -25,26 +32,30 @@
 
 extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
 
-Implemente_instanciable(Terme_Boussinesq_VEFPreP1B_Face,"Boussinesq_VEFPreP1B_P1NC",Terme_Boussinesq_VEF_Face);
-Add_synonym(Terme_Boussinesq_VEFPreP1B_Face,"Boussinesq_temperature_VEFPreP1B_P1NC");
-Add_synonym(Terme_Boussinesq_VEFPreP1B_Face,"Boussinesq_concentration_VEFPreP1B_P1NC");
+
+Implemente_instanciable(Terme_Boussinesq_Sensibility_VEFPreP1B_Face, "Terme_Boussinesq_Sensibility_VEFPreP1B_Face", Terme_Boussinesq_VEFPreP1B_Face) ;
+Add_synonym(Terme_Boussinesq_Sensibility_VEFPreP1B_Face,"Boussinesq_temperature_sensibility_VEFPreP1B_P1NC");
 
 //// printOn
-Sortie& Terme_Boussinesq_VEFPreP1B_Face::printOn(Sortie& s ) const
+Sortie& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::printOn(Sortie& s ) const
 {
-  return Terme_Boussinesq_base::printOn(s);
+  return Terme_Boussinesq_VEFPreP1B_Face::printOn(s);
 }
 
 //// readOn
-Entree& Terme_Boussinesq_VEFPreP1B_Face::readOn(Entree& s )
+Entree& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::readOn(Entree& s )
 {
-  return Terme_Boussinesq_base::readOn(s);
+  return Terme_Boussinesq_VEFPreP1B_Face::readOn(s);
 }
 
-DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
+
+
+DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
 {
+  Cerr<<"Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter, equation_scalaire() = "<<equation_scalaire().que_suis_je()<<finl;
+  assert(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility");
+
   const Domaine_VEF_PreP1b& domaine_VEF = ref_cast(Domaine_VEF_PreP1b, le_dom_VEF.valeur());
-  // Si seulement support P0 on appelle en VEF
   if (domaine_VEF.get_alphaE() && !domaine_VEF.get_alphaS() && !domaine_VEF.get_alphaA())
     return Terme_Boussinesq_VEF_Face::ajouter(resu);
 
@@ -63,28 +74,21 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   ArrOfDouble T0_etat=T0;
   Champ_Inc T_etat(le_scalaire);
   T_etat->valeurs()=0.;
-  if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
-    {
-      const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
-      if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BOUSSINESQ_TEMPERATURE")
-        T0=1.;
-      else
-        T0=0.;
-      if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BETA_TH")
-        {
-          const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
-          T_etat->valeurs().reset();
-          T_etat->valeurs()=val_T_etat;
-          beta_a=1.;
-        }
-      else
-        T0_etat=0.;
 
+  const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
+  if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BOUSSINESQ_TEMPERATURE")
+    T0=1.;
+  else
+    T0=0.;
+  if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BETA_TH")
+    {
+      const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
+      T_etat->valeurs().reset();
+      T_etat->valeurs()=val_T_etat;
+      beta_a=1.;
     }
   else
-    {
-      T0_etat=0.;
-    }
+    T0_etat=0.;
 
 
 
