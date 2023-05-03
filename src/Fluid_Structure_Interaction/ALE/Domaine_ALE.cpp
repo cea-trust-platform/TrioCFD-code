@@ -170,6 +170,11 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
     }
 }
+
+void Domaine_ALE::update_after_post(double temps)
+{
+  update_ALE_projection(temps);
+}
 //Compute the fluid force projected within the requested boundaries
 void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
 {
