@@ -9,6 +9,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/energie_bulle_seule
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/repulsion
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/test_sigma
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_bulle
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/schemas_temps
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_bulle_conv
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/tests_schemas_monophasique
