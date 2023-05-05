@@ -2019,6 +2019,28 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
   DoubleTab position;
   calculer_volume_bulles(volume_reel, position);
 
+  ArrOfDouble position_xmax_compo;
+  ArrOfDouble position_xmin_compo;
+  if (option_shear != 0 && IJK_Splitting::defilement_ == 1)
+    {
+      position_xmax_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmin_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmax_compo = -10000.;
+      position_xmin_compo = 10000.;
+
+      for (int i_sommet2 = 0; i_sommet2 < nbsom; i_sommet2++)
+        {
+          int iconnex = compo_connex_som[i_sommet2];
+          double coord = sommets(i_sommet2, 0);
+          if (coord>position_xmax_compo[iconnex])
+            position_xmax_compo[iconnex] = coord;
+          if (coord<position_xmin_compo[iconnex])
+            position_xmin_compo[iconnex] = coord;
+        }
+      mp_min_for_each_item(position_xmin_compo);
+      mp_max_for_each_item(position_xmax_compo);
+    }
+
   for (int i_sommet = 0; i_sommet < nbsom; i_sommet++)
     {
       for (direction=0; direction<3; direction++)
@@ -2028,15 +2050,25 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
 
           if (direction==0 && option_shear != 0 && IJK_Splitting::defilement_ == 1)
             {
-              const IJK_Splitting& split = ref_splitting_.valeur();
-              double Lx =  split.get_grid_geometry().get_domain_length(0);
-              double offset = option_shear * IJK_Splitting::shear_x_time_;
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               double pos_ref = position(iconnex,0);
-              // on veut le barycentre de la bulle decallee dans le domaine reel
-              double pos = std::fmod(std::fmod(pos_ref + offset, Lx) + Lx, Lx);
+              //const IJK_Splitting& split = ref_splitting_.valeur();
+              double Lx =  IJK_Splitting::Lx_for_shear_perio;
+              //double Lx =  split.get_grid_geometry().get_domain_length(0) - (position_xmax_compo(iconnex)-pos_ref);
+              double offset = option_shear * IJK_Splitting::shear_x_time_;
+              // le barycentre de la bulle reelle (compo >0) est situe entre db et Lx + db (pas entre 0 et Lx)
+              // vrai uniquement pour des bulles qui montent.
+              // Ne fonctionnera pas pour des bulles descendantes...
+              // Idem donc pour la bulle ghost
+              double decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[iconnex]-position_xmin_compo[iconnex]); // verifier si cest ca la valeur
+              // assure une position entre db et Lx + db
+              double pos = std::fmod(std::fmod(pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
               // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
               coord += (pos - pos_ref);
+//              std::cout << "decallage_bulle_reel_ext_domaine_reel=" << decallage_bulle_reel_ext_domaine_reel << std::endl;
+//              std::cout << "pos_ref=" << pos_ref << std::endl;
+//              std::cout << "offset=" << offset << std::endl;
+//              std::cout << "pos=" << pos << std::endl;
             }
 
 
@@ -2136,13 +2168,56 @@ static int decoder_deplacement(const int code, const int dir, int compo_bulle_re
 // composantes connexes a jour.
 static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& m, const IJK_Splitting& split,
                                                          DoubleTab& deplacement,
-                                                         DoubleTab& bounding_box_NS, DoubleTab position)
+                                                         DoubleTab& bounding_box_NS, DoubleTab position,
+                                                         const int nbulles, const Maillage_FT_IJK& mesh)
 {
   // Creation du tableau deplacement pour le maillage m :
   const int nbsom = m.nb_sommets();
   deplacement.resize(nbsom, 3);
+  // sommets du maillage temporaire (avec les ghosts a deplacer)
   ArrOfIntFT compo_sommets;
   m.calculer_compo_connexe_sommets(compo_sommets);
+
+  // sommets du maillage initial (avec juste les bulles reelles)
+  ArrOfIntFT compo_sommets_init;
+  mesh.calculer_compo_connexe_sommets(compo_sommets_init);
+  const int nbsomreel = mesh.nb_sommets();
+
+  ArrOfDouble position_xmax_compo;
+  ArrOfDouble position_xmin_compo;
+  if (IJK_Splitting::defilement_ == 1)
+    {
+      position_xmax_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmin_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmax_compo = -10000.;
+      position_xmin_compo = 10000.;
+
+      const DoubleTab& sommets = mesh.sommets(); // Tableau des coordonnees des marqueurs.
+
+      for (int i_sommet = 0; i_sommet < nbsomreel; i_sommet++)
+        {
+          // decodage du deplacement :
+          //const int code = compo_sommets[i_sommet];
+          int iconnex = compo_sommets_init[i_sommet];
+          //std::cout << " coord = " << sommets(i_sommet, 0) << "compo_sommets" << iconnex << std::endl;
+          double coord = sommets(i_sommet, 0);
+          if (coord>position_xmax_compo[iconnex])
+            position_xmax_compo[iconnex] = coord;
+          if (coord<position_xmin_compo[iconnex])
+            position_xmin_compo[iconnex] = coord;
+        }
+      mp_min_for_each_item(position_xmin_compo);
+      mp_max_for_each_item(position_xmax_compo);
+    }
+
+  for (int nb = 0; nb < nbulles; nb++)
+    {
+      std::cout << " position_xmin_compo " << position_xmin_compo[nb] << std::endl;
+      std::cout << " position_xmax_compo " << position_xmax_compo[nb] << std::endl;
+    }
+
+
+
 
   for (int i_sommet = 0; i_sommet < nbsom; i_sommet++)
     {
@@ -2153,38 +2228,50 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
         {
           // decodage du deplacement :
           int compo_bulle_reel = 0;
+          //int iconnex = compo_connex_som[i_sommet];
           int decode = decoder_deplacement(code, dir, compo_bulle_reel);
 
           double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
           deplacement(i_sommet, dir) = depl;
           double pos_ref = 0 ;
           double pos = 0;
+          double decallage_bulle_reel_ext_domaine_reel = 0.;
           // si seulement on a traverser une frontiere shear periodique
           if (dir==2 && depl != 0. && IJK_Splitting::defilement_ == 1)
             {
-              double Lx =  split.get_grid_geometry().get_domain_length(0);
+              double Lx =  IJK_Splitting::Lx_for_shear_perio;
               double offset = decode * IJK_Splitting::shear_x_time_;
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               pos_ref = position(compo_bulle_reel,0);
               // on veut le barycentre de la bulle decallee dans le domaine reel
-              pos = std::fmod(std::fmod(deplacement(i_sommet, 0)+ pos_ref + offset, Lx) + Lx, Lx);
-              // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
-              deplacement(i_sommet, 0) = pos - pos_ref;
-            }
-          if (deplacement(i_sommet, 2)  != 0)
-            {
-              std::cout << " " << std::endl;
-              std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
-              std::cout << " dir = "  << dir << std::endl;
-              std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
-              std::cout << " code = "  << code << std::endl;
-              std::cout << " decode = "  << decode << std::endl;
-              std::cout << " depl = "  << depl << std::endl;
-              std::cout << " pos_ref = "  << pos_ref << std::endl;
-              std::cout << " pos = "  << pos << std::endl;
-              std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
+              decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[compo_bulle_reel]-position_xmin_compo[compo_bulle_reel]); // verifier si cest ca la valeur
+              pos = std::fmod(std::fmod(deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
 
+              if (deplacement(i_sommet, 2)  != 0)
+                {
+                  std::cout << " " << std::endl;
+                  std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
+                  std::cout << " dir = "  << dir << std::endl;
+                  std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
+                  std::cout << " code = "  << code << std::endl;
+                  std::cout << " decode = "  << decode << std::endl;
+                  std::cout << " depl = "  << depl << std::endl;
+                  std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
+                  std::cout << " offset = "  << offset << std::endl;
+                  std::cout << " deplacement + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel = "  << deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel << std::endl;
+                  std::cout << " pos_ref = "  << pos_ref << std::endl;
+                  std::cout << " Lx = "  << Lx << std::endl;
+                  std::cout << " pos = "  << pos << std::endl;
+                  std::cout << " decallage_bulle_reel_ext_domaine_reel = "  << decallage_bulle_reel_ext_domaine_reel << std::endl;
+                }
+
+
+
+              //pos = std::fmod(std::fmod(deplacement(i_sommet, 0)+ pos_ref + offset, Lx) + Lx, Lx);
+              // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
+              deplacement(i_sommet, 0) += (pos - pos_ref);
             }
+
 
         }
     }
@@ -2341,8 +2428,8 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
     {
       icompo = compo_connexe_facettes[i_facette];
       a_dupliquer.set_composante_connexe(i_facette, encoder_compo(icompo /*numero bulle*/, 0 /* pas de deplacement */));
-      if (icompo != 0 || encoder_compo(icompo /*numero bulle*/, 0 /* pas de deplacement */) != 0)
-        std::cout << "icompo pas normale 1 = " << icompo <<" " << encoder_compo(icompo /*numero bulle*/, 0 /* pas de deplacement */) << std::endl ;
+//      if (icompo != 0 || encoder_compo(icompo /*numero bulle*/, 0 /* pas de deplacement */) != 0)
+//        std::cout << "icompo pas normale 1 = " << icompo <<" " << encoder_compo(icompo /*numero bulle*/, 0 /* pas de deplacement */) << std::endl ;
 
     }
 
@@ -2543,17 +2630,17 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
               nbulles_crees++;
               reste_a_faire = 1;
             }
-          std::cout << "mon_numero_iteration = " << mon_numero_iteration << std::endl;
-          std::cout << "icompo = " << icompo << std::endl;
-          std::cout << "index_signe[icompo] = " << index_signe[icompo] << std::endl;
-          std::cout << "index_copie[icompo] = " << index_copie[icompo] << std::endl;
-          std::cout << "nbulles_crees = " << nbulles_crees << std::endl;
-          std::cout << "perio_x_reel = " << perio_x_reel << std::endl;
-          std::cout << "perio_y_reel = " << perio_y_reel << std::endl;
-          std::cout << "perio_z_reel = " << perio_z_reel << std::endl;
-          std::cout << "perio_x_ghost = " << perio_x_ghost << std::endl;
-          std::cout << "masque_duplicata_pour_compo[icompo] = " << masque_duplicata_pour_compo[icompo] << std::endl;
-          std::cout << "reste_a_faire = " << reste_a_faire << std::endl;
+//          std::cout << "mon_numero_iteration = " << mon_numero_iteration << std::endl;
+//          std::cout << "icompo = " << icompo << std::endl;
+//          std::cout << "index_signe[icompo] = " << index_signe[icompo] << std::endl;
+//          std::cout << "index_copie[icompo] = " << index_copie[icompo] << std::endl;
+//          std::cout << "nbulles_crees = " << nbulles_crees << std::endl;
+//          std::cout << "perio_x_reel = " << perio_x_reel << std::endl;
+//          std::cout << "perio_y_reel = " << perio_y_reel << std::endl;
+//          std::cout << "perio_z_reel = " << perio_z_reel << std::endl;
+//          std::cout << "perio_x_ghost = " << perio_x_ghost << std::endl;
+//          std::cout << "masque_duplicata_pour_compo[icompo] = " << masque_duplicata_pour_compo[icompo] << std::endl;
+//          std::cout << "reste_a_faire = " << reste_a_faire << std::endl;
         }
 //
       reste_a_faire = ::mp_max(reste_a_faire);
@@ -2564,12 +2651,12 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
           break;
         }
 
-      for (icompo = 0; icompo < nbulles; icompo++)
-        {
-          std::cout << "index_copie = " << index_copie[icompo] << ", " ;
-          std::cout << " " << std::endl;
-          std::cout << "index_signe = " << index_signe[icompo] << ", " ;
-        }
+//      for (icompo = 0; icompo < nbulles; icompo++)
+//        {
+//          std::cout << "index_copie = " << index_copie[icompo] << ", " ;
+//          std::cout << " " << std::endl;
+//          std::cout << "index_signe = " << index_signe[icompo] << ", " ;
+//        }
 
 
       // Supprime les facettes qui ne sont plus a dupliquer
@@ -2614,13 +2701,13 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
               // On change la valeur de la composante connexe associee a la facette
               // pour memoriser le deplacement qu'elle subira ensuite.
 
-              std::cout << "mon_numero_iteration = " << mon_numero_iteration << std::endl ;
+//              std::cout << "mon_numero_iteration = " << mon_numero_iteration << std::endl ;
 
 
 
               a_dupliquer.set_composante_connexe(i_facette, encoder_compo(icompo, code_deplacement));
-              std::cout << "signe | index | icompo = code ==>" << signe << " " << index << " " << icompo << " " << encoder_compo(icompo, code_deplacement) << std::endl;
-              std::cout << "decoder_numero_bulle(compo_connexe_facettes[i_facette]) = " << decoder_numero_bulle(compo_connexe_facettes[i_facette]) << std::endl;
+//              std::cout << "signe | index | icompo = code ==>" << signe << " " << index << " " << icompo << " " << encoder_compo(icompo, code_deplacement) << std::endl;
+//              std::cout << "decoder_numero_bulle(compo_connexe_facettes[i_facette]) = " << decoder_numero_bulle(compo_connexe_facettes[i_facette]) << std::endl;
 
 
 
@@ -2668,9 +2755,10 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
       ArrOfDouble volume_reel;
       DoubleTab position;
       calculer_volume_bulles(volume_reel, position);
+
       calculer_deplacement_from_code_compo_connexe(maillage_temporaire, split,
                                                    deplacement,
-                                                   bounding_box_NS_domain_, position);
+                                                   bounding_box_NS_domain_, position, nbulles, mesh);
       // La methode transporter gere les compo connexes.
       maillage_temporaire.transporter(deplacement);
       maillage_temporaire.nettoyer_maillage();
@@ -2871,6 +2959,14 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
   // Il les communiques a tous les procs.
   // broadcast to all mpi processes:
   envoyer_broadcast(masque_duplicata_pour_compo, 0);
+  std::cout << "preparer_duplicata_bulles" << std::endl;
+  const int nbulles = get_nb_bulles_reelles();
+  for (int icompo = 0; icompo < nbulles; icompo++)
+    {
+      if (masque_duplicata_pour_compo[icompo]!=0 && masque_duplicata_pour_compo[icompo] != 1)
+        std::cout << "masque pour bulle " << icompo << " = " << masque_duplicata_pour_compo[icompo] << std::endl;
+    }
+
 }
 
 // Methode supprimant toutes les bulles dupliquees (reconnues par compo_connex <
