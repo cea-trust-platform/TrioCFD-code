@@ -79,9 +79,8 @@ public :
                                  const DoubleTab& bounding_box_offsetp,
                                  const DoubleTab& bounding_box_offsetm,
                                  const DoubleTab& authorized_bounding_box,
-                                 ArrOfInt& masque_duplicata_pour_compo_reel,
-                                 ArrOfInt& masque_duplicata_pour_compo_ghost);
-  void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo, ArrOfInt& masque_duplicata_pour_compo_ghost);
+                                 ArrOfInt& masque_duplicata_pour_compo_reel);
+  void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo);
   void creer_duplicata_bulles();
   void supprimer_duplicata_bulles();
   void supprimer_certaines_bulles_reelles();
