@@ -4119,49 +4119,25 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     return;
   //  Calculer vitesse_ft (etendue) a partir du champ de vitesse.
   {
-    for (int dir = 0; dir < 3; dir++)
-      {
-        redistribute_to_splitting_ft_faces_[dir].redistribute(velocity_[dir], velocity_ft_[dir], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 
-//        for (int i = -10; i < velocity_ft_[dir].ni()+10; i++ )
+    redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
+    redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
+    redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+    redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+    redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+    redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+//    for (int dir = 0; dir < 3; dir++)
+//      {
+//        if (dir==0)
 //          {
-//            for (int j = -10; j < velocity_ft_[dir].nj()+10; j++ )
-//              {
-//                for (int k = -10; k < velocity_ft_[dir].nk()+10; k++ )
-//                  {
-////                    Vecteur3 xyz = splitting_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_I);
-////                    if (dir==0)
-////                      xyz = splitting_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_I);
-////                    else if (dir==1)
-////                      xyz = splitting_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_J);
-////                    else if (dir==2)
-////                      xyz = splitting_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_K);
-////
-////                    double Lz =  splitting_.get_grid_geometry().get_domain_length(2);
-//                    if (i<0 && dir==0)
-//                      {
-//                        velocity_ft_[dir](i,j,k) -=boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_());
-//                      }
-//                    else if (i>velocity_ft_[dir].ni() && dir==0)
-//                      {
-//                        velocity_ft_[dir](i,j,k) +=boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_());
-//
-//                      }
-//
-//                  }
-//              }
+//            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 //          }
-
-
-        if (dir==0)
-          {
-            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-          }
-        else
-          {
-            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-          }
-      }
+//        else
+//          {
+//            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+//          }
+//      }
 
   }
 
@@ -4218,106 +4194,25 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 
 
 
-  redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
-  redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
-  redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+  redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
+  redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
+  redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 
-  FixedVector<IJK_Field_double, 3> velocity_ft_tmp=velocity_ft_;
-  double Lx =  splitting_.get_grid_geometry().get_domain_length(0);
-  double Lz =  splitting_.get_grid_geometry().get_domain_length(2);
-  double DX = Lx/velocity_[0].ni() ;
-  int ni = velocity_[0].ni();
-  for (int dir = 0; dir < 3; dir++)
-    {
-      for (int i = 0; i < velocity_ft_[dir].ni(); i++ )
-        {
-          for (int j = 0; j < velocity_ft_[dir].nj(); j++ )
-            {
-              for (int k = 0; k < velocity_ft_[dir].nk(); k++ )
-                {
-                  Vecteur3 xyz = splitting_ft_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_I);
-                  if (dir==0)
-                    xyz = splitting_ft_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_I);
-                  else if (dir==1)
-                    xyz = splitting_ft_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_J);
-                  else if (dir==2)
-                    xyz = splitting_ft_.get_coords_of_dof(i,j,k,IJK_Splitting::FACES_K);
+  redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+  redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+  redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
 
-                  double x_deplacement = 0.;
-
-                  if (xyz[2]<=0)
-                    {
-                      x_deplacement = IJK_Splitting::shear_x_time_;///2;
-                    }
-                  else if (xyz[2]>=Lz)
-                    {
-                      x_deplacement = -IJK_Splitting::shear_x_time_;///2;
-                    }
-
-                  double istmp = i+x_deplacement/DX;
-
-                  int ifloorm2 = (int) round(istmp) - 2;
-                  int ifloorm1 = (int) round(istmp) - 1;
-                  int ifloor0 = (int) round(istmp);
-                  int ifloorp1 = (int) round(istmp) + 1;
-                  int ifloorp2 = (int) round(istmp) + 2;
-
-                  int x[5] = {ifloorm2, ifloorm1, ifloor0, ifloorp1, ifloorp2};
-
-                  ifloorm2 = (ifloorm2 % ni + ni) % ni;
-                  ifloorm1 = (ifloorm1 % ni + ni) % ni;
-                  ifloor0 = (ifloor0 % ni + ni) % ni;
-                  ifloorp1 = (ifloorp1 % ni + ni) % ni;
-                  ifloorp2 = (ifloorp2 % ni + ni) % ni;
-
-                  double y[5] = {velocity_ft_[dir](ifloorm2, j, k),
-                                 velocity_ft_[dir](ifloorm1, j, k),
-                                 velocity_ft_[dir](ifloor0, j, k),
-                                 velocity_ft_[dir](ifloorp1, j, k),
-                                 velocity_ft_[dir](ifloorp2, j, k)
-                                };
-
-
-                  double a0 = y[0] / ((x[0] - x[1]) * (x[0] - x[2]) * (x[0] - x[3]) * (x[0] - x[4]));
-                  double a1 = y[1] / ((x[1] - x[0]) * (x[1] - x[2]) * (x[1] - x[3]) * (x[1] - x[4]));
-                  double a2 = y[2] / ((x[2] - x[0]) * (x[2] - x[1]) * (x[2] - x[3]) * (x[2] - x[4]));
-                  double a3 = y[3] / ((x[3] - x[0]) * (x[3] - x[1]) * (x[3] - x[2]) * (x[3] - x[4]));
-                  double a4 = y[4] / ((x[4] - x[0]) * (x[4] - x[1]) * (x[4] - x[2]) * (x[4] - x[3]));
-
-                  // Evaluate the interpolation polynomial at istmp
-
-                  velocity_ft_tmp[dir](i, j, k) = a0 * ((istmp - x[1]) * (istmp - x[2]) * (istmp - x[3]) * (istmp - x[4]))
-                                                  + a1 * ((istmp - x[0]) * (istmp - x[2]) * (istmp - x[3]) * (istmp - x[4]))
-                                                  + a2 * ((istmp - x[0]) * (istmp - x[1]) * (istmp - x[3]) * (istmp - x[4]))
-                                                  + a3 * ((istmp - x[0]) * (istmp - x[1]) * (istmp - x[2]) * (istmp - x[4]))
-                                                  + a4 * ((istmp - x[0]) * (istmp - x[1]) * (istmp - x[2]) * (istmp - x[3]));
-
-                  if (xyz[2]<0 && dir==0)
-                    {
-                      velocity_ft_tmp[dir](i, j, k) -=boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_());
-                    }
-                  else if (xyz[2]>Lz && dir==0)
-                    {
-                      velocity_ft_tmp[dir](i, j, k) +=boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_());
-                    }
-
-                }
-            }
-        }
-    }
-  velocity_ft_=velocity_ft_tmp;
-
-  for (int dir = 0; dir < 3; dir++)
-    {
-      if (dir==0)
-        {
-          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-        }
-      else
-        {
-          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-        }
-    }
+//  for (int dir = 0; dir < 3; dir++)
+//    {
+//      if (dir==0)
+//        {
+//          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+//        }
+//      else
+//        {
+//          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+//        }
+//    }
 
 
   // On conserve les duplicatas que l'on transporte comme le reste.
@@ -4621,6 +4516,10 @@ Vecteur3 IJK_FT_double::calculer_grad_p_over_rho_moyen(const IJK_Field_double& p
 
   return resu;
 }
+
+
+
+
 
 void IJK_FT_double::write_check_etapes_et_termes(int rk_step)
 {

@@ -2210,11 +2210,11 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
       mp_max_for_each_item(position_xmax_compo);
     }
 
-  for (int nb = 0; nb < nbulles; nb++)
-    {
-      std::cout << " position_xmin_compo " << position_xmin_compo[nb] << std::endl;
-      std::cout << " position_xmax_compo " << position_xmax_compo[nb] << std::endl;
-    }
+//  for (int nb = 0; nb < nbulles; nb++)
+//    {
+//      std::cout << " position_xmin_compo " << position_xmin_compo[nb] << std::endl;
+//      std::cout << " position_xmax_compo " << position_xmax_compo[nb] << std::endl;
+//    }
 
 
 
@@ -2247,23 +2247,23 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
               decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[compo_bulle_reel]-position_xmin_compo[compo_bulle_reel]); // verifier si cest ca la valeur
               pos = std::fmod(std::fmod(deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
 
-              if (deplacement(i_sommet, 2)  != 0)
-                {
-                  std::cout << " " << std::endl;
-                  std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
-                  std::cout << " dir = "  << dir << std::endl;
-                  std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
-                  std::cout << " code = "  << code << std::endl;
-                  std::cout << " decode = "  << decode << std::endl;
-                  std::cout << " depl = "  << depl << std::endl;
-                  std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
-                  std::cout << " offset = "  << offset << std::endl;
-                  std::cout << " deplacement + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel = "  << deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel << std::endl;
-                  std::cout << " pos_ref = "  << pos_ref << std::endl;
-                  std::cout << " Lx = "  << Lx << std::endl;
-                  std::cout << " pos = "  << pos << std::endl;
-                  std::cout << " decallage_bulle_reel_ext_domaine_reel = "  << decallage_bulle_reel_ext_domaine_reel << std::endl;
-                }
+//              if (deplacement(i_sommet, 2)  != 0)
+//                {
+//                  std::cout << " " << std::endl;
+//                  std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
+//                  std::cout << " dir = "  << dir << std::endl;
+//                  std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
+//                  std::cout << " code = "  << code << std::endl;
+//                  std::cout << " decode = "  << decode << std::endl;
+//                  std::cout << " depl = "  << depl << std::endl;
+//                  std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
+//                  std::cout << " offset = "  << offset << std::endl;
+//                  std::cout << " deplacement + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel = "  << deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel << std::endl;
+//                  std::cout << " pos_ref = "  << pos_ref << std::endl;
+//                  std::cout << " Lx = "  << Lx << std::endl;
+//                  std::cout << " pos = "  << pos << std::endl;
+//                  std::cout << " decallage_bulle_reel_ext_domaine_reel = "  << decallage_bulle_reel_ext_domaine_reel << std::endl;
+//                }
 
 
 
