@@ -2,7 +2,7 @@
 
 err=$1.err
 \rm -rf lata/post-ascii.lata*
-[ -f lata/post.lata ] && lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata
+[ -f lata/post.lata ] && lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata || echo "lata_analyzer not run or failed"
 [ -f lata/post-ascii.lata ] && grep VITESSE.SOM.INTERFACES lata/post-ascii.lata | awk '{print $3}' > vifiles.txt
 \rm -f sum_dIdt_or_dV.txt ai.txt vol_vap.txt sum_dIdt_after-PCH.txt vi.txt
 grep "^Volume_phase_0" $err | awk '{print $4, $2}' > vol_vap.txt

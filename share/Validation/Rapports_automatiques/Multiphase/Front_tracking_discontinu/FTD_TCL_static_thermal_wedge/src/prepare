@@ -1,4 +1,3 @@
 #!/bin/bash
 python generate.py
-\rm post_run
 

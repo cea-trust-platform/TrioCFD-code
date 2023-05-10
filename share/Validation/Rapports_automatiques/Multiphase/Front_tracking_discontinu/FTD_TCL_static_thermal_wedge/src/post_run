@@ -1,4 +1,19 @@
 #!/bin/bash
+
+lata_to_med ()
+{
+  [ ! -d lata ] && echo "Lata is missing" && return -2
+  echo "Dimension 2" > lata/convert.data
+  echo "lata_to_med post.lata post" >> lata/convert.data
+  echo "Fin" >> lata/convert.data
+  cd lata
+  trust convert.data 1> convert.out 2> convert.err
+  cd ..
+  # source $TRUST_ROOT/env_for_python.sh
+  python3 ../conv_med.py
+  return 0
+}
+
 if [ ${1} != "fake" ] ; then 
   echo "[post_run] Running data_extract" && ../data_extract.sh || (echo "data_extract failed" && exit -1)
   echo "[post_run] Running postpro" && visit -nowin -cli -s ../postpro.py&> postpro.log || [ $? == 250 ] || (echo "postpro failed" && exit -1)
@@ -6,5 +21,6 @@ if [ ${1} != "fake" ] ; then
   if [ $(basename $PWD) == "CAS_OFFSET-0.5" ] ; then
     echo "[post_run] Running visit_Re_Nu2" &&  visit -nowin -cli -s ../visit_Re_Nu2.py&> visit_Re_Nu2.log || [ $? == 250 ] || (echo "visit_Re_Nu2 failed" && exit -1)
   fi
+  echo "[post_run] Running med extraction of interface. " && lata_to_med || (echo "post pro of lata_to_med failed" && exit -1)
 fi
 echo "End of post_run in `basename $PWD`"

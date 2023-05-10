@@ -21,7 +21,6 @@ Parameters {
 	ParametersTrio_U Type of boundary conditions : Heated wall with constant temperature and prescribed contact angle (bottom), free openings or walls otherwise.
 	ParametersTrio_U Type of fluid : Atm. water\&steam.
 
-	TestCase . fake 
         CasTest CAS_OFFSET-0.5 calc 1 /* jdd inclus en annexe */
         CasTest CAS_OFFSET-0.4 calc 1
         CasTest CAS_OFFSET-0.3 calc 1
@@ -58,13 +57,13 @@ Parameters {
 
 Chapter {
 	Title "Tests Description"
-	Description "Geometry : 2D (axi?)"
+	Description "Geometry : 2D"
 	Description "Dimensions : R=25e-6 m, L=12.e-6 m"
 	Description "Mesh : Hexa, "
 	Description "Initial conditions : "
 	Description "...Hydraulic : Zero velocity"
-	Description "...Interface : plane at a prescribed angle"
-	Description "...Temperature : T=7$°$ Cover-saturation at the wall, and linear decrease on 5$\mu m$"
+	Description "...Interface : plane at a prescribed angle 5, 10, 15, 20, 30, 50, 80 or 90$°$"
+	Description "...Temperature : T=3,5,7,9 or 15$°$C over-saturation at the wall, and linear decrease on 5$\mu m$"
 	Description "Boundary conditions :"
 	Description "..."
 	Description "..."
@@ -162,6 +161,77 @@ Chapter {
 		up3D 0. 1 0.
 	}
 	
+	visu {
+		Title "final comparison of mp to analytical using VisIt projection by pos_cmfe"
+		nb_img_without_newline 1
+		Origin Visit
+		Width 7.5cm
+		instruction_visit DefineScalarExpression("ri","sqrt((coord(INTERFACES)[0]-5e-6)^2+(coord(INTERFACES)[1])^2)")
+		instruction_visit DefineScalarExpression("mpana", "0.67897/(-2.2574e6)*7.0/(ri*(50*3.14159)/180)")
+		instruction_visit DefineScalarExpression("mp", "pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)
+		instruction_visit  OpenDatabase("REF/lata/post.lata")
+		instruction_visit ScatterAtts = ScatterAttributes()
+		instruction_visit ScatterAtts.var1 = "ri"
+		instruction_visit ScatterAtts.var2 = "mpana"
+		instruction_visit ScatterAtts.colorType = ScatterAtts.ColorBySingleColor
+		instruction_visit ScatterAtts.pointSizePixels = 10
+		instruction_visit ScatterAtts.singleColor = (0, 0, 0, 255)
+		instruction_visit ScatterAtts.scaleCube = 0
+		instruction_visit SetDefaultPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mpana", 0, 1)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mp", 0, 1)
+		instruction_visit ScatterAtts.var2 = "mp"
+		instruction_visit ScatterAtts.singleColor = (255, 0, 0, 255)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit DrawPlots()
+		instruction_visit View2DAtts = View2DAttributes()
+		instruction_visit View2DAtts.windowCoords = (5.20315e-08, 1.56526e-05, -9.20733, -0.154104)
+		instruction_visit View2DAtts.viewportCoords = (0.2, 0.95, 0.15, 0.95)
+		instruction_visit SetView2D(View2DAtts)
+		cycles -1
+	}
+	
+	Figure {
+		Width 7.5cm
+		Dimension 2
+		LabelX "d [$\\mu m$]"
+		LabelY "W+"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M2"
+			file ./CAS_REFINE2/xysm.dat
+			columns ($3) ($4)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M0.5"
+			file ./CAS_REFINE0.5/xysm.dat
+			columns ($3) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+	}
 }
 Chapter {
 	Title "Results"
@@ -199,7 +269,7 @@ Chapter {
 			legend "Reference case"
 			file CAS_OFFSET0.0/dTdni.xyz
 			columns (1e6*sqrt($2*$2+$3*$3)) ($5)
-			Style linepoints
+			Style linespoints
 			TypeLigne 1
 			LineWidth 2
 			PointSize 3

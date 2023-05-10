@@ -23,14 +23,15 @@ ExportDatabase(ExportDBAtts)
 import math
 import numpy as np
 x, y, z, dTdn = np.loadtxt("dTdni.xyz", skiprows=2, usecols=(1,2,3,4)).T
+def readFileInfo():
+    data = {}
+    with open("info.txt") as f:
+        for line in f.readlines():
+            key, value = line.rstrip("\n").split("=")
+            data[key] = float(value)
+    return data
 
-data = {}
-with open("info.txt") as f:
-  for line in f.readlines():
-    key, value = line.rstrip("\n").split("=")
-    data[key] = float(value)
-
-
+data = readFileInfo()
 # Curvilinear absissa : 
 s = np.sqrt(x*x+y*y+z*z)
 s -= s[0]

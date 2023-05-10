@@ -17,8 +17,7 @@ do
           do
              dest=$cwd/$case/VoF$VOF/MassSource$ms/Interp$i/Remesh$remesh
              mkdir -p $dest
-             cp -f "post_run" "$dest"
-             cp -f "./plot.py" "${dest}"
+	     \cp -f post_run $dest/post_run
 
              sed -e "/  VOFlike_correction_volume/s/VOFlike_correction_volume.*/VOFlike_correction_volume $v/g" \
 	              -e "s/  nb_iterations_correction_volume [0-9]/  nb_iterations_correction_volume $o/" \
