@@ -87,51 +87,51 @@ Casesetup {
 				nb_columns 4
 				label parameter \latex_($P$\latex_) | \latex_(\texttt{ratioCutoffWavenumber}\latex_) | cut-off wavenumber \latex_($\kappa_\Delta$\latex_) | \latex_($k_\text{res} / k_\text{tot}$\latex_)
 				line {
-					legend VDF 1a
+					legend "VDF 1a"
 					values 16 2 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VDF 1b
+					legend "VDF 1b"
 					values 32 1 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VDF 1c
+					legend "VDF 1c"
 					values 64 0.5 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VDF 1d
+					legend "VDF 1d"
 					values 128 0.25 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VDF 2a
+					legend "VDF 2a"
 					values 50 2 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VDF 2b
+					legend "VDF 2b"
 					values 100 1 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VDF 2c
+					legend "VDF 2c"
 					values 200 0.5 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VDF 2d
+					legend "VDF 2d"
 					values 400 0.25 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VDF 3a
+					legend "VDF 3a"
 					values 256 2 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				line {
-					legend VDF 3b
+					legend "VDF 3b"
 					values 512 1 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				line {
-					legend VDF 3c
+					legend "VDF 3c"
 					values 1024 0.5 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				line {
-					legend VDF 3d
+					legend "VDF 3d"
 					values 2048 0.25 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				}
@@ -141,35 +141,35 @@ Casesetup {
 				nb_columns 4
 				label mesh points \latex_($P$\latex_) | \latex_(\texttt{ratioCutoffWavenumber}\latex_) | cut-off wavenumber \latex_($\kappa_\Delta$\latex_) | \latex_($k_\text{res} / k_\text{tot}$\latex_)
 				line {
-					legend VEF 1a
+					legend "VEF 1a"
 					values 8 1.414 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VEF 1b
+					legend "VEF 1b"
 					values 16 0.707 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VEF 1c
+					legend "VEF 1c"
 					values 32 0.353 \latex_(1005~rad/m\latex_) 10.62%
 					}
 				line {
-					legend VEF 2a
+					legend "VEF 2a"
 					values 25 1.414 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VEF 2b
+					legend "VEF 2b"
 					values 50 0.707 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VEF 2c
+					legend "VEF 2c"
 					values 100 0.353 \latex_(3142~rad/m\latex_) 50.99%
 					}
 				line {
-					legend VEF 3a
+					legend "VEF 3a"
 					values 128 1.414 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				line {
-					legend VEF 3b
+					legend "VEF 3b"
 					values 256 0.707 \latex_(16085~rad/m\latex_) 90.07%
 					}
 				}

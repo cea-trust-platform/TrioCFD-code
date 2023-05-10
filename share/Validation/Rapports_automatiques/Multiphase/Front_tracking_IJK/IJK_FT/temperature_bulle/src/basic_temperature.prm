@@ -41,38 +41,38 @@ The system can be re-written into a linear system to solve at time iteration j+1
 
 	Auteur "A.S.-M.G"
 
-	CasTest AIR_WATER/COARSE pre_run.data 2
-	CasTest AIR_WATER/COARSE COARSE.data 2
-	CasTest AIR_WATER/MEDIUM pre_run.data 2
-	CasTest AIR_WATER/MEDIUM MEDIUM.data 2
-	CasTest AIR_WATER/FINE pre_run.data 2
-	CasTest AIR_WATER/FINE FINE.data 2
+	CasTest AIR_WATER/COARSE pre_run.data 8
+	CasTest AIR_WATER/COARSE COARSE.data 8
+	CasTest AIR_WATER/MEDIUM pre_run.data 8
+	CasTest AIR_WATER/MEDIUM MEDIUM.data 8
+	CasTest AIR_WATER/FINE pre_run.data 8
+	CasTest AIR_WATER/FINE FINE.data 8
 
-	CasTest AIR_WATER pre_run.data 2 
+	CasTest AIR_WATER pre_run.data 8 
 	CasTest AIR_WATER AIR_WATER_seq.data 1
-	CasTest AIR_WATER AIR_WATER_par8.data 2
+	CasTest AIR_WATER AIR_WATER_par8.data 8
 
-	CasTest ALUMINA_WATER/COARSE pre_run.data 2
-	CasTest ALUMINA_WATER/COARSE COARSE.data 2
-	CasTest ALUMINA_WATER/MEDIUM pre_run.data 2
-	CasTest ALUMINA_WATER/MEDIUM MEDIUM.data 2
-	CasTest ALUMINA_WATER/FINE pre_run.data 2
-	CasTest ALUMINA_WATER/FINE FINE.data 2
+	CasTest ALUMINA_WATER/COARSE pre_run.data 8
+	CasTest ALUMINA_WATER/COARSE COARSE.data 8
+	CasTest ALUMINA_WATER/MEDIUM pre_run.data 8
+	CasTest ALUMINA_WATER/MEDIUM MEDIUM.data 8
+	CasTest ALUMINA_WATER/FINE pre_run.data 8
+	CasTest ALUMINA_WATER/FINE FINE.data 8
 
-	CasTest ALUMINA_WATER pre_run.data 2
+	CasTest ALUMINA_WATER pre_run.data 8
 	CasTest ALUMINA_WATER ALUMINA_WATER_seq.data 1
-	CasTest ALUMINA_WATER ALUMINA_WATER_par8.data 2
+	CasTest ALUMINA_WATER ALUMINA_WATER_par8.data 8
 
-	CasTest ALUMINA_AIR/COARSE pre_run.data 2
-	CasTest ALUMINA_AIR/COARSE COARSE.data 2
-	CasTest ALUMINA_AIR/MEDIUM pre_run.data 2
-	CasTest ALUMINA_AIR/MEDIUM MEDIUM.data 2
-	CasTest ALUMINA_AIR/FINE pre_run.data 2
-	CasTest ALUMINA_AIR/FINE FINE.data 2
+	CasTest ALUMINA_AIR/COARSE pre_run.data 8
+	CasTest ALUMINA_AIR/COARSE COARSE.data 8
+	CasTest ALUMINA_AIR/MEDIUM pre_run.data 8
+	CasTest ALUMINA_AIR/MEDIUM MEDIUM.data 8
+	CasTest ALUMINA_AIR/FINE pre_run.data 8
+	CasTest ALUMINA_AIR/FINE FINE.data 8
 	
-	CasTest ALUMINA_AIR pre_run.data 2
+	CasTest ALUMINA_AIR pre_run.data 8
 	CasTest ALUMINA_AIR ALUMINA_AIR_seq.data 1
-	CasTest ALUMINA_AIR ALUMINA_AIR_par8.data 2
+	CasTest ALUMINA_AIR ALUMINA_AIR_par8.data 8
 
 }
 

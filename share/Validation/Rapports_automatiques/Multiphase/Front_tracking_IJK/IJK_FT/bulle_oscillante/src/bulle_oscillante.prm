@@ -2,7 +2,7 @@ Parametres {
 	Titre "Oscillation d'une bulle en IJK"
 	Description "Inspiré de la fiche de validation de Trio_U Oscillation d'une bulle."
 	Auteur "G.B."
-	CasTest . ijkft_bulle_oscillante.data 2
+	CasTest . ijkft_bulle_oscillante.data 8
 	ExtraUsedFile init.lata*
 	ExtraUsedFile prepare.lata*
 }

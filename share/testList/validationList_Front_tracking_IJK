@@ -3,6 +3,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_canal_bulles_symetrique
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/creeping_flow
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_stat
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/bulle_oscillante
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/conservation_volume
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/reprise_xyz_ijk
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/energie_bulle_seule
