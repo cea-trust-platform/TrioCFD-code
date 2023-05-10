@@ -80,6 +80,10 @@ public :
                                  const DoubleTab& bounding_box_offsetm,
                                  const DoubleTab& authorized_bounding_box,
                                  ArrOfInt& masque_duplicata_pour_compo_reel);
+
+  void preparer_duplicata_bulles_masque_6bit(const DoubleTab& bounding_box,
+                                             const DoubleTab& authorized_bounding_box,
+                                             ArrOfInt& masque_duplicata_pour_compo);
   void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo);
   void creer_duplicata_bulles();
   void supprimer_duplicata_bulles();

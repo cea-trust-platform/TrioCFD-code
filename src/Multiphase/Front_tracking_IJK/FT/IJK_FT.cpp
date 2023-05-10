@@ -4127,17 +4127,17 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
     redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
     redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
-//    for (int dir = 0; dir < 3; dir++)
-//      {
-//        if (dir==0)
-//          {
-//            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-//          }
-//        else
-//          {
-//            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-//          }
-//      }
+    for (int dir = 0; dir < 3; dir++)
+      {
+        if (dir==0)
+          {
+            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          }
+        else
+          {
+            velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+          }
+      }
 
   }
 
@@ -4202,17 +4202,17 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
   redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
 
-//  for (int dir = 0; dir < 3; dir++)
-//    {
-//      if (dir==0)
-//        {
-//          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-//        }
-//      else
-//        {
-//          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-//        }
-//    }
+  for (int dir = 0; dir < 3; dir++)
+    {
+      if (dir==0)
+        {
+          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+        }
+      else
+        {
+          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+        }
+    }
 
 
   // On conserve les duplicatas que l'on transporte comme le reste.
