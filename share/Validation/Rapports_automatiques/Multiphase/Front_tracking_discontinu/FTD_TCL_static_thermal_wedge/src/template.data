@@ -20,7 +20,7 @@ Mailler dom
         {
         bord sym1                        X = 0.         0. <= Y <= 1.    
         bord haut1                       Y = 1.         0. <= X <= 1.    
-        raccord local homogene bas1      Y = 0.         0. <= X <= 1.    
+        bord bas1 			 Y = 0.         0. <= X <= 1.    
         bord libre1                      X = 1.         0. <= Y <= 1.    
         }
 }
@@ -65,13 +65,13 @@ Lire sch
 {
 	nb_pas_dt_max 100000 # 100000000 #
 	tinit 0.
-	tmax  2.e-4 # 1.e-4 objectif #
-	dt_min 1.e-15
+	tmax  1.e-4 
+	dt_min 1.e-10
 	# dt_start 1.e-6 #
 	dt_max @tstep@ # Used as timestep when implicit is used... #
 	#          5.e-10 Small is needed when true density jump? and maybe not enough #
         dt_impr 1e-5
-	dt_sauv 4e-5
+	dt_sauv 1e-5
 	seuil_statio -1
 	diffusion_implicite 0
 	dt_start dt_min 
@@ -106,7 +106,7 @@ Lire pb
          	  Cw               1.e-16
          	  turbulence_paroi negligeable
         	}
-		solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-12 # impr # }
+		solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-8 # impr # }
 		convection { quick }
 		diffusion { }
 		conditions_initiales { vitesse champ_uniforme 2 0. 0. }
