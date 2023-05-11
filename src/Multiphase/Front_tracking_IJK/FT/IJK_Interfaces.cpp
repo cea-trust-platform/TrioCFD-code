@@ -454,8 +454,22 @@ void IJK_Interfaces::compute_vinterp()
       // columns), and stores into "result" void ijk_interpolate(const
       // IJK_Field_double & field, const DoubleTab &coordinates, ArrOfDouble &
       // result)
+
+      //cisailler velocity_ft[direction] pour advecter les sommets en prenant le champ de vitesse
+      // normal dans le cas dune resolution en u' pour bien transporter les marqueurs
+//	  if(boundary_conditions_.get_resolution_u_prime_())
+//	  {
+//		  velocity_ft[0].change_to_sheared_reference_frame(1,  0)
+//	  }
+
       ijk_interpolate_skip_unknown_points(velocity_ft[direction], sommets, vinterp_component,
                                           1.e5 /* value for unknown points */);
+
+//	  if(boundary_conditions_.get_resolution_u_prime_())
+//	  {
+//		  velocity_ft[0].change_to_sheared_reference_frame(-1,  0)
+//	  }
+
       for (int i = 0; i < nbsom; i++)
         vinterp_(i, direction) = vinterp_component[i];
     }

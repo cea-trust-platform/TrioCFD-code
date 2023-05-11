@@ -2139,6 +2139,7 @@ void IJK_FT_double::run()
 
               if (use_inv_rho_in_poisson_solver_)
                 {
+                  inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
                                                    1., pressure_rhs_, check_divergence_,
@@ -3847,6 +3848,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
           if (use_inv_rho_in_poisson_solver_)
             {
+              inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
                                                pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
@@ -3878,6 +3880,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         {
           if (use_inv_rho_in_poisson_solver_)
             {
+              inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
                                                pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
@@ -4030,6 +4033,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           Cerr << "Methode basee sur inv rho pour le grad(P) en RK3" << finl;
           Cerr << " Option a tester si besoin. " << finl;
           Process::exit();
+          inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
                                            pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
@@ -4120,6 +4124,13 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   //  Calculer vitesse_ft (etendue) a partir du champ de vitesse.
   {
 
+    // si on resoud en u', il faut ajouter le cisaillement moyen au champ de vitesse avant de convecter les marqueurs
+    // sinon on perd une partie du mouvement de la bulle.
+    // apres transporter_maillage, on retourne au champ de vitesse u'
+    if(boundary_conditions_.get_resolution_u_prime_())
+      {
+        velocity_[0].change_to_u_prime_to_u(1,  0, boundary_conditions_.get_dU_perio());
+      }
     redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
     redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
     redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
@@ -4127,6 +4138,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
     redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
     redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+
     for (int dir = 0; dir < 3; dir++)
       {
         if (dir==0)
@@ -4139,6 +4151,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
           }
       }
 
+
   }
 
   // On supprime les duplicatas avant le transport :
@@ -4147,6 +4160,32 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
+
+
+  if(boundary_conditions_.get_resolution_u_prime_())
+    {
+      velocity_[0].change_to_u_prime_to_u(-1,  0 , boundary_conditions_.get_dU_perio());
+
+      redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
+      redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
+      redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+
+      for (int dir = 0; dir < 3; dir++)
+        {
+          if (dir==0)
+            {
+              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+            }
+          else
+            {
+              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+            }
+        }
+    }
 
   // Apres le transport, est-ce que certaines bulles reeles sont trop proche du bord
   // du domaine etendu? Si on en trouve, on les transferts :
@@ -4193,7 +4232,10 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   statistiques().begin_count(deplacement_interf_counter_);
 
 
-
+  if(boundary_conditions_.get_resolution_u_prime_())
+    {
+      velocity_[0].change_to_u_prime_to_u(1,  0, boundary_conditions_.get_dU_perio());
+    }
   redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
   redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
   redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
@@ -4221,6 +4263,32 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
+
+  if(boundary_conditions_.get_resolution_u_prime_())
+    {
+      velocity_[0].change_to_u_prime_to_u(-1,  0 , boundary_conditions_.get_dU_perio());
+
+      redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
+      redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
+      redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+
+      for (int dir = 0; dir < 3; dir++)
+        {
+          if (dir==0)
+            {
+              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+            }
+          else
+            {
+              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+            }
+        }
+    }
+
   statistiques().end_count(deplacement_interf_counter_);
   // On verra a la fin du pas de temps si certaines bulles reeles sont trop proche du bord
   // du domaine etendu. Pour l'instant, dans les sous dt, on ne les transferts pas.
