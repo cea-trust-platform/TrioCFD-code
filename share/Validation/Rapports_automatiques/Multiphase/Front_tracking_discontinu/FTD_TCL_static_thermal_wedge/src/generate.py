@@ -15,9 +15,11 @@ lts = [0.1e-6, 0.2e-6, 0.3e-6]
 
 def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, dt=refDT, tstep=tstep):
    if os.path.isdir(dest):
-      shutil.rmtree(dest)
+      # shutil.rmtree(dest)
+      print("Directory %s not updated"%dest)
+   else:
+      os.mkdir(dest)
       pass
-   os.mkdir(dest)
    # Read in the file and make the replacements:
    with open('template.data') as f:
       data = f.read()
