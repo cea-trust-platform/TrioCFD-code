@@ -1072,3 +1072,57 @@ the Boussinesq hypothesis.
 
 Several turbulence model can be defined, as defined in the more
 complete model.
+
+\subsection{Drift-flux models}
+
+The drift-flux model is an appropriate choice whenever the two-phase flow is strongly coupled, i.e. only small kinematic desequilibrium between the phases may appear \cite{hibiki2002distribution}. The system is then described by the mixture balance equations for mass, momentum and energy, supplemented by the formulation of a relative velocity that accounts for the kinematic desequilibrium between both phases. \\
+
+Zuber and Findlay \cite{zuber1965average} introduced in 1965 a formulation of the void-fraction-weighted mean gas velocity (or intrinsic averaged gas velocity) as a function of the area-averaged mixture velocity : 
+
+	\begin{equation}\label{eq_drift-velocity}
+		\mathbf{V_g} = \frac{\left\langle\alpha_g * \mathbf{v_g}\right\rangle}{\left\langle\alpha_g\right\rangle} = C_0 \mathbf{J} + \mathbf{V_{gj}} 
+	\end{equation}
+	
+	
+where $\mathbf{V_g}$ is the void-fraction-weighted mean gas velocity, $C_0$ is the distribution parameter, $\mathbf{V_{gj}}$ the void-fraction-weighted mean drift velocity and $\mathbf{J}$ denotes the area-averaged mixture velocity. The latter is the volume average of the mixture local velocity $\mathbf{j}$, which can be expressed in terms of the local phase velocities $\mathbf{v_l}$ and $\mathbf{v_g}$ and the phase fractions $\alpha_l$ and $\alpha_g$ as follows:%$\left\langle\mathbf{j}\right\rangle$ the area-averaged mixture velocity defined as follows: 
+	
+	\begin{equation}
+		\mathbf{j} = \alpha_g \mathbf{v_g} + \alpha_l \mathbf{v_l}
+	\end{equation}
+	
+with $\mathbf{J} = \left\langle \mathbf{j} \right\rangle $ 
+
+
+The constitutive equations for the drift-flux model, originally developed to calculate intrinsic averaged velocities in vertical upward two-phase flows \cite{zuber1965average}\cite{ishii1977one}, where later on extended at the local scale to three-dimensional and more complex flows \cite{manninen1996mixture}\cite{mahdavi2017implementation}, thereby allowing to define a local drift velocity in stream and transverse directions.\\
+
+In TrioCFD, several drift velocities are proposed at the component and local scales. 
+
+\paragraph{At the component scale } (i.e. nuclear core reactor, steam generator, ...), the porous medium is represented by an homogeneous equivalent medium and instrinsic average velocities are (amongst others) unknowns of the system. Two different drift-velocities may be chosen to close the system of equations:
+\begin{itemize}
+	\item Either the distribution parameter $C_0$ and the void-fraction-weighted mean drift velocity vector are used-defined constants. 
+	\item Or fitted for the bubbly flow regime as proposed by  Hibiki and Ishii \cite{hibiki2002distribution} : 
+	\begin{align}
+		C_0 = \big(1.2 - 0.2 \sqrt{\frac{\rho_g}{\rho_l}}\big)(1-\exp(-18\left\langle\alpha_g\right\rangle))\\
+		V_{gj} = \sqrt{2}\big(\frac{g\Delta\rho}{\rho_f^2}\big)^{1/4}(1-\left\langle\alpha_g\right\rangle)^{1.75},
+	\end{align}
+
+The vector $\mathbf{V_{gj}}$ is oriented in the stream direction. Let us recall that the drift-flux model established by \cite{hibiki2002distribution} is valid for one-dimensional upward two-phase flows. 
+\end{itemize}
+
+\paragraph{At the local scale} 
+\begin{itemize}
+	\item Either the distribution parameter $C_0$ and a local gas drift-velocity vector are used-defined constants. 
+	\item Or the three-dimensional drift-velocity is derived as proposed by Manninen \cite{manninen1996mixture}. The dispersed phase (denoted by the subscript d) is assumed in equilibrium in the continuum phase (denoted by the subscript c) such that the force balance applied to the dispersed phase equates to zero, thereby leading to the formulation of the relative velocity in the stream and transverse direction :
+	
+	\begin{align}
+		\mathbf{F_{FI}} = K ||\mathbf{u_d} - \mathbf{u_c}\rVert \underbrace{(\mathbf{u_d} - \mathbf{u_c})}_\textbf{relative velocity}  = - \mathbf{F_{lift}} - \mathbf{F_{buoyancy}} -\mathbf{F_{centrifugal}} -\mathbf{F_{dispersion}} 
+	\end{align}	 
+
+As of now, the local relative velocity is defined in the case of upward flow in a vertical pipe so that the centrifugal acceleration is not taken into account. The formulation of the local relative velocity will be shortly extended to the case of rotational two-phase flows.  
+
+\end{itemize}
+
+
+ 
+
+
