@@ -166,9 +166,9 @@ Chapter {
 		nb_img_without_newline 1
 		Origin Visit
 		Width 7.5cm
-		instruction_visit DefineScalarExpression("ri","sqrt((coord(INTERFACES)[0]-5e-6)^2+(coord(INTERFACES)[1])^2)")
+		instruction_visit DefineScalarExpression("ri","1.e-20+sqrt((coord(INTERFACES)[0]-5e-6)^2+(coord(INTERFACES)[1])^2)")
 		instruction_visit DefineScalarExpression("mpana", "0.67897/(-2.2574e6)*7.0/(ri*(50*3.14159)/180)")
-		instruction_visit DefineScalarExpression("mp", "pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)
+		instruction_visit DefineScalarExpression("mp", "pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)")
 		instruction_visit  OpenDatabase("REF/lata/post.lata")
 		instruction_visit ScatterAtts = ScatterAttributes()
 		instruction_visit ScatterAtts.var1 = "ri"

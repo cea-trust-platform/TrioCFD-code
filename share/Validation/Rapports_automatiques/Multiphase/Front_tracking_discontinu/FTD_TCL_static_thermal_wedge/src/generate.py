@@ -17,6 +17,7 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
    if os.path.isdir(dest):
       # shutil.rmtree(dest)
       print("Directory %s not updated"%dest)
+      return
    else:
       os.mkdir(dest)
       pass

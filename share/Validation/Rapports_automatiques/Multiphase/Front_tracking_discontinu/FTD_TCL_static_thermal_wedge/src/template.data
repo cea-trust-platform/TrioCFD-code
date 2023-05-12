@@ -63,7 +63,7 @@ Lire fluide
 Schema_Euler_explicite  sch
 Lire sch
 {
-	nb_pas_dt_max 100000 # 100000000 #
+	nb_pas_dt_max 110000 # 100000000 #
 	tinit 0.
 	tmax  1.e-4 
 	dt_min 1.e-10
