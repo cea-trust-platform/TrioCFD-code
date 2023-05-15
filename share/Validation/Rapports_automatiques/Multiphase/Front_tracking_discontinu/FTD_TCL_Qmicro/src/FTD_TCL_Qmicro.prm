@@ -10,7 +10,6 @@ Parameters {
 	TestCase THETA40/VoF1000 Qmicro_only.data
 	TestCase THETA40/VoF1003 Qmicro_only.data
 	TestCase THETA40/VoF1110 Qmicro_only.data
-	TestCase THETA40/VoF1113 Qmicro_only.data
 	TestCase THETA40/VoF1330 Qmicro_only.data
 	TestCase THETA40/VoF1333 Qmicro_only.data
 	
@@ -84,7 +83,7 @@ EOF
                 Version ""
                 file ./THETA20/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -92,7 +91,7 @@ EOF
                 Version ""
                 file ./THETA40/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -100,7 +99,7 @@ EOF
                 Version ""
                 file ./THETA80/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -163,7 +162,7 @@ EOF
                 Version ""
                 file ./THETA40/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
