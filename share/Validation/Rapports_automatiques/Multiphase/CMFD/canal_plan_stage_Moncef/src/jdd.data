@@ -1,0 +1,209 @@
+# PARALLEL OK #
+
+Dimension 2
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+    pave bloc1
+    {
+        origine 0 0
+        longueurs $lx $y_1
+        nombre_de_noeuds $nx $ny_1
+    }
+    {
+        bord entree	 X = 0.            0. <= Y <= $y_1
+        bord sortie	 X = $lx	    0. <= Y <= $y_1
+        bord bas	 Y = 0. 	    0. <= X <= $lx
+    } ,
+    pave bloc2
+    {
+        origine 0 $y_1
+        longueurs $lx $ly_2
+        nombre_de_noeuds $nx $ny_2
+    }
+    {
+        bord entree	 X = 0	            $y_1 <= Y <= $y_2
+        bord sortie	 X = $lx	    $y_1 <= Y <= $y_2
+    } ,
+    pave bloc3
+    {
+        origine 0 $y_2
+        longueurs $lx $ly_3
+        nombre_de_noeuds $nx $ny_3
+    }
+    {
+        bord entree	 X = 0	            $y_2 <= Y <= $y_3
+        bord sortie	 X = $lx	    $y_2 <= Y <= $y_3
+        bord haut	 Y = $y_3 	    0 <= X <= $lx
+    }
+}
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+    /* Choose Nb_parts so to have ~ 25000 cells per processor */
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$schema  dis
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax $tmax
+    dt_impr 1e-8
+    facsec $facsec
+    facsec_max $facsec
+    seuil_statio 1e-10
+    nb_pas_dt_max $nb_pas_dt_max
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 $diss_conv }
+        iter_min 2
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Pb_Multiphase pb
+
+
+associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Lire pb
+{
+    Milieu_composite
+    {
+        liquide_eau Fluide_Incompressible
+        {
+            mu champ_uniforme      1 $mu
+            rho champ_uniforme     1 $rho
+            lambda Champ_Uniforme  1 1
+            Cp Champ_Uniforme      1 1e3
+            beta_th Champ_Uniforme 1 0
+        }
+    }
+    correlations
+    {
+        loi_paroi adaptative { }
+    }
+    QDM_Multiphase
+    {
+        evanescence { homogene { alpha_res 1 alpha_res_min .5 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        convection { amont }
+        diffusion  { turbulente $diffusion { sigma 1 } }
+        initial_conditions
+        {
+            vitesse  champ_fonc_xyz dom 2 $u_0 0
+            pression Champ_Fonc_xyz dom 1 1e5
+        }
+        conditions_limites
+        {
+            bas Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+            haut symetrie
+            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 $u_0 0
+            sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 1e5
+        }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
+        convection { amont }
+        conditions_limites
+        {
+            bas paroi
+            haut symetrie
+            entree	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            sortie	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+        }
+    }
+    Energie_Multiphase
+    {
+        diffusion { }
+        convection { amont }
+        initial_conditions { temperature Champ_Uniforme 1 0 }
+        boundary_conditions
+        {
+            bas paroi_adiabatique
+            haut symetrie
+            entree	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            sortie	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+        }
+    }
+    $equation
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { $diss Champ_Fonc_xyz dom 1 $IC_diss }
+        boundary_conditions
+        {
+            bas $CL_diss
+            haut symetrie
+            entree	frontiere_ouverte tau_ext Champ_Front_Uniforme 1 $IC_diss
+            sortie	frontiere_ouverte tau_ext Champ_Front_Uniforme 1 $IC_diss
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+            $diffusion_sup
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 0.01 }
+        boundary_conditions
+        {
+            bas $CL_k
+            haut symetrie
+            entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+            sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+        }
+        sources
+        {
+            Production_energie_cin_turb ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+    Postraitement
+    {
+        sondes			{
+            k	    	k      		periode 1e8 segment 1000    95 0.0005    95 0.9995
+            diss    	$diss      		periode 1e8 position_like k
+            vit    	vitesse_liquide_eau	periode 1e8 position_like k
+            y_plus		y_plus			periode 1e8 position_like k
+        }
+        format lml
+		champs binaire dt_post 10.
+			{
+            k	    elem
+            $diss    elem
+            vitesse_liquide_eau	elem
+            y_plus	elem
+        }
+
+    }
+}
+
+Resoudre pb
+
+Fin
