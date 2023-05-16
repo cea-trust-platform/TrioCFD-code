@@ -35,7 +35,7 @@ cd -
 
 echo -e "File ${INFOFILE} update"
 sed -ri "s/(TrioCFD v.* merge) ${currentVersion}/\1 ${newVersion}/gmi" ${INFOFILE}
-sed -ri "s/(Based on trust SHA1 ID :) .*/\1 ${shaID1}/gmi" ${INFOFILE}
+sed -ri "s/(Based on trust Id SHA1 :) .*/\1 ${shaID1}/gmi" ${INFOFILE}
 git add -u ${INFOFILE}
 
 exit 0

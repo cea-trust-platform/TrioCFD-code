@@ -142,8 +142,8 @@ protected :
   int capillary_effect_on_theta_activated_;
   int TCL_energy_correction_;
   int tag_tcl_;
-  double coeffa_; //
-  double coeffb_; //
+  //double coeffa_; //
+  //double coeffb_; //
   double Qtcl_; //
   double lv_; // The length...
   double theta_app_;

@@ -33,7 +33,10 @@
 static const double TSAT_CONSTANTE = 0.;
 
 Implemente_instanciable_sans_constructeur( Triple_Line_Model_FT_Disc, "Triple_Line_Model_FT_Disc", Objet_U ) ;
-
+// XD Triple_Line_Model_FT_Disc objet_u Triple_Line_Model_FT_Disc -1 Triple Line Model (TCL)
+// XD ref navier_stokes_ft_disc navier_stokes_ft_disc
+// XD ref transport_interfaces_ft_disc transport_interfaces_ft_disc
+// XD ref convection_diffusion_temperature_ft_disc convection_diffusion_temperature_ft_disc
 
 
 Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
@@ -42,8 +45,8 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   capillary_effect_on_theta_activated_(0),
   TCL_energy_correction_(0),
   tag_tcl_(-1),
-  coeffa_(0),
-  coeffb_(0),
+  //coeffa_(0),
+  //coeffb_(0),
   Qtcl_(0),
   lv_(0.),
   theta_app_(0.),
@@ -93,15 +96,15 @@ Entree& Triple_Line_Model_FT_Disc::readOn( Entree& is )
 // Description: Methode appelee par readOn. Declaration des parametres a lire dans le .data
 void Triple_Line_Model_FT_Disc::set_param(Param& p)
 {
-  p.ajouter("Qtcl", &Qtcl_);
-  p.ajouter("lv", &lv_);
-  p.ajouter("coeffa", &coeffa_);
-  p.ajouter("coeffb", &coeffb_);
-  p.ajouter("theta_app", &theta_app_);
-  p.ajouter("ylim", &ym_);
-  p.ajouter("ym", &ym_);
-  p.ajouter("sm", &sm_,Param::REQUIRED);
-  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_);
+  p.ajouter("Qtcl", &Qtcl_); // XD_ADD_P floattant Heat flux contribution to micro-region [W/m]
+  p.ajouter("lv", &lv_); // X_D_ADD_P floattant Slip length (unused)
+  //p.ajouter("coeffa", &coeffa_); // X_D_ADD_P floattant not_set
+  //p.ajouter("coeffb", &coeffb_); // X_D_ADD_P floattant not_set
+  p.ajouter("theta_app", &theta_app_); // XD_ADD_P floattant Apparent contact angle (Cox-Voinov)
+  //p.ajouter("ylim", &ym_); // X_D_ADD_P floattant not_set
+  p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
+  p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
+  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
 }
