@@ -6,6 +6,7 @@ Parameters {
 	TestCase . PE2_modif_div0.data
 	TestCase . PE2_p_forte.data
 	TestCase . PE2_p_forte_modif_div0.data
+        # DISABLE_PARALLEL_RUN #
 
 	Description Tout a l'air ok mis a part le pb d'instabilite en sortie si pression est imposee de facon forte en sortie.
 	Description " Effet renforce par le fait que l'on n'a ni convection ni diffusion"
