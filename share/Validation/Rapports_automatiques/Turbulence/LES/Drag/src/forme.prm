@@ -42,6 +42,7 @@ Parameters {
 	TestCase DemiCercle k3r.data
 	TestCase DemiCercle k3r_alt.data
 	IncludeData 2
+        # DISABLE_PARALLEL_RUN #
 }
 
 Chapter {
