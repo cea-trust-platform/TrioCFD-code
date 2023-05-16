@@ -51,7 +51,7 @@ void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const
                               ref_cast(Op_Diff_PolyMAC_P0_base, pb_->equation(2).operateur(0).l_op_base()).nu();
 
   double theta_plus = calc_theta_plus(y, u_tau, in.mu[0], in.lambda[0], in.rho[0], in.Cp[0], in.D_h),
-         fac = in.rho[0] * in.Cp[0] * u_tau / theta_plus * 1. / (1 - in.rho[0] * in.Cp[0] * y / diffu_th(e, 0) * u_tau / theta_plus); // No alpha
+         fac = in.rho[0] * in.Cp[0] * u_tau / theta_plus * 1. / (1 - in.rho[0] * in.Cp[0] * y / diffu_th(e, 0) * u_tau / theta_plus); // No alpha ; truc chelou en bas de la fraction : diffusion entre le mur et le centre du premier element
   if (out.qpk) (*out.qpk)(0) = fac * (in.Tp - in.T[0]);
   if (out.dTf_qpk) (*out.dTf_qpk)(0,0) = -fac;
   if (out.dTp_qpk) (*out.dTp_qpk)(0)   = fac;
