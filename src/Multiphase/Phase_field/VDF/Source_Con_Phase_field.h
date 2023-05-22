@@ -92,8 +92,8 @@ protected:
   double angle_alphaMatrix;
   double diagonal_coeff;
   int kappa_ind;
-  int type_kappa_;
-  int type_kappa_auto_diffusion_;
+  int type_kappa_ = -1;
+  int type_kappa_auto_diffusion_ = -1;
   int type_alpha_rotation_;
   int type_potentiel_analytique_;
   int type_systeme_naire_;
@@ -298,7 +298,7 @@ inline DoubleTab Source_Con_Phase_field::kappa_func_auto_diffusion(const DoubleT
   DoubleTab kappaMatrix_(c.dimension(0), nb_equation_CH*nb_equation_CH);
 
   // creation d'un tableau temp_c qui contiendra toutes les concentrations des n composants non pas les n-1 seulements (n-1 eqs).
-  //La dernière colonne correspondra a 1-somme sur (n-1) des concentrations
+  //La derniere colonne correspondra a 1-somme sur (n-1) des concentrations
 
   for (int k=0; k<c.line_size(); k++)
     {
