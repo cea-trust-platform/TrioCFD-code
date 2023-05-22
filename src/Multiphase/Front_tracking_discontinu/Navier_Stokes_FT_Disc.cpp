@@ -3264,10 +3264,14 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           Cerr << "[TCL] Contact line model is activated" << finl;
           ArrOfInt elems_with_CL_contrib;
+          ArrOfInt faces_with_CL_contrib;
           ArrOfDouble mpoint_from_CL;
           ArrOfDouble Q_from_CL;
           // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
-          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, mpoint_from_CL, Q_from_CL);
+          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
+                                                                       faces_with_CL_contrib,
+                                                                       mpoint_from_CL,
+                                                                       Q_from_CL);
 
           // Correct the field mpoint in wall-adjacent cells to account for TCL model:
           // ---> It's not added to mpoint now. Its contribution is added in
