@@ -385,10 +385,8 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
         }
       int inner_nodes = 0;
 
-      int inside[3] = {};
       for (int isom = 0; isom< Objet_U::dimension; isom++)
         {
-          inside[isom] =0;
           const int num_som = facettes(fa7, isom); // numero du sommet dans le tableau sommets
           // Cerr << " node-number #" << num_som << "face-number #" << fa7 << finl;
 
@@ -409,7 +407,6 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
             {
               //  Cerr << " This node lies inside the element #" << elem << finl;
               inner_nodes += 1;
-              inside[isom] = 1;
             }
         }
       // Cerr << " nb of inner nodes = " << inner_nodes << " in elem " << elem
@@ -443,7 +440,7 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
         }
       else if((inner_nodes == 1)||(inner_nodes == 0))
         {
-          // TODO : If this method works also when there are 2 intersections, we 
+          // TODO : If this method works also when there are 2 intersections, we
           // could remove the for loop before and the if (....) ... else if ... and just keep below:
           //  Cerr << " find the intersection points of the facettes and elem-faces "<< finl;
           // One point in, one point out, search  1 intersect
@@ -600,24 +597,13 @@ double compute_distance(const Domaine_VF& domaine_vf, const int num_face, const 
 
 // Q_int = Q_meso*circum_dis is W
 double Triple_Line_Model_FT_Disc::compute_Qint(const DoubleTab& in_out, const double theta_app_loc,
-                                               const int num_face, double& Q_meso) const
+                                               const int num_wall_face, double& Q_meso) const
 {
   double circum_dis = 1.;
   if (Objet_U::bidim_axi)
     {
-      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ref_ns_.valeur().domaine_dis().valeur());
-      const double xf = zvdf.xv(num_face,zvdf.orientation(num_face));
       const double xl = in_out(0,0);
       const double xr = in_out(1,0);
-      if ((xf-xl)*(xf-xr)>0.)
-        {
-          Cerr << "Issue, point f is not between l and r" << finl;
-          Cerr << "xl=" << xl <<finl;
-          Cerr << "xf=" << xf <<finl;
-          Cerr << "xr=" << xr <<finl;
-          Process::exit();
-        }
-//      const double radial_dis = zvdf.xv(num_face,1-korient); // 1-korient is the direction // to wall in 2D.
       double radial_dis = (xr + xl)/2;
       const double angle_bidim_axi = Maillage_FT_Disc::angle_bidim_axi();
       circum_dis = angle_bidim_axi*radial_dis;
@@ -628,12 +614,12 @@ double Triple_Line_Model_FT_Disc::compute_Qint(const DoubleTab& in_out, const do
   const double yr = in_out(1,1);
   double Twall = 0.;
   double flux = 0.;
-  ref_eq_temp_.valeur().get_flux_and_Twall(num_face, flux, Twall);
+  ref_eq_temp_.valeur().get_flux_and_Twall(num_wall_face, flux, Twall);
 
   const double ytop = std::fmax(yr,yl);
   const double ybot = std::fmin(yr,yl);
   // Meso region is between ym_ and ymeso_:
-  double ln_y = log(std::fmin(ymeso_,std::fmax(ytop,ym_))/std::fmax(ymeso_,std::fmax(ybot,ym_)));
+  double ln_y = log(std::fmin(ymeso_,std::fmax(ytop,ym_))/std::fmin(ymeso_,std::fmax(ybot,ym_)));
   assert(kl_cond_>0.);
 //  Cerr << "ln_y = " << ln_y << " time_total = " << temps << " Theta_app_local = " << theta_app_loc
 //       <<" delT = "<< Twall << " kl = "<< kl_cond_ << finl;
@@ -1472,8 +1458,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
               in_out(0,korient) *= -1;
               in_out(1,korient) *= -1;
             }
-          assert(in_out(0,korient) >=0);
-          assert(in_out(1,korient) >=0);
+          assert(in_out(0,korient) >=-Objet_U::precision_geom);
+          assert(in_out(1,korient) >=-Objet_U::precision_geom);
         }
         const double xl = in_out(0,0);
         const double yl = in_out(0,1);

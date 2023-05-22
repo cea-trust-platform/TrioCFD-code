@@ -4,7 +4,6 @@ PrecisionGeom 1.e-12
 dimension 2
 # bidim_axi # 
 domaine dom
-domaine dom_solide
 Probleme_FT_Disc_gen pb
 
 # BEGIN MESH #
@@ -24,11 +23,10 @@ Mailler dom
         bord libre1                      X = 1.         0. <= Y <= 1.    
         }
 }
-transformer dom x*25e-6 y*12.e-6 # pas=0.5e-6 #
+transformer dom x*24e-6 y*12.e-6
 
 # 
 Scatter DOM.Zones dom
-Scatter DOM_SOLIDE.Zones dom_solide
 #
 
 Fluide_Incompressible  eau
@@ -78,20 +76,36 @@ Lire sch
 	facsec 0.30 # not necessary for this case 50x25 but necessary when refined #
 }
 
+Triple_Line_Model_FT_Disc TCL 
+Read TCL 
+{
+  deactivate
+  Qtcl @Qi@ # W/m # 
+  ym 5.e-7
+  # ymeso 5.e-6 #
+  n_extend_meso 1
+  sm @sm@ # TestCase at theta_app = @degliq@ degree #
+          # sm = ym / tan(theta) #
+  inout_method both
+}
+
 Champ_Uniforme gravite
-Lire gravite 2 0.0 0.0 # HACK, mettre -9.81 en y au final #
+Lire gravite 2 0.0 0.0
 Associate fluide gravite
 
 Navier_stokes_FT_disc                         hydraulique
 Transport_interfaces_FT_disc                  interf
 convection_diffusion_temperature_ft_disc      thermique
-# convection_diffusion_temperature_ft_disc      thermique_vapeur #
 Associate pb dom
 Associate pb hydraulique
 Associate pb thermique
-# Associate pb thermique_vapeur #
 Associate pb interf
 Associate pb fluide
+
+Associate TCL hydraulique
+Associate TCL thermique
+Associate TCL interf
+Associate pb TCL
 
 VDF dis
 Associate pb sch
@@ -102,11 +116,11 @@ Lire pb
 	hydraulique
 	{
 	 	modele_turbulence sous_maille_wale
-        	{
-         	  Cw               1.e-16
-         	  turbulence_paroi negligeable
-        	}
-		solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-8 # impr # }
+		{
+			Cw               0.
+			turbulence_paroi negligeable
+		}
+		solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-12 # impr # }
 		convection { quick }
 		diffusion { }
 		conditions_initiales { vitesse champ_uniforme 2 0. 0. }
@@ -118,12 +132,10 @@ Lire pb
                 correction_courbure_ordre 2
 		boundary_conditions 
 		{
-		libre1   paroi_fixe # symetrie #
+		libre1   sortie_libre_rho_variable champ_front_uniforme 1 0.
 		haut1    paroi_fixe
-#		libre1   sortie_libre_rho_variable champ_front_uniforme 1 0.
-		haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
-	#	bas1     paroi_fixe 
-		sym1 	symetrie 
+		bas1     paroi_fixe 
+		sym1 	 symetrie 
         	}
 		# boussinesq_approximation #
 		# terme_gravite rho_G #
@@ -211,11 +223,11 @@ Lire pb
                 boundary_conditions
                 {
 			bas1   paroi_temperature_imposee Champ_front_fonc_xyz 1 @DT@
-                        haut1  paroi_temperature_imposee Champ_front_fonc_xyz 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6-(@offset@e-6)))/@degliq@)
-                        libre1 paroi_temperature_imposee Champ_front_fonc_xyz 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6-(@offset@e-6)))/@degliq@)
+                        haut1  paroi_temperature_imposee Champ_front_fonc_xyz 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6+1.e-20-(@offset@e-6)))/@degliq@)
+                        libre1 paroi_temperature_imposee Champ_front_fonc_xyz 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6+1.e-20-(@offset@e-6)))/@degliq@)
 			sym1   symetrie
                 }
-                conditions_initiales { Temperature_thermique champ_fonc_xyz dom 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6-(@offset@e-6)))/@degliq@) }
+                conditions_initiales { Temperature_thermique champ_fonc_xyz dom 1 @DT@*(1-180/3.14159*atan(y/(x-5.e-6+1.e-20-(@offset@e-6)))/@degliq@) }
         }
 	
 #
@@ -301,6 +313,8 @@ Lire pb
         volume_maille elem 
         indicatrice_interf elem 
         vitesse elem
+        pressure elem
+        second_membre_projection elem
         vitesse faces
     } 
     interfaces interf { 
