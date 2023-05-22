@@ -97,14 +97,14 @@ Entree& Triple_Line_Model_FT_Disc::readOn( Entree& is )
 void Triple_Line_Model_FT_Disc::set_param(Param& p)
 {
   p.ajouter("Qtcl", &Qtcl_); // XD_ADD_P floattant Heat flux contribution to micro-region [W/m]
-  p.ajouter("lv", &lv_); // X_D_ADD_P floattant Slip length (unused)
-  //p.ajouter("coeffa", &coeffa_); // X_D_ADD_P floattant not_set
-  //p.ajouter("coeffb", &coeffb_); // X_D_ADD_P floattant not_set
+  p.ajouter("lv", &lv_); // XD_ADD_P floattant Slip length (unused)
+  //p.ajouter("coeffa", &coeffa_); // XD_ADD_P floattant not_set
+  //p.ajouter("coeffb", &coeffb_); // XD_ADD_P floattant not_set
   p.ajouter("theta_app", &theta_app_); // XD_ADD_P floattant Apparent contact angle (Cox-Voinov)
-  //p.ajouter("ylim", &ym_); // X_D_ADD_P floattant not_set
+  //p.ajouter("ylim", &ym_); // XD_ADD_P floattant not_set
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
-  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
+  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position (unused)
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
 }
