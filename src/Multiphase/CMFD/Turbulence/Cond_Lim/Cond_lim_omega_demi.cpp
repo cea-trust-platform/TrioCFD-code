@@ -35,6 +35,7 @@
 #include <math.h>
 
 Implemente_instanciable(Cond_lim_omega_demi,"Cond_lim_omega_demi",Dirichlet_loi_paroi);
+// XD Cond_lim_omega_demi condlim_base Cond_lim_omega_demi 1 Adaptive wall law boundary condition for turbulent dissipation rate
 
 Sortie& Cond_lim_omega_demi::printOn(Sortie& s ) const
 {
