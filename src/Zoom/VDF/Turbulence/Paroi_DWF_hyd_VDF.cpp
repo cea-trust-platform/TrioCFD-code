@@ -102,8 +102,8 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
   EChaine ch_pbmg(nom_pbmg);
   //interpreter(ch_pbmg);
 
-  Nom pbMG_("pbMG");
-  const Objet_U& ob_pbmg=Interprete::objet(pbMG_);
+  Nom pbMGName("pbMG");
+  const Objet_U& ob_pbmg=Interprete::objet(pbMGName);
   pbMG=ref_cast(Pb_MG, ob_pbmg);
 
   pbMG.associer_pbMG_pbGglobal_(pb_thhyd); // Probleme grossier  = le probleme a resoudre
