@@ -130,7 +130,7 @@ if GRADT==1 :
    DefineScalarExpression("Grad_T_fois_surf_elem", "pos_cmfe(<[0]id:GRAD_TEMP_THERMIQUE_ELEM_dom>,INTERFACES,-100.)*sinterf")
 else :
    # DefineScalarExpression("Grad_T_fois_surf_elem",str(L_vap)+"/"+str(k_l)+"*pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)*sinterf")
-   DefineScalarExpression("Grad_T_fois_surf_elem",str(L_vap)+"/"+str(k_l)+"*pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,-100.)*sinterf")
+   DefineScalarExpression("Grad_T_fois_surf_elem",str(L_vap)+"/"+str(k_l)+"*pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)*sinterf")
 
 if PAR==1 :
    DefineScalarExpression("facettes_locales", "eq(PE_LOCAL_ELEM_INTERFACES, PE_ELEM_INTERFACES)") # Pour eliminer facettes virtuelles

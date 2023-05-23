@@ -163,8 +163,8 @@ Lire pb
       # In remaillage, nb_iter_correction_volume -> additional VoF conserving iterations after lissage and bary are finished #
       # facteur_longueur_ideale 1.0 is not recommanded usually #
       VOFlike_correction_volume 1
-      nb_iterations_correction_volume 1 
-      nb_lissage_correction_volume 1 
+      nb_iterations_correction_volume 3 
+      nb_lissage_correction_volume 3 
       # Bloc Remesh Best # 
       remaillage {
                     pas 1e-12
@@ -175,7 +175,7 @@ Lire pb
                     relax_barycentrage 0.1
                     facteur_longueur_ideale 1.0
                     nb_iter_barycentrage 1
-                    nb_iter_correction_volume 3
+                    nb_iter_correction_volume 0
                     seuil_dvolume_residuel 1e-15
                     lissage_courbure_coeff -0.02
                     lissage_courbure_iterations_systematique 1

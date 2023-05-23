@@ -15,9 +15,12 @@ lts = [0.1e-6, 0.2e-6, 0.3e-6]
 
 def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, dt=refDT, tstep=tstep):
    if os.path.isdir(dest):
-      shutil.rmtree(dest)
+      # shutil.rmtree(dest)
+      print("Directory %s not updated"%dest)
+      return
+   else:
+      os.mkdir(dest)
       pass
-   os.mkdir(dest)
    # Read in the file and make the replacements:
    with open('template.data') as f:
       data = f.read()
@@ -38,6 +41,7 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
       f.write("lda=0.67897\n")
       f.write("DT=%s\n"%str(dt))
       f.write("theta=%s\n"%str(degliq))
+      f.write("Lvap=%s\n"%str(-2.2574e6))
    #
    n=1
    print("\tCasTest %s calc %d"%(dest,1))
@@ -57,12 +61,12 @@ for ts in lts :
       pass
    pass 
 
-subprocess.call(["ln","-sf", "CAS_OFFSET0.0", "REF"])
+if not os.path.exists("REF"): subprocess.call(["ln","-sf", "CAS_OFFSET0.0", "REF"])
 
 # refinement serie : 
 for r in lraf : 
    if (r == 1):
-       subprocess.call(["ln","-sf", "REF", "CAS_REFINE%s"%r])
+       if not os.path.exists("CAS_REFINE%s"%r): subprocess.call(["ln","-sf", "REF", "CAS_REFINE%s"%r])
    else:
       makeCase(dest="CAS_REFINE%s"%r, Nx=int(refNx*r), Ny=(refNy*r),degliq=refdegliq,offset=refoffset)
       pass
@@ -71,7 +75,7 @@ for r in lraf :
 # Angle serie : 
 for angle in langle : 
    if (angle == refdegliq):
-       subprocess.call(["ln","-sf", "REF", "CAS_ANGLE%s"%angle])
+       if not os.path.exists("CAS_ANGLE%s"%angle): subprocess.call(["ln","-sf", "REF", "CAS_ANGLE%s"%angle])
    else:
       makeCase(dest="CAS_ANGLE%s"%angle, Nx=refNx, Ny=refNy,degliq=angle,offset=refoffset)
       pass
@@ -80,7 +84,7 @@ for angle in langle :
 # Overheat series : 
 for dt in ldt: 
    if (dt == refDT):
-       subprocess.call(["ln","-sf", "REF", "CAS_DT%s"%dt])
+       if not os.path.exists("CAS_DT%s"%dt): subprocess.call(["ln","-sf", "REF", "CAS_DT%s"%dt])
    else:
       makeCase(dest="CAS_DT%s"%dt, Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, dt=dt)
       pass
