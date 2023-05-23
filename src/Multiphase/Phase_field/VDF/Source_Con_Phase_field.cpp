@@ -972,7 +972,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   rho0 = eq_ns.rho0();
   drhodc_ = eq_ns.drhodc();
-  // Dans le modele binaire cette derivee est constante - On la calcule au debut selon que l'approx boussi soit utilisée ou non.
+  // Dans le modele binaire cette derivee est constante - On la calcule au debut selon que l'approx boussi soit utilisee ou non.
 
   boussi_=eq_ns.get_boussi_();
   if (boussi_!=1 && boussi_!=0)
@@ -1288,7 +1288,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   if (type_systeme_naire_==0)
     {
       // Dans cette partie, le laplacien est obtenu comme div.(grad F) avec
-      // une application du solveur masse entre l'étape de gradient et de divergence
+      // une application du solveur masse entre l'etape de gradient et de divergence
 
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
@@ -1328,7 +1328,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
     }
   else if (type_systeme_naire_==1)
     {
-      // Dans cette partie, le laplacien s'obtient comme div(grad F) où F est un DoubleTab avec nb_comp colonnes.
+      // Dans cette partie, le laplacien s'obtient comme div(grad F) ou F est un DoubleTab avec nb_comp colonnes.
       // On introduit des fonctions temporaires (temp) pour le calcul de chaque colonne avant de les regrouper dans un DoubleTab a la fin
 
       /*DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
@@ -1566,7 +1566,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
   // Utilise dans l'ancien modele de Didier Jamet
 
-  /* commente par mr264902 car pas utilise dans la version présente
+  /* commente par mr264902 car pas utilise dans la version presente
   //DoubleTab& alpha_gradC_carre=eq_c.set_alpha_gradC_carre();
   //calculer_alpha_gradC_carre(alpha_gradC_carre);
   //DoubleTab& div_alpha_rho_gradC=eq_c.set_div_alpha_rho_gradC();
@@ -2771,7 +2771,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
       // On multiplie donc le nombre d'elements non nuls de la matrice A par le nb_equation_CH pour avoir le nombre d'element nnz sur la meme ligne
       // Puis on ajoute le nombre de 1 venant de la matrice unitaire sur la premiere ligne.
       // dimensionnement est le nombre d'element non nuls (nnz) dans la grosse matrice_diffusion_CH
-      // Le dimensionnement total est donc le nnz de la premiere ligne multiplié par 2*nb_equation_CH
+      // Le dimensionnement total est donc le nnz de la premiere ligne multiplie par 2*nb_equation_CH
       dimensionnement*=nb_equation_CH;
       dimensionnement+=nb_elem;
       dimensionnement*=2*nb_equation_CH;
@@ -4702,7 +4702,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
     Cerr<<"positions "<<positions<<finl;
     Cerr<<"nb_elem "<<nb_elem<<finl;*/
 
-  DoubleTab gradc2_elem(nb_elem,dimension);//***a dimensionner avec le nombre de composants des élémentsconcentration
+  DoubleTab gradc2_elem(nb_elem,dimension);//***a dimensionner avec le nombre de composants des elements concentration
 
   // Nombre de composantes du vecteur gradc2
   if(gradc2_elem.nb_dim()==1)
@@ -4714,7 +4714,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   for(elem=0; elem<nb_elem; elem++)
     {
       // Boucle sur le nombre de composantes du vecteur
-      //*** composantes issues de dimension (si 2 donc x et y), faudrait-il mettre prob_dimension à la place de nb_compo et ncomp
+      //*** composantes issues de dimension (si 2 donc x et y), faudrait-il mettre prob_dimension a la place de nb_compo et ncomp
       //*** pour eviter toute confusion avec le nombre de composants des elements c1 c2 c3 etc//***
       for(int ncomp=0; ncomp<nb_compo_; ncomp++)
         {
