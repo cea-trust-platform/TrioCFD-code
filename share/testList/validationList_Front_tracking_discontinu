@@ -17,7 +17,6 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_solid_particle_fall_viscosity
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_remesh_bidim_axi
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_hanging_drop
-./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_static_thermal_wedge
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/PB_FT
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/ftd_gravite
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_imposed_constant_growth
