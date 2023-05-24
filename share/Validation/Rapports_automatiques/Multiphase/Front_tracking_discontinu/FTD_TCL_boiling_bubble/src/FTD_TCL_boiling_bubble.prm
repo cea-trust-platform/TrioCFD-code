@@ -94,7 +94,14 @@ Chapter {
 			TypeLigne 2
 			LineWidth 2
 			PointSize 0
-		}	
+		}
+		Curve {
+			legend "Max theorique Qmeso"
+			file S2/eth0.0001/M20-Fiche/R0/instant_Qmic_meso.txt
+			columns ($1) (10.983497983797387)
+			Style lines
+			TypeLigne 3
+		}
 	}
 }
 

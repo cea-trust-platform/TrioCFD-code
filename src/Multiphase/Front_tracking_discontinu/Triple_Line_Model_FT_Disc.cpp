@@ -1223,9 +1223,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   list_meso_elems.set_smart_resize(1);
   ArrOfInt list_meso_faces;
   list_meso_faces.set_smart_resize(1);
-  // TODO : The following list is useless. Cleaning to be done.
-  ArrOfDouble list_meso_distance_offset_cell_to_wall;
-  list_meso_distance_offset_cell_to_wall.set_smart_resize(1);
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
@@ -1233,132 +1230,95 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   const IntTab& elem_faces = zvdf.elem_faces();
 
-  {
-    // Boucle sur les bords pour traiter les conditions aux limites
-    int ndeb, nfin, num_face;
-    const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
-    for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
-      {
-        const Cond_lim& la_cl = zcldis.les_conditions_limites(n_bord);
-        // const Cond_lim& la_cl_face = zclvdf.la_cl_de_la_face(num_face);
-        const Nom& bc_name = la_cl.frontiere_dis().le_nom();
-        Cerr << que_suis_je() << "::derivee_en_temps_inco() computing near TCL contrib "
-             << "at CL " << la_cl.valeur();// << finl;
-        // For each BC, we check its type to see if it's a wall:
-        if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur())
-             || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
-          {
-            Cerr << "  -> for this BC [" <<
-                 bc_name <<"], we compute a specific phase-change rate near TCL." << finl;
-            const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-            ndeb = le_bord.num_premiere_face();
-            nfin = ndeb + le_bord.nb_faces();
-            for (num_face=ndeb; num_face<nfin; num_face++)
-              {
-                // Tricky way to find the element (one of the neighbour doesn't exists and contains -1...)
-                const int elem = -face_voisins(num_face, 0) * face_voisins(num_face, 1);
-                int index=intersections.index_elem()[elem];
-                if (index < 0)
-                  continue; // This element is not crossed by the interface. Go to the next face.
+  // Parcours des faces de bord ayant une contribution micro:
+  // Searching in the neighbourhood (only if the face has a contact line, that means that the face is already
+  // in the list num_faces that was filled at micro region:
+  // (at this stage, num_faces only has micro TCL elements)
+  const int nb_faces_TCL = num_faces.size_array();
+  for(int j=0; j<nb_faces_TCL; j++)
+    {
+      const int num_face = num_faces[j];
+      const int elem = elems_with_CL_contrib[j];
+      if (is_in_list(list_meso_elems,elem))
+        continue; // This elem from micro region was already appended to the list_meso_elems during previous iteration.
+      //             We dont want to do it again
 
-                //  Cerr << "Elem #" << elem << " is adjacent to the wall " << bc_name
-                //      << " and also contains an interface. So it belongs to meso domaine." << finl;
+      // Tricky way to find the element (one of the neighbour doesn't exists and contains -1...)
+      // const int elem = -face_voisins(num_face, 0) * face_voisins(num_face, 1);
+      // Unit normal vector pointing out of the wall
+      const int korient = orientation(num_face); // 0:x 1:y or 2:z (gives the direction it is normal to)
+      //const int ktangent = 1-korient; // eg, x on a bottom wall
+      const double xwall =zvdf.xv(num_face, korient);
+      double nwall[3] = {0.,0.,0.}; // Away from the wall by convention here
+      (zvdf.xp(elem, korient)> xwall) ? nwall[korient] = 1. : nwall[korient] = -1.;
+      const int num_bord= zvdf.face_numero_bord(num_face);
+      //const Front_VF& the_wall = zvdf.front_VF(num_bord);
+      list_meso_elems.append_array(elem); // Initialize the list with the current meso elem
+      Cerr << "[TCL] at Elem #" << elem << " face #" << num_face << finl;
 
-                // Unit normal vector pointing out of the wall
-                const int korient = orientation(num_face); // 0:x 1:y or 2:z (gives the direction it is normal to)
-                //const int ktangent = 1-korient; // eg, x on a bottom wall
-                const double xwall =zvdf.xv(num_face, korient);
-                double nwall[3] = {0.,0.,0.}; // Away from the wall by convention here
-                (zvdf.xp(elem, korient)> xwall) ? nwall[korient] = 1. : nwall[korient] = -1.;
+      list_meso_faces.append_array(num_face);
+      const int nb_voisins = face_voisins.dimension(1);
+      ArrOfInt future_new_elems;
+      future_new_elems.set_smart_resize(1);
+      future_new_elems.append_array(elem); // Initialize the list with the current meso elem
+      while (future_new_elems.size_array()) // There are some elements to deal with
+        //for (int i_ext_meso=0; i_ext_meso <= n_ext_meso_; i_ext_meso++)
+        {
+          ArrOfInt new_elems(future_new_elems);
+          future_new_elems.resize_array(0); // Empty the future list to be constructed
+          for (int i=0; i< new_elems.size_array(); i++)
+            {
+              const int ielem = new_elems[i];
+              Cerr << "[TCL] Neighboorhood iElem #" << ielem << finl;
+              for (int iv=0; iv <= nb_voisins; iv++)
+                {
+                  const int num_face2 = elem_faces(ielem,iv);
+                  int elem_voisin = face_voisins(num_face2, 0) + face_voisins(num_face2, 1) - ielem;
+                  if (elem_voisin<0)
+                    continue; // We hit a border, there is no neighbour here
+                  int index2=intersections.index_elem()[elem_voisin];
+                  if (index2 < 0)
+                    continue; // This element is not crossed by the interface. Go to the next face.
+                  // We won't want to do ielem twice (unless it was a micro elem)
+                  // Have we seen this element already in the meso list?
+                  if (is_in_list(list_meso_elems,elem_voisin))
+                    continue;
 
-                // Searching in the neighbourhood (only if the face has a contact line, that means that the face is already in  is_in_list)
-                // TODO : Instead of this if, it would be more efficient to replace the loop on n_bord
-                //        by a loop on elements in num_faces (at this stage, num_faces only has micro TCL elements)
-                //        Cleaning to be done.
-                if (is_in_list(num_faces,num_face))
-                  {
-                    const int num_bord= zvdf.face_numero_bord(num_face);
-                    //const Front_VF& the_wall = zvdf.front_VF(num_bord);
-                    assert(n_bord ==num_bord);
-                    list_meso_elems.append_array(elem); // Initialize the list with the current meso elem
-                    Cerr << "[TCL] at Elem #" << elem << " face #" << num_face << finl;
+                  // Here, we are with a new element elem_voisin to append to both lists
+                  const double dist = std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
+                  const double half_cell_height = std::fabs(zvdf.dist_face_elem0(num_face2,elem_voisin));
+                  // The elem is added ONLY IF it is partly in the meso region, ie :
+                  if ((dist-half_cell_height)< ymeso_-Objet_U::precision_geom)
+                    {
+                      list_meso_elems.append_array(elem_voisin);
+                      future_new_elems.append_array(elem_voisin);
 
-                    list_meso_faces.append_array(num_face);
-                    double dist = std::fabs(zvdf.dist_face_elem0(num_face,elem));
-                    list_meso_distance_offset_cell_to_wall.append_array(dist);
-                    const int nb_voisins = face_voisins.dimension(1);
-                    ArrOfInt future_new_elems;
-                    future_new_elems.set_smart_resize(1);
-                    future_new_elems.append_array(elem); // Initialize the list with the current meso elem
-                    while (future_new_elems.size_array()) // There are some elements to deal with
-                      //for (int i_ext_meso=0; i_ext_meso <= n_ext_meso_; i_ext_meso++)
-                      {
-                        ArrOfInt new_elems(future_new_elems);
-                        future_new_elems.resize_array(0); // Empty the future list to be constructed
-                        for (int i=0; i< new_elems.size_array(); i++)
-                          {
-                            const int ielem = new_elems[i];
-                            Cerr << "[TCL] Neighboorhood iElem #" << ielem << finl;
-                            for (int iv=0; iv <= nb_voisins; iv++)
-                              {
-                                const int num_face2 = elem_faces(ielem,iv);
-                                int elem_voisin = face_voisins(num_face2, 0) + face_voisins(num_face2, 1) - ielem;
-                                if (elem_voisin<0)
-                                  continue; // We hit a border, there is no neighbour here
-                                int index2=intersections.index_elem()[elem_voisin];
-                                if (index2 < 0)
-                                  continue; // This element is not crossed by the interface. Go to the next face.
-                                // We won't want to do ielem twice (unless it was a micro elem)
-                                // Have we seen this element already in the meso list?
-                                if (is_in_list(list_meso_elems,elem_voisin))
-                                  continue;
+                      // Now searching for the wall face:
+                      // "-nwall " because we want to go to the wall
+                      int a = (-nwall[korient] <0) ? 0 : Objet_U::dimension;
+                      int b = korient ; // if the normal is along y, korient=1 and we want 1 for x
+                      int iface = a+b;
+                      Cerr << "iface " << iface << finl;
+                      const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
+                      list_meso_faces.append_array(num_face_wall);
+                    }
+                }
+            }
+        }
+      Cerr << "list_meso_elems #" << list_meso_elems << finl;
+      Cerr << "list_meso_faces #" << list_meso_faces << finl;
+      //Process::exit();
+    }
+  Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
 
-                                // Here, we are with a new element elem_voisin to append to both lists
-                                dist = std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
-                                const double half_cell_height = std::fabs(zvdf.dist_face_elem0(num_face2,elem_voisin));
-                                // The elem is added ONLY IF it is partly in the meso region, ie :
-                                if ((dist-half_cell_height)< ymeso_-Objet_U::precision_geom)
-                                  {
-                                    list_meso_elems.append_array(elem_voisin);
-                                    future_new_elems.append_array(elem_voisin);
-                                    list_meso_distance_offset_cell_to_wall.append_array(dist);
-
-                                    // Now searching for the wall face:
-                                    // "-nwall " because we want to go to the wall
-                                    int a = (-nwall[korient] <0) ? 0 : Objet_U::dimension;
-                                    int b = korient ; // if the normal is along y, korient=1 and we want 1 for x
-                                    int iface = a+b;
-                                    Cerr << "iface " << iface << finl;
-                                    const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
-                                    list_meso_faces.append_array(num_face_wall);
-                                  }
-                              }
-                          }
-                      }
-                    Cerr << "list_meso_elems #" << list_meso_elems << finl;
-                    Cerr << "list_meso_distance_offset_cell_to_wall #" << list_meso_distance_offset_cell_to_wall << finl;
-                    Cerr << "list_meso_faces #" << list_meso_faces << finl;
-                    //Process::exit();
-                  }
-                Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
-              }
-          }
-        else
-          {
-            Cerr << "Nothing specific for this type of BC " << bc_name << " near TCL. " << finl;
-          }
-      }
-  }
-
-  // 3. Third loop to fill-in meso contribution
-  // We have our list of cells, we can complete their contribution and add them to the list
+// 3. Third loop to fill-in meso contribution
+// We have our list of cells, we can complete their contribution and add them to the list
   {
     const double nn = list_meso_elems.size_array();
     for (int idx=0; idx<nn; idx++)
       {
         const int elem = list_meso_elems[idx];
         const int num_face = list_meso_faces[idx];
-        const double dist = list_meso_distance_offset_cell_to_wall[idx];
         double surface_tot = 0.;
         DoubleTab in_out(2,Objet_U::dimension); // The coords of left and right points where the interface cross the cell boundary
         FTd_vecteur3 norm_elem = {0., 0., 0.};
@@ -1385,8 +1345,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             compute_approximate_interface_inout(zvdf, korient,
                                                 elem, num_face,
                                                 in_out_approx, norm_elem_approx, surface_tot_approx);
-            Cerr << "comparison of approx to exact method in elem " << elem
-                 << " " << dist << finl;
+            Cerr << "comparison of approx to exact method in elem " << elem << finl;
             // in_out(0,0) -> x_in
             // in_out(0,1) -> y_in
             // in_out(1,0) -> x_out
