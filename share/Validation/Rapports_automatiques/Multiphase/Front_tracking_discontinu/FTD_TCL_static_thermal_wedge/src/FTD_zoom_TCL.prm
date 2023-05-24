@@ -8,7 +8,7 @@ Parameters {
 	Description "....No effect of phase-change on the interface (no motion)"
 	Description "....Prescribed wall temperature"
 
-	VersionTrio_U "1.7.6"
+	VersionTrio_U "1.9.2"
 
 	ParametersTrio_U Type of problem : Probleme_FT_Disc_gen
 	ParametersTrio_U Discretization : VDF
@@ -57,6 +57,10 @@ Parameters {
         CasTest CAS_REFINE1/TCL2 calc 1
         CasTest CAS_REFINE1/TCL4 calc 1
         CasTest CAS_REFINE1/TCL6 calc 1
+        ExtraUsedFile REF/lata/post.lata.INDICATRICE_*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_GRAD_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.MPOINT_THERMIQUE*
 
 	Author "G. Bois"
 }

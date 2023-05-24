@@ -54,7 +54,7 @@ Lire fluide
 {
   fluide1 eau
   fluide0 vapeur
-  sigma   Champ_Uniforme 1         0.058988 # 0.05	 #
+  sigma   Champ_Uniforme 1     0.0 #    0.058988 #
   chaleur_latente Champ_Uniforme 1    -2.2574e6
 }
 
