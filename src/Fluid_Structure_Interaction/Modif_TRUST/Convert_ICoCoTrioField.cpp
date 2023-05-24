@@ -21,6 +21,8 @@
 #include <Domaine_VF.h>
 #include <PE_Groups.h>
 #include <Comm_Group.h>
+#include <Probleme_base.h>
+#include <fstream>
 
 void affecte_double_avec_doubletab(double** p, const ArrOfDouble& trio)
 {
@@ -37,7 +39,14 @@ void affecte_int_avec_inttab(int** p, const ArrOfInt& trio)
 
 void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
 {
-  build_triomesh(ch.get_ref_domaine_dis_base(), afield, ch.get_localisation() == NODE, ch.get_localisation() == FACE);
+  //DEV ANTONIN LEPREVOST FOR COUPLING TRIO WITH EUROPLEXUX
+  if(ch.le_nom().getString() == "neant") //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+    {
+      Cerr << "Interpolation P0 -> P1 TRUST" << endl;
+      build_triomesh(ch.get_ref_domaine_dis_base(), afield, 1, ch.get_localisation() == FACE);
+    }
+  else
+    build_triomesh(ch.get_ref_domaine_dis_base(), afield, ch.get_localisation() == NODE, ch.get_localisation() == FACE);
 
   afield.setName(ch.le_nom().getString());
   afield._time1 = afield._time2 = ch.get_time(), afield._itnumber = 0;
@@ -47,8 +56,80 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
   Champ espace_stockage;
   const Champ_base& champ_ecriture = ch.get_champ(espace_stockage);
   const DoubleTab& vals = champ_ecriture.valeurs();
-  afield._nb_field_components = vals.nb_dim() > 1 ? vals.dimension(1) : 1;
-  affecte_double_avec_doubletab(&afield._field, vals);
+
+  const Domaine_VF& dom_vf = ref_cast(Domaine_VF, ch.get_ref_domaine_dis_base()); //On aimerai recuperer la surface des faces et d autres info geo par Domaine_VF mais RIEN n est bien defini quand on tire le domaine dis d un champ par extraction -> PBM TRUST
+  const Probleme_base& pb_base = ch.get_ref_pb_base();
+  const Domaine& dom_main = pb_base.domaine();
+  const Frontiere& frontiere_IFS = dom_main.frontiere(3);
+  const Faces& faces_IFS = frontiere_IFS.faces();
+
+  int nb_som = afield._nbnodes;
+  int space_dim = afield._space_dim;
+  int nb_face = faces_IFS.nb_faces();
+  int nb_som_face = afield._nodes_per_elem;
+
+
+  if(ch.le_nom().getString() == "neant") //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+    {
+      afield._mesh_dim = 2; //Pourquoi mesh dim vaut 1 en 3D ? Encore pbm avec le champ extraction, si on modifie pas erreur dans le couplage -> PBM TRUST
+
+      DoubleTab vals_som(nb_som, space_dim);
+      vals_som = 0.;
+
+      DoubleVect surface_nodes(nb_som);
+      DoubleVect surface_faces(nb_face);
+      faces_IFS.calculer_surfaces(surface_faces);
+
+      DoubleVect force_tot_som(space_dim);
+      DoubleVect force_tot_elem(space_dim);
+
+			double surface_tot_elem = 0;
+			double surface_tot_som = 0;
+      for(int face = 0; face < nb_face; face++)
+        {
+					surface_tot_elem += surface_faces(face);
+          for(int som_loc = 0; som_loc < nb_som_face; som_loc++)
+            {
+              int som = faces_IFS.sommet(face, som_loc);
+              surface_nodes[som] += (1.0/3.0) * surface_faces(face);
+              
+							for(int k = 0; k < space_dim; k++)
+                vals_som(som, k) +=  (1.0/3.0) * vals(face, k); //On ne multiplie pas par la surface_faces(face) car vals est deja multiplie par la surface -> vals(face) = int_E vals(E) dx = |E| vals(E)
+            }
+          for(int k = 0; k < space_dim; k++)
+            force_tot_elem(k) += vals(face, k);
+        }
+
+      for(int som = 0; som < nb_som; som++)//On n a pas besoin de diviser par la surface de chaque noeud (surface_nodes) car on doit renvoyer l integral du champ et non le champ lui meme pour EPX 
+        {
+					surface_tot_som += surface_nodes(som);
+          for(int k = 0; k < space_dim; k++)
+            {
+							force_tot_som(k) += vals_som(som, k);
+            }
+        }
+
+      std::ofstream file_force_tot_som("force_fluid_interpolate_som.txt", ios::app);
+      std::ofstream file_force_tot_elem("force_fluid_elem.txt", ios::app);
+
+      if(file_force_tot_som)
+        file_force_tot_som << ch.get_time() << " " << force_tot_som(0) << " " << force_tot_som(1) << " " << force_tot_som(2) << endl;
+
+      if(file_force_tot_elem)
+        file_force_tot_elem << ch.get_time() << " " << force_tot_elem(0) << " " << force_tot_elem(1) << " " << force_tot_elem(2) << endl;
+			
+			Cerr << "Surface total elem : " << surface_tot_elem << endl;
+			Cerr << "Surface total som : " << surface_tot_som << endl;
+
+      afield._nb_field_components = vals_som.nb_dim() > 1 ? vals_som.dimension(1) : 1;
+      affecte_double_avec_doubletab(&afield._field, vals_som);
+
+    }
+  else
+    {
+      afield._nb_field_components = vals.nb_dim() > 1 ? vals.dimension(1) : 1;
+      affecte_double_avec_doubletab(&afield._field, vals);
+    }
 }
 
 void build_triofield(const Champ_base& ch, const Domaine_dis_base& dom_dis, ICoCo::TrioField& afield)
@@ -148,8 +229,6 @@ using std::vector;
  */
 MEDDoubleField build_medfield(TrioField& triofield)
 {
-
-  Cerr << "MODIF_TRUST::build_medfield" << endl;
   MEDCoupling::MCAuto<MEDCoupling::MEDCouplingUMesh> mesh(MEDCoupling::MEDCouplingUMesh::New("",triofield._mesh_dim));
   MEDCoupling::MCAuto<MEDCoupling::DataArrayDouble> coo(MEDCoupling::DataArrayDouble::New());
   coo->alloc(triofield._nbnodes,triofield._space_dim);
