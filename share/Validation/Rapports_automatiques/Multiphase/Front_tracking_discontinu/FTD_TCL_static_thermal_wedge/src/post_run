@@ -10,8 +10,8 @@ lata_to_med ()
   cd lata
   trust convert.data 1> convert.out 2> convert.err
   cd ..
-  # source $TRUST_ROOT/env_for_python.sh
-  python3 $local_root/conv_med.py
+  source $TRUST_MEDCOUPLING_ROOT/env.sh
+  python $local_root/conv_med.py
   return 0
 }
 
