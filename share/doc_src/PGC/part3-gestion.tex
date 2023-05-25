@@ -52,7 +52,7 @@ Une fiche de demande d'intervention est constituée de multiples champs. Tous ne
    \item \textbf{Original Submission} (\textit{type :} Texte) : décrit en détails le problème rencontré ou le développement prévu. Comme, il s'agit d'un champ sans restriction, il est recommandé de donner le maximum d'informations sur le contexte de la fiche et les attendus.
    \item \textbf{Priority} (\textit{type :} liste de choix) : définit la priorité de la fiche considérée par rapport aux autres ouvertes. Ce champ est principalement à destination de l'équipe TMA afin qu'elle soit renseignée sur la priorité de traitement des fiches en fonction des contraintes projet. L'affectation a une priorité induit un délai de résolution : 1-High -> 10 jours ouvrés ; 2-Medium -> 22 jours ouvrés ; 3-Low -> avant la prochaine livraison de version. Le compteur débute à la date renseignée dans le champs \textit{Date hiérarchisation}.
    \item \textbf{Category} (\textit{type :} liste de choix) : correspond à une des catégories de Demandes d'Intervention listées au Chapitre \ref{chapitre:termes} et identifiées dans le contrat de marché de la TMA.
-   \item \textbf{Sub project associated} (\textit{type :} liste de choix) : permet d'identifier le Baltik impacté par la DI.
+   \item \textbf{Sub project associated} (\textit{type :} liste de choix) : permet d'identifier le module impacté par la DI.
    \item \textbf{Authorization to work on this} (\textit{type :} case à cocher) : champ destiné à la TMA pour lui donner l'autorisation de débuter les travaux sur la DI.
    \item \textbf{Date hiérarchisation} (\textit{type :} date) : champ à mettre à jour avec le champ précédent (Authorization to work on this) et à renseigner avec la date du jour du lancement des travaux sur la DI. Cette date permettra de vérifier que le délai de réalisation de la DI est bien tenu.
    \item \textbf{Status} (\textit{type :} liste de choix) : correspond à l'état de vie de la fiche. Cette notion sera plus approfondie dans la section suivante (voir section \ref{sec:etatsDI}). 
@@ -416,8 +416,32 @@ Elle est utilisée pour répondre aux questionnements des utilisateurs mais éga
 \lhead{Interfa\c cage pour l'utilisateur et le d\'eveloppeur}
 \rhead{OUTILS}
 Plusieurs scripts et outils sont à la disposition des utilisateurs afin de faciliter l'utilisation de la plateforme TRUST/TrioCFD. Une procédure est dédiée à chaque action effectuée sur la plateforme. Ces outils étant nombreux, ils n'ont pas pu tous être détaillés pour la première version de ce document mais cette partie sera étayée au fil des différentes versions.
-\subsection{\label{subsec:install}Installation et compilation de TrioCFD}
-On considère qu'une version TRUST au même niveau de développement est à disposition. On commence par charger l'environnement de TRUST de cette version :
+
+\subsection{Trouver la version de TRUST \`a utiliser avec TrioCFD}
+\label{subsec:versionTRUST}
+
+Une version donn\'ee de TrioCFD doit \^etre utilis\'ee avec une version sp\'ecifique de TRUST.\\
+
+Le fichier "\emph{./src/Version\_info}" fournit cette version de TRUST sous la forme du "Id SHA1" de git.\\
+
+Par cons\'equent, la premi\`ere chose \`a faire avant de compiler TrioCFD est de se placer (et de compiler)
+sur la version associ\'ee de TRUST.\\
+
+Si le "Id SHA1" est par exemple "9296ac998a9b2c6187067b8e5a219dcb814fbb4d", il convient de faire :
+\begin{lstlisting}
+> cd trust-code
+> git checkout 9296ac998a9b2c6187067b8e5a219dcb814fbb4d
+> ./configure && make
+\end{lstlisting}
+
+\subsection{Installation et compilation de TrioCFD}
+\label{subsec:install}
+
+On consid\`ere que la version de TRUST associ\`ee \`a celle de TrioCFD est \`a disposition
+(c'est le cas pour les versions officielles par exemple, la version 1.9.2 de TrioCFD
+doit s'utiliser avec la version 1.9.2 de TRUST).\\
+
+On commence par charger l'environnement de TRUST de cette version :
 \begin{lstlisting}
 > source trust-code/env_TRUST.sh
 \end{lstlisting}
@@ -436,16 +460,21 @@ On lance la compilation de TrioCFD dans le mode souhaité:
 
 \subsection{Lancement d'un cas test}
 Pour lancer un calcul en mode séquentiel, la méthodologie est la suivante :
+
 \begin{lstlisting}
 > cd $my_test_directory
 > trust my_data_file %whitout .data
 \end{lstlisting}
-Il s'agit du lancement standard d'un calcul. D'autres options sont disponibles pour effectuer cette action et sont détaillés ci-après. La syntaxe de lancement devient alors :
+
+Il s'agit du lancement standard d'un calcul. D'autres options sont disponibles pour effectuer
+cette action et sont d\'etaill\`ees ci-apr\`es.
+La syntaxe de lancement devient alors :
 \begin{lstlisting}
 > trust [option] my_data file [nb_cpus] [1>file.out] [2>file.err]
 \end{lstlisting}
 où \texttt{nb\_cpus} correspond au nombre de processeurs utilisés pour lancer le calcul (ce nombre doit être égal au nombre de sous-domaines définis dans le jeu de données),\\
 où les \texttt{options} disponibles sont :
+
 \begin{table}[H]
 \begin{centering}
 %\scriptsize
