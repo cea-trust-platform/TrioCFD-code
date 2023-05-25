@@ -1,6 +1,7 @@
 Parameters {
 	Title "TCL heat flux"
 	Author "G.B."
+	VersionTrio_U "1.9.2"
 	TestCase THETA20/VoF1113 Qmicro_only.data
 	TestCase THETA40/VoF1113 Qmicro_only.data
 	TestCase THETA80/VoF1113 Qmicro_only.data
@@ -17,7 +18,7 @@ Parameters {
 \latex_(There is neither gravity nor surface tension.
 The interface is initialized as a sphere portion matching the contact line BC at an angle $40^\circ$ with a 
 curvature radius of 0.1mm. 
-Initial CL radius is then: $r_{cl}=64.0835$µm for $40^\circ$.
+Initial CL radius is then: $r_{CL}=64.0835$µm for $40^\circ$.
 The temperature is set to saturation everywhere ($T=0$ including on BCs). The test-case is not related to temperature resolution. Phase change is created through a source term at the TCL with $Q_{CL} = 50W/m$. 
 
 Mesh size in $\Delta=10\mu m$. Micro-region extension is set to : $y_m=3.7\mu m$ and $s_m = 5\mu m$.
@@ -74,7 +75,7 @@ EOF
 
 	Figure {
         Title "Bubble Growth - Effect of contact angle"
-        Description "Prefect, there is no effect of contact angle."
+        Description "For any contact angle, we are capable of recovering the correct time evolution of bubble growth (dV/dt)."
         Dimension 2
         LabelX "time [ms]"
         LabelY "vapour volume V/V0 [-]"

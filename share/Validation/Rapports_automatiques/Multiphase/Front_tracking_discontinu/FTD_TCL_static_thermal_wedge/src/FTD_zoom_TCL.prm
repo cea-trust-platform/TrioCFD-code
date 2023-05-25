@@ -8,7 +8,7 @@ Parameters {
 	Description "....No effect of phase-change on the interface (no motion)"
 	Description "....Prescribed wall temperature"
 
-	VersionTrio_U "1.7.6"
+	VersionTrio_U "1.9.2"
 
 	ParametersTrio_U Type of problem : Probleme_FT_Disc_gen
 	ParametersTrio_U Discretization : VDF
@@ -26,7 +26,9 @@ Parameters {
         CasTest CAS_OFFSET-0.3 calc 1
 #         CasTest CAS_OFFSET-0.2 calc 1  /* Weirdly, but its the only one unstable, spurrious currents */
         CasTest CAS_OFFSET-0.1 calc 1
-        CasTest CAS_OFFSET0.0 calc 1
+        CasTest CAS_OFFSET0.0 calc 1 /* REF case */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-07 calc 1 /* max||u|| = 1e-12 -> very reasonnable */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-08 calc 1 /* max||u|| = 1e-3 -> very reasonnable */
         CasTest CAS_OFFSET0.1 calc 1
 #        CasTest CAS_OFFSET0.2 calc 1  /* Weirdly, very unstable too. We have to set dt=3.0e-8 to remove spurrious */
         CasTest CAS_OFFSET0.2_TIMESTEP1e-07 calc 1
@@ -39,7 +41,7 @@ Parameters {
         CasTest CAS_REFINE0.5 calc 1
         CasTest CAS_REFINE2 calc 1
         CasTest CAS_REFINE4 calc 1
-        CasTest CAS_REFINE8 calc 1
+#        CasTest CAS_REFINE8 calc 1
         CasTest CAS_ANGLE5 calc 1
         CasTest CAS_ANGLE10 calc 1
         CasTest CAS_ANGLE15 calc 1
@@ -49,8 +51,16 @@ Parameters {
         CasTest CAS_ANGLE90 calc 1
         CasTest CAS_DT3 calc 1
         CasTest CAS_DT5 calc 1
-        CasTest CAS_DT9 calc 1
+        CasTest CAS_DT10 calc 1
         CasTest CAS_DT15 calc 1
+        CasTest CAS_REFINE1/TCL1 calc 1
+        CasTest CAS_REFINE1/TCL2 calc 1
+        CasTest CAS_REFINE1/TCL4 calc 1
+        CasTest CAS_REFINE1/TCL6 calc 1
+        ExtraUsedFile REF/lata/post.lata.INDICATRICE_*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_GRAD_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.MPOINT_THERMIQUE*
 
 	Author "G. Bois"
 }
@@ -193,24 +203,75 @@ Chapter {
 	}
 	
 	Figure {
+		Title "final comparison of mp to analytical using MED and Python"
 		Width 7.5cm
 		Dimension 2
-		LabelX "d [$\\mu m$]"
-		LabelY "W+"
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
 		legend below title " at the interface"
 		Include_Description_Curves 0
 		Curve {
-			legend "Reference solution"
+			legend "Reference solution (without interf. resistance)"
 			file ./CAS_REFINE2/sm_ana.dat
-			columns ($1) ($2)
+			columns ($1*1e6) ($2)
 			Style lines
 			TypeLigne 1
 			LineWidth 2
 		}
 		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
 			legend "Mesh M2"
 			file ./CAS_REFINE2/xysm.dat
-			columns ($3) ($4)
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M0.5"
+			file ./CAS_REFINE0.5/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+	}
+	
+	Figure {
+		Title "TCL model effect. final comparison of mp to analytical using MED and Python"
+		Width 7.5cm
+		Dimension 2
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution (without interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
 			Style lines
 			TypeLigne 2
 			LineWidth 2
@@ -218,17 +279,41 @@ Chapter {
 		Curve {
 			legend "Mesh M1"
 			file ./CAS_REFINE1/xysm.dat
-			columns ($3) ($4)
+			columns ($3*1e6) ($4)
 			Style lines
 			TypeLigne 3
 			LineWidth 2
 		}
 		Curve {
-			legend "Mesh M0.5"
-			file ./CAS_REFINE0.5/xysm.dat
-			columns ($3) ($4)
+			legend "Mesh M1 (TCL - meso=1)"
+			file ./CAS_REFINE1/TCL1/xysm.dat
+			columns ($3*1e6) ($4)
 			Style lines
 			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=2)"
+			file ./CAS_REFINE1/TCL2/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=4)"
+			file ./CAS_REFINE1/TCL4/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 6
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=6)"
+			file ./CAS_REFINE1/TCL6/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 7
 			LineWidth 2
 		}
 	}
@@ -854,10 +939,10 @@ The definition of $T_l$ in mixed cells should be clarified.
 		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
 		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
 		Origin Visit
-		mesh CAS_REFINE8/lata/post.lata INTERFACES
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
 #		Operator_to_all no_legend
 #		Operator no_databaseinfo
-		Pseudocolor_with_range CAS_REFINE8/lata/post.lata dom dT ELEM min max
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM min max
 		cycles -1
 		normal3D 0. 0. 1. 
 		up3D 0. 1 0.
@@ -873,11 +958,8 @@ The definition of $T_l$ in mixed cells should be clarified.
 		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
 		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
 		Origin Visit
-#		InsertText 0. 13.e-6 0. "Refined_colorbar" 0.1
-		mesh CAS_REFINE8/lata/post.lata INTERFACES
-#		Operator_to_all no_legend
-#		Operator no_databaseinfo
-		Pseudocolor_with_range CAS_REFINE8/lata/post.lata dom dT ELEM -0.01 0.01
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM -0.01 0.01
 		cycles -1
 		normal3D 0. 0. 1. 
 		up3D 0. 1 0.
@@ -940,15 +1022,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 #		nb_img_without_newline 1
@@ -1006,15 +1088,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 		nb_img_without_newline 2
@@ -1072,15 +1154,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 #		nb_img_without_newline 1
@@ -1138,15 +1220,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 }
 
@@ -1493,7 +1575,7 @@ Chapter {
 
 Chapter {
 	Title "Effect of the wall overheat"
-	Description "The wall overheat angle is varied from 3 to 15$\deg C$."
+	Description "The wall overheat is varied from 3 to 15$\deg C$."
 	Figure {
 		nb_img_without_newline 2
 		Title "(final) flux at the bottom wall"
@@ -1524,17 +1606,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($2)
 			Style linespoints
 			TypeLigne 1
@@ -1542,8 +1615,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($2)
 			Style linespoints
 			TypeLigne 2
@@ -1590,17 +1663,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($2)
 			Style linespoints
 			TypeLigne 1
@@ -1608,8 +1672,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($2)
 			Style linespoints
 			TypeLigne 2
@@ -1656,17 +1720,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($3)
 			Style linespoints
 			TypeLigne 1
@@ -1674,8 +1729,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($3)
 			Style linespoints
 			TypeLigne 2
@@ -1722,17 +1777,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($3)
 			Style linespoints
 			TypeLigne 1
@@ -1740,8 +1786,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($3)
 			Style linespoints
 			TypeLigne 2

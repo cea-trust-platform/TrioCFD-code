@@ -446,7 +446,7 @@ static void extrapoler_champ_elem(const Domaine_VF&    domaine_vf,
           // Extrapolation parabolique tenant compte de la courbure de l'interface :
           const double div_n = champ_div_n[i_elem];
           champ[i_elem] = d * grad * (1. - 0.5 * div_n * d) + interfacial_value;
-          // TODO:
+          // TODO: Assess Higher order Taylor series by the inclusion of a new parameter in the datafile. (Formulae below to be checked)
           //  champ[i_elem] = 0.5 * d * grad * (1. - 0.5 * div_n * d) + interfacial_value; // multiplied by 0.5 (may be it was missing...we have to check)
           //  champ[i_elem] = d * grad * (1. - 0.5 * div_n * d + div_n * div_n * d * d / 6.) + interfacial_value;
         }
@@ -1501,7 +1501,7 @@ int Convection_Diffusion_Temperature_FT_Disc::preparer_calcul()
 }
 
 // A few methods for TCL only:
-double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_face, const double distance_wall_interface) const
+double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_face) const
 {
   double interfacial_flux = 0.;
   const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
@@ -1568,7 +1568,6 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_face(const int num
 {
   double flux=0., Twall=0.;
   get_flux_and_Twall(num_face,
-                     -1. /* distance_wall_interface  is not needed to get Twall */,
                      flux, Twall);
   return Twall;
 }
@@ -1603,12 +1602,11 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_elem(const int ele
     }
   double flux=0., Twall=0.;
   get_flux_and_Twall(num_face,
-                     -1. /* distance_wall_interface  is not needed to get Twall */,
                      flux, Twall);
   return Twall;
 }
 
-void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_face, const double distance_wall_interface,
+void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_face,
                                                                   double& flux, double& Twall) const
 {
   flux = 0.;
@@ -1631,7 +1629,6 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
       flux = 0.;
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
-      assert(distance_wall_interface>0.);
       Process::exit();
     }
   else if ( sub_type(Neumann_paroi,la_cl.valeur()) )
@@ -1642,7 +1639,6 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
       Process::exit();
-      assert(distance_wall_interface>0.);
     }
   else if (sub_type(Echange_impose_base, la_cl.valeur()))
     {
@@ -1702,7 +1698,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) c
   for (int i=0; i<3; i++)
     d += (xyz_face[i] - P[i])*(xyz_face[i] - P[i]);
   d= sqrt(d);
-  const double flux = get_flux_to_face(num_face, d);
+  const double flux = get_flux_to_face(num_face);
   const double k = fluide_dipha_.valeur().fluide_phase(phase_).conductivite()(0,0);
 //  Cerr << "flux/d/k" <<  flux << " " << d << " " << k <<  finl;
   // flux is incoming. So "-flux" is needed.

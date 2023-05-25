@@ -39,14 +39,18 @@ if mp in mc.GetAllFieldNames(fName):
    lst_dt = mc.GetAllFieldIterations(fName,mp) # take last time-step
    fC = mc.ReadFieldCell(fName,"dom",0,mp,lst_dt[-1][0],lst_dt[-1][1])
    fai = mc.ReadFieldCell(fName,"dom",0,ai,lst_dt[-1][0],lst_dt[-1][1])
+   #mesh= fC.getMesh()
    mpa = fC.getArray()
    aia = fai.getArray()
    cells,cellsIndex = euler.getCellsContainingPoints(cdg_interf2, len(cdg_interf2),eps )
    #print(cells)
    mpa_part = mpa[cells]
    aia_part = aia[cells]
-   mat = np.c_[cdg_interf2.toNumPyArray(),mpa_part.toNumPyArray(),aia_part.toNumPyArray()]
-   np.savetxt("mpoint.txt", mat)
+   # Je ne comprends pas pourquoi c'est seulemnt parfois, mais ils n'ont pas tous la meme taille donc impossible : 
+   #mat = np.c_[cdg_interf2.toNumPyArray(),mpa_part.toNumPyArray(),aia_part.toNumPyArray()]
+   # J'imaginais en effet que les points de cdg_interf2 qui ne sont pas dans interf sont sur les faces. 
+   # Dans ce cas, avec n'importe quelle précision eps, on recupere 2 elem a chaque fois. 
+   #np.savetxt("mpoint.txt", mat)
    pass
 
 coord2 = interf2.getCoords()
@@ -119,9 +123,14 @@ print("CASE: dT=", dT, "  -- theta_app=",data["theta"],)
 # Analytical solution from Vadim:
 smin = 2e-7
 vs_ana = np.linspace(smin,vs.max(),201)
+# 1. without interfacial resistance : 
 qi_ana = lda*dT/(vs_ana*theta_app)
 mp_ana = qi_ana/Lvap
-np.savetxt("sm_ana.dat", np.vstack([vs_ana,mp_ana]).T, header="s m_ana")
+# 2. with interfacial resistance : 
+Ri=6.38209e-08
+qi_anar = lda*dT/(vs_ana*theta_app+Ri*lda)
+mp_anar = qi_anar/Lvap
+np.savetxt("sm_ana.dat", np.vstack([vs_ana,mp_ana, mp_anar]).T, header="s m_ana, mp_ana(Ri)")
 
 import matplotlib.pyplot as plt
 plt.figure()

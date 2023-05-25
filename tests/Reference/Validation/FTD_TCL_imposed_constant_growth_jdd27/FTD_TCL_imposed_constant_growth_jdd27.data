@@ -87,11 +87,8 @@ Read TCL
 {
   Qtcl 0.0 # W/m # 
   lv 10.e-9
-  # coeffa -1.9291 #
-  # coeffb  4.03634 #
-  # ylim 5.e-6 #
-  sm   5.e-6 # TestCase at theta_app = 90° => sm=ylim #
-  initial_CL_xcoord 0.000035 # Incorrect. To be computed by Vinod #
+  ym 5.e-6
+  sm 5.e-6 # TestCase at theta_app = 90° => sm=ym #
 }
 
 Champ_Uniforme gravite

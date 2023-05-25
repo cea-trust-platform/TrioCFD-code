@@ -5,6 +5,8 @@ Parameters {
  	TestCase S2/eth0.0001/M20-Fiche/R0 SEQ_COA_source.data
  	TestCase S2/eth0.0001/M20-Fiche-noTCL/R0 SEQ_COA_source.data
 # 	TestCase . PAR_COA_source.data 4
+	ExtraUsedFile S2/eth0.0001/M20-Fiche/R0/lata/post.lata.DISTANCE_INTERFACE_ELEM_INTERF*
+	ExtraUsedFile S2/eth0.0001/M20-Fiche/R0/lata/post.lata.MPOINT_THERMIQUE*
 }
 
 Chapter {
@@ -92,7 +94,14 @@ Chapter {
 			TypeLigne 2
 			LineWidth 2
 			PointSize 0
-		}	
+		}
+		Curve {
+			legend "Max theorique Qmeso"
+			file S2/eth0.0001/M20-Fiche/R0/instant_Qmic_meso.txt
+			columns ($1) (10.983497983797387)
+			Style lines
+			TypeLigne 3
+		}
 	}
 }
 

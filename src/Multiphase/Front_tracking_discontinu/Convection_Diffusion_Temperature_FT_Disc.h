@@ -47,10 +47,10 @@ public:
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
   void         mettre_a_jour(double temps) override;
   int preparer_calcul() override;
-  double get_flux_to_face(const int num_face, const double distance_wall_interface) const;
+  double get_flux_to_face(const int num_face) const;
   double get_Twall_at_face(const int num_face) const;
   double get_Twall_at_elem(const int elem) const;
-  void get_flux_and_Twall(const int num_face, const double distance_wall_interface,
+  void get_flux_and_Twall(const int num_face,
                           double& flux, double& Twall) const;
   double get_Twall(const int num_face) const;
   virtual void suppression_interfaces(const IntVect& num_compo, const ArrOfInt& flags_compo_a_supprimer, int nouvelle_phase);
