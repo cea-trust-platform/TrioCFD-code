@@ -315,6 +315,7 @@ Lire pb
         vitesse elem
         pressure elem
         second_membre_projection elem
+	vitesse_delta_interface faces
         vitesse faces
     } 
     interfaces interf { 
