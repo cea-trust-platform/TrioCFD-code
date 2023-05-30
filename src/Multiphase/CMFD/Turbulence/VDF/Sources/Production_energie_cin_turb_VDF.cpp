@@ -60,7 +60,6 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
       else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
 
-
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension ;
   int N = equation().inconnue()->valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),

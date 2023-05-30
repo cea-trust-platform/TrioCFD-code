@@ -58,6 +58,7 @@ Scatter DOM.Zones dom
 END SCATTER #
 
 $schema  dis
+$option_schema
 
 Schema_euler_implicite sch
 Read sch

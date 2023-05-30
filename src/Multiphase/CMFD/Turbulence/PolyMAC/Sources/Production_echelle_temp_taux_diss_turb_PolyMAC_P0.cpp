@@ -38,12 +38,9 @@ Entree& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is) { 
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VF&                     domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
-  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const grad_Champ_Face_PolyMAC_P0&        grad = ref_cast(grad_Champ_Face_PolyMAC_P0, eq_qdm.get_champ("gradient_vitesse"));
-  const DoubleTab&                     tab_grad = grad.valeurs();
   const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
+  const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
   const DoubleTab&                          alp = equation().probleme().get_champ("alpha").valeurs();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
