@@ -14,25 +14,25 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Correction_Antal_PolyMAC_P0.cpp
+// File:        Correction_Antal_VDF.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Correction_Antal_PolyMAC_P0.h>
-#include <Champ_Face_PolyMAC_P0.h>
+#include <Correction_Antal_VDF.h>
+#include <Champ_Face_VDF.h>
 #include <Pb_Multiphase.h>
 #include <math.h>
 
-Implemente_instanciable(Correction_Antal_PolyMAC_P0, "Correction_Antal_Face_PolyMAC_P0", Source_base);
+Implemente_instanciable(Correction_Antal_VDF, "Correction_Antal_VDF_Face", Source_base);
 
-Sortie& Correction_Antal_PolyMAC_P0::printOn(Sortie& os) const
+Sortie& Correction_Antal_VDF::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Correction_Antal_PolyMAC_P0::readOn(Entree& is)
+Entree& Correction_Antal_VDF::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("Cw1", &Cw1_);
@@ -53,21 +53,21 @@ Entree& Correction_Antal_PolyMAC_P0::readOn(Entree& is)
   return is;
 }
 
-void Correction_Antal_PolyMAC_P0::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
+void Correction_Antal_VDF::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
 
-  if (!pbm.has_champ("diametre_bulles")) Process::exit("Correction_Lubchenko_PolyMAC_P0::completer() : a bubble diameter must be defined !");
+  if (!pbm.has_champ("diametre_bulles")) Process::exit(que_suis_je() + " : a bubble diameter must be defined !");
 }
 
 
-void Correction_Antal_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Correction_Antal_VDF::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
 }
 
-void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Correction_Antal_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
+  const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue().valeur());
   const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &rho   = equation().milieu().masse_volumique().passe(),
@@ -75,27 +75,25 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(),
                 &fcl = ch.fcl();
-  const DoubleVect& pe = equation().milieu().porosite_elem(),
-                    &pf = equation().milieu().porosite_face(),
-                     &ve = domaine.volumes(),
-                      &vf = domaine.volumes_entrelaces(),
-                       &fs = domaine.face_surfaces();
+  const DoubleVect& pf = equation().milieu().porosite_face(),
+                    &vf = domaine.volumes_entrelaces(),
+                     &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(),
                    &n_f = domaine.face_normales(),
-                    &y_elem = domaine.y_elem(),
-                     &y_faces = domaine.y_faces(),
-                      &n_y_elem = domaine.normale_paroi_elem(),
-                       &n_y_faces = domaine.normale_paroi_faces();
+                    &y_faces = domaine.y_faces(),
+                     &n_y_faces = domaine.normale_paroi_faces();
   int N = pvit.line_size() ,
       D = dimension,
-      nf_tot = domaine.nb_faces_tot(),
-      nf = domaine.nb_faces(),
-      ne_tot = domaine.nb_elem_tot();
+      nf = domaine.nb_faces();
 
   DoubleTrav dv(N, N), pvit_l(N,D), scal_u(N) ;
-  int e, f, c, k, d, i;
+  int e, f, c, k, d;
 
   double fac, a_l, rho_l, db_l, secmem_l;
+
+  DoubleTab pvit_elem(0, N * dimension);
+  domaine.domaine().creer_tableau_elements(pvit_elem);
+  ch.get_elem_vector_field(pvit_elem, true);
 
   for (f = 0; f < nf; f++)
     if (fcl(f, 0) < 2)
@@ -105,7 +103,7 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
         for (d = 0 ; d<D ; d++)
           for (k = 0 ; k<N ; k++)
             for (c=0 ; c<2 && (e = f_e(f, c)) >= 0; c++)
-              pvit_l(k, d) += vf_dir(f, c)/vf(f)*pvit(nf_tot+D*e+d, k) ;
+              pvit_l(k, d) += vf_dir(f, c)/vf(f)*pvit_elem(e, N*d+k) ;
         scal_u = 0;
         for (k = 0 ; k<N ; k++)
           for (d = 0 ; d<D ; d++)
@@ -150,44 +148,4 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
             }
 
       }
-
-  for ( e = 0; e < ne_tot; e++)
-    {
-      pvit_l = 0;
-      // Fill velocity at the element
-      for (d = 0 ; d<D ; d++)
-        for (k = 0 ; k<N ; k++)
-          pvit_l(k, d) += pvit(nf_tot+D*e+d, k) ;
-
-      // Retract component normal to the wall
-      scal_u = 0;
-      for (k = 0 ; k<N ; k++)
-        for (d = 0 ; d<D ; d++)
-          scal_u(k) += pvit_l(k, d)*n_y_elem(e, d);
-      for (k = 0 ; k<N ; k++)
-        for (d = 0 ; d<D ; d++)
-          pvit_l(k, d) -= scal_u(k)*n_y_elem(e, d) ;
-
-      // Calculation of norm of velocity
-      dv = 0.;
-      for ( k = 0; k < N; k++)
-        if (k != n_l)
-          {
-            for (d = 0 ; d<D ; d++)  dv(k, n_l) +=  (pvit_l(k, d)-pvit_l(n_l, d)) * (pvit_l(k, d)-pvit_l(n_l, d));
-            dv(k, n_l) = std::sqrt(dv(k, n_l));
-          }
-
-      for (k = 0; k < N; k++)
-        if (k != n_l)
-          {
-            fac = pe(e) * ve(e) ;
-            secmem_l = fac * 2. * alpha(e,k) * rho(e,n_l) * dv(k,n_l) * dv(k,n_l) / d_bulles(e,k) * std::max(0., Cw1_ + Cw2_*d_bulles(e,k)/(2.*y_elem(e))) ;
-
-            for ( d = 0, i = nf_tot + D * e; d < D; d++, i++)
-              {
-                secmem(i , k)   += secmem_l * n_y_elem(e, d);
-                secmem(i , n_l) -= secmem_l * n_y_elem(e, d);
-              }
-          }
-    }
 }
