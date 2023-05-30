@@ -214,7 +214,6 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
   chp.filtrer_L2(ub);
 
 
-  int cpt=0;
   int num_face;
   for (num_face=0; num_face <nb_faces; num_face++)
     {
@@ -230,7 +229,6 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
       Ec_ubp+=(vitesse(num_face,0)-ub(num_face,0))*ub(num_face,0);
       Ec_ubp+=(vitesse(num_face,1)-ub(num_face,1))*ub(num_face,1);
       Ec_ubp+=(vitesse(num_face,2)-ub(num_face,2))*ub(num_face,2);
-      cpt++;
     }
   Ectot/=(2*nb_faces);
   Ec_ub/=(2*nb_faces);
