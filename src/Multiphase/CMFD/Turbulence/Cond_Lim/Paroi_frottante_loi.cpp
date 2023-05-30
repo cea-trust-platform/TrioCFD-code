@@ -132,7 +132,7 @@ void Paroi_frottante_loi::me_calculer()
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().probleme().domaine_dis().valeur());
 
-  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"), &y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces du domaine
+  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces du domaine
   const DoubleTab& nu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe(),
                    &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport().passe(),
                     &vit   = domaine_Cl_dis().equation().probleme().get_champ("vitesse").passe(),
@@ -179,7 +179,7 @@ void Paroi_frottante_loi::me_calculer()
         }
       double norm_u_parallel = std::sqrt(domaine.dot(&u_parallel(0), &u_parallel(0)));
 
-      double y_loc = y(f_domaine, n);
+      double y_loc = f_e(f_domaine,0) >=0  ? domaine.dist_face_elem0(f_domaine,e) : domaine.dist_face_elem1(f_domaine,e);
       double y_plus_loc = y_loc * u_tau(f_domaine, n)/ nu_visc(e, n) ;
       double fac_coeff_grad_ = 1 + fac_prod_k_ * std::tanh( (y_plus_loc/y_p_prod_k_)*(y_plus_loc/y_p_prod_k_) ) - fac_prod_k_grand_ * std::tanh( (y_plus_loc/y_p_prod_k_grand_)*(y_plus_loc/y_p_prod_k_grand_)*(y_plus_loc/y_p_prod_k_grand_) );
       double mu_tot_loc = (mu_poly) ? (*mu_poly)(e,n) : (mu_vdf) ? (*mu_vdf)(e,n) + mu_visc(e,n) : -1;
