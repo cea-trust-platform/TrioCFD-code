@@ -55,9 +55,9 @@ public:
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
   inline double viscA(int, int, int, double) const;
   void calc_visc(ArrOfDouble& diffu_tot, const Domaine_VEF& le_dom,
-		 int num_face, int num2, int dimension, int num_elem,
-		 double diffu_turb, const DoubleTab& diffu, int is_mu_unif,
-		 const ArrOfDouble& inv_Prdt) const;
+                 int num_face, int num2, int dimension, int num_elem,
+                 double diffu_turb, const DoubleTab& diffu, int is_mu_unif,
+                 const ArrOfDouble& inv_Prdt) const;
   // Methodes pour l implicite.
 
   inline void dimensionner(Matrice_Morse&) const override;
@@ -77,7 +77,7 @@ protected :
 // Fonction utile visc
 // mu <Si, Sj> / |K|
 inline double Op_Diff_K_Omega_VEF_Face::viscA(int num_face, int num2,
-					      int num_elem, double diffu) const
+                                              int num_elem, double diffu) const
 {
   const Domaine_VEF& domaine = le_dom_vef.valeur();
   const IntTab& face_voisins = domaine.face_voisins();
@@ -89,7 +89,7 @@ inline double Op_Diff_K_Omega_VEF_Face::viscA(int num_face, int num2,
     pscal += face_normales(num_face, 2)*face_normales(num2, 2);
 
   // *equation().milieu().porosite_elem(num_elem));
-  double signe = 1
+  double signe = 1;
   if ((face_voisins(num_face, 0) == face_voisins(num2, 0)) ||
       (face_voisins(num_face, 1) == face_voisins(num2, 1)))
     signe = -1;
@@ -108,7 +108,7 @@ inline void Op_Diff_K_Omega_VEF_Face::dimensionner(Matrice_Morse& matrice) const
  *
  */
 inline void Op_Diff_K_Omega_VEF_Face::contribuer_a_avec(const DoubleTab& inco,
-							Matrice_Morse& matrice) const
+                                                        Matrice_Morse& matrice) const
 {
   ajouter_contribution(inco, matrice);
 }

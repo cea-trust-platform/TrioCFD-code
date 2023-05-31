@@ -25,8 +25,8 @@
 #include <Paroi_hyd_base_VEF.h>
 
 Implemente_base_sans_constructeur(Op_Diff_K_Omega_VEF_base,
-				  "Op_Diff_K_Omega_VEF_base",
-				  Op_Diff_K_Omega_base);
+                                  "Op_Diff_K_Omega_VEF_base",
+                                  Op_Diff_K_Omega_base);
 
 Sortie& Op_Diff_K_Omega_VEF_base::printOn(Sortie& s) const
 {
@@ -46,11 +46,11 @@ void Op_Diff_K_Omega_VEF_base::completer()
     {
       const Transport_K_Omega& eqn_transport = ref_cast(Transport_K_Omega, mon_equation.valeur());
       const Modele_turbulence_hyd_K_Omega& mod_turb = ref_cast(Modele_turbulence_hyd_K_Omega,
-							       eqn_transport.modele_turbulence());
+                                                               eqn_transport.modele_turbulence());
       const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
       associer_diffusivite_turbulente(visc_turb);
       Op_Diff_K_Omega_VEF_base::associer_Pr_K_Omega(mod_turb.get_Prandtl_K(),
-						    mod_turb.get_Prandtl_Omega());
+                                                    mod_turb.get_Prandtl_Omega());
     }
 }
 

@@ -22,7 +22,7 @@
 #define Op_Diff_K_Omega_VEF_base_included
 
 #define PRDT_K_DEFAUT 0.5
-#define PRDT_Omega_DEFAUT 0.5
+#define PRDT_OMEGA_DEFAUT 0.5
 
 #include <Op_Diff_K_Omega_base.h>
 #include <Op_VEF_Face.h>
@@ -43,7 +43,7 @@ class Champ_Inc;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Op_Diff_K_Omega_VEF_base : public Op_Diff_2eq_base
+class Op_Diff_K_Omega_VEF_base : public Op_Diff_K_Omega_base
 {
 
   Declare_base_sans_constructeur(Op_Diff_K_Omega_VEF_base);
@@ -51,12 +51,12 @@ class Op_Diff_K_Omega_VEF_base : public Op_Diff_2eq_base
 public:
 
   inline Op_Diff_K_Omega_VEF_base(double Prandt_K = PRDT_K_DEFAUT ,
-                                double Prandt_Omega = PRDT_OMEGA_DEFAUT );
+                                  double Prandt_Omega = PRDT_OMEGA_DEFAUT );
   void completer() override;
   void associer_diffusivite(const Champ_base& ch_diff) override;
   void associer_diffusivite_turbulente() override = 0;
   inline void associer_diffusivite_turbulente(const Champ_Fonc&);
-  inline void associer_Pr_K_Eps(double, double);
+  inline void associer_Pr_K_Omega(double, double);
   inline const Champ_Fonc& diffusivite_turbulente() const;
   inline const Champ_base& diffusivite() const override
   {
@@ -76,7 +76,7 @@ protected:
 //
 
 inline Op_Diff_K_Omega_VEF_base::Op_Diff_K_Omega_VEF_base(double Prandt_K,
-                                                      double Prandt_Omega)
+                                                          double Prandt_Omega)
   : Prdt_K(Prandt_K), Prdt_Omega(Prandt_Omega) {}
 
 inline const Champ_Fonc& Op_Diff_K_Omega_VEF_base::diffusivite_turbulente() const
