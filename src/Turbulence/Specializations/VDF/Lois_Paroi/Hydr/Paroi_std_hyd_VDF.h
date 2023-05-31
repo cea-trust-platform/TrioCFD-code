@@ -98,8 +98,8 @@ protected:
 
   // Constant
   static constexpr double BETA1 {0.075};
-  static constexpr double Cmu025 = pow(Cmu, 0.25); // Cmu to the power 0.25
-  static constexpr double sCmu = sqrt(Cmu); // Square root of Cmu
+  const double Cmu025 {std::pow(0.09, 0.25)}; // Cmu to the power 0.25
+  const double sCmu {std::sqrt(0.09)}; // Square root of Cmu
   double ypluslam {0};
   int blended_ {0};
 };

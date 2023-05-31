@@ -59,6 +59,10 @@ protected:
   REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
   IntVect face_keps_imposee_; // avec descripteur parallele
   int flag_face_keps_imposee_;
+
+  static constexpr double BETA_OMEGA {0.075};
+  static constexpr double BETA_K {0.09};  // equals to Cmu
+
 };
 
 #endif

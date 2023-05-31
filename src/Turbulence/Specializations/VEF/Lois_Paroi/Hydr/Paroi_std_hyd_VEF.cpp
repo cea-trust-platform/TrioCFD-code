@@ -120,8 +120,9 @@ int Paroi_std_hyd_VEF::init_lois_paroi()
   seuil_LP.resize(le_dom_VEF->nb_faces_tot());
   iterations_LP.resize(le_dom_VEF->nb_faces_tot());
 
-  return init_lois_paroi_hydraulique();
+  check_turbulence_model();
 
+  return init_lois_paroi_hydraulique();
 }
 
 // Remplissage de la table
@@ -1080,7 +1081,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   return 1;
 }  // fin de calcul_hyd_BiK (K-eps bicephale)
 
-int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
+int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
@@ -1092,15 +1093,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
 
-  double visco=-1;
-  int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  double visco {-1};
+  int l_unif {0};
+  if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
     {
-      visco = std::max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;
     }
-  else
-    l_unif = 0;
+
   if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
     //   on ne doit pas changer tab_visco ici !
     {
@@ -1109,22 +1109,24 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
     }
   // tab_visco+=DMINFLOAT;
 
-  double norm_v=-1;
-  double dist=-1,d_visco=-1;
-  double u_plus_d_plus,u_plus,d_plus,u_star;
+  double norm_v {-1};
+  double dist {-1}, d_visco {-1};
+  double u_plus_d_plus {0}, u_plus {0}, d_plus {0}, u_star {0};
   ArrOfDouble val(dimension);
-  Cisaillement_paroi_=0;
+  Cisaillement_paroi_ = 0;
 
-  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
-  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_keps_impose_, face_keps_imposee_, domaine_VEF, le_dom_Cl_VEF, !is_champ_Q1NC);
+  int is_champ_Q1NC = sub_type(Champ_Q1NC, eqn_hydr.inconnue().valeur());
+  remplir_face_keps_imposee(flag_face_keps_imposee_, methode_calcul_face_keps_impose_,
+                            face_keps_imposee_, domaine_VEF,
+                            le_dom_Cl_VEF, !is_champ_Q1NC);
 
   IntVect num(nfac);
   ArrOfDouble stock_erugu(domaine_VEF.nb_faces_tot());
   ArrOfInt is_defilante_face(domaine_VEF.nb_faces_tot());
 
   // Loop on boundaries
-  int nb_bords=domaine_VEF.nb_front_Cl();
-  for (int n_bord=0; n_bord<nb_bords; n_bord++)
+  int nb_bords = domaine_VEF.nb_front_Cl();
+  for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
@@ -1133,40 +1135,38 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
           (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
           (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE") )
         {
-          int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
+          int is_defilante = sub_type(Dirichlet_paroi_defilante, la_cl.valeur()) ;
 
           if(la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
-            {
-              is_defilante = (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE");
-            }
+            is_defilante = (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE");
 
           // Recuperation de la valeur Erugu
-          double erugu=Erugu;
-          if (sub_type(Paroi_rugueuse,la_cl.valeur()))
-            erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
+          double erugu = Erugu;
+          if (sub_type(Paroi_rugueuse, la_cl.valeur()))
+            erugu = ref_cast(Paroi_rugueuse, la_cl.valeur()).get_erugu();
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
-          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+          for (int ind_face = ndeb; ind_face < nfin; ind_face++)
             {
-              int num_face=le_bord.num_face(ind_face);
-              int elem=face_voisins(num_face,0);
+              int num_face = le_bord.num_face(ind_face);
+              int elem = face_voisins(num_face, 0);
 
-              is_defilante_face[num_face]=is_defilante;
-              stock_erugu[num_face]=erugu;
+              is_defilante_face[num_face] = is_defilante;
+              stock_erugu[num_face] = erugu;
 
               // on determine les faces de l'element qui sont autres que le num_face traite
-              for (int nf2=0; nf2<nfac; nf2++)
-                num[nf2] = elem_faces(elem,nf2);
+              for (int nf2 = 0; nf2 < nfac; nf2++)
+                num[nf2] = elem_faces(elem, nf2);
 
               // Maintenant on place le num_face en fin de tableau
-              for (int nf2=0; nf2<nfac-1; nf2++)
+              for (int nf2 = 0; nf2 < nfac-1; nf2++)
                 {
-                  num[nf2] = elem_faces(elem,nf2);
+                  num[nf2] = elem_faces(elem, nf2);
                   if (num[nf2] == num_face)
                     {
                       num[nf2] = num[nfac-1];
@@ -1174,53 +1174,65 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                     }
                 }
 
-              int nfc=0;
+              int nfc = 0;
               // Boucle sur les faces :
-              for (int nf=0; nf<nfac; nf++)
+              for (int nf = 0; nf < nfac; nf++)
                 {
-                  if (num[nf]==num_face)
+                  // cAlan : split this function to avoid the ifs!
+                  // cAlan : and remove this block from the loop as
+                  // cAlan : num_face was placed at the end of the num tab
+                  if (num[nf] == num_face)
                     {
                       // Strategie pour les tetras :
                       // On impose k et eps a la paroi :
                       // approximation: d(k)/d(n) = 0 a la paroi
                       // c'est faux mais ca marche
-                      tab_k_eps(num[nf],0)=0.;
-                      tab_k_eps(num[nf],1)=0.;
-                      int nk=0;
+                      tab_2eq(num[nf], 0) = 0.;
+                      if (turbulence_model_type == 1) // second equation is epsilon
+                        tab_2eq(num[nf], 1) = 0.;
+                      else if (turbulence_model_type == 1) // second equation is omega
+                        {
+                          // cAlan : c'est sale car on reprendre la valeur de d_visco et de dist de l'itération précédente. A améliorer quand on optimisera cette fonction.
+                          assert(dist > 0); // on vérifie quand même que dist n'est pas nulle...
+                          tab_2eq(num[nf], 1) = 10*6*d_visco/(BETA_OMEGA*dist*dist);
+                        }
+                      int nk = 0;
 
-                      for (int k=0; k<nfac; k++)
+                      for (int k = 0; k < nfac; k++)
                         //if ( (num[k] >= ndebint) && (k != nf))
-                        if ( (face_keps_imposee_[num[k]]>-1) && (k != nf))
+                        if ((face_keps_imposee_[num[k]] > -1) && (k != nf))
                           {
 
-                            tab_k_eps(num[nf],0)+= tab_k_eps(num[k],0);
-                            tab_k_eps(num[nf],1)+= tab_k_eps(num[k],1);
+                            tab_2eq(num[nf], 0) += tab_2eq(num[k], 0);
+                            tab_2eq(num[nf], 1) += tab_2eq(num[k], 1);
                             nk++;
                           }
-                      if (nk != 0 )
+                      if (nk != 0)
                         {
-                          tab_k_eps(num[nf],0)/=nk;
-                          tab_k_eps(num[nf],1)/=nk;
+                          tab_2eq(num[nf], 0) /= nk;
+                          tab_2eq(num[nf], 1) /= nk;
                         }
                     }
 
                   // On verifie si num[nf] n'est pas une face de bord :
-                  else if ( (face_keps_imposee_[num[nf]]>-1))//if (num[nf]>=ndebint)
+                  else if ((face_keps_imposee_[num[nf]] > -1))//if (num[nf]>=ndebint)
                     {
                       nfc++;
-                      norm_v=norm_vit_lp_k(vitesse,num[nf],num_face,domaine_VEF,val,is_defilante);
+                      norm_v = norm_vit_lp_k(vitesse,num[nf], num_face, domaine_VEF,
+                                             val, is_defilante);
+
                       if (!is_champ_Q1NC)
-                        dist=distance_face(num_face,num[nf],domaine_VEF);
+                        dist = distance_face(num_face, num[nf],domaine_VEF);
                       else
-                        dist=distance_face_elem(num_face,elem,domaine_VEF);
+                        dist = distance_face_elem(num_face, elem, domaine_VEF);
 
                       if (l_unif)
                         d_visco = visco;
                       else
-                        d_visco = tab_visco(elem,0);
+                        d_visco = tab_visco(elem, 0);
 
                       u_plus_d_plus = norm_v*dist/d_visco;
-                      u_plus = calculer_u_plus(nf,u_plus_d_plus,erugu);
+                      u_plus = calculer_u_plus(nf, u_plus_d_plus, erugu);
 
                       if (!is_u_star_impose_)
                         {
@@ -1237,74 +1249,82 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                         }
                       else
                         {
-                          u_star = u_star_impose_  ;
+                          u_star = u_star_impose_;
                           d_plus = 0.;
                         }
-                      calculer_k_eps(tab_k_eps(num[nf],0),tab_k_eps(num[nf],1),d_plus,u_star,d_visco,dist);
+                      // calculer_k_eps(tab_k_eps(num[nf],0),tab_k_eps(num[nf],1),d_plus,u_star,d_visco,dist);
 
                       // Calcul de la contrainte tangentielle
-                      for (int dir=0; dir<dimension; dir++)
-                        Cisaillement_paroi_(num_face,dir) += u_star*u_star*val[dir];
+                      for (int dir = 0; dir < dimension; dir++)
+                        Cisaillement_paroi_(num_face, dir) += u_star*u_star*val[dir];
                       // Fin de la strategie du calcul generalise de la loi de paroi
+
+                      // Evaluate the turbulent quantities
+                      compute_turbulent_quantities(tab_2eq(num[nf], 0), tab_2eq(num[nf], 1),
+                                                   d_plus, u_star, d_visco, dist);
                     }
                 }
 
-              // A voir si juste :
-              if (nfc != 0 )
-                for (int dir=0; dir<dimension; dir++)
-                  Cisaillement_paroi_(num_face,dir)/=nfc;
+              // A voir si juste : // cAlan !! WTF ce commentaire
+              if (nfc != 0)
+                for (int dir = 0; dir < dimension; dir++)
+                  Cisaillement_paroi_(num_face, dir) /= nfc;
 
-              double u_starbis=0;
-              for (int dir=0; dir<dimension; dir++)
-                u_starbis+=Cisaillement_paroi_(num_face,dir)*Cisaillement_paroi_(num_face,dir);
+              double u_starbis = 0;
+              for (int dir = 0; dir < dimension; dir++)
+                u_starbis += Cisaillement_paroi_(num_face, dir)*Cisaillement_paroi_(num_face, dir);
 
               u_starbis=sqrt(sqrt(u_starbis));
-              tab_u_star_(num_face)=u_starbis;
-              tab_d_plus_(num_face)=u_starbis*dist/d_visco;
-              if (u_starbis != 0) uplus_(num_face)=norm_v/u_starbis;
+              tab_u_star_(num_face) = u_starbis;
+              tab_d_plus_(num_face) = u_starbis*dist/d_visco;
+              if (u_starbis != 0)
+                uplus_(num_face) = norm_v/u_starbis;
 
             } // End loop on real faces
 
         } // End Dirichlet conditions
 
       // Robin condition:
-      else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
+      else if (sub_type(Paroi_decalee_Robin, la_cl.valeur()))
         {
           // Recuperation de la valeur Erugu
-          double erugu=Erugu;
+          double erugu = Erugu;
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin, la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
           double delta = Paroi.get_delta();
 
           // Loop on real faces
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
-          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+          for (int ind_face = ndeb; ind_face < nfin; ind_face++)
             {
-              int num_face=le_bord.num_face(ind_face);
-              int elem=face_voisins(num_face,0);
+              int num_face = le_bord.num_face(ind_face);
+              int elem = face_voisins(num_face, 0);
 
-              double psc=0, norm=0;
-              norm_v=0;
+              double psc = 0;
+              double norm = 0;
+              norm_v = 0;
 
-              for(int comp=0; comp<dimension; comp++)
+              for(int comp = 0; comp < dimension; comp++)
                 {
-                  psc += vitesse(num_face,comp)*normales(num_face,comp);
-                  norm += normales(num_face,comp)*normales(num_face,comp);
+                  psc += vitesse(num_face, comp)*normales(num_face, comp);
+                  norm += normales(num_face, comp)*normales(num_face, comp);
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
-              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
+              if (std::fabs(norm) >= DMINFLOAT)
+                psc/=norm;
 
-              for(int comp=0; comp<dimension; comp++)
+              for(int comp = 0; comp < dimension; comp++)
                 {
-                  val[comp]=vitesse(num_face,comp)-psc*normales(num_face,comp);
+                  val[comp] = vitesse(num_face, comp) - psc*normales(num_face, comp);
                   norm_v += val[comp]*val[comp];
                 }
 
               norm_v = sqrt(norm_v);
-              if (std::fabs(norm_v)>=DMINFLOAT) val /= norm_v;
+              if (std::fabs(norm_v) >= DMINFLOAT)
+                val /= norm_v;
               dist = delta;
 
               // Common to Dirichlet
@@ -1312,11 +1332,11 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = tab_visco(elem,0);
+                d_visco = tab_visco(elem, 0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 
-              u_plus = calculer_u_plus(ind_face,u_plus_d_plus,erugu);
+              u_plus = calculer_u_plus(ind_face, u_plus_d_plus, erugu);
 
               if (!is_u_star_impose_)
                 {
@@ -1337,22 +1357,28 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                   d_plus = 0.;
                 }
 
-              calculer_k_eps(tab_k_eps(num_face,0),tab_k_eps(num_face,1),d_plus,u_star,d_visco,dist);
+              // calculer_k_eps(tab_2eq(num_face,0),tab_2eq(num_face,1),d_plus,u_star,d_visco,dist);
 
               // Calcul de la contrainte tangentielle
-              for (int j=0; j<dimension; j++)
-                Cisaillement_paroi_(num_face,j) = u_star*u_star*val[j];
+              for (int j = 0; j < dimension; j++)
+                Cisaillement_paroi_(num_face, j) = u_star*u_star*val[j];
 
+              // cAlan : pourquoi recalcule-t-on ustar à partir de tau_w ?
               double u_starbis=0;
-              for (int dir=0; dir<dimension; dir++)
-                u_starbis+=Cisaillement_paroi_(num_face,dir)*Cisaillement_paroi_(num_face,dir);
-              u_starbis=sqrt(sqrt(u_starbis));
+              for (int dir = 0; dir < dimension; dir++)
+                u_starbis += Cisaillement_paroi_(num_face, dir)*Cisaillement_paroi_(num_face, dir);
+              u_starbis = sqrt(sqrt(u_starbis));
 
-              tab_u_star_(num_face)=u_starbis;
-              tab_d_plus_(num_face)=u_starbis*dist/d_visco;
-              if (u_starbis != 0) uplus_(num_face)=norm_v/u_starbis;
+              tab_u_star_(num_face) = u_starbis;
+              tab_d_plus_(num_face) = u_starbis*dist/d_visco;
+              if (u_starbis != 0)
+                uplus_(num_face) = norm_v / u_starbis;
 
               // End common to Dirichlet
+
+              // Evaluate the turbulent quantities
+              compute_turbulent_quantities(tab_2eq(num_face, 0), tab_2eq(num_face, 1),
+                                           d_plus, u_star, d_visco, dist);
 
             } // End loop on real faces
 
@@ -1419,14 +1445,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 #endif
 
   // on recalcule partout ou c'est impose
-  int nb_faces_tot=domaine_VEF.nb_faces_tot();
-  for (int face=0; face<nb_faces_tot; face++)
+  int nb_faces_tot = domaine_VEF.nb_faces_tot();
+  for (int face = 0; face < nb_faces_tot; face++)
     {
-      int num_face=face_keps_imposee_[face];
-      if (num_face>-1)
+      int num_face = face_keps_imposee_[face];
+      if (num_face > -1)
         {
           // int elem_voisin;
-          int elem=face_voisins(num_face,0);
+          int elem=face_voisins(num_face, 0);
           //if (face_voisins(face,0)!=elem) elem_voisin=face_voisins(face,0);
           //else elem_voisin=face_voisins(face,1);
           //int elem_voisin=face_voisins(num_face,0);
@@ -1434,22 +1460,24 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
           double distb;
           if (!is_champ_Q1NC)
             {
-              distb=distance_face(num_face,face,domaine_VEF);
+              distb = distance_face(num_face, face, domaine_VEF);
             }
           else
             {
-              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur())) ;
-              distb=distance_face_elem(num_face,elem,domaine_VEF);
+              assert(sub_type(Champ_Q1NC, eqn_hydr.inconnue().valeur())) ;
+              distb = distance_face_elem(num_face, elem, domaine_VEF);
             }
 
-          norm_v=norm_vit_lp_k(vitesse,face,num_face,domaine_VEF,val,is_defilante_face[num_face]);
+          norm_v=norm_vit_lp_k(vitesse, face, num_face, domaine_VEF,
+                               val, is_defilante_face[num_face]);
+
           if (l_unif)
             d_visco = visco;
           else
-            d_visco = tab_visco(elem,0);
+            d_visco = tab_visco(elem, 0);
 
           u_plus_d_plus = norm_v*distb/d_visco;
-          u_plus = calculer_u_plus(face,u_plus_d_plus,stock_erugu[num_face]);
+          u_plus = calculer_u_plus(face, u_plus_d_plus, stock_erugu[num_face]);
 
           if(u_plus)
             {
@@ -1458,20 +1486,35 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
             }
           else
             {
-              u_star = 0.            ;
-              d_plus = 0.                   ;
+              u_star = 0.;
+              d_plus = 0.;
             }
 
-          calculer_k_eps(tab_k_eps(face,0),tab_k_eps(face,1),d_plus,u_star,d_visco,distb);
+          // calculer_k_eps(tab_k_eps(face,0),tab_k_eps(face,1),d_plus,u_star,d_visco,distb);
+          // Evaluate the turbulent quantities
+          compute_turbulent_quantities(tab_2eq(face, 0), tab_2eq(face, 1), d_plus, u_star, d_visco, dist);
         }
     }
 
   Cisaillement_paroi_.echange_espace_virtuel();
-  tab_k_eps.echange_espace_virtuel();
-  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd tab_k_eps",tab_k_eps);
-  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd Cisaillement_paroi_",Cisaillement_paroi_);
+  tab_2eq.echange_espace_virtuel();
+  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd tab_2eq", tab_2eq);
+  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd Cisaillement_paroi_", Cisaillement_paroi_);
   return 1;
 }  // fin de calcul_hyd (K-eps)
+
+void Paroi_std_hyd_VEF::compute_turbulent_quantities(double& var1, double& var2,
+                                                     double d_plus, double u_star,
+                                                     double d_visco, double dist)
+{
+  if (turbulence_model_type == 1) // K-Epsilon model
+    calculer_k_eps(var1, var2, d_plus, u_star, d_visco, dist);
+  else if (turbulence_model_type == 2) // K-Omega model
+    compute_k_omega(var1, var2, d_plus, u_star, d_visco, dist);
+  else
+    Cerr << "The turbulence model is neither k-epsilon nor k-omega. Implementation required?\n";
+  return;
+}
 
 double norm_vit_lp(const ArrOfDouble& vit,int face,const Domaine_VEF& domaine,ArrOfDouble& val)
 {
@@ -1748,6 +1791,47 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   return 1;
 }  // fin du calcul_hyd (nu-t)
 
+void Paroi_std_hyd_VEF::compute_k(double& k, double yp, double u_star)
+{
+  // Original comment:
+  // PQ : 05/04/07 : formulation continue de k et epsilon
+  //  assurant le bon comportement asymptotique
+
+  const double u_star_carre = u_star*u_star;
+  k = 0.07*yp*yp*exp(-yp/9.);
+  k += 1./sqrt(Cmu)*pow(1. - exp(-yp/20.), 2.);
+  k *= u_star_carre; // = k+ * u_star^2
+  return;
+}
+
+void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
+                                        double u_star, double d_visco)
+{
+
+  double const u_star_squared = u_star*u_star;
+
+  // 50625 = 15^4
+  eps  = (1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25))); // eps_plus
+  eps *= u_star_squared*u_star_squared/d_visco;
+  return;
+}
+
+void Paroi_std_hyd_VEF::compute_omega(double& omega, double yp,
+                                      double u_star, double d_visco,
+                                      double dist)
+{
+  // cAlan: à mutualiser avec le calcul du k_omega de Multiphase
+  const double w_vis = 6.*d_visco/(BETA_OMEGA*dist*dist);
+  const double w_log = u_star/(std::sqrt(BETA_K)*Kappa*dist);
+  const double w_1 = w_vis + w_log ;
+  const double w_2 = std::pow(std::pow(w_vis, 1.2) + std::pow(w_log, 1.2), 1./1.2);
+  const double blending = std::tanh(yp/10*yp/10*yp/10*yp/10);
+
+  omega = blending*w_1 + (1 - blending)*w_2;
+
+  return;
+}
+
 int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double u_star,
                                       double d_visco, double dist)
 {
@@ -1761,6 +1845,25 @@ int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double
   eps *= u_star_carre*u_star_carre/d_visco;
 
   return 1;
+}
+
+
+void Paroi_std_hyd_VEF::compute_k_epsilon(double& k, double& epsilon,
+                                          double yp, double u_star,
+                                          double d_visco, double dist)
+{
+  compute_k(k, yp, u_star);
+  compute_epsilon(epsilon, yp, u_star, d_visco);
+  return;
+}
+
+void Paroi_std_hyd_VEF::compute_k_omega(double& k, double& omega,
+                                        double yp, double u_star,
+                                        double d_visco, double dist)
+{
+  compute_k(k, yp, u_star);
+  compute_omega(omega, yp, u_star, d_visco, dist);
+  return;
 }
 
 double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,const double u_plus_d_plus,const double erugu)
@@ -1924,5 +2027,3 @@ void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
     }
   Ustar.syncfile();
 }
-
-

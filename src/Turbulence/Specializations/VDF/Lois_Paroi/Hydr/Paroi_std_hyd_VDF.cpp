@@ -22,8 +22,8 @@
 
 #include <Dirichlet_paroi_defilante.h>
 #include <Dirichlet_paroi_fixe.h>
-#include "Paroi_std_hyd_VDF.h"
-#include "TRUSTTabs_forward.h"
+#include <Paroi_std_hyd_VDF.h>
+#include <TRUSTTabs_forward.h>
 #include <Paroi_std_hyd_VDF.h>
 #include <Schema_Temps_base.h>
 #include <Mod_turb_hyd_base.h>
@@ -447,7 +447,8 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
       exit();
     }
   int ndeb, nfin, elem, ori;
-  double norm_v, dist, u_plus_d_plus, d_visco;
+  double norm_v, dist, u_plus_d_plus {0}, d_visco;
+  u_plus_d_plus += 1;
   //double val,val1,val2;
 
   //****************************************************************
@@ -490,8 +491,8 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
           for (int num_face = ndeb; num_face < nfin; num_face++)
             {
               if (isdiri) // for cl paroi_defilante uniquement
-                  for (int k = 0; k < dimension; k++)
-                    vit_paroi[k] = vitesse_imposee_face_bord(num_face - ndeb, k);
+                for (int k = 0; k < dimension; k++)
+                  vit_paroi[k] = vitesse_imposee_face_bord(num_face - ndeb, k);
 
               ori = orientation(num_face);
               if ((elem = face_voisins(num_face, 0)) != -1)
@@ -523,8 +524,9 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
               // = Compute local Reynolds number, yplus and uplus
               // cAlan : make them private et use functions ?
               const double Rey = dist*sqrt(field_komega(elem, 0))/d_visco;
-              const double yplus = Cmu25*Rey;
-              const double uplus = (1/Kappa)*log(Erugu*yplus);
+              const double yplus = Cmu025*Rey;
+              // const double uplus = (1/Kappa)*log(Erugu*yplus);
+              double uStar {0};
               // u_plus_d_plus = norm_v*dist/d_visco;
 
               // = Compute omega and production term
@@ -532,15 +534,16 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
                 {
                   const double fracLaminar = exp(-Rey/11.);
                   const double fracTurbu = 1 - fracLaminar;
-                  const double uStar = sqrt(fracLaminar*d_visco*magnitudeGradUw
-                                            + fracTurbu*sCmu*field_komega(elem, 0));
+                  double magnitudeGradUw = 1.;
+                  uStar = sqrt(fracLaminar*d_visco*magnitudeGradUw
+                               + fracTurbu*sCmu*field_komega(elem, 0));
                   const double omegaVis = 6.*d_visco/(BETA1*sqrt(dist));
                   const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist);
 
                   field_komega(elem, 1) = sqrt(pow(omegaVis, 2.) + pow(omegaLog, 2.));
-                  prodOmegaWall(elem) = (fracLaminar*prodOmega
-                                         + fracTurbu*sqrt(ustar*magnitudeGradUw*dist/uplus)
-                                         /(d_visco*Kappa*yplus))
+                  // prodOmegaWall(elem) = (fracLaminar*prodOmega
+                  //                        + fracTurbu*sqrt(ustar*magnitudeGradUw*dist/uplus)
+                  //                        /(d_visco*Kappa*yplus))
                 }
               else
                 {
@@ -549,16 +552,16 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
                       const double omegaVis = 6.*d_visco/(BETA1*sqrt(dist));
 
                       field_komega(elem, 1) = omegaVis;
-                      prodOmegaWall(elem) = prodOmega;
+                      // prodOmegaWall(elem) = prodOmega;
                     }
                   else
                     {
-                      const double uStar = sqrt(sCmu*field_komega(elem, 0));
+                      uStar = sqrt(sCmu*field_komega(elem, 0));
                       const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist);
 
                       field_komega(elem, 1) = omegaLog;
-                      prodOmegaWall(elem) = sqrt(ustar*magnitudeGradUw*dist/uplus)
-                                             /(d_visco*Kappa*yplus)
+                      // prodOmegaWall(elem) = sqrt(ustar*magnitudeGradUw*dist/uplus)
+                      // /(d_visco*Kappa*yplus)
                     }
                 }
 
@@ -566,7 +569,7 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
               tab_u_star_(num_face) = uStar;
               // Calcul de u* et des grandeurs turbulentes:
               // compute_layer_selection(u_plus_d_plus, d_visco, field_komega,
-                                      // norm_v, dist, elem, num_face);
+              // norm_v, dist, elem, num_face);
 
               // Calcul de la contrainte tangentielle
               double vit_frot = tab_u_star(num_face)*tab_u_star(num_face);
@@ -614,7 +617,7 @@ int Paroi_std_hyd_VDF::compute_layer_selection(double u_plus_d_plus, double d_vi
     {
       // Viscours sub-layer
       calculer_u_star_sous_couche_visq(norm_vit, d_visco, dist, num_face);
-      compute_viscous_layer(field_komega, dist, elem, d_visco, num_face);
+      compute_viscous_layer(field_komega, dist, d_visco, elem);
     }
 
   else if ((u_plus_d_plus > valmin) && (u_plus_d_plus < valmax))
@@ -634,40 +637,42 @@ int Paroi_std_hyd_VDF::compute_layer_selection(double u_plus_d_plus, double d_vi
   return 1;
 }
 
-int compute_viscous_layer(DoubleTab& field_komega, double dist_y,
-                          double viscosity, int elem)
+int Paroi_std_hyd_VDF::compute_viscous_layer(DoubleTab& field_komega, double dist_y,
+                                             double viscosity, int elem)
 {
   // at the wall, k = 0 and omega = 6 nu/(beta1 * sqrt(y)) with beta1(default)=0.075
   field_komega(elem, 0) = 0;
   field_komega(elem, 1) = 6.*viscosity/(BETA1*dist_y);
-  return 1
+  return 1;
 }
 
-int compute_buffer_layer(DoubleTab& field_komega, double dist_y,
-                         double viscosity, int elem, int face)
+int Paroi_std_hyd_VDF::compute_buffer_layer(DoubleTab& field_komega, double dist_y,
+                                            double viscosity, int elem, int face)
 {
-  const double u_star = tab_u_star(face);
+  const double u_star = tab_u_star_(face);
   const double u_star_carre = u_star*u_star;
-
 
   // Harmonic mean, as a first test. Other blendings could be
   // implemented. See OpenFOAM here
   // (https://www.openfoam.com/documentation/guides/latest/api/omegaWallFunctionFvPatchScalarField_8C_source.html)
   // for examples
-  field_komega(elem, 0) = u_star_carre/sqrt(Cmu);
+  field_komega(elem, 0) = u_star_carre/sCmu;
 
   const double omega_vis = 6.*viscosity/(BETA1*dist_y);
   const double omega_log = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist_y);
   field_komega(elem, 1) = sqrt(pow(omega_vis, 2.) + pow(omega_log, 2.));
-
+  return 1;
 }
-int compute_log_layer(DoubleTab& field_komega, double dist_y, int elem, int face)
+
+int Paroi_std_hyd_VDF::compute_log_layer(DoubleTab& field_komega, double dist_y, int elem, int face)
 {
   double u_star = tab_u_star(face);
   double u_star_carre = u_star*u_star;
 
   field_komega(elem, 0) = u_star_carre/sqrt(Cmu);
   field_komega(elem, 1) = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist_y);
+
+  return 1;
 }
 
 
@@ -1110,7 +1115,7 @@ void Paroi_std_hyd_VDF::imprimer_ustar(Sortie& os) const
               double x = domaine_VDF.xv(num_face,0);
               double y = domaine_VDF.xv(num_face,1);
               norme_L2 = Cisaillement_paroi_(num_face,0)*Cisaillement_paroi_(num_face,0)
-                + Cisaillement_paroi_(num_face,1)*Cisaillement_paroi_(num_face,1);
+                         + Cisaillement_paroi_(num_face,1)*Cisaillement_paroi_(num_face,1);
 
               if (dimension == 2)
                 Ustar << x << "\t| " << y;
