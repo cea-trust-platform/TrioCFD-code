@@ -30,12 +30,12 @@ class Transport_K_Omega;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-class Source_Transport_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
+class Source_Transport_VEF_K_Omega_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
 {
   Declare_base_sans_constructeur(Source_Transport_VEF_K_Omega_Face_base);
 public :
-  Source_Transport_VEF_Face_base() { }
-  Source_Transport_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
+  Source_Transport_VEF_K_Omega_Face_base() { }
+  Source_Transport_VEF_K_Omega_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
   void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;

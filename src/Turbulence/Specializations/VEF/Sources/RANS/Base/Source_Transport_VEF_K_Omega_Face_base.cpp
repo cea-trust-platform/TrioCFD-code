@@ -31,8 +31,8 @@
 #include <Domaine_VEF.h>
 
 Implemente_base_sans_constructeur(Source_Transport_VEF_K_Omega_Face_base,
-				  "Source_Transport_VEF_K_Omega_Face_base",
-				  Source_base);
+                                  "Source_Transport_VEF_K_Omega_Face_base",
+                                  Source_base);
 
 Sortie& Source_Transport_VEF_K_Omega_Face_base::printOn(Sortie& os) const { return os << que_suis_je(); }
 
@@ -55,20 +55,18 @@ DoubleTab& Source_Transport_VEF_K_Omega_Face_base::calculer(DoubleTab& resu) con
 DoubleTab& Source_Transport_VEF_K_Omega_Face_base::ajouter_komega(DoubleTab& resu) const
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,
-						  eq_hydraulique->domaine_Cl_dis().valeur());
+                                                  eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
-  const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
+  // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
   const int nb_faces_ = le_dom_VEF->nb_faces();
-  DoubleTrav P{nb_faces_};
+  DoubleTrav P {nb_faces_};
   const DoubleTab& K = get_K_pour_production(); // voir les classes filles
   calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K,
-			      vit, visco_turb, _interpolation_viscosite_turbulente);
+                              vit, visco_turb, _interpolation_viscosite_turbulente);
 
   fill_resu(volumes_entrelaces, P, resu); // voir les classes filles
 
   return resu;
 }
-
-
