@@ -109,7 +109,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
-  p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entier Meso region extension in number of cells [-]
+  p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entire Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
@@ -525,6 +525,38 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
       index = data.index_facette_suivante_;
     }
 
+  // removing two closing point
+  if (nint > 2)
+    {
+      for (int i=0; i < nint; i++)
+        {
+          for (int j=0; j < nint; j++)
+            {
+              if (i < j)
+                {
+                  const double dist = sqrt(pow((xint[i]-xint[j]), 2) + pow((yint[i]-yint[j]), 2));
+                  if (dist < Objet_U::precision_geom)
+                    {
+                      if (j!=nint-1)
+                        {
+
+                          xint[j] = xint[nint-1];
+                          yint[j] = yint[nint-1];
+                          nint--;
+                          j--;
+                        }
+                      else
+                        {
+                          nint--;
+
+
+                        }
+                    }
+                }
+
+            }
+        }
+    }
   // We should have found 2 intersections in the end:
   if (nint != 2)
     {

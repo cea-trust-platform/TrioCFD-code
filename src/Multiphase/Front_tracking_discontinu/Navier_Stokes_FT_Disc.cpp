@@ -2807,7 +2807,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
             }
         }
 #endif
-        if (variables_internes().ref_equation_mpoint_.non_nul())
+        if ((variables_internes().ref_equation_mpoint_.non_nul())&& !variables_internes().mpoint_inactif)
           {
             // Is it necessary to recompute them? no
             //variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
@@ -3757,7 +3757,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const double Lvap = fluide_diph.chaleur_latente();
           const double coef = jump_inv_rho/Lvap;
           // Correct the secmem2 contribution due to TCL :
-          probleme_ft().tcl().corriger_secmem(coef, secmem2);
+          if (!variables_internes().mpoint_inactif)
+            probleme_ft().tcl().corriger_secmem(coef, secmem2);
 
           const int check_consistency = 1 ; // local option to check that secmem2 in near-wall cell is actually well calculated
           if (check_consistency)
