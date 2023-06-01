@@ -109,12 +109,12 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
-  p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P integer Meso region extension in number of cells [-]
+  p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entier Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
   p.ajouter_flag("deactivate", &deactivate_);
-  p.ajouter("inout_method", &inout_method_); // XD_ADD_P chaine(into=["exact","approx", "both"]) Type of method for in out calc
+  p.ajouter("inout_method", &inout_method_); // XD_ADD_P chaine(into=["exact","approx","both"]) Type of method for in out calc
   p.dictionnaire("exact", EXACT);
   p.dictionnaire("approx", APPROX);
   p.dictionnaire("both", BOTH); // Makes both and compare them
