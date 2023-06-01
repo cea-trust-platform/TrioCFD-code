@@ -2442,7 +2442,6 @@ void compute_normale_barycenter_area_in_cell(const int elem,
     return; // No facette in this element.
 
   // Loop over the facettes crossing the element
-  int count = 0;
   while (index >= 0)
     {
       // Accessing the structure containing all the relevant information for facette number fa7
@@ -2474,7 +2473,6 @@ void compute_normale_barycenter_area_in_cell(const int elem,
       bary_facettes_dans_elem += coord_barycentre_fraction; // This is done for all the 3 components.
 
       index = data.index_facette_suivante_;
-      count++;
     }
 
   if (surface_tot > 0.)
