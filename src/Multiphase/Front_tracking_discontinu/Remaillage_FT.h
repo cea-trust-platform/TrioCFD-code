@@ -174,6 +174,8 @@ protected:
   int lissage_courbure_iterations_si_remaillage_;
   // Ancien parametre de lissage (voir readOn)
   int lissage_courbure_iterations_old_;
+  // Critere local de declenchement du lissage:
+  double lissage_critere_;
 };
 
 
