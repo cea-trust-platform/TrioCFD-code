@@ -40,7 +40,8 @@ void affecte_int_avec_inttab(int** p, const ArrOfInt& trio)
 void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
 {
   //DEV ANTONIN LEPREVOST FOR COUPLING TRIO WITH EUROPLEXUX
-  if(ch.le_nom().getString() == "neant") //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+
+  if(ch.le_nom().getString() == "neant" and ch.get_dimension() == 3) //Pourquoi neant pr le champ extraction ? -> PBM TRUST
     {
       Cerr << "Interpolation P0 -> P1 TRUST" << endl;
       build_triomesh(ch.get_ref_domaine_dis_base(), afield, 1, ch.get_localisation() == FACE);
@@ -68,8 +69,7 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
   int nb_face = faces_IFS.nb_faces();
   int nb_som_face = afield._nodes_per_elem;
 
-
-  if(ch.le_nom().getString() == "neant") //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+  if(ch.le_nom().getString() == "neant" and ch.get_dimension() == 3) //Pourquoi neant pr le champ extraction ? -> PBM TRUST
     {
       afield._mesh_dim = 2; //Pourquoi mesh dim vaut 1 en 3D ? Encore pbm avec le champ extraction, si on modifie pas erreur dans le couplage -> PBM TRUST
 
