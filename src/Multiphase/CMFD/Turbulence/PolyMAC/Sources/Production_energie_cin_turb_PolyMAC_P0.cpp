@@ -108,7 +108,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
-            if      (Type_diss == "tau")   nut_l =                                   k(e, n) * (*diss)(e, n);
+            if      (Type_diss == "tau")   nut_l =                         std::max(k(e, n) * (*diss)(e, n), limiter_ * nu(e, n)) ;
             else if (Type_diss == "omega") nut_l = ( ((*pdiss)(e,n) > 0.) ? std::max(k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)), limiter_ * nu(e, n)) : limiter_ * nu(e, n) );
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
@@ -122,7 +122,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
                 if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * alp(e,n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
               }
 
-            if (Type_diss == "tau")
+            if ( (Type_diss == "tau") && ((k(e, n)*(*diss)(e, n)) > (limiter_*nu(e, n))) )
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
