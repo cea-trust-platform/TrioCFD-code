@@ -38,7 +38,7 @@ do
   [[ -f ${TESTLIST} ]] && rm ${TESTLIST}
   touch ./${TESTLIST}
   
-  for f in $(find "./tests/Reference/${MOD}" -iname "*.data" | sort -u)
+  for f in $(find "./tests/Reference/${MOD}" -iname "*.data" | sort -duf)
   do
     if [[ "$(basename ${f%.*})" == "$(basename $(dirname ${f}))" &&
          ! -f "$(dirname ${f})/skipped" ]]
@@ -48,12 +48,12 @@ do
     fi
   done
   
-  for f in $(find "./share/Validation/Rapports_automatiques" -iwholename "*$(basename ${MOD})*src")
+  for f in $(find "./share/Validation/Rapports_automatiques" -iwholename "*$(basename ${MOD})*src" | sort -duf)
   do
     rapport=$(basename $(dirname $f))
     echo -e " Rapport de validation '${rapport}'"
   
-    for g in $(find "./tests/Reference/Validation" -iname "${rapport}_jdd*.data" | sort -u)
+    for g in $(find "./tests/Reference/Validation" -iname "${rapport}_jdd*.data" | sort -duf)
     do
       #echo -e ${g}
       echo -e "$(basename ${g%.*})" >> ${TESTLIST}
@@ -75,7 +75,7 @@ do
     [[ -f ${VALIDLIST} ]] && rm ${VALIDLIST}
     touch ./${VALIDLIST}
     
-    for r in $(find "./share/Validation/Rapports_automatiques/${MOD}" -iname "*.prm" -o -iname "*.ipynb")
+    for r in $(find "./share/Validation/Rapports_automatiques/${MOD}" -iname "*.prm" -o -iname "*.ipynb" | sort -duf)
     do
       echo -e "Rapport de validation : ${r}"
       REPVAL=$(dirname ${r})
