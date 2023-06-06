@@ -621,6 +621,9 @@
 \rowcolor{Orchid!10}ftd\_remaillage & Probleme\_FT\_Disc\_gen & VDF & 3 & 1500 hexa & 4 & Test of the volume and surface conservation & old format \\ 
 \rowcolor{Orchid!10} & & VEF & & 5239 tetra & & during the remeshing & \\
 \hline
+\rowcolor{Orchid!10}ftd\_remesh & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_bidim\_axi & & & & & & & \\
+\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -640,12 +643,24 @@
 \hline
 \rowcolor{Orchid!10}FTD\_solid\_particle & Probleme\_FT\_Disc\_gen & VDF & 3 & 20000 hexa & 3 & Fall of a solid particle in viscous fluid & old format \\ 
 \rowcolor{Orchid!10}\_fall\_viscosity & & & & & & followed by FTD & \\
+\hline
 %\hline
 %\rowcolor{Orchid!10}FTD\_sloshing & Probleme\_FT\_Disc\_gen & VDF & 3 & 365520 hexa & 1 & Free surface oscillations due to the sloshing & old format \\ 
 %\rowcolor{Orchid!10} & & & & & & of a liquid in a cylindrical pool & \\
 %\hline
 %\rowcolor{Orchid!10}FTD\_rising\_drop & Probleme\_FT\_Disc\_gen & VDF & 3 & 11664000 hexa & 1 & Rising of an inclusion of light fluid in a & old format \\ 
 %\rowcolor{Orchid!10} &  & & & & & heavy fluid & exclu\_nr \\
+\rowcolor{Orchid!10} FTD\_TCL         & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_boling\_bubble & & & & & & & \\
+\hline
+\rowcolor{Orchid!10} FTD\_TCL\_imposed  & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_constant\_growth & & & & & & & \\
+\hline
+\rowcolor{Orchid!10} FTD\_TCL  & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_Qmicro  & & & & & & & \\
+\hline
+\rowcolor{Orchid!10} FTD\_TCL\_static  & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_thermal\_wedge  & & & & & & & \\
 \hline
 \rowcolor{Orchid!10}IBC\_penalisation & Probleme\_FT\_Disc\_gen & VDF & 2 & 902 rect & 2 & Influence of penalization in Front-Tracking in 2D & old format \\ 
 \rowcolor{Orchid!10}\_poiseuille & & & & & & verification test & \\
@@ -667,23 +682,6 @@
 \hline
 \rowcolor{Orchid!10}pena\_ellipsoide & Probleme\_FT\_Disc\_gen & VDF & 3 & 2250 hexa & 2 & Influence of penalization in Front-Tracking in 3D & old format \\ 
 \rowcolor{Orchid!10} & & & & & & Molten glass bath reactor with stirrer & \\
-\hline
-\end{tabular}
-\end{centering}
-\end{table}
-
-\newpage
-
-\begin{table}[H]
-\begin{centering}
-\begin{tabular}{lclccclc}
-\hline
-\textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline
-\noalign{\vskip0.1cm}
-\hline
-\hline
-\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking}} \\
 \hline
 \rowcolor{Orchid!10}tubeY & Probleme\_FT\_Disc\_gen & VDF & 2 & 1088 rect & 2 & Checking for competing reactions & old format \\ 
 \rowcolor{Orchid!10} & & VEF & & 1088 tri & & & \\
