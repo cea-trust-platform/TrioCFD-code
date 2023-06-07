@@ -4028,11 +4028,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           Cerr << " Option codee uniquement pour le sch_euler... Tester et implementer si besoiN. " << finl;
           Process::exit();
         }
+      // OPTION A SELECTIONNE DANS LE CAS DUN SHEAR PERIO POUR EVITER LES PBMS D INTERPOLATION DE RHO AU NIVEAU DU BORD PERIO_Z
       if (use_inv_rho_in_poisson_solver_)
         {
           Cerr << "Methode basee sur inv rho pour le grad(P) en RK3" << finl;
           Cerr << " Option a tester si besoin. " << finl;
-          Process::exit();
+          //Process::exit();
           inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
