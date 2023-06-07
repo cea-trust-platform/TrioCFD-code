@@ -3,7 +3,9 @@
 \begin{longtable}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
+\hline
+\noalign{\vskip0.1cm}
+\hline
 \endhead
 \hline
 \endfoot
@@ -110,29 +112,40 @@
 \begin{tabular}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
+\hline
+\noalign{\vskip0.1cm}
+\hline
 \hline
 \rowcolor{LimeGreen} \multicolumn{8}{c}{\textbf{Laminar Flow}} \\
 \hline
 \rowcolor{LimeGreen!10}Turbulence\_synthetique & Pb\_hydraulique & VDF & 3 & 1024 to 65536 hexa & 15 & Generation of isotropic synthetic & new format \\ 
-\rowcolor{LimeGreen!10}& & VEF & & 6144 to 16777216 hexa & 8 & fluctuations as inlet boundary condition &  \\ \hline
+\rowcolor{LimeGreen!10}& & VEF & & 6144 to 16777216 hexa & 8 & fluctuations as inlet boundary condition &  \\
+\hline
 \rowcolor{LimeGreen!10}Vorticite\_et\_fonction & Pb\_hydraulique & VDF & 2 & 7 $\Rightarrow$ 16 to 65536 rect & 40 & Verification of vorticity and & old format \\ 
 \rowcolor{LimeGreen!10}\_de\_Courant & \textbf{Pb\_conduction} & VEF & & 7 $\Rightarrow$ 16 to 65536 quad & & Stream function in a square cavity &  \\ 
-\rowcolor{LimeGreen!10} &  & VEF & & 6 $\Rightarrow$ 40 to 104420 tri & & & \\ \hline
+\rowcolor{LimeGreen!10} &  & VEF & & 6 $\Rightarrow$ 40 to 104420 tri & & & \\
+\hline
 \rowcolor{LimeGreen!10}2D\_VEF\_Cylindre & Pb\_hydraulique & VEF & 2 & 999 tri & 1 & \textbf{Implicit\_Euler\_steady\_scheme} & old format \\
-\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical Test} & \\ \hline
+\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical Test} & \\
+\hline
 \rowcolor{LimeGreen!10}Navier\_Stokes\_2d & Pb\_hydraulique & VEF & 2 & 104420 tri. & 8 & \textbf{Implicit\_Euler\_steady\_scheme} & old format \\
-\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical}: comparison with analytical & \\ \hline
+\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical}: comparison with analytical & \\
+\hline
 \rowcolor{LimeGreen!10}Navier\_Stokes\_3d & Pb\_hydraulique & VEF & 3 & 61052 tetra & 3 & \textbf{Implicit\_Euler\_steady\_scheme} & old format \\ 
-\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical}: comparison with analytical & \\ \hline
+\rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical}: comparison with analytical & \\
+\hline
 \rowcolor{LimeGreen!10}NoFlow & Pb\_hydraulique & VEF & 2 & 3 $\Rightarrow$ 242, 1054 & 24 & \textbf{Validation of the $P_0-RT$ scheme} & old format \\ 
-\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & in case of a $\vec{u}=0$ & \\ \hline
+\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & in case of a $\vec{u}=0$ & \\
+\hline
 \rowcolor{LimeGreen!10}StatVortex2D & Pb\_hydraulique & VEF & 2 & 3 $\Rightarrow$ 242, 1054 & 24 & \textbf{Validation of the $P_0-RT$ scheme} & old format \\ 
-\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & for a steady state 2D vortex &  \\ \hline
+\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & for a steady state 2D vortex &  \\
+\hline
 \rowcolor{LimeGreen!10}StatVortex & Pb\_hydraulique & VEF & 3 & 4 $\Rightarrow$ 215 & 40 & \textbf{Validation of the $P_0-RT$ scheme} & old format \\ 
-\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & to 7711 tetra & & for a steady state 3D vortex & \\ \hline
+\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & to 7711 tetra & & for a steady state 3D vortex & \\
+\hline
 \rowcolor{LimeGreen!10}RotFlow & Pb\_hydraulique & VEF & 2 & 3 $\Rightarrow$ 242, 1054 & 24 & \textbf{Validation of the $P_0-RT$ scheme} & old format \\ 
-\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & for a rotational velocity & \\ \hline
+\rowcolor{LimeGreen!10} & & \textbf{P0 RT} & & \& 4262 tri. & & for a rotational velocity & \\
+\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -145,10 +158,9 @@
 \begin{tabular}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
-
+\hline \noalign{\vskip0.1cm}
 \hline
-
+\hline
 \rowcolor{ForestGreen} \multicolumn{8}{c}{\textbf{Thermal Laminar Flow}} \\
 \hline
 \rowcolor{ForestGreen!10}Convection\_Rotating & Pb\_thermohydraulique & VEF & 2 & 6130 tri & 28 & Laminar advection of temperature & old format \\ 
@@ -281,38 +293,49 @@
 \begin{tabular}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
-
+\hline \noalign{\vskip0.1cm}
 \hline
-
+\hline
 \rowcolor{SkyBlue} \multicolumn{8}{c}{\textbf{Turbulent Flow}} \\
 \hline
 \rowcolor{SkyBlue!10}expansion\_2D\_axi\_3D & Pb\_hydraulique\_Turbulent & VDF & Axi & 5577 rect & 5 & Expanding turbulent flow with & old format \\ 
-\rowcolor{SkyBlue!10}\_VEF\_circular & & VEF & 3 & 65923 tetra & 5 & various inlet velocities & \\ \hline
+\rowcolor{SkyBlue!10}\_VEF\_circular & & VEF & 3 & 65923 tetra & 5 & various inlet velocities & \\
+\hline
 \rowcolor{SkyBlue!10}expansion\_3D & Pb\_hydraulique\_Turbulent & VDF & 3 & 48400 hexa & 5 & Same than previous in 3D  & old format \\
-\rowcolor{SkyBlue!10}\_VDF\_VEF & & VEF & & 51840 tetra & 5 & with VDF and VEF mesh & \\ \hline
+\rowcolor{SkyBlue!10}\_VDF\_VEF & & VEF & & 51840 tetra & 5 & with VDF and VEF mesh & \\
+\hline
 \rowcolor{SkyBlue!10}Mixing\_length & Pb\_hydraulique\_Turbulent & VEF & 2 & 7 $\Rightarrow$ 80 to  & 14 & Mixing length in 2D and 3D & new format \\
-\rowcolor{SkyBlue!10}\_VEF\_WF & & VEF & 3 & 7680 tetra & & VEF-plane channel & report \\ \hline
+\rowcolor{SkyBlue!10}\_VEF\_WF & & VEF & 3 & 7680 tetra & & VEF-plane channel & report \\
+\hline
 \rowcolor{SkyBlue!10}OBI\_diffuser\_VEF & Pb\_hydraulique\_Turbulent & VEF & 2 & 36644 tetra & 2 & Turbulent flow in a 2D diffuser & new format \\ 
-\rowcolor{SkyBlue!10}\_k\_eps & & & & & & with the $\kappa-\epsilon$ model & report \\ \hline
+\rowcolor{SkyBlue!10}\_k\_eps & & & & & & with the $\kappa-\epsilon$ model & report \\
+\hline
 \rowcolor{SkyBlue!10}Tube\_turb\_perio & Pb\_hydraulique\_Turbulent & VEF & 3 & 78576 tetra & 1 & Fully developed turbulent flow & old format \\ 
-\rowcolor{SkyBlue!10}\_EF\_stab & & & & & & in circular tube & \\ \hline
+\rowcolor{SkyBlue!10}\_EF\_stab & & & & & & in circular tube & \\
+\hline
 \rowcolor{SkyBlue!10}Tube\_turb\_perio & Pb\_hydraulique\_Turbulent & VEF & 3 & 78576 tetra & 1 & Same than previous with muscl scheme & old format \\ 
-\rowcolor{SkyBlue!10}\_muscl & & & & & & better prediction of  turbulent viscosity  & \\ \hline
+\rowcolor{SkyBlue!10}\_muscl & & & & & & better prediction of  turbulent viscosity  & \\
+\hline
 \rowcolor{SkyBlue!10}EsthairNoWire & Pb\_hydraulique\_Turbulent & VEF & 3 & 3 $\Rightarrow$ 3114 to  & 5 & Esthair calculations of a 19 rods & old format \\ 
-\rowcolor{SkyBlue!10} & & & & 11829 tetra & & sub-assembly without space wire & \\ \hline
+\rowcolor{SkyBlue!10} & & & & 11829 tetra & & sub-assembly without space wire & \\
+\hline
 \rowcolor{SkyBlue!10}ContractionTurbFlow & Pb\_hydraulique\_Turbulent & VEF & 3 & 684 \& 1260 & 6 & Pressure loss through a  & old format \\ 
-\rowcolor{SkyBlue!10}\_3D\_VEF & & & & 29011 \& 107842 & & sudden contraction & \\ \hline
+\rowcolor{SkyBlue!10}\_3D\_VEF & & & & 29011 \& 107842 & & sudden contraction & \\
+\hline
 \rowcolor{SkyBlue!10}Cube\_Atmo & Pb\_hydraulique\_Turbulent & VEF & 3 & 2 $\Rightarrow$ 42964 and & 4 & Atmospheric flow around & old format \\ 
-\rowcolor{SkyBlue!10} & & & & 55183 hexa & & a cube &  \\ \hline
+\rowcolor{SkyBlue!10} & & & & 55183 hexa & & a cube &  \\
+\hline
 \rowcolor{SkyBlue!10}Couche\_Limite & Pb\_hydraulique\_Turbulent & VEF & 3 & 27727 tetra & 3 & Simulation of the atmospheric boundary & old format \\ 
-\rowcolor{SkyBlue!10}\_Atmospherique & & & & & & layer - Source\_Transport\_K\_Eps & \\ \hline
+\rowcolor{SkyBlue!10}\_Atmospherique & & & & & & layer - Source\_Transport\_K\_Eps & \\
+\hline
 \rowcolor{SkyBlue!10}Loi\_paroi\_3D\_VEF & Pb\_hydraulique\_Turbulent & VEF & 3 & 9 $\Rightarrow$ 288 to & 24 & Validate behaviour of VEF/Nicholson/ & old format \\ 
-\rowcolor{SkyBlue!10} & & & & 9216 tetra & & $\lambda$u' approach - Source\_Qdm\_lambdaup & \\ \hline
+\rowcolor{SkyBlue!10} & & & & 9216 tetra & & $\lambda$u' approach - Source\_Qdm\_lambdaup & \\
+\hline
 \rowcolor{SkyBlue!10}Watlon\_k\_eps & Pb\_hydraulique\_Turbulent & VEF & 3 & 661632 tetra & 6 & Watlon experiment: fluid mixing in & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & T-pipe with long cycle fluctuations & skip \\\hline \rowcolor{SkyBlue!10}Flow\_in\_curved\_pipe & skip Pb\_Hydraulique\_Turbulent & VEF & 3 & 463259 tetra & 2 & Swirling turbulent flow through & old format \\ 
+\rowcolor{SkyBlue!10} & & & & & & T-pipe with long cycle fluctuations & skip \\
+\hline
+\rowcolor{SkyBlue!10}Flow\_in\_curved\_pipe & skip Pb\_Hydraulique\_Turbulent & VEF & 3 & 463259 tetra & 2 & Swirling turbulent flow through & old format \\ 
 \rowcolor{SkyBlue!10} & & & & & & a curved pipe & skip \\ \hline
-
 \end{tabular}
 \end{centering}
 \end{table}
@@ -324,40 +347,54 @@
 \begin{tabular}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
-
 \hline
-
+\noalign{\vskip0.1cm}
+\hline
+\hline
 \rowcolor{SkyBlue} \multicolumn{8}{c}{\textbf{Turbulent Flow}} \\
 \hline
 \rowcolor{SkyBlue!10}Fiche\_validation\_Re590 & Pb\_hydraulique\_Turbulent & VDF & 3 & 62370 hexa & 4 & New wall law treatment for the LES of  & old format \\
-\rowcolor{SkyBlue!10} & & VEF & & 61440 tetra & & turbulent heat transfer in a periodic channel & \\ \hline
+\rowcolor{SkyBlue!10} & & VEF & & 61440 tetra & & turbulent heat transfer in a periodic channel & \\
+\hline
 \rowcolor{SkyBlue!10}CHANNEL\_LES\_VEF & Pb\_hydraulique\_Turbulent & VEF & 3 & 65856 tetra & 4 & Channel LES VEF $Re_\tau=1110$ with  & old format \\
-\rowcolor{SkyBlue!10}\_RE\_TAU\_1110 & & & & & & EF\_STAB scheme & \\ \hline
+\rowcolor{SkyBlue!10}\_RE\_TAU\_1110 & & & & & & EF\_STAB scheme & \\
+\hline
 \rowcolor{SkyBlue!10}les\_THI\_qdm\_ReInf\_VEF & Pb\_hydraulique\_Turbulent & VDF & 3 & 195112 hexa & 12 & LES: Isotropic homogeneous turbulence in & old format \\ 
-\rowcolor{SkyBlue!10} & & VEF & & 196608 tetra & & a periodic cube & exclu\_nr \\ \hline
+\rowcolor{SkyBlue!10} & & VEF & & 196608 tetra & & a periodic cube & exclu\_nr \\
+\hline
 \rowcolor{SkyBlue!10}Channel\_VEF\_LES\_Hyd & Pb\_hydraulique\_Turbulent & VEF & 3 & 4800 tetra & 12 & Pressure drop in a 3D periodic & old format \\ 
-\rowcolor{SkyBlue!10}\_WF\_Pressure\_drop & & & & & & turbulent flow in a plane channel & \\ \hline
+\rowcolor{SkyBlue!10}\_WF\_Pressure\_drop & & & & & & turbulent flow in a plane channel & \\
+\hline
 \rowcolor{SkyBlue!10}Loi\_paroi2D\_VEF & Pb\_hydraulique\_Turbulent & VEF & 2 & 5 $\Rightarrow$ 80 & 24 & Validation of a Cranck-Nicholson time  & old format \\ 
-\rowcolor{SkyBlue!10} & & & & to 1280 tetra & & scheme - stabilization with a source term $\lambda$u' & \\ \hline
+\rowcolor{SkyBlue!10} & & & & to 1280 tetra & & scheme - stabilization with a source term $\lambda$u' & \\
+\hline
 \rowcolor{SkyBlue!10}Baglietto & Pb\_hydraulique\_Turbulent & VEF & 2 & 162 tri & 6 & Study of non-linear Baglietto $\kappa-\epsilon$ model & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & for low Reynolds number & \\ \hline
+\rowcolor{SkyBlue!10} & & & & & & for low Reynolds number & \\
+\hline
 \rowcolor{SkyBlue!10}Low\_Reynolds & Pb\_hydraulique\_Turbulent & VDF & 3 & 1192 hexa & 7 & Validation of Launder-Sharma, Jones-Launder & old format \\ 
-\rowcolor{SkyBlue!10} & & VEF & & mesh & & and Lam-Bremhorst for low Reynolds & \\ \hline
+\rowcolor{SkyBlue!10} & & VEF & & mesh & & and Lam-Bremhorst for low Reynolds & \\
+\hline
 \rowcolor{SkyBlue!10}Verification\_k\_epsilon & Pb\_hydraulique\_Turbulent & VDF & 3 & $10^6$ hexa & 4 & Check the post-processing of the convective, & new format \\ 
-\rowcolor{SkyBlue!10}\_transport\_equation & & VEF & & $7.5 \cdot 10^5$ tetra & & diffusive and source terms of the $k-\varepsilon$ model &  \\ \hline
+\rowcolor{SkyBlue!10}\_transport\_equation & & VEF & & $7.5 \cdot 10^5$ tetra & & diffusive and source terms of the $k-\varepsilon$ model &  \\
+\hline
 \rowcolor{SkyBlue!10}decroissance\_keps & Pb\_hydraulique\_Turbulent & VDF & 2 & 1 rect & 2 & Decreasing turbulence in a plane  & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & channel - Coding verification& \\ \hline
+\rowcolor{SkyBlue!10} & & & & & & channel - Coding verification& \\
+\hline
 \rowcolor{SkyBlue!10}Marche\_incline & Pb\_hydraulique\_Turbulent & VEF & 2 & 200 tria & 3 & Turbulent channel flow with  & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & backward step - Coding verification & \\ \hline
+\rowcolor{SkyBlue!10} & & & & & & backward step - Coding verification & \\
+\hline
 \rowcolor{SkyBlue!10}Test\_ghost\_visit & Pb\_hydraulique\_Turbulent & VDF & 3 & 300 rect & 1 & Test of visualisation mors specially   & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & with ghost - Coding verification & \\ \hline
+\rowcolor{SkyBlue!10} & & & & & & with ghost - Coding verification & \\
+\hline
 \rowcolor{SkyBlue!10}2D\_Cyl\_Re20000 & Pb\_hydraulique\_Turbulent & VEF & 2 & 3 $\Rightarrow$ 9034 to & 18 & 2D cylinder in turbulent oscillating  & old format \\ 
-\rowcolor{SkyBlue!10} & & & & 32032 tetra & & cross water flow & skip \\ \hline
+\rowcolor{SkyBlue!10} & & & & 32032 tetra & & cross water flow & skip \\
+\hline
 \rowcolor{SkyBlue!10}Drag & Pb\_hydraulique\_Turbulent & VEF & 2 & 6 $\Rightarrow$ 920 to & 24 & Obstacles of different shapes in & old format \\ 
-\rowcolor{SkyBlue!10} & & & & 1123 tri & & turbulent air flow & \\\hline \rowcolor{SkyBlue!10}3D\_Cyl\_Re20000 & Pb\_hydraulique\_Turbulent & VEF & 3 & 458802 tetra & 6 & 3D cylinder in turbulent oscillating & old format \\ 
-\rowcolor{SkyBlue!10} & & & & & & cross water flow & skip \\ \hline
-
+\rowcolor{SkyBlue!10} & & & & 1123 tri & & turbulent air flow & \\
+\hline
+\rowcolor{SkyBlue!10}3D\_Cyl\_Re20000 & Pb\_hydraulique\_Turbulent & VEF & 3 & 458802 tetra & 6 & 3D cylinder in turbulent oscillating & old format \\ 
+\rowcolor{SkyBlue!10} & & & & & & cross water flow & skip \\
+\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -445,33 +482,45 @@
 \rowcolor{Blue!60} \multicolumn{8}{c}{\textbf{Thermal Turbulent Flow}} \\
 \hline
 \rowcolor{Blue!10}Jet\_impingement\_on & Pb\_thermohydraulique & VEF & 3 & 116356 tetra & 3 & Turbulent heated air jet impacting & old format \\
-\rowcolor{Blue!10}\_a\_hot\_flat\_plate & \_turbulent & & & & & an isothermal plane wall & \\ \hline
+\rowcolor{Blue!10}\_a\_hot\_flat\_plate & \_turbulent & & & & & an isothermal plane wall & \\
+\hline
 \rowcolor{Blue!10}Thermal\_stratification & Pb\_thermohydraulique & VEF & 2 & 2968 tri & 4 & Thermal stratification in a cooled & new format \\
-\rowcolor{Blue!10}\_flow & \_turbulent & & 3 & 27252 tetra & & plenum & report \\ \hline
+\rowcolor{Blue!10}\_flow & \_turbulent & & 3 & 27252 tetra & & plenum & report \\
+\hline
 \rowcolor{Blue!10}Two\_Layers\_ & Pb\_thermohydraulique & VDF & 2 & 7000 rect & 6 & Turbulent mixing layers at different  & old format \\ 
-\rowcolor{Blue!10}Stratif & \_turbulent & VEF & 2 & 7200 tetra & & velocities and temperatures & \\ \hline
+\rowcolor{Blue!10}Stratif & \_turbulent & VEF & 2 & 7200 tetra & & velocities and temperatures & \\
+\hline
 \rowcolor{Blue!10}Two\_Layers\_ & Pb\_thermohydraulique & VEF & 2 & 7200 tetra & 20 & Same as previous with implicite time scheme -  & old format \\ 
-\rowcolor{Blue!10}Stratif\_impl & \_turbulent & & & & & with different algorithms & \\ \hline
+\rowcolor{Blue!10}Stratif\_impl & \_turbulent & & & & & with different algorithms & \\
+\hline
 \rowcolor{Blue!10}Turb\_coupled & Pb\_thermohydraulique & & & Fluid: 3304 tetra & & Turbulent heat exchange through a & \\ 
 \rowcolor{Blue!10}\_pipeFlow & \_turbulent & VEF & 3 & Solid: 2543 tetra & 15 & periodic circular pipe coupled & old format \\ 
-\rowcolor{Blue!10} & \textbf{Pb\_conduction} & & & & & with wall conduction & \\ \hline
+\rowcolor{Blue!10} & \textbf{Pb\_conduction} & & & & & with wall conduction & \\
+\hline
 \rowcolor{Blue!10}PeriodicBox & Pb\_thermohydraulique & VEF & 3 & 463259 tetra & 4 & Flow in a curved pipe with  & old format \\ 
-\rowcolor{Blue!10} & \_turbulent & & & & & RANS and LES model Re=50000 & \\ \hline
+\rowcolor{Blue!10} & \_turbulent & & & & & RANS and LES model Re=50000 & \\
+\hline
 \rowcolor{Blue!10}wl\_vef\_laminar & Pb\_thermohydraulique & VEF & 3 & 2400 tetra & 4 & Wall law validation for & old format \\ 
-\rowcolor{Blue!10} & \_turbulent & & & & & VEF discretization & \\ \hline
+\rowcolor{Blue!10} & \_turbulent & & & & & VEF discretization & \\
+\hline
 \rowcolor{Blue!10}wl\_vef\_analytic & Pb\_thermohydraulique & VEF & 3 & 3 $\Rightarrow$ 1200 to  & 6 & Same than previous with comparison & old format \\ 
-\rowcolor{Blue!10} & \_turbulent & & & 28800 tetra & & between with and whitout wall laws &  \\ \hline
+\rowcolor{Blue!10} & \_turbulent & & & 28800 tetra & & between with and whitout wall laws &  \\
+\hline
 \rowcolor{Blue!10}wl\_vef\_correlation & Pb\_thermohydraulique & VEF & 3 & 2400 tetra & 5 & Same than previous with & old format \\ 
-\rowcolor{Blue!10} & \_turbulent & & & & &  $k-\epsilon$ + loi\_standard\_hydr & \\ \hline
+\rowcolor{Blue!10} & \_turbulent & & & & &  $k-\epsilon$ + loi\_standard\_hydr & \\
+\hline
 \rowcolor{Blue!10}wl\_vef\_coupling & Pb\_thermohydraulique & & & 2400 hexa + & & Turbulent heat exchange through a periodic plane & \\ 
 \rowcolor{Blue!10} & \_turbulent & VEF & 3 & 2400 in wall & 4 & channel coupled with wall conduction & old format \\ 
-\rowcolor{Blue!10} & \textbf{Pb\_conduction} & & & & & & \\ \hline
+\rowcolor{Blue!10} & \textbf{Pb\_conduction} & & & & & & \\
+\hline
 \rowcolor{Blue!10} & & VDF & 2 & 781 rect & & & \\
 \rowcolor{Blue!10}Uniform\_keps\_front & Pb\_thermohydraulique & VEF & 2 & 3124 tri & 8 & Check Champ\_front\_normal fields & old format \\ 
 \rowcolor{Blue!10}\_field\_from\_ud & \_turbulent & VDF & 3 & 700 hexa & & Coding verification & exclu\_nr\\ 
-\rowcolor{Blue!10} & & VEF & 3 & 16800 tetra & & & \\\hline
+\rowcolor{Blue!10} & & VEF & 3 & 16800 tetra & & & \\
+\hline
 \rowcolor{Blue!10}Boussinesq\_VEF & Pb\_thermohydraulique & VEF & 3 & 34992 tetra & 8 & Check Boussinesq source term in VEF & old format \\ 
-\rowcolor{Blue!10} & \_turbulent & & & & & for LES - Schema\_Predictor\_Corrector & \\ \hline
+\rowcolor{Blue!10} & \_turbulent & & & & & for LES - Schema\_Predictor\_Corrector & \\
+\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -539,7 +588,9 @@
 \begin{tabular}{lclccclc}
 \hline
 \textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
-\hline \noalign{\vskip0.1cm} \hline
+\hline
+\noalign{\vskip0.1cm}
+\hline
 \hline
 \rowcolor{Blue!60} \multicolumn{8}{c}{\textbf{Thermal Turbulent Flow}} \\
 \hline
