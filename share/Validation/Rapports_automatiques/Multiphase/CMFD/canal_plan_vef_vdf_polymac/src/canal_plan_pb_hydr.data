@@ -1,0 +1,153 @@
+# PARALLEL OK #
+
+Dimension 2
+Pb_hydraulique_turbulent pb
+
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+    pave bloc1
+    {
+        origine 0 0
+        longueurs 100 0.2
+        nombre_de_noeuds $Nx $Ny1
+    }
+    {
+        bord entree	 X = 0.            0. <= Y <= 0.2
+        bord sortie	 X = 100	    0. <= Y <= 0.2
+        bord bas	 Y = 0. 	    0. <= X <= 100
+    } ,
+    pave bloc2
+    {
+        origine 0 0.2
+        longueurs 100 0.2
+        nombre_de_noeuds $Nx $Ny2
+    }
+    {
+        bord entree	 X = 0	            0.2 <= Y <= 0.4
+        bord sortie	 X = 100	    0.2 <= Y <= 0.4
+    } ,
+    pave bloc3
+    {
+        origine 0 0.4
+        longueurs 100 0.6
+        nombre_de_noeuds $Nx $Ny3
+    }
+    {
+        bord entree	 X = 0	            0.4 <= Y <= 1.0
+        bord sortie	 X = 100	    0.4 <= Y <= 1.0
+        bord haut	 Y = 1.0 	    0 <= X <= 100
+    }
+}
+$trianglemesh
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+    /* Choose Nb_parts so to have ~ 25000 cells per processor */
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$method dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	dt_impr 1e+6
+	facsec 20
+	facsec_max 20
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	seuil_statio 1e-30
+	tmax $tmax
+}
+
+
+Associer pb dom
+Associer pb sch
+
+Discretiser pb dis
+
+Lire pb
+{
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 $mu
+    	rho champ_uniforme 1 $rho
+   }
+   
+   	Navier_Stokes_turbulent
+	{
+		Solveur_pression	PETSC Cholesky { }
+		Convection		{ amont }
+		Diffusion		{  }
+		Conditions_initiales	{ vitesse champ_uniforme 2 $inlet_velocity 0 }
+		Conditions_limites	{
+					bas paroi_fixe
+            				haut symetrie
+            				entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 $inlet_velocity 0
+            				sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
+					}
+		Modele_turbulence k_epsilon
+					{
+					transport_k_epsilon
+					{
+						convection		{ amont }
+						diffusion		{ }
+						conditions_initiales 	{ k_eps champ_uniforme 2 $inlet_k $inlet_epsilon }
+						conditions_limites	{
+									entree	frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+            								sortie	frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+									bas	paroi
+									haut	symetrie
+									}
+						sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }
+					}
+					turbulence_paroi loi_standard_hydr dt_impr_ustar  $tmax
+					}
+	}
+
+	Postraitement
+	{
+		Definition_champs 	{
+        					d_paroi refChamp { Pb_champ pb distance_paroi_globale }
+                            }
+		sondes			{
+					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
+					u		VitesseX		periode 1e8 position_like vitesse
+					k		k		periode 1e8 position_like vitesse
+					diss		eps		periode 1e8 position_like vitesse
+					dist_paroi	d_paroi		periode 1e8 position_like vitesse 
+					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
+					y_plus			y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0
+					pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
+					gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
+					}
+		format lata
+		champs binaire dt_post 10
+					{
+					vitesse elem
+					k elem
+					eps elem
+					y_plus elem
+					 
+					}		
+	}
+	
+}
+
+
+Resoudre pb
+
+Fin
+ 
