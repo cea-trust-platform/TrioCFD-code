@@ -172,7 +172,7 @@ protected :
   double initial_CL_xcoord_; // Former position of the contact line. Not nice, but needed to copute the CL velocity
   double kl_cond_; // We store the liquid conductivity for easy access.
   double rhocpl_;
-  int inout_method_;
+  int inout_method_ = 0;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.
