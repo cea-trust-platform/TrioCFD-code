@@ -83,29 +83,29 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
       DoubleVect force_tot_som(space_dim);
       DoubleVect force_tot_elem(space_dim);
 
-			double surface_tot_elem = 0;
-			double surface_tot_som = 0;
+      double surface_tot_elem = 0;
+      double surface_tot_som = 0;
       for(int face = 0; face < nb_face; face++)
         {
-					surface_tot_elem += surface_faces(face);
+          surface_tot_elem += surface_faces(face);
           for(int som_loc = 0; som_loc < nb_som_face; som_loc++)
             {
               int som = faces_IFS.sommet(face, som_loc);
               surface_nodes[som] += (1.0/3.0) * surface_faces(face);
-              
-							for(int k = 0; k < space_dim; k++)
+
+              for(int k = 0; k < space_dim; k++)
                 vals_som(som, k) +=  (1.0/3.0) * vals(face, k); //On ne multiplie pas par la surface_faces(face) car vals est deja multiplie par la surface -> vals(face) = int_E vals(E) dx = |E| vals(E)
             }
           for(int k = 0; k < space_dim; k++)
             force_tot_elem(k) += vals(face, k);
         }
 
-      for(int som = 0; som < nb_som; som++)//On n a pas besoin de diviser par la surface de chaque noeud (surface_nodes) car on doit renvoyer l integral du champ et non le champ lui meme pour EPX 
+      for(int som = 0; som < nb_som; som++)//On n a pas besoin de diviser par la surface de chaque noeud (surface_nodes) car on doit renvoyer l integral du champ et non le champ lui meme pour EPX
         {
-					surface_tot_som += surface_nodes(som);
+          surface_tot_som += surface_nodes(som);
           for(int k = 0; k < space_dim; k++)
             {
-							force_tot_som(k) += vals_som(som, k);
+              force_tot_som(k) += vals_som(som, k);
             }
         }
 
@@ -117,9 +117,9 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
 
       if(file_force_tot_elem)
         file_force_tot_elem << ch.get_time() << " " << force_tot_elem(0) << " " << force_tot_elem(1) << " " << force_tot_elem(2) << endl;
-			
-			Cerr << "Surface total elem : " << surface_tot_elem << endl;
-			Cerr << "Surface total som : " << surface_tot_som << endl;
+
+      Cerr << "Surface total elem : " << surface_tot_elem << endl;
+      Cerr << "Surface total som : " << surface_tot_som << endl;
 
       afield._nb_field_components = vals_som.nb_dim() > 1 ? vals_som.dimension(1) : 1;
       affecte_double_avec_doubletab(&afield._field, vals_som);
