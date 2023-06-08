@@ -1,0 +1,125 @@
+# PARALLEL OK 8 #
+dimension 2
+bidim_axi
+Pb_hydraulique_turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+    Pave tube
+    {
+        Origine 0. 0.
+        Nombre_de_Noeuds $Ny $Nx
+        Longueurs 2.0 100
+    }
+    {
+        bord axi    X = 0   0 <= Y <= 100
+        bord haut   Y = 100   0 <= X <= 2.0
+        bord bas    Y = 0   0 <= X <= 2.0
+        bord wall   X = 2.0 0 <= Y <= 100
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Decouper dom
+{
+    partitionneur metis { nb_parts 2 }
+    nb_parts_tot 2
+    Larg_joint 2
+    Nom_Zones dom
+    ecrire_decoupage dom.txt
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter dom.Zones dom
+END SCATTER #
+
+
+$method dis
+option_vdf
+{
+all_options
+}
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	dt_impr 1e+6
+	facsec 20
+	facsec_max 20
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	seuil_statio 1e-30
+	tmax $tmax
+}
+
+
+Associer pb dom
+Associer pb sch
+
+Discretiser pb dis
+
+Lire pb
+{
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 $mu
+    	rho champ_uniforme 1 $rho
+   }
+   
+   	Navier_Stokes_turbulent
+	{
+		Solveur_pression	PETSC Cholesky { }
+		Convection		{ amont }
+		Diffusion		{  }
+		Conditions_initiales	{ vitesse champ_uniforme 2 0 $inlet_velocity }
+		Conditions_limites	{
+					wall paroi_fixe
+            				axi symetrie
+            				bas frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 0 $inlet_velocity
+            				haut frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
+					}
+		Modele_turbulence k_epsilon
+					{
+					transport_k_epsilon
+					{
+						convection		{ amont }
+						diffusion		{ }
+						conditions_initiales 	{ k_eps champ_uniforme 2 $inlet_k $inlet_epsilon }
+						conditions_limites	{
+									bas	frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+            								haut	frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+									wall	paroi
+									axi	symetrie
+									}
+						sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }
+					}
+					turbulence_paroi loi_standard_hydr dt_impr_ustar  $tmax
+					}
+	}
+    Post_processing
+    {
+        sondes			{
+            k	    	k      		periode 1e8 segment $nb_points_prof    $y_min_prof $z_prof    $y_max_prof $z_prof
+            diss    	eps      		periode 1e8 position_like k
+            vitesse    	vitesse	periode 1e8 position_like k
+            # dist_paroi	Distance_paroi		periode 1e8 position_like k #
+            y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $y_yplus $z_min_yplus    $y_yplus $z_max_yplus  
+            pression	pression		periode 1e8 segment 1001	0.8 0	0.8 100
+            # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
+        }
+        format lata
+        fields dt_post 10
+        {
+            vitesse          elem
+            k	    elem
+        }
+    }
+}
+
+Solve pb
+End

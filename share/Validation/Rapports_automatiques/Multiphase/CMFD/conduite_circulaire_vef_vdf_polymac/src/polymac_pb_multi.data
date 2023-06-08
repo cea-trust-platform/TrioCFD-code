@@ -1,0 +1,178 @@
+# PARALLEL OK #
+
+Dimension 3
+Domaine dom
+
+# BEGIN MESH #
+Lire_med { domain dom file $name_mesh mesh mesh }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        /* Choose Nb_parts so to have ~ 25000 cells per processor */
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+PolyMAC_P0  dis
+option_PolyMAC_P0 { traitement_axi }
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax $tmax
+    dt_impr 1e-8
+    facsec $facsec
+    facsec_max $facsec
+    seuil_statio 1e-10
+    nb_pas_dt_max $nb_pas_dt_max
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 $diss_conv }
+        iter_min 2
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Pb_Multiphase pb
+
+
+associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Lire pb
+{
+    Milieu_composite
+    {
+        liquide_eau Fluide_Incompressible
+        {
+            mu champ_uniforme      1 $mu
+            rho champ_uniforme     1 $rho
+            lambda Champ_Uniforme  1 1
+            Cp Champ_Uniforme      1 1e3
+            beta_th Champ_Uniforme 1 0
+        }
+    }
+    correlations
+    {
+        loi_paroi adaptative { }
+    }
+    QDM_Multiphase
+    {
+        evanescence { homogene { alpha_res 1 alpha_res_min .5 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        convection { amont }
+        diffusion  { turbulente $diffusion { sigma 1 } }
+        initial_conditions
+        {
+            vitesse  champ_fonc_xyz dom 3 0 0 $inlet_velocity
+            pression Champ_Fonc_xyz dom 1 $outlet_pressure
+        }
+        conditions_limites
+        {
+            wall paroi_frottante_loi { }
+            symetrie symetrie
+            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 3 0 0 $inlet_velocity
+            top frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
+        }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
+        convection { amont }
+        conditions_limites
+        {
+            wall paroi
+            symetrie symetrie
+            bottom	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            top	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+        }
+    }
+    Energie_Multiphase
+    {
+        diffusion { }
+        convection { amont }
+        initial_conditions { temperature Champ_Uniforme 1 0 }
+        boundary_conditions
+        {
+            wall paroi_adiabatique
+            symetrie symetrie
+            bottom	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            top	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+        }
+    }
+    $equation
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { $diss Champ_Fonc_xyz dom 1 $IC_diss }
+        boundary_conditions
+        {
+            wall $CL_diss
+            symetrie symetrie
+            bottom	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+            top	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+            $diffusion_sup
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 0.01 }
+        boundary_conditions
+        {
+            wall $CL_k
+            symetrie symetrie
+            bottom	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+            top	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+        }
+        sources
+        {
+            Production_energie_cin_turb ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+    Postraitement
+    {
+        sondes			{
+            k	    	k      		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof $z_prof    $x_max_prof $y_max_prof $z_prof
+            diss    	$diss      		periode 1e8 position_like k
+            vitesse    	vitesse_liquide_eau	periode 1e8 position_like k
+            # dist_paroi	Distance_paroi		periode 1e8 position_like k #
+            y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
+            # pression	pression		periode 1e8 segment 1001	0 0.8	100 0.8 #
+            # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
+        }
+        format lata
+		champs binaire dt_post 10.
+			{
+            k	    elem
+            $diss    elem
+            vitesse_liquide_eau	elem
+            y_plus	elem
+        }
+
+    }
+}
+
+Resoudre pb
+
+Fin

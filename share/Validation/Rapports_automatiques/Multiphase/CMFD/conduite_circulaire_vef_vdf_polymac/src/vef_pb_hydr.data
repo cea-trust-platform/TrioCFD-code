@@ -1,0 +1,113 @@
+# PARALLEL OK #
+
+Dimension 3
+Pb_hydraulique_turbulent pb
+
+Domaine dom
+
+# BEGIN MESH #
+Lire_med { domain dom file $file_mesh mesh $name_mesh }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        /* Choose Nb_parts so to have ~ 25000 cells per processor */
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$method dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	dt_impr 1e+6
+	facsec 20
+	facsec_max 20
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	seuil_statio 1e-30
+	tmax $tmax
+}
+
+
+Associer pb dom
+Associer pb sch
+
+Discretiser pb dis
+
+Lire pb
+{
+   
+   fluide_incompressible {
+    	mu champ_uniforme 1 $mu
+    	rho champ_uniforme 1 $rho
+   }
+   
+   	Navier_Stokes_turbulent
+	{
+		Solveur_pression	PETSC Cholesky { }
+		Convection		{ amont }
+		Diffusion		{  }
+		Conditions_initiales	{ vitesse champ_uniforme 3 0 0 $inlet_velocity }
+		Conditions_limites	{
+					wall paroi_fixe
+            				inlet frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 3 0 0 $inlet_velocity
+            				outlet frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
+					}
+		Modele_turbulence k_epsilon
+					{
+					transport_k_epsilon
+					{
+						convection		{ amont }
+						diffusion		{ }
+						conditions_initiales 	{ k_eps champ_uniforme 2 $inlet_k $inlet_epsilon }
+						conditions_limites	{
+									inlet	frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+            								outlet	frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+									wall	paroi
+									}
+						sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }
+					}
+					turbulence_paroi loi_standard_hydr dt_impr_ustar  $tmax
+					}
+	}
+
+	Postraitement
+	{
+		sondes			{
+					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof $z_prof    $x_max_prof $y_max_prof $z_prof
+					k		k		periode 1e8 position_like vitesse
+					diss		eps		periode 1e8 position_like vitesse
+					# dist_paroi	Distance_paroi		periode 1e8 position_like vitesse #
+					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
+					y_plus			y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
+					# pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
+					gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8 #
+					}
+		format lata
+		champs binaire dt_post 10
+					{
+					vitesse elem
+					k elem
+					eps elem
+					y_plus elem
+					 
+					}		
+	}
+	
+}
+
+
+Resoudre pb
+
+Fin
+ 
