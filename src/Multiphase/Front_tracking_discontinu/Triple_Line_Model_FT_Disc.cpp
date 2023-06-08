@@ -114,7 +114,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
   p.ajouter_flag("deactivate", &deactivate_);
-  p.ajouter("inout_method", &inout_method_); // XD_ADD_P chaine(into=["exact","approx","both"]) Type of method for in out calc
+  p.ajouter("inout_method", &inout_method_); // XD_ADD_P chaine(into=["exact","approx","both"]) Type of method for in out calc. By defautl, exact method is used
   p.dictionnaire("exact", EXACT);
   p.dictionnaire("approx", APPROX);
   p.dictionnaire("both", BOTH); // Makes both and compare them
