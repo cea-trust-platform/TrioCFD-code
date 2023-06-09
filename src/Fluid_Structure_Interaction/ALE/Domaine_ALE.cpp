@@ -41,6 +41,8 @@
 #include <Operateur_Grad.h>
 #include <communications.h>
 #include <Faces.h>
+#include <CL_Types_include.h>
+
 
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
@@ -85,8 +87,11 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       for (int i=0; i<N_som; i++)
         {
           for (int k=0; k<dimension; k++)
-            coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
+            {
+              coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
+            }
         }
+
 
       //On recalcule les vitesses aux faces
       Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
@@ -94,7 +99,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       int nb_faces=le_dom_VF.nb_faces();
       int nb_som_face=le_dom_VF.nb_som_face();
       IntTab& face_sommets=le_dom_VF.face_sommets();
-      //creer_mes_domaines_frontieres(le_dom_VF);//update the boundary surface domain
+      creer_mes_domaines_frontieres(le_dom_VF);//update the boundary surface domain
+
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
@@ -112,6 +118,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
       ::calculer_centres_gravite(xv, type_face,
                                  sommets_, face_sommets);
+
       if(sub_type(Domaine_VDF, le_dom_VF))
         {
           Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
@@ -131,16 +138,54 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           le_dom_VEF.calculer_h_carre();
           const Elem_VEF& type_elem=le_dom_VEF.type_elem();
 
+          /*          for (int i=0; i<nb_faces_tot; i++)
+                      {
+                        Cerr <<  "face : " << i << " face normal " << normales(i,0) << " " << normales(i,1) <<  "position : " << i << " x y  " << le_dom_VEF.xv(i,0) << " " << le_dom_VEF.xv(i,1) <<finl;
+                      }*/
+
+
           // Recalcul des normales
-          normales=0;
+          normales=0.;
           for (int num_face=0; num_face<nb_faces_tot; num_face++)
             type_elem.normale(num_face,normales, face_sommets,
                               face_voisins,elem_faces,
                               *this) ;
+
+          //specific treatment for the periodic boundary conditions (the orientations of certain normals are changed)
+          //impose face_normales_(faassociee,k) = face_normales_(face,k)
+          //as it is done during the first call to the function Domain_VEF::modifier_pour_Cl .
+          //we cannot use this function again to update the direction of the normals because on the periodic edges the neighbors are no longer =-1
+          //after the first call to Domain_VEF::modifier_pour_Cl
+          //and therefore we no longer go through the loop because of the test "if ( ( face_neighbors_(face,0) == -1) || (face_neighbors_(face,1) == -1) )"
+
+          const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+          for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
+            {
+              const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
+              if (sub_type(Periodique,la_cl.valeur()))
+                {
+                  const Cond_lim_base& cl = la_cl.valeur();
+                  const Periodique& la_cl_period = ref_cast(Periodique,cl);
+                  const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+                  //int num1 = le_bord.num_premiere_face();
+                  //int num2 = (num1 + le_bord.nb_faces());
+                  int ndeb = 0;
+                  int nfin = le_bord.nb_faces_tot();
+                  for (int num_face=ndeb; num_face<nfin/2; num_face++)
+                    {
+                      int face = le_bord.num_face(num_face);
+                      int faassociee = le_bord.num_face(la_cl_period.face_associee(num_face));
+                      for (int k=0; k<dimension; k++)
+                        normales(faassociee,k) = normales(face,k);
+                    }
+                }
+            }
+
           type_elem.creer_facette_normales(*this, facette_normales_, rang_elem_non_standard);
           //Cerr << "carre_pas_du_maillage : " << le_dom_VEF.carre_pas_du_maillage() << finl;
-          int nb_eqn=pb.nombre_d_equations();
 
+          int nb_eqn=pb.nombre_d_equations();
           for(int num_eq=0; num_eq<nb_eqn; num_eq++)
             {
               Domaine_Cl_dis& zcl_dis=pb.equation(num_eq).domaine_Cl_dis();
@@ -148,7 +193,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
               la_zcl_VEF.remplir_volumes_entrelaces_Cl(le_dom_VEF);
               la_zcl_VEF.remplir_normales_facettes_Cl(le_dom_VEF );
             }
-
           // Recalcul des surfaces avec les normales:
           DoubleVect face_surfaces_(nb_faces_tot);
           for (int i=0; i<nb_faces_tot; i++)
@@ -543,12 +587,12 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
         for (int isom=0; isom<nb_som_ele; isom++)
           {
             int facei=elem_faces(elem,isom);
-            int ii=get_renum_som_perio(elem_som(elem,isom));
+            int ii=elem_som(elem,isom);
             for (int jsom=isom+1; jsom<nb_som_ele; jsom++)
               {
                 int i=ii;
                 int facej=elem_faces(elem,jsom);
-                int j=get_renum_som_perio(elem_som(elem,jsom));
+                int j=elem_som(elem,jsom);
 
                 if(i>j)
                   {
@@ -594,7 +638,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
             for(int isom=0; isom<dimension; isom++)
               {
                 int som=domaine_VEF.face_sommets(face,isom);
-                som=get_renum_som_perio(som);
                 diag[som]=1.e14;
               }
           }
@@ -630,7 +673,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
               for(int isom=0; isom<dimension; isom++)
                 {
                   int som=domaine_VEF.face_sommets(face,isom);
-                  som=get_renum_som_perio(som);
                   secmem(som)=1.e14*vit_bords(som,comp);
                 }
             }
@@ -644,7 +686,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           solv.resoudre_systeme(mat, secmem, solution);
           solution.echange_espace_virtuel();
           for(int som=0; som<nbsom; som++)
-            ch_som(som,comp)=solution(get_renum_som_perio(som));
+            ch_som(som,comp)=solution(som);
         }
       else
         {
