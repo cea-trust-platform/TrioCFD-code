@@ -1080,7 +1080,6 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
           jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0));
         }
     }
-  jacobianALE=1.;
 }
 
 /*! @brief On assemble la matrice des inconnues implicite.
