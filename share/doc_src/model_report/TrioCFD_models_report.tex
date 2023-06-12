@@ -144,7 +144,7 @@
 \usepackage{imakeidx}
 \usepackage{hyperref}
 \hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
-%
+
 \setlength\hoffset{0cm}
 \setlength\voffset{0cm}
 \setlength\oddsidemargin{0cm}
@@ -181,8 +181,6 @@
 \makeatother
 %
 \fancypagestyle{part}{%
-%%\fancyhead[L]{}
-%%\fancyhead[R]{\textit{\rightmark}}
 \lfoot{\textit{TrioCFD Models Documentation}}
 \cfoot{}
 \rfoot{\thepage}
@@ -190,8 +188,6 @@
 \renewcommand{\footrulewidth}{0.3pt}}
 %
 \fancypagestyle{chapter}{%
-%%\fancyhead[L]{\textit{\rightmark}}
-%%\fancyhead[R]{}
 \lfoot{\textit{TrioCFD Models Documentation}}
 \cfoot{}
 \rfoot{\thepage}
@@ -207,7 +203,6 @@
 \renewcommand{\theequation}{\thepart.\thesection~~eq\arabic{equation}}
 %%\lhead{\leftmark}
 \chead{}
-%%\rhead{\rightmark}
 \lfoot{\textit{TrioCFD Models Documentation}}
 \cfoot{}
 \rfoot{\thepage}
@@ -258,6 +253,11 @@
 %
 \counterwithin*{chapter}{part}
 %
+
+% Variables definition
+% - TrioCFD version
+\newcommand\codeVersion{1.9.1}
+
 \makeindex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % debut du document
@@ -279,20 +279,21 @@
 \begin{center} \vspace{2cm}
 \parbox[t]{12cm}{\hspace{1cm}\huge{\textbf{USER DOCUMENTATION :}}
 \newline
-\hspace{3cm}\LARGE{\textbf{Models Documentation TrioCFD}}} \end{center}
+\hspace{3cm}\LARGE{\textbf{Models Documentation TrioCFD v\codeVersion}}} \end{center}
 \vspace{0.4cm}
 \begin{center}\includegraphics[scale=0.5]{../pictures/TrioCFD.png} \end{center}
 \vspace{0.4cm}
 \begin{center}\includegraphics[scale=0.35]{../pictures/logo_DM2S.png} \end{center}
 \vspace{0.4cm}
 \setlength{\tabcolsep}{0.5cm}
+
 \begin{tabular}{ Sc|Sc|Sc|Sc }
 \hline
 Code Version & Date & Code manager & Authors \\
- & & J. DARONA & \\ \hline
- & &\multirow{3}{*}{\includegraphics[scale=0.6]{../validation_report/tools/sign_JD.png}} &  \\
-v1.9.1 & \today && TrioCFD Team\\
- & &&  \\ \hline
+\hline
+v\codeVersion & \today & \includegraphics[scale=0.5]{../validation_report/tools/sign_JD.png} & TrioCFD Team\\
+              &        & J. DARONA &\\
+\hline
 \multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } models\_report\_TrioCFD.tex } \\
 \multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
 \multicolumn{2}{c|}{\textbf{CEA SACLAY} } & \multicolumn{2}{c}{ } \\
@@ -351,13 +352,14 @@ v1.9.1 & \today && TrioCFD Team\\
 \input{./part7-perspectives.tex}
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix
-\Huge
-\section*{\label{sec:Annexe_ListeValid}Annexe A : liste des fiches de validation dans \texttt{TrioCFD}}
-\addcontentsline{toc}{part}{Annexe A: liste des fiches de validation dans \texttt{TrioCFD}}
-\normalsize \normalfont
-\input{./annexeA.tex}
-\pagebreak
+%\appendix
+%\Huge
+%\section*{\label{sec:Annexe_ListeValid}Annexe A : liste des fiches de validation dans \texttt{TrioCFD}}
+%\addcontentsline{toc}{part}{Annexe A: liste des fiches de validation dans \texttt{TrioCFD}}
+%\normalsize
+%\normalfont
+%\input{./annexeA.tex}
+%\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \lhead{}
 \rhead{BIBLIOGRAPHIE}
