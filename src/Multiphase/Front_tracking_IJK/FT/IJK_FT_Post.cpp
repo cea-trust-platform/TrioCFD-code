@@ -37,7 +37,7 @@
  * Take as main parameter reference to FT to be able to use its members.
  */
 IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
-  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
+  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), pressure_l_(ijk_ft.pressure_l_), pressure_v_(ijk_ft.pressure_v_), p_interpol_error_(ijk_ft.p_interpol_error_), velocity_(ijk_ft.velocity_),
   d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_)
 {
   groups_statistiques_FT_.dimensionner(0);
@@ -380,6 +380,8 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.dimensionner_force(0);
       liste_post_instantanes_.add("VELOCITY");
       liste_post_instantanes_.add("PRESSURE");
+      liste_post_instantanes_.add("PRESSURE_V");
+      liste_post_instantanes_.add("PRESSURE_L");
       liste_post_instantanes_.add("INDICATRICE_FT");
       liste_post_instantanes_.add("INDICATRICE");
       liste_post_instantanes_.add("RHO");
@@ -821,6 +823,12 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
   if (liste_post_instantanes_.contient_("PRESSURE"))
     n--, dumplata_scalar(lata_name, "PRESSURE", pressure_, latastep);
+  if (liste_post_instantanes_.contient_("PRESSURE_L"))
+    n--, dumplata_scalar(lata_name, "PRESSURE_L", pressure_l_, latastep);
+  if (liste_post_instantanes_.contient_("PRESSURE_V"))
+    n--, dumplata_scalar(lata_name, "PRESSURE_V", pressure_v_, latastep);
+  if (liste_post_instantanes_.contient_("PRESSURE_ERROR"))
+    n--, dumplata_scalar(lata_name, "PRESSURE_ERROR", p_interpol_error_, latastep);
   if (liste_post_instantanes_.contient_("D_PRESSURE"))
     n--, dumplata_scalar(lata_name, "D_PRESSURE", ref_ijk_ft_.d_pressure_, latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE"))

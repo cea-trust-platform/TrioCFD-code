@@ -207,6 +207,7 @@ protected :
 
   const IJK_FT_double& operator=(const IJK_FT_double&);
   void update_rho_v();
+  void update_pressure_phase();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
   void rk3_sub_step(const int rk_step, const double total_timestep,
@@ -453,6 +454,13 @@ protected :
 
   // Pressure field
   IJK_Field_double pressure_;
+  // Pressure field
+  IJK_Field_double pressure_l_;
+  // Pressure field
+  IJK_Field_double pressure_v_;
+  IJK_Field_double p_interpol_error_;
+
+
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver

@@ -43,6 +43,7 @@
 #include <Force_sp.h>
 #include <Force_ph.h>
 
+
 #define COMPLEMENT_ANTI_DEVIATION_RESIDU
 // #define VARIABLE_DZ
 //#define PROJECTION_DE_LINCREMENT_DV
@@ -1453,6 +1454,13 @@ int IJK_FT_double::initialise()
       Cout << "Initialisation pression \nPini = " << expression_pression_initiale_ << finl;
       set_field_data(pressure_, expression_pression_initiale_);
       pressure_.echange_espace_virtuel(pressure_.ghost());
+      set_field_data(pressure_l_, expression_pression_initiale_);
+      pressure_l_.echange_espace_virtuel(pressure_l_.ghost());
+      set_field_data(pressure_v_, expression_pression_initiale_);
+      pressure_v_.echange_espace_virtuel(pressure_v_.ghost());
+      set_field_data(p_interpol_error_, expression_pression_initiale_);
+      p_interpol_error_.echange_espace_virtuel(p_interpol_error_.ghost());
+
     }
 
 
@@ -1910,6 +1918,9 @@ void IJK_FT_double::run()
     }
   //
   pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  pressure_l_.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  pressure_v_.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  p_interpol_error_.allocate(splitting_, IJK_Splitting::ELEM, 3);
 
   if (include_pressure_gradient_in_ustar_)
     {
@@ -2628,6 +2639,7 @@ void IJK_FT_double::run()
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
+      update_pressure_phase();
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -4438,6 +4450,223 @@ void IJK_FT_double::update_rho_v()
       calculer_rho_v(rho_field_, velocity_, rho_v_);
     }
 }
+
+
+void IJK_FT_double::update_pressure_phase()
+{
+// remplissage des variable p_v et p_l avec les valeurs connues; -1.e-5 dans les cases à interpoler
+// Fast Inverse Distance Weighting (IDW) Interpolation
+  const int ni = pressure_.ni();
+  const int nj = pressure_.nj();
+  const int nk = pressure_.nk();
+  //int size_box_kriging = 20 ;
+  double beta = 20.;
+// beta est la distance power qui determine a quel point les valeurs les plus proches sont importantes
+// vis-a-vis des valeurs les plus eloignees --> a changer en voyant comment reconstruire au mieux les variables monofluides
+// beta = 20 --> en gros ça copie la valeur la plus proche...
+  double Lx = splitting_.get_coords_of_dof(ni,nj,nk,IJK_Splitting::ELEM)[0];
+  double Ly = splitting_.get_coords_of_dof(ni,nj,nk,IJK_Splitting::ELEM)[1];
+  double Lz = splitting_.get_coords_of_dof(ni,nj,nk,IJK_Splitting::ELEM)[2];
+
+  for (int k = 0; k < nk; k++)
+    {
+      for (int j = 0; j < nj; j++)
+        {
+          for (int i = 0; i < ni; i++)
+            {
+
+              if(interfaces_.I(i,j,k)==1.)
+                {
+                  pressure_l_(i,j,k) = pressure_(i,j,k) ;
+                  pressure_v_(i,j,k) = 0.;
+                }
+              else if (interfaces_.I(i,j,k)==0.)
+                {
+                  pressure_v_(i,j,k) = pressure_(i,j,k) ;
+                  pressure_l_(i,j,k) = 0.;
+                }
+              else // on ne sinteresse aux valeurs par phase que dans les mailles diphasiques
+                {
+                  pressure_v_(i,j,k) = -1.e5;
+                  pressure_l_(i,j,k) = -1.e5;
+                }
+            }
+        }
+    }
+
+  Vecteur3 xyz_interpolate = splitting_.get_coords_of_dof(ni,nj,nk,IJK_Splitting::ELEM);;
+  int icible = 0;
+  int jcible =0;
+  int kcible =0;
+
+  bool finish = false;
+
+  while(finish == false)
+    {
+
+      bool cible =false;
+      for (int k = 0; k < nk; k++)
+        {
+          for (int j = 0; j < nj; j++)
+            {
+              for (int i = 0; i < ni; i++)
+                {
+                  if(pressure_l_(i,j,k) == -1.e5) // on ne sinteresse aux valeurs par phase que dans les mailles diphasiques
+                    {
+                      xyz_interpolate = splitting_.get_coords_of_dof(i,j,k,IJK_Splitting::ELEM);
+                      icible = i ;
+                      jcible = j ;
+                      kcible = k ;
+                      cible = true;
+                    }
+                  if (cible)
+                    break;
+                }
+              if (cible)
+                break;
+            }
+          if (cible)
+            break;
+        }
+
+      if (!cible)
+        finish = true;
+
+
+
+      double num_l = 0.;
+      double denum_l = 0.;
+      double num_v = 0.;
+      double denum_v = 0.;
+      for (int kk = 0; kk < nk; kk++)
+        {
+          for (int jj = 0; jj < nj; jj++)
+            {
+              for (int ii = 0; ii < ni; ii++)
+                {
+                  if (interfaces_.I(ii,jj,kk)==1.)
+                    {
+                      Vecteur3 xyz_reel = splitting_.get_coords_of_dof(ii,jj,kk,IJK_Splitting::ELEM);
+                      // dx compris entre -Lx et +Lx
+                      // en perio, on veut un resultat entre -Lx/2 et Lx/2
+                      double dx = xyz_reel[0]-xyz_interpolate[0];
+                      double dy = xyz_reel[1]-xyz_interpolate[1];
+                      double dz = xyz_reel[2]-xyz_interpolate[2];
+
+                      if(splitting_.get_grid_geometry().get_periodic_flag(0))
+                        {
+                          if(dx > Lx / 2.)
+                            {
+                              dx = dx - Lx;
+                            }
+                          if (dx < - Lx / 2.)
+                            {
+                              dx = dx + Lx;
+                            }
+                        }
+                      if(splitting_.get_grid_geometry().get_periodic_flag(1))
+                        {
+                          if(dy > Ly / 2.)
+                            {
+                              dy = dy - Ly;
+                            }
+                          if (dy < - Ly / 2.)
+                            {
+                              dy = dy + Ly;
+                            }
+                        }
+                      if(splitting_.get_grid_geometry().get_periodic_flag(2))
+                        {
+                          if(dz > Lz / 2.)
+                            {
+                              dz = dz - Lz;
+                            }
+                          if (dz < - Lz / 2.)
+                            {
+                              dz = dz + Lz;
+                            }
+                        }
+
+                      num_l += pressure_l_(ii,jj,kk)/std::pow(std::sqrt(dx*dx+dy*dy+dz*dz),beta);
+                      denum_l += 1./std::pow(std::sqrt(dx*dx+dy*dy+dz*dz),beta);
+                    }
+                  else if (interfaces_.I(ii,jj,kk)==0.)
+                    {
+                      Vecteur3 xyz_reel = splitting_.get_coords_of_dof(ii,jj,kk,IJK_Splitting::ELEM);
+                      // dx compris entre -Lx et +Lx
+                      // en perio, on veut un resultat entre -Lx/2 et Lx/2
+                      double dx = xyz_reel[0]-xyz_interpolate[0];
+                      double dy = xyz_reel[1]-xyz_interpolate[1];
+                      double dz = xyz_reel[2]-xyz_interpolate[2];
+
+                      if(splitting_.get_grid_geometry().get_periodic_flag(0))
+                        {
+                          if(dx > Lx / 2.)
+                            {
+                              dx = dx - Lx;
+                            }
+                          if (dx < - Lx / 2.)
+                            {
+                              dx = dx + Lx;
+                            }
+                        }
+                      if(splitting_.get_grid_geometry().get_periodic_flag(1))
+                        {
+                          if(dy > Ly / 2.)
+                            {
+                              dy = dy - Ly;
+                            }
+                          if (dy < - Ly / 2.)
+                            {
+                              dy = dy + Ly;
+                            }
+                        }
+                      if(splitting_.get_grid_geometry().get_periodic_flag(2))
+                        {
+                          if(dz > Lz / 2.)
+                            {
+                              dz = dz - Lz;
+                            }
+                          if (dz < - Lz / 2.)
+                            {
+                              dz = dz + Lz;
+                            }
+                        }
+
+                      num_v += pressure_v_(ii,jj,kk)/std::pow(std::sqrt(dx*dx+dy*dy+dz*dz),beta);
+                      denum_v += 1./std::pow(std::sqrt(dx*dx+dy*dy+dz*dz),beta);
+                    }
+
+                }
+            }
+        }
+      pressure_l_(icible,jcible,kcible) = num_l/denum_l ;
+      pressure_v_(icible,jcible,kcible) = num_v/denum_v ;
+    }
+
+
+  // on stocke l erreur relative commise par linterpolation en %
+  for (int k = 0; k < nk; k++)
+    {
+      for (int j = 0; j < nj; j++)
+        {
+          for (int i = 0; i < ni; i++)
+            {
+              p_interpol_error_(i,j,k) = pressure_l_(i,j,k)*interfaces_.I(i,j,k) + pressure_v_(i,j,k)*(1.-interfaces_.I(i,j,k)) - pressure_(i,j,k);
+              p_interpol_error_(i,j,k) /=  pressure_(i,j,k);
+              p_interpol_error_(i,j,k) *= 100.;
+            }
+        }
+    }
+
+  pressure_l_.echange_espace_virtuel(pressure_l_.ghost());
+  pressure_v_.echange_espace_virtuel(pressure_v_.ghost());
+  p_interpol_error_.echange_espace_virtuel(p_interpol_error_.ghost());
+
+}
+
+
+
 
 // Transfert du maillage ft vers ns de champs aux faces :
 void IJK_FT_double::transfer_ft_to_ns()
