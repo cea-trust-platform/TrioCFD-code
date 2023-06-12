@@ -190,10 +190,17 @@ Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
     }
 
   int nb_loop_contr = 0;
+  IntTab* elem_contr = nullptr;
   if ( go_conv == 1) // Specialization domaine EF
-    nb_loop_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().nb_som_elem();
+    {
+      nb_loop_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().nb_som_elem();
+      elem_contr = &ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().les_elems();
+    }
   else if ( go_conv == 2) // Specialization domaine VEF
-    nb_loop_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).domaine().nb_faces_elem();
+    {
+      nb_loop_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).domaine().nb_faces_elem();
+      elem_contr = &ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).elem_faces();
+    }
 
   for (int i=0; i<nb_ddl; i++) // boucle sur les elements
     {
@@ -230,18 +237,7 @@ Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
               double vale = 0.;
               for (int icontrl=0; icontrl<nb_loop_contr; icontrl++)
                 {
-                  int contrl = 0;
-                  if( go_conv == 1)
-                    {
-                      const IntTab& elem_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().les_elems();
-                      contrl = elem_contr(i,icontrl);
-                    }
-                  if( go_conv == 2)
-                    {
-                      const IntTab& elem_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).elem_faces();
-                      contrl = elem_contr(i,icontrl);
-                    }
-
+                  int contrl = ( elem_contr!=nullptr ? (*elem_contr)(i,icontrl) : 0);
                   if ( nb_dim_so(so) == 1 || dim_2_so(so) == 1 )
                     vale += source_so_val(contrl)/nb_loop_contr;
                   else
