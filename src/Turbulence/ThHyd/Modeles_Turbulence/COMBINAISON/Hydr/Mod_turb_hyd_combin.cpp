@@ -27,6 +27,13 @@
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <stat_counters.h>
 #include <Param.h>
+#include <Champ_Inc_P0_base.h>
+#include <Champ_Inc_P1_base.h>
+#include <Champ_Inc_Q1_base.h>
+#include <Champ_P1NC.h>
+#include <Champ_Q1NC.h>
+#include <Domaine_EF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Mod_turb_hyd_combin,"Modele_turbulence_hyd_combinaison",Mod_turb_hyd_base);
 
@@ -130,16 +137,65 @@ Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
   double z=0;
   DoubleTabs sources_val(nb_var_);
 
+  IntTab conv_to_elem(nb_var_); // conv_to_elem() = 0 <=> champ P0, = 1 <=> champ P1 ou Q1, = 2 <=> champ P1NC ou Q1NC
+  int go_conv = 0; // go_conv = 1 <=> domaine EF, go_conv = 2 <=> domaine VEF
+  IntTab nb_dim_so(nb_var_);
+  IntTab dim_2_so(nb_var_);
+
   for (int so=0; so<nb_var_; so++)
     {
       REF(Champ_base) ch_ref;
       ch_ref = mon_pb.get_champ(les_var[so]);
       const DoubleTab& source_so_val = ch_ref->valeurs();
       sources_val[so] = source_so_val;
+
+      // type de champ ? doit on convertir en champ par element ?
+      if ( sub_type(Champ_Inc_P0_base,mon_pb.get_champ(les_var[so])) )
+        {
+          conv_to_elem(so) = 0; // on ne fait rien
+        }
+      else if ( sub_type(Champ_Inc_P1_base,mon_pb.get_champ(les_var[so])) || sub_type(Champ_Inc_Q1_base,mon_pb.get_champ(les_var[so])) )
+        {
+          conv_to_elem(so) = 1; // champ nodal a convertir en champ element
+          go_conv = 1;
+        }
+      else if ( sub_type(Champ_P1NC,mon_pb.get_champ(les_var[so])) || sub_type(Champ_Q1NC,mon_pb.get_champ(les_var[so])) )
+        {
+          conv_to_elem(so) = 2; // champ face a convertir en champ element
+          go_conv = 2;
+        }
+      else
+        {
+          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : error "<< les_var[so] <<" not Champ_P0_XX"<<finl;
+          exit();
+        }
+
+      if ( conv_to_elem(so) != 0 )
+        Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : " << les_var[so] <<" Conversion " << " => Champ_P0_XX"<<finl;
+
+      // champ scalaire ? si non, dim seconde dimension ?
+      nb_dim_so(so) = source_so_val.nb_dim();
+      if (nb_dim_so(so) < 1 || nb_dim_so(so) > 2) // nb_dim in [1; 2] only
+        {
+          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<source_so_val.nb_dim()<<" != 1 or 2 "<<finl;
+          exit();
+        }
+      dim_2_so(so) = 0;
+      if ( nb_dim_so(so) != 1)
+        {
+          dim_2_so(so) = source_so_val.dimension(1);
+          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<nb_dim_so(so)<<" and second dimension = "<<" "<<dim_2_so(so)<<finl;
+        }
+
     }
 
+  int nb_loop_contr = 0;
+  if ( go_conv == 1) // Specialization domaine EF
+    nb_loop_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().nb_som_elem();
+  else if ( go_conv == 2) // Specialization domaine VEF
+    nb_loop_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).domaine().nb_faces_elem();
 
-  for (int i=0; i<nb_ddl; i++)
+  for (int i=0; i<nb_ddl; i++) // boucle sur les elements
     {
       x=xp(i,0);
       y=xp(i,1);
@@ -152,11 +208,51 @@ Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
       fxyz[0].setVar("z",z);
       fxyz[0].setVar("t",temps);
 
+      double vale2;
       for (int so=0; so<nb_var_; so++)
         {
           const Nom nom_source = les_var[so];;
           const DoubleTab& source_so_val = sources_val[so];
-          fxyz[0].setVar(nom_source,source_so_val(i));
+
+          if ( conv_to_elem(so) == 0) // champ elem
+            {
+              if ( nb_dim_so(so) == 1 || dim_2_so(so) == 1 )
+                fxyz[0].setVar(nom_source,source_so_val(i));
+              else
+                {
+                  vale2 = 0.;
+                  for (int i2=0; i2<(dim_2_so(so)-1); i2++) vale2 += source_so_val(i,i2)*source_so_val(i,i2);
+                  fxyz[0].setVar(nom_source,sqrt(vale2));
+                }
+            }
+          else // not champ elem
+            {
+              double vale = 0.;
+              for (int icontrl=0; icontrl<nb_loop_contr; icontrl++)
+                {
+                  int contrl = 0;
+                  if( go_conv == 1)
+                    {
+                      const IntTab& elem_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().les_elems();
+                      contrl = elem_contr(i,icontrl);
+                    }
+                  if( go_conv == 2)
+                    {
+                      const IntTab& elem_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).elem_faces();
+                      contrl = elem_contr(i,icontrl);
+                    }
+
+                  if ( nb_dim_so(so) == 1 || dim_2_so(so) == 1 )
+                    vale += source_so_val(contrl)/nb_loop_contr;
+                  else
+                    {
+                      vale2 = 0.;
+                      for (int i2=0; i2<(dim_2_so(so)-1); i2++) vale2 += source_so_val(contrl,i2)*source_so_val(contrl,i2);
+                      vale += sqrt(vale2)/nb_loop_contr;
+                    }
+                }
+              fxyz[0].setVar(nom_source,vale);
+            }
         }
       viscosite_valeurs(i) = fxyz[0].eval();
     }
