@@ -49,7 +49,7 @@ Read mon_schema
 	# .sauv files printing period #
         periode_sauvegarde_securite_en_heures 23
  	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
-	facsec 0.5
+	facsec 1.
         facsec_max 1.
 	solveur implicite_ALE
 	{
@@ -110,7 +110,7 @@ Read pb
           
 		# Fields #
 		format lml 
-		fields dt_post 1e-3
+		fields dt_post 1000
 		{
 			pression_pa som
 			vitesse som
