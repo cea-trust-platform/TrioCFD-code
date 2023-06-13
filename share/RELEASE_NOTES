@@ -1,11 +1,21 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.2 : Enhancements, modifications and corrected bugs since version 1.9.1 :
 --------------------------------------------------------------------------------------------------
-01/06/23 (TrioCFD) Change     : FTD - Adding an optional criterion to smooth the interface conditionally (based on local curvature variation)
-25/04/23 (TrioCFD) Change     : New project organization (all modues are gathered)
-02/02/23 (TRUST) Major Change : Domain and Zone are now merged into a single concept: Domaine. All former keywords remain supported (Sous_Zone, Create_domain_from_sous_zone, etc...), but internally the code now only work with Domaine.
-27/01/23 (TRUST) Portability  : C++14 compilers are now mandatory so old GNU compilers (<5.0) are not supported anymore
-04/01/23 (TRUST) Major Change : For Pb_Multiphase, simple calls are now applied to compute fluid/saturations properties (improve significantly the performance especially with libraries like EOS, RefProp, ...)
+02/06/23 (TrioCFD) Doc         : CMFD - Documentation for drift velocities 
+01/06/23 (TrioCFD) Change      : FTD - Adding an optional criterion to smooth the interface conditionally (based on local curvature variation)
+25/05/23 (TrioCFD) Tests       : FTD - Adding 5 TCL (contact line model) validation reports 
+16/05/23 (TrioCFD) Tests       : FT IJK - Fix some validation reports
+03/05/23 (TrioCFD) Change      : FSI & SA - No more mask
+25/04/23 (TrioCFD) Major Change: New project organization (all modues are gathered)
+13/04/23 (TrioCFD) Doc         : Update documentation generation scripts
+20/03/23 (TrioCFD) New Feature : CMFD - 'Probleme_multiphase' development in progress
+21/02/23 (TrioCFD) New Feature : CMFD - Development in progress
+13/02/23 (TrioCFD) New Feature : FT IJK - New shear boundary condition
+08/02/23 (TrioCFD) New Feature : Turbulence - adding the possibility (still experimental) to compute turbulent viscosity using harmonic mean
+06/02/23 (TRUST)   Change      : C++ template are used (no more macros)
+02/02/23 (TRUST)   Major Change: Domain and Zone are now merged into a single concept: Domaine. All former keywords remain supported (Sous_Zone, Create_domain_from_sous_zone, etc...), but internally the code now only work with Domaine.
+27/01/23 (TrioCFD) New feature : Phase_field - Extension to N components
+04/01/23 (TRUST)   Major Change: For Pb_Multiphase, simple calls are now applied to compute fluid/saturations properties (improve significantly the performance especially with libraries like EOS, RefProp, ...)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.1 : Enhancements, modifications and corrected bugs since version 1.9.0 :
 --------------------------------------------------------------------------------------------------
