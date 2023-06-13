@@ -3,12 +3,12 @@ Release notes version 1.9.2 : Enhancements, modifications and corrected bugs sin
 --------------------------------------------------------------------------------------------------
 02/06/23 (TrioCFD) Doc         : CMFD - Documentation for drift velocities 
 01/06/23 (TrioCFD) Change      : FTD - Adding an optional criterion to smooth the interface conditionally (based on local curvature variation)
-25/05/23 (TrioCFD) Tests       : FTD - Adding 5 TCL (contact line model) validation reports 
+25/05/23 (TrioCFD) Tests       : FTD - Adding TCL (contact line model) validation reports 
 16/05/23 (TrioCFD) Tests       : FT IJK - Fix some validation reports
 03/05/23 (TrioCFD) Change      : FSI & SA - No more mask
 25/04/23 (TrioCFD) Major Change: New project organization (all modues are gathered)
 13/04/23 (TrioCFD) Doc         : Update documentation generation scripts
-20/03/23 (TrioCFD) New Feature : CMFD - 'Probleme_multiphase' development in progress
+20/03/23 (TrioCFD) Change      : CMFD - 'Probleme_multiphase' development in progress
 21/02/23 (TrioCFD) New Feature : CMFD - Development in progress
 13/02/23 (TrioCFD) New Feature : FT IJK - New shear boundary condition
 08/02/23 (TrioCFD) New Feature : Turbulence - adding the possibility (still experimental) to compute turbulent viscosity using harmonic mean
