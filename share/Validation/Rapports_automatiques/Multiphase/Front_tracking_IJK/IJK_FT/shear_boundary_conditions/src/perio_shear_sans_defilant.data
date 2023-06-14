@@ -18,8 +18,8 @@ Lire grid_splitting
 {
   ijk_grid_geometry DOM
   nproc_i 1
-  nproc_j 2
-  nproc_k 2
+  nproc_j 1
+  nproc_k 1
 }
 
 IJK_FT_double

@@ -1920,7 +1920,14 @@ void IJK_FT_double::run()
     }
 
   // allocation d'une pression monofluide avec des tableau de projection liquide et vapeur
-  pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, true );
+  if (!disable_diphasique_)
+    {
+      pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, true );
+    }
+  else
+    {
+      pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
+    }
   pressure_l_.allocate(splitting_, IJK_Splitting::ELEM, 3);
   pressure_v_.allocate(splitting_, IJK_Splitting::ELEM, 3);
   p_interpol_error_.allocate(splitting_, IJK_Splitting::ELEM, 3);
@@ -2643,8 +2650,9 @@ void IJK_FT_double::run()
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
 
-      // uniquement pour post-traitement
-      update_pressure_phase();
+      // uniquement pour post-traitement --> pas top, oblige dallouer de nouveaux tableaux...
+      if (!disable_diphasique_)
+        update_pressure_phase();
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
