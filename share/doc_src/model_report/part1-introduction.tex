@@ -1,11 +1,13 @@
 Le code de calcul \texttt{TrioCFD} est un logiciel open-source \cite{TrioCFD}
 pour les simulations en m\'ecanique des fluides, adapt\'e en particulier
 aux calculs massivement parall\`eles d\textquoteright \'ecoulements turbulents
-dans des configurations industrielles. Cette note technique est une
-documentation des mod\`eles physiques de ce code qui existe depuis plus
-de vingt-cinq ans (depuis les travaux sur les Volumes-El\'ements Finis
-dans \cite{Emon92}) et qui a trouv\'e des applications dans plusieurs
-sous-domaines de la m\'ecanique des fluides. De nombreuses r\'ef\'erences
+dans des configurations industrielles.\\
+Il existe depuis le milieu des ann\'es 90 (et les travaux sur les Volumes-El\'ements
+Finis dans \cite{Emon92}) et a trouv\'e des applications dans plusieurs
+sous-domaines de la m\'ecanique des fluides.\\
+
+Le pr\'esent document d\'ecrit les mod\`eles physiques impl\'ement\'es dans \texttt{TrioCFD}.
+De nombreuses r\'ef\'erences
 accessibles dans la litt\'erature (dont 28 th\`eses) d\'ecrivent les m\'ethodes
 num\'eriques du code ou des applications originales. Ces r\'ef\'erences
 (th\`eses et articles) peuvent \^etre retrouv\'ees au format \texttt{PDF}
@@ -57,19 +59,18 @@ cette section, des rappels sont \'egalement effectu\'es sur les d\'efinitions
 des tenseurs du taux de d\'eformation et celui de rotation car ceux-ci
 sont utilis\'es dans la section suivante d\'edi\'ee aux mod\`eles de turbulence.
 Les mod\`eles de turbulence en m\'ecanique des fluides sont nombreux et
-plusieurs livres et publications de synth\`ese existent d\'ej\`a (e.g. \cite{Book_Chassaing,Argyropoulos-Markatos_ReviewTurbulence_AMM2015}).
+plusieurs livres et publications de synth\`ese existent d\'ej\`a
+(e.g. \cite{Book_Chassaing,Argyropoulos-Markatos_ReviewTurbulence_AMM2015}).
 Dans \texttt{TrioCFD}, les mod\`eles qui sont d\'evelopp\'es sont ceux qui
 sont les plus couramment utilis\'es dans la litt\'erature et qui font
 l'objet d'un consensus dans le domaine tels que la LES (Smagorinski
 et WALE) et les diff\'erentes d\'eclinaisons du RANS $\overline{k}-\overline{\epsilon}$.
-Ils seront d\'etaill\'es dans la section \ref{sec:Modeles-de-turbulence}.
-Une base de cas tests d'environ 160 fiches de validations existe d\'ej\`a
-pour \texttt{TrioCFD}. La liste de ces fiches est \`a ce jour regroup\'ee
-dans un fichier \texttt{Excel} dont la version \texttt{PDF} est accessible
-en interne CEA. L'ensemble des cas tests de validation est synth\'etis\'e
-dans les deux tables \ref{tab:FichesValid1} et \ref{tab:FichesValid2}
-dans l'annexe \ref{sec:Annexe_ListeValid} de ce document. Dans les
-versions ult\'erieures de cette documentation, les mod\`eles d\'ecrits seront
-illustr\'es par quelques fiches de validation de liste en Annexe. Plusieurs
-mises \`a jour de cette documentation sont \`a pr\'evoir pour l'\'elargir
+Ils seront d\'etaill\'es dans la section \ref{sec:Modeles-de-turbulence}.\\
+
+Une base de cas tests d'environ 200 rapports de validations existe pour \texttt{TrioCFD}.
+La liste des cas tests de cette base est pr\'esent\'e en Annexe A
+du \emph{Rapport de validation} (voir TrioCFD\_validatio\_report.pdf).
+Dans les versions ult\'erieures de cette documentation, les mod\`eles d\'ecrits seront
+illustr\'es par quelques rapports de validation.
+Plusieurs mises \`a jour de cette documentation sont \`a pr\'evoir pour l'\'elargir
 petit \`a petit \`a l'ensemble des mod\`eles accessibles dans le code.
