@@ -35,7 +35,6 @@
 // Ces includes seront a retirer quand on aura clairement separe les operations
 // specifiques au VDF et VEF
 #include <Domaine_VF.h>
-#include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Terme_Source_Constituant_Vortex_VEF_Face.h>
 #include <TRUSTTrav.h>
 #include <Matrice_Morse_Sym.h>
@@ -2502,6 +2501,53 @@ void compute_normale_barycenter_area_in_cell(const int elem,
 
 }
 
+void Navier_Stokes_FT_Disc::compute_boussinesq_additional_gravity(
+  const Convection_Diffusion_Temperature_FT_Disc& eq,
+  const Fluide_Diphasique& fluide_dipha,
+  const IntTab& face_voisins,
+  const DoubleVect& volumes_entrelaces,
+  const IntVect& orientation,
+  const DoubleTab& indicatrice,
+  const ArrOfDouble& g, // Vect3
+  DoubleTab& gravite_face) const
+{
+  const int phase_eq = eq.get_phase();
+  const DoubleTab& temperature_eq = eq.inconnue().valeur().valeurs();
+  const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
+  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
+  const double beta_th_phase_eq = tab_beta_th_phase_eq(0,0);
+
+  for (int face=0; face<gravite_face.dimension(0); face++)
+    {
+      const int elem0 = face_voisins(face, 0);
+      const int elem1 = face_voisins(face, 1);
+      double coef = 0.;
+      // On suppose la ref T0 egale a Tsat
+      //
+      // Pour les mailles monophasiques, on peut faire simplement l'hypothese que T = chi_k T_k
+      // Dans les mailles diphasiques, T = chi_k T_k est une hypothese discutable.
+      // Pour les mailles diphasiques, on pourrait envisager une reconstruction plus precise de la
+      // temperature monofluide a partir du gradient (cad de mpoint).
+      // Neglected in first approximation. we simply compute T = chi_k T_k
+      if (elem0 >= 0)
+        {
+          double chi = (2*phase_eq-1)*indicatrice[elem0]+1-phase_eq;
+          double T_eq = temperature_eq[elem0];
+          coef = chi*T_eq;
+        }
+      if (elem1 >= 0)
+        {
+          double chi = (2*phase_eq-1)*indicatrice[elem1]+1-phase_eq;
+          double T_eq = temperature_eq[elem1];
+          coef += chi*T_eq;
+        }
+      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
+        coef *= 0.5;
+      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef*beta_th_phase_eq;
+    }
+}
+
+
 /*! @brief Calcul de la derivee en temps de la vitesse.
  *
  */
@@ -2635,8 +2681,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   const int m =  vpoint.line_size();
 
   DoubleTab gravite_face(inconnue().valeurs());
-  if (variables_internes().terme_gravite_ == Navier_Stokes_FT_Disc_interne::GRAVITE_RHO_G
-      && milieu().a_gravite())
+  if (milieu().a_gravite())
     {
       ArrOfDouble g(dimension);
       // Pour l'instant : gravite uniforme g => phi(s) = - x scalaire g
@@ -2656,9 +2701,15 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           const IntTab& face_voisins = le_dom_dis.valeur().valeur().face_voisins();
           const IntVect& orientation = ref_cast(Domaine_VDF, domaine_dis().valeur()).orientation();
-          for (int face=0; face<n; face++)
-            gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
-
+          if (variables_internes().terme_gravite_ == Navier_Stokes_FT_Disc_interne::GRAVITE_RHO_G)
+            {
+              for (int face=0; face<n; face++)
+                gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
+            }
+          else
+            {
+              gravite_face = 0.; // En gradI, on ne prend pas directement la gravite
+            }
           // Boussinesq Approximation in use :
           if (variables_internes().is_boussinesq_)
             {
@@ -2669,102 +2720,26 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                   Process::exit();
                 }
               const DoubleTab& indicatrice = refeq_transport.valeur().get_update_indicatrice().valeurs();
-              const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
-
               // First phase with temperature :
               if (variables_internes().ref_equation_mpoint_.non_nul())
                 {
-                  const Convection_Diffusion_Temperature_FT_Disc& eq  =  variables_internes().ref_equation_mpoint_.valeur();
-                  const int phase_eq = eq.get_phase();
-                  const DoubleTab& temperature_eq = eq.inconnue().valeur().valeurs();
-                  const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
-                  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
-                  const double beta_th_phase_eq = tab_beta_th_phase_eq(0,0);
-                  if (phase_eq != 1)
-                    {
-                      Cerr << "phase " << eq.get_phase() << " is associated to the phase chi=0 whereas boussinesq approximation "
-                           << "assumes equation " << eq.le_nom() << " is associated to the indicator function chi = 1" << finl;
-                      Process::exit();
-                    }
-
-                  for (int face=0; face<n; face++)
-                    {
-                      const int elem0 = face_voisins(face, 0);
-                      const int elem1 = face_voisins(face, 1);
-                      double coef = 0.;
-                      if (elem0 >= 0)
-                        {
-                          double chi = indicatrice[elem0];
-                          double T_eq = temperature_eq[elem0];
-                          // On suppose la ref T0 egale a Tsat
-                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
-                          //{
-                          // Pour les mailles monophasiques, on peut faire simplement l'hypothese que T = chi_k T_k
-                          coef = chi*T_eq * beta_th_phase_eq;
-                          //}
-                          //else
-                          //{
-                          // // Dans les mailles diphasiques, T = chi_k T_k est une hypothese discutable.
-                          // Pour les mailles diphasiques, on pourrait envisager une reconstruction plus precise de la
-                          // temperature monofluide a partir du gradient (cad de mpoint).
-                          // Neglected in first approximation.
-                          //}
-                        }
-                      if (elem1 >= 0)
-                        {
-                          double chi = indicatrice[elem1];
-                          double T_eq = temperature_eq[elem1];
-                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
-                          coef += chi*T_eq * beta_th_phase_eq;
-                        }
-                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
-                        coef *= 0.5;
-                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
-                    }
+                  compute_boussinesq_additional_gravity(variables_internes().ref_equation_mpoint_.valeur(),
+                                                        fluide_diphasique(),
+                                                        face_voisins,volumes_entrelaces,orientation,
+                                                        indicatrice,
+                                                        g,
+                                                        gravite_face);
                 }
 
               // Second phase with temperature :
               if (variables_internes().ref_equation_mpoint_vap_.non_nul())
                 {
-                  const Convection_Diffusion_Temperature_FT_Disc& eqv =  variables_internes().ref_equation_mpoint_vap_.valeur();
-                  const int phase_eqv = eqv.get_phase();
-                  const DoubleTab& temperature_eqv = eqv.inconnue().valeur().valeurs();
-                  const Fluide_Incompressible& fluide_phase_eqv = fluide_dipha.fluide_phase(phase_eqv);
-                  const DoubleTab& tab_beta_th_phase_eqv = fluide_phase_eqv.beta_t().valeurs();
-                  const double beta_th_phase_eqv = tab_beta_th_phase_eqv(0,0);
-                  if (phase_eqv != 0)
-                    {
-                      Cerr << "phase " << eqv.get_phase() << " is associated to the phase chi=1 whereas boussinesq approximation "
-                           << "assumes equation " << eqv.le_nom() << " is associated to the indicator function chi = 0" << finl;
-                      Process::exit();
-                    }
-
-                  for (int face=0; face<n; face++)
-                    {
-                      const int elem0 = face_voisins(face, 0);
-                      const int elem1 = face_voisins(face, 1);
-                      double coef = 0.;
-                      if (elem0 >= 0)
-                        {
-                          double chi = 1.-indicatrice[elem0];
-                          double T_eqv = temperature_eqv[elem0];
-                          // On suppose la ref T0 egale a Tsat pour les 2 champs :
-                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
-                          // on fait simplement l'hypothese que T = chi_k T_k
-                          coef = chi * T_eqv * beta_th_phase_eqv ;
-                          //}
-                        }
-                      if (elem1 >= 0)
-                        {
-                          double chi = 1.-indicatrice[elem1];
-                          double T_eqv  = temperature_eqv[elem1];
-                          //if ((chi_1*(1.-chi_1)) < 1.e-3 )
-                          coef += chi * T_eqv * beta_th_phase_eqv;
-                        }
-                      if (elem0 >= 0 && elem1 >= 0) // Not a boundary of the domain ?
-                        coef *= 0.5;
-                      gravite_face(face)-=volumes_entrelaces(face)*g(orientation[face])*coef;
-                    }
+                  compute_boussinesq_additional_gravity(variables_internes().ref_equation_mpoint_vap_.valeur(),
+                                                        fluide_diphasique(),
+                                                        face_voisins,volumes_entrelaces,orientation,
+                                                        indicatrice,
+                                                        g,
+                                                        gravite_face);
                 }
               // The end of boussinesq force source term.
             }
@@ -2772,6 +2747,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         }
       else
         {
+          // VEF case:
           if (variables_internes().is_boussinesq_)
             {
               Cerr << "Trying to use Boussinesq approximation on a 2phase flow in VEF? Not yet available. Ask TRUST support." << finl;
