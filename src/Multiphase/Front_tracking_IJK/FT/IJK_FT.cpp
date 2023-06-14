@@ -1471,6 +1471,7 @@ int IJK_FT_double::initialise()
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
 
+
   nalloc += post_.initialise(reprise_);
 
   // statistiques...
@@ -1512,7 +1513,7 @@ int IJK_FT_double::initialise()
         current_time_, tstep_
       );
     }
-
+  pressure_.update_indicatrice(interfaces_.I());
   maj_indicatrice_rho_mu();
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
@@ -1560,6 +1561,7 @@ int IJK_FT_double::initialise()
           );
         }
     }
+  pressure_.update_indicatrice(interfaces_.I());
 
   return nalloc;
 }
@@ -2641,8 +2643,7 @@ void IJK_FT_double::run()
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
 
-      pressure_.update_indicatrice(interfaces_.I());
-      pressure_.update_monofluide_to_phase_value();
+      // uniquement pour post-traitement
       update_pressure_phase();
 
       if (current_time_ >= post_.t_debut_statistiques())
@@ -4235,6 +4236,8 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 #endif
     current_time_, tstep_
   );
+  // mise a jour de l'indicatrice pour les variables monofluides
+  pressure_.update_indicatrice(interfaces_.I());
   statistiques().end_count(deplacement_interf_counter_);
 }
 
@@ -4331,6 +4334,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 #endif
     current_time_, rk_step
   );
+  pressure_.update_indicatrice(interfaces_.I());
 }
 
 //  Parcourir_maillage cree des noeuds et facettes virtuelles.
