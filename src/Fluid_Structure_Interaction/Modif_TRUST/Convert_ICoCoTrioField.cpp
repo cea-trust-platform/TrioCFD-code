@@ -41,13 +41,14 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
 {
   //DEV ANTONIN LEPREVOST FOR COUPLING TRIO WITH EUROPLEXUX
 
-  if(ch.le_nom().getString() == "neant" and ch.get_dimension() == 3) //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+  if(ch.get_nom_post() == "FLUID_FORCE_SOM" and ch.get_dimension() == 3)
     {
       Cerr << "Interpolation P0 -> P1 TRUST" << endl;
       build_triomesh(ch.get_ref_domaine_dis_base(), afield, 1, ch.get_localisation() == FACE);
     }
   else
     build_triomesh(ch.get_ref_domaine_dis_base(), afield, ch.get_localisation() == NODE, ch.get_localisation() == FACE);
+
 
   afield.setName(ch.le_nom().getString());
   afield._time1 = afield._time2 = ch.get_time(), afield._itnumber = 0;
@@ -69,7 +70,7 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
   int nb_face = faces_IFS.nb_faces();
   int nb_som_face = afield._nodes_per_elem;
 
-  if(ch.le_nom().getString() == "neant" and ch.get_dimension() == 3) //Pourquoi neant pr le champ extraction ? -> PBM TRUST
+  if(ch.get_nom_post() == "FLUID_FORCE_SOM" and ch.get_dimension() == 3)
     {
       afield._mesh_dim = 2; //Pourquoi mesh dim vaut 1 en 3D ? Encore pbm avec le champ extraction, si on modifie pas erreur dans le couplage -> PBM TRUST
 
@@ -82,6 +83,8 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
 
       DoubleVect force_tot_som(space_dim);
       DoubleVect force_tot_elem(space_dim);
+
+      std::ofstream file_force_P0("force_fluid_P0.txt", ios::app);
 
       double surface_tot_elem = 0;
       double surface_tot_som = 0;
@@ -98,6 +101,9 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
             }
           for(int k = 0; k < space_dim; k++)
             force_tot_elem(k) += vals(face, k);
+
+          if(file_force_P0)
+            file_force_P0 << afield._time1 << " " << vals(face, 0) << " " << vals(face, 1) << " " << vals(face,2) << endl;
         }
 
       for(int som = 0; som < nb_som; som++)//On n a pas besoin de diviser par la surface de chaque noeud (surface_nodes) car on doit renvoyer l integral du champ et non le champ lui meme pour EPX
@@ -109,8 +115,9 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
             }
         }
 
-      std::ofstream file_force_tot_som("force_fluid_interpolate_som.txt", ios::app);
-      std::ofstream file_force_tot_elem("force_fluid_elem.txt", ios::app);
+      std::ofstream file_force_tot_som("force_total_fluid_interpolate_som.txt", ios::app);
+      std::ofstream file_force_tot_elem("force_total_fluid_elem.txt", ios::app);
+
 
       if(file_force_tot_som)
         file_force_tot_som << ch.get_time() << " " << force_tot_som(0) << " " << force_tot_som(1) << " " << force_tot_som(2) << endl;
