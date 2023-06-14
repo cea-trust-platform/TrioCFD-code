@@ -1513,7 +1513,7 @@ int IJK_FT_double::initialise()
         current_time_, tstep_
       );
     }
-  pressure_.update_indicatrice(interfaces_.I());
+  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   maj_indicatrice_rho_mu();
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
@@ -1561,7 +1561,7 @@ int IJK_FT_double::initialise()
           );
         }
     }
-  pressure_.update_indicatrice(interfaces_.I());
+  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
 
   return nalloc;
 }
@@ -4237,7 +4237,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     current_time_, tstep_
   );
   // mise a jour de l'indicatrice pour les variables monofluides
-  pressure_.update_indicatrice(interfaces_.I());
+  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   statistiques().end_count(deplacement_interf_counter_);
 }
 
@@ -4334,7 +4334,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 #endif
     current_time_, rk_step
   );
-  pressure_.update_indicatrice(interfaces_.I());
+  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
 }
 
 //  Parcourir_maillage cree des noeuds et facettes virtuelles.
