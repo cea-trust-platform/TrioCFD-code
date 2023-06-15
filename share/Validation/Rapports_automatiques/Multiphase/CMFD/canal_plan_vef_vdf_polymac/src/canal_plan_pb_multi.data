@@ -187,14 +187,11 @@ Lire pb
     }
     Postraitement
     {
-		Definition_champs 	{
-        					d_paroi refChamp { Pb_champ pb distance_paroi_globale }
-                            }
         sondes			{
             k	    	k      		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
             diss    	$diss      		periode 1e8 position_like k
             vitesse    	vitesse_liquide_eau	periode 1e8 position_like k
-            dist_paroi	d_paroi		periode 1e8 position_like k 
+            # dist_paroi	Distance_paroi		periode 1e8 position_like k #
            $comment y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_min_yplus $y_yplus    $x_max_yplus $y_yplus $comment
             pression	pression		periode 1e8 segment 1001	0 0.8	100 0.8
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #

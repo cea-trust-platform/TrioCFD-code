@@ -119,15 +119,12 @@ Lire pb
 
 	Postraitement
 	{
-		Definition_champs 	{
-        					d_paroi refChamp { Pb_champ pb distance_paroi_globale }
-                            }
 		sondes			{
 					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
 					u		VitesseX		periode 1e8 position_like vitesse
 					k		k		periode 1e8 position_like vitesse
 					diss		eps		periode 1e8 position_like vitesse
-					dist_paroi	d_paroi		periode 1e8 position_like vitesse 
+					dist_paroi	Distance_paroi		periode 1e8 position_like vitesse
 					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
 					y_plus			y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0
 					pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
