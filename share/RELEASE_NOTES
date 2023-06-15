@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
+15/06/23 (TrioCFD) Bug fix     : FSI - Fix periodic boundary conditions in ALE module
 
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.2 : Enhancements, modifications and corrected bugs since version 1.9.1 :
