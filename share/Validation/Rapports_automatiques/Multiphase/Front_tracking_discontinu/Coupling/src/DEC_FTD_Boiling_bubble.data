@@ -1,0 +1,263 @@
+# Boiling bubble simulation #
+# lance_test 4 ecarts #
+# PARALLEL RUNS #
+# dimension 3 #
+dimension 3
+
+domaine dom_fluide
+domaine dom_solide
+
+Probleme_FT_Disc_gen pb1
+Pb_conduction pb2
+
+# BEGIN MESH #
+Mailler dom_fluide
+{  
+ 	pave pave1
+	{ 
+	origine 0. 0. 0.
+	longueurs 1. 1. 1. 
+	nombre_de_noeuds 51 51 51
+	
+	}
+	{
+	bord paroi1   			 X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
+	bord haut1    			 Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
+	raccord local homogene bas1      Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
+	bord paroi1  			 X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
+	bord paroi1   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
+	bord paroi1    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
+	}
+}
+transformer dom_fluide x*0.008-0.004 y*0.008-0.004 z*0.016
+
+Mailler dom_solide
+{  
+ 	pave pave2
+	{ 
+	origine 0. 0. 0.
+	longueurs 1. 1. 1. 
+	nombre_de_noeuds 51 51 6
+	
+	}
+	{
+	bord paroi2    			 X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
+	raccord local homogene haut2     Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
+	bord bas2     			 Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
+	bord paroi2   			 X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
+	bord paroi2   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
+	bord paroi2    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
+	}
+}
+transformer dom_solide x*0.008-0.004 y*0.008-0.004 z*0.0001-0.0001
+
+# END MESH #
+
+# Using *Metis* tool to cut DOM_FLUIDE into *nb_parts*  blocks #
+# overlapping width Larg_joint 2 => for high ordre scheme >=2nd order  #
+# *nb_parts_tot* the number of processeur #
+
+Partition dom_fluide
+{
+	# Partitionneur tranche { tranches 4 4 6 } #
+	Partitionneur metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM_FLUIDE
+	nb_parts_tot 2
+}
+
+Partition dom_solide
+{
+	# Partitionneur tranche { tranches 4 4 6 } #
+	Partitionneur metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM_SOLIDE
+	nb_parts_tot 2
+}
+Fin
+# CODE finir Just Before this  Line #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_fluide
+Scatter DOM.Zones dom_solide
+END SCATTER #
+
+
+Fluide_Incompressible  eau
+Lire eau 
+{
+  mu champ_uniforme       1 70.e-6
+  rho champ_uniforme      1 610
+  lambda champ_uniforme   1 461.e-3
+  cp champ_uniforme       1 8270
+  
+  
+}
+
+Fluide_Incompressible air
+Lire air
+{
+  mu champ_uniforme       1 22.e-6
+  rho champ_uniforme      1 100
+  lambda champ_uniforme   1 111.e-3
+  cp champ_uniforme       1 11000
+ 
+}
+
+Fluide_diphasique fluide
+Lire fluide
+{
+  fluide1 eau
+  fluide0 air
+  sigma   Champ_Uniforme 1            0.002
+  chaleur_latente Champ_Uniforme 1    -50000
+}
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	nb_pas_dt_max 10
+	tinit 0.
+	tmax  1
+	dt_min 1.e-18
+	dt_max 0.2e-3
+        dt_impr -100000
+	dt_sauv 5
+	seuil_statio -1
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -10.1
+Associate fluide gravite
+
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+convection_diffusion_temperature_ft_disc      thermique
+Associate pb1 dom_fluide
+Associate pb1 hydraulique
+Associate pb1 thermique
+Associate pb1 interf
+Associate pb1 fluide
+
+Associate pb1 sch
+VDF dis
+Discretize pb1 dis
+system "mkdir -p lata"
+Lire pb1
+{
+	
+	hydraulique
+	{
+	 	modele_turbulence sous_maille_wale
+        	{
+         	  Cw               1.e-16
+         	  turbulence_paroi1 negligeable
+        	}
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+		
+		equation_interfaces_proprietes_fluide interf
+		equation_temperature_mpoint thermique
+		
+		boundary_conditions 
+		{
+		paroi1   paroi1_fixe 
+		bas1     paroi1_fixe 
+		haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
+        	}
+	}
+	interf
+	{
+		interpolation_repere_local
+		methode_transport vitesse_interpolee hydraulique
+	        conditions_initiales { fonction x^2+y^2+z^2-0.0005^2 } 
+		iterations_correction_volume 1
+        	n_iterations_distance 2
+		remaillage {
+			pas 0.000001
+			nb_iter_remaillage 1
+			critere_arete 0.35
+			critere_remaillage 0.2
+			pas_lissage 0.000001
+			lissage_courbure_iterations 0
+			lissage_courbure_coeff -0.1
+			nb_iter_barycentrage 3
+			relax_barycentrage 1
+			facteur_longueur_ideale 2.
+			nb_iter_correction_volume 3
+			seuil_dvolume_residuel 1e-12
+			}
+		collisions
+		{
+                active
+                juric_pour_tout
+		juric_local  phase_continue 1 
+                type_remaillage Juric { source_isovaleur indicatrice }
+		}
+		boundary_conditions
+		{
+		# bas1  paroi1_FT_disc constant champ_front_fonc_xyz 1 80*abs(cos(2*3.1415/0.0027*x)*cos(2*3.14/0.0027*y))+40 #
+		bas1 paroi1_FT_disc constant champ_front_fonc_xyz 1 60
+		paroi1 paroi1_FT_disc symetrie
+		haut1   paroi1_FT_disc symetrie
+		}
+	}
+	
+	thermique
+	{
+		equation_interface interf
+		equation_navier_stokes hydraulique
+		phase 1
+                diffusion { }
+                convection { quick }
+                boundary_conditions
+                {
+			bas1   paroi1_flux_impose Champ_front_Uniforme 1 46100.
+			haut1  frontiere_ouverte T_ext Champ_front_Uniforme 1 0.
+			paroi1 paroi1_adiabatique
+                }
+                conditions_initiales { Temperature_thermique Champ_Uniforme 1 5. }
+	}
+	postraitement 
+	{
+		champs dt_post 10
+		{
+			vitesse elem
+			temperature_thermique elem
+		}
+	}
+	
+liste_postraitements
+{
+	
+   Postraitement_ft_lata post1
+   {
+	dt_post 0.005
+	nom_fichier lata/post
+ 	champs elements
+  	      {
+  		 
+  		 indicatrice_interf
+  		 temperature_thermique
+		 vitesse
+		 pression
+		 temperature_mpoint
+  	      }
+	      
+		
+	interfaces interf
+	      {  
+		champs sommets { courbure }
+
+              }
+
+    }
+    }
+}
+
+Solve pb1
+FIN
+
+			     
