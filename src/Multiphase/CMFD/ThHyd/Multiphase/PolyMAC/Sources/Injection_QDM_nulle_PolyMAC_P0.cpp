@@ -45,6 +45,10 @@ Sortie& Injection_QDM_nulle_PolyMAC_P0::printOn(Sortie& os) const
 
 Entree& Injection_QDM_nulle_PolyMAC_P0::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("beta", &beta_);
+  param.lire_avec_accolades_depuis(is);
+
   return is;
 }
 
@@ -104,9 +108,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
               for (int n = 0 ; n<N ; n++)
                 for (int m = 0 ; m<N ; m++)
                   {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m);  // Force along -vit
+                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_;  // Force along -vit
                     if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) ;
+                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
                   }
 
             for (int i=0 ; i < e_f.line_size() ; i++)
@@ -118,9 +122,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     for (int n = 0 ; n<N ; n++)
                       for (int m = 0 ; m<N ; m++)
                         {
-                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m);
+                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_;
                           if (mat)
-                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2);
+                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_;
                         }
                   }
               }
@@ -181,9 +185,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
               for (int n = 0 ; n<N ; n++)
                 for (int m = 0 ; m<N ; m++)
                   {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m);  // Force along -vit
+                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_ ;  // Force along -vit
                     if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) ;
+                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
                   }
 
             for (int i=0 ; i < e_f.line_size() ; i++)
@@ -195,9 +199,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     for (int n = 0 ; n<N ; n++)
                       for (int m = 0 ; m<N ; m++)
                         {
-                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m);
+                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_ ;
                           if (mat)
-                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2);
+                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_ ;
                         }
                   }
               }
