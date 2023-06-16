@@ -28,7 +28,6 @@ Sortie& Operateur_Diff::printOn(Sortie& os) const
 
 Entree& Operateur_Diff::readOn(Entree& is)
 {
-//  valeur().Garde_Tenseur_Reynolds();
   return Operateur::lire(is);
 }
 
@@ -54,7 +53,6 @@ void Operateur_Diff::typer()
       Nom nom_type= eqn.discretisation().get_name_of_type_for(que_suis_je(),typ,eqn,diffusivite());
       DERIV(Operateur_Diff_base)::typer(nom_type);
       valeur().associer_diffusivite(diffusivite());
-      valeur().Garde_Tenseur_Reynolds();
     }
   Cerr << valeur().que_suis_je() << finl;
 }
