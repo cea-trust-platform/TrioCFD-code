@@ -1328,6 +1328,66 @@ static int decoder_numero_bulle(const int code)
   return num_bulle;
 }
 
+// Calcule le champ de courbure moyenne sur le domaine etendu IJK_ft
+// Utile pour gerer les conditions de shear-periodicite :: interpolation de la pression monofluide
+void IJK_Interfaces::calculer_kappa_ft(IJK_Field_double& kappa_ft)
+{
+  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
+  const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
+  const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
+  const IntTab& facettes = mesh.facettes();
+  const ArrOfDouble& courbure = maillage_ft_ijk_.get_update_courbure_sommets();
+
+  const int n = mesh.nb_facettes();
+  const IJK_Splitting& s = kappa_ft.get_splitting();
+
+
+  IJK_Field_double SI_ft;
+  SI_ft.allocate(s, IJK_Splitting::ELEM, 0);
+  SI_ft.data() = 0.;
+
+  kappa_ft.data() = 0.;
+
+  for (int fa7 = 0; fa7 < n; fa7++)
+    {
+
+      // On compte aussi les facettes_virtuelles
+      //if (mesh.facette_virtuelle(fa7))
+      //  continue;
+      const double sf=surface_facettes[fa7];
+      int index=intersections.index_facette()[fa7];
+      while (index >= 0)
+        {
+          const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+          const int num_elem = data.numero_element_;
+          const Int3 ijk = s.convert_packed_to_ijk_cell(num_elem);
+          const double surf = data.fraction_surface_intersection_ * sf;
+          for (int isom = 0; isom< 3; isom++)
+            {
+              const int num_som = facettes(fa7, isom);
+              const double kappa = courbure[num_som];
+              kappa_ft(ijk[0],ijk[1],ijk[2]) += kappa*surf;
+            }
+          SI_ft(ijk[0],ijk[1],ijk[2]) += surf;
+          index = data.index_element_suivant_;
+        }
+    }
+
+
+  const int nx = kappa_ft.ni();
+  const int ny = kappa_ft.nj();
+  const int nz = kappa_ft.nk();
+
+  for (int k = 0; k < nz; k++)
+    for (int j = 0; j < ny; j++)
+      for (int i = 0; i < nx; i++)
+        {
+          if (kappa_ft(i,j,k)!=0.)
+            kappa_ft(i,j,k)/=SI_ft(i,j,k);
+        }
+}
+
+
 // Le champ de normale n'est pas sur une grille decallee.
 // Il doit etre a la meme localisation que "ai" : IJK_Splitting::ELEM
 // Le champ kappa_ai contient le produit de la courbure moyenne sur la cellule

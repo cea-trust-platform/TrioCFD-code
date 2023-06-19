@@ -1513,7 +1513,9 @@ int IJK_FT_double::initialise()
         current_time_, tstep_
       );
     }
-  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  interfaces_.calculer_kappa_ft(kappa_ft_);
+  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   maj_indicatrice_rho_mu();
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
@@ -1561,7 +1563,9 @@ int IJK_FT_double::initialise()
           );
         }
     }
-  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  interfaces_.calculer_kappa_ft(kappa_ft_);
+  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
 
   return nalloc;
 }
@@ -1923,6 +1927,7 @@ void IJK_FT_double::run()
   if (!disable_diphasique_)
     {
       pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, true );
+
     }
   else
     {
@@ -1991,6 +1996,9 @@ void IJK_FT_double::run()
   // alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
   //  allocate_velocity(velocity_ft_, splitting_ft_, 0);
   allocate_velocity(velocity_ft_, splitting_ft_, 4);
+
+  // pour les conditions de shear-periodicite --> interpolation de la pression monofluide
+  kappa_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
 
   if (!disable_diphasique_)
     {
@@ -4245,7 +4253,9 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     current_time_, tstep_
   );
   // mise a jour de l'indicatrice pour les variables monofluides
-  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  interfaces_.calculer_kappa_ft(kappa_ft_);
+  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   statistiques().end_count(deplacement_interf_counter_);
 }
 
@@ -4342,7 +4352,9 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 #endif
     current_time_, rk_step
   );
-  pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  interfaces_.calculer_kappa_ft(kappa_ft_);
+  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
+  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
 }
 
 //  Parcourir_maillage cree des noeuds et facettes virtuelles.

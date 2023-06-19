@@ -277,6 +277,8 @@ public :
   //                  (+1 pour le voisin d'indice plus eleve, -1 pour l'autre )
   int compute_cell_phase_with_interface_normal(int num_elem, int direction, int face_plus);
 
+  void calculer_kappa_ft(IJK_Field_double& kappa_ft);
+
   void calculer_normales_et_aires_interfaciales(IJK_Field_double& ai,
                                                 IJK_Field_double& kappa_ai,
                                                 FixedVector<IJK_Field_double, 3>& normale_cell,
