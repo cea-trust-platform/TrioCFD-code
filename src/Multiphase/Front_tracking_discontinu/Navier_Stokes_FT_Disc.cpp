@@ -19,6 +19,7 @@
 // Version:     /main/55
 //
 //////////////////////////////////////////////////////////////////////////////
+#include <Parametre_implicite.h>
 #include <Navier_Stokes_FT_Disc.h>
 #include <Probleme_FT_Disc_gen.h>
 #include <Modele_turbulence_hyd_nul.h>
@@ -2658,7 +2659,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   // B.M. 08/2004 : on transporte "v" et non "rho_v"...
 
   DoubleTab& terme_convection_valeurs = variables_internes().terme_convection.valeur().valeurs();
-  if (schema_temps().diffusion_implicite())
+  bool calcul_explicite = false;
+  if (parametre_equation_.non_nul() && sub_type(Parametre_implicite, parametre_equation_.valeur()))
+    {
+      Parametre_implicite& param2 = ref_cast(Parametre_implicite, parametre_equation_.valeur());
+      calcul_explicite = param2.calcul_explicite();
+    }
+  if (schema_temps().diffusion_implicite() && !calcul_explicite)
     {
       terme_convection_valeurs=0;
       derivee_en_temps_conv(terme_convection_valeurs,la_vitesse.valeurs());
@@ -2783,7 +2790,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // on ajoute pas la diffusion cela sera fait par Gradient_conjugue_diff_impl
       // sauf si !is_explicite (terme forcage vitesse implicite; resolution conjointe forcage diffusion)
       // car dans ce cas la vitesse a imposer a besoin d'une bonne approximation de vpoint
-      if( !variables_internes().is_explicite )
+      if( !variables_internes().is_explicite && !calcul_explicite)
         flag_diff = 1;
       else
         flag_diff = 0;
@@ -2879,7 +2886,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   vpoint.echange_espace_virtuel();
 
   //  si terme forcage vitesse explicite => J'ai tout, je peux resoudre (Gradient_conjugue_diff_impl)
-  if (schema_temps().diffusion_implicite() && variables_internes().is_explicite )
+  if (schema_temps().diffusion_implicite() && !calcul_explicite && variables_internes().is_explicite )
     {
       DoubleTab derivee(la_vitesse.valeurs());
       // on indique au solveur masse de diviser par rho en plus du volume car l'operateur de diffusion renvoit qqqc en rho d u/dt
@@ -2950,7 +2957,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           // si !variables_internes().is_explicite (terme forcage implicite) on retire la diffusion explicite
           // de vpoint (implicitee dans Gradient_conjugue_diff_impl_IBC)
-          if( !variables_internes().is_explicite )
+          if( !variables_internes().is_explicite && !calcul_explicite)
             {
               const DoubleTab& rho_faces = champ_rho_faces_.valeur().valeurs();
               const DoubleTab& diffusion = variables_internes().terme_diffusion.valeur().valeurs();

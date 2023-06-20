@@ -19,6 +19,7 @@
 // Version:     /main/25
 //
 //////////////////////////////////////////////////////////////////////////////
+#include <Parametre_implicite.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Domaine_VF.h>
@@ -41,6 +42,7 @@
 #include <Domaine_VDF.h>
 #include <stat_counters.h>
 #include <TRUST_Ref.h>
+#include <Matrice_Morse_Sym.h>
 
 static const double TSAT_CONSTANTE = 0.;
 
@@ -895,6 +897,305 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
     }
 }
 
+DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco_eq_base(DoubleTab& derivee)
+{
+  derivee=0;
+  DoubleTrav secmem(derivee);
+
+  // const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
+  // GB mod 2023.06.19 :
+  const double rhoCp = get_champ("rho_cp_comme_T").valeurs()(0, 0);
+
+  // secmem = sum(operators) + sources + equation specific terms
+  if (schema_temps().diffusion_implicite())
+    {
+      // Add convection operator only if equation has one
+      derivee = inconnue().valeurs();
+      if (nombre_d_operateurs()>1)
+        {
+          derivee_en_temps_conv(secmem, derivee);
+          secmem *= rhoCp;
+        }
+    }
+  else
+    {
+      // Add all explicit operators
+      for(int i=0; i<nombre_d_operateurs(); i++)
+        if(operateur(i).l_op_base().get_decal_temps()!=1)
+          {
+            DoubleTrav secmem_tmp(secmem);
+            operateur(i).ajouter(secmem_tmp);
+            if (i == 1) secmem_tmp *= rhoCp;
+            secmem += secmem_tmp;
+          }
+    }
+  les_sources.ajouter(secmem);
+
+  if (calculate_time_derivative())
+    {
+      // Store dI/dt(n) = M-1 secmem :
+      derivee_en_temps().valeurs()=secmem;
+      solveur_masse.appliquer(derivee_en_temps().valeurs());
+      schema_temps().modifier_second_membre((*this),secmem); // Change secmem for some schemes (eg: Adams_Bashforth)
+    }
+
+  corriger_derivee_expl(secmem); // Add specific term for an equation (eg: -gradP for Navier Stokes)
+
+  if (implicite_==0)
+    {
+      solveur_masse.appliquer(secmem); // M-1 * secmem
+      if (schema_temps().diffusion_implicite())
+        {
+          // Solve: (1/dt + M-1*A)*dI = M-1 * secmem
+          // where A is the diffusion
+          Equation_base::Gradient_conjugue_diff_impl(secmem, derivee);
+        }
+      else
+        {
+          derivee = secmem;
+          derivee.echange_espace_virtuel();
+        }
+      corriger_derivee_impl(derivee);  // Solve specific implicit term for an equation (eg: pressure for Navier Stokes)
+    }
+  else if (implicite_>0)
+    {
+      // TRUST support notices that this part has never been covered...
+      //implicite
+      // M dU/dt + AU* = f -BUn;
+      // U* = Un+dt dU/dt
+      // (M/dt + A) U* = f -BUn + M/dt Un
+      //
+      double dt=schema_temps().pas_de_temps();
+      for(int i=0; i<nombre_d_operateurs(); i++)
+        {
+          //boucle sur les operateurs
+          Operateur_base& op=operateur(i).l_op_base();
+          if(op.get_matrice().est_nul())
+            op.set_matrice().typer("Matrice_Morse");
+          if(op.get_decal_temps()==1)
+            {
+              //if (op.set_matrice().valeur().nb_lignes()<2)
+              {
+                Matrice_Morse& matrice=ref_cast(Matrice_Morse,op.set_matrice().valeur());
+                op.dimensionner(matrice);
+                sys_invariant_=0;
+              }
+              if(!sys_invariant_)
+                {
+                  Matrice_Morse& matrice=ref_cast(Matrice_Morse, op.set_matrice().valeur());
+                  op.contribuer_a_avec(inconnue().valeurs(), matrice);
+                  solv_masse().ajouter_masse(dt, op.set_matrice().valeur());
+
+                  if(
+                    (op.get_solveur()->que_suis_je()=="Solv_Cholesky")
+                    ||
+                    (op.get_solveur()->que_suis_je()=="Solv_GCP")
+                  )
+                    {
+                      Matrice_Morse_Sym new_mat(matrice);
+                      new_mat.set_est_definie(1);
+                      op.set_matrice()=new_mat;
+                      ref_cast_non_const(SolveurSys,op.get_solveur())->reinit();
+                    }
+                }
+            }
+        }
+      if(implicite_==1)
+        {
+          // Un seul operateur implicite.
+          // On suppose que c'est le premier (la diffusion !!)
+          Operateur_base& op=operateur(0).l_op_base();
+          Matrice_Base& matrice=op.set_matrice().valeur();
+          // DoubleTrav secmem(derivee);
+          secmem=derivee;
+          solv_masse().ajouter_masse(dt, secmem, inconnue().valeurs());
+          op.contribuer_au_second_membre(secmem );
+          op.set_solveur().resoudre_systeme(matrice,
+                                            secmem,
+                                            derivee
+                                           );
+          solv_masse().corriger_solution(derivee,inconnue().valeurs());
+
+          derivee-=inconnue().valeurs();
+          derivee/=dt;
+
+          //Sert uniquement a calculer les flux sur les bords quand la diffusion est implicitee !
+          DoubleTab resu;
+          resu=derivee;
+          operateur(0).calculer(inconnue().valeurs(), resu);
+        }
+      else
+        {
+          // plusieurs operateurs implicites ...
+          Cerr << "Must be coded ... " << finl;
+          exit();
+        }
+    }
+  else
+    {
+      Cerr << "Error in Equation_base::derivee_en_temps_inco" << finl;
+      Cerr << "implicite_ = " << implicite_ << " has not been initialized!" << finl;
+      Cerr << "May be " << que_suis_je() << "::completer() method doesn't call Equation_base::completer()" << finl;
+      Cerr << "Contact TRUST support." << finl;
+      Process::exit();
+    }
+  return derivee;
+}
+
+// With this approach, calculer_delta_u_interface is not called,
+// so the velocity should be extended.
+// Fills the field : vitesse_convection_
+void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_extension()
+{
+  Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
+  vitesse_convection_.valeurs() = ns.inconnue().valeurs();
+  // Projection of the convective field :
+  //SolveurSys solveur_pression(ns.get_solveur_pression());
+  Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
+  solveur_masse_fictitious->set_name_of_coefficient_temporel("no_coeff");
+
+  //On utilise un operateur de divergence temporaire et pas celui porte par l equation
+  //pour ne pas modifier les flux_bords_ rempli au cours de ...::mettre_a_jour
+  Operateur_Div div_tmp;
+  div_tmp.associer_eqn(ns);// It's slightly tricky but associating it to (*this) is not OK, because we want to apply it to a velocity.
+  // As delta_u is not the unknown of this equation (no more than vitesse_convection_), we resort to ns to
+  // make it work. Basically, it also means that delta_u gets the BC from u_ns?
+  // Problem with div_tmp.typer() that get the type of equation to make a type.
+  // Hence, it will see a conv/diff equation for a scalar... and will type div_tmp badly (not for a vector velocity field!)
+  // Instead we associer_eqn to ns
+  div_tmp.typer();
+  Cerr << "[Conv_diff_FT_Disc] div_tmp recieved the type " << div_tmp.type() << finl;
+  Cerr << "[Conv_diff_FT_Disc] div_tmp que suis je " << div_tmp.que_suis_je() << finl;
+  if (0)
+    {
+      Equation_base& eqn=ref_eq_ns_.valeur();
+      Nom inut;
+      Nom nom_type=eqn.discretisation().get_name_of_type_for(ns.que_suis_je(),inut,ns);
+      //  const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
+      // ref_cast
+      //  DERIV(Operateur_Div_base)::typer(nom_type);
+      Cerr << "[Conv_diff_FT_Disc] Velocity correction. Construction of the divergence operator type : " << nom_type << finl;
+      //   Cerr << valeur().que_suis_je() << finl ;
+    }
+
+  div_tmp.l_op_base().associer_eqn(ns);//*this);
+  //div_tmp.typer();
+  div_tmp->completer();
+  // En VDF, la methode 'completer()' est surchargee et fait
+  //     1. Operateur_base::completer();
+  //     2. iter.completer_();
+  // donc si on fait juste :
+  //     div_tmp.l_op_base().associer(domaine_dis(), zcl_fictitious_, vitesse_convection_);
+  // On rate l'etape 2 qui a ete faite avec le completer plus haut...
+
+  // WARNING : Si on prend les cl de l'ope de pression pour cette divergence, il y a une vitesse sur les sorties de NS
+  //           qui se trouve face a des conditions limites de symetrie dans zcl_fictitious...
+  //           Du coup, ca fait un gros div! Ce n'est pas ce qu'on veut.
+  //           PAR CONTRE, pour le calcul du gradient ci-dessous, c'est bien les cl de zcl_fictitious qu'on veut,
+  //           sinon, sortie libre va mettre un grad(P).n non nul au bord!!
+  //		   DONC EN CONCLUSION, ON VEUT UN MIX!
+  //
+
+  // RHS for this pressure solveur : div(delta_u)
+  // We need to create a table sized as temperature to store the rhs :
+  DoubleTab& secmem = divergence_delta_U.valeurs();
+  //secmem.copy(inconnue().valeurs(), Array_base::NOCOPY_NOINIT);
+  div_tmp->calculer(vitesse_convection_.valeurs(),secmem);
+
+  // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide
+  if (0) // Cela pourrait etre utile si on construisait le saut de vitesse delta u_0 mais
+    // cela semble presenter que peu d'interet...
+    {
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+      const IntTab& face_voisins = domaine_vf.face_voisins();
+      const IntTab& elem_faces = domaine_vf.elem_faces();
+      const int nb_elem = secmem.size_array();
+      const int   nb_faces_elem = elem_faces.dimension(1);
+      const Transport_Interfaces_FT_Disc& eq_transport = ref_eq_interface_.valeur();
+      // Distance a l'interface discretisee aux elements:
+      const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
+      //     const int nb_elem = secmem2.dimension(0);
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          const double dist = distance(elem);
+          int i_face = -1;
+          if (dist < -1e20)
+            {
+              // Distance invalide: on est loin de l'interface
+              // invalide ou voisin invalide, on supprime la div :
+              secmem(elem) = 0.;
+            }
+          else
+            {
+              // Y a-t-il un voisin pour lequel la distance est invalide
+              for (i_face = 0; i_face < nb_faces_elem; i_face++)
+                {
+                  const int face = elem_faces(elem, i_face);
+                  const int voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                  if (voisin >= 0)
+                    {
+                      const double d = distance(voisin);
+                      if (d < -1e20)
+                        {
+                          // invalide ou voisin invalide, on supprime la div :
+                          secmem(elem) = 0.;
+                          break; // Un voisin invalide
+                        }
+                    }
+                }
+            }
+        }
+    }
+  // Correction du second membre d'apres les conditions aux limites :
+  assembleur_pression_.valeur().modifier_secmem(secmem);
+  // Ajout pour la sauvegarde au premier pas de temps si reprise
+  la_pression.changer_temps(schema_temps().temps_courant());
+
+  // Resolution du systeme en pression : calcul de la_pression
+  solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
+                                     secmem,
+                                     la_pression.valeurs()
+                                    );
+  assembleur_pression_.modifier_solution(la_pression.valeurs());
+  // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
+
+  DoubleTab& gradP = gradient_pression_.valeurs();
+  // Can I re-use a gradient from NS?
+  Operateur_Grad gradient_tmp;
+  gradient_tmp.associer_eqn(ns);//*this);
+  gradient_tmp.typer();
+  gradient_tmp.l_op_base().associer_eqn(ns);//*this);
+  gradient_tmp->completer();
+  // It is important to associate the gradient to the good BC via zcl,
+  // Otherwise a normal gradient appears at the outlet.
+  gradient_tmp.l_op_base().associer(domaine_dis(), zcl_fictitious_, vitesse_convection_); // Quel champ inco pour le gradP? A quoi sert-elle?
+  gradient_tmp.calculer(la_pression.valeur().valeurs(), gradP);
+  // I don't wanna divide by rho_face :
+  solveur_masse_fictitious.appliquer(gradP); // divide by cell_volume
+
+  // Correction of vitesse : "+=" seems the good sign, though I don't understand why...
+  {
+    int i, j;
+    DoubleTab& vc = vitesse_convection_.valeurs();
+    const int n = vc.dimension(0);
+    if (vc.nb_dim() == 1)
+      {
+        // VDF
+        for (i = 0; i < n; i++)
+          vc(i) += gradP(i);
+      }
+    else
+      {
+        //VEF
+        const int m = vc.dimension(1);
+        for (i = 0; i < n; i++)
+          for (j = 0; j < m; j++)
+            vc(i,j) += gradP(i,j);
+      }
+    vc.echange_espace_virtuel();
+  }
+
+}
 DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(DoubleTab& derivee)
 {
   // We start the timestep by computing :
@@ -926,176 +1227,39 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
     }
   else
     {
-      // With this approach, calculer_delta_u_interface is not called,
-      // so the velocity should be extended. We do:
-      vitesse_convection_.valeurs() = vitesse_ns.valeurs();
-      // Projection of the convective field :
-      //SolveurSys solveur_pression(ns.get_solveur_pression());
-      Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
-      solveur_masse_fictitious->set_name_of_coefficient_temporel("no_coeff");
-
-      //On utilise un operateur de divergence temporaire et pas celui porte par l equation
-      //pour ne pas modifier les flux_bords_ rempli au cours de ...::mettre_a_jour
-      Operateur_Div div_tmp;
-      div_tmp.associer_eqn(ns);// It's slightly tricky but associating it to (*this) is not OK, because we want to apply it to a velocity.
-      // As delta_u is not the unknown of this equation (no more than vitesse_convection_), we resort to ns to
-      // make it work. Basically, it also means that delta_u gets the BC from u_ns?
-      // Problem with div_tmp.typer() that get the type of equation to make a type.
-      // Hence, it will see a conv/diff equation for a scalar... and will type div_tmp badly (not for a vector velocity field!)
-      // Instead we associer_eqn to ns
-      div_tmp.typer();
-      Cerr << "[Conv_diff_FT_Disc] div_tmp recieved the type " << div_tmp.type() << finl;
-      Cerr << "[Conv_diff_FT_Disc] div_tmp que suis je " << div_tmp.que_suis_je() << finl;
-      if (0)
-        {
-          Equation_base& eqn=ref_eq_ns_.valeur();
-          Nom inut;
-          Nom nom_type=eqn.discretisation().get_name_of_type_for(ns.que_suis_je(),inut,ns);
-          //  const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
-          // ref_cast
-          //  DERIV(Operateur_Div_base)::typer(nom_type);
-          Cerr << "[Conv_diff_FT_Disc] Velocity correction. Construction of the divergence operator type : " << nom_type << finl;
-          //   Cerr << valeur().que_suis_je() << finl ;
-        }
-
-      div_tmp.l_op_base().associer_eqn(ns);//*this);
-      //div_tmp.typer();
-      div_tmp->completer();
-      // En VDF, la methode 'completer()' est surchargee et fait
-      //     1. Operateur_base::completer();
-      //     2. iter.completer_();
-      // donc si on fait juste :
-      //     div_tmp.l_op_base().associer(domaine_dis(), zcl_fictitious_, vitesse_convection_);
-      // On rate l'etape 2 qui a ete faite avec le completer plus haut...
-
-      // WARNING : Si on prend les cl de l'ope de pression pour cette divergence, il y a une vitesse sur les sorties de NS
-      //           qui se trouve face a des conditions limites de symetrie dans zcl_fictitious...
-      //           Du coup, ca fait un gros div! Ce n'est pas ce qu'on veut.
-      //           PAR CONTRE, pour le calcul du gradient ci-dessous, c'est bien les cl de zcl_fictitious qu'on veut,
-      //           sinon, sortie libre va mettre un grad(P).n non nul au bord!!
-      //		   DONC EN CONCLUSION, ON VEUT UN MIX!
-      //
-
-      // RHS for this pressure solveur : div(delta_u)
-      // We need to create a table sized as temperature to store the rhs :
-      DoubleTab& secmem = divergence_delta_U.valeurs();
-      //secmem.copy(inconnue().valeurs(), Array_base::NOCOPY_NOINIT);
-      div_tmp->calculer(vitesse_convection_.valeurs(),secmem);
-
-      // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide
-      if (0) // Cela pourrait etre utile si on construisait le saut de vitesse delta u_0 mais
-        // cela semble presenter que peu d'interet...
-        {
-          const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
-          const IntTab& face_voisins = domaine_vf.face_voisins();
-          const IntTab& elem_faces = domaine_vf.elem_faces();
-          const int nb_elem = secmem.size_array();
-          const int   nb_faces_elem = elem_faces.dimension(1);
-          const Transport_Interfaces_FT_Disc& eq_transport = ref_eq_interface_.valeur();
-          // Distance a l'interface discretisee aux elements:
-          const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
-          //     const int nb_elem = secmem2.dimension(0);
-          for (int elem = 0; elem < nb_elem; elem++)
-            {
-              const double dist = distance(elem);
-              int i_face = -1;
-              if (dist < -1e20)
-                {
-                  // Distance invalide: on est loin de l'interface
-                  // invalide ou voisin invalide, on supprime la div :
-                  secmem(elem) = 0.;
-                }
-              else
-                {
-                  // Y a-t-il un voisin pour lequel la distance est invalide
-                  for (i_face = 0; i_face < nb_faces_elem; i_face++)
-                    {
-                      const int face = elem_faces(elem, i_face);
-                      const int voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
-                      if (voisin >= 0)
-                        {
-                          const double d = distance(voisin);
-                          if (d < -1e20)
-                            {
-                              // invalide ou voisin invalide, on supprime la div :
-                              secmem(elem) = 0.;
-                              break; // Un voisin invalide
-                            }
-                        }
-                    }
-                }
-            }
-        }
-      // Correction du second membre d'apres les conditions aux limites :
-      assembleur_pression_.valeur().modifier_secmem(secmem);
-      // Ajout pour la sauvegarde au premier pas de temps si reprise
-      la_pression.changer_temps(schema_temps().temps_courant());
-
-      // Resolution du systeme en pression : calcul de la_pression
-      solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
-                                         secmem,
-                                         la_pression.valeurs()
-                                        );
-      assembleur_pression_.modifier_solution(la_pression.valeurs());
-      // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
-
-      DoubleTab& gradP = gradient_pression_.valeurs();
-      // Can I re-use a gradient from NS?
-      Operateur_Grad gradient_tmp;
-      gradient_tmp.associer_eqn(ns);//*this);
-      gradient_tmp.typer();
-      gradient_tmp.l_op_base().associer_eqn(ns);//*this);
-      gradient_tmp->completer();
-      // It is important to associate the gradient to the good BC via zcl,
-      // Otherwise a normal gradient appears at the outlet.
-      gradient_tmp.l_op_base().associer(domaine_dis(), zcl_fictitious_, vitesse_convection_); // Quel champ inco pour le gradP? A quoi sert-elle?
-      gradient_tmp.calculer(la_pression.valeur().valeurs(), gradP);
-      // I don't wanna divide by rho_face :
-      solveur_masse_fictitious.appliquer(gradP); // divide by cell_volume
-
-      // Correction of vitesse : "+=" seems the good sign, though I don't understand why...
-      {
-        int i, j;
-        DoubleTab& vc = vitesse_convection_.valeurs();
-        const int n = vc.dimension(0);
-        if (vc.nb_dim() == 1)
-          {
-            // VDF
-            for (i = 0; i < n; i++)
-              vc(i) += gradP(i);
-          }
-        else
-          {
-            //VEF
-            const int m = vc.dimension(1);
-            for (i = 0; i < n; i++)
-              {
-                for (j = 0; j < m; j++)
-                  {
-                    vc(i,j) += gradP(i,j);
-                  }
-              }
-          }
-        vc.echange_espace_virtuel();
-      }
+      // Compute vitesse_convection_ which is equal to ns.inconnue() in phase_ and is extended (divergence-free) in the other phase:
+      compute_divergence_free_velocity_extension();
     }
   statistiques().end_count(count1);
 
   // Application of 2 operators: convection & diffusion
+  // STEP 3: Convection operator
+  // STEP 4: Diffusion operator
+  // Convection and diffusion are dealt with in the standard way;
+  // diffusion can be implicited.
+  // rhoCp is used for convection.
+  // vitesse_convection_ is used for convection.
   DoubleTab& temperature = inconnue().valeur().valeurs();
   derivee = 0.;
 
-  //GB: 2020.08.21 : Test updating the past temperature with the extension :
-  // 2022: Not conclusive I believe
-  if (0)
-    {
-      DoubleTab& temperature_passe = inconnue().passe();
-      temperature_passe = temperature;
-    }
   // STEP 3: Diffusion operator
   //  static const Stat_Counter_Id count2 = statistiques().new_counter(1, "terme_diffusif_T", 0);
   //  statistiques().begin_count(count2);
-  terme_diffusif.ajouter(temperature, derivee);
+  bool calcul_explicite = false;
+  if (parametre_equation_.non_nul() && sub_type(Parametre_implicite, parametre_equation_.valeur()))
+    {
+      Parametre_implicite& param2 = ref_cast(Parametre_implicite, parametre_equation_.valeur());
+      calcul_explicite = param2.calcul_explicite();
+    }
+
+  if (schema_temps().diffusion_implicite() && !calcul_explicite)
+    {
+      // do it later?
+    }
+  else
+    {
+      terme_diffusif.ajouter(temperature, derivee);
+    }
   //  statistiques().end_count(count2);
   const int nb_diffu=mixed_elems_.size_array();
   // const double temps = schema_temps().temps_courant();
@@ -1146,6 +1310,21 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   //  statistiques().end_count(count3);
 
   solveur_masse.appliquer(derivee);
+  if (schema_temps().diffusion_implicite() && !calcul_explicite)
+    {
+      Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco_eq_base(derivee);
+      //    Invalide sur fluide_dipha_
+      // const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
+      // Donc imposs d'appeler :
+      //Convection_Diffusion_Temperature::derivee_en_temps_inco_eq_base(derivee);
+      return derivee;
+    }
+  else
+    {
+      // TODO : J'aimerais bien deplacer la diffusion explicite la aussi.
+      //        Il faut juste revoir les boucles pour deplacer le lost_fluxes associes ici aussi
+      // terme_diffusif.ajouter(temperature, derivee);
+    }
 
   // To remove duplicates in the list of mixed_elems (some elements are there several times, twice (conv+diff) for each face-to-pure-liquid)
   collect_into_unique_occurence(mixed_elems_, lost_fluxes_);
@@ -1428,6 +1607,7 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
 }
 
 // Pour que milieu().mettre_a_jour(temps) ne plante pas...
+// Et d'autres comme diffusivite_pour_transport...
 Milieu_base& Convection_Diffusion_Temperature_FT_Disc::milieu()
 {
   if (!fluide_dipha_.non_nul())

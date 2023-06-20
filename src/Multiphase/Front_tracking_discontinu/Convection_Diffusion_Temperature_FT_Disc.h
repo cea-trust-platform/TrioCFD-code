@@ -44,7 +44,9 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual void preparer_pas_de_temps(void);
   virtual void corriger_pas_de_temps(double dt);
+  void compute_divergence_free_velocity_extension();
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
+  DoubleTab&   derivee_en_temps_inco_eq_base(DoubleTab&);
   void         mettre_a_jour(double temps) override;
   int preparer_calcul() override;
   double get_flux_to_face(const int num_face) const;
