@@ -1366,7 +1366,7 @@ void IJK_Interfaces::calculer_kappa_ft(IJK_Field_double& kappa_ft)
             {
               const int num_som = facettes(fa7, isom);
               const double kappa = courbure[num_som];
-              kappa_ft(ijk[0],ijk[1],ijk[2]) += kappa*surf;
+              kappa_ft(ijk[0],ijk[1],ijk[2]) += kappa*surf/3.;
             }
           SI_ft(ijk[0],ijk[1],ijk[2]) += surf;
           index = data.index_element_suivant_;
