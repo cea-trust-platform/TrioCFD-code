@@ -1,0 +1,51 @@
+#!/bin/bash
+base=FTD_Boussinesq_Implicite_BidimAxi
+
+jdd1=${base}_rho_g_Texplicite
+#cp -f ${base}.data $jdd1.data
+
+jdd2=${base}_rho_g_Timplicite_lowDT
+#sed -e "s///" \
+#       $jdd1.data > $jdd2.data
+
+jdd3=${base}_rho_g_Timplicite
+sed -e "s/ dt_max .*/ dt_max 0.1/" \
+    -e "s/rho_g_Timplicite_lowDT/rho_g_Timplicite/" \
+       $jdd2.data > $jdd3.data
+       
+jdd4=${base}_grad_I_Timplicite
+sed -e "s/rho_g/grad_I/" \
+       $jdd3.data > $jdd4.data
+       
+
+jdd5=${base}_rho_g_repr1
+sed -e "s/tinit .*/   tinit 1.5 # On va faire 5dt pour trouver la meme solution en reprise #/" \
+    -e "/reprise binaire rho_g.sauv/s/#//g" \
+    -e "/vitesse champ_uniforme/d" \
+    -e "/Champ_Fonc_xyz/d" \
+    -e "s/rho_g_Timplicite/repr1/g" \
+       $jdd3.data > $jdd5.data
+              
+jdd6=${base}_rhog_repr2
+sed -e "/reprise binaire rho_g.sauv/d" \
+    -e "/Champ_Fonc_Med/s/#//g" \
+    -e "/loc elem/s/#//g" \
+    -e "s/repr1/repr2/g" \
+       $jdd5.data > $jdd6.data
+
+echo "prepare has generated the datafiles and is running some of the calculations..."
+trust $jdd1 1>$jdd1.out 2>$jdd1.err || exit -1
+echo "End of $jdd1"
+trust $jdd2 1>$jdd2.out 2>$jdd2.err || exit -2
+echo "End of $jdd2"
+trust $jdd3 1>$jdd3.out 2>$jdd3.err || exit -3
+echo "End of $jdd3"
+trust $jdd4 1>$jdd4.out 2>$jdd4.err || (echo "Failure of $jdd4. Stopping" && exit -4)
+echo "End of $jdd4"
+trust $jdd5 1>$jdd5.out 2>$jdd5.err || (echo "Failure of $jdd5. Stopping" && exit -5)
+echo "End of $jdd5"
+trust $jdd6 1>$jdd6.out 2>$jdd6.err || (echo "Failure of $jdd6. Stopping" && exit -6)
+echo "End of $jdd6"
+
+
+
