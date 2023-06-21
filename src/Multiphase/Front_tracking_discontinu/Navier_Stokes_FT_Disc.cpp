@@ -2760,9 +2760,16 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
               Cerr << "Trying to use Boussinesq approximation on a 2phase flow in VEF? Not yet available. Ask TRUST support." << finl;
               Process::exit();
             }
-          for (int face=0; face<n; face++)
-            for (int dim=0; dim<m; dim++)
-              gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
+          if (variables_internes().terme_gravite_ == Navier_Stokes_FT_Disc_interne::GRAVITE_RHO_G)
+            {
+              for (int face=0; face<n; face++)
+                for (int dim=0; dim<m; dim++)
+                  gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
+            }
+          else
+            {
+              gravite_face = 0.; // En gradI, on ne prend pas directement la gravite
+            }
         }
       solveur_masse.appliquer(gravite_face);
     }
