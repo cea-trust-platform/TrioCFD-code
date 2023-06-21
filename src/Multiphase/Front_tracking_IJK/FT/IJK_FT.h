@@ -455,11 +455,6 @@ protected :
 
   // Pressure field
   IJK_Field_double pressure_;
-  // Pressure field
-  IJK_Field_double pressure_l_;
-  // Pressure field
-  IJK_Field_double pressure_v_;
-  IJK_Field_double p_interpol_error_;
   IJK_Field_double kappa_ft_;
   IJK_Field_double kappa_ft_ns_;
   // Molecular diffusivity (see diffusion operator)

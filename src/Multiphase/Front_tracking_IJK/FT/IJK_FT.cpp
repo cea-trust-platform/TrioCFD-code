@@ -1454,13 +1454,6 @@ int IJK_FT_double::initialise()
       Cout << "Initialisation pression \nPini = " << expression_pression_initiale_ << finl;
       set_field_data(pressure_, expression_pression_initiale_);
       pressure_.echange_espace_virtuel(pressure_.ghost());
-      set_field_data(pressure_l_, expression_pression_initiale_);
-      pressure_l_.echange_espace_virtuel(pressure_l_.ghost());
-      set_field_data(pressure_v_, expression_pression_initiale_);
-      pressure_v_.echange_espace_virtuel(pressure_v_.ghost());
-      set_field_data(p_interpol_error_, expression_pression_initiale_);
-      p_interpol_error_.echange_espace_virtuel(p_interpol_error_.ghost());
-
     }
 
 
@@ -1946,9 +1939,6 @@ void IJK_FT_double::run()
     {
       pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
     }
-  pressure_l_.allocate(splitting_, IJK_Splitting::ELEM, 3);
-  pressure_v_.allocate(splitting_, IJK_Splitting::ELEM, 3);
-  p_interpol_error_.allocate(splitting_, IJK_Splitting::ELEM, 3);
 
   if (include_pressure_gradient_in_ustar_)
     {
@@ -2671,10 +2661,6 @@ void IJK_FT_double::run()
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
-
-      // uniquement pour post-traitement --> pas top, oblige dallouer de nouveaux tableaux...
-      if (!disable_diphasique_)
-        update_pressure_phase();
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -3866,15 +3852,6 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 #endif
     {
 
-      // advecter le champ de vitesse fluctuantes par le champ de vitesse moyen cisaille pendant la duree du pas de temps
-      // a n'utiliser que si on resoud le systeme en u' et pas en U.
-      // on n'advecte pas la pression car ce n'est pas une grandeur transportée
-      // if (resolution_fluctuations_)
-      //{
-      //velocity_[0].change_to_sheared_reference_frame(1., 1, 0);
-      //velocity_[1].change_to_sheared_reference_frame(1., 2, 0);
-      //velocity_[2].change_to_sheared_reference_frame(1., 3, 0);
-      //}
       //statistiques().begin_count(projection_counter_);
       if (include_pressure_gradient_in_ustar_)
         {
@@ -4175,10 +4152,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     // si on resoud en u', il faut ajouter le cisaillement moyen au champ de vitesse avant de convecter les marqueurs
     // sinon on perd une partie du mouvement de la bulle.
     // apres transporter_maillage, on retourne au champ de vitesse u'
-    if(boundary_conditions_.get_resolution_u_prime_())
-      {
-        velocity_[0].change_to_u_prime_to_u(1,  0, boundary_conditions_.get_dU_perio());
-      }
+
     redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
     redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
     redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
@@ -4209,31 +4183,6 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
 
-
-  if(boundary_conditions_.get_resolution_u_prime_())
-    {
-      velocity_[0].change_to_u_prime_to_u(-1,  0 , boundary_conditions_.get_dU_perio());
-
-      redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
-      redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
-      redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-
-      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
-      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
-
-      for (int dir = 0; dir < 3; dir++)
-        {
-          if (dir==0)
-            {
-              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-            }
-          else
-            {
-              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-            }
-        }
-    }
 
   // Apres le transport, est-ce que certaines bulles reeles sont trop proche du bord
   // du domaine etendu? Si on en trouve, on les transferts :
@@ -4292,10 +4241,6 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   statistiques().begin_count(deplacement_interf_counter_);
 
 
-  if(boundary_conditions_.get_resolution_u_prime_())
-    {
-      velocity_[0].change_to_u_prime_to_u(1,  0, boundary_conditions_.get_dU_perio());
-    }
   redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
   redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
   redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
@@ -4323,31 +4268,6 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
-
-  if(boundary_conditions_.get_resolution_u_prime_())
-    {
-      velocity_[0].change_to_u_prime_to_u(-1,  0 , boundary_conditions_.get_dU_perio());
-
-      redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
-      redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
-      redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-
-      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
-      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
-
-      for (int dir = 0; dir < 3; dir++)
-        {
-          if (dir==0)
-            {
-              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-            }
-          else
-            {
-              velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-            }
-        }
-    }
 
   statistiques().end_count(deplacement_interf_counter_);
   // On verra a la fin du pas de temps si certaines bulles reeles sont trop proche du bord
@@ -4506,32 +4426,6 @@ void IJK_FT_double::update_rho_v()
       calculer_rho_v(rho_field_, velocity_, rho_v_);
     }
 }
-
-
-void IJK_FT_double::update_pressure_phase()
-{
-// pour post-traitement uniquement
-// a supprimer quand option fonctionnelle, ainsi que les variables pressure_l et pressure_v
-  const int ni = pressure_.ni();
-  const int nj = pressure_.nj();
-  const int nk = pressure_.nk();
-
-  for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              pressure_l_(i,j,k) = pressure_.get_projection_liquide()(i,j,k);
-              pressure_v_(i,j,k) = pressure_.get_projection_vapeur()(i,j,k);
-            }
-        }
-    }
-
-
-}
-
-
 
 
 // Transfert du maillage ft vers ns de champs aux faces :
