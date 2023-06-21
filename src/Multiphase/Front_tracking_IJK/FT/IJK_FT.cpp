@@ -1508,7 +1508,6 @@ int IJK_FT_double::initialise()
     }
   interfaces_.calculer_kappa_ft(kappa_ft_);
   calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
@@ -1564,7 +1563,6 @@ int IJK_FT_double::initialise()
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
   calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
 
@@ -4219,8 +4217,8 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
   calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+
   pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
 
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
@@ -4297,7 +4295,6 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
   calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  //pressure_.update_indicatrice(interfaces_.I_ft(), ijk_splitting_ft_extension_);
   pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);

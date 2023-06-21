@@ -457,6 +457,7 @@ protected :
   IJK_Field_double pressure_;
   IJK_Field_double kappa_ft_;
   IJK_Field_double kappa_ft_ns_;
+  IJK_Field_double I_ns_;
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver
