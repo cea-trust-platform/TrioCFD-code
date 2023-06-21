@@ -1657,9 +1657,16 @@ void Transport_Interfaces_FT_Disc::preparer_pas_de_temps(void)
 
 double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
 {
-  // We should think of implementing it as in eq. 16 for instance:
+  // TODO:
+// We should think of implementing it as in eq. 16 for instance:
   // https://hal.archives-ouvertes.fr/hal-02304125/document
   // and use the Lagrangian min edge length instead of Delta_x.
+  //
+  // Ou encore :
+  // Par ailleurs du fait de la contrainte sur le pas de temps capillaire (Popinet 2009) cette approche connait également des limites (Pierson 2021). En effet, quand les films deviennent suffisamment minces, et que les cellules composant le film sont suffisamment petites, le pas de temps nécessaire au calcul décroît drastiquement, comme la taille des cellules à la puissance trois-demi.
+  // Pierson, J. (2021). Numerical study of drop bouncing on a fluid-fluid interface. ICTAM, Milan.
+  // Popinet, S. (2020). A vertically-Lagrangian, non-hydrostatic, multilayer model for multiscale free-surface flows. Journal of Computational Physics, 109609
+  //
   return DMAXFLOAT;
 }
 

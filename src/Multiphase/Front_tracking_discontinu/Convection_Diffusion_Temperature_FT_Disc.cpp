@@ -152,7 +152,7 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
   else if (mot=="diffusion")
     {
       if (je_suis_maitre())
-        Cerr << " Equation_Concentration_FT::lire diffusivite" << finl;
+        Cerr << " "<< que_suis_je() <<"::lire diffusivite" << finl;
       // Need phase to know which diffusivity to use:
       if (phase_ < 0)
         {
@@ -166,7 +166,7 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
   else if (mot=="convection")
     {
       if (je_suis_maitre())
-        Cerr << " Equation_Concentration_FT::lire convection" << finl;
+        Cerr <<  " "<< que_suis_je() <<"::lire convection" << finl;
       if (!ref_eq_ns_.non_nul())
         {
           barrier();
@@ -211,7 +211,11 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
 
 const Champ_base& Convection_Diffusion_Temperature_FT_Disc::vitesse_pour_transport() const
 {
-  return ref_eq_ns_.valeur().vitesse();
+  // return ref_eq_ns_.valeur().vitesse();
+  // GB 2019.03.07 (code lost between 2022.02.16 and 2023.06.20!!)
+  // We will go through all the effort of creating a continous velocity from the unknown of NS!
+  // We might as well use it! ;-)
+  return vitesse_convection_;
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::preparer_pas_de_temps(void)
