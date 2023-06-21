@@ -14,13 +14,13 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_VEF_Face_base.h
+// File      : Source_Transport_K_Omega_VEF_Face_base.h
 // Directory : $TURBULENCE_ROOT/src/Specializations/VEF/Sources/RANS/Base
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_VEF_K_Omega_Face_base_included
-#define Source_Transport_VEF_K_Omega_Face_base_included
+#ifndef Source_Transport_K_Omega_VEF_Face_base_included
+#define Source_Transport_K_Omega_VEF_Face_base_included
 
 #include <Calcul_Production_K_VEF.h>
 #include <Source_Transport_proto.h>
@@ -30,12 +30,12 @@ class Transport_K_Omega;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-class Source_Transport_VEF_K_Omega_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
+class Source_Transport_K_Omega_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
 {
-  Declare_base_sans_constructeur(Source_Transport_VEF_K_Omega_Face_base);
+  Declare_base_sans_constructeur(Source_Transport_K_Omega_VEF_Face_base);
 public :
-  Source_Transport_VEF_K_Omega_Face_base() { }
-  Source_Transport_VEF_K_Omega_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
+  Source_Transport_K_Omega_VEF_Face_base() { }
+  Source_Transport_K_Omega_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
   void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
@@ -51,6 +51,14 @@ protected :
   REF(Domaine_VEF) le_dom_VEF;
   REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
+  // Constants for the classic k-omega model Wilcox 1988
+  static constexpr double BETA_K = 0.09; // Cmu or BETA_STAR, but clearer with _K
+  static constexpr double BETA_OMEGA = 3./40.; // BETA
+  static constexpr double SIGMA_K = 0.5; // SIGMA_STAR
+  static constexpr double SIGMA_OMEGA = 0.5; // SIGMA
+  static constexpr double ALPHA_OMEGA = 5./9.; // ALPHA
+
+
 private:
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
@@ -61,4 +69,4 @@ private:
   virtual void fill_resu(const DoubleVect&, const DoubleTrav&, DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
-#endif /* Source_Transport_VEF_K_Omega_Face_base_included */
+#endif /* Source_Transport_K_Omega_VEF_Face_base_included */

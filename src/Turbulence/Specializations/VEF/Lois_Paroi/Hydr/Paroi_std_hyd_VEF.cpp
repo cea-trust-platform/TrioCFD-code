@@ -1190,7 +1190,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                       tab_2eq(num[nf], 0) = 0.;
                       if (turbulence_model_type == 1) // second equation is epsilon
                         tab_2eq(num[nf], 1) = 0.;
-                      else if (turbulence_model_type == 1) // second equation is omega
+                      else if (turbulence_model_type == 2) // second equation is omega
                         {
                           // cAlan : c'est sale car on reprendre la valeur de d_visco et de dist de l'itération précédente. A améliorer quand on optimisera cette fonction.
                           assert(dist > 0); // on vérifie quand même que dist n'est pas nulle...

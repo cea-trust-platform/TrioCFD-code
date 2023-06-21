@@ -303,7 +303,7 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
   if (equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
-  // loipar.calculer_hyd(ch_K_Omega);
+  loipar.calculer_hyd(ch_K_Omega);
   eqn_transp_K_Omega().controler_K_Omega();
   calculer_viscosite_turbulente(ch_K_Omega.temps());
   limiter_viscosite_turbulente();
@@ -351,7 +351,9 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   if (equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
-  // loipar.calculer_hyd(ch_K_Omega);
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour loiparoi before", 0);
+  loipar.calculer_hyd(ch_K_Omega);
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour loiparoi after", 1);
   eqn_transp_K_Omega().controler_K_Omega();
   calculer_viscosite_turbulente(ch_K_Omega.temps());
   limiter_viscosite_turbulente();

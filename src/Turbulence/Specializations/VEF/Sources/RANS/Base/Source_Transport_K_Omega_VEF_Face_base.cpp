@@ -14,14 +14,14 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_VEF_K_Omega_Face_base.cpp
+// File      : Source_Transport_K_Omega_VEF_Face_base.cpp
 // Directory : $TURBULENCE_ROOT/src/Specializations/VEF/Sources/RANS/Base
 //
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
-#include <Source_Transport_VEF_K_Omega_Face_base.h>
+#include <Source_Transport_K_Omega_VEF_Face_base.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Champ_Uniforme.h>
 #include <Constituant.h>
@@ -30,29 +30,29 @@
 #include <Champ_P1NC.h>
 #include <Domaine_VEF.h>
 
-Implemente_base_sans_constructeur(Source_Transport_VEF_K_Omega_Face_base,
-                                  "Source_Transport_VEF_K_Omega_Face_base",
+Implemente_base_sans_constructeur(Source_Transport_K_Omega_VEF_Face_base,
+                                  "Source_Transport_K_Omega_VEF_Face_base",
                                   Source_base);
 
-Sortie& Source_Transport_VEF_K_Omega_Face_base::printOn(Sortie& os) const { return os << que_suis_je(); }
+Sortie& Source_Transport_K_Omega_VEF_Face_base::printOn(Sortie& os) const { return os << que_suis_je(); }
 
-Entree& Source_Transport_VEF_K_Omega_Face_base::readOn(Entree& is) { return Source_Transport_proto::readOn_proto(is, que_suis_je()); }
+Entree& Source_Transport_K_Omega_VEF_Face_base::readOn(Entree& is) { return Source_Transport_proto::readOn_proto(is, que_suis_je()); }
 
-void Source_Transport_VEF_K_Omega_Face_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_K_Omega_VEF_Face_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
 {
   le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis.valeur());
   le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
 }
 
-void Source_Transport_VEF_K_Omega_Face_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
+void Source_Transport_K_Omega_VEF_Face_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
 
-DoubleTab& Source_Transport_VEF_K_Omega_Face_base::calculer(DoubleTab& resu) const
+DoubleTab& Source_Transport_K_Omega_VEF_Face_base::calculer(DoubleTab& resu) const
 {
   resu = 0.;
   return ajouter(resu);
 }
 
-DoubleTab& Source_Transport_VEF_K_Omega_Face_base::ajouter_komega(DoubleTab& resu) const
+DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& resu) const
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,
                                                   eq_hydraulique->domaine_Cl_dis().valeur());

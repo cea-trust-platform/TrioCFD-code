@@ -727,7 +727,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   const Domaine_VEF& domaine_VEF,
   const Domaine_Cl_VEF& zcl_VEF,
   DoubleTab& G,
-  const DoubleTab& inconnue,
+  const DoubleTab& inconnue, // scalar, concentration, temperature, etc.
   const DoubleTab& alpha_turb,
   const Champ_Don& ch_beta,
   const DoubleVect& gravite,

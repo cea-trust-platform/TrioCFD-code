@@ -99,13 +99,13 @@ protected:
  */
 inline void Paroi_std_hyd_VEF::check_turbulence_model()
 {
-  if (sub_type(Modele_turbulence_hyd_K_Eps, mon_modele_turb_hyd.valeur()))
-    turbulence_model_type = 1;
-  else if (sub_type(Modele_turbulence_hyd_K_Omega, mon_modele_turb_hyd.valeur()))
+  turbulence_model_type = 1;
+  // if (sub_type(Modele_turbulence_hyd_K_Eps, mon_modele_turb_hyd.valeur()))
+  // turbulence_model_type = 1;
+  if (sub_type(Modele_turbulence_hyd_K_Omega, mon_modele_turb_hyd.valeur()))
     turbulence_model_type = 2;
-  else
-    Process::exit("The turbulence model should either be K_Eps or K_Omega");
-  return;
+  // else
+  // Process::exit("The turbulence model should either be K_Eps or K_Omega");
 }
 
 /*! @brief cette classe permet de specifier des options a la loi de paroi standard.
