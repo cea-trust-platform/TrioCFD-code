@@ -53,7 +53,7 @@ Equation_base::Equation_base()
   ecrit_champ_xyz_bin=0;
   sys_invariant_=1;
   implicite_=-1;
-  has_time_factor_=0;
+  has_time_factor_=false;
   champs_compris_.ajoute_nom_compris("volume_maille");
   Nom expr_equation_non_resolue="0";
   equation_non_resolue_.setNbVar(1);

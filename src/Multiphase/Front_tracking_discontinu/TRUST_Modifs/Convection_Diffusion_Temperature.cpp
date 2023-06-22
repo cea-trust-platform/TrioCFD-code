@@ -403,7 +403,7 @@ double Convection_Diffusion_Temperature::get_time_factor() const
 // ajoute les contributions des operateurs et des sources
 void Convection_Diffusion_Temperature::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
-  const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
+  const double rhoCp = get_time_factor();
 
   // Test de verification de la methode contribuer_a_avec
   for (int op=0; op<nombre_d_operateurs(); op++)
@@ -496,8 +496,7 @@ void Convection_Diffusion_Temperature::assembler_blocs(matrices_t matrices, Doub
       Equation_base::assembler_blocs(matrices, secmem, semi_impl);
       return;
     }
-  const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
-
+  const double rhoCp = get_time_factor();
   /* mise a zero */
   secmem = 0;
   for (auto &&i_m : matrices) i_m.second->get_set_coeff() = 0;
@@ -593,7 +592,7 @@ void Convection_Diffusion_Temperature::set_indic_pena_globale()
 void Convection_Diffusion_Temperature::transport_ibc(DoubleTrav& secmem_conv_vr, DoubleTab& inco_conv_vr)
 {
   secmem_conv_vr = 0.;
-  const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
+  const double rhoCp = get_time_factor();
 
   //fonction characteristique globale ibc au temps courant
   set_indic_pena_globale();
