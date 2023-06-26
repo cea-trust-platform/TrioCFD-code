@@ -1505,9 +1505,13 @@ int IJK_FT_double::initialise()
       );
     }
   interfaces_.calculer_kappa_ft(kappa_ft_);
-  calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+  if(boundary_conditions_.get_correction_interp_monofluide())
+    {
+      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+    }
+
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
     inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
@@ -1559,11 +1563,12 @@ int IJK_FT_double::initialise()
         }
     }
   interfaces_.calculer_kappa_ft(kappa_ft_);
-
-  calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
-
+  if(boundary_conditions_.get_correction_interp_monofluide())
+    {
+      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+    }
 
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
@@ -1926,7 +1931,7 @@ void IJK_FT_double::run()
     }
 
   // allocation d'une pression monofluide avec des tableau de projection liquide et vapeur
-  if (!disable_diphasique_)
+  if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
       pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, 1, rho_vapeur_, rho_liquide_);
 
@@ -1950,9 +1955,20 @@ void IJK_FT_double::run()
   molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
-  rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
-  if (use_inv_rho_)
-    inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
+
+  if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
+    {
+      rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
+      if (use_inv_rho_)
+        inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
+    }
+  else
+    {
+      rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+      if (use_inv_rho_)
+        inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+    }
+
   //  rho_batard_.allocate(splitting_, IJK_Splitting::ELEM, 2);
 
   if (diffusion_alternative_)
@@ -4214,10 +4230,12 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // mise a jour de l'indicatrice pour les variables monofluides
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
-  calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-
-  pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+  if(boundary_conditions_.get_correction_interp_monofluide())
+    {
+      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+    }
 
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
@@ -4292,9 +4310,13 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   );
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
-  calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-  pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+  if(boundary_conditions_.get_correction_interp_monofluide())
+    {
+      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+    }
+
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
     inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
