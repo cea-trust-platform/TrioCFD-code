@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
+19/06/23 (TRUST) Portability   : C++14 compilers are now mandatory so old GNU compilers (<5.0) are not supported anymore
 15/06/23 (TrioCFD) Bug fix     : FSI - Fix periodic boundary conditions in ALE module
 
 --------------------------------------------------------------------------------------------------
