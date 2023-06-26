@@ -43,7 +43,6 @@
 #include <Force_sp.h>
 #include <Force_ph.h>
 
-
 #define COMPLEMENT_ANTI_DEVIATION_RESIDU
 // #define VARIABLE_DZ
 //#define PROJECTION_DE_LINCREMENT_DV
@@ -1464,7 +1463,6 @@ int IJK_FT_double::initialise()
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
 
-
   nalloc += post_.initialise(reprise_);
 
   // statistiques...
@@ -2170,7 +2168,7 @@ void IJK_FT_double::run()
 
               if (use_inv_rho_in_poisson_solver_)
                 {
-                  inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+                  //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
                                                    1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
@@ -3870,7 +3868,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
           if (use_inv_rho_in_poisson_solver_)
             {
-              inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+              //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
                                                pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
@@ -3902,7 +3900,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         {
           if (use_inv_rho_in_poisson_solver_)
             {
-              inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+              //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
                                                pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
@@ -4056,7 +4054,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           Cerr << "Methode basee sur inv rho pour le grad(P) en RK3" << finl;
           Cerr << " Option a tester si besoin. " << finl;
           //Process::exit();
-          inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+          //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
                                            pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
