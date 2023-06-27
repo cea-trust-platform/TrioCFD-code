@@ -31,6 +31,10 @@ compare_lata ./ref/rho_g_Timplicite.lata lata/repr1.lata --seuil 1.e-6 --dernier
 compare_lata ./ref/rho_g_Timplicite.lata lata/repr2.lata --seuil 1.e-6 --dernier
 [ $? -ne 0 ] && echo "Failure of compare_lata between rho_g and repr2 (by reloading from med) in $PWD" && ko=1
 
+# Calcul pour verifier la reprise du champ de Temperature et de vitesse par relecture d'un med :
+compare_lata ./ref/rho_g_Timplicite.lata lata/repr3.lata --seuil 1.e-6 --dernier
+[ $? -ne 0 ] && echo "Failure of compare_lata between rho_g and repr3 (by reloading from med on faces) in $PWD" && ko=1
+
 
 
 exit $ko

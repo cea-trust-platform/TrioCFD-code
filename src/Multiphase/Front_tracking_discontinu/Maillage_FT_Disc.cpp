@@ -4094,17 +4094,36 @@ int Maillage_FT_Disc::check_mesh(int error_is_fatal, int skip_facette_pe, int sk
                   double copie = coord_facettes(i, n++);
                   if (original != copie)
                     {
-                      Journal() << "Erreur facette " << i << " sommet " << j;
+                      Journal() << "Erreur facette " << i << " sommet " << j << " direction " << k;
                       Journal() << "   " << original << " != " << copie << finl;
                       printFa7(i,1,Journal());
                       Journal() <<" Fa7 orig ="<<finl;
-                      Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) << " " << coord_facettes(i, 2) << finl;
-                      Journal() << " som1= " << coord_facettes(i, 3) << " " << coord_facettes(i, 4) << " " << coord_facettes(i, 5) << finl;
-                      Journal() << " som2= " << coord_facettes(i, 6) << " " << coord_facettes(i, 7) << " " << coord_facettes(i, 8) << finl;
+                      if (Objet_U::dimension ==3)
+                        {
+                          Journal() << " som0= " << sommets_(i, 0) << " " << sommets_(i, 1) << " " << sommets_(i, 2) << finl;
+                          Journal() << " som1= " << sommets_(i, 3) << " " << sommets_(i, 4) << " " << sommets_(i, 5) << finl;
+                          Journal() << " som2= " << sommets_(i, 6) << " " << sommets_(i, 7) << " " << sommets_(i, 8) << finl;
+                        }
+                      else
+                        {
+                          Journal() << " som0= " << sommets_(i, 0) << " " << sommets_(i, 1) <<finl;
+                          Journal() << " som1= " << sommets_(i, 2) << " " << sommets_(i, 3) << finl;
+                        }
+                      Journal() <<" Fa7 copie ="<<finl;
+                      if (Objet_U::dimension ==3)
+                        {
+                          Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) << " " << coord_facettes(i, 2) << finl;
+                          Journal() << " som1= " << coord_facettes(i, 3) << " " << coord_facettes(i, 4) << " " << coord_facettes(i, 5) << finl;
+                          Journal() << " som2= " << coord_facettes(i, 6) << " " << coord_facettes(i, 7) << " " << coord_facettes(i, 8) << finl;
+                        }
+                      else
+                        {
+                          Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) <<finl;
+                          Journal() << " som1= " << coord_facettes(i, 2) << " " << coord_facettes(i, 3) << finl;
+                        }
                       if (error_is_fatal)
                         {
-                          assert(0);
-                          exit();
+                          Process::exit();
                         }
                       return_code = 0;
                     }

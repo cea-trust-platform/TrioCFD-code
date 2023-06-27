@@ -24,28 +24,38 @@ sed -e "s/tinit .*/   tinit 1.5 # On va faire 5dt pour trouver la meme solution 
     -e "/vitesse champ_uniforme/d" \
     -e "/Champ_Fonc_xyz/d" \
     -e "s/rho_g_Timplicite/repr1/g" \
+    -e "s/sauvegarde binaire rho_g.sauv/sauvegarde binaire repr1.sauv/" \
        $jdd3.data > $jdd5.data
               
-jdd6=${base}_rhog_repr2
+jdd6=${base}_rho_g_repr2
 sed -e "/reprise binaire rho_g.sauv/d" \
     -e "/Champ_Fonc_Med/s/#//g" \
     -e "/loc elem/s/#//g" \
     -e "s/repr1/repr2/g" \
+    -e "s#file med.*#file med/rho_g_Timplicite.med#g" \
        $jdd5.data > $jdd6.data
 
+jdd7=${base}_rhog_repr3
+sed -e "s/repr2/repr3/g" \
+    -e "s#file med.*#file med/rho_g_Timplicite.med#g" \
+    -e "s/VITESSE_ELEM_dom/VITESSE_FACES_dom/" \
+       $jdd6.data > $jdd7.data
+       
 echo "prepare has generated the datafiles and is running some of the calculations..."
-trust $jdd1 1>$jdd1.out 2>$jdd1.err || exit -1
+trust $jdd1 1>$jdd1.out 2>$jdd1.err || exit 1
 echo "End of $jdd1"
-trust $jdd2 1>$jdd2.out 2>$jdd2.err || exit -2
+trust $jdd2 1>$jdd2.out 2>$jdd2.err || exit 2
 echo "End of $jdd2"
-trust $jdd3 1>$jdd3.out 2>$jdd3.err || exit -3
+trust $jdd3 1>$jdd3.out 2>$jdd3.err || exit 3
 echo "End of $jdd3"
-trust $jdd4 1>$jdd4.out 2>$jdd4.err || (echo "Failure of $jdd4. Stopping" && exit -4)
+trust $jdd4 1>$jdd4.out 2>$jdd4.err || (echo "Failure of $jdd4. Stopping" && exit 4)
 echo "End of $jdd4"
-trust $jdd5 1>$jdd5.out 2>$jdd5.err || (echo "Failure of $jdd5. Stopping" && exit -5)
+trust $jdd5 1>$jdd5.out 2>$jdd5.err || (echo "Failure of $jdd5. Stopping" && exit 5)
 echo "End of $jdd5"
-trust $jdd6 1>$jdd6.out 2>$jdd6.err || (echo "Failure of $jdd6. Stopping" && exit -6)
+trust $jdd6 1>$jdd6.out 2>$jdd6.err || (echo "Failure of $jdd6. Stopping" && exit 6)
 echo "End of $jdd6"
+trust $jdd7 1>$jdd7.out 2>$jdd7.err || (echo "Failure of $jdd7. Stopping" && exit 7)
+echo "End of $jdd7"
 
 
 
