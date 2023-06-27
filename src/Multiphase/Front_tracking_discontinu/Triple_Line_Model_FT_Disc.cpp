@@ -1025,6 +1025,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // 1. First loop on contact line cells:
   {
     int fa7;
+    // IF 2D: LOOP over all sub-lines of L-G interface
     const int nb_facettes = maillage.nb_facettes();
     for (fa7 = 0; fa7 < nb_facettes; fa7++)
       {
@@ -1044,7 +1045,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             // We have a contact line in this cell...
             // In most cases, contact line will come to a sum of 2,
             // but in corners, or a 1-cell channel, it can be 3.
-            //
+            // DO NOT ALLOW TWO SOMMETS AT BOUNDRAY ( CAN HAPPEN FOR SAMLL ANGLE ?)
             int num_bc_face=-1;
             int num_som = 0;
             if (tcl_s0)
@@ -1070,6 +1071,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             Cerr << que_suis_je() << "::derivee_en_temps_inco() computing contrib at TCL. CL "
                  << la_cl.valeur();// << finl;
             // For each BC, we check its type to see if it's a wall:
+            // BC for hydraulic equation
             if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur())
                  || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
               {
