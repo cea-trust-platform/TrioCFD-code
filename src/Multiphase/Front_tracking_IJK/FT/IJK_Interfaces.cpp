@@ -2130,7 +2130,8 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
               // Ne fonctionnera pas pour des bulles descendantes...
               // Idem donc pour la bulle ghost
               double decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[iconnex]-position_xmin_compo[iconnex]); // verifier si cest ca la valeur
-              // assure une position entre db et Lx + db
+              // assure une position entre db et Lx + db --> vrai que pour une bulle qui monte....
+              // Si la bulle descend, risque de ne pas fonctionner --> il faudrait assurer une position entre -db et Lx+db ?
               double pos = std::fmod(std::fmod(pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
               // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
               coord += (pos - pos_ref);
@@ -2208,7 +2209,7 @@ void IJK_Interfaces::creer_duplicata_bulles()
 //            Dans les 2 cas, on ne retiendra dans code_deplacement que
 //            l'encodage pure du deplacement.
 // Retourne 0, -1 ou +1 selon le deplacement necessaire dans la direction dir :
-static int decoder_deplacement(const int code, const int dir, int compo_bulle_reel = 0)
+static int decoder_deplacement(const int code, const int dir, int& compo_bulle_reel)
 {
   // decodage du deplacement :
   const int code_deplacement = code & 63;        // 63 = 111111b est le  masque ne conservant que les 6 derniers bits.
@@ -2281,6 +2282,7 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
 
 //  for (int nb = 0; nb < nbulles; nb++)
 //    {
+//      std::cout << " iconnex = " << nb << std::endl;
 //      std::cout << " position_xmin_compo " << position_xmin_compo[nb] << std::endl;
 //      std::cout << " position_xmax_compo " << position_xmax_compo[nb] << std::endl;
 //    }
@@ -2295,7 +2297,8 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
           const int code = compo_sommets[i_sommet];
           // On remplit le deplacement des sommets de la facette:
 
-          // decodage du deplacement :
+          // decodage du deplacement
+          // le vrai compo_bulle_reel est lu par decoder_deplacement
           int compo_bulle_reel = 0;
           //int iconnex = compo_connex_som[i_sommet];
           int decode = decoder_deplacement(code, dir, compo_bulle_reel);
@@ -2318,20 +2321,22 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
 
 //              if (deplacement(i_sommet, 2)  != 0)
 //                {
-//                  std::cout << " " << std::endl;
-//                  std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
-//                  std::cout << " dir = "  << dir << std::endl;
-//                  std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
-//                  std::cout << " code = "  << code << std::endl;
-//                  std::cout << " decode = "  << decode << std::endl;
-//                  std::cout << " depl = "  << depl << std::endl;
-//                  std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
-//                  std::cout << " offset = "  << offset << std::endl;
-//                  std::cout << " deplacement + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel = "  << deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel << std::endl;
-//                  std::cout << " pos_ref = "  << pos_ref << std::endl;
-//                  std::cout << " Lx = "  << Lx << std::endl;
-//                  std::cout << " pos = "  << pos << std::endl;
-//                  std::cout << " decallage_bulle_reel_ext_domaine_reel = "  << decallage_bulle_reel_ext_domaine_reel << std::endl;
+//                  std::cout << " code = " << code << std::endl;
+//                  std::cout << " compo_bulle_reel = " << compo_bulle_reel << std::endl;
+////                  std::cout << " " << std::endl;
+////                  std::cout << "calculer_deplacement_from_code_compo_connexe" << std::endl;
+////                  std::cout << " dir = "  << dir << std::endl;
+////                  std::cout << " compo_bulle_reel = "  << compo_bulle_reel << std::endl;
+////                  std::cout << " code = "  << code << std::endl;
+////                  std::cout << " decode = "  << decode << std::endl;
+////                  std::cout << " depl = "  << depl << std::endl;
+////                  std::cout << " deplacement(i_sommet, 0) = "  << deplacement(i_sommet, 0) << std::endl;
+////                  std::cout << " offset = "  << offset << std::endl;
+////                  std::cout << " deplacement + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel = "  << deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel << std::endl;
+////                  std::cout << " pos_ref = "  << pos_ref << std::endl;
+////                  std::cout << " Lx = "  << Lx << std::endl;
+////                  std::cout << " pos = "  << pos << std::endl;
+////                  std::cout << " decallage_bulle_reel_ext_domaine_reel = "  << decallage_bulle_reel_ext_domaine_reel << std::endl;
 //                }
 
 
@@ -2380,7 +2385,8 @@ static void calculer_deplacement_from_code_compo_connexe_negatif(const Maillage_
           for (int dir = 0; dir < 3; dir++)
             {
               // decodage du deplacement :
-              int decode = decoder_deplacement(code, dir);
+              int unused_variable = 0 ;
+              int decode = decoder_deplacement(code, dir, unused_variable);
               double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
               deplacement(i_sommet, dir) = depl;
               // duCluzeau
@@ -2420,7 +2426,8 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
       for (int dir = 0; dir < 3; dir++)
         {
           // decodage du deplacement :
-          int decode = decoder_deplacement(code, dir);
+          int unused_variable = 0 ;
+          int decode = decoder_deplacement(code, dir, unused_variable);
           double depl = decode * (bounding_box_NS(dir,1) - bounding_box_NS(dir,0));
           for (int isom = 0; isom < 3; isom++)
             {
@@ -2789,7 +2796,7 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
           icompo = decoder_numero_bulle(compo_connexe_facettes[i_facette]);
           // Pour cette composante, quelle est la prochaine copie a faire ?
           //std::cout << "icompo = " << icompo << std::endl;
-          if(icompo != 0)
+          if(icompo < 0)
             {
               std::cout << "icompo pas normale 2 = " << icompo << " " << compo_connexe_facettes[i_facette]<< std::endl ;
               std::cout << "pas normale car encodage de literation precedente rate !" ;
@@ -3252,7 +3259,8 @@ void IJK_Interfaces::deplacer_bulle_perio(const ArrOfInt& masque_deplacement_par
           std::cout << "Deplacement x y z : ";
           for (int dir = 0; dir < 3; dir++)
             {
-              const int decode = decoder_deplacement(code_deplacement, dir);
+              int unused_variable = 0 ;
+              const int decode = decoder_deplacement(code_deplacement, dir, unused_variable);
               std::cout << decode << " ";
             }
           std::cout << std::endl;
