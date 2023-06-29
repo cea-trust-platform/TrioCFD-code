@@ -1952,18 +1952,19 @@ void IJK_FT_double::run()
   //  if (!(expression_derivee_acceleration_ == Nom("0")))
   allocate_velocity(rho_v_, splitting_, 1);
 
-  molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
 
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
+      molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, mu_vapeur_, mu_liquide_);
       rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
       if (use_inv_rho_)
         inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
     }
   else
     {
+      molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       if (use_inv_rho_)
         inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
