@@ -15,7 +15,7 @@ def getValueFromFic_triou(fic, key):
    nb=len(lines)
    rc=re.compile(key+"[\s]*(?P<value>[\-]?[\d]*.[\d]*[eE]?[+\-]?[\d]*)")
    #rc=re.compile(key+"[\s]*(?P<value>[\-]?[\d]*.[\d]*[eE]?[+\-]?[\d]*)")
-   #print fic, key, delta
+   #print(fic, key, delta)
    for i, st in enumerate(lines):
       m=rc.match(st.strip())
       if m:
@@ -746,14 +746,14 @@ if (1):
 	dxv=(x1-x0)
 	dxvt=-(inter)/rhov*dt
 	ddxvt=(dxv-dxvt)/dxvt*100
-	print dxvt
-	
+	print(dxvt)
+
 	#Verification de dx cote liquide (inutile)
 	dxl=0
 	dxl=dxv
 	dxlt=-(inter)/rhol*dt+inter*(1/rhol-1/rhov)*dt
 	ddxlt=(dxl-dxlt)/dxlt*100
-	print dxlt
+	print(dxlt)
 
 	#Definition d'un volume de controle
 	def xl(t,U):
@@ -1010,14 +1010,14 @@ if (1):
 	dxv=(x1-x0)
 	dxvt=-(inter)/rhov*dt
 	ddxvt=(dxv-dxvt)/dxvt*100
-	print dxvt
+	print(dxvt)
 	
 	#Verification de dx cote liquide (inutile)
 	dxl=0
 	dxl=dxv
 	dxlt=-(inter)/rhol*dt+inter*(1/rhol-1/rhov)*dt
 	ddxlt=(dxl-dxlt)/dxlt*100
-	print dxlt
+	print(dxlt)
 
 	#Definition d'un volume de controle
 	def xl(t,U):
