@@ -276,7 +276,6 @@ visu {
 	instruction_visit SetActivePlots((1))
 	instruction_visit m2=MeshAttributes()
 	instruction_visit m2.opaqueMode=m2.Off
-	instruction_visit m2.foregroundFlag=0
 	instruction_visit m2.meshColor=(255,0,0,255)
 	instruction_visit m2.lineWidth = 4
 	instruction_visit m2.legendFlag = 0
@@ -285,7 +284,6 @@ visu {
 	instruction_visit SetActivePlots((2))
 	instruction_visit m3=MeshAttributes()
 	instruction_visit m3.opaqueMode=m3.Off
-	instruction_visit m3.foregroundFlag=0
 	instruction_visit m3.legendFlag = 0
 	instruction_visit m3.lineWidth = 3
 	instruction_visit m3.meshColor=(0,255,0,255)

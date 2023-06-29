@@ -75,7 +75,6 @@ visu {
 	instruction_visit SetActivePlots((1))
 	instruction_visit m2=MeshAttributes()
 	instruction_visit m2.opaqueMode=m2.Off
-	instruction_visit m2.foregroundFlag=0
 	instruction_visit m2.meshColor=(255,0,0,255)
 	instruction_visit SetPlotOptions(m2)
 	normal3D 0. 1. 0.
