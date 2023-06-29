@@ -245,7 +245,7 @@ EOF
 		instruction_visit v.useStride = 1
 		instruction_visit v.stride = 1
 		instruction_visit v.scale = 0.0001
-		instruction_visit v.colorByMag = 1
+		instruction_visit v.colorByMagnitude = 1
 		instruction_visit v.useLegend = 1
 #		instruction_visit v.vectorColor = (0, 0, 0, 255)
 	   instruction_visit SetPlotOptions(v)
@@ -266,7 +266,7 @@ EOF
 		instruction_visit v.useStride = 1
 		instruction_visit v.stride = 1
 		instruction_visit v.scale = 0.0001
-		instruction_visit v.colorByMag = 1
+		instruction_visit v.colorByMagnitude = 1
 		instruction_visit v.useLegend = 1
 	        instruction_visit SetPlotOptions(v)
 		Width 5cm
