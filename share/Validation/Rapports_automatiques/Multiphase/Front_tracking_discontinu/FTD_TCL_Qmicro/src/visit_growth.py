@@ -42,7 +42,7 @@ if (ts_end>TimeSliderGetNStates()):
    pass
 
 list_ts = range(ts_start,int(ts_end),nb_ts) # On centralise ici la liste des timestep e traiter.
-print list_ts
+print(list_ts)
 
 DefineScalarExpression("xinterf", "coord(INTERFACES)[0]")
 DefineScalarExpression("yinterf", "coord(INTERFACES)[1]")
@@ -140,7 +140,7 @@ for state in list_ts:
    
    dVbdt_ana = Qcl* 2.*math.pi *xcl / (rhov*Lvap)# m3/(s)
    dVbdt_from_mpai = mpai/rhov # m3/(s)
-   print"timestep ", state, " time ", time, " xcl ", xcl, " integral(mpai) ", mpai, " Vb ", Vb, " dVbdt ", dVbdt_from_mpai, " dVbdt_ana ", dVbdt_ana
+   print("timestep ", state, " time ", time, " xcl ", xcl, " integral(mpai) ", mpai, " Vb ", Vb, " dVbdt ", dVbdt_from_mpai, " dVbdt_ana ", dVbdt_ana)
    #------------------------------------
    # Ecriture des resultats dans un fichier
    #------------------------------------

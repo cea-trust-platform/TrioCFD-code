@@ -137,7 +137,8 @@ Chapter {
 		instruction_visit VectorAtts.stride = 1
 		instruction_visit VectorAtts.scale = 0.09
 		instruction_visit VectorAtts.scaleByMagnitude = 0
-		instruction_visit VectorAtts.colorByMag = 0
+		instruction_visit try: VectorAtts.colorByMagnitude = 0
+		instruction_visit except: VectorAtts.colorByMag = 0
 		instruction_visit SetPlotOptions(VectorAtts)
 		cycles 0 -1
 		normal3D 0. 0. 1. 
@@ -164,7 +165,8 @@ Chapter {
 		instruction_visit VectorAtts.stride = 1
 		instruction_visit VectorAtts.scale = 0.4
 		instruction_visit VectorAtts.scaleByMagnitude = 1
-		instruction_visit VectorAtts.colorByMag = 1
+		instruction_visit try: VectorAtts.colorByMagnitude = 1
+		instruction_visit except: VectorAtts.colorByMag = 1
 		instruction_visit SetPlotOptions(VectorAtts)
 		cycles -1
 		normal3D 0. 0. 1. 
