@@ -57,7 +57,7 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
   param.lire_avec_accolades(s);
 
   nom_bord_oppose_=nom_bord;
-  h_paroi=1e10;
+  h_paroi=DMAXFLOAT;
   numero_T_=0;
   T_autre_pb().typer("Champ_front_calc");
   T_ext().typer("Ch_front_var_instationnaire_dep");
@@ -86,6 +86,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
   DoubleTab Texttmp(Text);
   DoubleTab Twalltmp(Text);
+  Twalltmp.detach_vect();
   int opt=0;
   calculer_h_mon_pb(mon_h,0.,opt);
   for( int n=0; n<2; n++)
@@ -96,7 +97,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
       double invhparoi=1./h_paroi;
       calculer_h_autre_pb( autre_h, invhparoi, opt);
 
-      calculer_Teta_paroi(T_wall_,mon_h,autre_h,is_pb_fluide,temps);
+      calculer_Teta_paroi(Twalltmp,mon_h,autre_h,is_pb_fluide,temps);
       calculer_Teta_equiv(Texttmp,mon_h,autre_h,is_pb_fluide,temps);
       // on a calculer Teta paroi, on peut calculer htot dans himp (= mon_h)
       int taille=mon_h.dimension(0);
