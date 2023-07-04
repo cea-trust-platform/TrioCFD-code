@@ -47,6 +47,9 @@ public :
   int reculer(double temps) override;
 protected :
   Champ_front indicatrice_;
+  // T_wall_ is defined as DoubleTab in Echange_contact_VDF
+  // Ti_wall_ temperature at wall-fluid interface
+  Champ_front Ti_wall_;
   double indicatrice_ref_;
   Nom nom_champ_indicatrice_, nom_bord_oppose_;
 };

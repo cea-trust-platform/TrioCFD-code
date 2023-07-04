@@ -31,6 +31,9 @@
 #include <Equation_base.h>
 #include <Conduction.h>
 #include <Param.h>
+#include <Interprete.h>
+#include <Probleme_FT_Disc_gen.h>
+#include <Triple_Line_Model_FT_Disc.h>
 
 
 Implemente_instanciable( Echange_contact_VDF_FT_Disc_solid, "Echange_contact_VDF_FT_Disc_solid", Echange_contact_VDF_FT_Disc ) ;
@@ -57,7 +60,7 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
   param.lire_avec_accolades(s);
 
   nom_bord_oppose_=nom_bord;
-  h_paroi=DMAXFLOAT;
+  h_paroi=1e10;
   numero_T_=0;
   T_autre_pb().typer("Champ_front_calc");
   T_ext().typer("Ch_front_var_instationnaire_dep");
@@ -79,28 +82,29 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
 
   int is_pb_fluide=0;
-  // Il faut dimensionner Twall : (car dans la classe mere, c'est fait par : calculer_Teta_paroi
-  //     alors qu'ici, on n'envoie pas Twall dans calculer_Teta_paroi)
-  const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
-  int nb_faces_bord = ma_front_vf.nb_faces();
-  T_wall_.resize(nb_faces_bord,1);
 
   DoubleTab& hh_imp= h_imp_->valeurs();
+  DoubleTab& mon_Ti= Ti_wall_->valeurs();
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
   DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
   DoubleTab Texttmp(Text);
   DoubleTab Twalltmp(Text);
   Twalltmp.detach_vect();
-  int opt=0;
-  calculer_h_mon_pb(mon_h,0.,opt);
-  for( int n=0; n<2; n++)
-    {
-      numero_T_=n;
 
-      assert(h_paroi!=0.);
-      double invhparoi=1./h_paroi;
-      calculer_h_autre_pb( autre_h, invhparoi, opt);
+  int opt=0;
+  // h of solid
+  calculer_h_mon_pb(mon_h,0.,opt);
+  // need to overwrite mon_h by h_micro in 2-phase cells
+  // 1, compoute Q_micro
+
+  // numero_T = 0 T_autre_pb_
+  // numero_T = 1 T2_autre_pb_
+  for( int n=0; n<2; n++)
+  {
+      numero_T_=n;
+      // h of fluid
+      calculer_h_autre_pb( autre_h, 0., opt);
 
       calculer_Teta_paroi(Twalltmp,mon_h,autre_h,is_pb_fluide,temps);
       calculer_Teta_equiv(Texttmp,mon_h,autre_h,is_pb_fluide,temps);
@@ -112,7 +116,6 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
       for (int ii=0; ii<taille; ii++)
         {
           if (est_egal(I(ii,0),I_ref_))
-
             for (int jj=0; jj<nb_comp; jj++)
               {
                 hh_imp(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
@@ -120,12 +123,74 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                 Text(ii,jj)=Texttmp(ii,jj);
                 T_wall_(ii,jj)=Twalltmp(ii,jj);
               }
-        }
-    }
+          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ = 1 )){
+        	  for (int jj=0; jj<nb_comp; jj++)
+        	  {
+            	  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
+            	  const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
+            	  const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
+            	  // double qtcl =10.;
 
+            	  const ArrOfInt& elems_with_CL_contrib = tcl->elems();
+            	  const ArrOfDouble& Q_from_CL = tcl->Q();
+
+            	  Nom  nom_dom = (mon_dom_cl_dis -> domaine()).que_suis_je();
+            	  Domaine_VF& le_dom=ref_cast(Domaine_VF, Interprete::objet(nom_dom));
+            	  const IntTab& face_voisins = le_dom.face_voisins();
+
+            	  Frontiere&  le_front = h_imp_.frontiere_dis().frontiere();
+
+                  int face = -1;
+
+                  if (ii <le_front.num_premiere_face()+le_front.nb_faces())
+                    face = ii-le_front.num_premiere_face();
+                  else
+                    for (int i=0; i<le_front.get_faces_virt().size_array(); i++)
+                      if (le_front.get_faces_virt()[i]==ii)
+                        face = i+le_front.nb_faces();
+
+                  if (face==-1)
+                    {
+                      Cerr << "Identification to num_face FAILED" <<finl;
+                      Process::exit();
+                    }
+
+                  const int elemf = face_voisins(face, 0)+face_voisins(face, 1) +1;
+                  const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
+                  const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
+                  int nb_contrib = 0;
+
+                  const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+                  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+
+                  for (int idx = 0; idx < nb_contact_line_contribution; idx++)
+                    {
+                      // element i
+                      const int elemi = elems_with_CL_contrib[idx];
+
+                      if (elemi == elemf)
+                        {
+                          nb_contrib++;
+                          const double TCL_wall_flux = Q_from_CL[idx];
+                          // val should be : -rho*Cp * flux(W)
+                          // probably because the whole energy equation is written with rhoCp somewhere...
+                          // and the sign should be negative for incoming flux (towards the fluid) by convention.
+                          const double val = sign*TCL_wall_flux;
+                          if (nb_contrib == 1)
+                        	  hh_imp(ii,jj) = val/(Text[ii] - mon_inco[ii]);
+                          else
+                        	  hh_imp(ii,jj) += val/(Text[ii] - mon_inco[ii]);
+                        }
+                    }
+
+        	  }
+
+          }
+        }
+  }
+  
   numero_T_=0;
   Echange_global_impose::mettre_a_jour(temps);
-
 }
 
 
