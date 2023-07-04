@@ -158,6 +158,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           //after the first call to Domain_VEF::modifier_pour_Cl
           //and therefore we no longer go through the loop because of the test "if ( ( face_neighbors_(face,0) == -1) || (face_neighbors_(face,1) == -1) )"
 
+          IntVect fait(nb_faces_tot);
+          fait=0;
           const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
           const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
           for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -168,16 +170,19 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
                   const Cond_lim_base& cl = la_cl.valeur();
                   const Periodique& la_cl_period = ref_cast(Periodique,cl);
                   const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-                  //int num1 = le_bord.num_premiere_face();
-                  //int num2 = (num1 + le_bord.nb_faces());
                   int ndeb = 0;
                   int nfin = le_bord.nb_faces_tot();
-                  for (int num_face=ndeb; num_face<nfin/2; num_face++)
+                  for (int num_face=ndeb; num_face<nfin; num_face++)
                     {
                       int face = le_bord.num_face(num_face);
-                      int faassociee = le_bord.num_face(la_cl_period.face_associee(num_face));
-                      for (int k=0; k<dimension; k++)
-                        normales(faassociee,k) = normales(face,k);
+                      if(fait(face) == 0 )
+                        {
+                          int faassociee = le_bord.num_face(la_cl_period.face_associee(num_face));
+                          fait(face)=1;
+                          fait(faassociee)=1;
+                          for (int k=0; k<dimension; k++)
+                            normales(faassociee,k) = normales(face,k);
+                        }
                     }
                 }
             }
