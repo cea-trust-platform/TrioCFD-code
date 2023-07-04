@@ -25,6 +25,7 @@
 #include <Transport_K_Omega_base.h>
 #include <Op_Diff_K_Omega_base.h> // cAlan: mutualisé ?
 #include <Operateur_Conv.h>
+#include <Operateur_Grad.h>
 #include <Champ_Don.h>
 
 class Motcle;
@@ -47,18 +48,27 @@ public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline void associer_Champ_Inconnu(const Champ_Inc& );
+
   void associer_modele_turbulence(const Mod_turb_hyd_RANS_komega& ) override;
+
+  void completer() override;
+
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
+
   const Motcle& domaine_application() const override;
+
   DoubleTab& corriger_derivee_impl(DoubleTab& d) override;
   virtual void corriger_derivee_impl_ALE(DoubleTab& d) { throw; } // pour ALE seulement
+  // Gradient operator for the cross diffusion term
+  inline const Operateur_Grad& gradient_operator_komega() const { return Op_Grad_komega;}
 
 protected :
   int with_nu_;
   Op_Diff_K_Omega terme_diffusif;
   Operateur_Conv terme_convectif;
+  Operateur_Grad Op_Grad_komega;
 
   REF(Champ_Inc) inco_eqn_associee;
   Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu

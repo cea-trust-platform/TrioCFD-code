@@ -19,6 +19,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "Transport_K_Omega.h"
+#include "Mod_turb_hyd_RANS_komega.h"
+#include "Transport_2eq_base.h"
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Discretisation_base.h>
@@ -139,6 +142,21 @@ void Transport_K_Omega::associer_modele_turbulence(const Mod_turb_hyd_RANS_komeg
   associer_vitesse(eqn_hydr.inconnue());
   mon_modele = ref_cast(Modele_turbulence_hyd_K_Omega, modele);
   discretiser();
+}
+
+/*! @brief Methode to associate the gradient operator.
+ *
+ * @param None
+ */
+void Transport_K_Omega::completer()
+{
+  Transport_K_Omega_base::completer();
+
+  // Initialisation of the gradient operator
+  Op_Grad_komega.associer_eqn(*this);
+  Op_Grad_komega.typer();
+  Op_Grad_komega.l_op_base().associer_eqn(*this);
+  Op_Grad_komega->associer(domaine_dis(), domaine_Cl_dis(), inconnue());
 }
 
 /*! @brief Renvoie le nombre d'operateurs de l'equation.
