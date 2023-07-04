@@ -65,7 +65,8 @@ void Source_Transport_K_Omega_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab
       // cAlan : enfin. A adapter.
       double volporo = volumes(elem)*porosite_vol(elem);
       resu(elem, 0) += (P(elem) - BETA_K*K_Omega(elem, 0)*K_Omega(elem, 1))*volporo;
-      resu(elem, 1) += (ALPHA_OMEGA*P(elem)*K_Omega(elem, 1)/K_Omega(elem, 0) - BETA_OMEGA*K_Omega(elem, 1)*K_Omega(elem, 1));
+      resu(elem, 1) += (ALPHA_OMEGA*P(elem)*K_Omega(elem, 1)/K_Omega(elem, 0)
+                        - BETA_OMEGA*K_Omega(elem, 1)*K_Omega(elem, 1));
       // if (K_eps(elem,0) >= LeK_MIN)
       //   resu(elem,1) += (C1*P(elem)- C2*K_eps(elem,1))*volumes(elem)*porosite_vol(elem)*K_eps(elem,1)/K_eps(elem,0);
     }

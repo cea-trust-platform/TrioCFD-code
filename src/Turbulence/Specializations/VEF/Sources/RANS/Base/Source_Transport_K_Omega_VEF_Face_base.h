@@ -35,10 +35,10 @@ class Source_Transport_K_Omega_VEF_Face_base : public Source_base, public Calcul
   Declare_base_sans_constructeur(Source_Transport_K_Omega_VEF_Face_base);
 public :
   Source_Transport_K_Omega_VEF_Face_base() { }
-  Source_Transport_K_Omega_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
+  Source_Transport_K_Omega_VEF_Face_base(double cs1, double cs2): Source_Transport_proto(cs1, cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis&) override;
   DoubleTab& calculer(DoubleTab&) const override;
   DoubleTab& ajouter(DoubleTab&) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 

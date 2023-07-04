@@ -37,8 +37,8 @@ class Source_Transport_K_Omega_VEF_Face : public Source_Transport_K_Omega_VEF_Fa
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Omega_VEF_Face);
 public:
-  Source_Transport_K_Omega_VEF_Face(double cte1 = C1__, double cte2 = C2__) : Source_Transport_K_Omega_VEF_Face_base(cte1,cte2) { }
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  Source_Transport_K_Omega_VEF_Face(double cte1 = C1__, double cte2 = C2__) : Source_Transport_K_Omega_VEF_Face_base(cte1, cte2) { }
+  DoubleTab& ajouter(DoubleTab&) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
 protected:

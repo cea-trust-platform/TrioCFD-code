@@ -1801,7 +1801,6 @@ void Paroi_std_hyd_VEF::compute_k(double& k, double yp, double u_star)
   k = 0.07*yp*yp*exp(-yp/9.);
   k += 1./sqrt(Cmu)*pow(1. - exp(-yp/20.), 2.);
   k *= u_star_carre; // = k+ * u_star^2
-  return;
 }
 
 void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
@@ -1813,7 +1812,6 @@ void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
   // 50625 = 15^4
   eps  = (1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25))); // eps_plus
   eps *= u_star_squared*u_star_squared/d_visco;
-  return;
 }
 
 void Paroi_std_hyd_VEF::compute_omega(double& omega, double yp,
@@ -1828,8 +1826,6 @@ void Paroi_std_hyd_VEF::compute_omega(double& omega, double yp,
   const double blending = std::tanh(yp/10*yp/10*yp/10*yp/10);
 
   omega = blending*w_1 + (1 - blending)*w_2;
-
-  return;
 }
 
 int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double u_star,
