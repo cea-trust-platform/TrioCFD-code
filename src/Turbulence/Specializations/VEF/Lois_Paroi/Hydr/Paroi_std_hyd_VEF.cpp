@@ -1194,7 +1194,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                         {
                           // cAlan : c'est sale car on reprendre la valeur de d_visco et de dist de l'itération précédente. A améliorer quand on optimisera cette fonction.
                           assert(dist > 0); // on vérifie quand même que dist n'est pas nulle...
-                          tab_2eq(num[nf], 1) = 10*6*d_visco/(BETA_OMEGA*dist*dist);
+                          tab_2eq(num[nf], 1) = 6*d_visco/(BETA_OMEGA*dist*dist);
                         }
                       int nk = 0;
 
