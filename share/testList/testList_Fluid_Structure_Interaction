@@ -1,5 +1,6 @@
 3dOscillatingBeamALE_CoarseMesh
 ALE_with_Periodic_BC
+ALE_with_Periodic_BC_Parallel
 Beam_CF
 Beam_PP
 Beam_PP_mobile_probes
