@@ -41,29 +41,29 @@ Entree& Source_Transport_K_Omega_VEF_Face::readOn(Entree& is)
 void Source_Transport_K_Omega_VEF_Face::associer_pb(const Probleme_base& pb)
 {
   Source_Transport_K_Omega_VEF_Face_base::associer_pb(pb);
-  mon_eq_transport_K_Omega = ref_cast(Transport_K_Omega, equation());
+  eqn_K_Omega = ref_cast(Transport_K_Omega, equation());
 }
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 {
-  return mon_eq_transport_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
+  return eqn_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() const
 {
   const Modele_turbulence_hyd_K_Omega& mod = ref_cast(Modele_turbulence_hyd_K_Omega,
-                                                      mon_eq_transport_K_Omega->modele_turbulence());
+                                                      eqn_K_Omega->modele_turbulence());
   return mod.loi_paroi().valeur().Cisaillement_paroi();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() const
 {
-  return mon_eq_transport_K_Omega->inconnue().valeurs();
+  return eqn_K_Omega->inconnue().valeurs();
 }
 
 const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
 {
   const Modele_turbulence_hyd_K_Omega& mod = ref_cast(Modele_turbulence_hyd_K_Omega,
-                                                      mon_eq_transport_K_Omega->modele_turbulence());
+                                                      eqn_K_Omega->modele_turbulence());
   return mod.loi_paroi().valeur().que_suis_je();
 }
 
@@ -90,8 +90,8 @@ void Source_Transport_K_Omega_VEF_Face::contribuer_a_avec(const DoubleTab& a,
                                                           Matrice_Morse& matrice) const
 {
   const DoubleTab& K_Omega = equation().inconnue().valeurs();
-  const double LeK_MIN = mon_eq_transport_K_Omega->modele_turbulence().get_K_MIN();
-  const DoubleVect& porosite_face = mon_eq_transport_K_Omega->milieu().porosite_face();
+  const double LeK_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
+  const DoubleVect& porosite_face = eqn_K_Omega->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
 
   // on implicite le -eps et le -eps^2/k

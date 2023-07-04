@@ -43,7 +43,7 @@ public:
 
 protected:
   void associer_pb(const Probleme_base& pb) override;
-  REF(Transport_K_Omega) mon_eq_transport_K_Omega;
+  REF(Transport_K_Omega) eqn_K_Omega;
 
 private:
   const DoubleTab& get_visc_turb() const override;

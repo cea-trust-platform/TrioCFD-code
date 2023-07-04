@@ -39,17 +39,17 @@ Entree& Source_Transport_K_Omega_VDF_Elem::readOn(Entree& is)
 void Source_Transport_K_Omega_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
   Source_Transport_K_Omega_VDF_Elem_base::associer_pb(pb);
-  mon_eq_transport_K_Omega = ref_cast(Transport_K_Omega, equation());
+  eqn_K_Omega = ref_cast(Transport_K_Omega, equation());
 }
 
 const DoubleTab& Source_Transport_K_Omega_VDF_Elem::get_visc_turb() const
 {
-  return mon_eq_transport_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
+  return eqn_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 void Source_Transport_K_Omega_VDF_Elem::calculer_terme_production(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
-  const DoubleTab& K_Omega = mon_eq_transport_K_Omega->inconnue().valeurs();
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   if (axi) calculer_terme_production_K_Axi(la_domaine_VDF.valeur(), vitesse, P, K_Omega, visco_turb);
   else calculer_terme_production_K_for_komega(la_domaine_VDF.valeur(), la_domaine_Cl_VDF.valeur(), P, K_Omega, vit, vitesse, visco_turb);
 }
@@ -58,8 +58,8 @@ void Source_Transport_K_Omega_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab
 {
   const DoubleVect& volumes = la_domaine_VDF->volumes();
   const DoubleVect& porosite_vol = la_domaine_Cl_VDF->equation().milieu().porosite_elem();
-  const DoubleTab& K_Omega = mon_eq_transport_K_Omega->inconnue().valeurs();
-  // const double K_MIN = mon_eq_transport_K_Omega->modele_turbulence().get_K_MIN();
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
+  // const double K_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < la_domaine_VDF->nb_elem(); elem++)
     {
       // cAlan : enfin. A adapter.

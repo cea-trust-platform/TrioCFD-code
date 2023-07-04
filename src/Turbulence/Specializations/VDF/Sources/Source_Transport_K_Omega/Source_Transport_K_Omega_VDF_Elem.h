@@ -42,7 +42,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
-  REF(Transport_K_Omega) mon_eq_transport_K_Omega;
+  REF(Transport_K_Omega) eqn_K_Omega;
   void associer_pb(const Probleme_base& pb) override;
 
 private:
