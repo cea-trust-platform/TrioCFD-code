@@ -1172,9 +1172,19 @@ void  Domaine_ALE::computeFluidForceOnBeam()
      {
        //The flux_bords are zero during the first time step following a resumption of calculation
        //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
-       SFichier os("toto_grad.txt");
-       op_grad.impr(os);
+       op_grad.impr(Cout);
      }*/
+
+  //Resumption: The flux_bords_diff is zero during the first time step following a resumption of calculation
+  //and is updated only at the end of this time step. The call to the "ajouter" function is used to update flux_bords variable.
+  double norme_op_diff=mp_norme_vect(flux_bords_diff);
+  if(resumption && norme_op_diff==0. )
+    {
+      DoubleTab resu=eqn_hydr.vitesse().valeurs();
+      resu=0.;
+      op_diff.ajouter(eqn_hydr.vitesse().valeurs(),resu);
+    }
+  //end resumption
 
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
