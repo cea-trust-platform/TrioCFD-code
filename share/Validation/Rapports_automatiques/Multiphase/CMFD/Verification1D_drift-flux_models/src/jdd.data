@@ -20,7 +20,7 @@ mailler  dom
         bord  boundary  Y = 1.0    0.0 <= X <= 1.0 0.0 <= Z <= 1. 
     }
 }
-$polyedriser
+polyedriser dom
 # END MESH #
 
 # BEGIN PARTITION
@@ -38,7 +38,7 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-$schema
+polymac_p0  dis option_covimac {  }
 
 
 Schema_euler_implicite sch
@@ -67,6 +67,7 @@ Read pb
     {
         liquide_sodium Fluide_sodium_liquide {  P_ref 100000.0 T_ref 800 }
         gaz_sodium Fluide_sodium_gaz { P_ref 100000.0 T_ref 879.9430097752451 }
+        saturation_sodium saturation_sodium { P_ref 100000.0 T_ref 879.9430097752451 }
     }
     correlations
     {
@@ -102,6 +103,7 @@ Read pb
             bas  frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
             haut frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
         }
+        sources {  }
     }
     Energie_Multiphase
     {
@@ -128,7 +130,12 @@ Read pb
     {
 	sondes
 	{
-	$sondes
+		alpha_gaz_sodium alpha_gaz_sodium periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
+ 		vitesse_liquide_sodium vitesse_liquide_sodium periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
+ 		vitesse_gaz_sodium vitesse_gaz_sodium periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
+ 		temperature temperature periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
+		masse_volumique masse_volumique periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
+ 		pression pression periode 1.e-2 segment 1000 0.5 0.5 0.0005 0.5 0.5 0.9995 
 	}
 
         Format lml 
