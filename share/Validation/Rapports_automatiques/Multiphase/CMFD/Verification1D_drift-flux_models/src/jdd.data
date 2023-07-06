@@ -23,21 +23,6 @@ mailler  dom
 polyedriser dom
 # END MESH #
 
-# BEGIN PARTITION
-Partition dom
-{
-        /* Choose Nb_parts so to have ~ 25000 cells per processor */
-        Partition_tool metis { nb_parts 4 }
-        Larg_joint 2
-        zones_name DOM
-}
-End
-END PARTITION #
-
-# BEGIN SCATTER
-Scatter DOM.Zones dom
-END SCATTER #
-
 polymac_p0  dis option_covimac {  }
 
 
@@ -54,7 +39,6 @@ Read sch
         seuil_convergence_implicite 1e30
     }
 }
-
 
 Pb_HEM pb
 Associate  pb dom
