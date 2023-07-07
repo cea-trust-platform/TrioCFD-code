@@ -462,7 +462,6 @@ protected :
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
-  IJK_Field_double pressure_rhs_before_shear_;
   // Operators and pressure solver
   OpDiffIJK_double velocity_diffusion_op_simple_;
   OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;

@@ -459,7 +459,7 @@ void IJK_problem_double::run()
   recalculer_mu_de_rho(rho_field_, molecular_mu_, 2);
 
   pressure_projection(velocity_[0], velocity_[1],  velocity_[2], pressure_, 1.,
-                      pressure_rhs_, pressure_rhs_, check_divergence_, poisson_solver_, 0.);
+                      pressure_rhs_, check_divergence_, poisson_solver_, 0.);
   const double max_timestep = timestep_;
 
   couplage_tubes_ibc_.initialize(splitting_);
@@ -767,7 +767,7 @@ void IJK_problem_double::euler_time_step()
   //(le compteur statistique est deja present dans la fonction de projection)
   //statistiques().begin_count(projection_);
   pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                               pressure_rhs_, pressure_rhs_, check_divergence_, poisson_solver_, 0.);
+                               pressure_rhs_, check_divergence_, poisson_solver_, 0.);
 
   //statistiques().end_count(projection_);
 

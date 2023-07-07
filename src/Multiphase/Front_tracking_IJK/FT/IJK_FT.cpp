@@ -1930,7 +1930,6 @@ void IJK_FT_double::run()
       allocate_velocity(terme_diffusion_mass_solver_, splitting_, 1);
     }
 
-  // allocation d'une pression monofluide avec des tableau de projection liquide et vapeur
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
       pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, 1, rho_vapeur_, rho_liquide_);
@@ -1953,7 +1952,6 @@ void IJK_FT_double::run()
   allocate_velocity(rho_v_, splitting_, 1);
 
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
-  pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
 
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
@@ -2188,21 +2186,21 @@ void IJK_FT_double::run()
                   //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
-                                                   1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
+                                                   1., pressure_rhs_, check_divergence_,
                                                    poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
                 }
               else
                 {
                   pressure_projection_with_rho(rho_field_, velocity_[0],
                                                velocity_[1], velocity_[2], pressure_, 1.,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
                 }
 
             }
           else
             {
               pressure_projection(velocity_[0], velocity_[1], velocity_[2],
-                                  pressure_, 1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
+                                  pressure_, 1., pressure_rhs_, check_divergence_,
                                   poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
         }
@@ -3804,13 +3802,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (!include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
               // GAB --> C'est plutot ici que l(on ajoute le terme_pression !!)
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           d_pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
 
               // Then update the pressure field :
               const int kmax = pressure_.nk();
@@ -3885,9 +3883,8 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
           if (use_inv_rho_in_poisson_solver_)
             {
-              //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
@@ -3895,7 +3892,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
               // On l'a fait avant pour etre sur qu'elle soit bien dans la derivee stockee...
 #else
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 #endif
             }
 
@@ -3917,16 +3914,15 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         {
           if (use_inv_rho_in_poisson_solver_)
             {
-              //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
 #ifdef PROJECTION_DE_LINCREMENT_DV
 #else
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 #endif
             }
         }
@@ -3993,12 +3989,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           if (include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           d_pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
         }
 #else
@@ -4068,13 +4064,11 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
       // OPTION A SELECTIONNE DANS LE CAS DUN SHEAR PERIO POUR EVITER LES PBMS D INTERPOLATION DE RHO AU NIVEAU DU BORD PERIO_Z
       if (use_inv_rho_in_poisson_solver_)
         {
-          Cerr << "Methode basee sur inv rho pour le grad(P) en RK3" << finl;
-          Cerr << " Option a tester si besoin. " << finl;
-          //Process::exit();
-          //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
+          // Cerr << "Methode basee sur inv rho pour le grad(P) en RK3" << finl;
+          // Cerr << " Option a tester si besoin. " << finl;
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
         }
       else
         {
@@ -4083,7 +4077,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 #else
           pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                        fractionnal_timestep,
-                                       pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                       pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
           // GAB TODO : cest a peu pres ici qu'il faudra travailler pour recuperer le
           // terme de pression
 #endif
@@ -4162,17 +4156,18 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   //  Calculer vitesse_ft (etendue) a partir du champ de vitesse.
   {
 
-    // si on resoud en u', il faut ajouter le cisaillement moyen au champ de vitesse avant de convecter les marqueurs
-    // sinon on perd une partie du mouvement de la bulle.
-    // apres transporter_maillage, on retourne au champ de vitesse u'
+    // Il faut ajouter le cisaillement moyen au champ de vitesse_ft avant de convecter les marqueurs
 
-    redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
-    redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
-    redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+    redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
+    redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
+    redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
 
-    redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-    redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
-    redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+    if (IJK_Splitting::defilement_ == 1)
+      {
+        redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+        redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+        redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+      }
 
     for (int dir = 0; dir < 3; dir++)
       {
@@ -4186,7 +4181,6 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
           }
       }
 
-
   }
 
   // On supprime les duplicatas avant le transport :
@@ -4195,7 +4189,6 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
-
 
   // Apres le transport, est-ce que certaines bulles reeles sont trop proche du bord
   // du domaine etendu? Si on en trouve, on les transferts :
@@ -4256,13 +4249,15 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   statistiques().begin_count(deplacement_interf_counter_);
 
 
-  redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);//,2);
-  redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);//,1);
-  redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);//,0,boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));//, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-
-  redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-  redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
-  redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+  redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
+  redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
+  redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
+  if (IJK_Splitting::defilement_ == 1)
+    {
+      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1],0., 1);
+      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2],0., 2);
+    }
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -4283,7 +4278,6 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
-
   statistiques().end_count(deplacement_interf_counter_);
   // On verra a la fin du pas de temps si certaines bulles reeles sont trop proche du bord
   // du domaine etendu. Pour l'instant, dans les sous dt, on ne les transferts pas.
@@ -4539,9 +4533,9 @@ Vecteur3 IJK_FT_double::calculer_inv_rho_grad_p_moyen(const IJK_Field_double& rh
 
 void IJK_FT_double::calculer_I_kappa_sigma(IJK_Field_double& kappa_ft,const IJK_Field_double& indic, double sigma)
 {
-  for (int k = 0; k < kappa_ft.nk(); k++)
-    for (int j = 0; j < kappa_ft.nj(); j++)
-      for (int i = 0; i < kappa_ft.ni(); i++)
+  for (int k = -2; k < kappa_ft.nk()+2; k++)
+    for (int j = -2; j < kappa_ft.nj()+2; j++)
+      for (int i = -2; i < kappa_ft.ni()+2; i++)
         kappa_ft(i,j,k)*=indic(i,j,k)*sigma;
 }
 
@@ -4601,10 +4595,6 @@ Vecteur3 IJK_FT_double::calculer_grad_p_over_rho_moyen(const IJK_Field_double& p
 
   return resu;
 }
-
-
-
-
 
 void IJK_FT_double::write_check_etapes_et_termes(int rk_step)
 {
