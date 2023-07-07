@@ -367,8 +367,8 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt)
 //Solve the beam dynamics. Time integration scheme: HHT
 DoubleVect& Beam_model::TimeSchemeHHT (const double& dt)
 {
-  Cerr<<" dt = "<<dt<<" temps_ = "<<temps_<<" tempsComputeForceOnBeam_= "<<tempsComputeForceOnBeam_<<finl;
-  Cerr<<" force = "<<fluidForceOnBeam_<<finl;
+  //Cerr<<" dt = "<<dt<<" temps_ = "<<temps_<<" tempsComputeForceOnBeam_= "<<tempsComputeForceOnBeam_<<finl;
+  //Cerr<<" force = "<<fluidForceOnBeam_<<finl;
   double beta = (1-alpha_)*(1-alpha_)/4;
   double gamma= (1- 2*alpha_)/2;
   double squareDt=dt*dt;
