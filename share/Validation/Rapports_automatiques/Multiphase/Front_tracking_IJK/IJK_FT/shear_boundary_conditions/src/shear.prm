@@ -1,9 +1,10 @@
 Parametres {
 	Titre "Shear-periodicity condition (velocity jump at z-boundary + desynchronization of z-border) "
 	Auteur "A. du Cluzeau"
-	# CasTest . perio_shear_defilant.data 
-	# CasTest . mixte_shear_avec_bulle.data 
-	# CasTest . mixte_shear_avec_bulle_9proc.data 9
+	CasTest . perio_shear_defilant.data 
+	CasTest . mixte_shear_avec_bulle.data 
+	CasTest . mixte_shear_avec_bulle_9proc.data 9
+	CasTest . mixte_shear_avec_bulle_9proc_reprise.data 9
 }
 
 
@@ -71,6 +72,28 @@ Titre "Diphasique parallele"
 		Up3D 1 0 0
 		zoom3D 0 0 1.
 		pseudocolor mixte_shear_avec_bulle_9proc.lata DOM PRESSURE ELEM
+	}
+
+}
+
+Chapitre {
+
+Titre "Reprise"
+
+	visu {
+		titre "Shear periodicity avec defilement : Etat final (VX)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM_dual VELOCITY_X FACES
+	}
+	
+		visu {
+		titre "Shear periodicity avec defilement : Etat final (VX)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM PRESSURE ELEM
 	}
 
 }
