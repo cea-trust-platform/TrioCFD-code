@@ -9,6 +9,7 @@ Domaine_ALE dom
 Read_MED {
     domain dom
     file Poutre.med
+    exclude_groups 1 Beam
 }
 # END MESH #
 
