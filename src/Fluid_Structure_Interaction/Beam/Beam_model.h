@@ -36,7 +36,7 @@
 // Fluid-structure interaction model.
 // Reduced mechanical model: a beam model (1d).
 // Resolution based on a modal analysis.
-// Temporal discretization: Newmark
+// Temporal discretization: Newmark finite differences, Newmark mean acceleration,  or Hilber-Hughes-Taylor (HHT)
 // ALE coupling with the reduced beam model
 /////////////////////////////////////////////////////////////////////////////
 
