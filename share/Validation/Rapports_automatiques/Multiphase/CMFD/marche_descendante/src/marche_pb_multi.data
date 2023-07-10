@@ -1,0 +1,243 @@
+# PARALLEL OK #
+
+Dimension 2
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entre 
+		{
+		Origine -1.1133  0.0127
+		Nombre_de_Noeuds $Nx_inlet $Ny_inlet
+		Longueurs 1.1133 0.1016
+		Facteurs  $fact_x_inlet $fact_y_inlet
+		Symy
+		}
+		{
+		Bord Entree X = -1.1133  0.0127 <= Y <= 0.1143
+		Bord HautT  Y = 0.1143 -1.1133 <= X <= 0.
+		Bord BasT   Y = 0.0127 -1.1133 <= X <= 0.
+		} ,
+	
+	Pave Haut
+		{
+		Origine 0. 0.0127
+		Nombre_de_Noeuds $Nx_step $Ny_inlet 
+		Longueurs 0.5  0.1016
+		Facteurs $fact_x_step $fact_y_inlet
+		Symy
+		}
+		{
+		Bord Haut2  Y = 0.1143  0. <= X <= 0.5
+		Bord Sortie X = 0.5   0.0127 <= Y <= 0.1143
+		} ,
+	
+		
+	Pave Bas
+		{
+		Origine 0. 0. 
+		Nombre_de_Noeuds $Nx_step $Ny_step
+		Longueurs 0.5 0.0127
+		Facteurs $fact_x_step  $fact_y_step
+		symy
+		}
+		{
+		Bord Bas2   Y = 0.  0. <= X <= 0.5
+		Bord Gauche X = 0.  0. <= Y <= 0.0127
+		Bord Sortie X = 0.5   0. <= Y <= 0.0127
+		} 
+
+	
+	
+}
+
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+    /* Choose Nb_parts so to have ~ 25000 cells per processor */
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$method dis $options_vdf
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax $tmax
+    dt_impr 1
+    facsec 1
+    facsec_max 1
+    seuil_statio 1e-6
+    nb_pas_dt_max $nb_pas_dt_max
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5  $diss_conv  }
+        iter_min 2
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Pb_Multiphase pb
+
+
+associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Lire pb
+{
+    Milieu_composite
+    {
+        liquide_eau Fluide_Incompressible
+        {
+            mu champ_uniforme      1 $mu
+            rho champ_uniforme     1 $rho
+            lambda Champ_Uniforme  1 1
+            Cp Champ_Uniforme      1 1e3
+            beta_th Champ_Uniforme 1 0
+        }
+    }
+    correlations
+    {
+        loi_paroi adaptative { }
+    }
+    QDM_Multiphase
+    {
+        evanescence { homogene { alpha_res 1 alpha_res_min .5 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        convection { amont }
+        diffusion  { turbulente $diffusion { sigma 1 } }
+        initial_conditions
+        {
+            vitesse  champ_fonc_xyz dom 2 0 0
+            pression Champ_Fonc_xyz dom 1 0
+        }
+        conditions_limites
+        {
+            HautT Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+	    Haut2 Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+	    Gauche Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+            Bas2 Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+	    BasT Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+            Entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 44.2 0
+            Sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
+        }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
+        convection { amont }
+        conditions_limites
+        {
+            HautT paroi
+	    Haut2 paroi
+	    Gauche paroi
+	    Bas2 paroi
+	    BasT paroi 
+            Entree	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            Sortie	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+        }
+    }
+    Energie_Multiphase
+    {
+        diffusion { }
+        convection { amont }
+        initial_conditions { temperature Champ_Uniforme 1 0 }
+        boundary_conditions
+        {
+            HautT paroi_adiabatique
+	    Haut2 paroi_adiabatique
+	    Gauche paroi_adiabatique
+	    Bas2 paroi_adiabatique
+	    BasT paroi_adiabatique
+            Entree	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+            Sortie	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+        }
+    }
+    $equation
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { $diss Champ_Fonc_xyz dom 1 $IC_diss }
+        boundary_conditions
+        { 
+            HautT $CL_diss 
+	    Haut2 $CL_diss
+	    Gauche $CL_diss 
+	    Bas2 $CL_diss
+	    BasT $CL_diss 
+            Entree	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+            Sortie	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+            $diffusion_sup 
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 5.366 }
+        boundary_conditions
+        {  
+            HautT Cond_lim_k_simple_flux_nul  
+	    Haut2 Cond_lim_k_simple_flux_nul  
+	    Gauche Cond_lim_k_simple_flux_nul  
+	    Bas2 Cond_lim_k_simple_flux_nul  
+	    BasT Cond_lim_k_simple_flux_nul 
+            Entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 5.366
+            Sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 5.366
+        }
+        sources
+        {
+            Production_energie_cin_turb ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+    Postraitement
+	{
+	        format lata
+		Sondes
+		{     					
+			sonde_U_x-4h vitesse periode 0.1 segment 80  -0.0508 0.0127  -0.0508 0.1143
+			sonde_U_x1h vitesse periode 0.1 segment 80  0.0127 0.  0.0127 0.1143
+			sonde_U_x4h vitesse periode 0.1 segment 80  0.0508 0.  0.0508 0.1143
+			sonde_U_x6h vitesse periode 0.1 segment 80  0.0762 0.  0.0762 0.1143
+			sonde_U_x10h vitesse periode 0.1 segment 80  0.127 0.  0.127 0.1143
+			sonde_U_paroi grav vitesse periode 1e5 segment 100  0.0 0.0  0.5 0.0
+		}
+
+		Format lata
+		Champs dt_post 1e-1
+		       {
+			pression som
+			vitesse som
+			k
+			k_residu elem
+			$diss elem
+			y_plus elem
+		       }
+	}
+}
+
+Resoudre pb
+
+Fin

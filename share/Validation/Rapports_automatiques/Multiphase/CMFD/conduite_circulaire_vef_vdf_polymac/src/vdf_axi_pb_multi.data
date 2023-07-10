@@ -44,7 +44,7 @@ Read sch_ice
     tinit 0
     tmax $tmax
     dt_impr 1e-8
-    facsec $facsec
+    facsec 0.2
     facsec_max $facsec
     seuil_statio 1e-10
     nb_pas_dt_max $nb_pas_dt_max
@@ -100,7 +100,7 @@ Read pbt
         {
             axi    symetrie
             bas    frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 0 $inlet_velocity
-            wall   paroi_fixe
+            wall   paroi_frottante_loi { }
             haut   frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
         }
     }
@@ -146,7 +146,7 @@ Read pbt
 	Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 }   ,
 	Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
 	Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 } 
-	 
+	$diffusion_sup
 	}
     }
     energie_cinetique_turbulente
@@ -175,7 +175,8 @@ Read pbt
             vitesse    	vitesse_liquide_eau	periode 1e8 position_like k
             # dist_paroi	Distance_paroi		periode 1e8 position_like k #
             y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $y_yplus $z_min_yplus    $y_yplus $z_max_yplus  
-            pression	pression		periode 1e8 segment 1001	0.8 0	0.8 100
+            pression_io	pression		periode 1e8 segment 2	$y_p $z_min_p    $y_p $z_max_p
+            vitesse_io		vitesse		periode 1e8 position_like pression_io
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
         }
         format lata

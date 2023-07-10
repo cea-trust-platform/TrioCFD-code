@@ -8,8 +8,8 @@ def build_mesh(alpha_d, folder, med_name):
     # hauteur maillage
     h = 100
     # quelque chose
-    n = 24
-    nz = 60
+    n = 28
+    nz = 70
 
     theta_mesh_size = 6. # en degres
     nt = ceil(alpha_d / theta_mesh_size) # equivalent axisymetrique (une maille 3D d'epaisseur)

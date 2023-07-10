@@ -34,7 +34,7 @@ Lire sch
 	facsec 20
 	facsec_max 20
 	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
-	seuil_statio 1e-30
+	seuil_statio 1e-4
 	tmax $tmax
 }
 
@@ -85,13 +85,18 @@ Lire pb
 	{
 		sondes			{
 					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof $z_prof    $x_max_prof $y_max_prof $z_prof
+					vitesse_grav grav		vitesse		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof $z_prof    $x_max_prof $y_max_prof $z_prof
 					k		k		periode 1e8 position_like vitesse
+					k_grav grav		k		periode 1e8 position_like vitesse
 					diss		eps		periode 1e8 position_like vitesse
+					diss_grav grav		eps		periode 1e8 position_like vitesse
 					# dist_paroi	Distance_paroi		periode 1e8 position_like vitesse #
 					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
 					y_plus			y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
-					# pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
-					gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8 #
+					y_plus_grav grav			y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
+					pression_io grav	pression		periode 1e8 segment 2    $x_p $y_p $z_min_p    $x_p $y_p $z_max_p
+					vitesse_io grav	vitesse		periode 1e8 position_like pression_io
+					# gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8 #
 					}
 		format lata
 		champs binaire dt_post 10

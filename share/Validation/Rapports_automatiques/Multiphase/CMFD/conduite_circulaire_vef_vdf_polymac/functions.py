@@ -58,6 +58,7 @@ def method_name(config):
     return method_Pb_hydr, method_Pb_multi
 
 def file_name(config):
+    # identifier le nom du jeu de donnée à utiliser (dans src/) à partir de la config
     names = []
     for method in config:
         name = ""
@@ -77,6 +78,7 @@ def file_name(config):
 ###############################################################################
 
 def sonde_firstpoint(R,Ny):
+    # coordonnée du 1er point de la sonde
     # N : nombre de noeuds selon y 
     # on veut un 1er point à 1/2 de la maille
     first_point = []
@@ -91,22 +93,29 @@ def sonde_firstpoint(R,Ny):
 
 def substitution_pb_hydr(params):
     # récupérer les paramètres entrés par l'utilisateur
-    config, Ny, N_vef, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,nb_points_prof,tmax = params
+    config, Ny, N_vef, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,y_min_profvef,y_max_profvef,nb_points_prof,tmax = params
     nb_mesh = len(Ny) # nombre de maillages différents du domaines (raffinements choisis)
     nb_method_Pb_hydr = len(method_Pb_hydr) # nombre de configuration avec Pb_hydrau
     dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method_Pb_hydr)] # matrice qui sera remplie avec les dictionnaires
     for i in range(nb_method_Pb_hydr):
-        theta = 5 # deg
+        theta = 0 # deg
         if "VDF" in config[i]:
             theta = 90 # deg
         for j in range(nb_mesh):
             AR=20 # aspect ratio
-            N = Ny[j]  
+            N = Ny[j]
             x_min_yplus, x_max_yplus, nb_points_yplus, y_yplus = sonde_yplus(N,AR,L,R)
+            y_min = y_min_prof
+            y_max = y_max_prof
+            nb_points = nb_points_prof
+            if "VEF" in config[i]:
+                y_min = y_min_profvef
+                y_max = y_max_profvef
+                nb_points = N_vef
             dict = {"Ny" : N,
                    "Nx" : int(L/R/AR*(N-1))+1,
-                   "file_mesh" : f"vef_mesh_t45_n{N_vef[j]-1}.med",
-                    "name_mesh" : f"vef_mesh_t45_n{N_vef[j]-1}",
+                   "file_mesh" : f"vef_mesh_n{N_vef[j]-1}.med",
+                    "name_mesh" : f"vef_mesh_n{N_vef[j]-1}",
 
                     "method" : method_Pb_hydr[i],
                     "inlet_velocity" : inlet_velocity,
@@ -117,19 +126,25 @@ def substitution_pb_hydr(params):
                    "mu" : mu,
                    "rho" : rho,
                    "tmax" : tmax,
-                   
+                   # sonde profis (dans la section du conduit)
                    "z_prof" : x_prof,                 
-                   "x_min_prof" : (R-y_min_prof[j])*np.cos(theta*np.pi/180),
-                   "y_min_prof" : (R-y_min_prof[j])*np.sin(theta*np.pi/180),
-                   "x_max_prof" : (R-y_max_prof[j])*np.cos(theta*np.pi/180),
-                   "y_max_prof" : (R-y_max_prof[j])*np.sin(theta*np.pi/180),
-                   "nb_points_prof" : nb_points_prof[j],
-
+                   "x_min_prof" : (R-y_min[j])*np.cos(theta*np.pi/180),
+                   "y_min_prof" : (R-y_min[j])*np.sin(theta*np.pi/180),
+                   "x_max_prof" : (R-y_max[j])*np.cos(theta*np.pi/180),
+                   "y_max_prof" : (R-y_max[j])*np.sin(theta*np.pi/180),
+                   "nb_points_prof" : nb_points[j],
+                    # sonde y+ : le long de la paroi (1 point par cellule de mailllage)
                    "z_min_yplus" : x_min_yplus,
                    "z_max_yplus" : x_max_yplus,
                    "x_yplus" : (R-y_yplus)*np.cos(theta*np.pi/180),
                    "y_yplus" : (R-y_yplus)*np.sin(theta*np.pi/180),
-                   "nb_points_yplus" : nb_points_yplus}
+                   "nb_points_yplus" : nb_points_yplus,
+                   # sonde de pression : calcul de la perte de charge
+                   "x_p" : (R/4)*np.cos(theta*np.pi/180),
+                   "y_p" : (R/4)*np.sin(theta*np.pi/180),
+                   "z_min_p" : 0,
+                   "z_max_p" : L
+                   }
             dict_list[i][j] = dict
     return dict_list
 
@@ -155,7 +170,7 @@ CL_diss = ["scalaire_impose_paroi champ_front_uniforme 1 0 ", "Cond_lim_omega_de
 # Condition limite à la paroi pour l'eq de transport k
 CL_k = ["Cond_lim_k_simple_flux_nul ", "Cond_lim_k_simple_flux_nul  "]
 # terme source supp dans l'équation de transport de tau (dissipation turbu)
-diffusion_sup = [" "] *2+[" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
+diffusion_sup = [" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
 # Autres param de simu
 facsec     = 1
 nb_pas_dt_max = "1000000"
@@ -164,6 +179,7 @@ options_vdf = ["option_vdf { all_options }", "option_vdf { all_options }", "", "
 params_pb_multi = [equation, diffusion, diss, diss_conv, IC_diss, CL_k, diffusion_sup, facsec, nb_pas_dt_max]
 
 def sonde_yplus(N,AR,L,H):
+    # paramètre de la sonde de y+ le lond de la paroi
     # On veut avoir y_plus au centre de masse des éléments de maillage
     dx = L/(AR*(N-1)) # taille d'une maille
     x_min = dx/2
@@ -173,6 +189,7 @@ def sonde_yplus(N,AR,L,H):
     return x_min, x_max, nb_points, dy/2
 
 def abscisses_sonde_yplus(config,Ny):
+    # cette fonction donne une liste des coordonnées le long de la paroi de la sonde de y+
     N = Ny
     AR = 20
     if "triangle" in config:
@@ -187,18 +204,19 @@ def get_tau_from_yplus(y_plus, y_demi, rho, mu):
     return u_tau, tau
 
 def get_value_at_x(var,x,x_tar):
+    # interpolation linéaire
     return np.interp(np.array(x_tar), x, var)
 
 def substitution_pb_multi(params):
-    config, Ny, N_vef, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,nb_points_prof,tmax = params
+    config, Ny, N_vef, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,y_min_profvef,y_max_profvef,nb_points_prof,tmax = params
     nb_mesh = len(Ny)
     nb_method_Pb_multi = len(method_Pb_multi)
     nb_method_Pb_hydr = len(method_Pb_hydr)
     dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method_Pb_multi)]
     for i in range(nb_method_Pb_multi):
-        theta = 1 # deg
+        theta = 1 # deg : coordonnée selon theta de la sonde
         if "VDF" in config[i+nb_method_Pb_hydr]:
-            theta = 90 # deg
+            theta = 90 # deg : car le maillage est 2D 
         for j in range(nb_mesh):
             AR=20
             N=Ny[j]
@@ -218,7 +236,7 @@ def substitution_pb_multi(params):
                     "inlet_velocity" : inlet_velocity,
                     "outlet_pressure" : outlet_pressure,
 
-                    "diffusion_sup" : diffusion_sup[i],
+                    "diffusion_sup" : diffusion_sup[i%2],
                    "diffusion" : diffusion[i%2] ,
                    "diss": diss[i%2],
                    "diss_ext": diss_ext[i%2],
@@ -240,6 +258,11 @@ def substitution_pb_multi(params):
                    "x_yplus" : (R-y_yplus)*np.cos(theta*np.pi/180),
                    "y_yplus" : (R-y_yplus)*np.sin(theta*np.pi/180),
                    "nb_points_yplus" : nb_points_yplus,
+
+                   "x_p" : (R/4)*np.cos(theta*np.pi/180),
+                   "y_p" : (R/4)*np.sin(theta*np.pi/180),
+                   "z_min_p" : 0,
+                   "z_max_p" : L
                    }
             dict_list[i][j] = dict
     return dict_list
@@ -275,7 +298,8 @@ def read_facefile(file):
         data[k] = np.array(data[k])
     return data
 
-def get_wall_param(array):
+def get_wall_param2D(array):
+    # récupérer les données du fichier Ustar.face
     array = np.transpose(array)
     x = array[0]
     y = array[1]
@@ -289,8 +313,9 @@ def get_wall_param(array):
     x, y, u_plus, d_plus, u_star, tau, tau_x, tau_y = x[sort_index], y[sort_index], u_plus[sort_index], d_plus[sort_index], u_star[sort_index], tau[sort_index], tau_x[sort_index], tau_y[sort_index]
     return x, y, u_plus, d_plus, u_star, tau, tau_x, tau_y
 
-def get_values_at_x(array, x_val):
-    x, y, u_plus, d_plus, u_star, tau, tau_x, tau_y = get_wall_param(array)
+def get_values_at_x2D(array, x_val):
+    # récupérer les données du fichier Ustar.face en x_val (interpolation linéaire)
+    x, y, u_plus, d_plus, u_star, tau, tau_x, tau_y = get_wall_param2D(array)
     u_plus = np.interp(np.array(x_val), x, u_plus)
     d_plus = np.interp(np.array(x_val), x, d_plus)
     u_star = np.interp(np.array(x_val), x, u_star)
@@ -299,6 +324,35 @@ def get_values_at_x(array, x_val):
     tau_y = np.interp(np.array(x_val), x, tau_y) # m²/s²
     return u_plus, d_plus, u_star, tau, tau_x, tau_y
 
+def get_wall_param3D(array):
+    # récupérer les données du fichier Ustar.face
+    array = np.transpose(array)
+    x = array[0]
+    y = array[1]
+    z = array[2]
+    u_plus = array[3]
+    d_plus = array[4]
+    u_star = array[5]
+    tau = array[6] # m²/s²
+    tau_x = array[7] # m²/s²
+    tau_y = array[8] # m²/s²
+    tau_z = array[9] # m²/s²
+    sort_index = np.argsort(z)
+    x, y, z, u_plus, d_plus, u_star, tau, tau_x, tau_y, tau_z = x[sort_index], y[sort_index], z[sort_index], u_plus[sort_index], d_plus[sort_index], u_star[sort_index], tau[sort_index], tau_x[sort_index], tau_y[sort_index], tau_z[sort_index]
+    return x, y, z, u_plus, d_plus, u_star, tau, tau_x, tau_y, tau_z
+
+def get_values_at_x3D(array, z_val):
+    # récupérer les données du fichier Ustar.face en z_val (interpolation linéaire)
+    x, y, z, u_plus, d_plus, u_star, tau, tau_x, tau_y, tau_z = get_wall_param3D(array)
+    u_plus = np.interp(np.array(z_val), z, u_plus)
+    d_plus = np.interp(np.array(z_val), z, d_plus)
+    u_star = np.interp(np.array(z_val), z, u_star)
+    tau = np.interp(np.array(z_val), z, tau) # m²/s²
+    tau_x = np.interp(np.array(z_val), z, tau_x) # m²/s²
+    tau_y = np.interp(np.array(z_val), z, tau_y) # m²/s²
+    tau_z = np.interp(np.array(z_val), z, tau_z) # m²/s²
+    return u_plus, d_plus, u_star, tau, tau_x, tau_y, tau_z
+
 def get_residu_name(filename, indice):
     # trouve le nom du residu le plus grand à la dernière iteration
     f = open(filename,"r")
@@ -306,6 +360,14 @@ def get_residu_name(filename, indice):
     line = lines[0].strip("#").strip("\n").strip(" ").split("\t")
     line = [x for x in line if x!='']
     return line[4+indice]
+
+def read_perf(filename,old_name, new_name):
+    # lire les performance de calcul
+    f = open(filename, "r")
+    lines = f.readlines()
+    perf = lines[0]
+    perf = perf.replace(old_name, new_name)
+    return perf
 
 ###############################################################################
 ############################# First calculations ##############################
@@ -361,5 +423,23 @@ def y_plus_prediction(y1,Ny,u_tau,mu,rho):
     return y_VDF_plus, y_VEF_plus, y_PolyMAC_plus
 
 ###############################################################################
-############################# First calculations ##############################
+############################## Last calculations ##############################
 ###############################################################################
+
+def facteur_frottement(Re,f_guess):
+    # Cette fonction calcule le facteur de frottement f en fonction du Re pour une conduite lisse
+    # Au lieu d'utiliser le diagramme de Moody (compliqué pour un calcul numérique)
+    # On utilise la relation de Blasius pour 4e3<Re<1e5
+    # et la formule de Von Karman et Nikuradse pour Re>1e5 (résolution itérative car relation non linéaire)
+    if Re>1e5:
+        tol = 1e-3 # tolerance sur l'erreur
+        e = 1 # erreur
+        while e>tol:
+            f = 1/(2*log10(sqrt(f_guess)*Re)-0.8)**2 # formule de Von Karman et Nikuradse
+            e = abs((f-f_guess)/f_guess)
+            f_guess = f
+    elif Re>=4e3 and Re<=1e5:
+        f = 0.316*Re**(-1/4) # formule de Blasius
+    else: # laminaire
+        f = 64/Re
+    return f

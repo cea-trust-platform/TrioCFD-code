@@ -70,7 +70,7 @@ Read sch
     facsec_max $facsec
     seuil_statio 1e-10
     nb_pas_dt_max $nb_pas_dt_max
-    solveur ice
+    solveur $solveur_temps
     {
         criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 $diss_conv }
         iter_min 2
@@ -194,6 +194,9 @@ Lire pb
             # dist_paroi	Distance_paroi		periode 1e8 position_like k #
            $comment y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_min_yplus $y_yplus    $x_max_yplus $y_yplus $comment
             pression	pression		periode 1e8 segment 1001	0 0.8	100 0.8
+            pression_io	pression		periode 1e8 segment 2    0.75 0    0.75 100
+            pression_i		pression		periode 1e8 segment 100     0 0	0 1
+            pression_o		pression		periode 1e8 segment 100     100 0	100 1
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
         }
         format lata

@@ -29,8 +29,7 @@ import SALOMEDS
 ############################# Mesh parameters ###############################
 #############################################################################
 
-theta = 45 # deg
-Ny=[7]
+Ny=[13] # nombre de noeud sur le rayon du tube (direction radiale = normal à la paroi)
 R = 2 # [m] rayon cylindre
 L = 100 # [m] hauteur cylindre
 cell_size = [R/(N-1) for N in Ny] # [m]
@@ -124,5 +123,5 @@ def main(R,L,name,cell_size):
     salome.sg.updateObjBrowser()
 
 for i in range(len(cell_size)):
-  name = f"vef_mesh_t{theta}_n{Ny[i]-1}"
+  name = f"vef_mesh_n{Ny[i]-1}"
   main(R,L,name,cell_size[i])

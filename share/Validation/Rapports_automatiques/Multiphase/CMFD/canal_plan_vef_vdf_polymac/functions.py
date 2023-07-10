@@ -16,7 +16,7 @@ B = 5.2 # loi log
 y1 = 0.2 # [m] height of mesh 1st block
 y2 = 0.4 # [m] height of mesh 1st block
 y3 = 1 # [m] height of mesh 1st block
-AR = 20 # aspect ratio
+AR = 20 # aspect ratio (à modifier dans quelques fonctions aussi :( )
 AR_polymac = 1 # trainguler avec polymac
 L = 100 # [m] Longueur du domaine (canal)
 H = 1 # [m] demi hauteur du canal (CL : symétrie)
@@ -56,7 +56,7 @@ def method_name(config):
     method_Pb_hydr = []
     method_Pb_multi = []
     for method in config:
-        if "k-epsilon" in method:
+        if "k-epsilon" in method: # ATTENTION : on se sert du fait que seul vef et vdf sont lancé avec le modèle k-epsilon
             name = "VDF"
             if "VEF" in method:
                 name = "VEFPreP1b"
@@ -162,7 +162,7 @@ CL_diss = ["scalaire_impose_paroi champ_front_uniforme 1 0 ", "Cond_lim_omega_de
 # Condition limite à la paroi pour l'eq de transport k
 CL_k = ["Cond_lim_k_simple_flux_nul ", "Cond_lim_k_simple_flux_nul  "]
 # terme source supp dans l'équation de transport de tau (dissipation turbu)
-diffusion_sup = [" "] *2+[" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
+diffusion_sup = [" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
 # Autres param de simu
 facsec     = 1
 nb_pas_dt_max = "1000000"
@@ -215,6 +215,9 @@ def substitution_pb_multi(params):
     dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method_Pb_multi)]
     for i in range(nb_method_Pb_multi):
         trianguler = ""
+        solveur_temps = "ice"
+        if config[i+2] == "VDF_k-tau":
+            solveur_temps = "SETS"
         for j in range(nb_mesh):
             AR=20
             N = 2*int(Ny[j]-1)+1  # en vef trianguler_h coupe les cellules en 4
@@ -244,6 +247,7 @@ def substitution_pb_multi(params):
                    "nb_points_yplus" : nb_points_yplus,
                    "tmax" : tmax,
                    "facsec" : str(facsec),
+                   "solveur_temps" : solveur_temps,
                    "options_vdf" : options_vdf[i],
                    "diffusion_sup" : diffusion_sup[i],
                    "diffusion" : diffusion[i%2] ,
@@ -400,6 +404,27 @@ def y_plus_prediction(y1,Ny,u_tau,mu,rho):
     y_VDF_plus, y_VEF_plus, y_PolyMAC_plus = y_plus(y_VDF,u_tau,mu,rho), y_plus(y_VEF,u_tau,mu,rho), y_plus(y_PolyMAC,u_tau,mu,rho)
     return y_VDF_plus, y_VEF_plus, y_PolyMAC_plus
 
+###############################################################################
+############################## Last calculations ##############################
+###############################################################################
+
+def facteur_frottement(Re,f_guess):
+    # Cette fonction calcule le facteur de frottement f en fonction du Re pour une conduite lisse
+    # Au lieu d'utiliser le diagramme de Moody (compliqué pour un calcul numérique)
+    # On utilise la relation de Blasius pour 4e3<Re<1e5
+    # et la formule de Von Karman et Nikuradse pour Re>1e5 (résolution itérative car relation non linéaire)
+    if Re>1e5:
+        tol = 1e-3 # tolerance sur l'erreur
+        e = 1 # erreur
+        while e>tol:
+            f = 1/(2*log10(sqrt(f_guess)*Re)-0.8)**2 # formule de Von Karman et Nikuradse
+            e = abs((f-f_guess)/f_guess)
+            f_guess = f
+    elif Re>=4e3 and Re<=1e5:
+        f = 0.316*Re**(-1/4) # formule de Blasius
+    else: # laminaire
+        f = 64/Re
+    return f
 ###############################################################################
 ###############################################################################
 ###############################################################################
