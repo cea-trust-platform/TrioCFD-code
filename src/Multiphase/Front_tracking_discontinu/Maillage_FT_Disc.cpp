@@ -1580,6 +1580,80 @@ const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
   return data_cache.normale_facettes_;
 }
 
+double Maillage_FT_Disc::compute_surface_and_normale_element(const int elem, const bool normalize, double surface, double normale[3]) const
+{
+  const ArrOfDouble& surface_facettes = get_update_surface_facettes();
+  const DoubleTab& normale_facettes = get_update_normale_facettes();
+  const Intersections_Elem_Facettes& intersections = intersections_elem_facettes();
+  const ArrOfInt& index_elem = intersections.index_elem();
+  normale[0]=0.;
+  normale[1]=0.;
+  normale[2]=0.;// = {0.,0.,0.}; // Normale sortante de I=0 vers I=1
+  surface = 0.;
+  {
+    int index = index_elem[elem];
+    if (index<0)
+      return surface;
+    // Boucle sur les faces qui traversent l'element:
+    while (index >= 0)
+      {
+        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+        const double fraction_surf = data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+        for (int dir= 0; dir<Objet_U::dimension; dir++)
+          normale[dir] += fraction_surf * normale_facettes(data.numero_facette_, dir);
+        surface += fraction_surf;
+        index = data.index_facette_suivante_;
+      }
+  }
+
+  if (normalize)
+    {
+      const double norm = sqrt(normale[0]*normale[0]+normale[1]*normale[1]+normale[2]*normale[2]);
+      if (norm> Objet_U::precision_geom * Objet_U::precision_geom) // c'est a peu pres une surface pour le moment donc norm tres petit.
+        {
+          for (int dir= 0; dir<Objet_U::dimension; dir++)
+            normale[dir] /= norm;
+        }
+    }
+  return surface;
+}
+
+double Maillage_FT_Disc::compute_normale_element(const int elem, const bool normalize, ArrOfDouble& normale) const
+{
+  const ArrOfDouble& surface_facettes = get_update_surface_facettes();
+  const DoubleTab& normale_facettes = get_update_normale_facettes();
+  const Intersections_Elem_Facettes& intersections = intersections_elem_facettes();
+  const ArrOfInt& index_elem = intersections.index_elem();
+  normale=0.;// Normale sortante de I=0 vers I=1
+  {
+    int index = index_elem[elem];
+    if (index<0)
+      return 0.;
+    // Boucle sur les faces qui traversent l'element:
+    while (index >= 0)
+      {
+        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+        const double fraction_surf = data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+        for (int dir= 0; dir<Objet_U::dimension; dir++)
+          normale[dir] += fraction_surf * normale_facettes(data.numero_facette_, dir);
+        //surface_totale += fraction_surf;
+        index = data.index_facette_suivante_;
+      }
+    //Cerr << "Surface dans l'elem : " <<  surface_totale << finl;
+  }
+
+  const double norm = norme_array(normale);
+  if (normalize)
+    {
+      if (norm> Objet_U::precision_geom * Objet_U::precision_geom) // c'est a peu pres une surface pour le moment donc norm tres petit.
+        {
+          for (int dir= 0; dir<Objet_U::dimension; dir++)
+            normale[dir] /= norm;
+        }
+    }
+  return norm;
+}
+
 const ArrOfDouble& Maillage_FT_Disc::get_surface_facettes() const
 {
   const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();

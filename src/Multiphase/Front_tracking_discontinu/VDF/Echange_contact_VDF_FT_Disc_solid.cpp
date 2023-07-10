@@ -79,6 +79,11 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
 
   int is_pb_fluide=0;
+  // Il faut dimensionner Twall : (car dans la classe mere, c'est fait par : calculer_Teta_paroi
+  //     alors qu'ici, on n'envoie pas Twall dans calculer_Teta_paroi)
+  const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
+  int nb_faces_bord = ma_front_vf.nb_faces();
+  T_wall_.resize(nb_faces_bord,1);
 
   DoubleTab& hh_imp= h_imp_->valeurs();
   hh_imp=0;
