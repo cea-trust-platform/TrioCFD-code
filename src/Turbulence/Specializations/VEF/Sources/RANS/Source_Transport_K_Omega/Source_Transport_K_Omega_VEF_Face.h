@@ -41,9 +41,8 @@ public:
   DoubleTab& ajouter(DoubleTab&) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
-  void resize_gradient_tab(DoubleTab &grad) const;
   void elem_to_face(const Domaine_VF&, const DoubleTab& grad_elems, DoubleTab& grad_faces) const;
-  void compute_cross_diffusion() const;
+  void compute_cross_diffusion(DoubleTab&) const override;
 
 protected:
   void associer_pb(const Probleme_base& pb) override;
@@ -54,7 +53,7 @@ private:
   const DoubleTab& get_cisaillement_paroi() const override;
   const DoubleTab& get_K_pour_production() const override;
   const Nom get_type_paroi() const override;
-  void fill_resu(const DoubleVect& , const DoubleTrav& , DoubleTab& ) const override;
+  void fill_resu(const DoubleVect& , const DoubleTrav& , const DoubleTab&, DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_K_Omega_VEF_Face_included */

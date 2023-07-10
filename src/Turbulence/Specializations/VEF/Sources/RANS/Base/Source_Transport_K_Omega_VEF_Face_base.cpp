@@ -19,6 +19,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include <TRUSTTabs_forward.h>
 #include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
 #include <Source_Transport_K_Omega_VEF_Face_base.h>
@@ -62,11 +63,15 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
   // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
   const int nb_faces_ = le_dom_VEF->nb_faces();
   DoubleTrav P {nb_faces_};
+
+  DoubleTab gradKgradOmega (nb_faces_);
+  compute_cross_diffusion(gradKgradOmega);
+
   const DoubleTab& K = get_K_pour_production(); // voir les classes filles
   calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K,
                               vit, visco_turb, _interpolation_viscosite_turbulente);
 
-  fill_resu(volumes_entrelaces, P, resu); // voir les classes filles
+  fill_resu(volumes_entrelaces, P, gradKgradOmega, resu); // voir les classes filles
 
   return resu;
 }

@@ -62,7 +62,7 @@ public:
   DoubleTab& corriger_derivee_impl(DoubleTab& d) override;
   virtual void corriger_derivee_impl_ALE(DoubleTab& d) { throw; } // pour ALE seulement
   // Gradient operator for the cross diffusion term
-  inline const Operateur_Grad& gradient_operator_komega() const { return Op_Grad_komega;}
+  inline const Operateur_Grad& gradient_operator_komega() const { return Op_Grad_komega; }
 
 protected :
   int with_nu_;

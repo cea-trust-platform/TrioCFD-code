@@ -19,9 +19,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Transport_K_Omega.h"
-#include "Mod_turb_hyd_RANS_komega.h"
-#include "Transport_2eq_base.h"
+#include <Transport_K_Omega.h>
+#include <Mod_turb_hyd_RANS_komega.h>
+#include <Transport_2eq_base.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Discretisation_base.h>

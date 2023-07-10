@@ -45,6 +45,9 @@ public :
   inline void mettre_a_jour(double temps) override { Calcul_Production_K_VEF::mettre_a_jour(temps); }
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { /* Do Nothing */ }
 
+  virtual void compute_cross_diffusion(DoubleTab&) const { return not_implemented<void>(__func__); };
+
+
 protected :
   DoubleTab& ajouter_komega(DoubleTab&) const;
 
@@ -66,7 +69,7 @@ private:
   virtual const DoubleTab& get_K_pour_production() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const Nom get_type_paroi() const { return not_implemented<Nom>(__func__); }
   virtual void calcul_tenseur_reyn(const DoubleTab&, const DoubleTab&, DoubleTab& ) const { return not_implemented<void>(__func__); }
-  virtual void fill_resu(const DoubleVect&, const DoubleTrav&, DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void fill_resu(const DoubleVect&, const DoubleTrav&, const DoubleTab&, DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
 #endif /* Source_Transport_K_Omega_VEF_Face_base_included */
