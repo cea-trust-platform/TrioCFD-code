@@ -997,7 +997,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     {
       Cerr << "Now that elems_, mp_and  Q_ are stored as members to the TCL class, we shouldn't need to call this function "
            << "several times for the same timestep. Please check or contact support." << finl;
-      Process::exit();
+      // Process::exit();
     }
 
   const Parcours_interface& parcours = eq_transport.parcours_interface();

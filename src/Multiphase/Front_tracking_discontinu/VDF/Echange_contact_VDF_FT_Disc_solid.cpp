@@ -84,7 +84,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   int is_pb_fluide=0;
 
   DoubleTab& hh_imp= h_imp_->valeurs();
-  // DoubleTab& mon_Ti= Ti_wall_->valeurs();
+  // DoubleTab& mon_Ti= Ti_wall_.valeur().valeurs_au_temps(temps);
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
   DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
@@ -121,7 +121,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                 hh_imp(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
 
                 Text(ii,jj)=Texttmp(ii,jj);
-                T_wall_(ii,jj)=Twalltmp(ii,jj);
+                // mon_Ti(ii)=Twalltmp(ii, jj);
               }
           if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ = 1 ))
             {
@@ -135,26 +135,11 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                   const ArrOfInt& elems_with_CL_contrib = tcl->elems();
                   const ArrOfDouble& Q_from_CL = tcl->Q();
 
-                  Nom  nom_dom = (mon_dom_cl_dis -> domaine()).que_suis_je();
-                  Domaine_VF& le_dom=ref_cast(Domaine_VF, Interprete::objet(nom_dom));
+                  Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
                   const IntTab& face_voisins = le_dom.face_voisins();
 
-                  Frontiere&  le_front = h_imp_.frontiere_dis().frontiere();
+                  const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
 
-                  int face = -1;
-
-                  if (ii <le_front.num_premiere_face()+le_front.nb_faces())
-                    face = ii-le_front.num_premiere_face();
-                  else
-                    for (int i=0; i<le_front.get_faces_virt().size_array(); i++)
-                      if (le_front.get_faces_virt()[i]==ii)
-                        face = i+le_front.nb_faces();
-
-                  if (face==-1)
-                    {
-                      Cerr << "Identification to num_face FAILED" <<finl;
-                      Process::exit();
-                    }
 
                   const int elemf = face_voisins(face, 0)+face_voisins(face, 1) +1;
                   const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
@@ -192,6 +177,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
   numero_T_=0;
   Echange_global_impose::mettre_a_jour(temps);
+
 }
 
 

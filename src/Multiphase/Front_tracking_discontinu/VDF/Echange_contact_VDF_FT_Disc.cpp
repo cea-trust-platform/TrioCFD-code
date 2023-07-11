@@ -83,7 +83,8 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   int is_pb_fluide=0;
 
   DoubleTab& mon_h= h_imp_->valeurs();
-  DoubleTab& mon_Ti= Ti_wall_->valeurs();
+  DoubleTab& mon_Ti= Ti_wall_.valeur().valeurs_au_temps(temps);
+
 
   int opt=0;
   calculer_h_autre_pb( autre_h, 0., opt);
@@ -114,20 +115,36 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
         //mixed mesh => Text, Twall, mon_h
         if (I(ii,0) > 0 && I(ii,0) < 1  && (indicatrice_ref_ = 1 ))
           {
-            Nom nom_pb=mon_dom_cl_dis->equation().probleme().que_suis_je();
+            Nom nom_pb=mon_dom_cl_dis->equation().probleme().le_nom();
             Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
-            const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
-            const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
-            const ArrOfDouble& Q_from_CL = tcl->Q();
-            const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
+            Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
+            Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
+            // const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
+            // const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
+            // const ArrOfDouble& Q_from_CL = tcl->Q();
+            // const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
 
 
-            Nom  nom_dom = (mon_dom_cl_dis -> domaine()).que_suis_je();
-            Domaine_VF& le_dom=ref_cast(Domaine_VF, Interprete::objet(nom_dom));
+            ArrOfInt elems_with_CL_contrib;
+            ArrOfInt faces_with_CL_contrib;
+            ArrOfDouble mpoint_from_CL;
+            ArrOfDouble Q_from_CL;
+            // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
+            // Probleme ? if called several times???????????????????????
+            tcl-> compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
+                                                           faces_with_CL_contrib,
+                                                           mpoint_from_CL,
+                                                           Q_from_CL);
+
+
+
+
+            Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
             const IntTab& face_voisins = le_dom.face_voisins();
 
-            Frontiere&  le_front = h_imp_.frontiere_dis().frontiere();
-            const int face = ii+le_front.num_premiere_face();
+            const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
+
+
 
 
             const Equation_base& mon_eqn = domaine_Cl_dis().equation();
@@ -139,14 +156,13 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
               {
                 // face i
 
-
                 const int facei = faces_with_CL_contrib[idx];
                 if (facei == face)
                   {
                     const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
                     const double TCL_wall_flux = Q_from_CL[idx];
                     const double val = sign*TCL_wall_flux;
-                    if (Ti_wall_(ii, jj) != 0.)
+                    if (mon_Ti(ii, jj) != 0.)
                       mon_h(ii) += val/(T_ext()->valeurs_au_temps(temps)(ii)-mon_inco(ii, 0));
                     mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
                   }
@@ -179,7 +195,6 @@ void Echange_contact_VDF_FT_Disc::completer()
     }
   ch.creer(nom_pb, nom_bord_, nom_champ_indicatrice_);
   ch.set_distant(distant);
-
 
   ch.associer_fr_dis_base(T_ext().frontiere_dis());
 
@@ -238,7 +253,8 @@ int Echange_contact_VDF_FT_Disc::initialiser(double temps)
   Champ_front_calc& cha=ref_cast(Champ_front_calc, T_autre_pb().valeur());
   cha.creer(nom_autre_pb_, nom_bord, nom_champ);
 
-  // initialization of Ti_wall_ with temperature of T_autre_pb
+  // initialization of Ti_wall_ with temperature of T_autre_pb BECAUSE nom_champ = name of T_autre_pb()
+  // Ti_wall_ is created from T_autre_pb()
   Champ_front_calc& chT=ref_cast(Champ_front_calc, Ti_wall_.valeur());
   chT.creer(nom_autre_pb_, nom_bord, nom_champ);
 

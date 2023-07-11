@@ -1,0 +1,392 @@
+# Boiling couped with solid #
+dimension 2
+PrecisionGeom 1e-18
+bidim_axi
+
+
+domaine dom_fluide
+domaine dom_solide
+
+Probleme_FT_Disc_gen pb1
+Pb_conduction pb2
+
+Mailler dom_fluide
+{  
+ 	pave pave1
+	{ 
+	origine 0. 0. 
+	longueurs 1. 1.
+	nombre_de_noeuds 51 101
+	
+	}
+	{
+         bord left     X = 0.          0. <= Y <= 1.
+	 bord right    X = 1.         0. <= Y <= 1.
+	 bord up       Y = 1.        0. <= X <= 1.
+         #  bord bot      Y = 0.          0. <= X <= 1. #
+	 raccord local homogene bot Y = 0.          0. <= X <= 1.
+	}
+}
+transformer dom_fluide x*0.003 y*0.006
+
+Mailler dom_solide
+{  
+ 	pave pave2
+	{ 
+	origine 0. 0.
+	longueurs 1. 1.  
+	nombre_de_noeuds 51 3
+	
+	}
+	{
+	bord sleft     X = 0.          0. <= Y <= 1.
+	 bord sright    X = 1.         0. <= Y <= 1.
+	 raccord local homogene  sup       Y = 1.        0. <= X <= 1.
+         #  bord bot      Y = 0.          0. <= X <= 1. #
+	 bord sbot Y = 0.          0. <= X <= 1.
+	}
+}
+transformer dom_solide x*0.003 y*0.0002-0.0002
+
+#
+Scatter DOM_FLUIDE.Zones dom_fluide
+Scatter DOM_SOLIDE.Zones dom_solide
+#
+
+VDF dis
+
+Fluide_Incompressible  eau
+Lire eau 
+{
+  	mu champ_uniforme       1 0.00028291
+  	rho champ_uniforme      1 958
+  	lambda champ_uniforme   1 0.67909
+  	cp champ_uniforme       1 4215.7
+  
+  
+}
+
+Fluide_Incompressible vapeur
+Lire vapeur
+{
+  mu champ_uniforme       1 1.2269e-05	
+  rho champ_uniforme      1 0.59817
+  lambda champ_uniforme   1 0.025096	
+  cp champ_uniforme       1 2.0800e3
+ 
+}
+
+Fluide_diphasique fluide
+Lire fluide
+{
+  fluide1 eau
+  fluide0 vapeur
+  sigma   Champ_Uniforme 1            0.058912	
+  chaleur_latente Champ_Uniforme 1    -2256.43e3
+}
+
+Solide sol
+Read sol
+{
+	rho Uniform_Field 1 8500.
+	lambda Champ_Uniforme 1 234.    
+	Cp Champ_Uniforme 1 376.
+}
+
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+   nb_pas_dt_max 1000000000
+   tinit 0.0
+   tmax  1.e-6 # 7e-5 is already unstable sometimes when timestep too large... #
+   tcpumax 23.75
+   dt_min 1.e-18
+   dt_max 1E-8 # 5e-7 is unstable on coa test whereas 1e-8, 1e-7, 2.5e-7 are stable until at least 7e-5 with remesh BEST #
+               # 1e-7 is necessary on coa test otherwise it is unstable at 89.4e-4 with remesh BEST #
+   dt_impr 2.e-6
+   dt_sauv 500
+   facsec 1.
+   seuil_statio -1
+   periode_sauvegarde_securite_en_heures 0.5
+}
+
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+convection_diffusion_temperature_ft_disc      thermique
+convection_diffusion_temperature_ft_disc      thermique_vapeur 
+
+Triple_Line_Model_FT_Disc TCL 
+Read TCL 
+{
+  Qtcl 0
+  lv 10.e-9
+#  coeffa -1.9291
+  coeffb  4.03634 #
+  ym 3.785e-6
+  sm 4.946e-6
+  initial_CL_xcoord 6.0297e-5 # Incorrect. To be computed by Vinod #
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0. -9.81
+Associate fluide gravite
+Associate sol gravite
+
+
+Associate pb1 dom_fluide
+Associate pb1 hydraulique
+Associate pb1 thermique
+Associate pb1 thermique_vapeur 
+Associate pb1 interf
+Associate pb1 fluide
+
+Associate TCL hydraulique
+Associate TCL thermique
+Associate TCL interf
+Associate pb1 TCL
+
+Associate pb2 dom_solide
+Associate pb2 sol
+
+
+
+Probleme_Couple pbc
+Associate pbc pb1
+Associate pbc pb2
+Associate pbc sch
+Discretize pbc dis
+
+system "mkdir -p lata slata"
+
+Lire pb1
+{
+	
+	hydraulique
+	{
+	 	modele_turbulence nul
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { vitesse champ_uniforme 2 0. 0. }
+		
+		equation_interfaces_proprietes_fluide interf
+		equation_temperature_mpoint thermique
+		equation_temperature_mpoint_vapeur thermique_vapeur 
+		interpol_indic_pour_dI_dt interp_ai_based
+     		terme_gravite grad_I  # grad_I or rho_g #
+		
+		boundary_conditions 
+		{
+		right   sortie_libre_rho_variable champ_front_uniforme 1 0.
+      		bot     paroi_fixe 
+      		up      sortie_libre_rho_variable champ_front_uniforme 1 0.
+      		left    Symetrie
+        	}
+	}
+	
+	
+	interf
+	{
+		type_indic_faces standard
+		# interpolation_repere_local #
+		methode_interpolation_v vdf_lineaire
+		methode_transport vitesse_interpolee hydraulique
+	        conditions_initiales { fonction x^2+(y-0.0001*cos(50.0*pi/180.0))^2-0.0001^2 }
+		VOFlike_correction_volume 1
+
+		 nb_iterations_correction_volume 1 # to get the correct dI/dt #
+      		 nb_lissage_correction_volume 1 # To smooth the dI/dt correction to avoid pikes on the interface #
+      		 n_iterations_distance 8
+		remaillage {
+                    pas 1e-12
+                    nb_iter_remaillage 3
+                    critere_arete 0.35
+                    critere_remaillage 0.35
+                    pas_lissage 1e-12
+                    relax_barycentrage 0.1
+                    facteur_longueur_ideale 1.0
+                    nb_iter_barycentrage 1
+                    nb_iter_correction_volume 3
+                    seuil_dvolume_residuel 1e-15
+                    lissage_courbure_coeff -0.02
+                    lissage_courbure_iterations_systematique 1
+                    lissage_courbure_iterations_si_remaillage 5
+			}
+		collisions
+		{
+                active
+                juric_pour_tout
+                juric_local  phase_continue 1 
+                type_remaillage Juric { source_isovaleur indicatrice }
+ 		}
+		boundary_conditions
+		{
+		 bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 50+90*(x_lt_3.e-5)
+      		 right  Paroi_FT_disc Symetrie
+      		 up     Paroi_FT_disc Symetrie
+      		 left   Paroi_FT_disc Symetrie
+		}
+	}
+	
+	thermique
+	{
+		EQUATION_INTERFACE INTERF
+		EQUATION_NAVIER_STOKES HYDRAULIQUE
+		PHASE 1
+ 		STENCIL_WIDTH 8
+                DIFFUSION { }
+                CONVECTION { QUICK }
+                BOUNDARY_CONDITIONS
+                {
+			bot   ECHANGE_CONTACT_VDF_FT_DISC {
+					AUTRE_PROBLEME pb2
+					AUTRE_BORD sup 
+					AUTRE_CHAMP_TEMPERATURE TEMPERATURE 
+					NOM_MON_INDICATRICE INDICATRICE_INTERF 
+					PHASE 1
+	}
+			up  FRONTIERE_OUVERTE T_EXT CHAMP_FRONT_UNIFORME 1 0.
+			left symetrie
+			right  frontiere_ouverte T_ext Champ_front_Fonc_xyz 1 (8.5*(1-erf(y/0.0001)))  
+                }
+                CONDITIONS_INITIALES { Temperature_thermique Champ_Fonc_xyz dom_fluide 1 (8.5*(1-erf(y/0.0001))) }
+	}
+		
+	thermique_vapeur
+	{
+		EQUATION_INTERFACE INTERF
+		EQUATION_NAVIER_STOKES HYDRAULIQUE
+		PHASE 0
+ 		STENCIL_WIDTH 8
+                DIFFUSION { }
+                CONVECTION { QUICK }
+		
+                BOUNDARY_CONDITIONS
+                {
+			bot   ECHANGE_CONTACT_VDF_FT_DISC {
+					AUTRE_PROBLEME pb2
+					AUTRE_BORD sup 
+					AUTRE_CHAMP_TEMPERATURE TEMPERATURE 
+					NOM_MON_INDICATRICE INDICATRICE_INTERF 
+					PHASE 0
+				}
+			up  FRONTIERE_OUVERTE T_EXT CHAMP_FRONT_UNIFORME 1 0.
+			left  Symetrie
+			right PAROI_ADIABATIQUE
+                }
+                CONDITIONS_INITIALES { TEMPERATURE_THERMIQUE_VAPEUR Champ_Fonc_xyz dom_fluide 1 (8.5*(1-erf(y/0.0001))) }
+	}
+
+
+	POSTRAITEMENT 
+	{
+	 CHAMPS DT_POST 1.E-13
+	 {
+		VITESSE ELEM
+		TEMPERATURE_THERMIQUE ELEM
+	 }
+	 }
+	 
+   postraitement 
+   {
+      fichier lata/postbis
+      champs dt_post 1.E-13
+      {
+         indicatrice_interf
+         temperature_thermique
+       vitesse
+       pression
+       mpoint_thermique
+      }
+                Probes 
+               {
+                  temperature_probe grav temperature_thermique Periode 1.e-4 segment 400 0. 5.0e-6 0.004 5.0e-6
+               # velocity_probe grav VitesseX Periode 1.e-4 segment 100 0. 1.875e-5 0.003 1.875e-5 #           
+               }
+   }
+   
+   liste_postraitements
+   {
+    postraitement_ft_lata post1 { 
+     format Lata 
+     fichier lata/post 
+     champs dt_post 1.0e-13 { 
+        VOLUME_MAILLE elem 
+        indicatrice_interf elem 
+        temperature_thermique elem
+	 temperature_thermique_vapeur elem 
+        vitesse faces 
+        pression elem 
+        mpoint_thermique elem
+	mpoint_thermique_vapeur elem 
+        pression_laplacien_d elem 
+        second_membre_projection elem 
+        interfacial_area elem 
+        vitesse_conv_thermique faces 
+        vitesse_delta_interface faces 
+        terme_convection_vitesse faces 
+        terme_diffusion_vitesse faces 
+        # flux_tmp_interf faces  #
+     } 
+     interfaces interf { 
+        courbure som 
+        vitesse som 
+        vitesse_repere_local som 
+        COMPO_CONNEXE elem 
+        PE elem 
+        PE_LOCAL elem 
+     } 
+    }   
+   }
+   
+}
+
+Read pb2
+{
+	Conduction
+	{
+		diffusion { }
+		initial_conditions {
+			temperature Champ_Uniforme 1 6.
+			}
+		boundary_conditions {
+			sleft symetrie
+			sright   PAROI_ADIABATIQUE
+			sbot paroi_flux_impose Champ_front_fonc_xyz 1 0.
+			sup  echange_contact_VDF_FT_Disc_solid {
+				autre_probleme pb1
+				autre_bord bot 
+				autre_champ_temperature_indic1 temperature_thermique
+				autre_champ_temperature_indic0 temperature_thermique_vapeur
+				autre_champ_indicatrice indicatrice_interf
+			}
+
+		}
+		 CONDITIONS_INITIALES { temperature Champ_Uniforme 1 8.5 }
+		}
+
+Post_processing
+	{
+
+		Format lata
+		fichier slata/post
+		fields dt_post 1.e-13
+		{
+		    temperature elem
+		}
+	}
+
+	
+}
+
+Imprimer_flux dom_fluide { bot }
+Imprimer_flux_sum dom_fluide { bot }
+
+Imprimer_flux_sum dom_solide { sup }
+Imprimer_flux dom_solide { sup }
+
+Solve pbc
+FIN
+
+			     
