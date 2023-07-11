@@ -665,12 +665,13 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
         case Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS:
           {
             variables_internes_->OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS;
-            if (Process::je_suis_maitre()) {
-              Cerr << " correction of div(chi u) at exit : zero vapour mass flux on cells touching outlet." << finl;
-              Cerr << " This is a bad option because it does not let vapour get out explicitly (prevents interface contact)" << finl;
-              Cerr << " Should not be used or with great care." << finl;
-              // Process::exit();
-            }
+            if (Process::je_suis_maitre())
+              {
+                Cerr << " correction of div(chi u) at exit : zero vapour mass flux on cells touching outlet." << finl;
+                Cerr << " This is a bad option because it does not let vapour get out explicitly (prevents interface contact)" << finl;
+                Cerr << " Should not be used or with great care." << finl;
+                // Process::exit();
+              }
             return 1;
           }
         default:
@@ -1470,13 +1471,18 @@ double compute_indic_ghost(const int elem, const int num_face, const double indi
 {
   double indic_ghost= 0.;
   ArrOfDouble normale(3), normale_face(3); // Normale sortante de I=0 vers I=1
-  const double face_surface = domVF.face_surfaces(num_face);
+  const double face_surface = domVF.face_surfaces(num_face); //  ==  0. ? 1. : domVF.face_surfaces(num_face);
+  if (est_egal(face_surface, 0.))
+    {
+      // On est sur l'axe de rotation du bidim_axi :
+      return indic;
+    }
   for (int i=0; i< Objet_U::dimension; i++)
     normale_face[i] = domVF.face_normales(num_face, i)/face_surface; // pour normalisation
   const double norm = maillage.compute_normale_element(elem, true /* NORMALIZE */, normale);
   if (est_egal(norm, 0.))
     // L'element est pure, non traverse.
-    indic_ghost = indic;
+    return indic;
   // normale_sortante_au_domaine pour regler le signe du prodscal avec la normale_SORTANTE
   const double prodscal = normale_sortante_au_domaine * dotproduct_array(normale, normale_face);
   double val = 1./sqrt(2.); // Could be improved. Corresponds to cubic cell and Indic=0.5
@@ -1765,7 +1771,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
                     if (nbdimr ==1)
                       {
                         resu(num_face)=coef*normale_sortante_au_domaine*(indic_ghost-indic);
-                        assert(std::abs(coef*normale_sortante_au_domaine-zvf.face_normales(num_face, zvf.orientation(num_face)))
+                        assert(std::abs(coef-zvf.face_normales(num_face, zvf.orientation(num_face)))
                                < Objet_U::precision_geom*Objet_U::precision_geom);
                       }
                     else
