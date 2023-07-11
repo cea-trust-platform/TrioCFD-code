@@ -107,7 +107,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
         if (!est_egal(I(ii,0),indicatrice_ref_))
           {
             mon_h(ii,jj)=0. ;
-            mon_Ti[ii, jj] = 0.;
+            mon_Ti(ii, jj) = 0.;
           }
 // **************************************To be implemented*******************
         // 2 - phase cells at pb-Boundary when solving T-eq at Liquid side
@@ -130,20 +130,26 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
             const int face = ii+le_front.num_premiere_face();
 
 
+            const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+            const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+
+
             const int nb_contact_line_contribution = faces_with_CL_contrib.size_array();
             for (int idx = 0; idx < nb_contact_line_contribution; idx++)
               {
                 // face i
+
+
                 const int facei = faces_with_CL_contrib[idx];
                 if (facei == face)
-                {
-                	const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
+                  {
+                    const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
                     const double TCL_wall_flux = Q_from_CL[idx];
                     const double val = sign*TCL_wall_flux;
-                    if (Ti_wall_[ii] != 0.)
-                    	mon_h(ii,jj) += val/mon_Ti[ii];
-                    mon_Ti[ii] += T_ext().valeurs()[ii] - val/autre_h[ii] ;
-                }
+                    if (Ti_wall_(ii, jj) != 0.)
+                      mon_h(ii) += val/(T_ext()->valeurs_au_temps(temps)(ii)-mon_inco(ii, 0));
+                    mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
+                  }
               }
 
           }

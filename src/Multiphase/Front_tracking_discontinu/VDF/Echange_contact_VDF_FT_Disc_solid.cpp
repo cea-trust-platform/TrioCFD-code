@@ -84,7 +84,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   int is_pb_fluide=0;
 
   DoubleTab& hh_imp= h_imp_->valeurs();
-  DoubleTab& mon_Ti= Ti_wall_->valeurs();
+  // DoubleTab& mon_Ti= Ti_wall_->valeurs();
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
   DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
@@ -101,7 +101,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   // numero_T = 0 T_autre_pb_
   // numero_T = 1 T2_autre_pb_
   for( int n=0; n<2; n++)
-  {
+    {
       numero_T_=n;
       // h of fluid
       calculer_h_autre_pb( autre_h, 0., opt);
@@ -123,22 +123,23 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                 Text(ii,jj)=Texttmp(ii,jj);
                 T_wall_(ii,jj)=Twalltmp(ii,jj);
               }
-          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ = 1 )){
-        	  for (int jj=0; jj<nb_comp; jj++)
-        	  {
-            	  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
-            	  const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
-            	  const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
-            	  // double qtcl =10.;
+          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ = 1 ))
+            {
+              for (int jj=0; jj<nb_comp; jj++)
+                {
+                  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
+                  const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
+                  const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
+                  // double qtcl =10.;
 
-            	  const ArrOfInt& elems_with_CL_contrib = tcl->elems();
-            	  const ArrOfDouble& Q_from_CL = tcl->Q();
+                  const ArrOfInt& elems_with_CL_contrib = tcl->elems();
+                  const ArrOfDouble& Q_from_CL = tcl->Q();
 
-            	  Nom  nom_dom = (mon_dom_cl_dis -> domaine()).que_suis_je();
-            	  Domaine_VF& le_dom=ref_cast(Domaine_VF, Interprete::objet(nom_dom));
-            	  const IntTab& face_voisins = le_dom.face_voisins();
+                  Nom  nom_dom = (mon_dom_cl_dis -> domaine()).que_suis_je();
+                  Domaine_VF& le_dom=ref_cast(Domaine_VF, Interprete::objet(nom_dom));
+                  const IntTab& face_voisins = le_dom.face_voisins();
 
-            	  Frontiere&  le_front = h_imp_.frontiere_dis().frontiere();
+                  Frontiere&  le_front = h_imp_.frontiere_dis().frontiere();
 
                   int face = -1;
 
@@ -177,18 +178,18 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                           // and the sign should be negative for incoming flux (towards the fluid) by convention.
                           const double val = sign*TCL_wall_flux;
                           if (nb_contrib == 1)
-                        	  hh_imp(ii,jj) = val/(Text[ii] - mon_inco[ii]);
+                            hh_imp(ii,jj) = val/(Text[ii] - mon_inco[elemi]);
                           else
-                        	  hh_imp(ii,jj) += val/(Text[ii] - mon_inco[ii]);
+                            hh_imp(ii,jj) += val/(Text[ii] - mon_inco[elemi]);
                         }
                     }
 
-        	  }
+                }
 
-          }
+            }
         }
-  }
-  
+    }
+
   numero_T_=0;
   Echange_global_impose::mettre_a_jour(temps);
 }
