@@ -93,7 +93,7 @@ visu {
         instruction_visit SetActivePlots((2))
         instruction_visit m2=MeshAttributes()
         instruction_visit m2.lineWidth = 3
-        instruction_visit try: m2.meshColorSource=0
+        instruction_visit try: m2.meshColorSource=m2.MeshCustom
         instruction_visit except: m2.foregroundFlag=0
         instruction_visit m2.legendFlag = 0
         instruction_visit m2.meshColor=(255,0,0,255)
@@ -104,7 +104,7 @@ visu {
         instruction_visit m3.lineWidth = 3
         instruction_visit m3.opaqueMode=m2.Off
         instruction_visit m3.legendFlag = 0
-        instruction_visit try: m3.meshColorSource=0
+        instruction_visit try: m3.meshColorSource=m3.MeshCustom
         instruction_visit except: m3.foregroundFlag=0
         instruction_visit m3.meshColor=(0,0,255,255)
         instruction_visit SetPlotOptions(m3)
@@ -298,7 +298,7 @@ EOF
         instruction_visit SetActivePlots((2))
         instruction_visit m2=MeshAttributes()
         instruction_visit m2.lineWidth = 5
-        instruction_visit try: m2.meshColorSource=0
+        instruction_visit try: m2.meshColorSource=m2.MeshCustom
         instruction_visit except: m2.foregroundFlag=0
         instruction_visit m2.legendFlag = 0
         instruction_visit m2.meshColor=(255,0,0,255)
@@ -309,7 +309,7 @@ EOF
         instruction_visit m3.lineWidth = 3
         instruction_visit m3.opaqueMode=m2.Off
         instruction_visit m3.legendFlag = 0
-        instruction_visit try: m3.meshColorSource=0
+        instruction_visit try: m3.meshColorSource=m3.MeshCustom
         instruction_visit except: m3.foregroundFlag=0
         instruction_visit m3.meshColor=(0,0,255,255)
         instruction_visit SetPlotOptions(m3)
@@ -319,7 +319,7 @@ EOF
         instruction_visit m4.lineWidth = 1
         instruction_visit m4.opaqueMode=m2.Off
         instruction_visit m4.legendFlag = 0
-        instruction_visit try: m4.meshColorSource=0
+        instruction_visit try: m4.meshColorSource=m4.MeshCustom
         instruction_visit except: m4.foregroundFlag=0
         instruction_visit m4.meshColor=(255,255,0,255)
         instruction_visit SetPlotOptions(m4)
