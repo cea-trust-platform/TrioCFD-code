@@ -136,6 +136,8 @@ public:
   // Acces aux grandeurs calculees a partir du maillage:
   virtual const ArrOfDouble& get_update_surface_facettes() const;
   virtual const DoubleTab& get_update_normale_facettes() const;
+  virtual double compute_normale_element(const int elem, const bool normalize, ArrOfDouble&  normale) const;
+  virtual double compute_surface_and_normale_element(const int elem, const bool normalize, double surface, double normal[3]) const;
   virtual const ArrOfDouble& get_update_courbure_sommets() const;
 
   virtual const ArrOfDouble& get_surface_facettes() const;

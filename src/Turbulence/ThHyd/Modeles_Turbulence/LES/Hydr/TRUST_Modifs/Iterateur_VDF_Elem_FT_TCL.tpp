@@ -140,17 +140,20 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
           // so many times but I don't know how to proceed as "tcl" is only defined if sub_types are true.
           // Or is it? Maybe it works in any case if any pb can have an empty tcl model as an embedded object...
           const ArrOfInt& elems_with_CL_contrib = tcl->elems();
+          const ArrOfInt& boundary_faces = tcl->boundary_faces();
           const ArrOfDouble& Q_from_CL = tcl->Q();
           //tcl.compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, mpoint_from_CL, Q_from_CL);
-          const int elemf = face_voisins(face, 0)+face_voisins(face, 1) +1;
           const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
-          const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
+          const int nb_contact_line_contribution = Q_from_CL.size_array();
           int nb_contrib = 0;
           for (int idx = 0; idx < nb_contact_line_contribution; idx++)
             {
               const int elemi = elems_with_CL_contrib[idx];
-              if (elemi == elemf)
+              const int facei = boundary_faces[idx];
+              const int elem_bord_with_facei = face_voisins(facei, 0)+face_voisins(facei, 1) +1;
+              if (facei == face)
                 {
+                  // The corresponding contribution should be assigned to the face
                   nb_contrib++;
                   const double TCL_wall_flux = Q_from_CL[idx];
                   // val should be : -rho*Cp * flux(W)
@@ -169,6 +172,13 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
                       flux[k] += val;
                     }
                   Cerr << " new-flux = " << flux[k] << " [contrib #" << nb_contrib << "]" <<  finl;
+                  if (elem_bord_with_facei != elemi)
+                    {
+                      // In this case, the flux is meso-region from a cell not adjacent to the wall.
+                      // So what? Does it really matter?
+                      // I believe that the fact that we take the interfacial flux from elemi and apply it at the wall
+                      // face that is a boundary to elem_of_facei is not really an issue.
+                    }
                 }
             }
         }
