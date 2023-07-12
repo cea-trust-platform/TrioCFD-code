@@ -15,6 +15,20 @@
 
 #include <OpCentre4IJK.h>
 
+Implemente_instanciable(OpConvCentre4IJK_double, "OpConvCentre4IJK_double", OpConvIJKFacesCommon_double);
+
+Sortie& OpConvCentre4IJK_double::printOn(Sortie& os) const
+{
+  //  OpConvIJKFacesCommon_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvCentre4IJK_double::readOn(Entree& is)
+{
+  //  OpConvIJKFacesCommon_double::readOn(is);
+  return is;
+}
+
 inline void calcul_g(const double& dxam, const double& dx, const double& dxav, double& g1, double& g2, double& g3, double& g4)
 {
   g1 = -dx*dx*(dx/2+dxav)/(4*(dx+dxam+dxav)*(dx+dxam)*dxam);

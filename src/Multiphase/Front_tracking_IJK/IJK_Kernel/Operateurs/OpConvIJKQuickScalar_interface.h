@@ -40,27 +40,32 @@
 
 class Corrige_flux_FT;
 
-class OpConvIJKQuickScalarInterface_double
-  : public OpConvIJKQuickScalar_double
+class OpConvIJKQuickScalarInterface_double  : public OpConvIJKQuickScalar_double
 {
+  Declare_instanciable_sans_constructeur(OpConvIJKQuickScalarInterface_double);
+
+public:
+  OpConvIJKQuickScalarInterface_double() : OpConvIJKQuickScalar_double() {};
+
 protected:
   // Ces methodes devraient cacher les methodes de OpConv..._base
   // Mais pas sur. Je pense que ca ne marche pas si on appelle
   // la methode de OpConv..base elle les trouvera qd meme.
   void compute_set(IJK_Field_double& dx) override;
-  // void compute_add(IJK_Field_double& dx) final;
-  Corrige_flux_FT *correction_ {};
+  //   void compute_add(IJK_Field_double& dx) final;
 
 public:
+//  virtual void initialize(const IJK_Splitting& splitting,
+//                          Corrige_flux_FT& corrige_flux);
+//  virtual void initialize(const IJK_Splitting& splitting,
+//  												const IJK_Field& indicatrice,
+//                  				Corrige_flux_FT& corrige_flux);
   // using OpConvIJKQuickScalar_double::calculer;
   // using OpConvIJKQuickScalar_double::ajouter;
   // OpConvIJKQuickScalarInterface_double() :
   // correction_{}
   // {
   // }
-  virtual ~OpConvIJKQuickScalarInterface_double() {};
-  void initialize(const IJK_Splitting& splitting,
-                  Corrige_flux_FT& corrige_flux);
   // void calculer(const IJK_Field_double& convect, const IJK_Field_double&
   // disc_prop, const IJK_Field_double& vx, const IJK_Field_double& vy, const
   // IJK_Field_double& vz, IJK_Field_double& res);

@@ -20,6 +20,7 @@
 
 class OpConvCentre2IJKScalar_double : public OpConvIJKElemCommon_double
 {
+  Declare_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double);
 public:
   OpConvCentre2IJKScalar_double() : OpConvIJKElemCommon_double() { }
 protected:

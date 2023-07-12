@@ -38,7 +38,8 @@
  */
 IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
   statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
-  d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_)
+  d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_),
+  thermal_subresolution_(ijk_ft.thermal_subresolution_)
 {
   groups_statistiques_FT_.dimensionner(0);
 }
@@ -417,6 +418,14 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           {
             posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);
             ++idx_en;
+          }
+      }
+      {
+        int idx_th_subres = 0;
+        for (auto&& itr = thermal_subresolution_.begin(); itr != thermal_subresolution_.end(); ++itr)
+          {
+            posttraiter_tous_champs_thermal_subresolution(liste_post_instantanes_, idx_th_subres);
+            ++idx_th_subres;
           }
       }
     }
@@ -924,6 +933,15 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
         if (idx_en == 0)
           n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_en;
+      }
+    int idx_th_subres = 0;
+    for (auto &itr : thermal_subresolution_)
+      {
+        int nb = posttraiter_champs_instantanes_thermal_subresolution(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th_subres);
+        // Interfacial thermal fields :
+        if (idx_th_subres == 0)
+          n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
+        ++idx_th_subres;
       }
 
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
@@ -2635,6 +2653,13 @@ void IJK_FT_Post::compute_phase_pressures_based_on_poisson(const int phase)
 
 // Methode appelee lorsqu'on a mis "TOUS" dans la liste des champs a postraiter.
 // Elle ajoute a la liste tous les noms de champs postraitables par IJK_Interfaces
+
+void IJK_FT_Post::posttraiter_tous_champs_thermal_subresolution(Motcles& liste, const int idx) const
+{
+  liste.add("TEMPERATURE");
+}
+
+
 void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste, const int idx) const
 {
   liste.add("TEMPERATURE");
@@ -2682,8 +2707,29 @@ void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste, const int idx)
   liste.add("DIV_RHO_CP_T_V");
 }
 
+int IJK_FT_Post::posttraiter_champs_instantanes_thermal_subresolution(const Motcles& liste_post_instantanes,
+                                                                      const char *lata_name, const int latastep, const double current_time, IJK_Thermal_Subresolution& itr,
+                                                                      const int idx)
+{
+  Cerr << liste_post_instantanes << finl;
+  int n = 0; // nombre de champs postraites
+  std::ostringstream oss;
+  oss << "TEMPERATURE_" << idx;
+  Nom nom_temp(oss.str().c_str());
+  if ((liste_post_instantanes_.contient_("TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temp, itr.temperature_, latastep);
+    }
+  oss.str("");
+  return n;
+}
+
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Thermique& itr,
+int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
+                                                          const char *lata_name,
+                                                          const int latastep,
+                                                          const double current_time,
+                                                          IJK_Thermique& itr,
                                                           const int idx)
 {
   Cerr << liste_post_instantanes << finl;

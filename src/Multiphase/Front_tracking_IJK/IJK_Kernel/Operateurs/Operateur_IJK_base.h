@@ -20,6 +20,7 @@
 #include <IJK_Field_simd_tools.h>
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_data_channel.h>
+#include <Corrige_flux_FT.h>
 
 inline void putzero(IJK_Field_local_double& flux)
 {
@@ -41,14 +42,15 @@ inline void putzero(IJK_Field_local_double& flux)
 // The derived class must implement a public "compute" method that will call compute_set()
 // or compute_add() (see for example OpDiffTurbIJK_double and OpConvCentre4IJK_double)
 // It must also implement the compute_flux...() methods to compute fluxes between the control volumes.
-class Operateur_IJK_faces_base_double
+class Operateur_IJK_faces_base_double : public Objet_U
 {
+  Declare_base( Operateur_IJK_faces_base_double );
+
 public:
-  virtual ~Operateur_IJK_faces_base_double() {};
   virtual double compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
-protected:
   void compute_set(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   void compute_add(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
+protected:
   // The derived class must implement the computation of fluxes (9 methods)
   // See for example classes OpDiffTurbIJK_double and OpConvCentre4IJK_double.
   virtual void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer) = 0;
@@ -75,13 +77,15 @@ private:
 };
 
 // Same, but base class for operator on cell centered scalar datapeeb
-class Operateur_IJK_elem_base_double
+class Operateur_IJK_elem_base_double : public Objet_U
 {
+  Declare_base( Operateur_IJK_elem_base_double );
+
 public:
-  virtual ~Operateur_IJK_elem_base_double() {};
-protected:
+  virtual void initialize(const IJK_Splitting& splitting)=0;
   virtual void compute_set(IJK_Field_double& dx);
   virtual void compute_add(IJK_Field_double& dx);
+protected:
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
   virtual void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) = 0;
@@ -89,7 +93,6 @@ protected:
 
 private:
   void compute_(IJK_Field_double& dx, bool add);
-
 
 };
 

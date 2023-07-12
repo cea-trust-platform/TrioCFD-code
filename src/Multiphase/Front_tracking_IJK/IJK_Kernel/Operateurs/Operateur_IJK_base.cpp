@@ -36,17 +36,12 @@
 //   flux_i(i+1,j,k) at right
 //   ...
 
-
-
-
-
 static inline void swap_data(IJK_Field_local_double*& a, IJK_Field_local_double*& b)
 {
   IJK_Field_local_double *tmp=a;
   a=b;
   b=tmp;
 }
-
 
 // Compute the "- divergence" of the given flux, integrated over control volume
 // We assume than flux contain the integral of the flux on the faces of the control volumes
@@ -100,6 +95,25 @@ static void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Fie
       resu_ptr.next_j();
     }
 
+}
+
+
+/*
+ * Operateur_IJK_faces_base
+ */
+
+Implemente_base(Operateur_IJK_faces_base_double,"Operateur_IJK_faces_base_double", Objet_U);
+
+Sortie& Operateur_IJK_faces_base_double::printOn(Sortie& os) const
+{
+  //  Objet_U::printOn(os);
+  return os;
+}
+
+Entree& Operateur_IJK_faces_base_double::readOn(Entree& is)
+{
+  //  Objet_U::readOn(is);
+  return is;
 }
 
 // Compute the maximum stable timestep for a convection scheme on the local processor.
@@ -227,6 +241,24 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
 }
 
 
+/*
+ * Operateur_IJK_elem_base
+ */
+
+Implemente_base(Operateur_IJK_elem_base_double,"Operateur_IJK_elem_base_double",Objet_U);
+
+Sortie& Operateur_IJK_elem_base_double::printOn(Sortie& os) const
+{
+  //  Objet_U::printOn(os);
+  return os;
+}
+
+Entree& Operateur_IJK_elem_base_double::readOn(Entree& is)
+{
+  //  Objet_U::readOn(is);
+  return is;
+}
+
 void Operateur_IJK_elem_base_double::compute_set(IJK_Field_double& dx)
 {
   compute_(dx, 0);
@@ -251,6 +283,10 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
   IJK_Field_local_double * const flux_y = &tmp[3];
 
   compute_flux_z(*flux_zmin, 0);
+  // TODO: correct_flux_z_min();
+  // fluxes_to_correct ?
+  // Critere fabs(fluxes_to_correct)<DMAX_FLOAT ?
+  // Zero valeur admissible
 
   const int kmax = dx.nk();
   for (int k = 0; k < kmax; k++)
@@ -258,6 +294,8 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
       compute_flux_x(*flux_x, k);
       compute_flux_y(*flux_y, k);
       compute_flux_z(*flux_zmax, k+1);
+      // TODO: correct_flux()
+      // Subresolution
       Operator_IJK_div(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
       swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
     }

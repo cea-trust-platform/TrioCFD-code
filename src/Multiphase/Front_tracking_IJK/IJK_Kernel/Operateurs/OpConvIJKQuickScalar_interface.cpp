@@ -58,6 +58,20 @@
 //   flux_i(i+1,j,k) at right
 //   ...
 
+Implemente_instanciable_sans_constructeur(OpConvIJKQuickScalarInterface_double, "OpConvIJKQuickScalarInterface_double", OpConvIJKQuickScalar_double);
+
+Sortie& OpConvIJKQuickScalarInterface_double::printOn(Sortie& os) const
+{
+  //  OpConvIJKQuickScalar_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvIJKQuickScalarInterface_double::readOn(Entree& is)
+{
+  //  OpConvIJKQuickScalar_double::readOn(is);
+  return is;
+}
+
 static inline void swap_data(IJK_Field_local_double *& a,
                              IJK_Field_local_double *& b)
 {
@@ -116,19 +130,6 @@ static void Operator_IJK_div_set(const IJK_Field_local_double& flux_x,
   }
 }
 
-void OpConvIJKQuickScalarInterface_double::initialize(
-  const IJK_Splitting& splitting, Corrige_flux_FT& corrige)
-{
-  OpConvIJKQuickScalar_double::initialize(splitting);
-  perio_k_ = splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
-  channel_data_.initialize(splitting);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
-  correction_ = &corrige;
-}
-
 // Finalement on va faire ces manipulations dans la correction de flux, comme ça
 // il n'y a pas d'erreur possible. void
 // OpConvIJKQuickScalarInterface_double::calculer(const IJK_Field_double&
@@ -159,10 +160,10 @@ void OpConvIJKQuickScalarInterface_double::compute_set(IJK_Field_double& dx)
   IJK_Field_local_double *const flux_y = &tmp[3];
 
   // Une fois pour tout le domaine
-  correction_->update();
+  corrige_flux_->update();
 
   compute_flux_z(*flux_zmin, 0);
-  correction_->corrige_flux_faceIJ(flux_zmin, -1, 2);
+  corrige_flux_->corrige_flux_faceIJ(flux_zmin, -1, 2);
 
   const int kmax = dx.nk();
   for (int k = 0; k < kmax; k++)
@@ -170,10 +171,10 @@ void OpConvIJKQuickScalarInterface_double::compute_set(IJK_Field_double& dx)
       compute_flux_x(*flux_x, k);
       compute_flux_y(*flux_y, k);
       compute_flux_z(*flux_zmax, k + 1);
-      correction_->corrige_flux_faceIJ(flux_x, k, 0);
-      correction_->corrige_flux_faceIJ(flux_y, k, 1);
+      corrige_flux_->corrige_flux_faceIJ(flux_x, k, 0);
+      corrige_flux_->corrige_flux_faceIJ(flux_y, k, 1);
       // correction_->corrige_flux_faceIJ(flux_zmin, k, 2);
-      correction_->corrige_flux_faceIJ(flux_zmax, k, 2);
+      corrige_flux_->corrige_flux_faceIJ(flux_zmax, k, 2);
       Operator_IJK_div_set(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k);
       swap_data(flux_zmin,
                 flux_zmax); // conserve le flux en z pour la couche z suivante

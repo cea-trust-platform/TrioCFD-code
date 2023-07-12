@@ -20,9 +20,45 @@
 
 class OpDiffIJKScalarGeneric_double : public Operateur_IJK_elem_base_double
 {
+  Declare_base_sans_constructeur(OpDiffIJKScalarGeneric_double);
 public:
   OpDiffIJKScalarGeneric_double();
-  void initialize(const IJK_Splitting& splitting);
+  virtual void initialize(const IJK_Splitting& splitting) override;
+//  virtual void calculer(const IJK_Field_double& field,
+//                const IJK_Field_double& coeff_field_x,
+//                const IJK_Field_double& coeff_field_y,
+//                const IJK_Field_double& coeff_field_z,
+//                IJK_Field_double& result,
+//                const IJK_Field_local_double& boundary_flux_kmin,
+//                const IJK_Field_local_double& boundary_flux_kmax);
+//  virtual void ajouter(const IJK_Field_double& field,
+//               const IJK_Field_double& coeff_field_x,
+//               const IJK_Field_double& coeff_field_y,
+//               const IJK_Field_double& coeff_field_z,
+//               IJK_Field_double& result,
+//               const IJK_Field_local_double& boundary_flux_kmin,
+//               const IJK_Field_local_double& boundary_flux_kmax);
+  virtual void calculer(const IJK_Field_double& field,
+                        IJK_Field_double& result,
+                        const IJK_Field_local_double& boundary_flux_kmin,
+                        const IJK_Field_local_double& boundary_flux_kmax);
+  virtual void ajouter(const IJK_Field_double& field,
+                       IJK_Field_double& result,
+                       const IJK_Field_local_double& boundary_flux_kmin,
+                       const IJK_Field_local_double& boundary_flux_kmax);
+
+  inline void set_uniform_lambda(const double uniform_lambda) { uniform_lambda_ = &uniform_lambda; };
+
+  inline void set_lambda(IJK_Field_local_double& lambda) { lambda_ = &lambda; };
+
+  inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
+                              IJK_Field_local_double& coeff_field_y,
+                              IJK_Field_local_double& coeff_field_z)
+  {
+    coeff_field_x_ = &coeff_field_x;
+    coeff_field_y_ = &coeff_field_y;
+    coeff_field_z_ = &coeff_field_z;
+  }
 
   inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
   {
@@ -41,10 +77,11 @@ protected:
   template <DIRECTION _DIR_>
   inline void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
 
-  const IJK_Field_local_double& get_lambda_vectorial(DIRECTION _DIR_);
+//  const IJK_Field_local_double& get_lambda_vectorial(DIRECTION _DIR_);
+//
+//  const IJK_Field_local_double& get_structural_model(DIRECTION _DIR_);
 
-  const IJK_Field_local_double& get_structural_model(DIRECTION _DIR_);
-
+  const IJK_Field_local_double& get_model(DIRECTION _DIR_);
 
   Operateur_IJK_data_channel channel_data_;
   bool perio_k_;
@@ -53,14 +90,19 @@ protected:
   const IJK_Field_local_double *input_field_;
 
   const IJK_Field_local_double *lambda_;
+  const double *uniform_lambda_;
 
-  const IJK_Field_local_double *lambda_vector_x_;
-  const IJK_Field_local_double *lambda_vector_y_;
-  const IJK_Field_local_double *lambda_vector_z_;
+  const IJK_Field_local_double *coeff_field_x_;
+  const IJK_Field_local_double *coeff_field_y_;
+  const IJK_Field_local_double *coeff_field_z_;
 
-  const IJK_Field_local_double *structural_model_x_;
-  const IJK_Field_local_double *structural_model_y_;
-  const IJK_Field_local_double *structural_model_z_;
+//  const IJK_Field_local_double *lambda_vector_x_;
+//  const IJK_Field_local_double *lambda_vector_y_;
+//  const IJK_Field_local_double *lambda_vector_z_;
+//
+//  const IJK_Field_local_double *structural_model_x_;
+//  const IJK_Field_local_double *structural_model_y_;
+//  const IJK_Field_local_double *structural_model_z_;
 
   const IJK_Field_local_double *boundary_flux_kmin_;
   const IJK_Field_local_double *boundary_flux_kmax_;
@@ -68,103 +110,60 @@ protected:
   bool is_anisotropic_;
   bool is_vectorial_;
   bool is_structural_;
+  bool is_uniform_;
+  bool is_corrected_;
+
 };
 
+class OpDiffUniformIJKScalar_double : public OpDiffIJKScalarGeneric_double
+{
+  Declare_instanciable_sans_constructeur(OpDiffUniformIJKScalar_double);
+public:
+  OpDiffUniformIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_uniform_ = true; }
+};
+
+class OpDiffUniformIJKScalarCorrection_double : public OpDiffIJKScalarGeneric_double
+{
+  Declare_instanciable_sans_constructeur(OpDiffUniformIJKScalarCorrection_double);
+public:
+  OpDiffUniformIJKScalarCorrection_double() : OpDiffIJKScalarGeneric_double() { is_uniform_ = true, is_corrected_ = true; }
+};
 
 class OpDiffIJKScalar_double : public OpDiffIJKScalarGeneric_double
 {
+  Declare_instanciable_sans_constructeur(OpDiffIJKScalar_double);
 public:
   OpDiffIJKScalar_double() : OpDiffIJKScalarGeneric_double() {}
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& molecular_alpha,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& molecular_alpha,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
 };
 
 class OpDiffAnisotropicIJKScalar_double : public OpDiffIJKScalarGeneric_double
 {
+  Declare_instanciable_sans_constructeur(OpDiffAnisotropicIJKScalar_double);
 public:
   OpDiffAnisotropicIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_anisotropic_ = true; }
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& molecular_alpha,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& molecular_alpha,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
 };
 
 class OpDiffVectorialIJKScalar_double : public OpDiffIJKScalarGeneric_double
 {
+  Declare_instanciable_sans_constructeur(OpDiffVectorialIJKScalar_double);
 public:
   OpDiffVectorialIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_vectorial_ = true; }
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& molecular_alpha_vector_x,
-                const IJK_Field_double& molecular_alpha_vector_y,
-                const IJK_Field_double& molecular_alpha_vector_z,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& molecular_alpha_vector_x,
-               const IJK_Field_double& molecular_alpha_vector_y,
-               const IJK_Field_double& molecular_alpha_vector_z,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
 };
 
 class OpDiffVectorialAnisotropicIJKScalar_double : public OpDiffIJKScalarGeneric_double
 {
+  Declare_instanciable_sans_constructeur(OpDiffVectorialAnisotropicIJKScalar_double);
 public:
   OpDiffVectorialAnisotropicIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_vectorial_ = true, is_anisotropic_ = true; }
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& molecular_alpha_vector_x,
-                const IJK_Field_double& molecular_alpha_vector_y,
-                const IJK_Field_double& molecular_alpha_vector_z,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& molecular_alpha_vector_x,
-               const IJK_Field_double& molecular_alpha_vector_y,
-               const IJK_Field_double& molecular_alpha_vector_z,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
 };
 
 class OpDiffIJKScalarStructuralOnly_double : public OpDiffIJKScalarGeneric_double
 {
+  Declare_instanciable_sans_constructeur(OpDiffIJKScalarStructuralOnly_double);
 public:
   OpDiffIJKScalarStructuralOnly_double() : OpDiffIJKScalarGeneric_double() { is_structural_ = true; }
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& structural_model_x,
-                const IJK_Field_double& structural_model_y,
-                const IJK_Field_double& structural_model_z,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& structural_model_x,
-               const IJK_Field_double& structural_model_y,
-               const IJK_Field_double& structural_model_z,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
-
 };
 
 #include <OpDiffTurbIJKScalar.tpp>
-
 
 #endif

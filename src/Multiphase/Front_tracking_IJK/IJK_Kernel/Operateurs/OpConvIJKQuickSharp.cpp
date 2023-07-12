@@ -15,6 +15,20 @@
 
 #include <OpConvIJKQuickSharp.h>
 
+Implemente_instanciable(OpConvIJKQuickSharp_double, "OpConvIJKQuickSharp_double", OpConvIJKFacesCommon_double);
+
+Sortie& OpConvIJKQuickSharp_double::printOn(Sortie& os) const
+{
+  //  OpConvIJKFacesCommon_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvIJKQuickSharp_double::readOn(Entree& is)
+{
+  //  OpConvIJKFacesCommon_double::readOn(is);
+  return is;
+}
+
 void OpConvIJKQuickSharp_double::initialize(const IJK_Splitting& splitting)
 {
   OpConvIJKFacesCommon_double::initialize(splitting);

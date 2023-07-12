@@ -19,6 +19,7 @@
 
 class OpConvAmontIJK_double : public OpConvIJKFacesCommon_double
 {
+  Declare_instanciable(OpConvAmontIJK_double);
 protected:
 
   inline void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer) override

@@ -15,69 +15,40 @@
 
 #include <OpConvDiscIJKQuickScalar.h>
 
+Implemente_instanciable_sans_constructeur(OpConvDiscIJKQuickScalar_double, "OpConvDiscIJKQuickScalar_double", OpConvIJKElemCommon_double);
 
-void OpConvDiscIJKQuickScalar_double::initialize(const IJK_Splitting& splitting)
+Sortie& OpConvDiscIJKQuickScalar_double::printOn(Sortie& os) const
 {
-  OpConvIJKElemCommon_double::initialize(splitting);
-  input_indicatrice_ = 0;
+  //  OpConvIJKElemCommon_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvDiscIJKQuickScalar_double::readOn(Entree& is)
+{
+  //  OpConvIJKElemCommon_double::readOn(is);
+  return is;
 }
 
 void OpConvDiscIJKQuickScalar_double::calculer(const IJK_Field_double& field,
-                                               const IJK_Field_double& ref_ijk,
                                                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                                IJK_Field_double& result)
 {
-  // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
-  assert(channel_data_.get_delta_z().size() == field.nk());
-
-  input_velocity_x_ = &vx;
-  input_velocity_y_ = &vy;
-  input_velocity_z_ = &vz;
-  input_indicatrice_ = &ref_ijk;
-  input_field_ = &field;
-  stored_curv_fram_layer_z_ = -1000; // put a non-existant layer index: curv_fram will be computed at first call
-  // Storage for curvature and fram limiter. We need 1 ghost layer:
-  //  flux at left of the leftmost field data requires curv and fram on the element at left
-  //  flux at the right of the rightmost field data requires on the element at right
-  // We need 4 layers of temporary storage: curv and fram, and, for each, two consecutive layers in z
-  const int ni = field.ni();
-  const int nj = field.nj();
-  tmp_curv_fram_.allocate(ni, nj, 4, 1);
-  compute_set(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  OpConvIJKElemCommon_double::calculer(field, vx, vy, vz, result);
   input_indicatrice_ = 0;
 
 }
 
 void OpConvDiscIJKQuickScalar_double::ajouter(const IJK_Field_double& field,
-                                              const IJK_Field_double& ref_ijk,
                                               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                               IJK_Field_double& result)
 {
-  // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
-  assert(channel_data_.get_delta_z().size() == field.nk());
-
-  input_velocity_x_ = &vx;
-  input_velocity_y_ = &vy;
-  input_velocity_z_ = &vz;
-  input_field_ = &field;
-  input_indicatrice_ = &ref_ijk;
-  stored_curv_fram_layer_z_ = -1000; // put a non-existant layer index: curv_fram will be computed at first call
-  // Storage for curvature and fram limiter. We need 1 ghost layer:
-  //  flux at left of the leftmost field data requires curv and fram on the element at left
-  //  flux at the right of the rightmost field data requires on the element at right
-  // We need 4 layers of temporary storage: curv and fram, and, for each, two consecutive layers in z
-  const int ni = field.ni();
-  const int nj = field.nj();
-  tmp_curv_fram_.allocate(ni, nj, 4, 1);
-  compute_add(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  OpConvIJKElemCommon_double::ajouter(field, vx, vy, vz, result);
   input_indicatrice_ = 0;
 
 }
+
+//void OpConvDiscIJKQuickScalar_double::initialize(const IJK_Splitting& splitting)
+//{
+//  OpConvIJKElemCommon_double::initialize(splitting, indicatrice);
+//  input_indicatrice_ = 0;
+//}

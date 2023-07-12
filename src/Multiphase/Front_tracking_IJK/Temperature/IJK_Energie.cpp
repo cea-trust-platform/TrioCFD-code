@@ -173,15 +173,19 @@ int IJK_Energie::initialize(const IJK_Splitting& splitting, const int idx)
   nalloc += 5;
 
   diffusion_temperature_op_.initialize(splitting);
-  corrige_flux_temp_conv_.initialize(
+
+  corrige_flux_.typer("Corrige_flux_FT_temperature_conv");
+
+  corrige_flux_.set_physical_parameters(rho_cp_.liqu(), rho_cp_.vap(),
+                                        lda_.liqu(), lda_.vap());
+  corrige_flux_.initialize(
     ref_ijk_ft_->get_splitting_ns(),
     temperature_,
     ref_ijk_ft_->itfce(),
-    ref_ijk_ft_,
-    rho_cp_.liqu(), rho_cp_.vap(),
-    lda_.liqu(), lda_.vap());
-  energy_convection_op_quick_interface_.initialize(
-    splitting, corrige_flux_temp_conv_);
+    ref_ijk_ft_);
+
+  energy_convection_op_quick_interface_.set_corrige_flux(corrige_flux_);
+  energy_convection_op_quick_interface_.initialize(splitting);
 
 
   if ((ref_ijk_ft_.non_nul()) and (!ref_ijk_ft_->disable_diphasique()))
@@ -476,8 +480,9 @@ void IJK_Energie::add_temperature_diffusion()
     }
   else
     {
+      diffusion_temperature_op_.set_lambda(lambda_);
       diffusion_temperature_op_.calculer(
-        temperature_, lambda_, div_lambda_grad_T_volume_, boundary_flux_kmin_,
+        temperature_, div_lambda_grad_T_volume_, boundary_flux_kmin_,
         boundary_flux_kmax_);
       // Update d_temperature
       // d_temperature_ +=div_lambda_grad_T_volume_;
@@ -791,10 +796,22 @@ void IJK_Energie::compute_interfacial_temperature2(
   temp_vap.set_smart_resize(1);
   coo_liqu.set_smart_resize(1);
   coo_vap.set_smart_resize(1);
-  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
-    temperature_ft_, lambda_liquid_, lambda_vapor_, dist, coord_facettes,
-    normale_facettes, interfacial_temperature, flux_normal_interp, temp_liqu,
-    temp_vap, coo_liqu, coo_vap);
+//  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
+//    temperature_ft_, lambda_liquid_, lambda_vapor_, dist, coord_facettes,
+//    normale_facettes, interfacial_temperature, flux_normal_interp, temp_liqu,
+//    temp_vap, coo_liqu, coo_vap);
+  corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
+                                                  lambda_liquid_,
+                                                  lambda_vapor_,
+                                                  dist,
+                                                  coord_facettes,
+                                                  normale_facettes,
+                                                  interfacial_temperature,
+                                                  flux_normal_interp,
+                                                  temp_liqu,
+                                                  temp_vap,
+                                                  coo_liqu,
+                                                  coo_vap);
   for (int fa7 = 0; fa7 < nb_facettes; fa7++)
     {
       flux_normal_interp(fa7) *= surface_facettes(fa7);
@@ -829,6 +846,123 @@ double IJK_Energie::compute_global_energy(const IJK_Field_double& temperature)
                                                     DIRECTION_K);
   global_energy_ = mp_sum(global_energy_) / (double)(ntot);
   return global_energy_;
+}
+
+/*
+ * Methods that do not belong to the class
+ */
+
+// From DNS_QC; Vectorize code later?
+int IJK_Energie::calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax)
+{
+  const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
+  const int nktot = temperature.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
+  int k;
+  // calcul l'indice k de la couche de mailles voisine du bord. Si je n'ai pas de bord, on met k = -1
+  if (!bord_kmax)
+    {
+      // on veut le bord "k_global = 0"
+      if (kmin == 0)
+        {
+          // ce bord est chez moi... et il est en k=0
+          k = 0;
+        }
+      else
+        {
+          // ce bord n'est pas chez moi
+          k = -1;
+        }
+    }
+  else
+    {
+      // on veut le bord kmax
+      if (kmin + temperature.nk() == nktot)
+        {
+          // ce bord est chez moi... et il est en k= truc...
+          k = temperature.nk() - 1;
+        }
+      else
+        {
+          k = -1;
+        }
+    }
+  return k;
+}
+
+// From DNS_QC; Vectorize code later?
+// valeur de retour: indice local du plan de temperature voisin utilise,
+//  -1 si on n'a pas le bord sur ce processeur
+// Calcule l'integrale sur chaque face du bord demande du flux de chaleur a travers la face
+// positif si le flux va vers les k positifs.
+int IJK_Energie::calculer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                              const double lambda_de_t_paroi,
+                                              const double T_paroi_impose,
+                                              IJK_Field_local_double& flux_bord,
+                                              const bool bord_kmax)
+{
+  const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
+  int k = calculer_k_pour_bord(temperature, bord_kmax);
+  if (k == -1)
+    return k;
+
+  // redimensionne flux_bord avec ni * nj:
+  const int ni = temperature.ni(); // nombre d'element local sur ce processeur
+  const int nj = temperature.nj();
+  flux_bord.allocate(ni, nj, 1 /* 1 seule couche de valeurs en k */, 0 /* pas d'elements fantomes */);
+
+  const IJK_Grid_Geometry& geometry = temperature.get_splitting().get_grid_geometry();
+  const double delta_k = geometry.get_delta(DIRECTION_K)[k + kmin]; // k+kmin est l'indice global de la maille locale k
+  double facteur = 2.0 / delta_k * geometry.get_constant_delta(DIRECTION_I) * geometry.get_constant_delta(DIRECTION_J);
+  if (bord_kmax)
+    facteur *= -1.; // he he... je vous laisse reflechir a ca :)
+  // nan c'est pas simpa: la convention dans l'operateur de diffusion est
+  //   d/dt = flux(i,j) - flux(i+1,j) + ... + flux(i,j,k) - flux(i,j,k+1)
+  // donc si la paroi inferieure (k=0) est plus froide que le fluide, il faut que le flux stocke soit negatif.
+  // et si la paroi inferieure (k=kmax) est plus froide que le fluide, il faut que le flux stocke soit positif.
+  for (int j = 0; j < nj; j++)
+    {
+      for (int i = 0; i < ni; i++)
+        {
+          // Temperature de la maille voisine
+          const double t = temperature(i,j,k);
+          // le flux est positif s'il va vers les k croissants
+          flux_bord(i,j,0) = (T_paroi_impose - t) * lambda_de_t_paroi * facteur;
+        }
+    }
+  return k;
+}
+int IJK_Energie::imposer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                             const double flux_paroi_impose,
+                                             IJK_Field_local_double& flux_bord,
+                                             const bool bord_kmax)
+{
+  int k = calculer_k_pour_bord(temperature, bord_kmax);
+  if (k == -1)
+    return k;
+
+  // redimensionne flux_bord avec ni * nj:
+  const int ni = temperature.ni(); // nombre d'element local sur ce processeur
+  const int nj = temperature.nj();
+  flux_bord.allocate(ni, nj, 1 /* 1 seule couche de valeurs en k */, 0 /* pas d'elements fantomes */);
+  //MR je multiplie le flux par la surface dxdy
+  const IJK_Grid_Geometry& geometry = temperature.get_splitting().get_grid_geometry();
+
+  double facteur = 1.* geometry.get_constant_delta(DIRECTION_I) * geometry.get_constant_delta(DIRECTION_J);
+  if (bord_kmax)
+    facteur *= -1.; // he he... je vous laisse reflechir a ca :)
+  // nan c'est pas simpa: la convention dans l'operateur de diffusion est
+  //   d/dt = flux(i,j) - flux(i+1,j) + ... + flux(i,j,k) - flux(i,j,k+1)
+  // donc si la paroi inferieure (k=0) est plus froide que le fluide, il faut que le flux stocke soit negatif.
+  // et si la paroi superieure (k=kmax) est plus froide que le fluide, il faut que le flux stocke soit positif.
+  for (int j = 0; j < nj; j++)
+    {
+      for (int i = 0; i < ni; i++)
+        {
+          // le flux est positif s'il va vers les k croissants
+          flux_bord(i,j,0) = flux_paroi_impose * facteur;
+        }
+    }
+  return k;
 }
 
 double IJK_Energie::get_rhocp_l() const { return rho_cp_.liqu(); }

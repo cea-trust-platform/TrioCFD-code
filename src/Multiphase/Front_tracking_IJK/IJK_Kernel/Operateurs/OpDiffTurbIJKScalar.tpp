@@ -37,9 +37,29 @@ void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, 
   const int ny = _DIR_ == DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
 
   ConstIJK_double_ptr input_field(*input_field_, 0, 0, k_layer);
-  ConstIJK_double_ptr lambda(is_vectorial_? get_lambda_vectorial(_DIR_) : *lambda_, 0, 0, k_layer);
   const IJK_Field_local_double dummy_field = *input_field_;
-  ConstIJK_double_ptr structural_model(is_structural_ ? get_structural_model(_DIR_) : dummy_field, 0, 0, k_layer);
+//  ConstIJK_double_ptr lambda(is_vectorial_? get_lambda_vectorial(_DIR_) : *lambda_, 0, 0, k_layer);
+  Simd_double avg_lambda(1.);
+  if (uniform_lambda_)
+    {
+      Simd_double uniform_lambda(*uniform_lambda_);
+      avg_lambda *= uniform_lambda;
+    }
+//  if (is_uniform_)
+//  	{ avg_lambda(*uniform_lambda_); }
+//  else
+//  	{
+  if (uniform_lambda_)
+    {
+      lambda_=input_field_;
+    }
+  ConstIJK_double_ptr lambda(is_vectorial_? get_model(_DIR_) : *lambda_, 0, 0, k_layer);
+
+//	ConstIJK_double_ptr lambda;
+//	IF LAMBDA_.NON_NULL() LAMBDA
+//			(is_vectorial_? get_lambda_vectorial(_DIR_) : *lambda_, 0, 0, k_layer);
+//		}
+  ConstIJK_double_ptr structural_model(is_structural_ ? get_model(_DIR_) : dummy_field, 0, 0, k_layer);
 
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
 
@@ -104,7 +124,7 @@ void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, 
       for (int i = 0; i < imax; i += vsize)
         {
           Simd_double flux = 0.;
-          if(is_structural_)
+          if (is_structural_)
             {
               Simd_double s_mo, s_mo_dummy;
               structural_model.get_left_center(_DIR_, i, s_mo_dummy, s_mo);
@@ -112,23 +132,26 @@ void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, 
             }
           else
             {
-
-              Simd_double left_val, right_val, lambda_m1, lambda_m2;
+              Simd_double left_val, right_val;
               input_field.get_left_center(_DIR_, i, left_val, right_val);
-              // Fetch conductivity on neighbour cells:
-              lambda.get_left_center(_DIR_, i, lambda_m1, lambda_m2);
+              if (!is_uniform_)
+                {
+                  Simd_double lambda_m1, lambda_m2;
+                  // Fetch conductivity on neighbour cells:
+                  lambda.get_left_center(_DIR_, i, lambda_m1, lambda_m2);
 
-              // geometric avg: (d0+d1) / ( d0 / lambda_m1 + d1 / lambda_m2 ), optimized with only 1 division:
-              Simd_double zeroVec = 0.;
-              Simd_double dsabs = SimdSelect(zeroVec, d0 * lambda_m2 + d1 * lambda_m1, d0 * lambda_m2 + d1 * lambda_m1, (-1) * (d0 * lambda_m2 + d1 * lambda_m1));
-              Simd_double oneVec = 1.;
-              Simd_double minVec = DMINFLOAT;
-              Simd_double ds = SimdSelect(dsabs, minVec, oneVec, d0 * lambda_m2 + d1 * lambda_m1);
-              Simd_double d = 1.;
-              if(is_anisotropic_)
-                d = d0 + d1;
-              Simd_double avg_lambda = SimdSelect(dsabs, minVec, zeroVec, SimdDivideMed(d * lambda_m1 * lambda_m2, ds));
-              // thermal flux is positive if going from left to right => -grad(T)
+                  // geometric avg: (d0+d1) / ( d0 / lambda_m1 + d1 / lambda_m2 ), optimized with only 1 division:
+                  Simd_double zeroVec = 0.;
+                  Simd_double dsabs = SimdSelect(zeroVec, d0 * lambda_m2 + d1 * lambda_m1, d0 * lambda_m2 + d1 * lambda_m1, (-1) * (d0 * lambda_m2 + d1 * lambda_m1));
+                  Simd_double oneVec = 1.;
+                  Simd_double minVec = DMINFLOAT;
+                  Simd_double ds = SimdSelect(dsabs, minVec, oneVec, d0 * lambda_m2 + d1 * lambda_m1);
+                  Simd_double d = 1.;
+                  if(is_anisotropic_)
+                    d = d0 + d1;
+                  avg_lambda = SimdSelect(dsabs, minVec, zeroVec, SimdDivideMed(d * lambda_m1 * lambda_m2, ds));
+                  // thermal flux is positive if going from left to right => -grad(T)
+                }
               flux = (left_val - right_val) * avg_lambda * surface;
             }
           resu_ptr.put_val(i, flux);
@@ -137,7 +160,8 @@ void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, 
       if (j+1==jmax)
         break;
       input_field.next_j();
-      lambda.next_j();
+      if (!is_uniform_)
+        { lambda.next_j(); }
       if(is_structural_)
         structural_model.next_j();
       resu_ptr.next_j();

@@ -20,8 +20,10 @@
 
 class OpConvIJKQuickScalar_double : public OpConvIJKElemCommon_double
 {
+  Declare_instanciable_sans_constructeur(OpConvIJKQuickScalar_double);
+
 public:
-  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { }
+  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { };
 
 protected:
 

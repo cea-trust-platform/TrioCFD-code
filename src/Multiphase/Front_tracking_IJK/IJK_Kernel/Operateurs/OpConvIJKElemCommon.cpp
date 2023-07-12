@@ -15,6 +15,20 @@
 
 #include <OpConvIJKElemCommon.h>
 
+Implemente_base_sans_constructeur(OpConvIJKElemCommon_double,"OpConvIJKElemCommon_double",Operateur_IJK_elem_base_double);
+
+Sortie& OpConvIJKElemCommon_double::printOn(Sortie& os) const
+{
+  //  Operateur_IJK_elem_base_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvIJKElemCommon_double::readOn(Entree& is)
+{
+  //  Operateur_IJK_elem_base_double::readOn(is);
+  return is;
+}
+
 void OpConvIJKElemCommon_double::initialize(const IJK_Splitting& splitting)
 {
   perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);

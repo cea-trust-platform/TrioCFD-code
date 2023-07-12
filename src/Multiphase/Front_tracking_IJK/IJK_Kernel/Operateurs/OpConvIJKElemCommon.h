@@ -19,18 +19,28 @@
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
 
+class Corrige_flux_FT;
+
 class OpConvIJKElemCommon_double : public Operateur_IJK_elem_base_double
 {
+  Declare_base_sans_constructeur(OpConvIJKElemCommon_double);
 public:
   OpConvIJKElemCommon_double() { stored_curv_fram_layer_z_ = -1000; }
-  void initialize(const IJK_Splitting& splitting);
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                IJK_Field_double& result);
+  void initialize(const IJK_Splitting& splitting) override;
+  virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
+  virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };
 
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-               IJK_Field_double& result);
+  virtual void calculer(const IJK_Field_double& field,
+                        const IJK_Field_double& vx,
+                        const IJK_Field_double& vy,
+                        const IJK_Field_double& vz,
+                        IJK_Field_double& result);
+
+  virtual void ajouter(const IJK_Field_double& field,
+                       const IJK_Field_double& vx,
+                       const IJK_Field_double& vy,
+                       const IJK_Field_double& vz,
+                       IJK_Field_double& result);
 protected:
 
   void compute_curv_fram(DIRECTION _DIR_, int k_layer);
@@ -60,7 +70,7 @@ protected:
   const IJK_Field_local_double *input_velocity_x_;
   const IJK_Field_local_double *input_velocity_y_;
   const IJK_Field_local_double *input_velocity_z_;
-  bool perio_k_ ;
+  bool perio_k_=false;
 
   // Temporary array to store curvature and fram coefficients
   // for the current computed flux.
@@ -68,6 +78,11 @@ protected:
   // layer k=0 and k=2 store the previous values computed in direction "k" (which is used 2 times)
   IJK_Field_local_double tmp_curv_fram_;
   int stored_curv_fram_layer_z_; // which (local) layer is currently stored in layer 0 of the tmp array ?
+
+  Corrige_flux_FT *corrige_flux_;
+  const IJK_Field_local_double *indicatrice_;
+
+  bool is_corrected_=false;
 
 private:
 

@@ -15,6 +15,20 @@
 
 #include <OpConvIJKFacesCommon.h>
 
+Implemente_base(OpConvIJKFacesCommon_double, "OpConvIJKFacesCommon_double", Operateur_IJK_faces_base_double);
+
+Sortie& OpConvIJKFacesCommon_double::printOn(Sortie& os) const
+{
+  //  Operateur_IJK_faces_base_double::printOn(os);
+  return os;
+}
+
+Entree& OpConvIJKFacesCommon_double::readOn(Entree& is)
+{
+  //  Operateur_IJK_faces_base_double::readOn(is);
+  return is;
+}
+
 void OpConvIJKFacesCommon_double::initialize(const IJK_Splitting& splitting)
 {
   channel_data_.initialize(splitting);

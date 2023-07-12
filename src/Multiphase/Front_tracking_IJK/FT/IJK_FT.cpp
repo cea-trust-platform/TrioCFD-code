@@ -481,6 +481,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   // Read list of thermic equations:
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
+  param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
 
   param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
@@ -806,6 +807,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   for (auto& itr : energie_)
     itr.associer(*this);
 
+  for (auto& itr : thermal_subresolution_)
+    itr.associer(*this);
+
   run();
   return is;
 }
@@ -1118,6 +1122,13 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       itr.sauvegarder_temperature(lata_name, idx2);
       ++idx2;
     }
+
+  int idx3 =0;
+  for (auto& itr : thermal_subresolution_)
+    {
+      itr.sauvegarder_temperature(lata_name, idx3);
+      ++idx3;
+    }
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
   SFichier fichier;
   if (Process::je_suis_maitre())
@@ -1156,6 +1167,9 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
               << " interfaces " << interfaces_  ;
       fichier << " forcage " << forcage_
               << " corrections_qdm " << qdm_corrections_;
+      /*
+       * Temperature
+       */
       int flag_list_not_empty = 0;
       if (thermique_.size() > 0)
         {
@@ -1173,7 +1187,9 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         }
       if (flag_list_not_empty)
         fichier << " } \n" ;
-
+      /*
+       * Energy
+       */
       int flag_list_not_empty_en = 0;
       if (energie_.size() > 0)
         {
@@ -1190,6 +1206,26 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
             fichier << "\n" ;
         }
       if (flag_list_not_empty_en)
+        fichier << " } \n" ;
+      /*
+       * Thermal Sub-resolution
+       */
+      int flag_list_not_empty_th_subres = 0;
+      if (thermal_subresolution_.size() > 0)
+        {
+          fichier << " thermal_subresolution {\n" ;
+          flag_list_not_empty_th_subres = 1;
+        }
+      for(auto itr = thermal_subresolution_.begin(); itr != thermal_subresolution_.end(); )
+        {
+          fichier << *itr ;
+          ++itr;
+          if (itr != thermal_subresolution_.end())
+            fichier << ", \n" ;
+          else
+            fichier << "\n" ;
+        }
+      if (flag_list_not_empty_th_subres)
         fichier << " } \n" ;
 
       post_.sauvegarder_post_maitre(lata_name, fichier);
@@ -1214,6 +1250,7 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("interfaces", & interfaces_);
   param.ajouter("thermique", &thermique_);
   param.ajouter("energie", &energie_);
+  param.ajouter("thermal_subresolution", &thermal_subresolution_);
   param.ajouter("forcage", &forcage_);
   param.ajouter("corrections_qdm", &qdm_corrections_);
   // GAB : En chantier, (ce qui suit)
@@ -1313,7 +1350,15 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       dt_energie= std::min(dt_energie, dt_en);
     }
 
-  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie));
+  double dt_thermal_subresolution = 1.e20;
+  for (const auto& itr : thermal_subresolution_)
+    {
+      const double dt_th_subres = itr.compute_timestep(dt_thermal_subresolution, dxmin);
+      // We take the most restrictive of all thermal problems and use it for all:
+      dt_thermal_subresolution= std::min(dt_thermal_subresolution, dt_th_subres);
+    }
+
+  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie),dt_thermal_subresolution));
 
   if (Process::je_suis_maitre())
     {
@@ -1322,6 +1367,8 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       fic<< tstep_<<" "<< current_time_<<" "<<dt;
       fic<<" "<<dt_cfl<<" "<<dt_fo<<" "<<dt_oh;
       fic<<" "<<dt_thermique; // If no thermal equation, value will be large.
+      fic<<" "<<dt_energie; // If no thermal equation, value will be large.
+      fic<<" "<<dt_thermal_subresolution; // If no thermal equation, value will be large.
       fic<<finl;
       fic.close();
     }
@@ -1488,21 +1535,20 @@ int IJK_FT_double::initialise()
   for (int i=0; i<2; i++)
     {
       interfaces_.switch_indicatrice_next_old();
-      interfaces_.calculer_indicatrice_next(
-        post_.potentiel(),
-        gravite_,
-        delta_rho,
-        sigma_,
-        /*Pour post-traitement : post_.rebuilt_indic()
-        */
+      interfaces_.calculer_indicatrice_next(post_.potentiel(),
+                                            gravite_,
+                                            delta_rho,
+                                            sigma_,
+                                            /*Pour post-traitement : post_.rebuilt_indic()
+                                            */
 #ifdef SMOOTHING_RHO
-        /* Pour le smoothing : */
-        rho_field_ft_,
-        rho_vapeur_,
-        smooth_density_,
+                                            /* Pour le smoothing : */
+                                            rho_field_ft_,
+                                            rho_vapeur_,
+                                            smooth_density_,
 #endif
-        current_time_, tstep_
-      );
+                                            current_time_, tstep_
+                                           );
     }
 
   maj_indicatrice_rho_mu();
@@ -1526,10 +1572,21 @@ int IJK_FT_double::initialise()
         itr.update_thermal_properties();
       idx2++;
     }
+
+  int idx3 =0;
+  for (auto& itr : thermal_subresolution_)
+    {
+      nalloc += itr.initialize(splitting_, idx3);
+      if (!disable_diphasique_)
+        itr.update_thermal_properties();
+      idx3++;
+    }
+
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
-  if ((energie_.size() > 0) or (thermique_.size() >0))
+//  if ((energie_.size() > 0) or (thermique_.size() >0) or (thermal_subresolution_.size()>0))
+  if (energie_.size() > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -2066,6 +2123,9 @@ void IJK_FT_double::run()
 
               for (auto& itr : energie_)
                 itr.update_thermal_properties();
+
+              for (auto& itr : thermal_subresolution_)
+                itr.update_thermal_properties();
             }
           // La pression n'est pas encore initialisee. elle est donc nulle.
           // Avec cette option, on essaye une initialisation basee sur le champ de pression diphasique
@@ -2183,6 +2243,11 @@ void IJK_FT_double::run()
           // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
           itr.update_thermal_properties();
         }
+      for (auto& itr : thermal_subresolution_)
+        {
+          // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
+          itr.update_thermal_properties();
+        }
     }
   else
     {
@@ -2191,6 +2256,9 @@ void IJK_FT_double::run()
         itr.update_thermal_properties();
 
       for (auto& itr : energie_)
+        itr.update_thermal_properties();
+
+      for (auto& itr : thermal_subresolution_)
         itr.update_thermal_properties();
 
       const double indic_moyen = calculer_v_moyen(interfaces_.I());

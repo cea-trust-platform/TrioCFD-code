@@ -20,15 +20,15 @@
 
 class OpConvDiscIJKQuickScalar_double : public OpConvIJKElemCommon_double
 {
+  Declare_instanciable_sans_constructeur(OpConvDiscIJKQuickScalar_double);
 public:
-  OpConvDiscIJKQuickScalar_double() : OpConvIJKElemCommon_double() {  }
-  void initialize(const IJK_Splitting& splitting);
-  void calculer(const IJK_Field_double& field, const IJK_Field& ref_ijk,
+  OpConvDiscIJKQuickScalar_double() : OpConvIJKElemCommon_double() {  };
+  void calculer(const IJK_Field_double& field,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                IJK_Field_double& result);
-  void ajouter(const IJK_Field_double& field, const IJK_Field_double& ref_ijk,
+                IJK_Field_double& result) override;
+  void ajouter(const IJK_Field_double& field,
                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-               IJK_Field_double& result);
+               IJK_Field_double& result) override;
 protected:
 
   inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
@@ -44,7 +44,7 @@ protected:
     compute_flux_<DIRECTION::Z>(resu,k_layer);
   }
 
-  const IJK_Field_local_double *input_indicatrice_;
+  const IJK_Field_local_double *input_indicatrice_=0;
 
 private:
 

@@ -25,6 +25,7 @@
 
 class OpConvIJKFacesCommon_double : public Operateur_IJK_faces_base_double
 {
+  Declare_base(OpConvIJKFacesCommon_double);
 public:
   void initialize(const IJK_Splitting& splitting);
   void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,

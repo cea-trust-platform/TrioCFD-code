@@ -37,6 +37,20 @@
  *          Yes_M_Struct: the flux is 'structural_model'
  */
 
+Implemente_base_sans_constructeur(OpDiffIJKFacesGeneric_double, "OpDiffIJKFacesGeneric_double", Operateur_IJK_faces_base_double);
+
+Sortie& OpDiffIJKFacesGeneric_double::printOn(Sortie& os) const
+{
+  //  Operateur_IJK_faces_base_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffIJKFacesGeneric_double::readOn(Entree& is)
+{
+  //  Operateur_IJK_faces_base_double::readOn(is);
+  return is;
+}
+
 OpDiffIJKFacesGeneric_double::OpDiffIJKFacesGeneric_double()
 {
   vx_ = 0;
@@ -77,7 +91,6 @@ OpDiffIJKFacesGeneric_double::OpDiffIJKFacesGeneric_double()
 
 
 }
-
 
 const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_v(DIRECTION _DIR_)
 {
@@ -205,6 +218,207 @@ const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_divergence()
 {
   assert(with_divergence_);
   return *divergence_;
+}
+
+
+/*
+ * Definitions of the subclasses
+ */
+
+Implemente_instanciable_sans_constructeur(OpDiffIJK_double, "OpDiffIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffTurbIJK_double, "OpDiffTurbIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffTurbIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffTurbIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeIJK_double, "OpDiffStdWithLaminarTransposeIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceIJK_double, "OpDiffStdWithLaminarTransposeAndDivergenceIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffAnisotropicIJK_double, "OpDiffAnisotropicIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffAnisotropicIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffAnisotropicIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAnisotropicIJK_double, "OpDiffStdWithLaminarTransposeAnisotropicIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeAnisotropicIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeAnisotropicIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double, "OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStructuralOnlyZeroatwallIJK_double, "OpDiffStructuralOnlyZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStructuralOnlyZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStructuralOnlyZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double, "OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double, "OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffTensorialZeroatwallIJK_double, "OpDiffTensorialZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffTensorialZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffTensorialZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double, "OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffTensorialAnisotropicZeroatwallIJK_double, "OpDiffTensorialAnisotropicZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
+}
+
+Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double, "OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double", OpDiffIJKFacesGeneric_double);
+
+Sortie& OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::printOn(Sortie& os) const
+{
+  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  return os;
+}
+
+Entree& OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::readOn(Entree& is)
+{
+  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  return is;
 }
 
 void OpDiffTurbIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,

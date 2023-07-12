@@ -22,6 +22,7 @@
 
 class OpConvCentre4IJK_double : public OpConvIJKFacesCommon_double
 {
+  Declare_instanciable(OpConvCentre4IJK_double);
 public:
   void initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc);
   void initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc);

@@ -43,6 +43,7 @@
 #include <Force_sp.h>
 #include <TRUST_List.h>
 #include <IJK_Energie.h>
+#include <IJK_Thermal_Subresolution.h>
 #include <TRUST_Ref.h>
 
 class Probleme_base;
@@ -117,6 +118,10 @@ public :
   {
     return reprise_;
   }
+  int get_tstep() const
+  {
+    return tstep_;
+  }
   double get_rho_l() const
   {
     return rho_liquide_;
@@ -124,6 +129,14 @@ public :
   double get_rho_v() const
   {
     return rho_vapeur_;
+  }
+  double get_rho_field_ijk(int i, int j, int k) const
+  {
+    return rho_field_(i,j,k);
+  }
+  int get_disable_diphasique() const
+  {
+    return disable_diphasique_;
   }
 //  const int& nb_thermal_equations() const
 //  {
@@ -566,6 +579,7 @@ protected :
   // Dealing with thermal aspects:
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
+  LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
 
 };
 

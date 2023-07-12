@@ -20,6 +20,7 @@
 
 class OpConvIJKQuickSharp_double : public OpConvIJKFacesCommon_double
 {
+  Declare_instanciable(OpConvIJKQuickSharp_double);
 public:
   void initialize(const IJK_Splitting& splitting);
 
