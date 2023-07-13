@@ -47,9 +47,9 @@ public:
                        const IJK_Field_local_double& boundary_flux_kmin,
                        const IJK_Field_local_double& boundary_flux_kmax);
 
-  inline void set_uniform_lambda(const double uniform_lambda) { uniform_lambda_ = &uniform_lambda; };
+  inline void set_uniform_lambda(const double& uniform_lambda) { uniform_lambda_ = &uniform_lambda; };
 
-  inline void set_lambda(IJK_Field_local_double& lambda) { lambda_ = &lambda; };
+  inline void set_lambda(const IJK_Field_local_double& lambda) { lambda_ = &lambda; };
 
   inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
                               IJK_Field_local_double& coeff_field_y,

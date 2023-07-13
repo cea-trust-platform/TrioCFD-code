@@ -21,16 +21,17 @@
 
 #include <Operateur_IJK_elem_diff.h>
 
-Implemente_instanciable( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", Operateur_IJK_elem ) ;
+Implemente_instanciable( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV(OpDiffIJKScalarGeneric_double) ) ;
 
 Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 {
-  Operateur_IJK_elem::printOn( os );
+  DERIV(OpDiffIJKScalarGeneric_double)::printOn( os );
   return os;
 }
 
 Entree& Operateur_IJK_elem_diff::readOn( Entree& is )
 {
-  Operateur_IJK_elem::readOn( is );
+  DERIV(OpDiffIJKScalarGeneric_double)::readOn( is );
   return is;
 }
+

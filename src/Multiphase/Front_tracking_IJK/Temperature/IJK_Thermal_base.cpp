@@ -26,7 +26,6 @@
 #include <IJK_FT.h>
 #include <DebogIJK.h>
 #include <Corrige_flux_FT.h>
-#include <OpConvDiscIJKQuickScalar.h>
 
 
 Implemente_base_sans_constructeur( IJK_Thermal_base, "IJK_Thermal_base", Objet_U ) ;
@@ -279,7 +278,9 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   /*
    * Initialise the operators
    */
-  temperature_convection_op_.initialize(splitting);
+//  temperature_convection_op_.initialize(splitting);
+  temperature_diffusion_op_.test();
+  Cout << "Test" << finl;
   temperature_diffusion_op_.initialize(splitting);
 
   /*
@@ -287,7 +288,8 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
    */
   temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
-  nalloc += 2;
+  div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
+  nalloc += 3;
 
   if (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"))
     {
@@ -679,7 +681,8 @@ void IJK_Thermal_base::add_temperature_diffusion()
        */
       temperature_diffusion_op_.calculer(temperature_,
                                          div_coeff_grad_T_volume_,
-                                         boundary_flux_kmin_, boundary_flux_kmax_);
+                                         boundary_flux_kmin_,
+                                         boundary_flux_kmax_);
     }
 
   /*

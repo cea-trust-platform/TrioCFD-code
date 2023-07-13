@@ -34,14 +34,16 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_diff : public Operateur_IJK_elem
+class Operateur_IJK_elem_diff : public DERIV(OpDiffIJKScalarGeneric_double)
 {
 
   Declare_instanciable( Operateur_IJK_elem_diff ) ;
 
 public :
-  DERIV(OpDiffIJKScalarGeneric_double) OpDiffIJKScalarDeriv;
-  inline void typer(const char * type);
+  inline void test();
+  inline void initialize(const IJK_Splitting& splitting);
+  inline void compute_set(IJK_Field_double& dx);
+  inline void compute_add(IJK_Field_double& dx);
   inline void calculer(const IJK_Field_double& field,
                        IJK_Field_double& result,
                        const IJK_Field_local_double& boundary_flux_kmin,
@@ -50,17 +52,32 @@ public :
                       IJK_Field_double& result,
                       const IJK_Field_local_double& boundary_flux_kmin,
                       const IJK_Field_local_double& boundary_flux_kmax);
-  inline void set_uniform_lambda(const double uniform_lambda);
-  inline void set_lambda(IJK_Field_local_double& lambda);
+  inline void set_uniform_lambda(const double& uniform_lambda);
+  inline void set_lambda(const IJK_Field_local_double& lambda);
   inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
                               IJK_Field_local_double& coeff_field_y,
                               IJK_Field_local_double& coeff_field_z);
+  //  inline void typer(const char * type);
 };
 
-inline void Operateur_IJK_elem_diff::typer(const char * type)
+inline void Operateur_IJK_elem_diff::test()
 {
-  Operateur_IJK_elem::typer(type);
-  OpDiffIJKScalarDeriv.typer(type);
+  Cout << "Test" << finl;
+}
+
+inline void Operateur_IJK_elem_diff::initialize(const IJK_Splitting& splitting)
+{
+  valeur().initialize(splitting);
+}
+
+inline void Operateur_IJK_elem_diff::compute_set(IJK_Field_double& dx)
+{
+  valeur().compute_set(dx);
+}
+
+inline void Operateur_IJK_elem_diff::compute_add(IJK_Field_double& dx)
+{
+  valeur().compute_add(dx);
 }
 
 inline void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
@@ -68,10 +85,10 @@ inline void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
                                               const IJK_Field_local_double& boundary_flux_kmin,
                                               const IJK_Field_local_double& boundary_flux_kmax)
 {
-  return OpDiffIJKScalarDeriv.valeur().calculer(field,
-                                                result,
-                                                boundary_flux_kmin,
-                                                boundary_flux_kmax);
+  return valeur().calculer(field,
+                           result,
+                           boundary_flux_kmin,
+                           boundary_flux_kmax);
 }
 
 
@@ -80,28 +97,34 @@ inline void Operateur_IJK_elem_diff::ajouter(const IJK_Field_double& field,
                                              const IJK_Field_local_double& boundary_flux_kmin,
                                              const IJK_Field_local_double& boundary_flux_kmax)
 {
-  return OpDiffIJKScalarDeriv.valeur().ajouter(field,
-                                               result,
-                                               boundary_flux_kmin,
-                                               boundary_flux_kmax);
+  return valeur().ajouter(field,
+                          result,
+                          boundary_flux_kmin,
+                          boundary_flux_kmax);
 }
 
 
-inline void Operateur_IJK_elem_diff::set_uniform_lambda(const double uniform_lambda)
+inline void Operateur_IJK_elem_diff::set_uniform_lambda(const double& uniform_lambda)
 {
-  return OpDiffIJKScalarDeriv.valeur().set_uniform_lambda(uniform_lambda);
+  return valeur().set_uniform_lambda(uniform_lambda);
 }
 
-inline void Operateur_IJK_elem_diff::set_lambda(IJK_Field_local_double& lambda)
+inline void Operateur_IJK_elem_diff::set_lambda(const IJK_Field_local_double& lambda)
 {
-  return OpDiffIJKScalarDeriv.valeur().set_lambda(lambda);
+  return valeur().set_lambda(lambda);
 }
 
 inline void Operateur_IJK_elem_diff::set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
                                                      IJK_Field_local_double& coeff_field_y,
                                                      IJK_Field_local_double& coeff_field_z)
 {
-  return OpDiffIJKScalarDeriv.valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+  return valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
 }
+
+//inline void Operateur_IJK_elem_diff::typer(const char * type)
+//{
+//  Operateur_IJK_elem::typer(type);
+//  OpDiffIJKScalarDeriv.typer(type);
+//}
 
 #endif /* Operateur_IJK_elem_diff_included */

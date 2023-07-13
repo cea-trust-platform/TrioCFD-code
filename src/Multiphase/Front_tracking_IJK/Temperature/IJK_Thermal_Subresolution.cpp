@@ -67,7 +67,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   uniform_lambda_ = lambda_liquid_;
   uniform_alpha_ =	lambda_liquid_ / (ref_ijk_ft_->get_rho_l() * cp_liquid_);
-  calulate_grad_T_ = 1;
+//  calulate_grad_T_ = 1;
+  calulate_grad_T_=0;
   // TODO: Implement ghost fluid if necessary
   ghost_fluid_ = 0;
 
@@ -80,14 +81,13 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   if (diffusion_flux_correction_)
     {
       temperature_diffusion_op_.typer("OpDiffUniformIJKScalarCorrection_double");
+      temperature_convection_op_.initialize(splitting);
     }
   if (convective_flux_correction_)
     {
       temperature_convection_op_.typer("OpConvIJKQuickScalar_double");
+      temperature_diffusion_op_.initialize(splitting);
     }
-
-  temperature_convection_op_.initialize(splitting);
-  temperature_diffusion_op_.initialize(splitting);
 
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
@@ -115,6 +115,7 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
   const double vol = dx*dy*dz;
   const double rhocp_l = ref_ijk_ft_->get_rho_l() * cp_liquid_;
 //  const double rhocp_v = ref_ijk_ft_->get_rho_v() * cp_vapour_;
+  double d_temp_sum=0.;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -124,7 +125,9 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
           const double ope = div_coeff_grad_T_volume_(i,j,k);
           const double resu = ope/rhocpVol;
           d_temperature_(i,j,k) += resu;
+          d_temp_sum += ope;
         }
+  Cout << d_temp_sum << finl;
 }
 
 

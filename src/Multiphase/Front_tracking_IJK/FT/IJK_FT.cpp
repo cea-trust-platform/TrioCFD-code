@@ -2235,17 +2235,17 @@ void IJK_FT_double::run()
 
       for (auto& itr : thermique_)
         {
-          // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
+          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
       for (auto& itr : energie_)
         {
-          // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
+          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
       for (auto& itr : thermal_subresolution_)
         {
-          // To fill in fields for cp (with cp_liq) and lambda (with labda_liq)
+          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
     }
@@ -3795,6 +3795,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
   for (auto& itr : energie_)
     itr.euler_time_step(velocity_);
+
+  for (auto& itr : thermal_subresolution_)
+    itr.euler_time_step(timestep_);
 
   if (!frozen_velocity_)
     {

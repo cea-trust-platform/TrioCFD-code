@@ -256,7 +256,7 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
   cp_.allocate(splitting, IJK_Splitting::ELEM, 2);
   lambda_.allocate(splitting, IJK_Splitting::ELEM, 1);
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);// 1
-  div_lambda_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);;
+  div_lambda_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
   nalloc += 5;
 
   if ((ref_ijk_ft_.non_nul()) and (!ref_ijk_ft_->disable_diphasique_))
@@ -861,6 +861,7 @@ void IJK_Thermique::add_temperature_diffusion()
   const double rhocp_l = ref_ijk_ft_->rho_liquide_*cp_liquid_;
   const double rhocp_v = ref_ijk_ft_->rho_vapeur_*cp_vapor_;
   const bool geometric_mean = ((rho_cp_inv_) and (rhocp_l > DMINFLOAT) and (rhocp_v >DMINFLOAT));
+  double d_temp_sum=0.;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -890,9 +891,10 @@ void IJK_Thermique::add_temperature_diffusion()
               const double ope = div_lambda_grad_T_volume_(i,j,k);
               const double resu = ope/rhocpV;
               d_temperature_(i,j,k) +=resu ;
+              d_temp_sum += resu;
             }
         }
-
+  Cout << "Test d_temp_sum: " << d_temp_sum << finl;
   statistiques().end_count(cnt_diff_temp);
   DebogIJK::verifier("div_lambda_grad_T_volume", div_lambda_grad_T_volume_);
 // Cerr << "diff_temp" << " " <<  d_temperature_(1,1,1) << finl;

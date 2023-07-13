@@ -34,12 +34,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_conv : public Operateur_IJK_elem
+class Operateur_IJK_elem_conv : public DERIV(OpConvIJKElemCommon_double)
 {
   Declare_instanciable( Operateur_IJK_elem_conv ) ;
 public :
-  DERIV(OpConvIJKElemCommon_double) OpConvIJKElemDeriv;
-  inline void typer(const char * type);
+  inline void initialize(const IJK_Splitting& splitting);
+  inline void compute_set(IJK_Field_double& dx);
+  inline void compute_add(IJK_Field_double& dx);
   inline void set_corrige_flux(Corrige_flux_FT& corrige_flux);
   inline void calculer(const IJK_Field_double& field,
                        const IJK_Field_double& vx,
@@ -51,17 +52,28 @@ public :
                       const IJK_Field_double& vy,
                       const IJK_Field_double& vz,
                       IJK_Field_double& result);
+  //  DERIV(OpConvIJKElemCommon_double) OpConvIJKElemDeriv;
+  //  inline void typer(const char * type);
 };
 
-inline void Operateur_IJK_elem_conv::typer(const char * type)
+inline void Operateur_IJK_elem_conv::initialize(const IJK_Splitting& splitting)
 {
-  Operateur_IJK_elem::typer(type);
-  OpConvIJKElemDeriv.typer(type);
+  valeur().initialize(splitting);
+}
+
+inline void Operateur_IJK_elem_conv::compute_set(IJK_Field_double& dx)
+{
+  valeur().compute_set(dx);
+}
+
+inline void Operateur_IJK_elem_conv::compute_add(IJK_Field_double& dx)
+{
+  valeur().compute_add(dx);
 }
 
 inline void Operateur_IJK_elem_conv::set_corrige_flux(Corrige_flux_FT& corrige_flux)
 {
-  OpConvIJKElemDeriv.valeur().set_corrige_flux(corrige_flux);
+  valeur().set_corrige_flux(corrige_flux);
 }
 
 inline void Operateur_IJK_elem_conv::calculer(const IJK_Field_double& field,
@@ -70,9 +82,8 @@ inline void Operateur_IJK_elem_conv::calculer(const IJK_Field_double& field,
                                               const IJK_Field_double& vz,
                                               IJK_Field_double& result)
 {
-  OpConvIJKElemDeriv.valeur().calculer(field, vx, vy, vz, result);
+  valeur().calculer(field, vx, vy, vz, result);
 }
-
 
 inline void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
                                              const IJK_Field_double& vx,
@@ -80,7 +91,13 @@ inline void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
                                              const IJK_Field_double& vz,
                                              IJK_Field_double& result)
 {
-  OpConvIJKElemDeriv.valeur().ajouter(field, vx, vy, vz, result);
+  valeur().ajouter(field, vx, vy, vz, result);
 }
+
+//inline void Operateur_IJK_elem_conv::typer(const char * type)
+//{
+//  Operateur_IJK_elem::typer(type);
+//  OpConvIJKElemDeriv.typer(type);
+//}
 
 #endif /* Operateur_IJK_elem_conv_included */

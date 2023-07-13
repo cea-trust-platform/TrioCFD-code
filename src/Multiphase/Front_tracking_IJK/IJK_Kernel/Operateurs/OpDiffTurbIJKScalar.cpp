@@ -127,7 +127,7 @@ void OpDiffIJKScalarGeneric_double::calculer(const IJK_Field_double& field,
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_set(result);
   input_field_ = 0;
-  uniform_lambda_ = 0;
+//  uniform_lambda_ = 0;
   lambda_ = 0;
   coeff_field_x_ = 0;
   coeff_field_y_ = 0;
@@ -145,7 +145,7 @@ void OpDiffIJKScalarGeneric_double::ajouter(const IJK_Field_double& field,
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_add(result);
   input_field_ = 0;
-  uniform_lambda_ = 0;
+//  uniform_lambda_ = 0;
   lambda_ = 0;
   coeff_field_x_ = 0;
   coeff_field_y_ = 0;
