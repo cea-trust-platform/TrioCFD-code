@@ -113,7 +113,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 // **************************************To be implemented*******************
         // 2 - phase cells at pb-Boundary when solving T-eq at Liquid side
         //mixed mesh => Text, Twall, mon_h
-        if (I(ii,0) > 0 && I(ii,0) < 1  && (indicatrice_ref_ = 1 ))
+        if (I(ii,0) > 0 && I(ii,0) < 1  && (indicatrice_ref_ == 1 ))
           {
             Nom nom_pb=mon_dom_cl_dis->equation().probleme().le_nom();
             Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
@@ -141,6 +141,8 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
             Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
             const IntTab& face_voisins = le_dom.face_voisins();
+            const DoubleVect& surface= le_dom.face_surfaces();
+
 
             const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
 
@@ -151,20 +153,35 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
             const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
 
 
+
+
             const int nb_contact_line_contribution = faces_with_CL_contrib.size_array();
+            int nb_contrib = 0;
             for (int idx = 0; idx < nb_contact_line_contribution; idx++)
               {
-                // face i
-
                 const int facei = faces_with_CL_contrib[idx];
+
                 if (facei == face)
                   {
+                    nb_contrib++;
                     const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
-                    const double TCL_wall_flux = Q_from_CL[idx];
+                    const double TCL_wall_flux = Q_from_CL[idx]/surface(face);
                     const double val = sign*TCL_wall_flux;
-                    if (mon_Ti(ii, jj) != 0.)
-                      mon_h(ii) += val/(T_ext()->valeurs_au_temps(temps)(ii)-mon_inco(ii, 0));
-                    mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
+                    const int elemi = face_voisins(face, 0)+face_voisins(face, 1)+1;
+
+                    if (nb_contrib == 1)
+                      {
+                        mon_h(ii) = val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                        mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
+                      }
+
+                    else
+                      {
+                        mon_h(ii) += val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                        mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
+                      }
+
+
                   }
               }
 

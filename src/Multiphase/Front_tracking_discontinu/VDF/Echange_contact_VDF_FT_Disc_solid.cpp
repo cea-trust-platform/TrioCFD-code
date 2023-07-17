@@ -107,6 +107,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
       calculer_h_autre_pb( autre_h, 0., opt);
 
       calculer_Teta_paroi(Twalltmp,mon_h,autre_h,is_pb_fluide,temps);
+      // calculer_Teta_equiv(Text,mon_h,autre_h,is_pb_fluide,temps);
       calculer_Teta_equiv(Texttmp,mon_h,autre_h,is_pb_fluide,temps);
       // on a calculer Teta paroi, on peut calculer htot dans himp (= mon_h)
       int taille=mon_h.dimension(0);
@@ -123,7 +124,32 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                 Text(ii,jj)=Texttmp(ii,jj);
                 // mon_Ti(ii)=Twalltmp(ii, jj);
               }
-          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ = 1 ))
+          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ == 1 ))
+            for (int jj=0; jj<nb_comp; jj++)
+              {
+                hh_imp(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
+                Text(ii,jj)=Texttmp(ii,jj);
+
+
+                // mon_Ti(ii)=Twalltmp(ii, jj);
+              }
+
+        }
+
+
+    }
+
+  for( int n=0; n<2; n++)
+    {
+      numero_T_=n;
+      int taille=mon_h.dimension(0);
+      double I_ref_=1.;
+      if (n==1)
+        I_ref_=0;
+
+      for (int ii=0; ii<taille; ii++)
+        {
+          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ == 1 ))
             {
               for (int jj=0; jj<nb_comp; jj++)
                 {
@@ -132,17 +158,26 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                   const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
                   // double qtcl =10.;
 
+
                   const ArrOfInt& elems_with_CL_contrib = tcl->elems();
+                  const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
                   const ArrOfDouble& Q_from_CL = tcl->Q();
 
                   Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
                   const IntTab& face_voisins = le_dom.face_voisins();
+                  const DoubleVect& surface= le_dom.face_surfaces();
 
-                  const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
+                  // const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
+                  // const int face = ii+ T_ext().frontiere_dis().frontiere().num_premiere_face();
 
 
-                  const int elemf = face_voisins(face, 0)+face_voisins(face, 1) +1;
-                  const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
+                  const Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+                  const Front_VF& front_vf=ref_cast(Front_VF, ch.front_dis());
+                  // num_face in Liquid-Domaine
+                  const int face = ii+ front_vf.num_premiere_face();
+
+
+
                   const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
                   int nb_contrib = 0;
 
@@ -152,20 +187,27 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
                     {
                       // element i
-                      const int elemi = elems_with_CL_contrib[idx];
 
-                      if (elemi == elemf)
+                      const int facei = faces_with_CL_contrib[idx];
+
+                      if (facei == face)
                         {
                           nb_contrib++;
-                          const double TCL_wall_flux = Q_from_CL[idx];
+                          const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
+
+
+                          const int faces = ii+ frontiere_dis().frontiere().num_premiere_face();
+
+                          const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
+                          const double TCL_wall_flux = Q_from_CL[idx]/surface(faces);
                           // val should be : -rho*Cp * flux(W)
                           // probably because the whole energy equation is written with rhoCp somewhere...
                           // and the sign should be negative for incoming flux (towards the fluid) by convention.
                           const double val = sign*TCL_wall_flux;
                           if (nb_contrib == 1)
-                            hh_imp(ii,jj) = val/(Text[ii] - mon_inco[elemi]);
+                            hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
                           else
-                            hh_imp(ii,jj) += val/(Text[ii] - mon_inco[elemi]);
+                            hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
                         }
                     }
 
