@@ -175,19 +175,24 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                       {
                         // mon_h(ii) = val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
                     	flux_local = val;
-                        mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
                       }
 
                     else
                       {
                         // mon_h(ii) += val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
                     	flux_local += val;
-                        mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
                       }
 
                   }
               }
-            mon_phi(ii, jj) += flux_local;
+            mon_phi(ii, jj) = flux_local;
+            mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - flux_local/autre_h(ii) ;
+            // To be consistent with *get_flux_and_Twall* in the Convection_Diffusion_Temperature_FT_Disc.cpp
+            // where flux = h*(T_imp - 0.);
+            if (mon_Ti(ii, jj) != 0.)
+            	mon_h(ii) = flux_local/mon_Ti(ii, jj);
+            else
+            	mon_h(ii) = 0.;
           }
       }
 
@@ -302,4 +307,26 @@ int Echange_contact_VDF_FT_Disc::initialiser(double temps)
 
   Champ_front_calc& chbis=ref_cast(Champ_front_calc, indicatrice_.valeur());
   return chbis.initialiser(temps,domaine_Cl_dis().equation().inconnue());
+}
+
+void Echange_contact_VDF_FT_Disc::set_temps_defaut(double temps)
+{
+  if (Ti_wall_.non_nul())
+	  Ti_wall_.valeur().set_temps_defaut(temps);
+  if (indicatrice_.non_nul())
+	  indicatrice_.valeur().set_temps_defaut(temps);
+  Echange_global_impose::set_temps_defaut(temps);
+}
+
+double Echange_contact_VDF_FT_Disc::Ti_wall(int i) const
+{
+
+  if (Ti_wall_.valeurs().size() == 1)
+    return Ti_wall_(0, 0);
+  else if (Ti_wall_.valeurs().dimension(1) == 1)
+    return Ti_wall_(i, 0);
+  else
+    Cerr << "Echange_contact_VDF_FT_Disc::Ti_wall_ erreur" << finl;
+  exit();
+  return 0.;
 }

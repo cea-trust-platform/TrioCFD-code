@@ -40,13 +40,14 @@ public :
   void mettre_a_jour(double ) override;
   int initialiser(double temps) override;
   void completer() override;
-
-
+  virtual double Ti_wall(int num) const;
   void changer_temps_futur(double temps,int i) override;
   int avancer(double temps) override;
   int reculer(double temps) override;
+  void set_temps_defaut(double temps) override;
 protected :
   Champ_front indicatrice_;
+
   // T_wall_ is defined as DoubleTab in Echange_contact_VDF
   // Ti_wall_ temperature at wall-fluid interface
   Champ_front Ti_wall_;
