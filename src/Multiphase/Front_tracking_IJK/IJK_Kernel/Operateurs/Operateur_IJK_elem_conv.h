@@ -22,7 +22,6 @@
 #ifndef Operateur_IJK_elem_conv_included
 #define Operateur_IJK_elem_conv_included
 
-#include <Operateur_IJK_elem.h>
 #include <OpConvIJKElemCommon.h>
 #include <TRUST_Deriv.h>
 

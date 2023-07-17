@@ -82,7 +82,7 @@ static void fill_g_compo(DoubleTab& g, int nb_values, int offset,
     }
 }
 
-void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc)
+void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting) //, const Boundary_Conditions& bc)
 {
   OpConvIJKFacesCommon_double::initialize(splitting);
 
@@ -106,37 +106,7 @@ void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting, const B
   iend = channel_data_.last_global_k_layer_flux(2 /* compo */, 2 /* dir */) - 1;
   fill_g_compo(g_compo_z_dir_z_, nb_zfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, true);
 
-  ref_bc_ = bc;
-
-}
-
-void OpConvCentre4IJK_double::initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc)
-{
-  // Warning / TODO : This method shall be factorized with the previous one.
-  OpConvIJKFacesCommon_double::initialize(splitting);
-
-  // Fill 4-th order filtering coefficients for z direction:
-  const int nb_xfaces = splitting.get_nb_faces_local(0 /* for component x */, 2 /* in direction z */);
-  const int nb_zfaces = splitting.get_nb_faces_local(2 /* for component z */, 2 /* in direction z */);
-  // number of flux values computed on this processor in direction k
-  // equals the number of faces owned by the processor, plus 1
-
-  const int offset_to_global_k_layer = channel_data_.offset_to_global_k_layer();
-  const ArrOfDouble_with_ghost& delta_z = channel_data_.get_delta_z();
-
-  // first flux computed with 4th order is 1 layer after the first non zero flux, after the wall.
-  // SPECIFIC FOR CHANNEL WITH WALLS IN K DIRECTION !
-  int istart, iend;
-  istart = channel_data_.first_global_k_layer_flux(0 /* compo */, 2 /* dir */) + 1;
-  iend = channel_data_.last_global_k_layer_flux(0 /* compo */, 2 /* dir */) - 1;
-  fill_g_compo(g_compo_xy_dir_z_, nb_xfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, false);
-
-  istart = channel_data_.first_global_k_layer_flux(2 /* compo */, 2 /* dir */) + 1;
-  iend = channel_data_.last_global_k_layer_flux(2 /* compo */, 2 /* dir */) - 1;
-  fill_g_compo(g_compo_z_dir_z_, nb_zfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, true);
-
-  ref_bc_Thermique_ = bc;
-
+//  ref_bc_ = bc;
 }
 
 void OpConvCentre4IJK_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
@@ -145,8 +115,6 @@ void OpConvCentre4IJK_double::calculer(const IJK_Field_double& inputx, const IJK
 {
   OpConvIJKFacesCommon_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
-
-
 }
 
 void OpConvCentre4IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,

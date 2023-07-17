@@ -135,15 +135,22 @@ void OpDiffIJKFacesGeneric_double::flux_loop_(IJK_Field_local_double& resu, int 
 
   const IJK_Field_local_double dummy_field = vCOMPO;
 
-  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_molecular_nu_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
+//  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_molecular_nu_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
+//  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
+  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_nu(), 0, 0, k_layer);
+
 
   ConstIJK_double_ptr div_ptr(with_divergence_ ? get_divergence() : dummy_field, 0, 0, k_layer);
 
   // Turbulent kinetic energy from turbulence model
-  ConstIJK_double_ptr turbulent_nu(is_turb_ ? get_turbulent_nu() : dummy_field, 0, 0, k_layer);
-  ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_turbulent_k_energy() : dummy_field, 0, 0, k_layer );
+  //  ConstIJK_double_ptr turbulent_nu(is_turb_ ? get_turbulent_nu() : dummy_field, 0, 0, k_layer);
+  //  ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_turbulent_k_energy() : dummy_field, 0, 0, k_layer );
+  //  ConstIJK_double_ptr structural_model(is_structural_ ? get_structural_model(_DIR_, _VCOMPO_) : dummy_field, 0, 0, k_layer);
+  //  ConstIJK_double_ptr structural_model(is_structural_ ? get_coeff_tensor(_DIR_, _VCOMPO_) : dummy_field, 0, 0, k_layer);
 
-  ConstIJK_double_ptr structural_model(is_structural_ ? get_structural_model(_DIR_, _VCOMPO_) : dummy_field, 0, 0, k_layer);
+  ConstIJK_double_ptr turbulent_nu(is_turb_ ? get_nu() : *nu_, 0, 0, k_layer);
+  ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_nu() : *nu_, 0, 0, k_layer );
+  ConstIJK_double_ptr structural_model(is_structural_ ? get_coeff_tensor(_DIR_, _VCOMPO_) : *nu_, 0, 0, k_layer);
 
   // Result (fluxes in direction DIR for component COMPO of the convected field)
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);

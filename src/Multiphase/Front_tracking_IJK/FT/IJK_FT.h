@@ -25,10 +25,8 @@
 #include <FixedVector.h>
 #include <IJK_Field.h>
 #include <IJK_Splitting.h>
-#include <OpDiffTurbIJK.h>
-#include <OpConvIJKQuickSharp.h>
-#include <OpCentre4IJK.h>
-#include <OpConvIJKAmont.h>
+#include <Operateur_IJK_faces_diff.h>
+#include <Operateur_IJK_faces_conv.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
 #include <Linear_algebra_tools.h>
@@ -44,7 +42,15 @@
 #include <TRUST_List.h>
 #include <IJK_Energie.h>
 #include <IJK_Thermal_Subresolution.h>
+#include <IJK_Thermal.h>
 #include <TRUST_Ref.h>
+#include <Objet_U.h>
+
+//#include <Vecteur3.h>
+//#include <OpDiffTurbIJK.h>
+//#include <OpConvIJKQuickSharp.h>
+//#include <OpCentre4IJK.h>
+//#include <OpConvIJKAmont.h>
 
 class Probleme_base;
 
@@ -471,17 +477,20 @@ protected :
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
   // Operators and pressure solver
-  OpDiffIJK_double velocity_diffusion_op_simple_;
-  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
+  Operateur_IJK_faces_diff velocity_diffusion_op_;
   Nom type_velocity_diffusion_form_; /* simple_arithmetic : div(mu grad(u))
   	  	  	  	  	  	  	  	  	 * full_arithmetic    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
   	  	  	  	  	  	  	  	  	 *                      mu : moyenne arithmetique
   	  	  	  	  	  	  	  	  	 * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
   	  	  	  	  	  	  	  	  	 *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
   	  	  	  	  	  	  	  	  	 */
-  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
-  OpConvCentre4IJK_double velocity_convection_op_centre_;
-  OpConvAmontIJK_double velocity_convection_op_amont_;
+  Operateur_IJK_faces_conv velocity_convection_op_;
+
+//  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
+//  OpConvCentre4IJK_double velocity_convection_op_centre_;
+//  OpConvAmontIJK_double velocity_convection_op_amont_;
+//  OpDiffIJK_double velocity_diffusion_op_simple_;
+//  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
 
   Nom type_velocity_convection_form_; /* non_conservative_simple : rho div(u u)
   	  	  	  	  	  	  	  	  	 * non_conservative_rhou     : div(rho u u) - u div(rho u)
@@ -580,7 +589,7 @@ protected :
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
   LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
-
+  LIST(IJK_Thermal) thermal_;
 };
 
 #endif /* IJK_FT_included */

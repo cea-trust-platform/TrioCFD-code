@@ -37,7 +37,7 @@ void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, 
   const int ny = _DIR_ == DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
 
   ConstIJK_double_ptr input_field(*input_field_, 0, 0, k_layer);
-  const IJK_Field_local_double dummy_field = *input_field_;
+//  const IJK_Field_local_double dummy_field = *input_field_;
   Simd_double uniform_lambda(1.);
   Simd_double avg_lambda;
   if (is_uniform_ and uniform_lambda_!=0)

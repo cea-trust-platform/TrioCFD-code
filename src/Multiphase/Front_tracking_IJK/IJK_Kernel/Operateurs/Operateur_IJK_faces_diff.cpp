@@ -14,23 +14,24 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Operateur_IJK_faces.cpp
+// File      : Deriv_Operateur_IJK_faces_diff.cpp
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <Operateur_IJK_faces.h>
+#include <Operateur_IJK_faces_diff.h>
 
-Implemente_instanciable( Operateur_IJK_faces, "Operateur_IJK_faces", DERIV(Operateur_IJK_faces_base_double) ) ;
+Implemente_instanciable( Operateur_IJK_faces_diff, "Operateur_IJK_faces_diff", DERIV(OpDiffIJKFacesGeneric_double) ) ;
 
-Sortie& Operateur_IJK_faces::printOn( Sortie& os ) const
+
+Sortie& Operateur_IJK_faces_diff::printOn( Sortie& os ) const
 {
-  DERIV(Operateur_IJK_faces_base_double)::printOn( os );
+  DERIV(OpDiffIJKFacesGeneric_double)::printOn( os );
   return os;
 }
 
-Entree& Operateur_IJK_faces::readOn( Entree& is )
+Entree& Operateur_IJK_faces_diff::readOn( Entree& is )
 {
-  DERIV(Operateur_IJK_faces_base_double)::readOn( is );
+  DERIV(OpDiffIJKFacesGeneric_double)::readOn( is );
   return is;
 }

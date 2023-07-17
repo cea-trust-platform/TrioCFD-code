@@ -41,12 +41,12 @@ void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const
 {
   statistiques().begin_count(convection_counter_);
 
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
   inputx_ = &inputx;
   inputy_ = &inputy;
   inputz_ = &inputz;
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
 
   compute_set(dvx, dvy, dvz);
 
@@ -61,12 +61,12 @@ void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const 
 {
   statistiques().begin_count(convection_counter_);
 
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
   inputx_ = &inputx;
   inputy_ = &inputy;
   inputz_ = &inputz;
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
 
   compute_add(dvx, dvy, dvz);
 
@@ -74,3 +74,43 @@ void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const 
   statistiques().end_count(convection_counter_);
 
 }
+
+//void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(convection_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//  inputx_ = &inputx;
+//  inputy_ = &inputy;
+//  inputz_ = &inputz;
+//
+//  compute_set(dvx, dvy, dvz);
+//
+//  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+//  statistiques().end_count(convection_counter_);
+//
+//}
+//
+//void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(convection_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//  inputx_ = &inputx;
+//  inputy_ = &inputy;
+//  inputz_ = &inputz;
+//
+//  compute_add(dvx, dvy, dvz);
+//
+//  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+//  statistiques().end_count(convection_counter_);
+//
+//}

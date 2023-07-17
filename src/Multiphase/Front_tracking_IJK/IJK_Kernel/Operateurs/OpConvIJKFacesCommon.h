@@ -21,19 +21,37 @@
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
 #include <Operateur_IJK_data_channel.h>
-
+#include <Boundary_Conditions.h>
+#include <Boundary_Conditions_Thermique.h>
 
 class OpConvIJKFacesCommon_double : public Operateur_IJK_faces_base_double
 {
   Declare_base(OpConvIJKFacesCommon_double);
 public:
-  void initialize(const IJK_Splitting& splitting);
+  virtual void initialize(const IJK_Splitting& splitting);
+  virtual void set_bc(const Boundary_Conditions& bc) { ; };
+  virtual void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) { ; };
+//  void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
+//  void ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   void ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
+  void set_velocity_components(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz) {vx_ = &vx; vy_ = &vy; vz_ = &vz; };
+  virtual void calculer_avec_u_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
+                                        const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
+                                        IJK_Field_double& div_rho_u) { ; };
+  virtual void ajouter_avec_u_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
+                                       const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
+                                       IJK_Field_double& div_rho_u) { ; };
 protected:
 
   Operateur_IJK_data_channel channel_data_;

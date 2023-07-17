@@ -71,7 +71,6 @@ public :
   int initialize(const IJK_Splitting& splitting, const int idx);
   void update_thermal_properties();
   double compute_timestep(const double timestep,
-                          const double rho_l, const double rho_v,
                           const double dxmin) const;
   void associer(const IJK_FT_double& ijk_ft);
   void euler_time_step(const double timestep);

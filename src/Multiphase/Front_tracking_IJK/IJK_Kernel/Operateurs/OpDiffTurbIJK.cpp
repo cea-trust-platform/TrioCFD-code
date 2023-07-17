@@ -56,32 +56,46 @@ OpDiffIJKFacesGeneric_double::OpDiffIJKFacesGeneric_double()
   vx_ = 0;
   vy_ = 0;
   vz_ = 0;
-  molecular_nu_ = 0;
 
-  turbulent_nu_ = 0;
-  turbulent_k_energy_ = 0;
+//  molecular_nu_ = 0;
+//  turbulent_nu_ = 0;
+//  turbulent_k_energy_ = 0;
+
+  uniform_nu_=0;
+  nu_ = 0;
   divergence_ = 0;
 
-  molecular_nu_tensor_xx_ = 0;
-  molecular_nu_tensor_xy_ = 0;
-  molecular_nu_tensor_xz_ = 0;
-  molecular_nu_tensor_yx_ = 0;
-  molecular_nu_tensor_yy_ = 0;
-  molecular_nu_tensor_yz_ = 0;
-  molecular_nu_tensor_zx_ = 0;
-  molecular_nu_tensor_zy_ = 0;
-  molecular_nu_tensor_zz_ = 0;
+  coeff_tensor_xx_ = 0;
+  coeff_tensor_xy_ = 0;
+  coeff_tensor_xz_ = 0;
+  coeff_tensor_yx_ = 0;
+  coeff_tensor_yy_ = 0;
+  coeff_tensor_yz_ = 0;
+  coeff_tensor_zx_ = 0;
+  coeff_tensor_zy_ = 0;
+  coeff_tensor_zz_ = 0;
 
-  structural_model_xx_ = 0;
-  structural_model_xy_ = 0;
-  structural_model_xz_ = 0;
-  structural_model_yx_ = 0;
-  structural_model_yy_ = 0;
-  structural_model_yz_ = 0;
-  structural_model_zx_ = 0;
-  structural_model_zy_ = 0;
-  structural_model_zz_ = 0;
+//  molecular_nu_tensor_xx_ = 0;
+//  molecular_nu_tensor_xy_ = 0;
+//  molecular_nu_tensor_xz_ = 0;
+//  molecular_nu_tensor_yx_ = 0;
+//  molecular_nu_tensor_yy_ = 0;
+//  molecular_nu_tensor_yz_ = 0;
+//  molecular_nu_tensor_zx_ = 0;
+//  molecular_nu_tensor_zy_ = 0;
+//  molecular_nu_tensor_zz_ = 0;
+//
+//  structural_model_xx_ = 0;
+//  structural_model_xy_ = 0;
+//  structural_model_xz_ = 0;
+//  structural_model_yx_ = 0;
+//  structural_model_yy_ = 0;
+//  structural_model_yz_ = 0;
+//  structural_model_zx_ = 0;
+//  structural_model_zy_ = 0;
+//  structural_model_zz_ = 0;
 
+  is_uniform_ = false;
   is_turb_= false;
   is_anisotropic_ = false;
   with_divergence_= false;
@@ -90,6 +104,27 @@ OpDiffIJKFacesGeneric_double::OpDiffIJKFacesGeneric_double()
   is_structural_= false;
 
 
+}
+
+void OpDiffIJKFacesGeneric_double::set_coeff_x_y_z(const IJK_Field_double& coeff_tensor_xx,
+                                                   const IJK_Field_double& coeff_tensor_xy,
+                                                   const IJK_Field_double& coeff_tensor_xz,
+                                                   const IJK_Field_double& coeff_tensor_yx,
+                                                   const IJK_Field_double& coeff_tensor_yy,
+                                                   const IJK_Field_double& coeff_tensor_yz,
+                                                   const IJK_Field_double& coeff_tensor_zx,
+                                                   const IJK_Field_double& coeff_tensor_zy,
+                                                   const IJK_Field_double& coeff_tensor_zz)
+{
+  coeff_tensor_xx_ = &coeff_tensor_xx;
+  coeff_tensor_xy_ = &coeff_tensor_xy;
+  coeff_tensor_xz_ = &coeff_tensor_xz;
+  coeff_tensor_yx_ = &coeff_tensor_yx;
+  coeff_tensor_yy_ = &coeff_tensor_yy;
+  coeff_tensor_yz_ = &coeff_tensor_yz;
+  coeff_tensor_zx_ = &coeff_tensor_zx;
+  coeff_tensor_zy_ = &coeff_tensor_zy;
+  coeff_tensor_zz_ = &coeff_tensor_zz;
 }
 
 const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_v(DIRECTION _DIR_)
@@ -108,90 +143,41 @@ const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_v(DIRECTION _DIR
     }
   return *vx_;
 }
-const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_molecular_nu_tensor(DIRECTION _COMPO1_, DIRECTION _COMPO2_)
-{
-  assert(is_tensorial_);
-  switch(_COMPO1_)
-    {
-    case DIRECTION::X:
-      {
-        if(_COMPO2_ == DIRECTION::X)
-          return *molecular_nu_tensor_xx_;
-        if(_COMPO2_ == DIRECTION::Y)
-          return *molecular_nu_tensor_xy_;
-        if(_COMPO2_ == DIRECTION::Z)
-          return *molecular_nu_tensor_xz_;
-        break;
-      }
-    case DIRECTION::Y:
-      {
-        if(_COMPO2_ == DIRECTION::X)
-          return *molecular_nu_tensor_yx_;
-        if(_COMPO2_ == DIRECTION::Y)
-          return *molecular_nu_tensor_yy_;
-        if(_COMPO2_ == DIRECTION::Z)
-          return *molecular_nu_tensor_yz_;
-        break;
-      }
-    case DIRECTION::Z:
-      {
-        if(_COMPO2_ == DIRECTION::X)
-          return *molecular_nu_tensor_zx_;
-        if(_COMPO2_ == DIRECTION::Y)
-          return *molecular_nu_tensor_zy_;
-        if(_COMPO2_ == DIRECTION::Z)
-          return *molecular_nu_tensor_zz_;
-        break;
-      }
-    default:
-      Cerr << "Error in OpDiffTensorial_base_double::get_molecular_nu: wrong direction..." << finl;
-      Process::exit();
-    }
 
-  // for compilation only...
-  return *molecular_nu_tensor_xx_;
-}
-
-const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_molecular_nu()
+const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_coeff_tensor(DIRECTION _COMPO1_, DIRECTION _COMPO2_)
 {
-  assert(!is_tensorial_);
-  return *molecular_nu_;
-}
-
-const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_structural_model(DIRECTION _COMPO1_, DIRECTION _COMPO2_)
-{
-  assert(is_structural_);
+  assert(is_structural_ || is_tensorial_);
 
   switch(_COMPO1_)
     {
     case DIRECTION::X:
       {
         if(_COMPO2_ == DIRECTION::X)
-          return *structural_model_xx_;
+          return *coeff_tensor_xx_;
         if(_COMPO2_ == DIRECTION::Y)
-          return *structural_model_xy_;
+          return *coeff_tensor_xy_;
         if(_COMPO2_ == DIRECTION::Z)
-          return *structural_model_xz_;
+          return *coeff_tensor_xz_;
         break;
       }
     case DIRECTION::Y:
       {
         if(_COMPO2_ == DIRECTION::X)
-          return *structural_model_yx_;
+          return *coeff_tensor_yx_;
         if(_COMPO2_ == DIRECTION::Y)
-          return *structural_model_yy_;
+          return *coeff_tensor_yy_;
         if(_COMPO2_ == DIRECTION::Z)
-          return *structural_model_yz_;
+          return *coeff_tensor_yz_;
         break;
       }
     case DIRECTION::Z:
       {
         if(_COMPO2_ == DIRECTION::X)
-          return *structural_model_zx_;
+          return *coeff_tensor_zx_;
         if(_COMPO2_ == DIRECTION::Y)
-          return *structural_model_zy_;
+          return *coeff_tensor_zy_;
         if(_COMPO2_ == DIRECTION::Z)
-          return *structural_model_zz_;
+          return *coeff_tensor_zz_;
         break;
       }
     default:
@@ -200,18 +186,19 @@ const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_structural_model
     }
 
   // for compilation only...
-  return *structural_model_zx_;
+  return *coeff_tensor_xx_;
 }
 
-const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_turbulent_nu()
+const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_nu()
 {
-  assert(is_turb_);
-  return *turbulent_nu_;
+  assert(!is_tensorial_);
+  return *nu_;
 }
-const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_turbulent_k_energy()
+
+const double& OpDiffIJKFacesGeneric_double::get_uniform_nu()
 {
-  assert(is_turb_);
-  return *turbulent_k_energy_;
+  assert(is_uniform_);
+  return *uniform_nu_;
 }
 
 const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_divergence()
@@ -221,6 +208,162 @@ const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_divergence()
 }
 
 
+//const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_molecular_nu()
+//{
+//  assert(!is_tensorial_);
+//  return *molecular_nu_;
+//}
+//
+//const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_turbulent_nu()
+//{
+//  assert(is_turb_);
+//  return *turbulent_nu_;
+//}
+//const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_turbulent_k_energy()
+//{
+//  assert(is_turb_);
+//  return *turbulent_k_energy_;
+//}
+
+void OpDiffIJKFacesGeneric_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(diffusion_counter_);
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  compute_add(dvx, dvy, dvz);
+//  molecular_nu_ = 0;
+//  turbulent_nu_ = 0;
+//  turbulent_k_energy_ = 0;
+  nu_=0;
+  divergence_ = 0;
+  coeff_tensor_xx_ = 0;
+  coeff_tensor_xy_ = 0;
+  coeff_tensor_xz_ = 0;
+  coeff_tensor_yx_ = 0;
+  coeff_tensor_yy_ = 0;
+  coeff_tensor_yz_ = 0;
+  coeff_tensor_zx_ = 0;
+  coeff_tensor_zy_ = 0;
+  coeff_tensor_zz_ = 0;
+  statistiques().end_count(diffusion_counter_);
+}
+
+void OpDiffIJKFacesGeneric_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                            IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+{
+  statistiques().begin_count(diffusion_counter_);
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+//  molecular_nu_ = 0;
+//  turbulent_nu_ = 0;
+//  turbulent_k_energy_ = 0;
+  nu_=0;
+  divergence_ = 0;
+  coeff_tensor_xx_ = 0;
+  coeff_tensor_xy_ = 0;
+  coeff_tensor_xz_ = 0;
+  coeff_tensor_yx_ = 0;
+  coeff_tensor_yy_ = 0;
+  coeff_tensor_yz_ = 0;
+  coeff_tensor_zx_ = 0;
+  coeff_tensor_zy_ = 0;
+  coeff_tensor_zz_ = 0;
+  compute_set(dvx, dvy, dvz);
+  statistiques().end_count(diffusion_counter_);
+
+}
+
+//const IJK_Field_local_double& OpDiffIJKFacesGeneric_double::get_molecular_nu_tensor(DIRECTION _COMPO1_, DIRECTION _COMPO2_)
+//{
+//  assert(is_tensorial_);
+//  switch(_COMPO1_)
+//    {
+//    case DIRECTION::X:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *molecular_nu_tensor_xx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *molecular_nu_tensor_xy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *molecular_nu_tensor_xz_;
+//        break;
+//      }
+//    case DIRECTION::Y:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *molecular_nu_tensor_yx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *molecular_nu_tensor_yy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *molecular_nu_tensor_yz_;
+//        break;
+//      }
+//    case DIRECTION::Z:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *molecular_nu_tensor_zx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *molecular_nu_tensor_zy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *molecular_nu_tensor_zz_;
+//        break;
+//      }
+//    default:
+//      Cerr << "Error in OpDiffTensorial_base_double::get_molecular_nu: wrong direction..." << finl;
+//      Process::exit();
+//    }
+//
+//  // for compilation only...
+//  return *molecular_nu_tensor_xx_;
+//}
+//
+//{
+//  assert(is_structural_);
+//
+//  switch(_COMPO1_)
+//    {
+//    case DIRECTION::X:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *structural_model_xx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *structural_model_xy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *structural_model_xz_;
+//        break;
+//      }
+//    case DIRECTION::Y:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *structural_model_yx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *structural_model_yy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *structural_model_yz_;
+//        break;
+//      }
+//    case DIRECTION::Z:
+//      {
+//        if(_COMPO2_ == DIRECTION::X)
+//          return *structural_model_zx_;
+//        if(_COMPO2_ == DIRECTION::Y)
+//          return *structural_model_zy_;
+//        if(_COMPO2_ == DIRECTION::Z)
+//          return *structural_model_zz_;
+//        break;
+//      }
+//    default:
+//      Cerr << "Error in OpDiffStructuralOnlyZeroatwallIJK_double::get_structural_model: wrong direction..." << finl;
+//      Process::exit();
+//    }
+//
+//  // for compilation only...
+//  return *structural_model_zx_;
+//}
+
 /*
  * Definitions of the subclasses
  */
@@ -229,13 +372,13 @@ Implemente_instanciable_sans_constructeur(OpDiffIJK_double, "OpDiffIJK_double", 
 
 Sortie& OpDiffIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -243,13 +386,13 @@ Implemente_instanciable_sans_constructeur(OpDiffTurbIJK_double, "OpDiffTurbIJK_d
 
 Sortie& OpDiffTurbIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffTurbIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -257,13 +400,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeIJK_doubl
 
 Sortie& OpDiffStdWithLaminarTransposeIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -271,13 +414,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDiverg
 
 Sortie& OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -285,13 +428,13 @@ Implemente_instanciable_sans_constructeur(OpDiffAnisotropicIJK_double, "OpDiffAn
 
 Sortie& OpDiffAnisotropicIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffAnisotropicIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -299,13 +442,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAnisotrop
 
 Sortie& OpDiffStdWithLaminarTransposeAnisotropicIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeAnisotropicIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -313,13 +456,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDiverg
 
 Sortie& OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -327,13 +470,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStructuralOnlyZeroatwallIJK_doub
 
 Sortie& OpDiffStructuralOnlyZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStructuralOnlyZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -341,13 +484,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorial
 
 Sortie& OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -355,13 +498,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDiverg
 
 Sortie& OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -369,13 +512,13 @@ Implemente_instanciable_sans_constructeur(OpDiffTensorialZeroatwallIJK_double, "
 
 Sortie& OpDiffTensorialZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffTensorialZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -383,13 +526,13 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorial
 
 Sortie& OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -397,13 +540,13 @@ Implemente_instanciable_sans_constructeur(OpDiffTensorialAnisotropicZeroatwallIJ
 
 Sortie& OpDiffTensorialAnisotropicZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffTensorialAnisotropicZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
@@ -411,730 +554,730 @@ Implemente_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDiverg
 
 Sortie& OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::printOn(Sortie& os) const
 {
-  //  OpDiffIJKFacesGeneric_double::printOn(os);
+  OpDiffIJKFacesGeneric_double::printOn(os);
   return os;
 }
 
 Entree& OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::readOn(Entree& is)
 {
-  //  OpDiffIJKFacesGeneric_double::readOn(is);
+  OpDiffIJKFacesGeneric_double::readOn(is);
   return is;
 }
 
-void OpDiffTurbIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                   const IJK_Field_double& molecular_nu,
-                                   const IJK_Field_double& turbulent_nu,
-                                   const IJK_Field_double& turbulent_k_energy,
-                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  turbulent_nu_ = &turbulent_nu;
-  turbulent_k_energy_ = &turbulent_k_energy;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffTurbIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                    const IJK_Field_double& molecular_nu,
-                                    const IJK_Field_double& turbulent_nu,
-                                    const IJK_Field_double& turbulent_k_energy,
-                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  turbulent_nu_ = &turbulent_nu;
-  turbulent_k_energy_ = &turbulent_k_energy;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                               const IJK_Field_double& molecular_nu,
-                               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                const IJK_Field_double& molecular_nu,
-                                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                      const IJK_Field_double& molecular_nu,
-                                                      IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                       const IJK_Field_double& molecular_nu,
-                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                   const IJK_Field_double& molecular_nu,
-                                                                   const IJK_Field_double& divergence,
-                                                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  divergence_ = &divergence;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                    const IJK_Field_double& molecular_nu,
-                                                                    const IJK_Field_double& divergence,
-                                                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  divergence_ = &divergence;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                          const IJK_Field_double& molecular_nu,
-                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                           const IJK_Field_double& molecular_nu,
-                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                 const IJK_Field_double& molecular_nu,
-                                                                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                  const IJK_Field_double& molecular_nu,
-                                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                              const IJK_Field_double& molecular_nu,
-                                                                              const IJK_Field_double& divergence,
-                                                                              IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  divergence_ = &divergence;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                               const IJK_Field_double& molecular_nu,
-                                                                               const IJK_Field_double& divergence,
-                                                                               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_ = &molecular_nu;
-
-  divergence_ = &divergence;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                  const IJK_Field_double& molecular_nu_tensor_xx,
-                                                  const IJK_Field_double& molecular_nu_tensor_xy,
-                                                  const IJK_Field_double& molecular_nu_tensor_xz,
-                                                  const IJK_Field_double& molecular_nu_tensor_yx,
-                                                  const IJK_Field_double& molecular_nu_tensor_yy,
-                                                  const IJK_Field_double& molecular_nu_tensor_yz,
-                                                  const IJK_Field_double& molecular_nu_tensor_zx,
-                                                  const IJK_Field_double& molecular_nu_tensor_zy,
-                                                  const IJK_Field_double& molecular_nu_tensor_zz,
-                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                   const IJK_Field_double& molecular_nu_tensor_xx,
-                                                   const IJK_Field_double& molecular_nu_tensor_xy,
-                                                   const IJK_Field_double& molecular_nu_tensor_xz,
-                                                   const IJK_Field_double& molecular_nu_tensor_yx,
-                                                   const IJK_Field_double& molecular_nu_tensor_yy,
-                                                   const IJK_Field_double& molecular_nu_tensor_yz,
-                                                   const IJK_Field_double& molecular_nu_tensor_zx,
-                                                   const IJK_Field_double& molecular_nu_tensor_zy,
-                                                   const IJK_Field_double& molecular_nu_tensor_zz,
-                                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                         const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                         const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                         const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                         const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                         const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                         const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                         const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                         const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                         const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                         IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                          const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                          const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                          const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                          const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                          const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                          const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                          const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                          const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                          const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                      const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                      const IJK_Field_double& divergence,
-                                                                                      IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  divergence_ = &divergence;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                       const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                       const IJK_Field_double& divergence,
-                                                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  divergence_ = &divergence;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-
-void OpDiffTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                             const IJK_Field_double& molecular_nu_tensor_xx,
-                                                             const IJK_Field_double& molecular_nu_tensor_xy,
-                                                             const IJK_Field_double& molecular_nu_tensor_xz,
-                                                             const IJK_Field_double& molecular_nu_tensor_yx,
-                                                             const IJK_Field_double& molecular_nu_tensor_yy,
-                                                             const IJK_Field_double& molecular_nu_tensor_yz,
-                                                             const IJK_Field_double& molecular_nu_tensor_zx,
-                                                             const IJK_Field_double& molecular_nu_tensor_zy,
-                                                             const IJK_Field_double& molecular_nu_tensor_zz,
-                                                             IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                              const IJK_Field_double& molecular_nu_tensor_xx,
-                                                              const IJK_Field_double& molecular_nu_tensor_xy,
-                                                              const IJK_Field_double& molecular_nu_tensor_xz,
-                                                              const IJK_Field_double& molecular_nu_tensor_yx,
-                                                              const IJK_Field_double& molecular_nu_tensor_yy,
-                                                              const IJK_Field_double& molecular_nu_tensor_yz,
-                                                              const IJK_Field_double& molecular_nu_tensor_zx,
-                                                              const IJK_Field_double& molecular_nu_tensor_zy,
-                                                              const IJK_Field_double& molecular_nu_tensor_zz,
-                                                              IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                    const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                     const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                     IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                                 const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                                 const IJK_Field_double& divergence,
-                                                                                                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  divergence_ = &divergence;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_xx,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_xy,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_xz,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_yx,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_yy,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_yz,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_zx,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_zy,
-                                                                                                  const IJK_Field_double& molecular_nu_tensor_zz,
-                                                                                                  const IJK_Field_double& divergence,
-                                                                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
-  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
-  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
-  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
-  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
-  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
-  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
-  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
-  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
-
-  divergence_ = &divergence;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-
-void OpDiffStructuralOnlyZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                       const IJK_Field_double& structural_model_xx,
-                                                       const IJK_Field_double& structural_model_xy,
-                                                       const IJK_Field_double& structural_model_xz,
-                                                       const IJK_Field_double& structural_model_yx,
-                                                       const IJK_Field_double& structural_model_yy,
-                                                       const IJK_Field_double& structural_model_yz,
-                                                       const IJK_Field_double& structural_model_zx,
-                                                       const IJK_Field_double& structural_model_zy,
-                                                       const IJK_Field_double& structural_model_zz,
-                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-
-  structural_model_xx_ = &structural_model_xx;
-  structural_model_xy_ = &structural_model_xy;
-  structural_model_xz_ = &structural_model_xz;
-  structural_model_yx_ = &structural_model_yx;
-  structural_model_yy_ = &structural_model_yy;
-  structural_model_yz_ = &structural_model_yz;
-  structural_model_zx_ = &structural_model_zx;
-  structural_model_zy_ = &structural_model_zy;
-  structural_model_zz_ = &structural_model_zz;
-  compute_add(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
-void OpDiffStructuralOnlyZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                                        const IJK_Field_double& structural_model_xx,
-                                                        const IJK_Field_double& structural_model_xy,
-                                                        const IJK_Field_double& structural_model_xz,
-                                                        const IJK_Field_double& structural_model_yx,
-                                                        const IJK_Field_double& structural_model_yy,
-                                                        const IJK_Field_double& structural_model_yz,
-                                                        const IJK_Field_double& structural_model_zx,
-                                                        const IJK_Field_double& structural_model_zy,
-                                                        const IJK_Field_double& structural_model_zz,
-                                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-{
-  statistiques().begin_count(diffusion_counter_);
-
-  vx_ = &vx;
-  vy_ = &vy;
-  vz_ = &vz;
-
-
-  structural_model_xx_ = &structural_model_xx;
-  structural_model_xy_ = &structural_model_xy;
-  structural_model_xz_ = &structural_model_xz;
-  structural_model_yx_ = &structural_model_yx;
-  structural_model_yy_ = &structural_model_yy;
-  structural_model_yz_ = &structural_model_yz;
-  structural_model_zx_ = &structural_model_zx;
-  structural_model_zy_ = &structural_model_zy;
-  structural_model_zz_ = &structural_model_zz;
-  compute_set(dvx, dvy, dvz);
-  statistiques().end_count(diffusion_counter_);
-
-}
+//void OpDiffTurbIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                   const IJK_Field_double& molecular_nu,
+//                                   const IJK_Field_double& turbulent_nu,
+//                                   const IJK_Field_double& turbulent_k_energy,
+//                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  turbulent_nu_ = &turbulent_nu;
+//  turbulent_k_energy_ = &turbulent_k_energy;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffTurbIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                    const IJK_Field_double& molecular_nu,
+//                                    const IJK_Field_double& turbulent_nu,
+//                                    const IJK_Field_double& turbulent_k_energy,
+//                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  turbulent_nu_ = &turbulent_nu;
+//  turbulent_k_energy_ = &turbulent_k_energy;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                               const IJK_Field_double& molecular_nu,
+//                               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                const IJK_Field_double& molecular_nu,
+//                                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                      const IJK_Field_double& molecular_nu,
+//                                                      IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                       const IJK_Field_double& molecular_nu,
+//                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                   const IJK_Field_double& molecular_nu,
+//                                                                   const IJK_Field_double& divergence,
+//                                                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  divergence_ = &divergence;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                    const IJK_Field_double& molecular_nu,
+//                                                                    const IJK_Field_double& divergence,
+//                                                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  divergence_ = &divergence;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                          const IJK_Field_double& molecular_nu,
+//                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                           const IJK_Field_double& molecular_nu,
+//                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                 const IJK_Field_double& molecular_nu,
+//                                                                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                  const IJK_Field_double& molecular_nu,
+//                                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                              const IJK_Field_double& molecular_nu,
+//                                                                              const IJK_Field_double& divergence,
+//                                                                              IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  divergence_ = &divergence;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                               const IJK_Field_double& molecular_nu,
+//                                                                               const IJK_Field_double& divergence,
+//                                                                               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_ = &molecular_nu;
+//
+//  divergence_ = &divergence;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                  const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                  const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                  const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                  const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                  const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                  const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                  const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                  const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                  const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                   const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                   const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                   const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                   const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                   const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                   const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                   const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                   const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                   const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                         const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                         IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                          const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                      const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                      const IJK_Field_double& divergence,
+//                                                                                      IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  divergence_ = &divergence;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                       const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                       const IJK_Field_double& divergence,
+//                                                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  divergence_ = &divergence;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//
+//void OpDiffTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                             const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                             const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                             const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                             const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                             const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                             const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                             const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                             const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                             const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                             IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                              const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                              const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                              const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                              const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                              const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                              const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                              const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                              const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                              const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                              IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                    const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                     const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                     IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                                 const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                                 const IJK_Field_double& divergence,
+//                                                                                                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  divergence_ = &divergence;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_xx,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_xy,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_xz,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_yx,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_yy,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_yz,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_zx,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_zy,
+//                                                                                                  const IJK_Field_double& molecular_nu_tensor_zz,
+//                                                                                                  const IJK_Field_double& divergence,
+//                                                                                                  IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+//  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+//  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+//  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+//  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+//  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+//  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+//  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+//  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+//
+//  divergence_ = &divergence;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//
+//void OpDiffStructuralOnlyZeroatwallIJK_double::ajouter(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                       const IJK_Field_double& structural_model_xx,
+//                                                       const IJK_Field_double& structural_model_xy,
+//                                                       const IJK_Field_double& structural_model_xz,
+//                                                       const IJK_Field_double& structural_model_yx,
+//                                                       const IJK_Field_double& structural_model_yy,
+//                                                       const IJK_Field_double& structural_model_yz,
+//                                                       const IJK_Field_double& structural_model_zx,
+//                                                       const IJK_Field_double& structural_model_zy,
+//                                                       const IJK_Field_double& structural_model_zz,
+//                                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//
+//  structural_model_xx_ = &structural_model_xx;
+//  structural_model_xy_ = &structural_model_xy;
+//  structural_model_xz_ = &structural_model_xz;
+//  structural_model_yx_ = &structural_model_yx;
+//  structural_model_yy_ = &structural_model_yy;
+//  structural_model_yz_ = &structural_model_yz;
+//  structural_model_zx_ = &structural_model_zx;
+//  structural_model_zy_ = &structural_model_zy;
+//  structural_model_zz_ = &structural_model_zz;
+//  compute_add(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
+//void OpDiffStructuralOnlyZeroatwallIJK_double::calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+//                                                        const IJK_Field_double& structural_model_xx,
+//                                                        const IJK_Field_double& structural_model_xy,
+//                                                        const IJK_Field_double& structural_model_xz,
+//                                                        const IJK_Field_double& structural_model_yx,
+//                                                        const IJK_Field_double& structural_model_yy,
+//                                                        const IJK_Field_double& structural_model_yz,
+//                                                        const IJK_Field_double& structural_model_zx,
+//                                                        const IJK_Field_double& structural_model_zy,
+//                                                        const IJK_Field_double& structural_model_zz,
+//                                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+//{
+//  statistiques().begin_count(diffusion_counter_);
+//
+//  vx_ = &vx;
+//  vy_ = &vy;
+//  vz_ = &vz;
+//
+//
+//  structural_model_xx_ = &structural_model_xx;
+//  structural_model_xy_ = &structural_model_xy;
+//  structural_model_xz_ = &structural_model_xz;
+//  structural_model_yx_ = &structural_model_yx;
+//  structural_model_yy_ = &structural_model_yy;
+//  structural_model_yz_ = &structural_model_yz;
+//  structural_model_zx_ = &structural_model_zx;
+//  structural_model_zy_ = &structural_model_zy;
+//  structural_model_zz_ = &structural_model_zz;
+//  compute_set(dvx, dvy, dvz);
+//  statistiques().end_count(diffusion_counter_);
+//
+//}
 

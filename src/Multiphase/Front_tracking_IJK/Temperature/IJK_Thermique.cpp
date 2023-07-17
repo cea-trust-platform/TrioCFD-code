@@ -243,7 +243,8 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
         }
       break;
     case 4:
-      temperature_convection_op_centre4_.initialize(splitting, boundary_conditions_);
+      temperature_convection_op_centre4_.set_bc_thermique(boundary_conditions_);
+      temperature_convection_op_centre4_.initialize(splitting);
       break;
     default:
       Cerr << "Undefined operator for the convection of the temperature. " << finl;
@@ -450,10 +451,11 @@ void IJK_Thermique::update_thermal_properties()
 // CFL value is not computed as it is the same as for the velocity equation.
 // The calculation should be stable if Fo <= 1.0 (thanks to the 0.5 in the formula below).
 double IJK_Thermique::compute_timestep(const double timestep,
-                                       const double rho_l, const double rho_v,
                                        const double dxmin) const
 {
   // alpha = lambda/(rho*cp)
+  double rho_l = ref_ijk_ft_->get_rho_l();
+  double rho_v = ref_ijk_ft_->get_rho_v();
   const double alpha_max = std::max(lambda_liquid_/(rho_l*cp_liquid_), lambda_vapor_/(rho_v*cp_vapor_));
   double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
   if (diff_temp_negligible_) dt_fo = 1.e20;

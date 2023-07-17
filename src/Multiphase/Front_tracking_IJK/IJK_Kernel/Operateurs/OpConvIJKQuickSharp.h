@@ -22,7 +22,7 @@ class OpConvIJKQuickSharp_double : public OpConvIJKFacesCommon_double
 {
   Declare_instanciable(OpConvIJKQuickSharp_double);
 public:
-  void initialize(const IJK_Splitting& splitting);
+  void initialize(const IJK_Splitting& splitting) override;
 
 protected:
   inline void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer) override

@@ -22,7 +22,6 @@
 #ifndef Operateur_IJK_elem_diff_included
 #define Operateur_IJK_elem_diff_included
 
-#include <Operateur_IJK_elem.h>
 #include <OpDiffTurbIJKScalar.h>
 #include <TRUST_Deriv.h>
 

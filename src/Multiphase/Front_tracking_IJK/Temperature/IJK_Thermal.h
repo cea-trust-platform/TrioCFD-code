@@ -14,74 +14,51 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Operateur_IJK_elem.h
-// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
+// File      : IJK_Thermal.h
+// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Operateur_IJK_included
-#define Operateur_IJK_included
+#ifndef IJK_Thermal_included
+#define IJK_Thermal_included
 
-#include <Operateur_IJK_base.h>
+#include <IJK_Thermal_base.h>
 #include <TRUST_Deriv.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class Operateur_IJK_elem
+// .DESCRIPTION : class IJK_Thermal
 //
-// <Description of class Operateur_IJK_elem>
+// <Description of class IJK_Thermal>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem : public DERIV(Operateur_IJK_elem_base_double)
+class IJK_Thermal : public DERIV(IJK_Thermal_base)
 {
 
-  Declare_instanciable( Operateur_IJK_elem );
+  Declare_instanciable( IJK_Thermal ) ;
 
-public:
-  inline void initialize(const IJK_Splitting& splitting);
-  inline void compute_set(IJK_Field_double& dx);
-  inline void compute_add(IJK_Field_double& dx);
-//  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer);
-//  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer);
-//  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer);
-//  inline void compute_(IJK_Field_double& dx, bool add);
+public :
+  inline void associer(const IJK_FT_double& ijk_ft);
+  inline void sauvegarder_temperature(Nom& lata_name, int idx);
+  inline double compute_timestep(const double timestep,
+                                 const double dxmin) const;
 
 };
 
-inline void Operateur_IJK_elem::initialize(const IJK_Splitting& splitting)
+inline void IJK_Thermal::associer(const IJK_FT_double& ijk_ft)
 {
-  valeur().initialize(splitting);
+  valeur().associer(ijk_ft);
 }
 
-inline void Operateur_IJK_elem::compute_set(IJK_Field_double& dx)
+inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)
 {
-  valeur().compute_set(dx);
+  valeur().sauvegarder_temperature(lata_name, idx);
 }
 
-inline void Operateur_IJK_elem::compute_add(IJK_Field_double& dx)
+inline double IJK_Thermal::compute_timestep(const double timestep, const double dxmin) const
 {
-  valeur().compute_add(dx);
+  return valeur().compute_timestep(timestep, dxmin);
 }
 
-//inline void Operateur_IJK_elem::compute_flux_x(IJK_Field_local_double& resu, const int k_layer)
-//{
-//  valeur().compute_flux_x(resu, k_layer);
-//}
-//
-//inline void Operateur_IJK_elem::compute_flux_y(IJK_Field_local_double& resu, const int k_layer)
-//{
-//  valeur().compute_flux_y(resu, k_layer);
-//}
-//
-//inline void Operateur_IJK_elem::compute_flux_z(IJK_Field_local_double& resu, const int k_layer)
-//{
-//  valeur().compute_flux_z(resu, k_layer);
-//}
-//
-//inline void Operateur_IJK_elem::compute_(IJK_Field_double& dx, bool add)
-//{
-//  valeur().compute_(dx, add);
-//}
-
-#endif /* Operateur_IJK_elem_included */
+#endif /* IJK_Thermal_included */

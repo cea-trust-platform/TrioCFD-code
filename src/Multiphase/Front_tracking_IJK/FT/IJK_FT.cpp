@@ -42,6 +42,7 @@
 #include <corrections_qdm.h>
 #include <Force_sp.h>
 #include <Force_ph.h>
+#include <Vecteur3.h>
 
 #define COMPLEMENT_ANTI_DEVIATION_RESIDU
 // #define VARIABLE_DZ
@@ -482,6 +483,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
   param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
+  param.ajouter("thermal", &thermal_); // XD_ADD_P chaine not_set
 
   param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
@@ -810,6 +812,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   for (auto& itr : thermal_subresolution_)
     itr.associer(*this);
 
+  for (auto& itr : thermal_)
+    itr.associer(*this);
+
   run();
   return is;
 }
@@ -1129,6 +1134,14 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       itr.sauvegarder_temperature(lata_name, idx3);
       ++idx3;
     }
+
+  int idth =0;
+  for (auto& itr : thermal_)
+    {
+      itr.sauvegarder_temperature(lata_name, idth);
+      ++idth;
+    }
+
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
   SFichier fichier;
   if (Process::je_suis_maitre())
@@ -1228,6 +1241,29 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       if (flag_list_not_empty_th_subres)
         fichier << " } \n" ;
 
+      /*
+       * Thermal problems
+       */
+      int flag_list_not_empty_th = 0;
+      if (thermal_.size() > 0)
+        {
+          fichier << " thermal_ {\n" ;
+          flag_list_not_empty_th = 1;
+        }
+      for(auto itr = thermal_.begin(); itr != thermal_.end(); )
+        {
+          fichier << *itr ;
+          ++itr;
+          if (itr != thermal_.end())
+            fichier << ", \n" ;
+          else
+            fichier << "\n" ;
+        }
+      if (flag_list_not_empty_th)
+        fichier << " } \n" ;
+      /*
+       *
+       */
       post_.sauvegarder_post_maitre(lata_name, fichier);
       fichier << "}\n" ;
 #endif
@@ -1251,6 +1287,7 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("thermique", &thermique_);
   param.ajouter("energie", &energie_);
   param.ajouter("thermal_subresolution", &thermal_subresolution_);
+  param.ajouter("thermal", &thermal_);
   param.ajouter("forcage", &forcage_);
   param.ajouter("corrections_qdm", &qdm_corrections_);
   // GAB : En chantier, (ce qui suit)
@@ -1337,7 +1374,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   double dt_thermique = 1.e20;
   for (const auto& itr : thermique_)
     {
-      const double dt_th = itr.compute_timestep(dt_thermique, rho_liquide_, rho_vapeur_, dxmin);
+      const double dt_th = itr.compute_timestep(dt_thermique, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
       dt_thermique= std::min(dt_thermique, dt_th);
     }
@@ -1358,7 +1395,16 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       dt_thermal_subresolution= std::min(dt_thermal_subresolution, dt_th_subres);
     }
 
-  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie),dt_thermal_subresolution));
+  double dt_thermal = 1.e20;
+  for (const auto& itr : thermal_)
+    {
+      const double dt_th = itr.compute_timestep(dt_thermal, dxmin);
+      // We take the most restrictive of all thermal problems and use it for all:
+      dt_thermal= std::min(dt_thermal_subresolution, dt_th);
+    }
+
+  const double dt = std::min(max_timestep, timestep_facsec_*std::min(dt_eq_velocity, dt_thermal));
+  //  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie),dt_thermal_subresolution));
 
   if (Process::je_suis_maitre())
     {
@@ -2056,36 +2102,47 @@ void IJK_FT_double::run()
   //velocity_diffusion_op_.initialize(splitting_, boundary_conditions_);
   if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
     {
-      velocity_diffusion_op_simple_.initialize(splitting_,
-                                               boundary_conditions_);
+//      velocity_diffusion_op_simple_.initialize(splitting_,
+//                                               boundary_conditions_);
+      velocity_diffusion_op_.typer("OpDiffIJK_double");
     }
   else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
     {
-      velocity_diffusion_op_full_.initialize(splitting_,
-                                             boundary_conditions_);
+//      velocity_diffusion_op_full_.initialize(splitting_,
+//                                             boundary_conditions_);
+      velocity_diffusion_op_.typer("OpDiffStdWithLaminarTransposeIJK_double");
     }
   else
     {
       Cerr << "Unknown velocity diffusion operator! " << finl;
       Process::exit();
     }
-
+  velocity_diffusion_op_.set_bc(boundary_conditions_);
+  velocity_diffusion_op_.initialize(splitting_);
   //  velocity_convection_op(type_velocity_convection_op_).initialize(splitting_);
+  //  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
+  //	OpConvCentre4IJK_double velocity_convection_op_centre_;
+  //	OpConvAmontIJK_double velocity_convection_op_amont_;
   switch (type_velocity_convection_op_)
     {
     case 0:
-      velocity_convection_op_sharp_.initialize(splitting_);
+      velocity_convection_op_.typer("OpConvIJKQuickSharp_double");
+//      velocity_convection_op_sharp_.initialize(splitting_);
       break;
     case 1:
-      velocity_convection_op_centre_.initialize(splitting_, boundary_conditions_);
+      velocity_convection_op_.typer("OpConvCentre4IJK_double");
+      velocity_convection_op_.set_bc(boundary_conditions_);
+//      velocity_convection_op_centre_.initialize(splitting_, boundary_conditions_);
       break;
     case 2:
-      velocity_convection_op_amont_.initialize(splitting_);
+      velocity_convection_op_.typer("OpConvAmontIJK_double");
+//      velocity_convection_op_amont_.initialize(splitting_);
       break;
     default:
       Cerr << "Error, unknown type of velocity_convection_op" << finl;
       Process::exit();
     }
+  velocity_convection_op_.initialize(splitting_);
 
 // Economise la memoire si pas besoin
   if (!disable_solveur_poisson_)
@@ -3062,28 +3119,31 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
     {
       if (type_velocity_convection_form_== Nom("non_conservative_simple"))
         {
-          switch(type_velocity_convection_op_)
-            {
-            case 0:
-              velocity_convection_op_sharp_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                                     velocity_[0], velocity_[1], velocity_[2],
-                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-              break;
-            case 1:
-              velocity_convection_op_centre_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                                      velocity_[0], velocity_[1], velocity_[2],
-                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-              break;
-            case 2:
-              velocity_convection_op_amont_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                                     velocity_[0], velocity_[1], velocity_[2],
-                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-
-              break;
-            default:
-              Cerr << "Unknown type of velocity convection operator" << finl;
-              Process::exit();
-            }
+          velocity_convection_op_.calculer(velocity_[0], velocity_[1], velocity_[2],
+                                           velocity_[0], velocity_[1], velocity_[2],
+                                           d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//          switch(type_velocity_convection_op_)
+//            {
+//            case 0:
+//              velocity_convection_op_sharp_.calculer(velocity_[0], velocity_[1], velocity_[2],
+//                                                     velocity_[0], velocity_[1], velocity_[2],
+//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//              break;
+//            case 1:
+//              velocity_convection_op_centre_.calculer(velocity_[0], velocity_[1], velocity_[2],
+//                                                      velocity_[0], velocity_[1], velocity_[2],
+//                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//              break;
+//            case 2:
+//              velocity_convection_op_amont_.calculer(velocity_[0], velocity_[1], velocity_[2],
+//                                                     velocity_[0], velocity_[1], velocity_[2],
+//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//
+//              break;
+//            default:
+//              Cerr << "Unknown type of velocity convection operator" << finl;
+//              Process::exit();
+//            }
           // Multiplication par rho (on va rediviser a la fin)
           // (a partir de rho aux elements et dv aux faces)
           if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
@@ -3109,493 +3169,508 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
           d_velocity_[2].data() = 0.;
           if (type_velocity_convection_op_!=1)
             {
-              Cerr << "Choix d'options pas encore compatible : convection conservative en QUICK!" << finl;
-              Cerr << " Method OpConvQuickSharpIJK_double::ajouter_avec_u_div_rhou not implemented!" << finl;
-              Process::exit();
-#if 0
-              velocity_convection_op_sharp_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2], // rhov_
-                                                                    velocity_[0], velocity_[1], velocity_[2],
-                                                                    d_velocity_[0], d_velocity_[1], d_velocity_[2],
-                                                                    div_rhou_);
-#endif
+              velocity_convection_op_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2], // rhov_
+                                                              velocity_[0], velocity_[1], velocity_[2],
+                                                              d_velocity_[0], d_velocity_[1], d_velocity_[2],
+                                                              div_rhou_);
+//              Cerr << "Choix d'options pas encore compatible : convection conservative en QUICK!" << finl;
+//              Cerr << " Method OpConvQuickSharpIJK_double::ajouter_avec_u_div_rhou not implemented!" << finl;
+//              Process::exit();
+//#if 0
+//              velocity_convection_op_sharp_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2], // rhov_
+//                                                                    velocity_[0], velocity_[1], velocity_[2],
+//                                                                    d_velocity_[0], d_velocity_[1], d_velocity_[2],
+//                                                                    div_rhou_);
+//#endif
+//            }
+//          else
+//            {
+//              velocity_convection_op_centre_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2],
+//                                                                     velocity_[0], velocity_[1], velocity_[2],
+//                                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2],
+//                                                                     div_rhou_);
+//            }
+            }
+          else if (type_velocity_convection_form_== Nom("conservative"))
+            {
+              update_rho_v();
+              velocity_convection_op_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
+                                               velocity_[0], velocity_[1], velocity_[2],
+                                               d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//          switch (type_velocity_convection_op_)
+//            {
+//            case 0:
+//              velocity_convection_op_sharp_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
+//                                                     velocity_[0], velocity_[1], velocity_[2],
+//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//              break;
+//            case 1:
+//              velocity_convection_op_centre_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
+//                                                      velocity_[0], velocity_[1], velocity_[2],
+//                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//              break;
+//            case 2:
+//              velocity_convection_op_amont_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
+//                                                     velocity_[0], velocity_[1], velocity_[2],
+//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//              break;
+//            default:
+//              Cerr << "unknown type of convection op" << finl;
+//              Process::exit();
+//            }
+
             }
           else
             {
-              velocity_convection_op_centre_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2],
-                                                                     velocity_[0], velocity_[1], velocity_[2],
-                                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2],
-                                                                     div_rhou_);
-            }
-        }
-      else if (type_velocity_convection_form_== Nom("conservative"))
-        {
-          update_rho_v();
-          switch (type_velocity_convection_op_)
-            {
-            case 0:
-              velocity_convection_op_sharp_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-                                                     velocity_[0], velocity_[1], velocity_[2],
-                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-              break;
-            case 1:
-              velocity_convection_op_centre_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-                                                      velocity_[0], velocity_[1], velocity_[2],
-                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-              break;
-            case 2:
-              velocity_convection_op_amont_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-                                                     velocity_[0], velocity_[1], velocity_[2],
-                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-              break;
-            default:
-              Cerr << "unknown type of convection op" << finl;
+              Cerr << "Unknown velocity convection type! " << finl;
               Process::exit();
             }
+          post_.fill_op_conv();
+          // GAB, qdm
 
-        }
-      else
-        {
-          Cerr << "Unknown velocity convection type! " << finl;
-          Process::exit();
-        }
-      post_.fill_op_conv();
-      // GAB, qdm
+          // a priori homogene a int_{volume_cellule} (d rho v / dt) pour le moment
+          // on divise le terme_convection par volume_cellule
+          // Il ne faudrai pas un mass solveur sur mon terme de convection... avant de le moyenner meme ?
 
-      // a priori homogene a int_{volume_cellule} (d rho v / dt) pour le moment
-      // on divise le terme_convection par volume_cellule
-      // Il ne faudrai pas un mass solveur sur mon terme de convection... avant de le moyenner meme ?
-
-      for (int dir = 0; dir < 3; dir++)
-        {
-          // if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
-          // Pourquoi diviser par volume_cell_uniforme ?
-          terme_convection[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme;
-
-          if (test_etapes_et_bilan)
+          for (int dir = 0; dir < 3; dir++)
             {
-              terme_convection_mass_solver_[dir] = d_velocity_[dir];
-              if(!disable_diphasique_)
+              // if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
+              // Pourquoi diviser par volume_cell_uniforme ?
+              terme_convection[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme;
+
+              if (test_etapes_et_bilan)
                 {
-                  for (int k=0; k<d_velocity_[dir].nk(); k++)
+                  terme_convection_mass_solver_[dir] = d_velocity_[dir];
+                  if(!disable_diphasique_)
                     {
-                      mass_solver_with_rho(terme_convection_mass_solver_[dir], rho_field_, delta_z_local_, k);
-                    }
-                }
-              else
-                {
-                  for (int k=0; k<d_velocity_[dir].nk(); k++)
-                    for (int j=0; j<d_velocity_[dir].nj(); j++)
-                      for (int i=0; i<d_velocity_[dir].ni(); i++)
-                        terme_convection_mass_solver_[dir](i,j,k) = terme_convection_mass_solver_[dir](i,j,k) / (rho_liquide_ * volume_cell_uniforme);
-                }
-
-              terme_moyen_convection_mass_solver_[dir] = calculer_v_moyen(terme_convection_mass_solver_[dir]);
-            }
-          // else
-          // terme_convection[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme;
-        }
-
-      //
-    }
-  else
-    {
-      d_velocity_[0].data() = 0.;
-      d_velocity_[1].data() = 0.;
-      d_velocity_[2].data() = 0.;
-    }
-
-  // Calcul diffusion
-  if ((!diffusion_alternative_) && (!disable_diffusion_qdm_) )
-    {
-
-      if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
-        {
-          velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                                molecular_mu_,
-                                                d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-        }
-      else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
-        {
-          velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                              molecular_mu_,
-                                              d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-        }
-      else
-        {
-          Cerr << "Unknown velocity diffusion operator! " << finl;
-          Process::exit();
-        }
-      // GAB, qdm
-      // a priori homogene a int_{volume_cellule} (d rho v / dt) pour le moment
-      // mais on le divise par volume_cell_uniforme donc homogene a d rho v / dt maintenant
-      // en diffusion "normale", on ajoute la diffusion plus tard
-      for (int dir = 0; dir < 3; dir++)
-        {
-          // if (rk_step==-1 || rk_step==0) // revient a rk_step>0 // euler ou premier pdt de rk3
-          terme_diffusion[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir];
-          terme_diffusion_mass_solver_[dir] = d_velocity_[dir];
-          // terme_diffusion_mass_solver_ contient la diffusion et la convection
-          if (test_etapes_et_bilan)
-            {
-              if (!disable_diphasique_)
-                {
-                  for (int k=0; k<terme_diffusion_mass_solver_[dir].nk(); k++)
-                    {
-                      mass_solver_with_rho(terme_diffusion_mass_solver_[dir], rho_field_, delta_z_local_, k);
-
-                      // On retranche la convection
-                      for (int j=0; j<terme_diffusion_mass_solver_[dir].nk(); j++ )
-                        for (int i=0; i<terme_diffusion_mass_solver_[dir].ni(); i++)
-                          terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) - terme_convection_mass_solver_[dir](i,j,k);
-                    }
-                }
-              else
-                {
-                  // Dans le cas monophasique, rho_field_ vaut partout rho_liquide
-                  for (int k=0; k<terme_diffusion_mass_solver_[dir].nk(); k++)
-                    for (int j=0; j<terme_diffusion_mass_solver_[dir].nk(); j++ )
-                      for (int i=0; i<terme_diffusion_mass_solver_[dir].ni(); i++)
+                      for (int k=0; k<d_velocity_[dir].nk(); k++)
                         {
-                          terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) / (rho_liquide_*volume_cell_uniforme);
-                          terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) - terme_convection_mass_solver_[dir](i,j,k);
+                          mass_solver_with_rho(terme_convection_mass_solver_[dir], rho_field_, delta_z_local_, k);
                         }
+                    }
+                  else
+                    {
+                      for (int k=0; k<d_velocity_[dir].nk(); k++)
+                        for (int j=0; j<d_velocity_[dir].nj(); j++)
+                          for (int i=0; i<d_velocity_[dir].ni(); i++)
+                            terme_convection_mass_solver_[dir](i,j,k) = terme_convection_mass_solver_[dir](i,j,k) / (rho_liquide_ * volume_cell_uniforme);
+                    }
+
+                  terme_moyen_convection_mass_solver_[dir] = calculer_v_moyen(terme_convection_mass_solver_[dir]);
                 }
-              // Moyenne sur le volume du domaine de simulation
-              terme_moyen_diffusion_mass_solver_[dir] = calculer_v_moyen(terme_diffusion_mass_solver_[dir]);
               // else
-              // terme_diffusion[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir];
+              // terme_convection[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme;
             }
+
+          //
         }
-      //
-    }
+      else
+        {
+          d_velocity_[0].data() = 0.;
+          d_velocity_[1].data() = 0.;
+          d_velocity_[2].data() = 0.;
+        }
 
-  // GAB, qdm
-  if (test_etapes_et_bilan)
-    for (int i = 0; i < 3; i++)
-      {
-        // Cout << "BF d_v_diff_et_conv" << finl;
-        d_v_diff_et_conv[i] = d_velocity_[i];
-        // Cout << "AF d_v_diff_et_conv" << finl;
-      }
-  //
+      // Calcul diffusion
+      if ((!diffusion_alternative_) && (!disable_diffusion_qdm_) )
+        {
+          velocity_diffusion_op_.set_nu(molecular_mu_);
+          velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+                                         d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//      if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
+//        {
+//          velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+//                                                molecular_mu_,
+//                                                d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//        }
+//      else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
+//        {
+//          velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+//                                              molecular_mu_,
+//                                              d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+//        }
+//      else
+//        {
+//          Cerr << "Unknown velocity diffusion operator! " << finl;
+//          Process::exit();
+//        }
+          // GAB, qdm
+          // a priori homogene a int_{volume_cellule} (d rho v / dt) pour le moment
+          // mais on le divise par volume_cell_uniforme donc homogene a d rho v / dt maintenant
+          // en diffusion "normale", on ajoute la diffusion plus tard
+          for (int dir = 0; dir < 3; dir++)
+            {
+              // if (rk_step==-1 || rk_step==0) // revient a rk_step>0 // euler ou premier pdt de rk3
+              terme_diffusion[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir];
+              terme_diffusion_mass_solver_[dir] = d_velocity_[dir];
+              // terme_diffusion_mass_solver_ contient la diffusion et la convection
+              if (test_etapes_et_bilan)
+                {
+                  if (!disable_diphasique_)
+                    {
+                      for (int k=0; k<terme_diffusion_mass_solver_[dir].nk(); k++)
+                        {
+                          mass_solver_with_rho(terme_diffusion_mass_solver_[dir], rho_field_, delta_z_local_, k);
 
-  // Calcul et ajout du grad(P^{n})*volume_cell (_entrelace?) :
-  if (include_pressure_gradient_in_ustar_)
-    {
-      // pressure gradient requires the "left" value in all directions:
-      pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
-#ifndef VARIABLE_DZ
-      double volume = 1.;
-      for (int i = 0; i < 3; i++)
-        volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-#else
-      Cerr << "This methods does not support variable DZ yet... Contact trust support. ";
-      Process::exit();
-      const double volume = get_channel_control_volume(dv, k, delta_z_local_);
-#endif
-      add_gradient_times_constant(pressure_, -volume /*constant*/,  d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-      Cout << "BF add_gradient_times_constant" << finl;
+                          // On retranche la convection
+                          for (int j=0; j<terme_diffusion_mass_solver_[dir].nk(); j++ )
+                            for (int i=0; i<terme_diffusion_mass_solver_[dir].ni(); i++)
+                              terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) - terme_convection_mass_solver_[dir](i,j,k);
+                        }
+                    }
+                  else
+                    {
+                      // Dans le cas monophasique, rho_field_ vaut partout rho_liquide
+                      for (int k=0; k<terme_diffusion_mass_solver_[dir].nk(); k++)
+                        for (int j=0; j<terme_diffusion_mass_solver_[dir].nk(); j++ )
+                          for (int i=0; i<terme_diffusion_mass_solver_[dir].ni(); i++)
+                            {
+                              terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) / (rho_liquide_*volume_cell_uniforme);
+                              terme_diffusion_mass_solver_[dir](i,j,k) = terme_diffusion_mass_solver_[dir](i,j,k) - terme_convection_mass_solver_[dir](i,j,k);
+                            }
+                    }
+                  // Moyenne sur le volume du domaine de simulation
+                  terme_moyen_diffusion_mass_solver_[dir] = calculer_v_moyen(terme_diffusion_mass_solver_[dir]);
+                  // else
+                  // terme_diffusion[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir];
+                }
+            }
+          //
+        }
+
       // GAB, qdm
-      // En utilisation normale de la pression, elle n'est pas ajoutee ici
       if (test_etapes_et_bilan)
-        {
-          add_gradient_times_constant(pressure_, -volume,
-                                      terme_pression_in_ustar_local[0],
-                                      terme_pression_in_ustar_local[1],
-                                      terme_pression_in_ustar_local[2]);
-          for (int dir_press = 0; dir_press < 3; dir_press++)
-            terme_pression_in_ustar[dir_press] = calculer_v_moyen(terme_pression_in_ustar_local[dir_press]);
-          Cout << "AF add_gradient_times_constant" << finl;
-        }
+        for (int i = 0; i < 3; i++)
+          {
+            // Cout << "BF d_v_diff_et_conv" << finl;
+            d_v_diff_et_conv[i] = d_velocity_[i];
+            // Cout << "AF d_v_diff_et_conv" << finl;
+          }
       //
-    }
 
-  // Calcul du terme source aux interfaces pour l'ajouter a dv :
-  if (!disable_diphasique_)
-    {
-      for (int dir = 0; dir < 3; dir++)
+      // Calcul et ajout du grad(P^{n})*volume_cell (_entrelace?) :
+      if (include_pressure_gradient_in_ustar_)
         {
-          terme_source_interfaces_ft_[dir].data() = 0.;
-          terme_repulsion_interfaces_ft_[dir].data() = 0.;
-          terme_abs_repulsion_interfaces_ft_[dir].data() = 0.;
+          // pressure gradient requires the "left" value in all directions:
+          pressure_.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
+#ifndef VARIABLE_DZ
+          double volume = 1.;
+          for (int i = 0; i < 3; i++)
+            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
+#else
+          Cerr << "This methods does not support variable DZ yet... Contact trust support. ";
+          Process::exit();
+          const double volume = get_channel_control_volume(dv, k, delta_z_local_);
+#endif
+          add_gradient_times_constant(pressure_, -volume /*constant*/,  d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+          Cout << "BF add_gradient_times_constant" << finl;
+          // GAB, qdm
+          // En utilisation normale de la pression, elle n'est pas ajoutee ici
+          if (test_etapes_et_bilan)
+            {
+              add_gradient_times_constant(pressure_, -volume,
+                                          terme_pression_in_ustar_local[0],
+                                          terme_pression_in_ustar_local[1],
+                                          terme_pression_in_ustar_local[2]);
+              for (int dir_press = 0; dir_press < 3; dir_press++)
+                terme_pression_in_ustar[dir_press] = calculer_v_moyen(terme_pression_in_ustar_local[dir_press]);
+              Cout << "AF add_gradient_times_constant" << finl;
+            }
+          //
         }
-      interfaces_.ajouter_terme_source_interfaces(
-        terme_source_interfaces_ft_,
-        terme_repulsion_interfaces_ft_,
-        terme_abs_repulsion_interfaces_ft_
-      );
 
-
-      // Avant le solveur de masse, il faut un terme homogene a \int_vol {rho v }
-      if (!disable_source_interf_)
+      // Calcul du terme source aux interfaces pour l'ajouter a dv :
+      if (!disable_diphasique_)
         {
           for (int dir = 0; dir < 3; dir++)
             {
-              if ((rk_step == -1) || (refuse_patch_conservation_QdM_RK3_source_interf_))
-                {
-                  // Avec le schema Euler, ou si on refuse le patch de conservation de la QdM en RK3 diphasique :
-                  redistribute_from_splitting_ft_faces_[dir].redistribute_add(terme_source_interfaces_ft_[dir],
-                                                                              d_velocity_[dir]);
-                }
-              else
-                {
-                  // On n'ajoute pas le terme source a d_velocity_...
-                  // On le prendra en compte directement dans velocity_.
-                }
+              terme_source_interfaces_ft_[dir].data() = 0.;
+              terme_repulsion_interfaces_ft_[dir].data() = 0.;
+              terme_abs_repulsion_interfaces_ft_[dir].data() = 0.;
             }
+          interfaces_.ajouter_terme_source_interfaces(
+            terme_source_interfaces_ft_,
+            terme_repulsion_interfaces_ft_,
+            terme_abs_repulsion_interfaces_ft_
+          );
 
-          {
-            for (int dir = 0; dir < 3; dir++)
+
+          // Avant le solveur de masse, il faut un terme homogene a \int_vol {rho v }
+          if (!disable_source_interf_)
+            {
+              for (int dir = 0; dir < 3; dir++)
+                {
+                  if ((rk_step == -1) || (refuse_patch_conservation_QdM_RK3_source_interf_))
+                    {
+                      // Avec le schema Euler, ou si on refuse le patch de conservation de la QdM en RK3 diphasique :
+                      redistribute_from_splitting_ft_faces_[dir].redistribute_add(terme_source_interfaces_ft_[dir],
+                                                                                  d_velocity_[dir]);
+                    }
+                  else
+                    {
+                      // On n'ajoute pas le terme source a d_velocity_...
+                      // On le prendra en compte directement dans velocity_.
+                    }
+                }
+
               {
-                redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
-                                                                        terme_source_interfaces_ns_[dir]);
-                // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
-                //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
-//                if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
-                if (test_etapes_et_bilan)
+                for (int dir = 0; dir < 3; dir++)
                   {
-                    terme_interfaces_bf_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                    terme_interfaces_bf_mass_solver_bis[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
-                  }
+                    redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
+                                                                            terme_source_interfaces_ns_[dir]);
+                    // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
+                    //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
+//                if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
+                    if (test_etapes_et_bilan)
+                      {
+                        terme_interfaces_bf_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                        terme_interfaces_bf_mass_solver_bis[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
+                      }
 //                else
 //                  {
 //                    terme_interfaces_bf_mass_solver[dir] += calculer_v_moyen(terme_source_interfaces_ns_[dir]);
 //                    terme_interfaces_bf_mass_solver_bis[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
 //                  }
-              }
-            //statistiques().end_count(cnt_SourceInterf);
-            // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
-            compute_correction_for_momentum_balance(rk_step);
-            for (int dir = 0; dir < 3; dir++)
-              {
-                if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
+                  }
+                //statistiques().end_count(cnt_SourceInterf);
+                // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
+                compute_correction_for_momentum_balance(rk_step);
+                for (int dir = 0; dir < 3; dir++)
                   {
-                    // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
-                    // Utilisation directe du terme source interf pour l'ajouter a velocity_.
-                    // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
-                    const int kmax = terme_source_interfaces_ns_[dir].nk();
-                    for (int k = 0; k < kmax; k++)
+                    if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
                       {
-                        // division par le produit (volume * rho_face)
-                        if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                        // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
+                        // Utilisation directe du terme source interf pour l'ajouter a velocity_.
+                        // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
+                        const int kmax = terme_source_interfaces_ns_[dir].nk();
+                        for (int k = 0; k < kmax; k++)
                           {
-                            Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
-                            Process::exit();
-                            // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
-                          }
-                        else
-                          {
-                            mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-                          }
-                        // puis
-                        // comme euler_explicit_update mais avec un pas de temps partiel :
-                        const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
-                        const int imax = terme_source_interfaces_ns_[dir].ni();
-                        const int jmax = terme_source_interfaces_ns_[dir].nj();
-                        for (int j = 0; j < jmax; j++)
-                          {
-                            for (int i = 0; i < imax; i++)
+                            // division par le produit (volume * rho_face)
+                            if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
                               {
-                                double x = terme_source_interfaces_ns_[dir](i,j,k);
-                                velocity_[dir](i,j,k) += x * delta_t;
+                                Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
+                                Process::exit();
+                                // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                              }
+                            else
+                              {
+                                mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                              }
+                            // puis
+                            // comme euler_explicit_update mais avec un pas de temps partiel :
+                            const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
+                            const int imax = terme_source_interfaces_ns_[dir].ni();
+                            const int jmax = terme_source_interfaces_ns_[dir].nj();
+                            for (int j = 0; j < jmax; j++)
+                              {
+                                for (int i = 0; i < imax; i++)
+                                  {
+                                    double x = terme_source_interfaces_ns_[dir](i,j,k);
+                                    velocity_[dir](i,j,k) += x * delta_t;
+                                  }
                               }
                           }
-                      }
-                    // On est dans une boucle sur les directions la, c ok
-                    // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
-                    if (test_etapes_et_bilan)
-                      {
-                        // Cout << "BF terme_interfaces_af_mass_solver" << finl;
-                        terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                        // Cout << "AF terme_interfaces_af_mass_solver" << finl;
+                        // On est dans une boucle sur les directions la, c ok
+                        // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
+                        if (test_etapes_et_bilan)
+                          {
+                            // Cout << "BF terme_interfaces_af_mass_solver" << finl;
+                            terme_interfaces_af_mass_solver[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                            // Cout << "AF terme_interfaces_af_mass_solver" << finl;
+                          }
                       }
                   }
               }
-          }
+            }
         }
-    }
 
-  // On laisse l'ecriture de ce fichier de sortie A L'INTERIEUR de calculer_dv car on souhaite relever
-  // la valeur des differents termes A CHAQUE sous-pas de temps du schema RK3. On peut en revanche,
-  // deplacer cette ecriture A LA FIN de calculer_dv.
-  Cout << "G bilan qdm " << finl;
-  if (test_etapes_et_bilan)
-    write_check_etapes_et_termes(rk_step);
-  //
+      // On laisse l'ecriture de ce fichier de sortie A L'INTERIEUR de calculer_dv car on souhaite relever
+      // la valeur des differents termes A CHAQUE sous-pas de temps du schema RK3. On peut en revanche,
+      // deplacer cette ecriture A LA FIN de calculer_dv.
+      Cout << "G bilan qdm " << finl;
+      if (test_etapes_et_bilan)
+        write_check_etapes_et_termes(rk_step);
+      //
 
-  fill_variable_source_and_potential_phi(time);
+      fill_variable_source_and_potential_phi(time);
 
 
-  for (int dir = 0; dir < 3; dir++)
-    {
-      // GAB question : pour quoi on cree dv, qu'est ce qui empeche de travailler sur d_velocity ???
-      //                -> Est ce que c'est uniquement parce qu'on va faire un certain nb d'operations dessus
-      //                   et que manipuler dv est plus leger que de manipuler d_velocity ?
-      IJK_Field_double& dv = d_velocity_[dir];
-      const int kmax = d_velocity_[dir].nk();
-      const int ni = dv.ni();
-      const int nj = dv.nj();
-      // terme source acceleration homogene a une force volumique (gradient de pression uniforme)
-      // Si la correction est activee, on oppose la force_moy
-      double force_volumique = correction_force_[dir]*terme_source_correction_[dir];
-      // if (dir == DIRECTION_I)
-      //   {
-      //     force_volumique += terme_source_acceleration_;
-      //   }
-      // GAB, rotation
-      if (dir == direction_gravite_)
+      for (int dir = 0; dir < 3; dir++)
         {
-          force_volumique += terme_source_acceleration_;
-        }
+          // GAB question : pour quoi on cree dv, qu'est ce qui empeche de travailler sur d_velocity ???
+          //                -> Est ce que c'est uniquement parce qu'on va faire un certain nb d'operations dessus
+          //                   et que manipuler dv est plus leger que de manipuler d_velocity ?
+          IJK_Field_double& dv = d_velocity_[dir];
+          const int kmax = d_velocity_[dir].nk();
+          const int ni = dv.ni();
+          const int nj = dv.nj();
+          // terme source acceleration homogene a une force volumique (gradient de pression uniforme)
+          // Si la correction est activee, on oppose la force_moy
+          double force_volumique = correction_force_[dir]*terme_source_correction_[dir];
+          // if (dir == DIRECTION_I)
+          //   {
+          //     force_volumique += terme_source_acceleration_;
+          //   }
+          // GAB, rotation
+          if (dir == direction_gravite_)
+            {
+              force_volumique += terme_source_acceleration_;
+            }
 
 #ifndef VARIABLE_DZ
-      double volume = 1.;
-      for (int i = 0; i < 3; i++)
-        volume *= splitting_.get_grid_geometry().get_constant_delta(i);
+          double volume = 1.;
+          for (int i = 0; i < 3; i++)
+            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
 
-      // GAB, qdm
-      // dans d_velocity_moyen on a la contrib de interfaces, forces ajoutees
-      temre_intf_conv_diff_mass_solver[dir] = calculer_v_moyen(d_velocity_[dir]);
+          // GAB, qdm
+          // dans d_velocity_moyen on a la contrib de interfaces, forces ajoutees
+          temre_intf_conv_diff_mass_solver[dir] = calculer_v_moyen(d_velocity_[dir]);
 
 
-      Cerr << "disable_diffusion_qdm_ : "<< disable_diffusion_qdm_ << finl;
-      Cerr << "diffusion_alternative_ : "<< diffusion_alternative_ << finl;
-      Cerr << "type_velocity_diffusion_form_ : "<< type_velocity_diffusion_form_ << finl;
-      for (int k = 0; k < kmax; k++)
-        {
-          // #else
-          //       for (int k = 0; k < kmax; k++)
-          //         {
-          //           const double volume = get_channel_control_volume(dv, k, delta_z_local_);
-          //         }
-          const double f = force_volumique * volume;
-          if ((expression_variable_source_[0] != "??") ||
-              (expression_variable_source_[1] != "??") ||
-              (expression_variable_source_[2] != "??") ||
-              (expression_potential_phi_ != "??"))
+          Cerr << "disable_diffusion_qdm_ : "<< disable_diffusion_qdm_ << finl;
+          Cerr << "diffusion_alternative_ : "<< diffusion_alternative_ << finl;
+          Cerr << "type_velocity_diffusion_form_ : "<< type_velocity_diffusion_form_ << finl;
+          for (int k = 0; k < kmax; k++)
             {
-              for (int j = 0; j < nj; j++)
-                for (int i = 0; i < ni; i++)
-                  {
-                    dv(i,j,k) += facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f;
-                  }
-            }
-          else
-            {
-              for (int j = 0; j < nj; j++)
-                for (int i = 0; i < ni; i++)
-                  dv(i,j,k) += f;
-            }
-
-          if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-            {
-              mass_solver_with_inv_rho(d_velocity_[dir], inv_rho_field_, delta_z_local_, k);
-            }
-          else
-            {
-              mass_solver_with_rho(d_velocity_[dir], rho_field_, delta_z_local_, k);
-            }
-
-          // Terme source gravitaire en version simple "rho_g":
-          // GAB : question a Guillaume : l 3235 -> "IJK_Field_double& dv = d_velocity_[dir];" ,  MAIS C'EST APRES
-          // LA LIGNE 2865 ou d_velocity subi un calculer_rho_v.
-          //       donc dv est homogene a rho*v et donc a rho*g. Or 8 lignes plus bas on a dv(i,j,k) += g; !!!
-          // il faut appliquer un mass_solver_with_rho a dv pour que l'operation soit homogene d'apres gr...
-          // a moins que le mass_solver soit applique dans une des methodes...
-          // mass_solver_with... est applique sur d_velocity_ juste au dessus de ce long commentaire. Donc d_velocity
-          // est bien homogene a g, et ainsi (jespere) dv est bien homogene a g.
-          if (interfaces_.is_terme_gravite_rhog())
-            {
-              const double g = gravite_[dir];
-              for (int j = 0; j < nj; j++)
-                for (int i = 0; i < ni; i++)
-                  dv(i,j,k) += g;  // c'est rho*g qu'il faut pour GR, 18.08.2021
-            }
-
-          if ((diffusion_alternative_) && (!disable_diffusion_qdm_))
-            {
-
-              if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
+              // #else
+              //       for (int k = 0; k < kmax; k++)
+              //         {
+              //           const double volume = get_channel_control_volume(dv, k, delta_z_local_);
+              //         }
+              const double f = force_volumique * volume;
+              if ((expression_variable_source_[0] != "??") ||
+                  (expression_variable_source_[1] != "??") ||
+                  (expression_variable_source_[2] != "??") ||
+                  (expression_potential_phi_ != "??"))
                 {
-                  velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                                        unit_,
-                                                        laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
-                }
-              else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
-                {
-                  velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                                      unit_,
-                                                      laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
+                  for (int j = 0; j < nj; j++)
+                    for (int i = 0; i < ni; i++)
+                      {
+                        dv(i,j,k) += facteur_variable_source_*variable_source_[dir](i,j,k) * volume + f;
+                      }
                 }
               else
                 {
-                  Cerr << "Unknown velocity diffusion operator! " << finl;
-                  Process::exit();
+                  for (int j = 0; j < nj; j++)
+                    for (int i = 0; i < ni; i++)
+                      dv(i,j,k) += f;
                 }
-              for (int dir2 = 0; dir2 < 3; dir2++)
-                {
-                  const int kmax2 = d_velocity_[dir2].nk();
-                  const int imax = d_velocity_[dir2].ni();
-                  const int jmax = d_velocity_[dir2].nj();
-                  for (int k2 = 0; k2 < kmax2; k2++)
-                    for (int j = 0; j < jmax; j++)
-                      for (int i = 0; i < imax; i++)
-                        {
-                          // double laplacien_u = laplacien_velocity_[dir2](i,j,k2);
-                          // GAB, c'est assez dangereux de nommer nu une viscosite dynamique...
-                          // const double nu = molecular_mu_(i,j,k2) ; // On stocke nu dans mu dans ce cas.
-                          // GAB, qdm
-                          if (test_etapes_et_bilan)
-                            {
-                              terme_diffusion_local[dir2](i,j,k2) = molecular_mu_(i,j,k2)*laplacien_velocity_[dir2](i,j,k2);
-                              // Cerr << "terme diffusion local" << terme_diffusion_local[dir2](i,j,k2) << finl;
-                              d_velocity_[dir2](i,j,k2) += terme_diffusion_local[dir2](i,j,k2);
-                              // d_velocity_[dir2](i,j,k2) += nu * laplacien_u;
-                            }
-                        }
-                  // GAB, qdm
-                  d_velocity_[dir2].echange_espace_virtuel(d_velocity_[dir2].ghost());
-                  //
-                }
-            }
 
-        }
-      // GAB, TODO bilan qdm
-      // d_velocity_moyen_ap_mass_solver[dir] = calculer_v_moyen(d_velocity_[dir]);
-      // dans d_velocity_conv_et_diff_moy on a que la contrib de convection et de diffusion
-      // d_velocity_conv_et_diff_moy[dir] = calculer_v_moyen(d_velocity_conv_et_diff[dir])
+              if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                {
+                  mass_solver_with_inv_rho(d_velocity_[dir], inv_rho_field_, delta_z_local_, k);
+                }
+              else
+                {
+                  mass_solver_with_rho(d_velocity_[dir], rho_field_, delta_z_local_, k);
+                }
+
+              // Terme source gravitaire en version simple "rho_g":
+              // GAB : question a Guillaume : l 3235 -> "IJK_Field_double& dv = d_velocity_[dir];" ,  MAIS C'EST APRES
+              // LA LIGNE 2865 ou d_velocity subi un calculer_rho_v.
+              //       donc dv est homogene a rho*v et donc a rho*g. Or 8 lignes plus bas on a dv(i,j,k) += g; !!!
+              // il faut appliquer un mass_solver_with_rho a dv pour que l'operation soit homogene d'apres gr...
+              // a moins que le mass_solver soit applique dans une des methodes...
+              // mass_solver_with... est applique sur d_velocity_ juste au dessus de ce long commentaire. Donc d_velocity
+              // est bien homogene a g, et ainsi (jespere) dv est bien homogene a g.
+              if (interfaces_.is_terme_gravite_rhog())
+                {
+                  const double g = gravite_[dir];
+                  for (int j = 0; j < nj; j++)
+                    for (int i = 0; i < ni; i++)
+                      dv(i,j,k) += g;  // c'est rho*g qu'il faut pour GR, 18.08.2021
+                }
+
+              if ((diffusion_alternative_) && (!disable_diffusion_qdm_))
+                {
+                  velocity_diffusion_op_.set_nu(unit_);
+                  velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+                                                 laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
+//              if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
+//                {
+//              	velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+//              	                                                        unit_,
+//              	                                                        laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
+//                  velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+//                                                        unit_,
+//                                                        laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
+//                }
+//              else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
+//                {
+//                  velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
+//                                                      unit_,
+//                                                      laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
+//                }
+//              else
+//                {
+//                  Cerr << "Unknown velocity diffusion operator! " << finl;
+//                  Process::exit();
+//                }
+                  for (int dir2 = 0; dir2 < 3; dir2++)
+                    {
+                      const int kmax2 = d_velocity_[dir2].nk();
+                      const int imax = d_velocity_[dir2].ni();
+                      const int jmax = d_velocity_[dir2].nj();
+                      for (int k2 = 0; k2 < kmax2; k2++)
+                        for (int j = 0; j < jmax; j++)
+                          for (int i = 0; i < imax; i++)
+                            {
+                              // double laplacien_u = laplacien_velocity_[dir2](i,j,k2);
+                              // GAB, c'est assez dangereux de nommer nu une viscosite dynamique...
+                              // const double nu = molecular_mu_(i,j,k2) ; // On stocke nu dans mu dans ce cas.
+                              // GAB, qdm
+                              if (test_etapes_et_bilan)
+                                {
+                                  terme_diffusion_local[dir2](i,j,k2) = molecular_mu_(i,j,k2)*laplacien_velocity_[dir2](i,j,k2);
+                                  // Cerr << "terme diffusion local" << terme_diffusion_local[dir2](i,j,k2) << finl;
+                                  d_velocity_[dir2](i,j,k2) += terme_diffusion_local[dir2](i,j,k2);
+                                  // d_velocity_[dir2](i,j,k2) += nu * laplacien_u;
+                                }
+                            }
+                      // GAB, qdm
+                      d_velocity_[dir2].echange_espace_virtuel(d_velocity_[dir2].ghost());
+                      //
+                    }
+                }
+
+            }
+          // GAB, TODO bilan qdm
+          // d_velocity_moyen_ap_mass_solver[dir] = calculer_v_moyen(d_velocity_[dir]);
+          // dans d_velocity_conv_et_diff_moy on a que la contrib de convection et de diffusion
+          // d_velocity_conv_et_diff_moy[dir] = calculer_v_moyen(d_velocity_conv_et_diff[dir])
 
 #endif
 
-      // For the addition of the external forces to d_velocity_
-      compute_add_external_forces(dir);
-    } // end of loop [dir].
-  ///////////////////////////////////////////////////////
-  // GAB, THI
-  // MODIF GAB.. /!\ tstep : le numero d'iteration; timestep : le pas de temps, le dt
-  // est-on au moment ou velocity_ contient la vitesse ou est-on au moment ou velocity_ contient la qdm ?
-  if (forcage_.get_type_forcage() > 0)// && (rk_step==-1 || rk_step==0))
-    {
-      if (rk_step==-1)
+          // For the addition of the external forces to d_velocity_
+          compute_add_external_forces(dir);
+        } // end of loop [dir].
+      ///////////////////////////////////////////////////////
+      // GAB, THI
+      // MODIF GAB.. /!\ tstep : le numero d'iteration; timestep : le pas de temps, le dt
+      // est-on au moment ou velocity_ contient la vitesse ou est-on au moment ou velocity_ contient la qdm ?
+      if (forcage_.get_type_forcage() > 0)// && (rk_step==-1 || rk_step==0))
         {
-          compute_add_THI_force_sur_d_velocity(velocity_, tstep_, timestep_,time, d_velocity_.get_splitting(),forcage_.get_facteur_forcage());//, rk_step);
+          if (rk_step==-1)
+            {
+              compute_add_THI_force_sur_d_velocity(velocity_, tstep_, timestep_,time, d_velocity_.get_splitting(),forcage_.get_facteur_forcage());//, rk_step);
+            }
+          else
+            {
+              const double intermediate_dt = compute_fractionnal_timestep_rk3(timestep_, rk_step);
+              compute_add_THI_force_sur_d_velocity(velocity_, tstep_,intermediate_dt,time, d_velocity_.get_splitting(),forcage_.get_facteur_forcage());//, rk_step);
+            }
         }
-      else
-        {
-          const double intermediate_dt = compute_fractionnal_timestep_rk3(timestep_, rk_step);
-          compute_add_THI_force_sur_d_velocity(velocity_, tstep_,intermediate_dt,time, d_velocity_.get_splitting(),forcage_.get_facteur_forcage());//, rk_step);
-        }
+      // verifier si mon terme de thi est bon en integrale
+      ///////////////////////////////////////////////////////
+
+
+      // Il est important de s'assurer a la fin que la derivee de la vitesse soit a zero sur les parois:
+      if (!splitting_.get_grid_geometry().get_periodic_flag(DIRECTION_K))
+        force_zero_on_walls(d_velocity_[2]);
+
+      statistiques().end_count(calcul_dv_counter_);
+
     }
-  // verifier si mon terme de thi est bon en integrale
-  ///////////////////////////////////////////////////////
-
-
-  // Il est important de s'assurer a la fin que la derivee de la vitesse soit a zero sur les parois:
-  if (!splitting_.get_grid_geometry().get_periodic_flag(DIRECTION_K))
-    force_zero_on_walls(d_velocity_[2]);
-
-  statistiques().end_count(calcul_dv_counter_);
-
 }
 
 void IJK_FT_double::compute_add_external_forces(const int dir)
@@ -4484,7 +4559,7 @@ int IJK_FT_double::get_direction(const ArrOfDouble& vecteur)
     }
 }
 
-// GAB, qdm : construction du terme de pression pour le bian de qdm. Je trouve ea plus logique de bouger cette fonction dans
+// GAB, qdm : construction du terme de pression pour le bilan de qdm. Je trouve ea plus logique de bouger cette fonction dans
 //            IJK_Navier_Stokes_tool, mais etant donne qu'elle se trouve dans IJK_kernel, je ne sais pas trop si c'est propre que j'y touche
 //            voir avec Guillaume ce qu'il en dit.
 //            inspire de : void IJK_FT_Post::calculer_gradient_indicatrice_et_pression(const IJK_Field_double& indic)
