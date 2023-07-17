@@ -84,7 +84,8 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
   DoubleTab& mon_h= h_imp_->valeurs();
   DoubleTab& mon_Ti= Ti_wall_.valeur().valeurs_au_temps(temps);
-
+  DoubleTab& mon_phi = phi_ext_.valeur().valeurs_au_temps(temps);
+  mon_phi = 0;
 
   int opt=0;
   calculer_h_autre_pb( autre_h, 0., opt);
@@ -149,14 +150,15 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
 
 
-            const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-            const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
-
-
-
+            // const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+            // const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
 
             const int nb_contact_line_contribution = faces_with_CL_contrib.size_array();
             int nb_contrib = 0;
+            double flux_local = 0.;
+
+            mon_h(ii) = 0.;
+
             for (int idx = 0; idx < nb_contact_line_contribution; idx++)
               {
                 const int facei = faces_with_CL_contrib[idx];
@@ -166,25 +168,26 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                     nb_contrib++;
                     const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
                     const double TCL_wall_flux = Q_from_CL[idx]/surface(face);
-                    const double val = sign*TCL_wall_flux;
-                    const int elemi = face_voisins(face, 0)+face_voisins(face, 1)+1;
+                    const double val = -sign*TCL_wall_flux;
+                    // const int elemi = face_voisins(face, 0)+face_voisins(face, 1)+1;
 
                     if (nb_contrib == 1)
                       {
-                        mon_h(ii) = val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                        // mon_h(ii) = val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                    	flux_local = val;
                         mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
                       }
 
                     else
                       {
-                        mon_h(ii) += val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                        // mon_h(ii) += val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
+                    	flux_local += val;
                         mon_Ti(ii, jj) += T_ext().valeurs()(ii, jj) - val/autre_h(ii) ;
                       }
 
-
                   }
               }
-
+            mon_phi(ii, jj) += flux_local;
           }
       }
 
@@ -263,18 +266,40 @@ int Echange_contact_VDF_FT_Disc::reculer(double temps)
 
 int Echange_contact_VDF_FT_Disc::initialiser(double temps)
 {
+	phi_ext_lu_ = true;
+
+	// XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
+	Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+	ch.creer(nom_autre_pb_, nom_bord, nom_champ);
+
+	const Milieu_base& le_milieu = ch.milieu();
+	int nb_comp = le_milieu.conductivite()->nb_comp();
+
+	Nom nom_racc1 = frontiere_dis().frontiere().le_nom();
+	Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+	int nb_faces_raccord1 = domaine_dis1.domaine().raccord(nom_racc1).valeur().nb_faces();
+
+	derivee_phi_ext_.typer("Champ_front_fonc");
+	derivee_phi_ext_->fixer_nb_comp(nb_comp);
+	derivee_phi_ext_->associer_fr_dis_base(frontiere_dis());
+	derivee_phi_ext_.valeurs().resize(nb_faces_raccord1,nb_comp);
+
+	phi_ext_.typer("Champ_front_fonc");
+	phi_ext_->fixer_nb_comp(nb_comp);
+	phi_ext_->associer_fr_dis_base(frontiere_dis());
+	phi_ext_.valeurs().resize(nb_faces_raccord1,nb_comp);
+
+
   if (!Echange_contact_VDF::initialiser(temps))
     return 0;
 
-  // XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
-  Champ_front_calc& cha=ref_cast(Champ_front_calc, T_autre_pb().valeur());
-  cha.creer(nom_autre_pb_, nom_bord, nom_champ);
+
 
   // initialization of Ti_wall_ with temperature of T_autre_pb BECAUSE nom_champ = name of T_autre_pb()
   // Ti_wall_ is created from T_autre_pb()
   Champ_front_calc& chT=ref_cast(Champ_front_calc, Ti_wall_.valeur());
   chT.creer(nom_autre_pb_, nom_bord, nom_champ);
 
-  Champ_front_calc& ch=ref_cast(Champ_front_calc, indicatrice_.valeur());
-  return ch.initialiser(temps,domaine_Cl_dis().equation().inconnue());
+  Champ_front_calc& chbis=ref_cast(Champ_front_calc, indicatrice_.valeur());
+  return chbis.initialiser(temps,domaine_Cl_dis().equation().inconnue());
 }

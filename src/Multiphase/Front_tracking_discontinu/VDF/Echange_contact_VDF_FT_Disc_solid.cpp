@@ -88,9 +88,13 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
   DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
+
   DoubleTab Texttmp(Text);
   DoubleTab Twalltmp(Text);
   Twalltmp.detach_vect();
+
+  DoubleTab& mon_phi = phi_ext_.valeur().valeurs_au_temps(temps);
+  mon_phi = 0;
 
   int opt=0;
   // h of solid
@@ -180,9 +184,11 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
                   const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
                   int nb_contrib = 0;
+                  double flux_local = 0.;
+                  hh_imp(ii,jj) = 0.;
 
-                  const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-                  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+                  // const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+                  // const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
 
                   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
                     {
@@ -195,22 +201,22 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                           nb_contrib++;
                           const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
 
-
+                          // const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
                           const int faces = ii+ frontiere_dis().frontiere().num_premiere_face();
-
-                          const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
                           const double TCL_wall_flux = Q_from_CL[idx]/surface(faces);
                           // val should be : -rho*Cp * flux(W)
                           // probably because the whole energy equation is written with rhoCp somewhere...
                           // and the sign should be negative for incoming flux (towards the fluid) by convention.
-                          const double val = sign*TCL_wall_flux;
+                          const double val = - sign*TCL_wall_flux;
                           if (nb_contrib == 1)
-                            hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
+                        	  flux_local = val;
+                            // hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
                           else
-                            hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
+                        	  flux_local += val;
+                            // hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
                         }
                     }
-
+                  mon_phi(ii, jj) += flux_local;
                 }
 
             }
@@ -288,8 +294,9 @@ int Echange_contact_VDF_FT_Disc_solid::reculer(double temps)
 
 int Echange_contact_VDF_FT_Disc_solid::initialiser(double temps)
 {
+	// phi_ext_lu_ = true;
   if (!Echange_contact_VDF_FT_Disc::initialiser(temps))
-    return 0;
+	  return 0;
 
   Champ_front_calc& cha=ref_cast(Champ_front_calc, T_autre_pb().valeur());
   cha.creer(nom_autre_pb_, nom_bord, nom_champ);
