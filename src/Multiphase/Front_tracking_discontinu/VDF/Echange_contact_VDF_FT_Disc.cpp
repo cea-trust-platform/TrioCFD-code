@@ -187,12 +187,6 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
               }
             mon_phi(ii, jj) = flux_local;
             mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - flux_local/autre_h(ii) ;
-            // To be consistent with *get_flux_and_Twall* in the Convection_Diffusion_Temperature_FT_Disc.cpp
-            // where flux = h*(T_imp - 0.);
-            if (mon_Ti(ii, jj) != 0.)
-            	mon_h(ii) = flux_local/mon_Ti(ii, jj);
-            else
-            	mon_h(ii) = 0.;
           }
       }
 

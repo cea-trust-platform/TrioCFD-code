@@ -1700,21 +1700,22 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
     }
   else if (sub_type(Echange_impose_base, la_cl.valeur()))
     {
-      Cerr << "Echange_contact_VDF_FT_Disc" << finl;
-      /* Le terme de flux calcule a partir du couple(h_imp,T_ext) s'ecrit :
-      //                           h_t(T_ext - T_entier)*Surf
-      //                           avec h_t : coefficient d'echange global.
-       * */
+
       if (sub_type(Echange_contact_VDF_FT_Disc, la_cl.valeur()))
       {
+    	  Cerr << "Echange_contact_VDF_FT_Disc" << finl;
+    	        /* Le terme de flux calcule a partir du (phi_ext) s'ecrit :
+    	        //                           phi_ext_*Surf
+    	        //                           avec phi_ext : heat flux density at the surface.
+    	         * */
           const Echange_contact_VDF_FT_Disc& la_cl_typee = ref_cast(Echange_contact_VDF_FT_Disc, la_cl.valeur());
           //  Cerr <<  "   Face " << num_face << " is actually #" << num_face-ndeb << " on this boundary." << finl;
           const double h = la_cl_typee.h_imp(num_face-ndeb);
           const double T_imp = la_cl_typee.Ti_wall(num_face-ndeb);
           // Cerr <<  "   Reading coefficients h= " << h << " and T_imp= " << T_imp << " for heat flux evaluation." << finl;
-          // The flux is between the wall and Tsat :
-          flux = h*(T_imp - TSAT_CONSTANTE); // What about the area? surf should be the interfacial area or come from the face area?
-          //                                                it is taken into account after this function.
+          // We keep the term + h*(T_imp - TSAT_CONSTANTE) as h = 0.;
+          //
+          flux = la_cl_typee.flux_exterieur_impose(num_face-ndeb) + h*(T_imp - TSAT_CONSTANTE);
           Twall = T_imp;
       }
       else
