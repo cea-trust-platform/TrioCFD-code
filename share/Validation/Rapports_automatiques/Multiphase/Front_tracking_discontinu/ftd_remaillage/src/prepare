@@ -1,19 +1,22 @@
 #!/bin/bash
 
-if [ ! -d FTD_remaillage_vef ]
+if [ ! -d FTD_remaillage_vef_SEQ ]
 then
   # copie_cas_test FTD_remaillage_vef
-  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vef ./
+  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vef ./FTD_remaillage_vef_SEQ
 fi
 
-if [ ! -d FTD_remaillage_vdf ]
+if [ ! -d FTD_remaillage_vdf_SEQ ]
 then
   # copie_cas_test FTD_remaillage_vdf
-  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vdf ./
+  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vdf ./FTD_remaillage_vdf_SEQ
 fi
 
-cp -f pre_run_vef FTD_remaillage_vef/pre_run
-(cd FTD_remaillage_vef;./pre_run)
+cp -R ./FTD_remaillage_vef_SEQ ./FTD_remaillage_vef_PAR
+cp -f pre_run_vef FTD_remaillage_vef_PAR/pre_run
+(cd FTD_remaillage_vef_PAR;./pre_run)
 
-cp -f pre_run_vdf FTD_remaillage_vdf/pre_run
-(cd FTD_remaillage_vdf;./pre_run)
+
+cp -R ./FTD_remaillage_vdf_SEQ ./FTD_remaillage_vdf_PAR
+cp -f pre_run_vdf FTD_remaillage_vdf_PAR/pre_run
+(cd FTD_remaillage_vdf_PAR;./pre_run)
