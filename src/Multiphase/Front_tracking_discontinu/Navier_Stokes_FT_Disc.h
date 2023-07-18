@@ -55,6 +55,7 @@ public:
   DoubleTab&          derivee_en_temps_inco(DoubleTab& vpoint) override;
   void                projeter() override;
   virtual const Champ_base& calculer_div_normale_interface();
+  void correct_bad_gradient_at_exit(DoubleTab& u0) const;
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
   const Champ_Don& diffusivite_pour_transport() const override;
 

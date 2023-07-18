@@ -7685,6 +7685,11 @@ const Maillage_FT_Disc& Transport_Interfaces_FT_Disc::maillage_interface_pour_po
   return maillage_interface();
 }
 
+const int& Transport_Interfaces_FT_Disc::get_n_iterations_distance() const
+{
+  return variables_internes_->n_iterations_distance;
+}
+
 /*! @brief Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements
  *
  */
