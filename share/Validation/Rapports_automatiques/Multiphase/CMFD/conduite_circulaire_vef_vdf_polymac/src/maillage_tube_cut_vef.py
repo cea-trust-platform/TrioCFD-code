@@ -29,7 +29,7 @@ import SALOMEDS
 ############################# Mesh parameters ###############################
 #############################################################################
 
-Ny=[13] # nombre de noeud sur le rayon du tube (direction radiale = normal à la paroi)
+Ny=[11,13] # nombre de noeud sur le rayon du tube (direction radiale = normal à la paroi)
 R = 2 # [m] rayon cylindre
 L = 100 # [m] hauteur cylindre
 cell_size = [R/(N-1) for N in Ny] # [m]

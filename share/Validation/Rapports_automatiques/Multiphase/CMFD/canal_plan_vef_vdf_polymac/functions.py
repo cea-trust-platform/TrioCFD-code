@@ -50,26 +50,201 @@ description_fiche = f"""On simule un écoulement monophasique turbulent en RANS
     des facteurs multiplictaifs des tailles de mailles : taux1 et taux2\n
     """
 
-
-def method_name(config):
-    # identifier le mot clé de la discretisation utilisée à partir du nom de la config entrée par l'utilisateur
-    method_Pb_hydr = []
-    method_Pb_multi = []
-    for method in config:
-        if "k-epsilon" in method: # ATTENTION : on se sert du fait que seul vef et vdf sont lancé avec le modèle k-epsilon
-            name = "VDF"
-            if "VEF" in method:
-                name = "VEFPreP1b"
-            method_Pb_hydr.append(name)
-        else:
-            name = "VDF"
-            if "PolyMAC" in method:
-                name = "PolyMAC_P0"
-            method_Pb_multi.append(name)
-    return method_Pb_hydr, method_Pb_multi
-
 ###############################################################################
 ######################### Substitution in data file ###########################
+###############################################################################
+
+# # A mettre à jour lors de l'ajout d'une configuration (nouveau modèle ou nouveau problème ou les deux) !!!
+
+available_config = ["VEF_k-epsilon", "VDF_k-epsilon", "VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
+available_config_pb_hydr = ["VEF_k-epsilon", "VDF_k-epsilon"]
+available_config_pb_multi = ["VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
+
+"""
+On utilise un dictionnaire qui définit pour chaque configuration (ex : "VEF_k-epsilon") les valeurs
+des variables qu'il faut remplacer dans les jdd
+"""
+param_config={} 
+
+# # initialisation :
+param_config["VEF_k-epsilon"] = {}
+param_config["VDF_k-epsilon"] = {}
+param_config["VDF_k-omega"] = {}
+param_config["VDF_k-tau"] = {}
+param_config["PolyMAC_k-omega"] = {}
+param_config["PolyMAC_k-tau"] = {}
+
+# # attribution des valeurs
+# triangle_mesh
+for config in available_config:
+    param_config[config]["trianglemesh"] = ""
+param_config["VEF_k-epsilon"]["trianglemesh"] = "trianguler_H dom"
+# method de discretisation
+for config in available_config:
+    if "VEF" in config:
+        param_config[config]["method"] = "VEFPreP1b"
+    elif "VDF" in config:
+        param_config[config]["method"] = "VDF"
+    else:
+        param_config[config]["method"] = "PolyMAC_P0"
+# Option VDF 
+for config in available_config:
+    if "VDF" in config:
+        param_config[config]["options_vdf"] = "option_vdf { all_options }"
+    else:
+        param_config[config]["options_vdf"] = ""
+# facsec
+for config in available_config:
+    param_config[config]["facsec"] = "1"
+# nb_pas_dt_max 
+for config in available_config:
+    param_config[config]["nb_pas_dt_max"] = "1000000"
+# solveur temps
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["solveur_temps"] = "sets"
+    else:
+        param_config[config]["solveur_temps"] = "ice"
+# diss_conv : Condition de convergence du calcul sur le terme de dissipation turbulente
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["diss_conv"] = " tau 1.e-5 "
+    elif "k-omega" in config:
+        param_config[config]["diss_conv"] = " omega 1. "
+    else:
+        param_config[config]["diss_conv"] = ""
+# difffusion : terme de diffusion dans l'eq de qdm
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["diffusion"] = "k_tau"
+    elif "k-omega" in config:
+        param_config[config]["diffusion"] = "k_omega"
+    else:
+        param_config[config]["diffusion"] = ""
+# equation : équation à utiliser pour la dissipation (tau ou omega)
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["equation"] = "echelle_temporelle_turbulente"
+    elif "k-omega" in config:
+        param_config[config]["equation"] = "taux_dissipation_turbulent"
+    else:
+        param_config[config]["equation"] = ""
+# IC_diss : Conditions initiales pour tau et omega
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["IC_diss"] = "2"
+    elif "k-omega" in config:
+        param_config[config]["IC_diss"] = str(1./2)
+    else:
+        param_config[config]["IC_diss"] = ""
+# diss_conv : Condition de convergence du calcul sur le terme de dissipation turbulente
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["diss_ext"] = "tau_ext"
+    elif "k-omega" in config:
+        param_config[config]["diss_ext"] = "omega_ext"
+    else:
+        param_config[config]["diss_ext"] = ""
+# diss : Mot clé terme de dissipation turbulente
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["diss"] = "tau"
+    elif "k-omega" in config:
+        param_config[config]["diss"] = "omega"
+    else:
+        param_config[config]["diss"] = ""
+# CL_diss : Condition limite à la paroi pour l'eq de transport de la dissipation turbulente (tau et omega)
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["CL_diss"] = "scalaire_impose_paroi champ_front_uniforme 1 0 "
+    elif "k-omega" in config:
+        param_config[config]["CL_diss"] = "Cond_lim_omega_demi { }  "
+    else:
+        param_config[config]["CL_diss"] = ""
+# diffusion_sup : terme source supp dans l'équation de transport de tau
+for config in available_config:
+    if "k-tau" in config:
+        param_config[config]["diffusion_sup"] = " , Diffusion_supplementaire_echelle_temp_turb "
+    elif "k-omega" in config:
+        param_config[config]["diffusion_sup"] = " "
+    else:
+        param_config[config]["diffusion_sup"] = ""
+
+
+# #
+# # substituion for pb hydraulique and pb multiphase
+# #
+
+def substitution(params):
+    # Cette fonction crée une liste de dictionnaire pour substituer les variables entrée par l'utilisateur dans le jeu de données
+        
+    # récupérer les paramètres entrés par l'utilisateur
+    config, Ny, taux1, taux2, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,nb_points_prof,tmax = params
+    nb_mesh = len(Ny) # nombre de maillages différents du domaines (raffinements choisis)
+    nb_method = len(config) # nombre de configuration avec Pb_hydrau
+    dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method)] # matrice qui sera remplie avec les dictionnaires
+    for i in range(nb_method):
+        for j in range(nb_mesh):
+            AR=20 # aspect ratio
+            N = 2*int(Ny[j]-1)+1  # nombre de noeuds bloc 1 : en vef trianguler_h coupe les cellules en 4, donc on fait x2 en y
+            if "VEF" in config[i]:
+                N = Ny[j] # en vef trianguler_h coupe les cellule en 4
+                if N==2: # si on a une seule maille au bloc 1 vef ne converge pas, il faut baisser l'aspect ratio
+                    AR = int(AR/2)
+            x_min_yplus, x_max_yplus, nb_points_yplus, y_yplus = sonde_yplus(N,AR,L,y1)
+
+            dict = {"Ny1" : N,
+                    "Ny2" : int((N-1)/(taux1[j]))+1,
+                    "Ny3" : int((3*(N-1))/(taux1[j]*taux2[j]))+1,
+                   "Nx" : int(L/y1/AR*(N-1))+1,
+                    "trianglemesh" : param_config[config[i]]["trianglemesh"],
+
+                    "method" : param_config[config[i]]["method"],
+                    "inlet_velocity" : inlet_velocity,
+                    "outlet_pressure" : outlet_pressure,
+                    "inlet_k" : inlet_k,
+                    "inlet_epsilon" : inlet_epsilon,
+
+                   "x_prof" : x_prof,
+                   "mu" : mu,
+                   "rho" : rho,
+                   "y_min_prof" : y_min_prof[j],
+                   "y_max_prof" : y_max_prof[j],
+                   "nb_points_prof" : nb_points_prof[j],
+                   "tmax" : tmax,
+
+                   "x_min_yplus" : x_min_yplus,
+                   "x_max_yplus" : x_max_yplus,
+                   "y_yplus" : y_yplus,
+                   "nb_points_yplus" : nb_points_yplus,
+
+                   "facsec" : param_config[config[i]]["facsec"],
+                   "solveur_temps" : param_config[config[i]]["solveur_temps"],
+                   "options_vdf" : param_config[config[i]]["options_vdf"],
+                   "diffusion_sup" : param_config[config[i]]["diffusion_sup"],
+                   "diffusion" : param_config[config[i]]["diffusion"] ,
+                   "diss": param_config[config[i]]["diss"],
+                   "diss_ext": param_config[config[i]]["diss_ext"],
+                   "diss_conv" : param_config[config[i]]["diss_conv"],                                  
+                   "IC_diss" : param_config[config[i]]["IC_diss"] ,
+                   "CL_diss" : param_config[config[i]]["CL_diss"] ,
+                   "CL_k" : "Cond_lim_k_simple_flux_nul " ,
+                   "equation" : param_config[config[i]]["equation"],
+                   "nb_pas_dt_max" : param_config[config[i]]["nb_pas_dt_max"],
+                    }
+            dict_list[i][j] = dict
+    return dict_list
+
+
+def GenerateInputFile(dir,build,substitutions_dict, name):
+    with open(f"{build}/{name}.data", "r") as file: 
+        filedata = Template(file.read())
+    result = filedata.substitute(substitutions_dict)
+    with open(dir+f"/{name}.data", "w") as file:
+        file.write(result)
+
+###############################################################################
+######################### fonctions pré-traitement ############################
 ###############################################################################
 
 def sonde_firstpoint(y1,Ny):
@@ -94,81 +269,6 @@ def sonde_nbpoints(y1,Ny):
         n_tot = n1*(ceil(H/y1)) # nombre de mailles tout le domaine selon y (hyp:pas d'inflation)
         nb_points.append(n_tot)
     return nb_points
-
-# #
-# # substituion for pb hydraulique
-# #
-
-def substitution_pb_hydr(params):
-    # Cette fonction crée une liste de dictionnaire pour substituer les variables entrée par l'utilisateur dans le jeu de données
-    # Cette fonction ne concerne que les jeux de données utilisant pb_hydraulique_turbulent
-    
-    
-    # récupérer les paramètres entrés par l'utilisateur
-    config, Ny, taux1, taux2, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,nb_points_prof,tmax = params
-    nb_mesh = len(Ny) # nombre de maillages différents du domaines (raffinements choisis)
-    nb_method_Pb_hydr = len(method_Pb_hydr) # nombre de configuration avec Pb_hydrau
-    dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method_Pb_hydr)] # matrice qui sera remplie avec les dictionnaires
-    for i in range(nb_method_Pb_hydr):
-        for j in range(nb_mesh):
-            AR=20 # aspect ratio
-            trianguler = ""
-            N = 2*int(Ny[j]-1)+1  # nombre de noeuds bloc 1 : en vef trianguler_h coupe les cellules en 4, donc on fait x2 en y
-            if method_Pb_hydr[i] == "VEFPreP1b":
-                trianguler = "trianguler_H dom"
-                N = Ny[j] # en vef trianguler_h coupe les cellule en 4
-                if N==2: # si on a une seule maille au bloc 1 vef ne converge pas, il faut baisser l'aspect ratio
-                    AR = int(AR/2)
-            dict = {"Ny1" : N,
-                    "Ny2" : int((N-1)/(taux1[j]))+1,
-                    "Ny3" : int((3*(N-1))/(taux1[j]*taux2[j]))+1,
-                   "Nx" : int(L/y1/AR*(N-1))+1,
-                    "trianglemesh" : trianguler,
-
-                    "method" : method_Pb_hydr[i],
-                    "inlet_velocity" : inlet_velocity,
-                    "outlet_pressure" : outlet_pressure,
-                    "inlet_k" : inlet_k,
-                    "inlet_epsilon" : inlet_epsilon,
-
-                   "x_prof" : x_prof,
-                   "mu" : mu,
-                   "rho" : rho,
-                   "y_min_prof" : y_min_prof[j],
-                   "y_max_prof" : y_max_prof[j],
-                   "nb_points_prof" : nb_points_prof[j],
-                   "tmax" : tmax}
-            dict_list[i][j] = dict
-    return dict_list
-
-# #
-# # substituion for pb multiphase
-# #
-
-# Mot clé de l'équation à utiliser pour la dissipation (tau ou omega)
-equation = ["echelle_temporelle_turbulente"]+["taux_dissipation_turbulent"]
-# mot clé : terme de diffusion dans l'eq de qdm
-diffusion = [ "k_tau"]+["k_omega"]
-# Mot clé terme de dissipation turbulente
-diss =         ["tau"]+['omega']
-
-diss_ext = ["tau_ext"]+["omega_ext"]
-# Condition de convergence du calcul sur le terme de dissipation turbulente
-diss_conv= [" tau 1.e-5 "]+[" omega 1. "]
-# Conditions initiales pour tau et omega
-IC_diss =      ["2"]+[str(1./2)]
-# Condition limite à la paroi pour l'eq de transport de la dissipation turbulente (tau et omega)
-CL_diss = ["scalaire_impose_paroi champ_front_uniforme 1 0 ", "Cond_lim_omega_demi { }  "]
-# Condition limite à la paroi pour l'eq de transport k
-CL_k = ["Cond_lim_k_simple_flux_nul ", "Cond_lim_k_simple_flux_nul  "]
-# terme source supp dans l'équation de transport de tau (dissipation turbu)
-diffusion_sup = [" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
-# Autres param de simu
-facsec     = 1
-nb_pas_dt_max = "1000000"
-options_vdf = ["option_vdf { all_options }", "option_vdf { all_options }", "", "", ""]
-
-params_pb_multi = [equation, diffusion, diss, diss_conv, IC_diss, CL_k, diffusion_sup, facsec, nb_pas_dt_max]
 
 def sonde_yplus(N,AR,L,y1):
     # On veut avoir y_plus au centre de masse des éléments de maillage le long de l'axe x pour récupérer tau_wall
@@ -205,73 +305,6 @@ def get_value_at_x(var,x,x_tar):
     
     return np.interp(np.array(x_tar), x, var)
 
-def substitution_pb_multi(params):
-    # Cette fonction crée une liste de dictionnaire pour substituer les variables entrée par l'utilisateur dans le jeu de données
-    # Cette fonction ne concerne que les jeux de données utilisant pb_hydraulique_turbulent
-    
-    config, Ny, taux1, taux2, method_Pb_hydr, method_Pb_multi, inlet_velocity,outlet_pressure,inlet_k,inlet_epsilon,x_prof,mu,rho,y_min_prof,y_max_prof,nb_points_prof,tmax = params
-    nb_mesh = len(Ny)
-    nb_method_Pb_multi = len(method_Pb_multi)
-    dict_list = [[0 for x in range(nb_mesh)] for y in range(nb_method_Pb_multi)]
-    for i in range(nb_method_Pb_multi):
-        trianguler = ""
-        solveur_temps = "ice"
-        if config[i+2] == "VDF_k-tau":
-            solveur_temps = "SETS"
-        for j in range(nb_mesh):
-            AR=20
-            N = 2*int(Ny[j]-1)+1  # en vef trianguler_h coupe les cellules en 4
-            comment_yplus_sonde = ""
-            if "triangle" in config[i+2]: # si on veut un maillage triangulaire avec polymac
-                trianguler = "trianguler_H dom"
-                AR = AR_polymac # Il faut réduit le rapport d'aspect pour que ça marche
-                N=Ny[j]
-                comment_yplus_sonde = " # "
-            x_min_yplus, x_max_yplus, nb_points_yplus, y_yplus = sonde_yplus(N,AR,L,y1)
-            dict = {"Ny1" : N,
-                    "Ny2" : int((N-1)/(taux1[j]))+1,
-                    "Ny3" : int((3*(N-1))/(taux1[j]*taux2[j]))+1,
-                   "Nx" : int(L/y1/AR*(N-1))+1,
-                    "method" : method_Pb_multi[i],
-                    "inlet_velocity" : inlet_velocity,
-                    "outlet_pressure" : outlet_pressure,
-                   "x_prof" : x_prof,
-                   "mu" : mu,
-                   "rho" : rho,
-                   "y_min_prof" : y_min_prof[j],
-                   "y_max_prof" : y_max_prof[j],
-                   "nb_points_prof" : nb_points_prof[j],
-                   "x_min_yplus" : x_min_yplus,
-                   "x_max_yplus" : x_max_yplus,
-                   "y_yplus" : y_yplus,
-                   "nb_points_yplus" : nb_points_yplus,
-                   "tmax" : tmax,
-                   "facsec" : str(facsec),
-                   "solveur_temps" : solveur_temps,
-                   "options_vdf" : options_vdf[i],
-                   "diffusion_sup" : diffusion_sup[i],
-                   "diffusion" : diffusion[i%2] ,
-                   "diss": diss[i%2],
-                   "diss_ext": diss_ext[i%2],
-                   "diss_conv" : diss_conv[i%2],                                  
-                   "IC_diss" : IC_diss[i%2] ,
-                   "CL_diss" : CL_diss[i%2] ,
-                   "CL_k" : CL_k[i%2] ,
-                   "equation" : equation[i%2],
-                   "nb_pas_dt_max" : nb_pas_dt_max,
-                   "trianglemesh" : trianguler,
-                   "comment" : comment_yplus_sonde}
-            dict_list[i][j] = dict
-    return dict_list
-
-
-def GenerateInputFile(dir,build,substitutions_dict, name):
-    with open(f"{build}/{name}.data", "r") as file: 
-        filedata = Template(file.read())
-    result = filedata.substitute(substitutions_dict)
-    with open(dir+f"/{name}.data", "w") as file:
-        file.write(result)
-        
 ###############################################################################
 ################################# Read files ##################################
 ###############################################################################

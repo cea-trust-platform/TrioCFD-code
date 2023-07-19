@@ -130,7 +130,7 @@ Lire pb
 					pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
 					gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
 					pression_io	pression		periode 1e8 segment 2    0.75 0    0.75 100
-					pression_i	pression		periode 1e8 segment 100     0 0	0 1
+					pression_i	pression		periode 1e8 segment 100     5 0	5 1
 					pression_o	pression		periode 1e8 segment 100     100 0	100 1
 					}
 		format lata
@@ -140,7 +140,7 @@ Lire pb
 					k elem
 					eps elem
 					y_plus elem
-					 
+					pression elem
 					}		
 	}
 	

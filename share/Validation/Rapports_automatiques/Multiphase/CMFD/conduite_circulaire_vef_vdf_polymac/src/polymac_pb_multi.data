@@ -159,7 +159,8 @@ Lire pb
             # dist_paroi	Distance_paroi		periode 1e8 position_like k #
             y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
             pression_io	pression		periode 1e8 segment 2    $x_p $y_p $z_min_p    $x_p $y_p $z_max_p
-            vitesse_io		vitesse		periode 1e8 position_like pression_io
+            pression_i		pression		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof 5    $x_max_prof $y_max_prof 5
+            pression_o		pression		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof 100    $x_max_prof $y_max_prof 100
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
         }
         format lata

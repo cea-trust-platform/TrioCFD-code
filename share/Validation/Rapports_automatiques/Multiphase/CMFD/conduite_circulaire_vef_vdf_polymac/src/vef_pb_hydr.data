@@ -95,7 +95,8 @@ Lire pb
 					y_plus			y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
 					y_plus_grav grav			y_plus			periode 1e8 segment $nb_points_yplus    $x_yplus $y_yplus $z_min_yplus    $x_yplus $y_yplus $z_max_yplus
 					pression_io grav	pression		periode 1e8 segment 2    $x_p $y_p $z_min_p    $x_p $y_p $z_max_p
-					vitesse_io grav	vitesse		periode 1e8 position_like pression_io
+					pression_i grav	pression		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof 5    $x_max_prof $y_max_prof 5
+					pression_o grav	pression		periode 1e8 segment $nb_points_prof    $x_min_prof $y_min_prof 100    $x_max_prof $y_max_prof 100
 					# gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8 #
 					}
 		format lata
