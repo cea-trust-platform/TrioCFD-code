@@ -58,7 +58,10 @@ Entree& Postraitement_ft_lata::readOn(Entree& is)
     }
 
   if (!sub_type(Format_Post_Lata, format_post.valeur()))
-    Process::exit("ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'.");
+    {
+      Cerr << "ERROR: In Postraitement_ft_lata, only the LATA (V2) format is supported! Use directive 'format lata'." << finl;
+      Process::exit();
+    }
 
   return is;
 }

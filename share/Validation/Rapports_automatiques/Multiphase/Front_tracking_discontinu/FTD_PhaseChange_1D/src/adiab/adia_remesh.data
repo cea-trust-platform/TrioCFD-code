@@ -129,7 +129,7 @@ Lire pb
          conditions_initiales { fonction -(x-0.000110) }
          iterations_correction_volume 0
   	 methode_interpolation_v vdf_lineaire
-         n_iterations_distance 10
+         n_iterations_distance 10 # 3 is enough, but we test what happens when BC are reached... #
 	   # maillage { 
 	       correction_contact_courbure_coeff 0.
 	       calcul_courbure_iterations 1
@@ -160,12 +160,13 @@ remaillage {
          sortie   Paroi_FT_disc symetrie
          }
      }
+
      thermique
      {
          equation_interface interf
          equation_navier_stokes hydraulique
          phase 1
-  	 stencil_width 25
+  	 stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
                  diffusion { }
                  convection { quick }
                  boundary_conditions
@@ -183,7 +184,7 @@ remaillage {
          equation_interface interf
          equation_navier_stokes hydraulique
          phase 0
-  stencil_width 25
+  stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
                  diffusion { }
                  convection { quick }
                  boundary_conditions
@@ -195,7 +196,6 @@ remaillage {
                  conditions_initiales { Temperature_thermique_vapeur champ_fonc_xyz dom 1
          0.*50000000./40.*(x-0.0104) }
      }
-
 
 liste_postraitements
 {
@@ -215,6 +215,9 @@ liste_postraitements
         temperature_grad_thermique elem 
         vitesse elem 
         vitesse_delta_interface elem 
+        vitesse_conv_thermique faces
+        vitesse_conv_thermique_vapeur faces
+        vitesse faces
         pression_laplacien_d elem 
         pression elem 
         temperature_mpoint elem 

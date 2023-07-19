@@ -219,7 +219,7 @@ Lire pb
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width  8
+                stencil_width  9
                 diffusion { }
                 convection { quick }
                 boundary_conditions

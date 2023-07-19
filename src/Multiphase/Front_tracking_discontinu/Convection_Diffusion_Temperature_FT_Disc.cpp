@@ -293,6 +293,49 @@ static void extrapolate(const Domaine_VF&    domaine_vf,
     }
 }
 
+static void extrapoler_dans_phase(DoubleTab&        gradient,
+                                  const DoubleTab& indicatrice,
+                                  const Domaine_VF&    domaine_vf,
+                                  const double invalid_test,
+                                  const double indic_phase, const int nb_iter)
+{
+  DoubleTab gradient_old;
+  for (int iteration = 0; iteration < nb_iter; iteration++)
+    {
+      // Copie de la valeur du gradient: on ne veut pas utiliser les valeurs
+      // calculees lors de l'iteration courante
+      gradient_old = gradient;
+      // La valeur sur un element est la moyenne des valeurs sur les elements voisins
+      for (int i_elem = 0; i_elem < domaine_vf.elem_faces().dimension(0); i_elem++)
+        {
+          if (indicatrice[i_elem] != indic_phase)
+            {
+              // Ne pas toucher au gradient de la phase "phase".
+              // Iterer sur les autres valeurs.
+              double somme = 0.;
+              int coeff = 0;
+              for (int i_face = 0; i_face < domaine_vf.elem_faces().dimension(1); i_face++)
+                {
+                  const int face = domaine_vf.elem_faces(i_elem, i_face);
+                  const int voisin = domaine_vf.face_voisins(face, 0) + domaine_vf.face_voisins(face, 1) - i_elem;
+                  if (voisin >= 0)
+                    {
+                      // Not a boundary...
+                      const double grad = gradient_old[voisin];
+                      if (grad > invalid_test)
+                        {
+                          somme += grad;
+                          coeff++;
+                        }
+                    }
+                }
+              if (coeff > 0)
+                gradient[i_elem] = somme / coeff;
+            }
+        }
+      gradient.echange_espace_virtuel();
+    }
+}
 // A partir des valeurs du "champ" dans la phase "phase", calcule
 // les valeurs du "champ" dans un voisinage d'epaisseur "stencil_width"
 // en extrapolant lineairement et en supposant que la valeur a l'interface
@@ -310,7 +353,7 @@ static void extrapoler_champ_elem(const Domaine_VF&    domaine_vf,
                                   const double temps)
 {
   const IntTab& elem_faces = domaine_vf.elem_faces();
-  const IntTab& faces_elem = domaine_vf.face_voisins();
+  //const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_faces_elem = elem_faces.dimension(1);
   const int nb_elem       = elem_faces.dimension(0);
 
@@ -403,42 +446,12 @@ static void extrapoler_champ_elem(const Domaine_VF&    domaine_vf,
   // On etale ce gradient par continuite sur une epaisseur de "stencil_value"
   // Les iterations de cet algorithme convergent vers une sorte de laplacien=0
   // avec condition aux limites de Dirichlet sur les elements de la phase "phase".
-  DoubleTab gradient_old;
-  for (int iteration = 0; iteration < stencil_width; iteration++)
-    {
-      // Copie de la valeur du gradient: on ne veut pas utiliser les valeurs
-      // calculees lors de l'iteration courante
-      gradient_old = gradient;
-      // La valeur sur un element est la moyenne des valeurs sur les elements voisins
-      for (i_elem = 0; i_elem < nb_elem; i_elem++)
-        {
-          if (indicatrice[i_elem] != indic_phase)
-            {
-              // Ne pas toucher au gradient de la phase "phase".
-              // Iterer sur les autres valeurs.
-              double somme = 0.;
-              int coeff = 0;
-              for (int i_face = 0; i_face < nb_faces_elem; i_face++)
-                {
-                  const int face = elem_faces(i_elem, i_face);
-                  const int voisin = faces_elem(face, 0) + faces_elem(face, 1) - i_elem;
-                  if (voisin >= 0)
-                    {
-                      // Not a boundary...
-                      const double grad = gradient_old[voisin];
-                      if (grad > invalid_test)
-                        {
-                          somme += grad;
-                          coeff++;
-                        }
-                    }
-                }
-              if (coeff > 0)
-                gradient[i_elem] = somme / coeff;
-            }
-        }
-      gradient.echange_espace_virtuel();
-    }
+  extrapoler_dans_phase(gradient, indicatrice, domaine_vf, invalid_test, indic_phase, stencil_width/* nb_iter*/ );
+
+  // 2023. Pour la vitesse de convection extrapolee, on reextrapole dans l'autre phase :
+  const double autre_phase = 1.-indic_phase;
+  extrapoler_dans_phase(gradient, indicatrice, domaine_vf, invalid_test, autre_phase, stencil_width/* nb_iter*/ );
+
   // On calcule la valeur extrapolee:
   for (i_elem = 0; i_elem < nb_elem; i_elem++)
     {
@@ -1081,7 +1094,10 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   if (!divergence_free_velocity_extension_)
     {
       ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_);
-      vitesse_convection_.valeurs() += vitesse_ns.valeurs();
+      //vitesse_convection_.valeurs() += vitesse_ns.valeurs();
+      vitesse_convection_.valeurs() += vitesse_ns.futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
+      //Cerr << inconnue()->temps()  << " =! " << vitesse_ns.temps() << " " << vitesse_convection_.temps() << finl;
+      //Process::exit();
     }
   else
     {
@@ -1270,7 +1286,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
 {
   Convection_Diffusion_Temperature::mettre_a_jour(temps);
-
+  vitesse_convection_.mettre_a_jour(temps);
   // GB : Debut du maintien artificiel de la temperature.
   if (maintien_temperature_)
     {
@@ -1396,6 +1412,15 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser_assembleur_pression()
 void Convection_Diffusion_Temperature_FT_Disc::completer()
 {
   Convection_Diffusion_Temperature::completer();
+  const Transport_Interfaces_FT_Disc& ft = ref_eq_interface_.valeur();
+  const int ndist = ft.get_n_iterations_distance();
+  if (stencil_width_ <= ndist)
+    {
+      Cerr << "The value of the stencil to compute mpoint should at least be strictly larger than "
+           << "the width on which the distance is computed (given by n_iterations_distance in " << ft.que_suis_je() << ")" << finl;
+      Cerr << "Current options : stencil= " << stencil_width_ << " and n_iterations_distance= " << ndist << " are invalid! Exiting." << finl;
+      Process::exit();
+    }
   if (divergence_free_velocity_extension_)
     {
       if (!solveur_pression_.non_nul())
@@ -1540,7 +1565,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_
   if (!sub_type(Domaine_Cl_VDF, zcldis))
     {
       Cerr << "Woops! Not VDF";
-      Process::exit(-1);
+      Process::exit();
     }
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   const Cond_lim& la_cl = zclvdf.la_cl_de_la_face(num_face);
@@ -1646,7 +1671,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
   if (!sub_type(Domaine_Cl_VDF, zcldis))
     {
       Cerr << "Woops! Not VDF";
-      Process::exit(-1);
+      Process::exit();
     }
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   const Cond_lim& la_cl = zclvdf.la_cl_de_la_face(num_face);

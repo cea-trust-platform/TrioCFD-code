@@ -1798,6 +1798,62 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     }
 }
 
+void Navier_Stokes_FT_Disc::correct_at_exit_bad_gradient(DoubleTab& u0) const
+{
+  // Correction du gradient a la sortie (car celui-ci ne doit pas se baser sur la CL de pression):
+  // On prefere mettre la valeur d'en face qu'une valeur abherante. -> comme cela, la divergence (plus tard) tendra vers 0)
+  const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const IntTab& elem_faces = zvf.elem_faces();
+  const IntTab& face_voisins = zvf.face_voisins();
+  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+  // Boucle sur les bords pour traiter les conditions aux limites
+  for (int n_bord=0; n_bord<zvf.nb_front_Cl(); n_bord++)
+    {
+      // pour chaque Condition Limite on regarde son type
+      // Si face de Dirichlet ou de Symetrie on ne fait rien
+      // Si face de Neumann on calcule la contribution au terme source
+      const Cond_lim& la_cl = zcldis.les_conditions_limites(n_bord);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const int ndeb = le_bord.num_premiere_face();
+      const int nfin = ndeb + le_bord.nb_faces();
+      if ( (sub_type(Dirichlet,la_cl.valeur()))
+           ||
+           (sub_type(Neumann_sortie_libre,la_cl.valeur()))
+           ||
+           (sub_type(Dirichlet_homogene,la_cl.valeur()))
+         )
+        {
+          // const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, zvf);
+          // Cerr << que_suis_je() << "::calculer_delta_u_interface() correction de u0 gradient(phi) a la CL : " <<  la_cl.valeur() << finl;
+          const int nb_faces=elem_faces.dimension(1) ;
+          for (int num_face=ndeb; num_face<nfin; num_face++)
+            {
+              const int elem = face_voisins(num_face,0)+face_voisins(num_face,1)+1;
+              int idx_face_de_lelem = 0;
+              for (idx_face_de_lelem=0; idx_face_de_lelem<nb_faces; idx_face_de_lelem++)
+                {
+                  if (elem_faces(elem,idx_face_de_lelem) == num_face)
+                    break; // Face found
+                }
+              if (nb_faces==idx_face_de_lelem)
+                {
+                  Cerr << "Face is not found!! " << finl;
+                  Process::exit();
+                }
+              const int num_face_den_face=elem_faces(elem,(idx_face_de_lelem+Objet_U::dimension)%nb_faces);
+              // const int elem_voisin = face_voisins(num_face_den_face,0)+face_voisins(num_face_den_face,1)-elem;
+              // const double d_elem = dist[elem];
+              // const double d_voisin = dist[elem_voisin];
+              // const double delta = zvdf.dist_face(num_face, num_face_den_face , zvdf.orientation(num_face));
+              // Il faudrait lineariser a l'ordre 2 car cela sert aussi au calcul de laplacien_d.
+              // On extrapole le gradient mais on ne peut pas faire mieux car on a un petit stencil a 2 points sur dist.
+              for (int c=0; c< u0.line_size(); c++)
+                u0(num_face,c) = u0(num_face_den_face,c);//*(1.+xxxxx);
+            }
+        }
+    }
+}
+
 /*! @brief Calcul du saut de vitesse a l'interface du au changement de phase
  *
  *   phase_pilote = -1: u-u0 = champ de vitesse de deplacement de l'interface
@@ -2065,6 +2121,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   if (champ_u0.que_suis_je() == "Champ_Face")
     {
       gradient.calculer(phi, u0);
+      correct_at_exit_bad_gradient(u0);
     }
   else
     {
@@ -3827,6 +3884,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   //  static const Stat_Counter_Id count2 = statistiques().new_counter(1, "calculer_gradient", 0);
   //  statistiques().begin_count(count2);
   gradient.calculer(phi, u0);
+  correct_at_exit_bad_gradient(u0);
   //  statistiques().end_count(count2);
   //  static const Stat_Counter_Id count4 = statistiques().new_counter(1, "calculer_solveur_masse", 0);
   //  statistiques().begin_count(count4);
