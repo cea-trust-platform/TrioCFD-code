@@ -1094,7 +1094,10 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   if (!divergence_free_velocity_extension_)
     {
       ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_);
-      vitesse_convection_.valeurs() += vitesse_ns.valeurs();
+      //vitesse_convection_.valeurs() += vitesse_ns.valeurs();
+      vitesse_convection_.valeurs() += vitesse_ns.futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
+      //Cerr << inconnue()->temps()  << " =! " << vitesse_ns.temps() << " " << vitesse_convection_.temps() << finl;
+      //Process::exit();
     }
   else
     {
@@ -1283,7 +1286,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
 {
   Convection_Diffusion_Temperature::mettre_a_jour(temps);
-
+  vitesse_convection_.mettre_a_jour(temps);
   // GB : Debut du maintien artificiel de la temperature.
   if (maintien_temperature_)
     {

@@ -247,7 +247,7 @@ interf
  conditions_initiales { fonction (x)^2+(y)^2+(z+2.5e-3)^2-(1.e-3)^2 }
  iterations_correction_volume 2
  methode_interpolation_v vdf_lineaire
- n_iterations_distance 25
+ n_iterations_distance 7
  remaillage {
   pas 1.e-6
   nb_iter_remaillage 2
