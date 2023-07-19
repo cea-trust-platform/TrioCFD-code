@@ -7,7 +7,7 @@ mz_theorique=-3.14e-7
 
 # Sans IBC:
 file=`ls -art *Forces_NO_IBC_2D_VEF_pb_Contrainte_visqueuse_moment.out | tail -1` && [ "$file" = "" ] && exit -1
-mz_sans_ibc=`tail -1 $file | awk '{print $2}'`
+mz_sans_ibc=`tail -1 $file | awk '{print $4}'`
 
 # Avec IBC:
 file=`ls -art *Forces_IBC_2D_VEF_Moment_total_sur_body.out | tail -1`
