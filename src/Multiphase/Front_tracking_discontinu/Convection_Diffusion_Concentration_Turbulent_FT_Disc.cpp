@@ -62,7 +62,7 @@ Entree& Convection_Diffusion_Concentration_Turbulent_FT_Disc::readOn(Entree& is)
           if (nom_equation_nu_t_ == "??")
             {
               Cerr << "Missing EQUATION_NU_T" << finl;
-              Process::exit(-1);
+              Process::exit();
             }
         }
       Cerr << "The kinematic model used is : modele_cinetique " << modele_cinetique_ << finl;
@@ -410,7 +410,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
         {
           Cerr << "MODELE_CINETIQUE not implemented ==> Please specify model 1 -- 4" << finl;
           barrier();
-          Process::exit(-1);
+          Process::exit();
         }
 
     }

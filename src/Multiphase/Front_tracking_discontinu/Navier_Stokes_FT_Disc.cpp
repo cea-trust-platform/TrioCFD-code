@@ -1798,7 +1798,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     }
 }
 
-void Navier_Stokes_FT_Disc::correct_bad_gradient_at_exit(DoubleTab& u0) const
+void Navier_Stokes_FT_Disc::correct_at_exit_bad_gradient(DoubleTab& u0) const
 {
   // Correction du gradient a la sortie (car celui-ci ne doit pas se baser sur la CL de pression):
   // On prefere mettre la valeur d'en face qu'une valeur abherante. -> comme cela, la divergence (plus tard) tendra vers 0)
@@ -2121,7 +2121,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   if (champ_u0.que_suis_je() == "Champ_Face")
     {
       gradient.calculer(phi, u0);
-      correct_bad_gradient_at_exit(u0);
+      correct_at_exit_bad_gradient(u0);
     }
   else
     {
@@ -3884,7 +3884,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   //  static const Stat_Counter_Id count2 = statistiques().new_counter(1, "calculer_gradient", 0);
   //  statistiques().begin_count(count2);
   gradient.calculer(phi, u0);
-  correct_bad_gradient_at_exit(u0);
+  correct_at_exit_bad_gradient(u0);
   //  statistiques().end_count(count2);
   //  static const Stat_Counter_Id count4 = statistiques().new_counter(1, "calculer_solveur_masse", 0);
   //  statistiques().begin_count(count4);
