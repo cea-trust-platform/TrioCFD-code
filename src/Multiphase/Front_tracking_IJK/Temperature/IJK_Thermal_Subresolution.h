@@ -60,10 +60,10 @@ public :
 
 protected :
 
-//  void add_temperature_diffusion() override;
   void compute_diffusion_increment() override;
   void correct_temperature_for_eulerian_fluxes() override;
-//  void correct_temperature_increment_diffusion();
+  //  void add_temperature_diffusion() override;
+  //  void correct_temperature_increment_diffusion();
 
   int diffusion_flux_correction_;
   int convective_flux_correction_;

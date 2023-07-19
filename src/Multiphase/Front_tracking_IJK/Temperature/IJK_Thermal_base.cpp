@@ -65,6 +65,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   type_T_source_="??";
   wall_flux_=0;
   lambda_variable_=0; //terme source variable
+//  type_thermal_problem_=0;
   /*
    * Ceci est une initialisation des derivees des temperatures moyenne de chaque phase
    * Il n'est peut-etre pas pertinent de les mettre ici
@@ -223,18 +224,23 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
 
+//  param.ajouter("type_thermal_problem", &type_thermal_problem_);
+//  param.dictionnaire("subresolution", 0);
+//  param.dictionnaire("multiplesubresolutions", 1);
+//  param.dictionnaire("onefluid", 2);
+
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
   param.ajouter("type_temperature_convection_op", &type_temperature_convection_op_); // XD_ADD_P chaine(into=["Amont","Quick","Centre2","Centre4"]) convection operator
   param.dictionnaire("Quick",1);
   param.dictionnaire("Centre2",2);
   param.ajouter_flag("diff_temp_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
 
+
   param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
 
 //  param.ajouter_flag("single_phase", &single_phase_);
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
 }
-
 
 /********************************************
  * Public methods
@@ -1358,6 +1364,30 @@ double IJK_Thermal_base::get_rhocp_v() const
 {
   return  ref_ijk_ft_->get_rho_v() * cp_vapour_;
 }
+
+//int IJK_Thermal_base::get_type_thermal_problem() const
+//{
+//  return  type_thermal_problem_;
+//}
+//
+//std::string IJK_Thermal_base::set_type_thermal_problem()
+//{
+//  switch (type_thermal_problem_)
+//    {
+//    case 0:
+//      name_type_thermal_problem_ = "subresolution";
+//      break;
+//    case 1:
+//      name_type_thermal_problem_ = "multiplesubresolutions";
+//      break;
+//    case 2:
+//      name_type_thermal_problem_ = "onefluid";
+//      break;
+//    default:
+//      name_type_thermal_problem_ = "subresolution";
+//    }
+//  return name_type_thermal_problem_;
+//}
 
 /*
  * Methods that do not belong to the class

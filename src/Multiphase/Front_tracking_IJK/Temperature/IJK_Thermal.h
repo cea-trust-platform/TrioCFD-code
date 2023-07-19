@@ -23,6 +23,7 @@
 #define IJK_Thermal_included
 
 #include <IJK_Thermal_base.h>
+#include <IJK_Thermal_Reader.h>
 #include <TRUST_Deriv.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -35,16 +36,54 @@
 
 class IJK_Thermal : public DERIV(IJK_Thermal_base)
 {
-
-  Declare_instanciable( IJK_Thermal ) ;
+  Declare_instanciable( IJK_Thermal );
 
 public :
+//  IJK_Thermal_Reader* thermal_reader_;
+//  inline void set_thermal_reader(IJK_Thermal_Reader& thermal_reader);
+//  inline void typer_problem();
+//  inline void typer_problem(std::string string_type);
+  inline int initialize(const IJK_Splitting& splitting, const int idx);
+  inline void update_thermal_properties();
+  inline void euler_time_step(const double timestep);
   inline void associer(const IJK_FT_double& ijk_ft);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
                                  const double dxmin) const;
 
 };
+
+//inline void IJK_Thermal::set_thermal_reader(IJK_Thermal_Reader& thermal_reader)
+//{
+//  thermal_reader_ = &thermal_reader;
+//}
+//
+//inline void IJK_Thermal::typer_problem(std::string string_type)
+//{
+//  typer(string_type.c_str());
+//}
+//
+//inline void IJK_Thermal::typer_problem()
+//{
+////  Cout << "Test" << valeur().get_type_thermal_problem() << finl;
+////  Cerr << "Test" << valeur().get_type_thermal_problem() << finl;
+//  typer(thermal_reader_->set_type_thermal_problem().c_str());
+//}
+
+inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
+{
+  return valeur().initialize(splitting, idx);
+}
+
+inline void IJK_Thermal::update_thermal_properties()
+{
+  return valeur().update_thermal_properties();
+}
+
+inline void IJK_Thermal::euler_time_step(const double timestep)
+{
+  valeur().euler_time_step(timestep);
+}
 
 inline void IJK_Thermal::associer(const IJK_FT_double& ijk_ft)
 {

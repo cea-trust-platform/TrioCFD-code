@@ -31,6 +31,47 @@ Sortie& IJK_Thermal::printOn( Sortie& os ) const
 
 Entree& IJK_Thermal::readOn( Entree& is )
 {
-  DERIV(IJK_Thermal_base)::readOn( is );
+  Cerr<<"Read and Cast IJK_Thermal :"<<finl;
+  Motcle word;
+  is>>word;
+  Nom type = "IJK_Thermal_";
+  Motcles thermal_words(3);
+  {
+    thermal_words[0] = "subresolution";
+    thermal_words[1] = "multiplesubresolutions";
+    thermal_words[2] = "onefluid";
+  }
+  int thermal_rank = thermal_words.search(word);
+  switch(thermal_rank)
+    {
+    case 0 :
+      {
+        type += "Subresolution";
+        break;
+      }
+    case 1 :
+      {
+        type += "Multiple_Subresolutions";
+        break;
+      }
+    case 2 :
+      {
+        type += "Onefluid";
+        break;
+      }
+    default :
+      {
+        Cerr<<"ERROR : Thermal problems already implemented are:"<<finl;
+        Cerr<<thermal_words<<finl;
+        abort();
+      }
+    }
+  typer(type);
+  // valeur().readOn(is);
+  is >> valeur();
   return is;
+  //  thermal_reader_->readOn(is);
+  //  Cerr << thermal_reader_->set_type_thermal_problem() << finl;
+  //  typer_problem();
+  //  DERIV(IJK_Thermal_base)::readOn( is );
 }

@@ -90,6 +90,9 @@ public:
    */
   double get_rhocp_l() const;
   double get_rhocp_v() const;
+  //  int get_type_thermal_problem() const;
+  //  std::string set_type_thermal_problem();
+
   const IJK_Field_double& get_temperature() const
   {
     return temperature_ ;
@@ -159,7 +162,8 @@ protected:
   int single_phase_;
   double uniform_lambda_;
   double uniform_alpha_;
-
+//  int type_thermal_problem_;
+//  std::string name_type_thermal_problem_;
   /*
    * Initialisation (B.Cs, expression)
    */

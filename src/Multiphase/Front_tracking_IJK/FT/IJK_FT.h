@@ -43,6 +43,7 @@
 #include <IJK_Energie.h>
 #include <IJK_Thermal_Subresolution.h>
 #include <IJK_Thermal.h>
+#include <IJK_Thermal_Reader.h>
 #include <TRUST_Ref.h>
 #include <Objet_U.h>
 
@@ -590,6 +591,9 @@ protected :
   LIST(IJK_Energie) energie_;
   LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
   LIST(IJK_Thermal) thermal_;
+  //  LIST(IJK_Thermal_Reader) thermal_reader_;
+  //  int thermal_problem_number_;
+
 };
 
 #endif /* IJK_FT_included */

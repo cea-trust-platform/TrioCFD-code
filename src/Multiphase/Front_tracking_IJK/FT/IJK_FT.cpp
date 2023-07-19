@@ -463,7 +463,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("facteur_variable_source_init", &facteur_variable_source_); // XD_ADD_P chaine not_set
   param.ajouter("expression_derivee_facteur_variable_source", &expression_derivee_facteur_variable_source_); // XD_ADD_P chaine not_set
 
-
   param.ajouter("expression_p_init", &expression_pression_initiale_); // XD_ADD_P chaine initial pressure field (optional)
 
   param.ajouter("expression_potential_phi", &expression_potential_phi_); // XD_ADD_P chaine parser to define phi and make a momentum source Nabla phi.
@@ -483,7 +482,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
   param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
-  param.ajouter("thermal", &thermal_); // XD_ADD_P chaine not_set
+  param.ajouter("thermal", &thermal_);
+  //  thermal_problem_number_=0;
+//  param.ajouter("thermal_problem_number", &thermal_problem_number_); // XD_ADD_P floattant vapour viscosity
 
   param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
@@ -576,6 +577,21 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 // XD attr expression_ddWdydz_ana chaine expression_ddWdydz_ana 1 analytical expression d2W/dydz=f(x,y,z,t), for post-processing only
 // XD attr t_debut_statistiques floattant t_debut_statistiques 1 Initial time for computation, printing and accumulating time-integration
 // XD attr sondes bloc_lecture sondes 1 probes
+
+  /*
+   * Cast the thermal problems first to correctly read the list of objects
+   */
+//  Cout << "IJK_Thermal_Reader begin" << finl;
+//  int idth=0;
+//  for (auto& itr : thermal_)
+//    {
+//      thermal_reader_[idth] = IJK_Thermal_Reader();
+//      itr.set_thermal_reader(thermal_reader_[idth]);
+//      idth++;
+//    }
+//  Cout << thermal_reader_[0].get_type_thermal_problem() << finl;
+//  Cout << "IJK_Thermal_Reader end" << finl;
+
   param.lire_avec_accolades(is);
   // GAB, rotation
   direction_gravite_ = get_direction(gravite_);
@@ -813,7 +829,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     itr.associer(*this);
 
   for (auto& itr : thermal_)
-    itr.associer(*this);
+    {
+      itr.associer(*this);
+    }
 
   run();
   return is;
@@ -1247,7 +1265,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       int flag_list_not_empty_th = 0;
       if (thermal_.size() > 0)
         {
-          fichier << " thermal_ {\n" ;
+          fichier << " thermal {\n" ;
           flag_list_not_empty_th = 1;
         }
       for(auto itr = thermal_.begin(); itr != thermal_.end(); )
@@ -1415,6 +1433,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       fic<<" "<<dt_thermique; // If no thermal equation, value will be large.
       fic<<" "<<dt_energie; // If no thermal equation, value will be large.
       fic<<" "<<dt_thermal_subresolution; // If no thermal equation, value will be large.
+      fic<<" "<<dt_thermal; // If no thermal equation, value will be large.
       fic<<finl;
       fic.close();
     }
@@ -1626,6 +1645,16 @@ int IJK_FT_double::initialise()
       if (!disable_diphasique_)
         itr.update_thermal_properties();
       idx3++;
+    }
+
+
+  int idth =0;
+  for (auto& itr : thermal_)
+    {
+      nalloc += itr.initialize(splitting_, idth);
+      if (!disable_diphasique_)
+        itr.update_thermal_properties();
+      idth++;
     }
 
   statistiques().end_count(calculer_thermique_prop_counter_);
@@ -2183,6 +2212,9 @@ void IJK_FT_double::run()
 
               for (auto& itr : thermal_subresolution_)
                 itr.update_thermal_properties();
+
+              for (auto& itr : thermal_)
+                itr.update_thermal_properties();
             }
           // La pression n'est pas encore initialisee. elle est donc nulle.
           // Avec cette option, on essaye une initialisation basee sur le champ de pression diphasique
@@ -2305,10 +2337,16 @@ void IJK_FT_double::run()
           // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
+      for (auto& itr : thermal_)
+        {
+          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
+          itr.update_thermal_properties();
+        }
     }
   else
     {
-      Cerr << "Cas normal diphasique l2158" << finl;
+      Cerr << "Cas normal diphasique IJK_FT::run()" << finl;
+
       for (auto& itr : thermique_)
         itr.update_thermal_properties();
 
@@ -2316,6 +2354,9 @@ void IJK_FT_double::run()
         itr.update_thermal_properties();
 
       for (auto& itr : thermal_subresolution_)
+        itr.update_thermal_properties();
+
+      for (auto& itr : thermal_)
         itr.update_thermal_properties();
 
       const double indic_moyen = calculer_v_moyen(interfaces_.I());
@@ -3872,6 +3913,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
     itr.euler_time_step(velocity_);
 
   for (auto& itr : thermal_subresolution_)
+    itr.euler_time_step(timestep_);
+
+  for (auto& itr : thermal_)
     itr.euler_time_step(timestep_);
 
   if (!frozen_velocity_)
