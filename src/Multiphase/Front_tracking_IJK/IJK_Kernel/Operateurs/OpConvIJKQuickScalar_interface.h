@@ -40,12 +40,12 @@
 
 class Corrige_flux_FT;
 
-class OpConvIJKQuickScalarInterface_double  : public OpConvIJKQuickScalar_double
+class OpConvQuickInterfaceIJKScalar_double  : public OpConvQuickIJKScalar_double
 {
-  Declare_instanciable_sans_constructeur(OpConvIJKQuickScalarInterface_double);
+  Declare_instanciable_sans_constructeur(OpConvQuickInterfaceIJKScalar_double);
 
 public:
-  OpConvIJKQuickScalarInterface_double() : OpConvIJKQuickScalar_double() {};
+  OpConvQuickInterfaceIJKScalar_double() : OpConvQuickIJKScalar_double() {};
 
 protected:
   // Ces methodes devraient cacher les methodes de OpConv..._base

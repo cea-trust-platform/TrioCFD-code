@@ -58,15 +58,15 @@
 //   flux_i(i+1,j,k) at right
 //   ...
 
-Implemente_instanciable_sans_constructeur(OpConvIJKQuickScalarInterface_double, "OpConvIJKQuickScalarInterface_double", OpConvIJKQuickScalar_double);
+Implemente_instanciable_sans_constructeur(OpConvQuickInterfaceIJKScalar_double, "OpConvQuickInterfaceIJKScalar_double", OpConvQuickIJKScalar_double);
 
-Sortie& OpConvIJKQuickScalarInterface_double::printOn(Sortie& os) const
+Sortie& OpConvQuickInterfaceIJKScalar_double::printOn(Sortie& os) const
 {
   //  OpConvIJKQuickScalar_double::printOn(os);
   return os;
 }
 
-Entree& OpConvIJKQuickScalarInterface_double::readOn(Entree& is)
+Entree& OpConvQuickInterfaceIJKScalar_double::readOn(Entree& is)
 {
   //  OpConvIJKQuickScalar_double::readOn(is);
   return is;
@@ -132,7 +132,7 @@ static void Operator_IJK_div_set(const IJK_Field_local_double& flux_x,
 
 // Finalement on va faire ces manipulations dans la correction de flux, comme ça
 // il n'y a pas d'erreur possible. void
-// OpConvIJKQuickScalarInterface_double::calculer(const IJK_Field_double&
+// OpConvQuickInterfaceIJKScalar_double::calculer(const IJK_Field_double&
 // convect, const IJK_Field_double& disc_prop, const IJK_Field_double& vx, const
 // IJK_Field_double& vy, const IJK_Field_double& vz, IJK_Field_double& res)
 // {
@@ -145,7 +145,7 @@ static void Operator_IJK_div_set(const IJK_Field_local_double& flux_x,
 //   // ensuite on corrige le flux avec la methode correction flux
 // }
 
-void OpConvIJKQuickScalarInterface_double::compute_set(IJK_Field_double& dx)
+void OpConvQuickInterfaceIJKScalar_double::compute_set(IJK_Field_double& dx)
 {
   IJK_Field_local_double storage;
   storage.allocate(dx.ni() + 1, dx.nj() + 1, 4, 0);
@@ -181,11 +181,11 @@ void OpConvIJKQuickScalarInterface_double::compute_set(IJK_Field_double& dx)
     }
 }
 
-// void OpConvIJKQuickScalarInterface_double::compute_add(IJK_Field_double& dx)
+// void OpConvQuickInterfaceIJKScalar_double::compute_add(IJK_Field_double& dx)
 // {
 // }
 
-// OpConvIJKQuickScalarInterface_double::~OpConvIJKQuickScalarInterface_double()
+// OpConvQuickInterfaceIJKScalar_double::~OpConvQuickInterfaceIJKScalar_double()
 // {
 //   delete correction_;
 // }

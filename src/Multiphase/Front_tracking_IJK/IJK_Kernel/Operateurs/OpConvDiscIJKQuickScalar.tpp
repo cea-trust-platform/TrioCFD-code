@@ -20,7 +20,7 @@
 
 
 template <DIRECTION _DIR_>
-void OpConvDiscIJKQuickScalar_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
+void OpConvDiscQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
   if(_DIR_==DIRECTION::Z)
     {

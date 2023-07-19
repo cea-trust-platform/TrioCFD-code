@@ -21,7 +21,28 @@
 
 #include <IJK_Thermal.h>
 
-Implemente_instanciable( IJK_Thermal, "IJK_Thermal", DERIV(IJK_Thermal_base) ) ;
+Implemente_instanciable_sans_constructeur( IJK_Thermal, "IJK_Thermal", DERIV(IJK_Thermal_base) ) ;
+
+IJK_Thermal::IJK_Thermal()
+{
+  thermal_rank_ = 0;
+  thermal_problem_type_ = "subresolution";
+  prefix_="IJK_Thermal_";
+  thermal_words_ = Motcles(4);
+  {
+    thermal_words_[0] = "subresolution";
+    thermal_words_[1] = "multiplesubresolutions";
+    thermal_words_[2] = "onefluid";
+    thermal_words_[3] = "onefluidenergy";
+  }
+  lata_suffix_ = Motcles(4);
+  {
+    lata_suffix_[0] = "SUBRES_";
+    lata_suffix_[1] = "MSUBRES_";
+    lata_suffix_[2] = "OF_";
+    lata_suffix_[3] = "OFE_";
+  }
+}
 
 Sortie& IJK_Thermal::printOn( Sortie& os ) const
 {
@@ -31,18 +52,13 @@ Sortie& IJK_Thermal::printOn( Sortie& os ) const
 
 Entree& IJK_Thermal::readOn( Entree& is )
 {
-  Cerr<<"Read and Cast IJK_Thermal :"<<finl;
+  Cerr << "Read and Cast IJK_Thermal :" << finl;
   Motcle word;
-  is>>word;
-  Nom type = "IJK_Thermal_";
-  Motcles thermal_words(3);
-  {
-    thermal_words[0] = "subresolution";
-    thermal_words[1] = "multiplesubresolutions";
-    thermal_words[2] = "onefluid";
-  }
-  int thermal_rank = thermal_words.search(word);
-  switch(thermal_rank)
+  is >> word;
+  Nom type = "";
+  thermal_rank_ = thermal_words_.search(word);
+  type += prefix_;
+  switch(thermal_rank_)
     {
     case 0 :
       {
@@ -59,19 +75,20 @@ Entree& IJK_Thermal::readOn( Entree& is )
         type += "Onefluid";
         break;
       }
+    case 3 :
+      {
+        type += "OnefluidEnergy";
+        break;
+      }
     default :
       {
-        Cerr<<"ERROR : Thermal problems already implemented are:"<<finl;
-        Cerr<<thermal_words<<finl;
+        Cerr << "ERROR : Thermal problems that are already implemented are:" << finl;
+        Cerr << thermal_words_ << finl;
         abort();
       }
     }
+  thermal_problem_type_=thermal_words_[thermal_rank_];
   typer(type);
-  // valeur().readOn(is);
   is >> valeur();
   return is;
-  //  thermal_reader_->readOn(is);
-  //  Cerr << thermal_reader_->set_type_thermal_problem() << finl;
-  //  typer_problem();
-  //  DERIV(IJK_Thermal_base)::readOn( is );
 }

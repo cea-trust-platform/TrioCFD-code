@@ -61,18 +61,6 @@ public :
                           const double dxmin) const;
   void update_thermal_properties() override;
 
-  int depracated_rho_cp_;
-  int rho_cp_inv_;
-  int lambda_moy_arith_;
-  int conserv_energy_global_;
-  int type_temperature_convection_form_;
-
-  IJK_Field_double d_T_rustine_; // Temperature increment to conserve the energy.
-  IJK_Field_double RK3_F_rustine_; // Temporary storage for substeps in the RK3 algorithm for the rustine calculation.
-  IJK_Field_double div_rho_cp_T_;
-  IJK_Field_double lambda_;
-  IJK_Field_double cp_;
-
 protected :
 
   void add_temperature_diffusion() override;
@@ -82,6 +70,16 @@ protected :
   double E0_;//volumique
   IJK_Field_double T_rust_;
   void compute_T_rust(const FixedVector<IJK_Field_double, 3>& velocity);
+
+  int depracated_rho_cp_;
+  int rho_cp_inv_;
+  int lambda_moy_arith_;
+  int type_temperature_convection_form_;
+
+  IJK_Field_double div_rho_cp_T_;
+  IJK_Field_double lambda_;
+  IJK_Field_double cp_;
+
 };
 
 #endif /* IJK_Thermal_Onefluid_included */

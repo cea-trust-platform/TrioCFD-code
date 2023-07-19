@@ -257,24 +257,24 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
    */
   if (single_phase_)
     {
-      temperature_diffusion_op_.typer("OpDiffUniformIJKScalar_double");
-      temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
+//      temperature_diffusion_op_.typer("OpDiffUniformIJKScalar_double");
+//      temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
+      temperature_diffusion_op_.typer_diffusion_op("uniform");
     }
   else
     {
-      temperature_diffusion_op_.typer("OpDiffIJKScalar_double");
+      temperature_diffusion_op_.typer_diffusion_op("standard");
     }
-
   /*
    * Convection operator
    */
   switch(type_temperature_convection_op_)
     {
     case 1:
-      temperature_convection_op_.typer("OpConvIJKQuickScalar_double");
+      temperature_convection_op_.typer_convection_op("quick");
       break;
     case 2:
-      temperature_convection_op_.typer("OpConvCentre2IJKScalar_double");
+      temperature_convection_op_.typer_convection_op("centre2");
       break;
     default:
       Cerr << "Undefined operator for the convection of the temperature. " << finl;
@@ -284,10 +284,14 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   /*
    * Initialise the operators
    */
-//  temperature_convection_op_.initialize(splitting);
-  temperature_diffusion_op_.test();
-  Cout << "Test" << finl;
+  temperature_convection_op_.initialize(splitting);
   temperature_diffusion_op_.initialize(splitting);
+
+  /*
+   * Corrige Flux FT
+   */
+
+  corrige_flux_.typer("Corrige_flux_FT_temperature_conv");
 
   /*
    * Fields
@@ -1504,4 +1508,133 @@ int IJK_Thermal_base::imposer_flux_thermique_bord(const IJK_Field_double& temper
         }
     }
   return k;
+}
+
+/*
+ * Patch coming from IJK_Thermique (Aymeric's thesis)
+ */
+
+void IJK_Thermal_base::euler_rustine_step(const double timestep, const double dE)
+{
+  compute_dT_rustine(dE);
+  // Update the temperature :
+  const int kmax = temperature_.nk();
+  const double ene_ini = compute_global_energy();
+  for (int k = 0; k < kmax; k++)
+    {
+      ref_ijk_ft_->euler_explicit_update(d_T_rustine_, temperature_, k);
+    }
+  temperature_.echange_espace_virtuel(temperature_.ghost());
+  const double ene_post = compute_global_energy();
+  Cerr << "[Energy-Budget-T"<<rang_<<" euler rustine] time t=" << ref_ijk_ft_->get_current_time()
+       << " " << ene_ini
+       << " " << ene_post << " [W.m-3]."
+       << " dE "<< dE
+       << finl;
+  source_callback();
+}
+
+void IJK_Thermal_base::compute_dT_rustine(const double dE)
+{
+  const int ni = T_rust_.ni();
+  const int nj = T_rust_.nj();
+  const int nk = T_rust_.nk();
+  const double rho_l = ref_ijk_ft_->get_rho_l();
+  const double rho_v = ref_ijk_ft_->get_rho_v();
+  const IJK_Field_double indic = ref_ijk_ft_->itfce().I();
+  double int_rhocpTrust = 0;
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          int_rhocpTrust +=  (rho_l*cp_liquid_*indic(i,j,k) + rho_v*cp_vapour_*(1.-indic(i,j,k)))*T_rust_(i,j,k);
+        }
+  const int ntot = T_rust_.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_I)
+                   *T_rust_.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_J)
+                   *T_rust_.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
+  int_rhocpTrust = mp_sum(int_rhocpTrust)/(double)(ntot);
+  Cerr << "Le coeff de manque d'energie dE/int_rhocpTrust vaut : " << dE/int_rhocpTrust << finl;
+  if (int_rhocpTrust)
+    {
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              d_T_rustine_(i,j,k) = dE/ int_rhocpTrust * T_rust_(i,j,k);
+            }
+    }
+}
+
+void IJK_Thermal_base::rk3_rustine_sub_step(const int rk_step, const double total_timestep,
+                                            const double fractionnal_timestep, const double time, const double dE)
+{
+  compute_dT_rustine(dE);
+  // Update the temperature :
+  const int kmax = temperature_.nk();
+  const double ene_ini = compute_global_energy();
+  for (int k = 0; k < kmax; k++)
+    {
+      runge_kutta3_update(d_T_rustine_, RK3_F_rustine_, temperature_, rk_step, k, total_timestep);
+    }
+  temperature_.echange_espace_virtuel(temperature_.ghost());
+  const double ene_post = compute_global_energy();
+  Cerr << "[Energy-Budget-T"<<rang_<<"RK3 rustine step "<<rk_step<<"] time t=" << ref_ijk_ft_->get_current_time()
+       << " " << ene_ini
+       << " " << ene_post << " [W.m-3]. [step"<< rk_step << "]" << finl;
+  source_callback();
+}
+
+void IJK_Thermal_base::compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
+                                                        ArrOfDouble& flux_normal_interp)
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_geometry();
+  const double dist = 1.52 * std::pow(std::pow(geom.get_constant_delta(0), 2.) +
+                                      std::pow(geom.get_constant_delta(1), 2.) +
+                                      std::pow(geom.get_constant_delta(2), 2.),
+                                      0.5);
+  const Maillage_FT_IJK& maillage = ref_ijk_ft_->itfce().maillage_ft_ijk();
+  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
+  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+  const int nb_facettes = maillage.nb_facettes();
+  const IntTab& facettes = maillage.facettes();
+  const DoubleTab& sommets = maillage.sommets();
+  DoubleTab coord_facettes;
+  coord_facettes.resize(nb_facettes, 3);
+  coord_facettes = 0.;
+  for (int fa7 = 0; fa7 < nb_facettes; fa7++)
+    for (int dir = 0; dir < 3; dir++)
+      for (int som = 0; som < 3; som++)
+        coord_facettes(fa7, dir) += sommets(facettes(fa7, som), dir);
+
+  for (int fa7 = 0; fa7 < nb_facettes; fa7++)
+    for (int dir = 0; dir < 3; dir++)
+      coord_facettes(fa7, dir) /= 3.;
+
+  DoubleTab coo_liqu, coo_vap;
+  ArrOfDouble temp_liqu, temp_vap;
+  temp_liqu.set_smart_resize(1);
+  temp_vap.set_smart_resize(1);
+  coo_liqu.set_smart_resize(1);
+  coo_vap.set_smart_resize(1);
+  //  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
+  //    temperature_ft_, lambda_liquid_, lambda_vapor_, dist, coord_facettes,
+  //    normale_facettes, interfacial_temperature, flux_normal_interp, temp_liqu,
+  //    temp_vap, coo_liqu, coo_vap);
+  corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
+                                                  lambda_liquid_,
+                                                  lambda_vapour_,
+                                                  dist,
+                                                  coord_facettes,
+                                                  normale_facettes,
+                                                  interfacial_temperature,
+                                                  flux_normal_interp,
+                                                  temp_liqu,
+                                                  temp_vap,
+                                                  coo_liqu,
+                                                  coo_vap);
+  for (int fa7 = 0; fa7 < nb_facettes; fa7++)
+    {
+      flux_normal_interp(fa7) *= surface_facettes(fa7);
+      interfacial_temperature(fa7) *= surface_facettes(fa7);
+    }
 }

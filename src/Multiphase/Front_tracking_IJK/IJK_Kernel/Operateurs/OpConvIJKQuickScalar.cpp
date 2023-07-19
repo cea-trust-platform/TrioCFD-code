@@ -15,15 +15,15 @@
 
 #include <OpConvIJKQuickScalar.h>
 
-Implemente_instanciable_sans_constructeur(OpConvIJKQuickScalar_double, "OpConvIJKQuickScalar_double", OpConvIJKElemCommon_double);
+Implemente_instanciable_sans_constructeur(OpConvQuickIJKScalar_double, "OpConvQuickIJKScalar_double", OpConvIJKElemCommon_double);
 
-Sortie& OpConvIJKQuickScalar_double::printOn(Sortie& os) const
+Sortie& OpConvQuickIJKScalar_double::printOn(Sortie& os) const
 {
   //  OpConvIJKElemCommon_double::printOn(os);
   return os;
 }
 
-Entree& OpConvIJKQuickScalar_double::readOn(Entree& is)
+Entree& OpConvQuickIJKScalar_double::readOn(Entree& is)
 {
   //  OpConvIJKElemCommon_double::readOn(is);
   return is;

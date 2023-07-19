@@ -15,21 +15,21 @@
 
 #include <OpConvDiscIJKQuickScalar.h>
 
-Implemente_instanciable_sans_constructeur(OpConvDiscIJKQuickScalar_double, "OpConvDiscIJKQuickScalar_double", OpConvIJKElemCommon_double);
+Implemente_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double, "OpConvDiscQuickIJKScalar_double", OpConvIJKElemCommon_double);
 
-Sortie& OpConvDiscIJKQuickScalar_double::printOn(Sortie& os) const
+Sortie& OpConvDiscQuickIJKScalar_double::printOn(Sortie& os) const
 {
   //  OpConvIJKElemCommon_double::printOn(os);
   return os;
 }
 
-Entree& OpConvDiscIJKQuickScalar_double::readOn(Entree& is)
+Entree& OpConvDiscQuickIJKScalar_double::readOn(Entree& is)
 {
   //  OpConvIJKElemCommon_double::readOn(is);
   return is;
 }
 
-void OpConvDiscIJKQuickScalar_double::calculer(const IJK_Field_double& field,
+void OpConvDiscQuickIJKScalar_double::calculer(const IJK_Field_double& field,
                                                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                                IJK_Field_double& result)
 {
@@ -38,7 +38,7 @@ void OpConvDiscIJKQuickScalar_double::calculer(const IJK_Field_double& field,
 
 }
 
-void OpConvDiscIJKQuickScalar_double::ajouter(const IJK_Field_double& field,
+void OpConvDiscQuickIJKScalar_double::ajouter(const IJK_Field_double& field,
                                               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                               IJK_Field_double& result)
 {
@@ -47,7 +47,7 @@ void OpConvDiscIJKQuickScalar_double::ajouter(const IJK_Field_double& field,
 
 }
 
-//void OpConvDiscIJKQuickScalar_double::initialize(const IJK_Splitting& splitting)
+//void OpConvDiscQuickIJKScalar_double::initialize(const IJK_Splitting& splitting)
 //{
 //  OpConvIJKElemCommon_double::initialize(splitting, indicatrice);
 //  input_indicatrice_ = 0;

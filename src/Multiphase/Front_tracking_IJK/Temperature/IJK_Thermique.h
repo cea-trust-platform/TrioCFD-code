@@ -28,7 +28,6 @@
 #include <IJK_Splitting.h>
 #include <IJK_Field.h>
 #include <Parser.h>
-//#include <Interprete.h>
 #include <IJK_Lata_writer.h>
 #include <OpConvIJKQuickScalar.h>
 #include <OpConvIJKAmont.h>
@@ -203,12 +202,12 @@ protected :
   int type_temperature_convection_op_; // 1 : Amont / 2 : Centre2 / 3 : Quick  / 4 : Centre
   OpConvAmontIJK_double temperature_convection_op_amont_;
   OpConvCentre2IJKScalar_double temperature_convection_op_centre2_;
-  OpConvIJKQuickScalar_double temperature_convection_op_quick_;
+  OpConvQuickIJKScalar_double temperature_convection_op_quick_;
   OpConvCentre4IJK_double temperature_convection_op_centre4_;
 
   OpDiffIJKScalar_double diffusion_temperature_op_;
 
-  OpConvDiscIJKQuickScalar_double rho_cp_convection_op_quick_;
+  OpConvDiscQuickIJKScalar_double rho_cp_convection_op_quick_;
 
   // Storage for operators & time scheme:
   int diff_temp_negligible_;

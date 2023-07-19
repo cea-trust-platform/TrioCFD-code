@@ -276,6 +276,8 @@ protected :
 
   void fill_variable_source_and_potential_phi(const double time);
 
+  int size_thermal_problem(const char* thermal_problem);
+
   // GAB, rotation
   int get_direction(const ArrOfDouble& vecteur);
   //
@@ -478,26 +480,31 @@ protected :
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
   // Operators and pressure solver
+
+  /* Velocity diffusion operator:
+   * simple_arithmetic : div(mu grad(u))
+   * full_arithmetic    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
+   *                      mu : moyenne arithmetique
+   * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
+   *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
+   */
   Operateur_IJK_faces_diff velocity_diffusion_op_;
-  Nom type_velocity_diffusion_form_; /* simple_arithmetic : div(mu grad(u))
-  	  	  	  	  	  	  	  	  	 * full_arithmetic    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
-  	  	  	  	  	  	  	  	  	 *                      mu : moyenne arithmetique
-  	  	  	  	  	  	  	  	  	 * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
-  	  	  	  	  	  	  	  	  	 *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
-  	  	  	  	  	  	  	  	  	 */
+  Nom type_velocity_diffusion_form_;
+
+  /*
+   * Velocity convection operator
+   */
+  //  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
+  //  OpConvCentre4IJK_double velocity_convection_op_centre_;
+  //  OpConvAmontIJK_double velocity_convection_op_amont_;
+  //  OpDiffIJK_double velocity_diffusion_op_simple_;
+  //  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
   Operateur_IJK_faces_conv velocity_convection_op_;
-
-//  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
-//  OpConvCentre4IJK_double velocity_convection_op_centre_;
-//  OpConvAmontIJK_double velocity_convection_op_amont_;
-//  OpDiffIJK_double velocity_diffusion_op_simple_;
-//  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
-
   Nom type_velocity_convection_form_; /* non_conservative_simple : rho div(u u)
   	  	  	  	  	  	  	  	  	 * non_conservative_rhou     : div(rho u u) - u div(rho u)
   	  	  	  	  	  	  	  	  	 * conservative              : div(rho u u)
   	  	  	  	  	  	  	  	  	 */
-  //OpConvAmontIJK_double velocity_convection_op_;
+  //  OpConvAmontIJK_double velocity_convection_op_;
   int type_velocity_convection_op_; // 0 : Quick  / 1 : Centre / 2 : Amont
 
   Multigrille_Adrien poisson_solver_;
@@ -591,8 +598,6 @@ protected :
   LIST(IJK_Energie) energie_;
   LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
   LIST(IJK_Thermal) thermal_;
-  //  LIST(IJK_Thermal_Reader) thermal_reader_;
-  //  int thermal_problem_number_;
 
 };
 

@@ -39,36 +39,53 @@ class IJK_Thermal : public DERIV(IJK_Thermal_base)
   Declare_instanciable( IJK_Thermal );
 
 public :
-//  IJK_Thermal_Reader* thermal_reader_;
-//  inline void set_thermal_reader(IJK_Thermal_Reader& thermal_reader);
-//  inline void typer_problem();
-//  inline void typer_problem(std::string string_type);
+  /*
+   * Getters
+   */
+  inline const char* get_thermal_problem_type() { return thermal_problem_type_.c_str(); };
+  inline std::string& get_thermal_problem_type_str() { return thermal_problem_type_; };
+  inline int& get_thermal_rank() { return thermal_rank_; };
+  inline Motcles& get_thermal_words() { return thermal_words_; };
+  inline Motcles& get_thermal_suffix() { return lata_suffix_; };
+  inline const IJK_Field_double& get_temperature() const { return valeur().get_temperature(); };
+  inline IJK_Field_double& get_temperature_ft() { return valeur().get_temperature_ft(); }
+  inline const IJK_Field_double& get_temperature_ana() const { return valeur().get_temperature_ana(); };
+  inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
+  inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
+  inline const double& get_E0() const { return valeur().get_E0(); };
+  inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
+
+  /*
+   * Setters
+   */
+  inline void set_field_T_ana() { return valeur().set_field_T_ana(); };
+
   inline int initialize(const IJK_Splitting& splitting, const int idx);
   inline void update_thermal_properties();
   inline void euler_time_step(const double timestep);
+  inline void rk3_sub_step(const int rk_step,
+                           const double total_timestep,
+                           const double time);
   inline void associer(const IJK_FT_double& ijk_ft);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
                                  const double dxmin) const;
+  inline double compute_global_energy();
+  inline void calculer_ecart_T_ana() { valeur().calculer_ecart_T_ana(); };
+  inline void euler_rustine_step(const double timestep, const double dE);
+  inline void rk3_rustine_sub_step(const int rk_step, const double total_timestep,
+                                   const double fractionnal_timestep, const double time, const double dE);
+  inline void compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
+                                               ArrOfDouble& flux_normal_interp);
 
+protected:
+  int thermal_rank_;
+  std::string thermal_problem_type_;
+  Nom prefix_;
+  Motcles thermal_words_;
+  Motcles lata_suffix_;
 };
-
-//inline void IJK_Thermal::set_thermal_reader(IJK_Thermal_Reader& thermal_reader)
-//{
-//  thermal_reader_ = &thermal_reader;
-//}
-//
-//inline void IJK_Thermal::typer_problem(std::string string_type)
-//{
-//  typer(string_type.c_str());
-//}
-//
-//inline void IJK_Thermal::typer_problem()
-//{
-////  Cout << "Test" << valeur().get_type_thermal_problem() << finl;
-////  Cerr << "Test" << valeur().get_type_thermal_problem() << finl;
-//  typer(thermal_reader_->set_type_thermal_problem().c_str());
-//}
 
 inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
 {
@@ -98,6 +115,35 @@ inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)
 inline double IJK_Thermal::compute_timestep(const double timestep, const double dxmin) const
 {
   return valeur().compute_timestep(timestep, dxmin);
+}
+
+inline double IJK_Thermal::compute_global_energy()
+{
+  return valeur().compute_global_energy();
+}
+
+inline void IJK_Thermal::euler_rustine_step(const double timestep, const double dE)
+{
+  valeur().euler_rustine_step(timestep, dE);
+}
+
+inline void IJK_Thermal::rk3_rustine_sub_step(const int rk_step, const double total_timestep,
+                                              const double fractionnal_timestep, const double time, const double dE)
+{
+  valeur().rk3_rustine_sub_step(rk_step, total_timestep, fractionnal_timestep, time, dE);
+}
+
+inline void IJK_Thermal::rk3_sub_step(const int rk_step,
+                                      const double total_timestep,
+                                      const double time)
+{
+  valeur().rk3_sub_step(rk_step, total_timestep, time);
+}
+
+inline void IJK_Thermal::compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
+                                                          ArrOfDouble& flux_normal_interp)
+{
+  return valeur().compute_interfacial_temperature2(interfacial_temperature, flux_normal_interp);
 }
 
 #endif /* IJK_Thermal_included */

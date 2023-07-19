@@ -53,12 +53,14 @@ Entree& IJK_Thermal_Onefluid::readOn( Entree& is )
 
   lambda_moy_arith_=0;
   type_temperature_convection_form_ = 0;  // Default value: 0 : non conservative
+  conserv_energy_global_=0;
 
   Param param(que_suis_je());
 
   param.ajouter("type_temperature_convection_form", &type_temperature_convection_form_);
   param.dictionnaire("non conservative",0);
   param.dictionnaire("conservative",1);
+  param.ajouter("conserv_energy_global", &conserv_energy_global_);
 
   param.lire_avec_accolades(is);
   Cout << "IJK_Thermal_Onefluid::readOn : Parameters summary. " << finl;
@@ -72,6 +74,7 @@ int IJK_Thermal_Onefluid::initialize(const IJK_Splitting& splitting, const int i
   Cout << que_suis_je() << "::initialize()" << finl;
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
+  temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, lambda_, temperature_, temperature_, temperature_);
   cp_.allocate(splitting, IJK_Splitting::ELEM, 2);
   lambda_.allocate(splitting, IJK_Splitting::ELEM, 1);
   nalloc += 2;

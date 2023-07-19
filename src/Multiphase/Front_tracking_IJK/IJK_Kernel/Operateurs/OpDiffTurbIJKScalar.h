@@ -157,11 +157,11 @@ public:
   OpDiffVectorialAnisotropicIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_vectorial_ = true, is_anisotropic_ = true; }
 };
 
-class OpDiffIJKScalarStructuralOnly_double : public OpDiffIJKScalarGeneric_double
+class OpDiffStructuralOnlyIJKScalar_double : public OpDiffIJKScalarGeneric_double
 {
-  Declare_instanciable_sans_constructeur(OpDiffIJKScalarStructuralOnly_double);
+  Declare_instanciable_sans_constructeur(OpDiffStructuralOnlyIJKScalar_double);
 public:
-  OpDiffIJKScalarStructuralOnly_double() : OpDiffIJKScalarGeneric_double() { is_structural_ = true; }
+  OpDiffStructuralOnlyIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_structural_ = true; }
 };
 
 #include <OpDiffTurbIJKScalar.tpp>

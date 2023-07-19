@@ -35,18 +35,29 @@
 
 class IJK_FT;
 class IJK_Splitting;
+
+/*
+ * TODO:
+ */
 class IJK_Thermique;
-class IJK_Energie;
-class IJK_Thermal_Subresolution;
 class List_IJK_Thermique;
 class list_curseurIJK_Thermique;
 class const_list_curseurIJK_Thermique;
+
+class IJK_Energie;
 class List_IJK_Energie;
 class list_curseurIJK_Energie;
 class const_list_curseurIJK_Energie;
+
+class IJK_Thermal_Subresolution;
 class List_IJK_Thermal_Subresolution;
 class list_curseurIJK_Thermal_Subresolution;
 class const_list_curseurIJK_Thermal_Subresolution;
+
+class IJK_Thermal;
+class List_IJK_Thermal;
+class list_curseurIJK_Thermal;
+class const_list_curseurIJK_Thermal;
 /**
  * All the post-processing stuff of IJK_FT delegated into this helper class:
  */
@@ -135,13 +146,17 @@ public:
   //                                              const double value_for_bad_points,const IJK_Field_double& indic);
   void compute_extended_pressures(const Maillage_FT_IJK& mesh);
   //IJK_Field_double& extended_p);
-  void posttraiter_tous_champs_thermal_subresolution(Motcles& liste,  const int idx) const;
+  /*
+   * TODO:
+   */
   void posttraiter_tous_champs_thermique(Motcles& liste,  const int idx) const;
   void posttraiter_tous_champs_energie(Motcles& liste,  const int idx) const;
-  int posttraiter_champs_instantanes_thermal_subresolution(const Motcles& liste_post_instantanes,
-                                                           const char *lata_name,
-                                                           const int lata_step, const double current_time,
-                                                           IJK_Thermal_Subresolution& itr, const int idx);
+  void posttraiter_tous_champs_thermal_subresolution(Motcles& liste,  const int idx) const;
+  void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
+
+  /*
+   * TODO:
+   */
   int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
                                                const char *lata_name,
                                                const int lata_step, const double current_time,
@@ -150,6 +165,17 @@ public:
                                              const char *lata_name,
                                              const int lata_step, const double current_time,
                                              IJK_Energie& itr,  const int idx);
+  int posttraiter_champs_instantanes_thermal_subresolution(const Motcles& liste_post_instantanes,
+                                                           const char *lata_name,
+                                                           const int lata_step, const double current_time,
+                                                           IJK_Thermal_Subresolution& itr, const int idx);
+  int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
+                                             const char *lata_name,
+                                             const int lata_step, const double current_time,
+                                             IJK_Thermal& itr, const int idx);
+  /*
+   * TODO:
+   */
   int posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
                                                             const char *lata_name,
                                                             const int lata_step, const double current_time,
@@ -158,6 +184,21 @@ public:
                                                           const char *lata_name,
                                                           const int lata_step, const double current_time,
                                                           IJK_Energie& ,  const int idx);
+
+  int posttraiter_champs_instantanes_thermal_interface(const Motcles& liste_post_instantanes,
+                                                       const char *lata_name,
+                                                       const int latastep,
+                                                       const double current_time,
+                                                       IJK_Thermal& itr,
+                                                       const int idx);
+
+  int posttraiter_champs_instantanes_thermal_interface_ref(const Motcles& liste_post_instantanes,
+                                                           const char *lata_name,
+                                                           const int latastep,
+                                                           const double current_time,
+                                                           IJK_Thermal& itr,
+                                                           const int idx);
+
 //  void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
 
   Motcles get_liste_post_instantanes() const
@@ -302,11 +343,11 @@ protected:
 
 
   int sondes_demande_;
-  Sondes_IJK les_sondes_;           // Sondes a traiter
+  Sondes_IJK les_sondes_;  // Sondes a traiter
 
-  //
-  // References to various members of IJK_FT_double that are heavily used in the post:
-  //
+  /*
+   * References to various members of IJK_FT_double that are heavily used in the post:
+   */
   IJK_FT_double& ref_ijk_ft_;
 
   const int& disable_diphasique_;    // yes a ref, not a const value.
@@ -322,13 +363,13 @@ protected:
   LIST(IJK_Thermique)& thermique_;
   LIST(IJK_Energie)& energie_;
   LIST(IJK_Thermal_Subresolution)& thermal_subresolution_;
+  LIST(IJK_Thermal)& thermal_;
+
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;
-
     IJK_Field_double source_temperature_ana_, ecart_source_t_ana_; */
 
-// FixedVector<IJK_Field_double, 3> grad_T_;
-
+  // FixedVector<IJK_Field_double, 3> grad_T_;
 
   Multigrille_Adrien poisson_solver_post_;
 };

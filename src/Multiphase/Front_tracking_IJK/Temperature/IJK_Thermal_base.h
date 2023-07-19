@@ -48,8 +48,8 @@ class IJK_FT_double;
 class IJK_Thermal_base : public Objet_U
 {
 
-  friend class IJK_FT_Post;
-  friend class IJK_FT_double;
+//  friend class IJK_FT_Post;
+//  friend class IJK_FT_double;
   Declare_base( IJK_Thermal_base ) ;
 
 public:
@@ -97,15 +97,35 @@ public:
   {
     return temperature_ ;
   }
+  IJK_Field_double& get_temperature_ft()
+  {
+    return temperature_ft_ ;
+  }
+  const FixedVector<IJK_Field_double, 3>& get_grad_T() const
+  {
+    return grad_T_ ;
+  }
   IJK_Field_double& set_temperature()
   {
     return temperature_ ;
+  }
+  const IJK_Field_double& get_temperature_ana() const
+  {
+    return temperature_ana_ ;
+  }
+  const IJK_Field_double& get_ecart_t_ana() const
+  {
+    return ecart_t_ana_ ;
+  }
+  const IJK_Field_double& get_div_lambda_grad_T() const
+  {
+    return div_coeff_grad_T_volume_ ;
   }
   const IJK_Field_double& get_temperature_adim_bulles() const
   {
     return temperature_adim_bulles_;
   }
-  FixedVector<IJK_Field_double, 3>& get_gradient_temperature()
+  const FixedVector<IJK_Field_double, 3>& get_gradient_temperature() const
   {
     return grad_T_ ;
   }
@@ -118,6 +138,23 @@ public:
     fichier_reprise_temperature_ = lataname;
   }
   void set_field_T_ana();
+
+  /*
+   * Patch from IJK_Thermique
+   */
+  void euler_rustine_step(const double timestep, const double dE);
+  void rk3_rustine_sub_step(const int rk_step, const double total_timestep,
+                            const double fractionnal_timestep, const double time, const double dE);
+  virtual int& get_conserv_energy_global() { return conserv_energy_global_; };
+  const double& get_E0() const { return E0_; };
+
+  void compute_dT_rustine(const double dE);
+  void compute_T_rust(const FixedVector<IJK_Field_double, 3>& velocity);
+
+  void calculer_ecart_T_ana();
+  void compute_interfacial_temperature2(
+    ArrOfDouble& interfacial_temperature,
+    ArrOfDouble& flux_normal_interp); //const ;
 #if 0
   void ecrire_reprise_thermique(SFichier& fichier);
 #endif
@@ -138,7 +175,7 @@ protected:
                          double& E_vap,
                          double& E_mixt,
                          double& E_tot);
-  void calculer_ecart_T_ana();
+
   void source_callback();
   void calculer_temperature_physique_T(const IJK_Field_double&  vx, const double dTm);
   void calculer_temperature_adim_bulles();
@@ -148,8 +185,16 @@ protected:
   //  void calculer_temperature_physique_T_dummy();
 
 
+  /*
+   * Patch to conserve energy
+   */
+  double E0_; //volumique
+  IJK_Field_double T_rust_;
+  IJK_Field_double d_T_rustine_; // Temperature increment to conserve the energy.
+  IJK_Field_double RK3_F_rustine_; // Temporary storage for substeps in the RK3 algorithm for the rustine calculation.
+
   REF(IJK_FT_double) ref_ijk_ft_;
-  Corrige_flux_FT corrige_flux;
+  Corrige_flux_FT corrige_flux_;
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
   int rang_;
 
@@ -225,7 +270,7 @@ protected:
   IJK_Field_double div_coeff_grad_T_volume_;
 
   /*
-   * Fields:
+   * Fields
    */
   IJK_Field_double rho_cp_;
   IJK_Field_double rho_cp_T_;
@@ -234,6 +279,12 @@ protected:
   IJK_Field_double RK3_F_temperature_; // Temporary storage for substeps in the RK3 algorithm.
   FixedVector<IJK_Field_double, 3> storage_; // Temporary storage for fluxes calculation.
   int calculate_local_energy_;
+  int conserv_energy_global_;
+
+  /*
+   * Fields FT
+   */
+  IJK_Field_double temperature_ft_;
 
   /*
    * Post-processing

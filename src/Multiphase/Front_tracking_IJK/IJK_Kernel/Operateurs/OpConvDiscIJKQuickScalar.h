@@ -18,11 +18,11 @@
 
 #include <OpConvIJKElemCommon.h>
 
-class OpConvDiscIJKQuickScalar_double : public OpConvIJKElemCommon_double
+class OpConvDiscQuickIJKScalar_double : public OpConvIJKElemCommon_double
 {
-  Declare_instanciable_sans_constructeur(OpConvDiscIJKQuickScalar_double);
+  Declare_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double);
 public:
-  OpConvDiscIJKQuickScalar_double() : OpConvIJKElemCommon_double() {  };
+  OpConvDiscQuickIJKScalar_double() : OpConvIJKElemCommon_double() {  };
   void calculer(const IJK_Field_double& field,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                 IJK_Field_double& result) override;

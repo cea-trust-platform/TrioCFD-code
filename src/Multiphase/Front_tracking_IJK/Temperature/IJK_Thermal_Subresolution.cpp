@@ -74,9 +74,10 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
+  temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
 
   /*TODO:
-   * Change the operators to add fluxes corrections
+   * Change the operators to add fluxes corrections (Maybe not)
    */
   if (diffusion_flux_correction_)
     {
@@ -114,7 +115,6 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
   const double dz = geom.get_constant_delta(DIRECTION_K);
   const double vol = dx*dy*dz;
   const double rhocp_l = ref_ijk_ft_->get_rho_l() * cp_liquid_;
-//  const double rhocp_v = ref_ijk_ft_->get_rho_v() * cp_vapour_;
   double d_temp_sum=0.;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -127,9 +127,7 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
           d_temperature_(i,j,k) += resu;
           d_temp_sum += ope;
         }
-  Cout << d_temp_sum << finl;
 }
-
 
 void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
 {

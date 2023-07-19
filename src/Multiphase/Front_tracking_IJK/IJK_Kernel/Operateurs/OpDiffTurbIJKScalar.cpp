@@ -237,15 +237,15 @@ Entree& OpDiffVectorialAnisotropicIJKScalar_double::readOn(Entree& is)
   return is;
 }
 
-Implemente_instanciable_sans_constructeur(OpDiffIJKScalarStructuralOnly_double, "OpDiffIJKScalarStructuralOnly_double", OpDiffIJKScalarGeneric_double);
+Implemente_instanciable_sans_constructeur(OpDiffStructuralOnlyIJKScalar_double, "OpDiffStructuralOnlyIJKScalar_double", OpDiffIJKScalarGeneric_double);
 
-Sortie& OpDiffIJKScalarStructuralOnly_double::printOn(Sortie& os) const
+Sortie& OpDiffStructuralOnlyIJKScalar_double::printOn(Sortie& os) const
 {
   //  OpDiffIJKScalarGeneric_double::printOn(os);
   return os;
 }
 
-Entree& OpDiffIJKScalarStructuralOnly_double::readOn(Entree& is)
+Entree& OpDiffStructuralOnlyIJKScalar_double::readOn(Entree& is)
 {
   //  OpDiffIJKScalarGeneric_double::readOn(is);
   return is;

@@ -479,6 +479,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("forcage", &forcage_);  // XD_ADD_P chaine not_set
   param.ajouter("corrections_qdm", &qdm_corrections_); // XD_ADD_P chaine not_set
   // Read list of thermic equations:
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
   param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
@@ -819,6 +822,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   interfaces_.associer(*this);
 
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   for (auto& itr : thermique_)
     itr.associer(*this);
 
@@ -829,9 +835,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     itr.associer(*this);
 
   for (auto& itr : thermal_)
-    {
-      itr.associer(*this);
-    }
+    itr.associer(*this);
 
   run();
   return is;
@@ -1133,6 +1137,9 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
   int idx =0;
   //TODO sauvegarde des champs surfaces (vapeur) et barycentre,
   //eventuellement du med pour voir si la conversion marche.
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   for (auto& itr : thermique_)
     {
       itr.sauvegarder_temperature(lata_name, idx);
@@ -1198,6 +1205,10 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
               << " interfaces " << interfaces_  ;
       fichier << " forcage " << forcage_
               << " corrections_qdm " << qdm_corrections_;
+
+      /*
+       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       */
       /*
        * Temperature
        */
@@ -1302,6 +1313,9 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
   param.ajouter("interfaces", & interfaces_);
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   param.ajouter("thermique", &thermique_);
   param.ajouter("energie", &energie_);
   param.ajouter("thermal_subresolution", &thermal_subresolution_);
@@ -1389,6 +1403,9 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
   const double dt_eq_velocity = 1./(1./dt_cfl+1./dt_fo+1./dt_oh);
 
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   double dt_thermique = 1.e20;
   for (const auto& itr : thermique_)
     {
@@ -1418,7 +1435,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     {
       const double dt_th = itr.compute_timestep(dt_thermal, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
-      dt_thermal= std::min(dt_thermal_subresolution, dt_th);
+      dt_thermal = std::min(dt_thermal_subresolution, dt_th);
     }
 
   const double dt = std::min(max_timestep, timestep_facsec_*std::min(dt_eq_velocity, dt_thermal));
@@ -1620,6 +1637,10 @@ int IJK_FT_double::initialise()
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
   statistiques().begin_count(calculer_thermique_prop_counter_);
+
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   int idx =0;
   for (auto& itr : thermique_)
     {
@@ -1647,7 +1668,9 @@ int IJK_FT_double::initialise()
       idx3++;
     }
 
-
+  /*
+   * Thermal problems
+   */
   int idth =0;
   for (auto& itr : thermal_)
     {
@@ -1660,8 +1683,35 @@ int IJK_FT_double::initialise()
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
 //  if ((energie_.size() > 0) or (thermique_.size() >0) or (thermal_subresolution_.size()>0))
   if (energie_.size() > 0)
+    {
+      interfaces_.set_compute_surfaces_mouillees();
+      for (int i=0; i<2; i++)
+        {
+          interfaces_.switch_indicatrice_next_old();
+          interfaces_.calculer_indicatrice_next(
+            post_.potentiel(),
+            gravite_,
+            delta_rho,
+            sigma_,
+            /*Pour post-traitement : post_.rebuilt_indic()
+            */
+#ifdef SMOOTHING_RHO
+            /* Pour le smoothing : */
+            rho_field_ft_,
+            rho_vapeur_,
+            smooth_density_,
+#endif
+            current_time_, tstep_
+          );
+        }
+    }
+
+  if (size_thermal_problem("onefluidenergy") > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -2204,6 +2254,9 @@ void IJK_FT_double::run()
           maj_indicatrice_rho_mu();
           if (!disable_diphasique_)
             {
+              /*
+               * TODO: Change this block with DERIV CLASS IJK_Thermal
+               */
               for (auto& itr : thermique_)
                 itr.update_thermal_properties();
 
@@ -2322,6 +2375,9 @@ void IJK_FT_double::run()
       // indicatrice_ns_.data() = 1.;
       // indicatrice_ns_next_.data() = 1.;
 
+      /*
+       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       */
       for (auto& itr : thermique_)
         {
           // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
@@ -2347,6 +2403,9 @@ void IJK_FT_double::run()
     {
       Cerr << "Cas normal diphasique IJK_FT::run()" << finl;
 
+      /*
+       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       */
       for (auto& itr : thermique_)
         itr.update_thermal_properties();
 
@@ -2530,6 +2589,9 @@ void IJK_FT_double::run()
                 }
               maj_indicatrice_rho_mu();
 
+              /*
+               * TODO: Change this block with DERIV CLASS IJK_Thermal
+               */
               for (auto& itr : thermique_)
                 {
                   itr.update_thermal_properties();
@@ -2537,6 +2599,18 @@ void IJK_FT_double::run()
                     {
                       const double dE = itr.E0_ - itr.compute_global_energy();
                       itr.euler_rustine_step(timestep_, dE);
+                    }
+                }
+              for (auto& itr : thermal_)
+                {
+                  if (itr.get_thermal_problem_type_str() == "onefluid")
+                    {
+                      itr.update_thermal_properties();
+                      if (itr.get_conserv_energy_global())
+                        {
+                          const double dE = itr.get_E0() - itr.compute_global_energy();
+                          itr.euler_rustine_step(timestep_, dE);
+                        }
                     }
                 }
 
@@ -2632,6 +2706,20 @@ void IJK_FT_double::run()
                                                    current_time_at_rk3_step, dE);
                         }
                     }
+                  for (auto& itr : thermal_)
+                    {
+                      if (itr.get_thermal_problem_type_str() == "onefluid")
+                        {
+                          itr.update_thermal_properties();
+                          if (itr.get_conserv_energy_global())
+                            {
+                              const double dE = itr.get_E0() - itr.compute_global_energy();
+                              itr.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
+                                                       current_time_at_rk3_step, dE);
+                            }
+                        }
+
+                    }
                 }
               // Calcul du terme source force acceleration :
               // GAB, rotation
@@ -2671,6 +2759,9 @@ void IJK_FT_double::run()
                 itr.update_thermal_properties();
 
               for (auto& itr : energie_)
+                itr.update_thermal_properties();
+
+              for (auto& itr : thermal_)
                 itr.update_thermal_properties();
             }
           // GAB, qdm rho_n+1 v_n+1 :
@@ -3897,7 +3988,8 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  if ((thermique_.size() > 0) || (energie_.size()))
+//  if ((thermique_.size() > 0) || (energie_.size()))
+  if (thermal_.size())
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
       // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
@@ -3906,6 +3998,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
       velocity_[2].echange_espace_virtuel(2);
     }
 
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   for (auto& itr : thermique_)
     itr.euler_time_step(timestep_);
 
@@ -4114,6 +4209,9 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
 
+  /*
+   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   */
   for (auto& itr : thermique_)
     {
       itr.rk3_sub_step(rk_step, total_timestep, time);
@@ -4124,6 +4222,29 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
       // ++curseur;
       Cerr << "Le schema RK3 n est pas implemente avec des champs d energie" << finl;
       Process::exit();
+    }
+
+  for (auto& itr : thermal_)
+    {
+      int thermal_rank = itr.get_thermal_rank();
+      switch (thermal_rank)
+        {
+        case 0:
+          Cerr << "RK3 Time scheme is not implemented yet with" << itr.get_thermal_words()[thermal_rank] << finl;
+          break;
+        case 1:
+          Cerr << "RK3 Time scheme is not implemented yet with" << itr.get_thermal_words()[thermal_rank] << finl;
+          break;
+        case 2:
+          itr.rk3_sub_step(rk_step, total_timestep, time);
+          Cerr << "RK3 Time scheme is implemented with" << itr.get_thermal_words()[thermal_rank] << finl;
+          break;
+        case 3:
+          Cerr << "RK3 Time scheme is not implemented  with" << itr.get_thermal_words()[thermal_rank] << finl;
+          break;
+        default:
+          Process::exit();
+        }
     }
 
   if (!frozen_velocity_)
@@ -4962,3 +5083,15 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
     }
   Cout << "AF : compute_and_add_qdm_corrections" << finl;
 }
+
+int IJK_FT_double::size_thermal_problem(const char* thermal_problem)
+{
+  int size=0;
+  for (auto& itr : thermal_)
+    {
+      if (thermal_problem == itr.get_thermal_problem_type())
+        size++;
+    }
+  return size;
+}
+

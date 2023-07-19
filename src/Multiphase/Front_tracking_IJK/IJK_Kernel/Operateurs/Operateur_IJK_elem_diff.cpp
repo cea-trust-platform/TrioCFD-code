@@ -21,7 +21,22 @@
 
 #include <Operateur_IJK_elem_diff.h>
 
-Implemente_instanciable( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV(OpDiffIJKScalarGeneric_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV(OpDiffIJKScalarGeneric_double) ) ;
+
+Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
+{
+  diffusion_op_words_ = Motcles(6);
+  {
+    diffusion_op_words_[0] = "standard";
+    diffusion_op_words_[1] = "uniform";
+    diffusion_op_words_[2] = "anisotropic";
+    diffusion_op_words_[3] = "vectorial";
+    diffusion_op_words_[4] = "vectorialanisotropic";
+    diffusion_op_words_[5] = "structural";
+  }
+  prefix_ = Nom("OpDiff");
+  suffix_ = Nom("IJKScalar_double");
+}
 
 Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 {
@@ -31,7 +46,54 @@ Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 
 Entree& Operateur_IJK_elem_diff::readOn( Entree& is )
 {
-  DERIV(OpDiffIJKScalarGeneric_double)::readOn( is );
+  Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
+  Motcle word;
+  is >> word;
+  Nom type = "";
+  type += prefix_;
+  int diffusion_rank = diffusion_op_words_.search(word);
+  switch(diffusion_rank)
+    {
+    case 0 :
+      {
+        type += "";
+        break;
+      }
+    case 1 :
+      {
+        type += "Uniform";
+        break;
+      }
+    case 2 :
+      {
+        type += "Anisotropic";
+        break;
+      }
+    case 3 :
+      {
+        type += "Vectorial";
+        break;
+      }
+    case 4 :
+      {
+        type += "VectorialAnisotropic";
+        break;
+      }
+    case 5 :
+      {
+        type += "StructuralOnly";
+        break;
+      }
+    default :
+      {
+        Cerr << "ERROR : Diffusion operators that are already implemented are:" << finl;
+        Cerr << diffusion_op_words_ << finl;
+        abort();
+      }
+    }
+  type += suffix_;
+  typer(type);
+  is >> valeur();
   return is;
 }
 

@@ -37,6 +37,7 @@ class Operateur_IJK_elem_conv : public DERIV(OpConvIJKElemCommon_double)
 {
   Declare_instanciable( Operateur_IJK_elem_conv ) ;
 public :
+  inline void typer_convection_op(const char * convection_op);
   inline void initialize(const IJK_Splitting& splitting);
   inline void compute_set(IJK_Field_double& dx);
   inline void compute_add(IJK_Field_double& dx);
@@ -53,7 +54,52 @@ public :
                       IJK_Field_double& result);
   //  DERIV(OpConvIJKElemCommon_double) OpConvIJKElemDeriv;
   //  inline void typer(const char * type);
+protected:
+  Motcles convection_op_words_;
+  Nom prefix_;
+  Nom suffix_;
+  int convection_rank_;
 };
+
+inline void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
+{
+  Cerr << "Read and Cast Convection operators :" << finl;
+  Motcle convection_key(convection_op);
+  convection_rank_ = convection_op_words_.search(convection_key);
+  Nom type = "";
+  type += prefix_;
+  switch(convection_rank_)
+    {
+    case 0 :
+      {
+        type += "Centre2";
+        break;
+      }
+    case 1 :
+      {
+        type += "Quick";
+        break;
+      }
+    case 2 :
+      {
+        type += "DiscQuick";
+        break;
+      }
+    case 3 :
+      {
+        type += "QuickInterface";
+        break;
+      }
+    default :
+      {
+        Cerr << "ERROR : Scalar convection operators that are already implemented are:" << finl;
+        Cerr << convection_op_words_ << finl;
+        abort();
+      }
+    }
+  type += suffix_;
+  typer(type);
+}
 
 inline void Operateur_IJK_elem_conv::initialize(const IJK_Splitting& splitting)
 {
@@ -92,11 +138,5 @@ inline void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
 {
   valeur().ajouter(field, vx, vy, vz, result);
 }
-
-//inline void Operateur_IJK_elem_conv::typer(const char * type)
-//{
-//  Operateur_IJK_elem::typer(type);
-//  OpConvIJKElemDeriv.typer(type);
-//}
 
 #endif /* Operateur_IJK_elem_conv_included */

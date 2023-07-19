@@ -18,12 +18,12 @@
 
 #include <OpConvIJKElemCommon.h>
 
-class OpConvIJKQuickScalar_double : public OpConvIJKElemCommon_double
+class OpConvQuickIJKScalar_double : public OpConvIJKElemCommon_double
 {
-  Declare_instanciable_sans_constructeur(OpConvIJKQuickScalar_double);
+  Declare_instanciable_sans_constructeur(OpConvQuickIJKScalar_double);
 
 public:
-  OpConvIJKQuickScalar_double() : OpConvIJKElemCommon_double() { };
+  OpConvQuickIJKScalar_double() : OpConvIJKElemCommon_double() { };
 
 protected:
 

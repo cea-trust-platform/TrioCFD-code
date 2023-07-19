@@ -21,7 +21,20 @@
 
 #include <Operateur_IJK_elem_conv.h>
 
-Implemente_instanciable( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(OpConvIJKElemCommon_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(OpConvIJKElemCommon_double) ) ;
+
+Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
+{
+  convection_op_words_ = Motcles(4);
+  {
+    convection_op_words_[0] = "centre2";
+    convection_op_words_[1] = "quick";
+    convection_op_words_[2] = "discquick";
+    convection_op_words_[3] = "quickinterface";
+  }
+  prefix_ = Nom("OpConv");
+  suffix_ = Nom("IJKScalar_double");
+}
 
 Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
 {
@@ -31,6 +44,43 @@ Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
 
 Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
 {
-  DERIV(OpConvIJKElemCommon_double)::readOn( is );
+  Cerr << "Read and Cast Operateur_IJK_elem_conv :" << finl;
+  Motcle word;
+  is >> word;
+  Nom type = "";
+  type += prefix_;
+  convection_rank_ = convection_op_words_.search(word);
+  switch(convection_rank_)
+    {
+    case 0 :
+      {
+        type += "Centre2";
+        break;
+      }
+    case 1 :
+      {
+        type += "Quick";
+        break;
+      }
+    case 2 :
+      {
+        type += "DiscQuick";
+        break;
+      }
+    case 3 :
+      {
+        type += "QuickInterface";
+        break;
+      }
+    default :
+      {
+        Cerr << "ERROR : Scalar convection operators that are already implemented are:" << finl;
+        Cerr << convection_op_words_ << finl;
+        abort();
+      }
+    }
+  type += suffix_;
+  typer(type);
+  is >> valeur();
   return is;
 }
