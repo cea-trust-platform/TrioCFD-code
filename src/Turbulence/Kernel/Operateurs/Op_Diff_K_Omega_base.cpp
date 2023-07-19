@@ -26,9 +26,15 @@
 #include <Champ_Uniforme.h>
 #include <Champ_Don.h>
 
-Implemente_base(Op_Diff_K_Omega_base,"Op_Diff_K_Omega_base",Operateur_base);
-Implemente_instanciable(Op_Diff_K_Omega_negligeable,"Op_Diff_K_Omega_negligeable",Op_Diff_K_Omega_base);
-Implemente_instanciable(Op_Diff_K_Omega,"Op_Diff_K_Omega",DERIV(Op_Diff_K_Omega_base));
+Implemente_base(Op_Diff_K_Omega_base, "Op_Diff_K_Omega_base", Operateur_base);
+
+Implemente_instanciable(Op_Diff_K_Omega_negligeable,
+                        "Op_Diff_K_Omega_negligeable",
+                        Op_Diff_K_Omega_base);
+
+Implemente_instanciable(Op_Diff_K_Omega,
+                        "Op_Diff_K_Omega",
+                        DERIV(Op_Diff_K_Omega_base));
 
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.

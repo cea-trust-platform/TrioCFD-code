@@ -23,6 +23,7 @@
 #ifndef Mod_turb_hyd_RANS_komega_included
 #define Mod_turb_hyd_RANS_komega_included
 
+#include <Motcle.h>
 #include <Mod_turb_hyd_RANS_2eq.h>
 class Equation_base;
 class Transport_K_Omega_base;
@@ -72,6 +73,7 @@ protected:
   double Prandtl_K, Prandtl_Omega; // cAlan beware! rename and put in 2eq ?
   double OMEGA_MIN, OMEGA_MAX, K_MIN;
   int lquiet;
+  Motcle model_variant; // default model will be k-omega SST.
 
 };
 

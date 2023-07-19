@@ -31,11 +31,12 @@ Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_komega,
 
 Mod_turb_hyd_RANS_komega::Mod_turb_hyd_RANS_komega()
 {
-  Prandtl_K = 2.; // cAlan: carefull, it is the inverse of the classical definition for code purpose
+  Prandtl_K = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
   Prandtl_Omega = 2.;
-  OMEGA_MIN = 1.e-20;
+  OMEGA_MIN = 1.e-20; // OMEGA_MIN cannot be too small?
   OMEGA_MAX = 1.e+10;
   K_MIN = 1.e-20;
+  model_variant = "SST";
   lquiet = 0;
 }
 /*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)

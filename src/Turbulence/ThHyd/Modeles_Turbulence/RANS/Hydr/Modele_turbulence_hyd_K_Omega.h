@@ -50,6 +50,9 @@ public:
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
 
+  void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega,
+                                    DoubleTab& turbulent_viscosity);
+
   const Equation_base& equation_k_omega(int i) const override
   {
     assert ((i==0));

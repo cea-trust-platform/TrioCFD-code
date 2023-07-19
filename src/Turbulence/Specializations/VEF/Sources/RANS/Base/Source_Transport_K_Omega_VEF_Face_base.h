@@ -42,6 +42,8 @@ public :
   DoubleTab& calculer(DoubleTab&) const override;
   DoubleTab& ajouter(DoubleTab&) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
+  void elem_to_face(const Domaine_VF&, const DoubleTab& grad_elems, DoubleTab& grad_faces) const;
+
   inline void mettre_a_jour(double temps) override { Calcul_Production_K_VEF::mettre_a_jour(temps); }
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { /* Do Nothing */ }
 

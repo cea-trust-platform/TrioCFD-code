@@ -63,6 +63,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
   Mod_turb_hyd_RANS_komega::set_param(param);
+  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P Nom Model variant for k-omega (default value SST)
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
@@ -138,17 +139,12 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
                << " instead of " << n << finl;
           exit();
         }
+
       // A la fin de cette boucle, le tableau visco_turb_K_Omega
       // contient les valeurs de la viscosite turbulente
       // au centre des faces du maillage.
       // Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_K_Omega before",visco_turb_K_Omega);
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Omega(i, 1) <= OMEGA_MIN)
-            visco_turb_K_Omega[i] = 0;
-          else
-            visco_turb_K_Omega[i] = tab_K_Omega(i, 0)/(tab_K_Omega(i, 1)); // k/omega
-        }
+      fill_turbulent_viscosity_tab(tab_K_Omega, visco_turb_K_Omega);
       // Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_K_Omega after",visco_turb_K_Omega);
 
       // On connait donc la viscosite turbulente au centre des faces de chaque element
@@ -159,18 +155,24 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
     }
   else
     {
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Omega(i, 1) <= OMEGA_MIN)
-            visco_turb[i] = 0;
-          else
-            visco_turb[i] = tab_K_Omega(i, 0)/(tab_K_Omega(i, 1)); // k/omega
-        }
+      fill_turbulent_viscosity_tab(tab_K_Omega, visco_turb);
     }
 
   la_viscosite_turbulente.changer_temps(temps);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente after", la_viscosite_turbulente.valeurs());
   return la_viscosite_turbulente;
+}
+
+void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega, DoubleTab& turbulent_viscosity)
+{
+  const int nb_elem = tab_K_Omega.dimension(0);
+  for (int i = 0; i < nb_elem; ++i)
+    {
+      if (tab_K_Omega(i, 1) <= OMEGA_MIN)
+        turbulent_viscosity[i] = 0;
+      else
+        turbulent_viscosity[i] = tab_K_Omega(i, 0)/tab_K_Omega(i, 1); // k/omega
+    }
 }
 
 void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_Temps_base& sch, int avant)
@@ -370,10 +372,10 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 }
 
 // cAlan : fonction pour le bicephale
-// const Equation_base& Modele_turbulence_hyd_K_Eps::equation_k_eps(int i) const
+// const Equation_base& Modele_turbulence_hyd_K_Omega::equation_k_omega(int i) const
 // {
 //   assert ((i==0));
-//   return eqn_transport_K_Eps;
+//   return eqn_transport_K_Omega;
 // }
 
 // cAlan : templatable avec K_Eps

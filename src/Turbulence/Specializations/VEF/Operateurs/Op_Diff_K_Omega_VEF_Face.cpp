@@ -48,14 +48,10 @@ void Op_Diff_K_Omega_VEF_Face::associer(const Domaine_dis& domaine_dis,
                                         const Domaine_Cl_dis& domaine_cl_dis,
                                         const Champ_Inc& ch_diffuse)
 {
-  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse.valeur());
-  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
-  inconnue_ = inco;
-  le_dom_vef = zVEF;
-  la_zcl_vef = zclVEF;
+  inconnue_  = ref_cast(Champ_P1NC, ch_diffuse.valeur());
+  le_dom_vef = ref_cast(Domaine_VEF, domaine_dis.valeur());
+  la_zcl_vef = ref_cast(Domaine_Cl_VEF, domaine_cl_dis.valeur());
 }
-
 
 void Op_Diff_K_Omega_VEF_Face::associer_diffusivite_turbulente()
 {
@@ -68,7 +64,6 @@ void Op_Diff_K_Omega_VEF_Face::associer_diffusivite_turbulente()
   const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
   Op_Diff_K_Omega_VEF_base::associer_diffusivite_turbulente(diff_turb);
 }
-
 
 void  Op_Diff_K_Omega_VEF_Face::calc_visc(ArrOfDouble& diffu_tot, const Domaine_VEF& le_dom,
                                           int num_face, int num2, int dimension_inut,
@@ -97,15 +92,15 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
 
   ArrOfDouble diffu_tot(2);
   ArrOfDouble inv_Prdt(2);
-  inv_Prdt[0]=1./Prdt_K;
-  inv_Prdt[1]=1./Prdt_Omega;
+  inv_Prdt[0] = 1./Prdt_K;
+  inv_Prdt[1] = 1./Prdt_Omega;
 
-  int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
-  const DoubleTab& mu=diffusivite_->valeurs();
+  int is_mu_unif = sub_type(Champ_Uniforme, diffusivite_.valeur());
+  const DoubleTab& mu = diffusivite_->valeurs();
 
-  int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
-  int nb_front=domaine_VEF.nb_front_Cl();
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
+  const int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
+  const int nb_front = domaine_VEF.nb_front_Cl();
+  const DoubleTab& mu_turb = diffusivite_turbulente_->valeurs();
   // double inverse_Prdt_K = 1.0/Prdt_K;
   //double inverse_Prdt_Omega = 1.0/Prdt_Omega;
   int j;
@@ -114,23 +109,23 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
   for (int n_bord=0; n_bord<nb_front; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());;
+      const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());;
       int num1 = 0;
       int num2 = le_bord.nb_faces_tot();
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-          for (int ind_face=num1; ind_face<num2; ind_face++)
+          const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
+          for (int ind_face = num1; ind_face < num2; ind_face++)
             {
               int fac_asso = la_cl_perio.face_associee(ind_face);
               fac_asso = le_bord.num_face(fac_asso);
               int num_face = le_bord.num_face(ind_face);
-              for (int k=0; k<2; k++)
+              for (int k = 0; k < 2; k++)
                 {
-                  int elem = face_voisins(num_face,k);
+                  int elem = face_voisins(num_face, k);
                   double d_mu = mu_turb(elem);
-                  for (int i=0; i<nb_faces_elem; i++)
+                  for (int i = 0; i < nb_faces_elem; i++)
                     {
                       if ( ( (j= elem_faces(elem,i)) > num_face ) && (j != fac_asso) )
                         {
@@ -266,7 +261,7 @@ void Op_Diff_K_Omega_VEF_Face::ajouter_contribution(const DoubleTab& transporte,
   inv_Prdt[1]=1./Prdt_Omega;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
-  int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
+  const int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();
   int nb_comp = 1;
 

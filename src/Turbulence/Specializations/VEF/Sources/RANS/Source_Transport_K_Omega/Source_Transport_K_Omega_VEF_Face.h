@@ -41,7 +41,6 @@ public:
   DoubleTab& ajouter(DoubleTab&) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
-  void elem_to_face(const Domaine_VF&, const DoubleTab& grad_elems, DoubleTab& grad_faces) const;
   void compute_cross_diffusion(DoubleTab&) const override;
 
 protected:

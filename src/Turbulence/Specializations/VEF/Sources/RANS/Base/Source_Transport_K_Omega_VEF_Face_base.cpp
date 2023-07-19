@@ -53,25 +53,56 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::calculer(DoubleTab& resu) con
   return ajouter(resu);
 }
 
+// cAlan, 2023-06-23: salement copié de Source_Chaleur_WC_VEF. À mutualiser.
+void Source_Transport_K_Omega_VEF_Face_base::elem_to_face(const Domaine_VF& domaine,
+                                                          const DoubleTab& grad_elems,
+                                                          DoubleTab& grad_faces) const
+{
+  const DoubleVect& vol = domaine.volumes();
+  const IntTab& elem_faces = domaine.elem_faces();
+  const int nb_face_elem = elem_faces.line_size();
+  const int nb_elem_tot = domaine.nb_elem_tot();
+  const int nb_comp = grad_faces.line_size();
+
+  assert (grad_elems.dimension_tot(0) == nb_elem_tot);
+  assert (grad_faces.dimension_tot(0) == domaine.nb_faces_tot());
+  assert (grad_elems.line_size() == nb_comp);
+
+  grad_faces = 0.;
+  for (int elem = 0; elem < nb_elem_tot; ++elem)
+    for (int s = 0; s < nb_face_elem; ++s)
+      {
+        const int face = elem_faces(elem, s);
+        for (int comp = 0; comp < nb_comp; ++comp)
+          grad_faces(face, comp) += grad_elems(elem, comp) * vol(elem);
+      }
+
+  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
+  for (int f = 0; f < domaine.nb_faces_tot(); ++f)
+    for (int comp = 0; comp < nb_comp; ++comp)
+      grad_faces(f, comp) /= volumes_entrelaces(f)*nb_face_elem;
+}
+
 DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& resu) const
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,
                                                   eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& velocity = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
   const int nb_faces_ = le_dom_VEF->nb_faces();
-  DoubleTrav P {nb_faces_};
+  DoubleTrav production_TKE {nb_faces_};
 
   DoubleTab gradKgradOmega (nb_faces_);
   compute_cross_diffusion(gradKgradOmega);
 
-  const DoubleTab& K = get_K_pour_production(); // voir les classes filles
-  calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K,
-                              vit, visco_turb, _interpolation_viscosite_turbulente);
+  const DoubleTab& TKE = get_K_pour_production(); // voir les classes filles
+  calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, production_TKE,
+                              TKE, velocity, visco_turb,
+                              _interpolation_viscosite_turbulente);
 
-  fill_resu(volumes_entrelaces, P, gradKgradOmega, resu); // voir les classes filles
+  fill_resu(volumes_entrelaces, production_TKE, gradKgradOmega, resu); // voir les classes filles
 
   return resu;
 }

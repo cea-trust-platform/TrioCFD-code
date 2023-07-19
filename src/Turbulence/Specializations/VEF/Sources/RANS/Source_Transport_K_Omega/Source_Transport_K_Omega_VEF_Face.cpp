@@ -125,43 +125,11 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   DoubleTab gradOmega_face(velocity_field_face);
   elem_to_face(domaine, gradOmega_elem, gradOmega_face);
 
-  // Product gradKgradOmega
-  // gradKgradOmega.resize(nb_tot, nb_compo);
-  // Si on a gradKgradOmega en argument, il faut s'assurer qu'il est bien dimensionné à l'initialisation
+  // Dot Product gradKgradOmega
   for (int num_face = 0; num_face < le_dom_VEF->nb_faces(); ++num_face)
     for (int ncompo = 0; ncompo < nbr_velocity_components; ++ncompo)
       gradKgradOmega(num_face) +=
         gradK_face(num_face, ncompo) * gradOmega_face(num_face, ncompo);
-}
-
-// cAlan, 2023-06-23: salement copié de Source_Chaleur_WC_VEF. À mutualiser.
-void Source_Transport_K_Omega_VEF_Face::elem_to_face(const Domaine_VF& domaine,
-                                                     const DoubleTab& grad_elems,
-                                                     DoubleTab& grad_faces) const
-{
-  const DoubleVect& vol = domaine.volumes();
-  const IntTab& elem_faces = domaine.elem_faces();
-  const int nb_face_elem = elem_faces.line_size();
-  const int nb_elem_tot = domaine.nb_elem_tot();
-  const int nb_comp = grad_faces.line_size();
-
-  assert (grad_elems.dimension_tot(0) == nb_elem_tot);
-  assert (grad_faces.dimension_tot(0) == domaine.nb_faces_tot());
-  assert (grad_elems.line_size() == nb_comp);
-
-  grad_faces = 0.;
-  for (int elem = 0; elem < nb_elem_tot; ++elem)
-    for (int s = 0; s < nb_face_elem; ++s)
-      {
-        const int face = elem_faces(elem, s);
-        for (int comp = 0; comp < nb_comp; ++comp)
-          grad_faces(face, comp) += grad_elems(elem, comp) * vol(elem);
-      }
-
-  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
-  for (int f = 0; f < domaine.nb_faces_tot(); ++f)
-    for (int comp = 0; comp < nb_comp; ++comp)
-      grad_faces(f, comp) /= volumes_entrelaces(f)*nb_face_elem;
 }
 
 // cAlan: Tried to get a dedicated function to resize a tab. Make a function for this?
@@ -211,10 +179,9 @@ void Source_Transport_K_Omega_VEF_Face::contribuer_a_avec(const DoubleTab& a,
   const DoubleVect& porosite_face = eqn_K_Omega->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
 
-  // on implicite le -eps et le -eps^2/k
-  // cAlan: to be adapted for k_omega
+  // cAlan: to be adapted for k_omega? Copy of the k-eps method
   for (int face = 0; face < K_Omega.dimension(0); face++)
-    if (K_Omega(face, 0) >= LeK_MIN) // -eps*vol  donne +vol dans la bonne case
+    if (K_Omega(face, 0) >= LeK_MIN)
       {
         const double volporo = porosite_face(face) * volumes_entrelaces(face);
 
