@@ -84,17 +84,14 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   int is_pb_fluide=0;
 
   DoubleTab& hh_imp= h_imp_->valeurs();
-  // DoubleTab& mon_Ti= Ti_wall_.valeur().valeurs_au_temps(temps);
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
-  DoubleTab& Text=T_ext()->valeurs_au_temps(temps);
+  DoubleTab& Text=T_ext()-> valeurs();
+  DoubleTab& mon_Ti= Ti_wall_-> valeurs();
 
   DoubleTab Texttmp(Text);
   DoubleTab Twalltmp(Text);
   Twalltmp.detach_vect();
-
-  DoubleTab& mon_phi = phi_ext_.valeur().valeurs_au_temps(temps);
-  mon_phi = 0;
 
   int opt=0;
   // h of solid
@@ -126,105 +123,108 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
                 hh_imp(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
 
                 Text(ii,jj)=Texttmp(ii,jj);
-                // mon_Ti(ii)=Twalltmp(ii, jj);
+                mon_Ti(ii) = Twalltmp(ii, jj);
               }
-          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ == 1 ))
-            for (int jj=0; jj<nb_comp; jj++)
-              {
-                hh_imp(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
-                Text(ii,jj)=Texttmp(ii,jj);
-
-
-                // mon_Ti(ii)=Twalltmp(ii, jj);
-              }
-
         }
-
-
     }
 
-  for( int n=0; n<2; n++)
+
+
+  Probleme_base &pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_autre_pb_));
+  if (sub_type(Probleme_FT_Disc_gen, pb_gen))
     {
-      numero_T_=n;
-      int taille=mon_h.dimension(0);
-      double I_ref_=1.;
-      if (n==1)
-        I_ref_=0;
+      const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*> (&pb_gen);
+      if (pbft->tcl ().is_activated ())
+	{
+	  DoubleTab &mon_phi = phi_ext_->valeurs ();
+	  mon_phi = 0;
+	  for (int n = 0; n < 2; n++)
+	    {
+	      numero_T_ = n;
+	      int taille = mon_h.dimension (0);
+	      double I_ref_ = 1.;
+	      if (n == 1)
+		I_ref_ = 0;
 
-      for (int ii=0; ii<taille; ii++)
-        {
-          if (I(ii,0) > 0 && I(ii,0) < 1  && (I_ref_ == 1 ))
-            {
-              for (int jj=0; jj<nb_comp; jj++)
-                {
-                  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
-                  const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
-                  const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
-                  // double qtcl =10.;
+	      for (int ii = 0; ii < taille; ii++)
+		{
+		  if (I (ii, 0) > 0 && I (ii, 0) < 1 && (I_ref_ == 1))
+		    {
+		      for (int jj = 0; jj < nb_comp; jj++)
+			{
 
+			  const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl () : nullptr;
 
-                  const ArrOfInt& elems_with_CL_contrib = tcl->elems();
-                  const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
-                  const ArrOfDouble& Q_from_CL = tcl->Q();
+			  const ArrOfInt &faces_with_CL_contrib = tcl->boundary_faces ();
+			  const ArrOfDouble &Q_from_CL = tcl->Q ();
 
-                  Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
-                  const IntTab& face_voisins = le_dom.face_voisins();
-                  const DoubleVect& surface= le_dom.face_surfaces();
+			  const Domaine_VF &le_dom = ref_cast( Domaine_VF, mon_dom_cl_dis->domaine_dis ().valeur ());
+			  const IntTab &face_voisins = le_dom.face_voisins ();
+			  const DoubleVect &surface = le_dom.face_surfaces ();
 
-                  // const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
-                  // const int face = ii+ T_ext().frontiere_dis().frontiere().num_premiere_face();
+			  // const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
+			  // const int face = ii+ T_ext().frontiere_dis().frontiere().num_premiere_face();
 
+			  const Champ_front_calc &ch = ref_cast( Champ_front_calc, T_autre_pb ().valeur ());
+			  const Front_VF &front_vf = ref_cast(Front_VF, ch.front_dis ());
+			  // num_face in Liquid-Domaine
+			  const int face = ii + front_vf.num_premiere_face ();
 
-                  const Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
-                  const Front_VF& front_vf=ref_cast(Front_VF, ch.front_dis());
-                  // num_face in Liquid-Domaine
-                  const int face = ii+ front_vf.num_premiere_face();
+			  const int nb_contact_line_contribution = faces_with_CL_contrib.size_array ();
+			  int nb_contrib = 0;
+			  double flux_local = 0.;
+			  hh_imp (ii, jj) = 0.;
 
+			  for (int idx = 0; idx < nb_contact_line_contribution;
+			      idx++)
+			    {
+			      // element i
 
+			      const int facei = faces_with_CL_contrib[idx];
 
-                  const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
-                  int nb_contrib = 0;
-                  double flux_local = 0.;
-                  hh_imp(ii,jj) = 0.;
+			      if (facei == face)
+				{
+				  nb_contrib++;
+				  const double sign = (face_voisins (face, 0) == -1) ? -1. : 1.;
 
-                  // const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-                  // const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+				  // const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
+				  const int faces = ii + frontiere_dis ().frontiere ().num_premiere_face ();
+				  const double TCL_wall_flux = Q_from_CL[idx]
+				      / surface (faces);
+				  // val should be : -rho*Cp * flux(W)
+				  // probably because the whole energy equation is written with rhoCp somewhere...
+				  // and the sign should be negative for incoming flux (towards the fluid) by convention.
+				  const double val = -sign * TCL_wall_flux;
+				  if (nb_contrib == 1)
+				    flux_local = val;
+				  // hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
+				  else
+				    flux_local += val;
+				  // hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
+				}
+			    }
+			  mon_phi (ii, jj) += flux_local;
 
-                  for (int idx = 0; idx < nb_contact_line_contribution; idx++)
-                    {
-                      // element i
+			  const Equation_base &mon_eqn =
+			      domaine_Cl_dis ().equation ();
+			  const DoubleTab &mon_inco =
+			      mon_eqn.inconnue ().valeurs ();
 
-                      const int facei = faces_with_CL_contrib[idx];
+			  const int faces = ii + frontiere_dis ().frontiere ().num_premiere_face ();
+			  const int elemi = face_voisins (faces, 0) + face_voisins (faces, 1) + 1;
 
-                      if (facei == face)
-                        {
-                          nb_contrib++;
-                          const double sign = (face_voisins(face, 0) == -1) ? -1. : 1.;
+			  mon_Ti (ii, jj) = mon_inco (elemi, 0) + flux_local / mon_h (ii);
+			}
 
-                          // const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
-                          const int faces = ii+ frontiere_dis().frontiere().num_premiere_face();
-                          const double TCL_wall_flux = Q_from_CL[idx]/surface(faces);
-                          // val should be : -rho*Cp * flux(W)
-                          // probably because the whole energy equation is written with rhoCp somewhere...
-                          // and the sign should be negative for incoming flux (towards the fluid) by convention.
-                          const double val = - sign*TCL_wall_flux;
-                          if (nb_contrib == 1)
-                        	  flux_local = val;
-                            // hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
-                          else
-                        	  flux_local += val;
-                            // hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
-                        }
-                    }
-                  mon_phi(ii, jj) += flux_local;
-                }
-
-            }
-        }
+		    }
+		}
+	    }
+	}
     }
 
   numero_T_=0;
   Echange_global_impose::mettre_a_jour(temps);
+  Ti_wall_.mettre_a_jour(temps);
 
 }
 
@@ -294,13 +294,49 @@ int Echange_contact_VDF_FT_Disc_solid::reculer(double temps)
 
 int Echange_contact_VDF_FT_Disc_solid::initialiser(double temps)
 {
-	// phi_ext_lu_ = true;
+
   if (!Echange_contact_VDF_FT_Disc::initialiser(temps))
 	  return 0;
+
+
+
+
 
   Champ_front_calc& cha=ref_cast(Champ_front_calc, T_autre_pb().valeur());
   cha.creer(nom_autre_pb_, nom_bord, nom_champ);
 
+  const Milieu_base &le_milieu = cha.milieu ();
+  int nb_comp = le_milieu.conductivite ()->nb_comp ();
+
+  Nom nom_racc1 = frontiere_dis ().frontiere ().le_nom ();
+  Domaine_dis_base &domaine_dis1 = domaine_Cl_dis ().domaine_dis ().valeur ();
+  int nb_faces_raccord1 =
+      domaine_dis1.domaine ().raccord (nom_racc1).valeur ().nb_faces ();
+
+  Probleme_base &pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_autre_pb_));
+
+  if (sub_type(Probleme_FT_Disc_gen, pb_gen))
+    {
+      const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*> (&pb_gen);
+
+      if (pbft->tcl ().is_activated ())
+	{
+	  phi_ext_lu_ = true;
+
+	  derivee_phi_ext_.typer ("Champ_front_fonc");
+	  derivee_phi_ext_->fixer_nb_comp (nb_comp);
+	  derivee_phi_ext_->associer_fr_dis_base (frontiere_dis ());
+	  derivee_phi_ext_.valeurs ().resize (nb_faces_raccord1, nb_comp);
+
+	  phi_ext_.typer ("Champ_front_fonc");
+	  phi_ext_->fixer_nb_comp (nb_comp);
+	  phi_ext_->associer_fr_dis_base (frontiere_dis ());
+	  phi_ext_.valeurs ().resize (nb_faces_raccord1, nb_comp);
+
+	}
+    }
+
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T2_autre_pb_.valeur());
   return ch.initialiser(temps,domaine_Cl_dis().equation().inconnue());
 }
+

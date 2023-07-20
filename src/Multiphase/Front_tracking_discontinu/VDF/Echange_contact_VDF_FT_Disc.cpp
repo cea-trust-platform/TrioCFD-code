@@ -72,70 +72,89 @@ Entree& Echange_contact_VDF_FT_Disc::readOn( Entree& s )
 }
 void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 {
+  T_autre_pb().mettre_a_jour(temps);
+  indicatrice_.mettre_a_jour(temps);
+
+  const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
+
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
   // le_milieu =  SOLID
   const Milieu_base& le_milieu=ch.milieu();
   int nb_comp = le_milieu.conductivite()->nb_comp();
   assert(nb_comp==1);
 
-  T_autre_pb().mettre_a_jour(temps);
 
   int is_pb_fluide=0;
 
   DoubleTab& mon_h= h_imp_->valeurs();
-  DoubleTab& mon_Ti= Ti_wall_.valeur().valeurs_au_temps(temps);
-  DoubleTab& mon_phi = phi_ext_.valeur().valeurs_au_temps(temps);
-  mon_phi = 0;
+  DoubleTab& mon_Ti= Ti_wall_-> valeurs();
+  DoubleTab& mon_Tex= T_ext()-> valeurs();
+
+
+  DoubleTab Twalltmp(mon_Ti);
+  Twalltmp.detach_vect();
 
   int opt=0;
   calculer_h_autre_pb( autre_h, 0., opt);
   // Here, compute h_diff in the fluid side
   calculer_h_mon_pb(mon_h,0.,opt);
 
-  calculer_Teta_paroi(mon_Ti,mon_h,autre_h,is_pb_fluide,temps);
-  calculer_Teta_equiv(T_ext()->valeurs_au_temps(temps),mon_h,autre_h,is_pb_fluide,temps);
+  calculer_Teta_paroi(Twalltmp,mon_h,autre_h,is_pb_fluide,temps);
+  calculer_Teta_equiv(mon_Tex,mon_h,autre_h,is_pb_fluide,temps);
 
   int taille=mon_h.dimension(0);
   for (int ii=0; ii<taille; ii++)
-    for (int jj=0; jj<nb_comp; jj++)
-      mon_h(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
+    for (int jj=0; jj<nb_comp; jj++) {
+        if (est_egal(I(ii,0),indicatrice_ref_))
+        {
+        	mon_h(ii,jj)=1./(1./autre_h(ii,jj)+1./mon_h(ii,jj));
+            mon_Ti(ii, jj) = Twalltmp(ii, jj);
+        }
+        else
+        {
+        	mon_h(ii,jj) = 0.;
+        	// avoid to overwirte temperature at L-G mixed cell
+        	// as it will be used in TCL model, in particular,
+        	// influence the heat flux in MESO zone
 
-  indicatrice_.mettre_a_jour(temps);
-  const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
+        	// if no TCL_model: as h is set to 0
+        	// T in mixed cell are not important
+        	if (I(ii,0) == 0 || I(ii,0) == 1)
+        		mon_Ti(ii, jj) = Twalltmp(ii, jj);
 
-  for (int ii=0; ii<taille; ii++)
-    for (int jj=0; jj<nb_comp; jj++ )
-      {
-        if (!est_egal(I(ii,0),indicatrice_ref_))
-          {
-            mon_h(ii,jj)=0. ;
-            mon_Ti(ii, jj) = 0.;
-          }
-      }
+        }
+    }
 
+
+  Nom nom_pb=mon_dom_cl_dis->equation().probleme().le_nom();
+  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
+  Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
+
+
+  if (pbft-> tcl().is_activated()) {
+  // phi_ext_ used in *Eval_Diff_VDF_Elem_Gen.tpp* L97
+  DoubleTab& mon_phi = phi_ext_-> valeurs();
+  mon_phi = 0;
 // **************************************To be implemented*******************
         // 2 - phase cells at pb-Boundary when solving T-eq at Liquid side
         //mixed mesh => Text, Twall, mon_h
   if (indicatrice_ref_ == 1) {
-	  Nom nom_pb=mon_dom_cl_dis->equation().probleme().le_nom();
-	  Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
-	  Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
 	  Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
-	  // const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*>(&pb_gen);
-	  // const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
-	  // const ArrOfDouble& Q_from_CL = tcl->Q();
-	  // const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
-
-	  // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
-	  // Probleme ? if called several times???????????????????????
+          /*
 	  ArrOfInt elems_with_CL_contrib;
 	  ArrOfInt faces_with_CL_contrib;
 	  ArrOfDouble mpoint_from_CL;
 	  ArrOfDouble Q_from_CL;
 	  tcl-> compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
-		                                                           faces_with_CL_contrib,
-		                                                           mpoint_from_CL,
-		                                                           Q_from_CL);
+         	                                                           faces_with_CL_contrib,
+         	                                                           mpoint_from_CL,
+          	                                                           Q_from_CL);
+          	                                                           */
+
+
+	  const ArrOfDouble& Q_from_CL = tcl->Q();
+	  const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
+
 
 	  Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
 	  const IntTab& face_voisins = le_dom.face_voisins();
@@ -157,8 +176,6 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 	            int nb_contrib = 0;
 	            double flux_local = 0.;
 
-	            mon_h(ii) = 0.;
-
 	            for (int idx = 0; idx < nb_contact_line_contribution; idx++)
 	              {
 	                const int facei = faces_with_CL_contrib[idx];
@@ -173,13 +190,11 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
 	                    if (nb_contrib == 1)
 	                      {
-	                        // mon_h(ii) = val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
 	                    	flux_local = val;
 	                      }
 
 	                    else
 	                      {
-	                        // mon_h(ii) += val/(mon_inco(elemi, 0) - T_ext()->valeurs_au_temps(temps)(ii));
 	                    	flux_local += val;
 	                      }
 
@@ -189,9 +204,13 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 	            mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - flux_local/autre_h(ii) ;
 	          }
 	      }
+    }
   }
 
+  // put in the end: to make sure to update the *modified* h_imp_, T_ext_ and phi_ext_
   Echange_global_impose::mettre_a_jour(temps);
+  Ti_wall_.mettre_a_jour(temps);
+
 }
 
 
@@ -223,11 +242,6 @@ void Echange_contact_VDF_FT_Disc::completer()
   int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);
 
-  // we will implenment the mis a jour of temperature here
-  Ti_wall_.typer("Champ_front_calc");
-  Ti_wall_.associer_fr_dis_base(T_ext().frontiere_dis());
-  Ti_wall_->completer();
-  Ti_wall_->fixer_nb_valeurs_temporelles(nb_cases);
 }
 
 
@@ -266,39 +280,73 @@ int Echange_contact_VDF_FT_Disc::reculer(double temps)
 
 int Echange_contact_VDF_FT_Disc::initialiser(double temps)
 {
-	phi_ext_lu_ = true;
+  // XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
+  Champ_front_calc &ch = ref_cast(Champ_front_calc, T_autre_pb ().valeur ());
+  ch.creer (nom_autre_pb_, nom_bord, nom_champ);
 
-	// XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
-	Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
-	ch.creer(nom_autre_pb_, nom_bord, nom_champ);
+  const Milieu_base &le_milieu = ch.milieu ();
+  int nb_comp = le_milieu.conductivite ()->nb_comp ();
 
-	const Milieu_base& le_milieu = ch.milieu();
-	int nb_comp = le_milieu.conductivite()->nb_comp();
+  Nom nom_racc1 = frontiere_dis ().frontiere ().le_nom ();
+  Domaine_dis_base &domaine_dis1 = domaine_Cl_dis ().domaine_dis ().valeur ();
+  int nb_faces_raccord1 = domaine_dis1.domaine ().raccord (nom_racc1).valeur ().nb_faces ();
 
-	Nom nom_racc1 = frontiere_dis().frontiere().le_nom();
-	Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
-	int nb_faces_raccord1 = domaine_dis1.domaine().raccord(nom_racc1).valeur().nb_faces();
+  Nom nom_pb = mon_dom_cl_dis->equation ().probleme ().le_nom ();
+  Probleme_base &pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_pb));
 
-	derivee_phi_ext_.typer("Champ_front_fonc");
-	derivee_phi_ext_->fixer_nb_comp(nb_comp);
-	derivee_phi_ext_->associer_fr_dis_base(frontiere_dis());
-	derivee_phi_ext_.valeurs().resize(nb_faces_raccord1,nb_comp);
+  if (sub_type(Probleme_FT_Disc_gen, pb_gen))
+    {
+      const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*> (&pb_gen);
 
-	phi_ext_.typer("Champ_front_fonc");
-	phi_ext_->fixer_nb_comp(nb_comp);
-	phi_ext_->associer_fr_dis_base(frontiere_dis());
-	phi_ext_.valeurs().resize(nb_faces_raccord1,nb_comp);
+      if (pbft->tcl ().is_activated ())
+	{
+	  phi_ext_lu_ = true;
 
+	  derivee_phi_ext_.typer ("Champ_front_fonc");
+	  derivee_phi_ext_->fixer_nb_comp (nb_comp);
+	  derivee_phi_ext_->associer_fr_dis_base (frontiere_dis ());
+	  derivee_phi_ext_.valeurs ().resize (nb_faces_raccord1, nb_comp);
 
-  if (!Echange_contact_VDF::initialiser(temps))
+	  phi_ext_.typer ("Champ_front_fonc");
+	  phi_ext_->fixer_nb_comp (nb_comp);
+	  phi_ext_->associer_fr_dis_base (frontiere_dis ());
+	  phi_ext_.valeurs ().resize (nb_faces_raccord1, nb_comp);
+
+	}
+    }
+
+  // T_autre_pb is ALSO initialised in the following line
+  if (!Echange_contact_VDF::initialiser (temps))
     return 0;
 
+  Ti_wall_.typer ("Champ_front_fonc");
+  Ti_wall_->fixer_nb_comp (1);
+  Ti_wall_->associer_fr_dis_base (frontiere_dis ());
+  Ti_wall_.valeurs ().resize (nb_faces_raccord1, nb_comp);
+
+  Ti_wall_->initialiser (temps, domaine_Cl_dis ().inconnue ());
+  DoubleTab &mon_Ti = Ti_wall_->valeurs ();
+
+  int is_pb_fluide = 0;
+  DoubleTab mon_h (mon_Ti);
+  DoubleTab mautre_h (mon_Ti);
+  int opt = 0;
+  calculer_h_autre_pb (mautre_h, 0., opt);
+  // Here, compute h_diff in the fluid side
+  calculer_h_mon_pb (mon_h, 0., opt);
+
+  // Use Twalltmp to avoid resize distributed array mon_Ti
+  // when calling calculer_Teta_paroi
+  DoubleTab Twalltmp (mon_Ti);
+  Twalltmp.detach_vect ();
+
+  calculer_Teta_paroi (Twalltmp, mon_h, mautre_h, is_pb_fluide, temps);
+
+  int taille = mon_Ti.dimension (0);
+  for (int ii = 0; ii < taille; ii++)
+    mon_Ti (ii, 0) = Twalltmp (ii);
 
 
-  // initialization of Ti_wall_ with temperature of T_autre_pb BECAUSE nom_champ = name of T_autre_pb()
-  // Ti_wall_ is created from T_autre_pb()
-  Champ_front_calc& chT=ref_cast(Champ_front_calc, Ti_wall_.valeur());
-  chT.creer(nom_autre_pb_, nom_bord, nom_champ);
 
   Champ_front_calc& chbis=ref_cast(Champ_front_calc, indicatrice_.valeur());
   return chbis.initialiser(temps,domaine_Cl_dis().equation().inconnue());
