@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -56,8 +57,8 @@ description_fiche = f"""On simule un écoulement monophasique turbulent en RANS
 
 # # A mettre à jour lors de l'ajout d'une configuration (nouveau modèle ou nouveau problème ou les deux) !!!
 
-available_config = ["VEF_k-epsilon", "VDF_k-epsilon", "VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
-available_config_pb_hydr = ["VEF_k-epsilon", "VDF_k-epsilon"]
+available_config = ["VEF_k-epsilon", "VEF_k-omega", "VDF_k-epsilon", "VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
+available_config_pb_hydr = ["VEF_k-epsilon", "VDF_k-epsilon", "VEF_k-omega"]
 available_config_pb_multi = ["VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
 
 """
@@ -68,6 +69,7 @@ param_config={}
 
 # # initialisation :
 param_config["VEF_k-epsilon"] = {}
+param_config["VEF_k-omega"] = {}
 param_config["VDF_k-epsilon"] = {}
 param_config["VDF_k-omega"] = {}
 param_config["VDF_k-tau"] = {}
@@ -78,7 +80,9 @@ param_config["PolyMAC_k-tau"] = {}
 # triangle_mesh
 for config in available_config:
     param_config[config]["trianglemesh"] = ""
-param_config["VEF_k-epsilon"]["trianglemesh"] = "trianguler_H dom"
+    if "VEF" in config:
+        param_config[config]["trianglemesh"] = "trianguler_H dom"
+
 # method de discretisation
 for config in available_config:
     if "VEF" in config:
@@ -152,7 +156,7 @@ for config in available_config:
     elif "k-omega" in config:
         param_config[config]["diss"] = "omega"
     else:
-        param_config[config]["diss"] = ""
+        param_config[config]["diss"] = "eps"
 # CL_diss : Condition limite à la paroi pour l'eq de transport de la dissipation turbulente (tau et omega)
 for config in available_config:
     if "k-tau" in config:
@@ -169,6 +173,30 @@ for config in available_config:
         param_config[config]["diffusion_sup"] = " "
     else:
         param_config[config]["diffusion_sup"] = ""
+## !! Only for pb hydraulique !!
+for config in available_config:
+    if "k-epsilon" in config:
+        param_config[config]["modele_turb"] = "k_epsilon"
+        param_config[config]["equation_hydr"] = "transport_k_epsilon"
+        param_config[config]["turb"] = "k_eps"
+        param_config[config]["CL_turb"] = "frontiere_ouverte_K_eps_impose"
+        param_config[config]["turb_ext"] = "k_eps_ext"
+        param_config[config]["sources"] = "sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }"
+    elif "k-omega" in config:
+        param_config[config]["modele_turb"] = "k_omega"
+        param_config[config]["equation_hydr"] = "transport_k_omega"
+        param_config[config]["turb"] = "k_omega"
+        param_config[config]["CL_turb"] = "frontiere_ouverte_K_omega_impose"
+        param_config[config]["turb_ext"] = "k_omega_ext"
+        param_config[config]["sources"] = ""
+    else:
+        param_config[config]["modele_turb"] = ""
+        param_config[config]["equation_hydr"] = ""
+        param_config[config]["turb"] = ""
+        param_config[config]["CL_turb"] = ""
+        param_config[config]["turb_ext"] = ""
+        param_config[config]["sources"] = ""
+
 
 
 # #
@@ -203,7 +231,7 @@ def substitution(params):
                     "inlet_velocity" : inlet_velocity,
                     "outlet_pressure" : outlet_pressure,
                     "inlet_k" : inlet_k,
-                    "inlet_epsilon" : inlet_epsilon,
+                    "inlet_diss" : CL_diss(config[i], inlet_k, inlet_epsilon),
 
                    "x_prof" : x_prof,
                    "mu" : mu,
@@ -231,6 +259,14 @@ def substitution(params):
                    "CL_k" : "Cond_lim_k_simple_flux_nul " ,
                    "equation" : param_config[config[i]]["equation"],
                    "nb_pas_dt_max" : param_config[config[i]]["nb_pas_dt_max"],
+
+                   # bloc turbulence pb hydr
+                    "modele_turb" : param_config[config[i]]["modele_turb"],
+                    "equation_hydr" : param_config[config[i]]["equation_hydr"],
+                    "turb" : param_config[config[i]]["turb"],
+                    "CL_turb" : param_config[config[i]]["CL_turb"],
+                    "turb_ext" : param_config[config[i]]["turb_ext"],
+                    "sources" : param_config[config[i]]["sources"]
                     }
             dict_list[i][j] = dict
     return dict_list
@@ -246,6 +282,15 @@ def GenerateInputFile(dir,build,substitutions_dict, name):
 ###############################################################################
 ######################### fonctions pré-traitement ############################
 ###############################################################################
+
+def CL_diss(config_name, k, eps):
+    # donne la condition limite en omega et tau à partir de k et epsilon
+    diss = eps
+    if "omega" in config_name:
+        diss = eps/0.09/k
+    elif "tau" in config_name:
+        diss = k*0.09/eps
+    return diss
 
 def sonde_firstpoint(y1,Ny):
     # y1 : taille 1ere bloc de maillage

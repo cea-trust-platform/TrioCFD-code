@@ -98,20 +98,20 @@ Lire pb
             				entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 $inlet_velocity 0
             				sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
 					}
-		Modele_turbulence k_epsilon
+		Modele_turbulence $modele_turb
 					{
-					transport_k_epsilon
+					$equation_hydr
 					{
 						convection		{ amont }
 						diffusion		{ }
-						conditions_initiales 	{ k_eps champ_uniforme 2 $inlet_k $inlet_epsilon }
+						conditions_initiales 	{ $turb champ_uniforme 2 $inlet_k $inlet_diss }
 						conditions_limites	{
-									entree	frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
-            								sortie	frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 $inlet_k $inlet_epsilon
+									entree	$CL_turb Champ_Front_Uniforme 2 $inlet_k $inlet_diss
+            								sortie	frontiere_ouverte $turb_ext Champ_Front_Uniforme 2 $inlet_k $inlet_diss
 									bas	paroi
 									haut	symetrie
 									}
-						sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }
+						$sources
 					}
 					turbulence_paroi loi_standard_hydr dt_impr_ustar  $tmax
 					}
@@ -123,7 +123,7 @@ Lire pb
 					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
 					u		VitesseX		periode 1e8 position_like vitesse
 					k		k		periode 1e8 position_like vitesse
-					diss		eps		periode 1e8 position_like vitesse
+					diss		$diss		periode 1e8 position_like vitesse
 					dist_paroi	Distance_paroi		periode 1e8 position_like vitesse
 					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
 					y_plus			y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0
@@ -138,7 +138,7 @@ Lire pb
 					{
 					vitesse elem
 					k elem
-					eps elem
+					$diss elem
 					y_plus elem
 					pression elem
 					}		
