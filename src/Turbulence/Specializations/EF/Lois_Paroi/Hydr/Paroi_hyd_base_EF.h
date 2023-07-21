@@ -54,6 +54,12 @@ public:
   };
   void imprimer_premiere_ligne_ustar(int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const override;
   void imprimer_ustar_mean_only(Sortie&, int, const LIST(Nom)&, const Nom& ) const override;
+  //Methodes de l interface des champs postraitables
+  //////////////////////////////////////////////////////
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  /////////////////////////////////////////////////////
 
 protected:
 
