@@ -69,6 +69,7 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
 }
 void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 {
+  // update T_autre pb1/2
   T2_autre_pb_.mettre_a_jour(temps);
   T_autre_pb_.mettre_a_jour(temps);
   indicatrice_.mettre_a_jour(temps);
@@ -223,6 +224,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
     }
 
   numero_T_=0;
+  // put in the end: to make sure to update the *modified* h_imp_, phi_ext_, and Text
   Echange_global_impose::mettre_a_jour(temps);
   Ti_wall_.mettre_a_jour(temps);
 

@@ -207,7 +207,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
     }
   }
 
-  // put in the end: to make sure to update the *modified* h_imp_, T_ext_ and phi_ext_
+  // put in the end: to make sure to update the *modified* h_imp_, phi_ext_, and T_ext
   Echange_global_impose::mettre_a_jour(temps);
   Ti_wall_.mettre_a_jour(temps);
 

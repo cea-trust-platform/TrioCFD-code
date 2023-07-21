@@ -28,6 +28,8 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Chimie.h>
 #include <Triple_Line_Model_FT_Disc.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Dirichlet_paroi_defilante.h>
 
 Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
 
@@ -366,4 +368,25 @@ void Probleme_FT_Disc_gen::preparer_calcul(void)
 {
   Cerr<<"Probleme_FT_Disc_gen::preparer_calcul"<<finl;
   Pb_Fluide_base::preparer_calcul();
+}
+
+bool Probleme_FT_Disc_gen::updateGivenFields()
+{
+  // add: fill the lists of TCL model if actived
+  // Which will be used for updated the BCs
+
+  if (tcl ().is_activated ())
+    {
+
+      ArrOfInt elems_with_CL_contrib;
+      ArrOfInt faces_with_CL_contrib;
+      ArrOfDouble mpoint_from_CL;
+      ArrOfDouble Q_from_CL;
+      tcl ().compute_TCL_fluxes_in_all_boundary_cells (elems_with_CL_contrib,
+						       faces_with_CL_contrib,
+						       mpoint_from_CL,
+						       Q_from_CL);
+    }
+  Probleme_base::updateGivenFields();
+  return true;
 }
