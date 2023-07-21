@@ -1,7 +1,10 @@
 3dOscillatingBeamALE_CoarseMesh
 ALE_with_Periodic_BC_3D
 ALE_with_Periodic_BC
+Align_Multiple_CF_Beams_Free_Vibration
+Align_Multiple_CF_Beams_LES
 Beam_CF
+Beam_CF_Resumption
 Beam_PP
 Beam_PP_mobile_probes
 DivaALE_jdd1

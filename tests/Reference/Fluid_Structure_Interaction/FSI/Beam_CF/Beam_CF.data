@@ -42,18 +42,21 @@ Projection_ALE_boundary dom {
 }
 Beam_model dom
 {
-    nb_modes 1 # number of modes #
-    direction 0 # x=0, y=1, z=2 #
-    Young_Module 60.e+6 # Pa #
-    Rho_beam 7500. # kg/m^3 #
-    NewmarkTimeScheme MA
-    Mass_and_stiffness_file_name vibr_pout2tube_coarse_EL.txt
-    Absc_file_name vibr_pout2tube_absc_coarse_EL.txt
-    CI_file_name vibr_pout2tube_coarse_EL_CI.txt
-    Modal_deformation_file_name  1 vibr_pout2tube_coarse_EL_phi_1.txt
-    Output_position_1D 1  500
-    Output_position_3D 1  0.7 0.02 0.02
-    # Restart_file_name SaveBeamForRestart.txt #
+    nb_beam 1
+    Name Poutre {
+	    nb_modes 1 # number of modes #
+	    direction 0 # x=0, y=1, z=2 #
+	    Young_Module 60.e+6 # Pa #
+	    Rho_beam 7500. # kg/m^3 #
+	    NewmarkTimeScheme MA
+	    Mass_and_stiffness_file_name vibr_pout2tube_coarse_EL.txt
+	    Absc_file_name vibr_pout2tube_absc_coarse_EL.txt
+	    CI_file_name vibr_pout2tube_coarse_EL_CI.txt
+	    Modal_deformation_file_name  1 vibr_pout2tube_coarse_EL_phi_1.txt
+	    Output_position_1D 1  500
+	    Output_position_3D 1  0.7 0.02 0.02
+	    # Restart_file_name SaveBeamForRestart.txt #
+    }
 
 }
 

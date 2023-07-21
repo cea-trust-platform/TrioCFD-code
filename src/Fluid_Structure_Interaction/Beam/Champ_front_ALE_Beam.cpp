@@ -60,17 +60,28 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 
   Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, domaine);
 
-  double dt = dom_ale.get_dt();
-  const int nbModes=dom_ale.getBeamNbModes();
+  int nbBordsBeam= dom_ale.getBeamNbBeam(); //give the number of Beam in the domain
+  int index=-1; //position of Beam associated with the boundary front
+  for(int i=0; i<nbBordsBeam; i++)
+    {
+      if(front.le_nom()==dom_ale.getBeamName(i))
+        index=i; //we find the position of Beam associated with the boundary front.le_nom()
+    }
+  if(index==-1)//no match found between the Beam name and the mobile boundaries
+    {
+      Cerr << "The CL name and the Beam name must be the same!";
+      exit();
+    }
 
+  double dt = dom_ale.get_dt();
+  const int nbModes=dom_ale.getBeamNbModes(index);
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
   int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
-  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt);
-
+  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(index,tps, dt);
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -86,17 +97,15 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
           DoubleVect phi(3);
           for(int count=0; count<nbModes; count++ )
             {
-              const DoubleTab& u=dom_ale.getBeamDisplacement(count);
-              const DoubleTab& R=dom_ale.getBeamRotation(count);
-              phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
+              const DoubleTab& u=dom_ale.getBeamDisplacement(index,count);
+              const DoubleTab& R=dom_ale.getBeamRotation(index,count);
+              phi=dom_ale.interpolationOnThe3DSurface(index,x,y,z, u, R);
               for(int comp=0; comp<nb_comp(); comp++)
                 {
                   value[comp] +=beamVelocity[count]*phi[comp];
-
                 }
 
             }
-
           for( j=0; j<nb_comp(); j++)
             {
               vit_som_bord_ALE(faces.sommet(i,k),j)=value[j];

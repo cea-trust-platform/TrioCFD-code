@@ -47,13 +47,14 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
+Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), nbBeam(0), associate_eq(false)
 {
-  beam = new Beam_model();
+
+  beam = new Beam_model[nbBeam];
 }
 Domaine_ALE::~Domaine_ALE()
 {
-  delete beam;
+  delete[] beam;
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -833,7 +834,7 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 
 
 //Read the mechanical beam model parameters. See the Beam class for details
-void Domaine_ALE::reading_beam_model(Entree& is)
+void Domaine_ALE::read_beam(Entree& is, int& count)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -842,7 +843,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Nom masse_and_stiffness_file_name;
   Noms phi_file_name;
   Nom absc_file_name;
-  Nom CI_file_name;
+  Nom CI_file_name="none";
   Nom Restart_file_name="none";
   int var_int;
   int nb_modes;
@@ -854,7 +855,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   is >> motlu;
   if (motlu != accolade_ouverte)
     {
-      Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
+      Cerr << "Erreur a la lecture du Beam\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
       exit();
@@ -867,26 +868,37 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       if(motlu=="nb_modes")
         {
           is >> nb_modes;
-          beam->setNbModes(nb_modes);
-          Cerr << "Number of modes : " <<  beam->getNbModes() << finl;
+          beam[count].setNbModes(nb_modes);
+          Cerr << "Number of modes : " <<  beam[count].getNbModes() << finl;
         }
       if(motlu=="direction")
         {
           is >> var_int;
-          beam->setDirection(var_int);
-          Cerr << "Direction : " <<  beam->getDirection() << finl;
+          beam[count].setDirection(var_int);
+          Cerr << "Direction : " <<  beam[count].getDirection() << finl;
+        }
+      if(motlu=="BaseCenterCoordinates")
+        {
+          is >> var_double;
+          double x=var_double;
+          is >> var_double;
+          double y=var_double;
+          is >> var_double;
+          double z=var_double;
+          beam[count].setCenterCoordinates(x,y,z);
+
         }
       if(motlu=="Young_Module")
         {
           is >> var_double;
-          beam->setYoung(var_double);
-          Cerr << "Young module : " <<  beam->getYoung() << finl;
+          beam[count].setYoung(var_double);
+          Cerr << "Young module : " <<  beam[count].getYoung() << finl;
         }
       if(motlu=="Rho_beam")
         {
           is >> var_double;
-          beam->setRhoBeam(var_double);
-          Cerr << "Rho beam : " <<  beam->getRhoBeam() << finl;
+          beam[count].setRhoBeam(var_double);
+          Cerr << "Rho beam : " <<  beam[count].getRhoBeam() << finl;
         }
       if(motlu=="Mass_and_stiffness_file_name")
         {
@@ -919,18 +931,10 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       if(motlu=="NewmarkTimeScheme")
         {
           is >> nomlu;
-          bool scheme=true;
-          if(nomlu=="FD")
-            scheme=false;
-          else if(nomlu=="MA")
-            scheme=true;
-          else
-            {
-              Cerr << "NewmarkTimeScheme wrong: choose between FD and MA" <<finl;
-              exit();
-            }
-
-          beam->setTimeScheme(scheme);
+          double alpha=-0.1; //default value
+          if(nomlu =="HHT")
+            is>>alpha;
+          beam[count].setTimeScheme(nomlu,alpha);
         }
       if(motlu=="Output_position_1D")
         {
@@ -944,7 +948,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
               output_position_1D[i]=poz;
             }
 
-          beam->setOutputPosition1D(output_position_1D);
+          beam[count].setOutputPosition1D(output_position_1D);
         }
       if(motlu=="Output_position_3D")
         {
@@ -960,7 +964,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
                   output_position_3D(i,j)=poz;
                 }
             }
-          beam->setOutputPosition3D(output_position_3D);
+          beam[count].setOutputPosition3D(output_position_3D);
         }
       if (motlu=="Restart_file_name")
         {
@@ -971,68 +975,56 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       if (motlu == accolade_fermee)
         break;
     }
-  beam->readInputMassStiffnessFiles(masse_and_stiffness_file_name);
-  beam->readInputAbscFiles(absc_file_name);
+  beam[count].readInputMassStiffnessFiles(masse_and_stiffness_file_name);
+  beam[count].readInputAbscFiles(absc_file_name);
   assert(nb_modes==phi_file_name.size());
-  beam->readInputModalDeformation(phi_file_name);
-  beam->readInputCIFile(CI_file_name);
-  fluidForceOnBeam.resize(nb_modes);
-  fluidForceOnBeam=0.;
-  tempsComputeForceOnBeam=0.;
-  if(Restart_file_name!="none")
+  beam[count].readInputModalDeformation(phi_file_name);
+  if(CI_file_name!="none")
     {
-      beam->readRestartFile(Restart_file_name);
-      tempsComputeForceOnBeam=beam->getTime();
-
-      std::string const nomFichier(Restart_file_name);
-      ifstream monFlux(nomFichier.c_str());
-
-      if(monFlux)
-        {
-          double temps, displacement, speed, acceleration, force;
-          for(int i=0; i<nb_modes; i++)
-            {
-              monFlux >> temps >> displacement >> speed >>acceleration>>force;
-              fluidForceOnBeam[i]=force;
-            }
-
-          monFlux.close();
-        }
-      else
-        {
-          Cerr<< "ERROR: Unable to open the file " <<Restart_file_name<<finl;
-        }
+      beam[count].readInputCIFile(CI_file_name);
     }
   else
     {
+      beam[count].initialization();
+    }
+  if(Restart_file_name!="none")
+    {
+      beam[count].readRestartFile(Restart_file_name);
+    }
+  else
+    {
+      Nom beam_name=beam[count].getBeamName();
       //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
-      std::remove("BeamDisplacement1D.txt");
-      std::remove("BeamVelocity1D.txt");
-      std::remove("BeamAcceleration1D.txt");
-      std::remove("BeamDisplacement3D.txt");
-      std::remove("BeamVelocity3D.txt");
-      std::remove("BeamAcceleration3D.txt");
-      std::remove("ModalForceFluide1D.txt");
+      std::remove(beam_name+"Displacement1D.txt");
+      std::remove(beam_name+"Velocity1D.txt");
+      std::remove(beam_name+"Acceleration1D.txt");
+      std::remove(beam_name+"Displacement3D.txt");
+      std::remove(beam_name+"Velocity3D.txt");
+      std::remove(beam_name+"Acceleration3D.txt");
+      std::remove(beam_name+"ModalForceFluide1D.txt");
       //end delete old files
 
-      //prepare the headers of the output file ModalForceFluide1D
-      std::ofstream ofs;
-      ofs.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs<<"# Printing modal 1D fluid force: time mode  ";
-      for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
-      ofs<<endl;
-      ofs.close();
-      //end prepare the headers of the output file ModalForceFluide1D
+      if(je_suis_maitre())
+        {
+          //prepare the headers of the output file ModalForceFluide1D
+          std::ofstream ofs;
+          ofs.open (beam_name+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+          ofs<<"# Printing modal 1D fluid force: time mode  ";
+          for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
+          ofs<<endl;
+          ofs.close();
+          //end prepare the headers of the output file ModalForceFluide1D
+        }
 
-      if(nb_output_points_1D>0)
+      if(nb_output_points_1D>0 && je_suis_maitre())
         {
           // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
           std::ofstream ofs_1;
-          ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_1.open (beam_name+"Displacement1D.txt", std::ofstream::out | std::ofstream::app);
           std::ofstream ofs_2;
-          ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_2.open (beam_name+"Velocity1D.txt", std::ofstream::out | std::ofstream::app);
           std::ofstream ofs_3;
-          ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_3.open (beam_name+"Acceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
           ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
           for(int k=0; k<nb_output_points_1D; k++)
@@ -1060,15 +1052,15 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           ofs_3.close();
           //end prepare the headers
         }
-      if(nb_output_points_3D>0)
+      if(nb_output_points_3D>0 && je_suis_maitre())
         {
           // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
           std::ofstream ofs_1;
-          ofs_1.open ("BeamDisplacement3D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_1.open (beam_name+"Displacement3D.txt", std::ofstream::out | std::ofstream::app);
           std::ofstream ofs_2;
-          ofs_2.open ("BeamVelocity3D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_2.open (beam_name+"Velocity3D.txt", std::ofstream::out | std::ofstream::app);
           std::ofstream ofs_3;
-          ofs_3.open ("BeamAcceleration3D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_3.open (beam_name+"Acceleration3D.txt", std::ofstream::out | std::ofstream::app);
 
           ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
           for(int k=0; k<nb_output_points_3D; k++)
@@ -1099,16 +1091,96 @@ void Domaine_ALE::reading_beam_model(Entree& is)
     }
 
 }
-DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
+//Read the mechanical beam model parameters. See the Beam class for details
+void Domaine_ALE::reading_beam_model(Entree& is)
 {
-  return beam->interpolationOnThe3DSurface(x,y,z, u, R);
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  Nom beam_name="none";
+
+
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
+      Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
+           << motlu;
+      exit();
+    }
+  is >> nomlu;
+  motlu=nomlu;
+  if(motlu=="nb_beam")
+    {
+      is>>nbBeam;
+      if(nbBeam>0)
+        beam = new Beam_model[nbBeam];
+      Cerr << "Beam number : " <<  nbBeam << finl;
+    }
+  else
+    {
+      Cerr << "Erreur a la lecture du Beam model\n";
+      Cerr << "On attendait en premier le nombre de Beam dans le domaine a la place de \n"
+           << motlu;
+      exit();
+    }
+  int count_read_beam=0;
+  while(1)
+    {
+      is >> nomlu;
+      motlu=nomlu;
+      if(motlu=="Name")
+        {
+          is >> beam_name;
+          bool test=false;
+          for (int n=0; n<nb_bords_ALE; n++)
+            {
+              if(les_bords_ALE(n).le_nom()==beam_name)
+                test=true;
+            }
+          if(test)
+            {
+              beam[count_read_beam].setBeamName(beam_name);
+              Cerr << "Beam name : " <<  beam[count_read_beam].getBeamName() << finl;
+            }
+          else
+            {
+              Cerr << "The name of the beam must be the name of the CL for which the mechanical beam model applies, not " << beam_name;
+              exit();
+            }
+          read_beam(is, count_read_beam);
+          count_read_beam++;
+        }
+      else if (motlu == accolade_fermee)
+        {
+          if(count_read_beam!=nbBeam)
+            {
+              Cerr << "We read  "<<count_read_beam <<" model and not "<<nbBeam;
+              Cerr << "Please indicate the right number of beam in the domain";
+              exit();
+            }
+
+          break;
+        }
+      else
+        {
+          Cerr << "Erreur a la lecture du Beam model\n";
+          Cerr << "On attendait le nom du bord a la place de \n"
+               << motlu;
+          exit();
+        }
+
+    }
+
 }
 
-void Domaine_ALE::initializationBeam (double velocity)
+DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const int& i, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
-  beam->initialization(velocity);
+  return beam[i].interpolationOnThe3DSurface(x,y,z, u, R);
 }
-double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+
+/*double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
 {
 
   double dt = 0.;
@@ -1121,48 +1193,55 @@ double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
   //Cerr << "soundSpeed: "<< soundSpeed << endl;
   dt = 0.5*(minSurf/soundSpeed);
   return dt;
+}*/
+
+const Nom& Domaine_ALE::getBeamName(const int& i) const
+{
+  return beam[i].getBeamName();
+}
+const int& Domaine_ALE::getBeamNbModes(const int& i) const
+{
+  return beam[i].getNbModes();
 }
 
-const DoubleTab& Domaine_ALE::getBeamDisplacement(int i) const
+const int& Domaine_ALE::getBeamNbBeam() const
 {
-  return beam->getDisplacement(i);
+  return nbBeam;
 }
-const DoubleTab& Domaine_ALE::getBeamRotation(int i) const
+
+const DoubleTab& Domaine_ALE::getBeamDisplacement(const int& i, const int& j) const
 {
-  return beam->getRotation(i);
+  return beam[i].getDisplacement(j);
+}
+const DoubleTab& Domaine_ALE::getBeamRotation(const int& i, const int& j) const
+{
+  return beam[i].getRotation(j);
 
 }
-const int& Domaine_ALE::getBeamDirection() const
+inline const int& Domaine_ALE::getBeamDirection(const int& i) const
 {
-  return beam->getDirection();
+  return beam[i].getDirection();
 }
-DoubleVect& Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
+DoubleVect& Domaine_ALE::getBeamVelocity(const int& i, const double& tps, const double& dt)
 {
   //if tps=tempsComputeForceOnBeam then the dynamics of the beam has already been solved. We only solve once per time step.
+  double tempsComputeForceOnBeam=beam[i].getTempsComputeForceOnBeam();
   if(tps!=tempsComputeForceOnBeam && dt!=0.)
     {
-      computeFluidForceOnBeam();
-      tempsComputeForceOnBeam = tps; // update the variable tempsComputeForceOnBeam after computing the fluid force
+      computeFluidForceOnBeam(i);
+      beam[i].setTempsComputeForceOnBeam(tps); // update the variable tempsComputeForceOnBeam after computing the fluid force
     }
-  return beam->getVelocity(tps, dt, fluidForceOnBeam);
-}
-const int& Domaine_ALE::getBeamNbModes()
-{
-  return beam->getNbModes();
+  return beam[i].getVelocity(tps, dt);
 }
 
-const DoubleVect& Domaine_ALE::getFluidForceOnBeam()
-{
 
-  return fluidForceOnBeam;
-}
 
 Equation_base& Domaine_ALE::getEquation()
 {
   return eq;
 }
 //Compute the modal fluid force acting on the Beam: sum of a pressure (op_grad.flux_bords) and a viscous term (op_diff.flux_bords) projected on the 3D modal deformation
-void  Domaine_ALE::computeFluidForceOnBeam()
+void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
 {
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
@@ -1171,36 +1250,53 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   const DoubleTab& xv=le_dom_vef.xv();
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
-  const int nbModes=fluidForceOnBeam.size();
+  const int nbModes=getBeamNbModes(i);
 
-  /* if (flux_bords_grad.size()==0)
-     {
-       //The flux_bords are zero during the first time step following a resumption of calculation
-       //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
-       SFichier os("toto_grad.txt");
-       op_grad.impr(os);
-     }*/
+  /*if (flux_bords_grad.size()==0)
+    {
+      //The flux_bords are zero during the first time step following a resumption of calculation
+      //and are updated only at the end of this time step. The call to the "impr" function is used to update flux_bords variables.
+      Cout<<" impr dans Domaine ALE"<<finl;
+      op_grad.impr(Cout);
+    }*/
 
+  //Resumption: The flux_bords_diff is zero during the first time step following a resumption of calculation
+  //and is updated only at the end of this time step. The call to the "ajouter" function is used to update flux_bords variable.
+  double norme_op_diff=mp_norme_vect(flux_bords_diff);
+  if(resumption && norme_op_diff==0. )
+    {
+      DoubleTab resu=eqn_hydr.vitesse().valeurs();
+      resu=0.;
+      op_diff.ajouter(eqn_hydr.vitesse().valeurs(),resu);
+    }
+  //end resumption
+
+  DoubleVect fluidForceOnBeam;
+  fluidForceOnBeam.resize(nbModes);
+  fluidForceOnBeam=0.;
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
-      fluidForceOnBeam=0.;
+
       DoubleVect phi(3);
       phi=0.;
       for (int n=0; n<nb_bords_ALE; n++)
         {
-          int ndeb = les_bords_ALE(n).num_premiere_face();
-          int nfin = ndeb + les_bords_ALE(n).nb_faces();
-
-          for (int face=ndeb; face<nfin; face++)
+          if(les_bords_ALE(n).le_nom()==beam[i].getBeamName())
             {
-              for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+              int ndeb = les_bords_ALE(n).num_premiere_face();
+              int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+              for (int face=ndeb; face<nfin; face++)
                 {
-                  const DoubleTab& u=getBeamDisplacement(nbmodes);
-                  const DoubleTab& R=getBeamRotation(nbmodes);
-                  phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R); //compute the 3D modal deformation
-                  for(int comp=0; comp<3; comp++)
+                  for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
                     {
-                      fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
+                      const DoubleTab& u=getBeamDisplacement(i,nbmodes);
+                      const DoubleTab& R=getBeamRotation(i,nbmodes);
+                      phi=interpolationOnThe3DSurface(i,xv(face,0),xv(face,1),xv(face,2), u, R); //compute the 3D modal deformation
+                      for(int comp=0; comp<3; comp++)
+                        {
+                          fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
+                        }
                     }
                 }
             }
@@ -1208,11 +1304,13 @@ void  Domaine_ALE::computeFluidForceOnBeam()
         }
     }
   mp_sum_for_each_item(fluidForceOnBeam);
+  beam[i].setFluidForceOnBeam(fluidForceOnBeam);
   if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
     {
       std::ofstream ofs_1;
-      ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<tempsComputeForceOnBeam<<" ";
+      ofs_1.precision(32);
+      ofs_1.open (beam[i].getBeamName()+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1<<beam[i].getTempsComputeForceOnBeam()<<" ";
       for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
         ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
       ofs_1<<endl;

@@ -13,7 +13,7 @@ Read_MED {
 }
 # END MESH #
 
-
+VerifierCoin dom { }
 # BEGIN PARTITION
 Partition dom
 {
@@ -32,11 +32,8 @@ END PARTITION #
 boundaries of the domain and specify the speed that must be imposed on them #
 Imposer_vit_bords_ALE dom
 {
-    3 # number of mobile boundaries #
+    1 # number of mobile boundaries #
     Poutre     Champ_front_ALE_Beam 3  0.   0.  0.
-    in_poutre  Champ_front_ALE_Beam 3  0.   0.  0.
-    Out_poutre Champ_front_ALE_Beam 3  0.   0.  0.
-
 }
 # Solver used to solve the system giving the moving mesh velocity #
 # Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  }  } #
@@ -47,19 +44,21 @@ Solver_moving_mesh_ALE dom { PETSc Cholesky { } }
 # For the Beam model into the ALE framework: block to indicate the number of the modes and specify the name of the beam #
 Beam_model dom
 {
-    nb_modes 7 # number of modes #
-    direction 0 # x=0, y=1, z=2 #
-    Young_Module 200.e+9 # Pa #
-    Rho_beam 8100. # kg/m^3 #
-    NewmarkTimeScheme MA
-    Mass_and_stiffness_file_name vibr_pout2tube_coarse_AA.txt
-    Absc_file_name vibr_pout2tube_absc_coarse_AA.txt
-    CI_file_name vibr_pout2tube_coarse_AA_CI.txt
-    Modal_deformation_file_name 7 vibr_pout2tube_coarse_AA_phi_1.txt  vibr_pout2tube_coarse_AA_phi_2.txt vibr_pout2tube_coarse_AA_phi_3.txt vibr_pout2tube_coarse_AA_phi_4.txt vibr_pout2tube_coarse_AA_phi_5.txt vibr_pout2tube_coarse_AA_phi_6.txt vibr_pout2tube_coarse_AA_phi_7.txt
-    Output_position_1D 3 0 250 500
-    Output_position_3D 3 0. 0.02 0.02 0.7 0.02 0.02 0.35 0.02 0.02
-    # Restart_file_name SaveBeamForRestart.txt #
+    nb_beam 1
+    Name Poutre {
+	    nb_modes 7 # number of modes #
+	    direction 0 # x=0, y=1, z=2 #
+	    Young_Module 200.e+9 # Pa #
+	    Rho_beam 8100. # kg/m^3 #
+	    NewmarkTimeScheme MA
+	    Mass_and_stiffness_file_name vibr_pout2tube_coarse_AA.txt
+	    Absc_file_name vibr_pout2tube_absc_coarse_AA.txt
+	    CI_file_name vibr_pout2tube_coarse_AA_CI.txt
+	    Modal_deformation_file_name 7 vibr_pout2tube_coarse_AA_phi_1.txt  vibr_pout2tube_coarse_AA_phi_2.txt vibr_pout2tube_coarse_AA_phi_3.txt vibr_pout2tube_coarse_AA_phi_4.txt 		 vibr_pout2tube_coarse_AA_phi_5.txt vibr_pout2tube_coarse_AA_phi_6.txt vibr_pout2tube_coarse_AA_phi_7.txt
+	    Output_position_1D 3 0 250 500
+	    Output_position_3D 3 0. 0.02 0.02 0.7 0.02 0.02 0.35 0.02 0.02
 
+    }
 }
 
 # I select a discretization #
@@ -127,9 +126,6 @@ Read pb
         # Boundary conditions #
         boundary_conditions {
             Poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3  0.   0.  0.
-            in_poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3    0.   0.  0.
-            Out_poutre   frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3   0.   0.  0.
-
             Wall  paroi_fixe
             In    frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0. 0. 0.
             Out   frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.

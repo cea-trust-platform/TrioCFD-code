@@ -36,7 +36,7 @@
 // Fluid-structure interaction model.
 // Reduced mechanical model: a beam model (1d).
 // Resolution based on a modal analysis.
-// Temporal discretization: Newmark
+// Temporal discretization: Newmark finite differences, Newmark mean acceleration,  or Hilber-Hughes-Taylor (HHT)
 // ALE coupling with the reduced beam model
 /////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +62,8 @@ public :
   inline void setBeamName(const Nom&) ;
   inline const Nom& getFileName() const;
   inline void setFileName(const Nom&) ;
-  inline const bool& getTimeScheme() const;
-  inline void setTimeScheme(const bool&) ;
+  inline const Nom& getTimeScheme() const;
+  inline void setTimeScheme(const Nom&, double&) ;
   inline void setOutputPosition1D(const DoubleVect&) ;
   inline void setOutputPosition3D(const DoubleTab&) ;
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
@@ -73,10 +73,12 @@ public :
   void readRestartFile(Nom& Restart_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
-  void initialization(double velocity);
-  DoubleVect& NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce);
-  DoubleVect& NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce);
-  DoubleVect& getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce);
+  void initialization(double displacement);
+  void initialization();
+  DoubleVect& NewmarkSchemeFD (const double& dt);
+  DoubleVect& NewmarkSchemeMA (const double& dt);
+  DoubleVect& TimeSchemeHHT (const double& dt);
+  DoubleVect& getVelocity(const double& tps, const double& dt);
   inline double soundSpeed();
   inline  double getMass(int i);
   inline  double getStiffness(int i);
@@ -85,7 +87,10 @@ public :
   void saveBeamForRestart() const;
   void printOutputPosition1D() const;
   void printOutputPosition3D() const;
-
+  inline void setFluidForceOnBeam(const DoubleVect&);
+  inline void setTempsComputeForceOnBeam(const double&);
+  inline const double& getTempsComputeForceOnBeam() const;
+  void setCenterCoordinates(const double&,const double&, const double&);
 protected :
   int nbModes_;
   int direction_; //x=0, y=1, z=2
@@ -101,11 +106,18 @@ protected :
   DoubleVect qHalfSpeed_; // Beam 1d speed at dt/2
   DoubleVect qAcceleration_; //Beam 1d acceleration
   DoubleVect qDisplacement_; //Beam 1d displacement
-  bool timeScheme_; // Time discretization scheme
+  Nom timeScheme_; // Time discretization scheme
   //DoubleTab phi3D_;
   double temps_;
   DoubleVect output_position_1D_; //post-treatment of the 1d position of the points (points on the Beam)
   DoubleTab output_position_3D_; // post-treatment of the 3d position of the points (points on the 3d surface)
+  Nom beamName_;
+  double alpha_;
+  DoubleVect fluidForceOnBeam_; //Fluid force acting on the IFS boundary
+  double tempsComputeForceOnBeam_;
+  double x0_; //x-coordinate of the center of the Beam base
+  double y0_; //y-coordinate of the center of the Beam base
+  double z0_; //z-coordinate of the center of the Beam base
 
 };
 inline const int& Beam_model::getNbModes() const
@@ -145,13 +157,14 @@ inline void Beam_model::setRhoBeam(const double& rho)
   rho_=rho;
 }
 
-inline const bool& Beam_model::getTimeScheme() const
+inline const Nom& Beam_model::getTimeScheme() const
 {
   return timeScheme_;
 }
-inline void Beam_model::setTimeScheme(const bool& timeScheme)
+inline void Beam_model::setTimeScheme(const Nom& timeScheme, double& alpha)
 {
   timeScheme_=timeScheme;
+  alpha_=alpha;
 }
 inline double Beam_model::soundSpeed()
 {
@@ -169,28 +182,51 @@ inline double  Beam_model::getStiffness(int i)
   return stiffness_[i];
 }
 
-const DoubleTab& Beam_model::getDisplacement(int i) const
+inline const DoubleTab& Beam_model::getDisplacement(int i) const
 {
   assert(i<nbModes_);
   return u_(i);
 }
-const DoubleTab& Beam_model::getRotation(int i) const
+inline const DoubleTab& Beam_model::getRotation(int i) const
 {
   assert(i<nbModes_);
   return R_(i);
 
 }
 
-void Beam_model::setOutputPosition1D(const DoubleVect& pos)
+inline void Beam_model::setOutputPosition1D(const DoubleVect& pos)
 {
   output_position_1D_=pos;
 
 }
-void Beam_model::setOutputPosition3D(const DoubleTab& pos)
+inline void Beam_model::setOutputPosition3D(const DoubleTab& pos)
 {
   output_position_3D_=pos;
 
 }
 
+inline const Nom& Beam_model::getBeamName() const
+{
+  return beamName_;
+}
+inline void Beam_model::setBeamName(const Nom& value)
+{
+  beamName_=value;
+}
+inline void Beam_model::setFluidForceOnBeam(const DoubleVect& force)
+{
+
+  fluidForceOnBeam_=force;
+}
+
+inline void Beam_model::setTempsComputeForceOnBeam(const double& tps)
+{
+  tempsComputeForceOnBeam_=tps;
+}
+
+inline const double& Beam_model::getTempsComputeForceOnBeam() const
+{
+  return tempsComputeForceOnBeam_;
+}
 
 #endif /* Beam_model_included */
