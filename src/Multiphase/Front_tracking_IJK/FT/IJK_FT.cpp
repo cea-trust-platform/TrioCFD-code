@@ -1382,7 +1382,7 @@ int IJK_FT_double::initialise()
             }
           // duCluzeau
           // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
-          // si on commence le calcul à t !=0 avec un decallage
+          // si on commence le calcul a t !=0 avec un decallage
 
           velocity_[0].change_to_sheared_reference_frame(1, 1);
           velocity_[1].change_to_sheared_reference_frame(1, 2);
@@ -1397,7 +1397,7 @@ int IJK_FT_double::initialise()
 //          for (int dir = 0; dir < 3; dir++)
 //          {
 //			  std::cout << std::endl;
-//			  std::cout << " ########### DIR = " << dir <<"  #############" << std::endl;
+//			  std::cout << " ########### DIR = " << dir <<"  #############" << std::endl;
 //			  std::cout << std::endl;
 //        	  for (int j = -2; j < velocity_[dir].nj() + 2; j++)
 //        	  {
@@ -1504,17 +1504,22 @@ int IJK_FT_double::initialise()
         current_time_, tstep_
       );
     }
-  interfaces_.calculer_kappa_ft(kappa_ft_);
-  if(boundary_conditions_.get_correction_interp_monofluide())
+  if (!disable_diphasique_)
     {
-      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
-    }
+      interfaces_.calculer_kappa_ft(kappa_ft_);
+      if(boundary_conditions_.get_correction_interp_monofluide())
+        {
+          calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+          pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+          pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+        }
 
-  rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  if (use_inv_rho_)
-    inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      if (use_inv_rho_)
+        inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+    }
+  else
+    kappa_ft_.data() =0.;
   maj_indicatrice_rho_mu();
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
@@ -1562,18 +1567,22 @@ int IJK_FT_double::initialise()
           );
         }
     }
-  interfaces_.calculer_kappa_ft(kappa_ft_);
-  if(boundary_conditions_.get_correction_interp_monofluide())
+  if (!disable_diphasique_)
     {
-      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+      interfaces_.calculer_kappa_ft(kappa_ft_);
+      if(boundary_conditions_.get_correction_interp_monofluide())
+        {
+          calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
+          pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+          pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+        }
+
+      rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      if (use_inv_rho_)
+        inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
     }
-
-  rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  if (use_inv_rho_)
-    inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-
+  else
+    kappa_ft_.data() = 0.;
   return nalloc;
 }
 /*
