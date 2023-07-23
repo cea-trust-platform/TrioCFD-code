@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,40 +12,25 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : IJK_Thermal_Onefluid_energy.cpp
+// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
+//
+/////////////////////////////////////////////////////////////////////////////
 
-#ifndef OpConvIJKQuickScalar_include
-#define OpConvIJKQuickScalar_include
+#include <IJK_Thermal_Onefluid_Energy.h>
 
-#include <OpConvIJKElemCommon.h>
+Implemente_instanciable( IJK_Thermal_Onefluid_Energy, "IJK_Thermal_Onefluid_Energy", IJK_Thermal_base ) ;
 
-class OpConvQuickIJKScalar_double : public OpConvIJKElemCommon_double
+Sortie& IJK_Thermal_Onefluid_Energy::printOn( Sortie& os ) const
 {
-  Declare_instanciable_sans_constructeur(OpConvQuickIJKScalar_double);
+  IJK_Thermal_base::printOn( os );
+  return os;
+}
 
-public:
-  OpConvQuickIJKScalar_double() : OpConvIJKElemCommon_double() { };
-
-protected:
-
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
-
-private:
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
-
-};
-
-#include <OpConvIJKQuickScalar.tpp>
-
-#endif
+Entree& IJK_Thermal_Onefluid_Energy::readOn( Entree& is )
+{
+  IJK_Thermal_base::readOn( is );
+  return is;
+}

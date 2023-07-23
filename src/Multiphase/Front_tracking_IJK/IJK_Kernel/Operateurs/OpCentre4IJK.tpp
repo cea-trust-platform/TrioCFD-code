@@ -12,8 +12,8 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-#ifndef OpCentre4IJK_H_TPP
-#define OpCentre4IJK_H_TPP
+#ifndef OpCentre4IJK_TPP_included
+#define OpCentre4IJK_TPP_included
 
 // Methode appelee a chaque couche de vitesses calculees, apres le calcul de la divergence du flux
 //  div(u x rho_u) pour la composante _DIR_ de vitesse, par Operateur_IJK_faces_base_double::compute_

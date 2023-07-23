@@ -22,10 +22,10 @@
 #ifndef Operateur_IJK_faces_diff_included
 #define Operateur_IJK_faces_diff_included
 
-#include <OpDiffTurbIJK.h>
 #include <TRUST_Deriv.h>
+#include <Operateur_IJK_faces_diff_base.h>
 
-class Operateur_IJK_faces_diff : public DERIV( OpDiffIJKFacesGeneric_double )
+class Operateur_IJK_faces_diff : public DERIV( Operateur_IJK_faces_diff_base_double )
 {
   Declare_instanciable( Operateur_IJK_faces_diff ) ;
 public:
@@ -66,12 +66,38 @@ public:
   inline const IJK_Field_local_double& get_divergence();
   inline const IJK_Field_local_double& get_coeff_tensor(DIRECTION _COMPO1_, DIRECTION _COMPO2_);
 
+  /*
+   * ReadOn
+   */
+  Entree& typer_diffusion_op( Entree& is );
+  void typer_diffusion_op( const char * diffusion_op );
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
+  void set_param(Param& param);
+  Nom get_diffusion_op_type( Motcle word );
+  /*
+   * Getters
+   */
+  Nom get_diffusion_op_option() { return diffusion_option_; };
+  Nom get_diffusion_op() { return diffusion_op_; };
+  /*
+   * Setters
+   */
+
+
 //  inline void set_molecular_nu(const IJK_Field_local_double& molecular_nu);
 //  inline void set_turbulent_nu(const IJK_Field_local_double& turbulent_nu);
 //  inline void set_turbulent_k_energy(const IJK_Field_local_double& turbulent_k_energy);
 //  inline const IJK_Field_local_double& get_molecular_nu();
 //	inline const IJK_Field_local_double& get_turbulent_nu();
 //	inline const IJK_Field_local_double& get_turbulent_k_energy();
+protected:
+  Motcles diffusion_op_words_;
+  Motcles diffusion_op_options_;
+  Nom prefix_;
+  Nom suffix_;
+  int diffusion_rank_;
+  Nom diffusion_op_;
+  Nom diffusion_option_;
 };
 
 inline double Operateur_IJK_faces_diff::compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)

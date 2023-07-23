@@ -22,8 +22,8 @@
 #ifndef Operateur_IJK_elem_diff_included
 #define Operateur_IJK_elem_diff_included
 
-#include <OpDiffTurbIJKScalar.h>
 #include <TRUST_Deriv.h>
+#include <Operateur_IJK_elem_diff_base.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -33,13 +33,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_diff : public DERIV(OpDiffIJKScalarGeneric_double)
+class Operateur_IJK_elem_diff : public DERIV( Operateur_IJK_elem_diff_base_double )
 {
 
   Declare_instanciable( Operateur_IJK_elem_diff ) ;
 
 public :
-  inline void typer_diffusion_op(const char * diffusion_op);
   inline void initialize(const IJK_Splitting& splitting);
   inline void compute_set(IJK_Field_double& dx);
   inline void compute_add(IJK_Field_double& dx);
@@ -51,125 +50,40 @@ public :
                       IJK_Field_double& result,
                       const IJK_Field_local_double& boundary_flux_kmin,
                       const IJK_Field_local_double& boundary_flux_kmax);
-  inline void set_conductivity_coefficient(const double& uniform_lambda,
-                                           const IJK_Field_local_double& lambda,
-                                           IJK_Field_local_double& coeff_field_x,
-                                           IJK_Field_local_double& coeff_field_y,
-                                           IJK_Field_local_double& coeff_field_z);
+  /*
+   * ReadOn
+   */
+  void typer_diffusion_op(const char * diffusion_op);
+  Entree& typer_diffusion_op(Entree& is);
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
+  void set_param(Param& param);
+  Nom get_convection_op_type(Motcle word);
+
+  /*
+   * Getters
+   */
+
+  /*
+   * Setters
+   */
   inline void set_uniform_lambda(const double& uniform_lambda);
   inline void set_lambda(const IJK_Field_local_double& lambda);
   inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
                               IJK_Field_local_double& coeff_field_y,
                               IJK_Field_local_double& coeff_field_z);
-  //  inline void typer(const char * type);
+  void set_conductivity_coefficient(const double& uniform_lambda,
+                                    const IJK_Field_local_double& lambda,
+                                    IJK_Field_local_double& coeff_field_x,
+                                    IJK_Field_local_double& coeff_field_y,
+                                    IJK_Field_local_double& coeff_field_z);
 protected:
   Motcles diffusion_op_words_;
   Nom prefix_;
   Nom suffix_;
   int diffusion_rank_;
+  Nom diffusion_op_;
+  Nom diffusion_op_options_;
 };
-
-inline void Operateur_IJK_elem_diff::set_conductivity_coefficient(const double& uniform_lambda,
-                                                                  const IJK_Field_local_double& lambda,
-                                                                  IJK_Field_local_double& coeff_field_x,
-                                                                  IJK_Field_local_double& coeff_field_y,
-                                                                  IJK_Field_local_double& coeff_field_z)
-{
-  switch(diffusion_rank_)
-    {
-    case 0 :
-      {
-        // Standard
-        set_lambda(lambda);
-        break;
-      }
-    case 1 :
-      {
-        // Uniform
-        set_uniform_lambda(uniform_lambda);
-        break;
-      }
-    case 2 :
-      {
-        // Anisotropic
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
-        break;
-      }
-    case 3 :
-      {
-        // Vectorial
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
-        break;
-      }
-    case 4 :
-      {
-        // VectorialAnisotropic
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
-        break;
-      }
-    case 5 :
-      {
-        // StructuralOnly
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
-        break;
-      }
-    default :
-      {
-        Cerr << "ERROR : The conductivity can not be set properly" << finl;
-        abort();
-      }
-    }
-}
-
-inline void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op)
-{
-  Cerr << "Read and Cast Diffusion operators :" << finl;
-  Motcle diffusion_key(diffusion_op);
-  diffusion_rank_ = diffusion_op_words_.search(diffusion_key);
-  Nom type = "";
-  type += prefix_;
-  switch(diffusion_rank_)
-    {
-    case 0 :
-      {
-        type += "";
-        break;
-      }
-    case 1 :
-      {
-        type += "Uniform";
-        break;
-      }
-    case 2 :
-      {
-        type += "Anisotropic";
-        break;
-      }
-    case 3 :
-      {
-        type += "Vectorial";
-        break;
-      }
-    case 4 :
-      {
-        type += "VectorialAnisotropic";
-        break;
-      }
-    case 5 :
-      {
-        type += "StructuralOnly";
-        break;
-      }
-    default :
-      {
-        Cerr << "ERROR : Diffusion operators that are already implemented are:" << finl;
-        Cerr << diffusion_op_words_ << finl;
-        abort();
-      }
-    }
-  type += suffix_;
-  typer(type);
-}
 
 inline void Operateur_IJK_elem_diff::initialize(const IJK_Splitting& splitting)
 {

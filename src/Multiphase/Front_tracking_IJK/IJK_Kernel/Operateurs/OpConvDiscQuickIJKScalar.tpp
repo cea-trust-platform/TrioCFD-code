@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvDiscIJKQuickScalar_H_TPP
-#define OpConvDiscIJKQuickScalar_H_TPP
+#ifndef OpConvDiscQuickIJKScalar_TPP_included
+#define OpConvDiscQuickIJKScalar_TPP_included
 
 #include <IJK_Field_simd_tools.h>
 

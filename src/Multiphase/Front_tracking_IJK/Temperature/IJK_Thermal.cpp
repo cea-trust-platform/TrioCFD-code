@@ -52,6 +52,11 @@ Sortie& IJK_Thermal::printOn( Sortie& os ) const
 
 Entree& IJK_Thermal::readOn( Entree& is )
 {
+  return typer_thermal(is);
+}
+
+Entree& IJK_Thermal::typer_thermal( Entree& is )
+{
   Cerr << "Read and Cast IJK_Thermal :" << finl;
   Motcle word;
   is >> word;

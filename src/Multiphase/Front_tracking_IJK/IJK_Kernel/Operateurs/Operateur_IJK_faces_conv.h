@@ -22,13 +22,11 @@
 #ifndef Operateur_IJK_faces_conv_included
 #define Operateur_IJK_faces_conv_included
 
-#include <OpConvIJKFacesCommon.h>
-#include <OpConvIJKQuickSharp.h>
-#include <OpCentre4IJK.h>
-#include <OpConvIJKAmont.h>
 #include <TRUST_Deriv.h>
+#include <Operateur_IJK_faces_conv_base.h>
+#include <OpConvAmontIJK.h>
 
-class Operateur_IJK_faces_conv : public DERIV( OpConvIJKFacesCommon_double )
+class Operateur_IJK_faces_conv : public DERIV( Operateur_IJK_faces_conv_base_double )
 {
   Declare_instanciable( Operateur_IJK_faces_conv ) ;
 
@@ -54,6 +52,31 @@ public:
                                        const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
                                        IJK_Field_double& div_rho_u);
+
+  /*
+   * ReadOn
+   */
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
+  void set_param(Param& param);
+  void typer_convection_op(const char * convection_op);
+  Entree& typer_convection_op(Entree& is);
+  Nom get_convection_op_type( Motcle word );
+  /*
+   * Getters
+   */
+  inline Nom get_convection_op_option() { return convection_option_; };
+  inline Nom get_convection_op() { return convection_op_; };
+  /*
+   * Setters
+   */
+protected:
+  Motcles convection_op_words_;
+  Motcles convection_op_options_;
+  Nom prefix_;
+  Nom suffix_;
+  Nom convection_op_;
+  Nom convection_option_;
+  int convection_rank_;
 };
 
 inline double Operateur_IJK_faces_conv::compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)

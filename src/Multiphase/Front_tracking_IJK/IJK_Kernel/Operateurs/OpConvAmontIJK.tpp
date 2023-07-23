@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKAmont_H_TPP
-#define OpConvIJKAmont_H_TPP
+#ifndef OpConvAmontIJK_TPP_included
+#define OpConvAmontIJK_TPP_included
 
 #include <IJK_Field_simd_tools.h>
 

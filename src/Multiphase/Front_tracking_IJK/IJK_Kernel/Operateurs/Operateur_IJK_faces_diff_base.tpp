@@ -13,8 +13,8 @@
  *
  *****************************************************************************/
 
-#ifndef OpDiffTurbIJK_H_TPP
-#define OpDiffTurbIJK_H_TPP
+#ifndef Operateur_IJK_faces_diff_base_TPP_included
+#define Operateur_IJK_faces_diff_base_TPP_included
 #include <stat_counters.h>
 
 /*
@@ -42,7 +42,7 @@
  *
  */
 template<DIRECTION _DIR_, DIRECTION _VCOMPO_>
-void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
+void Operateur_IJK_faces_diff_base_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
   const int idir = (int)_DIR_;
   const int icompo = (int)_VCOMPO_;
@@ -95,7 +95,7 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
                     break;
                   }
                 default:
-                  Cerr << "OpDiffIJKFacesGeneric_double::compute_flux_ wrong boundary condition." << finl;
+                  Cerr << "Operateur_IJK_faces_diff_base_double::compute_flux_ wrong boundary condition." << finl;
                   Process::exit();
                 }
               return;
@@ -115,7 +115,7 @@ void OpDiffIJKFacesGeneric_double::compute_flux_(IJK_Field_local_double& resu, c
 
 
 template<DIRECTION _DIR_, DIRECTION _VCOMPO_>
-void OpDiffIJKFacesGeneric_double::flux_loop_(IJK_Field_local_double& resu, int k_layer, int top_wall, int bottom_wall )
+void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& resu, int k_layer, int top_wall, int bottom_wall )
 {
   const IJK_Field_local_double& vCOMPO = get_v(_VCOMPO_);
   const IJK_Field_local_double& vDIR = get_v(_DIR_);
@@ -208,11 +208,11 @@ void OpDiffIJKFacesGeneric_double::flux_loop_(IJK_Field_local_double& resu, int 
 }
 
 template<DIRECTION _DIR_, DIRECTION _VCOMPO_>
-void OpDiffIJKFacesGeneric_double::flux_loop_same_dir_compo_(int i, double surface, double inv_distance_DIR, double inv_distance_COMPO,
-                                                             const ConstIJK_double_ptr& vCOMPO_ptr, const ConstIJK_double_ptr& vDIR_ptr,
-                                                             const ConstIJK_double_ptr& molecular_nu, const ConstIJK_double_ptr& div_ptr,
-                                                             const ConstIJK_double_ptr& turbulent_nu, const ConstIJK_double_ptr& turbulent_k_energy,
-                                                             const ConstIJK_double_ptr& structural_model, Simd_double& flux )
+void Operateur_IJK_faces_diff_base_double::flux_loop_same_dir_compo_(int i, double surface, double inv_distance_DIR, double inv_distance_COMPO,
+                                                                     const ConstIJK_double_ptr& vCOMPO_ptr, const ConstIJK_double_ptr& vDIR_ptr,
+                                                                     const ConstIJK_double_ptr& molecular_nu, const ConstIJK_double_ptr& div_ptr,
+                                                                     const ConstIJK_double_ptr& turbulent_nu, const ConstIJK_double_ptr& turbulent_k_energy,
+                                                                     const ConstIJK_double_ptr& structural_model, Simd_double& flux )
 {
   if(is_structural_)
     {
@@ -267,11 +267,11 @@ void OpDiffIJKFacesGeneric_double::flux_loop_same_dir_compo_(int i, double surfa
 }
 
 template<DIRECTION _DIR_, DIRECTION _VCOMPO_>
-void OpDiffIJKFacesGeneric_double::flux_loop_different_dir_compo_(int i, double surface, double inv_distance_DIR, double inv_distance_COMPO, int top_wall, int bottom_wall,
-                                                                  const ConstIJK_double_ptr& vCOMPO_ptr, const ConstIJK_double_ptr& vDIR_ptr,
-                                                                  const ConstIJK_double_ptr& molecular_nu, const ConstIJK_double_ptr& div_ptr,
-                                                                  const ConstIJK_double_ptr& turbulent_nu, const ConstIJK_double_ptr& turbulent_k_energy,
-                                                                  const ConstIJK_double_ptr& structural_model, Simd_double& flux )
+void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i, double surface, double inv_distance_DIR, double inv_distance_COMPO, int top_wall, int bottom_wall,
+                                                                          const ConstIJK_double_ptr& vCOMPO_ptr, const ConstIJK_double_ptr& vDIR_ptr,
+                                                                          const ConstIJK_double_ptr& molecular_nu, const ConstIJK_double_ptr& div_ptr,
+                                                                          const ConstIJK_double_ptr& turbulent_nu, const ConstIJK_double_ptr& turbulent_k_energy,
+                                                                          const ConstIJK_double_ptr& structural_model, Simd_double& flux )
 {
 
   if(is_structural_)

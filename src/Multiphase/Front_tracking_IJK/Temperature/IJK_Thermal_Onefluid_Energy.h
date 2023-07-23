@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,47 +12,37 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : IJK_Thermal_Onefluid_Energy.h
+// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
+//
+/////////////////////////////////////////////////////////////////////////////
 
-#ifndef OpConvDiscIJKQuickScalar_include
-#define OpConvDiscIJKQuickScalar_include
+#ifndef IJK_Thermal_Onefluid_Energy_included
+#define IJK_Thermal_Onefluid_Energy_included
 
-#include <OpConvIJKElemCommon.h>
+#include <IJK_Thermal_base.h>
 
-class OpConvDiscQuickIJKScalar_double : public OpConvIJKElemCommon_double
+/////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION : class IJK_Thermal_Onefluid_Energy
+//
+// <Description of class IJK_Thermal_Onefluid_Energy>
+//
+/////////////////////////////////////////////////////////////////////////////
+
+class IJK_Thermal_Onefluid_Energy : public IJK_Thermal_base
 {
-  Declare_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double);
-public:
-  OpConvDiscQuickIJKScalar_double() : OpConvIJKElemCommon_double() {  };
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                IJK_Field_double& result) override;
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-               IJK_Field_double& result) override;
-protected:
 
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
+  Declare_instanciable( IJK_Thermal_Onefluid_Energy ) ;
 
-  const IJK_Field_local_double *input_indicatrice_=0;
+public :
 
-private:
-
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
+protected :
+  void correct_temperature_for_eulerian_fluxes() override {};
+  void compute_diffusion_increment() override { ; };
 
 };
 
-#include <OpConvDiscIJKQuickScalar.tpp>
-
-#endif
+#endif /* IJK_Thermal_Onefluid_Energy_included */

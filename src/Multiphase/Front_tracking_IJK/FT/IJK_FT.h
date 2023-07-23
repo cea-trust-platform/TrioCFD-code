@@ -43,7 +43,7 @@
 #include <IJK_Energie.h>
 #include <IJK_Thermal_Subresolution.h>
 #include <IJK_Thermal.h>
-#include <IJK_Thermal_Reader.h>
+#include <IJK_Thermals.h>
 #include <TRUST_Ref.h>
 #include <Objet_U.h>
 
@@ -276,7 +276,7 @@ protected :
 
   void fill_variable_source_and_potential_phi(const double time);
 
-  int size_thermal_problem(const char* thermal_problem);
+  int size_thermal_problem(Nom thermal_problem);
 
   // GAB, rotation
   int get_direction(const ArrOfDouble& vecteur);
@@ -489,7 +489,7 @@ protected :
    *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
    */
   Operateur_IJK_faces_diff velocity_diffusion_op_;
-  Nom type_velocity_diffusion_form_;
+  //  Nom type_velocity_diffusion_form_;
 
   /*
    * Velocity convection operator
@@ -500,12 +500,13 @@ protected :
   //  OpDiffIJK_double velocity_diffusion_op_simple_;
   //  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
   Operateur_IJK_faces_conv velocity_convection_op_;
-  Nom type_velocity_convection_form_; /* non_conservative_simple : rho div(u u)
-  	  	  	  	  	  	  	  	  	 * non_conservative_rhou     : div(rho u u) - u div(rho u)
-  	  	  	  	  	  	  	  	  	 * conservative              : div(rho u u)
-  	  	  	  	  	  	  	  	  	 */
+//  Nom type_velocity_convection_form_;
+  /* non_conservative_simple : rho div(u u)
+   * non_conservative_rhou     : div(rho u u) - u div(rho u)
+   * conservative              : div(rho u u)
+   */
   //  OpConvAmontIJK_double velocity_convection_op_;
-  int type_velocity_convection_op_; // 0 : Quick  / 1 : Centre / 2 : Amont
+  //  int type_velocity_convection_op_; // 0 : Quick  / 1 : Centre / 2 : Amont
 
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters
@@ -556,7 +557,7 @@ protected :
 
   int refuse_patch_conservation_QdM_RK3_source_interf_;
   // GAB, qdm
-  int test_etapes_et_bilan;
+  int test_etapes_et_bilan_;
   //
   // GAB, champ de reprise + champ initial
   int add_initial_field_;
@@ -598,6 +599,7 @@ protected :
   LIST(IJK_Energie) energie_;
   LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
   LIST(IJK_Thermal) thermal_;
+  IJK_Thermals thermals_;
 
 };
 

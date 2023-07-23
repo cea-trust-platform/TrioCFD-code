@@ -13,18 +13,46 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKQuickScalar.h>
+#ifndef OpConvDiscQuickIJKScalar_included
+#define OpConvDiscQuickIJKScalar_included
 
-Implemente_instanciable_sans_constructeur(OpConvQuickIJKScalar_double, "OpConvQuickIJKScalar_double", OpConvIJKElemCommon_double);
+#include <Operateur_IJK_elem_conv_base.h>
 
-Sortie& OpConvQuickIJKScalar_double::printOn(Sortie& os) const
+class OpConvDiscQuickIJKScalar_double : public Operateur_IJK_elem_conv_base_double
 {
-  //  OpConvIJKElemCommon_double::printOn(os);
-  return os;
-}
+  Declare_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double);
+public:
+  OpConvDiscQuickIJKScalar_double() : Operateur_IJK_elem_conv_base_double() {  };
+  void calculer(const IJK_Field_double& field,
+                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                IJK_Field_double& result) override;
+  void ajouter(const IJK_Field_double& field,
+               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+               IJK_Field_double& result) override;
+protected:
 
-Entree& OpConvQuickIJKScalar_double::readOn(Entree& is)
-{
-  //  OpConvIJKElemCommon_double::readOn(is);
-  return is;
-}
+  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::X>(resu,k_layer);
+  }
+  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::Y>(resu,k_layer);
+  }
+  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::Z>(resu,k_layer);
+  }
+
+  const IJK_Field_local_double *input_indicatrice_=0;
+
+private:
+
+  template <DIRECTION _DIR_>
+  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
+
+};
+
+#include <OpConvDiscQuickIJKScalar.tpp>
+
+#endif /* OpConvDiscQuickIJKScalar_included */

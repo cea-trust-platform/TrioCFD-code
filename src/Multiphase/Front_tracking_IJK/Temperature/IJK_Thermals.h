@@ -14,72 +14,33 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_Thermal_Onefluid.h
+// File      : IJK_Thermals.h
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_Thermal_Onefluid_included
-#define IJK_Thermal_Onefluid_included
+#ifndef IJK_Thermals_included
+#define IJK_Thermals_included
 
-#include <IJK_Thermal_base.h>
-#include <IJK_Field.h>
-#include <Boundary_Conditions_Thermique.h>
-#include <IJK_Splitting.h>
-#include <IJK_Field.h>
-#include <Parser.h>
-#include <IJK_Lata_writer.h>
-#include <OpConvQuickIJKScalar.h>
-#include <OpCentre4IJK.h>
-#include <OpConvCentre2IJKScalar.h>
-#include <Ouvrir_fichier.h>
-#include <Corrige_flux_FT.h>
-#include <TRUST_Ref.h>
-#include <Operateur_IJK_elem_diff_base.h>
-#include <OpConvAmontIJK.h>
-#include <OpConvDiscQuickIJKScalar.h>
+#include <IJK_Thermal.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class IJK_Thermal_Onefluid
+// .DESCRIPTION : class IJK_Thermals
 //
-// <Description of class IJK_Thermal_Onefluid>
+// <Description of class IJK_Thermals>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-
-class IJK_Thermal_Onefluid : public IJK_Thermal_base
+class IJK_Thermals : public LIST(IJK_Thermal)
 {
 
-  Declare_instanciable( IJK_Thermal_Onefluid ) ;
+  Declare_instanciable( IJK_Thermals ) ;
 
 public :
 
-  int initialize(const IJK_Splitting& splitting, const int idx) override;
-  double compute_timestep(const double timestep,
-                          const double rho_l, const double rho_v,
-                          const double dxmin) const;
-  void update_thermal_properties() override;
-
 protected :
-
-  void add_temperature_diffusion() override;
-  void compute_diffusion_increment() override;
-  void correct_temperature_for_eulerian_fluxes() override { ; };
-  //Rustine
-  double E0_;//volumique
-  IJK_Field_double T_rust_;
-  void compute_T_rust(const FixedVector<IJK_Field_double, 3>& velocity);
-
-  int depracated_rho_cp_;
-  int rho_cp_inv_;
-  int lambda_moy_arith_;
-  int type_temperature_convection_form_;
-
-  IJK_Field_double div_rho_cp_T_;
-  IJK_Field_double lambda_;
-  IJK_Field_double cp_;
 
 };
 
-#endif /* IJK_Thermal_Onefluid_included */
+#endif /* IJK_Thermals_included */

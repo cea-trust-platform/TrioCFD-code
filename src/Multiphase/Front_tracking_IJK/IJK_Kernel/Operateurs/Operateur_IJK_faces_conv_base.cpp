@@ -13,31 +13,29 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKFacesCommon.h>
+#include <Operateur_IJK_faces_conv_base.h>
 
-Implemente_base(OpConvIJKFacesCommon_double, "OpConvIJKFacesCommon_double", Operateur_IJK_faces_base_double);
+Implemente_base(Operateur_IJK_faces_conv_base_double, "Operateur_IJK_faces_conv_base_double", Operateur_IJK_faces_base_double);
 
-Sortie& OpConvIJKFacesCommon_double::printOn(Sortie& os) const
+Sortie& Operateur_IJK_faces_conv_base_double::printOn(Sortie& os) const
 {
-  //  Operateur_IJK_faces_base_double::printOn(os);
   return os;
 }
 
-Entree& OpConvIJKFacesCommon_double::readOn(Entree& is)
+Entree& Operateur_IJK_faces_conv_base_double::readOn(Entree& is)
 {
-  //  Operateur_IJK_faces_base_double::readOn(is);
   return is;
 }
 
-void OpConvIJKFacesCommon_double::initialize(const IJK_Splitting& splitting)
+void Operateur_IJK_faces_conv_base_double::initialize(const IJK_Splitting& splitting)
 {
   channel_data_.initialize(splitting);
   perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
 }
 
-void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+void Operateur_IJK_faces_conv_base_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                                    const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                                    IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
   statistiques().begin_count(convection_counter_);
 
@@ -55,9 +53,9 @@ void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const
 
 }
 
-void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
+void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+                                                   const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                                   IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
   statistiques().begin_count(convection_counter_);
 
@@ -75,7 +73,7 @@ void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const 
 
 }
 
-//void OpConvIJKFacesCommon_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//void Operateur_IJK_faces_conv_base_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
 //                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 //{
@@ -95,7 +93,7 @@ void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const 
 //
 //}
 //
-//void OpConvIJKFacesCommon_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
+//void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
 //                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 //{

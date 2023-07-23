@@ -23,7 +23,6 @@
 #define IJK_Thermal_included
 
 #include <IJK_Thermal_base.h>
-#include <IJK_Thermal_Reader.h>
 #include <TRUST_Deriv.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -42,8 +41,8 @@ public :
   /*
    * Getters
    */
-  inline const char* get_thermal_problem_type() { return thermal_problem_type_.c_str(); };
-  inline std::string& get_thermal_problem_type_str() { return thermal_problem_type_; };
+//  inline const char* get_thermal_problem_type() { return thermal_problem_type_.c_str(); };
+  inline Nom& get_thermal_problem_type() { return thermal_problem_type_; };
   inline int& get_thermal_rank() { return thermal_rank_; };
   inline Motcles& get_thermal_words() { return thermal_words_; };
   inline Motcles& get_thermal_suffix() { return lata_suffix_; };
@@ -79,9 +78,11 @@ public :
   inline void compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
                                                ArrOfDouble& flux_normal_interp);
 
+  Entree& typer_thermal( Entree& is );
+
 protected:
   int thermal_rank_;
-  std::string thermal_problem_type_;
+  Nom thermal_problem_type_;
   Nom prefix_;
   Motcles thermal_words_;
   Motcles lata_suffix_;

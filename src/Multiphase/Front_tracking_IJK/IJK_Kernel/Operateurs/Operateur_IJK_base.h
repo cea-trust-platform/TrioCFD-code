@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef Operateur_IJK_base_H
-#define Operateur_IJK_base_H
+#ifndef Operateur_IJK_base_included
+#define Operateur_IJK_base_included
 
 #include <IJK_Field.h>
 #include <IJK_Field_simd_tools.h>

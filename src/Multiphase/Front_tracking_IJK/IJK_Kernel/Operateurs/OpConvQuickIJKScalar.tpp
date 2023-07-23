@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickScalar_H_TPP
-#define OpConvIJKQuickScalar_H_TPP
+#ifndef OpConvQuickIJKScalar_TPP_included
+#define OpConvQuickIJKScalar_TPP_included
 
 #include <IJK_Field.h>
 

@@ -26,7 +26,7 @@
 #include <stat_counters.h>
 #include <IJK_FT.h>
 #include <Corrige_flux_FT.h>
-#include <OpConvDiscIJKQuickScalar.h>
+#include <OpConvDiscQuickIJKScalar.h>
 
 Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Thermal_Subresolution", IJK_Thermal_base ) ;
 
@@ -41,14 +41,20 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
 {
   IJK_Thermal_base::printOn( os );
+  os << "  {\n";
+  os << "    convective_flux_correction" <<  " " << convective_flux_correction_ << "\n";
+  os << "    diffusion_flux_correction" <<  " " << diffusion_flux_correction_ << "\n";
+  os << "    ghost_fluid" <<  " " << ghost_fluid_ << "\n";
+  os << "    override_vapour_mixed_values" <<  " " << override_vapour_mixed_values_ << "\n";
+  os << "  \n}";
   return os;
 }
 
 Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 {
   IJK_Thermal_base::readOn( is );
-  Cout << "IJK_Thermal_Subresolution::readOn : Parameters summary. " << finl;
-  printOn(Cout);
+//  Cout << "IJK_Thermal_Subresolution::readOn : Parameters summary. " << finl;
+//  printOn(Cout);
   return is;
 }
 
@@ -68,12 +74,14 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   uniform_lambda_ = lambda_liquid_;
   uniform_alpha_ =	lambda_liquid_ / (ref_ijk_ft_->get_rho_l() * cp_liquid_);
 //  calulate_grad_T_ = 1;
+  // TODO: Reused grad T calculation
   calulate_grad_T_=0;
   // TODO: Implement ghost fluid if necessary
   ghost_fluid_ = 0;
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
+//  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
 
   /*TODO:

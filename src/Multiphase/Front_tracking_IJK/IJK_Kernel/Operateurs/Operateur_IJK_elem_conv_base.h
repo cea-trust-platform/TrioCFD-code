@@ -13,19 +13,19 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKElemCommon_include
-#define OpConvIJKElemCommon_include
+#ifndef Operateur_IJK_elem_conv_base_included
+#define Operateur_IJK_elem_conv_base_included
 
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
 
 class Corrige_flux_FT;
 
-class OpConvIJKElemCommon_double : public Operateur_IJK_elem_base_double
+class Operateur_IJK_elem_conv_base_double : public Operateur_IJK_elem_base_double
 {
-  Declare_base_sans_constructeur(OpConvIJKElemCommon_double);
+  Declare_base_sans_constructeur(Operateur_IJK_elem_conv_base_double);
 public:
-  OpConvIJKElemCommon_double() { stored_curv_fram_layer_z_ = -1000; }
+  Operateur_IJK_elem_conv_base_double() { stored_curv_fram_layer_z_ = -1000; }
   void initialize(const IJK_Splitting& splitting) override;
   virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
   virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };

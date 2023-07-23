@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickSharp_H_TPP
-#define OpConvIJKQuickSharp_H_TPP
+#ifndef OpConvQuickSharpIJK_TPP_included
+#define OpConvQuickSharpIJK_TPP_included
 
 inline double sharp(const double utc)
 {
@@ -119,7 +119,7 @@ inline double conv_quick_sharp_moins(const double psc,const double vit_0,const d
  *
  */
 template <DIRECTION _DIR_, DIRECTION _VCOMPO_>
-void OpConvIJKQuickSharp_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
+void OpConvQuickSharpIJK_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
   // convected field
   const IJK_Field_local_double& src = get_input(_VCOMPO_);

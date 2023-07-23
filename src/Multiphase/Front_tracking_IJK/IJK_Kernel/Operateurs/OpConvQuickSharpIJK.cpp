@@ -13,37 +13,24 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvCentre2IJKScalar_included
-#define OpConvCentre2IJKScalar_included
+#include <OpConvQuickSharpIJK.h>
 
-#include <Operateur_IJK_elem_conv_base.h>
+Implemente_instanciable(OpConvQuickSharpIJK_double, "OpConvQuickSharpIJK_double", Operateur_IJK_faces_conv_base_double);
 
-class OpConvCentre2IJKScalar_double : public Operateur_IJK_elem_conv_base_double
+Sortie& OpConvQuickSharpIJK_double::printOn(Sortie& os) const
 {
-  Declare_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double);
-public:
-  OpConvCentre2IJKScalar_double() : Operateur_IJK_elem_conv_base_double() { }
-protected:
+  return os;
+}
 
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
+Entree& OpConvQuickSharpIJK_double::readOn(Entree& is)
+{
+  return is;
+}
 
-private:
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
-
-};
-
-#include <OpConvCentre2IJKScalar.tpp>
-
-#endif /* OpConvCentre2IJKScalar_included */
+void OpConvQuickSharpIJK_double::initialize(const IJK_Splitting& splitting)
+{
+  Operateur_IJK_faces_conv_base_double::initialize(splitting);
+  delta_x_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_I);
+  delta_y_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_J);
+  delta_z_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_K);
+}

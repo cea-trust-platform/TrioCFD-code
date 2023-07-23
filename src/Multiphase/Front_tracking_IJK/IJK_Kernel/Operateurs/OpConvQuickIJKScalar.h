@@ -13,42 +13,39 @@
 *
 *****************************************************************************/
 
-#include <OpConvDiscIJKQuickScalar.h>
+#ifndef OpConvQuickScalarIJK_included
+#define OpConvQuickScalarIJK_included
 
-Implemente_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double, "OpConvDiscQuickIJKScalar_double", OpConvIJKElemCommon_double);
+#include <Operateur_IJK_elem_conv_base.h>
 
-Sortie& OpConvDiscQuickIJKScalar_double::printOn(Sortie& os) const
+class OpConvQuickIJKScalar_double : public Operateur_IJK_elem_conv_base_double
 {
-  //  OpConvIJKElemCommon_double::printOn(os);
-  return os;
-}
+  Declare_instanciable_sans_constructeur(OpConvQuickIJKScalar_double);
 
-Entree& OpConvDiscQuickIJKScalar_double::readOn(Entree& is)
-{
-  //  OpConvIJKElemCommon_double::readOn(is);
-  return is;
-}
+public:
+  OpConvQuickIJKScalar_double() : Operateur_IJK_elem_conv_base_double() { };
 
-void OpConvDiscQuickIJKScalar_double::calculer(const IJK_Field_double& field,
-                                               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                               IJK_Field_double& result)
-{
-  OpConvIJKElemCommon_double::calculer(field, vx, vy, vz, result);
-  input_indicatrice_ = 0;
+protected:
 
-}
+  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::X>(resu,k_layer);
+  }
+  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::Y>(resu,k_layer);
+  }
+  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
+  {
+    compute_flux_<DIRECTION::Z>(resu,k_layer);
+  }
 
-void OpConvDiscQuickIJKScalar_double::ajouter(const IJK_Field_double& field,
-                                              const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                              IJK_Field_double& result)
-{
-  OpConvIJKElemCommon_double::ajouter(field, vx, vy, vz, result);
-  input_indicatrice_ = 0;
+private:
+  template <DIRECTION _DIR_>
+  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
 
-}
+};
 
-//void OpConvDiscQuickIJKScalar_double::initialize(const IJK_Splitting& splitting)
-//{
-//  OpConvIJKElemCommon_double::initialize(splitting, indicatrice);
-//  input_indicatrice_ = 0;
-//}
+#include <OpConvQuickIJKScalar.tpp>
+
+#endif /* OpConvQuickScalarIJK_included */

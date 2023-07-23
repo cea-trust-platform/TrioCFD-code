@@ -13,18 +13,40 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKAmont.h>
+#include <OpConvDiscQuickIJKScalar.h>
 
-Implemente_instanciable(OpConvAmontIJK_double, "OpConvAmontIJK_double", OpConvIJKFacesCommon_double);
+Implemente_instanciable_sans_constructeur(OpConvDiscQuickIJKScalar_double, "OpConvDiscQuickIJKScalar_double", Operateur_IJK_elem_conv_base_double);
 
-Sortie& OpConvAmontIJK_double::printOn(Sortie& os) const
+Sortie& OpConvDiscQuickIJKScalar_double::printOn(Sortie& os) const
 {
-  //  OpConvIJKFacesCommon_double::printOn(os);
   return os;
 }
 
-Entree& OpConvAmontIJK_double::readOn(Entree& is)
+Entree& OpConvDiscQuickIJKScalar_double::readOn(Entree& is)
 {
-  //  OpConvIJKFacesCommon_double::readOn(is);
   return is;
 }
+
+void OpConvDiscQuickIJKScalar_double::calculer(const IJK_Field_double& field,
+                                               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                               IJK_Field_double& result)
+{
+  Operateur_IJK_elem_conv_base_double::calculer(field, vx, vy, vz, result);
+  input_indicatrice_ = 0;
+
+}
+
+void OpConvDiscQuickIJKScalar_double::ajouter(const IJK_Field_double& field,
+                                              const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                              IJK_Field_double& result)
+{
+  Operateur_IJK_elem_conv_base_double::ajouter(field, vx, vy, vz, result);
+  input_indicatrice_ = 0;
+
+}
+
+//void OpConvDiscQuickIJKScalar_double::initialize(const IJK_Splitting& splitting)
+//{
+//  Operateur_IJK_elem_conv_base_double::initialize(splitting, indicatrice);
+//  input_indicatrice_ = 0;
+//}

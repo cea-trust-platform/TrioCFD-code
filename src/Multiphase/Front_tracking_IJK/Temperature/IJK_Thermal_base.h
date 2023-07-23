@@ -58,7 +58,7 @@ public:
    * Initialisation
    */
   virtual void set_param(Param& param);
-  int initialize(const IJK_Splitting& splitting, const int idx);
+  virtual int initialize(const IJK_Splitting& splitting, const int idx);
   virtual void update_thermal_properties();
   double compute_timestep(const double timestep,
                           const double dxmin) const;

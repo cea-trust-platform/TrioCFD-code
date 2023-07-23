@@ -13,16 +13,16 @@
 *
 *****************************************************************************/
 
-#ifndef OpDiffTurbIJKScalar_H
-#define OpDiffTurbIJKScalar_H
+#ifndef Operateur_IJK_elem_diff_base_H
+#define Operateur_IJK_elem_diff_base_H
 
 #include <Operateur_IJK_base.h>
 
-class OpDiffIJKScalarGeneric_double : public Operateur_IJK_elem_base_double
+class Operateur_IJK_elem_diff_base_double : public Operateur_IJK_elem_base_double
 {
-  Declare_base_sans_constructeur(OpDiffIJKScalarGeneric_double);
+  Declare_base_sans_constructeur(Operateur_IJK_elem_diff_base_double);
 public:
-  OpDiffIJKScalarGeneric_double();
+  Operateur_IJK_elem_diff_base_double();
   virtual void initialize(const IJK_Splitting& splitting) override;
 //  virtual void calculer(const IJK_Field_double& field,
 //                const IJK_Field_double& coeff_field_x,
@@ -115,55 +115,55 @@ protected:
 
 };
 
-class OpDiffUniformIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffUniformIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffUniformIJKScalar_double);
 public:
-  OpDiffUniformIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_uniform_ = true; }
+  OpDiffUniformIJKScalar_double() : Operateur_IJK_elem_diff_base_double() { is_uniform_ = true; }
 };
 
-class OpDiffUniformIJKScalarCorrection_double : public OpDiffIJKScalarGeneric_double
+class OpDiffUniformIJKScalarCorrection_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffUniformIJKScalarCorrection_double);
 public:
-  OpDiffUniformIJKScalarCorrection_double() : OpDiffIJKScalarGeneric_double() { is_uniform_ = true, is_corrected_ = true; }
+  OpDiffUniformIJKScalarCorrection_double() : Operateur_IJK_elem_diff_base_double() { is_uniform_ = true, is_corrected_ = true; }
 };
 
-class OpDiffIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffIJKScalar_double);
 public:
-  OpDiffIJKScalar_double() : OpDiffIJKScalarGeneric_double() {}
+  OpDiffIJKScalar_double() : Operateur_IJK_elem_diff_base_double() {}
 };
 
-class OpDiffAnisotropicIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffAnisotropicIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffAnisotropicIJKScalar_double);
 public:
-  OpDiffAnisotropicIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_anisotropic_ = true; }
+  OpDiffAnisotropicIJKScalar_double() : Operateur_IJK_elem_diff_base_double() { is_anisotropic_ = true; }
 };
 
-class OpDiffVectorialIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffVectorialIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffVectorialIJKScalar_double);
 public:
-  OpDiffVectorialIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_vectorial_ = true; }
+  OpDiffVectorialIJKScalar_double() : Operateur_IJK_elem_diff_base_double() { is_vectorial_ = true; }
 };
 
-class OpDiffVectorialAnisotropicIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffVectorialAnisotropicIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffVectorialAnisotropicIJKScalar_double);
 public:
-  OpDiffVectorialAnisotropicIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_vectorial_ = true, is_anisotropic_ = true; }
+  OpDiffVectorialAnisotropicIJKScalar_double() : Operateur_IJK_elem_diff_base_double() { is_vectorial_ = true, is_anisotropic_ = true; }
 };
 
-class OpDiffStructuralOnlyIJKScalar_double : public OpDiffIJKScalarGeneric_double
+class OpDiffStructuralOnlyIJKScalar_double : public Operateur_IJK_elem_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStructuralOnlyIJKScalar_double);
 public:
-  OpDiffStructuralOnlyIJKScalar_double() : OpDiffIJKScalarGeneric_double() { is_structural_ = true; }
+  OpDiffStructuralOnlyIJKScalar_double() : Operateur_IJK_elem_diff_base_double() { is_structural_ = true; }
 };
 
-#include <OpDiffTurbIJKScalar.tpp>
+#include <Operateur_IJK_elem_diff_base.tpp>
 
 #endif

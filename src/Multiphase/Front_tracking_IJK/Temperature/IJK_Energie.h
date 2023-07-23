@@ -42,13 +42,13 @@
 #include <IJK_Splitting.h>
 #include <MonofluidVar.h>
 #include <Objet_U.h>
-#include <OpConvIJKQuickScalar_interface.h>
-#include <OpDiffTurbIJKScalar.h>
+#include <OpConvQuickInterfaceIJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Parser.h>
 #include <TRUST_Ref.h>
 #include <Corrige_flux_FT.h>
 #include <Corrige_flux_FT_temperature_conv.h>
+#include <Operateur_IJK_elem_diff_base.h>
 // #include <Corrige_flux_FT_temperature_conv.h>
 
 class IJK_FT_double;

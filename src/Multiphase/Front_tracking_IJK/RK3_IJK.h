@@ -33,7 +33,7 @@
 #include <IJK_Lata_writer.h>
 #include <Linear_algebra_tools.h>
 #include <Couplage_Tubes_IBC.h>
-#include <OpConvIJKQuickScalar.h>
+#include <OpConvQuickIJKScalar.h>
 #include <Boundary_Conditions.h>
 
 

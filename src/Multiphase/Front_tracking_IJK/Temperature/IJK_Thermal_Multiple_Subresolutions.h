@@ -29,15 +29,15 @@
 #include <IJK_Field.h>
 #include <Parser.h>
 #include <IJK_Lata_writer.h>
-#include <OpConvIJKQuickScalar.h>
-#include <OpConvIJKAmont.h>
+#include <OpConvQuickIJKScalar.h>
 #include <OpCentre4IJK.h>
-#include <OpDiffTurbIJKScalar.h>
-#include <OpConvDiscIJKQuickScalar.h>
 #include <OpConvCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
+#include <Operateur_IJK_elem_diff_base.h>
+#include <OpConvAmontIJK.h>
+#include <OpConvDiscQuickIJKScalar.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -55,7 +55,7 @@ class IJK_Thermal_Multiple_Subresolutions : public IJK_Thermal_Subresolution
 
 public :
 
-  int initialize(const IJK_Splitting& splitting, const int idx);
+  int initialize(const IJK_Splitting& splitting, const int idx) override;
   void update_thermal_properties() override;
 
 protected :

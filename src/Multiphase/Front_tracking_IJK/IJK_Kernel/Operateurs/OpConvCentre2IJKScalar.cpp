@@ -15,16 +15,14 @@
 
 #include <OpConvCentre2IJKScalar.h>
 
-Implemente_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double, "OpConvCentre2IJKScalar_double", OpConvIJKElemCommon_double);
+Implemente_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double, "OpConvCentre2IJKScalar_double", Operateur_IJK_elem_conv_base_double);
 
 Sortie& OpConvCentre2IJKScalar_double::printOn(Sortie& os) const
 {
-  //  OpConvIJKElemCommon_double::printOn(os);
   return os;
 }
 
 Entree& OpConvCentre2IJKScalar_double::readOn(Entree& is)
 {
-  //  OpConvIJKElemCommon_double::readOn(is);
   return is;
 }

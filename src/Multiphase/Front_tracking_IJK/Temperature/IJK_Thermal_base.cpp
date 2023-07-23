@@ -197,7 +197,6 @@ Entree& IJK_Thermal_base::readOn( Entree& is )
   Param param(que_suis_je());
   set_param(param);
   param.lire_avec_accolades(is);
-
   Cout << "IJK_Thermal_base::readOn : Parameters summary. " << finl;
   printOn(Cout);
   return is;
@@ -248,7 +247,7 @@ void IJK_Thermal_base::set_param(Param& param)
 
 int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
 {
-  Cout << que_suis_je() << "::initialize()" << finl;
+//  Cout << que_suis_je() << "::initialize()" << finl;
   rang_ = idx;
   int nalloc = 0;
 
@@ -426,7 +425,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       nalloc +=3 ;
     }
 
-  Cout << "End of " << que_suis_je() << "::initialize()" << finl;
+//  Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
 }
 

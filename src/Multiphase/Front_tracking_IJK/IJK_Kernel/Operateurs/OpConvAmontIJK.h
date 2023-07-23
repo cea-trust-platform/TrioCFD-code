@@ -13,11 +13,11 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKAmont_H
-#define OpConvIJKAmont_H
-#include <OpConvIJKFacesCommon.h>
+#ifndef OpConvAmontIJK_included
+#define OpConvAmontIJK_included
+#include <Operateur_IJK_faces_conv_base.h>
 
-class OpConvAmontIJK_double : public OpConvIJKFacesCommon_double
+class OpConvAmontIJK_double : public Operateur_IJK_faces_conv_base_double
 {
   Declare_instanciable(OpConvAmontIJK_double);
 protected:
@@ -64,6 +64,6 @@ private:
   void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
 };
 
-#include <OpConvIJKAmont.tpp>
+#include <OpConvAmontIJK.tpp>
 
-#endif
+#endif /* OpConvAmontIJK_included */

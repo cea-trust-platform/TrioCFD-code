@@ -33,7 +33,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <Corrige_flux_FT.h>
 #include <IJK_Field_simd_tools.h>
-#include <OpConvIJKQuickScalar_interface.h>
+#include <OpConvQuickInterfaceIJKScalar.h>
 #include <Operateur_IJK_base.h>
 
 // Definition of the fluxes

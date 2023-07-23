@@ -13,14 +13,14 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKQuickSharp_H
-#define OpConvIJKQuickSharp_H
-#include <OpConvIJKFacesCommon.h>
+#ifndef OpConvQuickSharpIJK_included
+#define OpConvQuickSharpIJK_included
+#include <Operateur_IJK_faces_conv_base.h>
 
 
-class OpConvIJKQuickSharp_double : public OpConvIJKFacesCommon_double
+class OpConvQuickSharpIJK_double : public Operateur_IJK_faces_conv_base_double
 {
-  Declare_instanciable(OpConvIJKQuickSharp_double);
+  Declare_instanciable(OpConvQuickSharpIJK_double);
 public:
   void initialize(const IJK_Splitting& splitting) override;
 
@@ -88,6 +88,6 @@ private:
 
 };
 
-#include <OpConvIJKQuickSharp.tpp>
+#include <OpConvQuickSharpIJK.tpp>
 
-#endif
+#endif /* OpConvQuickSharpIJK_included */

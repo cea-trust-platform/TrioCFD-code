@@ -13,17 +13,18 @@
 *
 *****************************************************************************/
 
-#ifndef OpCentre4IJK_H
-#define OpCentre4IJK_H
+#ifndef OpCentre4IJK_included
+#define OpCentre4IJK_included
 
-#include <OpConvIJKFacesCommon.h>
+#include <Operateur_IJK_faces_conv_base.h>
 
-class OpConvCentre4IJK_double : public OpConvIJKFacesCommon_double
+class OpConvCentre4IJK_double : public Operateur_IJK_faces_conv_base_double
 {
-  Declare_instanciable(OpConvCentre4IJK_double);
+  Declare_instanciable_sans_constructeur(OpConvCentre4IJK_double);
 public:
-  void set_bc(const Boundary_Conditions& bc) override { ref_bc_ = bc; };
-  void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) override { ref_bc_Thermique_ = bc_th; };
+  OpConvCentre4IJK_double() { div_rho_u_=0; };
+  inline void set_bc(const Boundary_Conditions& bc) override { ref_bc_ = bc; };
+  inline void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) override { ref_bc_Thermique_ = bc_th; };
   void initialize(const IJK_Splitting& splitting) override;
 //  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc);
 //  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc);
@@ -116,6 +117,9 @@ protected:
   REF(Boundary_Conditions) ref_bc_;
   REF(Boundary_Conditions_Thermique) ref_bc_Thermique_;
 private:
+  /*
+   * TODO: !!!!!! pb dans exec_divergence
+   */
   void calculer_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
                          IJK_Field_double& resu, int k_layer, const Operateur_IJK_data_channel& channel);
   template <DIRECTION _DIR_, DIRECTION _VCOMPO_>
@@ -126,4 +130,4 @@ private:
 };
 
 #include <OpCentre4IJK.tpp>
-#endif
+#endif /* OpCentre4IJK_included */

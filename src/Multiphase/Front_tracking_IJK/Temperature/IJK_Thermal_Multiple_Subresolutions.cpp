@@ -26,7 +26,7 @@
 #include <stat_counters.h>
 #include <IJK_FT.h>
 #include <Corrige_flux_FT.h>
-#include <OpConvDiscIJKQuickScalar.h>
+#include <OpConvDiscQuickIJKScalar.h>
 
 Implemente_instanciable( IJK_Thermal_Multiple_Subresolutions, "IJK_Thermal_Multiple_Subresolutions", IJK_Thermal_Subresolution ) ;
 

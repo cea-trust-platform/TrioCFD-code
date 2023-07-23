@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpDiffTurbIJKScalar_H_TPP
-#define OpDiffTurbIJKScalar_H_TPP
+#ifndef Operateur_IJK_elem_diff_base_TPP_included
+#define Operateur_IJK_elem_diff_base_TPP_included
 
 static void copy_boundary_condition(const IJK_Field_local_double& boundary_flux, IJK_Field_local_double& resu)
 {
@@ -31,7 +31,7 @@ static void copy_boundary_condition(const IJK_Field_local_double& boundary_flux,
 }
 
 template <DIRECTION _DIR_>
-void OpDiffIJKScalarGeneric_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
+void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
   const int nx = _DIR_ == DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni() ;
   const int ny = _DIR_ == DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();

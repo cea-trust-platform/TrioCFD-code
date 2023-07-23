@@ -37,7 +37,7 @@ class IJK_FT;
 class IJK_Splitting;
 
 /*
- * TODO:
+ * TODO: Demander à Aymeric l'interet (obsolete ??)
  */
 class IJK_Thermique;
 class List_IJK_Thermique;
@@ -50,14 +50,9 @@ class list_curseurIJK_Energie;
 class const_list_curseurIJK_Energie;
 
 class IJK_Thermal_Subresolution;
-class List_IJK_Thermal_Subresolution;
-class list_curseurIJK_Thermal_Subresolution;
-class const_list_curseurIJK_Thermal_Subresolution;
-
 class IJK_Thermal;
-class List_IJK_Thermal;
-class list_curseurIJK_Thermal;
-class const_list_curseurIJK_Thermal;
+class IJK_Thermals;
+
 /**
  * All the post-processing stuff of IJK_FT delegated into this helper class:
  */
@@ -364,6 +359,7 @@ protected:
   LIST(IJK_Energie)& energie_;
   LIST(IJK_Thermal_Subresolution)& thermal_subresolution_;
   LIST(IJK_Thermal)& thermal_;
+  IJK_Thermals& thermals_;
 
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;

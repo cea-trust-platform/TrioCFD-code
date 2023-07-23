@@ -20,8 +20,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Operateur_IJK_elem_diff.h>
+#include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV(OpDiffIJKScalarGeneric_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV( Operateur_IJK_elem_diff_base_double ) ) ;
 
 Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
 {
@@ -36,64 +37,152 @@ Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
   }
   prefix_ = Nom("OpDiff");
   suffix_ = Nom("IJKScalar_double");
+  diffusion_op_ = "";
+  diffusion_op_options_ = "";
 }
 
 Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 {
-  DERIV(OpDiffIJKScalarGeneric_double)::printOn( os );
+  DERIV(Operateur_IJK_elem_diff_base_double)::printOn( os );
   return os;
 }
 
 Entree& Operateur_IJK_elem_diff::readOn( Entree& is )
 {
+  typer_diffusion_op(is);
+  Param param(que_suis_je());
+  set_param(param);
+  param.lire_sans_accolade(is);
+  return is;
+}
+
+void Operateur_IJK_elem_diff::set_param(Param& param)
+{
+  param.ajouter_non_std("velocity_diffusion_op", (this));
+}
+
+int Operateur_IJK_elem_diff::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+{
+  return 1;
+}
+
+Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
+{
   Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
   Motcle word;
   is >> word;
-  Nom type = "";
-  type += prefix_;
+  Nom type(get_convection_op_type(word));
+  typer(type);
+  is >> valeur();
+  return is;
+}
+
+void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (const char * convection_op)
+{
+  Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
+  Motcle word(diffusion_op);
+  Nom type(get_convection_op_type(word));
+  typer(type);
+}
+
+Nom Operateur_IJK_elem_diff::get_convection_op_type(Motcle word)
+{
+  Nom type(prefix_);
   int diffusion_rank = diffusion_op_words_.search(word);
   switch(diffusion_rank)
     {
     case 0 :
       {
-        type += "";
+        diffusion_op_ += "";
         break;
       }
     case 1 :
       {
-        type += "Uniform";
+        diffusion_op_ += "Uniform";
         break;
       }
     case 2 :
       {
-        type += "Anisotropic";
+        diffusion_op_ += "Anisotropic";
         break;
       }
     case 3 :
       {
-        type += "Vectorial";
+        diffusion_op_ += "Vectorial";
         break;
       }
     case 4 :
       {
-        type += "VectorialAnisotropic";
+        diffusion_op_ += "VectorialAnisotropic";
         break;
       }
     case 5 :
       {
-        type += "StructuralOnly";
+        diffusion_op_ += "StructuralOnly";
         break;
       }
     default :
       {
-        Cerr << "ERROR : Diffusion operators that are already implemented are:" << finl;
+        Cerr << "ERROR : Diffusion operators (elem) that are already implemented are:" << finl;
         Cerr << diffusion_op_words_ << finl;
         abort();
       }
     }
+  type += diffusion_op_;
   type += suffix_;
   typer(type);
-  is >> valeur();
-  return is;
+  return type;
+}
+
+void Operateur_IJK_elem_diff::set_conductivity_coefficient(const double& uniform_lambda,
+                                                           const IJK_Field_local_double& lambda,
+                                                           IJK_Field_local_double& coeff_field_x,
+                                                           IJK_Field_local_double& coeff_field_y,
+                                                           IJK_Field_local_double& coeff_field_z)
+{
+  switch(diffusion_rank_)
+    {
+    case 0 :
+      {
+        // Standard
+        set_lambda(lambda);
+        break;
+      }
+    case 1 :
+      {
+        // Uniform
+        set_uniform_lambda(uniform_lambda);
+        break;
+      }
+    case 2 :
+      {
+        // Anisotropic
+        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        break;
+      }
+    case 3 :
+      {
+        // Vectorial
+        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        break;
+      }
+    case 4 :
+      {
+        // VectorialAnisotropic
+        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        break;
+      }
+    case 5 :
+      {
+        // StructuralOnly
+        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        break;
+      }
+    default :
+      {
+        Cerr << "ERROR : The conductivity can not be set properly" << finl;
+        abort();
+      }
+    }
 }
 

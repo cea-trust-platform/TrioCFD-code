@@ -13,8 +13,8 @@
  *
  *****************************************************************************/
 
-#ifndef OpDiffTurbIJK_H
-#define OpDiffTurbIJK_H
+#ifndef Operateur_IJK_faces_diff_base_included
+#define Operateur_IJK_faces_diff_base_included
 #include <Operateur_IJK_base.h>
 #include <Boundary_Conditions.h>
 
@@ -36,12 +36,12 @@
  *          Yes_M_DivTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i
  *          Yes_M_Struct: the flux is 'structural_model'
  */
-class OpDiffIJKFacesGeneric_double : public Operateur_IJK_faces_base_double
+class Operateur_IJK_faces_diff_base_double : public Operateur_IJK_faces_base_double
 {
-  Declare_base_sans_constructeur(OpDiffIJKFacesGeneric_double);
+  Declare_base_sans_constructeur(Operateur_IJK_faces_diff_base_double);
 
 public:
-  OpDiffIJKFacesGeneric_double();
+  Operateur_IJK_faces_diff_base_double();
 
   inline virtual void initialize(const IJK_Splitting& splitting)
   {
@@ -215,11 +215,11 @@ protected:
 
 };
 
-class OpDiffIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffIJK_double);
 public:
-  OpDiffIJK_double() : OpDiffIJKFacesGeneric_double() {};
+  OpDiffIJK_double() : Operateur_IJK_faces_diff_base_double() {};
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -228,11 +228,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffTurbIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffTurbIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffTurbIJK_double);
 public:
-  OpDiffTurbIJK_double() : OpDiffIJKFacesGeneric_double() { is_turb_ = true ; }
+  OpDiffTurbIJK_double() : Operateur_IJK_faces_diff_base_double() { is_turb_ = true ; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                const IJK_Field_double& turbulent_nu,
@@ -246,11 +246,11 @@ public:
 
 };
 
-class OpDiffStdWithLaminarTransposeIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeIJK_double() : OpDiffIJKFacesGeneric_double() { with_transpose_ = true; }
+  OpDiffStdWithLaminarTransposeIJK_double() : Operateur_IJK_faces_diff_base_double() { with_transpose_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -259,11 +259,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeAndDivergenceIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeAndDivergenceIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeAndDivergenceIJK_double() : OpDiffIJKFacesGeneric_double() { with_divergence_ = true, with_transpose_ = true; }
+  OpDiffStdWithLaminarTransposeAndDivergenceIJK_double() : Operateur_IJK_faces_diff_base_double() { with_divergence_ = true, with_transpose_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                const IJK_Field_double& divergence,
@@ -274,11 +274,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffAnisotropicIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffAnisotropicIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffAnisotropicIJK_double);
 public:
-  OpDiffAnisotropicIJK_double() : OpDiffIJKFacesGeneric_double() { is_anisotropic_ = true; }
+  OpDiffAnisotropicIJK_double() : Operateur_IJK_faces_diff_base_double() { is_anisotropic_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -287,11 +287,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeAnisotropicIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeAnisotropicIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAnisotropicIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeAnisotropicIJK_double() : OpDiffIJKFacesGeneric_double() { is_anisotropic_ = true, with_transpose_ = true; }
+  OpDiffStdWithLaminarTransposeAnisotropicIJK_double() : Operateur_IJK_faces_diff_base_double() { is_anisotropic_ = true, with_transpose_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -300,11 +300,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double(): OpDiffIJKFacesGeneric_double() { is_anisotropic_ = true, with_transpose_ = true, with_divergence_ = true; }
+  OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double(): Operateur_IJK_faces_diff_base_double() { is_anisotropic_ = true, with_transpose_ = true, with_divergence_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu,
 //                const IJK_Field_double& divergence,
@@ -316,11 +316,11 @@ public:
 };
 
 //FixMe:: for zeroAtWall, where to put the zero and when???
-class OpDiffTensorialZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffTensorialZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffTensorialZeroatwallIJK_double);
 public:
-  OpDiffTensorialZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_tensorial_ = true ; }
+  OpDiffTensorialZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_tensorial_ = true ; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -345,11 +345,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_tensorial_ = true, with_transpose_ = true; }
+  OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_tensorial_ = true, with_transpose_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -374,11 +374,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffTensorialAnisotropicZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffTensorialAnisotropicZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffTensorialAnisotropicZeroatwallIJK_double);
 public:
-  OpDiffTensorialAnisotropicZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_tensorial_ = true, is_anisotropic_ = true; }
+  OpDiffTensorialAnisotropicZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_tensorial_ = true, is_anisotropic_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -404,11 +404,11 @@ public:
 };
 
 
-class OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_tensorial_ = true, with_transpose_ = true, with_divergence_ = true; }
+  OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_tensorial_ = true, with_transpose_ = true, with_divergence_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -435,11 +435,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_anisotropic_ = true, is_tensorial_ = true, with_transpose_ = true; }
+  OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_anisotropic_ = true, is_tensorial_ = true, with_transpose_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -464,11 +464,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double);
 public:
-  OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_anisotropic_ = true, is_tensorial_ = true, with_transpose_ = true, with_divergence_ = true; }
+  OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_anisotropic_ = true, is_tensorial_ = true, with_transpose_ = true, with_divergence_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& molecular_nu_tensor_xx,
 //                const IJK_Field_double& molecular_nu_tensor_xy,
@@ -495,11 +495,11 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-class OpDiffStructuralOnlyZeroatwallIJK_double : public OpDiffIJKFacesGeneric_double
+class OpDiffStructuralOnlyZeroatwallIJK_double : public Operateur_IJK_faces_diff_base_double
 {
   Declare_instanciable_sans_constructeur(OpDiffStructuralOnlyZeroatwallIJK_double);
 public:
-  OpDiffStructuralOnlyZeroatwallIJK_double() : OpDiffIJKFacesGeneric_double() { is_structural_ = true; }
+  OpDiffStructuralOnlyZeroatwallIJK_double() : Operateur_IJK_faces_diff_base_double() { is_structural_ = true; }
 //  void calculer(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                const IJK_Field_double& structural_model_xx,
 //                const IJK_Field_double& structural_model_xy,
@@ -524,6 +524,6 @@ public:
 //               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
 };
 
-#include <OpDiffTurbIJK.tpp>
+#include <Operateur_IJK_faces_diff_base.tpp>
 
-#endif
+#endif /* Operateur_IJK_faces_diff_base_included */

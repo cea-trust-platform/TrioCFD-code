@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvIJKFacesCommon
-#define OpConvIJKFacesCommon
+#ifndef Operateur_IJK_faces_conv_base_included
+#define Operateur_IJK_faces_conv_base_included
 #include <IJK_Field.h>
 #include <IJK_Field_simd_tools.h>
 #include <TRUSTTab.h>
@@ -24,13 +24,13 @@
 #include <Boundary_Conditions.h>
 #include <Boundary_Conditions_Thermique.h>
 
-class OpConvIJKFacesCommon_double : public Operateur_IJK_faces_base_double
+class Operateur_IJK_faces_conv_base_double : public Operateur_IJK_faces_base_double
 {
-  Declare_base(OpConvIJKFacesCommon_double);
+  Declare_base(Operateur_IJK_faces_conv_base_double);
 public:
   virtual void initialize(const IJK_Splitting& splitting);
-  virtual void set_bc(const Boundary_Conditions& bc) { ; };
-  virtual void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) { ; };
+  virtual inline void set_bc(const Boundary_Conditions& bc) { ; };
+  virtual inline void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) { ; };
 //  void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
 //                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
 //                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);

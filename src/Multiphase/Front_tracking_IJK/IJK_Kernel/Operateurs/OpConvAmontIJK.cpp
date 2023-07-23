@@ -13,26 +13,16 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKQuickSharp.h>
+#include <OpConvAmontIJK.h>
 
-Implemente_instanciable(OpConvIJKQuickSharp_double, "OpConvIJKQuickSharp_double", OpConvIJKFacesCommon_double);
+Implemente_instanciable(OpConvAmontIJK_double, "OpConvAmontIJK_double", Operateur_IJK_faces_conv_base_double);
 
-Sortie& OpConvIJKQuickSharp_double::printOn(Sortie& os) const
+Sortie& OpConvAmontIJK_double::printOn(Sortie& os) const
 {
-  //  OpConvIJKFacesCommon_double::printOn(os);
   return os;
 }
 
-Entree& OpConvIJKQuickSharp_double::readOn(Entree& is)
+Entree& OpConvAmontIJK_double::readOn(Entree& is)
 {
-  //  OpConvIJKFacesCommon_double::readOn(is);
   return is;
-}
-
-void OpConvIJKQuickSharp_double::initialize(const IJK_Splitting& splitting)
-{
-  OpConvIJKFacesCommon_double::initialize(splitting);
-  delta_x_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_I);
-  delta_y_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_J);
-  delta_z_ = splitting.get_grid_geometry().get_constant_delta(DIRECTION_K);
 }

@@ -34,9 +34,9 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <Corrige_flux_FT.h>
 #include <IJK_Splitting.h>
-#include <OpConvIJKQuickScalar.h>
 #include <Operateur_IJK_base.h>
 #include <Operateur_IJK_data_channel.h>
+#include <OpConvQuickIJKScalar.h>
 
 class Corrige_flux_FT;
 

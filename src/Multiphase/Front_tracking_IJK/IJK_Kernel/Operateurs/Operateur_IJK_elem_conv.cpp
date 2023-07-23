@@ -20,8 +20,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Operateur_IJK_elem_conv.h>
+#include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(OpConvIJKElemCommon_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(Operateur_IJK_elem_conv_base_double) ) ;
 
 Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
 {
@@ -34,42 +35,78 @@ Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
   }
   prefix_ = Nom("OpConv");
   suffix_ = Nom("IJKScalar_double");
+  convection_op_ = "";
+  convection_op_option_= "";
 }
 
 Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
 {
-  DERIV(OpConvIJKElemCommon_double)::printOn( os );
+  DERIV(Operateur_IJK_elem_conv_base_double)::printOn( os );
   return os;
 }
 
 Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
 {
+  typer_convection_op(is);
+  Param param(que_suis_je());
+  set_param(param);
+  param.lire_sans_accolade(is);
+  return is;
+}
+
+void Operateur_IJK_elem_conv::set_param(Param& param)
+{
+  param.ajouter_non_std("velocity_convection_op", (this));
+}
+
+int Operateur_IJK_elem_conv::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+{
+  return 1;
+}
+
+Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
+{
   Cerr << "Read and Cast Operateur_IJK_elem_conv :" << finl;
   Motcle word;
   is >> word;
-  Nom type = "";
-  type += prefix_;
+  Motcle type(get_convection_op_type(word));
+  typer(type);
+  is >> valeur();
+  return is;
+}
+
+void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
+{
+  Cerr << "Read and Cast Operateur_IJK_elem_conv :" << finl;
+  Motcle word(convection_op);
+  Motcle type(get_convection_op_type(word));
+  typer(type);
+}
+
+Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
+{
+  Nom type(prefix_);
   convection_rank_ = convection_op_words_.search(word);
   switch(convection_rank_)
     {
     case 0 :
       {
-        type += "Centre2";
+        convection_op_ += "Centre2";
         break;
       }
     case 1 :
       {
-        type += "Quick";
+        convection_op_ += "Quick";
         break;
       }
     case 2 :
       {
-        type += "DiscQuick";
+        convection_op_ += "DiscQuick";
         break;
       }
     case 3 :
       {
-        type += "QuickInterface";
+        convection_op_ += "QuickInterface";
         break;
       }
     default :
@@ -79,8 +116,7 @@ Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
         abort();
       }
     }
+  type += convection_op_;
   type += suffix_;
-  typer(type);
-  is >> valeur();
-  return is;
+  return type;
 }

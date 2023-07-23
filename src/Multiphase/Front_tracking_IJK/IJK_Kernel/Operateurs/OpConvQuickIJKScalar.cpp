@@ -13,37 +13,16 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvCentre2IJKScalar_included
-#define OpConvCentre2IJKScalar_included
+#include <OpConvQuickIJKScalar.h>
 
-#include <Operateur_IJK_elem_conv_base.h>
+Implemente_instanciable_sans_constructeur(OpConvQuickIJKScalar_double, "OpConvQuickIJKScalar_double", Operateur_IJK_elem_conv_base_double);
 
-class OpConvCentre2IJKScalar_double : public Operateur_IJK_elem_conv_base_double
+Sortie& OpConvQuickIJKScalar_double::printOn(Sortie& os) const
 {
-  Declare_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double);
-public:
-  OpConvCentre2IJKScalar_double() : Operateur_IJK_elem_conv_base_double() { }
-protected:
+  return os;
+}
 
-  inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::X>(resu,k_layer);
-  }
-  inline void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Y>(resu,k_layer);
-  }
-  inline void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) override
-  {
-    compute_flux_<DIRECTION::Z>(resu,k_layer);
-  }
-
-private:
-  template <DIRECTION _DIR_>
-  void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
-
-};
-
-#include <OpConvCentre2IJKScalar.tpp>
-
-#endif /* OpConvCentre2IJKScalar_included */
+Entree& OpConvQuickIJKScalar_double::readOn(Entree& is)
+{
+  return is;
+}

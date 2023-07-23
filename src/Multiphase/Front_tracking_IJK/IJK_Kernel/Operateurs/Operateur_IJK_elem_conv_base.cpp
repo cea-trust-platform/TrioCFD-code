@@ -13,23 +13,21 @@
 *
 *****************************************************************************/
 
-#include <OpConvIJKElemCommon.h>
+#include <Operateur_IJK_elem_conv_base.h>
 
-Implemente_base_sans_constructeur(OpConvIJKElemCommon_double,"OpConvIJKElemCommon_double",Operateur_IJK_elem_base_double);
+Implemente_base_sans_constructeur(Operateur_IJK_elem_conv_base_double,"Operateur_IJK_elem_conv_base_double",Operateur_IJK_elem_base_double);
 
-Sortie& OpConvIJKElemCommon_double::printOn(Sortie& os) const
+Sortie& Operateur_IJK_elem_conv_base_double::printOn(Sortie& os) const
 {
-  //  Operateur_IJK_elem_base_double::printOn(os);
   return os;
 }
 
-Entree& OpConvIJKElemCommon_double::readOn(Entree& is)
+Entree& Operateur_IJK_elem_conv_base_double::readOn(Entree& is)
 {
-  //  Operateur_IJK_elem_base_double::readOn(is);
   return is;
 }
 
-void OpConvIJKElemCommon_double::initialize(const IJK_Splitting& splitting)
+void Operateur_IJK_elem_conv_base_double::initialize(const IJK_Splitting& splitting)
 {
   perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
   channel_data_.initialize(splitting);
@@ -39,9 +37,9 @@ void OpConvIJKElemCommon_double::initialize(const IJK_Splitting& splitting)
   input_velocity_z_ = 0;
 }
 
-void OpConvIJKElemCommon_double::calculer(const IJK_Field_double& field,
-                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                          IJK_Field_double& result)
+void Operateur_IJK_elem_conv_base_double::calculer(const IJK_Field_double& field,
+                                                   const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                                   IJK_Field_double& result)
 {
   // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
   assert(channel_data_.get_delta_z().size() == field.nk());
@@ -66,9 +64,9 @@ void OpConvIJKElemCommon_double::calculer(const IJK_Field_double& field,
 
 }
 
-void OpConvIJKElemCommon_double::ajouter(const IJK_Field_double& field,
-                                         const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-                                         IJK_Field_double& result)
+void Operateur_IJK_elem_conv_base_double::ajouter(const IJK_Field_double& field,
+                                                  const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
+                                                  IJK_Field_double& result)
 {
   // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
   assert(channel_data_.get_delta_z().size() == field.nk());
@@ -97,7 +95,7 @@ void OpConvIJKElemCommon_double::ajouter(const IJK_Field_double& field,
 // Copy curv_fram values from layers 1 and 3 to layers 0 and 2
 // (called at end of the computation of fluxes in z direction to keep the values
 //  for the next layer).
-void OpConvIJKElemCommon_double::shift_curv_fram(IJK_Field_local_double& tmp_curv_fram)
+void Operateur_IJK_elem_conv_base_double::shift_curv_fram(IJK_Field_local_double& tmp_curv_fram)
 {
   const int ni = tmp_curv_fram.ni();
   const int nj = tmp_curv_fram.nj();
@@ -116,7 +114,7 @@ void OpConvIJKElemCommon_double::shift_curv_fram(IJK_Field_local_double& tmp_cur
 
 // compute the "curv" value and part of the fram limiter (in the Fram routine from Eval_Quick_VDF_Elem.h) for 3 adjacent T values
 // store result in tmp_curv_fram_, z layer=1 (curv) and z layer=3 (fram)
-void OpConvIJKElemCommon_double::compute_curv_fram(DIRECTION _DIR_, int k_layer)
+void Operateur_IJK_elem_conv_base_double::compute_curv_fram(DIRECTION _DIR_, int k_layer)
 {
   int index = _DIR_ == DIRECTION::Y ? -1 : 0;
   ConstIJK_double_ptr input_field(*input_field_, 0, index, k_layer);
@@ -219,7 +217,7 @@ void OpConvIJKElemCommon_double::compute_curv_fram(DIRECTION _DIR_, int k_layer)
     }
 }
 
-void OpConvIJKElemCommon_double::compute_curv_fram_loop_(DIRECTION _DIR_, int iter, double factor12, double factor01, const ConstIJK_double_ptr& input_field, IJK_double_ptr& curv_values, IJK_double_ptr& fram_values )
+void Operateur_IJK_elem_conv_base_double::compute_curv_fram_loop_(DIRECTION _DIR_, int iter, double factor12, double factor01, const ConstIJK_double_ptr& input_field, IJK_double_ptr& curv_values, IJK_double_ptr& fram_values )
 {
   double t0 = 0., t1 = 0., t2 = 0.;
   input_field.get_left_center_right(_DIR_, iter, t0, t1, t2);

@@ -13,8 +13,8 @@
  *
  *****************************************************************************/
 
-#ifndef OpConvCentre2IJKScalar_H_TPP
-#define OpConvCentre2IJKScalar_H_TPP
+#ifndef OpConvCentre2IJKScalar_TPP_included
+#define OpConvCentre2IJKScalar_TPP_included
 #include <IJK_Field.h>
 
 template <DIRECTION _DIR_>

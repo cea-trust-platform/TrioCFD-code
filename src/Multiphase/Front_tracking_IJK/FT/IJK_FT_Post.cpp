@@ -41,7 +41,8 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
   interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
   d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_),
   thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_),
-  thermal_subresolution_(ijk_ft.thermal_subresolution_), thermal_(ijk_ft.thermal_)
+  thermal_subresolution_(ijk_ft.thermal_subresolution_), thermal_(ijk_ft.thermal_),
+  thermals_(ijk_ft.thermals_)
 {
   groups_statistiques_FT_.dimensionner(0);
 }
