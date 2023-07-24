@@ -50,10 +50,12 @@ void ComputeValParCompoInCell::calculer_moyennes_interface_element_pour_compo(
 
   // Boucle sur les facettes qui traversent l'element elem :
   int count = 0;
+  int num_som = 0;
+  int fa7 = 0;
   while (index >= 0)
     {
       const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-      const int fa7 = data.numero_facette_;
+      fa7 = data.numero_facette_;
       const int icompo = compo_connexe[fa7];
       if (icompo == num_compo)
         {
@@ -69,7 +71,7 @@ void ComputeValParCompoInCell::calculer_moyennes_interface_element_pour_compo(
           for (int isom = 0; isom < 3; isom++)
             {
               // numero du sommet dans le tableau sommets
-              const int num_som = facettes(fa7, isom);
+              num_som = facettes(fa7, isom);
               // Coordonnees barycentriques du centre de gravite de l'intersection
               // par rapport aux trois sommets de la facette.
               const double bary_som = data.barycentre_[isom];
@@ -92,12 +94,18 @@ void ComputeValParCompoInCell::calculer_moyennes_interface_element_pour_compo(
     }
   else
     {
-      Cerr << " Erreur dans "
+      Cerr << " Trouble in "
            "ComputeValParCompoInCell::calculer_normale_et_bary_element_pour_compo."
            << finl;
-      Cerr << "L'element " << elem << " contient des facettes de surface totale nulle!" << finl;
-      Cerr << "Que mettre pour le barycentre? ..." << finl;
-      assert(0);
+      Cerr << "L'element " << elem << " contient des facettes de surface totale "
+           << surface_tot << " nulle!" << finl;
+      for (int dir = 0; dir < 3; dir++)
+        {
+          bary[dir] = sommets(num_som, dir);
+          normale[dir] = normale_facettes(fa7, dir);
+        }
+      Cerr << "bary: " << bary[0] << " " << bary[1] << " " << bary[2] << finl;
+      Cerr << "normale: " << normale[0] << " " << normale[1] << " " << normale[2] << finl;
       Process::exit();
     }
 
@@ -303,14 +311,14 @@ void ComputeValParCompoInCell::calculer_moy_field_sommet_par_compo(
               assert(index >= 0); // Aucune facette dans cet element.
 
               double surface = 0.;
-
+              double moy_field_fa7 = 0.;
               // Boucle sur les facettes qui traversent l'element elem :
               while (index >= 0)
                 {
                   const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
                   const int fa7 = data.numero_facette_;
                   const int icompo = compo_connexe[fa7];
-                  double moy_field_fa7 = 0.;
+                  moy_field_fa7 = 0.;
                   if (icompo == num_compo)
                     {
                       const double surface_facette = surface_facettes[fa7];
@@ -334,9 +342,10 @@ void ComputeValParCompoInCell::calculer_moy_field_sommet_par_compo(
                   index = data.index_facette_suivante_;
                 }
 
-              assert(surface > 0.);
-              moy_field *= 1. / surface;
-
+              if (surface > 0.)
+                moy_field *= 1. / surface;
+              else
+                moy_field = moy_field_fa7;
               field_par_compo[i_compo](i, j, k) = moy_field;
             }
         }
