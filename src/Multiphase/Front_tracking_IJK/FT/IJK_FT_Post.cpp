@@ -29,6 +29,7 @@
 #include <IJK_Splitting.h>
 #include <Process.h>    // Process::Journal()
 #include <stat_counters.h>
+#include <IJK_Thermals.h>
 
 #include <sstream>
 
@@ -439,6 +440,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_th;
           }
       }
+      thermals_.posttraiter_tous_champs_thermal(liste_post_instantanes_);
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -966,6 +968,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_th;
       }
+
+    /*
+     * TODO: TEST
+     */
+    thermals_.posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, n);
 
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
   }

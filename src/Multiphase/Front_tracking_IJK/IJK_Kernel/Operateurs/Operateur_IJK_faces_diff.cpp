@@ -61,6 +61,8 @@ Operateur_IJK_faces_diff::Operateur_IJK_faces_diff()
   }
   prefix_ = Nom("OpDiff");
   suffix_ = Nom("IJK_double");
+  is_cast_= false;
+  diffusion_rank_ = 0;
 }
 
 Sortie& Operateur_IJK_faces_diff::printOn( Sortie& os ) const
@@ -73,28 +75,31 @@ Entree& Operateur_IJK_faces_diff::readOn( Entree& is )
 {
 
   typer_diffusion_op(is);
-  Param param(que_suis_je());
-  set_param(param);
-  param.lire_sans_accolade(is);
+//  Param param(que_suis_je());
+//  set_param(param);
+//  param.lire_sans_accolade(is);
   return is;
 }
 
 void Operateur_IJK_faces_diff::set_param(Param& param)
 {
-  param.ajouter_non_std("velocity_diffusion_op", (this));
+  param.ajouter_non_std("velocity_diffusion_form", (this));
 }
 
 int Operateur_IJK_faces_diff::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  Motcle motlu;
-  is >> motlu;
-  if (Process::je_suis_maitre())
-    Cerr << mot << " " << motlu << finl;
-  int option_rank = diffusion_op_options_.search(motlu);
-  if (option_rank < diffusion_op_options_.size() && option_rank !=-1)
-    diffusion_option_ = diffusion_op_options_[option_rank];
-  else
-    diffusion_option_ = diffusion_op_options_[0];
+  if (mot=="velocity_diffusion_form")
+    {
+      Motcle motlu;
+      is >> motlu;
+      if (Process::je_suis_maitre())
+        Cerr << mot << " " << motlu << finl;
+      int option_rank = diffusion_op_options_.search(motlu);
+      if (option_rank < diffusion_op_options_.size() && option_rank !=-1)
+        diffusion_option_ = diffusion_op_options_[option_rank];
+      else
+        diffusion_option_ = diffusion_op_options_[0];
+    }
   return 1;
 }
 
@@ -106,6 +111,7 @@ Entree& Operateur_IJK_faces_diff::typer_diffusion_op( Entree& is )
   Nom type(get_diffusion_op_type(word));
   typer(type);
   is >> valeur();
+  is_cast_=true;
   return is;
 }
 
@@ -115,14 +121,15 @@ void Operateur_IJK_faces_diff::typer_diffusion_op( const char * diffusion_op )
   Motcle word(diffusion_op);
   Motcle type(get_diffusion_op_type(word));
   typer(type);
+  is_cast_=true;
 }
 
 Nom Operateur_IJK_faces_diff::get_diffusion_op_type( Motcle word )
 {
+  diffusion_rank_ = diffusion_op_words_.search(word);
   Nom type(prefix_);
-  int diffusion_rank = diffusion_op_words_.search(word);
   // TODO: Use enum instead such as in IJK_FT:   enum TimeScheme { EULER_EXPLICITE, RK3_FT }; ??
-  switch(diffusion_rank)
+  switch(diffusion_rank_)
     {
     case 0 :
       {
@@ -204,10 +211,10 @@ Nom Operateur_IJK_faces_diff::get_diffusion_op_type( Motcle word )
       }
     case 16 :
       {
-//				type += "";
         // TODO: Full adaptive (viscosity with direction dependancy !)
         Cerr << "Unknown velocity diffusion operator! " << finl;
-        Process::exit();
+        abort();
+        //        Process::exit();
         break;
       }
     default :

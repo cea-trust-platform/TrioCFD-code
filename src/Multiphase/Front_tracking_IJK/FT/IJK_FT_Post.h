@@ -32,7 +32,6 @@
 #include <IJK_Interfaces.h>
 #include <Multigrille_Adrien.h>
 
-
 class IJK_FT;
 class IJK_Splitting;
 

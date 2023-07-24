@@ -33,6 +33,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+class IJK_FT_double;
+class Switch_FT_double;
+
 class IJK_Thermal : public DERIV(IJK_Thermal_base)
 {
   Declare_instanciable( IJK_Thermal );
@@ -54,11 +57,12 @@ public :
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
   inline const double& get_E0() const { return valeur().get_E0(); };
   inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
-
+  inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };
   /*
    * Setters
    */
   inline void set_field_T_ana() { return valeur().set_field_T_ana(); };
+  void set_fichier_sauvegarde(const char *lata_name) { valeur().set_fichier_sauvegarde(lata_name); };
 
   inline int initialize(const IJK_Splitting& splitting, const int idx);
   inline void update_thermal_properties();
@@ -67,6 +71,8 @@ public :
                            const double total_timestep,
                            const double time);
   inline void associer(const IJK_FT_double& ijk_ft);
+  inline void associer_post(const IJK_FT_Post& ijk_ft_post);
+  inline void associer_switch(const Switch_FT_double& ijk_ft_switch);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
                                  const double dxmin) const;
@@ -77,7 +83,22 @@ public :
                                    const double fractionnal_timestep, const double time, const double dE);
   inline void compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
                                                ArrOfDouble& flux_normal_interp);
-
+  void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
+  int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
+                                             const char * lata_name,
+                                             const int latastep,
+                                             const double current_time,
+                                             const int idx);
+  int posttraiter_champs_instantanes_thermal_interface(const Motcles& liste_post_instantanes,
+                                                       const char *lata_name,
+                                                       const int latastep,
+                                                       const double current_time,
+                                                       const int idx);
+  int posttraiter_champs_instantanes_thermal_interface_ref(const Motcles& liste_post_instantanes,
+                                                           const char *lata_name,
+                                                           const int latastep,
+                                                           const double current_time,
+                                                           const int idx);
   Entree& typer_thermal( Entree& is );
 
 protected:
@@ -86,6 +107,10 @@ protected:
   Nom prefix_;
   Motcles thermal_words_;
   Motcles lata_suffix_;
+
+  REF(IJK_FT_double) ref_ijk_ft_;
+  REF(IJK_FT_Post) ref_ijk_ft_post_;
+  REF(Switch_FT_double) ref_ijk_ft_switch_;
 };
 
 inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
@@ -105,7 +130,20 @@ inline void IJK_Thermal::euler_time_step(const double timestep)
 
 inline void IJK_Thermal::associer(const IJK_FT_double& ijk_ft)
 {
+  ref_ijk_ft_ = ijk_ft;
   valeur().associer(ijk_ft);
+}
+
+inline void IJK_Thermal::associer_post(const IJK_FT_Post& ijk_ft_post)
+{
+  ref_ijk_ft_post_ = ijk_ft_post;
+  valeur().associer_post(ijk_ft_post);
+}
+
+inline void IJK_Thermal::associer_switch(const Switch_FT_double& ijk_ft_switch)
+{
+  ref_ijk_ft_switch_ = ijk_ft_switch;
+  valeur().associer_switch(ref_ijk_ft_switch_);
 }
 
 inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)

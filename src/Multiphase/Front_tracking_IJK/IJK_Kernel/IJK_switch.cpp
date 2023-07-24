@@ -441,7 +441,6 @@ void Switch_double::switch_scalar_field(const IJK_Field_double& oldf, IJK_Field_
                 x += coeff_i(i, di) * coeff_j(j, dj) * coeff_k(k, dk) * oldf(i2+di, j2+dj, k2+dk);
           newf(i,j,k) = x;
         }
-
 }
 
 

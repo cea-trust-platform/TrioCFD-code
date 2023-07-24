@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef OpCentre4IJK_included
-#define OpCentre4IJK_included
+#ifndef OpConvCentre4IJK_included
+#define OpConvCentre4IJK_included
 
 #include <Operateur_IJK_faces_conv_base.h>
 
@@ -129,5 +129,5 @@ private:
 
 };
 
-#include <OpCentre4IJK.tpp>
-#endif /* OpCentre4IJK_included */
+#include <OpConvCentre4IJK.tpp>
+#endif /* OpConvCentre4IJK_included */

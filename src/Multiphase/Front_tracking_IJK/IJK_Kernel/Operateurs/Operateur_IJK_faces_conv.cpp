@@ -26,17 +26,22 @@ Implemente_instanciable_sans_constructeur( Operateur_IJK_faces_conv, "Operateur_
 
 Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
 {
-  convection_op_words_ = Motcles(9);
+  convection_op_words_ = Motcles(5);
   {
     convection_op_words_[0] = "amont";
-    convection_op_words_[1] = "Amont";
-    convection_op_words_[2] = "centre";
-    convection_op_words_[3] = "Centre";
-    convection_op_words_[4] = "centre4";
-    convection_op_words_[5] = "Centre4";
-    convection_op_words_[6] = "quick";
-    convection_op_words_[7] = "Quick";
-    convection_op_words_[8] = "quicksharp";
+    convection_op_words_[1] = "centre";
+    convection_op_words_[2] = "centre4";
+    convection_op_words_[3] = "quick";
+    convection_op_words_[4] = "quicksharp";
+//    convection_op_words_[0] = "amont";
+//    convection_op_words_[1] = "Amont";
+//    convection_op_words_[2] = "centre";
+//    convection_op_words_[3] = "Centre";
+//    convection_op_words_[4] = "centre4";
+//    convection_op_words_[5] = "Centre4";
+//    convection_op_words_[6] = "quick";
+//    convection_op_words_[7] = "Quick";
+//    convection_op_words_[8] = "quicksharp";
   }
   /* non_conservative_simple : rho div(u u)
    * non_conservative_rhou     : div(rho u u) - u div(rho u)
@@ -51,7 +56,9 @@ Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
   }
 
   prefix_ = Nom("OpConv");
-  suffix_ = Nom("IJKScalar_double");
+  suffix_ = Nom("IJK_double");
+  is_cast_=false;
+  convection_rank_=0;
 }
 
 Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
@@ -63,20 +70,20 @@ Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
 Entree& Operateur_IJK_faces_conv::readOn( Entree& is )
 {
   typer_convection_op(is);
-  Param param(que_suis_je());
-  set_param(param);
-  param.lire_sans_accolade(is);
+//  Param param(que_suis_je());
+//  set_param(param);
+//  param.lire_sans_accolade(is);
   return is;
 }
 
 void Operateur_IJK_faces_conv::set_param(Param& param)
 {
-  param.ajouter_non_std("velocity_convection_op", (this));
+  param.ajouter_non_std("velocity_convection_form", (this));
 }
 
 int Operateur_IJK_faces_conv::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  if (mot=="velocity_convection_op")
+  if (mot=="velocity_convection_form")
     {
       Motcle motlu;
       is >> motlu;
@@ -99,6 +106,7 @@ Entree& Operateur_IJK_faces_conv::typer_convection_op(Entree& is) // (const char
   Motcle word(convection_op);
   Nom type(get_convection_op_type(word));
   typer(type);
+  is_cast_=true;
   return is;
 }
 
@@ -108,46 +116,60 @@ void Operateur_IJK_faces_conv::typer_convection_op(const char * convection_op) /
   Motcle word(convection_op);
   Nom type(get_convection_op_type(word));
   typer(type);
+  is_cast_=true;
 }
 
 Nom Operateur_IJK_faces_conv::get_convection_op_type( Motcle word ) // (const char * convection_op)
 {
-  Motcle convection_op;
-  Motcle convection_key(convection_op);
-  convection_rank_ = convection_op_words_.search(convection_key);
+  convection_rank_ = convection_op_words_.search(word);
   Nom type(prefix_);
   switch(convection_rank_)
     {
     case 0 :
       {
-        convection_op_ += "Centre4";
+        convection_op_ += "Amont";
         break;
       }
     case 1 :
       {
-        convection_op_ += "Quick";
+        convection_op_ += "Centre4";
         break;
       }
     case 2 :
       {
-        convection_op_ += "DiscQuick";
+        convection_op_ += "Centre4";
         break;
       }
     case 3 :
       {
-        convection_op_ += "Centre4";
+        convection_op_ += "QuickSharp";
         break;
       }
     case 4 :
       {
-        convection_op_ += "Quick";
+        convection_op_ += "QuickSharp";
         break;
       }
-    case 5 :
-      {
-        convection_op_ += "DiscQuick";
-        break;
-      }
+//    case 5 :
+//      {
+//        convection_op_ += "Centre4";
+//        break;
+//      }
+//    case 6 :
+//      {
+//        convection_op_ += "Centre4";
+//        break;
+//      }
+//    case 7 :
+//      {
+//        convection_op_ += "QuickSharp";
+//        break;
+//      }
+//    case 8 :
+//      {
+//        convection_op_ += "QuickSharp";
+//        break;
+//      }
     default :
       {
         Cerr << "ERROR : Scalar convection operators that are already implemented are:" << finl;

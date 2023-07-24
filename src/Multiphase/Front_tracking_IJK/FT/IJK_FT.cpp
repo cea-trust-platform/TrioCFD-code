@@ -489,6 +489,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
   param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
   param.ajouter("thermal", &thermal_);
+  param.ajouter("thermals", &thermals_);
   //  thermal_problem_number_=0;
 //  param.ajouter("thermal_problem_number", &thermal_problem_number_); // XD_ADD_P floattant vapour viscosity
 
@@ -828,6 +829,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   for (auto& itr : thermal_)
     itr.associer(*this);
 
+  thermals_.associer(*this);
+
   run();
   return is;
 }
@@ -1158,6 +1161,8 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       ++idth;
     }
 
+  thermals_.sauvegarder_temperature(lata_name);
+
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
   SFichier fichier;
   if (Process::je_suis_maitre())
@@ -1281,6 +1286,11 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
         }
       if (flag_list_not_empty_th)
         fichier << " } \n" ;
+
+      /*
+       * Thermals test
+       */
+      thermals_.sauvegarder_thermals(fichier);
       /*
        *
        */
@@ -1311,6 +1321,7 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("energie", &energie_);
   param.ajouter("thermal_subresolution", &thermal_subresolution_);
   param.ajouter("thermal", &thermal_);
+  param.ajouter("thermals", &thermals_);
   param.ajouter("forcage", &forcage_);
   param.ajouter("corrections_qdm", &qdm_corrections_);
   // GAB : En chantier, (ce qui suit)
@@ -1426,10 +1437,13 @@ double IJK_FT_double::find_timestep(const double max_timestep,
     {
       const double dt_th = itr.compute_timestep(dt_thermal, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:
-      dt_thermal = std::min(dt_thermal_subresolution, dt_th);
+      dt_thermal = std::min(dt_thermal, dt_th);
     }
 
-  const double dt = std::min(max_timestep, timestep_facsec_*std::min(dt_eq_velocity, dt_thermal));
+  double dt_thermals = 1.e20;
+  thermals_.compute_timestep(dt_thermals, dxmin);
+
+  const double dt = std::min(max_timestep, timestep_facsec_*std::min(dt_eq_velocity, dt_thermals));
   //  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie),dt_thermal_subresolution));
 
   if (Process::je_suis_maitre())
@@ -1442,6 +1456,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       fic<<" "<<dt_energie; // If no thermal equation, value will be large.
       fic<<" "<<dt_thermal_subresolution; // If no thermal equation, value will be large.
       fic<<" "<<dt_thermal; // If no thermal equation, value will be large.
+      fic<<" "<<dt_thermals; // If no thermal equation, value will be large.
       fic<<finl;
       fic.close();
     }
@@ -1671,6 +1686,8 @@ int IJK_FT_double::initialise()
       idth++;
     }
 
+  thermals_.initialize(splitting_, nalloc);
+
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
@@ -1703,6 +1720,30 @@ int IJK_FT_double::initialise()
     }
 
   if (size_thermal_problem(Nom("onefluidenergy")) > 0)
+    {
+      interfaces_.set_compute_surfaces_mouillees();
+      for (int i=0; i<2; i++)
+        {
+          interfaces_.switch_indicatrice_next_old();
+          interfaces_.calculer_indicatrice_next(
+            post_.potentiel(),
+            gravite_,
+            delta_rho,
+            sigma_,
+            /*Pour post-traitement : post_.rebuilt_indic()
+            */
+#ifdef SMOOTHING_RHO
+            /* Pour le smoothing : */
+            rho_field_ft_,
+            rho_vapeur_,
+            smooth_density_,
+#endif
+            current_time_, tstep_
+          );
+        }
+    }
+
+  if (thermals_.size_thermal_problem(Nom("onefluidenergy")) > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -2189,8 +2230,9 @@ void IJK_FT_double::run()
 //      Process::exit();
 //    }
 
-  velocity_diffusion_op_.set_bc(boundary_conditions_);
   velocity_diffusion_op_.initialize(splitting_);
+  velocity_diffusion_op_.set_bc(boundary_conditions_);
+
   //  velocity_convection_op(type_velocity_convection_op_).initialize(splitting_);
   //  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
   //	OpConvCentre4IJK_double velocity_convection_op_centre_;
@@ -2261,6 +2303,8 @@ void IJK_FT_double::run()
 
               for (auto& itr : thermal_)
                 itr.update_thermal_properties();
+
+              thermals_.update_thermal_properties();
             }
           // La pression n'est pas encore initialisee. elle est donc nulle.
           // Avec cette option, on essaye une initialisation basee sur le champ de pression diphasique
@@ -2391,6 +2435,7 @@ void IJK_FT_double::run()
           // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
+      thermals_.update_thermal_properties();
     }
   else
     {
@@ -2410,6 +2455,8 @@ void IJK_FT_double::run()
 
       for (auto& itr : thermal_)
         itr.update_thermal_properties();
+
+      thermals_.update_thermal_properties();
 
       const double indic_moyen = calculer_v_moyen(interfaces_.I());
       rho_moyen_ = indic_moyen*rho_liquide_ + (1-indic_moyen)*rho_vapeur_;
@@ -2607,6 +2654,8 @@ void IJK_FT_double::run()
                     }
                 }
 
+              thermals_.euler_rustine_step(timestep_);
+
               // GAB, qdm rho_n+1 v_n+1 :
               if (test_etapes_et_bilan_)
                 {
@@ -2713,6 +2762,9 @@ void IJK_FT_double::run()
                         }
 
                     }
+                  thermals_.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
+                                                 current_time_at_rk3_step);
+
                 }
               // Calcul du terme source force acceleration :
               // GAB, rotation
@@ -2756,6 +2808,8 @@ void IJK_FT_double::run()
 
               for (auto& itr : thermal_)
                 itr.update_thermal_properties();
+
+              thermals_.update_thermal_properties();
             }
           // GAB, qdm rho_n+1 v_n+1 :
           if (test_etapes_et_bilan_)
@@ -3995,6 +4049,14 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
       velocity_[1].echange_espace_virtuel(2);
       velocity_[2].echange_espace_virtuel(2);
     }
+  if (thermals_.size())
+    {
+      // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
+      // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
+      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+      velocity_[1].echange_espace_virtuel(2);
+      velocity_[2].echange_espace_virtuel(2);
+    }
 
   /*
    * TODO: Change this block with DERIV CLASS IJK_Thermal
@@ -4010,6 +4072,9 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
   for (auto& itr : thermal_)
     itr.euler_time_step(timestep_);
+
+  thermals_.euler_time_step(timestep_);
+
 
   if (!frozen_velocity_)
     {
@@ -4244,6 +4309,8 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           Process::exit();
         }
     }
+
+  thermals_.rk3_sub_step(rk_step, total_timestep, time);
 
   if (!frozen_velocity_)
     {
@@ -5091,5 +5158,11 @@ int IJK_FT_double::size_thermal_problem(Nom thermal_problem)
         size++;
     }
   return size;
+}
+
+void IJK_FT_double::redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,
+                                                      IJK_Field_double& output_field)
+{
+  redistribute_to_splitting_ft_elem_.redistribute(input_field, output_field);
 }
 

@@ -26,7 +26,6 @@
 #include <Objet_U.h>
 #include <Boundary_Conditions_Thermique.h>
 #include <IJK_Splitting.h>
-#include <IJK_Field.h>
 #include <Parser.h>
 #include <IJK_Lata_writer.h>
 #include <Operateur_IJK_elem_conv.h>
@@ -34,6 +33,7 @@
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
+#include <IJK_FT_Post.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -44,6 +44,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 class IJK_FT_double;
+class Switch_FT_double;
 
 class IJK_Thermal_base : public Objet_U
 {
@@ -64,6 +65,8 @@ public:
                           const double dxmin) const;
 
   void associer(const IJK_FT_double& ijk_ft);
+  void associer_post(const IJK_FT_Post& ijk_ft_post);
+  void associer_switch(const Switch_FT_double& ijk_ft_switch);
   void euler_time_step(const double timestep);
   void rk3_sub_step(const int rk_step,
                     const double total_timestep,
@@ -194,6 +197,8 @@ protected:
   IJK_Field_double RK3_F_rustine_; // Temporary storage for substeps in the RK3 algorithm for the rustine calculation.
 
   REF(IJK_FT_double) ref_ijk_ft_;
+  REF(IJK_FT_Post) ref_ijk_ft_post_;
+  REF(Switch_FT_double) ref_ijk_ft_switch_;
   Corrige_flux_FT corrige_flux_;
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
   int rang_;

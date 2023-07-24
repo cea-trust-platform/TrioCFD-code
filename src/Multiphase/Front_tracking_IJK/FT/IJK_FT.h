@@ -145,6 +145,10 @@ public :
   {
     return disable_diphasique_;
   }
+  const Maillage_FT_IJK& get_maillage_ft_ijk() const
+  {
+    return interfaces_.maillage_ft_ijk();
+  }
 //  const int& nb_thermal_equations() const
 //  {
 //      return thermique_.
@@ -220,6 +224,9 @@ public :
     return splitting_.get_grid_geometry();
   }
   const IJK_FT_Post& get_post() const {return post_;}
+
+  void redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,
+                                         IJK_Field_double& output_field);
 
 protected :
   // Interdit constructeur par copie et operateur copie

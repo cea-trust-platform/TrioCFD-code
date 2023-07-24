@@ -57,7 +57,7 @@ public :
   Entree& typer_diffusion_op(Entree& is);
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
   void set_param(Param& param);
-  Nom get_convection_op_type(Motcle word);
+  Nom get_diffusion_op_type(Motcle word);
 
   /*
    * Getters
@@ -83,10 +83,13 @@ protected:
   int diffusion_rank_;
   Nom diffusion_op_;
   Nom diffusion_op_options_;
+  bool is_cast_;
 };
 
 inline void Operateur_IJK_elem_diff::initialize(const IJK_Splitting& splitting)
 {
+  if (!is_cast_)
+    typer_diffusion_op("standard");
   valeur().initialize(splitting);
 }
 

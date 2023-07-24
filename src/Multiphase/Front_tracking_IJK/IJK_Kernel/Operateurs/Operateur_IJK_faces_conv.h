@@ -77,6 +77,7 @@ protected:
   Nom convection_op_;
   Nom convection_option_;
   int convection_rank_;
+  bool is_cast_;
 };
 
 inline double Operateur_IJK_faces_conv::compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
@@ -96,6 +97,8 @@ inline void Operateur_IJK_faces_conv::compute_add(IJK_Field_double& dvx, IJK_Fie
 
 inline void Operateur_IJK_faces_conv::initialize(const IJK_Splitting& splitting)
 {
+  if (!is_cast_)
+    typer_convection_op("quick");
   valeur().initialize(splitting);
 }
 

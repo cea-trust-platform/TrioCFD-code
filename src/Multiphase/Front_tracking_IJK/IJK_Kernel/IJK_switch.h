@@ -19,7 +19,6 @@
 #include <IJK_Splitting.h>
 #include <FixedVector.h>
 #include <Interprete.h>
-
 #include <Linear_algebra_tools.h>
 #include <Param.h>
 #include <Interprete_bloc.h>
@@ -62,8 +61,10 @@ protected:
                                                      DoubleTab& coeff_k, IntTab Indice_k) = 0;
 
   // overriden in FT - to be brought here at some point once merge with thermic BC is done ...
-  virtual int init_thermique()  { return 0; }
-  virtual void prepare_thermique(const Nom lata_name) {}
+  virtual int init_thermique()  { return 0; };
+  virtual void prepare_thermique(const Nom lata_name) {};
+  virtual int init_thermals()  { return 0; };
+  virtual void prepare_thermals(const Nom lata_name) {};
 
   void write_velocity(const Nom lata_name) const;
   void calculer_coords(const IJK_Splitting::Localisation loc);

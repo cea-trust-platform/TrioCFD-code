@@ -74,10 +74,13 @@ protected:
   int convection_rank_;
   Nom convection_op_;
   Nom convection_op_option_;
+  bool is_cast_;
 };
 
 inline void Operateur_IJK_elem_conv::initialize(const IJK_Splitting& splitting)
 {
+  if (!is_cast_)
+    typer_convection_op("quick");
   valeur().initialize(splitting);
 }
 

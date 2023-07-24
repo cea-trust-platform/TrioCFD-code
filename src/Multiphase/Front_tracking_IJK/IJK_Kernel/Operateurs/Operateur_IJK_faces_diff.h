@@ -98,6 +98,7 @@ protected:
   int diffusion_rank_;
   Nom diffusion_op_;
   Nom diffusion_option_;
+  bool is_cast_;
 };
 
 inline double Operateur_IJK_faces_diff::compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
@@ -117,6 +118,8 @@ inline void Operateur_IJK_faces_diff::compute_add(IJK_Field_double& dvx, IJK_Fie
 
 inline void Operateur_IJK_faces_diff::initialize(const IJK_Splitting& splitting)
 {
+  if (!is_cast_)
+    typer_diffusion_op("standard");
   valeur().initialize(splitting);
 }
 

@@ -21,15 +21,15 @@
 
 #include <IJK_Thermal_base.h>
 #include <Param.h>
-#include <IJK_Navier_Stokes_tools.h>
+//#include <IJK_Navier_Stokes_tools.h>
 #include <stat_counters.h>
-#include <IJK_FT.h>
 #include <DebogIJK.h>
 #include <Corrige_flux_FT.h>
-
+#include <IJK_FT.h>
+#include <IJK_FT_Post.h>
+#include <IJK_switch_FT.h>
 
 Implemente_base_sans_constructeur( IJK_Thermal_base, "IJK_Thermal_base", Objet_U ) ;
-
 
 /********************************************
  * Methods inherited from Objet_U
@@ -500,6 +500,16 @@ void IJK_Thermal_base::associer(const IJK_FT_double& ijk_ft)
 {
   ref_ijk_ft_ = ijk_ft;
   liste_post_instantanes_ = ijk_ft.get_post().get_liste_post_instantanes();
+}
+
+void IJK_Thermal_base::associer_post(const IJK_FT_Post& ijk_ft_post)
+{
+  ref_ijk_ft_post_ = ijk_ft_post;
+}
+
+void IJK_Thermal_base::associer_switch(const Switch_FT_double& ijk_ft_switch)
+{
+  ref_ijk_ft_switch_ = ijk_ft_switch;
 }
 
 void IJK_Thermal_base::euler_time_step(const double timestep)

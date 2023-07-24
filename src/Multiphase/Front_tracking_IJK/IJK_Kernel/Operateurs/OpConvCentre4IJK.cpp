@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <OpCentre4IJK.h>
+#include <OpConvCentre4IJK.h>
 
 Implemente_instanciable_sans_constructeur(OpConvCentre4IJK_double, "OpConvCentre4IJK_double", Operateur_IJK_faces_conv_base_double);
 

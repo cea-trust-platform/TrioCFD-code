@@ -26,17 +26,19 @@ Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_I
 
 Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
 {
-  convection_op_words_ = Motcles(4);
+  convection_op_words_ = Motcles(5);
   {
-    convection_op_words_[0] = "centre2";
-    convection_op_words_[1] = "quick";
-    convection_op_words_[2] = "discquick";
-    convection_op_words_[3] = "quickinterface";
+    convection_op_words_[0] = "centre";
+    convection_op_words_[1] = "centre2";
+    convection_op_words_[2] = "quick";
+    convection_op_words_[3] = "discquick";
+    convection_op_words_[4] = "quickinterface";
   }
   prefix_ = Nom("OpConv");
   suffix_ = Nom("IJKScalar_double");
   convection_op_ = "";
-  convection_op_option_= "";
+  convection_op_option_ = "";
+  convection_rank_ = 0;
 }
 
 Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
@@ -56,7 +58,7 @@ Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
 
 void Operateur_IJK_elem_conv::set_param(Param& param)
 {
-  param.ajouter_non_std("velocity_convection_op", (this));
+  param.ajouter_non_std("velocity_convection_form", (this));
 }
 
 int Operateur_IJK_elem_conv::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -72,6 +74,7 @@ Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
   Motcle type(get_convection_op_type(word));
   typer(type);
   is >> valeur();
+  is_cast_=true;
   return is;
 }
 
@@ -81,6 +84,7 @@ void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
   Motcle word(convection_op);
   Motcle type(get_convection_op_type(word));
   typer(type);
+  is_cast_=true;
 }
 
 Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
@@ -96,15 +100,20 @@ Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
       }
     case 1 :
       {
-        convection_op_ += "Quick";
+        convection_op_ += "Centre2";
         break;
       }
     case 2 :
       {
-        convection_op_ += "DiscQuick";
+        convection_op_ += "Quick";
         break;
       }
     case 3 :
+      {
+        convection_op_ += "DiscQuick";
+        break;
+      }
+    case 4 :
       {
         convection_op_ += "QuickInterface";
         break;

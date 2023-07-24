@@ -39,6 +39,8 @@ Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
   suffix_ = Nom("IJKScalar_double");
   diffusion_op_ = "";
   diffusion_op_options_ = "";
+  is_cast_ = false;
+  diffusion_rank_= 0 ;
 }
 
 Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
@@ -50,15 +52,15 @@ Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 Entree& Operateur_IJK_elem_diff::readOn( Entree& is )
 {
   typer_diffusion_op(is);
-  Param param(que_suis_je());
-  set_param(param);
-  param.lire_sans_accolade(is);
+//  Param param(que_suis_je());
+//  set_param(param);
+//  param.lire_sans_accolade(is);
   return is;
 }
 
 void Operateur_IJK_elem_diff::set_param(Param& param)
 {
-  param.ajouter_non_std("velocity_diffusion_op", (this));
+  param.ajouter_non_std("velocity_diffusion_form", (this));
 }
 
 int Operateur_IJK_elem_diff::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -71,9 +73,10 @@ Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
   Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
   Motcle word;
   is >> word;
-  Nom type(get_convection_op_type(word));
+  Nom type(get_diffusion_op_type(word));
   typer(type);
   is >> valeur();
+  is_cast_=true;
   return is;
 }
 
@@ -81,15 +84,16 @@ void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (
 {
   Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
   Motcle word(diffusion_op);
-  Nom type(get_convection_op_type(word));
+  Nom type(get_diffusion_op_type(word));
   typer(type);
+  is_cast_=true;
 }
 
-Nom Operateur_IJK_elem_diff::get_convection_op_type(Motcle word)
+Nom Operateur_IJK_elem_diff::get_diffusion_op_type(Motcle word)
 {
   Nom type(prefix_);
-  int diffusion_rank = diffusion_op_words_.search(word);
-  switch(diffusion_rank)
+  diffusion_rank_ = diffusion_op_words_.search(word);
+  switch(diffusion_rank_)
     {
     case 0 :
       {
