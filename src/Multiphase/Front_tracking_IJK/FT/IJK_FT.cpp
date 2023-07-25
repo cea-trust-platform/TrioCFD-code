@@ -447,6 +447,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("expression_vy_init", &expression_vitesse_initiale_[1]); // XD_ADD_P chaine initial field for y-velocity component (parser of x,y,z)
   param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]); // XD_ADD_P chaine initial field for z-velocity component (parser of x,y,z)
   param.ajouter("expression_derivee_force", &expression_derivee_acceleration_); // XD_ADD_P chaine expression of the time-derivative of the X-component of a source-term (see terme_force_ini for the initial value). terme_force_ini : initial value of the X-component of the source term (see expression_derivee_force  for time evolution)
+  param.ajouter_flag("compute_force_init", &compute_force_init_); // XD_ADD_P chaine not_set
   param.ajouter("terme_force_init", &terme_source_acceleration_); // XD_ADD_P chaine not_set
   param.ajouter("correction_force", &correction_force_); // XD_ADD_P chaine not_set
   param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_); // XD_ADD_P chaine not_set
@@ -1590,13 +1591,37 @@ int IJK_FT_double::initialise()
       pressure_.echange_espace_virtuel(pressure_.ghost());
     }
 
-
-
   // On peut recuperer le domainevf:
   const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
+
+
+  /*
+   * Compute mean rho_g using the indicator function
+   */
+  if (compute_force_init_)
+    {
+      double indicator_sum = 0;
+      double terme_source_acceleration_increment;
+      const int ni = interfaces_.I().ni();
+      const int nj = interfaces_.I().nj();
+      const int nk = interfaces_.I().nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double indic = interfaces_.I(i,j,k);
+              indicator_sum += indic;
+              terme_source_acceleration_increment = rho_liquide_ * indic + rho_vapeur_ * (1-indic);
+              terme_source_acceleration_ += terme_source_acceleration_increment;
+            }
+      const double gravite_norm = sqrt(gravite_[0]*gravite_[0] + gravite_[1]*gravite_[1] + gravite_[2]*gravite_[2]);
+      terme_source_acceleration_ /= indicator_sum;
+      terme_source_acceleration_ *= gravite_norm;
+      Cout << "Calculation of force init due to gravity mean(rho_g): " << terme_source_acceleration_ << finl;
+    }
 
   nalloc += post_.initialise(reprise_);
 

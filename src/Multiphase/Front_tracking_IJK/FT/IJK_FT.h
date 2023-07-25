@@ -367,6 +367,7 @@ protected :
   Vecteur3 integrated_residu_;
   // terme source qdm pour pousser le fluide dans le canal (en m/s/s)
   double terme_source_acceleration_;
+  int compute_force_init_;
 
   // Vecteurs de taille 3 a lire dans le jeu de donnees :
   ArrOfDouble terme_source_correction_; // Valeur de la force de correction moyenne a appliquer
