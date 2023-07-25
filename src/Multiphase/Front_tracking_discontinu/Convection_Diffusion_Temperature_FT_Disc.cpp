@@ -1702,12 +1702,12 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
     {
 
       if (sub_type(Echange_contact_VDF_FT_Disc, la_cl.valeur()))
-      {
-    	  Cerr << "Echange_contact_VDF_FT_Disc" << finl;
-    	        /* Le terme de flux calcule a partir du (phi_ext) s'ecrit :
-    	        //                           phi_ext_*Surf
-    	        //                           avec phi_ext : heat flux density at the surface.
-    	         * */
+        {
+          Cerr << "Echange_contact_VDF_FT_Disc" << finl;
+          /* Le terme de flux calcule a partir du (phi_ext) s'ecrit :
+          //                           phi_ext_*Surf
+          //                           avec phi_ext : heat flux density at the surface.
+           * */
           const Echange_contact_VDF_FT_Disc& la_cl_typee = ref_cast(Echange_contact_VDF_FT_Disc, la_cl.valeur());
           //  Cerr <<  "   Face " << num_face << " is actually #" << num_face-ndeb << " on this boundary." << finl;
           const double h = la_cl_typee.h_imp(num_face-ndeb);
@@ -1717,9 +1717,9 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
           //
           flux = la_cl_typee.flux_exterieur_impose(num_face-ndeb) + h*(T_imp - TSAT_CONSTANTE);
           Twall = T_imp;
-      }
+        }
       else
-      {
+        {
           Cerr << "paroi_temperature_imposee (among other possibilities)" << finl;
           /* Le terme de flux calcule a partir du couple(h_imp,T_ext) s'ecrit :
           //                           h_t(T_ext - T_entier)*Surf
@@ -1736,7 +1736,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
           //                                                it is taken into account after this function.
           Twall = T_imp;
 
-      }
+        }
     }
   /*  else if ( sub_type(paroi_contact,la_cl.valeur()) )
       {

@@ -264,10 +264,14 @@ void Triple_Line_Model_FT_Disc::completer()
       // ymeso has not been initialised. n_ext_meso is used instead:
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
       const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
-      const int num_face_bord_with_tcl = get_any_tcl_face();
-      int elem_voisin = zvdf.face_voisins(num_face_bord_with_tcl, 0) + zvdf.face_voisins(num_face_bord_with_tcl, 1) +1;
-      const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face_bord_with_tcl,elem_voisin));
-      ymeso_ = cell_height * n_ext_meso_;
+      int num_face_bord_with_tcl = get_any_tcl_face();
+      if (num_face_bord_with_tcl>0)
+        {
+          int elem_voisin = zvdf.face_voisins(num_face_bord_with_tcl, 0) + zvdf.face_voisins(num_face_bord_with_tcl, 1) +1;
+          const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face_bord_with_tcl,elem_voisin));
+          ymeso_ = cell_height * n_ext_meso_;
+        }
+      ymeso_ = Process::mp_max(ymeso_);
       Cerr << "[TCL] ymeso is set to " << ymeso_ << " according to provided n_ext_meso_ " << n_ext_meso_ << finl;
     }
   ymeso_ -= Objet_U::precision_geom;

@@ -383,9 +383,9 @@ bool Probleme_FT_Disc_gen::updateGivenFields()
       ArrOfDouble mpoint_from_CL;
       ArrOfDouble Q_from_CL;
       tcl ().compute_TCL_fluxes_in_all_boundary_cells (elems_with_CL_contrib,
-						       faces_with_CL_contrib,
-						       mpoint_from_CL,
-						       Q_from_CL);
+                                                       faces_with_CL_contrib,
+                                                       mpoint_from_CL,
+                                                       Q_from_CL);
     }
   Probleme_base::updateGivenFields();
   return true;
