@@ -67,7 +67,7 @@ public:
  */
 inline void Op_Conv_centre4b_VDF_Face::associer_vitesse(const Champ_base& ch_vit)
 {
-  const Champ_Face& vit = (Champ_Face&) ch_vit;
+  const Champ_Face_VDF& vit = (Champ_Face_VDF&) ch_vit;
 
   Eval_centre4b_VDF_Face& eval_conv = (Eval_centre4b_VDF_Face&) iter.evaluateur();
   eval_conv.associer(vit );                // Eval_Conv_VDF::associer

@@ -28,12 +28,12 @@
 #include <Zone_VF.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champs_compris.h>
 #include <Transport_Interfaces_base.h>
 #include <Probleme_base.h>
 #include <Loi_Etat_GP.h>
-#include <Champ_Fonc_Face.h>
+#include <Champ_Fonc_Face_VDF.h>
 #include <Assembleur_P_VDF.h>
 #include <Matrice_Morse.h>
 #include <Multigrille_Adrien.h>

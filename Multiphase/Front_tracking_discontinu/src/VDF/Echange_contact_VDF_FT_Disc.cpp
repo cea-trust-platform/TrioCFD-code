@@ -44,6 +44,8 @@ Sortie& Echange_contact_VDF_FT_Disc::printOn( Sortie& os ) const
 
 Entree& Echange_contact_VDF_FT_Disc::readOn( Entree& s )
 {
+  if (app_domains.size() == 0) app_domains = { Motcle("Thermique") };
+
   //  Echange_contact_VDF::readOn( is );
   Cerr<<"Lecture des parametres du contact (Echange_contact_VDF_FT_Disc::readOn)"<<finl;
   Param param("Echange_contact_VDF_FT_Disc::readOn");

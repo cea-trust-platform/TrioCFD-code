@@ -31,7 +31,7 @@ class Temperature_imposee_paroi_rayo_transp : public Cond_Lim_Rayo, public Tempe
   Declare_instanciable(Temperature_imposee_paroi_rayo_transp);
 
 public :
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void associer_modele_rayo(Modele_Rayonnement_base& ) override;
   void completer() override;
   void mettre_a_jour(double temps) override;

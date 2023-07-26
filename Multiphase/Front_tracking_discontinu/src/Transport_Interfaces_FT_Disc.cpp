@@ -32,14 +32,14 @@
 #include <Parser.h>
 #include <Zone_VF.h>
 #include <Zone_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_P1NC.h>
 #include <Champ_Fonc_P1NC.h>
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 #include <Statistiques.h>
 #include <Paroi_FT_disc.h>
-#include <Champ_Fonc_Face.h>
+#include <Champ_Fonc_Face_VDF.h>
 #include <Scatter.h>
 #include <LecFicDiffuse.h>
 #include <Sauvegarde_Reprise_Maillage_FT.h>
@@ -2083,7 +2083,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
                   ref_cast(Champ_Fonc_P1NC, champ_vitesse).filtrer_L2(champ_filtre.valeurs());
               }
           }
-        else if (sub_type(Champ_Face, champ_vitesse) || sub_type(Champ_Fonc_Face,champ_vitesse))
+        else if (sub_type(Champ_Face_VDF, champ_vitesse) || sub_type(Champ_Fonc_Face_VDF,champ_vitesse))
           {
             // On appelle 'valeur_aux_elems' du champ aux faces.
             champ_vitesse_interp = &champ_vitesse;
@@ -2146,7 +2146,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
       }
     case Transport_Interfaces_FT_Disc_interne::VDF_LINEAIRE:
       {
-        if (!sub_type(Champ_Face, champ_vitesse) && !sub_type(Champ_Fonc_Face,champ_vitesse) )
+        if (!sub_type(Champ_Face_VDF, champ_vitesse) && !sub_type(Champ_Fonc_Face_VDF,champ_vitesse) )
           {
             Cerr << "Error for the method Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee\n"
                  << "the interpolation VDF_LINEAIRE is valid only for a VDF discretization with a Champ_face field\n"

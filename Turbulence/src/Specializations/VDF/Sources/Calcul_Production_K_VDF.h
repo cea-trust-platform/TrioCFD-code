@@ -24,7 +24,7 @@
 
 #include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
-class Champ_Face;
+class Champ_Face_VDF;
 class Zone_VDF;
 
 //  CLASS Calcul_Production_K_VDF
@@ -35,13 +35,13 @@ class Calcul_Production_K_VDF
 protected:
   Calcul_Production_K_VDF() {}
 
-  DoubleVect& calculer_terme_production_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_Axi(const Zone_VDF&, const Champ_Face&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_Axi(const Zone_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_BiK(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_BiK(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const Champ_Face_VDF&, const DoubleTab&) const;
 
-  DoubleVect& calculer_terme_production_K_BiK_Axi(const Zone_VDF&, const Champ_Face&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
+  DoubleVect& calculer_terme_production_K_BiK_Axi(const Zone_VDF&, const Champ_Face_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&) const;
 
   DoubleVect& calculer_terme_destruction_K(const Zone_VDF&, const Zone_Cl_VDF&, DoubleVect&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
 

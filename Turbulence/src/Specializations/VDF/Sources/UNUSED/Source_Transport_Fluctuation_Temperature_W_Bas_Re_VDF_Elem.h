@@ -46,7 +46,7 @@ class Champ_Don_base;
 class Zone_dis;
 class Zone_Cl_dis;
 class Zone_Cl_VDF;
-class Champ_Face;
+class Champ_Face_VDF;
 
 // La classe derive de Source_base et peut etre d'un terme source
 class Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem : public Source_base,

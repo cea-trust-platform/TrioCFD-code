@@ -25,7 +25,7 @@
 #include <TRUSTTrav.h>
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Schema_Temps_base.h>
 #include <Zone_Cl_dis.h>
 #include <Equation_base.h>
@@ -154,7 +154,7 @@ void Modele_turbulence_Longueur_Melange_VDF::calculer_energie_cinetique_turb()
 void Modele_turbulence_Longueur_Melange_VDF::calculer_Sij2()
 {
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  Champ_Face& ch = ref_cast(Champ_Face,mon_equation->inconnue().valeur());
+  Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
   const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const int nb_elem = zone_VDF.nb_elem_tot();

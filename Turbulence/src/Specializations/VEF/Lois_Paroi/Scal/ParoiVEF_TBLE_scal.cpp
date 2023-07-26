@@ -308,7 +308,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   int itmax=0,itmax_loc;
 
   DoubleTab termes_sources;
-  termes_sources.resize(nb_faces);
+  termes_sources.resize(nb_faces,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
   termes_sources /= rhoCp;
 

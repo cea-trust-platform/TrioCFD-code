@@ -23,45 +23,38 @@
 
 // const
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem,"Op_Diff_K_Eps_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)
 Sortie& Op_Diff_K_Eps_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_VDF_Elem::Op_Diff_K_Eps_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)()) { }
+Op_Diff_K_Eps_VDF_Elem::Op_Diff_K_Eps_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_VDF_Elem>()) { }
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem_Axi,"Op_Diff_K_Eps_VDF_P0_VDF_Axi",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem_Axi)
 Sortie& Op_Diff_K_Eps_VDF_Elem_Axi::printOn(Sortie& s) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_VDF_Elem_Axi::readOn(Entree& s) { return s ; }
-Op_Diff_K_Eps_VDF_Elem_Axi::Op_Diff_K_Eps_VDF_Elem_Axi() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem_Axi)()) { }
+Op_Diff_K_Eps_VDF_Elem_Axi::Op_Diff_K_Eps_VDF_Elem_Axi() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_VDF_Elem_Axi>()) { }
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_QC_VDF_Elem,"Op_Diff_K_Eps_QC_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_QC_VDF_Elem)
 Sortie& Op_Diff_K_Eps_QC_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_QC_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_QC_VDF_Elem::Op_Diff_K_Eps_QC_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_QC_VDF_Elem)()) { }
+Op_Diff_K_Eps_QC_VDF_Elem::Op_Diff_K_Eps_QC_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_QC_VDF_Elem>()) { }
 
 // var
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_var_VDF_Elem,"Op_Diff_K_Eps_var_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_var_VDF_Elem)
 Sortie& Op_Diff_K_Eps_var_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_var_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_var_VDF_Elem::Op_Diff_K_Eps_var_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_var_VDF_Elem)()) { }
+Op_Diff_K_Eps_var_VDF_Elem::Op_Diff_K_Eps_var_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_var_VDF_Elem>()) { }
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_var_QC_VDF_Elem,"Op_Diff_K_Eps_QC_var_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_QC_var_VDF_Elem)
 Sortie& Op_Diff_K_Eps_var_QC_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_var_QC_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_var_QC_VDF_Elem::Op_Diff_K_Eps_var_QC_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_QC_var_VDF_Elem)()) { }
+Op_Diff_K_Eps_var_QC_VDF_Elem::Op_Diff_K_Eps_var_QC_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_Eps_QC_var_VDF_Elem>()) { }
 
 // Bicephale
 Implemente_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem,"Op_Diff_K_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_VDF_Elem)
 Sortie& Op_Diff_K_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_VDF_Elem::Op_Diff_K_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_VDF_Elem)()) { }
+Op_Diff_K_VDF_Elem::Op_Diff_K_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_K_VDF_Elem>()) { }
 
 Implemente_instanciable_sans_constructeur(Op_Diff_Eps_VDF_Elem,"Op_Diff_Eps_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)
 Sortie& Op_Diff_Eps_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_Eps_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_Eps_VDF_Elem::Op_Diff_Eps_VDF_Elem() : Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)()) { }
+Op_Diff_Eps_VDF_Elem::Op_Diff_Eps_VDF_Elem() : Op_Diff_K_Eps_VDF_base(Iterateur_VDF_Elem<Eval_Diff_Eps_VDF_Elem>()) { }

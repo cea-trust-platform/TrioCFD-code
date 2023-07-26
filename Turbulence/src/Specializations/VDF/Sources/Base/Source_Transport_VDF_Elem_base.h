@@ -60,7 +60,7 @@ private:
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const { return not_implemented<Modele_Fonc_Bas_Reynolds&>(__func__); }
-  virtual void calculer_terme_production(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleVect&) const { return not_implemented<void>(__func__); }
+  virtual void calculer_terme_production(const Champ_Face_VDF&, const DoubleTab& , const DoubleTab& , DoubleVect&) const { return not_implemented<void>(__func__); }
   virtual void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }

@@ -26,6 +26,7 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Zone_VDF.h>
+#include <Ref_Milieu_base.h>
 
 Implemente_instanciable(Echange_contact_VDF_Zoom_grossier,"Paroi_Echange_contact_VDF_Zoom_grossier",Echange_contact_VDF_Zoom_base);
 

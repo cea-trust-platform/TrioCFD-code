@@ -44,7 +44,6 @@ public :
   inline Champ_front& temperature_bord();
   inline const Champ_front& temperature_bord() const;
   void calculer_temperature_bord(double temps);
-
   void completer() override;
 
 protected :

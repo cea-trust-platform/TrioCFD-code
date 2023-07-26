@@ -41,7 +41,7 @@ public :
   Champ_front& temperature_bord();
   //void calculer_temperature_bord();
   void calculer_temperature_bord(double temps);
-
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
 
 protected :

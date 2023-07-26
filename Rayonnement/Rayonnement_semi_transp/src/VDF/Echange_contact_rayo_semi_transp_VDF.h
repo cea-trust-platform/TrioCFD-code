@@ -49,7 +49,6 @@ public :
   void calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
   void calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
   Echange_contact_rayo_semi_transp_VDF& la_Cl_opposee();
-
 protected :
 
   Champ_front T_paroi;

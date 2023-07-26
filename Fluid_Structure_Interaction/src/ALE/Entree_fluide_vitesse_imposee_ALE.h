@@ -24,7 +24,7 @@
 #ifndef Entree_fluide_vitesse_imposee_ALE_included
 #define Entree_fluide_vitesse_imposee_ALE_included
 
-#include <Entree_fluide_vitesse_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 
 
 /*! @brief classe Entree_fluide_vitesse_imposee Cas particulier de la classe Dirichlet_entree_fluide

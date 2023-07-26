@@ -25,10 +25,10 @@
 #include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <TRUSTTrav.h>
-#include <Entree_fluide_temperature_imposee.h>
+#include <Dirichlet_entree_fluide_leaves.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Modele_turbulence_scal_Fluctuation_Temperature.h>
@@ -264,12 +264,12 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   calculer_Prod_uteta_T(zone_VDF,zone_Cl_VDF,scalaire,Flux_Chaleur_Turb,uteta_T);
   if (axi)
     {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       calculer_terme_production_K_Axi(zone_VDF,vitesse,P,K_eps_Bas_Re,visco_turb);
     }
   else
     {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       calculer_terme_production_K(zone_VDF,zone_Cl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
     }
 

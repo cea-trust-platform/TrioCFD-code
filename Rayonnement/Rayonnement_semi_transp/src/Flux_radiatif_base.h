@@ -38,6 +38,7 @@ class Flux_radiatif_base : public Neumann_paroi
   Declare_base(Flux_radiatif_base);
 
 public :
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   inline Champ_front& emissivite();
   inline const Champ_front& emissivite() const;
   inline double& A();

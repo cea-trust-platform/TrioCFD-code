@@ -31,7 +31,7 @@
 #include <Symetrie.h>
 #include <Neumann.h>
 #include <Neumann_homogene.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 #include <Champ_Uniforme.h>
 #include <Milieu_base.h>
 
@@ -270,12 +270,12 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
       const IntTab& face_voisins = la_zone.face_voisins();
       const IntTab& elem_faces = la_zone.elem_faces();
 
-      const Champ_Face& vitesse = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
+      const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
       int nb_elem_tot=la_zone.nb_elem_tot();
       DoubleTab gij(nb_elem_tot,dimension,dimension);
       // Rque methode non const Pourquoi ?
 
-      ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj(vitesse.valeurs(),gij,ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur()));
+      ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj(vitesse.valeurs(),gij,ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur()));
       DoubleTab der_seconde(dimension,dimension,dimension);
       // der_seconde (i,j,k) d2 ui dxj dxk
       for (int elem=0; elem<nb_elem_tot; elem++)
@@ -451,7 +451,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
   const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
   const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
   //  Cerr<<la_zone_Cl.equation().le_nom()<<finl;exit();
-  const Champ_Face& vitesse = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Zone_Cl_VDF& zcl_hydro = ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur());
   //  int nb_faces = la_zone.nb_faces();
   const IntTab& Qdm = la_zone.Qdm();
@@ -808,7 +808,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 {
   const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
   const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
-  //  const Champ_Face& vitesse = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
+  //  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
 
   //  int nb_faces = la_zone.nb_faces();
   const IntTab& Qdm = la_zone.Qdm();

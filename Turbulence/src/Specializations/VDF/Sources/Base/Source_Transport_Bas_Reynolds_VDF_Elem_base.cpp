@@ -24,7 +24,7 @@
 #include <Zone_Cl_VDF.h>
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
-#include <Champ_Face.h>
+#include <Champ_Face_VDF.h>
 
 Implemente_base_sans_constructeur( Source_Transport_Bas_Reynolds_VDF_Elem_base, "Source_Transport_Bas_Reynolds_VDF_Elem_base", Source_Transport_VDF_Elem_base ) ;
 
@@ -51,7 +51,7 @@ void Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter_blocs(matrices_t matri
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Zone_Cl_dis& zcl_keps=eqn_keps_bas_re->zone_Cl_dis();
   const Zone_dis& zone_dis_keps =eqn_keps_bas_re ->zone_dis();
-  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const int nb_elem = la_zone_VDF->nb_elem();
 
   DoubleTrav P(visco_turb), D(visco_turb), E(visco_turb), F1(nb_elem), F2(nb_elem);
