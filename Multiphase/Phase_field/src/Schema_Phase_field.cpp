@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Schema_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
-// Version:     /main/19
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Schema_Phase_field.h>
 #include <Equation.h>
@@ -307,7 +300,6 @@ int Schema_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
       set_stationnaire_atteint()=sch3.valeur().isStationary();
       return 1;
     }
-  return 1;
 }
 
 
@@ -395,10 +387,12 @@ int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
   sch2.valeur().set_dt()=pas_de_temps();
 
   present=eq_c.get_c_demi();
+  //Cerr << "present = "<<present<<finl;
 
   sch2.valeur().faire_un_pas_de_temps_eqn_base(eq_c);
   set_stationnaire_atteint()=sch2.valeur().isStationary();
   present=intermediaire;
+  //Cerr << "present apres = "<<present<<finl;
 
   return 1;
 }

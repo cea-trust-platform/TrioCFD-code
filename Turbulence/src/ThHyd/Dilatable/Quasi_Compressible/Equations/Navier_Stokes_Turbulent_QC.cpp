@@ -128,6 +128,7 @@ void Navier_Stokes_Turbulent_QC::completer()
 int Navier_Stokes_Turbulent_QC::preparer_calcul()
 {
   return Navier_Stokes_Turbulent::preparer_calcul();
+  /*
   // Cerr << "Navier_Stokes_Fluide_Dilatable_Proto::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
   //solveur_pression->assembler_QC(le_fluide->masse_volumique().valeurs());
@@ -145,7 +146,7 @@ int Navier_Stokes_Turbulent_QC::preparer_calcul()
   projeter();
   le_modele_turbulence.preparer_calcul();
 
-  return 1;
+  return 1;*/
 }
 
 

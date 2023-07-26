@@ -196,7 +196,6 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
     }
   else
     return Convection_Diffusion_Temperature::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 const Champ_base& Convection_Diffusion_Temperature_FT_Disc::vitesse_pour_transport() const

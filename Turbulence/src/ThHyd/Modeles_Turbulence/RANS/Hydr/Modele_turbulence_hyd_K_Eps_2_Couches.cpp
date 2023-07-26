@@ -68,7 +68,6 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
     }
   else
     return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.

@@ -210,7 +210,6 @@ int Transport_Marqueur_FT::lire_motcle_non_standard(const Motcle& mot, Entree& i
     }
   else
     return Equation_base::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 

@@ -84,7 +84,6 @@ int Transport_Fluctuation_Temperature_W::lire_motcle_non_standard(const Motcle& 
     }
   else
     return Convection_Diffusion_std::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 void Transport_Fluctuation_Temperature_W::discretiser()

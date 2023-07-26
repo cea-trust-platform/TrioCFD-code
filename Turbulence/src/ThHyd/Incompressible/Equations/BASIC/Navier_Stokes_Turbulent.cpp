@@ -116,7 +116,6 @@ int Navier_Stokes_Turbulent::lire_motcle_non_standard(const Motcle& mot, Entree&
     }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 const Champ_Don& Navier_Stokes_Turbulent::diffusivite_pour_transport() const

@@ -28,6 +28,9 @@
 #include <TRUSTTrav.h>
 #include <Frontiere_dis_base.h>
 #include <Param.h>
+#include <Constituant.h>
+#include <Champ_Don.h>
+//#include <Mass_Redistribution_Phase_Field.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Phase_field,"Convection_Diffusion_Phase_field",Convection_Diffusion_Concentration);
 // XD convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
@@ -46,22 +49,12 @@ Convection_Diffusion_Phase_field::Convection_Diffusion_Phase_field()
     nom[0]="potentiel_chimique_generalise";
   */
 }
-/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
- *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
+
 Sortie& Convection_Diffusion_Phase_field::printOn(Sortie& is) const
 {
   return Convection_Diffusion_Concentration::printOn(is);
 }
 
-
-/*! @brief cf Convection_Diffusion_Concentration::readOn(is)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
- */
 Entree& Convection_Diffusion_Phase_field::readOn(Entree& is)
 {
   Convection_Diffusion_Concentration::readOn(is);
@@ -99,7 +92,6 @@ int Convection_Diffusion_Phase_field::lire_motcle_non_standard(const Motcle& mot
     }
   else
     return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Discretise l'equation.
@@ -113,8 +105,8 @@ void Convection_Diffusion_Phase_field::discretiser()
   Cerr << "mutilde discretization" << finl;
   //dis.mutilde(schema_temps(), zone_dis(), ch_mutilde);
 
-  dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
-
+  //dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
+  dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",constituant().nb_constituants(),schema_temps().temps_courant(),ch_mutilde);
   champs_compris_.ajoute_champ(ch_mutilde);
 
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,probleme().equation(0));
@@ -154,8 +146,13 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
 
   // mutilde, div_alpha_gradC, alpha_gradC_carre et pression_thermo
   // ont la meme structure que la concentration
+
   mutilde = inconnue().valeurs();
   mutilde = 0.;
+
+  //Mass_Redistribution_Phase_Field::c_ini = inconnue().valeurs();//Mass_redistribution
+
+
   // si on traite une variable avec "dis." (voir discretiser()), l'operation "resize" est inutile car "dis." s'en charge.
   // En sequentiel : resize() autorise
   // En parallele : resize() interdit, car alors on ne prend pas en compte les joints
@@ -165,10 +162,16 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
 
   div_alpha_gradC = inconnue().valeurs();
   div_alpha_gradC = 0.;
+
+
   alpha_gradC_carre = div_alpha_gradC;
-  pression_thermo = div_alpha_gradC;
+  //pression_thermo = div_alpha_gradC;
+
+  //Cerr<<" mutilde : preparer_calcul = "<< mutilde <<finl;
+  //Cerr<<" div_alpha_gradC : preparer_calcul = "<< div_alpha_gradC <<finl;
+  //Cerr<<" alpha_gradC_carre : preparer_calcul = "<< alpha_gradC_carre <<finl;
+  //Cerr<<" pression_thermo : preparer_calcul = "<< pression_thermo <<finl;
 
   sources().mettre_a_jour(schema_temps().temps_courant());
-
   return 1;
 }

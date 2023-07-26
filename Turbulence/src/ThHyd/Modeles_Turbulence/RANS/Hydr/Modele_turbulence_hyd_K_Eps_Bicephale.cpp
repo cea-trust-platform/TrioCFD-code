@@ -98,7 +98,6 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle
     }
   else
     return Mod_turb_hyd_RANS_Bicephale::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -520,7 +519,6 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Bicephale::equation_k_eps(int i
     {
       return eqn_transport_Eps;
     }
-  return eqn_transport_K; // for the compilers
 }
 const Champ_base&  Modele_turbulence_hyd_K_Eps_Bicephale::get_champ(const Motcle& nom) const
 {

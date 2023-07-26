@@ -91,7 +91,6 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(c
     }
   else
     return Mod_turb_hyd_RANS_Bicephale::lire_motcle_non_standard(mot,is);
-  return 1;
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente(double temps)
@@ -256,7 +255,6 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::equation_
     {
       return eqn_transport_Eps_Rea;
     }
-  return eqn_transport_K_Rea; // for the compilers
 }
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(const Motcle& nom) const
@@ -282,7 +280,6 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(co
     }
 
   throw Champs_compris_erreur();
-  return ref_champ;
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_noms_champs_postraitables(Noms& nom,Option opt) const

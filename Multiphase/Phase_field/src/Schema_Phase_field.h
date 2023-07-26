@@ -12,19 +12,9 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Schema_Phase_field.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
-// Version:     /main/14
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #ifndef Schema_Phase_field_included
 #define Schema_Phase_field_included
-
-
-
 
 #include <Convection_Diffusion_Phase_field.h>
 

@@ -38,9 +38,6 @@ Entree& Neumann_paroi_rayo_semi_transp_VEF::readOn(Entree& is)
 {
   is >>  le_champ_front;
   return is;
-
-  temperature_bord_.typer("Champ_front_fonc");
-  temperature_bord_->fixer_nb_comp(1);
 }
 
 void Neumann_paroi_rayo_semi_transp_VEF::mettre_a_jour(double temps)
@@ -71,8 +68,6 @@ double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i,int j) const
     return le_champ_front(0,j)-flux_radiatif(i);
   else
     return le_champ_front(i,j)-flux_radiatif(i);
-
-  return 0;
 }
 
 

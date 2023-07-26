@@ -87,7 +87,6 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_sta
     default :
       {
         return  Modele_turbulence_scal_base::lire_motcle_non_standard(mot,s);
-        break;
       }
     }
   return 1;
@@ -224,7 +223,6 @@ const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_c
         }
     }
   throw Champs_compris_erreur();
-  return ref_champ;
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_noms_champs_postraitables(Noms& nom,Option opt) const

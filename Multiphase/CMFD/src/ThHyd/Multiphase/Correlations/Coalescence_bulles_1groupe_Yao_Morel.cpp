@@ -57,3 +57,4 @@ void Coalescence_bulles_1groupe_Yao_Morel::coefficient(const DoubleTab& alpha, c
           coeff(n_l, k) = coeff(k, n_l);
         }
 }
+

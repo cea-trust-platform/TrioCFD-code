@@ -286,7 +286,7 @@ Lire pb
             format Lata
             fichier post2
             champs dt_post 0.01 {
-                indicatrice_interf elem
+                indicatrice_body elem
             }
             interfaces body {
                 pe som

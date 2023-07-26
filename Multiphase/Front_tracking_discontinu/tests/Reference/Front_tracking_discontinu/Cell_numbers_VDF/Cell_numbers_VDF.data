@@ -244,7 +244,7 @@ Lire pb
     fichier ancre 
     champs dt_post .06250000000000000000
         {
-            indicatrice_cuve elem
+            indicatrice_agit elem
         }	    
     interfaces agit { 
         courbure som 

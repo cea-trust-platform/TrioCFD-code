@@ -47,10 +47,7 @@ public:
   DoubleTab& calculer(DoubleTab& ) const override;
   inline void associer_pb(const Probleme_base& ) override;
   DoubleTab& ajouter(DoubleTab& ) const override;
-  void mettre_a_jour(double temps) override
-  {
-    ;
-  }
+  void mettre_a_jour(double temps) override { }
 
 protected :
   void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& ) override;
@@ -65,3 +62,5 @@ inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& pb )
 }
 
 #endif
+
+
