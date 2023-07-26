@@ -450,7 +450,8 @@ double IJK_Thermique::compute_timestep(const double timestep,
 {
   // alpha = lambda/(rho*cp)
   const double alpha_max = std::max(lambda_liquid_/(rho_l*cp_liquid_), lambda_vapor_/(rho_v*cp_vapor_));
-  const double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
+  if (diff_temp_negligible_) dt_fo = 1.e20;
   return dt_fo;
 }
 

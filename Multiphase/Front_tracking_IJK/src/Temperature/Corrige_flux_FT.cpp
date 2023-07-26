@@ -387,6 +387,11 @@ void Corrige_flux_FT_temperature_conv::corrige_flux_faceIJ(
         const double frac_vapeur = s_vap / s_face;
         const double frac_liquide = 1.- frac_vapeur;
 
+        //const bool face_monophasique = frac_liquide * frac_vapeur < EPS_;
+        //const bool stencil_liquide = test_if_stencil_inclut_bout_interface_liquide();
+        //const bool stencil_vapeur = test_if_stencil_inclut_bout_interface_vapeur();
+        //const bool stencil_inclut_interface = stencil_liquide & stencil_vapeur;
+
         multiplie_par_rho_cp_de_la_face_monophasique(frac_liquide, flux);
         // if ((face_monophasique) && (not stencil_inclut_interface))
         //   {
@@ -511,6 +516,7 @@ void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDoub
   for (int i_diph = 0; i_diph < n_diph; i_diph++)
     {
       const double di_vap = std::abs(intersection_ijk_face_.dist_interf()(2*i_diph));
+      const double di_liq = di_vap; // TODO : Check that. GB include, no idea!
       assert(d1 - di_vap > 0.);
       assert(d1 - std::abs(intersection_ijk_face_.dist_interf()(2*i_diph+1)) > 0.);
       // La distance entre le point a l'interface et le point d'interpolation de
@@ -518,13 +524,15 @@ void Corrige_flux_FT_temperature_conv::interp_back_to_bary_faces(const ArrOfDoub
       // donner une valeur négative.
       const double d1_vap_inv = 1. / (d1 - di_vap + EPS_);
       const double di_vap_inv = 1. / (di_vap + EPS_);
+      const double d1_liq_inv = 1. / (d1 - di_liq + EPS_);
+      const double di_liq_inv = 1. / (di_liq+ EPS_);
       temperature_barys_(i_diph, 1) =
         (temp_interface_face_(2*i_diph) * di_vap_inv + temp_vap(2*i_diph) * d1_vap_inv) /
         (di_vap_inv + d1_vap_inv);
       // liquide
       temperature_barys_(i_diph, 0) =
-        (temp_interface_face_(2*i_diph+1) * di_vap_inv + temp_liqu(2*i_diph+1) * d1_vap_inv) /
-        (di_vap_inv + d1_vap_inv);
+        (temp_interface_face_(2*i_diph+1) * di_liq_inv + temp_liqu(2*i_diph+1) * d1_liq_inv) /
+        (di_liq_inv + d1_liq_inv);
     }
 }
 

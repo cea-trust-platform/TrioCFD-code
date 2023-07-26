@@ -85,12 +85,29 @@ IJK_FT_double
   {
     {
     Boundary_Conditions {
+                 bctype_kmin Paroi_Temperature_imposee
+                 bctype_kmax Paroi_Temperature_imposee
+                 Temperature_imposee_kmin -1.
+                 Temperature_imposee_kmax 1.
+    }
+    expression_T_init 2.*cos(2*Pi*z/0.031415926535897934)
+    # reprise_T #
+    fo 1.
+    cp_liquid 2100.
+    lambda_liquid 0.1
+    cp_vapor 21000.
+    lambda_vapor 0.1
+   # wall_flux #
+    type_T_source patch_dabiri
+    } , 
+    {
+    Boundary_Conditions {
                  bctype_kmin Paroi_Flux_impose
                  bctype_kmax Paroi_Flux_impose
                  flux_impose_kmin 10.
                  flux_impose_kmax 10.
     }
-    expression_T_init 0.01*cos(2*Pi*x/0.031415926535897934)
+    expression_T_init 0.01*cos(2*Pi*x/0.01)
     # reprise_T #
 
     fo 1.

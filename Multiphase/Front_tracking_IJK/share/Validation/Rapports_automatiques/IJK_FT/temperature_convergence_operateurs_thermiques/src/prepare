@@ -13,7 +13,6 @@ do
         cp ../convection.sh CONVECTION.sh
         cp ../post_run .
         sed -i -e "s/conv_temp.*/# convection_temperature_negligible #/g" \
-            -e "s/expression_vy.*/expression_vy_init 0.1/g" \
             -e "s/disable_convection_qdm//g" \
             -e "s/# CONV//g" \
             -e "s/CONV #//g" $dir.data
@@ -23,13 +22,13 @@ do
             -e "s/BASIC_TEMPERATURE/${dir}/g" ../diffusion.sh >DIFFUSION.sh
         cp ../post_run .
         sed -i -e "s/diff_temp.*/# diff_temp_negligible #/g" \
+            -e "s/timestep .*/timestep 9e-8/"\
             -e "s/DIFF #//g"\
             -e "s/# DIFF//g" $dir.data
     fi
     if [ $dir = "SCHEMA_TEMPS" ] ; then
         cp ../schema_temps.sh .
         sed -i -e "s/TEMPS #//g" \
-            -e "s/ expression_vy.*/expression_vy_init 0.1/g" \
             -e "s/# TEMPS//g" $dir.data
     fi
     cd ..

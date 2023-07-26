@@ -10,7 +10,7 @@ Parametres {
 		EOF
 
 	Auteur "A.S."
-	CasTest DIFFUSION DIFFUSION.data 1
+ 	CasTest DIFFUSION DIFFUSION.data 1
 	CasTest CONVECTION CONVECTION.data 1
 	CasTest SCHEMA_TEMPS SCHEMA_TEMPS.data 1
 }
@@ -19,10 +19,26 @@ Chapitre {
 	Titre "Evolution de la temperature avec diffusion, et convergence de l'operateur en espace"
 
 	Description <<EOF
-		Dans ce cas la, on desactive la convection de temperature. Il n'y a pas de transfert de qdm (et la vitesse initiale est nulle)
-	Pour le moment on regarde la solution uniquement dans un cas periodique, dans un deuxième temps la fiche prendra aussi en compte un cas avec des parois.
-	Il faut aussi ajouter l'imlage de convergence de l'operateur.
-		EOF
+\latex_(
+Dans ce cas la, on desactive la convection de temperature. Il n'y a pas de transfert de qdm (et la vitesse initiale est nulle).	Pour le moment on regarde la solution uniquement dans un cas periodique, dans un deuxième temps la fiche prendra aussi en compte un cas avec des parois. Il faut aussi ajouter l'image de convergence de l'operateur.
+We use a timestep limited by diffusion $dt=9e-8$ for the finest mesh, 
+et on impose 800 dt, ce qui conduit a $t_fin=7.2e-5$. Pour comparaison, le temps de demi-diffusion est beaucoup plus grand : 0.01264s.
+
+We compute : 
+\begin{equation}
+\mathcal{L}_{diff} = \nabla \cdot (\lambda \nabla T) = \sum_f \int_{S_f} \left( \lambda (\nabla T)_f\right)dS
+\end{equation}
+here $\lambda$ is constant; 
+The gradient at the face is centered, thus second order : $\hat{\nabla T}_f = \nabla T_f + \mathcal{O}(\Delta x^2)$.
+Computation of the divergence is itself also second order as it is centred, thus (in 1D): 
+\begin{equation}
+\mathcal{L}_{diff} = \frac{\nabla T_l - \nabla T_r}{\Delta x}+ \mathcal{O}(\Delta x^2)
+= \frac{\hat{\nabla T}_l - \hat{\nabla T}_r+ \mathcal{O}(\Delta x^2}{\Delta x}+ \mathcal{O}(\Delta x^2)
+= \frac{\hat{\nabla T}_l - \hat{\nabla T}_r}{\Delta x}+ \mathcal{O}(\Delta x)
+\end{equation}
+which would lead to first order... 
+It is not the case, the diffusion operator is in fact 2nd order. Where is my mistake in the demonstration?
+\latex_) EOF
 
 	visu {
 		titre "Solution calculee"
@@ -54,14 +70,20 @@ Chapitre {
 		incluredesccourbes 0
 		labelX  "DX"
 		courbe {
-			fichier DIFFUSION/CONVERGENCE/cvgx_L2_EUL.txt
+			fichier DIFFUSION/cvgx_L2_EUL.txt
 			colonnes ($1) ($3)
 			style points
 			Legende "EUL"
 		}
 		courbe {
-			fichier DIFFUSION/CONVERGENCE/cvgx_L2_EUL.txt
-			colonnes ($1) (2*0.00440539*10**(-1)*(($1)/8)**(-2))
+			fichier DIFFUSION/cvgx_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "RK"
+		}
+		courbe {
+			fichier DIFFUSION/cvgx_L2_EUL.txt
+			colonnes ($1) (4.9509e-05*(($1)/8)**(-2))
 			Legende "o2"
 			style lines
 		}
@@ -76,7 +98,12 @@ Chapitre {
 	Title "Evolution de la temperature avec convection, et convergence de l'operateur en espace"
 
 	Description <<EOF
-		Dans le cas de la convection, on desactice la diffusion. Pour rendre la solution non triviale, on impose un CL en vitesse constante selon y. Il n'y a pas de convection ni de diffusion de la qdm.
+		Dans le cas de la convection, on desactive la diffusion. Pour rendre la solution non triviale, on impose un CL en vitesse constante selon y. Il n'y a pas de convection ni de diffusion de la qdm.
+		\latex_(
+We use a timestep limited by convection $dt=1.10e-5$ for the finest mesh, run on 800 timesteps;
+The solution is compared.
+
+\latex_)
 		EOF
 
 	visu {
@@ -102,11 +129,30 @@ Chapitre {
 
 	Description <<EOF
 		Ici on observe un comportement qui peut sembler etonnant, mais en realite c'est le comportement attendu de l'operateur QUICK qui possede un limiteur. Ce limiteur est active aux extremas de la fonction a predire, ce qui est bien le cas ici. Le limiteur degrade localement l'ordre de la solution qui passe de 3 a 1. Cela donne donc une erreur plus importante dans la zone des extremas de la fonction a predire.
+		I tend to believe that it is not the case. The temperature interpolation is 3rd order accurate but the divergence based on fluxes differences is second order.  
+		
+		\latex_(
+We compute : 
+\begin{equation}
+\mathcal{L}_{conv} = \nabla \cdot (\mathbf{u} T) = \sum_f \int_{S_f} \left( \mathbf{u}_f T_f\right)dS
+\end{equation}
+Our interpolation to the face $\hat{T}_f$ is 3rd ordrer thanks to the QUICK scheme: ${T}_f = \hat{T}_f +\mathcal{O}(\Delta x^3)$.
+The velocity is exactly known at the face.
+In one direction, it leads to an operator of central finite difference (which is itself second order)
+\begin{equation}
+\mathcal{L}_{i} = \frac{\mathbf{u}_f \hat{T}_f - \mathbf{u}_g \hat{T}_g}{\Delta x} + \mathcal{O}(\Delta x^2)= 
+ \frac{\mathbf{u}_f T_f - \mathbf{u}_g T_g+\mathcal{O}(\Delta x^3)}{\Delta x}+ \mathcal{O}(\Delta x^2) = 
+ \frac{\mathbf{u}_f T_f - \mathbf{u}_g T_g}{\Delta x} +\mathcal{O}(\Delta x^2)+ \mathcal{O}(\Delta x^2)
+\end{equation}
+where $f$ and $g$ are to faces of element $i$.
+The second order accuracy is recovered for the QUICK scheme.
+\latex_) 
 		EOF
 
 	Figure {
 		Titre "Norme L2 en fonction du pas de maillage."
-		Description "Ordre 3 pour le schema QUICK" LogX
+		Description "Ordre 2 pour le schema QUICK -> Why? We see also (last point on Euler) that CFL=1 is not accurate enough with Euler scheme"
+		LogX
 		LogY
 		incluredesccourbes 0
 		labelX  "DX"
@@ -117,10 +163,22 @@ Chapitre {
 			style points
 			Legende "EUL"
 		}
+		courbe {
+			fichier CONVECTION/CONVERGENCE/cvgx_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "RK3"
+		}
 		Curve {
 			fichier CONVECTION/CONVERGENCE/cvgx_L2_EUL.txt
-			colonnes ($1) (5*2.20918e-03*(($1)/8)**(-3))
+			colonnes ($1) (0.07*(($1)/8)**(-3))
 			Legende "o3"
+			Style lines
+		}
+		Curve {
+			fichier CONVECTION/CONVERGENCE/cvgx_L2_EUL.txt
+			colonnes ($1) (0.07*(($1)/8)**(-2))
+			Legende "o2"
 			Style lines
 		}
 	}
