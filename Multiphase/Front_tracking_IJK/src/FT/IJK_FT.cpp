@@ -2035,7 +2035,7 @@ void IJK_FT_double::run()
       velocity_convection_op_sharp_.initialize(splitting_);
       break;
     case 1:
-      velocity_convection_op_centre_.initialize(splitting_);
+      velocity_convection_op_centre_.initialize(splitting_, boundary_conditions_);
       break;
     case 2:
       velocity_convection_op_amont_.initialize(splitting_);

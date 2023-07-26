@@ -17,11 +17,14 @@
 #define OpCentre4IJK_H
 
 #include <OpConvIJKFacesCommon.h>
+#include <Boundary_Conditions.h>
+#include <Boundary_Conditions_Thermique.h>
 
 class OpConvCentre4IJK_double : public OpConvIJKFacesCommon_double
 {
 public:
-  void initialize(const IJK_Splitting& splitting);
+  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc);
+  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc);
   void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -109,7 +112,8 @@ protected:
   // Pointer to div_rho_u, filled by operator if ajouter_avec_u_div_rhou() is called
   IJK_Field_double *div_rho_u_;
   int last_computed_klayer_for_div_rhou_;
-
+  REF(Boundary_Conditions) ref_bc_;
+  REF(Boundary_Conditions_Thermique) ref_bc_Thermique_;
 private:
   void calculer_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
                          IJK_Field_double& resu, int k_layer, const Operateur_IJK_data_channel& channel);
