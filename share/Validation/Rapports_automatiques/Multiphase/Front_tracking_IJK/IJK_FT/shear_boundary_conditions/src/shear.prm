@@ -1,9 +1,9 @@
 Parametres {
-	Titre "Shear condition (imposed velocity at mooving wall or periodicity with velocity jump at z-boundary)"
+	Titre "Shear-periodicity condition (velocity jump at z-boundary + desynchronization of z-border) "
 	Auteur "A. du Cluzeau"
-	CasTest . wall_shear.data
-	CasTest . perio_shear.data
-	CasTest . mixte_shear_avec_bulle.data
+	CasTest . perio_shear_defilant.data 4
+    CasTest . perio_shear_sans_defilant.data 4
+	CasTest . mixte_shear_avec_bulle.data 4
 }
 
 
@@ -11,27 +11,65 @@ Parametres {
 
 Chapitre {
 
-Titre "Velocity variation"
+Titre "Monophasique"
 
-	figure {
-		titre "profil de vitesse U (cas monophasique)"
-		incluredesccourbes 0
-		labelX  "z"
-		labelY  "taux de vide"
-		Courbe {
-		   fichier monophasique_statistiques_0.000900.txt
-		   colonnes ($1) ($3)
-		}
+
+	visu {
+		titre "Shear periodicity sans defilement : Etat final (VX)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_sans_defilant.lata DOM_dual VELOCITY_X FACES
 	}
-	
-    figure {
-		titre "profil de vitesse U (cas diphasique)"
-		incluredesccourbes 0
-		labelX  "z"
-		labelY  "taux de vide"
-		Courbe {
-		   fichier diphasique_statistiques_0.000290.txt
-		   colonnes ($1) ($3)
-		}
+	visu {
+		titre "Shear periodicity sans defilement : Etat final (VZ)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_sans_defilant.lata DOM_dual VELOCITY_Z FACES
 	}
+		visu {
+		titre "Shear periodicity sans defilement : Etat final (PRESSURE)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_sans_defilant.lata DOM PRESSURE ELEM
+	}
+
+	visu {
+		titre "Shear periodicity avec defilement : Etat final (VX)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_defilant.lata DOM_dual VELOCITY_X FACES
+	}
+	visu {
+		titre "Shear periodicity avec defilement : Etat final (VZ)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_defilant.lata DOM_dual VELOCITY_Z FACES
+	}
+		visu {
+		titre "Shear periodicity avec defilement : Etat final (PRESSURE)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor perio_shear_defilant.lata DOM PRESSURE ELEM
+	}
+}
+
+
+Chapitre {
+
+Titre "Diphasique"
+
+	visu {
+		titre "Shear periodicity avec defilement : Etat final (VX)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor mixte_shear_avec_bulle.lata DOM_dual VELOCITY_X FACES
+	}
+
 }

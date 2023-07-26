@@ -33,6 +33,9 @@ IJK_FT_double
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear
     dU_perio 2. # Ux jump condition [m/s] at z=0|z=Lz #
+    t0_shear 0.0
+    defilement 0
+    resolution_u_prime 0
   }
 
   timestep_facsec 1.0
