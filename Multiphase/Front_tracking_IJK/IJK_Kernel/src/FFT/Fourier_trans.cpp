@@ -1837,9 +1837,9 @@ void Fourier_trans::postraiter_TFi(Sortie& os, int flag_valeur_instantanee) cons
       for (int k =0; k < Taille ; k++ )
         {
           char s[100];
-          sprintf(s, "%16.16e ", elem_coord_[z+offsetk]);
+          snprintf(s, 100, "%16.16e ", elem_coord_[z+offsetk]);
           os << s;
-          sprintf(s, "%16.16e ", tri_ki[k]);
+          snprintf(s, 100, "%16.16e ", tri_ki[k]);
           os << s;
           for (int val = 0; val < N; val++)
             {
@@ -1849,7 +1849,7 @@ void Fourier_trans::postraiter_TFi(Sortie& os, int flag_valeur_instantanee) cons
                 x = TFi_[val][Indice] / N_echantillons_;
               else
                 x = TFi_[val][Indice];
-              sprintf(s, "%16.16e ", x);
+              snprintf(s, 100, "%16.16e ", x);
               os << s;
             }
           os << finl;
@@ -1875,9 +1875,9 @@ void Fourier_trans::postraiter_TFx(Sortie& os, int flag_valeur_instantanee) cons
       for (int k =0; k < imax/2 ; k++ )
         {
           char s[100];
-          sprintf(s, "%16.16e ", elem_coord_[z+offsetk]);
+          snprintf(s, 100, "%16.16e ", elem_coord_[z+offsetk]);
           os << s;
-          sprintf(s, "%16.16e ", k*fac);
+          snprintf(s, 100, "%16.16e ", k*fac);
           os << s;
           for (int val = 0; val < N; val++)
             {
@@ -1887,7 +1887,7 @@ void Fourier_trans::postraiter_TFx(Sortie& os, int flag_valeur_instantanee) cons
                 x = TFx_[val][Indice] / N_echantillons_;
               else
                 x = TFx_[val][Indice];
-              sprintf(s, "%16.16e ", x);
+              snprintf(s, 100, "%16.16e ", x);
               os << s;
             }
           os << finl;
@@ -1914,9 +1914,9 @@ void Fourier_trans::postraiter_TFy(Sortie& os, int flag_valeur_instantanee) cons
       for (int k =0; k < jmax/2 ; k++ )
         {
           char s[100];
-          sprintf(s, "%16.16e ", elem_coord_[z+offsetk]);
+          snprintf(s, 100, "%16.16e ", elem_coord_[z+offsetk]);
           os << s;
-          sprintf(s, "%16.16e ", k*fac);
+          snprintf(s, 100, "%16.16e ", k*fac);
           os << s;
           for (int val = 0; val < N; val++)
             {
@@ -1926,7 +1926,7 @@ void Fourier_trans::postraiter_TFy(Sortie& os, int flag_valeur_instantanee) cons
                 x = TFy_[val][Indice] / N_echantillons_;
               else
                 x = TFy_[val][Indice];
-              sprintf(s, "%16.16e ", x);
+              snprintf(s, 100, "%16.16e ", x);
               os << s;
             }
           os << finl;
@@ -1955,11 +1955,11 @@ void Fourier_trans::sauvegarde() const
   for (True_int i = 0; i < N; i++)
     {
       char nom_champ[100];
-      sprintf(nom_champ, "TFI_%d",i );
+      snprintf(nom_champ, 100, "TFI_%d",i );
       fichier << nom_champ << " " << TFi_[i] << finl;
-      sprintf(nom_champ, "TFX_%d",i );
+      snprintf(nom_champ, 100, "TFX_%d",i );
       fichier << nom_champ << " " << TFx_[i] << finl;
-      sprintf(nom_champ, "TFY_%d",i );
+      snprintf(nom_champ, 100, "TFY_%d",i );
       fichier << nom_champ << " " << TFy_[i] << finl;
     }
 
@@ -1991,11 +1991,11 @@ void Fourier_trans::reprise()
   for (True_int i = 0; i < N; i++)
     {
       char nom_champ[100];
-      sprintf(nom_champ, "TFI_%d",i );
+      snprintf(nom_champ, 100, "TFI_%d",i );
       param.ajouter(nom_champ, &TFi_[i]);
-      sprintf(nom_champ, "TFX_%d",i );
+      snprintf(nom_champ, 100, "TFX_%d",i );
       param.ajouter(nom_champ, &TFx_[i]);
-      sprintf(nom_champ, "TFY_%d",i );
+      snprintf(nom_champ, 100, "TFY_%d",i );
       param.ajouter(nom_champ, &TFy_[i]);
     }
 

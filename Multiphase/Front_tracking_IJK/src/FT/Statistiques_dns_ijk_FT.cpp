@@ -1487,17 +1487,16 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                   dIdz = (gradI[2](i,j,k) + gradI[2](i, j, k+1)) * 0.5;
                 }
 
-              LIST_CURSEUR(IJK_Thermique) curseur(cas.thermique_);
               int idx =0;
-              while(curseur)
+              for (auto& itr : cas.thermique_)
                 {
-                  const IJK_Field_double& temperature = curseur->get_temperature();
+                  const IJK_Field_double& temperature = itr.get_temperature();
                   const double T = temperature(i,j,k);
 
                   double T_adim_bulles;
                   if (liste_post_instantanes.contient_("TEMPERATURE_ADIM_BULLES"))
                     {
-                      const IJK_Field_double& temperature_adim_bulles = curseur->get_temperature_adim_bulles();
+                      const IJK_Field_double& temperature_adim_bulles = itr.get_temperature_adim_bulles();
                       T_adim_bulles = temperature_adim_bulles(i,j,k);
                     }
                   else
@@ -1507,7 +1506,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 
 
                   // Derivee seconde de la temperature :
-                  FixedVector<IJK_Field_double, 3>& gradT = curseur->get_gradient_temperature();
+                  FixedVector<IJK_Field_double, 3>& gradT = itr.get_gradient_temperature();
                   double ddTdxdx = 0.;
                   double ddTdxdy = 0.;
                   double ddTdxdz = 0.;
@@ -1561,7 +1560,6 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                   AJOUTT(IWddTdzdz_MOY, chi*w*ddTdzdz);
                   AJOUTT(ITbulles_MOY, chi*T_adim_bulles);
 #undef AJOUTT
-                  ++curseur;
                   idx++;
                 }
 
@@ -2645,7 +2643,7 @@ void Statistiques_dns_ijk_FT::postraiter_thermique(const double current_time) co
           for (int j = 0; j < nz; j++)
             {
               char s[100];
-              sprintf(s, "%16.16e ", elem_coord_[j]);
+              snprintf(s, 100, "%16.16e ", elem_coord_[j]);
               os << s;
               for (int i = 0; i < nvalt_; i++)
                 {
@@ -2654,7 +2652,7 @@ void Statistiques_dns_ijk_FT::postraiter_thermique(const double current_time) co
                     x = integrale_temporelle_temperature_(i,j,ith) / t_integration_;
                   else
                     x = moyenne_spatiale_instantanee_temperature_(i,j,ith);
-                  sprintf(s, "%16.16e ", x);
+                  snprintf(s, 100, "%16.16e ", x);
                   os << s;
                 }
               os << finl;
@@ -2759,12 +2757,9 @@ void Statistiques_dns_ijk_FT::completer_read(Param& param)
   // Thus, we cannot resize integrale_temporelle_temperature_ or moyenne_spatiale_instantanee_temperature_ correctly.
   // However, we can do something for nb_thermal_fields_ from the problem !
   {
-    LIST_CURSEUR(IJK_Thermique) curseur(ref_ijk_ft_->thermique_);
     int idx =0;
-    while(curseur)
+    for ( auto&& itr = ref_ijk_ft_->thermique_.begin(); itr != ref_ijk_ft_->thermique_.end(); ++itr )
       {
-        // const IJK_Field_double& temperature = curseur->get_temperature();
-        ++curseur;
         idx++;
       }
     //curseur = ref_ijk_ft_->thermique_; //RAZ
@@ -2799,12 +2794,9 @@ void Statistiques_dns_ijk_FT::initialize(const IJK_FT_double& ijk_ft, const IJK_
   for (int i = 0; i < n; i++)
     elem_coord_[i] = (coord_z[i] + coord_z[i+1]) * 0.5;
 
-  LIST_CURSEUR(IJK_Thermique) curseur(ref_ijk_ft_->thermique_);
   int idx =0;
-  while(curseur)
+  for ( auto&& itr = ref_ijk_ft_->thermique_.begin(); itr != ref_ijk_ft_->thermique_.end(); ++itr )
     {
-      // const IJK_Field_double& temperature = curseur->get_temperature();
-      ++curseur;
       idx++;
     }
   //curseur = ref_ijk_ft_->thermique_; //RAZ

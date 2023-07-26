@@ -24,25 +24,25 @@
 
 #include <Eval_Diff_K_Eps_Bas_Re_VDF_var.h>
 #include <Eval_Diff_K_Eps_VDF_const.h>
-#include <Eval_Diff_VDF_Elem.h>
+#include <Eval_Diff_VDF_Elem_Gen.h>
 
 /// \cond DO_NOT_DOCUMENT
 class Eval_Diff_K_Eps_Bas_Re_VDF_leaves { };
 /// \endcond
 
-class Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>, public Eval_Diff_K_Eps_Bas_Re_VDF_const
+class Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem : public Eval_Diff_VDF_Elem_Gen<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem>, public Eval_Diff_K_Eps_Bas_Re_VDF_const
 {
 public:
   static constexpr bool IS_MULTD = false, IS_RANS = true;
 };
 
-class Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>, public Eval_Diff_K_Eps_Bas_Re_VDF_const
+class Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi : public Eval_Diff_VDF_Elem_Gen<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi>, public Eval_Diff_K_Eps_Bas_Re_VDF_const
 {
 public:
   static constexpr bool IS_MULTD = false, IS_AXI = true, IS_RANS = true;
 };
 
-class Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>, public Eval_Diff_K_Eps_Bas_Re_VDF_var
+class Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Eval_Diff_VDF_Elem_Gen<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>, public Eval_Diff_K_Eps_Bas_Re_VDF_var
 {
 public:
   static constexpr bool IS_RANS = true;

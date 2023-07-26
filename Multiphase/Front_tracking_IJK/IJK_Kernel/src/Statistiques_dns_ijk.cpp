@@ -1735,7 +1735,7 @@ void Statistiques_dns_ijk::postraiter(Sortie& os, int flag_valeur_instantanee) c
   for (int j = 0; j < n; j++)
     {
       char s[100];
-      sprintf(s, "%16.16e ", elem_coord_[j]);
+      snprintf(s,100, "%16.16e ", elem_coord_[j]);
       os << s;
       for (int i = 0; i < nval_; i++)
         {
@@ -1744,7 +1744,7 @@ void Statistiques_dns_ijk::postraiter(Sortie& os, int flag_valeur_instantanee) c
             x = integrale_temporelle_[i][j] / t_integration_;
           else
             x = moyenne_spatiale_instantanee_[i][j];
-          sprintf(s, "%16.16e ", x);
+          snprintf(s,100, "%16.16e ", x);
           os << s;
         }
       os << finl;
@@ -1780,7 +1780,7 @@ void Statistiques_dns_ijk::postraiter_k(Sortie& os, int flag_valeur_instantanee)
   for (int j = 0; j < n; j++)
     {
       char s[100];
-      sprintf(s, "%16.16e ", elem_coord_[j]);
+      snprintf(s,100, "%16.16e ", elem_coord_[j]);
       os << s;
       for (int i = 0; i < kval_; i++)
         {
@@ -1800,7 +1800,7 @@ void Statistiques_dns_ijk::postraiter_k(Sortie& os, int flag_valeur_instantanee)
             {
               x = moyenne_spatiale_ec_[i][j];
             }
-          sprintf(s, "%16.16e ", x);
+          snprintf(s,100, "%16.16e ", x);
           os << s;
         }
       os << finl;

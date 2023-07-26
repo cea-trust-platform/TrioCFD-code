@@ -125,6 +125,7 @@ Read pb
 	Postraitements
 	{
 	    lata {
+		Domaine DOM_BODY
                 Sondes
                 	{
                         sonde_vit  vitesse periode 0.1 segment 20 1.0 0. 0.4 1.0 2.0 0.4
@@ -145,8 +146,6 @@ Read pb
 
 			}
 		format lml fichier mixedBC
-
-		Domaine DOM_BODY
 		Champs dt_post 5.
 			{
 			vitesse

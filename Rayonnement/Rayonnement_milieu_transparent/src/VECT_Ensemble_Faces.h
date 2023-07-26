@@ -24,7 +24,7 @@
 #define VECT_Ensemble_Faces_included
 
 #include <Ensemble_Faces_base.h>
-Declare_vect(Ensemble_Faces_base);
+#include <TRUST_Vector.h>
 
 
 class VECT_Ensemble_Faces : public VECT(Ensemble_Faces_base)

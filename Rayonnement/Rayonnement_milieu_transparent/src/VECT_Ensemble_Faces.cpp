@@ -22,8 +22,6 @@
 
 #include <VECT_Ensemble_Faces.h>
 
-Implemente_vect(Ensemble_Faces_base);
-
 Implemente_instanciable(VECT_Ensemble_Faces,"VECT_Ensemble_Faces",VECT(Ensemble_Faces_base));
 
 Sortie& VECT_Ensemble_Faces::printOn(Sortie& s) const

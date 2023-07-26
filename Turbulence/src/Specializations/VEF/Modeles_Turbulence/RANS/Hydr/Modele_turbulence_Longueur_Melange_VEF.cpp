@@ -418,24 +418,23 @@ int Modele_turbulence_Longueur_Melange_VEF::preparer_calcul( )
 {
   // On ne doit pas lire_distance_paroi dans le cas ou on post-traite le champs Distance_paroi
   // car c'est deja fait dans la classe mere Mod_turb_hyd_base
-  LIST_CURSEUR(DERIV(Postraitement_base)) curseur = equation().probleme().postraitements();
   bool contient_distance_paroi = false;
-  while (curseur && !contient_distance_paroi)
-    {
-      if (sub_type(Postraitement,curseur.valeur().valeur()))
-        {
-          Postraitement& post = ref_cast(Postraitement,curseur.valeur().valeur());
-          for (int i=0; i<post.noms_champs_a_post().size(); i++)
-            {
-              if (post.noms_champs_a_post()[i].contient("DISTANCE_PAROI"))
-                {
-                  contient_distance_paroi = true;
-                  break;
-                }
-            }
-        }
-      ++curseur;
-    }
+  for (auto& itr : equation().probleme().postraitements())
+    if (!contient_distance_paroi)
+      {
+        if (sub_type(Postraitement,itr.valeur()))
+          {
+            Postraitement& post = ref_cast(Postraitement,itr.valeur());
+            for (int i=0; i<post.noms_champs_a_post().size(); i++)
+              {
+                if (post.noms_champs_a_post()[i].contient("DISTANCE_PAROI"))
+                  {
+                    contient_distance_paroi = true;
+                    break;
+                  }
+              }
+          }
+      }
   if (!contient_distance_paroi && cas == 4)
     lire_distance_paroi();
   Mod_turb_hyd_base::preparer_calcul();

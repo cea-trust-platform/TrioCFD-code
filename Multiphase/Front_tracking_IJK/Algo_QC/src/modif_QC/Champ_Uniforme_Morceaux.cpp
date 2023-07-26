@@ -25,7 +25,8 @@
 #include <Sous_Zone.h>
 #include <Domaine.h>
 #include <Interprete.h>
-#include <Vect_Parser_U.h>
+#include <Parser_U.h>
+#include <TRUST_Vector.h>
 
 Implemente_instanciable(Champ_Uniforme_Morceaux,"Champ_Uniforme_Morceaux",Champ_Don_base);
 

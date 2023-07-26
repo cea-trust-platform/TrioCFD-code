@@ -22,13 +22,12 @@
 #ifndef Beam_model_included
 #define Beam_model_included
 
-#include <List.h>
+#include <TRUST_List.h>
 #include <Interprete_geometrique_base.h>
 #include <Nom.h>
 #include <Bords.h>
 #include <Motcle.h>
 
-Declare_liste(DoubleTab);
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class Beam_model

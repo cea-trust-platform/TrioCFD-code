@@ -22,12 +22,9 @@
 #ifndef _RK3b_h
 #define _RK3b_h
 
-
-
-
-
 #include <Schema_Temps_base.h>
-#include <Vect_Ref_Probleme_base.h>
+#include <Ref_Probleme_base.h>
+#include <TRUST_Vector.h>
 class Pb_MG;
 class Pb_2G;
 

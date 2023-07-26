@@ -24,8 +24,8 @@
 
 #include <TRUSTList.h>
 #include <Sonde_IJK.h>
+#include <TRUST_List.h>
 
-Declare_liste(Sonde_IJK);
 
 /*! @brief : class Sondes_IJK
  *
@@ -54,31 +54,16 @@ protected :
 
 inline void Sondes_IJK::completer_IJK(const IJK_FT_double& ijk_ft)
 {
-  LIST_CURSEUR(Sonde_IJK) curseur=*this;
-  while(curseur)
-    {
-      curseur->completer_IJK(ijk_ft);
-      ++curseur;
-    }
+  for(auto& itr : *this) itr.completer_IJK(ijk_ft);
 }
 
 inline void Sondes_IJK::ouvrir_fichiers()
 {
-  LIST_CURSEUR(Sonde_IJK) curseur=*this;
-  while(curseur)
-    {
-      curseur->ouvrir_fichier();
-      ++curseur;
-    }
+  for(auto& itr : *this) itr.ouvrir_fichier();
 }
 inline void Sondes_IJK::fermer_fichiers()
 {
-  LIST_CURSEUR(Sonde_IJK) curseur=*this;
-  while(curseur)
-    {
-      curseur->fermer_fichier();
-      ++curseur;
-    }
+  for(auto& itr : *this) itr.fermer_fichier();
 }
 
 

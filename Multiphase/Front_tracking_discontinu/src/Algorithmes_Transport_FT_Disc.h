@@ -29,14 +29,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Objet_U.h>
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 
 class Zone_VF;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Algorithmes_Transport_FT_Disc;
 
-Declare_deriv(Algorithmes_Transport_FT_Disc);
 
 /*! @brief : classe Algorithmes_Transport_FT_Disc
  *

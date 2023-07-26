@@ -126,10 +126,12 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   type+=nb_inc;
 
   Nom type_diff;
-  if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite()))
-    type_diff="const_";
+  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
   else
-    type_diff="var_";
+    {
+      if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite())) type_diff="const_";
+      else type_diff="var_";
+    }
   type+=type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();

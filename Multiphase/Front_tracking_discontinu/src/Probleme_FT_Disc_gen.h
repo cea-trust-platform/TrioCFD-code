@@ -24,7 +24,8 @@
 #define Probleme_FT_Disc_gen_included
 
 #include <Pb_Fluide_base.h>
-#include <Vect_Ref_Equation_base.h>
+#include <TRUST_Vector.h>
+#include <Ref_Equation_base.h>
 #include <Ref_Chimie.h>
 #include <Triple_Line_Model_FT_Disc.h>
 

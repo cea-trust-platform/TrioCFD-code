@@ -22,7 +22,7 @@
 #include <Parcours_interface.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
-#include <Deriv_Parcours_interface.h>
+#include <TRUST_Deriv.h>
 #include <Comm_Group.h>
 #include <Connectivite_frontieres.h>
 #include <Param.h>
@@ -33,7 +33,6 @@ Implemente_instanciable_sans_constructeur(Parcours_interface,"Parcours_interface
 
 static int flag_warning_code_missing=1;
 Implemente_ref(Parcours_interface);
-Implemente_deriv(Parcours_interface);
 
 const double Parcours_interface::Erreur_relative_maxi_ = 1.E-13;
 

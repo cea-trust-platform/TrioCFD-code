@@ -23,8 +23,8 @@
 #define Champ_front_ALE_projection_included
 
 #include <Ch_front_var_instationnaire_dep.h>
+#include <TRUST_Vector.h>
 #include <Parser_U.h>
-#include <Vect_Parser_U.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //

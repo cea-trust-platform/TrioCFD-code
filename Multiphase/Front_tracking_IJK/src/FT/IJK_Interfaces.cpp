@@ -4878,21 +4878,21 @@ void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& 
       IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
       for (True_int idir=0; idir < 3; idir++)
         {
-          sprintf(s, "%s_bulles_external_force_every_%d.out", nomcas, idir);
+          snprintf(s, 1000, "%s_bulles_external_force_every_%d.out", nomcas, idir);
           // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
           fic.ouvrir(s, mode);
           if (reset)
             {
               // Header in the file:
-              sprintf(s, "# Individual forces applied inside chiv[bubble_i]=1.\n# value=1./Vol_bubble \\int F_j(bubble_i) dv");
+              snprintf(s, 1000, "# Individual forces applied inside chiv[bubble_i]=1.\n# value=1./Vol_bubble \\int F_j(bubble_i) dv");
               fic << s;
               fic << finl;
             }
-          sprintf(s, "%.16e ", current_time);
+          snprintf(s, 1000, "%.16e ", current_time);
           fic << s;
           for (int ib = 0; ib < nb_bulles_reelles_; ib++)
             {
-              sprintf(s,"%.16e ", individual_forces(ib,idir));
+              snprintf(s, 1000, "%.16e ", individual_forces(ib,idir));
               fic << s;
             }
           fic << finl;

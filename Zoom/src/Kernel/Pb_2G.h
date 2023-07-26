@@ -28,15 +28,15 @@
 
 
 #include <Connectivites.h>
-#include <List_Prolongement.h>
-#include <List_Restriction.h>
+#include <TRUST_List.h>
+#include <Prolongement.h>
+#include <Restriction.h>
 #include <Ref_Pb_MG.h>
 class Prolongement;
 class Restriction;
 class Pb_grossier;
 class Champ_front_zoom;
 class Pb_1G;
-#include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 class Frontiere;
 class Probleme_base;

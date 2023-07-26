@@ -21,10 +21,9 @@
 
 #ifndef Diffu_totale_included
 #define Diffu_totale_included
-#include <Deriv.h>
+#include <TRUST_Deriv.h>
 #include <Diffu_totale_base.h>
 
-Declare_deriv(Diffu_totale_base);
 
 /*! @brief Classe Diffu_totale Classe generique calculant la diffusivite totale (somme diffusivite
  *

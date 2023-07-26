@@ -2954,7 +2954,7 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
         Force << espace << force_[k];
       Force << finl;
       const Zone& zone=zone_dis().zone();
-      const int impr_mom = zone.Moments_a_imprimer();
+      const int impr_mom = zone.moments_a_imprimer();
       if (impr_mom)
         {
           SFichier Moment;
@@ -3037,7 +3037,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
     force_=0;
     moment_=0;
     const Zone& zone=zone_dis().zone();
-    const int impr_mom = zone.Moments_a_imprimer();
+    const int impr_mom = zone.moments_a_imprimer();
     const ArrOfDouble& centre_gravite = zone.cg_moments();
     const DoubleTab& centre_faces = ref_cast(Zone_VF,zone_dis().valeur()).xv();
     ArrOfDouble xgr(dimension);

@@ -42,10 +42,8 @@
 #include <init_forcage_THI.h>
 #include <corrections_qdm.h>
 #include <Force_sp.h>
+#include <TRUST_List.h>
 #include <IJK_Energie.h>
-
-Declare_liste(IJK_Thermique);
-Declare_liste(IJK_Energie);
 
 // #define SMOOTHING_RHO
 

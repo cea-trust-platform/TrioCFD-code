@@ -189,7 +189,7 @@ void Switch_QC_double::compute_and_write_extra_fields(const Nom& lata_name, Doub
           n = ((long long) geom.get_nb_elem_tot(DIRECTION_I))
                               * ((long long) geom.get_nb_elem_tot(DIRECTION_J))
                               * ((long long) geom.get_nb_elem_tot(DIRECTION_K));
-          sprintf(sz_string, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
+          snprintf(sz_string, 100, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
           f << "Champ RHO " << (lata_name + Nom(".RHO.data")) << " geometrie=" << geom.le_nom() << " size=" << sz_string
               << " localisation=ELEM composantes=1" << finl;
         }

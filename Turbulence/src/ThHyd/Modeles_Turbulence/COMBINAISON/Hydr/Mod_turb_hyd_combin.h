@@ -23,9 +23,10 @@
 #define Mod_turb_hyd_combin_included
 
 #include <Mod_turb_hyd_base.h>
-#include <Vect_Parser_U.h>
-
 #include <TRUSTTabs_forward.h>
+#include <TRUST_Vector.h>
+#include <Parser_U.h>
+
 
 /*! @brief Classe Mod_turb_hyd_combin Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
  *
