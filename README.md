@@ -2,7 +2,12 @@
 # TrioCFD
 
 **TrioCFD** (previously named "Trio_U") is the Computational Fluid Dynamics (CFD) code
-based on the TRUST platform ("TRUST" with Front_Tracking, Radiation, ALE for fluid/structure interactions and Turbulence LES & RANS models).
+based on the TRUST platform.
+There are different physical modules such as:
+- Turbulence LES & RANS models,
+- Front_Tracking,
+- Radiation,
+- ALE for fluid/structure interactions.
 
 This software is OpenSource (BSD license).
 
@@ -55,7 +60,7 @@ source ./env_TrioCFD.sh
 
 To check:
 ```bash
-make check_all_optim
+make check_optim
 ```
 
 To see documentation:

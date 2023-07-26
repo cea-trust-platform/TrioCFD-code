@@ -34,7 +34,7 @@ function updateTRAD2_ajout0()
 
 mkdir -p share/doc_src
 
-updateTRAD2_ajout0
+# updateTRAD2_ajout0
 
 if [ ! -f build/html/index.html ]
 then

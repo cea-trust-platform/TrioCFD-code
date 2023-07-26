@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# P1 #
+sed "s/Read dis { P0 }/Read dis { P1 }/" StatVortex2D_P0_Re1.data >   StatVortex2D_P1_Re1.data
+sed "s/Read dis { P0 }/Read dis { P1 }/" StatVortex2D_P0_Re100.data > StatVortex2D_P1_Re100.data
+
+# P0P1 #
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" StatVortex2D_P0_Re1.data >   StatVortex2D_P0P1_Re1.data
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" StatVortex2D_P0_Re100.data > StatVortex2D_P0P1_Re100.data
+
+# P0RT #
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" StatVortex2D_P0_Re1.data >   StatVortex2D_P0RT_Re1.data
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" StatVortex2D_P0_Re100.data > StatVortex2D_P0RT_Re100.data
+
+# Folders & Data files generation #
+
+Parameter="Re1 Re100"
+Discretization="P0 P1 P0P1 P0RT"
+for Discr in $Discretization ; do
+  for Re in $Parameter ; do
+    for num in `seq 1 3`; do
+
+        fold="mesh_"$num"/"$Discr"/"$Re
+        mkdir -p $fold
+
+        MeshFile="Square_h"$num
+        ln -sfn $project_directory/share/Validation/Rapports_automatiques/P1NCP0RT/mesh/$MeshFile".med" $fold/.
+
+        DataFile="StatVortex2D_"$Discr"_"$Re".data"
+        cp  $DataFile $fold/StatVortex2D.data
+        sed -i "s/ Square_h1.med/ $MeshFile.med/" $fold/StatVortex2D.data
+    done
+  done
+done

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ! -d Bilans_VEF ]
+then
+   # copie_cas_test Bilans_VEF
+   cp -R ${project_directory}/tests/Reference/Turbulence/LES/Bilans_VEF ./ || exit 1
+   mv Bilans_VEF Bilans_VEF_Impl
+   rm -f Bilans_VEF_Impl/verifie
+   (cd Bilans_VEF_Impl; sed "s/uler_explicite/uler_implicite/; s/seuil_statio/solveur implicite {   seuil_convergence_implicite 1e-4 seuil_convergence_solveur 1e-8 solveur gen { seuil 1e-9 solv_elem bicgstab precond ilu { type 2 filling 10 } } } seuil_statio/;s/ cholesky { }/ gcp { precond ssor { omega 1.6 } seuil 1e-12 }/" Bilans_VEF.data > toto.data; mv toto.data Bilans_VEF.data )
+   
+   # copie_cas_test Bilans_VEF
+   cp -R ${project_directory}/tests/Reference/Turbulence/LES/Bilans_VEF ./ || exit 1
+
+   rm -f Bilans_VEF/verifie
+fi

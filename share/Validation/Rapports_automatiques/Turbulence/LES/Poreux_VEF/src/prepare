@@ -1,0 +1,34 @@
+#!/bin/bash
+
+TCFD_REP_TEST=${project_directory}/tests/Reference/Turbulence/LES
+TRUS_REP_TEST=${TRUST_ROOT}/tests/Reference
+
+for cas in Poreux_VEF_2D Poreux_VEF_3D Poreux_VEF_3D_EFstab Poreux_VEF_3D_turb Poreux_VEF_Poiseuille
+do
+    if [ ! -d $cas ]
+    then
+      if [[ -d ${TCFD_REP_TEST}/${cas} ]]
+      then
+        # copie_cas_test $cas
+        cp -R ${TCFD_REP_TEST}/${cas} ./
+      elif [[ -d ${TRUS_REP_TEST}/${cas} ]]
+      then
+        # copie_cas_test $cas $TRUST_ROOT/tests
+        cp -R ${TRUS_REP_TEST}/${cas} ./
+      else
+        echo -e "Error: the test cas ${cas} has not been found !"
+        exit 1
+      fi
+    fi
+
+    (cd $cas ; sed "s/champs dt_post/format lata champs dt_post/" $cas.data > p; mv p $cas.data )
+    # echo "	CasTest \"$cas\" \"$cas.data\""
+done
+
+cp -r Poreux_VEF_3D_EFstab Poreux_VEF_3D_EFstab_mod
+cd Poreux_VEF_3D_EFstab_mod
+sed "s/amont/EF_stab { } /" Poreux_VEF_3D_EFstab.data | sed "s/seg_P /seg_T temperature periode 0.1 segment 20 0.025 0.5 0.5 0.975 0.5 0.5 seg_P /" > Poreux_VEF_3D_EFstab_mod.data
+
+cd ..
+sed -i "s/lml/lata/" Poreux_Boussinesq_VEF_3D.data
+
