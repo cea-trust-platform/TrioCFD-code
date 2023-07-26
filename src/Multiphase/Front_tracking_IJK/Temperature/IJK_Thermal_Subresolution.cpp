@@ -53,8 +53,6 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
 Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 {
   IJK_Thermal_base::readOn( is );
-//  Cout << "IJK_Thermal_Subresolution::readOn : Parameters summary. " << finl;
-//  printOn(Cout);
   return is;
 }
 

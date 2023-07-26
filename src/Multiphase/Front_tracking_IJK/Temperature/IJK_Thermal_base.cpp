@@ -207,6 +207,8 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("fo", &fo_); // XD_ADD_P floattant not_set
   param.ajouter("cp_liquid", &cp_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid specific heat at constant pressure
   param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid thermal conductivity
+  param.ajouter("cp_vapour", &cp_vapour_); // XD_ADD_P floattant Liquid specific heat at constant pressure
+  param.ajouter("lambda_vapour", &lambda_vapour_); // XD_ADD_P floattant Liquid thermal conductivity
 
   param.ajouter("expression_T_init", &expression_T_init_); // XD_ADD_P chaine Expression of initial temperature (parser of x,y,z)
 
@@ -300,7 +302,8 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
   nalloc += 3;
 
-  if (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"))
+  rho_cp_post_ = (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"));
+  if (rho_cp_post_)
     {
       rho_cp_.allocate(splitting, IJK_Splitting::ELEM, 2);
       nalloc += 1;
@@ -449,7 +452,7 @@ void IJK_Thermal_base::update_thermal_properties()
       for (int i=0; i < nx; i++)
         {
           double chi_l = indic(i,j,k);
-          if (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"))
+          if (rho_cp_post_)
             {
               rho_cp_(i,j,k) = rho_l*cp_liquid_*chi_l + rho_v*cp_vapour_*(1-chi_l);
             }
@@ -458,7 +461,7 @@ void IJK_Thermal_base::update_thermal_properties()
               rho_cp_T_(i,j,k) = (rho_l*cp_liquid_*chi_l + rho_v*cp_vapour_*(1-chi_l))*temperature_(i,j,k);
             }
         }
-  if (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"))
+  if (rho_cp_post_)
     {
       rho_cp_.echange_espace_virtuel(rho_cp_.ghost());
     }

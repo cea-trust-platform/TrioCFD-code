@@ -300,6 +300,7 @@ protected:
   FixedVector<IJK_Field_double, 3> grad_T_;
   double global_energy_;
   int calulate_grad_T_;
+  int rho_cp_post_;
 
 };
 
