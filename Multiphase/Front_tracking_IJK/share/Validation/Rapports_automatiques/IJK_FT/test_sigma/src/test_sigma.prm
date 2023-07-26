@@ -6,6 +6,7 @@ Parametres {
 	CasTest . test_sigma_seq.data
 	CasTest . test_sigma_drho_seq.data
 	CasTest . test_sigma_par8.data 8
+	ExtraUsedFile init.lata*
 }
 
 Chapitre {

@@ -1,3 +1,4 @@
+# PARALLEL ONLY 4 #
 IJK_Grid_Geometry DOM
 
 Lire DOM
@@ -55,6 +56,7 @@ IJK_FT_double
   champs_a_postraiter 11 COMPO_CONNEXE INDICATRICE VELOCITY PRESSURE COURBURE INTERFACES EXTERNAL_FORCE INTEGRATED_VELOCITY INTEGRATED_PRESSURE INTEGRATED_TIMESCALE INDICATRICE_PERTURBE
   check_stop_file stop.txt
   dt_sauvegarde 50
+  tinit 0
   nb_pas_dt_max 100
   
   multigrid_solver {

@@ -45,17 +45,17 @@
 
 #define old_forme
 
-Implemente_instanciable(Echelle_temporelle_turbulente,"Echelle_temporelle_turbulente",Convection_Diffusion_std);
+Implemente_instanciable(Echelle_temporelle_turbulente,"Echelle_temporelle_turbulente",Convection_diffusion_turbulence_multiphase);
 
 
-/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
+/*! @brief Simple appel a: Convection_diffusion_turbulence_multiphase::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Echelle_temporelle_turbulente::printOn(Sortie& is) const
 {
-  return Convection_Diffusion_std::printOn(is);
+  return Convection_diffusion_turbulence_multiphase::printOn(is);
 }
 
 /*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
@@ -65,26 +65,13 @@ Sortie& Echelle_temporelle_turbulente::printOn(Sortie& is) const
  */
 Entree& Echelle_temporelle_turbulente::readOn(Entree& is)
 {
-  assert(l_inco_ch.non_nul());
-  assert(le_fluide.non_nul());
-  Convection_Diffusion_std::readOn(is);
+  Convection_diffusion_turbulence_multiphase::readOn(is);
 
   terme_convectif.set_fichier("Convection_echelle_temporelle_turbulente");
   terme_convectif.set_description((Nom)"Turbulent time scale transfer rate=Integral(-rho*tau*ndS) [kg] if SI units used");
   terme_diffusif.set_fichier("Diffusion_echelle_temporelle_turbulente");
   terme_diffusif.set_description((Nom)"Turbulent time scale transfer rate=Integral(mu*grad(tau)*ndS) [kg] if SI units used");
   return is;
-}
-
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base ou en Fluide_Ostwald.
- *
- * @param (Milieu_base& un_milieu)
- * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
- */
-void Echelle_temporelle_turbulente::associer_milieu_base(const Milieu_base& un_milieu)
-{
-  const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
-  associer_fluide(un_fluide);
 }
 
 const Champ_Don& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
@@ -115,65 +102,6 @@ void Echelle_temporelle_turbulente::discretiser()
   Cerr << "Echelle_temporelle_turbulente::discretiser() ok" << finl;
 }
 
-
-/*! @brief Renvoie le milieu physique de l'equation.
- *
- * (un Fluide_base upcaste en Milieu_base)
- *     (version const)
- *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
- */
-const Milieu_base& Echelle_temporelle_turbulente::milieu() const
-{
-  return le_fluide.valeur();
-}
-
-
-/*! @brief Renvoie le milieu physique de l'equation.
- *
- * (un Fluide_base upcaste en Milieu_base)
- *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
- */
-Milieu_base& Echelle_temporelle_turbulente::milieu()
-{
-  return le_fluide.valeur();
-}
-
-/*! @brief Impression des flux sur les bords sur un flot de sortie.
- *
- * Appelle Equation_base::impr(Sortie&)
- *
- * @param (Sortie& os) un flot de sortie
- * @return (int) code de retour propage
- */
-int Echelle_temporelle_turbulente::impr(Sortie& os) const
-{
-  return Equation_base::impr(os);
-}
-
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
- *
- * Ici "Thermique".
- *
- * @return (Motcle&) le nom du domaine d'application de l'equation
- */
-const Motcle& Echelle_temporelle_turbulente::domaine_application() const
-{
-  static Motcle mot("Turbulence");
-  return mot;
-}
-
-/*! @brief Associe un fluide incompressible a l'equation.
- *
- * @param (Fluide_base& un_fluide) le milieu fluide incompressible a associer a l'equation
- */
-void Echelle_temporelle_turbulente::associer_fluide(const Fluide_base& un_fluide)
-{
-  le_fluide = un_fluide;
-}
-
-
 void Echelle_temporelle_turbulente::calculer_alpha_rho_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
@@ -188,11 +116,11 @@ void Echelle_temporelle_turbulente::calculer_alpha_rho_tau(const Objet_U& obj, D
   for (i = 0; i < Nl; i++)
     for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * tau(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a une domaine_dis_base */
+  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
   DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab() ;
   DoubleTab b_rho, b_tau = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_tau.dimension_tot(0);
-  if (ch_rho.a_une_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
+  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
   else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis().valeur()).xv_bord(), b_rho);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_tau(i, n);

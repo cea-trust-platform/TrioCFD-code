@@ -80,7 +80,6 @@ Probleme_base::~Probleme_base()
 Probleme_base::Probleme_base() : osauv_hdf_(0), reprise_effectuee_(0), reprise_version_(155), restart_file(0), coupled_(0)
 {
   resuming_in_progress_=0;
-  tstat_deb_ = tstat_fin_ = -1;
 }
 
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Ecriture d'un probleme sur un flot de sortie.
@@ -97,7 +96,7 @@ Sortie& Probleme_base::printOn(Sortie& os) const
   for (int i = 0; i < nombre_d_equations(); i++)
     os << equation(i).que_suis_je() << " " << equation(i) << finl;
   os << les_postraitements;
-  os << le_domaine_dis;
+  os << le_domaine_dis.valeur();
   return os;
 }
 
@@ -377,9 +376,8 @@ void Probleme_base::discretiser_equations()
 
 /*! @brief Affecte une discretisation au probleme Discretise le Domaine associe au probleme avec la discretisation
  *
- *      Associe la premiere domaine du Domaine aux equations du probleme
+ *      Associe le premier Domaine aux equations du probleme
  *      Discretise les equations associees au probleme
- *      NOTE: TRUST V1 une seule Domaine_dis pas Domaine_dis est traitee
  *
  * @param (Discretisation_base& discretisation) une discretisation pour le probleme
  */
@@ -398,7 +396,7 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
   une_discretisation.associer_domaine(le_domaine_.valeur());
   une_discretisation.discretiser(le_domaine_dis);
   // Can not do this before, since the Domaine_dis is not typed yet:
-  le_domaine_dis.associer_domaine(le_domaine_);
+  le_domaine_dis->associer_domaine(le_domaine_);
 
   if (milieu_via_associer() || is_pb_FT())
     {
@@ -637,7 +635,7 @@ Domaine& Probleme_base::domaine()
  */
 const Domaine_dis& Probleme_base::domaine_dis() const
 {
-  return le_domaine_dis;
+  return le_domaine_dis.valeur();
 }
 
 /*! @brief Renvoie le domaine discretise associe au probleme.
@@ -646,7 +644,7 @@ const Domaine_dis& Probleme_base::domaine_dis() const
  */
 Domaine_dis& Probleme_base::domaine_dis()
 {
-  return le_domaine_dis;
+  return le_domaine_dis.valeur();
 }
 
 /*! @brief Associe un milieu physique aux equations du probleme.
@@ -905,27 +903,6 @@ int Probleme_base::comprend_champ_post(const Motcle& un_nom) const
         return 1;
     }
   return 0;
-}
-
-/*! @brief On verifie que le temps de debut et de fin des statistiques est identique sur tous les champsde tous les postraitements
- *
- */
-int Probleme_base::verifie_tdeb_tfin(const Motcle& un_nom) const
-{
-  for (const auto &itr : postraitements())
-    {
-      const Postraitement& post = ref_cast(Postraitement, itr.valeur());
-      if (tstat_deb_ == -1)
-        tstat_deb_ = post.tstat_deb();
-      else if (!est_egal(tstat_deb_, post.tstat_deb()) && post.tstat_deb() != -1)
-        Cerr << "Beginning times of statistics t_deb are differents but the calculation continues" << finl;
-
-      if (tstat_fin_ == -1)
-        tstat_fin_ = post.tstat_fin();
-      else if (!est_egal(tstat_fin_, post.tstat_fin()) && post.tstat_fin() != -1)
-        Cerr << "Ending times of statistics t_fin are differents but the calculation continues" << finl;
-    }
-  return 1;
 }
 
 const Champ_Generique_base& Probleme_base::get_champ_post(const Motcle& un_nom) const
@@ -1273,12 +1250,12 @@ int Probleme_base::postraiter(int force)
   statistiques().end_count(postraitement_counter_);
 
   //specific ALE postraitement
-  if(le_domaine_dis.domaine().que_suis_je()=="Domaine_ALE")
+  if(le_domaine_dis->domaine().que_suis_je()=="Domaine_ALE")
     {
       if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
         {
           //compute the projection on the ALE boundaries
-          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis.domaine());
+          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis->domaine());
           double temps = le_schema_en_temps->temps_courant();
           dom_ale.update_ALE_projection(temps);
         }

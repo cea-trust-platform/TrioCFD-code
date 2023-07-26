@@ -387,13 +387,13 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
 
 void Eq_rayo_semi_transp_VEF::completer()
 {
-  const Domaine_dis_base& une_domaine_dis = domaine_dis().valeur();
-  int n = une_domaine_dis.nb_front_Cl();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+  int n = un_domaine_dis.nb_front_Cl();
 
   int ii;
   for (ii =0; ii<n; ii++)
     {
-      const Frontiere_dis_base& la_fr_dis = une_domaine_dis.frontiere_dis(ii);
+      const Frontiere_dis_base& la_fr_dis = un_domaine_dis.frontiere_dis(ii);
       le_dom_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
     }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,8 +16,9 @@
 #ifndef Operateur_Diff_base_included
 #define Operateur_Diff_base_included
 
-#include <Operateur_base.h>
 #include <Support_Champ_Masse_Volumique.h>
+#include <Operateur_base.h>
+#include <Correlation.h>
 #include <TRUST_Ref.h>
 
 class Champ_base;
@@ -47,6 +48,9 @@ public:
   //liste d'Op_Diff de problemes resolus simultanement (thermique monolithique)
   mutable std::vector<const Operateur_Diff_base *> op_ext;
   virtual void init_op_ext() const {}    //remplissage de op_ext (ne peut pas etre fait dans completer(), trop tot)
+
+  virtual bool is_turb() const { return false; }
+  virtual const Correlation* correlation_viscosite_turbulente() const { return nullptr; }
 
 protected:
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;

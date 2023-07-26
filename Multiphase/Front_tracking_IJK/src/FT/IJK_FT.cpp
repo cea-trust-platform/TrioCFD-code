@@ -200,8 +200,8 @@ void copy_field_to_extended_domain(const IJK_Field_double& input_field,
           input_field2(i,j,k) = input_field(i,j,k);
         }
   // Echange espace virtuel pour avoir les valeurs sur nextension mailles
-  // autour de la domaine locale initiale.
-  // On espere que la domaine etendue sur ce processeur est a l'interieur...
+  // autour du domaine local initial.
+  // On espere que le domaine etendu sur ce processeur est a l'interieur...
   // Il nous faut une epaisseur supplementaire car les faces de droite du
   // maillage etendu portent une inconnue qui n'existe pas dans le maillage
   // d'origine, s'il est periodique.
@@ -645,10 +645,10 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     }
   splitting_ = ref_cast(IJK_Splitting, Interprete_bloc::objet_global(ijk_splitting_name));
 
-  Cerr << "Construction de la domaine VDF NS pour les sondes..." << finl;
+  Cerr << "Construction du domaine VDF NS pour les sondes..." << finl;
   refprobleme_ns_ = creer_domaine_vdf(splitting_, "DOM_NS_VDF");
 
-  Cerr << "Construction de la domaine VDF..." << finl;
+  Cerr << "Construction du domaine VDF..." << finl;
   {
     build_extended_splitting(splitting_, splitting_ft_, ijk_splitting_ft_extension_);
     refprobleme_ft_disc_ = creer_domaine_vdf(splitting_ft_, "DOM_VDF");
@@ -1417,7 +1417,7 @@ int IJK_FT_double::initialise()
 
 
 
-  // On peut recuperer la domainevf:
+  // On peut recuperer le domainevf:
   const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
@@ -1980,7 +1980,7 @@ void IJK_FT_double::run()
 
   //GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
   // Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
-  // alors il faut une domaine ghost de la taille de la longueur maximale des arretes.
+  // alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
   //  allocate_velocity(velocity_ft_, splitting_ft_, 0);
   allocate_velocity(velocity_ft_, splitting_ft_, 4);
 

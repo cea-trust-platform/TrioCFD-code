@@ -35,7 +35,7 @@ class Domaine;
  *     la directive ConstruireDomaine :
  *         ConstruireDomaine nom_domaine nom_ssdomaine
  *     Cette directive sert a construire un nouveau domaine a partir
- *     d 'une sous domaine
+ *     d 'un sous domaine
  *
  * @sa Interprete Rectangle
  */

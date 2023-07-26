@@ -23,15 +23,15 @@
 #ifndef Echelle_temporelle_turbulente_included
 #define Echelle_temporelle_turbulente_included
 
-#include <Convection_Diffusion_std.h>
+#include <Convection_diffusion_turbulence_multiphase.h>
 #include <Fluide_base.h>
 #include <TRUST_Ref.h>
 
 /*! @brief classe Echelle_temporelle_turbulente Equation de transport de l'echelle temporelle turbulente (modele k-tau)
  *
- * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature Convection_diffusion_turbulence_multiphase
  */
-class Echelle_temporelle_turbulente : public Convection_Diffusion_std
+class Echelle_temporelle_turbulente : public Convection_diffusion_turbulence_multiphase
 {
   Declare_instanciable_sans_constructeur(Echelle_temporelle_turbulente);
 
@@ -39,18 +39,10 @@ public :
 
   Echelle_temporelle_turbulente();
 
-  void associer_fluide(const Fluide_base& );
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
   void discretiser() override;
-  const Milieu_base& milieu() const override;
-  Milieu_base& milieu() override;
-  void associer_milieu_base(const Milieu_base& ) override;
-  int impr(Sortie& os) const override;
+
   const Champ_Don& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
-
-  const Motcle& domaine_application() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
   static void calculer_alpha_rho_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
@@ -58,35 +50,6 @@ public :
   {
     return { "alpha_rho_tau", calculer_alpha_rho_tau };
   }
-
-  int positive_unkown() override {return 1;};
-
-protected :
-
-  Champ_Inc l_inco_ch;
-  REF(Fluide_base) le_fluide;
 };
-
-
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline const Champ_Inc& Echelle_temporelle_turbulente::inconnue() const
-{
-  return l_inco_ch;
-}
-
-
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
- *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
- */
-inline Champ_Inc& Echelle_temporelle_turbulente::inconnue()
-{
-  return l_inco_ch;
-}
 
 #endif

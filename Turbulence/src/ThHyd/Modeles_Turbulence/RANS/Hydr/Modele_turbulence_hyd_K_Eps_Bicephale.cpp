@@ -186,7 +186,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
     }
 
 
-  // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
+  // dans le cas d'un domaine nul on doit effectuer le dimensionnement
   double non_prepare=1;
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente tab_K",tab_K);

@@ -8,6 +8,7 @@ Parametres {
 	Auteur "A.S."
 	CasTest . pre_run.data 1
 	CasTest . CHMTVAR.data 4
+	# DISABLE_PARALLEL_RUN #
 }
 
 Chapitre {

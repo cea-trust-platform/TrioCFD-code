@@ -33,6 +33,9 @@
 #include <Domaine_Poly_base.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
+#include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
+#include <Viscosite_turbulente_k_omega.h>
+#include <Viscosite_turbulente_k_tau.h>
 
 #include <math.h>
 
@@ -46,7 +49,7 @@ Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 
 Entree& Paroi_frottante_loi::readOn(Entree& s )
 {
-  if (app_domains.size() == 0) app_domains = { Motcle("indetermine") };
+  if (app_domains.size() == 0) app_domains = { Motcle("turbulence") };
 
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
@@ -63,6 +66,33 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
   return s;
 }
 
+void Paroi_frottante_loi::completer()
+{
+  if (!ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb()) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
+  if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
+    }
+  else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .6;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+    }
+  else
+    {
+      if (fac_prod_k_<-1.e7) fac_prod_k_ =  0.;
+      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ =  0.;
+      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+    }
+}
+
+
 void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
 {
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
@@ -73,25 +103,13 @@ void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
       tab(f + f1, n) |= 1;
 }
 
-double Paroi_frottante_loi::coefficient_frottement(int i) const
-{
-  return valeurs_coeff_(i,0);
-}
+double Paroi_frottante_loi::coefficient_frottement(int i) const {return valeurs_coeff_(i,0);}
 
-double Paroi_frottante_loi::coefficient_frottement(int i,int j) const
-{
-  return valeurs_coeff_(i,j);
-}
+double Paroi_frottante_loi::coefficient_frottement(int i,int j) const {return valeurs_coeff_(i,j);}
 
-double Paroi_frottante_loi::coefficient_frottement_grad(int i) const
-{
-  return valeurs_coeff_grad_(i,0);
-}
+double Paroi_frottante_loi::coefficient_frottement_grad(int i) const {return valeurs_coeff_grad_(i,0);}
 
-double Paroi_frottante_loi::coefficient_frottement_grad(int i,int j) const
-{
-  return valeurs_coeff_grad_(i,j);
-}
+double Paroi_frottante_loi::coefficient_frottement_grad(int i,int j) const {return valeurs_coeff_grad_(i,j);}
 
 int Paroi_frottante_loi::initialiser(double temps)
 {
@@ -117,7 +135,7 @@ void Paroi_frottante_loi::me_calculer()
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, domaine_Cl_dis().equation().probleme().domaine_dis().valeur());
 
-  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la domaine
+  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces du domaine
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   const DoubleTab& vit   = domaine_Cl_dis().equation().probleme().get_champ("vitesse").valeurs(),
                    &rho = domaine_Cl_dis().equation().probleme().get_champ("masse_volumique").valeurs(),
@@ -173,7 +191,7 @@ void Paroi_frottante_loi::me_calculer()
         valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
 
         /*
-                // Test : faire frotter un peu quand même
+                // Test : faire frotter un peu quand meme
                 int f_domaine = f + f1; // number of the face in the domaine
                 int e = f_e(f_domaine,0);
                 valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;

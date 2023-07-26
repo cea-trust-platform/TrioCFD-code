@@ -424,7 +424,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity(IJK_Field_double& vx, IJK_Field_doub
   const int offset_k = splitting.get_offset_local(DIRECTION_K);  // donne l'offset selon la direction k
 
   const int ntubes = faisceau.size();
-  const double epsilon = epaisseur_lissage_ * geom.get_constant_delta(DIRECTION_I); // definition de la demi largeur de la domaine d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
+  const double epsilon = epaisseur_lissage_ * geom.get_constant_delta(DIRECTION_I); // definition de la demi largeur du domaine d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
 
   // Boucle sur les tubes du faisceau
   for (int itube = 0; itube < ntubes; itube++)
@@ -433,7 +433,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity(IJK_Field_double& vx, IJK_Field_doub
       const double tube_r = tube.get_rayon();
       const double omega = tube.get_omega();
       const double r_tube_min = tube_r - epsilon;
-      const double r_tube_max = tube_r + epsilon; // rayon inf et max de la domaine d'etalement du terme de forcage
+      const double r_tube_max = tube_r + epsilon; // rayon inf et max du domaine d'etalement du terme de forcage
       const double r_tube_min_carre = r_tube_min * r_tube_min;
       const double r_tube_max_carre = r_tube_max * r_tube_max;
 
@@ -457,9 +457,9 @@ void Couplage_Tubes_IBC::force_ibc_velocity(IJK_Field_double& vx, IJK_Field_doub
           int jmax = velocity.nj();
           int kmax = velocity.nk();
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye au domaine couvert par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cylindre + etalement
+            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans le domaine courvert par le cylindre + etalement
             const double xmax = position_cylindre[0] + (tube_r + epsilon);
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
               imin++;
@@ -535,12 +535,12 @@ void Couplage_Tubes_IBC::force_ibc_velocity(IJK_Field_double& vx, IJK_Field_doub
                               f_etalement = 0.5 * ( 1 - tanh(4* (d - tube_r)/ epsilon) ) ; // pour d= tube_r la derive de f_etalement est de 10
                             }
 
-                          double delta_v = f_etalement * (extrapolated_v - velocity(i,j,k)); // qdm ds la domaine d'etalement
+                          double delta_v = f_etalement * (extrapolated_v - velocity(i,j,k)); // qdm ds le domaine d'etalement
 
                           // Calcul de rho sur la face: moyenne des rho sur les elements voisins
                           double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                           delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
-                          velocity(i, j, k) = f_etalement * extrapolated_v + (1-f_etalement) * velocity(i, j, k); // forcage etale dans la domaine d'etalement de largeur 2 * epsilon
+                          velocity(i, j, k) = f_etalement * extrapolated_v + (1-f_etalement) * velocity(i, j, k); // forcage etale dans le domaine d'etalement de largeur 2 * epsilon
                           masse_fluide += volume_maille * rho_fluide;
                           volume += volume_maille;
                         }
@@ -623,9 +623,9 @@ void Couplage_Tubes_IBC::force_ibc_velocity_frac_vol(IJK_Field_double& vx, IJK_F
           //      const double d_x = geom.get_constant_delta(0);
           const double d_z = geom.get_constant_delta(2);
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (tube_r + d_z); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cylindre + etalement
+            const double xmin = position_cylindre[0] - (tube_r + d_z); // on n'oublie pas que l'on doit chercher dans le domaine courverte par le cylindre + etalement
             const double xmax = position_cylindre[0] + (tube_r + d_z);
             //Cout << "xmin : " << xmin << " xmax : " <<  xmax<<finl;
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -689,13 +689,13 @@ void Couplage_Tubes_IBC::force_ibc_velocity_frac_vol(IJK_Field_double& vx, IJK_F
                           else
                             f = d_occupe / d_z ;
                           double delta_v_non_etale = extrapolated_v - velocity(i,j,k);
-                          double delta_v = f * delta_v_non_etale; // qdm ds la domaine d'etalement
+                          double delta_v = f * delta_v_non_etale; // qdm ds le domaine d'etalement
                           //Cout << " delta_v : " << delta_v << " extrapolated_v : " << extrapolated_v << " velocity(i,j,k) : " << velocity(i,j,k) << " f : " << f << " d_occupe : " << d_occupe << " delta_v_non_etale : " << delta_v_non_etale << finl;
 
                           // Calcul de rho sur la face: moyenne des rho sur les elements voisins
                           double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                           delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
-                          velocity(i, j, k) = f * extrapolated_v + (1-f) * velocity(i, j, k); // forcage etale dans la domaine d'etalement de largeur 2 * epsilon
+                          velocity(i, j, k) = f * extrapolated_v + (1-f) * velocity(i, j, k); // forcage etale dans le domaine d'etalement de largeur 2 * epsilon
                           //Cout << " delta_qdm_cylindre : " << delta_qdm_cylindre << " volume_maille : " << volume_maille << " rho_fluide : " << rho_fluide << " velocity(i, j, k) : " << velocity(i, j, k) << finl;
                           masse_fluide += volume_maille * rho_fluide;
                           volume += volume_maille;
@@ -804,9 +804,9 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
           const double delta_z = geom.get_constant_delta(2);
 
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cylindre + etalement
+            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans le domaine courvert par le cylindre + etalement
             const double xmax = position_cylindre[0] + (L_cube_ + delta_x);
             Cout << "xmin : " << xmin << " xmax : " <<  xmax << finl;
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -879,7 +879,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
                                   double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                                   delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
                                   Cout << " delta_qdm_cylindre : " << delta_qdm_cylindre << " volume_maille : " << volume_maille << finl;
-                                  velocity(i, j, k) = extrapolated_v; // forcage etale dans la domaine d'etalement de largeur 2 * epsilon
+                                  velocity(i, j, k) = extrapolated_v; // forcage etale dans le domaine d'etalement de largeur 2 * epsilon
                                   masse_fluide += volume_maille * rho_fluide;
                                   volume += volume_maille;
 
@@ -910,7 +910,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
                                   double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                                   delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
                                   Cout << " delta_qdm_cylindre : " << delta_qdm_cylindre << " volume_maille : " << volume_maille << finl;
-                                  velocity(i, j, k) = extrapolated_v; // forcage etale dans la domaine d'etalement de largeur 2 * epsilon
+                                  velocity(i, j, k) = extrapolated_v; // forcage etale dans le domaine d'etalement de largeur 2 * epsilon
                                   masse_fluide += volume_maille * rho_fluide;
                                   volume += volume_maille;
 
@@ -1013,9 +1013,9 @@ void Couplage_Tubes_IBC::ibc0_velocity_cube(IJK_Field_double& vx, IJK_Field_doub
           const double delta_x = geom.get_constant_delta(0);
           const double delta_z = geom.get_constant_delta(2);
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube
+            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube
             const double xmax = position_cylindre[0] + (L_cube_ + delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -1185,9 +1185,9 @@ void Couplage_Tubes_IBC::ibc0_force_cube(IJK_Field_double& vx, IJK_Field_double&
           const double delta_x = geom.get_constant_delta(0);
           const double delta_z = geom.get_constant_delta(2);
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube
+            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube
             const double xmax = position_cylindre[0] + (L_cube_ + delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -1337,9 +1337,9 @@ void Couplage_Tubes_IBC::ibc_diffuse_velocity_cube(IJK_Field_double& vx, IJK_Fie
           const double delta_x = geom.get_constant_delta(0);
           const double delta_z = geom.get_constant_delta(2);
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube + une maille
+            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube + une maille
             const double xmax = position_cylindre[0] + (L_cube_ + delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -1426,7 +1426,7 @@ void Couplage_Tubes_IBC::ibc_diffuse_velocity_cube(IJK_Field_double& vx, IJK_Fie
                           Cout << "Forcage "<< "i : " << i << " j : " << j << " k : " << k <<  " x_M : " << x_coord << " z_M : " << z_coord << " v* : " ;
                           Cout << velocity(i,j,k) << " f_k : " << f_k <<" f_i : " << f_i << " f_ik : " << f_ik << finl;
 #endif
-                          double delta_v = f_ik * (extrapolated_v - velocity(i,j,k)); // qdm ds la domaine d'etalement
+                          double delta_v = f_ik * (extrapolated_v - velocity(i,j,k)); // qdm ds la zone d'etalement
                           // Calcul de rho sur la face: moyenne des rho sur les elements voisins
                           double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                           delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
@@ -1531,9 +1531,9 @@ void Couplage_Tubes_IBC::ibc_diffuse_force_cube(IJK_Field_double& vx, IJK_Field_
           const double delta_x = geom.get_constant_delta(0);
           const double delta_z = geom.get_constant_delta(2);
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube + une maille
+            const double xmin = position_cylindre[0] - (L_cube_ + delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube + une maille
             const double xmax = position_cylindre[0] + (L_cube_ + delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -1611,7 +1611,7 @@ void Couplage_Tubes_IBC::ibc_diffuse_force_cube(IJK_Field_double& vx, IJK_Field_
                               f_k = d_k / delta_z;
                             }
                           f_ik = f_i * f_k; // frac volumique occupee
-                          double delta_v = f_ik * (extrapolated_v - velocity(i,j,k)); // qdm ds la domaine d'etalement
+                          double delta_v = f_ik * (extrapolated_v - velocity(i,j,k)); // qdm ds la zone d'etalement
                           // Calcul de rho sur la face: moyenne des rho sur les elements voisins
                           double rho_fluide = (rho_fluide_field(i,j,k) + rho_fluide_field(i+ivoisin, j+jvoisin, k+kvoisin)) * 0.5; // rho sur la face est la moy des deux cotes
                           delta_qdm_cylindre += delta_v * volume_maille * rho_fluide;
@@ -1714,9 +1714,9 @@ void Couplage_Tubes_IBC::ibc_localisee_velocity_cube(IJK_Field_double& vx, IJK_F
 
 
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + 2 * delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube + deux mailles car pr le calcul de v ds la couche lim on a besoin de la vitesse au dessus
+            const double xmin = position_cylindre[0] - (L_cube_ + 2 * delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube + deux mailles car pr le calcul de v ds la couche lim on a besoin de la vitesse au dessus
             const double xmax = position_cylindre[0] + (L_cube_ + 2 * delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -2038,9 +2038,9 @@ void Couplage_Tubes_IBC::ibc_localisee_velocity_cube_qdm(IJK_Field_double& vx, I
 
 
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (L_cube_ + 2 * delta_x); // on n'oublie pas que l'on doit chercher dans la domaine courverte par le cube + deux mailles car pr le calcul de v ds la couche lim on a besoin de la vitesse au dessus
+            const double xmin = position_cylindre[0] - (L_cube_ + 2 * delta_x); // on n'oublie pas que l'on doit chercher dans la zone courverte par le cube + deux mailles car pr le calcul de v ds la couche lim on a besoin de la vitesse au dessus
             const double xmax = position_cylindre[0] + (L_cube_ + 2 * delta_x);
 
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
@@ -2393,7 +2393,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_symetrie_plane(IJK_Field_double& vx,
   const int ntubes = faisceau.size();
   const double h_maillage = geom.get_constant_delta(DIRECTION_I);
 
-  const double epsilon = epaisseur_lissage_ * h_maillage; // definition de la demi largeur de la domaine d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
+  const double epsilon = epaisseur_lissage_ * h_maillage; // definition de la demi largeur de la zone d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
 
   DoubleTab coords(1,3); // tableau temporaire ou on stocke les coordonnees des points ou on veut interpoler la vitesse
   DoubleTab vitesses_interpolees(1,3);
@@ -2425,9 +2425,9 @@ void Couplage_Tubes_IBC::force_ibc_velocity_symetrie_plane(IJK_Field_double& vx,
           int jmax = velocity.nj();
           int kmax = velocity.nk();
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans la domaine couverte par le cylindre + etalement
+            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans la zone couverte par le cylindre + etalement
             const double xmax = position_cylindre[0] + (tube_r + epsilon);
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
               imin++;
@@ -2620,7 +2620,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_miroir(IJK_Field_double& vx, IJK_Fie
   const int offset_k = splitting.get_offset_local(DIRECTION_K);  // donne l'offset selon la direction k
 
   const int ntubes = faisceau.size();
-  const double epsilon = epaisseur_lissage_ * geom.get_constant_delta(DIRECTION_I); // definition de la demi largeur de la domaine d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
+  const double epsilon = epaisseur_lissage_ * geom.get_constant_delta(DIRECTION_I); // definition de la demi largeur de la zone d'etalement du terme de forcage comme un nombre de fois la largeur de maille selon la direction x
 
   // Boucle sur les tubes du faisceau
   for (int itube = 0; itube < ntubes; itube++)
@@ -2653,9 +2653,9 @@ void Couplage_Tubes_IBC::force_ibc_velocity_miroir(IJK_Field_double& vx, IJK_Fie
           int jmax = velocity.nj();
           int kmax = velocity.nk();
           {
-            // restreint le domaine ijk balaye a la domaine couverte par le cylindre:
+            // restreint le domaine ijk balaye a la zone couverte par le cylindre:
             const ArrOfDouble& x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I] : elem_pos[DIRECTION_I];
-            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans la domaine couverte par le cylindre + etalement
+            const double xmin = position_cylindre[0] - (tube_r + epsilon); // on n'oublie pas que l'on doit chercher dans la zone couverte par le cylindre + etalement
             const double xmax = position_cylindre[0] + (tube_r + epsilon);
             while (imin < velocity.ni() && x_coord[imin + offset_i] < xmin)
               imin++;
@@ -2742,7 +2742,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_miroir(IJK_Field_double& vx, IJK_Fie
                               // pour l'instant je le fais en monoproc il faudra dc mettre i_min + offset_i, j , k_min + offset_k
                               // Valeur des vitesses aux quatre points du carre ds lequel est P
 
-                              // Test si on est bien a l'interieur de la domaine locale sur ce processeur:
+                              // Test si on est bien a l'interieur de la zone locale sur ce processeur:
                               {
                                 const int gh = velocity.ghost();
                                 const int ni = velocity.ni();
@@ -2893,7 +2893,7 @@ void Couplage_Tubes_IBC::calcul_F_pression(const IJK_Field_double& pressure, con
           k_max_local = k_max - 128;
 
 
-          // Test si on est bien a l'interieur de la domaine locale sur ce processeur:
+          // Test si on est bien a l'interieur de la zone locale sur ce processeur:
           {
             const int gh = pressure.ghost();
             const int ni = pressure.ni();

@@ -142,8 +142,6 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
 
   terme_diffusif.typer(type);
   terme_diffusif.l_op_base().associer_eqn(*this);
-  terme_diffusif.completer();
-  terme_diffusif.valeur().dimensionner(la_matrice);
 
 
   if (sub_type(Fluide_base,fluide()))
@@ -151,6 +149,8 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
       {
         const Champ_Don& long_rayo = fluide().longueur_rayo();
         terme_diffusif.valeur().associer_diffusivite(long_rayo);
+        terme_diffusif.completer();
+        terme_diffusif.valeur().dimensionner(la_matrice);
       }
     else
       {

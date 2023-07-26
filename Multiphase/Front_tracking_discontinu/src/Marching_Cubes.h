@@ -97,7 +97,7 @@ protected:
   void correspondance_espaces_distant_virtuel(const IntTab& def_noeud,
                                               Desc_Structure_FT& desc) const;
 
-  // Champs remplis lors de l'association avec la domaine
+  // Champs remplis lors de l'association avec le domaine
   // *********** DEBUT
   REF(Domaine_VF) ref_domaine_vf_;
 

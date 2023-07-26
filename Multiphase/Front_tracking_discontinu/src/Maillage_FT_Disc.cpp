@@ -116,7 +116,7 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 
   for (int i = 0; i < nb_som; i++)
     {
-      // Indice de la face de bord dans la domaine_VF
+      // Indice de la face de bord dans le domaine_VF
       const int num_face = sommet_face_bord_[i];
       if ((num_face < 0) || (num_face>=domaine_vf.nb_faces_bord()))
         continue;
@@ -577,7 +577,7 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
 
 /*! @brief on remplit refequation_transport_, schema_comm_domaine_ desc_sommets_.comm_group_ et desc_facettes_.comm_group_
  *
- * Precondition: la domaine_dis de l'equation doit etre complete (joints)
+ * Precondition: le domaine_dis de l'equation doit etre complete (joints)
  */
 void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation)
 {
@@ -2479,7 +2479,7 @@ void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
     }
 
   // Les echanges de sommets se font entre voisins par des joints du maillage
-  // fixe. On prend donc le schema de communication de la domaine.
+  // fixe. On prend donc le schema de communication de la zone.
   // Envoi des sommets aux destinataires (pour l'instant, creation de sommets
   // virtuels sur le processeur destination).
   creer_sommets_virtuels(liste_sommets, liste_pe, schema_comm_domaine_);

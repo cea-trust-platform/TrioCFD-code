@@ -62,7 +62,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   check();
   ArrOfDouble T0_etat=T0;
   Champ_Inc T_etat(le_scalaire);
-  T_etat.valeurs()=0.;
+  T_etat->valeurs()=0.;
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
     {
       const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
@@ -73,7 +73,8 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
       if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BETA_TH")
         {
           const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
-          T_etat.valeurs()=val_T_etat;
+          T_etat->valeurs().reset();
+          T_etat->valeurs()=val_T_etat;
           beta_a=1.;
         }
       else
@@ -225,9 +226,9 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
         assert(0);
 
       // Calcul du terme source aux points d'integration :
-      le_scalaire.valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
-      T_etat.valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire_etat);
-      beta().valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
+      le_scalaire->valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
+      T_etat->valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire_etat);
+      beta()->valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
 
       // Boucle sur les faces de l'element:
       for(int face=0; face<=dimension; face++)

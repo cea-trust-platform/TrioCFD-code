@@ -16,6 +16,7 @@ EOF
 	CasTest . ijkft_monte_multi_par8.data 8
 	CasTest . test_IJK_switch.data
 	CasTest . test_IJK_switch_par8.data 8
+	# DISABLE_PARALLEL_RUN #
 }
 Chapitre {
 	Titre "Maillage généré par cree_multi_bulles.sh"

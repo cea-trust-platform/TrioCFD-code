@@ -147,7 +147,7 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
 
 /*! @brief Remplissage du maillage mesh a partir d'un fichier de sauvegarde xyz (fichier) ou d'un domaine source (domaine_src pour importation d'une cao)
  *
- *   domaine_vf est la domaine support du maillage (pour calcul de l'indice de l'element contenant chaque
+ *   domaine_vf est le domaine support du maillage (pour calcul de l'indice de l'element contenant chaque
  *   sommet du mesh. domaine_vf peut etre nul dans le cas d'une reprise xyz au cours de l'etape 'avancer'.
  *   Dans ce cas, on lit les coordonnees et les elements mais on ne remplit pas mesh.
  *

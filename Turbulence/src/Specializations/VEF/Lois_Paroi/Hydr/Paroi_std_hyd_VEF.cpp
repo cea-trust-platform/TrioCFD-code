@@ -214,7 +214,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
             }
         }
 
-      //-on parcourt toutes les faces de la domaine pour identifier celles qui sont connectees a une face de bord
+      //-on parcourt toutes les faces du domaine pour identifier celles qui sont connectees a une face de bord
       // portant une CL de Dirichlet
       //-pour une face connectee on determine le nombre de sommets appartenant au(x) bord(s) (ils sont listes dans test)
       //int nb_faces_testes=nb_faces_tot;

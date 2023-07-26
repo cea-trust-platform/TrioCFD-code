@@ -25,7 +25,7 @@
 #include <Loi_paroi_adaptative.h>
 #include <Frontiere_dis_base.h>
 #include <Pb_Multiphase.h>
-#include <Domaine_Poly_base.h>
+#include <Domaine_VF.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
 
@@ -129,7 +129,7 @@ void Cond_lim_k_compliquee_demi::mettre_a_jour(double tps)
 void Cond_lim_k_compliquee_demi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Domaine_Poly_base& domaine = ref_cast(Domaine_Poly_base, domaine_Cl_dis().equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
                              ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu(),
