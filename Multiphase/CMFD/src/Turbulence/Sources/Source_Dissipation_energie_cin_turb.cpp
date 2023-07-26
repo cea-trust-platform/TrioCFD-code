@@ -30,7 +30,7 @@
 #include <Matrix_tools.h>
 
 Implemente_base(Source_Dissipation_energie_cin_turb,"Source_Dissipation_energie_cin_turb", Sources_Multiphase_base);
-// XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente -1 Dissipation source term used in the TKE equation
+// XD Terme_dissipation_energie_cinetique_turbulente source_base Terme_dissipation_energie_cinetique_turbulente 1 Dissipation source term used in the TKE equation
 // XD attr beta_k floattant beta_k 1 Constant for the used model
 
 // XD Production_echelle_temp_taux_diss_turb source_base Production_echelle_temp_taux_diss_turb -1 Production source term used in the tau and omega equations
@@ -103,14 +103,14 @@ void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices
 
 void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Domaine_VF& 	         domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& 						      k 	= equation().inconnue().valeur().valeurs();
-  const Champ_Inc_base& ch_alpha_rho_k 	= equation().champ_conserve();
-  const DoubleTab& 				alpha_rho_k		= ch_alpha_rho_k.valeurs();
-  const tabs_t& 				der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
-  const Navier_Stokes_std&     eq_qdm 	= ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
-  const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
-  const DoubleTab&                      nu 		  		= equation().probleme().get_champ("viscosite_cinematique").passe();
+  const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const DoubleTab&                    k = equation().inconnue().valeur().valeurs();
+  const Champ_Inc_base&  ch_alpha_rho_k = equation().champ_conserve();
+  const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.valeurs();
+  const tabs_t&         der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
+  const Navier_Stokes_std&       eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
+  const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+  const DoubleTab& nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -136,8 +136,8 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
       {
         if (Type_diss == "tau")
           {
-            double inv_tau = (k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
-                             ? 1./pdiss(e,mk) * (2. - diss(e, mk)/pdiss(e,mk))
+            double inv_tau = (k(e, mk) * diss(e, mk) > visc_turb.limiteur() * nu(e, mk))
+                             ? 1./diss(e,mk)
                              : k(e, mk) / (visc_turb.limiteur() * nu(e, mk)) ;
             secmem(e, mk) -= pe(e) * ve(e) * beta_k * alpha_rho_k(e,mk) * inv_tau;
             if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("alpha") ?       der_alpha_rho_k.at("alpha")(e,mk) : 0 )        * inv_tau;	// derivee en alpha
@@ -145,17 +145,17 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
             if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ?    der_alpha_rho_k.at("pression")(e, mp) : 0 )    * inv_tau;		// derivee par rapport a la pression
             if (!(Mk==nullptr))
               {
-                if (k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
+                if (k(e, mk) * diss(e,mk) > visc_turb.limiteur() * nu(e, mk))
                   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * inv_tau; // derivee en k ; depend de l'activation ou non du limiteur
                 else
                   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * 2 * beta_k * alpha_rho_k(e, mk) / (visc_turb.limiteur() * nu(e, mk)); // derivee en k
               }
             if (!(Mdiss==nullptr))
               {
-                if ( k(e, mk) * pdiss(e, mk) > visc_turb.limiteur() * nu(e, mk))
-                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk) * (-1)/(pdiss(e,mk)*pdiss(e,mk)); // derivee en tau  ; depend de l'activation ou non du limiteur
+                if ( k(e, mk) * diss(e,mk) > visc_turb.limiteur() * nu(e, mk))
+                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk) * (-1)/(diss(e,mk)*diss(e,mk)); // derivee en tau  ; depend de l'activation ou non du limiteur
                 else
-                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += 0;
+                  (*Mdiss)(Nk * e + mk, Nk * e + mk)       += 0*pdiss(e, mk);
               }
           }
         else if (Type_diss == "omega")

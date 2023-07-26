@@ -1,12 +1,40 @@
+#!/bin/bash
+
+function updateTRAD2_ajout0()
+{
+  RES="share/doc_src/TRAD2_ajout0"
+  TURB="./Turbulence/share/doc_src/TRAD2_ajout0"
+  
+  # First we get the list of file "TRAD2_ajout0" in the included projects
+  file2add=""
+  for x in $(cat project.cfg | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}')
+  do
+    if [[ -f ${x} ]]
+    then
+      file2add+="${x} "
+    fi
+  done
+
+  # We consider that Turbulence is the main important module of TrioCFD
+  # => so we copy it
+  cat ${TURB} > ${RES}
+  
+  for f in ${file2add}
+  do
+    if [[ $(diff ${TURB} ${f}) ]]
+    then
+      comm -13 ${TURB} ${f} >> ${RES}
+    fi
+  done
+}
+
+# ------------------------------------------------------------------------------ 
+# Beginnig of the script
+# ------------------------------------------------------------------------------ 
+
 mkdir -p share/doc_src
-cat /dev/null > share/doc_src/TRAD2_ajout0
-cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> share/doc_src/TRAD2_ajout0 2>>/dev/null
-#cd Rayonnement
-#cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> ../share/doc_src/TRAD2_ajout0 2>>/dev/null
-#cd ..
-#cd Multiphase
-#cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> ../share/doc_src/TRAD2_ajout0 2>>/dev/null
-#cd ..
+
+updateTRAD2_ajout0
 
 if [ ! -f build/html/index.html ]
 then

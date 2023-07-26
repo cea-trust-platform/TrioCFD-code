@@ -22,8 +22,6 @@
 
 #include <Source_Diffusion_croisee_echelle_temp_taux_diss_turb.h>
 
-#include <Neumann_loi_paroi_faible_tau_omega.h>
-#include <Neumann_loi_paroi_faible_k.h>
 #include <Domaine_Cl_PolyMAC.h>
 #include <Pb_Multiphase.h>
 #include <Matrix_tools.h>
@@ -43,48 +41,4 @@ Entree& Source_Diffusion_croisee_echelle_temp_taux_diss_turb::readOn(Entree& is)
   param.ajouter("sigma_d", &sigma_d);
   param.lire_avec_accolades_depuis(is);
   return is;
-}
-
-void Source_Diffusion_croisee_echelle_temp_taux_diss_turb::completer()
-{
-  const Pb_Multiphase& pb = ref_cast(Pb_Multiphase,  equation().probleme());
-
-  for (int i = 0 ; i <pb.nombre_d_equations() ; i++)
-    for (int j = 0 ; j<pb.equation(i).domaine_Cl_dis()->nb_cond_lim(); j++)
-      {
-        const Cond_lim& cond_lim_loc = pb.equation(i).domaine_Cl_dis()->les_conditions_limites(j);
-        if      sub_type(Neumann_loi_paroi_faible_k, cond_lim_loc.valeur())         f_grad_k_fixe = 0;
-        else if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_omega_fixe = 0;
-      }
-
-}
-
-void Source_Diffusion_croisee_echelle_temp_taux_diss_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
-{
-  const Domaine_VF& 		domaine 		= ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const int N = equation().inconnue().valeur().valeurs().line_size(), nb_elem = domaine.nb_elem();
-  int e, n;
-
-  assert(N == 1); // si N > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
-
-  for (auto &&n_m : matrices)
-    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
-      {
-        Matrice_Morse& mat = *n_m.second, mat2;
-        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
-        int m,
-            nc = dep.dimension_tot(0),	// nombre d'elements total
-            M  = dep.line_size();		// nombre de composantes
-        IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
-        if (n_m.first == "alpha" || n_m.first == "temperature")	// N <= M
-          for (e = 0; e < nb_elem; e++)
-            for (n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
-        if (n_m.first == "pression")
-          for (e = 0; e < nb_elem; e++)
-            for (n = 0; n < N; n++)
-              for (m = 0; m<M; m++) sten.append_line(N * e + n, M * e + m);
-        Matrix_tools::allocate_morse_matrix(N * domaine.nb_elem_tot(), M * nc, sten, mat2);
-        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
-      }
 }

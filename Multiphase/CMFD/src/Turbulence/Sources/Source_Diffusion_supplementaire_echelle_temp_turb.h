@@ -44,7 +44,7 @@ public :
 protected :
   double limiter_ = 5 ;
   double limiter_tau_ = 1.e-6;
-  int f_grad_tau_fixe = 0 ;
+  int f_grad_tau_fixe = 1 ;
 };
 
 #endif

@@ -22,7 +22,7 @@
 
 #include <Source_Diffusion_supplementaire_echelle_temp_turb.h>
 
-#include <Neumann_loi_paroi_faible_tau_omega.h>
+#include <Echange_impose_base.h>
 #include <QDM_Multiphase.h>
 #include <Pb_Multiphase.h>
 
@@ -30,6 +30,7 @@
 #include <vector>
 
 Implemente_base(Source_Diffusion_supplementaire_echelle_temp_turb,"Source_Diffusion_supplementaire_lin_echelle_temp_turb|Source_Diffusion_supplementaire_echelle_temp_turb", Sources_Multiphase_base);
+// XD Diffusion_supplementaire_lin_echelle_temp_turb source_base Diffusion_supplementaire_echelle_temp_turb 0 not_set
 
 Sortie& Source_Diffusion_supplementaire_echelle_temp_turb::printOn(Sortie& os) const { return os;}
 
@@ -40,6 +41,6 @@ void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
   for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
     {
       const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis()->les_conditions_limites(j);
-      if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_fixe = 1;
+      if sub_type(Echange_impose_base, cond_lim_loc.valeur()) f_grad_tau_fixe = 0;
     }
 }

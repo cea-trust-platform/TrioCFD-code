@@ -20,8 +20,7 @@ Mailler dom
         bord symm	Z = 3	0 <= X <= 3	0 <= Y <= 2000
     }
 }
-
-Polyedriser dom
+$polyedriser
 # END MESH #
 
 # BEGIN PARTITION
@@ -39,20 +38,18 @@ Scatter dom.Zones dom
 END SCATTER #
 
 
-PolyMAC_P0  dis
-option_PolyMAC_P0 {  }
-
+$schema  dis
 
 Schema_euler_implicite sch
 Read sch
 {
     tinit 0
     nb_pas_dt_max 2
-    dt_min 1.e-16
-    dt_max 1.e-16
+    dt_min 1.e-20
+    dt_max 1.e-20
     solveur ice
     {
-        criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e8 omega 1e8 }
+        criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e8  }
         iter_min 5
         solveur petsc cli { }
         seuil_convergence_implicite 1e30
@@ -89,7 +86,7 @@ Lire pb
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
         convection { centre }
-        diffusion  { turbulente k_omega { } }
+        diffusion  { turbulente $diffusion { } }
         initial_conditions
         {
             vitesse  champ_fonc_xyz dom 3 0 y 0
@@ -118,7 +115,7 @@ Lire pb
     }
     Energie_Multiphase
     {
-        diffusion { turbulente SGDH { sigma 0.3 }  }
+        diffusion { turbulente SGDH { sigma 1. }  }
         convection { amont }
         initial_conditions { temperature Champ_Uniforme 1 1 }
         boundary_conditions
@@ -129,20 +126,19 @@ Lire pb
             sortie	frontiere_ouverte T_ext Champ_Front_Uniforme 1 1
         }
         sources
-        {
-        }
+        { }
     }
-    taux_dissipation_turbulent
+    $equation
     {
         diffusion { turbulente SGDH { sigma 0.5 } }
         convection { amont }
-        initial_conditions { omega Champ_Fonc_xyz dom 1 1/0.7 }
+        initial_conditions { $diss Champ_Fonc_xyz dom 1 $IC_diss }
         boundary_conditions
         {
-            wall Neumann_loi_paroi_faible_omega { }
+            wall $CL_diss
             symm symetrie
-            entree	frontiere_ouverte omega_ext Champ_front_Fonc_xyz 1 1/0.7
-            sortie	frontiere_ouverte omega_ext Champ_front_Fonc_xyz 1 1/0.7
+            entree	frontiere_ouverte $diss_ext Champ_front_Fonc_xyz 1 $IC_diss
+            sortie	frontiere_ouverte $diss_ext Champ_front_Fonc_xyz 1 $IC_diss
         }
         sources
         {
@@ -155,7 +151,7 @@ Lire pb
         initial_conditions { k champ_fonc_xyz dom 1 3.1 }
         boundary_conditions
         {
-            wall Neumann_loi_paroi_faible_k { }
+            wall $CL_k
             symm symetrie
             entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 3.1
             sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 3.1
@@ -167,6 +163,11 @@ Lire pb
     Postraitement
     {
         Definition_champs	{
+            yp refChamp { Pb_champ pb y_plus }
+            diff_vit	       operateur_eqn	{
+                numero_op 0
+                sources { refChamp { pb_champ pb vitesse } }
+            }
             diff_T	       operateur_eqn	{
                 numero_op 0
                 sources { refChamp { pb_champ pb temperature } }
@@ -175,9 +176,9 @@ Lire pb
                 numero_op 0
                 sources { refChamp { pb_champ pb k } }
             }
-            diff_omega	operateur_eqn	{
+            diff_diss	operateur_eqn	{
                 numero_op 0
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb $diss } }
             }
         }
         sondes			{
@@ -188,19 +189,25 @@ Lire pb
 
             diff_T 	diff_T 		periode 1 position_like vitesse
             diff_k 	diff_k 		periode 1 position_like vitesse
-            diff_omega 	diff_omega 		periode 1 position_like vitesse
+            diff_diss 	diff_diss 		periode 1 position_like vitesse
+            diff_vit diff_vit periode 1 position_like vitesse
 
             k	 	k	 		periode 1 position_like vitesse
-            omega	 	omega	 		periode 1 position_like vitesse
+            $diss	 	$diss	 		periode 1 position_like vitesse
+            yp  yp  periode 1 position_like vitesse
         }
-        format lata
+        format lml
         champs binaire dt_post 1e6
         {
+            vitesse elem
+            diff_T elem
+            diff_k elem
+            diff_diss elem
+            diff_vit elem
+            yp elem
         }
     }
 }
-
-EcritureLectureSpecial EcrFicPartageBin
 
 Resoudre pb
 

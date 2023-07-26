@@ -31,15 +31,13 @@
 #include <Pb_Multiphase.h>
 
 Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_Production_energie_cin_turb);
-// XD Production_energie_cin_turb source_base Production_energie_cin_turb 1 Production source term for the TKE equation
-
 
 Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
 Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
 
 void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0&                   domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const DoubleTab&                     tab_grad = pb.get_champ("gradient_vitesse").passe();
@@ -110,7 +108,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
-            if      (Type_diss == "tau")   nut_l =                         std::max(k(e, n) * (*diss)(e, n), limiter_ * nu(e, n)) ;
+            if      (Type_diss == "tau")   nut_l =                                   k(e, n) * (*diss)(e, n);
             else if (Type_diss == "omega") nut_l = ( ((*pdiss)(e,n) > 0.) ? std::max(k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)), limiter_ * nu(e, n)) : limiter_ * nu(e, n) );
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
@@ -123,7 +121,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
                 if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
               }
 
-            if ( (Type_diss == "tau") && ((k(e, n)*(*diss)(e, n)) > (limiter_*nu(e, n))) )
+            if (Type_diss == "tau")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
