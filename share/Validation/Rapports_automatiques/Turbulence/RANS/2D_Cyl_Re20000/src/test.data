@@ -31,7 +31,7 @@ Read sch
 	/* tinit important pour generation NR */
 	tmax $TMAX_IMPOSED
 	seuil_statio -1
-	seuil_statio_relatif_deconseille 1
+	residuals { relative 1 }
 	dt_impr 1.e0	
 	$OPTIONS_TIME_SCHEME
 }

@@ -1,0 +1,298 @@
+# Boiling bubble simulation #
+# lance_test 4 ecarts #
+# PARALLEL RUNS #
+dimension 2 
+PrecisionGeom 1e-18
+ bidim_axi 
+
+domaine dom
+Probleme_FT_Disc_gen pb
+
+# BEGIN MESH #
+Mailler dom
+{  
+    pave pave1
+   { 
+   origine 0. 0.
+   longueurs 1. 1.  
+   nombre_de_noeuds 21 31 # 41 61 #
+      # facteurs 1.0 1.4 #
+   }
+   {
+   bord left     X = 0.          0. <= Y <= 1.
+        bord right    X = 1.      0. <= Y <= 1.
+   bord bot      Y = 0.          0. <= X <= 1.
+   bord up       Y = 1.        0. <= X <= 1.
+   }
+}
+transformer dom x*0.001/2. y*0.0015/2.-0.000375
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+   Partitionneur tranche { tranches 2 2 }
+   Larg_joint 2
+   Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Fluide_Incompressible  eau
+Lire eau 
+{
+  mu champ_uniforme       1 2.8e-4
+  rho champ_uniforme      1 1000
+  lambda champ_uniforme   1 0.679
+  cp champ_uniforme       1 4.21e3
+    
+}
+
+Fluide_Incompressible eau2
+Lire eau2
+{
+  mu champ_uniforme       1 2.8e-4
+  rho champ_uniforme      1 800
+  lambda champ_uniforme   1 0.679
+  cp champ_uniforme       1 4.21e3
+}
+
+Fluide_diphasique fluide
+Lire fluide
+{
+  fluide1 eau
+  fluide0 eau2
+  sigma   Champ_Uniforme 1            0.0
+  chaleur_latente Champ_Uniforme 1    -2.256e6
+}
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+   tinit 0.0
+	nb_pas_dt_max 3
+   tmax  0.0125
+   dt_min 1.25e-4 # 3 #
+   dt_max 1.25e-4 # 3 #
+   facsec 10000.
+   seuil_statio -1
+}
+
+Triple_Line_Model_FT_Disc TCL 
+Read TCL 
+{
+  Qtcl 0.0 # W/m # 
+  lv 10.e-9
+  ym 5.e-6
+  sm 5.e-6 # TestCase at theta_app = 90° => sm=ym #
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0. 0.
+Associate fluide gravite
+
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+convection_diffusion_temperature_ft_disc      thermique
+Associate pb dom
+Associate pb hydraulique
+Associate pb thermique
+Associate pb interf
+Associate pb fluide
+
+Associate TCL hydraulique
+Associate TCL thermique
+Associate TCL interf
+Associate pb TCL
+
+Associate pb sch
+VDF dis
+Discretize pb dis
+system "mkdir -p lata"
+Lire pb
+{
+   
+   hydraulique
+   {
+       modele_turbulence sous_maille_wale
+           {
+              Cw               0.0
+              turbulence_paroi negligeable
+           }
+
+      solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-18 impr }
+      convection { quick }
+      diffusion { }
+      conditions_initiales { vitesse champ_uniforme 2 0. 0. }
+      projection_initiale 0
+      dt_projection 1.e-10 1.e-18
+      equation_interfaces_proprietes_fluide interf
+      equation_temperature_mpoint thermique
+      # new_mass_source #  # -> it's a flag, when not activated, the variable is 0 #
+      # when new_mass_source is used, it forces the use of the new jump(1/rho)*ai*mp as a source term in the RHS of Poisson instead of the historical div(delta_u) #
+      interpol_indic_pour_dI_dt interp_standard # { interpolation to faces of indic ONLY used in calculer_dIdt : INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED } #
+      boundary_conditions 
+      {
+      up      sortie_libre_rho_variable champ_front_uniforme 1 0.
+      bot     Symetrie # sortie_libre_rho_variable champ_front_uniforme 1 0. #
+      right   Symetrie # sortie_libre_rho_variable champ_front_uniforme 1 0. #
+      left    Symetrie
+      }
+   }
+   interf
+   {
+      type_indic_faces standard # interpolation to faces of indic : { STANDARD, MODIFIEE, AI_BASED } #
+      # interpolation_repere_local #
+      methode_interpolation_v vdf_lineaire
+      methode_transport vitesse_interpolee hydraulique
+      # conditions_initiales { fonction x^2-0.00012^2 } -> vertical OK #
+      # conditions_initiales { fonction y-0.0 } -> horiz OK #
+      # conditions_initiales { fonction x+abs(y)-0.00012 } Chapeau #  
+      conditions_initiales { fonction x^2+y^2-0.00012^2 } # -> sphere #
+      n_iterations_distance 8
+      # VOFlike_correction_volume -> Flag to activate the VOF-like volume conservation (dI/dt) #
+      # nb_iterations_correction_volume -> iter to get the correct dI/dt #
+      # nb_lissage_correction_volume -> To smooth the dI/dt correction to avoid pikes on the interface #
+      # In remaillage, nb_iter_correction_volume -> additional VoF conserving iterations after lissage and bary are finished #
+      # facteur_longueur_ideale 1.0 is not recommanded usually #
+      VOFlike_correction_volume 0
+      nb_iterations_correction_volume 0 # to get the correct dI/dt #
+      nb_lissage_correction_volume 0 # To smooth the dI/dt correction to avoid pikes on the interface #
+      # Bloc Remesh Nothing
+      remaillage {
+                    pas 1e12
+                    nb_iter_remaillage 3
+                    critere_arete 0.35
+                    critere_remaillage 0.35
+                    pas_lissage 1e12
+                    relax_barycentrage 0.
+                    facteur_longueur_ideale 1.0
+                    nb_iter_barycentrage 0
+                    nb_iter_correction_volume 0
+                    seuil_dvolume_residuel 1e-15
+                    lissage_courbure_coeff 0.
+                    lissage_courbure_iterations_systematique 0
+                    lissage_courbure_iterations_si_remaillage 0
+      }
+      End Remesh Nothing #
+      # Bloc Remesh Best # 
+      remaillage {
+                    pas 1e-12
+                    nb_iter_remaillage 3
+                    critere_arete 0.35
+                    critere_remaillage 0.35
+                    pas_lissage 1e-12
+                    relax_barycentrage 0.1
+                    facteur_longueur_ideale 1.0
+                    nb_iter_barycentrage 1
+                    nb_iter_correction_volume 3
+                    seuil_dvolume_residuel 1e-15
+                    lissage_courbure_coeff -0.02
+                    lissage_courbure_iterations_systematique 1
+                    lissage_courbure_iterations_si_remaillage 5
+      }
+      # End Remesh Best #
+      collisions
+      {
+                active
+                juric_pour_tout
+      juric_local  phase_continue 1 
+                type_remaillage Juric { source_isovaleur indicatrice }
+      } 
+      parcours_interface { Correction_Parcours_Thomas }
+      boundary_conditions
+      {
+      bot    Paroi_FT_disc Symetrie
+      right  Paroi_FT_disc Symetrie
+      up     Paroi_FT_disc Symetrie
+                left   Paroi_FT_disc Symetrie
+      }
+   }
+   
+   thermique
+   {
+      prescribed_mpoint -10. # To force a phase-change rate independently of the thermal solution. #
+      equation_interface interf
+      equation_navier_stokes hydraulique
+      phase 1
+                stencil_width  8
+                diffusion { }
+                convection { quick }
+                boundary_conditions
+                {
+              bot   frontiere_ouverte T_ext Champ_front_Uniforme 1 0.0
+         up    frontiere_ouverte T_ext Champ_front_Uniforme 1 0.0
+            right   frontiere_ouverte T_ext Champ_front_Uniforme 1 0.0
+                      left    Symetrie
+                }
+              conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 0.0 }
+   }
+   postraitement 
+   {
+      champs dt_post 100
+      {
+         indicatrice_interf
+         temperature_thermique
+       vitesse
+       pression
+       mpoint_thermique
+      }
+   }
+   
+   liste_postraitements
+   {
+      postraitement_ft_lata post1 { 
+    format Lata 
+    fichier lata/post 
+    champs dt_post 1.0e-3 { 
+        VOLUME_MAILLE elem 
+        indicatrice_interf elem 
+        temperature_thermique elem 
+        vitesse elem 
+        vitesse faces 
+        pression elem 
+        mpoint_thermique elem 
+        distance_interface_elem_interf elem 
+        derivee_temporelle_indicatrice elem 
+        pression_laplacien_d elem 
+        second_membre_projection elem 
+        second_membre_projection_jump elem 
+        interfacial_area elem 
+        vitesse_delta_interface faces 
+        vitesse_jump0_hydraulique faces 
+        # vitesse_ph0_hydraulique faces  : N'existe plus? :'-( #
+        vitesse_conv_thermique
+        terme_convection_vitesse faces 
+        terme_diffusion_vitesse faces 
+        flux_tmp_interf faces 
+    } 
+    interfaces interf { 
+        courbure som 
+        vitesse som 
+        # vitesse_repere_local som #
+        COMPO_CONNEXE elem 
+        PE elem 
+        PE_LOCAL elem 
+    } 
+}
+   }   
+
+
+sauvegarde binaire source.sauv
+# resume_last_time binaire source.sauv #
+
+}
+EcritureLectureSpecial 0
+
+Imprimer_flux dom { bot }
+
+Imprimer_flux_sum dom { bot }
+
+Solve pb
+
+EcritureLectureSpecial 0
+End        

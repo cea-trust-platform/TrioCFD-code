@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+cas=cst_growth
+err=$cas.err
+[ -f lata/post.lata ] && lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata
+[ -f lata/post-ascii.lata ] && grep VITESSE.SOM.INTERFACES lata/post-ascii.lata | awk '{print $3}' > vifiles.txt
+\rm -f sum_dIdt_or_dV.txt ai.txt vol_vap.txt sum_dIdt_after-PCH.txt vi.txt
+grep "^Volume_phase_0" $err | awk '{print $4, $2}' > vol_vap.txt
+grep "^Surface_Totale_Interface" $err | awk '{print $4, $6}' > ai.txt
+grep "^Interfacial_velocity" $err | awk '{print $6, $8, $9, $10, $12, $13, $14}' > vi.txt
+grep "sum_dI_dt" $err | awk '{print $2, $4, $6, $8, $10, $12}' > sum_dIdt_or_dV.txt
+grep "AFTER-PCH].*sum is" $err | awk '{print $2, $7}' >  sum_dIdt_after-PCH.txt
+
+python $project_directory/share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_imposed_constant_growth/src/plot.py $1

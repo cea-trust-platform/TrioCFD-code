@@ -2359,7 +2359,6 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
             const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
             // const DoubleVect& volumes = domaine_vf.volumes();
             // Pas une ref, mais un tableau de travail local dans lequel on peut ajouter mointv
-            //DoubleTab mpoint = variables_internes().mpoint.valeur().valeurs();
             DoubleTab mpoint = variables_internes().ref_equation_mpoint_.valeur().get_mpoint();
             if (variables_internes().ref_equation_mpoint_vap_.non_nul())
               {
@@ -2369,6 +2368,24 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
                 for (int elem = 0; elem < nb_elem; elem++)
                   mpoint[elem] += mpointv[elem];
               }
+#if TCL_MODEL
+            // At this point in the algorithm, mpoint has not been augmented by the CL contribution yet, even though
+            // the TCL contribution (micro and meso) are already computed and associated to elements.
+            // It is done so because just earlier in this method, we call calculer_delta_u_interface
+            // to compute a continuous extension of velocity (to displace the interface markers).
+
+            // Adding the TCL contribution to the **local** DoubleTab mpoint
+            // (it is thus temporary for the moment and will be done on the real table later at the second call to
+            // Triple_Line_Model_FT_Disc::corriger_mpoint)
+            // The difference if we correct it here directly is subtile. It is probably fine for the extension of
+            // the interface velocity, but the extension for the convective velocity in the temperature has not been done yet.
+            // It may cause trouble in the convection then, but the GFM method kind of erase those cells.
+            if (probleme_ft().tcl().is_activated())
+              {
+                Cerr << "[TCL] Contact line model activated in volume correction" << finl;
+                probleme_ft().tcl().corriger_mpoint(mpoint);
+              }
+#endif
             for (int elem=0; elem< nb_elem; elem++)
               {
                 // By convention, mpoint is positive in condensation. Hence, mpoint >0 is responsible for dIv_dt < 0  => a minus sign!
@@ -2425,7 +2442,6 @@ void compute_normale_barycenter_area_in_cell(const int elem,
     return; // No facette in this element.
 
   // Loop over the facettes crossing the element
-  int count = 0;
   while (index >= 0)
     {
       // Accessing the structure containing all the relevant information for facette number fa7
@@ -2457,7 +2473,6 @@ void compute_normale_barycenter_area_in_cell(const int elem,
       bary_facettes_dans_elem += coord_barycentre_fraction; // This is done for all the 3 components.
 
       index = data.index_facette_suivante_;
-      count++;
     }
 
   if (surface_tot > 0.)
@@ -3230,14 +3245,12 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 #if TCL_MODEL
 
       /* double int_sec_mem2 = 0.;
-      double int_sec_mem = 0.;
       for (int elem = 0; elem < nb_elem; elem++)
         {
-          //int_sec_mem2 +=secmem2(elem);
+          int_sec_mem2 +=secmem2(elem);
           int_sec_mem +=secmem(elem);
-        } */
-      //   Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl;
-      //  Cerr << "Integral of secmem before TCL and /DT : " << int_sec_mem << finl;
+        }
+      Cerr << "Integral of secmem2 before TCL and /DT : " << int_sec_mem2 << finl; */
 
       // Now that the correction "corriger_mpoint" is performed directly into Convection_Diffusion_Temperature_FT_Disc,
       // it is no longer required to compute it here. The correction should propagate to calculer_delta_vitesse (in the discreete sense),
@@ -3247,39 +3260,30 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // (in the wall-normal direction). It results in an underestimation of the real TCL contribution...
       if (probleme_ft().tcl().is_activated())
         {
-          Cerr << "Contact line model is activated" << finl;
+          Cerr << "[TCL] Contact line model is activated" << finl;
           ArrOfInt elems_with_CL_contrib;
+          ArrOfInt faces_with_CL_contrib;
           ArrOfDouble mpoint_from_CL;
           ArrOfDouble Q_from_CL;
           // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
-          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, mpoint_from_CL, Q_from_CL);
-          // For later is they aren't passed as arguments
-          //const ArrOfInt& elems_with_CL_contrib = tcl.elems();
-          //const ArrOfDouble& mpoint_from_CL = tcl.mp();
-          //const ArrOfDouble& Q_from_CL = tcl.Q();
+          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
+                                                                       faces_with_CL_contrib,
+                                                                       mpoint_from_CL,
+                                                                       Q_from_CL);
 
           // Correct the field mpoint in wall-adjacent cells to account for TCL model:
-          // ---> It's done before now!
+          // ---> It's not added to mpoint now. Its contribution is added in
+          //      Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco
+          //      to be after the evaluation of the extended velocities (interfacial and liquid)
+          //      and their interpolation. That way, interpolation can still operate on a smooth field.
           // DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
           // probleme_ft().tcl().corriger_mpoint(elems_with_CL_contrib,mpoint_from_CL,mpoint);
 
           const double Lvap = fluide_diph.chaleur_latente();
           const double coef = jump_inv_rho/Lvap;
-          // Correct the secmem contribution due to TCL :
+          // Correct the secmem2 contribution due to TCL :
           probleme_ft().tcl().corriger_secmem(coef, secmem2);
-          //  calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
-          //  divergence.calculer(variables_internes().delta_u_interface, secmem2);
-//          int_sec_mem2 = 0;
-//          int_sec_mem = 0;
-//          for (int elem = 0; elem < nb_elem; elem++)
-//            {
-//              int_sec_mem2 +=secmem2(elem);
-//              int_sec_mem +=secmem(elem);
-//            }
-//          Cerr << "Secmem2 after tcl= " << int_sec_mem2 << finl;
-//          Cerr << "Secmem after tcl= " << int_sec_mem << finl;
-          // One point to check still is that the CL contribution to mpoint (mpoint_from_CL) should gives the same secmem2 as
-          // corriger_secmem when corriger_secmem is given Q_from_CL (instead of
+
           const int check_consistency = 1 ; // local option to check that secmem2 in near-wall cell is actually well calculated
           if (check_consistency)
             {
@@ -3303,14 +3307,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 
                   // sec and value should be the same:
                   error +=fabs(sec - value);
-                  //    Cerr << "value = " << value << "sec= " << sec << finl;
                   if (fabs(sec - value) > 1.e-12) // changed from 1.e-12 to 1.e-7 ---- for test
                     {
                       Cerr << "local difference sec-value=" << sec <<" - " << value << " = " << (sec - value) << finl;
                     }
                 }
 
-              if (error > 1.e-7)// changed from 1.e-8 to 1.e-7 ---- for test
+              if (error > 1.e-8)
                 {
                   Cerr << "Final error : " << error << " is fatal!" << finl;
                   Process::exit();
@@ -3349,7 +3352,6 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           REF(Transport_Interfaces_FT_Disc) & refeq_transport =
             variables_internes().ref_eq_interf_vitesse_imposee[k];
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
-
 
           if (eq_transport.get_vimp_regul()==1)
             compteur_vimp_regul++;
@@ -3483,7 +3485,6 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // On a modifie la matrice, il faut reinitialiser le solveur
       //  (recalcul des preconditionnement, factorisation pour Cholesky, etc...)
       solveur_pression().valeur().reinit();
-
     }
 
   assembleur_pression_.valeur().modifier_secmem(secmem);

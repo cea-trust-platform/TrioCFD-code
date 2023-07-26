@@ -113,10 +113,10 @@ pdflatex ${DOC}.tex
 pdflatex ${DOC}.tex
 
 # Installation of the final pdf report
-cp ${DOC}.pdf ../../doc
+#cp ${DOC}.pdf ../../doc
 
 # Cleaning
-for ext in aux idx lof log lot toc pdf
+for ext in aux idx lof log lot toc
 do
   rm "${DOC}.${ext}"
 done

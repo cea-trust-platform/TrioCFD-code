@@ -99,16 +99,28 @@ public :
     return tag_tcl_;
   };
   double compute_capillary_number() const;
+  int get_any_tcl_face() const;
+
+  // Using the exact in/out intersections of the interface within the cell (works only in 2D, and may assume the wall in y-)
   void get_in_out_coords(const Domaine_VDF& zvdf, const int elem,
                          const double dt,
                          DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot);
 
+  // computes an approximate interface position (equivalent mean-plane)
+  // returns in_out table and the mean normal in elem, and the interface surface
+  void compute_approximate_interface_inout(const Domaine_VDF& zvdf, const int korient,
+                                           const int elem, const int num_face,
+                                           DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot) const;
+
   double compute_local_cos_theta(const Parcours_interface& parcours, const int num_face, const FTd_vecteur3& norm_elem) const;
 
+  // Computes the integral flux in a cell in the meso zone.
+  // in and out are the interface position on both sides of the cell.
   double compute_Qint(const DoubleTab& in_out, const double theta_app_locs,
                       const int num_face, double& Qmeso) const;
 
   void compute_TCL_fluxes_in_all_boundary_cells(ArrOfInt& elems_with_CL_contrib,
+                                                ArrOfInt& faces_with_CL_contrib,
                                                 ArrOfDouble& mpoint_from_CL, ArrOfDouble& Q_from_CL);
 
   void corriger_mpoint(DoubleTab& mpoint) const;
@@ -126,7 +138,8 @@ public :
   void associer_eq_ns(const Equation_base& eq);
   void associer_eq_interf(const Equation_base& eq);
 
-
+  enum InoutMethod { EXACT, APPROX, BOTH };
+  //InoutMethod inout_method() const { return inout_method_;} ;
   inline ArrOfInt& elems();
   inline const ArrOfInt& elems() const;
   inline ArrOfInt& boundary_faces();
@@ -139,11 +152,13 @@ public :
 protected :
 
   bool activated_;
+  int deactivate_;
   int capillary_effect_on_theta_activated_;
   int TCL_energy_correction_;
+  int n_ext_meso_; // number of layers in the extension of the meso-zone.
   int tag_tcl_;
-  double coeffa_; //
-  double coeffb_; //
+  //double coeffa_; //
+  //double coeffb_; //
   double Qtcl_; //
   double lv_; // The length...
   double theta_app_;
@@ -151,10 +166,13 @@ protected :
   // The end of micro-region:
   double ym_;
   double sm_;
+  // End of meso region
+  double ymeso_;
 // double old_xcl_ ; // Former position of the contact line. Not nice, but needed to copute the CL velocity
   double initial_CL_xcoord_; // Former position of the contact line. Not nice, but needed to copute the CL velocity
   double kl_cond_; // We store the liquid conductivity for easy access.
   double rhocpl_;
+  int inout_method_ = 0;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.

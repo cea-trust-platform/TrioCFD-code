@@ -95,6 +95,16 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
   nom+=num;
   terme_diffusif.set_fichier(nom);
   terme_diffusif.set_description((Nom)"Conduction heat transfer rate=Integral(lambda*grad(T)*ndS) [W] if SI units used");
+
+  // If keyword correction_mpoint_diff_conv_energy_ has not been read, the table should be properly set:
+  if (correction_mpoint_diff_conv_energy_.size_array() != 3)
+    {
+      Cerr << "We account for no energy correction!!" << finl;
+      correction_mpoint_diff_conv_energy_.resize_array(3);
+      correction_mpoint_diff_conv_energy_[0] = 0;
+      correction_mpoint_diff_conv_energy_[1] = 0;
+      correction_mpoint_diff_conv_energy_[2] = 0;
+    }
   return is;
 }
 
@@ -436,7 +446,7 @@ static void extrapoler_champ_elem(const Domaine_VF&    domaine_vf,
           // Extrapolation parabolique tenant compte de la courbure de l'interface :
           const double div_n = champ_div_n[i_elem];
           champ[i_elem] = d * grad * (1. - 0.5 * div_n * d) + interfacial_value;
-          // TODO:
+          // TODO: Assess Higher order Taylor series by the inclusion of a new parameter in the datafile. (Formulae below to be checked)
           //  champ[i_elem] = 0.5 * d * grad * (1. - 0.5 * div_n * d) + interfacial_value; // multiplied by 0.5 (may be it was missing...we have to check)
           //  champ[i_elem] = d * grad * (1. - 0.5 * div_n * d + div_n * div_n * d * d / 6.) + interfacial_value;
         }
@@ -643,16 +653,8 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
          << " imbalance= " << total_derivee_energy-total_flux_lost+mpai_tot << finl;
   }
 
-  if (correction_mpoint_diff_conv_energy_.size_array() != 3)
-    {
-      Cerr << "We account for no energy correction!!" << finl;
-      correction_mpoint_diff_conv_energy_.resize_array(3);
-      correction_mpoint_diff_conv_energy_[0] = 0;
-      correction_mpoint_diff_conv_energy_[1] = 0;
-      correction_mpoint_diff_conv_energy_[2] = 0;
-    }
   // Energy balance correction. Loop on mixed elems only :
-  const int option=3;
+  const int option=-1; // To disable that
   {
     const int account_for_diff = correction_mpoint_diff_conv_energy_[0];
     const int account_for_conv = correction_mpoint_diff_conv_energy_[1];
@@ -1187,8 +1189,12 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
         const double mean_mp_before_corr = mp_sum_before_corr/int_ai_before;
         Cerr << " mp_sum_before_corr= " << mp_sum_before_corr << " mean_mp_before_corr= " << mean_mp_before_corr << " time= " << temps << finl;
       }
-    if ((!is_prescribed_mpoint_) && (correction_mpoint_diff_conv_energy_.size_array()) && (max_array(correction_mpoint_diff_conv_energy_)))
-      correct_mpoint();
+    if ((!is_prescribed_mpoint_) && (max_array(correction_mpoint_diff_conv_energy_)))
+      {
+        // WARNING!!  We don't correct mpoint if correction_mpoint_diff_conv_energy_ are all set to 0
+        // this method is not related to TCL model but rather to attempting energy conserving Ghost Fluid Method.
+        correct_mpoint();
+      }
   }
 
 #if TCL_MODEL
@@ -1207,7 +1213,8 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
         toto ce code n est pas lu
       }
 #endif
-      //assert(tcl.tag_tcl() != ref_eq_interface_.valeur().maillage_interface().get_mesh_tag());
+      // Ne compile pas, pourquoi?
+      // assert(tcl.tag_tcl() == ref_eq_interface_.valeur().maillage_interface().get_mesh_tag());
 
       // We are late enough within the timestep for the correction not to affect the velocities reconstructions (delta_u)
       // because we expect it has been done before. Nonetheless, we need to do it before the post-pro to see our corrected fields
@@ -1494,7 +1501,7 @@ int Convection_Diffusion_Temperature_FT_Disc::preparer_calcul()
 }
 
 // A few methods for TCL only:
-double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_face, const double distance_wall_interface) const
+double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_face) const
 {
   double interfacial_flux = 0.;
   const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
@@ -1561,7 +1568,6 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_face(const int num
 {
   double flux=0., Twall=0.;
   get_flux_and_Twall(num_face,
-                     -1. /* distance_wall_interface  is not needed to get Twall */,
                      flux, Twall);
   return Twall;
 }
@@ -1596,12 +1602,11 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_elem(const int ele
     }
   double flux=0., Twall=0.;
   get_flux_and_Twall(num_face,
-                     -1. /* distance_wall_interface  is not needed to get Twall */,
                      flux, Twall);
   return Twall;
 }
 
-void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_face, const double distance_wall_interface,
+void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_face,
                                                                   double& flux, double& Twall) const
 {
   flux = 0.;
@@ -1624,7 +1629,6 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
       flux = 0.;
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
-      assert(distance_wall_interface>0.);
       Process::exit();
     }
   else if ( sub_type(Neumann_paroi,la_cl.valeur()) )
@@ -1635,7 +1639,6 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
       Process::exit();
-      assert(distance_wall_interface>0.);
     }
   else if (sub_type(Echange_impose_base, la_cl.valeur()))
     {
@@ -1695,7 +1698,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) c
   for (int i=0; i<3; i++)
     d += (xyz_face[i] - P[i])*(xyz_face[i] - P[i]);
   d= sqrt(d);
-  const double flux = get_flux_to_face(num_face, d);
+  const double flux = get_flux_to_face(num_face);
   const double k = fluide_dipha_.valeur().fluide_phase(phase_).conductivite()(0,0);
 //  Cerr << "flux/d/k" <<  flux << " " << d << " " << k <<  finl;
   // flux is incoming. So "-flux" is needed.

@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+
+err=$1.err
+\rm -rf lata/post-ascii.lata*
+[ -f lata/post.lata ] && lata_analyzer lata/post.lata asciiout writelata_convert=lata/post-ascii.lata || echo "lata_analyzer not run or failed"
+[ -f lata/post-ascii.lata ] && grep VITESSE.SOM.INTERFACES lata/post-ascii.lata | awk '{print $3}' > vifiles.txt
+\rm -f sum_dIdt_or_dV.txt ai.txt vol_vap.txt sum_dIdt_after-PCH.txt vi.txt
+grep "^Volume_phase_0" $err | awk '{print $4, $2}' > vol_vap.txt
+grep "^Surface_Totale_Interface" $err | awk '{print $4, $6}' > ai.txt
+grep "^Interfacial_velocity" $err | awk '{print $6, $8, $9, $10, $12, $13, $14}' > vi.txt
+grep "sum_dI_dt" $err | awk '{print $2, $4, $6, $8, $10, $12}' > sum_dIdt_or_dV.txt
+grep "AFTER-PCH].*sum is" $err | awk '{print $2, $7}' >  sum_dIdt_after-PCH.txt
+
+if [ -f lata/post-ascii.lata ] ; then
+   echo "# t    rmin rmax xmax ymax ymin rcl" > interface-position.txt
+   for fic in `ls -rt lata/post-ascii.lata.INTERFACES.0.*[0-9]`
+   do
+      time=$(echo $fic | awk -FFACES. '{print $2}')
+      sed '1d;$d' $fic | awk 'NR == 1 { xmax=$1; xcl=$1; ymax=$2; ymin=$2; rmin=sqrt($1*$1+$2*$2) ; rmax=sqrt($1*$1+$2*$2) }
+      { r=sqrt($1*$1+$2*$2); if ($1>xmax) xmax=$1; if ($2>ymax) ymax=$2; if ($2<ymin) {ymin=$2; xcl=$1}; if (r>rmax) rmax=r; if (r<rmin) rmin=r; }
+      END {printf "%g %g %g %g %g %g %g\n", "'$time'", rmin, rmax, xmax, ymax, ymin, xcl}' >> interface-position.txt
+      echo -n "."
+   done
+   echo ""
+fi
+
+[ $(basename $PWD) == "VoF0000" ] || [ $(basename $PWD) == "VoF1333" ] && [ -f lata/post.lata ] && visit -nowin -cli -s ../../../src/visit_growth.py
+python ../../plot.py $1

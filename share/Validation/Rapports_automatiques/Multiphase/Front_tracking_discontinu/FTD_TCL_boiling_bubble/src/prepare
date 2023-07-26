@@ -1,0 +1,131 @@
+#!/bin/bash
+
+coarsening=1 # 1: For the prm  --  0: For the real cases from the publication
+
+remove_tcl()
+{
+  # should have 2 args: file_in and file_out
+  [ $# != 2 ] || [ $1 == $2 ] && echo "Issue in given arguments to remove_tcl" && exit -1
+  sed -e "/TCL/d;/Qtcl /d;/sm /d;/ym /d;" $1 > $2
+}
+
+# Coarsening/Lightening case and reducing domain :
+coarsen ()
+{
+   d=$(dirname $(dirname $1))/M20-Fiche/R0
+   mkdir -p $d
+   echo "******Creating $d COA_source.data for Run_fiche"
+   # dt_max 1.E-7 Ok, 2.8 instable. pour accelerer la fiche chercher au milieu? 
+   sed -e "s/nombre_de_noeuds 301 601/nombre_de_noeuds 101 151/" \
+    -e "s/transformer dom x\*0.003 y\*0.006/transformer dom x*0.002 y*0.003/" \
+    -e "s/ dt_max .*/ dt_max 1.E-7/"  \
+    -e "s/tranches .*}/tranches 2 2 }/" \
+    -e "s/ tmax .*/ tmax 50e-3/" ./$1/source.data > ./$d/COA_source.data;
+   sed -e "s#$1#$d#g" $1/sub_file > $d/sub_file
+   \cp -f ./$1/pre_run ./$1/post_run $d/
+   # Case without TCL
+   d2=$(dirname $(dirname $1))/M20-Fiche-noTCL/R0
+   mkdir -p $d2
+   remove_tcl ./$d/COA_source.data ./$d2/COA_source.data 
+   sed -e "s#$d#$d2#g" $d/sub_file > $d2/sub_file
+   \cp -f ./$d/pre_run ./$d/post_run $d2/
+}
+
+cases=(S1a S1b S1c S2 S3 S4 S5 S6 S7 )
+rs=(0.003 0.003 0.003 0.003 0.003 0.003 0.003 0.0009 0.0009 )
+zs=(0.0045 0.0045 0.0045 0.006 0.006 0.006 0.006 0.0009 0.0009 )
+Ms=(5 5-10-20-40 5 10 10 10 10 1.25-2.5 1.25-2.5 ) # Mesh sizes in µm
+dTs=(6.2 6.2 6.2 8.5 3.0 6.0 9.0 23.0 8.0 )
+thetas=(38.0 38.0 38.0 50.0 19.6 23.1 26.0 65.0 20.7 )
+sMs=(2.5 4.9 9.9 4.9 4.9 4.9 4.9 0.0 4.9 ) # in µm
+hMs=(1.5 3.0 6.0 3.8 1.6 1.9 2.1 0.0 1.7 ) # in µm
+Qmicros=(23.3 27.7 32.0 30.5 22.5 40.3 55.3 0.0 61.2 )
+eths=(1.0 1.0-0.10-0.25-0.30-0.38-0.70 1.0 0.10-0.71-1.0 1.0 1.0 1.0 1.0-1.25 1.0-1.25 ) # in mm
+dts=(1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 1e-8 )
+tmaxs=(50e-3 50e-3 50e-3 50e-3 50e-3 50e-3 50e-3 50e-3 50e-3 )
+r0=(0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.00006 0.00006 ) # initial bubble radius
+nb_pas_dt_max=1000000000
+[ $coarsening -eq 0 ] && nb_pas_dt_max=10 && sed -i "s/#DEACTIVATE //" pre_run 
+
+echo "#    case rmax zmax DeltaX DeltaT theta_app s_M h_M Qmicro delta_th r0  Ntot" 
+for c in ${!cases[@]}; 
+do
+   case=${cases[$c]}
+   r=${rs[$c]}
+   z=${zs[$c]}
+   dT=${dTs[$c]}
+   theta=${thetas[$c]}
+   sM=$(python3 -c "print(${sMs[$c]}*1e-6)")
+   hM=$(python3 -c "print(${hMs[$c]}*1e-6)")
+   Qmicro=${Qmicros[$c]}
+   Mall=${Ms[$c]}
+   eall=${eths[$c]}
+   dt=${dts[$c]}
+   tmax=$(python3 -c "print(${tmaxs[$c]})")
+   nb_pas_dt_max=$(python3 -c "print(int($nb_pas_dt_max))")
+   IFS='-' read -r -a meshes <<< "$Mall"
+   IFS='-' read -r -a deltas <<< "$eall"
+   for index in "${!meshes[@]}" 
+   do
+      #echo "$index ${meshes[index]}"
+      M=${meshes[index]}
+      Nx=$(python3 -c "print(int($r/($M*1e-6))+1)")
+      Nz=$(python3 -c "print(int($z/($M*1e-6))+1)")
+      Ntot=$(python3 -c "print(($Nx-1)*($Nz-1))")
+      if [ 10 == 10 ] ; then 
+         for i in "${!deltas[@]}" 
+         do
+            eth=$(python3 -c "print(${deltas[i]}*1e-3)")
+            echo "CASE: $case $r $z $M $dT $theta $sM $hM $Qmicro $eth $r0 $Ntot" 
+            dest=$case/eth$eth/M$M/R0
+            mkdir -p $dest
+            sed -e "s/@Nx@/$Nx/g" \
+                -e "s/@Nz@/$Nz/g" \
+                -e "s/@rmax@/$r/g" \
+                -e "s/@zmax@/$z/g" \
+                -e "s/ tmax .*/ tmax $tmax/" \
+                -e "s/ dt_max .*/ dt_max $dt/" \
+                -e "s/ sm .*/ sm $sM/" \
+                -e "s/ ym .*/ ym $hM/" \
+                -e "s/ Qtcl .*/ Qtcl $Qmicro/" \
+                -e "s/@theta@/$theta/g" \
+                -e "s/@r0@/$r0/g" \
+                -e "/Bloc Remesh Vinod/,/End Remesh Vinod/d" \
+                -e "s/@dT@/$dT/g" \
+                -e "s/@delta_th@/$eth/g" \
+                -e "s/nb_pas_dt_max .*/nb_pas_dt_max $nb_pas_dt_max/" \
+                template.data > $dest/source.data
+            sed -e "s#@case@#$dest#g" sub_file_template > $dest/sub_file
+            \cp -f pre_run post_run $dest/
+            # Prepare the true case for run_fiche:
+            [ $coarsening ] && [ $case == "S2" ] && [ $eth == "0.0001" ] && [ $M == 10 ] && echo "******Reducing case $dest for run_fiche" && coarsen $dest
+            if [ $case == "S1b" ] && [ $M == 10 ] ; then 
+               # Also create a case for several cycles : 
+               pinch=$(dirname $dest)/PINCH/R0
+               mkdir -p $pinch
+               sed -e "s/ # +90*(x_lt_3.e-5) to pinch contact line #/+90*(x_lt_3.e-5) # to pinch contact line #/" $dest/source.data > $pinch/source.data
+               sed -e "s#$dest#$pinch#g" $dest/sub_file > $pinch/sub_file
+               \cp -f $dest/pre_run $dest/post_run $pinch/
+            fi
+            if [ $case == "S6" ] ; then
+               \mv -f $dest/source.data $dest/source-bkp-with-TCL.data
+               echo "******Backup file for S6 : $dest/source-bkp-with-TCL.data" 
+               remove_tcl $dest/source-bkp-with-TCL.data $dest/source.data
+            fi
+            if [ $M != 10 ] ; then 
+               # We do just the first thermal thickness if we're not on the standard mesh
+               break
+            fi
+         done
+      else
+         # no no no
+         echo ""
+      fi
+   done
+done
+
+echo "End of prepare"
+exit
+
+
+

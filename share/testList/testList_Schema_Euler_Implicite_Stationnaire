@@ -1,6 +1,3 @@
-Marche_SKE_steady_jdd1
-Diffuseur_SKE_steady_jdd1
-Lid_driven_cavity_jdd1
 Navier_Stokes_2d_steady_jdd1
 Navier_Stokes_2d_steady_jdd2
 Navier_Stokes_2d_steady_jdd3
@@ -15,3 +12,6 @@ Navier_Stokes_3d_steady_jdd3
 2D_VEF_Cylindre_steady_jdd1
 Marche_k_eps_T_steady_jdd1
 ThHyd_3D_VEF_steady_jdd1
+Diffuseur_SKE_steady_jdd1
+Lid_driven_cavity_jdd1
+Marche_SKE_steady_jdd1

@@ -1,0 +1,311 @@
+Parameters {
+	Title "TCL heat flux"
+	Author "G.B."
+	VersionTrio_U "1.9.2"
+	TestCase THETA20/VoF1113 Qmicro_only.data
+	TestCase THETA40/VoF1113 Qmicro_only.data
+	TestCase THETA80/VoF1113 Qmicro_only.data
+	TestCase THETA20/VoF0000 Qmicro_only.data
+	TestCase THETA40/VoF0000 Qmicro_only.data
+	TestCase THETA80/VoF0000 Qmicro_only.data
+	TestCase THETA40/VoF1000 Qmicro_only.data
+	TestCase THETA40/VoF1003 Qmicro_only.data
+	TestCase THETA40/VoF1110 Qmicro_only.data
+	TestCase THETA40/VoF1330 Qmicro_only.data
+	TestCase THETA40/VoF1333 Qmicro_only.data
+	
+	Description "This 2D_axi case incorporates a contact line model that provides an additional heat flux and growth." <<EOF 
+\latex_(There is neither gravity nor surface tension.
+The interface is initialized as a sphere portion matching the contact line BC at an angle $40^\circ$ with a 
+curvature radius of 0.1mm. 
+Initial CL radius is then: $r_{CL}=64.0835$µm for $40^\circ$.
+The temperature is set to saturation everywhere ($T=0$ including on BCs). The test-case is not related to temperature resolution. Phase change is created through a source term at the TCL with $Q_{CL} = 50W/m$. 
+
+Mesh size in $\Delta=10\mu m$. Micro-region extension is set to : $y_m=3.7\mu m$ and $s_m = 5\mu m$.
+
+The instantaneous interface mass flowrate $G_{CL}$ (in kg/s) is given by
+\begin{equation}
+G_{CL} = \frac{Q_{CL} 2\pi r_{CL}}{L^{vap}}
+\end{equation}
+It also gives the bubble growth rate:
+\begin{equation}
+\rho_v \frac{dV_b}{dt} = G_{CL} = \frac{Q_{CL} 2\pi r_{CL}}{L^{vap}}
+\end{equation}
+
+\paragraph{Algorithm information}
+
+The contribution of the micro-region model is computed in \verb#compute_TCL_fluxes_in_all_boundary_cells#.
+It is then used directly to secmem2 to increase the bubble growth (it replaces mpoint contribution in cells with TCL model). It does not go through mpoint to avoid 
+perturbation in the macroscopic mpoint field that would lead too issues when the extension to the boundary is 
+performed by a smoothing to compute the interface velocity. 
+
+So far, TCL contribution into the VoF-like mass conservation algorithm \verb#Navier_Stokes_FT_Disc::calculer_dI_dt#
+is only implemented for the option \verb#Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED#
+ 
+Locally at the constact line, the radius evolves as 
+$$r_{ana} = r_0-\dot{m}/\rho_v t$$
+which leads to an interface velocity
+$$v_{i,ana} =-\dot{m}/\rho_v$$
+But in this case, it will evolve with time as $\dot{m}$ depends on $r_{cl}$ and therefore on time. 
+Besides, the TCL moves and drags some fluid. There is some thickness associated.
+
+This validation assessed a set of configurations: 
+\begin{itemize}
+  \item Contact angles are varied in  $20^\circ$, $40^\circ$, $80^\circ$.
+  \item \latex_) triokeyword(VOFlike_correction_volume) \latex_( can be activated with some associated options.
+\end{itemize}
+
+\latex_)
+EOF
+}
+
+Chapter {
+	Title "Bubble growth due to Qcl: effects of contact angle and volume conservation"
+   Description "" <<EOF
+\latex_(
+Theoretical volume, interface velocity and contact line position are compared to the calculation.
+Some conclusions can be drawn: 
+\begin{itemize}
+  \item It is good.
+  \item Volume correction brings some improvement. 
+\end{itemize}
+Conclusion, it is OK.
+\latex_) 
+EOF
+
+	Figure {
+        Title "Bubble Growth - Effect of contact angle"
+        Description "For any contact angle, we are capable of recovering the correct time evolution of bubble growth (dV/dt)."
+        Dimension 2
+        LabelX "time [ms]"
+        LabelY "vapour volume V/V0 [-]"
+        Curve {
+                legend "Ana 20°"
+                Version ""
+                file ./THETA20/VoF1113/v_ana.txt 
+                columns $1*1000 $2
+                Style points
+                PointSize 2
+        }
+        Curve {
+                legend "Ana 40°"
+                Version ""
+                file ./THETA40/VoF1113/v_ana.txt 
+                columns $1*1000 $2
+                Style points
+                PointSize 2
+        }
+        Curve {
+                legend "Ana 80°"
+                Version ""
+                file ./THETA80/VoF1113/v_ana.txt 
+                columns $1*1000 $2
+                Style points
+                PointSize 2
+        }
+        Curve {
+                legend "20° - VoF1113"
+                Version ""
+                file ./THETA20/VoF1113/v_num.txt 
+                columns $1*1000 $2  
+                Style lines
+                LineWidth 3
+        }
+        Curve {
+                legend "20° - VoF0000"
+                Version ""
+                file ./THETA20/VoF0000/v_num.txt 
+                columns $1*1000 $2  
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "40° - VoF1113"
+                Version ""
+                file ./THETA40/VoF1113/v_num.txt 
+                columns $1*1000 $2  
+                Style lines
+                LineWidth 3
+        }
+        Curve {
+                legend "40° - VoF0000"
+                Version ""
+                file ./THETA40/VoF0000/v_num.txt 
+                columns $1*1000 $2  
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "80° - VoF1113"
+                Version ""
+                file ./THETA80/VoF1113/v_num.txt 
+                columns $1*1000 $2
+                Style lines
+                LineWidth 3
+        }
+        Curve {
+                legend "80° - VoF0000"
+                Version ""
+                file ./THETA80/VoF0000/v_num.txt 
+                columns $1*1000 $2
+                Style lines
+                LineWidth 1
+        }
+   }
+	Figure {
+        Title "Bubble Growth - Effect of VoF options (at 40°)"
+        Description "Assessment of Volume preserving effect. Only the option without VoF (0000) is different from the rest."
+        Dimension 2
+        LabelX "time [ms]"
+        LabelY "vapour volume V/V0 [-]"
+        Curve {
+                legend "Ana 40"
+                Version ""
+                file ./THETA40/VoF1113/v_ana.txt 
+                columns $1*1000 $2
+                Style points
+                PointSize 2
+        }
+        Curve {
+                legend "VoF1113"
+                Version ""
+                file ./THETA40/VoF1113/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 3
+        }
+        Curve {
+                legend "VoF1110"
+                Version ""
+                file ./THETA40/VoF1110/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "VoF0000"
+                Version ""
+                file ./THETA40/VoF0000/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "VoF1000"
+                Version ""
+                file ./THETA40/VoF1000/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 3
+        }
+        Curve {
+                legend "VoF1003"
+                Version ""
+                file ./THETA40/VoF1003/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "VoF1330"
+                Version ""
+                file ./THETA40/VoF1330/v_num.txt 
+                columns $1*1000 $2
+                Style lines
+                LineWidth 1
+        }
+        Curve {
+                legend "VoF1333"
+                Version ""
+                file ./THETA40/VoF1333/v_num.txt 
+                columns $1*1000 $2 
+                Style lines
+                LineWidth 1
+        }
+   }
+   
+Figure {
+	Title "Bubble growth $dV/dt$"
+	Description "The bubble growth rate based on the actual bubble volume evolution between two timesteps is compared to the integral of mpoint over the interface and to the theoretical value computed directly from Qcl. A very good agreement is achieved and Vof-like correction (i.e. $VoF\neq 0000$) is necessary to reach a perfect agreement."
+	Picture ./THETA40/VoF0000/plot-dVdt.png
+}
+Figure {
+	Picture ./THETA40/VoF1333/plot-dVdt.png
+}
+
+Figure {
+	Title "Bubble growth, interface velocity and contact line radius"
+	Description "These results were mostly commented before, especially in sec. 2.1"
+	Picture ./THETA40/VoF0000/plot.png
+}
+
+Figure {
+	Picture ./THETA40/VoF1000/plot.png
+}
+Figure {
+	Picture ./THETA40/VoF1003/plot.png
+}
+Figure {
+	Picture ./THETA40/VoF1110/plot.png
+}
+Figure {
+	Picture ./THETA40/VoF1113/plot.png
+}
+Figure {
+	Picture ./THETA40/VoF1330/plot.png
+}
+Figure {
+	Picture ./THETA40/VoF1333/plot.png
+}
+
+visu {
+	Title "3 contact angles comparison."
+	Description "VoF=1113 for 3 contact angles: 20 in black, 40 in red, 80 in green. At 2 times (2ms and 20ms)"
+	nb_img_without_newline 2
+	width 5.5cm
+	mesh ./THETA20/VoF1113/lata/post.lata INTERFACES
+	mesh ./THETA40/VoF1113/lata/post.lata INTERFACES
+	mesh ./THETA80/VoF1113/lata/post.lata INTERFACES
+
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit m.lineWidth = 5
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit m2.lineWidth = 4
+	instruction_visit m2.legendFlag = 0
+	instruction_visit SetPlotOptions(m2)
+
+	instruction_visit SetActivePlots((2))
+	instruction_visit m3=MeshAttributes()
+	instruction_visit m3.opaqueMode=m3.Off
+	instruction_visit m3.foregroundFlag=0
+	instruction_visit m3.legendFlag = 0
+	instruction_visit m3.lineWidth = 3
+	instruction_visit m3.meshColor=(0,255,0,255)
+	instruction_visit SetPlotOptions(m3)
+	cycles 1 10 
+   }
+
+}
+
+Chapter {
+        Title "Conclusions"
+     
+        Description "This validation sheet aims to assess the model for localised heat flux at the TCL." <<EOF
+It is working fine in 2D_axi, with remeshing options and mass-conservation.
+EOF 
+}
+
+Chapter {
+        Title Computer performance
+        Tableau_performance {
+        }
+}
+

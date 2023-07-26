@@ -1,0 +1,442 @@
+Parameters {
+	Title "Bubble constant growth : volume conservation in VDF"
+	Author "G.B."
+	TestCase ./2D_axi/VoF111/MassSourceNew/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceNew/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceNew/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceNew/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF111/MassSourceHistorical/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceNew/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceNew/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceNew/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceNew/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceHistorical/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D_axi/VoF000/MassSourceHistorical/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D/VoF111/MassSourceNew/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF111/MassSourceNew/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF111/MassSourceHistorical/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D/VoF000/MassSourceNew/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF000/MassSourceNew/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D/VoF000/MassSourceNew/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF000/MassSourceNew/InterpStandard/RemeshBest cst_growth.data
+	TestCase ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest cst_growth.data
+	TestCase ./2D/VoF000/MassSourceHistorical/InterpStandard/RemeshNothing cst_growth.data
+	TestCase ./2D/VoF000/MassSourceHistorical/InterpStandard/RemeshBest cst_growth.data
+
+	TestCase 2D_axi/BEST best.data
+	Description "This case compares the validity of the volume evolution with a given phase-change rate in different cases: 2D and bidim_axi." <<EOF
+\latex_(The test-case is not related to temperature resolution as the keyword\latex_) triokeyword(prescribed_mpoint) \latex_(is used to set $\dot{m}=-10kg/m2s$.
+Therefore, the growth is imposed, and the radius evolves as 
+$$r_{ana} = r_0-\dot{m}/\rho_v t$$
+which leads to a constant interface velocity
+$$v_{i,ana} =-\dot{m}/\rho_v$$
+Cette fiche teste un ensemble de configurations : 
+\begin{itemize}
+  \item 2D / 2D\_axi
+  \item Avec / sans \latex_) triokeyword(VOFlike_correction_volume) \latex_(
+  \item Avec / sans \latex_) triokeyword(new_mass_source) \latex_(
+  \item \latex_) triokeyword(interpol_indic_pour_dI_dt) triokeyword(interp_ai_based) / triokeyword(interp_standard) \latex_(
+  \item 2 choix de remaillage : Nothing / Best
+  \item Standard value only for : \latex_) triokeyword(type_indic_faces interp_standard) \latex_(
+\end{itemize}
+
+\latex_)
+EOF
+}
+
+Chapter {
+	Title "Case 2D, bubble constant growth : volume conservation"
+   Description "" <<EOF
+\latex_(
+Theoretical volume, interface velocity and interfacial area are compared to the calculation.
+Some conclusions can be drawn: 
+\begin{itemize}
+  \item The combination VoF111/MassSourceHistorical/InterpStandard is clearly disfunctional independantly of the remeshing choice (see \emph{2D: Failure of the VoF111/MassSourceHistorical/InterpStandard combination}). Unfortunately, it is very close to the standard code behaviour. Maybe the choice \latex_) triokeyword(interpol_indic_pour_dI_dt interp_ai_based) \latex_( should be recommanded if it works in general. Or BugFix should be sought for. One possible lead to investigate is that in 
+\begin{verbatim}
+ Navier_Stokes_FT_Disc::calculer_dI_dt
+\end{verbatim}
+there is a second call to
+\begin{verbatim}
+switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
+\end{verbatim}
+in which only the case
+\begin{verbatim}
+Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED 
+\end{verbatim}
+does something; other cases do nothing. Is it expected?
+  \item Without volume correction (ie VoF000), we can see that all cases differ slightly from the analytical, both with and without remeshing (see \emph{2D: Mass source}).
+  MassSourceHistorical leads to underestimation of volume and area whereas the MassSourceNew\latex_)triokeyword(new_mass_source) \latex_( overassess them.
+  Remeshing has little impact there.
+  \item With volume correction (ie VoF111) all combinations perfectly match the analytical case except MassSourceNew/InterpAiBased/RemeshNothing (see \emph{2D: Effect of Volume correction}). In this last case, the activation of remeshing option is necessary (it is probably the addition of supplementary iterations in the mass conservation after smoothing that solves the issue \latex_)triokeyword(nb_iter_correction_volume 3) \latex_().
+  \item With \latex_)triokeyword(new_mass_source)\latex_(, the interface velocity is closer to the analytical value (and analytical is between numerical min and max).
+\end{itemize}
+Conclusion, in 2D, we recommand \latex_) triokeyword(VOFlike_correction_volume) and triokeyword(interp_ai_based)
+ and Remeshing, but the option triokeyword(new_mass_source) \latex_( can or cannot be used. VoF correction can recover the good growth, but it seems better to 
+ activate the option because the velocity is then closer to the analytical value.
+\latex_) 
+EOF
+
+Figure {
+	Title "2D: Failure of the VoF111/MassSourceHistorical/InterpStandard combination"
+	Description "This combination should be avoided for unknown reasons. Remesh bloc does not influence that."
+	Picture ./2D/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+}
+
+Figure {
+	Title "2D: Mass source"
+	Description "Historical Mass Source for the jump in secmem for projection"
+	Picture ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "With keyword : triokeyword(new_mass_source)"
+	Picture ./2D/VoF000/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+}
+
+Figure {
+	Title "2D: Effect of Volume correction"
+	Description "Effect of the option triokeyword(VOFlike_correction_volume)."
+	Description "triokeyword(VOFlike_correction_volume) 0"
+	Picture ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "triokeyword(VOFlike_correction_volume) 1"
+	Description "triokeyword(nb_iterations_correction_volume) 1"
+	Description "triokeyword(nb_lissage_correction_volume) 1"
+	Picture ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "The combination of triokeyword(VOFlike_correction_volume) 1 with MassSourceNew/InterpAiBased/RemeshNothing requires remeshing to be as good as others. Here with RemeshNothing, it is slightly off."
+	Picture ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "With RemeshBest, it is improved and perfectly matching too."
+	Picture ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+}
+
+visu {
+	Title "2D case"
+	Description "VoF=000 + RemeshNothing  in black, VoF=000 + RemeshBest  in red, VoF=111 + RemeshBest in green. Grey, Orange and blue lines are theoretical positions at the 3 times 1, 3, 5ms."
+	nb_img_without_newline 3
+	width 5.5cm
+	mesh ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/lata/post.lata INTERFACES
+	mesh ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest/lata/post.lata INTERFACES
+	mesh ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest/lata/post.lata INTERFACES
+	instruction_visit DefineScalarExpression("r_ELEM_dom", "sqrt(coord(dom)[0]^2+coord(dom)[1]^2)")
+	Isovalues ./2D/VoF000/MassSourceHistorical/InterpStandard/RemeshBest/lata/post.lata dom r ELEM
+	instruction_visit SetActivePlots(3)
+#	instruction_visit Query("Time")
+#	instruction_visit t = GetQueryOutputValue()
+#	instruction_visit xit = 0.00012+10./800*t
+	instruction_visit xi1 = 0.00012+10./800*0.001*1
+	instruction_visit xi3 = 0.00012+10./800*0.001*3
+	instruction_visit xi5 = 0.00012+10./800*0.001*5
+	instruction_visit ContourAtts = ContourAttributes()
+	instruction_visit ContourAtts.legendFlag = 0
+	instruction_visit ContourAtts.lineWidth = 2
+	instruction_visit ContourAtts.contourValue = (xi1, xi3, xi5)
+	instruction_visit ContourAtts.SetMultiColor(0, (128, 128, 128, 255)) # Grey
+	instruction_visit ContourAtts.SetMultiColor(1, (255, 153, 0, 255)) # Orange 
+	instruction_visit ContourAtts.SetMultiColor(2, (0, 0, 255, 255)) # Blue
+	instruction_visit ContourAtts.contourValue = (xi1, xi3, xi5)
+	instruction_visit ContourAtts.contourMethod = ContourAtts.Value
+	instruction_visit SetPlotOptions(ContourAtts)
+
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit m.lineWidth = 5
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit m2.lineWidth = 4
+	instruction_visit m2.legendFlag = 0
+	instruction_visit SetPlotOptions(m2)
+
+	instruction_visit SetActivePlots((2))
+	instruction_visit m3=MeshAttributes()
+	instruction_visit m3.opaqueMode=m3.Off
+	instruction_visit m3.foregroundFlag=0
+	instruction_visit m3.legendFlag = 0
+	instruction_visit m3.lineWidth = 3
+	instruction_visit m3.meshColor=(0,255,0,255)
+	instruction_visit SetPlotOptions(m3)
+#	normal3D 0. 1. 0.
+#	up3D 0. 0. 1.
+	cycles 1 3 5 
+   }
+
+}
+
+Chapter {
+	Title "Case 2D_axi, bubble constant growth : volume conservation"
+   Description "" <<EOF
+\latex_(
+On the 2D axi case, conclusions are unchanged: 
+\begin{itemize}
+  \item Again, the combination VoF111/MassSourceHistorical/InterpStandard is clearly disfunctional independantly of the remeshing choice (see \emph{2D\_axi: Failure of the VoF111/MassSourceHistorical/InterpStandard combination}). 
+  \item Again, without volume correction (ie VoF000), we can see that all cases differ slightly from the analytical, both with and without remeshing (see \emph{2D\_axi: Mass source}).
+  MassSourceHistorical leads to underestimation of volume and area whereas the MassSourceNew\latex_)triokeyword(new_mass_source) \latex_( over-assess them.
+  Remeshing has little impact there.
+  \item Again, with volume correction (ie VoF111) all combinations perfectly match the analytical case except MassSourceNew/InterpAiBased/RemeshNothing (see \emph{2D\_axi: Effect of Volume correction}). In this last case, the activation of remeshing option is necessary).
+  \item Again, with \latex_)triokeyword(new_mass_source)\latex_(, the interface velocity is closer to the analytical value (and analytical is between numerical min and max).
+\end{itemize}
+Conclusion, in 2D\_axi, we recommand \latex_) triokeyword(VOFlike_correction_volume) and triokeyword(interp_ai_based)
+ and Remeshing, but the option triokeyword(new_mass_source) \latex_(can or cannot be used. VoF correction can recover the good growth, but it seems better to 
+ activate the option because the velocity is then closer to the analytical value.
+\latex_) 
+EOF
+
+Figure {
+	Title "2D_axi: Failure of the VoF111/MassSourceHistorical/InterpStandard combination"
+	Description "This combination should be avoided for unknown reasons. Remesh bloc does not influence that."
+	Picture ./2D_axi/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+}
+
+Figure {
+	Title "2D_axi: Mass source"
+	Description "Historical Mass Source for the jump in secmem for projection"
+	Picture ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "With keyword : triokeyword(new_mass_source)"
+	Picture ./2D_axi/VoF000/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+}
+
+Figure {
+	Title "2D_axi: Effect of Volume correction"
+	Description "Effect of the option triokeyword(VOFlike_correction_volume)."
+	Description "triokeyword(VOFlike_correction_volume) 0"
+	Picture ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "triokeyword(VOFlike_correction_volume) 1"
+	Description "triokeyword(nb_iterations_correction_volume) 1"
+	Description "triokeyword(nb_lissage_correction_volume) 1"
+	Picture ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "The combination of triokeyword(VOFlike_correction_volume) 1 with MassSourceNew/InterpAiBased/RemeshNothing requires remeshing to be as good as others. Here with RemeshNothing, it is slightly off."
+	Picture ./2D_axi/VoF111/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+}
+Figure {
+	Description "With RemeshBest, it is improved and perfectly matching too."
+	Picture ./2D_axi/VoF111/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+}
+
+visu {
+	Title "2D_axi case"
+	Description "VoF=000 + RemeshNothing  in black, \\VoF=000 + RemeshBest  in red, VoF=111 + RemeshBest in green. Grey, Orange and blue lines are theoretical positions at the 3 times 1, 3, 5ms."
+	nb_img_without_newline 3
+	width 5.5cm
+	mesh ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/lata/post.lata INTERFACES
+	mesh ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest/lata/post.lata INTERFACES
+	mesh ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest/lata/post.lata INTERFACES
+	instruction_visit DefineScalarExpression("r_ELEM_dom", "sqrt(coord(dom)[0]^2+coord(dom)[1]^2)")
+	Isovalues ./2D_axi/VoF000/MassSourceHistorical/InterpStandard/RemeshBest/lata/post.lata dom r ELEM
+	instruction_visit SetActivePlots(3)
+#	instruction_visit Query("Time")
+#	instruction_visit t = GetQueryOutputValue()
+#	instruction_visit xit = 0.00012+10./800*t
+	instruction_visit xi1 = 0.00012+10./800*0.001*1
+	instruction_visit xi3 = 0.00012+10./800*0.001*3
+	instruction_visit xi5 = 0.00012+10./800*0.001*5
+	instruction_visit ContourAtts = ContourAttributes()
+	instruction_visit ContourAtts.legendFlag = 0
+	instruction_visit ContourAtts.lineWidth = 2
+	instruction_visit ContourAtts.contourValue = (xi1, xi3, xi5)
+	instruction_visit ContourAtts.SetMultiColor(0, (128, 128, 128, 255)) # Grey
+	instruction_visit ContourAtts.SetMultiColor(1, (255, 153, 0, 255)) # Orange 
+	instruction_visit ContourAtts.SetMultiColor(2, (0, 0, 255, 255)) # Blue
+	instruction_visit ContourAtts.contourValue = (xi1, xi3, xi5)
+	instruction_visit ContourAtts.contourMethod = ContourAtts.Value
+	instruction_visit SetPlotOptions(ContourAtts)
+
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit m.lineWidth = 5
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit m2.lineWidth = 4
+	instruction_visit m2.legendFlag = 0
+	instruction_visit SetPlotOptions(m2)
+
+	instruction_visit SetActivePlots((2))
+	instruction_visit m3=MeshAttributes()
+	instruction_visit m3.opaqueMode=m3.Off
+	instruction_visit m3.foregroundFlag=0
+	instruction_visit m3.legendFlag = 0
+	instruction_visit m3.lineWidth = 3
+	instruction_visit m3.meshColor=(0,255,0,255)
+	instruction_visit SetPlotOptions(m3)
+#	normal3D 0. 1. 0.
+#	up3D 0. 0. 1.
+	cycles 1 3 5 
+   }
+}
+Chapter {
+        Title "Conclusions"
+     
+        Description "The option triokeyword(VOFlike_correction_volume) globally " <<EOF
+enables to correct the bubble growth rate to match the theory. In is based on a VOF-like transport of the 
+discreete phase indicator. But it has the tendency to overact on the symetry axis (in 2D_axi).
+To hinder this drawback, the keyword triokeyword(nb_lissage_correction_volume) can be set in the range 1-4 (the actual value
+does not make much difference). 
+
+In this case (for the purpose of this validation sheet), it is used along with 
+triokeyword(nb_iterations_correction_volume) increased from 0 to 1 but it may not be necessary or very significant.
+Actually, even when triokeyword(nb_iterations_correction_volume) is 0, the (potentially smoothed) volume-correction is applied at least once anyway.
+It is then performed several times until either the triokeyword(nb_iterations_correction_volume) is overtaken or until the dvolume is below the
+threshold.
+
+Increasing remeshing is beneficial. The number of triokeyword(nb_iter_barycentrage) and its coefficient 
+triokeyword(relax_barycentrage) remain limited to be in agreement with FTD_remesh_bidim_axi.
+Lissage is also activated:
+
+triokeyword(pas) = triokeyword(pas_lissage) = 1.e-12  (to enable/activate both remeshing and smoothing frequency)
+
+triokeyword(lissage_courbure_coeff) -0.02 (negative and not too large for stability)
+
+triokeyword(nb_iter_correction_volume) 3 (to complete correction when both barycentrage and lissage are done).
+
+The triokeyword(facteur_longueur_ideale) 1.0 is small compared to standard recommendations, but it is stable
+in this rather canonical case. 
+
+Regarding the two options used in MassSourceNew and InterpAiBased, they seem to be the best choice and to improve the prediction of 
+the interface velocity before correction.
+EOF 
+}
+
+	
+
+Chapter {
+        Title "Appendix. Series of pictures for the diffferent cases"
+Figure {
+	Title "2D_axi: VoF0 vs VoF1"
+	Description "Effect of the options triokeyword(VOFlike_correction_volume, new_mass_source, interpol_indic_pour_dI_dt, remaillage)." 
+	Picture ./2D_axi/VoF111/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+}
+Figure { 
+  Picture ./2D_axi/VoF111/MassSourceNew/InterpStandard/RemeshNothing/plot.png 
+  }
+Figure {
+   Picture ./2D_axi/VoF111/MassSourceNew/InterpStandard/RemeshBest/plot.png 
+   }
+Figure {
+   Picture ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF111/MassSourceHistorical/InterpStandard/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceNew/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceNew/InterpStandard/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest/plot.png
+  }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D_axi/VoF000/MassSourceHistorical/InterpStandard/RemeshBest/plot.png
+   }
+
+
+Figure {
+	Title "2D: VoF0 vs VoF1"
+	Description "Effect of the options triokeyword(VOFlike_correction_volume, new_mass_source, interpol_indic_pour_dI_dt, remaillage)." 
+   Picture ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceNew/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceNew/InterpStandard/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceHistorical/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF111/MassSourceHistorical/InterpStandard/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceNew/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceNew/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceNew/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceNew/InterpStandard/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceHistorical/InterpAiBased/RemeshBest/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceHistorical/InterpStandard/RemeshNothing/plot.png
+   }
+Figure {
+   Picture ./2D/VoF000/MassSourceHistorical/InterpStandard/RemeshBest/plot.png
+}
+}
+
+	
+
+Chapter {
+        Title Computer performance
+        Tableau_performance {
+        }
+}
+

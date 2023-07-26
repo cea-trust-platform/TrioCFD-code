@@ -1,0 +1,1818 @@
+Parameters {
+	Title "Heat-transfer near contact line"
+	Description "Computation of heat transfer in the vicinity of a contact-line"
+	Description "Data analyzed"
+	Description "....integrated wall heat flux"
+	Description "....integrated interfacial flux"
+	Description "Assumptions:"
+	Description "....No effect of phase-change on the interface (no motion)"
+	Description "....Prescribed wall temperature"
+
+	VersionTrio_U "1.9.2"
+
+	ParametersTrio_U Type of problem : Probleme_FT_Disc_gen
+	ParametersTrio_U Discretization : VDF
+	ParametersTrio_U Time scheme : Euler_Explicite
+	ParametersTrio_U Solving of equations : Navier_stokes_FT_disc without turbulence Model
+	ParametersTrio_U Solving of equations : Convection_Diffusion_Temperature_FT_Dist for liquid
+	ParametersTrio_U Convection scheme : Momentum \& Temperature : quick
+	ParametersTrio_U Diffusion scheme : Default {} for all equations
+	ParametersTrio_U No Turbulence model : DNS
+	ParametersTrio_U Type of boundary conditions : Heated wall with constant temperature and prescribed contact angle (bottom), free openings or walls otherwise.
+	ParametersTrio_U Type of fluid : Atm. water\&steam.
+
+        CasTest CAS_OFFSET-0.5 calc 1 /* jdd inclus en annexe */
+        CasTest CAS_OFFSET-0.4 calc 1
+        CasTest CAS_OFFSET-0.3 calc 1
+#         CasTest CAS_OFFSET-0.2 calc 1  /* Weirdly, but its the only one unstable, spurrious currents */
+        CasTest CAS_OFFSET-0.1 calc 1
+        CasTest CAS_OFFSET0.0 calc 1 /* REF case */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-07 calc 1 /* max||u|| = 1e-12 -> very reasonnable */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-08 calc 1 /* max||u|| = 1e-3 -> very reasonnable */
+        CasTest CAS_OFFSET0.1 calc 1
+#        CasTest CAS_OFFSET0.2 calc 1  /* Weirdly, very unstable too. We have to set dt=3.0e-8 to remove spurrious */
+        CasTest CAS_OFFSET0.2_TIMESTEP1e-07 calc 1
+        CasTest CAS_OFFSET0.3 calc 1
+        CasTest CAS_OFFSET0.4 calc 1
+        CasTest CAS_OFFSET0.5 calc 1
+        CasTest CAS_OFFSET-0.2_TIMESTEP2e-07 calc 1
+#        CasTest CAS_OFFSET-0.2_TIMESTEP3e-07 calc 1 /* Weirdly, but its the only one unstable, spurrious currents */
+        CasTest CAS_REFINE0.25 calc 1
+        CasTest CAS_REFINE0.5 calc 1
+        CasTest CAS_REFINE2 calc 1
+        CasTest CAS_REFINE4 calc 1
+#        CasTest CAS_REFINE8 calc 1
+        CasTest CAS_ANGLE5 calc 1
+        CasTest CAS_ANGLE10 calc 1
+        CasTest CAS_ANGLE15 calc 1
+        CasTest CAS_ANGLE20 calc 1
+        CasTest CAS_ANGLE30 calc 1
+        CasTest CAS_ANGLE80 calc 1
+        CasTest CAS_ANGLE90 calc 1
+        CasTest CAS_DT3 calc 1
+        CasTest CAS_DT5 calc 1
+        CasTest CAS_DT10 calc 1
+        CasTest CAS_DT15 calc 1
+        CasTest CAS_REFINE1/TCL1 calc 1
+        CasTest CAS_REFINE1/TCL2 calc 1
+        CasTest CAS_REFINE1/TCL4 calc 1
+        CasTest CAS_REFINE1/TCL6 calc 1
+        ExtraUsedFile REF/lata/post.lata.INDICATRICE_*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_GRAD_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.MPOINT_THERMIQUE*
+
+	Author "G. Bois"
+}
+
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : 2D"
+	Description "Dimensions : R=25e-6 m, L=12.e-6 m"
+	Description "Mesh : Hexa, "
+	Description "Initial conditions : "
+	Description "...Hydraulic : Zero velocity"
+	Description "...Interface : plane at a prescribed angle 5, 10, 15, 20, 30, 50, 80 or 90$°$"
+	Description "...Temperature : T=3,5,7,9 or 15$°$C over-saturation at the wall, and linear decrease on 5$\mu m$"
+	Description "Boundary conditions :"
+	Description "..."
+	Description "..."
+	
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Steam/water properties at Atm. pressure:}\latex_)"	
+		nb_columns 2
+		label  water | steam
+
+		line 
+		{
+			legend "$\rho$ [kg/m$^3$]"
+			file prop.txt
+			origin ""
+		}
+		line 
+		{
+                        legend "$\mu$ [kg/m/s]"
+			file prop.txt
+			display_line 1
+			origin ""
+		}
+		line 
+		{
+                        legend "$\lambda$ [W/m/K]"
+			file prop.txt
+			display_line 0
+			origin ""
+		}
+		line 
+		{
+                        legend "Cp [J/kg/K]"
+			file prop.txt
+			display_line 0
+			origin ""
+		}
+		line 
+		{
+                        legend "Pr [-]"
+			file prop.txt
+			display_line 0
+			origin ""
+		}
+
+		
+	}
+	visu {
+		Title "Initial and final states"
+		nb_img_without_newline 2
+		Width 7.5cm
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineVectorExpression("gradT_ELEM_dom", "if(gt(INDICATRICE_INTERF_ELEM_dom, 0.5), gradient(TEMPERATURE_THERMIQUE_ELEM_dom), {0,0,0})")
+		Origin Visit
+		mesh REF/lata/post.lata dom
+		mesh REF/lata/post.lata INTERFACES
+		Pseudocolor REF/lata/post.lata dom Tl ELEM
+		BlackVector REF/lata/post.lata dom gradT ELEM 0.09
+		instruction_visit VectorAtts = VectorAttributes()
+		instruction_visit VectorAtts.useStride = 1
+		instruction_visit VectorAtts.stride = 1
+		instruction_visit VectorAtts.scale = 0.09
+		instruction_visit VectorAtts.scaleByMagnitude = 0
+		instruction_visit VectorAtts.colorByMag = 0
+		instruction_visit SetPlotOptions(VectorAtts)
+		cycles 0 -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	visu {
+		Title "Temperature Difference : dT = Tl - Tana"
+		nb_img_without_newline 1
+		Width 7.5cm
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineVectorExpression("gradT_ELEM_dom", "if(gt(INDICATRICE_INTERF_ELEM_dom, 0.5), gradient(TEMPERATURE_THERMIQUE_ELEM_dom), {0,0,0})")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana_ELEM_dom")
+
+		Origin Visit
+		mesh REF/lata/post.lata dom
+		mesh REF/lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+		Operator no_databaseinfo
+		Pseudocolor_with_range REF/lata/post.lata dom dT ELEM min max
+		Vector REF/lata/post.lata dom gradT ELEM 0.4
+		instruction_visit VectorAtts = VectorAttributes()
+		instruction_visit VectorAtts.useStride = 1
+		instruction_visit VectorAtts.stride = 1
+		instruction_visit VectorAtts.scale = 0.4
+		instruction_visit VectorAtts.scaleByMagnitude = 1
+		instruction_visit VectorAtts.colorByMag = 1
+		instruction_visit SetPlotOptions(VectorAtts)
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	
+	visu {
+		Title "final comparison of mp to analytical using VisIt projection by pos_cmfe"
+		nb_img_without_newline 1
+		Origin Visit
+		Width 7.5cm
+		instruction_visit DefineScalarExpression("ri","1.e-20+sqrt((coord(INTERFACES)[0]-5e-6)^2+(coord(INTERFACES)[1])^2)")
+		instruction_visit DefineScalarExpression("mpana", "0.67897/(-2.2574e6)*7.0/(ri*(50*3.14159)/180)")
+		instruction_visit DefineScalarExpression("mp", "pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)")
+		instruction_visit  OpenDatabase("REF/lata/post.lata")
+		instruction_visit ScatterAtts = ScatterAttributes()
+		instruction_visit ScatterAtts.var1 = "ri"
+		instruction_visit ScatterAtts.var2 = "mpana"
+		instruction_visit ScatterAtts.colorType = ScatterAtts.ColorBySingleColor
+		instruction_visit ScatterAtts.pointSizePixels = 10
+		instruction_visit ScatterAtts.singleColor = (0, 0, 0, 255)
+		instruction_visit ScatterAtts.scaleCube = 0
+		instruction_visit SetDefaultPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mpana", 0, 1)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mp", 0, 1)
+		instruction_visit ScatterAtts.var2 = "mp"
+		instruction_visit ScatterAtts.singleColor = (255, 0, 0, 255)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit DrawPlots()
+		instruction_visit View2DAtts = View2DAttributes()
+		instruction_visit View2DAtts.windowCoords = (5.20315e-08, 1.56526e-05, -9.20733, -0.154104)
+		instruction_visit View2DAtts.viewportCoords = (0.2, 0.95, 0.15, 0.95)
+		instruction_visit SetView2D(View2DAtts)
+		cycles -1
+	}
+	
+	Figure {
+		Title "final comparison of mp to analytical using MED and Python"
+		Width 7.5cm
+		Dimension 2
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution (without interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M2"
+			file ./CAS_REFINE2/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M0.5"
+			file ./CAS_REFINE0.5/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+	}
+	
+	Figure {
+		Title "TCL model effect. final comparison of mp to analytical using MED and Python"
+		Width 7.5cm
+		Dimension 2
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution (without interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=1)"
+			file ./CAS_REFINE1/TCL1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=2)"
+			file ./CAS_REFINE1/TCL2/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=4)"
+			file ./CAS_REFINE1/TCL4/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 6
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=6)"
+			file ./CAS_REFINE1/TCL6/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 7
+			LineWidth 2
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "We are interested in fluxes at the bottom wall and at the interface. "
+	Description " After a bump near the TCL (Triple Contact Line), an almost uniform value is reached."
+	Description " The analytical solution for the temperature is a self-similar solution function of the angular position (see mesh convergence section)."
+	Figure {
+		nb_img_without_newline 2
+		Title "Example of the (final) flux"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "x [$\mu$m]"
+		LabelY "$\phi$ [W/m²]"
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference case"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 3
+		}
+	}
+	Figure {
+		Width 7.5cm
+		Dimension 2
+		LabelX "d [$\\mu m$]"
+		LabelY "W+"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference case"
+			file CAS_OFFSET0.0/dTdni.xyz
+			columns (1e6*sqrt($2*$2+$3*$3)) ($5)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 3
+		}
+	}
+	Figure {
+		nb_img_without_newline 2
+		Title "Example of the (final) flux"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "s [$\mu$m]"
+		LabelY "$\phi$ [W/m²]"
+		legend below title "at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference case"
+			file CAS_OFFSET0.0/s_qi_qiana.txt
+			columns (1e6*($1)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 3
+		}
+		Curve {
+			legend "Analytical solution"
+			file CAS_OFFSET0.0/s_qi_qiana.txt
+			columns (1e6*($1)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 3
+		}
+	}
+	Figure {
+		Title "Example of the (final) integrated flux"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "x [$\mu$m]"
+		LabelY "$Q$ [W]"
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference case"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 3
+		}
+	}
+}
+
+Chapter {
+	Title "Sensitivity to the offset"
+	Description "How does the flux evolves when the contact line crosses to a new Eulerian cell at the wall? "
+	Description "Strangely, all calculations are stables except OFFSET-0.2 which requires to set the TIMESTEP to 2e-07 and OFFSET0.2 which is even more demanding (dt=1e-7). "
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "offset: -0.5"
+			file CAS_OFFSET-0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.5e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.4"
+			file CAS_OFFSET-0.4/xphi_last.txt
+			columns (1e6*($1-5e-6+0.4e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.3"
+			file CAS_OFFSET-0.3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.3e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.2"
+			file CAS_OFFSET-0.2_TIMESTEP2e-07/xphi_last.txt
+			columns (1e6*($1-5e-6+0.2e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.1"
+			file CAS_OFFSET-0.1/xphi_last.txt
+			columns (1e6*($1-5e-6+0.1e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 1
+		}
+		Curve {
+			legend "offset: 0"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.1"
+			file CAS_OFFSET0.1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.1e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.2"
+			file CAS_OFFSET0.2_TIMESTEP1e-07/xphi_last.txt
+			columns (1e6*($1-5e-6-0.2e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.3"
+			file CAS_OFFSET0.3/xphi_last.txt
+			columns (1e6*($1-5e-6-0.3e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.4"
+			file CAS_OFFSET0.4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.4e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.5"
+			file CAS_OFFSET0.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.5e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 6.5cm
+		Dimension 2
+		RangeX 0 3.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "offset: -0.5"
+			file CAS_OFFSET-0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.5e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.4"
+			file CAS_OFFSET-0.4/xphi_last.txt
+			columns (1e6*($1-5e-6+0.4e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.3"
+			file CAS_OFFSET-0.3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.3e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.2"
+			file CAS_OFFSET-0.2_TIMESTEP2e-07/xphi_last.txt
+			columns (1e6*($1-5e-6+0.2e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.1"
+			file CAS_OFFSET-0.1/xphi_last.txt
+			columns (1e6*($1-5e-6+0.1e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 1
+		}
+		Curve {
+			legend "offset: 0"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.1"
+			file CAS_OFFSET0.1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.1e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.2"
+			file CAS_OFFSET0.2_TIMESTEP1e-07/xphi_last.txt
+			columns (1e6*($1-5e-6-0.2e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.3"
+			file CAS_OFFSET0.3/xphi_last.txt
+			columns (1e6*($1-5e-6-0.3e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.4"
+			file CAS_OFFSET0.4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.4e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.5"
+			file CAS_OFFSET0.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.5e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) integrated flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m]"
+		LabelY "$P$ [W]"
+		LogY
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "offset: -0.5"
+			file CAS_OFFSET-0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.5e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.4"
+			file CAS_OFFSET-0.4/xphi_last.txt
+			columns (1e6*($1-5e-6+0.4e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.3"
+			file CAS_OFFSET-0.3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.3e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.2"
+			file CAS_OFFSET-0.2_TIMESTEP2e-07/xphi_last.txt
+			columns (1e6*($1-5e-6+0.2e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.1"
+			file CAS_OFFSET-0.1/xphi_last.txt
+			columns (1e6*($1-5e-6+0.1e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 1
+		}
+		Curve {
+			legend "offset: 0"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.1"
+			file CAS_OFFSET0.1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.1e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.2"
+			file CAS_OFFSET0.2_TIMESTEP1e-07/xphi_last.txt
+			columns (1e6*($1-5e-6-0.2e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.3"
+			file CAS_OFFSET0.3/xphi_last.txt
+			columns (1e6*($1-5e-6-0.3e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.4"
+			file CAS_OFFSET0.4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.4e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.5"
+			file CAS_OFFSET0.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.5e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		Title "(final) integrated flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m]"
+		LabelY "$P$ [W]"
+#		LogY
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "offset: -0.5"
+			file CAS_OFFSET-0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.5e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.4"
+			file CAS_OFFSET-0.4/xphi_last.txt
+			columns (1e6*($1-5e-6+0.4e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.3"
+			file CAS_OFFSET-0.3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.3e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.2"
+			file CAS_OFFSET-0.2_TIMESTEP2e-07/xphi_last.txt
+			columns (1e6*($1-5e-6+0.2e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "offset: -0.1"
+			file CAS_OFFSET-0.1/xphi_last.txt
+			columns (1e6*($1-5e-6+0.1e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 1
+		}
+		Curve {
+			legend "offset: 0"
+			file CAS_OFFSET0.0/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.1"
+			file CAS_OFFSET0.1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.1e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.2"
+			file CAS_OFFSET0.2_TIMESTEP1e-07/xphi_last.txt
+			columns (1e6*($1-5e-6-0.2e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.3"
+			file CAS_OFFSET0.3/xphi_last.txt
+			columns (1e6*($1-5e-6-0.3e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.4"
+			file CAS_OFFSET0.4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.4e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "offset: 0.5"
+			file CAS_OFFSET0.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.5e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+}
+
+Chapter {
+	Title "Mesh convergence study"
+	Description "Effect of mesh convergence." <<EOF
+\latex_(The analytical solution is given by : 
+\[ T_{ana} = \Delta T \left(1-\theta/\theta_0 \right)\] where $\theta$ is the angular coordinate of cylindrical coordinates and $\theta_0$ is the contact angle.
+Errors are not computed in mixed cells (crossed by the interface), nor in the vapor obviously. 
+The definition of $T_l$ in mixed cells should be clarified.
+\latex_) EOF
+	
+	visu {
+		Title "Temperature Difference : dT = Tl - Tana"
+		nb_img_without_newline 3
+		Width 5cm
+#		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
+		Origin Visit
+		mesh REF/lata/post.lata dom
+		mesh REF/lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+		Operator no_databaseinfo
+		Pseudocolor_with_range REF/lata/post.lata dom dT ELEM min max
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	visu {
+#		Title "Temperature Difference : dT = Tl - Tana"
+#		nb_img_without_newline 1
+		Width 5cm
+#		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
+		Origin Visit
+#		mesh CAS_REFINE2/lata/post.lata dom
+		mesh CAS_REFINE2/lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+		Operator no_databaseinfo
+		Pseudocolor_with_range CAS_REFINE2/lata/post.lata dom dT ELEM min max
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	visu {
+#		Title "Temperature Difference : dT = Tl - Tana"
+#		nb_img_without_newline 1
+		Width 5cm
+#		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
+		Origin Visit
+#		mesh CAS_REFINE4/lata/post.lata dom
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+		Operator no_databaseinfo
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM min max
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	visu {
+#		Title "Temperature Difference : dT = Tl - Tana"
+		nb_img_without_newline 2
+		Width 5cm
+#		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
+		Origin Visit
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
+#		Operator_to_all no_legend
+#		Operator no_databaseinfo
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM min max
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	visu {
+#		Title "Temperature Difference : dT = Tl - Tana"
+#		nb_img_without_newline 1
+		Width 5cm
+#		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(eq(INDICATRICE_INTERF_ELEM_dom,1), TEMPERATURE_THERMIQUE_ELEM_dom, 0.)")
+		instruction_visit DefineScalarExpression("Tana_ELEM_dom", "if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0),7.*(1-180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9)/50))*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		instruction_visit DefineScalarExpression("theta", "180/3.14159*atan(coord(dom)[1]/(abs(coord(dom)[0]-5.e-6-(0.0e-6))+1.e-9) )")
+		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
+		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
+		Origin Visit
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM -0.01 0.01
+		cycles -1
+		normal3D 0. 0. 1. 
+		up3D 0. 1 0.
+	}
+	Description "Some curves now."
+	
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "refine: 0.25 (coarsest)"
+			file CAS_REFINE0.25/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 0.5"
+			file CAS_REFINE0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 1 (ref)"
+			file CAS_REFINE1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 2"
+			file CAS_REFINE2/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 4"
+			file CAS_REFINE4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 3.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "refine: 0.25 (coarsest)"
+			file CAS_REFINE0.25/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 0.5"
+			file CAS_REFINE0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 1 (ref)"
+			file CAS_REFINE1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 2"
+			file CAS_REFINE2/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 4"
+			file CAS_REFINE4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
+	}
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) integrated flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "refine: 0.25 (coarsest)"
+			file CAS_REFINE0.25/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 0.5"
+			file CAS_REFINE0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 1 (ref)"
+			file CAS_REFINE1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 2"
+			file CAS_REFINE2/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 4"
+			file CAS_REFINE4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 3.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "refine: 0.25 (coarsest)"
+			file CAS_REFINE0.25/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 0.5"
+			file CAS_REFINE0.5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "refine: 1 (ref)"
+			file CAS_REFINE1/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 2"
+			file CAS_REFINE2/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "refine: 4"
+			file CAS_REFINE4/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
+	}
+}
+
+Chapter {
+	Title "Effect of the microscopic contact angle"
+	Description "The microscopic contact angle is varied from 5 to 90 degrees."
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "angle: 5"
+			file CAS_ANGLE5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 6
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 10"
+			file CAS_ANGLE10/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 15"
+			file CAS_ANGLE15/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 20"
+			file CAS_ANGLE20/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 30"
+			file CAS_ANGLE30/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 50 (ref)"
+			file CAS_ANGLE50/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 80"
+			file CAS_ANGLE80/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 90"
+			file CAS_ANGLE90/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "angle: 5"
+			file CAS_ANGLE5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 6
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 10"
+			file CAS_ANGLE10/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 15"
+			file CAS_ANGLE15/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 20"
+			file CAS_ANGLE20/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 30"
+			file CAS_ANGLE30/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 50 (ref)"
+			file CAS_ANGLE50/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 80"
+			file CAS_ANGLE80/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 90"
+			file CAS_ANGLE90/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) integrated flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "angle: 5"
+			file CAS_ANGLE5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 6
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 10"
+			file CAS_ANGLE10/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 15"
+			file CAS_ANGLE15/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 20"
+			file CAS_ANGLE20/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 30"
+			file CAS_ANGLE30/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 50 (ref)"
+			file CAS_ANGLE50/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 80"
+			file CAS_ANGLE80/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 90"
+			file CAS_ANGLE90/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 3.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "angle: 5"
+			file CAS_ANGLE5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 6
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 10"
+			file CAS_ANGLE10/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 5
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 15"
+			file CAS_ANGLE15/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "angle: 20"
+			file CAS_ANGLE20/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 30"
+			file CAS_ANGLE30/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 50 (ref)"
+			file CAS_ANGLE50/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 80"
+			file CAS_ANGLE80/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "angle: 90"
+			file CAS_ANGLE90/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+}
+
+Chapter {
+	Title "Effect of the wall overheat"
+	Description "The wall overheat is varied from 3 to 15$\deg C$."
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "DT: 3"
+			file CAS_DT3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 5"
+			file CAS_DT5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 15"
+			file CAS_DT15/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "DT: 3"
+			file CAS_DT3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 5"
+			file CAS_DT5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($2)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 15"
+			file CAS_DT15/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($2)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+		nb_img_without_newline 2
+		Title "(final) integrated flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 20.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "DT: 3"
+			file CAS_DT3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 5"
+			file CAS_DT5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 15"
+			file CAS_DT15/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+	Figure {
+#		nb_img_without_newline 1
+#		Title "(final) flux at the bottom wall"
+		Width 7.5cm
+		Dimension 2
+		RangeX 0 3.
+		LabelX "d [$\mu$m] (dist. from TCL)"
+		LabelY "$\phi$ [W/m²]"
+#		Logy
+		legend below title "at the bottom wall"
+		Include_Description_Curves 0
+		Curve {
+			legend "DT: 3"
+			file CAS_DT3/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 4
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 5"
+			file CAS_DT5/xphi_last.txt
+			columns (1e6*($1-5e-6+0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 2
+			PointSize 0
+		}
+		Curve {
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
+			columns (1e6*($1-5e-6-0.0e-6)) ($3)
+			Style linespoints
+			TypeLigne 1
+			LineWidth 2
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 2
+			LineWidth 1
+			PointSize 0.25
+		}
+		Curve {
+			legend "DT: 15"
+			file CAS_DT15/xphi_last.txt
+			columns (1e6*($1-5e-6-0.e-6)) ($3)
+			Style linespoints
+			TypeLigne 3
+			LineWidth 1
+			PointSize 0.25
+		}
+	}
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "The results showed for this case are very satisfying."
+}
+Chapter {
+	Title "Recommendations for users"
+	Description ""
+	Description ""
+	Description ""
+}

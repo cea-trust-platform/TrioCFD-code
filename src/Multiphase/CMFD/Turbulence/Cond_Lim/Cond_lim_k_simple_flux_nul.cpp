@@ -29,6 +29,7 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable(Cond_lim_k_simple_flux_nul,"Cond_lim_k_simple_flux_nul",Echange_global_impose_turbulent);
+// XD Cond_lim_k_simple_flux_nul condlim_base Cond_lim_k_simple_flux_nul 0 Adaptive wall law boundary condition for turbulent kinetic energy
 
 
 Sortie& Cond_lim_k_simple_flux_nul::printOn(Sortie& s ) const {return Echange_global_impose_turbulent::printOn(s);}
