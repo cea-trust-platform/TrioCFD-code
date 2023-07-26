@@ -1430,7 +1430,8 @@ Chapter {
 		instruction_visit VectorAttributes = VectorAttributes()
 		instruction_visit VectorAttributes.useStride = 0
 		instruction_visit VectorAttributes.nVectors = 800
-		instruction_visit VectorAttributes.colorByMag=0
+		instruction_visit try: VectorAttributes.colorByMagnitude=0
+		instruction_visit except: VectorAttributes.colorByMag=0
 		instruction_visit VectorAttributes.scale = 0.5
 		instruction_visit VectorAttributes.useLegend = 0
 		instruction_visit SetPlotOptions(VectorAttributes)
@@ -2414,7 +2415,8 @@ Chapter {
 		instruction_visit VectorAttributes = VectorAttributes()
 		instruction_visit VectorAttributes.useStride = 0
 		instruction_visit VectorAttributes.nVectors = 800
-		instruction_visit VectorAttributes.colorByMag=0
+		instruction_visit try: VectorAttributes.colorByMagnitude=0
+		instruction_visit except: VectorAttributes.colorByMag=0
 		instruction_visit VectorAttributes.scale = 0.5
 		instruction_visit VectorAttributes.useLegend = 0
 		instruction_visit SetPlotOptions(VectorAttributes)

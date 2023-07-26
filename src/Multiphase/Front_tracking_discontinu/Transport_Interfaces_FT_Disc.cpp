@@ -1657,9 +1657,19 @@ void Transport_Interfaces_FT_Disc::preparer_pas_de_temps(void)
 
 double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
 {
-  // We should think of implementing it as in eq. 16 for instance:
+  // TODO:
+// We should think of implementing it as in eq. 16 for instance:
   // https://hal.archives-ouvertes.fr/hal-02304125/document
   // and use the Lagrangian min edge length instead of Delta_x.
+  //
+  // Ou encore :
+  // Par ailleurs du fait de la contrainte sur le pas de temps capillaire (Popinet 2009) cette approche
+  // connait egalement des limites (Pierson 2021). En effet, quand les films deviennent suffisamment minces,
+  // et que les cellules composant le film sont suffisamment petites, le pas de temps necessaire au calcul
+  // decroit drastiquement, comme la taille des cellules a la puissance trois-demi.
+  // Pierson, J. (2021). Numerical study of drop bouncing on a fluid-fluid interface. ICTAM, Milan.
+  // Popinet, S. (2020). A vertically-Lagrangian, non-hydrostatic, multilayer model for multiscale free-surface flows. Journal of Computational Physics, 109609
+  //
   return DMAXFLOAT;
 }
 
@@ -2536,13 +2546,13 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
             const DoubleTab& interfacial_area = ns.get_interfacial_area();
             const DoubleTab& normale_elements = get_update_normale_interface().valeurs();
 
-            const int vef = (ns.inconnue().valeurs().nb_dim() == 2);
+            const int dim = ns.inconnue().valeurs().line_size();
+            const int vef = (dim == 2);
             if (vef)
               {
                 Cerr << "Code never applied or checked in VEF. You should read the algo first and assess it!" << finl;
                 Process::exit();
               }
-            const int dim = ns.inconnue().valeurs().line_size();
             // On fait la moyenne des 2 valeurs calculees sur les voisins
             // ATTENTION, ici on veut la valeur de chiv (cad chi_0) a la face.
             for (int face = 0; face < nfaces; face++)
@@ -2577,12 +2587,12 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
                                         const double nx = normale_elements(elem, j);
                                         // produit scalaire :
                                         x +=  nf*nx;
-                                        x *= ai/surface;
-                                        // Que/comment Choisir?
-                                        indic_face += x;
-                                        Cerr << "Never tested. To be verified. It should depend on a scalar product with the vect (xp-xv)" << finl;
-                                        Process::exit();
                                       }
+                                    x *= ai/surface;
+                                    // Que/comment Choisir?
+                                    indic_face += x;
+                                    Cerr << "Never tested. To be verified. It should depend on a scalar product with the vect (xp-xv)" << finl;
+                                    Process::exit();
                                   }
                                 else
                                   {
@@ -7673,6 +7683,11 @@ const Maillage_FT_Disc& Transport_Interfaces_FT_Disc::maillage_interface_pour_po
 {
   //return variables_internes_->maillage_pour_post;
   return maillage_interface();
+}
+
+const int& Transport_Interfaces_FT_Disc::get_n_iterations_distance() const
+{
+  return variables_internes_->n_iterations_distance;
 }
 
 /*! @brief Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements

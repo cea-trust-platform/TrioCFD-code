@@ -2,10 +2,10 @@ Parameters {
 	Title "Tests remaillage front-tracking"
 	Description "Test de la conservation du volume lors du remaillage"
 	Author "B.M."
-	TestCase "FTD_remaillage_vdf" "FTD_remaillage_vdf.data"
-	TestCase "FTD_remaillage_vdf" "PAR_FTD_remaillage_vdf.data" 4
-	TestCase "FTD_remaillage_vef" "FTD_remaillage_vef.data"
-	TestCase "FTD_remaillage_vef" "PAR_FTD_remaillage_vef.data" 4
+	TestCase "FTD_remaillage_vdf_SEQ" "FTD_remaillage_vdf.data"
+	TestCase "FTD_remaillage_vdf_PAR" "PAR_FTD_remaillage_vdf.data" 4
+	TestCase "FTD_remaillage_vef_SEQ" "FTD_remaillage_vef.data"
+	TestCase "FTD_remaillage_vef_PAR" "PAR_FTD_remaillage_vef.data" 4
 	Prerequisite "./extrait_volumes.sh"
 }
 
@@ -65,8 +65,8 @@ Figure {
 }
 visu {
 	Title "maillage avant et apres remaillage global"
-	mesh ./FTD_remaillage_vdf/lata/post.lata INTERFACES
-	mesh ./FTD_remaillage_vdf/lata/par_post.lata INTERFACES
+	mesh ./FTD_remaillage_vdf_SEQ/lata/post.lata INTERFACES
+	mesh ./FTD_remaillage_vdf_PAR/lata/par_post.lata INTERFACES
 	instruction_visit SetActivePlots((0))
 	instruction_visit m=MeshAttributes()
 	instruction_visit m.opaqueMode=m.Off
@@ -75,7 +75,8 @@ visu {
 	instruction_visit SetActivePlots((1))
 	instruction_visit m2=MeshAttributes()
 	instruction_visit m2.opaqueMode=m2.Off
-	instruction_visit m2.foregroundFlag=0
+	instruction_visit try: m2.meshColorSource=m2.MeshCustom
+	instruction_visit except: m2.foregroundFlag=0
 	instruction_visit m2.meshColor=(255,0,0,255)
 	instruction_visit SetPlotOptions(m2)
 	normal3D 0. 1. 0.

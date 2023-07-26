@@ -60,7 +60,17 @@ source ./env_TrioCFD.sh
 
 To check:
 ```bash
+# All non-regression test cases:
 make check_optim
+
+# A given non-regression test list
+make check_optim TESTLIST="./share/testList/{nameOfTheTestList}"
+
+# All validation report (warning it may take many days !):
+make validation
+
+# A given list of validation reports
+make validation TESTLIST="./share/testList/{nameOfTheValidationList}
 ```
 
 To see documentation:

@@ -64,7 +64,7 @@ else:
 
 for txt in l:
    ret = DefineScalarExpression("err_%s"%txt, "abs(ANA_%s_ELEM_DOM-%s_ELEM_DOM)"%(txt,txt))
-   print ret
+   print(ret)
    errs.append("err_%s"%txt)
    pass
 
@@ -111,7 +111,7 @@ for nor in ["max","L2"]:
    pass
 
 
-print Linf
-print L2
+print(Linf)
+print(L2)
 
 exit(0)

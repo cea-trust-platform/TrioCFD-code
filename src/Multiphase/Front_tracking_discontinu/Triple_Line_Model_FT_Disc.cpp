@@ -528,13 +528,49 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
   // We should have found 2 intersections in the end:
   if (nint != 2)
     {
-      Cerr << "Wrong number of intersections " << nint << finl;
       if (nint > 2)
         {
+          Cerr << "Too many intersections " << nint << " -> trying to suppress duplicates" << finl;
           Cerr << "Too many points, maybe a FT sommet was close to a border and is counted twice" << finl;
-          // TODO : il faut trier, supprimer le/les doublons et decrementer le nint.
+          Cerr << "Intersections are: " << finl;
+          for (int i=0; i<nint; i++)
+            Cerr << xint[i] << " " << yint[i] << finl;
+          Cerr << "In cell: " << elem << " at : " << finl;
+          Cerr << "x in : " << lface_dis << " " << lface_dis << finl;
+          Cerr << "y in : " << bface_dis << " " << tface_dis << finl;
+          for (int i=0; i<nint-1; i++)
+            {
+              for (int i2=0; i2<nint; i2++)
+                {
+                  double dist = std::sqrt(pow(xint[i]-xint[i2],2) +pow(yint[i]-yint[i2],2));
+                  if (dist < Objet_U::precision_geom)
+                    {
+                      // Ce sont les memes points :
+                      if (i2!= nint)
+                        {
+                          // Ce n'est pas le dernier point. On met le dernier point a la place de i2 puis on refait i2:
+                          xint[i2] = xint[nint-1];
+                          yint[i2] = yint[nint-1];
+                        }
+                      // On supprime donc le dernier:
+                      nint--;
+                    }
+                }
+            }
         }
-      Process::exit();
+      if (nint > 2)
+        {
+          Cerr << "Wrong number of intersections " << nint << finl;
+          Cerr << "STILL Too many points, maybe a FT sommet was close to a border and is counted twice" << finl;
+          Cerr << "Intersections are: " << finl;
+          for (int i=0; i<nint; i++)
+            Cerr << xint[i] << " " << yint[i] << finl;
+          Cerr << "In cell: " << elem << "at : " << finl;
+          Cerr << "x in : " << lface_dis << " " << lface_dis << finl;
+          Cerr << "y in : " << bface_dis << " " << tface_dis << finl;
+          // TODO : le tri n'a pas fonctionne? trier, supprimer le/les doublons et decrementer le nint.
+          Process::exit();
+        }
     }
 
   if (surface_tot > 0.)

@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
+--------------------------------------------------------------------------------------------------
+30/06/23 (TrioCFD) Bug fix     : FT IJK - Fixing valgrind leak (uninitialized pointer)
+30/06/23 (TrioCFD) Portability : Fix some validation reports to use Visit v3.3.3
+19/06/23 (TRUST) Portability   : C++14 compilers are now mandatory so old GNU compilers (<5.0) are not supported anymore
+15/06/23 (TrioCFD) Bug fix     : FSI - Fix periodic boundary conditions in ALE module
+
+--------------------------------------------------------------------------------------------------
 Release notes version 1.9.2 : Enhancements, modifications and corrected bugs since version 1.9.1 :
 --------------------------------------------------------------------------------------------------
 02/06/23 (TrioCFD) Doc         : CMFD - Documentation for drift velocities 
