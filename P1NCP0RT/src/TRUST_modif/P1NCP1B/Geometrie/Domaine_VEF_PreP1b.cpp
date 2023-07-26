@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Zone_VEF_PreP1b.h>
+#include <Domaine_VEF_PreP1b.h>
 #include <Domaine.h>
 #include <Scatter.h>
 #include <TRUSTLists.h>
@@ -31,19 +31,19 @@
 #include <VEFPreP1B.h>
 #include <Octree_Double.h>
 
-Implemente_instanciable_sans_constructeur(Zone_VEF_PreP1b,"Zone_VEFPreP1b",Zone_VEF);
+Implemente_instanciable_sans_constructeur(Domaine_VEF_PreP1b,"Domaine_VEFPreP1b",Domaine_VEF);
 
-Zone_VEF_PreP1b::Zone_VEF_PreP1b():P1Bulle(-1), alphaE(-1), alphaS(-1), alphaA(-1), alphaRT(-1), modif_div_face_dirichlet(-1),cl_pression_sommet_faible(-1) {}
+Domaine_VEF_PreP1b::Domaine_VEF_PreP1b():P1Bulle(-1), alphaE(-1), alphaS(-1), alphaA(-1), alphaRT(-1), modif_div_face_dirichlet(-1),cl_pression_sommet_faible(-1) {}
 
 // printOn et readOn
-Sortie& Zone_VEF_PreP1b::printOn(Sortie& s ) const
+Sortie& Domaine_VEF_PreP1b::printOn(Sortie& s ) const
 {
-  return Zone_VEF::printOn(s);
+  return Domaine_VEF::printOn(s);
 }
 
-Entree& Zone_VEF_PreP1b::readOn(Entree& is )
+Entree& Domaine_VEF_PreP1b::readOn(Entree& is )
 {
-  return Zone_VEF::readOn(is);
+  return Domaine_VEF::readOn(is);
 }
 
 /*! @brief Les volumes calcules dans discretiser() ne tiennent pas compte de la periodicite.
@@ -52,17 +52,17 @@ Entree& Zone_VEF_PreP1b::readOn(Entree& is )
  *   de tous les volumes des sommets "identiques" au sens de la periodicite.
  *
  */
-void Zone_VEF_PreP1b::discretiser()
+void Domaine_VEF_PreP1b::discretiser()
 {
-  Zone_VEF::discretiser();
+  Domaine_VEF::discretiser();
 
-  zone().domaine().creer_tableau_sommets(volumes_som, Array_base::NOCOPY_NOINIT);
+  domaine().creer_tableau_sommets(volumes_som, Array_base::NOCOPY_NOINIT);
 
   double coeff=1./3.;
   if (dimension==3)
     coeff=1./4.;
 
-  const IntTab& elements = zone().les_elems();
+  const IntTab& elements = domaine().les_elems();
   const int nb_som_elem = elements.dimension(1);
   // Boucle sur tous les elements car on ajoute des contributions aux sommets de joints:
   const int n = nb_elem_tot();
@@ -85,7 +85,7 @@ void Zone_VEF_PreP1b::discretiser()
   volumes_som.echange_espace_virtuel();
 }
 
-void Zone_VEF_PreP1b::discretiser_suite(const VEFPreP1B& discr)
+void Domaine_VEF_PreP1b::discretiser_suite(const VEFPreP1B& discr)
 {
   // Recuperation des parametres de la discretisation
   alphaE = discr.get_alphaE();
@@ -105,12 +105,12 @@ void Zone_VEF_PreP1b::discretiser_suite(const VEFPreP1B& discr)
     MD_Vector_composite md_p1b;
     if (alphaE)
       {
-        const MD_Vector& md = zone().md_vector_elements();
+        const MD_Vector& md = domaine().md_vector_elements();
         md_p1b.add_part(md, 0, "P0");
       }
     if (alphaS)
       {
-        const MD_Vector& md = zone().domaine().md_vector_sommets();
+        const MD_Vector& md = domaine().md_vector_sommets();
         md_p1b.add_part(md, 0, "P1");
       }
     if (alphaA)
@@ -120,19 +120,19 @@ void Zone_VEF_PreP1b::discretiser_suite(const VEFPreP1B& discr)
       }
     md_vector_p1b_.copy(md_p1b);
   }
-  Cerr << "La Zone_VEF_PreP1b a ete remplie avec succes" << finl;
+  Cerr << "La Domaine_VEF_PreP1b a ete remplie avec succes" << finl;
 }
 
-void Zone_VEF_PreP1b::discretiser_arete()
+void Domaine_VEF_PreP1b::discretiser_arete()
 {
-  const Domaine& dom = zone().domaine();
+  const Domaine& dom = domaine();
 
-  // Creation des aretes reelles (informations geometriques construites et stockees dans la zone)
-  zone().creer_aretes();
-  md_vector_aretes_ = zone().aretes_som().get_md_vector();
+  // Creation des aretes reelles (informations geometriques construites et stockees dans la domaine)
+  domaine().creer_aretes();
+  md_vector_aretes_ = domaine().aretes_som().get_md_vector();
 
-  // Calcul des centres de gravite des aretes xa_ stockes dans la Zone_VF
-  const IntTab& aretes_som = zone().aretes_som();
+  // Calcul des centres de gravite des aretes xa_ stockes dans la Domaine_VF
+  const IntTab& aretes_som = domaine().aretes_som();
   const int nb_aretes = aretes_som.dimension(0);
   const DoubleTab& coord = dom.les_sommets();
   const int dim = coord.dimension(1);
@@ -147,13 +147,13 @@ void Zone_VEF_PreP1b::discretiser_arete()
     }
   xa_.echange_espace_virtuel();
 
-  const IntTab& elem_aretes = zone().elem_aretes();
+  const IntTab& elem_aretes = domaine().elem_aretes();
 
   // Calcul du volume des aretes
   // Creation d'un tableau initialise a zero:
   creer_tableau_aretes(volumes_aretes);
 
-  const int nbr_elem = zone().nb_elem();
+  const int nbr_elem = domaine().nb_elem();
   const int nb_aretes_elem = elem_aretes.dimension(1);
   // facteur 6 pour le calcul des volumes des aretes, est-ce correct pour autre chose qu'un tetra ?
   assert(nb_aretes_elem == 6);
@@ -215,13 +215,13 @@ static int next(int S,
 
 
 
-void Zone_VEF_PreP1b::modifier_pour_Cl(const Conds_lim& conds_lim)
+void Domaine_VEF_PreP1b::modifier_pour_Cl(const Conds_lim& conds_lim)
 {
-  Zone_VEF::modifier_pour_Cl(conds_lim);
+  Domaine_VEF::modifier_pour_Cl(conds_lim);
   static DoubleVect* ptr=0;
   if(ptr!=&volumes_som)
     {
-      const Domaine& dom=zone().domaine();
+      const Domaine& dom=domaine();
       int i;
       const int ns = nb_som();
       for(i=0; i<ns; i++)
@@ -244,7 +244,7 @@ void Zone_VEF_PreP1b::modifier_pour_Cl(const Conds_lim& conds_lim)
   if (Debog::active())
     {
       IntVect tmp;
-      const Domaine& dom = zone().domaine();
+      const Domaine& dom = domaine();
       dom.creer_tableau_sommets(tmp, Array_base::NOCOPY_NOINIT);
       const int n = tmp.size_array();
       for (int i=0; i<n; i++)
@@ -279,20 +279,20 @@ void Zone_VEF_PreP1b::modifier_pour_Cl(const Conds_lim& conds_lim)
     }// fin if 3D
 }
 
-void exemple_champ_non_homogene(const Zone_VEF_PreP1b& zone_VEF, DoubleTab& tab)
+void exemple_champ_non_homogene(const Domaine_VEF_PreP1b& domaine_VEF, DoubleTab& tab)
 {
-  const DoubleTab& xp = zone_VEF.xp();
-  const Zone& zone=zone_VEF.zone();
-  const DoubleTab& coord=zone.domaine().coord_sommets();
-  const DoubleTab& xa=zone_VEF.xa();
-  const ArrOfInt& renum_arete_perio=zone_VEF.get_renum_arete_perio();
+  const DoubleTab& xp = domaine_VEF.xp();
+  const Domaine& domaine=domaine_VEF.domaine();
+  const DoubleTab& coord=domaine.coord_sommets();
+  const DoubleTab& xa=domaine_VEF.xa();
+  const ArrOfInt& renum_arete_perio=domaine_VEF.get_renum_arete_perio();
   // Verification du tableau xa des coordonnees arete
   if (xa.size_array()) Debog::verifier("xa=",xa);
-  int nb_elem=zone.nb_elem();
-  int nb_elem_tot=zone.nb_elem_tot();
-  int nb_som=zone.nb_som();
-  int nb_som_tot=zone.nb_som_tot();
-  int nb_aretes=zone.nb_aretes();
+  int nb_elem=domaine.nb_elem();
+  int nb_elem_tot=domaine.nb_elem_tot();
+  int nb_som=domaine.nb_som();
+  int nb_som_tot=domaine.nb_som_tot();
+  int nb_aretes=domaine.nb_aretes();
   for (int I=0 ; I<nb_elem; I++)
     {
       tab(I)=(1.1+xp(I,0))*(1.1+2*xp(I,1));
@@ -303,11 +303,11 @@ void exemple_champ_non_homogene(const Zone_VEF_PreP1b& zone_VEF, DoubleTab& tab)
       tab(nb_elem_tot+I)=(1.1+coord(I,0))*(1.1+2*coord(I,1));
       if (Objet_U::dimension==3) tab(nb_elem_tot+I)*=(1.1+3*coord(I,2));
       // On applique la periodicite:
-      tab(nb_elem_tot+I)=tab(nb_elem_tot+zone.domaine().get_renum_som_perio(I));
+      tab(nb_elem_tot+I)=tab(nb_elem_tot+domaine.get_renum_som_perio(I));
     }
 
 #ifndef NDEBUG
-  const IntVect& ok_arete = zone_VEF.get_ok_arete();
+  const IntVect& ok_arete = domaine_VEF.get_ok_arete();
 #endif
   for (int I=0; I<nb_aretes; I++)
     {
@@ -320,11 +320,11 @@ void exemple_champ_non_homogene(const Zone_VEF_PreP1b& zone_VEF, DoubleTab& tab)
   tab.echange_espace_virtuel();
 }
 
-void Zone_VEF_PreP1b::construire_ok_arete()
+void Domaine_VEF_PreP1b::construire_ok_arete()
 {
   Cerr << "Build array ok_arete..." << finl;
-  const Domaine& dom=zone().domaine();
-  const IntTab& aretes_som=zone().aretes_som();
+  const Domaine& dom=domaine();
+  const IntTab& aretes_som=domaine().aretes_som();
   const int nb_som_reel=nb_som();
 
   // Connectivite sommets-aretes (pour chaque sommet, liste des aretes adjacentes)
@@ -383,12 +383,12 @@ void Zone_VEF_PreP1b::construire_ok_arete()
       }
   }
 
-  // Estimation du nombre d'aretes superflues a trouver sur la zone
+  // Estimation du nombre d'aretes superflues a trouver sur la domaine
   // en comptant les sommets reels non periodiques dont le contenu vaut 0
-  int nombre_aretes_superflues_prevues_sur_la_zone=0;
+  int nombre_aretes_superflues_prevues_sur_le_dom=0;
   for (int i=0; i<nb_som_reel; i++)
     if (i==dom.get_renum_som_perio(i) && contenu[i]==0)
-      nombre_aretes_superflues_prevues_sur_la_zone++;
+      nombre_aretes_superflues_prevues_sur_le_dom++;
 
   ok_arete = -1;
 
@@ -462,12 +462,12 @@ void Zone_VEF_PreP1b::construire_ok_arete()
   ok_arete.echange_espace_virtuel();
 
   // Verification des aretes superflues
-  verifie_ok_arete(nombre_aretes_superflues_prevues_sur_la_zone);
+  verifie_ok_arete(nombre_aretes_superflues_prevues_sur_le_dom);
 
   // Ecriture des aretes superflues dans un fichier nom_du_cas.ok_arete afin de le relire la fois suivante
   Nom fichier(nom_du_cas());
   fichier+="_";
-  fichier+=zone().domaine().le_nom()+".ok_arete";
+  fichier+=domaine().le_nom()+".ok_arete";
 
   Cerr << "Writing file " << fichier << finl;
   EcrFicPartageBin fic_ok_arete_;
@@ -496,19 +496,19 @@ void Zone_VEF_PreP1b::construire_ok_arete()
   fic_ok_arete_.close();
 }
 
-void Zone_VEF_PreP1b::construire_renum_arete_perio(const Conds_lim& conds_lim)
+void Domaine_VEF_PreP1b::construire_renum_arete_perio(const Conds_lim& conds_lim)
 {
   Cerr << "Build array renum_arete_perio..." << finl;
-  const IntTab& aretes_som=zone().aretes_som();
-  const int nb_aretes_tot=zone().nb_aretes_tot();
-  const Domaine& dom=zone().domaine();
+  const IntTab& aretes_som=domaine().aretes_som();
+  const int nb_aretes_tot=domaine().nb_aretes_tot();
+  const Domaine& dom=domaine();
 
   // Initialisation de renum_arete_perio
   renum_arete_perio.resize_array(nb_aretes_tot);
   for (int i=0; i<nb_aretes_tot; i++)
     renum_arete_perio[i]=i;
 
-  const IntTab& elem_aretes=zone().elem_aretes();
+  const IntTab& elem_aretes=domaine().elem_aretes();
   ArrOfInt aretes1(6);
   ArrOfInt aretes2(6);
   // Premiere etape: faire pointer tous les aretes periodiques liees entre elles vers la meme arete
@@ -551,7 +551,7 @@ void Zone_VEF_PreP1b::construire_renum_arete_perio(const Conds_lim& conds_lim)
                     int som11=aretes_som(ar1, 0);
                     int som12=aretes_som(ar1, 1);
                     int ok=0;
-                    int nbf = zone().type_elem().nb_som_face();
+                    int nbf = domaine().type_elem().nb_som_face();
                     const IntTab& sommet = face_sommets();
                     for (int k=0; k<nbf; k++)
                       if (sommet(face,k)==som11 || sommet(face,k)==som12) ok++;
@@ -668,7 +668,7 @@ void Zone_VEF_PreP1b::construire_renum_arete_perio(const Conds_lim& conds_lim)
   */
 }
 
-void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_la_zone) const
+void Domaine_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_dom) const
 {
   Cerr << "Check array ok_arete..." << finl;
   // Algorithme de verification du tableau des aretes superflues
@@ -677,9 +677,9 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
   // ...
   // contenu doit contenir uniquement 2 ce qui implique que tous les
   // sommets ont ete analyses.
-  const Domaine& dom=zone().domaine();
+  const Domaine& dom=domaine();
   const int nb_som_reel=nb_som();
-  const IntTab& aretes_som=zone().aretes_som();
+  const IntTab& aretes_som=domaine().aretes_som();
   int nb_aretes_pour_verbose=60; // Pour verbose
   ArrOfInt sommet_relie_arete_superflue(nb_som_reel);
   sommet_relie_arete_superflue=0;
@@ -689,8 +689,8 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
 
   double nombre_aretes_reelles_superflues=0;
   // On parcourt toutes les aretes mais on ne regarde que les sommets reels
-  int nb_aretes_tot=zone().nb_aretes_tot();
-  int nb_aretes_reelles=zone().nb_aretes();
+  int nb_aretes_tot=domaine().nb_aretes_tot();
+  int nb_aretes_reelles=domaine().nb_aretes();
   for (int i=0; i<nb_aretes_tot; i++)
     {
       if (!ok_arete(i)) // arete superflue
@@ -716,11 +716,11 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
                 }
               int aretes_superflues_communes=1;
               // Si l'arete superflue est commune on en tient compte
-              for (int j=0; j<dom.zone(0).faces_joint().size(); j++)
+              for (int j=0; j<dom.faces_joint().size(); j++)
                 {
-                  int nb_aretes_sur_le_joint = dom.zone(0).faces_joint()(j).joint_item(Joint::ARETE).items_communs().size_array();
+                  int nb_aretes_sur_le_joint = dom.faces_joint()(j).joint_item(Joint::ARETE).items_communs().size_array();
                   for (int k=0; k<nb_aretes_sur_le_joint; k++)
-                    if (dom.zone(0).faces_joint()(j).joint_item(Joint::ARETE).items_communs()[k]==i) aretes_superflues_communes++;
+                    if (dom.faces_joint()(j).joint_item(Joint::ARETE).items_communs()[k]==i) aretes_superflues_communes++;
                 }
               // On compte les aretes reelles superflues
               if (i<nb_aretes_reelles)
@@ -744,13 +744,13 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
       {
         int sommets_communs=1;
         // On tient compte des sommets communs
-        for (int j=0; j<dom.zone(0).faces_joint().size(); j++)
-          for (int k=0; k<dom.zone(0).faces_joint()(j).joint_item(Joint::SOMMET).items_communs().size_array(); k++)
-            if (dom.zone(0).faces_joint()(j).joint_item(Joint::SOMMET).items_communs()[k]==i) sommets_communs++;
+        for (int j=0; j<dom.faces_joint().size(); j++)
+          for (int k=0; k<dom.faces_joint()(j).joint_item(Joint::SOMMET).items_communs().size_array(); k++)
+            if (dom.faces_joint()(j).joint_item(Joint::SOMMET).items_communs()[k]==i) sommets_communs++;
         nb_sommets_non_periodiques+=1./sommets_communs;
       }
   double total_nombre_aretes_superflues=mp_sum(nombre_aretes_reelles_superflues);
-  double somme_nombre_aretes_superflues_prevues_par_zone=mp_sum(nombre_aretes_superflues_prevues_sur_la_zone);
+  double somme_nombre_aretes_superflues_prevues_par_domaine=mp_sum(nombre_aretes_superflues_prevues_sur_le_dom);
   double total_nb_sommets_non_periodiques=mp_sum(nb_sommets_non_periodiques);
 
 
@@ -775,20 +775,20 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
   // Cerr << "Nombre d'aretes non superflues periodiques  =  " << nb_aretes_periodiques-nb_aretes_perio_superflues << finl;
 
   if (Process::nproc()==1) // On se limite au sequentiel car il y'a un soucis pour le calcul de total_nombre_aretes_superflues (les items communs pour les aretes n'est pas construit!)
-    if (!est_egal(somme_nombre_aretes_superflues_prevues_par_zone,total_nombre_aretes_superflues) && je_suis_maitre())
+    if (!est_egal(somme_nombre_aretes_superflues_prevues_par_domaine,total_nombre_aretes_superflues) && je_suis_maitre())
       {
-        Cerr << "La somme des aretes superflues prevues par zone n'est pas egale au nombre d'aretes superflues trouvees sur le domaine." << finl;
-        Cerr << somme_nombre_aretes_superflues_prevues_par_zone << " != " << total_nombre_aretes_superflues << finl;
+        Cerr << "La somme des aretes superflues prevues par domaine n'est pas egale au nombre d'aretes superflues trouvees sur le domaine." << finl;
+        Cerr << somme_nombre_aretes_superflues_prevues_par_domaine << " != " << total_nombre_aretes_superflues << finl;
         Process::exit();
       }
   if (Process::je_suis_maitre())
     {
-      Cerr << "Nombre total d'aretes superflues: " << somme_nombre_aretes_superflues_prevues_par_zone << finl;
+      Cerr << "Nombre total d'aretes superflues: " << somme_nombre_aretes_superflues_prevues_par_domaine << finl;
       Cerr << "Nombre total de sommets non periodiques = " << total_nb_sommets_non_periodiques << finl;
       Cerr << "Verification de l'egalite du nombre total d'aretes superflues et du nombre total de sommets: ";
     }
   // Verification que le nombre d'aretes superflues et egal au nombre de sommets
-  if (!est_egal(somme_nombre_aretes_superflues_prevues_par_zone,total_nb_sommets_non_periodiques) && je_suis_maitre())
+  if (!est_egal(somme_nombre_aretes_superflues_prevues_par_domaine,total_nb_sommets_non_periodiques) && je_suis_maitre())
     {
       Cerr << "Non correspondance. Echec de l'algorithme de recherche des aretes superflues." << finl;
       Process::exit();
@@ -800,11 +800,11 @@ void Zone_VEF_PreP1b::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_
 //  1: ok
 //  0: fichier inexistant
 //  -1: fichier existe mais pas le bon nombre d'aretes
-int Zone_VEF_PreP1b::lecture_ok_arete()
+int Domaine_VEF_PreP1b::lecture_ok_arete()
 {
   Nom fichier(nom_du_cas());
   fichier+="_";
-  fichier+=zone().domaine().le_nom()+".ok_arete";
+  fichier+=domaine().le_nom()+".ok_arete";
 
   Cerr << "Trying to read file " << fichier << " (edges to remove from the set of degrees of freedom)" << finl;
   EFichierBin fic_ok_arete_;
@@ -871,7 +871,7 @@ int Zone_VEF_PreP1b::lecture_ok_arete()
   return 1;
 }
 
-void Zone_VEF_PreP1b::creer_tableau_p1bulle(Array_base& x, Array_base::Resize_Options opt) const
+void Domaine_VEF_PreP1b::creer_tableau_p1bulle(Array_base& x, Array_base::Resize_Options opt) const
 {
   const MD_Vector& md = md_vector_p1b();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);

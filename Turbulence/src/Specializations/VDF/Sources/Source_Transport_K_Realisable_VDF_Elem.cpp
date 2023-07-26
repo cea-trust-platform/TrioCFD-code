@@ -43,14 +43,14 @@ void Source_Transport_K_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, 
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const DoubleTab& visco_turb = eqn_k_Rea->modele_turbulence().viscosite_turbulente().valeurs();
-  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   DoubleTrav P(visco_turb);
 
-  if (axi) calculer_terme_production_K_BiK_Axi(la_zone_VDF.valeur(),vitesse,P,K_Rea,visco_turb);
-  else calculer_terme_production_K_BiK(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_Rea,vit,vitesse,visco_turb);
+  if (axi) calculer_terme_production_K_BiK_Axi(le_dom_VDF.valeur(),vitesse,P,K_Rea,visco_turb);
+  else calculer_terme_production_K_BiK(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K_Rea,vit,vitesse,visco_turb);
   P.echange_espace_virtuel();
 
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) secmem(elem) += ( P(elem)-eps_Rea(elem) )*volumes(elem)*porosite_vol(elem);
+  for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++) secmem(elem) += ( P(elem)-eps_Rea(elem) )*volumes(elem)*porosite_vol(elem);
 
 }
 
@@ -59,7 +59,7 @@ void Source_Transport_K_Realisable_VDF_Elem::mettre_a_jour(double temps)
   const DoubleTab& K_Rea  = eqn_k_Rea->inconnue().valeurs(), &eps_Rea  = eqn_eps_Rea->inconnue().valeurs(), &vit  = eq_hydraulique->inconnue().valeurs();
   const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_LeEPS_MIN();
   Modele_Fonc_Realisable_base& mon_modele_fonc = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence()).associe_modele_fonction();
-  mon_modele_fonc.Contributions_Sources_BiK(eqn_k_Rea ->zone_dis(),eqn_k_Rea->zone_Cl_dis(),vit,K_Rea,eps_Rea,epsilon_minimum);
+  mon_modele_fonc.Contributions_Sources_BiK(eqn_k_Rea ->domaine_dis(),eqn_k_Rea->domaine_Cl_dis(),vit,K_Rea,eps_Rea,epsilon_minimum);
   Source_Transport_Realisable_VDF_Elem_base::mettre_a_jour(temps);
 }
 

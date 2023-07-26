@@ -27,7 +27,7 @@
 
 
 #include <Prolongement_base.h>
-class Zone_VF;
+class Domaine_VF;
 class Frontiere;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
@@ -48,12 +48,12 @@ class Prolongement_elem_elem_complet : public Prolongement_base
 public:
 
   //inline DoubleTab& distances();
-  void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+  void prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                  const Frontiere& frontF,IntVect& connect,
                  const DoubleTab& incoG,
                  DoubleTab& tab, int nb_comp) override;
-  void calculer(Zone_VF& zonef,
-                Zone_VF& zoneg,
+  void calculer(Domaine_VF& domainef,
+                Domaine_VF& domaineg,
                 IntVect& connect_ff) override;
 
 private:

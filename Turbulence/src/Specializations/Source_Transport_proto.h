@@ -22,13 +22,14 @@
 #ifndef Source_Transport_proto_included
 #define Source_Transport_proto_included
 
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Champ_Don.h>
 #include <Source_base.h>
+#include <TRUST_Ref.h>
 
+class Convection_Diffusion_Concentration;
+class Convection_Diffusion_Temperature;
+class Champ_Don_base;
+class Equation_base;
+class Champ_Don;
 class Modele_Fonc_Realisable_base;
 class Modele_Fonc_Bas_Reynolds;
 class Fluide_base;
@@ -67,7 +68,9 @@ protected:
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
   static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Pour realisable, Chabard et N3S
   static constexpr double C11__ = 1.55, C21__ = 2.; // pour Bas Re !
+  static constexpr int interpolation_viscosite_turbulente__ = 0; // moyenne arithmetique par defaut
   double C1 = C1__, C2 = C2__, C3 = C3__;
+  int _interpolation_viscosite_turbulente = interpolation_viscosite_turbulente__;
 
   REF(Champ_Don) beta_t, beta_c;
   REF(Champ_Don_base) gravite;

@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Sauvegarde_Reprise_Maillage_FT.h>
 #include <Maillage_FT_Disc.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <communications.h>
 #include <Array_tools.h>
 #include <Domaine.h>
@@ -56,7 +56,7 @@ void ecrire_tableau(Sortie& os, const ArrOfInt& tab)
   os.syncfile();
 }
 
-void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, const Zone_VF& zone_vf, Sortie& fichier)
+void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, const Domaine_VF& domaine_vf, Sortie& fichier)
 {
   if (Process::je_suis_maitre())
     fichier << mesh.temps_physique_ << finl;
@@ -79,7 +79,7 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
   coord_elem.resize(nb_sommets, dim);
   coord_som.resize(nb_sommets, dim);
   num_face_bord.resize_array(nb_sommets);
-  const DoubleTab& xp = zone_vf.xp();
+  const DoubleTab& xp = domaine_vf.xp();
   // Compteur de sommets reels
   int nb_sommets_reels = 0;
   int i, j;
@@ -99,8 +99,8 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
       int i_face_bord = -1;
       if (face_bord >= 0)
         {
-          i_face_bord = zone_vf.numero_face_local(face_bord, indice_element);
-          assert(face_bord == zone_vf.elem_faces(indice_element, i_face_bord));
+          i_face_bord = domaine_vf.numero_face_local(face_bord, indice_element);
+          assert(face_bord == domaine_vf.elem_faces(indice_element, i_face_bord));
         }
       num_face_bord[nb_sommets_reels] = i_face_bord;
       indice_global_sommet[i] = nb_sommets_reels;
@@ -147,13 +147,13 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
 
 /*! @brief Remplissage du maillage mesh a partir d'un fichier de sauvegarde xyz (fichier) ou d'un domaine source (domaine_src pour importation d'une cao)
  *
- *   zone_vf est la zone support du maillage (pour calcul de l'indice de l'element contenant chaque
- *   sommet du mesh. zone_vf peut etre nul dans le cas d'une reprise xyz au cours de l'etape 'avancer'.
+ *   domaine_vf est la domaine support du maillage (pour calcul de l'indice de l'element contenant chaque
+ *   sommet du mesh. domaine_vf peut etre nul dans le cas d'une reprise xyz au cours de l'etape 'avancer'.
  *   Dans ce cas, on lit les coordonnees et les elements mais on ne remplit pas mesh.
  *
  */
 void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
-                                              const Zone_VF * zone_vf,
+                                              const Domaine_VF * domaine_vf,
                                               Entree * fichier,
                                               const Domaine * domaine_src)
 {
@@ -191,7 +191,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
   // Pour chaque sommet conserve, quel est son indice global
   ArrOfInt indice_global_sommet;
   indice_global_sommet.set_smart_resize(1);
-  const Zone * const zone = (zone_vf ? &zone_vf->zone() : 0);
+  const Domaine * const domaine = (domaine_vf ? &domaine_vf->domaine() : 0);
   // Lecture des indices des elements contenant le sommet
   int erreur_sommets_exterieurs = 0;
   {
@@ -201,7 +201,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     // tmp3 : -1 ou numero du processeur qui garde le sommet.
     ArrOfInt tmp3;
     int i = 0;
-    const int nb_elements_reels = (zone_vf ? zone->nb_elem() : 0);
+    const int nb_elements_reels = (domaine_vf ? domaine->nb_elem() : 0);
     while (i < nb_som_tot)
       {
         const int n_to_read = std::min(chunk_size, nb_som_tot - i);
@@ -221,9 +221,9 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
               for (int k = 0; k < dim; k++)
                 tmp(j, k) = coord(i+j, k);
           }
-        if (zone_vf)
+        if (domaine_vf)
           {
-            zone->chercher_elements(tmp, tmp2);
+            domaine->chercher_elements(tmp, tmp2);
             // Ne pas tenir compte des sommets dans les elements virtuels
             for (int j = 0; j < n_to_read; j++)
               if (tmp2[j] >= nb_elements_reels)
@@ -322,7 +322,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
               for (int k = 0; k < dim; k++)
                 tmp(j, k) = coord(i+j, k);
           }
-        if (zone_vf)
+        if (domaine_vf)
           {
             for (int j = 0; j < n_to_read; j++)
               {
@@ -337,7 +337,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
           }
         i += n_to_read;
       }
-    assert(zone_vf == 0 || i_sommet == mesh.nb_sommets());
+    assert(domaine_vf == 0 || i_sommet == mesh.nb_sommets());
   }
   // Lecture des faces de bord
   if (fichier)
@@ -348,14 +348,14 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
       int i_sommet = 0;
       ArrOfInt tmp;
       mesh.sommet_face_bord_.resize_array(nb_sommets_locaux);
-      const IntTab * elem_faces = (zone_vf ? &zone_vf->elem_faces() : 0);
-      const int nb_faces_bord = (zone ? zone->nb_faces_frontiere() : 0);
+      const IntTab * elem_faces = (domaine_vf ? &domaine_vf->elem_faces() : 0);
+      const int nb_faces_bord = (domaine ? domaine->nb_faces_frontiere() : 0);
       while (i < nb_som_tot)
         {
           const int n_to_read = std::min(chunk_size, nb_som_tot - i);
           tmp.resize_array(n_to_read);
           fichier->get(tmp.addr(), tmp.size_array());
-          if (zone_vf)
+          if (domaine_vf)
             {
               for (int j = 0; j < n_to_read; j++)
                 {
@@ -384,7 +384,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
             }
           i += n_to_read;
         }
-      assert(zone_vf == 0 || i_sommet == mesh.nb_sommets());
+      assert(domaine_vf == 0 || i_sommet == mesh.nb_sommets());
     }
   else
     {
@@ -405,8 +405,8 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
   else
     {
       // lecture cao : on utilise le domaine
-      nb_faces_tot = domaine_src->zone(0).nb_elem();
-      if (domaine_src->zone(0).les_elems().dimension(1) != dim)
+      nb_faces_tot = domaine_src->nb_elem();
+      if (domaine_src->les_elems().dimension(1) != dim)
         {
           Cerr << "Error in Sauvegarde_Reprise_Maillage_FT::lire_xyz : source domain elements have bad dimension" << finl;
           Process::exit();
@@ -425,12 +425,12 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
         else
           {
             // Copie des elements dans le domaine
-            const IntTab& elems = domaine_src->zone(0).les_elems();
+            const IntTab& elems = domaine_src->les_elems();
             for (int j = 0; j < n_to_read; j++)
               for (int k = 0; k < dim; k++)
                 tmp(j, k) = elems(i+j, k);
           }
-        if (zone_vf)
+        if (domaine_vf)
           {
             for (int j = 0; j < n_to_read; j++)
               {
@@ -451,7 +451,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
         i += n_to_read;
       }
   }
-  if (!zone_vf)
+  if (!domaine_vf)
     return;
 
   {

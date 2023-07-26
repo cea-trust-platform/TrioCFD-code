@@ -24,21 +24,19 @@
 #define Pb_Couple_Rayonnement_included
 
 #include <Probleme_Couple.h>
-#include <Ref_Modele_Rayonnement_base.h>
-
 #include <Modele_Rayonnement_base.h>
-#include <Ref_Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Cond_lim_base;
 
 class Schema_Temps_base;
 class Discretisation_base;
 
 class Pb_Couple_Rayonnement: public Probleme_Couple
 {
-
   Declare_instanciable(Pb_Couple_Rayonnement);
 
 public:
-
   void le_modele_rayo_associe(const Modele_Rayonnement_base&);
   void associer_cl_base(const Cond_lim_base& );
   int associer_(Objet_U&) override;
@@ -47,11 +45,9 @@ public:
   void initialize() override;
   inline Modele_Rayonnement_base& le_modele_rayo();
   inline Cond_lim_base& cond_l_base();
-  void discretiser(const Discretisation_base&) override;
   int postraiter(int force=1) override;
 
 protected:
-
   REF(Modele_Rayonnement_base) le_modele_de_rayo;
   REF(Cond_lim_base) les_cl;
 };

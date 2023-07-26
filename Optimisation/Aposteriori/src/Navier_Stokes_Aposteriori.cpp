@@ -79,17 +79,17 @@ const Champ_base& Navier_Stokes_Aposteriori::get_champ(const Motcle& nom) const
 
 void Navier_Stokes_Aposteriori::estimateur_aposteriori()
 {
-  const Zone_VEF_PreP1b& zone_vef = ref_cast(Zone_VEF_PreP1b, zone_dis().valeur());
-  const Zone_Cl_VEF& zone_cl_vef = ref_cast(Zone_Cl_VEF, zone_Cl_dis().valeur());
+  const Domaine_VEF_PreP1b& domaine_vef = ref_cast(Domaine_VEF_PreP1b, domaine_dis().valeur());
+  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur());
   estimateur_aposteriori_.typer("Estimateur_Aposteriori_P0_VEF");
   Estimateur_Aposteriori_P0_VEF& ch = ref_cast(Estimateur_Aposteriori_P0_VEF, estimateur_aposteriori_.valeur());
-  ch.associer_zone_dis_base(zone_vef);
+  ch.associer_domaine_dis_base(domaine_vef);
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, la_vitesse.valeur());
   const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, la_pression.valeur());
-  ch.associer_champ(vit, pres, diffusivite_pour_transport() /* viscosite_cinematique */, zone_cl_vef);
+  ch.associer_champ(vit, pres, diffusivite_pour_transport() /* viscosite_cinematique */, domaine_cl_vef);
   ch.nommer("estimateur_aposteriori");
   ch.fixer_nb_comp(1);
-  ch.fixer_nb_valeurs_nodales(zone_vef.nb_elem());
+  ch.fixer_nb_valeurs_nodales(domaine_vef.nb_elem());
   ch.fixer_unite("sans");
   ch.changer_temps(la_vitesse.temps());
 }

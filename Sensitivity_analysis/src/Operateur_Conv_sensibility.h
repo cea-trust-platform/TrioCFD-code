@@ -23,7 +23,9 @@
 #define Operateur_Conv_sensibility_included
 
 #include <Operateur_Conv.h>
-#include <Ref_Champ_Inc_base.h>
+#include <TRUST_Ref.h>
+
+class Champ_Inc_base;
 
 /*! @brief : class Operateur_Conv_sensibility
  *
@@ -53,7 +55,7 @@ public :
 
 protected :
   Operateur_Conv op_conv;
-  void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& inco) override ;//Classe abstraite de Operateur base
+  void associer(const Domaine_dis&, const Domaine_Cl_dis&, const Champ_Inc& inco) override ;//Classe abstraite de Operateur base
   REF(Domaine) dom;
   REF(Champ_Inc_base) la_vitesse;
 

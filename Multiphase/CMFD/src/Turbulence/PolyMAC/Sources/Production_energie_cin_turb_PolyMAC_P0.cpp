@@ -22,7 +22,7 @@
 
 #include <Production_energie_cin_turb_PolyMAC_P0.h>
 
-#include <Zone_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Matrix_tools.h>
 #include <Probleme_base.h>
@@ -60,8 +60,8 @@ Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is)
 
 void Production_energie_cin_turb_PolyMAC_P0::completer()
 {
-  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  fac_.resize(zone.nb_elem_tot(), equation().inconnue().valeur().valeurs().line_size(), 2); // 3rd column : derivative
+  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  fac_.resize(domaine.nb_elem_tot(), equation().inconnue().valeur().valeurs().line_size(), 2); // 3rd column : derivative
   fac_ = 1. ;
 
   for (int e = 0 ; e < fac_.dimension_tot(0) ; e++)
@@ -79,14 +79,14 @@ void Production_energie_cin_turb_PolyMAC_P0::calculer_fac()
 {
   if (correlation_loi_paroi_.non_nul())
     {
-      const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-      const IntTab& f_e = zone.face_voisins();
+      const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+      const IntTab& f_e = domaine.face_voisins();
 
       Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
       DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau");
       const DoubleTab& tab_k = equation().probleme().get_champ("k").passe();
 
-      int nf = zone.nb_faces(), N = tab_k.line_size() ;
+      int nf = domaine.nb_faces(), N = tab_k.line_size() ;
 
       fac_ = 1.;
       for (int e = 0 ; e < fac_.dimension_tot(0) ; e++)
@@ -111,9 +111,9 @@ void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matri
 {
 // empty : no derivative for the turbulent kinetic energy production to add in the blocks
 
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab& k 	 = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs();
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), Nk = k.line_size();
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -150,13 +150,13 @@ void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matri
 
 void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&                   zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0&                   domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const DoubleTab&                     tab_grad = pb.get_champ("gradient_vitesse").passe();
   const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -178,7 +178,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
   const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
-  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = zone.nb_elem(), D = dimension, nf_tot = zone.nb_faces_tot() ;
+  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension, nf_tot = domaine.nb_faces_tot() ;
   int N = equation().inconnue()->valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),
       Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),

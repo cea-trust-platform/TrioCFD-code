@@ -28,8 +28,8 @@
 #include <Debog.h>
 #include <Champ_Fonc.h>
 #include <Champ_Don.h>
-#include <Ref_Champ_Don.h>
 #include <Constituant.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Convection_Diffusion_Phase_field Cas particulier de Convection_Diffusion_Concentration
  *

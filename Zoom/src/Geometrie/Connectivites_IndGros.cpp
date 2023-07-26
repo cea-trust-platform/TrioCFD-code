@@ -41,15 +41,15 @@ Entree& Connectivites_IndGros::readOn(Entree& s )
 }
 
 
-void Connectivites_IndGros::calculer_indice_gros(Zone_VF& zone_vfF,
-                                                 Zone_VF& zone_vfG)
+void Connectivites_IndGros::calculer_indice_gros(Domaine_VF& domaine_vfF,
+                                                 Domaine_VF& domaine_vfG)
 {
 
-  Zone& zoneF = zone_vfF.zone();
-  Zone& zoneG = zone_vfG.zone();
+  Domaine& domaineF = domaine_vfF.domaine();
+  Domaine& domaineG = domaine_vfG.domaine();
 
-  int nb_elemF = zoneF.nb_elem();
-  int nb_elemG = zoneG.nb_elem();
+  int nb_elemF = domaineF.nb_elem();
+  int nb_elemG = domaineG.nb_elem();
 
   int nb_elementF;
 
@@ -70,14 +70,14 @@ void Connectivites_IndGros::calculer_indice_gros(Zone_VF& zone_vfF,
  *
  *     (simple appel aux 2 methodes precedentes)
  *
- * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @param (Domaine& domaineG, Domaine& domaineF) domaine discretisee grossiere et fine
  * @throws da
  */
-void Connectivites_IndGros::calculer_connectivites(Zone_VF& zonef,
-                                                   Zone_VF& zoneg,
+void Connectivites_IndGros::calculer_connectivites(Domaine_VF& domainef,
+                                                   Domaine_VF& domaineg,
                                                    Domaine& domg)
 {
-  Connectivites_base::calculer_connectivites(zonef, zoneg, domg);
-  calculer_indice_gros(zonef, zoneg);
+  Connectivites_base::calculer_connectivites(domainef, domaineg, domg);
+  calculer_indice_gros(domainef, domaineg);
 }
 

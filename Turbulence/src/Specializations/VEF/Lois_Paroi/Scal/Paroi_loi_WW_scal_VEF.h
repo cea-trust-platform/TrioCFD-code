@@ -25,7 +25,7 @@
 
 #include <Paroi_std_scal_hyd_VEF.h>
 #include <Table.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 /*! @brief classe Paroi_loi_WW_scal_VEF
  *
@@ -41,7 +41,7 @@ class Paroi_loi_WW_scal_VEF : public Paroi_std_scal_hyd_VEF
   Declare_instanciable_sans_constructeur(Paroi_loi_WW_scal_VEF);
 
 public:
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   int calculer_scal(Champ_Fonc_base& ) override;
 
 private:

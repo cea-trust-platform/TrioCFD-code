@@ -22,7 +22,7 @@
 
 #include <Paroi_std_hyd_VDF.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Fluide_base.h>
@@ -79,7 +79,7 @@ void Paroi_std_hyd_VDF::set_param(Param& param)
 
 int Paroi_std_hyd_VDF::init_lois_paroi()
 {
-  uplus_.resize(la_zone_VDF->nb_faces_bord());
+  uplus_.resize(le_dom_VDF->nb_faces_bord());
   init_lois_paroi_();
 
   return init_lois_paroi_hydraulique();
@@ -101,20 +101,20 @@ int Paroi_std_hyd_VDF::preparer_calcul_hyd(DoubleTab& tab)
 {
   int nb_dim = tab.nb_dim();
   const int nb_comp= tab.line_size();
-  const IntTab& face_voisins = la_zone_VDF->face_voisins();
-  //  const IntVect& orientation = la_zone_VDF->orientation();
+  const IntTab& face_voisins = le_dom_VDF->face_voisins();
+  //  const IntVect& orientation = le_dom_VDF->orientation();
   // Boucle sur les bords
 
   int ndeb,nfin,elem;
 
-  for (int n_bord=0; n_bord<la_zone_VDF->nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<le_dom_VDF->nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))  ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
@@ -166,9 +166,9 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   // si isKeps=0 tab1=tab_nu_t
   //             tab2=tab_k
   //  Cerr<<" Paroi_std_hyd_VDF::calculer_hyd"<<finl;
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
@@ -205,14 +205,14 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   // Boucle sur les bords
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
@@ -244,21 +244,21 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
               ori = orientation(num_face);
               if ( (elem =face_voisins(num_face,0)) != -1)
                 {
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = -1.;
                 }
               else
                 {
                   elem = face_voisins(num_face,1);
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = 1.;
                 }
               if (axi)
-                dist=zone_VDF.dist_norm_bord_axi(num_face);
+                dist=domaine_VDF.dist_norm_bord_axi(num_face);
               else
-                dist=zone_VDF.dist_norm_bord(num_face);
+                dist=domaine_VDF.dist_norm_bord(num_face);
               if (l_unif)
                 d_visco = visco;
               else
@@ -328,7 +328,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   /*  if (dimension==3)
       {
       const double& tps = eqn_hydr.schema_temps().temps_courant();
-      const IntTab& elem_faces = zone_VDF.elem_faces();
+      const IntTab& elem_faces = domaine_VDF.elem_faces();
       SFichier fic_angle("angles.dat",ios::app); // impression des faces parietales et leur coordonnees
       double angle_u;
       double angle_cis;
@@ -340,11 +340,11 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
       int elem_ndeb = 0;
       ndeb = 0;
       //La face ndeb correspond ici a la premiere face parietale du bas
-      const DoubleTab& xp = zone_VDF.xp();
+      const DoubleTab& xp = domaine_VDF.xp();
 
-      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
       {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
       {
@@ -788,7 +788,7 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_log(DoubleTab& nu_t,DoubleTab& tab_k
 
 void Paroi_std_hyd_VDF::imprimer_ustar(Sortie& os) const
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   int ndeb,nfin;
   DoubleVect moy(4);
   moy=0.;
@@ -796,9 +796,9 @@ void Paroi_std_hyd_VDF::imprimer_ustar(Sortie& os) const
   EcrFicPartage Ustar;
   ouvrir_fichier_partage(Ustar,"Ustar");
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
@@ -834,14 +834,14 @@ void Paroi_std_hyd_VDF::imprimer_ustar(Sortie& os) const
           nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
-              double x=zone_VDF.xv(num_face,0);
-              double y=zone_VDF.xv(num_face,1);
+              double x=domaine_VDF.xv(num_face,0);
+              double y=domaine_VDF.xv(num_face,1);
               norme_L2= Cisaillement_paroi_(num_face,0)*Cisaillement_paroi_(num_face,0) + Cisaillement_paroi_(num_face,1)*Cisaillement_paroi_(num_face,1);
               if (dimension == 2)
                 Ustar << x << "\t| " << y;
               if (dimension == 3)
                 {
-                  double z=zone_VDF.xv(num_face,2);
+                  double z=domaine_VDF.xv(num_face,2);
                   Ustar << x << "\t| " << y << "\t| " << z;
                   norme_L2+= Cisaillement_paroi_(num_face,2)*Cisaillement_paroi_(num_face,2);
                 }
@@ -887,15 +887,15 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
                                                  double& visco_1,
                                                  double& visco_2)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const IntVect& orientation = zone_VDF.orientation();
+  const IntVect& orientation = domaine_VDF.orientation();
 
 //  double u_m1 = 0.; // moyenne des vitesses selon x, a la paroi 1 (y=0)
 //  double u_m2 = 0.; // moyenne des vitesses selon x, a la paroi 2 (y=2)
@@ -915,7 +915,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
 // nb_1 -> values(4,0)  et   nb_2 -> values(4,1)
 
   int dir_par,dir1,dir2;
-  int nb_front_Cl=zone_VDF.nb_front_Cl();
+  int nb_front_Cl=domaine_VDF.nb_front_Cl();
   double visco = -1;
   int l_unif = 0;
 
@@ -943,7 +943,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
       // Dans un premier temps on ne traite que les paroi_fixe,
       // qui correspondent a une des 2 parois du canal
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
@@ -1010,7 +1010,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
                 {
                   values(2,0) += vitesse(elem_faces(num_elem, dir1));
                   values(3,0) += vitesse(elem_faces(num_elem, dir2));
-                  values(1,0) += zone_VDF.dim_elem(num_elem, dir_par);
+                  values(1,0) += domaine_VDF.dim_elem(num_elem, dir_par);
                   if (l_unif)
                     values(0,0) += visco;
                   else
@@ -1021,7 +1021,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
                 {
                   values(2,1) += vitesse(elem_faces(num_elem, dir1));
                   values(3,1) += vitesse(elem_faces(num_elem, dir2));
-                  values(1,1) += zone_VDF.dim_elem(num_elem, dir_par);
+                  values(1,1) += domaine_VDF.dim_elem(num_elem, dir_par);
                   if (l_unif)
                     values(0,1) += visco;
                   else
@@ -1105,9 +1105,9 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 {
 
 // keps
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntVect& orientation = zone_VDF.orientation();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntVect& orientation = domaine_VDF.orientation();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
@@ -1144,14 +1144,14 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
   // Boucle sur les bords
 
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
@@ -1183,21 +1183,21 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
               ori = orientation(num_face);
               if ( (elem =face_voisins(num_face,0)) != -1)
                 {
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = -1.;
                 }
               else
                 {
                   elem = face_voisins(num_face,1);
-                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
-                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  //norm_v=norm_2D_vit(vit,elem,ori,domaine_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,domaine_VDF,vit_paroi,val);
                   signe = 1.;
                 }
               if (axi)
-                dist=zone_VDF.dist_norm_bord_axi(num_face);
+                dist=domaine_VDF.dist_norm_bord_axi(num_face);
               else
-                dist=zone_VDF.dist_norm_bord(num_face);
+                dist=domaine_VDF.dist_norm_bord(num_face);
               if (l_unif)
                 d_visco = visco;
               else

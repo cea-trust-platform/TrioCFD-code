@@ -22,7 +22,7 @@
 
 #include <Prolongement_elem_face.h>
 #include <Domaine.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 
 Implemente_instanciable(Prolongement_elem_face,"Prolongement_elem_face",Prolongement_base);
 
@@ -55,7 +55,7 @@ Entree& Prolongement_elem_face::readOn(Entree& s )
  *     car valeur
  *
  */
-void Prolongement_elem_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement_elem_face::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                                        const Frontiere& frontF,
                                        IntVect& connect,
                                        const DoubleTab& valG, DoubleTab& tab,
@@ -75,7 +75,7 @@ void Prolongement_elem_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
   int nb_faces_front_fine = frontF.nb_faces();
 
   //elemG voisins de chaque face grossiere
-  IntTab& voisins = zone_VFG.face_voisins();
+  IntTab& voisins = domaine_VFG.face_voisins();
 
   //Pour chaque face fine
   for (nbFacesF=0; nbFacesF<nb_faces_front_fine; nbFacesF++)
@@ -106,8 +106,8 @@ void Prolongement_elem_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
 //calcul des distances du centre de gravite de chaque face fine
 //au centre de gravite des elements grossiers correspondants
-void Prolongement_elem_face::calculer(Zone_VF& zonef,
-                                      Zone_VF& zoneg,
+void Prolongement_elem_face::calculer(Domaine_VF& domainef,
+                                      Domaine_VF& domaineg,
                                       IntVect& connect_ff)
 {
   //Cerr<<"debut de Prolongement_elem_face::calculer_distances"<<finl;
@@ -117,18 +117,18 @@ void Prolongement_elem_face::calculer(Zone_VF& zonef,
   int num_elemG;
   int dim;
   double somme_carres;
-  const int prem_face_bord_fin  =  zonef.premiere_face_bord();
-  const int der_face_bord_fin  =  prem_face_bord_fin+zonef.nb_faces_bord();
+  const int prem_face_bord_fin  =  domainef.premiere_face_bord();
+  const int der_face_bord_fin  =  prem_face_bord_fin+domainef.nb_faces_bord();
   //nombre de faces fines
   int nb_lignes = connect_ff.size_array();
   distances_.resize(nb_lignes, 2);
   distances_ = -1;
   //elemG voisins de chaque face grossiere
-  IntTab& voisins = zoneg.face_voisins();
+  IntTab& voisins = domaineg.face_voisins();
   //centre de gravite des elemG
-  const DoubleTab& cg_elem_grossier = zoneg.xp();
+  const DoubleTab& cg_elem_grossier = domaineg.xp();
   //centre de gravite des faces fines
-  const DoubleTab& cg_face_fine = zonef.xv();
+  const DoubleTab& cg_face_fine = domainef.xv();
 
   //Pour chaque face fine
   for (nbFacesF=prem_face_bord_fin; nbFacesF<der_face_bord_fin; nbFacesF++)

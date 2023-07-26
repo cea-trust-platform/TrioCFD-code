@@ -18,7 +18,6 @@
 #include <Discretisation_base.h>
 #include <Loi_Fermeture_base.h>
 #include <EcrFicCollecteBin.h>
-#include <Ref_Postraitement.h>
 #include <LecFicDiffuseBin.h>
 #include <communications.h>
 #include <Probleme_base.h>
@@ -28,6 +27,7 @@
 #include <FichierHDFPar.h>
 #include <Milieu_base.h>
 #include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
 #include <sys/stat.h>
 #include <Equation.h>
 #include <Debog.h>
@@ -362,8 +362,7 @@ int Probleme_base::verifier()
  */
 void Probleme_base::associer_domaine(const Domaine& un_domaine)
 {
-  le_domaine_dis.associer_domaine(un_domaine);
-
+  le_domaine_ = un_domaine;
 }
 
 void Probleme_base::discretiser_equations()
@@ -371,25 +370,35 @@ void Probleme_base::discretiser_equations()
   Cerr << "Discretization of the equations of problem " << que_suis_je() << " ..." <<  finl;
   for (int i = 0; i < nombre_d_equations(); i++)
     {
-      equation(i).associer_zone_dis(domaine_dis().zone_dis(0));
+      equation(i).associer_domaine_dis(domaine_dis());
       equation(i).discretiser();
     }
 }
 
 /*! @brief Affecte une discretisation au probleme Discretise le Domaine associe au probleme avec la discretisation
  *
- *      Associe la premiere zone du Domaine aux equations du probleme
+ *      Associe la premiere domaine du Domaine aux equations du probleme
  *      Discretise les equations associees au probleme
- *      NOTE: TRUST V1 une seule Zone_dis pas Domaine_dis est traitee
+ *      NOTE: TRUST V1 une seule Domaine_dis pas Domaine_dis est traitee
  *
  * @param (Discretisation_base& discretisation) une discretisation pour le probleme
  */
-void Probleme_base::discretiser(const Discretisation_base& une_discretisation)
+void Probleme_base::discretiser(Discretisation_base& une_discretisation)
 {
   associer();
   la_discretisation = une_discretisation;
   Cerr << "Discretization of the domain associated with the problem " << le_nom() << finl;
+
+  if (!le_domaine_.non_nul())
+    Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
+
+  // Initialisation du tableau renum_som_perio
+  le_domaine_->init_renum_perio();
+
+  une_discretisation.associer_domaine(le_domaine_.valeur());
   une_discretisation.discretiser(le_domaine_dis);
+  // Can not do this before, since the Domaine_dis is not typed yet:
+  le_domaine_dis.associer_domaine(le_domaine_);
 
   if (milieu_via_associer() || is_pb_FT())
     {
@@ -608,7 +617,7 @@ Schema_Temps_base& Probleme_base::schema_temps()
  */
 const Domaine& Probleme_base::domaine() const
 {
-  return le_domaine_dis.domaine();
+  return le_domaine_.valeur();
 }
 
 /*! @brief Renvoie le domaine associe au probleme.
@@ -617,7 +626,7 @@ const Domaine& Probleme_base::domaine() const
  */
 Domaine& Probleme_base::domaine()
 {
-  return le_domaine_dis.domaine();
+  return le_domaine_.valeur();
 }
 
 /*! @brief Renvoie le domaine discretise associe au probleme.
@@ -991,11 +1000,11 @@ void Probleme_base::mettre_a_jour(double temps)
 void Probleme_base::preparer_calcul()
 {
   const double temps = schema_temps().temps_courant();
-  // Modification du tableau Qdm porte par la zone_dis() dans le cas
+  // Modification du tableau Qdm porte par le domaine_dis() dans le cas
   // ou il y a des conditions aux limites periodiques.
   // Rq : Si l'une des equations porte la condition a la limite periodique
   //      alors les autres doivent forcement la porter.
-  equation(0).zone_dis()->modifier_pour_Cl(equation(0).zone_Cl_dis().les_conditions_limites());
+  equation(0).domaine_dis()->modifier_pour_Cl(equation(0).domaine_Cl_dis().les_conditions_limites());
   milieu().initialiser(temps);
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).preparer_calcul();

@@ -22,8 +22,9 @@
 #include <Frontiere_ouverte_vitesse_vortex.h>
 #include <EChaine.h>
 #include <Param.h>
-#include <Zone_VF.h>
-#include <Zone_Cl_dis_base.h>
+#include <Sous_Domaine.h>
+#include <Domaine_VF.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Domaine.h>
@@ -33,7 +34,7 @@ Implemente_instanciable(Frontiere_ouverte_vitesse_vortex,"Frontiere_ouverte_vite
 Entree& Frontiere_ouverte_vitesse_vortex::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("sous_zone", &nom_sous_zone_, Param::REQUIRED);
+  param.ajouter("sous_domaine", &nom_sous_domaine_, Param::REQUIRED);
   param.ajouter("equation", &nom_equation_, Param::REQUIRED);
   param.ajouter("integrale_reference", &integrale_reference_, Param::REQUIRED);
   param.ajouter("signe", &signe_, Param::REQUIRED);
@@ -61,20 +62,20 @@ Sortie& Frontiere_ouverte_vitesse_vortex::printOn(Sortie& os) const
 
 void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
 {
-  // Calcul de l'integrale du champ sur la sous-zone
-  const Zone_Cl_dis_base& zone_Cl_dis_base = zone_Cl_dis();
-  const Equation_base& equation = zone_Cl_dis_base.equation().probleme().get_equation_by_name(nom_equation_);
+  // Calcul de l'integrale du champ sur la sous-domaine
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = domaine_Cl_dis();
+  const Equation_base& equation = domaine_Cl_dis_base.equation().probleme().get_equation_by_name(nom_equation_);
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, equation);
   const DoubleTab& indic = eq.inconnue().valeurs();
-  const Sous_Zone& sous_zone = zone_Cl_dis_base.zone().domaine().ss_zone(nom_sous_zone_);
-  const DoubleVect& volume = ref_cast(Zone_VF, zone_Cl_dis_base.zone_dis().valeur()).volumes();
+  const Sous_Domaine& sous_domaine = domaine_Cl_dis_base.domaine().ss_domaine(nom_sous_domaine_);
+  const DoubleVect& volume = ref_cast(Domaine_VF, domaine_Cl_dis_base.domaine_dis().valeur()).volumes();
 
   double integrale = 0.;
-  const int n = sous_zone.nb_elem_tot();
+  const int n = sous_domaine.nb_elem_tot();
   int i;
   for (i = 0; i < n; i++)
     {
-      const int elem = sous_zone[i];
+      const int elem = sous_domaine[i];
       const double x = indic(elem);
       const double v = volume(elem);
       integrale += x * v;

@@ -28,11 +28,10 @@
 #include <Couplage_U.h>
 #include <TRUST_List.h>
 #include <Pb_2G.h>
-#include <Ref_Pb_2G.h>
-#include <Ref_Algo_MG_base.h>
-#include <Ref_Probleme_base.h>
 #include <Probleme_base.h>
+#include <TRUST_Ref.h>
 
+class Algo_MG_base;
 class Pb_2G;
 class Equation_base;
 class Champ_front_zoom;

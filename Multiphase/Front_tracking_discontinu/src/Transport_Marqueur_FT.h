@@ -93,7 +93,7 @@ public:
   void imposer_cond_lim();
   static void appliquer_reflexion_vitesse(const double x, const double y, const double z,
                                           const int som,int& face_bord,
-                                          const Zone_VF& zone_vf,
+                                          const Domaine_VF& domaine_vf,
                                           DoubleTab& vitesse);
 
   //Effectue l integration d un ensemble de points (sans notion de facettes)
@@ -192,7 +192,7 @@ protected:
   double dt_inject_;                    //periode d injection
   double dt_transfo_;                    //periode de transformation
 
-  Noms nom_sz_transfo_;             //Noms des sous_zones ou l on impose eventuellement un transformation
+  Noms nom_sz_transfo_;             //Noms des sous_domaines ou l on impose eventuellement un transformation
   double diametre_min_;             //Diametre minimum pour declencher une transformation
   double beta_transfo_;             //Parametre multiplicatif du volume de controle
 

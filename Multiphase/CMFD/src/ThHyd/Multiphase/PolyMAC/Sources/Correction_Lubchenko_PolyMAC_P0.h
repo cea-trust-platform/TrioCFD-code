@@ -22,8 +22,11 @@
 
 #ifndef Correction_Lubchenko_PolyMAC_P0_included
 #define Correction_Lubchenko_PolyMAC_P0_included
+
 #include <Source_base.h>
-#include <Ref_Correlation.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief classe Correction_Lubchenko_PolyMAC_P0 Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
  *
@@ -44,7 +47,7 @@ public :
   void check_multiphase_compatibility() const override {}; //of course
   void completer() override;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:

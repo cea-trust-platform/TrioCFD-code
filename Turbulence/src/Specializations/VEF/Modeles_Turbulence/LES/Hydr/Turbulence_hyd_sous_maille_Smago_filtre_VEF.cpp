@@ -21,7 +21,7 @@
 
 #include <Turbulence_hyd_sous_maille_Smago_filtre_VEF.h>
 #include <Champ_P1NC.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Turbulence_hyd_sous_maille_Smago_filtre_VEF,"Modele_turbulence_hyd_sous_maille_Smago_filtre_VEF",Turbulence_hyd_sous_maille_Smago_VEF);
 
@@ -56,8 +56,8 @@ Entree& Turbulence_hyd_sous_maille_Smago_filtre_VEF::readOn(Entree& s )
 //  double C2 = 0.43;
 //  double temps = mon_equation->inconnue().temps();
 //  DoubleVect& k = energie_cinetique_turb_.valeurs();
-//  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-//  const int nb_elem = zone_VEF.nb_elem();
+//  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+//  const int nb_elem = domaine_VEF.nb_elem();
 //  double temp;
 //
 //  if (k.size() != nb_elem)
@@ -84,22 +84,22 @@ Entree& Turbulence_hyd_sous_maille_Smago_filtre_VEF::readOn(Entree& s )
 void Turbulence_hyd_sous_maille_Smago_filtre_VEF::calculer_S_barre()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem();
 
-  const DoubleVect& vol = zone_VEF.volumes();
-  //  const DoubleTab& xgravite = zone_VEF.xp();
-  const Zone& zone=zone_VEF.zone();
-  //  const DoubleTab& xsom = zone.domaine().coord_sommets();
-  //  int nb_som_elem=zone.nb_som_elem();
-  int nb_faces_elem=zone.nb_faces_elem();
-  //  const IntTab& elem_som=zone.les_elems();
+  const DoubleVect& vol = domaine_VEF.volumes();
+  //  const DoubleTab& xgravite = domaine_VEF.xp();
+  const Domaine& domaine=domaine_VEF.domaine();
+  //  const DoubleTab& xsom = domaine.domaine().coord_sommets();
+  //  int nb_som_elem=domaine.nb_som_elem();
+  int nb_faces_elem=domaine.nb_faces_elem();
+  //  const IntTab& elem_som=domaine.les_elems();
 
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const IntTab& elem_faces = zone_VEF.elem_faces();
-  //  const int nb_face_bord = zone_VEF.nb_faces_bord();
-  const int nb_face = zone_VEF.nb_faces();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const IntTab& elem_faces = domaine_VEF.elem_faces();
+  //  const int nb_face_bord = domaine_VEF.nb_faces_bord();
+  const int nb_face = domaine_VEF.nb_faces();
 
   int i,elem;
   int fac=0;
@@ -138,7 +138,7 @@ void Turbulence_hyd_sous_maille_Smago_filtre_VEF::calculer_S_barre()
 
     }
 
-  Champ_P1NC::calcul_S_barre(vitesse,SMA_barre,zone_Cl_VEF);
+  Champ_P1NC::calcul_S_barre(vitesse,SMA_barre,domaine_Cl_VEF);
 
   // On recalcule la longueur caracteristique de l'element
 

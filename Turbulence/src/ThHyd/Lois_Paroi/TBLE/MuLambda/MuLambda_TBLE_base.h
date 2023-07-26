@@ -23,7 +23,10 @@
 #define MuLambda_TBLE_base_included
 
 #include <Objet_U.h>
-#include <Ref_Eq_couch_lim.h>
+#include <TRUST_Ref.h>
+
+class Eq_couch_lim;
+
 class Milieu_base;
 /*! @brief Classe MuLambda_TBLE_base Classe abstraite calculant Mu et Lambda sur le maillage TBLE
  *

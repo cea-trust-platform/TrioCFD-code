@@ -25,10 +25,11 @@
 #define Paroi_hyd_base_EF_included
 
 #include <Turbulence_paroi_base.h>
-#include <Zone_EF.h>
-#include <Zone_Cl_EF.h>
-#include <Ref_Zone_EF.h>
-#include <Ref_Zone_Cl_EF.h>
+#include <Domaine_EF.h>
+#include <Domaine_Cl_EF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_dis;
 
 
 /*! @brief CLASS: Paroi_hyd_base_EF Classe de base des lois de paroi hydraulique en EF
@@ -44,7 +45,7 @@ class Paroi_hyd_base_EF : public Turbulence_paroi_base
 
 public:
 
-  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   void init_lois_paroi_();
   DoubleTab& corriger_derivee_impl(DoubleTab& d) const override;
   inline const ArrOfInt& face_keps_imposee() const
@@ -56,8 +57,8 @@ public:
 
 protected:
 
-  REF(Zone_EF) la_zone_EF;
-  REF(Zone_Cl_EF) la_zone_Cl_EF;
+  REF(Domaine_EF) le_dom_EF;
+  REF(Domaine_Cl_EF) le_dom_Cl_EF;
   IntVect face_keps_imposee_; // avec descripteur parallele
   int flag_face_keps_imposee_;
 };

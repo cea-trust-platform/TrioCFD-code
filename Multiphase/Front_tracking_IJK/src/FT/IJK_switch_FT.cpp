@@ -71,15 +71,15 @@ void Switch_FT_double::initialise()
   const int new_ijk_splitting_ft_extension = (int)std::lrint(std::ceil(old_ijk_splitting_ft_extension_* old_to_new_ratio));
   Cerr << "Extended splitting dimensions. old = " << old_ijk_splitting_ft_extension_
       << " new = " <<new_ijk_splitting_ft_extension << finl;
-  Cerr << "Construction de la zone VDF..." << finl;
+  Cerr << "Construction de la domaine VDF..." << finl;
   IJK_Splitting splitting_ft;
   build_extended_splitting(new_mesh_, splitting_ft, new_ijk_splitting_ft_extension);
   // Le probleme ft disc qui porte le maillage vdf pour les algorithmes front-tracking
-  Probleme_base& refprobleme_ft_disc = creer_zone_vdf(splitting_ft, vdf_name);
-  const Zone_dis& zone_dis = refprobleme_ft_disc.domaine_dis().zone_dis(0);
+  Probleme_base& refprobleme_ft_disc = creer_domaine_vdf(splitting_ft, vdf_name);
+  const Domaine_dis& domaine_dis = refprobleme_ft_disc.domaine_dis();
   interfaces_.initialize(splitting_ft /* splitting_FT */,
       new_mesh_ /* splitting_Ns */,
-      zone_dis, 
+      domaine_dis, 
       false);
   interfaces_.set_reprise(1);
   interfaces_.lire_maillage_ft_dans_lata();

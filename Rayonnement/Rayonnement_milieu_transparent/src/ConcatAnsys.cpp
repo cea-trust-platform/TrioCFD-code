@@ -47,9 +47,9 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
   nom2+=Nom(".factforme");
   Nom nomS2=nom_du_cas();
   nomS2+=Nom(".facesrayo");
-  Zone& zone=dom.zone(0);
+  Domaine& domaine=dom;
   // Definition du nombre de faces rayonnantes
-  int nombre_faces_rayonnantes=zone.nb_bords()+zone.nb_raccords();
+  int nombre_faces_rayonnantes=domaine.nb_bords()+domaine.nb_raccords();
   // Tableau des facteurs de forme regroupes
   DoubleTab FIJ(nombre_faces_rayonnantes,nombre_faces_rayonnantes);
   DoubleVect SI(nombre_faces_rayonnantes);
@@ -112,18 +112,18 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
   //
   for (I=0; I<nombre_faces_rayonnantes; I++)
     {
-      Faces& faces=(I<zone.nb_bords()?zone.bord(I).faces():zone.raccord(I-zone.nb_bords()).valeur().faces());
+      Faces& faces=(I<domaine.nb_bords()?domaine.bord(I).faces():domaine.raccord(I-domaine.nb_bords()).valeur().faces());
       int nb_faces=faces.nb_faces();
       // Calcul des surfaces de chaque face
       DoubleVect Si;
-      faces.associer_zone(zone);
+      faces.associer_domaine(domaine);
       faces.calculer_surfaces(Si);
       for (i=0; i<nb_faces; i++)
         {
           SI(I)+=Si(i);
         }
       // Ecriture dans le fichier des bords pour TRUST (avec par defaut une emissivite de 1)
-      fr << (I<zone.nb_bords()?zone.bord(I).le_nom():zone.raccord(I-zone.nb_bords()).le_nom()) << " " << SI(I) << " 1." << finl;
+      fr << (I<domaine.nb_bords()?domaine.bord(I).le_nom():domaine.raccord(I-domaine.nb_bords()).le_nom()) << " " << SI(I) << " 1." << finl;
       if (deja_regroupe_dans_ansys)
         nb_faces=1;
       for (i=0; i<nb_faces; i++)
@@ -138,7 +138,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
           for (J=0; J<nombre_faces_rayonnantes; J++)
             {
               double FiJ=0;
-              int nombre_faces=(J<zone.nb_bords()?zone.bord(J).faces().nb_faces():zone.raccord(J-zone.nb_bords()).valeur().faces().nb_faces());
+              int nombre_faces=(J<domaine.nb_bords()?domaine.bord(J).faces().nb_faces():domaine.raccord(J-domaine.nb_bords()).valeur().faces().nb_faces());
               if (deja_regroupe_dans_ansys)
                 nombre_faces=1;
               for (j=0; j<nombre_faces; j++)
@@ -161,7 +161,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
           else if (est_egal(total_lu,0))
             {
               Cerr << "La somme des facteurs de forme de la ligne " << I+1 << " vaut 0 !" << finl;
-              Cerr << "Cela concerne le bord " << (I<zone.nb_bords()?zone.bord(I).le_nom():zone.raccord(I-zone.nb_bords()).le_nom()) << finl;
+              Cerr << "Cela concerne le bord " << (I<domaine.nb_bords()?domaine.bord(I).le_nom():domaine.raccord(I-domaine.nb_bords()).le_nom()) << finl;
               if (est_egal(SI(I),0))
                 {
                   Cerr << "La surface de ce bord est nulle..." << finl;

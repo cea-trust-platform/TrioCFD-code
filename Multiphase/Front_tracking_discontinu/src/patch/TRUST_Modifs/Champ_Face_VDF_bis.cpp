@@ -21,9 +21,9 @@
 #include <Champ_Uniforme.h>
 #include <Probleme_base.h>
 #include <distances_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 
-void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& zone_Cl_VDF)
+void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Domaine_Cl_VDF& domaine_Cl_VDF)
 {
   // On initialise le champ y_plus avec une valeur negative,
   // comme ca lorsqu'on veut visualiser le champ pres de la paroi,
@@ -35,9 +35,9 @@ void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_V
   y_plus = -1.;
 
   const Champ_Face_VDF& vit = *this;
-  const Zone_VDF& zone_VDF = zone_vdf();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntVect& orientation = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = domaine_vdf();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntVect& orientation = domaine_VDF.orientation();
   const Equation_base& eqn_hydr = equation();
 
   // Physical properties of both phases
@@ -51,8 +51,8 @@ void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_V
   const double delta_nu = tab_visco_ph1(0, 0) - tab_visco_ph0(0, 0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab
-  const Zone_Cl_dis_base& zone_Cl_dis_base = eqn_hydr.zone_Cl_dis().valeur();
-  const Equation_base& eqn_trans = zone_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
+  const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
   const DoubleTab& indic = eqn_interf.inconnue().valeurs();
 
@@ -78,14 +78,14 @@ void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_V
     {
       const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
-      yplus_faces.resize(zone_VDF.nb_faces_tot());
+      yplus_faces.resize(domaine_VDF.nb_faces_tot());
       yplus_faces.ref(loipar.tab_d_plus());
       yplus_already_computed = 1;
     }
 
-  for (int n_bord = 0; n_bord < zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      const Cond_lim& la_cl = zone_Cl_VDF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
       if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur()))
         {
@@ -111,18 +111,18 @@ void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_V
                   if (dimension == 2)
                     {
                       ori = orientation(num_face);
-                      norm_v = norm_2D_vit(vit.valeurs(), elem, ori, zone_VDF, val0);
+                      norm_v = norm_2D_vit(vit.valeurs(), elem, ori, domaine_VDF, val0);
                     }
                   else if (dimension == 3)
                     {
                       ori = orientation(num_face);
-                      norm_v = norm_3D_vit(vit.valeurs(), elem, ori, zone_VDF, val1, val2);
+                      norm_v = norm_3D_vit(vit.valeurs(), elem, ori, domaine_VDF, val1, val2);
                     } // dim 3
 
                   if (axi)
-                    dist = zone_VDF.dist_norm_bord_axi(num_face);
+                    dist = domaine_VDF.dist_norm_bord_axi(num_face);
                   else
-                    dist = zone_VDF.dist_norm_bord(num_face);
+                    dist = domaine_VDF.dist_norm_bord(num_face);
 
                   if (l_unif)
                     d_visco = visco_ph0 + indic(elem) * delta_nu;

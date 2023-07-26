@@ -18,7 +18,7 @@
 
 #include <EvAmontVDFFa.h>
 #include <EvalVDFFace.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 /*! @brief class Eval_Quick_VDF_Face
  *
  *  Evaluateur VDF pour la convection
@@ -96,13 +96,13 @@ protected:
 
 private:
    
-  inline double dist_face(entier n1,entier n2,entier k) const                { return la_zone->dist_face(n1,n2,k); };
-  inline double dist_face_period(entier n1,entier n2,entier k) const         { return la_zone->dist_face_period(n1,n2,k); };
+  inline double dist_face(entier n1,entier n2,entier k) const                { return le_dom->dist_face(n1,n2,k); };
+  inline double dist_face_period(entier n1,entier n2,entier k) const         { return le_dom->dist_face_period(n1,n2,k); };
   inline double dim_face(entier ,entier ) const;
   inline entier face_amont_conj(entier ,entier ,entier ) const;
   inline entier face_amont_princ(entier ,entier ) const;
-  inline double dist_elem(entier n1,entier n2,entier k) const                { return la_zone->dist_elem(n1,n2,k); };
-  inline double dist_elem_period(entier n1, entier n2, entier k) const        { return la_zone->dist_elem_period(n1,n2,k); };
+  inline double dist_elem(entier n1,entier n2,entier k) const                { return le_dom->dist_elem(n1,n2,k); };
+  inline double dist_elem_period(entier n1, entier n2, entier k) const        { return le_dom->dist_elem_period(n1,n2,k); };
   inline double dim_elem(entier ,entier ) const;          
 
 };
@@ -275,22 +275,22 @@ inline double conv_quick_sharp_moins(const double& psc,const double& vit_0,const
 
 inline double Eval_Quick_VDF_Face::dim_elem(entier n1, entier k) const
 {
-  return la_zone->dim_elem(n1,k);
+  return le_dom->dim_elem(n1,k);
 }
 
 inline double Eval_Quick_VDF_Face::dim_face(entier n1, entier k) const
 {
-  return la_zone->dim_face(n1,k);
+  return le_dom->dim_face(n1,k);
 }
 
 inline entier Eval_Quick_VDF_Face::face_amont_conj(entier num_face, entier i, entier k) const
 {
-  return la_zone->face_amont_conj(num_face, i, k);
+  return le_dom->face_amont_conj(num_face, i, k);
 }
 
 inline entier Eval_Quick_VDF_Face::face_amont_princ(entier num_face, entier i) const
 {
-  return la_zone->face_amont_princ(num_face, i);
+  return le_dom->face_amont_princ(num_face, i);
 }
 
 // Fonctions de calcul des flux pour une inconnue scalaire

@@ -328,14 +328,14 @@ void Navier_Stokes_std::completer()
   initialise_residu(1);
 
   la_pression.associer_eqn(*this);
-  la_pression->completer(la_zone_Cl_dis.valeur());
+  la_pression->completer(le_dom_Cl_dis.valeur());
   divergence_U.associer_eqn(*this);
   gradient_P.associer_eqn(*this);
   la_pression_en_pa.associer_eqn(*this);
-  la_pression_en_pa->completer(la_zone_Cl_dis.valeur());
+  la_pression_en_pa->completer(le_dom_Cl_dis.valeur());
   divergence.completer();
   gradient.completer();
-  assembleur_pression_.associer_zone_cl_dis_base(zone_Cl_dis().valeur());
+  assembleur_pression_.associer_domaine_cl_dis_base(domaine_Cl_dis().valeur());
   assembleur_pression_.completer(*this);
   if (sub_type(Multigrille_Adrien,solveur_pression_.valeur()))
     {
@@ -358,21 +358,21 @@ void Navier_Stokes_std::discretiser()
 
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
 
-  dis.vitesse(schema_temps(), zone_dis(), la_vitesse);
+  dis.vitesse(schema_temps(), domaine_dis(), la_vitesse);
   champs_compris_.ajoute_champ(la_vitesse);
   la_vitesse.valeur().add_synonymous(Nom("velocity"));
 
-  dis.pression(schema_temps(), zone_dis(), la_pression);
+  dis.pression(schema_temps(), domaine_dis(), la_pression);
   champs_compris_.ajoute_champ(la_pression);
   la_pression.valeur().add_synonymous(Nom("P_star"));
 
-  dis.pression_en_pa(schema_temps(), zone_dis(), la_pression_en_pa);
+  dis.pression_en_pa(schema_temps(), domaine_dis(), la_pression_en_pa);
   champs_compris_.ajoute_champ(la_pression_en_pa);
 
   la_pression_en_pa.valeur().add_synonymous(Nom("Pressure"));
 
-  dis.divergence_U(schema_temps(), zone_dis(), divergence_U);
-  dis.gradient_P(schema_temps(), zone_dis(), gradient_P);
+  dis.divergence_U(schema_temps(), domaine_dis(), divergence_U);
+  dis.gradient_P(schema_temps(), domaine_dis(), gradient_P);
   divergence.typer();
   divergence.l_op_base().associer_eqn(*this);
   gradient.typer();
@@ -402,7 +402,7 @@ void Navier_Stokes_std::discretiser_assembleur_pression()
   type += discretisation().que_suis_je();
   Cerr << "Navier_Stokes_std::discretiser_assembleur_pression : type="<< type << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
+  assembleur_pression_.associer_domaine_dis_base(domaine_dis().valeur());
 }
 
 /*! @brief Renvoie le nombre d'operateurs de l'equation: Pour Navier Stokes Standard c'est 2.
@@ -879,7 +879,7 @@ int Navier_Stokes_std::preparer_calcul()
 
 
   // Au cas ou une cl de pression depend de u que l'on vient de modifier
-  la_zone_Cl_dis->mettre_a_jour(temps);
+  le_dom_Cl_dis->mettre_a_jour(temps);
   gradient.calculer(la_pression.valeurs(), gradient_P.valeurs());
 
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression ap projeter", la_pression.valeurs());
@@ -1197,7 +1197,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!critere_Q.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-          dis.critere_Q(zone_dis(),zone_Cl_dis(),la_vitesse,critere_Q);
+          dis.critere_Q(domaine_dis(),domaine_Cl_dis(),la_vitesse,critere_Q);
           champs_compris_.ajoute_champ(critere_Q);
         }
     }
@@ -1207,7 +1207,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!porosite_volumique.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-          dis.porosite_volumique(zone_dis(),schema_temps(),porosite_volumique);
+          dis.porosite_volumique(domaine_dis(),schema_temps(),porosite_volumique);
           champs_compris_.ajoute_champ(porosite_volumique);
         }
     }
@@ -1216,7 +1216,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!y_plus.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
-          dis.y_plus(zone_dis(),zone_Cl_dis(),la_vitesse,y_plus);
+          dis.y_plus(domaine_dis(),domaine_Cl_dis(),la_vitesse,y_plus);
           champs_compris_.ajoute_champ(y_plus);
         }
     }
@@ -1225,7 +1225,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!Reynolds_maille.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
-          dis.reynolds_maille(zone_dis(),fluide(),la_vitesse,Reynolds_maille);
+          dis.reynolds_maille(domaine_dis(),fluide(),la_vitesse,Reynolds_maille);
           champs_compris_.ajoute_champ(Reynolds_maille);
         }
     }
@@ -1234,7 +1234,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!Courant_maille.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
-          dis.courant_maille(zone_dis(),schema_temps(),la_vitesse,Courant_maille);
+          dis.courant_maille(domaine_dis(),schema_temps(),la_vitesse,Courant_maille);
           champs_compris_.ajoute_champ(Courant_maille);
         }
     }
@@ -1243,7 +1243,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!Taux_cisaillement.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
-          dis.taux_cisaillement(zone_dis(),zone_Cl_dis(),la_vitesse,Taux_cisaillement);
+          dis.taux_cisaillement(domaine_dis(),domaine_Cl_dis(),la_vitesse,Taux_cisaillement);
           champs_compris_.ajoute_champ(Taux_cisaillement);
         }
     }
@@ -1252,7 +1252,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
       if (!pression_hydrostatique_.non_nul())
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
-          dis.discretiser_champ("Champ_sommets",zone_dis(),"pression_hydrostatique","Pa",1,0.,pression_hydrostatique_);
+          dis.discretiser_champ("Champ_sommets",domaine_dis(),"pression_hydrostatique","Pa",1,0.,pression_hydrostatique_);
           champs_compris_.ajoute_champ(pression_hydrostatique_);
         }
     }
@@ -1266,7 +1266,7 @@ void  Navier_Stokes_std::calculer_pression_hydrostatique(Champ_base& pression_hy
 {
   //  abort();
   DoubleTab& val= pression_hydro.valeurs();
-  const DoubleTab& coords = zone_dis().zone().domaine().les_sommets();
+  const DoubleTab& coords = domaine_dis().domaine().domaine().les_sommets();
   if (!milieu().a_gravite())
     {
       Cerr<<"postprocessing of presion_hydrostatique needs gravity"<<finl;
@@ -1411,8 +1411,8 @@ int Navier_Stokes_std::impr(Sortie& os) const
       // Calculation as OpenFOAM: http://foam.sourceforge.net/docs/cpp/a04190_source.html
       // It is relative errors (normalized by the volume/dt)
       double dt = schema_temps().pas_de_temps();
-      double local = LocalFlowRateError / ( probleme().domaine().zone(0).volume_total() / dt );
-      double global = mp_somme_vect(divergence_U.valeurs()) / ( probleme().domaine().zone(0).volume_total() / dt );
+      double local = LocalFlowRateError / ( probleme().domaine().volume_total() / dt );
+      double global = mp_somme_vect(divergence_U.valeurs()) / ( probleme().domaine().volume_total() / dt );
       cumulative_ += global;
       os << "time step continuity errors : sum local = " << local << ", global = " << global << ", cumulative = " << cumulative_ << finl;
       // Nouveau 1.6.1, arret si bilans de masse mauvais et seuil<1.e20

@@ -26,8 +26,11 @@
 #include <Transport_K_Eps_Bas_Reynolds.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Transport_Fluctuation_Temperature_W.h>
-#include <Ref_Champ_Fonc.h>
-#include <Ref_Transport_Fluctuation_Temperature_W.h>
+#include <TRUST_Ref.h>
+
+class Transport_Fluctuation_Temperature_W;
+class Champ_Fonc;
+
 
 class Modele_turbulence_scal_Fluctuation_Temperature_W :  public Modele_turbulence_scal_base
 {

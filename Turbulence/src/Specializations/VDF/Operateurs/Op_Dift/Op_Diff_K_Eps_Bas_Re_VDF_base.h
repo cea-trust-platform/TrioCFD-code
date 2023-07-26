@@ -32,8 +32,8 @@
 
 extern Stat_Counter_Id diffusion_counter_;
 
-class Zone_Cl_dis;
-class Zone_dis;
+class Domaine_Cl_dis;
+class Domaine_dis;
 class Champ_Inc;
 
 class Op_Diff_K_Eps_Bas_Re_VDF_base : public Op_Diff_K_Eps_Bas_Re_base, public Op_VDF_Elem
@@ -45,7 +45,7 @@ public:
   void completer() override;
 
   inline void mettre_a_jour_diffusivite() const  { /* do nothing */ }
-  inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const  override { Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem); }
+  inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const  override { Op_VDF_Elem::modifier_pour_Cl(iter->domaine(), iter->domaine_Cl(), matrice, secmem); }
   inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override { return iter->calculer(inco, resu); }
 
   inline void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override
@@ -54,7 +54,7 @@ public:
     Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
     if (!mat)
       return;
-    Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), mat2);
+    Op_VDF_Elem::dimensionner(iter->domaine(), iter->domaine_Cl(), mat2);
     mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
   }
 

@@ -92,7 +92,7 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is )
 void Echange_externe_impose_rayo_transp::completer()
 {
   Echange_externe_impose::completer();
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
 }
 
 

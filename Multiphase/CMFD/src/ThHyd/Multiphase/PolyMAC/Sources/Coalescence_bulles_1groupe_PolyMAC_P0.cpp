@@ -60,8 +60,8 @@ Entree& Coalescence_bulles_1groupe_PolyMAC_P0::readOn(Entree& is)
 
 void Coalescence_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
   for (auto &&n_m : matrices)
     if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega")
@@ -86,8 +86,8 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matric
 
 void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
                    &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),
@@ -126,7 +126,7 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
   const Coalescence_bulles_1groupe_base& correlation_coal = ref_cast(Coalescence_bulles_1groupe_base, correlation_.valeur());
 
   /* elements */
-  for (e = 0; e < zone.nb_elem(); e++)
+  for (e = 0; e < domaine.nb_elem(); e++)
     {
       for (n = 0; n < N; n++)
         {

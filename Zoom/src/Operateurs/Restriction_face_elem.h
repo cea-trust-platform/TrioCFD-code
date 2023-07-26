@@ -25,7 +25,7 @@
 #define Restriction_face_elem_included
 
 
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Probleme_base.h>
 #include <Connectivites.h>
 #include <Restriction_base.h>
@@ -47,16 +47,16 @@ class Restriction_face_elem : public Restriction_base
 public:
 
   inline IntVect& nb_faceF();
-  void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+  void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                    const  IntVect& connect,
                    DoubleTab& incoG,
                    const DoubleTab& incoF, int) override;
-  inline void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF,
+  inline void restreindre(const Domaine_VF& domaine_VFG, const Domaine_VF& domaine_VFF,
                           const  IntVect& connect,
                           DoubleTab& incoG,
                           const DoubleTab& incoF, int nb_comp,
                           int num_prem_face_frontG) override;
-  void calculer(const Zone_VF& zone_VFG,const  Zone_VF& zone_VFF, const IntVect& connect) override;
+  void calculer(const Domaine_VF& domaine_VFG,const  Domaine_VF& domaine_VFF, const IntVect& connect) override;
 
 
 private:
@@ -72,8 +72,8 @@ inline IntVect& Restriction_face_elem::nb_faceF()
 }
 
 
-inline void Restriction_face_elem::restreindre(const Zone_VF& zone_VFG,
-                                               const Zone_VF& zone_VFF,
+inline void Restriction_face_elem::restreindre(const Domaine_VF& domaine_VFG,
+                                               const Domaine_VF& domaine_VFF,
                                                const  IntVect& connect,
                                                DoubleTab& incoG,
                                                const DoubleTab& incoF,

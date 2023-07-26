@@ -21,12 +21,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Gravite_PF_VDF.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Periodique.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Navier_Stokes_phase_field.h>
 #include <Convection_Diffusion_Phase_field.h>
 #include <Probleme_base.h>
@@ -63,10 +63,10 @@ Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
  * @param (Entree& is) le flot d'entree pour la lecture des parametres
  * @return le flot d'entree modifie
  */
-void Source_Gravite_PF_VDF::associer_zones(const Zone_dis& zone,const Zone_Cl_dis& zone_cl)
+void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis& domaine,const Domaine_Cl_dis& domaine_cl)
 {
-  la_zone = ref_cast(Zone_VDF,zone.valeur());
-  la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_cl.valeur());
+  le_dom = ref_cast(Domaine_VDF,domaine.valeur());
+  le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl.valeur());
 }
 
 
@@ -77,11 +77,11 @@ void Source_Gravite_PF_VDF::associer_zones(const Zone_dis& zone,const Zone_Cl_di
  */
 DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
 {
-  int face, nb_faces = la_zone->nb_faces();
-  int premiere_face_interne = la_zone->premiere_face_int();
+  int face, nb_faces = le_dom->nb_faces();
+  int premiere_face_interne = le_dom->premiere_face_int();
 
-  const IntVect& orientation = la_zone->orientation();
-  const DoubleVect& volumes_entrelaces = la_zone->volumes_entrelaces();
+  const IntVect& orientation = le_dom->orientation();
+  const DoubleVect& volumes_entrelaces = le_dom->volumes_entrelaces();
   DoubleVect porosite_surf ;          // porosites surfaciques
   porosite_surf.ref(equation().milieu().porosite_face());
   Navier_Stokes_phase_field& eq_NS_PF = ref_cast_non_const(Navier_Stokes_phase_field, equation());
@@ -92,7 +92,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
   const int boussi = eq_NS_PF.get_boussi_();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme->equation(1));
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire(); //si type_systeme_naire = 0 ou 1
 
@@ -100,9 +100,9 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
     {
       if (boussi == 0)
         {
-          for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+          for (num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
             {
-              const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+              const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
@@ -124,12 +124,12 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         {
           const DoubleTab& rho = eq_NS_PF.rho().valeur().valeurs();
           double rho0 = eq_NS_PF.rho0();
-          const IntTab& face_voisins = la_zone->face_voisins();
-          const DoubleVect& volumes = la_zone->volumes();
+          const IntTab& face_voisins = le_dom->face_voisins();
+          const DoubleVect& volumes = le_dom->volumes();
 
-          for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+          for (num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
             {
-              const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+              const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
@@ -162,9 +162,9 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
     {
       if (boussi == 0)
         {
-          for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+          for (num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
             {
-              const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+              const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
@@ -186,12 +186,12 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         {
           const DoubleTab& rho = eq_NS_PF.rho().valeur().valeurs();
           double rho0 = eq_NS_PF.rho0();
-          const IntTab& face_voisins = la_zone->face_voisins();
-          const DoubleVect& volumes = la_zone->volumes();
+          const IntTab& face_voisins = le_dom->face_voisins();
+          const DoubleVect& volumes = le_dom->volumes();
 
-          for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+          for (num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
             {
-              const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+              const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();

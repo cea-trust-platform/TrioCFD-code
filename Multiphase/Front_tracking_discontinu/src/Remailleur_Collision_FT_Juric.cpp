@@ -125,7 +125,7 @@ int Remailleur_Collision_FT_Juric::traite_RuptureCoalescenceInterfaces(
   Process::Journal()<<"DEB Remailleur_Collision_FT_Juric::traite_RuptureCoalescenceInterfaces"<<finl;
 
   const Transport_Interfaces_FT_Disc& eq_transport_FT = maillage.equation_transport();
-  const Domaine& domaine = eq_transport_FT.zone_dis().zone().domaine();
+  const Domaine& domaine = eq_transport_FT.domaine_dis().domaine();
 
   DoubleTab fonction_iso;
 

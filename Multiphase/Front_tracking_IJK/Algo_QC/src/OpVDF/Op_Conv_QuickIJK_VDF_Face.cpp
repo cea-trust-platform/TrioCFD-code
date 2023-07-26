@@ -83,8 +83,8 @@ void Op_Conv_QuickIJK_VDF_Face::completer()
   const IJK_Splitting& split = ijkdis.get_IJK_splitting();
   op_ijk_.initialize(split);
 
-  const Zone_VDF& zone_vf = ref_cast(Zone_VDF, equation().zone_dis().valeur());
-  flux_bords_.resize(zone_vf.nb_faces_bord(),dimension);
+  const Domaine_VDF& domaine_vf = ref_cast(Domaine_VDF, equation().domaine_dis().valeur());
+  flux_bords_.resize(domaine_vf.nb_faces_bord(),dimension);
 
   Op_Conv_Quick_VDF_Face::completer();
 }

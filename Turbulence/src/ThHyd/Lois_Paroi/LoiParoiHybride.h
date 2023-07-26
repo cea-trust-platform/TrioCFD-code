@@ -27,8 +27,8 @@
 #include <TRUST_Vector.h>
 #include <Noms.h>
 
-class Zone_dis_base;
-class Zone_Cl_dis_base;
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
 
 /*! @brief LoiParoiHybride Classe Turbulence_paroi_base
  *
@@ -42,19 +42,19 @@ public :
 
 
   Entree& lire(Entree& , const Noms&, const Mod_turb_hyd_base&);
-  void associer(const Zone_dis&, const Zone_Cl_dis&);
+  void associer(const Domaine_dis&, const Domaine_Cl_dis&);
   int init_lois_paroi() ;
 
   // Simple appel aux calculer_hyd des differentes lois de parois
   int calculer_hyd(DoubleTab& ) ;
 
   //Appel des calculer_hyd des differentes lois de parois et remplissage du tableau de Cisaillement
-  int calculer_hyd(DoubleTab& tab1, const Zone_dis_base& , const Zone_Cl_dis_base& , DoubleTab& );
+  int calculer_hyd(DoubleTab& tab1, const Domaine_dis_base& , const Domaine_Cl_dis_base& , DoubleTab& );
 
   // Simple appel aux calculer_hyd des differentes lois de parois
   int calculer_hyd(DoubleTab& , DoubleTab& ) ;
   //Appel des calculer_hyd des differentes lois de parois et remplissage du tableau de Cisaillement
-  int calculer_hyd(DoubleTab& , DoubleTab&, const Zone_dis_base& , const Zone_Cl_dis_base& , DoubleTab&  ) ;
+  int calculer_hyd(DoubleTab& , DoubleTab&, const Domaine_dis_base& , const Domaine_Cl_dis_base& , DoubleTab&  ) ;
 
   // Imprimer_u_star de la loi de paroi Hybride n'est pas encore OK.
   //void imprimer_ustar(Sortie& ) const ;
@@ -63,7 +63,7 @@ public :
   int calculer_hyd_BiK(DoubleTab& , DoubleTab&) ;
 
   //Appel des calculer_hyd des differentes lois de parois et remplissage du tableau de Cisaillement en mode bicephale
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& , Zone_dis_base const& , Zone_Cl_dis_base const& , DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& , Domaine_dis_base const& , Domaine_Cl_dis_base const& , DoubleTab& );
 
 private:
   VECT(Turbulence_paroi) vect_lp;

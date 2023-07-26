@@ -28,7 +28,7 @@
 #include <EChaine.h>
 #include <SChaine.h>
 #include <Probleme_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <IJK_Navier_Stokes_tools.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur( Force_sp, "Force_sp", Objet_U ) ;

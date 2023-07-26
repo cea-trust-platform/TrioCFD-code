@@ -23,21 +23,17 @@
 #define Modele_Fonc_Realisable_base_included
 
 
-#include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
-#include <Ref_Fluide_base.h>
-#include <Ref_Champ_Inc.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Champ_Don.h>
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
-
-class Motcle;
-class Zone_dis;
-class Zone_Cl_dis;
-/* class Champ_Don_base; */
 #include <Champ_Don.h>
+#include <TRUST_Ref.h>
 
+class Champ_Inc;
+class Fluide_base;
+class Motcle;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;
@@ -67,23 +63,23 @@ public:
   virtual void discretiser();
   virtual void completer();
   virtual void associer_pb(const Probleme_base& ) ;
-  virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
+  virtual void associer(const Domaine_dis& , const Domaine_Cl_dis& )= 0;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override;
   virtual int Calcul_is_Reynolds_stress_isotrope() const;
   virtual int Calcul_is_Cmu_constant() const;
 
-  virtual void Calcul_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse) =0;
-  virtual void Calcul_C1(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
-  virtual void Calcul_Cmu_et_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  =0;
-  virtual void Contributions_Sources(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
-  virtual void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+  virtual void Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) =0;
+  virtual void Calcul_C1(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
+  virtual void Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  =0;
+  virtual void Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
+  virtual void Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                            const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
 
-  virtual void Calcul_C1_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
-  virtual void Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  =0;
-  virtual void Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
-  virtual void Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+  virtual void Calcul_C1_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  =0;
+  virtual void Contributions_Sources_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Contributions_Sources_Paroi_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
                                                const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
 
   Entree& lire(const Motcle&, Entree&);

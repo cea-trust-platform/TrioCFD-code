@@ -25,7 +25,7 @@
 #include <Loi_paroi_adaptative.h>
 #include <Frontiere_dis_base.h>
 #include <Pb_Multiphase.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Op_Diff_PolyMAC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
 
@@ -47,8 +47,8 @@ Entree& Cond_lim_k_simple_flux_nul::readOn(Entree& s )
 
 void Cond_lim_k_simple_flux_nul::completer()
 {
-  if (!sub_type(Energie_cinetique_turbulente, zone_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
-  if (zone_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
+  if (!sub_type(Energie_cinetique_turbulente, domaine_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
+  if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
 void Cond_lim_k_simple_flux_nul::liste_faces_loi_paroi(IntTab& tab)
@@ -74,16 +74,16 @@ int Cond_lim_k_simple_flux_nul::compatible_avec_eqn(const Equation_base& eqn) co
 
 int Cond_lim_k_simple_flux_nul::initialiser(double temps)
 {
-  h_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  h_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
 
-  h_grad_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  h_grad_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
 
-  K_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  K_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(K_);
 
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
 
   int nf = la_frontiere_dis->frontiere().nb_faces();
   for (int f =0 ; f < nf ; f++) K_(f, 0) = 0 ; // K is 0 on the wall
@@ -129,25 +129,25 @@ void Cond_lim_k_simple_flux_nul::mettre_a_jour(double tps)
 void Cond_lim_k_simple_flux_nul::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_VF& zone = ref_cast(Zone_VF, zone_Cl_dis().equation().zone_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
+  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                             ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu();
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
-  const IntTab& f_e = zone.face_voisins();
+  const IntTab& f_e = domaine.face_voisins();
 
   if (mu.nb_dim() >= 3) Process::exit("Cond_lim_k_simple : transport of k must be SGDH !");
 
   for (int f =0 ; f < nf ; f++)
     {
-      int f_zone = f + f1; // number of the face in the zone
-      int e_zone = f_e(f_zone,0);
+      int f_domaine = f + f1; // number of the face in the domaine
+      int e_domaine = f_e(f_domaine,0);
 
-      h_(f, 0) = mu(e_zone, 0) / y(f_zone) * (1-std::tanh( std::pow(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
-      h_grad_(f, 0) = 1. / y(f_zone) * (1-std::tanh( std::pow(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)/10.,2)));
+      h_(f, 0) = mu(e_domaine, 0) / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
+      h_grad_(f, 0) = 1. / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2)));
     }
 
   h_.echange_espace_virtuel();

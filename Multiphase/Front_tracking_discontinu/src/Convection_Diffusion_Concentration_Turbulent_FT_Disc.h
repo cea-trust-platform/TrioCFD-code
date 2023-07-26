@@ -24,7 +24,7 @@
 #define Convection_Diffusion_Concentration_Turbulent_FT_Disc_included
 
 #include <Convection_Diffusion_Concentration_Turbulent.h>
-#include <Ref_Equation_base.h>
+#include <TRUST_Ref.h>
 
 class ArrOfBit;
 /*! @brief Cette equation corrige le champ de concentration pour tenir compte de la presence d'une interface.
@@ -45,9 +45,9 @@ protected:
   void ramasse_miette_simple(double temps);
   void mettre_a_jour_chimie();
   void multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab);
-  void marquer_faces_sous_zone(const Nom& nom_sous_zone,
-                               ArrOfBit& marqueur,
-                               int sans_faces_non_std_volume_nul) const;
+  void marquer_faces_sous_domaine(const Nom& nom_sous_domaine,
+                                  ArrOfBit& marqueur,
+                                  int sans_faces_non_std_volume_nul) const;
 
   // Algorithme a utiliser pour tenir compte des interfaces:
   enum Options { RIEN = 0, RAMASSE_MIETTES_SIMPLE = 1 };
@@ -67,7 +67,7 @@ protected:
   Nom nom_equation_nu_t_;
   // Modele pour taux de reactions
   int modele_cinetique_;
-  // Zone de sortie ou on annule la concentration
-  Nom nom_zone_sortie_;
+  // Domaine de sortie ou on annule la concentration
+  Nom nom_domaine_sortie_;
 };
 #endif

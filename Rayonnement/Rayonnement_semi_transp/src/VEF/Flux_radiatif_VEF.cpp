@@ -27,13 +27,13 @@
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Eq_rayo_semi_transp_VEF.h>
 #include <Champ_front_uniforme.h>
-#include <Ref_Champ_front.h>
 #include <Schema_Temps_base.h>
 #include <Debog.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Flux_radiatif_VEF,"Flux_radiatif_VEF",Flux_radiatif_base);
 
@@ -65,7 +65,7 @@ Entree& Flux_radiatif_VEF::readOn(Entree& s )
  */
 void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
                                                coeff_abs, const Champ_Don& longueur_rayo,
-                                               const Champ_Don& indice,const Zone_VF& zvf,
+                                               const Champ_Don& indice,const Domaine_VF& zvf,
                                                const double sigma, double temps)
 {
   const DoubleTab& n = indice.valeurs();
@@ -123,13 +123,13 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
   REF(Champ_front) Tb;
-  const Conds_lim& les_cl_temp = eq_temp.zone_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_temp = 0;
 
   int test_nom=0;
   for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
     {
-      const Cond_lim& la_cl_temp = eq_temp.zone_Cl_dis().les_conditions_limites(num_cl_temp);
+      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
       Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
       if(nom_cl_temp == frontiere_dis().le_nom())
         {
@@ -176,12 +176,12 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   // Calcul du flux radiatif
   DoubleTab& Flux = flux_radiatif().valeurs();
   Flux.resize(le_bord.nb_faces(),1);
-  Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,zone_Cl_dis().equation());
+  Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
   DoubleTab& indice = fluide.indice().valeurs();
   DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
 
-  const Zone_VEF& zvef = ref_cast(Zone_VEF,zone_Cl_dis().zone_dis().valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_Cl_dis().domaine_dis().valeur());
   //  const IntTab& face_voisins = zvef.face_voisins();
   const DoubleTab& face_normales = zvef.face_normales();
 

@@ -31,8 +31,6 @@
 
 Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
 
-Implemente_ref(Probleme_FT_Disc_gen);
-
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
 {
   return Pb_Fluide_base::readOn(is);
@@ -301,7 +299,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 }
 
 
-void Probleme_FT_Disc_gen::discretiser(const Discretisation_base& dis)
+void Probleme_FT_Disc_gen::discretiser(Discretisation_base& dis)
 {
   Pb_Fluide_base::discretiser(dis);
   if (la_chimie_.non_nul())

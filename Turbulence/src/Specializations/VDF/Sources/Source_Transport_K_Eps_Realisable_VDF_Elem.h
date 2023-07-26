@@ -23,7 +23,9 @@
 #define Source_Transport_K_Eps_Realisable_VDF_Elem_included
 
 #include <Source_Transport_Realisable_VDF_Elem_base.h>
-#include <Ref_Transport_K_Eps_Realisable.h>
+#include <TRUST_Ref.h>
+
+class Transport_K_Eps_Realisable;
 
 class Source_Transport_K_Eps_Realisable_VDF_Elem : public Source_Transport_Realisable_VDF_Elem_base
 {

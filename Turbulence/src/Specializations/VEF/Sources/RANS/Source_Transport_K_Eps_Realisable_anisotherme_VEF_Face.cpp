@@ -21,7 +21,7 @@
 
 #include <Source_Transport_K_Eps_Realisable_anisotherme_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_anisotherme_VEF_Face,"Source_Transport_K_Eps_Realisable_anisotherme_VEF_P1NC",Source_Transport_K_Eps_Realisable_VEF_Face);
 
@@ -47,7 +47,7 @@ void Source_Transport_K_Eps_Realisable_anisotherme_VEF_Face::fill_resu_anisother
   // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
   double C3_loc, C1_loc = C1__, LeK_MIN = eqn_keps_Rea->modele_turbulence().get_LeK_MIN();
 
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
       resu(face, 0) += G(face) * volumes_entrelaces(face);
       if (K_eps(face, 0) >= LeK_MIN)

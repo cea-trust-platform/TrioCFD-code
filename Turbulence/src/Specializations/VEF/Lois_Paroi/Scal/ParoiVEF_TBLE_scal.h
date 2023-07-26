@@ -23,17 +23,17 @@
 #define ParoiVEF_TBLE_scal_included
 
 #include <Paroi_std_scal_hyd_VEF.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Eq_couch_lim.h>
 #include <TRUST_Vector.h>
-#include <Ref_Convection_Diffusion_std.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM_Scal.h>
+#include <TRUST_Ref.h>
 
-
+class Convection_Diffusion_std;
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Paroi_TBLE_QDM;
 
 /*! @brief CLASS: ParoiVEF_TBLE_scal

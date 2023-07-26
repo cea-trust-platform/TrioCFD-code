@@ -22,7 +22,7 @@
 #include <Paroi_loi_WW_scal_VDF.h>
 #include <Paroi_std_hyd_VDF.h>
 #include <Champ_Uniforme.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Probleme_base.h>
@@ -60,7 +60,7 @@ Entree& Paroi_loi_WW_scal_VDF::readOn(Entree& s)
 // Loi analytique avec raccordement des comportements
 // asymptotique de la temperature adimensionnee T+
 // sous-couche conductrice : T+=Pr y+
-// zone logarithmique : T+=2.12*ln(y+)+Beta
+// domaine logarithmique : T+=2.12*ln(y+)+Beta
 double Paroi_loi_WW_scal_VDF::Fthpar(double y_plus,double Pr,double Beta)
 {
   static double C_inv = 2.12;
@@ -74,15 +74,15 @@ double Paroi_loi_WW_scal_VDF::Fthpar(double y_plus,double Pr,double Beta)
 
 int Paroi_loi_WW_scal_VDF::init_lois_paroi()
 {
-  tab_u_star.resize(la_zone_VDF->nb_faces_bord());
+  tab_u_star.resize(le_dom_VDF->nb_faces_bord());
   return Paroi_scal_hyd_base_VDF::init_lois_paroi();
 }
 
 int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
   static double C = 1./2.12;
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -127,7 +127,7 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
       // Pour chaque condition limite on regarde son type
@@ -137,7 +137,7 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       // Si l'on est a une paroi a flux impose, le flux est connu et il est
       // directement pris a la condition aux limites pour le calcul des flux diffusifs.
 
-      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) )
         {
@@ -148,7 +148,7 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
           //find the associated boundary
           int boundary_index=-1;
-          if (zone_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
+          if (domaine_VDF.front_VF(n_bord).le_nom() == le_bord.le_nom())
             boundary_index=n_bord;
           assert(boundary_index >= 0);
 
@@ -158,9 +158,9 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               if (elem == -1)
                 elem = face_voisins(num_face,1);
               if (axi)
-                dist = zone_VDF.dist_norm_bord_axi(num_face);
+                dist = domaine_VDF.dist_norm_bord_axi(num_face);
               else
-                dist = zone_VDF.dist_norm_bord(num_face);
+                dist = domaine_VDF.dist_norm_bord(num_face);
               if (l_unif)
                 d_visco = visco;
               else
@@ -195,7 +195,7 @@ int Paroi_loi_WW_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               // au niveau des parois contacts entre plusieurs problemes (alpha_t pas recuperable !).
 
               int global_face=num_face;
-              int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
+              int local_face=domaine_VDF.front_VF(boundary_index).num_local_face(global_face);
               equivalent_distance_[boundary_index][local_face] = d_alpha*Fthpar(dist*u_star/d_visco,Pr,Beta)/u_star;
             }
         }

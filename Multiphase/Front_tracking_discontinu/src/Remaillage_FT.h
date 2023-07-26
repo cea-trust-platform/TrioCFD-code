@@ -24,12 +24,13 @@
 #define Remaillage_FT_included
 
 #include <TRUSTTabFT_forward.h>
-#include <Ref_Zone_VF.h>
 #include <Objet_U.h>
-#include <Zone_dis.h>
+#include <Domaine_dis.h>
 #include <FTd_tools.h>
+#include <TRUST_Ref.h>
+
 class Maillage_FT_Disc;
-class Zone_VF;
+class Domaine_VF;
 class Param;
 
 // POUR DEBUGGER LA CONSERVATION DU VOLUME
@@ -47,7 +48,7 @@ class Remaillage_FT : public Objet_U
 public:
   Remaillage_FT();
   void set_param(Param& p);
-  void associer_zone(const Zone_dis& zone_dis);
+  void associer_domaine(const Domaine_dis& domaine_dis);
 
   int supprimer_facettes_nulles(Maillage_FT_Disc& maillage) const;
   int traite_adherence(Maillage_FT_Disc& maillage) const;
@@ -136,7 +137,7 @@ protected:
 
   int nettoyer_maillage(Maillage_FT_Disc& maillage) const;
 
-  REF(Zone_VF) refzone_VF_;
+  REF(Domaine_VF) refdomaine_VF_;
 
   double temps_;
   double temps_dernier_remaillage_;

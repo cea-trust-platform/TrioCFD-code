@@ -67,7 +67,7 @@ void Modele_Fonc_Realisable_base::discretiser()
   const Discretisation_base& dis=mon_equation->discretisation();
   double temps=0;
 
-  dis.discretiser_champ("champ_elem", mon_equation->zone_dis(),"distance_paroi","m",1,temps,BR_wall_length_);
+  dis.discretiser_champ("champ_elem", mon_equation->domaine_dis(),"distance_paroi","m",1,temps,BR_wall_length_);
   champs_compris_.ajoute_champ(BR_wall_length_);
 
   Cerr << "Discretisation du modele K Espilon Realisable terminee" << finl;

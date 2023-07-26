@@ -21,8 +21,8 @@
 
 #include <LoiParoiHybride.h>
 #include <Motcle.h>
-#include <Zone_dis.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <EChaine.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
@@ -110,7 +110,7 @@ Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Mod_turb_
   return is;
 }
 
-void LoiParoiHybride::associer(const Zone_dis& zd, const Zone_Cl_dis& zcl)
+void LoiParoiHybride::associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcl)
 {
   int size = vect_lp.size();
   for (int ilp=0; ilp<size; ilp++)
@@ -148,7 +148,7 @@ int LoiParoiHybride::calculer_hyd(DoubleTab& tab1)
   return 1;
 }
 
-int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, const Zone_dis_base& zd, const Zone_Cl_dis_base& zcl, DoubleTab& tab_cis)
+int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcl, DoubleTab& tab_cis)
 {
   int size = vect_lp.size();
   for (int ilp=0; ilp<size; ilp++)
@@ -196,7 +196,7 @@ int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
   return 1;
 }
 
-int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2, const Zone_dis_base& zd, const Zone_Cl_dis_base& zcl, DoubleTab& tab_cis)
+int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2, const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcl, DoubleTab& tab_cis)
 {
   int size = vect_lp.size();
   for (int ilp=0; ilp<size; ilp++)
@@ -245,7 +245,7 @@ int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   return 1;
 }
 
-int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps, Zone_dis_base const& zd, Zone_Cl_dis_base const& zcl, DoubleTab& tab_cis)
+int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps, Domaine_dis_base const& zd, Domaine_Cl_dis_base const& zcl, DoubleTab& tab_cis)
 {
   int size = vect_lp.size();
   for (int ilp=0; ilp<size; ilp++)

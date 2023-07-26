@@ -24,8 +24,8 @@
 #include <Probleme_FT_Disc_gen.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Parser.h>
-#include <Zone_VEF.h>
-#include <Zone_Cl_VEF.h>
+#include <Domaine_VEF.h>
+#include <Domaine_Cl_VEF.h>
 #include <Neumann_sortie_libre.h>
 #include <Symetrie.h>
 #include <Periodique.h>
@@ -55,14 +55,14 @@ Entree& SourceFiltree_FT_disc_VEF_P1NC::lire(Entree& is)
 
 DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
-  const DoubleTab& xv = zone_VEF.xv();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
+  const DoubleTab& xv = domaine_VEF.xv();
   const DoubleTab& Indicatrice = Indic_->valeurs();
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
-  const int nb_front_Cl = zone_VEF.nb_front_Cl();
+  const int nb_front_Cl = domaine_VEF.nb_front_Cl();
 
   int n_bord,face, elem1,elem2,k, ndeb,nfin, offset;
   double indic, x,y,z = 0;
@@ -72,7 +72,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
       // pour chaque Condition Limite on regarde son type
       // Si face de Dirichlet on ne fait rien
       // Si face de Neumann, Periodique ou de Symetrie on calcule la contribution au terme source
-      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre,la_cl.valeur())||sub_type(Symetrie,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -146,7 +146,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
         }
     }
   //faces internes
-  for (face =zone_VEF.premiere_face_int(); face<zone_VEF.nb_faces(); face++)
+  for (face =domaine_VEF.premiere_face_int(); face<domaine_VEF.nb_faces(); face++)
     {
       elem1 = face_voisins(face,0);
       elem2 = face_voisins(face,1);
@@ -191,10 +191,10 @@ void SourceFiltree_FT_disc_VEF_P1NC::completer()
   Source_base::completer();
 }
 
-void SourceFiltree_FT_disc_VEF_P1NC::associer_zones(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis)
+void SourceFiltree_FT_disc_VEF_P1NC::associer_domaines(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
 }
 void SourceFiltree_FT_disc_VEF_P1NC::associer_pb(const Probleme_base& pb)
 {

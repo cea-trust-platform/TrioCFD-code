@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Con_Phase_field.h>
-#include <Zone_VDF.h>
-#include <Zone_Cl_VDF.h>
+#include <Domaine_VDF.h>
+#include <Domaine_Cl_VDF.h>
 #include <Probleme_base.h>
 #include <Milieu_base.h>
 #include <Navier_Stokes_phase_field.h>
@@ -1244,11 +1244,11 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Cerr << (int) system(tps_sleep) << finl;
 }
 
-void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
-                                            const Zone_Cl_dis& zone_Cl_dis)
+void Source_Con_Phase_field::associer_domaines(const Domaine_dis& domaine_dis,
+                                               const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, zone_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 }
 
 
@@ -1278,9 +1278,9 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   //const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-  //const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  //const IntTab& face_voisins = zone_VDF.face_voisins();
-  //const DoubleVect& volumes = zone_VDF.volumes();
+  //const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  //const IntTab& face_voisins = domaine_VDF.face_voisins();
+  //const DoubleVect& volumes = domaine_VDF.volumes();
   resu=0.;
 
 
@@ -1298,8 +1298,8 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
       opgrad.calculer(F,prov_face);
       /*
       // M*Grad(F)
-      int ndeb=zone_VDF.premiere_face_int();
-      int nbfaces=zone_VDF.nb_faces();
+      int ndeb=domaine_VDF.premiere_face_int();
+      int nbfaces=domaine_VDF.nb_faces();
       int el0,el1;
       double cface,vol0,vol1;
       for (int fac=ndeb; fac<nbfaces; fac++)
@@ -1402,9 +1402,9 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
   const DoubleTab& c=eq_c.inconnue().valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
 
 
   DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
@@ -1419,8 +1419,8 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
       opgrad.calculer(F,prov_face);
 
       // M*Kappa*Grad(F)
-      int ndeb=zone_VDF.premiere_face_int();
-      int nbfaces=zone_VDF.nb_faces();
+      int ndeb=domaine_VDF.premiere_face_int();
+      int nbfaces=domaine_VDF.nb_faces();
       int el0,el1;
       double cface,kappa_face,vol0,vol1;
 
@@ -1465,8 +1465,8 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
         }
 
       // Determine kappa_face et cface (faces interieures)
-      int ndeb=zone_VDF.premiere_face_int();
-      int nbfaces=zone_VDF.nb_faces();
+      int ndeb=domaine_VDF.premiere_face_int();
+      int nbfaces=domaine_VDF.nb_faces();
       int el0,el1;
       double vol0,vol1;
       DoubleTab kappa_face(prov_face.dimension(0),nb_comp*nb_comp);
@@ -1553,8 +1553,8 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
  */
 void Source_Con_Phase_field::premier_demi_dt()
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
 
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   DoubleTab& c=eq_c.inconnue().valeurs();
@@ -1668,7 +1668,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
                    DoubleTab x1(nb_elem_tot,2);
                    x1=0.;
-                   zone_VDF.zone().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
+                   domaine_VDF.domaine().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
                    double* x1_addr = x1.addr();
                    for(int n_elem=0; n_elem<nb_elem; n_elem++)
                      {
@@ -1700,7 +1700,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
 
                     DoubleTab second_membre(nb_elem, 2);
-                   zone_VDF.zone().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
+                   domaine_VDF.domaine().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
 
                    // Assemblage du second membre
                    double* sm_addr = second_membre.addr();
@@ -1832,7 +1832,7 @@ void Source_Con_Phase_field::premier_demi_dt()
               DoubleTab X_mutilde(mutilde.size_totale());
               DoubleTab x1(nb_elem,2);
               x1=0.;
-              zone_VDF.zone().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
+              domaine_VDF.domaine().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
               double* x1_addr = x1.addr();
               for (int j=0; j<nb_equation_CH; j++)
                 for (int i=0; i<nb_elem; i++)
@@ -1873,7 +1873,7 @@ void Source_Con_Phase_field::premier_demi_dt()
               DoubleTab sm_c(nb_elem_tot);
               DoubleTab sm_mutilde(nb_elem_tot);
               DoubleTab second_membre(nb_elem_tot, 2);
-              zone_VDF.zone().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
+              domaine_VDF.domaine().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
 
               // Assemblage du second membre
               double* sm_addr = second_membre.addr();
@@ -2294,11 +2294,11 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const DoubleVect& volumes = zone_VDF.volumes();
-  const int ndeb=zone_VDF.premiere_face_int();
-  const int nbfaces=zone_VDF.nb_faces();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const DoubleVect& volumes = domaine_VDF.volumes();
+  const int ndeb=domaine_VDF.premiere_face_int();
+  const int nbfaces=domaine_VDF.nb_faces();
 
   int el0,el1;
   double vol0,vol1;
@@ -2349,11 +2349,11 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_VDF.face_voisins();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const DoubleTab& positions = zone_VDF.xp();
-  const IntVect& ori = zone_VDF.orientation();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_VDF.face_voisins();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const DoubleTab& positions = domaine_VDF.xp();
+  const IntVect& ori = domaine_VDF.orientation();
 
   /* Cerr <<"face_ voisins "<< face_voisins<<finl;
    Cerr <<"elem_faces "<< elem_faces<<finl;*/
@@ -2363,7 +2363,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
   int compt1=0;
   int compt2=0;
 
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
   int nb_compo_;
   int f0;
   int min_tri;
@@ -3227,8 +3227,8 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
  */
 void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const DoubleTab& mutilde, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& c_demi, DoubleTab& mutilde_demi)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
   const double theta=0.6;
   DoubleVect residu1(nb_elem);
   DoubleVect residu2(nb_elem);
@@ -3325,8 +3325,8 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
  */
 void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matrice_Morse& matrice_diffusion_CH, DoubleTab& v0, const DoubleTab& x1)
 {
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
   int nb_elem_tot = c.size_totale();
 
   if (type_systeme_naire_==0)
@@ -3903,8 +3903,8 @@ l5:
       int i,j,nk,i0,im,it,ii;
       double tem=1.,res,ccos,ssin ;
       const int ns = 2*c.size_totale();
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-      const int nb_elem = zone_VDF.nb_elem_tot();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+      const int nb_elem = domaine_VDF.nb_elem_tot();
 
       // Ajoute par DJ
       //--------------
@@ -4556,13 +4556,12 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
   // ------------------------------------------
 
   // Interpolation aux elements de u^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& face_sommets = zone_VDF.face_sommets();
-  const DoubleTab& positions = zone_VDF.xp();
-  const Zone& zone_geom = zone_VDF.zone();
-  const Domaine& dom=zone_geom.domaine();
-  const int nb_elem = zone_VDF.nb_elem_tot();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& face_sommets = domaine_VDF.face_sommets();
+  const DoubleTab& positions = domaine_VDF.xp();
+  const Domaine& domaine_geom = domaine_VDF.domaine();
+  const int nb_elem = domaine_VDF.nb_elem_tot();
   int f0,f1, som0,som1;
   double psi,val0,val1;
   DoubleTab u2_elem(nb_elem,dimension);
@@ -4583,8 +4582,8 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
           som0 = face_sommets(f0,0);
           som1 = face_sommets(f1,0);
 
-          psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
-                / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
+          psi = ( positions(elem,ncomp) - domaine_geom.coord(som0,ncomp) )
+                / ( domaine_geom.coord(som1,ncomp) - domaine_geom.coord(som0,ncomp) ) ;
 
           if (std::fabs(psi) < 1.e-12)
             u2_elem(elem,ncomp) = val0 ;
@@ -4639,13 +4638,12 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   gradc2.carre();
 
   // Interpolation aux elements de (Grad(c))^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const IntTab& elem_faces = zone_VDF.elem_faces();
-  const IntTab& face_sommets = zone_VDF.face_sommets();
-  const DoubleTab& positions = zone_VDF.xp();
-  const Zone& zone_geom = zone_VDF.zone();
-  const Domaine& dom=zone_geom.domaine();
-  const int nb_elem = zone_VDF.nb_elem();
+  const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntTab& face_sommets = domaine_VDF.face_sommets();
+  const DoubleTab& positions = domaine_VDF.xp();
+  const Domaine& domaine_geom = domaine_VDF.domaine();
+  const int nb_elem = domaine_VDF.nb_elem();
   int nb_compo_;
   int elem;
   int f0,f1;
@@ -4688,13 +4686,13 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
     Cerr<<"prov_face apres gradc2.carre"<<gradc2<<finl;
 
     // Interpolation aux elements de (Grad(c))^2 (a partir de Discretisation_SG_VDF::calculer_tenS_capil)
-    const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-    const IntTab& elem_faces = zone_VDF.elem_faces();
-    const IntTab& face_sommets = zone_VDF.face_sommets();
-    const DoubleTab& positions = zone_VDF.xp();
-    const Zone& zone_geom = zone_VDF.zone();
-    const Domaine& dom=zone_geom.domaine();
-    const int nb_elem = zone_VDF.nb_elem();
+    const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
+    const IntTab& elem_faces = domaine_VDF.elem_faces();
+    const IntTab& face_sommets = domaine_VDF.face_sommets();
+    const DoubleTab& positions = domaine_VDF.xp();
+    const Domaine& domaine_geom = domaine_VDF.domaine();
+    const Domaine& dom=domaine_geom.domaine();
+    const int nb_elem = domaine_VDF.nb_elem();
     int elem;
     int f0,f1;
     int som0,som1;
@@ -4729,8 +4727,8 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
           som0 = face_sommets(f0,0);
           som1 = face_sommets(f1,0);
 
-          psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
-                / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
+          psi = ( positions(elem,ncomp) - domaine_geom.coord(som0,ncomp) )
+                / ( domaine_geom.coord(som1,ncomp) - domaine_geom.coord(som0,ncomp) ) ;
 
           if (std::fabs(psi) < 1.e-12)
             gradc2_elem(elem,ncomp) = val0 ;
@@ -4800,7 +4798,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
   if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
     {
       const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
-      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
       const int isfct = table.isfonction();
       DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
@@ -4813,7 +4811,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
         }
       if (isfct!=2)
         {
-          int nb_elems = zone_VDF.nb_elem();
+          int nb_elems = domaine_VDF.nb_elem();
           if (val_c.line_size() == 1)
             for (int num_elem=0; num_elem<nb_elems; num_elem++)
               mes_valeurs(num_elem,0) = table.val(val_c(num_elem));
@@ -4827,7 +4825,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
         }
       else
         {
-          const DoubleTab& centres_de_gravites = zone_VDF.xp();
+          const DoubleTab& centres_de_gravites = domaine_VDF.xp();
           table.valeurs(val_c,centres_de_gravites,t,mes_valeurs);
         }
     }

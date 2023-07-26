@@ -23,8 +23,8 @@
 #include <Champ_base.h>
 #include <TRUSTTab.h>
 #include <Transport_Interfaces_FT_Disc.h>
-#include <Zone.h>
-#include <Zone_VF.h>
+#include <Domaine.h>
+#include <Domaine_VF.h>
 #include <Probleme_base.h>
 #include <Param.h>
 
@@ -80,11 +80,11 @@ int Senseur_Interface::calculer_position(ArrOfDouble& pos) const
         }
     }
   IntVect num_element(nb_points_tests_);
-  const Zone& zone = eq.zone_dis().valeur().zone();
-  zone.chercher_elements(positions, num_element);
+  const Domaine& domaine = eq.domaine_dis().valeur().domaine();
+  domaine.chercher_elements(positions, num_element);
   DoubleVect dist(nb_points_tests_);
   // Invalide le numero d'element pour les elements virtuels
-  const int nb_elem = zone.nb_elem();
+  const int nb_elem = domaine.nb_elem();
   for (i = 0; i < nb_points_tests_; i++)
     {
       const int elem = num_element[i];
@@ -96,7 +96,7 @@ int Senseur_Interface::calculer_position(ArrOfDouble& pos) const
         }
     }
   double t_injection; // Entre 0 et 1, coordonnee de l'interface le long du segment
-  const DoubleTab& xp = ref_cast(Zone_VF, eq.zone_dis().valeur()).xp();
+  const DoubleTab& xp = ref_cast(Domaine_VF, eq.domaine_dis().valeur()).xp();
   const DoubleTab& normale_interf = eq.get_update_normale_interface().valeurs();
   const DoubleTab& distance_interf = eq.get_update_distance_interface().valeurs();
   if (i < nb_points_tests_)

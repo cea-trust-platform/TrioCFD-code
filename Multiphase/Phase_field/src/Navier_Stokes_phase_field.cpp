@@ -29,7 +29,7 @@
 #include <Assembleur_base.h>
 #include <Statistiques.h>
 #include <TRUSTTrav.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Domaine.h>
 #include <Param.h>
 #include <Champ_Fonc_Tabule.h>
@@ -272,7 +272,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
             }
           assert(motlu=="}");
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"viscosite_dynamique","Pa.s",mu_,probleme());
+          dis.nommer_completer_champ_physique(domaine_dis().valeur(),"viscosite_dynamique","Pa.s",mu_,probleme());
           champs_compris_.ajoute_champ(mu_);
         }
       if(diff_boussi_==1)
@@ -335,7 +335,7 @@ void Navier_Stokes_phase_field::discretiser()
   type = "Assembleur_P_VDF_Phase_Field";
   Cerr << "** Pressure assembling tool : " << type << " **" << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
+  assembleur_pression_.associer_domaine_dis_base(domaine_dis().valeur());
   assembleur_pression_.valeur().set_resoudre_increment_pression(1);
   // la discretisation du champ associe
   // - a la masse volumique est "retardee" a la methode creer_champ/completer
@@ -386,7 +386,7 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
   Navier_Stokes_std::creer_champ(motlu);
   if (motlu == "masse_volumique")
     {
-      Cerr << "Navier_Stokes_phase_field::creer_champ " << motlu << " " << rho_.non_nul() << " " << rho_.le_nom() << finl;
+      Cerr << "Navier_Stokes_phase_field::creer_champ " << motlu << " " << (int)rho_.non_nul() << " " << rho_.le_nom() << finl;
       const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
       if (!rho_.non_nul())
         {
@@ -395,9 +395,9 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (1)"<< finl;
               exit();
             }
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
+          dis.discretiser_champ("CHAMP_ELEM",domaine_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
           champs_compris_.ajoute_champ(rho_);
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",1,0.,drhodc_);
+          dis.discretiser_champ("CHAMP_ELEM",domaine_dis().valeur(),"derivee_masse_volumique","kg/m3",1,0.,drhodc_);
           champs_compris_.ajoute_champ(drhodc_);
         }
       if (rho_.le_nom()=="anonyme")
@@ -407,9 +407,9 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (2)"<< finl;
               exit();
             }
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"masse_volumique","kg/m3",rho_,probleme());
+          dis.nommer_completer_champ_physique(domaine_dis().valeur(),"masse_volumique","kg/m3",rho_,probleme());
           champs_compris_.ajoute_champ(rho_);
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"derivee_masse_volumique","kg/m3",drhodc_,probleme());
+          dis.nommer_completer_champ_physique(domaine_dis().valeur(),"derivee_masse_volumique","kg/m3",drhodc_,probleme());
           champs_compris_.ajoute_champ(drhodc_);
         }
     }
@@ -421,7 +421,7 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
 void Navier_Stokes_phase_field::calculer_rho(const bool init)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
-  Sources list_sources = eq_c.sources();
+  Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
   int type_systeme_naire = source_pf.get_type_systeme_naire();
 
@@ -437,7 +437,6 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       // normalement, quelque chose comme 'rho_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
-      //Sources list_sources = eq_c.sources();
       Source_Con_Phase_field_base& source_pf_base = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
       source_pf_base.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
       source_pf_base.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
@@ -522,7 +521,7 @@ void Navier_Stokes_phase_field::calculer_mu(const bool init)
       // normalement, quelque chose comme 'mu_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
-      Sources list_sources = eq_c.sources();
+      Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
       Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
       source_pf.calculer_champ_fonc_c(temps, mu_, eq_c.inconnue().futur(i));
       mu_.valeur().valeurs().echange_espace_virtuel();
@@ -595,11 +594,11 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
  */
 void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Don& rho_face_P)
 {
-  const Zone_VF& zoneVF = ref_cast(Zone_VF,zone_dis().valeur());
-  const IntTab& face_voisins = zoneVF.face_voisins();
-  const DoubleVect& volumes = zoneVF.volumes();
-  int nbfaces=zoneVF.nb_faces();
-  const int nbfaces_bord = zoneVF.premiere_face_int();
+  const Domaine_VF& domaineVF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const IntTab& face_voisins = domaineVF.face_voisins();
+  const DoubleVect& volumes = domaineVF.volumes();
+  int nbfaces=domaineVF.nb_faces();
+  const int nbfaces_bord = domaineVF.premiere_face_int();
   int el0,el1;
   double vol0,vol1;
 
@@ -751,9 +750,9 @@ void Navier_Stokes_phase_field::mettre_a_jour(double temps)
 void Navier_Stokes_phase_field::_aff_donnee_P0(const DoubleTab& tab, const Motcle& mot) const
 {
   int ielem;
-  const Zone_VF& zoneVF = ref_cast(Zone_VF,zone_dis().valeur());
-  int nbelems = zoneVF.nb_elem_tot();
-  const DoubleTab xp = zoneVF.xp();
+  const Domaine_VF& domaineVF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  int nbelems = domaineVF.nb_elem_tot();
+  const DoubleTab xp = domaineVF.xp();
   Cerr<<mot<<finl;
   for (ielem=0 ; ielem<nbelems ; ielem++)
     {
@@ -780,9 +779,9 @@ void Navier_Stokes_phase_field::_aff_donnee_P0(const DoubleTab& tab, const Motcl
 void Navier_Stokes_phase_field::_aff_donnee_P1(const DoubleTab& tab, const Motcle& mot) const
 {
   int iface;
-  const Zone_VF& zoneVF = ref_cast(Zone_VF,zone_dis().valeur());
-  int nbfaces = zoneVF.nb_faces();
-  const DoubleTab xv = zoneVF.xv();
+  const Domaine_VF& domaineVF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  int nbfaces = domaineVF.nb_faces();
+  const DoubleTab xv = domaineVF.xv();
   Cerr<<mot<<finl;
   for (iface=0 ; iface<nbfaces ; iface++)
     {
@@ -809,11 +808,11 @@ void Navier_Stokes_phase_field::_aff_donnee_P1(const DoubleTab& tab, const Motcl
 void Navier_Stokes_phase_field::_aff_donnee_P1Bulle(const DoubleTab& tab, const Motcle& mot) const
 {
   int ielem,isom;
-  const Zone_VF& zoneVF = ref_cast(Zone_VF,zone_dis().valeur());
-  int nbelems = zoneVF.nb_elem_tot();
-  int nbsoms = zoneVF.nb_som();
-  const DoubleTab xp = zoneVF.xp();
-  const DoubleTab xs = zoneVF.zone().domaine().coord_sommets();
+  const Domaine_VF& domaineVF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  int nbelems = domaineVF.nb_elem_tot();
+  int nbsoms = domaineVF.nb_som();
+  const DoubleTab xp = domaineVF.xp();
+  const DoubleTab xs = domaineVF.domaine().coord_sommets();
   Cerr<<mot<<finl;
   for (ielem=0 ; ielem<nbelems ; ielem++)
     {
@@ -872,7 +871,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       double dt=le_schema_en_temps->pas_de_temps();
 
       //   const Probleme_base& pb=ref_cast(Probleme_base, probleme());
-      const Zone_VF& zvf=ref_cast(Zone_VF, zone_dis().valeur());
+      const Domaine_VF& zvf=ref_cast(Domaine_VF, domaine_dis().valeur());
       const DoubleTab& tab_rho=rho_.valeurs();
       const IntTab& face_voisins = zvf.face_voisins();
       const int nbfaces_bord = zvf.premiere_face_int();
@@ -913,9 +912,9 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //     for (int ielem=0 ; ielem<zvf.nb_elem_tot() ; ielem++) {
       //       int elem=-1;
       //       {
-      //         int nb_som_elem = zvf.zone().nb_som_elem(), isom,som;
-      //         const IntTab& elem_sommets = zvf.zone().les_elems();
-      //         const DoubleTab& coord_sommets = zvf.zone().domaine().coord_sommets();
+      //         int nb_som_elem = zvf.domaine().nb_som_elem(), isom,som;
+      //         const IntTab& elem_sommets = zvf.domaine().les_elems();
+      //         const DoubleTab& coord_sommets = zvf.domaine().domaine().coord_sommets();
       //         int trouve = 0;
       //         for (isom=0 ; isom<nb_som_elem ; isom++) {
       //           som = elem_sommets(ielem,isom);
@@ -931,7 +930,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //         if (dimension==3)
       //           Cerr<<" "<<zvf.xp(elem,2);
       //         Cerr<<finl;
-      //         int nb_faces_elem = zvf.zone().nb_faces_elem(),iface,face;
+      //         int nb_faces_elem = zvf.domaine().nb_faces_elem(),iface,face;
       //         const IntTab& elem_faces = zvf.elem_faces();
       //         for (iface=0 ; iface<nb_faces_elem ; iface++) {
       //           face = elem_faces(elem,iface);
@@ -940,9 +939,9 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //             Cerr<<" "<<zvf.xv(face,2);
       //           Cerr<<finl;
       //         }
-      //         int nb_som_elem = zvf.zone().nb_som_elem(), isom,som;
-      //         const IntTab& elem_sommets = zvf.zone().les_elems();
-      //         const DoubleTab& coord_sommets = zvf.zone().domaine().coord_sommets();
+      //         int nb_som_elem = zvf.domaine().nb_som_elem(), isom,som;
+      //         const IntTab& elem_sommets = zvf.domaine().les_elems();
+      //         const DoubleTab& coord_sommets = zvf.domaine().domaine().coord_sommets();
       //         for (isom=0 ; isom<nb_som_elem ; isom++) {
       //           som = elem_sommets(elem,isom);
       //           Cerr<<"  som="<<som<<"  coord="<<coord_sommets(som,0)<<" "<<coord_sommets(som,1);
@@ -1128,8 +1127,8 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //Assembleur_P_VDF_FT& assembleur_pression=ref_cast(Assembleur_P_VDF_FT, assembleur_pression_.valeur());
       //assembleur_pression.modifier_matrice_pression(matrice_pression_);
 
-      const Zone_VF& zone_VF = ref_cast(Zone_VF,la_zone_dis.valeur().valeur());
-      const DoubleVect& volumes = zone_VF.volumes();
+      const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,le_dom_dis.valeur().valeur());
+      const DoubleVect& volumes = domaine_VF.volumes();
       int el0,el1;
       double vol0,vol1;
 

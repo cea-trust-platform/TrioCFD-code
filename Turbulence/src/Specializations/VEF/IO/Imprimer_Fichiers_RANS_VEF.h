@@ -22,18 +22,18 @@
 #ifndef Imprimer_Fichiers_RANS_VEF_included
 #define Imprimer_Fichiers_RANS_VEF_included
 
-
-
-
 #include <Interprete.h>
-#include <Zone_VEF.h>
-#include <Zone_dis.h>
+#include <Domaine_VEF.h>
+#include <Domaine_dis.h>
 #include <Equation_base.h>
 #include <TRUSTVect.h>
-#include <Ref_Zone_VEF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
 class Champ_Fonc_base;
-class Zone_dis;
+class Domaine_dis;
 
 class Imprimer_Fichiers_RANS_VEF : public Interprete
 {

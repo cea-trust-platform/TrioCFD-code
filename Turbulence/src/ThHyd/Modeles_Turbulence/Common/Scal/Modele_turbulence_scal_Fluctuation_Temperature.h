@@ -25,7 +25,9 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Transport_Fluctuation_Temperature.h>
 #include <Transport_Flux_Chaleur_Turbulente.h>
-#include <Ref_Champ_Fonc.h>
+#include <TRUST_Ref.h>
+
+class Champ_Fonc;
 
 class Modele_turbulence_scal_Fluctuation_Temperature :  public Modele_turbulence_scal_base
 {

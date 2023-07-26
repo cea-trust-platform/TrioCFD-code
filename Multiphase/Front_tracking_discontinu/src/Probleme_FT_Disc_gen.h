@@ -25,10 +25,11 @@
 
 #include <Pb_Fluide_base.h>
 #include <TRUST_Vector.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Chimie.h>
 #include <Triple_Line_Model_FT_Disc.h>
+#include <TRUST_Ref.h>
 
+class Chimie;
+class Equation_base;
 class Milieu_base;
 class Navier_Stokes_FT_Disc;
 class Transport_Interfaces_FT_Disc;
@@ -77,7 +78,7 @@ public:
   virtual void preparer_mise_a_jour(void);
 
   // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
-  void discretiser(const Discretisation_base&) override;
+  void discretiser(Discretisation_base&) override;
 protected:
 
 private:

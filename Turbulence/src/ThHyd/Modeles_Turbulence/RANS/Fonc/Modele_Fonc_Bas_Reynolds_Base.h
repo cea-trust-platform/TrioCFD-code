@@ -23,21 +23,17 @@
 #define Modele_Fonc_Bas_Reynolds_Base_included
 
 
-#include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
-#include <Ref_Fluide_base.h>
-#include <Ref_Champ_Inc.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Champ_Don.h>
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
-
-class Motcle;
-class Zone_dis;
-class Zone_Cl_dis;
-/* class Champ_Don_base; */
 #include <Champ_Don.h>
+#include <TRUST_Ref.h>
 
+class Champ_Inc;
+class Fluide_base;
+class Motcle;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;
@@ -61,20 +57,20 @@ public:
   virtual void associer_pb(const Probleme_base& ) ;
   virtual void associer_eqn(const Equation_base& );
   virtual void associer_eqn_2(const Equation_base& );
-  virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
+  virtual void associer(const Domaine_dis& , const Domaine_Cl_dis& )= 0;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override;
-  virtual DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
+  virtual DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
   virtual int Calcul_is_Reynolds_stress_isotrope() const;
   virtual int Calcul_is_Cmu_constant() const;
-  virtual DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const =0 ;
+  virtual DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const =0 ;
 
-//  virtual DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis& ) const =0 ;
-  virtual DoubleTab& Calcul_F1( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base&) const=0;
-  virtual DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const =0 ;
-  virtual DoubleTab& Calcul_Fmu ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don& )const =0 ;
-  virtual DoubleTab& Calcul_Cmu(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const double) const;
-  virtual DoubleTab& Calcul_Cmu_Paroi(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+//  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis& ) const =0 ;
+  virtual DoubleTab& Calcul_F1( DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base&) const=0;
+  virtual DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const Champ_base&) const =0 ;
+  virtual DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don& )const =0 ;
+  virtual DoubleTab& Calcul_Cmu(DoubleTab&,const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&, const DoubleTab&, const double) const;
+  virtual DoubleTab& Calcul_Cmu_Paroi(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,
                                       const DoubleTab& , const DoubleTab& ,
                                       const DoubleTab& ,const int,
                                       const DoubleTab&, const DoubleTab&,
@@ -82,14 +78,14 @@ public:
 
   virtual bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
 
-  virtual DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
-  virtual DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const =0 ;
+  virtual DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
+  virtual DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const =0 ;
 
-  virtual DoubleTab& Calcul_F1_BiK( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base&) const=0;
-  virtual DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const =0 ;
-  virtual DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const =0 ;
-  virtual DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
-  virtual DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+  virtual DoubleTab& Calcul_F1_BiK( DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base&) const=0;
+  virtual DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const =0 ;
+  virtual DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const =0 ;
+  virtual DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Domaine_dis&, const Domaine_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
+  virtual DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,
                                           const DoubleTab& , const DoubleTab& ,
                                           const DoubleTab& ,const int,
                                           const DoubleTab&, const DoubleTab&, const DoubleTab&,

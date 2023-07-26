@@ -166,13 +166,13 @@ void Pb_MG::initialiser_champ_front_zoom()
             {
               //  Cerr<<"num de l'equa : "<<nb_eq<<finl;
               Equation_base& eqF = pbFb.equation(nb_eq);
-              Zone_Cl_dis_base& zoneF = eqF.zone_Cl_dis();
-              int nbCond = zoneF.nb_cond_lim();
+              Domaine_Cl_dis_base& domaineF = eqF.domaine_Cl_dis();
+              int nbCond = domaineF.nb_cond_lim();
               //Cerr<<"nbCond = "<<nbCond<<finl;
               int nb_cond;
               for(nb_cond=0; nb_cond<nbCond; nb_cond++)
                 {
-                  Champ_front_base& champFront = zoneF.les_conditions_limites(nb_cond).valeur().champ_front();
+                  Champ_front_base& champFront = domaineF.les_conditions_limites(nb_cond).valeur().champ_front();
 
                   if(sub_type(Champ_front_zoom, champFront))
                     {

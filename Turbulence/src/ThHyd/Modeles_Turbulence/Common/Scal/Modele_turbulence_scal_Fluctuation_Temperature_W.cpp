@@ -145,7 +145,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::mettre_a_jour(double temp
 {
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp->schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp->zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp->domaine_Cl_dis().mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp.valeur());
   //eqn_transport_Fluctu_Temp->inconnue().mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->mettre_a_jour(temps);
@@ -199,7 +199,6 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::imprimer(Sortie& os) cons
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(const Motcle& nom) const
 {
-  REF(Champ_base) ref_champ;
   try
     {
       return Modele_turbulence_scal_base::get_champ(nom);

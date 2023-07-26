@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_front_contact_rayo_semi_transp_VEF.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Schema_Temps_base.h>
 #include <Pb_Couple_rayo_semi_transp.h>
 #include <Modele_rayo_semi_transp.h>

@@ -24,17 +24,16 @@
 
 #include <TRUST_Vector.h>
 #include <Paroi_hyd_base_VDF.h>
-#include <Zone_dis.h>
-#include <Zone_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Eq_couch_lim.h>
-#include <Ref_Milieu_base.h>
 #include <Milieu_base.h>
 #include <Mod_echelle_LRM.h>
-
+#include <TRUST_Ref.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Mod_echelle_LRM_base;
 
 /*! @brief CLASS: ParoiVDF_TBLE_LRM

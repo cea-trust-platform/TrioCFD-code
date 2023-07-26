@@ -24,7 +24,7 @@
 
 /*! @brief Ajoute une entree a la liste doublement chainee d'intersections entre la facette d'interface num_facette et l'element eulerien num_element.
  *
- *  Le numero d'element doit verifier 0 <= num_element < zone.nb_elem()
+ *  Le numero d'element doit verifier 0 <= num_element < domaine.nb_elem()
  *  Si le numero de facette est superieur a la taille de l'index des facettes,
  *  on agrandit l'index.
  *
@@ -143,9 +143,9 @@ void Intersections_Elem_Facettes::get_liste_facettes_traversantes(int num_elemen
     }
 }
 
-/*! @brief Renvoie un tableau de taille zone.
+/*! @brief Renvoie un tableau de taille domaine.
  *
- * nb_elem(): pour un element 0 <= elem < zone.nb_elem(),
+ * nb_elem(): pour un element 0 <= elem < domaine.nb_elem(),
  *   index_elem()[elem] est l'indice de la premiere intersection entre l'element
  *   et les facettes du maillage lagrangien (voir description de la classe)
  *

@@ -22,7 +22,7 @@
 
 #include <Production_echelle_temp_taux_diss_turb_PolyMAC_P0.h>
 
-#include <Zone_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Probleme_base.h>
 #include <grad_Champ_Face_PolyMAC_P0.h>
@@ -58,8 +58,8 @@ Entree& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree& is)
 
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&       zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
   for (auto &&i_m : matrices)
     if (i_m.first == "k")
@@ -77,7 +77,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matri
 
 void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&                   zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0&                   domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const grad_Champ_Face_PolyMAC_P0&        grad = ref_cast(grad_Champ_Face_PolyMAC_P0, eq_qdm.get_champ("gradient_vitesse"));
@@ -88,9 +88,9 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = domaine.nb_faces_tot(), ne = domaine.nb_elem(), D = dimension ;
   int N = tab_diss.line_size();
 
   DoubleTrav Rij(0, Nph, D, D);

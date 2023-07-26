@@ -25,7 +25,7 @@
 #define Connectivites_IndGros_included
 
 
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Connectivites_base.h>
 
 #include <Domaine.h>
@@ -45,7 +45,7 @@ class Connectivites_IndGros : public Connectivites_base
   Declare_instanciable(Connectivites_IndGros);
 
 public:
-  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+  void calculer_connectivites(Domaine_VF& domainef, Domaine_VF& domaineg,
                               Domaine& domg) override;
   inline IntVect& indice_gros(); // tableau d'entier de taille NELEM_GROS : 1 si l'elem grossier recouvre un elem fin, 0 sinon.
 
@@ -53,7 +53,7 @@ public:
 private:
   IntVect ind_gros; // indique si un element grossier recouvre un element fin
 
-  void calculer_indice_gros(Zone_VF& zonef, Zone_VF& zoneg);
+  void calculer_indice_gros(Domaine_VF& domainef, Domaine_VF& domaineg);
 
 };
 

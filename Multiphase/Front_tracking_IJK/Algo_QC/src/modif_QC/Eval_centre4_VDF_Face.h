@@ -27,7 +27,7 @@
 
 #include <Eval_Conv_VDF.h>
 #include <Eval_VDF_Face.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 /*! @brief class Eval_centre4_VDF_Face
  *
  *  Evaluateur VDF pour la convection
@@ -105,21 +105,21 @@ protected:
 private:
   inline double dist_face(int n1,int n2,int k) const
   {
-    return la_zone->dist_face(n1,n2,k);
+    return le_dom->dist_face(n1,n2,k);
   };
   inline double dist_face_period(int n1,int n2,int k) const
   {
-    return la_zone->dist_face_period(n1,n2,k);
+    return le_dom->dist_face_period(n1,n2,k);
   };
   inline double dist_elem_period(int n1,int n2,int k) const
   {
-    return la_zone->dist_elem_period(n1,n2,k);
+    return le_dom->dist_elem_period(n1,n2,k);
   };
   inline int face_amont_conj(int ,int ,int ) const;
   inline int face_amont_princ(int ,int ) const;
   inline double dim_elem(int n1,int k) const
   {
-    return la_zone->dim_elem(n1,k);
+    return le_dom->dim_elem(n1,k);
   };
 };
 
@@ -233,12 +233,12 @@ inline double conv_centre(const double& psc,const double& vit_0_0, const double&
 
 inline int Eval_centre4_VDF_Face::face_amont_conj(int num_face, int i, int k) const
 {
-  return la_zone->face_amont_conj(num_face, i, k);
+  return le_dom->face_amont_conj(num_face, i, k);
 }
 
 inline int Eval_centre4_VDF_Face::face_amont_princ(int num_face, int i) const
 {
-  return la_zone->face_amont_princ(num_face, i);
+  return le_dom->face_amont_princ(num_face, i);
 }
 
 

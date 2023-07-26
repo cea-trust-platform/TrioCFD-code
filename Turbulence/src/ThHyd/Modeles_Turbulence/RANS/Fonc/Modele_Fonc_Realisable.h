@@ -51,11 +51,11 @@ public:
   inline int Calcul_is_Reynolds_stress_isotrope() const;
   inline int Calcul_is_Cmu_constant() const;
 
-  inline void Calcul_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse) ;
-  inline void Calcul_C1(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) ;
-  inline void Calcul_Cmu_et_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  ;
-  inline void Contributions_Sources(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) ;
-  inline void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+  inline void Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) ;
+  inline void Calcul_C1(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) ;
+  inline void Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  ;
+  inline void Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) ;
+  inline void Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                           const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt) ;
 
   inline const Equation_base& seconde_equation() const;
@@ -137,29 +137,29 @@ inline int Modele_Fonc_Realisable::Calcul_is_Reynolds_stress_isotrope() const
   return valeur().Calcul_is_Reynolds_stress_isotrope();
 }
 
-inline void Modele_Fonc_Realisable::Calcul_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse)
+inline void Modele_Fonc_Realisable::Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse)
 {
-  valeur().Calcul_S( zone_dis, zone_Cl_dis, vitesse );
+  valeur().Calcul_S( domaine_dis, domaine_Cl_dis, vitesse );
 }
 
-inline void Modele_Fonc_Realisable::Calcul_C1(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+inline void Modele_Fonc_Realisable::Calcul_C1(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  valeur().Calcul_C1( zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN );
+  valeur().Calcul_C1( domaine_dis, domaine_Cl_dis, vitesse, K_Eps, EPS_MIN );
 }
 
-inline void Modele_Fonc_Realisable::Calcul_Cmu_et_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)
+inline void Modele_Fonc_Realisable::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  valeur().Calcul_Cmu_et_S( zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN );
+  valeur().Calcul_Cmu_et_S( domaine_dis, domaine_Cl_dis, vitesse, K_Eps, EPS_MIN );
 }
 
-inline void Modele_Fonc_Realisable::Contributions_Sources(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+inline void Modele_Fonc_Realisable::Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  valeur().Contributions_Sources( zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN );
+  valeur().Contributions_Sources( domaine_dis, domaine_Cl_dis, vitesse, K_Eps, EPS_MIN );
 }
 
-inline void Modele_Fonc_Realisable::Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
+inline void Modele_Fonc_Realisable::Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
 {
-  valeur().Contributions_Sources_Paroi( zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN,visco,visco_turb,loi_paroi,idt);
+  valeur().Contributions_Sources_Paroi( domaine_dis, domaine_Cl_dis, vitesse, K_Eps, EPS_MIN,visco,visco_turb,loi_paroi,idt);
 }
 
 inline const Equation_base& Modele_Fonc_Realisable::seconde_equation() const

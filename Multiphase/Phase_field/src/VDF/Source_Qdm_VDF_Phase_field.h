@@ -25,8 +25,11 @@
 
 #include <Navier_Stokes_std.h>
 #include <Terme_Source_Qdm.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Zone_Cl_VDF.h>
+#include <TRUST_Ref.h>
+
+class Domaine_Cl_VDF;
+class Domaine_VDF;
+
 
 /*! @brief class Source_Qdm_VDF_Phase_field
  *
@@ -57,9 +60,9 @@ protected:
   DoubleTab gradC_;
   int boussi_;
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  REF(Domaine_VDF) le_dom_VDF;
+  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   REF(Probleme_base) le_probleme2;
   DoubleTab& (Source_Qdm_VDF_Phase_field::*methode)(DoubleTab& ) const;
 };

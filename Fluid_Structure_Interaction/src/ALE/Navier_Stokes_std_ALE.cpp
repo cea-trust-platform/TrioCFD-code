@@ -194,11 +194,11 @@ void Navier_Stokes_std_ALE::discretiser()
   Navier_Stokes_std::discretiser();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse", zone_dis().valeur(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
+  dis.discretiser_champ("vitesse", domaine_dis().valeur(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
   champs_compris_.ajoute_champ(ALEMeshVelocity_);
   ALEMeshVelocity_.valeur().add_synonymous(Nom("ALEMeshVelocity"));
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse",zone_dis().valeur(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
+  dis.discretiser_champ("vitesse",domaine_dis().valeur(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
   champs_compris_.ajoute_champ(ALEMeshTotalDisplacement_);
   ALEMeshTotalDisplacement_.valeur().add_synonymous(Nom("ALEMeshTotalDisplacement"));
 }

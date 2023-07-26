@@ -28,8 +28,8 @@
 #include <Paroi_log_QDM.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 class Param;
 
 /*! @brief CLASS: Paroi_std_hyd_VDF
@@ -82,7 +82,7 @@ protected:
 inline double Paroi_std_hyd_VDF::tau_tang(int face, int k) const
 {
   if(face>=Cisaillement_paroi_.dimension(0))
-    face-=la_zone_VDF.valeur().nb_faces_internes();
+    face-=le_dom_VDF.valeur().nb_faces_internes();
   if(face>=Cisaillement_paroi_.dimension_tot(0))
     {
       Cerr << "Erreur dans tau_tang " << finl;

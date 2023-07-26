@@ -48,7 +48,7 @@ int Paroi_std_hyd_VEF_3couches::calculer_k_eps(double& k, double& eps , double y
                                                double d_visco, double dist)
 {
   // PQ : 05/04/07 : repris de l'ancienne methode de calcul
-  //  a la definition des zones pres, i.e selon :
+  //  a la definition des domaines pres, i.e selon :
   //         valmax  = table_hyd.val(30) => y+~30
   //   valmin  = table_hyd.val(5)  => y+~5
 

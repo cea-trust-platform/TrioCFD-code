@@ -24,8 +24,11 @@
 #define Ensemble_Faces_base_included
 
 #include <Cond_Lim_Rayo.h>
-#include <Ref_Cond_lim_base.h>
 #include <Motcle.h>
+#include <TRUST_Ref.h>
+
+class Cond_lim_base;
+
 
 class Ensemble_Faces_base : public Objet_U
 {

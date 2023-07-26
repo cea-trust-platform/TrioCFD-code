@@ -69,7 +69,6 @@ Entree& Transport_K_ou_Eps_Realisable::readOn(Entree& s )
           Source& so=les_sources.add(t);
           const Probleme_base& pb = probleme();
           Cerr << "Construction and typing for the source term of the Transport_K equation." << finl;
-          REF(Champ_base) ch;
           if (sub_type(Pb_Hydraulique_Turbulent,pb) || milieu().que_suis_je()=="Fluide_Quasi_Compressible")
             {
               Nom typ = "Source_Transport_K";
@@ -99,7 +98,6 @@ Entree& Transport_K_ou_Eps_Realisable::readOn(Entree& s )
           Source& so=les_sources.add(t);
           const Probleme_base& pb = probleme();
           Cerr << "Construction and typing for the source term of the Transport_Eps equation." << finl;
-          REF(Champ_base) ch;
           if (sub_type(Pb_Hydraulique_Turbulent,pb) || milieu().que_suis_je()=="Fluide_Quasi_Compressible")
             {
               Nom typ = "Source_Transport_Eps";

@@ -27,9 +27,11 @@
 #include <TRUSTLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
-#include <Ref_Equation_base.h>
 #include <Beam_model.h>
 #include <Champs_front_ALE_projection.h>
+#include <TRUST_Ref.h>
+
+class Equation_base;
 class Domaine_dis;
 class Beam_model;
 //////////////////////////////////////////////////////////////////////////////

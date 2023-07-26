@@ -41,7 +41,7 @@ Entree& Paroi_negligeable_scal_VDF::readOn(Entree& s)
 
 // int Paroi_negligeable_scal_VDF::init_lois_paroi()
 // {
-//   const Zone_VDF& zvdf = la_zone_VDF.valeur();
+//   const Domaine_VDF& zvdf = le_dom_VDF.valeur();
 //   tab_d_equiv_.resize(zvdf.nb_faces_bord());
 
 //   if (axi)

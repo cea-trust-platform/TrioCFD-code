@@ -21,11 +21,11 @@
 
 #include <Champ_front_ALE_Beam.h>
 #include <Frontiere_dis_base.h>
-#include <Zone_Cl_dis_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Front_VF.h>
 #include <Domaine_ALE.h>
 #include <Domaine.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Cond_lim.h>
 #include <TRUSTVects.h>
 #include <fstream>
@@ -55,11 +55,10 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Frontiere& front=la_frontiere_dis->frontiere();
   Cerr<<" front nom := "<<front.le_nom()<<finl;
   int nb_faces=front.nb_faces();
-  const Zone& zone=front.zone();
+  const Domaine& domaine=front.domaine();
   const Faces& faces=front.faces();
 
-  const Domaine& domaine=zone.domaine();
-  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
+  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, domaine);
 
   double dt = dom_ale.get_dt();
   const int nbModes=dom_ale.getBeamNbModes();

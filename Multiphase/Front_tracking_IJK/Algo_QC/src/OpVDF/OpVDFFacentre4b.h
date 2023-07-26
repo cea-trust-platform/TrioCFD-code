@@ -56,7 +56,7 @@ class Op_Conv_centre4b_VDF_Face : public Op_Conv_VDF_base
 public:
 
   Op_Conv_centre4b_VDF_Face();
-  void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& );
+  void associer(const Domaine_dis& , const Domaine_Cl_dis& , const Champ_Inc& );
   inline void associer_vitesse(const Champ_base&) ;
   const Champ_Inc_base& vitesse() const;
   Champ_Inc_base& vitesse();

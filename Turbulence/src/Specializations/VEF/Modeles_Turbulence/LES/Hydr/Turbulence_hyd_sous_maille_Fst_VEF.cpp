@@ -24,7 +24,7 @@
 #include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Turbulence_hyd_sous_maille_Fst_VEF,"Modele_turbulence_hyd_sous_maille_fst_VEF",Mod_turb_hyd_ss_maille_VEF);
 
@@ -61,11 +61,11 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 {
   //  static double C1 = 0.02587;
   //  static double C1 =0.777*0.18247*0.18247; // PQ:07/09/05 affectation de C1 dans le Readon
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
-  const int nb_elem = zone_VEF.nb_elem();
+  const int nb_elem = domaine_VEF.nb_elem();
 
   Racine.resize(nb_elem_tot);
 
@@ -96,8 +96,8 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 ////  double C2 = cs*cs*9.56;
 //  double temps = mon_equation->inconnue().temps();
 //  DoubleVect& k = energie_cinetique_turb_.valeurs();
-//  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-//  const int nb_elem = zone_VEF.nb_elem();
+//  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+//  const int nb_elem = domaine_VEF.nb_elem();
 //
 //  if (k.size() != nb_elem)
 //    {
@@ -116,11 +116,11 @@ Champ_Fonc& Turbulence_hyd_sous_maille_Fst_VEF::calculer_viscosite_turbulente()
 void Turbulence_hyd_sous_maille_Fst_VEF::calculer_racine()
 {
   const DoubleTab& la_vitesse = mon_equation->inconnue().valeurs();
-  const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const int nb_elem = zone_VEF.nb_elem();
-  const int nb_elem_tot = zone_VEF.nb_elem_tot();
-  const DoubleVect& vol = zone_VEF.volumes();
+  const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const int nb_elem = domaine_VEF.nb_elem();
+  const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const DoubleVect& vol = domaine_VEF.volumes();
 
   DoubleTab Sij(nb_elem_tot,dimension,dimension);
 
@@ -130,7 +130,7 @@ void Turbulence_hyd_sous_maille_Fst_VEF::calculer_racine()
     l_(elem) = exp(log(vol[elem])/double(dimension));
 
   DoubleTab duidxj(nb_elem,dimension,dimension);
-  Champ_P1NC::calcul_gradient(la_vitesse,duidxj,zone_Cl_VEF);
+  Champ_P1NC::calcul_gradient(la_vitesse,duidxj,domaine_Cl_VEF);
 
   for(int elem=0 ; elem<nb_elem_tot ; elem ++)
     for(int i=0 ; i<dimension ; i ++)

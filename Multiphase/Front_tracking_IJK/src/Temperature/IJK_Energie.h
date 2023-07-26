@@ -46,7 +46,9 @@
 #include <OpDiffTurbIJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Parser.h>
-#include <Ref_IJK_FT_double.h>
+#include <TRUST_Ref.h>
+
+class IJK_FT_double;
 
 /*! @brief : class IJK_Energie
  *
@@ -57,8 +59,6 @@
  */
 class IJK_FT_double;
 
-class IJK_Energie;
-Declare_ref(IJK_Energie);
 
 class IJK_Energie : public Objet_U
 {

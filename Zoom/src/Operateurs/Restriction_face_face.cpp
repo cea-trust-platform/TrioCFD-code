@@ -46,14 +46,14 @@ Entree& Restriction_face_face::readOn(Entree& s )
 /*! @brief calcul du nombre de faces fines dont l'elem contient le centre de gravite pour chaque face grossiere
  *
  */
-void Restriction_face_face::calculer(const Zone_VF& zone_VFG,
-                                     const Zone_VF& zone_VFF,
+void Restriction_face_face::calculer(const Domaine_VF& domaine_VFG,
+                                     const Domaine_VF& domaine_VFF,
                                      const IntVect& connect)
 {
   //Cerr<<"debut de  Restriction_face_face::calculer"<<finl;
-  int nb_elemG = zone_VFG.nb_elem();
-  int nb_faceG = zone_VFG.nb_faces();
-  const DoubleTab& cg_facesG = zone_VFG.xv();
+  int nb_elemG = domaine_VFG.nb_elem();
+  int nb_faceG = domaine_VFG.nb_faces();
+  const DoubleTab& cg_facesG = domaine_VFG.xv();
   int max1, max2, max3;
   int nbelemsF;
   IntVect nb_elemF_;
@@ -61,16 +61,16 @@ void Restriction_face_face::calculer(const Zone_VF& zone_VFG,
   int num_elemG;
   int nbfacesF;
   int nbfacesG;
-  const Zone& zoneF = zone_VFF.zone();
-  int nb_facesF_par_elemF = zoneF.nb_faces_elem();
-  int nb_facesG_par_elemG = zone_VFG.zone().nb_faces_elem();
+  const Domaine& domaineF = domaine_VFF.domaine();
+  int nb_facesF_par_elemF = domaineF.nb_faces_elem();
+  int nb_facesG_par_elemG = domaine_VFG.domaine().nb_faces_elem();
   int nombre_total_elemF = connect.size_array();
   nb_elemF_.resize(nb_elemG);
   nb_faceF_.resize(nb_faceG+1);
   nb_faceF_ = 0;
-  const IntTab& num_facesF = zone_VFF.elem_faces();
-  const IntTab& num_facesG = zone_VFG.elem_faces();
-  const Elem_geom& mon_elemF = zoneF.type_elem();
+  const IntTab& num_facesF = domaine_VFF.elem_faces();
+  const IntTab& num_facesG = domaine_VFG.elem_faces();
+  const Elem_geom& mon_elemF = domaineF.type_elem();
   int dim;
   DoubleVect coord_cgG;
   coord_cgG.resize(dimension);
@@ -180,32 +180,32 @@ void Restriction_face_face::calculer(const Zone_VF& zone_VFG,
  *     car valeur
  *
  */
-void Restriction_face_face::restreindre(const Zone_VF& zone_VFG,
-                                        const Zone_VF& zone_VFF,
+void Restriction_face_face::restreindre(const Domaine_VF& domaine_VFG,
+                                        const Domaine_VF& domaine_VFF,
                                         const IntVect& connect,
                                         DoubleTab& valG,
                                         const DoubleTab& valF,int nb_comp)
 {
   //Cerr<<"debut de  Restriction_face_face::restreindre"<<finl;
-  const DoubleTab& cg_facesG = zone_VFG.xv();
-  int nb_faceG = zone_VFG.nb_faces();
-  const Zone& zoneF = zone_VFF.zone();
-  int nb_facesF_par_elemF = zone_VFF.zone().nb_faces_elem();
-  int nb_facesG_par_elemG = zone_VFG.zone().nb_faces_elem();
+  const DoubleTab& cg_facesG = domaine_VFG.xv();
+  int nb_faceG = domaine_VFG.nb_faces();
+  const Domaine& domaineF = domaine_VFF.domaine();
+  int nb_facesF_par_elemF = domaine_VFF.domaine().nb_faces_elem();
+  int nb_facesG_par_elemG = domaine_VFG.domaine().nb_faces_elem();
   int nb_faces_fines;
   IntTab tab_facesF;
   int nbG;
   int comp;
   int num_elemG;
   int nbfacesF;
-  const IntTab& num_facesF = zone_VFF.elem_faces();
-  const IntTab& num_facesG = zone_VFG.elem_faces();
+  const IntTab& num_facesF = domaine_VFF.elem_faces();
+  const IntTab& num_facesG = domaine_VFG.elem_faces();
   int nbfacesG;
   int num_faceG;
   int dim;
   DoubleVect coord_cgG;
   coord_cgG.resize(dimension);
-  const Elem_geom& mon_elemF = zoneF.type_elem();
+  const Elem_geom& mon_elemF = domaineF.type_elem();
   int max1 = nb_faceF_(nb_faceG);
   tab_facesF.resize(nb_faceG, max1+1);
   tab_facesF = -1;
@@ -213,7 +213,7 @@ void Restriction_face_face::restreindre(const Zone_VF& zone_VFG,
 
 
   int nbelemsF;
-  int nombre_total_elemF =  zone_VFF.nb_elem();
+  int nombre_total_elemF =  domaine_VFF.nb_elem();
 
   //Mettre a 0 les valeurs grossieres a corriger
   for (nbG=0; nbG<nb_faceG; nbG++)

@@ -215,9 +215,9 @@ void Convection_Diffusion_Chaleur_QC::discretiser()
 {
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Energy equation discretization " << finl;
-  dis.temperature(schema_temps(), zone_dis(), l_inco_ch);
+  dis.temperature(schema_temps(), domaine_dis(), l_inco_ch);
   //Cerr<<finl<<"On va effectuer proprietes_physiques_fluide_Incompressible"<<finl;
-  //dis.proprietes_physiques_fluide_incompressible(zone_dis(), fluide(), l_inco_ch);
+  //dis.proprietes_physiques_fluide_incompressible(domaine_dis(), fluide(), l_inco_ch);
   champs_compris_.ajoute_champ(l_inco_ch);
   Equation_base::discretiser();
   Cerr << "Convection_Diffusion_Chaleur_QC::discretiser() ok" << finl;
@@ -295,10 +295,10 @@ void Convection_Diffusion_Chaleur_QC::calculer_div_u_ou_div_rhou(DoubleTab& deri
 
       DoubleTrav unite(T);
       unite=1;
-      ref_cast_non_const(Operateur_base,operateur(1).l_op_base()).associer_zone_cl_dis(zcl_modif_.valeur());
+      ref_cast_non_const(Operateur_base,operateur(1).l_op_base()).associer_domaine_cl_dis(zcl_modif_.valeur());
 
       operateur(1).ajouter(unite,derivee2);
-      ref_cast_non_const(Operateur_base,operateur(1).l_op_base()).associer_zone_cl_dis(zone_Cl_dis().valeur());
+      ref_cast_non_const(Operateur_base,operateur(1).l_op_base()).associer_domaine_cl_dis(domaine_Cl_dis().valeur());
     }
   else
     {
@@ -406,9 +406,9 @@ DoubleTab& Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco_sans_solveur_m
       }
     if (mode_convection_==0)
       {
-        la_zone_Cl_dis.les_conditions_limites().set_modifier_val_imp(1);
+        le_dom_Cl_dis.les_conditions_limites().set_modifier_val_imp(1);
         operateur(1).ajouter(derivee);
-        la_zone_Cl_dis.les_conditions_limites().set_modifier_val_imp(0);
+        le_dom_Cl_dis.les_conditions_limites().set_modifier_val_imp(0);
       }
     else
       calculer_div_u_ou_div_rhou(derivee);
@@ -429,7 +429,7 @@ DoubleTab& Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco_sans_solveur_m
       int diffusion_implicite=sch.diffusion_implicite();
       const DoubleTab& tab_rho = le_fluide->masse_volumique().valeurs();
       int n = tab_rho.dimension(0);
-      la_zone_Cl_dis.les_conditions_limites().set_modifier_val_imp(0);
+      le_dom_Cl_dis.les_conditions_limites().set_modifier_val_imp(0);
       // Calcul de derivee=Div(lambda*gradient(temperature))
       if (le_fluide->type_fluide()=="Gaz_Parfait")
       {
@@ -442,7 +442,7 @@ DoubleTab& Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco_sans_solveur_m
       assert(diffusion_implicite==0);
       }
 
-      la_zone_Cl_dis.les_conditions_limites().set_modifier_val_imp(1);
+      le_dom_Cl_dis.les_conditions_limites().set_modifier_val_imp(1);
       derivee.echange_espace_virtuel();
       Debog::verifier("Convection_Diffusion_Chaleur_QC::derivee_en_temps_inco_sans_solveur_masse derivee apres convection",derivee);
       // On ajoute le terme source a derivee
@@ -817,8 +817,8 @@ int Convection_Diffusion_Chaleur_QC::preparer_calcul()
   operateur(1).ajouter(tmp,tmp);
   if (mode_convection_==0)
     return 1;
-  // remplissage de la zone cl modifiee avec 1 partout au bord...
-  zcl_modif_=(zone_Cl_dis());
+  // remplissage de la domaine cl modifiee avec 1 partout au bord...
+  zcl_modif_=(domaine_Cl_dis());
   Conds_lim& condlims=zcl_modif_.valeur().les_conditions_limites();
   int nb=condlims.size();
   for (int i=0; i<nb; i++)

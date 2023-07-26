@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0.h>
-#include <Zone_PolyMAC_P0.h>
+#include <Domaine_PolyMAC_P0.h>
 #include <Champ_Elem_PolyMAC_P0.h>
 #include <Equation_base.h>
 #include <Pb_Multiphase.h>
@@ -63,9 +63,9 @@ Entree& Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::readOn(E
 
 void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab& k 	 = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs();
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), Nk = k.line_size();
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -102,7 +102,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionne
 
 void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Zone_PolyMAC_P0& 	         zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Domaine_PolyMAC_P0& 	         domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0&     ch_k = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());		// Champ k
   const DoubleTab& 						      k 	= ch_k.valeurs();
   const Champ_Inc_base& ch_alpha_rho_k 	= equation().champ_conserve();
@@ -112,7 +112,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
   const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff 		= ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   const DoubleTab&                      nu 		  		= equation().probleme().get_champ("viscosite_cinematique").passe();
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -124,7 +124,7 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
   const Champ_Elem_PolyMAC_P0& ch_diss = ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ(Nom(Type_diss.c_str()))); // Champ tau ou omega
   const DoubleTab&                diss = ch_diss.valeurs() ;
 
-  const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = zone.nb_elem();
+  const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = domaine.nb_elem();
 
   Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
                  *Mk = matrices.count(ch_k.le_nom().getString()) ? matrices.at(ch_k.le_nom().getString()) : nullptr,

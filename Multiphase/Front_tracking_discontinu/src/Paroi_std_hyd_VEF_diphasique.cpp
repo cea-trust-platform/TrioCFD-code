@@ -47,13 +47,13 @@ Entree& Paroi_std_hyd_VEF_diphasique::readOn( Entree& is )
   return is;
 }
 
-extern double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDouble& val);
+extern double norm_vit_lp(const ArrOfDouble& vit,int face,const Domaine_VEF& domaine,ArrOfDouble& val);
 /* Codee classe mere
-double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDouble& val)
+double norm_vit_lp(const ArrOfDouble& vit,int face,const Domaine_VEF& domaine,ArrOfDouble& val)
 {
-  // A reverser dans VEF/Zone (?)
+  // A reverser dans VEF/Domaine (?)
 
-  const DoubleTab& face_normale = zone.face_normales();
+  const DoubleTab& face_normale = domaine.face_normales();
   int dim=Objet_U::dimension;
   ArrOfDouble r(dim);
   double psc,norm_vit;
@@ -74,8 +74,8 @@ double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDou
 
 int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   // Physical properties of both phases
@@ -89,13 +89,13 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   const double delta_nu = tab_visco_ph1(0,0) - tab_visco_ph0(0,0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab
-  const Zone_Cl_dis_base& zone_Cl_dis_base = eqn_hydr.zone_Cl_dis().valeur();
-  const Equation_base& eqn_trans = zone_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
+  const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
   const DoubleTab& indic = eqn_interf.inconnue().valeurs();
 
-  const Zone& zone = zone_VEF.zone();
-  int nfac = zone.nb_faces_elem();
+  const Domaine& domaine = domaine_VEF.domaine();
+  int nfac = domaine.nb_faces_elem();
 
   double visco_ph0=-1;
   int l_unif;
@@ -132,10 +132,10 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   bool COMB =(sub_type(Mod_turb_hyd_combin,mon_modele_turb_hyd.valeur()) ? 1 : 0);  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
 
   // Loop on boundaries
-  int nb_bords=zone_VEF.nb_front_Cl();
+  int nb_bords=domaine_VEF.nb_front_Cl();
   for (int n_bord=0; n_bord<nb_bords; n_bord++)
     {
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
@@ -146,7 +146,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
             erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
 
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const IntTab& elem_faces = zone_VEF.elem_faces();
+          const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
           int ndeb = 0;
@@ -165,10 +165,10 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
                     vit[j]+=(vitesse(face,j)-vitesse(num_face,j)); // permet de soustraire la vitesse de glissement eventuelle
                 }
               vit   /= coef_vit;
-              dist   = distance_face_elem(num_face,elem,zone_VEF);
+              dist   = distance_face_elem(num_face,elem,domaine_VEF);
               dist  *= dist_corr; // pour passer du centre de gravite au milieu des faces en P1NC
 
-              double norm_v = norm_vit_lp(vit,num_face,zone_VEF,val);
+              double norm_v = norm_vit_lp(vit,num_face,domaine_VEF,val);
 
               if (l_unif)
                 d_visco = visco_ph0 + indic(elem) * delta_nu;
@@ -234,7 +234,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
 
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
-          const DoubleTab& normales = zone_VEF.face_normales();
+          const DoubleTab& normales = domaine_VEF.face_normales();
           double delta = Paroi.get_delta();
 
           // Loop on real faces

@@ -138,7 +138,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
   return eqn_transport_K_Eps.get_nutswitch();
 }
 
-/*! @brief indique si on doit ecrire la zone des 2 couches dans le .
+/*! @brief indique si on doit ecrire la domaine des 2 couches dans le .
  *
  * out. (version const)
  *

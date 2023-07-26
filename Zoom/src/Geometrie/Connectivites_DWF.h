@@ -25,7 +25,7 @@
 #define Connectivites_DWF_included
 
 
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Connectivites_base.h>
 
 #include <Domaine.h>
@@ -46,14 +46,14 @@ class Connectivites_DWF : public Connectivites_base
   Declare_instanciable(Connectivites_DWF);
 
 public:
-  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+  void calculer_connectivites(Domaine_VF& domainef, Domaine_VF& domaineg,
                               Domaine& domg) override;
   IntVect& connectivites_faceG_faceF() ;
 
 
 private:
   IntVect connect_faceG_faceF;
-  void calculer_connectivites_face_face(Zone_VF& zonef, Zone_VF& zoneg,
+  void calculer_connectivites_face_face(Domaine_VF& domainef, Domaine_VF& domaineg,
                                         Domaine& domg);
 
 };

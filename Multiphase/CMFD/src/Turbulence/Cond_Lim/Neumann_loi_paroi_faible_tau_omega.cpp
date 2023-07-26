@@ -30,7 +30,7 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Operateur_Diff_base.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
@@ -63,8 +63,8 @@ Entree& Neumann_loi_paroi_faible_tau_omega::readOn(Entree& s )
 
 void Neumann_loi_paroi_faible_tau_omega::completer()
 {
-  if (sub_type(Echelle_temporelle_turbulente, zone_Cl_dis().equation())) is_tau_ = 1;
-  else if (sub_type(Taux_dissipation_turbulent, zone_Cl_dis().equation())) is_tau_ = 0;
+  if (sub_type(Echelle_temporelle_turbulente, domaine_Cl_dis().equation())) is_tau_ = 1;
+  else if (sub_type(Taux_dissipation_turbulent, domaine_Cl_dis().equation())) is_tau_ = 0;
   else Process::exit("Neumann_loi_paroi_faible_tau_omega : equation must be tau/omega !");
 }
 
@@ -101,9 +101,9 @@ double Neumann_loi_paroi_faible_tau_omega::flux_impose(int i,int j) const
 
 int Neumann_loi_paroi_faible_tau_omega::initialiser(double temps)
 {
-  valeurs_flux_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  valeurs_flux_.resize(0,domaine_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_flux_);
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
   return 1;
 }
 
@@ -115,40 +115,40 @@ void Neumann_loi_paroi_faible_tau_omega::mettre_a_jour(double tps)
 void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_VF& zone = ref_cast(Zone_VF, zone_Cl_dis().equation().zone_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
-  const DoubleTab& visc_c  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
-                             ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() ;
+  const DoubleTab& visc_c  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                             ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() ;
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size() ;
-  const IntTab& f_e = zone.face_voisins();
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size() ;
+  const IntTab& f_e = domaine.face_voisins();
 
   if (mu.nb_dim() >= 3) Process::exit("Neumann_loi_paroi_faible_tau_omega : transport of tau/omega must be SGDH !");
   if (N > 1)  Process::exit("Neumann_loi_paroi_faible_tau : Only one phase for turbulent wall law is coded for now");
 
   if (is_tau_ == 1)
     {
-      if (sub_type(Op_Diff_Tau_PolyMAC_P0_Elem, zone_Cl_dis().equation().operateur(0).l_op_base()))
+      if (sub_type(Op_Diff_Tau_PolyMAC_P0_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()))
         {
-          double limiter = ref_cast(Op_Diff_Tau_PolyMAC_P0_Elem, zone_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
-          const DoubleTab& tau = zone_Cl_dis().equation().inconnue().passe();
+          double limiter = ref_cast(Op_Diff_Tau_PolyMAC_P0_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
+          const DoubleTab& tau = domaine_Cl_dis().equation().inconnue().passe();
           for (int f =0 ; f < nf ; f++)
             {
-              int f_zone = f + f1; // number of the face in the zone
-              int e_zone = f_e(f_zone,0);
-              valeurs_flux_(f, 0) = - mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)) / ((tau(e_zone,0) > limiter) ? limiter/(tau(e_zone,0)*tau(e_zone,0)) : 1/limiter); // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
+              int f_domaine = f + f1; // number of the face in the domaine
+              int e_domaine = f_e(f_domaine,0);
+              valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) / ((tau(e_domaine,0) > limiter) ? limiter/(tau(e_domaine,0)*tau(e_domaine,0)) : 1/limiter); // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
             }
         }
       else
         {
           for (int f =0 ; f < nf ; f++)
             {
-              int f_zone = f + f1; // number of the face in the zone
-              int e_zone = f_e(f_zone,0);
-              valeurs_flux_(f, 0) = - mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
+              int f_domaine = f + f1; // number of the face in the domaine
+              int e_domaine = f_e(f_domaine,0);
+              valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_tau(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)) ; // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
             }
         }
     }
@@ -156,9 +156,9 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
     {
       for (int f =0 ; f < nf ; f++)
         {
-          int f_zone = f + f1; // number of the face in the zone
-          int e_zone = f_e(f_zone,0);
-          valeurs_flux_(f, 0) = - mu(e_zone, 0) * dy_omega(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)); // flux de Neumann = -mu * dy_omega car flux selon - grad
+          int f_domaine = f + f1; // number of the face in the domaine
+          int e_domaine = f_e(f_domaine,0);
+          valeurs_flux_(f, 0) = - mu(e_domaine, 0) * dy_omega(y(f_domaine, 0), u_tau(f_domaine, 0), visc_c(e_domaine, 0)); // flux de Neumann = -mu * dy_omega car flux selon - grad
         }
     }
 

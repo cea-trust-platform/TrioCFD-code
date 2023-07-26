@@ -22,7 +22,7 @@
 
 #include <Temperature_imposee_paroi_rayo_transp.h>
 #include <Equation_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 #include <Champ_front_contact_rayo_transp_VEF.h>
 
 Implemente_instanciable(Temperature_imposee_paroi_rayo_transp,"Paroi_temperature_imposee_rayo_transp",Temperature_imposee_paroi);
@@ -45,7 +45,7 @@ void Temperature_imposee_paroi_rayo_transp::completer()
 {
   //  Cerr<<"Temperature_imposee_paroi_rayo_transp::completer debut"<<finl;
   Temperature_imposee_paroi::completer();
-  preparer_surface(frontiere_dis(),zone_Cl_dis());
+  preparer_surface(frontiere_dis(),domaine_Cl_dis());
 }
 
 void Temperature_imposee_paroi_rayo_transp::mettre_a_jour(double temps)

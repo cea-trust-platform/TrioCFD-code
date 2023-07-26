@@ -33,8 +33,8 @@
 #include <Paroi_log_QDM.h>
 
 class Champ_Fonc_base;
-class Zone_dis;
-class Zone_Cl_dis;
+class Domaine_dis;
+class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_std_hyd_VEF
  *
@@ -42,7 +42,7 @@ class Zone_Cl_dis;
  *  Turbulence_paroi_base
  *
  */
-void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Zone_VEF& zone_VEF,const REF(Zone_Cl_VEF) la_zone_Cl_VEF,int is_champ_P1NC);
+void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Domaine_VEF& domaine_VEF,const REF(Domaine_Cl_VEF) le_dom_Cl_VEF,int is_champ_P1NC);
 
 
 class Paroi_std_hyd_VEF : public Paroi_hyd_base_VEF, public Paroi_log_QDM

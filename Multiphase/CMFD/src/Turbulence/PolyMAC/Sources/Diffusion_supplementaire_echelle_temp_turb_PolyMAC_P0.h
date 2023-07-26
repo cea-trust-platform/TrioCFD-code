@@ -24,8 +24,10 @@
 #define Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0_included
 
 #include <Source_base.h>
-#include <Ref_Correlation.h>
 #include <TRUSTTab.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
 
 /*! @brief Classe Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la diffusion supplementaire venant de l'introduction du temps tau
  *
@@ -45,7 +47,7 @@ public :
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
   void completer() override;

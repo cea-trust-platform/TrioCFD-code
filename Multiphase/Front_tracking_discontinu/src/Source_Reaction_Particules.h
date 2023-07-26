@@ -24,7 +24,9 @@
 #define Source_Reaction_Particules_included
 
 #include <Source_base.h>
-#include <Ref_Transport_Marqueur_FT.h>
+#include <TRUST_Ref.h>
+
+class Transport_Marqueur_FT;
 
 /*! @brief Classe Source_Reaction_Particules Calcul du terme source a ajouter dans Navier_Stokes pour prendre en compte
  *
@@ -51,7 +53,7 @@ public :
 
 protected:
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
 

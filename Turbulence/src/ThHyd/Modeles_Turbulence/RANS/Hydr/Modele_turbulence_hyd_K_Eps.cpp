@@ -102,7 +102,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
 {
   const Champ_base& chK_Eps=eqn_transp_K_Eps().inconnue().valeur();
   Nom type=chK_Eps.que_suis_je();
-  const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Eps().zone_Cl_dis();
+  const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
 
@@ -115,7 +115,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
   if (n<0)
     {
       if (sub_type(Champ_Inc_P0_base, chK_Eps))
-        n = eqn_transp_K_Eps().zone_dis().zone().nb_elem();
+        n = eqn_transp_K_Eps().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_Eps field in Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente" << finl;
@@ -139,21 +139,21 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       //      const DoubleTab& tab_visco = ch_visco.valeurs();
       Fmu.resize(tab_K_Eps.dimension_tot(0));
-      const Zone_dis& la_zone_dis = eqn_transp_K_Eps().zone_dis();
+      const Domaine_dis& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
 
-      mon_modele_fonc.Calcul_Fmu( Fmu,la_zone_dis,la_zone_Cl_dis,tab_K_Eps,ch_visco);
+      mon_modele_fonc.Calcul_Fmu( Fmu,le_dom_dis,le_dom_Cl_dis,tab_K_Eps,ch_visco);
       /*const DoubleTab& vit = eqn_transp_K_Eps().probleme().equation(0).inconnue().valeurs();
       D=Fmu;
       D=0;
       if (0)
-        mon_modele_fonc.Calcul_D(D,la_zone_dis,eqn_transp_K_Eps().zone_Cl_dis(),vit,tab_K_Eps,ch_visco_cin);
+        mon_modele_fonc.Calcul_D(D,le_dom_dis,eqn_transp_K_Eps().domaine_Cl_dis(),vit,tab_K_Eps,ch_visco_cin);
        */
       int is_Cmu_constant = mon_modele_fonc.Calcul_is_Cmu_constant();
       if (is_Cmu_constant==0)
         {
 //          Cerr<< " On utilise un Cmu non constant "<< finl;
           const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-          mon_modele_fonc.Calcul_Cmu(Cmu, la_zone_dis, la_zone_Cl_dis,
+          mon_modele_fonc.Calcul_Cmu(Cmu, le_dom_dis, le_dom_Cl_dis,
                                      vitesse, tab_K_Eps, LeEPS_MIN);
 
           /*Paroi*/
@@ -165,7 +165,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
               visco_tab = tab_visco(0,0);
               const int idt =  mon_equation->schema_temps().nb_pas_dt();
               const DoubleTab& tab_paroi = loi_paroi().valeur().Cisaillement_paroi();
-              mon_modele_fonc.Calcul_Cmu_Paroi(Cmu, la_zone_dis, la_zone_Cl_dis,visco_tab, visco_turb, tab_paroi, idt,
+              mon_modele_fonc.Calcul_Cmu_Paroi(Cmu, le_dom_dis, le_dom_Cl_dis,visco_tab, visco_turb, tab_paroi, idt,
                                                vitesse, tab_K_Eps, LeEPS_MIN);
             }
         }
@@ -175,7 +175,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
     }
 
 
-  // dans le cas d'une zone nulle on doit effectuer le dimensionnement
+  // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
   double non_prepare=1;
   Debog::verifier("Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente tab_K_Eps",tab_K_Eps);
@@ -189,7 +189,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
 
       visco_turb_au_format_K_eps.typer(type);
       Champ_Inc_base& ch_visco_turb_K_eps=visco_turb_au_format_K_eps.valeur();
-      ch_visco_turb_K_eps.associer_zone_dis_base(eqn_transp_K_Eps().zone_dis().valeur());
+      ch_visco_turb_K_eps.associer_domaine_dis_base(eqn_transp_K_Eps().domaine_dis().valeur());
       ch_visco_turb_K_eps.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps.fixer_nb_comp(1);
       ch_visco_turb_K_eps.fixer_nb_valeurs_nodales(n);
@@ -285,7 +285,7 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K_Eps, const Schema_Temps
       if (size<0)
         {
           if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
-            size = le_champ_K_Eps.valeur().equation().zone_dis().zone().nb_elem();
+            size = le_champ_K_Eps.valeur().equation().domaine_dis().domaine().nb_elem();
           else
             {
               Cerr << "Unsupported K_Eps field in Modele_turbulence_hyd_K_Eps::imprimer_evolution_keps()" << finl;
@@ -435,7 +435,7 @@ void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
   Champ_Inc& ch_K_Eps = K_Eps();
   Schema_Temps_base& sch =eqn_transp_K_Eps().schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transp_K_Eps().zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);

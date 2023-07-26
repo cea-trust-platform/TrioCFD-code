@@ -93,7 +93,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
 
       visco_turb_au_format_K_eps.typer(type);
       Champ_Inc_base& ch_visco_turb_K_eps=visco_turb_au_format_K_eps.valeur();
-      ch_visco_turb_K_eps.associer_zone_dis_base(eqn_transport_K_Eps.zone_dis().valeur());
+      ch_visco_turb_K_eps.associer_domaine_dis_base(eqn_transport_K_Eps.domaine_dis().valeur());
       ch_visco_turb_K_eps.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps.fixer_nb_comp(1);
       ch_visco_turb_K_eps.fixer_nb_valeurs_nodales(n);
@@ -160,7 +160,7 @@ void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
   Champ_Inc& ch_K_Eps = K_Eps();
   Schema_Temps_base& sch = eqn_transport_K_Eps.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_K_Eps.zone_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_K_Eps.domaine_Cl_dis().mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transport_K_Eps);
   eqn_transport_K_Eps.mettre_a_jour(temps);
 

@@ -64,15 +64,15 @@ int Paroi_negligeable_VEF::init_lois_paroi()
 
   // Dimensionnement du tableau elem_paroi
   int num_cl,fac,i;
-  const Conds_lim& les_cl = la_zone_Cl_VEF->les_conditions_limites();
-  //  const IntTab& elem_faces = la_zone_VEF->elem_faces();
-  const IntTab& face_voisins = la_zone_VEF->face_voisins();
+  const Conds_lim& les_cl = le_dom_Cl_VEF->les_conditions_limites();
+  //  const IntTab& elem_faces = le_dom_VEF->elem_faces();
+  const IntTab& face_voisins = le_dom_VEF->face_voisins();
 
-  DoubleTrav Verif_elem_double(la_zone_VEF->nb_elem());
+  DoubleTrav Verif_elem_double(le_dom_VEF->nb_elem());
   compteur_elem_paroi = 0;
   Verif_elem_double = 0;
-  elem_paroi.resize(la_zone_VEF->nb_faces_bord());
-  elem_paroi_double.resize(la_zone_VEF->nb_faces_bord());
+  elem_paroi.resize(le_dom_VEF->nb_faces_bord());
+  elem_paroi_double.resize(le_dom_VEF->nb_faces_bord());
 
   for (num_cl=0; num_cl<les_cl.size(); num_cl++)
     {
@@ -136,9 +136,9 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
       IntVect num(dimension);
 
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-      const IntTab& face_voisins = zone_VEF.face_voisins();
-      const IntTab& elem_faces = zone_VEF.elem_faces();
+      const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+      const IntTab& face_voisins = domaine_VEF.face_voisins();
+      const IntTab& elem_faces = domaine_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -158,9 +158,9 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
           exit();
         }
 
-      for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {
@@ -180,10 +180,10 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                       if (num[0]==num_face) num[0]=elem_faces(elem,2);
                       else if (num[1]==num_face) num[1]=elem_faces(elem,2);
 
-                      dist = distance_2D(num_face,elem,zone_VEF);
+                      dist = distance_2D(num_face,elem,domaine_VEF);
                       dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
-                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
-                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, zone_VEF,val1,val2);
+                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],domaine_VEF,val1,val2);
+                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, domaine_VEF,val1,val2);
 
                     } // dim 2
                   else if (dimension == 3)
@@ -197,10 +197,10 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                       else if (num[1]==num_face) num[1]=elem_faces(elem,3);
                       else if (num[2]==num_face) num[2]=elem_faces(elem,3);
 
-                      dist = distance_3D(num_face,elem,zone_VEF);
+                      dist = distance_3D(num_face,elem,domaine_VEF);
                       dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
-                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
-                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
 
                     }// dim 3
 
@@ -237,9 +237,9 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
       IntVect num(dimension);
 
-      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-      const IntTab& face_voisins = zone_VEF.face_voisins();
-      const IntTab& elem_faces = zone_VEF.elem_faces();
+      const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+      const IntTab& face_voisins = domaine_VEF.face_voisins();
+      const IntTab& elem_faces = domaine_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -259,9 +259,9 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           exit();
         }
 
-      for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+      for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
         {
-          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+          const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
           if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
             {
@@ -281,10 +281,10 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                       if (num[0]==num_face) num[0]=elem_faces(elem,2);
                       else if (num[1]==num_face) num[1]=elem_faces(elem,2);
 
-                      dist = distance_2D(num_face,elem,zone_VEF);
+                      dist = distance_2D(num_face,elem,domaine_VEF);
                       dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
-                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
-                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, zone_VEF,val1,val2);
+                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],domaine_VEF,val1,val2);
+                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, domaine_VEF,val1,val2);
 
                     } // dim 2
                   else if (dimension == 3)
@@ -298,10 +298,10 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                       else if (num[1]==num_face) num[1]=elem_faces(elem,3);
                       else if (num[2]==num_face) num[2]=elem_faces(elem,3);
 
-                      dist = distance_3D(num_face,elem,zone_VEF);
+                      dist = distance_3D(num_face,elem,domaine_VEF);
                       dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
-                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
-                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
 
                     }// dim 3
 

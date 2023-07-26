@@ -12,7 +12,7 @@
 #include <N_S_Turb.h>
 #include <Pb_base.h>
 #include <Discr_base.h>
-#include <Zone_VF.h>
+#include <Domaine_VF.h>
 #include <Fluide_Quasi_Comp.h>
 #include <ZCl_dis_base.h>
 #include <Diriparoifixe.h>
@@ -762,9 +762,9 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
 	 exit();
 	}
 	
-      const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
+      const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
       
-      const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+      const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
       entier nb_cl=les_cl.size();
       entier num_cl,fac;
       entier num_cl_rep=0;

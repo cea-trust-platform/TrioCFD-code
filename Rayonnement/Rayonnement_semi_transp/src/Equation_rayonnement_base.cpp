@@ -368,9 +368,9 @@ void Equation_rayonnement_base::discretiser()
   Cerr <<"Radiation equation discretisation" << finl;
   Cerr <<"Do not matter with the fact that discretization of the temperature"<<finl;
   Cerr <<"is indicated indeed it is the irradiance wich is discretized."<<finl;
-  dis.temperature(schema_temps(), zone_dis(), irradiance_);
+  dis.temperature(schema_temps(), domaine_dis(), irradiance_);
 
-  // La methode temperature(schema_temps(), zone_dis(), irradiance_) permet
+  // La methode temperature(schema_temps(), domaine_dis(), irradiance_) permet
   // d'associer tout la bonne discretisation au champ de l'irradiance
   // toutefois, il faut modifier certaines grandeurs telles que le nom ou l'unite
   // de l'irradiance.

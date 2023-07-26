@@ -22,9 +22,10 @@
 #define Statistiques_dns_ijk_FT_H
 #include <FixedVector.h>
 #include <IJK_Field.h>
-#include <Ref_IJK_FT_double.h>
 #include <Statistiques_dns_ijk.h>
 #include <TRUSTArrays.h>
+#include <TRUST_Ref.h>
+
 class IJK_FT_double;
 class IJK_Grid_Geometry;
 

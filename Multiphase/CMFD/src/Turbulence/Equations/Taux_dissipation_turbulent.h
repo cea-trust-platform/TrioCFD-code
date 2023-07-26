@@ -25,7 +25,7 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Fluide_base.h>
-#include <Ref_Fluide_base.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Taux_dissipation_turbulent Equation de transport du taux de dissipation turbulen (modele k-omega)
  *

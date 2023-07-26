@@ -50,7 +50,7 @@ Entree& Prolongement_face_face_DWF::readOn(Entree& s )
  *  Les connectivites a passer sont du type elemF->elemG
  *
  */
-void Prolongement_face_face_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
+void Prolongement_face_face_DWF::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& domaine_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,
                                            const DoubleTab& valG, DoubleTab& tab,
@@ -61,17 +61,17 @@ void Prolongement_face_face_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
   const int prem_face_bord_fin  =  frontF.num_premiere_face();
   const int nb_faces_front_fine = frontF.nb_faces();
-  const IntTab& face_voisinsF = zone_VFF.face_voisins();
+  const IntTab& face_voisinsF = domaine_VFF.face_voisins();
 
 
-  const IntTab& elem_facesG =  zone_VFG.elem_faces();
+  const IntTab& elem_facesG =  domaine_VFG.elem_faces();
 
-  if(sub_type(Zone_VDF, zone_VFG) && sub_type(Zone_VDF, zone_VFF))
+  if(sub_type(Domaine_VDF, domaine_VFG) && sub_type(Domaine_VDF, domaine_VFF))
     {
-      const Zone_VDF& zone_vdfF = ref_cast(Zone_VDF, zone_VFF);
-      const IntVect& oriF = zone_vdfF.orientation();
-      //const Zone_VDF& zone_vdfG = ref_cast(Zone_VDF, zone_VFG);
-      // const IntVect& oriG = zone_vdfG.orientation();
+      const Domaine_VDF& domaine_vdfF = ref_cast(Domaine_VDF, domaine_VFF);
+      const IntVect& oriF = domaine_vdfF.orientation();
+      //const Domaine_VDF& domaine_vdfG = ref_cast(Domaine_VDF, domaine_VFG);
+      // const IntVect& oriG = domaine_vdfG.orientation();
       for (int ifaceF=0; ifaceF<nb_faces_front_fine; ifaceF++)
         {
           const int num_face=prem_face_bord_fin+ifaceF; // face fine courante
@@ -153,7 +153,7 @@ void Prolongement_face_face_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
             }
         }
     }
-  //if(sub_type(Zone_VEF, zone_VFG))
+  //if(sub_type(Domaine_VEF, domaine_VFG))
   {
     for (comp=0; comp<nb_compo; comp++)
       {
@@ -168,8 +168,8 @@ void Prolongement_face_face_DWF::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
 
 
 //NE FAIT RIEN
-void Prolongement_face_face_DWF::calculer(Zone_VF& zonef,
-                                          Zone_VF& zoneg,
+void Prolongement_face_face_DWF::calculer(Domaine_VF& domainef,
+                                          Domaine_VF& domaineg,
                                           IntVect& connect_ff)
 {
   //ne fait rien mais c'est normal!!!

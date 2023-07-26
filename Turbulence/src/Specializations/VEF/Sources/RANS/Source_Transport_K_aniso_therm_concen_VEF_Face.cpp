@@ -21,7 +21,7 @@
 
 #include <Source_Transport_K_aniso_therm_concen_VEF_Face.h>
 #include <Equation_base.h>
-#include <Zone_VEF.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Source_Transport_K_aniso_therm_concen_VEF_Face,"Source_Transport_K_aniso_therm_concen_VEF_P1NC",Source_Transport_K_VEF_Face);
 
@@ -42,7 +42,7 @@ void Source_Transport_K_aniso_therm_concen_VEF_Face::associer_pb(const Probleme_
 
 void Source_Transport_K_aniso_therm_concen_VEF_Face::fill_resu_anisotherme_concen(const DoubleTrav& G_t, const DoubleTrav& G_c, const DoubleVect& volumes_entrelaces, DoubleTab& resu) const
 {
-  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
       double G_sum = G_t(face) + G_c(face);
       resu(face) += G_sum * volumes_entrelaces(face);

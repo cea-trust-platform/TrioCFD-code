@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <AssembleurPVDF_PF.h>
-#include <Zone_Cl_VDF.h>
-#include <Zone_VDF.h>
+#include <Domaine_Cl_VDF.h>
+#include <Domaine_VDF.h>
 #include <Periodique.h>
 #include <Neumann_sortie_libre.h>
 #include <Dirichlet_entree_fluide_leaves.h>
@@ -69,11 +69,11 @@ int AssembleurPVDF_PF::liste_faces_periodiques(ArrOfInt& faces)
 {
   // On commence par surestimer largement la taille du tableau :
   // nombre de faces de bord
-  const int nb_faces_bord = la_zone_VDF.valeur().nb_faces_bord();
+  const int nb_faces_bord = le_dom_VDF.valeur().nb_faces_bord();
   faces.resize_array(nb_faces_bord);
 
   // Recherche des faces periodiques dans les conditions aux limites:
-  const Conds_lim& les_cl = la_zone_Cl_VDF.valeur().les_conditions_limites();
+  const Conds_lim& les_cl = le_dom_Cl_VDF.valeur().les_conditions_limites();
   const int nb_cl = les_cl.size();
   int nb_faces_periodiques = 0;
   for (int num_cl = 0; num_cl < nb_cl; num_cl++)
@@ -117,8 +117,8 @@ int AssembleurPVDF_PF::liste_faces_periodiques(ArrOfInt& faces)
 int AssembleurPVDF_PF::construire(Matrice& la_matrice)
 {
   int i;
-  const Zone_VDF& zone_vdf   = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_vdf.face_voisins();
+  const Domaine_VDF& domaine_vdf   = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_vdf.face_voisins();
 
   // Comptage du nombre total d'elements non nuls:
   // matrice carree : nombre de faces internes / 2 + nb_elem + nbfaces periodiques
@@ -129,8 +129,8 @@ int AssembleurPVDF_PF::construire(Matrice& la_matrice)
 
   // Premiere etape : comptage du nombre d'elements non nuls sur chaque ligne
   // Pour chaque ligne de la matrice carree, nombre d'elements non nuls
-  const int nb_elem     = zone_vdf.nb_elem();
-  const int nb_elem_tot = zone_vdf.nb_elem_tot();
+  const int nb_elem     = domaine_vdf.nb_elem();
+  const int nb_elem_tot = domaine_vdf.nb_elem_tot();
   ArrOfInt carre_nb_non_zero(nb_elem);
   // Idem pour le rectangle
   ArrOfInt rect_nb_non_zero(nb_elem);
@@ -145,8 +145,8 @@ int AssembleurPVDF_PF::construire(Matrice& la_matrice)
 
   ArrOfInt liste_faces_perio;
   const int nb_faces_periodiques = liste_faces_periodiques(liste_faces_perio);
-  const int nb_faces_internes = zone_vdf.nb_faces_internes();
-  const int premiere_face_interne = zone_vdf.premiere_face_int();
+  const int nb_faces_internes = domaine_vdf.nb_faces_internes();
+  const int premiere_face_interne = domaine_vdf.premiere_face_int();
   for (i = 0; i < nb_faces_internes + nb_faces_periodiques; i++)
     {
       int face;
@@ -191,7 +191,7 @@ int AssembleurPVDF_PF::construire(Matrice& la_matrice)
   rect.dimensionner(nb_elem, nb_elem_tot - nb_elem, rect_nb_non_zero_tot);
 
   {
-    const int nb_faces_bord = zone_vdf.nb_faces_bord();
+    const int nb_faces_bord = domaine_vdf.nb_faces_bord();
     les_coeff_pression.resize_array(nb_faces_bord);
   }
   ArrOfInt& carre_tab1 = carre.get_set_tab1();
@@ -290,11 +290,11 @@ int AssembleurPVDF_PF::construire(Matrice& la_matrice)
  */
 int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_ptr)
 {
-  const Zone_VDF& zone_vdf   = la_zone_VDF.valeur();
-  const IntTab& face_voisins = zone_vdf.face_voisins();
-  const DoubleVect& face_surfaces = zone_vdf.face_surfaces();
-  const DoubleVect& volumes_entrelaces = zone_vdf.volumes_entrelaces();
-  const DoubleVect& porosite_face = la_zone_Cl_VDF->equation().milieu().porosite_face();
+  const Domaine_VDF& domaine_vdf   = le_dom_VDF.valeur();
+  const IntTab& face_voisins = domaine_vdf.face_voisins();
+  const DoubleVect& face_surfaces = domaine_vdf.face_surfaces();
+  const DoubleVect& volumes_entrelaces = domaine_vdf.volumes_entrelaces();
+  const DoubleVect& porosite_face = le_dom_Cl_VDF->equation().milieu().porosite_face();
 
 
   const DoubleVect * valeurs_rho = 0;
@@ -310,7 +310,7 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
   Matrice_Morse_Sym& carre = ref_cast(Matrice_Morse_Sym, matrice.get_bloc(0,0).valeur());
   Matrice_Morse&      rect  = ref_cast(Matrice_Morse,     matrice.get_bloc(0,1).valeur());
 
-  const int nb_elem = zone_vdf.nb_elem();
+  const int nb_elem = domaine_vdf.nb_elem();
   ArrOfInt carre_nb_non_zero(nb_elem);
   ArrOfInt rect_nb_non_zero(nb_elem);
   carre_nb_non_zero = 1;
@@ -334,8 +334,8 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
   // Construction de la liste des faces periodiques
   ArrOfInt liste_faces_perio;
   const int nb_faces_periodiques = liste_faces_periodiques(liste_faces_perio);
-  const int nb_faces_internes = zone_vdf.nb_faces_internes();
-  const int premiere_face_interne = zone_vdf.premiere_face_int();
+  const int nb_faces_internes = domaine_vdf.nb_faces_internes();
+  const int premiere_face_interne = domaine_vdf.premiere_face_int();
   for (int i_face = 0; i_face < nb_faces_internes + nb_faces_periodiques; i_face++)
     {
 
@@ -393,7 +393,7 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
     }
 
   // Traitement des conditions aux limites
-  const Conds_lim& les_cl = la_zone_Cl_VDF.valeur().les_conditions_limites();
+  const Conds_lim& les_cl = le_dom_Cl_VDF.valeur().les_conditions_limites();
   const int nb_cl = les_cl.size();
   for (int num_cl = 0; num_cl < nb_cl; num_cl++)
     {
@@ -419,7 +419,7 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
               // Calcul du coefficient a ajouter dans la matrice
               const double surface  = face_surfaces[num_face];
               // Attention: le volume entrelace a une valeur particuliere au bord
-              // (voir Zone_VDF::calculer_volumes_entrelaces() )
+              // (voir Domaine_VDF::calculer_volumes_entrelaces() )
               const double volume   = volumes_entrelaces[num_face];
               const double porosite = porosite_face[num_face];
               const double coefficient = surface * surface * porosite / (volume * rho_face);
@@ -470,13 +470,13 @@ int AssembleurPVDF_PF::remplir(Matrice& la_matrice, const Champ_Don_base * rho_p
  */
 int AssembleurPVDF_PF::modifier_secmem(DoubleTab& secmem)
 {
-  const Zone_Cl_VDF& la_zone_cl = la_zone_Cl_VDF.valeur();
-  int nb_cond_lim = la_zone_cl.nb_cond_lim();
+  const Domaine_Cl_VDF& le_dom_cl = le_dom_Cl_VDF.valeur();
+  int nb_cond_lim = le_dom_cl.nb_cond_lim();
 
   for (int indice_cl = 0; indice_cl < nb_cond_lim; indice_cl++)
     {
       const Cond_lim_base& la_cl_base =
-        la_zone_cl.les_conditions_limites(indice_cl).valeur();
+        le_dom_cl.les_conditions_limites(indice_cl).valeur();
 
       const Front_VF& frontiere_vf = ref_cast(Front_VF, la_cl_base.frontiere_dis());
 
@@ -535,8 +535,8 @@ void AssembleurPVDF_PF::modifier_secmem_pression_imposee(const Neumann_sortie_li
                                                          DoubleTab& secmem)
 {
   const Champ_front_base& champ_front = cond_lim.champ_front().valeur();
-  const Zone_VDF& la_zone = la_zone_VDF.valeur();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const Domaine_VDF& le_dom = le_dom_VDF.valeur();
+  const IntTab& face_voisins = le_dom.face_voisins();
 
   if (get_resoudre_increment_pression())
     {
@@ -581,9 +581,9 @@ void AssembleurPVDF_PF::modifier_secmem_vitesse_imposee(const Entree_fluide_vite
                                                         DoubleTab& secmem)
 {
   const Champ_front_base& champ_front = cond_lim.champ_front().valeur();
-  const Zone_VDF& la_zone = la_zone_VDF.valeur();
-  const DoubleVect& face_surfaces = la_zone.face_surfaces();
-  const IntTab& face_voisins = la_zone.face_voisins();
+  const Domaine_VDF& le_dom = le_dom_VDF.valeur();
+  const DoubleVect& face_surfaces = le_dom.face_surfaces();
+  const IntTab& face_voisins = le_dom.face_voisins();
 
   if (get_resoudre_increment_pression())
     {
@@ -614,7 +614,7 @@ void AssembleurPVDF_PF::modifier_secmem_vitesse_imposee(const Entree_fluide_vite
               const double signe = (elem0 < 0) ? 1. : -1.;
               // Numero de l'element adjacent a la face de bord
               const int elem = elem0 + elem1 + 1;
-              const int ori = la_zone.orientation(num_face);
+              const int ori = le_dom.orientation(num_face);
               const double gpoint = (gpoint_variable) ? tab_gpoint(i, ori) : tab_gpoint(ori);
 
               secmem[elem] += signe * surface * gpoint;
@@ -640,7 +640,7 @@ int AssembleurPVDF_PF::modifier_solution(DoubleTab& pression)
       // On prend la pression minimale comme pression de reference
       // afin d'avoir la meme pression de reference en sequentiel et parallele
       press_0=DMAXFLOAT;
-      int nb_elem=la_zone_VDF.valeur().zone().nb_elem();
+      int nb_elem=le_dom_VDF.valeur().domaine().nb_elem();
       for(int n=0; n<nb_elem; n++)
         if (pression[n] < press_0)
           press_0 = pression[n];
@@ -742,24 +742,24 @@ int AssembleurPVDF_PF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
   return 1;
 }
 
-const Zone_dis_base& AssembleurPVDF_PF::zone_dis_base() const
+const Domaine_dis_base& AssembleurPVDF_PF::domaine_dis_base() const
 {
-  return la_zone_VDF.valeur();
+  return le_dom_VDF.valeur();
 }
 
-const Zone_Cl_dis_base& AssembleurPVDF_PF::zone_Cl_dis_base() const
+const Domaine_Cl_dis_base& AssembleurPVDF_PF::domaine_Cl_dis_base() const
 {
-  return la_zone_Cl_VDF.valeur();
+  return le_dom_Cl_VDF.valeur();
 }
 
-void AssembleurPVDF_PF::associer_zone_dis_base(const Zone_dis_base& la_zone_dis)
+void AssembleurPVDF_PF::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis)
 {
-  la_zone_VDF = ref_cast(Zone_VDF, la_zone_dis);
+  le_dom_VDF = ref_cast(Domaine_VDF, le_dom_dis);
 }
 
-void AssembleurPVDF_PF::associer_zone_cl_dis_base(const Zone_Cl_dis_base& la_zone_Cl_dis)
+void AssembleurPVDF_PF::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& le_dom_Cl_dis)
 {
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF, la_zone_Cl_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, le_dom_Cl_dis);
 }
 
 void AssembleurPVDF_PF::completer(const Equation_base& Eqn)

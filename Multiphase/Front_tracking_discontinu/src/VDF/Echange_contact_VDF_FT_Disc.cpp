@@ -27,7 +27,7 @@
 #include <Schema_Temps_base.h>
 #include <Milieu_base.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Zone_VDF.h>
+#include <Domaine_VDF.h>
 #include <Equation_base.h>
 #include <Conduction.h>
 #include <Param.h>
@@ -75,7 +75,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
   indicatrice_.mettre_a_jour(temps);
   const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
-  //Cerr<<zone_Cl_dis().equation().probleme().le_nom()<<" "<<I<<finl;
+  //Cerr<<domaine_Cl_dis().equation().probleme().le_nom()<<" "<<I<<finl;
   int taille=mon_h.dimension(0);
   int nb_comp=mon_h.dimension(1);
   for (int ii=0; ii<taille; ii++)
@@ -95,9 +95,9 @@ void Echange_contact_VDF_FT_Disc::completer()
 
 
   Nom nom_bord_=frontiere_dis().frontiere().le_nom();
-  Nom nom_pb=zone_Cl_dis().equation().probleme().le_nom();
+  Nom nom_pb=domaine_Cl_dis().equation().probleme().le_nom();
   int distant=0;
-  if (sub_type(Conduction,zone_Cl_dis().equation()))
+  if (sub_type(Conduction,domaine_Cl_dis().equation()))
     {
       nom_pb=nom_autre_pb_;
       nom_bord_=nom_bord_oppose_;
@@ -110,7 +110,7 @@ void Echange_contact_VDF_FT_Disc::completer()
 
   ch.completer();
 
-  int nb_cases=zone_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
+  int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);
 
 }
@@ -156,5 +156,5 @@ int Echange_contact_VDF_FT_Disc::initialiser(double temps)
   cha.creer(nom_autre_pb_, nom_bord, nom_champ);
 
   Champ_front_calc& ch=ref_cast(Champ_front_calc, indicatrice_.valeur());
-  return ch.initialiser(temps,zone_Cl_dis().equation().inconnue());
+  return ch.initialiser(temps,domaine_Cl_dis().equation().inconnue());
 }

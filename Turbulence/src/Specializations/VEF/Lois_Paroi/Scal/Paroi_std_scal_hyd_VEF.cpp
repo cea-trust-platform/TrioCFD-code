@@ -91,15 +91,15 @@ int Paroi_std_scal_hyd_VEF::init_lois_paroi()
 
 int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
+  const IntTab& face_voisins = domaine_VEF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const DoubleVect& volumes_maille = zone_VEF.volumes();
-  const DoubleVect& surfaces_face = zone_VEF.face_surfaces();
+  const DoubleVect& volumes_maille = domaine_VEF.volumes();
+  const DoubleVect& surfaces_face = domaine_VEF.face_surfaces();
   int l_unif;
 
   double visco=-1;
@@ -166,12 +166,12 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
     }
 
   // Boucle sur les bords:
-  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+  for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       // pour chaque condition limite on regarde son type
       // On applique les lois de paroi uniquement
       // aux voisinages des parois
-      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
            || (sub_type(Symetrie,la_cl.valeur()))

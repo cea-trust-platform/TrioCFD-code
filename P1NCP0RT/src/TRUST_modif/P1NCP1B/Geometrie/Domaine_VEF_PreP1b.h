@@ -13,18 +13,18 @@
 *
 *****************************************************************************/
 
-#ifndef Zone_VEF_PreP1b_included
-#define Zone_VEF_PreP1b_included
+#ifndef Domaine_VEF_PreP1b_included
+#define Domaine_VEF_PreP1b_included
 
-#include <Zone_VEF.h>
-#include <Zone.h>
+#include <Domaine_VEF.h>
+#include <Domaine.h>
 
 class VEFPreP1B;
 
-class Zone_VEF_PreP1b : public Zone_VEF
+class Domaine_VEF_PreP1b : public Domaine_VEF
 {
 
-  Declare_instanciable(Zone_VEF_PreP1b);
+  Declare_instanciable(Domaine_VEF_PreP1b);
 
 public :
   void discretiser() override;
@@ -32,11 +32,11 @@ public :
   void modifier_pour_Cl(const Conds_lim& ) override;
   int nb_som() const
   {
-    return zone().nb_som();
+    return domaine().nb_som();
   };
   int nb_elem() const
   {
-    return zone().nb_elem();
+    return domaine().nb_elem();
   };
   double volume_au_sommet(int som) const
   {
@@ -121,19 +121,19 @@ protected:
   int modif_div_face_dirichlet ;
   int cl_pression_sommet_faible; // determine si les cl de pression sont imposees de facon faible ou forte -> voir divergence et assembleur
   // Descripteur pour les tableaux p1b (selon alphaE, alphaS et alphaA)
-  // (construit dans Zone_VEF_PreP1b::discretiser())
+  // (construit dans Domaine_VEF_PreP1b::discretiser())
   MD_Vector md_vector_p1b_;
 };
 
 
-inline int Zone_VEF_PreP1b::numero_premier_element() const
+inline int Domaine_VEF_PreP1b::numero_premier_element() const
 {
   if (!alphaE)
     return -1;
   else
     return 0;
 }
-inline int Zone_VEF_PreP1b::numero_premier_sommet() const
+inline int Domaine_VEF_PreP1b::numero_premier_sommet() const
 {
   if (!alphaS)
     return -1;
@@ -142,7 +142,7 @@ inline int Zone_VEF_PreP1b::numero_premier_sommet() const
   else
     return nb_elem_tot();
 }
-inline int Zone_VEF_PreP1b::numero_premiere_arete() const
+inline int Domaine_VEF_PreP1b::numero_premiere_arete() const
 {
   if (!alphaA)
     return -1;
@@ -157,6 +157,6 @@ inline int Zone_VEF_PreP1b::numero_premiere_arete() const
 }
 
 // Methode pour tester:
-void exemple_champ_non_homogene(const Zone_VEF_PreP1b&, DoubleTab&);
+void exemple_champ_non_homogene(const Domaine_VEF_PreP1b&, DoubleTab&);
 
 #endif

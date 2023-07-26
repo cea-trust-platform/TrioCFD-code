@@ -25,8 +25,9 @@
 #include <Connectivites_faces_couple.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Zone_VDF.h>
-#include <Ref_Milieu_base.h>
+#include <Domaine_VDF.h>
+#include <Milieu_base.h>
+#include <TRUST_Ref.h>
 
 Implemente_instanciable(Echange_contact_VDF_Zoom_grossier,"Paroi_Echange_contact_VDF_Zoom_grossier",Echange_contact_VDF_Zoom_base);
 
@@ -60,8 +61,8 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
       int indice_pb=pbMG.indice_probleme(pbF.le_nom());
       le_pb2G=pbMG.pb_2G(indice_pb);
 
-      const Zone_dis_base& zone_disF = pbF.domaine_dis().zone_dis(0);
-      const Zone_VDF& zvdfF = ref_cast(Zone_VDF, zone_disF);
+      const Domaine_dis_base& domaine_disF = pbF.domaine_dis();
+      const Domaine_VDF& zvdfF = ref_cast(Domaine_VDF, domaine_disF);
       const DoubleVect& surfacesF = zvdfF.face_surfaces();
       const IntTab& face_voisinsF = zvdfF.face_voisins();
 
@@ -83,7 +84,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
 
       //MODIF
-      //const Zone_VDF& zvdf_2=ref_cast(Zone_VDF, ch.zone_dis());
+      //const Domaine_VDF& zvdf_2=ref_cast(Domaine_VDF, ch.domaine_dis());
       const Front_VF& front_vf_ext=ref_cast(Front_VF, front_ext);
       const Front_VF& front_vf=ref_cast(Front_VF, front);
       //const IntTab& face_voisins = zvdf_2.face_voisins();
@@ -92,7 +93,6 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
       //ON VEUT LE MILIEU FIN !!!!!!!!!
       //const Milieu_base& le_milieu = ch.inconnue().equation().milieu();
-      REF(Champ_base) ch_tampon;
       REF(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
@@ -109,14 +109,14 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
       DoubleVect e;
 
-      const Zone_dis_base& zone_dis1 = zone_Cl_dis().zone_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 
 
 
 
-      //Cerr << "Domaine : "<<zone_dis1.zone().domaine().le_nom()<<finl;
+      //Cerr << "Domaine : "<<domaine_dis1.domaine().domaine().le_nom()<<finl;
       //Cerr << "On traite le raccord de nom " << nom_racc1 << finl;
       const int nb_faces_front_gros = front_vf.nb_faces();
       const int num_prem_faceG = front_vf.num_premiere_face();
@@ -135,7 +135,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
 
 
-      if (zone_dis1.zone().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;
@@ -244,7 +244,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
               //find the associated boundary
               int boundary_index=-1;
-              int nb_boundaries=zvdfF.zone().nb_front_Cl();
+              int nb_boundaries=zvdfF.domaine().nb_front_Cl();
               for (int n_bord=0; n_bord<nb_boundaries; n_bord++)
                 {
                   if (zvdfF.front_VF(n_bord).le_nom() == front_vf.le_nom())
