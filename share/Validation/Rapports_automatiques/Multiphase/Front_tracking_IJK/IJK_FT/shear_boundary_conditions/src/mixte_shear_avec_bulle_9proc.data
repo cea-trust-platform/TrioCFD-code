@@ -21,8 +21,8 @@ Lire grid_splitting
   # pas de decoupage possible en i #
   nproc_i 1
   # decoupage en n proc sur y et z avec n>=3 #
-  nproc_j 1
-  nproc_k 1
+  nproc_j 3
+  nproc_k 3
 }
 
 IJK_FT_double

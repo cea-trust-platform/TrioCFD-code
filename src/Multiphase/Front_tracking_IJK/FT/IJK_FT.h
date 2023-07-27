@@ -211,6 +211,7 @@ protected :
 
   const IJK_FT_double& operator=(const IJK_FT_double&);
   void update_rho_v();
+  void update_pressure_phase();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
   void rk3_sub_step(const int rk_step, const double total_timestep,
@@ -265,6 +266,7 @@ protected :
   //
   // GAB, qdm
   Vecteur3 calculer_inv_rho_grad_p_moyen(const IJK_Field_double& inv_rho, const IJK_Field_double& pression);
+  void calculer_I_kappa_sigma(IJK_Field_double& kappa_ft,const IJK_Field_double& indic, double sigma);
   Vecteur3 calculer_grad_p_moyen(const IJK_Field_double& pression);
   Vecteur3 calculer_grad_p_over_rho_moyen(const IJK_Field_double& pression);
   FixedVector<IJK_Field_double, 3> terme_convection_mass_solver_;
@@ -450,6 +452,9 @@ protected :
 
   // Pressure field
   IJK_Field_double pressure_;
+  IJK_Field_double kappa_ft_;
+  IJK_Field_double kappa_ft_ns_;
+  IJK_Field_double I_ns_;
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver

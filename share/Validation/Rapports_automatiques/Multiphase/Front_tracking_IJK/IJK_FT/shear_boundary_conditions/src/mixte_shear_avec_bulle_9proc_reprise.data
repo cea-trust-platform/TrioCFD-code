@@ -21,8 +21,8 @@ Lire grid_splitting
   # pas de decoupage possible en i #
   nproc_i 1
   # decoupage en n proc sur y et z avec n>=3 #
-  nproc_j 1
-  nproc_k 1
+  nproc_j 3
+  nproc_k 3
 }
 
 IJK_FT_double
@@ -39,8 +39,8 @@ IJK_FT_double
     bctype_kmax Mixte_shear
     # saut de vitesse sur le bord z en m/s #
     dU_perio 0.3
-    # permet de debuter la simulation avec un desynchronisation des parois z-, z+ #
-    t0_shear 0.00839
+    # t0_shear forcement egal a 0 pour une reprise ! #
+    t0_shear 0.
     # si defilement = 0 On obtient seulement une condition de saut de la vitesse en z #
     # sans desynchronisation des parois #
     defilement 1
@@ -52,9 +52,9 @@ IJK_FT_double
   cfl 1.0
   fo  1.0
   oh  1.0
-  dt_post 100
-  dt_post_stats_bulles 100
-  dt_post_stats_plans 100
+  dt_post 10
+  dt_post_stats_bulles 10
+  dt_post_stats_plans 10
   t_debut_statistiques 0.0
   
   # rend le solveur de pression plus souple dans le cas shear-perio #
@@ -64,7 +64,7 @@ IJK_FT_double
   check_stop_file stop.txt
   dt_sauvegarde 5000
   tinit 0
-  nb_pas_dt_max 200
+  nb_pas_dt_max 10
   
   multigrid_solver {
     solver_precision mixed
@@ -81,7 +81,7 @@ IJK_FT_double
   check_divergence
   gravite 3 -20. 0.0 0.0
   interfaces {
-   fichier_reprise_interface init.lata
+   fichier_reprise_interface diph_fixe.sauv.lata
    timestep_reprise_interface       1
    lata_meshname   INTERFACES 
    remaillage_ft_ijk {
@@ -108,12 +108,9 @@ IJK_FT_double
   nom_sauvegarde diph_fixe.sauv
   sauvegarder_xyz
   # REPRISE #
-  # nom_reprise diph_init.sauv 
- timestep_reprise_vitesse 1 #
-  # expression doit etre compatible avec dU_perio #
-  expression_vx_init 0.3+0.3*z/0.001
-  expression_vy_init 0.0
-  expression_vz_init 0.0 
+  nom_reprise diph_fixe.sauv
+  timestep_reprise_vitesse 1
+
 }
 Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 Fin
