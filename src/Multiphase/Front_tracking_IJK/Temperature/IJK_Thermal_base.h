@@ -132,6 +132,10 @@ public:
   {
     return grad_T_ ;
   }
+  virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
+  virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
+  virtual double compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx);
+
   const char * get_fichier_sauvegarde() const
   {
     return fichier_reprise_temperature_;
@@ -165,6 +169,7 @@ public:
 
 protected:
 
+  void compute_cell_volume();
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
   void compute_temperature_convection(const FixedVector<IJK_Field_double, 3>& velocity);
   virtual void add_temperature_diffusion();
@@ -183,11 +188,12 @@ protected:
   void calculer_temperature_physique_T(const IJK_Field_double&  vx, const double dTm);
   void calculer_temperature_adim_bulles();
   void add_temperature_source();
-  //  void calculer_Nusselt(const IJK_Field_double& vx);
-  //  void calculer_temperature_adimensionnelle_theta(const IJK_Field_double&  vx, const double qw);
+  void calculer_Nusselt(const IJK_Field_double& vx);
+  void calculer_temperature_adimensionnelle_theta(const IJK_Field_double&  vx, const double qw);
+  void calculer_source_temperature_ana();
+  virtual double compute_rho_cp_u_mean(const IJK_Field_double& vx);
+  double compute_variable_wall_temperature(const int kmin, const int kmax);
   //  void calculer_temperature_physique_T_dummy();
-
-
   /*
    * Patch to conserve energy
    */
@@ -250,6 +256,8 @@ protected:
   double kl_;
   double T0v_;
   double T0l_;
+  IJK_Field_double source_temperature_ana_;
+  IJK_Field_double ecart_source_t_ana_;
 
   /*
    * Dimensionless temperature
@@ -269,7 +277,6 @@ protected:
    * 1 : Quick
    * 2 : Centre2
    */
-  int type_temperature_convection_op_;
   Operateur_IJK_elem_conv temperature_convection_op_;
   Operateur_IJK_elem_diff temperature_diffusion_op_;
   IJK_Field_double div_coeff_grad_T_volume_;
@@ -277,6 +284,7 @@ protected:
   /*
    * Fields
    */
+  double vol_;
   IJK_Field_double rho_cp_;
   IJK_Field_double rho_cp_T_;
   IJK_Field_double temperature_;

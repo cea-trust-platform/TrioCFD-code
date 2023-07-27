@@ -66,7 +66,14 @@ protected :
 
   void add_temperature_diffusion() override;
   void compute_diffusion_increment() override;
+  /* correct_temperature_for_eulerian_fluxes() May be clearly overridden later */
   void correct_temperature_for_eulerian_fluxes() override { ; };
+  double get_rho_cp_ijk(int i, int j, int k) const;
+  double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const override;
+  double compute_rho_cp_u_mean(const IJK_Field_double& vx) override;
+  double get_div_lambda_ijk(int i, int j, int k) const override;
+  double compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx) override;
+
   //Rustine
   double E0_;//volumique
   IJK_Field_double T_rust_;

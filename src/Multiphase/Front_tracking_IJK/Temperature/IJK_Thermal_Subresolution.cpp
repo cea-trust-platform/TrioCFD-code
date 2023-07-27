@@ -115,11 +115,6 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
   const int ni = d_temperature_.ni();
   const int nj = d_temperature_.nj();
   const int nk = d_temperature_.nk();
-  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
-  const double dx = geom.get_constant_delta(DIRECTION_I);
-  const double dy = geom.get_constant_delta(DIRECTION_J);
-  const double dz = geom.get_constant_delta(DIRECTION_K);
-  const double vol = dx*dy*dz;
   const double rhocp_l = ref_ijk_ft_->get_rho_l() * cp_liquid_;
   double d_temp_sum=0.;
   for (int k = 0; k < nk; k++)
@@ -127,7 +122,7 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
       for (int i = 0; i < ni; i++)
         {
           double rhocpVol;
-          rhocpVol = rhocp_l * vol;
+          rhocpVol = rhocp_l * vol_;
           const double ope = div_coeff_grad_T_volume_(i,j,k);
           const double resu = ope/rhocpVol;
           d_temperature_(i,j,k) += resu;

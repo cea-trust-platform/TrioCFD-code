@@ -82,11 +82,15 @@ public :
   const FixedVector<IJK_Field_double, 3>& get_velocity() const
   {
     return velocity_;
-  };
+  }
   const FixedVector<IJK_Field_double, 3>& get_velocity_ft() const
   {
     return velocity_ft_;
-  };
+  }
+  const IJK_Field_double& get_rho_field() const
+  {
+    return rho_field_;
+  }
   const double& get_current_time() const
   {
     return current_time_ ;
@@ -148,6 +152,10 @@ public :
   const Maillage_FT_IJK& get_maillage_ft_ijk() const
   {
     return interfaces_.maillage_ft_ijk();
+  }
+  int get_direction_gravite() const
+  {
+    return direction_gravite_;
   }
 //  const int& nb_thermal_equations() const
 //  {
@@ -294,37 +302,37 @@ protected :
   Vecteur3 calculer_grad_p_over_rho_moyen(const IJK_Field_double& pression);
   FixedVector<IJK_Field_double, 3> terme_convection_mass_solver_;
   FixedVector<IJK_Field_double, 3> terme_diffusion_mass_solver_;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_av_prediction_champ;
-  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_prediction_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_projection_champ;
-  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_projection_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_av_rho_mu_ind_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_rho_mu_ind_champ;
-  FixedVector<IJK_Field_double, 3> terme_diffusion_local;
-  FixedVector<IJK_Field_double, 3> terme_pression_local;
-  FixedVector<IJK_Field_double, 3> terme_pression_in_ustar_local;
-  FixedVector<IJK_Field_double, 3> d_v_diff_et_conv;
-  Vecteur3 rho_u_euler_av_prediction;
-  Vecteur3 rho_du_euler_ap_prediction;
-  Vecteur3 rho_u_euler_ap_projection;
-  Vecteur3 rho_du_euler_ap_projection;
-  Vecteur3 rho_u_euler_av_rho_mu_ind;
-  Vecteur3 rho_u_euler_ap_rho_mu_ind;
-  Vecteur3 u_euler_ap_rho_mu_ind;
-  Vecteur3 terme_diffusion;
-  Vecteur3 terme_convection;
-  Vecteur3 terme_pression;
-  Vecteur3 terme_pression_bis;
-  Vecteur3 terme_pression_ter;
-  Vecteur3 terme_interfaces;
-  Vecteur3 terme_pression_in_ustar;
-  Vecteur3 terme_interfaces_bf_mass_solver;
-  Vecteur3 terme_interfaces_bf_mass_solver_bis;
-  Vecteur3 terme_interfaces_af_mass_solver;
-  Vecteur3 temre_intf_conv_diff_mass_solver;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_av_prediction_champ_;
+  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_prediction_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_projection_champ_;
+  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_projection_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_av_rho_mu_ind_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_rho_mu_ind_champ_;
+  FixedVector<IJK_Field_double, 3> terme_diffusion_local_;
+  FixedVector<IJK_Field_double, 3> terme_pression_local_;
+  FixedVector<IJK_Field_double, 3> terme_pression_in_ustar_local_;
+  FixedVector<IJK_Field_double, 3> d_v_diff_et_conv_;
+  Vecteur3 rho_u_euler_av_prediction_;
+  Vecteur3 rho_du_euler_ap_prediction_;
+  Vecteur3 rho_u_euler_ap_projection_;
+  Vecteur3 rho_du_euler_ap_projection_;
+  Vecteur3 rho_u_euler_av_rho_mu_ind_;
+  Vecteur3 rho_u_euler_ap_rho_mu_ind_;
+  Vecteur3 u_euler_ap_rho_mu_ind_;
+  Vecteur3 terme_diffusion_;
+  Vecteur3 terme_convection_;
+  Vecteur3 terme_pression_;
+  Vecteur3 terme_pression_bis_;
+  Vecteur3 terme_pression_ter_;
+  Vecteur3 terme_interfaces_;
+  Vecteur3 terme_pression_in_ustar_;
+  Vecteur3 terme_interfaces_bf_mass_solver_;
+  Vecteur3 terme_interfaces_bf_mass_solver_bis_;
+  Vecteur3 terme_interfaces_af_mass_solver_;
+  Vecteur3 terme_interfaces_conv_diff_mass_solver_;
   Vecteur3 terme_moyen_convection_mass_solver_;
   Vecteur3 terme_moyen_diffusion_mass_solver_;
-  double pression_ap_proj;
+  double pression_ap_proj_;
   //
   // GAB qdm patch a posteriori
   //TODO :  enum corrections_qdm::type_dict_ { GB, GR };

@@ -22,6 +22,7 @@
 #include <IJK_Thermal_Onefluid.h>
 #include <IJK_FT.h>
 #include <DebogIJK.h>
+#include <IJK_Navier_Stokes_tools.h>
 
 Implemente_instanciable_sans_constructeur( IJK_Thermal_Onefluid, "IJK_Thermal_Onefluid", IJK_Thermal_base ) ;
 
@@ -74,6 +75,7 @@ void IJK_Thermal_Onefluid::set_param( Param& param )
   param.ajouter("conserv_energy_global", &conserv_energy_global_);
   param.ajouter_flag("lambda_moy_arith_", &lambda_moy_arith_);
   param.ajouter_flag("rho_cp_moy_harmonic", &rho_cp_moy_harmonic_);
+  param.ajouter_flag("deprecated_rho_cp", &deprecated_rho_cp_);
 }
 
 int IJK_Thermal_Onefluid::initialize(const IJK_Splitting& splitting, const int idx)
@@ -121,7 +123,7 @@ int IJK_Thermal_Onefluid::initialize(const IJK_Splitting& splitting, const int i
       Cout << "Initial energy at time t=" << ref_ijk_ft_->get_current_time() << " is " << E0_ << " [W.m-3]." << finl;
       Cerr << "Initial energy at time t=" << ref_ijk_ft_->get_current_time() << " is " << E0_ << " [W.m-3]." << finl;
     }
-  if (type_temperature_convection_form_==2)
+  if (type_temperature_convection_form_==1)
     {
       rho_cp_T_.allocate(splitting, IJK_Splitting::ELEM, 2);
       div_rho_cp_T_.allocate(splitting, IJK_Splitting::ELEM, 0);
@@ -157,21 +159,31 @@ void IJK_Thermal_Onefluid::update_thermal_properties()
             {
               if (deprecated_rho_cp_)
                 cp_(i,j,k) = cp_liquid_ * chi_l + cp_vapour_ * (1.- chi_l);
-              if (!rho_cp_post_)
+              else if (!rho_cp_post_)
                 rho_cp_(i,j,k) = rho_l * cp_liquid_ * chi_l + rho_v * cp_vapour_ * (1.- chi_l);
             }
+          if (rho_cp_post_)
+            rho_cp_(i,j,k) = rho_l * cp_liquid_ * chi_l + rho_v * cp_vapour_ * (1.- chi_l);
           if (harmonic_mean)
             lambda_(i,j,k) = lambda_liquid_ * lambda_vapour_ / ((1 - chi_l) * lambda_liquid_ + chi_l * lambda_vapour_);
           else
             lambda_(i,j,k) = lambda_liquid_  * chi_l + (1.- chi_l) * lambda_vapour_ ;
         }
   lambda_.echange_espace_virtuel(lambda_.ghost());
-  if (!rho_cp_post_)
+  if (rho_cp_post_)
     rho_cp_.echange_espace_virtuel(rho_cp_.ghost());
   if (rho_cp_moy_harmonic_)
     rho_cp_inv_.echange_espace_virtuel(rho_cp_inv_.ghost());
-  if (deprecated_rho_cp_)
-    cp_.echange_espace_virtuel(cp_.ghost());
+  else
+    {
+      if (deprecated_rho_cp_)
+        cp_.echange_espace_virtuel(cp_.ghost());
+      else
+        {
+          if (!rho_cp_post_)
+            rho_cp_.echange_espace_virtuel(rho_cp_.ghost());
+        }
+    }
 }
 
 void IJK_Thermal_Onefluid::add_temperature_diffusion()
@@ -190,12 +202,7 @@ void IJK_Thermal_Onefluid::compute_diffusion_increment()
   const int ni = d_temperature_.ni();
   const int nj = d_temperature_.nj();
   const int nk = d_temperature_.nk();
-  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
-  const double dx = geom.get_constant_delta(DIRECTION_I);
-  const double dy = geom.get_constant_delta(DIRECTION_J);
-  const double dz = geom.get_constant_delta(DIRECTION_K);
-  const double vol = dx*dy*dz;
-  const double vol_inv = 1./vol;
+  const double vol_inv = 1./vol_;
 //  const double rhocp_l = ref_ijk_ft_->get_rho_l()*cp_liquid_;
 //  const double rhocp_v = ref_ijk_ft_->get_rho_v()*cp_vapour_;
 //  const bool harmonic_mean = ((rho_cp_moy_harmonic_) and (rhocp_l > DMINFLOAT) and (rhocp_v >DMINFLOAT));
@@ -219,17 +226,108 @@ void IJK_Thermal_Onefluid::compute_diffusion_increment()
                 {
                   const double rho = ref_ijk_ft_->get_rho_field_ijk(i,j,k);
                   const double cp = cp_(i,j,k);
-                  rhocpV = rho * cp * vol;
+                  rhocpV = rho * cp * vol_;
                 }
               else
                 {
 //                  const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
 //                  rhocpV = (rhocp_l * chi_l + rhocp_v * (1 - chi_l)) *  vol;
-                  rhocpV = rho_cp_(i,j,k) * vol;
+                  rhocpV = rho_cp_(i,j,k) * vol_;
                 }
               const double ope = div_coeff_grad_T_volume_(i,j,k);
               const double resu = ope/rhocpV;
               d_temperature_(i,j,k) +=resu ;
             }
         }
+}
+
+double IJK_Thermal_Onefluid::compute_rho_cp_u_mean(const IJK_Field_double& vx)
+{
+  double rho_cp_u_mean = 0.;
+  if (rho_cp_moy_harmonic_)
+    {
+      const double rho_l = ref_ijk_ft_->get_rho_l();
+      const double rho_v = ref_ijk_ft_->get_rho_v();
+      const bool rho_cp_harmonic_mean = ((rho_cp_moy_harmonic_) and (rho_l*cp_liquid_ > DMINFLOAT) and (rho_v*cp_vapour_ >DMINFLOAT));
+      if (rho_cp_harmonic_mean)
+        rho_cp_u_mean = calculer_rho_cp_u_moyen_inv(vx, rho_cp_inv_);
+      else
+        rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_inv_);
+    }
+  else
+    {
+      if (deprecated_rho_cp_)
+        {
+          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, cp_, ref_ijk_ft_->get_rho_field());
+        }
+      else
+        {
+          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_);
+        }
+    }
+  return rho_cp_u_mean;
+}
+
+double IJK_Thermal_Onefluid::get_rho_cp_ijk(int i, int j, int k) const
+{
+  double rho_cp = 0.;
+  if (rho_cp_moy_harmonic_)
+    {
+      const double rho_l = ref_ijk_ft_->get_rho_l();
+      const double rho_v = ref_ijk_ft_->get_rho_v();
+      const bool rho_cp_harmonic_mean = ((rho_cp_moy_harmonic_) and (rho_l*cp_liquid_ > DMINFLOAT) and (rho_v*cp_vapour_ >DMINFLOAT));
+      if (rho_cp_harmonic_mean)
+        rho_cp = 1 / rho_cp_inv_(i,j,k);
+      else
+        rho_cp = rho_cp_inv_(i,j,k);
+    }
+  else
+    {
+      if (deprecated_rho_cp_)
+        {
+          rho_cp = cp_(i,j,k) * (ref_ijk_ft_->get_rho_field_ijk(i,j,k));
+        }
+      else
+        {
+          rho_cp = rho_cp_(i,j,k);
+        }
+    }
+  return rho_cp;
+}
+
+double IJK_Thermal_Onefluid::get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const
+{
+  return get_rho_cp_ijk(i,j,k) * vx(i,j,k);
+}
+
+double IJK_Thermal_Onefluid::get_div_lambda_ijk(int i, int j, int k) const
+{
+  return (lambda_(i+1,j,k)-lambda_(i-1,j,k));
+}
+
+double IJK_Thermal_Onefluid::compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx)
+{
+  double theta_adim_moy = 0.;
+  if (rho_cp_moy_harmonic_)
+    {
+      const double rho_l = ref_ijk_ft_->get_rho_l();
+      const double rho_v = ref_ijk_ft_->get_rho_v();
+      const bool rho_cp_harmonic_mean = ((rho_cp_moy_harmonic_) and (rho_l*cp_liquid_ > DMINFLOAT) and (rho_v*cp_vapour_ >DMINFLOAT));
+      if (rho_cp_harmonic_mean)
+        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy_inv(vx, temperature_adimensionnelle_theta_, rho_cp_inv_);
+      else
+        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_inv_); //TEST
+    }
+  else
+    {
+      if (deprecated_rho_cp_)
+        {
+          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, cp_, ref_ijk_ft_->get_rho_field());
+        }
+      else
+        {
+          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_);
+        }
+    }
+  return theta_adim_moy;
 }
