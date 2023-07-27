@@ -2,7 +2,7 @@ Parametres {
 	Titre "Shear-periodicity condition (velocity jump at z-boundary + desynchronization of z-border) "
 	Auteur "A. du Cluzeau"
 	CasTest . perio_shear_defilant.data 4
-    CasTest . perio_shear_sans_defilant.data 4
+	CasTest . perio_shear_sans_defilant.data 4
 	CasTest . mixte_shear_avec_bulle.data 4
 }
 

@@ -141,6 +141,8 @@ channel_swarm_fixed_jdd1
 channel_swarm_fixed_jdd2
 channel_swarm_fixed_jdd3
 schemas_temps_jdd1
+shear_boundary_conditions_jdd1
+shear_boundary_conditions_jdd2
 stat_diph_gradUP_jdd1
 temperature_canal_poiseuille_source_jdd1
 temperature_canal_poiseuille_source_jdd2

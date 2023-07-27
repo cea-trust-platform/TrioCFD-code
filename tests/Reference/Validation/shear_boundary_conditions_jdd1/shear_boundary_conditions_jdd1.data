@@ -35,7 +35,7 @@ IJK_FT_double
     bctype_kmax Mixte_shear
     dU_perio 0.625 
     t0_shear 0.0
-    defilement 0
+    defilement 1
     resolution_u_prime 0
   }
 
@@ -59,7 +59,7 @@ IJK_FT_double
   check_stop_file stop.txt
   dt_sauvegarde 5000
   tinit 0
-  nb_pas_dt_max 100
+	nb_pas_dt_max 3
   
   multigrid_solver {
     solver_precision mixed
