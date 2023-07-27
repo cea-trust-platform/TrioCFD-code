@@ -45,48 +45,39 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model
 
 // Syntaxe:
 //  Beam_model NOMDOMAINE {
+//    nb_beam
+//	  Name
 //     nb_modes number of modes
 //     direction 0|1|2
-//     Young_Module
-//     Rho_beam
-//     NewmarkTimeScheme MA|FD
+//     NewmarkTimeScheme MA|FD|HHT
 //     Mass_and_stiffness_file_name
 //     Absc_file_name
 //     Modal_deformation_file_name nb_modes files
+//     [ Young_Module ]
+//     { Rho_beam ]
+//     [ BaseCenterCoordinates position  ]
 //     [ CI_file_name ]
 //     [ Output_position_1D nb_points  position ]
 //     [ Output_position_3D nb_points  position ]
 //     [ Restart_file_name file ]
+//
 //  }
-
-// XD Beam_model interprete Beam_model -1 Reduced mechanical model: a beam model. Resolution based on a modal analysis. Temporal discretization: Newmark
-// XD  attr dom ref_domaine dom 0 Name of domain.
-// XD  attr Beam_model_bloc Beam_model_bloc Beam_model_bloc 0 description of the model
-
-// XD Beam_model_bloc objet_lecture nul 1 contains the model definition
-// XD  attr nb_modes entier n 0 Number of modes
-// XD  attr direction entier dir 0 x=0, y=1, z=2
-// XD  attr Young_Module floattant young 0 Young Module
-// XD  attr Rho_beam floattant rho 0 Beam density
-// XD  attr NewmarkTimeScheme chaine NewmarkTimeScheme 0 Solve the beam dynamics. Time integration scheme: choice between MA (Newmark mean acceleration) and FD (Newmark finite differences)
-// XD  attr Mass_and_stiffness_file_name chaine  Mass_and_stiffness_file_name 0 Name of the file containing the diagonal modal mass, stiffness, and damping matrices.
-// XD  attr Absc_file_name chaine Absc_file_name 0 Name of the file containing the coordinates of the Beam
-// XD  attr Modal_deformation_file_name listchaine Modal_deformation_file_name 0 Name of the file containing the modal deformation of the Beam
-// XD  attr CI_file_name chaine CI_file_name 1 Name of the file containing the initial condition of the Beam
-// XD  attr Restart_file_name chaine Restart_file_name 1 SaveBeamForRestart.txt file to restart the calculation
-// XD  attr Output_position_1D list pt1d 1 nb_points  position Post-traitement of specific points on the Beam
-// XD  attr Output_position_3D Output_position_3D pt3d 1 nb_points  position Post-traitement of specific points on the 3d FSI boundary
-// XD Output_position_3D interprete nul -1 nb_points position Post-traitement of specific points on the 3d FSI boundary
-// XD  attr n entier n 1 number of points
-// XD  attr x1 floattant x1 1 x coordinate
-// XD  attr y1 floattant y1 1 y coordinate
-// XD  attr z1 floattant z1 1 z coordinate
-// XD  attr x2 floattant x2 1 x coordinate
-// XD  attr y2 floattant y2 1 y coordinate
-// XD  attr z2 floattant z2 1 z coordinate
-// XD  attr x3 floattant x3 1 x coordinate
-// XD  attr y3 floattant y3 1 y coordinate
-// XD  attr z3 floattant z3 1 z coordinate
+//XD  Beam_model interprete Beam_model 1 Reduced mechanical model: a beam model. Resolution based on a modal analysis. Temporal discretization: Newmark or Hilber-Hughes-Taylor (HHT)
+//XD attr nb_beam entier nb 0 Number of beams
+//XD attr Name chaine BeamName 0 Name of the beam (the name must match with the name of the edge in the fluid domain)
+//XD attr nb_modes entier n 0 Number of modes
+//XD attr direction entier dir 0 x=0, y=1, z=2
+//XD attr NewmarkTimeScheme chaine NewmarkTimeScheme 0 Solve the beam dynamics. Time integration scheme: choice between MA (Newmark mean acceleration),  FD (Newmark finite differences), and HHT alpha (Hilber-Hughes-Taylor, alpha usually -0.1 )
+//XD attr Mass_and_stiffness_file_name chaine  Mass_and_stiffness_file_name 0 Name of the file containing the diagonal modal mass, stiffness, and damping matrices.
+//XD attr Absc_file_name chaine Absc_file_name 0 Name of the file containing the coordinates of the Beam
+//XD attr  Modal_deformation_file_name chaine  Modal_deformation_file_name 0 Name of the file containing the modal deformation of the Beam (mandatory if different from 0. 0. 0.)
+//XD attr Young_Module floattant young 1 Young Module
+//XD attr Rho_beam floattant rho 1 Beam density
+//XD attr BaseCenterCoordinates floattant pos_center 1 position of the base center coordinates on the Beam
+//XD attr CI_file_name chaine CI_file_name 1 Name of the file containing the initial condition of the Beam
+//XD attr Restart_file_name chaine Restart_file_name 1 SaveBeamForRestart.txt file to restart the calculation
+//XD attr Output_position_1D floattant pt1d 1 nb_points  position Post-traitement of specific points on the Beam
+//XD attr Output_position_3D floattant pt3d 1 nb_points  position Post-traitement of specific points on the 3d FSI boundary
 Beam_model::Beam_model()
 {
 
@@ -94,12 +85,19 @@ Beam_model::Beam_model()
   direction_=0;
   young_=200.e+9;
   rho_ = 8100.;
-  timeScheme_=true;
+  timeScheme_="MA";
   temps_ =0.;
   output_position_1D_.resize(0);
   output_position_1D_=0.;
   output_position_3D_.resize(0);
   output_position_3D_=0.;
+  alpha_=0.;
+  fluidForceOnBeam_.resize(0);
+  fluidForceOnBeam_=0.;
+  tempsComputeForceOnBeam_=0.;
+  x0_=0.;
+  y0_=0.;
+  z0_=0.;
 }
 Beam_model::~Beam_model()
 {
@@ -159,6 +157,7 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
   else
     {
       Cerr<< "ERROR: Unable to open the file." <<masse_and_stiffness_file_name<<finl;
+      exit();
     }
   //Cerr<<"mass = "<<mass_<<" stiffnes "<<stiffness_<<" damp = "<<damping_<<finl;
 }
@@ -185,6 +184,7 @@ void Beam_model::readInputAbscFiles(Nom& absc_file_name)
   else
     {
       Cerr<< "ERROR: Unable to open the file." <<absc_file_name<<finl;
+      exit();
     }
 }
 
@@ -197,10 +197,12 @@ void Beam_model::readInputCIFile(Nom& CI_file_name)
   qAcceleration_.resize(nbModes_);
   qDisplacement_.resize(nbModes_);
   qHalfSpeed_.resize(nbModes_);
+  fluidForceOnBeam_.resize(nbModes_);
   qSpeed_=0.;
   qHalfSpeed_=0.;
   qAcceleration_=0.;
   qDisplacement_=0.;
+  fluidForceOnBeam_=0.;
 
   string const nomFichier(CI_file_name);
 
@@ -220,6 +222,7 @@ void Beam_model::readInputCIFile(Nom& CI_file_name)
   else
     {
       Cerr<< "ERROR: Unable to open the file." <<CI_file_name<<finl;
+      exit();
     }
 
 }
@@ -234,10 +237,10 @@ void Beam_model::readRestartFile(Nom& Restart_file_name)
 
   if(monFlux)
     {
-      double temps, displacement, speed, acceleration, force;
+      double temps, displacement, speed, acceleration;
       for(int i=0; i<nbModes_; i++)
         {
-          monFlux >> temps >> displacement >> speed >>acceleration>>force;
+          monFlux >> temps >> displacement >> speed >>acceleration;
           temps_= temps;
           qDisplacement_[i]=displacement;
           qSpeed_[i] = speed;
@@ -245,6 +248,7 @@ void Beam_model::readRestartFile(Nom& Restart_file_name)
         }
 
       monFlux.close();
+      tempsComputeForceOnBeam_=temps_;
     }
   else
     {
@@ -289,24 +293,41 @@ void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
       else
         {
           Cerr<< "ERROR: Unable to open the file." <<modal_deformation_file_name[count]<<finl;
+          exit();
         }
     }
 }
 
-void Beam_model::initialization(double velocity)
+void Beam_model::initialization(double displacement)
 {
-
   qSpeed_.resize(nbModes_);
   qAcceleration_.resize(nbModes_);
   qDisplacement_.resize(nbModes_);
   qHalfSpeed_.resize(nbModes_);
+  fluidForceOnBeam_.resize(nbModes_);
   qSpeed_=0.;
   qHalfSpeed_=0.;
   qAcceleration_=0.;
-  qDisplacement_=velocity;
+  qDisplacement_=displacement;
+  fluidForceOnBeam_=0.;
+
+}
+void Beam_model::initialization()
+{
+  qSpeed_.resize(nbModes_);
+  qAcceleration_.resize(nbModes_);
+  qDisplacement_.resize(nbModes_);
+  qHalfSpeed_.resize(nbModes_);
+  fluidForceOnBeam_.resize(nbModes_);
+  qSpeed_=0.;
+  qHalfSpeed_=0.;
+  qAcceleration_=0.;
+  qDisplacement_=0.;
+  fluidForceOnBeam_=0.;
+
 }
 //Solve the beam dynamics. Time integration scheme: Newmark finite differences
-DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt)
 {
   double halfDt=dt/2.;
   for(int j=0; j < nbModes_; j++)
@@ -315,7 +336,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       qDisplacement_[j] += dt*qHalfSpeed_[j];
       double coeff1 = mass_[j] + halfDt*damping_[j];
       double coeff2 =	damping_[j]*qHalfSpeed_[j] + stiffness_[j]*qDisplacement_[j];
-      qAcceleration_[j]= (fluidForce[j] - coeff2)/coeff1;
+      qAcceleration_[j]= (fluidForceOnBeam_[j] - coeff2)/coeff1;
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
       //qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
@@ -328,7 +349,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
   return qSpeed_;
 }
 //Solve the beam dynamics. Time integration scheme: Newmark mean acceleration
-DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt)
 {
   double halfDt=dt/2;
   double squareHalfDt= halfDt*halfDt;
@@ -337,7 +358,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       double PreviousqAcceleration= qAcceleration_[j];
       double coeff1 = mass_[j] + halfDt*damping_[j] + squareHalfDt*stiffness_[j];
       double coeff2 = damping_[j]*(qSpeed_[j] + halfDt*qAcceleration_[j]) + stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareHalfDt*qAcceleration_[j]);
-      qAcceleration_[j]=(fluidForce[j] - coeff2)/coeff1;
+      qAcceleration_[j]=(fluidForceOnBeam_[j] - coeff2)/coeff1;
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
@@ -349,8 +370,40 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
   return qSpeed_;
 }
 
-DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
+//Solve the beam dynamics. Time integration scheme: HHT
+DoubleVect& Beam_model::TimeSchemeHHT (const double& dt)
 {
+  //Cerr<<" dt = "<<dt<<" temps_ = "<<temps_<<" tempsComputeForceOnBeam_= "<<tempsComputeForceOnBeam_<<finl;
+  //Cerr<<" force = "<<fluidForceOnBeam_<<finl;
+  double beta = (1-alpha_)*(1-alpha_)/4;
+  double gamma= (1- 2*alpha_)/2;
+  double squareDt=dt*dt;
+
+  for(int j=0; j < nbModes_; j++)
+    {
+      double PreviousqAcceleration= qAcceleration_[j];
+      double coeff1 = mass_[j] + dt*(1.+ alpha_)*gamma*damping_[j] + squareDt*(1.+ alpha_)*beta*stiffness_[j];
+      double coeff2 = (1.+ alpha_)*damping_[j]*(qSpeed_[j] + dt*(1.-gamma)*PreviousqAcceleration);
+      double coeff3 = (1.+ alpha_)*stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareDt*(0.5-beta)*PreviousqAcceleration);
+      double coeff4 = alpha_*stiffness_[j]*qDisplacement_[j];
+      double coeff5 = alpha_*damping_[j]*qSpeed_[j];
+      qAcceleration_[j]=(fluidForceOnBeam_[j] - coeff2 - coeff3 + coeff4 + coeff5)/coeff1;
+      qDisplacement_[j] += dt*qSpeed_[j] + squareDt*((0.5-beta)*PreviousqAcceleration + beta*qAcceleration_[j]);
+      qSpeed_[j] += dt*((1.-gamma)*PreviousqAcceleration + gamma*qAcceleration_[j]);
+    }
+
+  saveBeamForRestart();
+  if(output_position_1D_.size()>0) printOutputPosition1D();
+  if(output_position_3D_.size()>0) printOutputPosition3D();
+
+  return qSpeed_;
+}
+
+
+DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt)
+{
+  Cerr<<" Beam name : "<<beamName_<<", Time discretization scheme : "<<timeScheme_<<", Nb Modes : "<<nbModes_<<finl;
+
   if(dt == 0.)
     {
       return qSpeed_;
@@ -358,11 +411,12 @@ DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const D
   else if(temps_!=tps) // update qSpeed_ only once per time step!
     {
       temps_=tps;
-      if(timeScheme_)
-        return NewmarkSchemeMA(dt, fluidForce);
+      if(timeScheme_=="HHT")
+        return TimeSchemeHHT(dt);
+      else if(timeScheme_=="FD")
+        return NewmarkSchemeFD(dt);
       else
-        return NewmarkSchemeFD(dt, fluidForce);
-
+        return NewmarkSchemeMA(dt);
     }
   else
     {
@@ -450,9 +504,11 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
   Ry=alpha*R(i, 1) + betha*R(j, 1);
   Rz=alpha*R(i, 2) + betha*R(j, 2);
 
-  phi[0] =ux + Ry*zs -Rz*ys;
-  phi[1] =uy + Rz*xs -Rx*zs;
-  phi[2] =uz + Rx*ys -Ry*xs;
+  phi[0] =ux + Ry*(zs-z0_) -Rz*(ys-y0_);
+  phi[1] =uy + Rz*(xs-x0_) -Rx*(zs-z0_);
+  phi[2] =uz + Rx*(ys-y0_) -Ry*(xs-x0_);
+
+
 
   return phi;
 }
@@ -536,7 +592,7 @@ void Beam_model::saveBeamForRestart() const
   if (je_suis_maitre())
     {
       std::ofstream ofs_sauve;
-      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
+      ofs_sauve.open (beamName_+"SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
       ofs_sauve.precision(32);
       for(int j=0; j < nbModes_; j++)
         {
@@ -573,11 +629,11 @@ void Beam_model::printOutputPosition1D() const
         }
 
       std::ofstream ofs_1;
-      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1.open (beamName_+"Displacement1D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_2;
-      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_2.open (beamName_+"Velocity1D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_3;
-      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_3.open (beamName_+"Acceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
       ofs_1<<temps_<<" ";
       for(int k=0; k<nb_output_points; k++)
@@ -643,11 +699,11 @@ void Beam_model::printOutputPosition3D() const
             }
         }
       std::ofstream ofs_1;
-      ofs_1.open ("BeamDisplacement3D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1.open (beamName_+"Displacement3D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_2;
-      ofs_2.open ("BeamVelocity3D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_2.open (beamName_+"Velocity3D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_3;
-      ofs_3.open ("BeamAcceleration3D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_3.open (beamName_+"Acceleration3D.txt", std::ofstream::out | std::ofstream::app);
 
       ofs_1<<temps_<<" ";
       for(int k=0; k<nb_output_points; k++)
@@ -683,4 +739,12 @@ void Beam_model::printOutputPosition3D() const
       ofs_3.close();
 
     }
+}
+
+void Beam_model::setCenterCoordinates(const double& x0,const double& y0, const double& z0)
+{
+
+  x0_=x0;
+  y0_=y0;
+  z0_=z0;
 }

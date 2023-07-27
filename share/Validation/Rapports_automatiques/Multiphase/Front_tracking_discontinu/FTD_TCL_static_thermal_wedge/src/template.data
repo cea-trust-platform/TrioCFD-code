@@ -217,7 +217,7 @@ Lire pb
                 correction_courbure_ordre 0
                 phase 1
 		# maintien_temperature zone_tranche -6. #
-                stencil_width 2 # 10 #
+                stencil_width 11 # 10 #
                 diffusion { }
                 convection { quick }
                 boundary_conditions

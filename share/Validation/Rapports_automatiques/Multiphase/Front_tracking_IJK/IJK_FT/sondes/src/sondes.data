@@ -78,20 +78,20 @@ IJK_FT_double
   expression_vz_init cos(x*6.28318530717959)
   Sondes
     {
-       pression_s pressure periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       velocity_s velocity_z periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       indicatrice_s indicatrice periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1. 
-       cell_velocity_x_s cell_velocity_x periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1. 
-       velocity_x_s velocity_x periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dudx_s  dudx periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dudy_s  dudy periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dudz_s  dudz periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dvdx_s  dvdx periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dvdy_s  dvdy periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dvdz_s  dvdz periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dwdx_s dwdx periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dwdy_s dwdy periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
-       dwdz_s dwdz periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
+       pression_s pressure periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       velocity_s velocity_z periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       indicatrice_s indicatrice periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99 
+       cell_velocity_x_s cell_velocity_x periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99 
+       velocity_x_s velocity_x periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dudx_s  dudx periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dudy_s  dudy periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dudz_s  dudz periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dvdx_s  dvdx periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dvdy_s  dvdy periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dvdz_s  dvdz periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dwdx_s dwdx periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dwdy_s dwdy periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
+       dwdz_s dwdz periode 1.e-8 Segment 10 0.01 0.01 0.01  0.99 0.99 0.99
 
        velocity_p  velocity_z periode 1.e-8 point 1 0.5 0.5 0.5       
   }

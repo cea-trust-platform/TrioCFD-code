@@ -67,6 +67,7 @@ public :
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
   void reading_beam_model(Entree& is);
+  void read_beam(Entree& is, int&);
   void reading_projection_ALE_boundary(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
@@ -80,16 +81,16 @@ public :
   inline const DoubleTab& getNewJacobian() const;
 
 
-  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
-  void initializationBeam (double velocity) ;
-  double computeDtBeam(Domaine_dis&);
-  const DoubleTab& getBeamDisplacement(int i) const;
-  const DoubleTab& getBeamRotation(int i) const;
-  const int& getBeamDirection() const;
-  DoubleVect& getBeamVelocity(const double& tps, const double& dt);
-  const int& getBeamNbModes();
-  void computeFluidForceOnBeam();
-  const DoubleVect& getFluidForceOnBeam();
+  DoubleVect interpolationOnThe3DSurface(const int&, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
+  //double computeDtBeam(Domaine_dis&);
+  const DoubleTab& getBeamDisplacement(const int&, const int&) const;
+  const DoubleTab& getBeamRotation(const int&, const int&) const;
+  inline const int& getBeamDirection(const int&) const;
+  DoubleVect& getBeamVelocity(const int&,const double& tps, const double& dt);
+  const int& getBeamNbModes(const int&) const;
+  const Nom& getBeamName(const int&) const;
+  const int& getBeamNbBeam() const;
+  void computeFluidForceOnBeam(const int&);
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
 protected:
@@ -107,15 +108,12 @@ protected:
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
+  int nbBeam;
   Beam_model *beam; // Mechanical model: a beam model
   REF(Equation_base) eq;
-  DoubleVect fluidForceOnBeam; //Fluid force acting on the IFS boundary
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
-  double tempsComputeForceOnBeam; // Time at which the fluid force acting on the Beam is computed.
-
-
 };
 
 

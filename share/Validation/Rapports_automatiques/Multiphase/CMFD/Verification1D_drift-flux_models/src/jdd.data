@@ -23,7 +23,7 @@ mailler  dom
 polyedriser dom
 # END MESH #
 
-polymac_p0  dis option_covimac {  }
+polymac_p0  dis option_polymac_p0 {  }
 
 
 Schema_euler_implicite sch
