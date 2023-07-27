@@ -23,9 +23,9 @@ class Corrige_flux_FT;
 
 class Operateur_IJK_elem_conv_base_double : public Operateur_IJK_elem_base_double
 {
-  Declare_base_sans_constructeur(Operateur_IJK_elem_conv_base_double);
+  Declare_base(Operateur_IJK_elem_conv_base_double);
 public:
-  Operateur_IJK_elem_conv_base_double() { stored_curv_fram_layer_z_ = -1000; }
+  // { stored_curv_fram_layer_z_ = -1000; }
   void initialize(const IJK_Splitting& splitting) override;
   virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
   virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };
@@ -70,7 +70,7 @@ protected:
   const IJK_Field_local_double *input_velocity_x_;
   const IJK_Field_local_double *input_velocity_y_;
   const IJK_Field_local_double *input_velocity_z_;
-  bool perio_k_=false;
+  bool perio_k_;
 
   // Temporary array to store curvature and fram coefficients
   // for the current computed flux.
@@ -82,7 +82,7 @@ protected:
   Corrige_flux_FT *corrige_flux_;
   const IJK_Field_local_double *indicatrice_;
 
-  bool is_corrected_=false;
+  bool is_corrected_;
 
 private:
 

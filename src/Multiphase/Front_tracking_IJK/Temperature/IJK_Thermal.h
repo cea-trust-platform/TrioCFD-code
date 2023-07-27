@@ -44,7 +44,6 @@ public :
   /*
    * Getters
    */
-//  inline const char* get_thermal_problem_type() { return thermal_problem_type_.c_str(); };
   inline Nom& get_thermal_problem_type() { return thermal_problem_type_; };
   inline int& get_thermal_rank() { return thermal_rank_; };
   inline Motcles& get_thermal_words() { return thermal_words_; };

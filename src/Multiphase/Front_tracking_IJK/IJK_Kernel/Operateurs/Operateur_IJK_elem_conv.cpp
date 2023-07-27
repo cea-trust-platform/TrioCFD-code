@@ -39,6 +39,7 @@ Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
   convection_op_ = "";
   convection_op_option_ = "";
   convection_rank_ = 0;
+  is_cast_ = false;
 }
 
 Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const

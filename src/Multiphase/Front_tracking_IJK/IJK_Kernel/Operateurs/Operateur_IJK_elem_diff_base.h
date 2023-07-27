@@ -24,20 +24,6 @@ class Operateur_IJK_elem_diff_base_double : public Operateur_IJK_elem_base_doubl
 public:
   Operateur_IJK_elem_diff_base_double();
   virtual void initialize(const IJK_Splitting& splitting) override;
-//  virtual void calculer(const IJK_Field_double& field,
-//                const IJK_Field_double& coeff_field_x,
-//                const IJK_Field_double& coeff_field_y,
-//                const IJK_Field_double& coeff_field_z,
-//                IJK_Field_double& result,
-//                const IJK_Field_local_double& boundary_flux_kmin,
-//                const IJK_Field_local_double& boundary_flux_kmax);
-//  virtual void ajouter(const IJK_Field_double& field,
-//               const IJK_Field_double& coeff_field_x,
-//               const IJK_Field_double& coeff_field_y,
-//               const IJK_Field_double& coeff_field_z,
-//               IJK_Field_double& result,
-//               const IJK_Field_local_double& boundary_flux_kmin,
-//               const IJK_Field_local_double& boundary_flux_kmax);
   virtual void calculer(const IJK_Field_double& field,
                         IJK_Field_double& result,
                         const IJK_Field_local_double& boundary_flux_kmin,
@@ -77,10 +63,6 @@ protected:
   template <DIRECTION _DIR_>
   inline void compute_flux_(IJK_Field_local_double& resu, const int k_layer);
 
-//  const IJK_Field_local_double& get_lambda_vectorial(DIRECTION _DIR_);
-//
-//  const IJK_Field_local_double& get_structural_model(DIRECTION _DIR_);
-
   const IJK_Field_local_double& get_model(DIRECTION _DIR_);
 
   Operateur_IJK_data_channel channel_data_;
@@ -95,14 +77,6 @@ protected:
   const IJK_Field_local_double *coeff_field_x_;
   const IJK_Field_local_double *coeff_field_y_;
   const IJK_Field_local_double *coeff_field_z_;
-
-//  const IJK_Field_local_double *lambda_vector_x_;
-//  const IJK_Field_local_double *lambda_vector_y_;
-//  const IJK_Field_local_double *lambda_vector_z_;
-//
-//  const IJK_Field_local_double *structural_model_x_;
-//  const IJK_Field_local_double *structural_model_y_;
-//  const IJK_Field_local_double *structural_model_z_;
 
   const IJK_Field_local_double *boundary_flux_kmin_;
   const IJK_Field_local_double *boundary_flux_kmax_;

@@ -40,7 +40,6 @@ class Switch_FT_double;
 class IJK_Thermals : public LIST(IJK_Thermal)
 {
 
-//  Declare_instanciable( IJK_Thermals );
   Declare_instanciable_sans_constructeur( IJK_Thermals ) ;
 
 public :
@@ -69,14 +68,6 @@ public :
   int init_thermals(const IJK_Splitting& splitting);
   void prepare_thermals(const char *lataname);
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
-//  void compute_and_write_extra_fields(const Nom& lata_name,
-//                                      DoubleTab& coeff_i,
-//                                      IntTab Indice_i,
-//                                      DoubleTab& coeff_j,
-//                                      IntTab Indice_j,
-//                                      DoubleTab& coeff_k,
-//                                      IntTab Indice_k,
-//                                      IJK_Field_double& new_thermal);
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;

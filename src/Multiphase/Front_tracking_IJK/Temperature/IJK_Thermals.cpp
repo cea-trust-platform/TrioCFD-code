@@ -23,8 +23,6 @@
 #include <IJK_FT.h>
 #include <IJK_switch_FT.h>
 
-//Implemente_instanciable( IJK_Thermals, "IJK_Thermals", LIST(IJK_Thermal) );
-
 Implemente_instanciable_sans_constructeur( IJK_Thermals, "IJK_Thermals", LIST(IJK_Thermal) ) ;
 
 IJK_Thermals::IJK_Thermals(const IJK_FT_double& ijk_ft)
@@ -209,16 +207,6 @@ void IJK_Thermals::posttraiter_tous_champs_thermal(Motcles& liste_post_instantan
     }
 }
 
-//void IJK_Thermals::posttraiter_tous_champs_thermal(Motcles& liste_post_instantanes_)
-//{
-//  int idx_th = 0;
-//  for (auto&& itr = (*this).begin(); itr != (*this).end(); ++itr)
-//    {
-//      ref_ijk_ft_post_->posttraiter_tous_champs_thermal(liste_post_instantanes_, idx_th);
-//      ++idx_th;
-//    }
-//}
-
 void IJK_Thermals::posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
                                                           const char *lata_name,
                                                           const int latastep,
@@ -245,34 +233,6 @@ void IJK_Thermals::posttraiter_champs_instantanes_thermal(const Motcles& liste_p
       ++idx_th;
     }
 }
-
-//void IJK_Thermals::posttraiter_champs_instantanes_thermal(const char *lata_name,
-//                                                          const int latastep,
-//                                                          const double current_time,
-//                                                          int& n)
-//{
-//  int idx_th = 0;
-//  for (auto &itr : (*this))
-//    {
-//      int nb = ref_ijk_ft_post_->posttraiter_champs_instantanes_thermal(ref_ijk_ft_post_->get_liste_post_instantanes(),
-//                                                                        lata_name,
-//                                                                        latastep,
-//                                                                        current_time,
-//                                                                        itr,
-//                                                                        idx_th);
-//      // Interfacial thermal fields :
-//      if (!(ref_ijk_ft_->disable_diphasique()))
-//        nb += ref_ijk_ft_post_->posttraiter_champs_instantanes_thermal_interface(ref_ijk_ft_post_->get_liste_post_instantanes(),
-//                                                                                 lata_name,
-//                                                                                 latastep,
-//                                                                                 current_time,
-//                                                                                 itr,
-//                                                                                 idx_th);
-//      if (idx_th == 0)
-//        n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
-//      ++idx_th;
-//    }
-//}
 
 int IJK_Thermals::init_thermals(const IJK_Splitting& splitting)
 {
@@ -306,7 +266,6 @@ void IJK_Thermals::ecrire_fichier_reprise(SFichier& fichier, const char *lata_na
   int idx =0;
   for (auto itr = (*this).begin(); itr != (*this).end(); )
     {
-      //curseur->sauvegarder_temperature(lata_name, idx);
       (*itr).set_fichier_sauvegarde(lata_name);
       fichier << *itr ;
       ++itr;
@@ -320,34 +279,3 @@ void IJK_Thermals::ecrire_fichier_reprise(SFichier& fichier, const char *lata_na
   if (flag_list_not_empty)
     fichier << " } \n" ;
 }
-
-//void IJK_Thermals::compute_and_write_extra_fields(const Nom& lata_name,
-//                                                  DoubleTab& coeff_i,
-//                                                  IntTab Indice_i,
-//                                                  DoubleTab& coeff_j,
-//                                                  IntTab Indice_j,
-//                                                  DoubleTab& coeff_k,
-//                                                  IntTab Indice_k,
-//                                                  IJK_Field_double& new_thermal)
-//{
-//  int idx = 0;
-//  for (auto& itr : (*this))
-//    {
-//      const IJK_Field_double& old_temperature = itr.get_temperature();
-//      //IJK_Field_double& new_temperature = curseur->set_temperature();
-//      ref_ijk_ft_switch_->switch_scalar_field(old_temperature, new_thermal,
-//                                              coeff_i, Indice_i,
-//                                              coeff_j ,Indice_j,
-//                                              coeff_k ,Indice_k);
-//
-//      Cout << "Writing " << Nom("TEMPERATURE_") + Nom(idx) << " into " << lata_name << finl;
-//      // Process::exit();
-//      //const int latastep = 0;
-//      //      std::ostringstream oss;
-//      //              oss << "TEMPERATURE_" << idx;
-//      //            Nom nom_temp(oss.str().c_str());
-//      dumplata_scalar(lata_name, Nom("TEMPERATURE_") + Nom(idx), new_thermal, 0 /*we store a 0 */);
-//      //              oss.str("");
-//      ++idx;
-//    }
-//}

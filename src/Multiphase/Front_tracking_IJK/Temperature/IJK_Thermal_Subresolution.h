@@ -64,8 +64,6 @@ protected :
   void correct_temperature_for_eulerian_fluxes() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
-  //  void add_temperature_diffusion() override;
-  //  void correct_temperature_increment_diffusion();
 
   int diffusion_flux_correction_;
   int convective_flux_correction_;

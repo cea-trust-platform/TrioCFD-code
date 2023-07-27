@@ -39,17 +39,7 @@ class IJK_Splitting;
  * TODO: Demander à Aymeric l'interet (obsolete ??)
  */
 class IJK_Thermique;
-class List_IJK_Thermique;
-class list_curseurIJK_Thermique;
-class const_list_curseurIJK_Thermique;
-
 class IJK_Energie;
-class List_IJK_Energie;
-class list_curseurIJK_Energie;
-class const_list_curseurIJK_Energie;
-
-class IJK_Thermal_Subresolution;
-class IJK_Thermal;
 class IJK_Thermals;
 
 /**
@@ -145,7 +135,6 @@ public:
    */
   void posttraiter_tous_champs_thermique(Motcles& liste,  const int idx) const;
   void posttraiter_tous_champs_energie(Motcles& liste,  const int idx) const;
-  void posttraiter_tous_champs_thermal_subresolution(Motcles& liste,  const int idx) const;
   void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
 
   /*
@@ -159,14 +148,6 @@ public:
                                              const char *lata_name,
                                              const int lata_step, const double current_time,
                                              IJK_Energie& itr,  const int idx);
-  int posttraiter_champs_instantanes_thermal_subresolution(const Motcles& liste_post_instantanes,
-                                                           const char *lata_name,
-                                                           const int lata_step, const double current_time,
-                                                           IJK_Thermal_Subresolution& itr, const int idx);
-  int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
-                                             const char *lata_name,
-                                             const int lata_step, const double current_time,
-                                             IJK_Thermal& itr, const int idx);
   /*
    * TODO:
    */
@@ -178,20 +159,6 @@ public:
                                                           const char *lata_name,
                                                           const int lata_step, const double current_time,
                                                           IJK_Energie& ,  const int idx);
-
-  int posttraiter_champs_instantanes_thermal_interface(const Motcles& liste_post_instantanes,
-                                                       const char *lata_name,
-                                                       const int latastep,
-                                                       const double current_time,
-                                                       IJK_Thermal& itr,
-                                                       const int idx);
-
-  int posttraiter_champs_instantanes_thermal_interface_ref(const Motcles& liste_post_instantanes,
-                                                           const char *lata_name,
-                                                           const int latastep,
-                                                           const double current_time,
-                                                           IJK_Thermal& itr,
-                                                           const int idx);
 
 //  void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
 
@@ -356,14 +323,11 @@ protected:
   IJK_Splitting& splitting_ft_;
   LIST(IJK_Thermique)& thermique_;
   LIST(IJK_Energie)& energie_;
-  LIST(IJK_Thermal_Subresolution)& thermal_subresolution_;
-  LIST(IJK_Thermal)& thermal_;
   IJK_Thermals& thermals_;
 
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;
     IJK_Field_double source_temperature_ana_, ecart_source_t_ana_; */
-
   // FixedVector<IJK_Field_double, 3> grad_T_;
 
   Multigrille_Adrien poisson_solver_post_;

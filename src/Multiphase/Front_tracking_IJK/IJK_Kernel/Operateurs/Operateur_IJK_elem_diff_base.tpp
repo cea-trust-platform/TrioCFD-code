@@ -37,20 +37,27 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
   const int ny = _DIR_ == DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
 
   ConstIJK_double_ptr input_field(*input_field_, 0, 0, k_layer);
-//  const IJK_Field_local_double dummy_field = *input_field_;
   Simd_double uniform_lambda(1.);
   Simd_double avg_lambda;
   if (is_uniform_ and uniform_lambda_!=0)
     {
-      Simd_double uniform_lambda_tmp(*uniform_lambda_);
-      uniform_lambda *= uniform_lambda_tmp;
+      uniform_lambda = Simd_double(*uniform_lambda_);
     }
+  /*
+   *  M.G: lambda point toward the input field just to initialise *structural_model without error
+   *  May not work in further configurations (may be handled in IJK_Thermal classes) when operators
+   *  are cast.
+   */
   if (is_uniform_)
     {
       lambda_=input_field_;
     }
-  ConstIJK_double_ptr lambda(is_vectorial_? get_model(_DIR_) : *lambda_, 0, 0, k_layer);
 
+  /*
+   * Gives lambda field as a dummy field (Avoid the creation of a IJK_Field_local_double
+   * field in the current scope)
+   */
+  ConstIJK_double_ptr lambda(is_vectorial_? get_model(_DIR_) : *lambda_, 0, 0, k_layer);
   ConstIJK_double_ptr structural_model(is_structural_ ? get_model(_DIR_) : *lambda_, 0, 0, k_layer);
 
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
@@ -108,6 +115,8 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
       surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
     }
 
+  Simd_double lambda_m1(uniform_lambda);
+  Simd_double lambda_m2(uniform_lambda);
   const int imax = nx;
   const int jmax = ny;
   const int vsize = Simd_double::size();
@@ -130,8 +139,6 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
               Simd_double oneVec = 1.;
               Simd_double minVec = DMINFLOAT;
               Simd_double d = 1.;
-              Simd_double lambda_m1(uniform_lambda);
-              Simd_double lambda_m2(uniform_lambda);
               // Fetch conductivity on neighbour cells:
               if (!is_uniform_)
                 {
@@ -143,11 +150,8 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
               if(is_anisotropic_)
                 d = d0 + d1;
               avg_lambda = SimdSelect(dsabs, minVec, zeroVec, SimdDivideMed(d * lambda_m1 * lambda_m2, ds));
-//                  // thermal flux is positive if going from left to right => -grad(T)
+              // thermal flux is positive if going from left to right => -grad(T)
               flux = (left_val - right_val) * avg_lambda * surface;
-//              flux = (left_val - right_val) * 0.1 * surface;
-//              if (flux.data_ != 0.)
-//                Cerr << "Diffusive flux : " << i << j << k_layer << "=" << flux.data_ << finl;
             }
           resu_ptr.put_val(i, flux);
         }
@@ -161,7 +165,6 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
         structural_model.next_j();
       resu_ptr.next_j();
     }
-
 }
 
 #endif

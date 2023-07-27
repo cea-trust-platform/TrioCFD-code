@@ -31,12 +31,6 @@ public:
   virtual void initialize(const IJK_Splitting& splitting);
   virtual inline void set_bc(const Boundary_Conditions& bc) { ; };
   virtual inline void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) { ; };
-//  void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-//                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-//                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
-//  void ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-//               const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-//               IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);

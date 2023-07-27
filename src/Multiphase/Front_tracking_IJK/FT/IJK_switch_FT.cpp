@@ -30,6 +30,7 @@ Sortie & Switch_FT_double::printOn(Sortie&s) const
 {
   return s;
 }
+
 Entree & Switch_FT_double::readOn(Entree&s)
 {
   return s;
@@ -41,7 +42,7 @@ void Switch_FT_double::set_param(Param& param)
   // Parametres pour le FT:
   param.ajouter("interfaces", &interfaces_);
   param.ajouter("old_ijk_splitting_ft_extension", &old_ijk_splitting_ft_extension_);
-  // Parmetres pour la thermique:
+  // Parametres pour la thermique:
   param.ajouter("thermique", &thermique_);
   param.ajouter("thermals", &thermals_);
   // GAB : gabriel.ramirez@cea.fr
@@ -52,7 +53,7 @@ void Switch_FT_double::set_param(Param& param)
   param.ajouter("corrections_qdm", &old_qdm_corrections_);
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
-  }
+}
 
 void Switch_FT_double::initialise()
 {
@@ -119,7 +120,6 @@ void Switch_FT_double::initialise()
     */
 /////////////////////////////////////: gabriel.ramirez@cea.fr
 
-
 int Switch_FT_double::init_thermique()
 // The Thermique.initialize does both the allocate and the initialize:
 {
@@ -129,7 +129,7 @@ int Switch_FT_double::init_thermique()
     for (auto& itr : thermique_)
     {
       Cout << "Reading the old temperature field from " << Nom(itr.get_fichier_sauvegarde())
-               << " to fill the thermique_ field."<< finl;
+           << " to fill the thermique_ field."<< finl;
       nb_allocated_arrays += itr.initialize(old_mesh_, idx);
       idx++;
     }
@@ -138,7 +138,7 @@ int Switch_FT_double::init_thermique()
 }
 
 int Switch_FT_double::init_thermals()
-// The Thermique.initialize does both the allocate and the initialize:
+// init_thermals() does both the allocate and the initialize:
 {
   return thermals_.init_thermals(old_mesh_);
 }
@@ -153,7 +153,6 @@ void Switch_FT_double::prepare_thermals(const Nom lata_name)
 {
 	thermals_.prepare_thermals(lata_name);
 }
-
 
 // flag and_lata to know if we also create the associated lata
 void Switch_FT_double::ecrire_fichier_reprise(const char *fichier_sauvegarde, const bool and_lata)
@@ -243,7 +242,6 @@ void Switch_FT_double::set_param_reprise(Param& param)
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
   // fin GAB : gabriel.ramirez@cea.fr
-
 }
 
 void Switch_FT_double::compute_and_write_extra_fields(const Nom& lata_name,

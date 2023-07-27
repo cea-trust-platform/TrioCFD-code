@@ -35,14 +35,7 @@ Operateur_IJK_elem_diff_base_double::Operateur_IJK_elem_diff_base_double()
   is_uniform_ = false;
   is_corrected_ = false;
 
-  //  lambda_vector_x_ = 0;
-  //  lambda_vector_y_ = 0;
-  //  lambda_vector_z_ = 0;
-  //
-  //  structural_model_x_ = 0;
-  //  structural_model_y_ = 0;
-  //  structural_model_z_ = 0;
-
+  perio_k_ = false;
 }
 
 Sortie& Operateur_IJK_elem_diff_base_double::printOn(Sortie& os) const

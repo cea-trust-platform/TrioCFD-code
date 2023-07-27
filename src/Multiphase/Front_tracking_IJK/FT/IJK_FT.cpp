@@ -364,10 +364,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   fo_ = 1.;
   oh_ = 1.;
 
-  //  type_velocity_convection_op_ = 0;  // Default value: 0 : Quick
-  //  type_velocity_diffusion_form_ = Nom("simple_arithmetic"); // Default value: No grad^T
-  //  type_velocity_convection_form_ = Nom("non_conservative_simple"); // Default value:  rho div(u u)
-
   rho_vapeur_ = -1.;
   mu_vapeur_ = -1.;
   sigma_     = 0.;
@@ -468,13 +464,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   param.ajouter("expression_potential_phi", &expression_potential_phi_); // XD_ADD_P chaine parser to define phi and make a momentum source Nabla phi.
 
-//  param.ajouter("type_velocity_diffusion_form", &type_velocity_diffusion_form_); // XD_ADD_P chaine not_set
-//  param.ajouter("type_velocity_convection_op", &type_velocity_convection_op_); // XD_ADD_P chaine not_set
-//  param.dictionnaire("Quick",0);
-//  param.dictionnaire("Centre",1);
-//  param.dictionnaire("Amont",2);
-//  param.ajouter("type_velocity_convection_form", &type_velocity_convection_form_); // XD_ADD_P chaine not_set
-
   param.ajouter("velocity_diffusion_op", &velocity_diffusion_op_);
   param.ajouter("velocity_convection_op", &velocity_convection_op_);
 
@@ -488,8 +477,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
    */
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
-  param.ajouter("thermal_subresolution", &thermal_subresolution_); // XD_ADD_P chaine not_set
-  param.ajouter("thermal", &thermal_);
   param.ajouter("thermals", &thermals_);
   //  thermal_problem_number_=0;
 //  param.ajouter("thermal_problem_number", &thermal_problem_number_); // XD_ADD_P floattant vapour viscosity
@@ -824,12 +811,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   for (auto& itr : energie_)
     itr.associer(*this);
 
-  for (auto& itr : thermal_subresolution_)
-    itr.associer(*this);
-
-  for (auto& itr : thermal_)
-    itr.associer(*this);
-
   thermals_.associer(*this);
 
   run();
@@ -913,15 +894,9 @@ void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double&
         const int jmax = velocity.nj();
         const int kmax = velocity.nk();
         for (int k = kmin; k < kmax; k++)
-          {
-            for (int j = jmin; j < jmax; j++)
-              {
-                for (int i = imin; i < imax; i++)
-                  {
-                    velocity(i,j,k) = imposed[direction];
-                  }
-              }
-          }
+          for (int j = jmin; j < jmax; j++)
+            for (int i = imin; i < imax; i++)
+              velocity(i,j,k) = imposed[direction];
       }
   }
 }
@@ -1148,20 +1123,6 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       ++idx2;
     }
 
-  int idx3 =0;
-  for (auto& itr : thermal_subresolution_)
-    {
-      itr.sauvegarder_temperature(lata_name, idx3);
-      ++idx3;
-    }
-
-  int idth =0;
-  for (auto& itr : thermal_)
-    {
-      itr.sauvegarder_temperature(lata_name, idth);
-      ++idth;
-    }
-
   thermals_.sauvegarder_temperature(lata_name);
 
   // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
@@ -1247,49 +1208,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       if (flag_list_not_empty_en)
         fichier << " } \n" ;
       /*
-       * Thermal Sub-resolution
-       */
-      int flag_list_not_empty_th_subres = 0;
-      if (thermal_subresolution_.size() > 0)
-        {
-          fichier << " thermal_subresolution {\n" ;
-          flag_list_not_empty_th_subres = 1;
-        }
-      for(auto itr = thermal_subresolution_.begin(); itr != thermal_subresolution_.end(); )
-        {
-          fichier << *itr ;
-          ++itr;
-          if (itr != thermal_subresolution_.end())
-            fichier << ", \n" ;
-          else
-            fichier << "\n" ;
-        }
-      if (flag_list_not_empty_th_subres)
-        fichier << " } \n" ;
-
-      /*
-       * Thermal problems
-       */
-      int flag_list_not_empty_th = 0;
-      if (thermal_.size() > 0)
-        {
-          fichier << " thermal {\n" ;
-          flag_list_not_empty_th = 1;
-        }
-      for(auto itr = thermal_.begin(); itr != thermal_.end(); )
-        {
-          fichier << *itr ;
-          ++itr;
-          if (itr != thermal_.end())
-            fichier << ", \n" ;
-          else
-            fichier << "\n" ;
-        }
-      if (flag_list_not_empty_th)
-        fichier << " } \n" ;
-
-      /*
-       * Thermals test
+       * Thermals problems
        */
       thermals_.sauvegarder_thermals(fichier);
       /*
@@ -1320,8 +1239,6 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
    */
   param.ajouter("thermique", &thermique_);
   param.ajouter("energie", &energie_);
-  param.ajouter("thermal_subresolution", &thermal_subresolution_);
-  param.ajouter("thermal", &thermal_);
   param.ajouter("thermals", &thermals_);
   param.ajouter("forcage", &forcage_);
   param.ajouter("corrections_qdm", &qdm_corrections_);
@@ -1366,6 +1283,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   // On ne connait pas la longueur minimum du maillage lagrangien, mais on en prend une approximation :
   // lg \approx 1.7 delta
   double lg_cube = 1.;
+  double lg_cube_raw = 1.;
   for (int dir = 0; dir < 3; dir++)
     {
       const IJK_Field_double& v = velocity_[dir];
@@ -1374,15 +1292,9 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       const int nj = v.nj();
       const int nk = v.nk();
       for (int k = 0; k < nk; k++)
-        {
-          for (int j = 0; j < nj; j++)
-            {
-              for (int i = 0; i < ni; i++)
-                {
-                  max_v = std::max(max_v, fabs(v(i,j,k)));
-                }
-            }
-        }
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            max_v = std::max(max_v, fabs(v(i,j,k)));
       max_v = Process::mp_max(max_v);
       const IJK_Grid_Geometry& geom = v.get_splitting().get_grid_geometry();
 #ifndef VARIABLE_DZ
@@ -1392,19 +1304,26 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       const double delta = Process::mp_min(min_array(tab_dz));
 #endif
       lg_cube *= 1.7*delta;
+      lg_cube_raw *= delta;
       dxmin = std::min(delta, dxmin);
       // QUESTION GAB : pourquoi on ne reprend pas dxmin ?
       if (max_v>0)
         dt_cfl = std::min(dt_cfl, delta / max_v * 0.5);
-
     }
   dt_cfl *= cfl;
   const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
   double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
-  if (disable_diffusion_qdm_) dt_fo = 1.e20;
-  // Au cas ou sigma = 0, on utilise (sigma + 1e-20) :
-  const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
-  const double dt_eq_velocity = 1./(1./dt_cfl+1./dt_fo+1./dt_oh);
+  if (disable_diffusion_qdm_)
+    dt_fo = 1.e20;
+  /*
+   * Popinet et.al 2018 (review surface tension calculation)
+   * Au cas ou sigma = 0, on utilise (sigma + 1e-20)
+   */
+  double ideal_length_factor = get_remaillage_ft_ijk().get_facteur_longueur_ideale();
+  const double dt_oh  = sqrt((rho_liquide_ + rho_vapeur_) / (2 * M_PI) * lg_cube_raw * pow(ideal_length_factor, 3) / (sigma_ + 1e-20)) * oh;
+  // Seems underestimated !
+  //  const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
+  const double dt_eq_velocity = 1. / (1./dt_cfl + 1./dt_fo + 1./dt_oh);
 
   /*
    * TODO: Change this block with DERIV CLASS IJK_Thermal
@@ -1425,27 +1344,11 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       dt_energie= std::min(dt_energie, dt_en);
     }
 
-  double dt_thermal_subresolution = 1.e20;
-  for (const auto& itr : thermal_subresolution_)
-    {
-      const double dt_th_subres = itr.compute_timestep(dt_thermal_subresolution, dxmin);
-      // We take the most restrictive of all thermal problems and use it for all:
-      dt_thermal_subresolution= std::min(dt_thermal_subresolution, dt_th_subres);
-    }
-
-  double dt_thermal = 1.e20;
-  for (const auto& itr : thermal_)
-    {
-      const double dt_th = itr.compute_timestep(dt_thermal, dxmin);
-      // We take the most restrictive of all thermal problems and use it for all:
-      dt_thermal = std::min(dt_thermal, dt_th);
-    }
-
   double dt_thermals = 1.e20;
   thermals_.compute_timestep(dt_thermals, dxmin);
 
   const double dt = std::min(max_timestep, timestep_facsec_*std::min(dt_eq_velocity, dt_thermals));
-  //  const double dt = std::min(max_timestep, timestep_facsec_*std::min(std::min(std::min(dt_eq_velocity, dt_thermique), dt_energie),dt_thermal_subresolution));
+
 
   if (Process::je_suis_maitre())
     {
@@ -1455,8 +1358,6 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       fic<<" "<<dt_cfl<<" "<<dt_fo<<" "<<dt_oh;
       fic<<" "<<dt_thermique; // If no thermal equation, value will be large.
       fic<<" "<<dt_energie; // If no thermal equation, value will be large.
-      fic<<" "<<dt_thermal_subresolution; // If no thermal equation, value will be large.
-      fic<<" "<<dt_thermal; // If no thermal equation, value will be large.
       fic<<" "<<dt_thermals; // If no thermal equation, value will be large.
       fic<<finl;
       fic.close();
@@ -1582,7 +1483,6 @@ int IJK_FT_double::initialise()
     }
 #endif
 
-// Pour le check_stats_ :
   // Pour le check_stats_ ou pour travailler en increment de pression, il faut connaitre la pression initiale :
   if (expression_pression_initiale_ != "??")
     {
@@ -1640,7 +1540,7 @@ int IJK_FT_double::initialise()
           interfaces_.set_positions_reference();
         }
     }
-  //L'indicatrice non-perturbee est remplie (si besoin, cad si post-traitement) par le post.complete()
+  // L'indicatrice non-perturbee est remplie (si besoin, cad si post-traitement) par le post.complete()
   post_.complete(reprise_);
 
   const double delta_rho = rho_liquide_ - rho_vapeur_;
@@ -1690,27 +1590,9 @@ int IJK_FT_double::initialise()
       idx2++;
     }
 
-  int idx3 =0;
-  for (auto& itr : thermal_subresolution_)
-    {
-      nalloc += itr.initialize(splitting_, idx3);
-      if (!disable_diphasique_)
-        itr.update_thermal_properties();
-      idx3++;
-    }
-
   /*
    * Thermal problems
    */
-  int idth =0;
-  for (auto& itr : thermal_)
-    {
-      nalloc += itr.initialize(splitting_, idth);
-      if (!disable_diphasique_)
-        itr.update_thermal_properties();
-      idth++;
-    }
-
   thermals_.initialize(splitting_, nalloc);
 
   statistiques().end_count(calculer_thermique_prop_counter_);
@@ -1721,30 +1603,6 @@ int IJK_FT_double::initialise()
    */
 //  if ((energie_.size() > 0) or (thermique_.size() >0) or (thermal_subresolution_.size()>0))
   if (energie_.size() > 0)
-    {
-      interfaces_.set_compute_surfaces_mouillees();
-      for (int i=0; i<2; i++)
-        {
-          interfaces_.switch_indicatrice_next_old();
-          interfaces_.calculer_indicatrice_next(
-            post_.potentiel(),
-            gravite_,
-            delta_rho,
-            sigma_,
-            /*Pour post-traitement : post_.rebuilt_indic()
-            */
-#ifdef SMOOTHING_RHO
-            /* Pour le smoothing : */
-            rho_field_ft_,
-            rho_vapeur_,
-            smooth_density_,
-#endif
-            current_time_, tstep_
-          );
-        }
-    }
-
-  if (size_thermal_problem(Nom("onefluidenergy")) > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
       for (int i=0; i<2; i++)
@@ -2032,7 +1890,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       parser_derivee_acceleration_.setVar("tauw", tauw);
       // Pour utiliser rho_v il faudrait deplacer cette mise a jour a un endroit ou rho
       // est a jour en fonction de l'indicatrice
-      //parser_derivee_acceleration_.setVar("rho_v_moyen", rho_v_moy);
+      // parser_derivee_acceleration_.setVar("rho_v_moyen", rho_v_moy);
       derivee_acceleration = parser_derivee_acceleration_.eval();
 
       // Mise a jour de la source variable
@@ -2049,7 +1907,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
 
       if (qdm_corrections_.is_type_gb())
         {
-          //Cout << "get_time_scheme" << get_time_scheme() << finl;
+          // Cout << "get_time_scheme" << get_time_scheme() << finl;
           // ON NE VEUT PAS METTRE A JOUR TERME_SOURCE_ACCELERATION_ AVEC CETTE METHODE
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
@@ -2177,7 +2035,6 @@ void IJK_FT_double::run()
     }
 
   if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_rhou"))
-//  if (type_velocity_convection_form_ == Nom("non_conservative_rhou"))
     {
       div_rhou_.allocate(splitting_, IJK_Splitting::ELEM, 1);
     }
@@ -2236,51 +2093,8 @@ void IJK_FT_double::run()
       Cout << "Schema temps de type : euler_explicite" << finl;
     }
 
-  //velocity_diffusion_op_.initialize(splitting_, boundary_conditions_);
-//  if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
-//    {
-////      velocity_diffusion_op_simple_.initialize(splitting_,
-////                                               boundary_conditions_);
-//      velocity_diffusion_op_.typer("OpDiffIJK_double");
-//    }
-//  else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
-//    {
-////      velocity_diffusion_op_full_.initialize(splitting_,
-////                                             boundary_conditions_);
-//      velocity_diffusion_op_.typer("OpDiffStdWithLaminarTransposeIJK_double");
-//    }
-//  else
-//    {
-//      Cerr << "Unknown velocity diffusion operator! " << finl;
-//      Process::exit();
-//    }
-
   velocity_diffusion_op_.initialize(splitting_);
   velocity_diffusion_op_.set_bc(boundary_conditions_);
-
-  //  velocity_convection_op(type_velocity_convection_op_).initialize(splitting_);
-  //  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
-  //	OpConvCentre4IJK_double velocity_convection_op_centre_;
-  //	OpConvAmontIJK_double velocity_convection_op_amont_;
-//  switch (type_velocity_convection_op_)
-//    {
-//    case 0:
-//      velocity_convection_op_.typer("OpConvIJKQuickSharp_double");
-////      velocity_convection_op_sharp_.initialize(splitting_);
-//      break;
-//    case 1:
-//      velocity_convection_op_.typer("OpConvCentre4IJK_double");
-//      velocity_convection_op_.set_bc(boundary_conditions_);
-////      velocity_convection_op_centre_.initialize(splitting_, boundary_conditions_);
-//      break;
-//    case 2:
-//      velocity_convection_op_.typer("OpConvAmontIJK_double");
-////      velocity_convection_op_amont_.initialize(splitting_);
-//      break;
-//    default:
-//      Cerr << "Error, unknown type of velocity_convection_op" << finl;
-//      Process::exit();
-//    }
   velocity_convection_op_.initialize(splitting_);
 
 // Economise la memoire si pas besoin
@@ -2321,12 +2135,6 @@ void IJK_FT_double::run()
                 itr.update_thermal_properties();
 
               for (auto& itr : energie_)
-                itr.update_thermal_properties();
-
-              for (auto& itr : thermal_subresolution_)
-                itr.update_thermal_properties();
-
-              for (auto& itr : thermal_)
                 itr.update_thermal_properties();
 
               thermals_.update_thermal_properties();
@@ -2450,16 +2258,6 @@ void IJK_FT_double::run()
           // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
           itr.update_thermal_properties();
         }
-      for (auto& itr : thermal_subresolution_)
-        {
-          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
-          itr.update_thermal_properties();
-        }
-      for (auto& itr : thermal_)
-        {
-          // To fill in fields for cp (with cp_liq) and lambda (with lambda_liq)
-          itr.update_thermal_properties();
-        }
       thermals_.update_thermal_properties();
     }
   else
@@ -2473,12 +2271,6 @@ void IJK_FT_double::run()
         itr.update_thermal_properties();
 
       for (auto& itr : energie_)
-        itr.update_thermal_properties();
-
-      for (auto& itr : thermal_subresolution_)
-        itr.update_thermal_properties();
-
-      for (auto& itr : thermal_)
         itr.update_thermal_properties();
 
       thermals_.update_thermal_properties();
@@ -2666,18 +2458,6 @@ void IJK_FT_double::run()
                       itr.euler_rustine_step(timestep_, dE);
                     }
                 }
-              for (auto& itr : thermal_)
-                {
-                  if (itr.get_thermal_problem_type() == Nom("onefluid"))
-                    {
-                      itr.update_thermal_properties();
-                      if (itr.get_conserv_energy_global())
-                        {
-                          const double dE = itr.get_E0() - itr.compute_global_energy();
-                          itr.euler_rustine_step(timestep_, dE);
-                        }
-                    }
-                }
 
               thermals_.euler_rustine_step(timestep_);
 
@@ -2773,20 +2553,7 @@ void IJK_FT_double::run()
                                                    current_time_at_rk3_step, dE);
                         }
                     }
-                  for (auto& itr : thermal_)
-                    {
-                      if (itr.get_thermal_problem_type() == Nom("onefluid") )
-                        {
-                          itr.update_thermal_properties();
-                          if (itr.get_conserv_energy_global())
-                            {
-                              const double dE = itr.get_E0() - itr.compute_global_energy();
-                              itr.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
-                                                       current_time_at_rk3_step, dE);
-                            }
-                        }
 
-                    }
                   thermals_.rk3_rustine_sub_step(rk_step_, timestep_, fractionnal_timestep,
                                                  current_time_at_rk3_step);
 
@@ -2829,9 +2596,6 @@ void IJK_FT_double::run()
                 itr.update_thermal_properties();
 
               for (auto& itr : energie_)
-                itr.update_thermal_properties();
-
-              for (auto& itr : thermal_)
                 itr.update_thermal_properties();
 
               thermals_.update_thermal_properties();
@@ -3321,34 +3085,11 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   // Calcul d_velocity = convection
   if (!disable_convection_qdm_)
     {
-//			if (type_velocity_convection_form_== Nom("non_conservative_simple"))
       if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_simple"))
         {
           velocity_convection_op_.calculer(velocity_[0], velocity_[1], velocity_[2],
                                            velocity_[0], velocity_[1], velocity_[2],
                                            d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//          switch(type_velocity_convection_op_)
-//            {
-//            case 0:
-//              velocity_convection_op_sharp_.calculer(velocity_[0], velocity_[1], velocity_[2],
-//                                                     velocity_[0], velocity_[1], velocity_[2],
-//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//              break;
-//            case 1:
-//              velocity_convection_op_centre_.calculer(velocity_[0], velocity_[1], velocity_[2],
-//                                                      velocity_[0], velocity_[1], velocity_[2],
-//                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//              break;
-//            case 2:
-//              velocity_convection_op_amont_.calculer(velocity_[0], velocity_[1], velocity_[2],
-//                                                     velocity_[0], velocity_[1], velocity_[2],
-//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//
-//              break;
-//            default:
-//              Cerr << "Unknown type of velocity convection operator" << finl;
-//              Process::exit();
-//            }
           // Multiplication par rho (on va rediviser a la fin)
           // (a partir de rho aux elements et dv aux faces)
           if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
@@ -3364,7 +3105,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
             }
 
         }
-//      else if (type_velocity_convection_form_== Nom("non_conservative_rhou"))
       else if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_rhou"))
         {
           update_rho_v();
@@ -3373,60 +3113,19 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
           d_velocity_[0].data() = 0.;
           d_velocity_[1].data() = 0.;
           d_velocity_[2].data() = 0.;
-//          if (type_velocity_convection_op_!=1)
           if (velocity_convection_op_.get_convection_op() != Nom("Centre4"))
             {
               velocity_convection_op_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2], // rhov_
                                                               velocity_[0], velocity_[1], velocity_[2],
                                                               d_velocity_[0], d_velocity_[1], d_velocity_[2],
                                                               div_rhou_);
-//              Cerr << "Choix d'options pas encore compatible : convection conservative en QUICK!" << finl;
-//              Cerr << " Method OpConvQuickSharpIJK_double::ajouter_avec_u_div_rhou not implemented!" << finl;
-//              Process::exit();
-//#if 0
-//              velocity_convection_op_sharp_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2], // rhov_
-//                                                                    velocity_[0], velocity_[1], velocity_[2],
-//                                                                    d_velocity_[0], d_velocity_[1], d_velocity_[2],
-//                                                                    div_rhou_);
-//#endif
-//            }
-//          else
-//            {
-//              velocity_convection_op_centre_.ajouter_avec_u_div_rhou(rho_v_[0], rho_v_[1], rho_v_[2],
-//                                                                     velocity_[0], velocity_[1], velocity_[2],
-//                                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2],
-//                                                                     div_rhou_);
-//            }
             }
-//          else if (type_velocity_convection_form_== Nom("conservative"))
           else if (velocity_convection_op_.get_convection_op_option() == Nom("conservative"))
             {
               update_rho_v();
               velocity_convection_op_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
                                                velocity_[0], velocity_[1], velocity_[2],
                                                d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//          switch (type_velocity_convection_op_)
-//            {
-//            case 0:
-//              velocity_convection_op_sharp_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-//                                                     velocity_[0], velocity_[1], velocity_[2],
-//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//              break;
-//            case 1:
-//              velocity_convection_op_centre_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-//                                                      velocity_[0], velocity_[1], velocity_[2],
-//                                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//              break;
-//            case 2:
-//              velocity_convection_op_amont_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
-//                                                     velocity_[0], velocity_[1], velocity_[2],
-//                                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//              break;
-//            default:
-//              Cerr << "unknown type of convection op" << finl;
-//              Process::exit();
-//            }
-
             }
           else
             {
@@ -3485,23 +3184,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
           velocity_diffusion_op_.set_nu(molecular_mu_);
           velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
                                          d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//      if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
-//        {
-//          velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-//                                                molecular_mu_,
-//                                                d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//        }
-//      else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
-//        {
-//          velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-//                                              molecular_mu_,
-//                                              d_velocity_[0], d_velocity_[1], d_velocity_[2]);
-//        }
-//      else
-//        {
-//          Cerr << "Unknown velocity diffusion operator! " << finl;
-//          Process::exit();
-//        }
           // GAB, qdm
           // a priori homogene a int_{volume_cellule} (d rho v / dt) pour le moment
           // mais on le divise par volume_cell_uniforme donc homogene a d rho v / dt maintenant
@@ -3734,10 +3416,8 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
           // dans d_velocity_moyen on a la contrib de interfaces, forces ajoutees
           terme_interfaces_conv_diff_mass_solver_[dir] = calculer_v_moyen(d_velocity_[dir]);
 
-
           Cerr << "disable_diffusion_qdm_ : "<< disable_diffusion_qdm_ << finl;
           Cerr << "diffusion_alternative_ : "<< diffusion_alternative_ << finl;
-//        Cerr << "type_velocity_diffusion_form_ : "<< type_velocity_diffusion_form_ << finl;
           Cerr << "type_velocity_diffusion_form : "<< velocity_diffusion_op_.get_diffusion_op_option() << finl;
           for (int k = 0; k < kmax; k++)
             {
@@ -4065,15 +3745,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-//  if ((thermique_.size() > 0) || (energie_.size()))
-  if (thermal_.size())
-    {
-      // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
-      // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-      velocity_[1].echange_espace_virtuel(2);
-      velocity_[2].echange_espace_virtuel(2);
-    }
+  //  if ((thermique_.size() > 0) || (energie_.size()))
   if (thermals_.size())
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
@@ -4092,14 +3764,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
   for (auto& itr : energie_)
     itr.euler_time_step(velocity_);
 
-  for (auto& itr : thermal_subresolution_)
-    itr.euler_time_step(timestep_);
-
-  for (auto& itr : thermal_)
-    itr.euler_time_step(timestep_);
-
   thermals_.euler_time_step(timestep_);
-
 
   if (!frozen_velocity_)
     {
@@ -4310,29 +3975,6 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
       // ++curseur;
       Cerr << "Le schema RK3 n est pas implemente avec des champs d energie" << finl;
       Process::exit();
-    }
-
-  for (auto& itr : thermal_)
-    {
-      int thermal_rank = itr.get_thermal_rank();
-      switch (thermal_rank)
-        {
-        case 0:
-          Cerr << "RK3 Time scheme is not implemented yet with" << itr.get_thermal_words()[thermal_rank] << finl;
-          break;
-        case 1:
-          Cerr << "RK3 Time scheme is not implemented yet with" << itr.get_thermal_words()[thermal_rank] << finl;
-          break;
-        case 2:
-          itr.rk3_sub_step(rk_step, total_timestep, time);
-          Cerr << "RK3 Time scheme is implemented with" << itr.get_thermal_words()[thermal_rank] << finl;
-          break;
-        case 3:
-          Cerr << "RK3 Time scheme is not implemented  with" << itr.get_thermal_words()[thermal_rank] << finl;
-          break;
-        default:
-          Process::exit();
-        }
     }
 
   thermals_.rk3_sub_step(rk_step, total_timestep, time);
@@ -5168,17 +4810,6 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
             }
     }
   Cout << "AF : compute_and_add_qdm_corrections" << finl;
-}
-
-int IJK_FT_double::size_thermal_problem(Nom thermal_problem)
-{
-  int size=0;
-  for (auto& itr : thermal_)
-    {
-      if (thermal_problem == itr.get_thermal_problem_type())
-        size++;
-    }
-  return size;
 }
 
 void IJK_FT_double::redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,

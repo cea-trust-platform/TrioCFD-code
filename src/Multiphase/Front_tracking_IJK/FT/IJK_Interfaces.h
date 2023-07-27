@@ -250,6 +250,12 @@ public :
   {
     return maillage_ft_ijk_;
   }
+
+  const Remaillage_FT_IJK& remaillage_ft_ijk() const
+  {
+    return remaillage_ft_ijk_;
+  }
+
   const DoubleTab& RK3_G_store_vi() const
   {
     return  RK3_G_store_vi_;

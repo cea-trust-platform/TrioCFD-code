@@ -15,7 +15,18 @@
 
 #include <Operateur_IJK_faces_conv_base.h>
 
-Implemente_base(Operateur_IJK_faces_conv_base_double, "Operateur_IJK_faces_conv_base_double", Operateur_IJK_faces_base_double);
+Implemente_base_sans_constructeur(Operateur_IJK_faces_conv_base_double, "Operateur_IJK_faces_conv_base_double", Operateur_IJK_faces_base_double);
+
+Operateur_IJK_faces_conv_base_double::Operateur_IJK_faces_conv_base_double()
+{
+  vx_ = 0;
+  vy_ = 0;
+  vz_ = 0;
+  perio_k_ = false;
+  inputx_ = 0;
+  inputy_ = 0;
+  inputz_ = 0;
+}
 
 Sortie& Operateur_IJK_faces_conv_base_double::printOn(Sortie& os) const
 {
@@ -50,7 +61,6 @@ void Operateur_IJK_faces_conv_base_double::calculer(const IJK_Field_double& inpu
 
   vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
   statistiques().end_count(convection_counter_);
-
 }
 
 void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
@@ -70,45 +80,4 @@ void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& input
 
   vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
   statistiques().end_count(convection_counter_);
-
 }
-
-//void Operateur_IJK_faces_conv_base_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-//                                           const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-//                                           IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-//{
-//  statistiques().begin_count(convection_counter_);
-//
-//  vx_ = &vx;
-//  vy_ = &vy;
-//  vz_ = &vz;
-//  inputx_ = &inputx;
-//  inputy_ = &inputy;
-//  inputz_ = &inputz;
-//
-//  compute_set(dvx, dvy, dvz);
-//
-//  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
-//  statistiques().end_count(convection_counter_);
-//
-//}
-//
-//void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
-//                                          const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
-//                                          IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
-//{
-//  statistiques().begin_count(convection_counter_);
-//
-//  vx_ = &vx;
-//  vy_ = &vy;
-//  vz_ = &vz;
-//  inputx_ = &inputx;
-//  inputy_ = &inputy;
-//  inputz_ = &inputz;
-//
-//  compute_add(dvx, dvy, dvz);
-//
-//  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
-//  statistiques().end_count(convection_counter_);
-//
-//}

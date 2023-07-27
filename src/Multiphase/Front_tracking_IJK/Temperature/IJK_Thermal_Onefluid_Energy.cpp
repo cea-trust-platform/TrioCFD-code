@@ -21,7 +21,12 @@
 
 #include <IJK_Thermal_Onefluid_Energy.h>
 
-Implemente_instanciable( IJK_Thermal_Onefluid_Energy, "IJK_Thermal_Onefluid_Energy", IJK_Thermal_base ) ;
+Implemente_instanciable_sans_constructeur( IJK_Thermal_Onefluid_Energy, "IJK_Thermal_Onefluid_Energy", IJK_Thermal_base ) ;
+
+IJK_Thermal_Onefluid_Energy::IJK_Thermal_Onefluid_Energy()
+{
+
+}
 
 Sortie& IJK_Thermal_Onefluid_Energy::printOn( Sortie& os ) const
 {

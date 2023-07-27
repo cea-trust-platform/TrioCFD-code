@@ -21,7 +21,6 @@
 
 #include <IJK_Thermal_base.h>
 #include <Param.h>
-//#include <IJK_Navier_Stokes_tools.h>
 #include <stat_counters.h>
 #include <DebogIJK.h>
 #include <Corrige_flux_FT.h>
@@ -49,7 +48,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   lambda_liquid_=1.;
   lambda_vapour_=0.;
   single_phase_=1.;
-  fo_ = 1.; // fourier number
+  fo_ = 1.; // Fourier number
 
   /*
    * Initialisation of the problem
@@ -79,6 +78,14 @@ IJK_Thermal_base::IJK_Thermal_base()
   T0v_ = 1.;
   T0l_ = 0.;
   expression_T_ana_="??";
+
+  E0_ = 0;
+  uniform_lambda_ = 0;
+  uniform_alpha_ = 0;
+  global_energy_ = 0;
+  conserv_energy_global_=0;
+  vol_=0;
+  rho_cp_post_ = 0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -110,7 +117,6 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
       bckmin = " ";
       valeur_kmax = " ";
     }
-
   if( boundary_conditions_.get_bctype_k_min()==boundary_conditions_.Paroi_Temperature_imposee)
     {
       bctype_kmin="Paroi_Temperature_imposee";
@@ -208,9 +214,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid thermal conductivity
   param.ajouter("cp_vapour", &cp_vapour_); // XD_ADD_P floattant Liquid specific heat at constant pressure
   param.ajouter("lambda_vapour", &lambda_vapour_); // XD_ADD_P floattant Liquid thermal conductivity
-
   param.ajouter("expression_T_init", &expression_T_init_); // XD_ADD_P chaine Expression of initial temperature (parser of x,y,z)
-
   param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // XD_ADD_P bloc_lecture boundary conditions
   param.ajouter("type_T_source", &type_T_source_); // XD_ADD_P chaine(into=["dabiri","patch_dabiri","unweighted_dabiri"]) source term
   param.ajouter("expression_source_temperature", &expression_source_temperature_); // XD_ADD_P chaine source terms
@@ -220,19 +224,13 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("kv_source", &kv_);
   param.ajouter("T0l_source", &T0l_);
   param.ajouter("T0v_source", &T0v_);
-
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
-
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
   param.ajouter_flag("diff_temp_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
-
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
   param.ajouter("temperature_convection_op", &temperature_convection_op_);
-
   param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
-
-//  param.ajouter_flag("single_phase", &single_phase_);
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
 }
 
@@ -337,7 +335,6 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
         {
           Cerr << "Attention on demande des post-traitement sans avoir renseigner type_T_source" << finl;
           throw "Erreur post et type_T_source";
-          // type_T_source_ = "dabiri";
         }
     }
   if (liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES"))
@@ -412,8 +409,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
     }
 
   compute_cell_volume();
-
-//  Cout << "End of " << que_suis_je() << "::initialize()" << finl;
+  // Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
 }
 
@@ -679,11 +675,6 @@ void IJK_Thermal_base::add_temperature_diffusion()
   temperature_.echange_espace_virtuel(temperature_.ghost());
   DebogIJK::verifier("temp", temperature_);
 
-//  if (diff_temp_negligible_) // si diffusion negligeable
-//    {
-//      div_coeff_grad_T_volume_.data()=0;
-//    }
-
   if (!diff_temp_negligible_)
     {
       // Performance counters:
@@ -840,8 +831,6 @@ void IJK_Thermal_base::add_temperature_source()
                       Cerr << "Veut-on vraiment calculer une partie en lambda spatialement variable??" <<finl;
                       Cerr << "Exit at IJK_Thermal_base::add_temperature_source" << finl;
                       Process::exit();
-                      // const double div_lambda = (lambda_(i+1,j,k)-lambda_(i-1,j,k))/(2*dx);
-                      // source_temperature_(i,j,k) = (u-div_lambda)*dTm/<u>;
                     }
                   else
                     {
@@ -971,8 +960,6 @@ void IJK_Thermal_base::calculer_temperature_physique_T(const IJK_Field_double&  
   if (wall_flux_)
     {
       const IJK_Splitting& splitting = temperature_.get_splitting();
-
-      //const IJK_Splitting::Localisation loc = field.get_localisation();
       const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
       double dx =geom.get_constant_delta(DIRECTION_I);
       double origin_x = geom.get_origin(DIRECTION_I) + (dx * 0.5) ;
@@ -1034,9 +1021,7 @@ void IJK_Thermal_base::calculer_temperature_adim_bulles()
   Vl = Process::mp_sum(Vl);
   Tl /= Vl;
   Tv /= Vv;
-
   // Calcul de Tl et Tv :
-
   // const double Tl = Tv0_ / (1 - Tl) * (1 - Tl / (1 + Tv)) / (1 + Tl * Tv / ((1 - Tl) * (1 + Tv)));
   // const double Tv = Tv0_ / (1 + Tv) * (1 + Tv / (1 - Tl)) / (1 + Tv * Tl / ((1 + Tv) * (1 - Tl)));
   const int ntot = temperature_.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_I)
@@ -1047,19 +1032,12 @@ void IJK_Thermal_base::calculer_temperature_adim_bulles()
   Cerr << "Tv_test : time= "<< time << " alpha_v= " << Vv/ntot<< " TIv=" <<Tv*Vv/ntot<< " Tv="<< Tv << finl;
 
   for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              temperature_adim_bulles_(i,j,k) = (temperature_(i,j,k) - Tv0_)/(Tl - Tv);
-            }
-        }
-    }
-//  temperature_adim_bulles_.echange_espace_virtuel(temperature_adim_bulles_.ghost());
-//
-//
-//  TODO: ce qui suit ne devrait pas etre la, mais je le met ici temporairement avant de trouver une meilleure solution
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        temperature_adim_bulles_(i,j,k) = (temperature_(i,j,k) - Tv0_)/(Tl - Tv);
+
+  //  temperature_adim_bulles_.echange_espace_virtuel(temperature_adim_bulles_.ghost());
+  //  TODO: ce qui suit ne devrait pas etre la, mais je le met ici temporairement avant de trouver une meilleure solution
 
   double E_tot = 0.;
   double E_liq_pure = 0., E_liq = 0;
@@ -1161,7 +1139,7 @@ void IJK_Thermal_base::calculer_source_temperature_ana()
       const int nk = source_temperature_.nk();
       const int ntot=Process::mp_sum(ni*nj*nk);
       // La temperature est definie a une constante pres:
-      //const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
+      // const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
@@ -1180,30 +1158,9 @@ void IJK_Thermal_base::calculer_source_temperature_ana()
         }
       // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
       Cerr << finl ;
-      //  n++,dumplata_scalar(lata_name,"ECART_SOURCE_TEMPERATURE_ANA", ecart_source_t_ana_, latastep);
+      // n++,dumplata_scalar(lata_name,"ECART_SOURCE_TEMPERATURE_ANA", ecart_source_t_ana_, latastep);
     }
 }
-
-//void IJK_Thermal_base::calculer_temperature_physique_T_dummy()
-//{
-//  const int nk = d_temperature_.nk();
-//  const int ni = d_temperature_.ni();
-//  const int nj = d_temperature_.nj();
-//
-//  for (int k = 0; k < nk; k++)
-//    {
-//      for (int j = 0; j < nj; j++)
-//        {
-//          for (int i = 0; i < ni; i++)
-//            {
-//              temperature_physique_T_(i,j,k) = temperature_(i,j,k);
-//            }
-//        }
-//    }
-//  temperature_physique_T_.echange_espace_virtuel(temperature_physique_T_.ghost());
-//  DebogIJK::verifier("temperature_physique_T", temperature_physique_T_);
-//  return;
-//}
 
 double IJK_Thermal_base::compute_variable_wall_temperature(const int kmin, const int kmax)
 {
@@ -1247,17 +1204,16 @@ void IJK_Thermal_base::calculer_temperature_adimensionnelle_theta(const IJK_Fiel
         {
           //  const double T_mean = compute_spatial_mean(vx, temperature_, cp_, ref_ijk_ft_->rho_field_, kmin, nktot, k);
           for (int j = 0; j < nj; j++)
-            {
-              for (int i = 0; i < ni; i++)
-                {
-                  double theta = T_wall - temperature_(i,j,k);
-                  // double theta = T_wall -T_mean;
-                  // temperature_adimensionnelle_theta_(i,j,k) = theta/theta_tau;
-                  const double lambda_l = lambda_liquid_;
-                  temperature_adimensionnelle_theta_(i,j,k) = theta * lambda_l / q_w / h;
-                  //    temperature_adimensionnelle_theta_(i,j,k) = -T_mean*lambda_l/q_w/h;
-                }
-            }
+            for (int i = 0; i < ni; i++)
+              {
+                double theta = T_wall - temperature_(i,j,k);
+                // double theta = T_wall -T_mean;
+                // temperature_adimensionnelle_theta_(i,j,k) = theta/theta_tau;
+                const double lambda_l = lambda_liquid_;
+                temperature_adimensionnelle_theta_(i,j,k) = theta * lambda_l / q_w / h;
+                //    temperature_adimensionnelle_theta_(i,j,k) = -T_mean*lambda_l/q_w/h;
+              }
+
         }
       return;
     }
@@ -1318,7 +1274,7 @@ void IJK_Thermal_base::calculer_ecart_T_ana()
       const int nk = temperature_.nk();
       const int ntot=Process::mp_sum(ni*nj*nk);
       // La temperature est definie a une constante pres:
-      //const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
+      // const double cst_temp = temperature_ana_(0,0,0) - curseur->temperature_(0,0,0);
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
@@ -1405,30 +1361,6 @@ double IJK_Thermal_base::get_rhocp_v() const
   return  ref_ijk_ft_->get_rho_v() * cp_vapour_;
 }
 
-//int IJK_Thermal_base::get_type_thermal_problem() const
-//{
-//  return  type_thermal_problem_;
-//}
-//
-//std::string IJK_Thermal_base::set_type_thermal_problem()
-//{
-//  switch (type_thermal_problem_)
-//    {
-//    case 0:
-//      name_type_thermal_problem_ = "subresolution";
-//      break;
-//    case 1:
-//      name_type_thermal_problem_ = "multiplesubresolutions";
-//      break;
-//    case 2:
-//      name_type_thermal_problem_ = "onefluid";
-//      break;
-//    default:
-//      name_type_thermal_problem_ = "subresolution";
-//    }
-//  return name_type_thermal_problem_;
-//}
-
 /*
  * Methods that do not belong to the class
  */
@@ -1497,7 +1429,7 @@ int IJK_Thermal_base::calculer_flux_thermique_bord(const IJK_Field_double& tempe
   if (bord_kmax)
     facteur *= -1.; // he he... je vous laisse reflechir a ca :)
   // nan c'est pas simpa: la convention dans l'operateur de diffusion est
-  //   d/dt = flux(i,j) - flux(i+1,j) + ... + flux(i,j,k) - flux(i,j,k+1)
+  // d/dt = flux(i,j) - flux(i+1,j) + ... + flux(i,j,k) - flux(i,j,k+1)
   // donc si la paroi inferieure (k=0) est plus froide que le fluide, il faut que le flux stocke soit negatif.
   // et si la paroi inferieure (k=kmax) est plus froide que le fluide, il faut que le flux stocke soit positif.
   for (int j = 0; j < nj; j++)
@@ -1525,7 +1457,7 @@ int IJK_Thermal_base::imposer_flux_thermique_bord(const IJK_Field_double& temper
   const int ni = temperature.ni(); // nombre d'element local sur ce processeur
   const int nj = temperature.nj();
   flux_bord.allocate(ni, nj, 1 /* 1 seule couche de valeurs en k */, 0 /* pas d'elements fantomes */);
-  //MR je multiplie le flux par la surface dxdy
+  // MR je multiplie le flux par la surface dxdy
   const IJK_Grid_Geometry& geometry = temperature.get_splitting().get_grid_geometry();
 
   double facteur = 1.* geometry.get_constant_delta(DIRECTION_I) * geometry.get_constant_delta(DIRECTION_J);
@@ -1652,10 +1584,6 @@ void IJK_Thermal_base::compute_interfacial_temperature2(ArrOfDouble& interfacial
   temp_vap.set_smart_resize(1);
   coo_liqu.set_smart_resize(1);
   coo_vap.set_smart_resize(1);
-  //  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(
-  //    temperature_ft_, lambda_liquid_, lambda_vapor_, dist, coord_facettes,
-  //    normale_facettes, interfacial_temperature, flux_normal_interp, temp_liqu,
-  //    temp_vap, coo_liqu, coo_vap);
   corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
                                                   lambda_liquid_,
                                                   lambda_vapour_,

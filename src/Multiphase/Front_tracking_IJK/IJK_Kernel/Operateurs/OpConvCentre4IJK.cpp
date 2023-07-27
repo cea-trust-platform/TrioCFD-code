@@ -17,6 +17,12 @@
 
 Implemente_instanciable_sans_constructeur(OpConvCentre4IJK_double, "OpConvCentre4IJK_double", Operateur_IJK_faces_conv_base_double);
 
+OpConvCentre4IJK_double::OpConvCentre4IJK_double()
+{
+  div_rho_u_=0;
+  last_computed_klayer_for_div_rhou_=0;
+}
+
 Sortie& OpConvCentre4IJK_double::printOn(Sortie& os) const
 {
   return os;

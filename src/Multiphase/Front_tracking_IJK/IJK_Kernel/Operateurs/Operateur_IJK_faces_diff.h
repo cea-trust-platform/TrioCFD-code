@@ -83,13 +83,6 @@ public:
    * Setters
    */
 
-
-//  inline void set_molecular_nu(const IJK_Field_local_double& molecular_nu);
-//  inline void set_turbulent_nu(const IJK_Field_local_double& turbulent_nu);
-//  inline void set_turbulent_k_energy(const IJK_Field_local_double& turbulent_k_energy);
-//  inline const IJK_Field_local_double& get_molecular_nu();
-//	inline const IJK_Field_local_double& get_turbulent_nu();
-//	inline const IJK_Field_local_double& get_turbulent_k_energy();
 protected:
   Motcles diffusion_op_words_;
   Motcles diffusion_op_options_;
@@ -120,6 +113,7 @@ inline void Operateur_IJK_faces_diff::initialize(const IJK_Splitting& splitting)
 {
   if (!is_cast_)
     typer_diffusion_op("standard");
+  diffusion_option_ = diffusion_op_options_[0];
   valeur().initialize(splitting);
 }
 
@@ -233,35 +227,5 @@ inline const double& Operateur_IJK_faces_diff::get_uniform_nu()
 {
   return valeur().get_uniform_nu();
 }
-
-//inline void Operateur_IJK_faces_diff::set_molecular_nu(const IJK_Field_local_double& molecular_nu)
-//{
-//  valeur().set_molecular_nu(molecular_nu);
-//}
-//
-//inline void Operateur_IJK_faces_diff::set_turbulent_nu(const IJK_Field_local_double& turbulent_nu)
-//{
-//  valeur().set_turbulent_nu(turbulent_nu);
-//}
-//
-//inline void Operateur_IJK_faces_diff::set_turbulent_k_energy(const IJK_Field_local_double& turbulent_k_energy)
-//{
-//  valeur().set_turbulent_k_energy(turbulent_k_energy);
-//}
-//
-//inline const IJK_Field_local_double& Operateur_IJK_faces_diff::get_molecular_nu()
-//{
-//  return valeur().get_molecular_nu();
-//}
-//
-//inline const IJK_Field_local_double& Operateur_IJK_faces_diff::get_turbulent_nu()
-//{
-//  return valeur().get_turbulent_nu();
-//}
-//
-//inline const IJK_Field_local_double& Operateur_IJK_faces_diff::get_turbulent_k_energy()
-//{
-//  return valeur().get_turbulent_k_energy();
-//}
 
 #endif /* Operateur_IJK_faces_diff_included */

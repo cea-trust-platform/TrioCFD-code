@@ -75,9 +75,6 @@ Entree& Operateur_IJK_faces_diff::readOn( Entree& is )
 {
 
   typer_diffusion_op(is);
-//  Param param(que_suis_je());
-//  set_param(param);
-//  param.lire_sans_accolade(is);
   return is;
 }
 

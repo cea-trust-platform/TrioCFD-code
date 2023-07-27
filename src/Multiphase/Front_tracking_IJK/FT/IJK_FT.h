@@ -41,17 +41,9 @@
 #include <Force_sp.h>
 #include <TRUST_List.h>
 #include <IJK_Energie.h>
-#include <IJK_Thermal_Subresolution.h>
-#include <IJK_Thermal.h>
 #include <IJK_Thermals.h>
 #include <TRUST_Ref.h>
 #include <Objet_U.h>
-
-//#include <Vecteur3.h>
-//#include <OpDiffTurbIJK.h>
-//#include <OpConvIJKQuickSharp.h>
-//#include <OpCentre4IJK.h>
-//#include <OpConvIJKAmont.h>
 
 class Probleme_base;
 
@@ -153,16 +145,14 @@ public :
   {
     return interfaces_.maillage_ft_ijk();
   }
+  const Remaillage_FT_IJK& get_remaillage_ft_ijk() const
+  {
+    return interfaces_.remaillage_ft_ijk();
+  }
   int get_direction_gravite() const
   {
     return direction_gravite_;
   }
-//  const int& nb_thermal_equations() const
-//  {
-//      return thermique_.
-//    static int nb=1;
-//    return nb;
-//  }
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
@@ -291,11 +281,9 @@ protected :
 
   void fill_variable_source_and_potential_phi(const double time);
 
-  int size_thermal_problem(Nom thermal_problem);
-
   // GAB, rotation
   int get_direction(const ArrOfDouble& vecteur);
-  //
+
   // GAB, qdm
   Vecteur3 calculer_inv_rho_grad_p_moyen(const IJK_Field_double& inv_rho, const IJK_Field_double& pression);
   Vecteur3 calculer_grad_p_moyen(const IJK_Field_double& pression);
@@ -393,9 +381,9 @@ protected :
 
   IJK_Field_double potential_phi_;
 
-  //
-  // Post-processing helper class:
-  //
+  /*
+   * Post-processing helper class:
+   */
   friend class IJK_FT_Post;
   IJK_FT_Post post_;
 
@@ -505,24 +493,14 @@ protected :
    *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
    */
   Operateur_IJK_faces_diff velocity_diffusion_op_;
-  //  Nom type_velocity_diffusion_form_;
 
   /*
    * Velocity convection operator
+   * non_conservative_simple : rho div(u u)
+   * non_conservative_rhou   : div(rho u u) - u div(rho u)
+   * conservative            : div(rho u u)
    */
-  //  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
-  //  OpConvCentre4IJK_double velocity_convection_op_centre_;
-  //  OpConvAmontIJK_double velocity_convection_op_amont_;
-  //  OpDiffIJK_double velocity_diffusion_op_simple_;
-  //  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
   Operateur_IJK_faces_conv velocity_convection_op_;
-//  Nom type_velocity_convection_form_;
-  /* non_conservative_simple : rho div(u u)
-   * non_conservative_rhou     : div(rho u u) - u div(rho u)
-   * conservative              : div(rho u u)
-   */
-  //  OpConvAmontIJK_double velocity_convection_op_;
-  //  int type_velocity_convection_op_; // 0 : Quick  / 1 : Centre / 2 : Amont
 
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters
@@ -564,7 +542,7 @@ protected :
   // travail en increment de pression pour aider le solveur :
   int include_pressure_gradient_in_ustar_;
   // Discretisation du champ (1/rho) et utilisation dans le calcul de rho*v*v, dans le mass_solver
-  //    et dans pressure_projection_with_inv_rho :
+  // et dans pressure_projection_with_inv_rho :
   int use_inv_rho_for_mass_solver_and_calculer_rho_v_;
   int use_inv_rho_in_poisson_solver_;
   int use_inv_rho_;
@@ -582,7 +560,7 @@ protected :
   int suppression_rejetons_;
   // Supprime l'appel a quelques fonctions qui n'ont pas de sens en monophasique :
   // comme par exemple : deplacer_interfaces,
-  //    calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
+  // calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
   int disable_diphasique_;
 
   int time_scheme_;
@@ -613,8 +591,6 @@ protected :
   // Dealing with thermal aspects:
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
-  LIST(IJK_Thermal_Subresolution) thermal_subresolution_;
-  LIST(IJK_Thermal) thermal_;
   IJK_Thermals thermals_;
 
 };

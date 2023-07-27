@@ -18,7 +18,6 @@
 
 #include <IJK_Field_simd_tools.h>
 
-
 template <DIRECTION _DIR_>
 void OpConvDiscQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {

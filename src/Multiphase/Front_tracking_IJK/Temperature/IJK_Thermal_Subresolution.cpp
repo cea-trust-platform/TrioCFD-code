@@ -71,7 +71,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   uniform_lambda_ = lambda_liquid_;
   uniform_alpha_ =	lambda_liquid_ / (ref_ijk_ft_->get_rho_l() * cp_liquid_);
-//  calulate_grad_T_ = 1;
+  //  calulate_grad_T_ = 1;
   // TODO: Reused grad T calculation
   calulate_grad_T_=0;
   // TODO: Implement ghost fluid if necessary
@@ -79,7 +79,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
-//  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
+  //  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
 
   /*TODO:
@@ -159,44 +159,3 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
 
     }
 }
-
-/*
- * Correct directly the fluxes...
- */
-//void IJK_Thermal_Subresolution::correct_temperature_increment_diffusion()
-//{
-//  if (!ghost_fluid_)
-//    {
-//      if (!diffusion_flux_correction_)
-//        {
-//          if (override_vapour_mixed_values_)
-//            {
-//              const int ni = div_coeff_grad_T_volume_.ni();
-//              const int nj = div_coeff_grad_T_volume_.nj();
-//              const int nk = div_coeff_grad_T_volume_.nk();
-//              for (int k = 0; k < nk; k++)
-//                for (int j = 0; j < nj; j++)
-//                  for (int i = 0; i < ni; i++)
-//                    {
-//                      const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-//                      if (std::fabs(1.-indic)>1.e-8) // Mixed cells and pure vapour cells
-//                        { div_coeff_grad_T_volume_(i,j,k) = 0; }
-//                    }
-//            }
-//          else
-//            {
-//
-//            }
-//        }
-//      // TODO: Temperature sub-resolution (Strong coupling)
-//			//			else
-//			//				{
-//			//
-//			//				}
-//    }
-//  else
-//		{
-//
-//		}
-//}
-

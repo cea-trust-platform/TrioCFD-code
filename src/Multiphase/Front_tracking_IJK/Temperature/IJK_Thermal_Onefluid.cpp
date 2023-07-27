@@ -198,22 +198,16 @@ void IJK_Thermal_Onefluid::add_temperature_diffusion()
 void IJK_Thermal_Onefluid::compute_diffusion_increment()
 {
   // Update d_temperature
-  //d_temperature_ +=div_lambda_grad_T_volume_;
   const int ni = d_temperature_.ni();
   const int nj = d_temperature_.nj();
   const int nk = d_temperature_.nk();
   const double vol_inv = 1./vol_;
-//  const double rhocp_l = ref_ijk_ft_->get_rho_l()*cp_liquid_;
-//  const double rhocp_v = ref_ijk_ft_->get_rho_v()*cp_vapour_;
-//  const bool harmonic_mean = ((rho_cp_moy_harmonic_) and (rhocp_l > DMINFLOAT) and (rhocp_v >DMINFLOAT));
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
         {
           if (rho_cp_moy_harmonic_)
             {
-//              const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
-//              const double rhocpV_inv = (chi_l/rhocp_l  + (1 - chi_l)/rhocp_v) * vol_inv;
               const double rhocpV_inv = rho_cp_inv_(i,j,k) * vol_inv;
               const double ope = div_coeff_grad_T_volume_(i,j,k);
               const double resu = ope*rhocpV_inv;
@@ -230,8 +224,6 @@ void IJK_Thermal_Onefluid::compute_diffusion_increment()
                 }
               else
                 {
-//                  const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
-//                  rhocpV = (rhocp_l * chi_l + rhocp_v * (1 - chi_l)) *  vol;
                   rhocpV = rho_cp_(i,j,k) * vol_;
                 }
               const double ope = div_coeff_grad_T_volume_(i,j,k);

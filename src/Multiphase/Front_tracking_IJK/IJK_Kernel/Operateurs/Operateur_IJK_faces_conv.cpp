@@ -33,15 +33,6 @@ Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
     convection_op_words_[2] = "centre4";
     convection_op_words_[3] = "quick";
     convection_op_words_[4] = "quicksharp";
-//    convection_op_words_[0] = "amont";
-//    convection_op_words_[1] = "Amont";
-//    convection_op_words_[2] = "centre";
-//    convection_op_words_[3] = "Centre";
-//    convection_op_words_[4] = "centre4";
-//    convection_op_words_[5] = "Centre4";
-//    convection_op_words_[6] = "quick";
-//    convection_op_words_[7] = "Quick";
-//    convection_op_words_[8] = "quicksharp";
   }
   /* non_conservative_simple : rho div(u u)
    * non_conservative_rhou     : div(rho u u) - u div(rho u)
@@ -70,9 +61,6 @@ Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
 Entree& Operateur_IJK_faces_conv::readOn( Entree& is )
 {
   typer_convection_op(is);
-//  Param param(que_suis_je());
-//  set_param(param);
-//  param.lire_sans_accolade(is);
   return is;
 }
 
@@ -150,26 +138,6 @@ Nom Operateur_IJK_faces_conv::get_convection_op_type( Motcle word ) // (const ch
         convection_op_ += "QuickSharp";
         break;
       }
-//    case 5 :
-//      {
-//        convection_op_ += "Centre4";
-//        break;
-//      }
-//    case 6 :
-//      {
-//        convection_op_ += "Centre4";
-//        break;
-//      }
-//    case 7 :
-//      {
-//        convection_op_ += "QuickSharp";
-//        break;
-//      }
-//    case 8 :
-//      {
-//        convection_op_ += "QuickSharp";
-//        break;
-//      }
     default :
       {
         Cerr << "ERROR : Scalar convection operators that are already implemented are:" << finl;

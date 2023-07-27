@@ -48,13 +48,8 @@ class Switch_FT_double;
 
 class IJK_Thermal_base : public Objet_U
 {
-
-//  friend class IJK_FT_Post;
-//  friend class IJK_FT_double;
   Declare_base( IJK_Thermal_base ) ;
-
 public:
-
   /*
    * Initialisation
    */
@@ -71,7 +66,7 @@ public:
   void rk3_sub_step(const int rk_step,
                     const double total_timestep,
                     const double time);
-  void sauvegarder_temperature(Nom& lata_name, int idx);// const
+  void sauvegarder_temperature(Nom& lata_name, int idx);  // const
 
   double compute_global_energy(const IJK_Field_double& temperature);
   double compute_global_energy()
@@ -93,8 +88,6 @@ public:
    */
   double get_rhocp_l() const;
   double get_rhocp_v() const;
-  //  int get_type_thermal_problem() const;
-  //  std::string set_type_thermal_problem();
 
   const IJK_Field_double& get_temperature() const
   {
@@ -193,7 +186,7 @@ protected:
   void calculer_source_temperature_ana();
   virtual double compute_rho_cp_u_mean(const IJK_Field_double& vx);
   double compute_variable_wall_temperature(const int kmin, const int kmax);
-  //  void calculer_temperature_physique_T_dummy();
+
   /*
    * Patch to conserve energy
    */
@@ -218,8 +211,6 @@ protected:
   int single_phase_;
   double uniform_lambda_;
   double uniform_alpha_;
-//  int type_thermal_problem_;
-//  std::string name_type_thermal_problem_;
   /*
    * Initialisation (B.Cs, expression)
    */

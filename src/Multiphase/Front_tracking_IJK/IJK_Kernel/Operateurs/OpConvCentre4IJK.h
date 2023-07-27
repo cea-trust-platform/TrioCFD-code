@@ -20,9 +20,8 @@
 
 class OpConvCentre4IJK_double : public Operateur_IJK_faces_conv_base_double
 {
-  Declare_instanciable_sans_constructeur(OpConvCentre4IJK_double);
+  Declare_instanciable(OpConvCentre4IJK_double);
 public:
-  OpConvCentre4IJK_double() { div_rho_u_=0; };
   inline void set_bc(const Boundary_Conditions& bc) override { ref_bc_ = bc; };
   inline void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) override { ref_bc_Thermique_ = bc_th; };
   void initialize(const IJK_Splitting& splitting) override;

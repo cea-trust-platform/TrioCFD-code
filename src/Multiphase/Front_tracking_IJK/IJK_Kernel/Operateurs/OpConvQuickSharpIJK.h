@@ -62,7 +62,9 @@ protected:
     compute_flux_<DIRECTION::Z,DIRECTION::Z>(resu,k_layer);
   }
 
-  double delta_x_, delta_y_, delta_z_; // coded for uniform mesh
+  double delta_x_ = 0;
+  double delta_y_ = 0;
+  double delta_z_ = 0; // coded for uniform mesh
 
 private:
   template <DIRECTION _DIR_, DIRECTION _VCOMPO_>

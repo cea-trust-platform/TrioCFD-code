@@ -29,11 +29,9 @@
 #include <IJK_Splitting.h>
 #include <Process.h>    // Process::Journal()
 #include <stat_counters.h>
+#include <sstream>
 #include <IJK_Thermals.h>
 
-#include <sstream>
-
-//Implemente_liste(IJK_Thermique);
 /*
  * Take as main parameter reference to FT to be able to use its members.
  */
@@ -42,7 +40,6 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
   interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
   d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_),
   thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_),
-  thermal_subresolution_(ijk_ft.thermal_subresolution_), thermal_(ijk_ft.thermal_),
   thermals_(ijk_ft.thermals_)
 {
   groups_statistiques_FT_.dimensionner(0);
@@ -422,22 +419,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           {
             posttraiter_tous_champs_energie(liste_post_instantanes_, idx_en);
             ++idx_en;
-          }
-      }
-      {
-        int idx_th_subres = 0;
-        for (auto&& itr = thermal_subresolution_.begin(); itr != thermal_subresolution_.end(); ++itr)
-          {
-            posttraiter_tous_champs_thermal_subresolution(liste_post_instantanes_, idx_th_subres);
-            ++idx_th_subres;
-          }
-      }
-      {
-        int idx_th = 0;
-        for (auto&& itr = thermal_.begin(); itr != thermal_.end(); ++itr)
-          {
-            posttraiter_tous_champs_thermal(liste_post_instantanes_, idx_th);
-            ++idx_th;
           }
       }
       thermals_.posttraiter_tous_champs_thermal(liste_post_instantanes_);
@@ -947,30 +928,8 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_en;
       }
-    int idx_th_subres = 0;
-    for (auto &itr : thermal_subresolution_)
-      {
-        int nb = posttraiter_champs_instantanes_thermal_subresolution(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th_subres);
-        // Interfacial thermal fields :
-        if (idx_th_subres == 0)
-          n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
-        ++idx_th_subres;
-      }
-
-    int idx_th = 0;
-    for (auto &itr : thermal_)
-      {
-        int nb = posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
-        // Interfacial thermal fields :
-        if (!disable_diphasique_)
-          nb += posttraiter_champs_instantanes_thermal_interface(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
-        if (idx_th == 0)
-          n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
-        ++idx_th;
-      }
-
     /*
-     * TODO: TEST
+     * TODO: Clean IJK_Thermique et IJK_Energie
      */
     thermals_.posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, n);
 
@@ -2685,7 +2644,7 @@ void IJK_FT_Post::compute_phase_pressures_based_on_poisson(const int phase)
 // Elle ajoute a la liste tous les noms de champs postraitables par IJK_Interfaces
 
 /*
- * TODO:
+ * TODO: Clean IJK_Thermique et IJK_Energie
  */
 
 void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste, const int idx) const
@@ -2733,55 +2692,6 @@ void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste, const int idx)
   liste.add("GRAD_T2");
   liste.add("T_RUST");
   liste.add("DIV_RHO_CP_T_V");
-}
-
-void IJK_FT_Post::posttraiter_tous_champs_thermal_subresolution(Motcles& liste, const int idx) const
-{
-  liste.add("TEMPERATURE");
-}
-
-void IJK_FT_Post::posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const
-{
-  int thermal_rank = thermal_[idx].get_thermal_rank();
-  /*
-   * thermal_words_[0] = "subresolution";
-   * thermal_words_[1] = "multiplesubresolutions";
-   * thermal_words_[2] = "onefluid";
-   * thermal_words_[3] = "onefluidenergy";
-   */
-  liste.add("TEMPERATURE");
-  liste.add("TEMPERATURE_ANA");
-  liste.add("ECART_T_ANA");
-  liste.add("DIV_LAMBDA_GRAD_T_VOLUME");
-  liste.add("GRAD_T");
-  if (thermal_rank==0 || thermal_rank==1)
-    {
-      /*
-       * TODO: ADD SOME PARTICULAR FIELDS OR DO SWITCH CASE(thermal_rank)
-       */
-    }
-  else
-    {
-      /*
-       * TODO: CHECK IF GRAD_T0 MUST STILL BE POST-PROCESSED
-       */
-      liste.add("CP");
-      liste.add("LAMBDA");
-      //
-      liste.add("SOURCE_TEMPERATURE");
-      liste.add("TEMPERATURE_ADIM_BULLES");
-      liste.add("TEMPERATURE_PHYSIQUE_T");
-      liste.add("TEMPERATURE_ADIMENSIONNELLE_THETA");
-      liste.add("SOURCE_TEMPERATURE_ANA");
-      liste.add("ECART_SOURCE_TEMPERATURE_ANA");
-      //
-      liste.add("GRAD_T0");
-      liste.add("GRAD_T1");
-      liste.add("GRAD_T2");
-      //
-      liste.add("T_RUST");
-      liste.add("DIV_RHO_CP_T_V");
-    }
 }
 
 // idx is the number of the temperature in the list
@@ -2972,101 +2882,6 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_pos
   return n;
 }
 
-int IJK_FT_Post::posttraiter_champs_instantanes_thermal_subresolution(const Motcles& liste_post_instantanes,
-                                                                      const char *lata_name,
-                                                                      const int latastep,
-                                                                      const double current_time,
-                                                                      IJK_Thermal_Subresolution& itr,
-                                                                      const int idx)
-{
-  Cerr << liste_post_instantanes << finl;
-  int n = 0; // nombre de champs postraites
-  std::ostringstream oss;
-  oss << "TEMPERATURE_" << idx;
-  Nom nom_temp(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
-    {
-      n++, dumplata_scalar(lata_name, nom_temp, itr.get_temperature(), latastep);
-    }
-  oss.str("");
-  return n;
-}
-
-int IJK_FT_Post::posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
-                                                        const char *lata_name,
-                                                        const int latastep,
-                                                        const double current_time,
-                                                        IJK_Thermal& itr,
-                                                        const int idx)
-{
-  Cerr << liste_post_instantanes << finl;
-  int n = 0; // number of post-processed field
-  std::ostringstream oss;
-
-  Motcle thermal_suffix = itr.get_thermal_suffix()[itr.get_thermal_rank()];
-
-  /*
-   * TEMPERATURE
-   */
-  oss << "TEMPERATURE_" << thermal_suffix << idx;
-  Nom nom_temp(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
-    {
-      n++, dumplata_scalar(lata_name, nom_temp, itr.get_temperature(), latastep);
-    }
-  oss.str("");
-
-  /*
-   * TEMPERATURE_ANA
-   */
-  oss << "TEMPERATURE_ANA_" << thermal_suffix << idx;
-  Nom nom_ana(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("TEMPERATURE_ANA")) || (liste_post_instantanes.contient_(nom_ana)))
-    {
-      //set_field_data(itr.temperature_ana_, itr.expression_T_ana_, current_time);
-      itr.set_field_T_ana();
-      n++, dumplata_scalar(lata_name, nom_ana, itr.get_temperature_ana(), latastep);
-    }
-  oss.str("");
-
-  /*
-   * ECART_T_ANA
-   */
-  oss << "ECART_T_ANA_" << thermal_suffix << idx;
-  Nom nom_ecart_ana(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("ECART_T_ANA") || liste_post_instantanes.contient_(nom_ecart_ana)))
-    {
-      itr.calculer_ecart_T_ana();
-      n++, dumplata_scalar(lata_name, nom_ecart_ana, itr.get_ecart_t_ana(), latastep);
-    }
-  oss.str("");
-
-  /*
-   * DIV_LAMBDA_GRAD_T_VOLUME
-   */
-  oss << "DIV_LAMBDA_GRAD_T_VOLUME_" << thermal_suffix << idx;
-  Nom nom_div_lambda_grad_T(oss.str().c_str());
-  if ((liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME") || liste_post_instantanes.contient_(nom_div_lambda_grad_T)))
-    {
-      n++, dumplata_scalar(lata_name, nom_div_lambda_grad_T, itr.get_div_lambda_grad_T(), latastep);
-    }
-  oss.str("");
-
-  /*
-   * GRAD_T
-   */
-  oss << "GRAD_T_" << thermal_suffix << idx;
-  Nom nom_grad(oss.str().c_str());
-  if (liste_post_instantanes_.contient_("GRAD_T") || (liste_post_instantanes.contient_(nom_grad)))
-    {
-      const FixedVector<IJK_Field_double, 3>& grad_T = itr.get_grad_T();
-      n++, dumplata_vector(lata_name, nom_grad, grad_T[0], grad_T[1], grad_T[2], latastep);
-    }
-  oss.str("");
-
-  return n;
-}
-
 // idx is the number of the temperature in the list
 int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
                                                                        const char *lata_name,
@@ -3130,101 +2945,6 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcl
   std::ostringstream oss2;
   oss2 << "INTERFACE_PHIN_EN_" << idx;
   Nom nom_phin(oss2.str().c_str());
-  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_temp))
-      || (liste_post_instantanes.contient_(nom_phin)))
-    {
-      //  Computing interfacial temperature at fa7 centre :
-      const Maillage_FT_IJK& mesh = interfaces_.maillage_ft_ijk();
-      const ArrOfDouble& surface_facettes = mesh.get_update_surface_facettes();
-      const int nb_facettes = mesh.nb_facettes();
-      ArrOfDouble interfacial_temperature;
-      ArrOfDouble interfacial_phin;
-      // To transfer the field to FT splitting (because interfaces are there...) !!! NEEDED for compute_interfacial_temperature
-      IJK_Field_double& temperature_ft = itr.get_temperature_ft();
-      ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(itr.get_temperature(), temperature_ft);
-      temperature_ft.echange_espace_virtuel(temperature_ft.ghost());
-      // results are prop to the area :
-      //itr.compute_interfacial_temperature(interfacial_temperature, interfacial_phin, itr.get_storage());
-      itr.compute_interfacial_temperature2(interfacial_temperature, interfacial_phin);
-      for (int fa7 = 0; fa7 < nb_facettes; fa7++)
-        {
-          const double sf = surface_facettes[fa7];
-          interfacial_temperature[fa7] /= sf;
-          interfacial_phin[fa7] /= sf;
-        }
-      if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_(nom_temp)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_temp, "ELEM", interfacial_temperature, latastep);
-      if ((liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_phin)))
-        n++, dumplata_ft_field(lata_name, "INTERFACES", nom_phin, "ELEM", interfacial_phin, latastep);
-    }
-  oss.str("");
-  return n;
-}
-
-int IJK_FT_Post::posttraiter_champs_instantanes_thermal_interface(const Motcles& liste_post_instantanes,
-                                                                  const char *lata_name,
-                                                                  const int latastep,
-                                                                  const double current_time,
-                                                                  IJK_Thermal& itr,
-                                                                  const int idx)
-{
-  int n = 0; // nombre de champs postraites
-  int thermal_rank = thermal_[idx].get_thermal_rank();
-  if (thermal_rank==0 || thermal_rank==1)
-    {
-      /*
-       * TODO: COMPUTE INTERFACIAL GRADIENT
-       */
-      //  Cerr << liste_post_instantanes << finl;
-      //  int n = 0; // nombre de champs postraites
-      //  std::ostringstream oss;
-      //
-      //  /*
-      //   * NORMAL_T_GRADIENT
-      //   */
-      //  oss << "NORMAL_T_GRADIENT" << idx;
-      //  Nom nom_normal_temp(oss.str().c_str());
-      //  if (liste_post_instantanes_.contient_("NORMAL_T_GRADIENT") || (liste_post_instantanes.contient_(nom_normal_temp)))
-      //    {
-      //
-      //    }
-      //  oss.str("");
-      //
-      //  /*
-      //   *
-      //   */
-      //
-      //  /*
-      //   *
-      //   */
-    }
-  else
-    {
-      n = posttraiter_champs_instantanes_thermal_interface_ref(liste_post_instantanes, lata_name, latastep, current_time, itr, idx);
-    }
-  return n;
-}
-
-int IJK_FT_Post::posttraiter_champs_instantanes_thermal_interface_ref(const Motcles& liste_post_instantanes,
-                                                                      const char *lata_name,
-                                                                      const int latastep,
-                                                                      const double current_time,
-                                                                      IJK_Thermal& itr,
-                                                                      const int idx)
-{
-  Cerr << liste_post_instantanes << finl;
-  int n = 0; // nombre de champs postraites
-
-  Motcle thermal_suffix = itr.get_thermal_suffix()[itr.get_thermal_rank()];
-
-  std::ostringstream oss;
-  oss << "INTERFACE_TEMPERATURE_" << thermal_suffix << idx;
-  Nom nom_temp(oss.str().c_str());
-
-  std::ostringstream oss2;
-  oss2 << "INTERFACE_PHIN_" << thermal_suffix << idx;
-  Nom nom_phin(oss2.str().c_str());
-
   if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_temp))
       || (liste_post_instantanes.contient_(nom_phin)))
     {

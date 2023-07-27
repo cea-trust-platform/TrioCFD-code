@@ -69,7 +69,6 @@ protected :
   FixedVector<IJK_Field_double, 3> grad_T_vapour_;
 
   void correct_temperature_vapour_for_eulerian_fluxes();
-  void correct_temperature_vapour_increment_diffusion();
 
   OpDiffUniformIJKScalar_double diffusion_temperature_vapour_op_;
 

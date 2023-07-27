@@ -48,6 +48,8 @@ public :
   void barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume);
 
   void remaillage_local_interface(double temps, Maillage_FT_IJK& maillage);
+
+  const double& get_facteur_longueur_ideale() const { return facteur_longueur_ideale_; };
 protected :
 // N'oublie pas de mettre a jour le tableau compo_connexe_facettes
   int diviser_grandes_aretes(Maillage_FT_IJK& maillage) const;

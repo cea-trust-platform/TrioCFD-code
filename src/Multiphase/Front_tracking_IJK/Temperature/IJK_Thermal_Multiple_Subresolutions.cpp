@@ -28,7 +28,16 @@
 #include <Corrige_flux_FT.h>
 #include <OpConvDiscQuickIJKScalar.h>
 
-Implemente_instanciable( IJK_Thermal_Multiple_Subresolutions, "IJK_Thermal_Multiple_Subresolutions", IJK_Thermal_Subresolution ) ;
+Implemente_instanciable_sans_constructeur( IJK_Thermal_Multiple_Subresolutions, "IJK_Thermal_Multiple_Subresolutions", IJK_Thermal_Subresolution ) ;
+
+IJK_Thermal_Multiple_Subresolutions::IJK_Thermal_Multiple_Subresolutions()
+{
+  diffusion_flux_vapour_correction_=0;
+  convective_flux_vapour_correction_=0;
+  main_phase_ = 0;
+  uniform_alpha_vap_ = 0;
+  uniform_lambda_vap_ = 0;
+}
 
 Sortie& IJK_Thermal_Multiple_Subresolutions::printOn( Sortie& os ) const
 {
@@ -107,39 +116,6 @@ void IJK_Thermal_Multiple_Subresolutions::correct_temperature_vapour_for_euleria
                 }
         }
 // TODO: Temperature sub-resolution
-//			else
-//				{
-//
-//				}
-    }
-}
-
-void IJK_Thermal_Multiple_Subresolutions::correct_temperature_vapour_increment_diffusion()
-{
-  if (!ghost_fluid_)
-    {
-      if (!diffusion_flux_correction_)
-        {
-          if (override_vapour_mixed_values_)
-            {
-              const int ni = div_coeff_grad_T_vapour_volume_.ni();
-              const int nj = div_coeff_grad_T_vapour_volume_.nj();
-              const int nk = div_coeff_grad_T_vapour_volume_.nk();
-              for (int k = 0; k < nk; k++)
-                for (int j = 0; j < nj; j++)
-                  for (int i = 0; i < ni; i++)
-                    {
-                      const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-                      if (std::fabs(indic)<(1.-1.e-8)) // Mixed cells and pure liquid cells
-                        { div_coeff_grad_T_vapour_volume_(i,j,k) = 0; }
-                    }
-            }
-          else
-            {
-
-            }
-        }
-      // TODO: Temperature sub-resolution (Strong coupling)
 //			else
 //				{
 //
