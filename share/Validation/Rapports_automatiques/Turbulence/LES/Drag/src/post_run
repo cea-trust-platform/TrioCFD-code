@@ -12,7 +12,7 @@ mu=`awk '/mu / {print $NF}' $base.data`
 # Affichage des donnees du calcul
 echo | awk -v D=$D -v V=$V -v rho=$rho -v mu=$mu '{Re=rho*D*V/mu;printf("Reynolds: %2.2e\nDiametre(cm): %2.1f\nVitesse(m/s): %2.1f\nTemps(s): %3.0f\n",Re,D*100,V,D*D*rho/mu)}'
 
-# Verification du numbre de Reynolds affiche dans la fiche de validation
+# Verification du nombre de Reynolds affiche dans la fiche de validation
 Re=`echo | awk -v D=$D -v V=$V -v rho=$rho -v mu=$mu '{Re=rho*D*V/mu;print int(Re)}'`
 if [ "`grep Re=$Re ../forme.prm`" = "" ]
 then

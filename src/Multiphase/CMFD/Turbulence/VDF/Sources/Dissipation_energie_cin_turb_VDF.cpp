@@ -26,3 +26,4 @@ Implemente_instanciable(Dissipation_energie_cin_turb_VDF,"Dissipation_energie_ci
 
 Sortie& Dissipation_energie_cin_turb_VDF::printOn(Sortie& os) const { return Source_Dissipation_energie_cin_turb::printOn(os); }
 Entree& Dissipation_energie_cin_turb_VDF::readOn(Entree& is) { return Source_Dissipation_energie_cin_turb::readOn(is); }
+

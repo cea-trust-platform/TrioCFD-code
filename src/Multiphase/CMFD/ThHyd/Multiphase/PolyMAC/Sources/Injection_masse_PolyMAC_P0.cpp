@@ -20,3 +20,4 @@ Implemente_instanciable(Injection_masse_PolyMAC_P0, "Injection_masse_Elem_PolyMA
 Sortie& Injection_masse_PolyMAC_P0::printOn(Sortie& os) const {return Source_injection_masse_base::printOn(os);}
 
 Entree& Injection_masse_PolyMAC_P0::readOn(Entree& is) {return Source_injection_masse_base::readOn(is);}
+

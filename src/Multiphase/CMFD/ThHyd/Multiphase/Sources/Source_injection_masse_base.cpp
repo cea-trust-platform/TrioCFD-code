@@ -70,3 +70,4 @@ void Source_injection_masse_base::ajouter_blocs(matrices_t matrices, DoubleTab& 
       secmem(e, k) += pe[e] * ve[e] * tab_inj(!cI*e, k) * rho(!cR, k);
 
 }
+
