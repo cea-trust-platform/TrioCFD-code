@@ -187,6 +187,11 @@ protected:
   virtual double compute_rho_cp_u_mean(const IJK_Field_double& vx);
   double compute_variable_wall_temperature(const int kmin, const int kmax);
 
+  void force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
+                                  const IJK_Interfaces& interfaces, double nb_diam, int upstream_dir,
+                                  int gravity_dir, int upstream_stencil,
+                                  int side_temperature, int stencil_side);
+
   /*
    * Patch to conserve energy
    */
@@ -218,6 +223,10 @@ protected:
   IJK_Field_local_double boundary_flux_kmin_;
   IJK_Field_local_double boundary_flux_kmax_;
   Nom expression_T_init_;
+  double upstream_temperature_;
+  double nb_diam_upstream_;
+  int side_temperature_;
+  int stencil_side_;
 
   /*
    * Settings to resume a calculation

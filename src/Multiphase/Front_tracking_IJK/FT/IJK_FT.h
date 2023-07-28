@@ -153,6 +153,26 @@ public :
   {
     return direction_gravite_;
   }
+  const IJK_Interfaces& get_interface() const
+  {
+    return interfaces_;
+  }
+  const double& get_vitesse_upstream() const
+  {
+    return vitesse_upstream_;
+  }
+  const double& get_nb_diam_upstream() const
+  {
+    return nb_diam_upstream_;
+  }
+  const int& get_upstream_dir() const
+  {
+    return upstream_dir_;
+  }
+  const int& get_upstream_stencil() const
+  {
+    return upstream_stencil_;
+  }
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
@@ -248,7 +268,8 @@ protected :
   // These methods are static in order to make it clear that all data used and modified by the method are explicitely passed as arguments:
   static void force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed);
   static void force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
-                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam );
+                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam,
+                                      int upstream_dir, int gravity_dir, int upstream_stencil);
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
@@ -511,6 +532,8 @@ protected :
 
   double vitesse_entree_;
   double vitesse_upstream_;
+  int upstream_dir_; // static
+  int upstream_stencil_;
   double nb_diam_upstream_;
   double rho_liquide_;
   double rho_vapeur_;

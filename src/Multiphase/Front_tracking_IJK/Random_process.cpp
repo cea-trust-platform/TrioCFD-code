@@ -73,21 +73,26 @@ Sortie& Random_process::printOn( Sortie& os ) const
   //  *gen_write_->open(nomFichierReprise_.c_str());
   //  *gen_write_ << gen;
   //  gen_write_->close();
-
+  /*
+   * TODO: M.G Cela n'a strictement rien à faire dans printOn..., nom_sauvegarde_ n'est pas meme pas initialisé
+   *
   std::ofstream gen_write(nom_sauvegarde_ + ".gen");
-//  SFichier gen_write;
-//  gen_write.ouvrir(nom_sauvegarde_);
+  //  SFichier gen_write;
+  //  gen_write.ouvrir(nom_sauvegarde_);
   gen_write << gen;
   gen_write.close();
 
-//  IntTab semi_gen_et_modulo_reprise;
+  //  IntTab semi_gen_et_modulo_reprise;
+
   ArrOfInt semi_gen_et_modulo_reprise(2);
   long long_gen;
-//  gen_read_->open(nomFichierReprise_.c_str(), std::eam::out);
-//  *gen_read_ >> long_gen;
-//  gen_read_->close();
 
-//  std::ifstream gen_read(nom_du_cas()+".sauv.gen");
+  //  gen_read_->open(nomFichierReprise_.c_str(), std::eam::out);
+  //  *gen_read_ >> long_gen;
+  //  gen_read_->close();
+
+  //  std::ifstream gen_read(nom_du_cas()+".sauv.gen");
+
   EFichier gen_read;
   gen_read.ouvrir(nom_sauvegarde_ + ".gen");
   gen_read >> long_gen;
@@ -95,15 +100,19 @@ Sortie& Random_process::printOn( Sortie& os ) const
 
   semi_gen_et_modulo_reprise(0) = (int)(long_gen/2); // 10 (en binaire) : "10 >> 1 = 01"
   semi_gen_et_modulo_reprise(1) = (int)(long_gen%2);
+
+  */
+
   //  IntTab like_gen;
   //  like_gen.resize(625);
   //  for (int i=0; i<625; i++)
   //    {
   //      gen_read >> like_gen(i);
   //    }
+
   os << "{\n";
-  os << "     semi_gen_et_modulo_reprise_ " << semi_gen_et_modulo_reprise << "\n";
-  os << "     process_b " << process_flt << "\n";
+  os << " semi_gen_et_modulo_reprise " << semi_gen_et_modulo_reprise_ << "\n";
+  os << " process_b " << process_flt << "\n";
   os << "   }\n" ;
   return os;
 }

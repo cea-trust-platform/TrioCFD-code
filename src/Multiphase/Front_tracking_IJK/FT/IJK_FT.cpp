@@ -56,6 +56,8 @@
 //#define SMOOTHING_RHO
 
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
+//int IJK_FT_double::upstream_dir_ = DIRECTION_I;
+
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
 {
@@ -333,7 +335,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   //
   vitesse_entree_ = -1.1e20;
   vitesse_upstream_ = -1.1e20;
-  nb_diam_upstream_ = -1.1e20;
+  nb_diam_upstream_ = 0.;
+  upstream_dir_=-1;
+  upstream_stencil_=3;
   disable_solveur_poisson_ = 0;
   resolution_fluctuations_ = 0;
   disable_diffusion_qdm_ = 0;
@@ -430,6 +434,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
   param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P chaine not_set
   param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("upstream_dir", &upstream_dir_); // XD_ADD_P chaine not_set
+  param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P chaine not_set
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P chaine not_set
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
   param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
@@ -904,48 +910,78 @@ void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double&
 void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                             double v_imposed,
                                             const IJK_Interfaces& interfaces,
-                                            double nb_diam)
+                                            double nb_diam,
+                                            int upstream_dir,
+                                            int gravity_dir,
+                                            int upstream_stencil)
 {
+  int dir = 0;
+  if (upstream_dir == -1)
+    {
+      dir = gravity_dir;
+      if (dir == -1)
+        dir=0;
+    }
+  const IJK_Splitting& splitting = vx.get_splitting();
+  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
+
+  bool perio =  geom.get_periodic_flag(dir);
+
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
   interfaces.calculer_bounding_box_bulles(bounding_box);
   // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
-  const double Dbx = bounding_box(0, 0, 1) - bounding_box(0, 0, 0);
-  const double xb  = ( bounding_box(0, 0, 1) + bounding_box(0, 0, 0) ) / 2.;
-  double xobj = xb + nb_diam*Dbx;
+  const double Dbdir = bounding_box(0, dir, 1) - bounding_box(0, dir, 0);
+  const double dirb  = ( bounding_box(0, dir, 1) + bounding_box(0, dir, 0) ) / 2.;
+  const double ldir = geom.get_domain_length(dir) ;
+  if (nb_diam == 0.)
+    nb_diam = (ldir/Dbdir) / 2;
+  double dirobj = dirb + nb_diam*Dbdir;
 
-  const IJK_Splitting& splitting = vx.get_splitting();
-  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
-  const double dx = geom.get_constant_delta(DIRECTION_I);
   // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
-  const double origin_x = geom.get_origin(DIRECTION_I) ;
-  const double lx = geom.get_domain_length(DIRECTION_I) ;
-  const int offset_i = splitting.get_offset_local(DIRECTION_I);
+  const double ddir = geom.get_constant_delta(dir);
+  const double origin_dir = geom.get_origin(dir) ;
+  const int offset_dir = splitting.get_offset_local(dir);
 
-  bool perio =  geom.get_periodic_flag(DIRECTION_I);
+  // FIXME: If nb_diam is too large it will iterate a lot
   if (perio)
     {
-      while (xobj<origin_x)
-        xobj+= lx;
-      while (xobj>origin_x+lx)
-        xobj -= lx;
+      while (dirobj<origin_dir)
+        dirobj += ldir;
+      while (dirobj>origin_dir+ldir)
+        dirobj -= ldir;
     }
 
   // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
-  assert( ((xobj>=origin_x) && (xobj <= origin_x+lx) ));
+  assert( ((dirobj>=origin_dir) && (dirobj <= origin_dir+ldir) ));
 
-  const double x2 = (xobj-origin_x)/ dx;
-  int index_i = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
-  const int ni = vy.ni();
-  Cerr << "index_i " << index_i << finl;
+  const double x2 = (dirobj-origin_dir)/ ddir;
+  int index_dir = (int)(floor(x2)) - offset_dir; // C'est l'index local, donc potentiellement negatif...
+  int ndir;
+  switch(dir)
+    {
+    case 0:
+      ndir = vx.ni();
+      break;
+    case 1:
+      ndir = vx.nj();
+      break;
+    case 2:
+      ndir = vx.nk();
+      break;
+    default:
+      ndir = vx.ni();
+      break;
+    }
+  Cerr << "index_dir " << index_dir << finl;
 
-  if ((index_i >=0) && (index_i<ni))
+  if ((index_dir >=0) && (index_dir < ndir))
     {
       // On est sur le bon proc...
-      if (index_i+3 >= ni)
+      if (index_dir+upstream_stencil >= ndir)
         {
           // On ne veut pas s'embeter sur 2 procs...
-          index_i = ni-3;
+          index_dir = ndir-upstream_stencil;
         }
     }
   else
@@ -955,26 +991,55 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
 
   {
     double imposed[3] = {0., 0., 0.};
-    imposed[0] = v_imposed;
+    imposed[dir] = v_imposed;
     for (int direction = 0; direction < 3; direction++)
       {
         IJK_Field_double& velocity = select(direction, vx, vy, vz);
-        const int imin = index_i;
-        const int jmin = 0;
-        const int kmin = 0;
-        const int imax = imin+3;
-        const int jmax = velocity.nj();
-        const int kmax = velocity.nk();
-        for (int k = kmin; k < kmax; k++)
+        int imin;
+        int jmin;
+        int kmin;
+        int imax;
+        int jmax;
+        int kmax;
+        switch (dir)
           {
-            for (int j = jmin; j < jmax; j++)
-              {
-                for (int i = imin; i < imax; i++)
-                  {
-                    velocity(i,j,k) = imposed[direction];
-                  }
-              }
+          case 0:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = velocity.nj();
+            kmax = velocity.nk();
+            break;
+          case 1:
+            imin = 0;
+            jmin = index_dir;
+            kmin = 0;
+            imax = velocity.ni();
+            jmax = jmin+upstream_stencil;
+            kmax = velocity.nk();
+            break;
+          case 2:
+            imin = 0;
+            jmin = 0;
+            kmin = index_dir;
+            imax = velocity.ni();
+            jmax = velocity.nj();
+            kmax = kmin+upstream_stencil;
+            break;
+          default:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = velocity.nj();
+            kmax = velocity.nk();
+            break;
           }
+        for (int k = kmin; k < kmax; k++)
+          for (int j = jmin; j < jmax; j++)
+            for (int i = imin; i < imax; i++)
+              velocity(i,j,k) = imposed[direction];
       }
   }
 }
@@ -1517,6 +1582,8 @@ int IJK_FT_double::initialise()
               terme_source_acceleration_increment = rho_liquide_ * indic + rho_vapeur_ * (1-indic);
               terme_source_acceleration_ += terme_source_acceleration_increment;
             }
+      indicator_sum = Process::mp_sum(indicator_sum);
+      terme_source_acceleration_ = Process::mp_sum(terme_source_acceleration_);
       const double gravite_norm = sqrt(gravite_[0]*gravite_[0] + gravite_[1]*gravite_[1] + gravite_[2]*gravite_[2]);
       terme_source_acceleration_ /= indicator_sum;
       terme_source_acceleration_ *= gravite_norm;
@@ -3846,7 +3913,8 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 // Forcage de la vitesse en amont de la bulle :
       if (vitesse_upstream_ > -1e20)
         force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
-                                vitesse_upstream_, interfaces_, nb_diam_upstream_);
+                                vitesse_upstream_, interfaces_, nb_diam_upstream_,
+                                upstream_dir_, get_direction_gravite(), upstream_stencil_);
     } // end of if ! frozen_velocity
 //static Stat_Counter_Id projection_counter_ = statistiques().new_counter(0, "projection");
 #ifdef PROJECTION_DE_LINCREMENT_DV
@@ -4043,7 +4111,8 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
       if (vitesse_upstream_ > -1e20)
         {
           force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
-                                  vitesse_upstream_, interfaces_, nb_diam_upstream_);
+                                  vitesse_upstream_, interfaces_, nb_diam_upstream_,
+                                  upstream_dir_, get_direction_gravite(), upstream_stencil_);
         }
 
     } // end of if ! frozen_velocity
@@ -4667,15 +4736,10 @@ double IJK_FT_double::calculer_moyenne_de_phase_liq(const IJK_Field_double& vx)
   double v_moy = 0.;
 #ifndef VARIABLE_DZ
   for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              v_moy += vx(i,j,k)*interfaces_.I(i,j,k);
-            }
-        }
-    }
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        v_moy += vx(i,j,k)*interfaces_.I(i,j,k);
+
   // somme sur tous les processeurs.
   v_moy = Process::mp_sum(v_moy);
   // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
@@ -4689,12 +4753,8 @@ double IJK_FT_double::calculer_moyenne_de_phase_liq(const IJK_Field_double& vx)
     {
       const double dz = tab_dz[k+offset];
       for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              v_moy += vx(i,j,k)*dz;
-            }
-        }
+        for (int i = 0; i < ni; i++)
+          v_moy += vx(i,j,k)*dz;
     }
   // somme sur tous les processeurs.
   v_moy = Process::mp_sum(v_moy);
@@ -4726,15 +4786,12 @@ double IJK_FT_double::calculer_moyenne_de_phase_vap(const IJK_Field_double& vx)
   double v_moy = 0.;
 #ifndef VARIABLE_DZ
   for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              v_moy += vx(i,j,k)*(1-interfaces_.I(i,j,k));
-            }
-        }
-    }
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        v_moy += vx(i,j,k)*(1-interfaces_.I(i,j,k));
+
+
+
   // somme sur tous les processeurs.
   v_moy = Process::mp_sum(v_moy);
   // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
@@ -4748,12 +4805,8 @@ double IJK_FT_double::calculer_moyenne_de_phase_vap(const IJK_Field_double& vx)
     {
       const double dz = tab_dz[k+offset];
       for (int j = 0; j < nj; j++)
-        {
-          for (int i = 0; i < ni; i++)
-            {
-              v_moy += vx(i,j,k)*dz;
-            }
-        }
+        for (int i = 0; i < ni; i++)
+          v_moy += vx(i,j,k)*dz;
     }
   // somme sur tous les processeurs.
   v_moy = Process::mp_sum(v_moy);

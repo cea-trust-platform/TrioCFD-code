@@ -2286,152 +2286,150 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   int errcount_pext = 0;
   // i,j,k are the indices if the cells in the extended domain, for each processor
   for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
         {
-          for (int i = 0; i < ni; i++)
+          if ((interfaces_.In_ft()(i, j, k) > 1.e-6) && (1. - interfaces_.In_ft()(i, j, k) > 1.e-6))
             {
-              if ((interfaces_.In_ft()(i, j, k) > 1.e-6) && (1. - interfaces_.In_ft()(i, j, k) > 1.e-6))
+              // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+              //The normal may only be computed on the extended domain
+              // A relationship between the indices of the two meshes is defined
+              // Non sono piu necessari perche si lavora solo  una griglia, quella estesa
+              // const int n_ext = ref_ijk_ft_.get_splitting_extension();
+              // const int i_ft = i+ n_ext;
+              // const int j_ft = j+ n_ext;
+              // int k_ft = k;
+              // if (split.get_grid_geometry().get_periodic_flag(DIRECTION_K))
+              //   k_ft+= n_ext;
+              // const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
+              // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element); //number of bubbles crossing the cell
+              Vecteur3 bary_facettes_dans_elem;
+              Vecteur3 normale;
+              double norm = 1.;
+              double dist = 0.;
+              // int num_compo;
+              // if ( nb_compo_traversantes == 0)
+              //   {
+              //     normale[0]=1.;
+              //     normale[1]=1.;
+              //     normale[2]=1.;
+              //     Cerr << "Error no compo traversante on proc. " << Process::me() << finl;
+              //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+              //     Process::exit();
+              //   }
+              // else if ( nb_compo_traversantes == 1)
+              //   {
+
+              //     num_compo = liste_composantes_connexes_dans_element[0];
+              //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
+              //                                                             elem,
+              //                                                             mesh,
+              //                                                             normale,
+              //                                                             bary_facettes_dans_elem);
+              //   }
+
+              // // If the same cell is crossed by several bubbles the image points coincide with the crossed cells
+              // // the interpolation function in these points will lead to invalid values.
+              // else
+              //   {
+              //     num_compo = liste_composantes_connexes_dans_element[1];
+              //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
+              //                                                             elem,
+              //                                                             mesh,
+              //                                                             normale,
+              //                                                             bary_facettes_dans_elem);
+              //   }
+              for (int c = 0; c < 3; c++)
                 {
-                  // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                  //The normal may only be computed on the extended domain
-                  // A relationship between the indices of the two meshes is defined
-                  // Non sono piu necessari perche si lavora solo  una griglia, quella estesa
-                  // const int n_ext = ref_ijk_ft_.get_splitting_extension();
-                  // const int i_ft = i+ n_ext;
-                  // const int j_ft = j+ n_ext;
-                  // int k_ft = k;
-                  // if (split.get_grid_geometry().get_periodic_flag(DIRECTION_K))
-                  //   k_ft+= n_ext;
-                  // const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
-                  // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element); //number of bubbles crossing the cell
-                  Vecteur3 bary_facettes_dans_elem;
-                  Vecteur3 normale;
-                  double norm = 1.;
-                  double dist = 0.;
-                  // int num_compo;
-                  // if ( nb_compo_traversantes == 0)
-                  //   {
-                  //     normale[0]=1.;
-                  //     normale[1]=1.;
-                  //     normale[2]=1.;
-                  //     Cerr << "Error no compo traversante on proc. " << Process::me() << finl;
-                  //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                  //     Process::exit();
-                  //   }
-                  // else if ( nb_compo_traversantes == 1)
-                  //   {
-
-                  //     num_compo = liste_composantes_connexes_dans_element[0];
-                  //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
-                  //                                                             elem,
-                  //                                                             mesh,
-                  //                                                             normale,
-                  //                                                             bary_facettes_dans_elem);
-                  //   }
-
-                  // // If the same cell is crossed by several bubbles the image points coincide with the crossed cells
-                  // // the interpolation function in these points will lead to invalid values.
-                  // else
-                  //   {
-                  //     num_compo = liste_composantes_connexes_dans_element[1];
-                  //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
-                  //                                                             elem,
-                  //                                                             mesh,
-                  //                                                             normale,
-                  //                                                             bary_facettes_dans_elem);
-                  //   }
-                  for (int c = 0; c < 3; c++)
+                  normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i, j, k);
+                  bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i, j, k);
+                }
+              norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
+              //if (norm<0.95)
+              //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
+              //                       << " norm= " << norm << finl;
+              //  }
+              if (norm < 1.e-8)
+                {
+                  // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
+                  Process::Journal() << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                  Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided (" << " normale " << normale[0] << " " << normale[1]
+                                     << " " << normale[2] << " )" << finl;
+                  Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
+                  dist = 1.52 * sqrt(dx * dx + dy * dy + dz * dz) / 3.;
+                  if (interfaces_.In_ft()(i, j, k) * (1 - interfaces_.In_ft()(i, j, k)) > 1.e-6)
                     {
-                      normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i, j, k);
-                      bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i, j, k);
-                    }
-                  norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
-                  //if (norm<0.95)
-                  //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
-                  //                       << " norm= " << norm << finl;
-                  //  }
-                  if (norm < 1.e-8)
-                    {
-                      // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
-                      Process::Journal() << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
-                      Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided (" << " normale " << normale[0] << " " << normale[1]
-                                         << " " << normale[2] << " )" << finl;
-                      Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
-                      dist = 1.52 * sqrt(dx * dx + dy * dy + dz * dz) / 3.;
-                      if (interfaces_.In_ft()(i, j, k) * (1 - interfaces_.In_ft()(i, j, k)) > 1.e-6)
+                      Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                      if (interfaces_.In_ft()(i, j, k) > 0.99)
                         {
-                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
-                          if (interfaces_.In_ft()(i, j, k) > 0.99)
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i << "," << j << "," << k << "] = "
-                                                 << pressure_ft_(i, j, k) << finl;
-                              extended_pv_ft_(i, j, k) = 1.e20;
-                            }
-                          else
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i << "," << j << "," << k << "] = "
-                                                 << pressure_ft_(i, j, k) << finl;
-                              extended_pl_ft_(i, j, k) = 1.e20;
-                            }
-                          continue; // This cell is not added to crossed cells.
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i << "," << j << "," << k << "] = "
+                                             << pressure_ft_(i, j, k) << finl;
+                          extended_pv_ft_(i, j, k) = 1.e20;
                         }
                       else
                         {
-                          // We still need a unit normal
-                          for (int dir = 0; dir < 3; dir++)
-                            if (normale[dir] != 0)
-                              normale[dir] = (normale[dir] > 0.) ? 1.0 : -1.0;
-
-                          norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
-                          if (std::fabs(norm) < 1.e-10)
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
-                            }
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i << "," << j << "," << k << "] = "
+                                             << pressure_ft_(i, j, k) << finl;
+                          extended_pl_ft_(i, j, k) = 1.e20;
                         }
-                    }
-
-                  if (std::fabs(norm) < 1.e-10)
-                    {
-                      Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
-                      Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
-                      dist = 0.;
-                      errcount_pext++;
+                      continue; // This cell is not added to crossed cells.
                     }
                   else
                     {
-                      dist = 1.52 * (std::fabs(dx * normale[0]) + std::fabs(dy * normale[1]) + std::fabs(dz * normale[2])) / norm;
-                      // 2020.04.15 : GB correction for non-isotropic meshes and closer extrapolation points:
-                      // The previous version was looking very far away in the direction where the mesh is fine (dz in channel flows).
-                      // Then, a lot of ghost would be required.
-                      // This new version still goes to the same value of dist when nx=1 or when nz=1, but is sin between
-                      // double eps = 1.e-20;
-                      // dist = 1.52*std::min(min(dx/(std::fabs(normale[0])+eps),dy/(std::fabs(normale[1])+eps)),dz/(std::fabs(normale[2])+eps));
+                      // We still need a unit normal
+                      for (int dir = 0; dir < 3; dir++)
+                        if (normale[dir] != 0)
+                          normale[dir] = (normale[dir] > 0.) ? 1.0 : -1.0;
+
+                      norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
+                      if (std::fabs(norm) < 1.e-10)
+                        {
+                          Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
+                        }
                     }
+                }
 
-                  nbsom++;
-                  crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
-                  positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
-                  positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              if (std::fabs(norm) < 1.e-10)
+                {
+                  Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
+                  Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
+                  dist = 0.;
+                  errcount_pext++;
+                }
+              else
+                {
+                  dist = 1.52 * (std::fabs(dx * normale[0]) + std::fabs(dy * normale[1]) + std::fabs(dz * normale[2])) / norm;
+                  // 2020.04.15 : GB correction for non-isotropic meshes and closer extrapolation points:
+                  // The previous version was looking very far away in the direction where the mesh is fine (dz in channel flows).
+                  // Then, a lot of ghost would be required.
+                  // This new version still goes to the same value of dist when nx=1 or when nz=1, but is sin between
+                  // double eps = 1.e-20;
+                  // dist = 1.52*std::min(min(dx/(std::fabs(normale[0])+eps),dy/(std::fabs(normale[1])+eps)),dz/(std::fabs(normale[2])+eps));
+                }
 
-                  crossed_cells(nbsom - 1, 0) = i;
-                  crossed_cells(nbsom - 1, 1) = j;
-                  crossed_cells(nbsom - 1, 2) = k;
+              nbsom++;
+              crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
+              positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
 
-                  for (int dir = 0; dir < 3; dir++)
-                    {
-                      // Four image points are calculated, two on each side of the interface
-                      //liquid phase
-                      positions_liq(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] + dist * normale[dir]; // 1st point to be done...
-                      positions_liq(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] + 2 * dist * normale[dir]; // 2nd point to be done...
-                      //vapor_phase
-                      positions_vap(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] - dist * normale[dir]; // 1st point to be done...
-                      positions_vap(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] - 2 * dist * normale[dir]; // 2nd point to be done...
-                    }
+              crossed_cells(nbsom - 1, 0) = i;
+              crossed_cells(nbsom - 1, 1) = j;
+              crossed_cells(nbsom - 1, 2) = k;
+
+              for (int dir = 0; dir < 3; dir++)
+                {
+                  // Four image points are calculated, two on each side of the interface
+                  //liquid phase
+                  positions_liq(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] + dist * normale[dir]; // 1st point to be done...
+                  positions_liq(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] + 2 * dist * normale[dir]; // 2nd point to be done...
+                  //vapor_phase
+                  positions_vap(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] - dist * normale[dir]; // 1st point to be done...
+                  positions_vap(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] - 2 * dist * normale[dir]; // 2nd point to be done...
                 }
             }
         }
-    }
+
+
 
   errcount_pext = Process::mp_sum(errcount_pext);
   if ((Process::je_suis_maitre()) && (errcount_pext))

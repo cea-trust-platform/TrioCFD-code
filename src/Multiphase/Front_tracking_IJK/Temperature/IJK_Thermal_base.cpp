@@ -78,6 +78,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   T0v_ = 1.;
   T0l_ = 0.;
   expression_T_ana_="??";
+  upstream_temperature_=-1.1e20;
 
   E0_ = 0;
   uniform_lambda_ = 0;
@@ -86,6 +87,10 @@ IJK_Thermal_base::IJK_Thermal_base()
   conserv_energy_global_=0;
   vol_=0;
   rho_cp_post_ = 0;
+
+  nb_diam_upstream_=0;
+  side_temperature_=0;;
+  stencil_side_=2;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -188,6 +193,11 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
   if ( diff_temp_negligible_)
     os<< "    diff_temp_negligible \n";
 
+  os << "upstream_temperature" << upstream_temperature_;
+  os << "nb_diam_upstream" << nb_diam_upstream_;
+  os << "side_temperature" << side_temperature_;
+  os << "stencil_side" << stencil_side_;
+
   os<< "  }\n";
   return os;
 }
@@ -232,6 +242,10 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("temperature_convection_op", &temperature_convection_op_);
   param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
+  param.ajouter("upstream_temperature", &upstream_temperature_);
+  param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
+  param.ajouter_flag("side_temperature", &side_temperature_);
+  param.ajouter("stencil_side", &stencil_side_);
 }
 
 /********************************************
@@ -565,6 +579,15 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
   correct_temperature_for_eulerian_fluxes();
+
+  double nb_diam_upstream_velocity = ref_ijk_ft_->get_nb_diam_upstream();
+  if (nb_diam_upstream_ == 0.)
+    nb_diam_upstream_ = nb_diam_upstream_velocity;
+  if (upstream_temperature_ > -1e20 && ref_ijk_ft_->get_vitesse_upstream() > -1e20)
+    force_upstream_temperature(temperature_, upstream_temperature_,
+                               ref_ijk_ft_->get_interface(), nb_diam_upstream_,
+                               ref_ijk_ft_->get_upstream_dir(), ref_ijk_ft_->get_direction_gravite(),
+                               ref_ijk_ft_->get_upstream_stencil(), side_temperature_, stencil_side_);
 
   compute_temperature_convection(velocity);
 
@@ -1601,4 +1624,205 @@ void IJK_Thermal_base::compute_interfacial_temperature2(ArrOfDouble& interfacial
       flux_normal_interp(fa7) *= surface_facettes(fa7);
       interfacial_temperature(fa7) *= surface_facettes(fa7);
     }
+}
+
+void IJK_Thermal_base::force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
+                                                  const IJK_Interfaces& interfaces, double nb_diam,
+                                                  int upstream_dir, int gravity_dir,
+                                                  int upstream_stencil, int side_temperature,
+                                                  int stencil_side)
+{
+  int dir = 0;
+  if (upstream_dir == -1)
+    {
+      dir = gravity_dir;
+      if (dir == -1)
+        dir=0;
+    }
+  const IJK_Splitting& splitting = temperature.get_splitting();
+  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
+
+  bool perio =  geom.get_periodic_flag(dir);
+
+  assert(interfaces.get_nb_bulles_reelles() == 1);
+  DoubleTab bounding_box;
+  interfaces.calculer_bounding_box_bulles(bounding_box);
+  // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
+  const double Dbdir = bounding_box(0, dir, 1) - bounding_box(0, dir, 0);
+  const double dirb  = ( bounding_box(0, dir, 1) + bounding_box(0, dir, 0) ) / 2.;
+  const double ldir = geom.get_domain_length(dir) ;
+  if (nb_diam == 0.)
+    nb_diam = (ldir/Dbdir) / 2;
+  double dirobj = dirb + nb_diam*Dbdir;
+
+  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
+  const double ddir = geom.get_constant_delta(dir);
+  const double origin_dir = geom.get_origin(dir) ;
+  const int offset_dir = splitting.get_offset_local(dir);
+
+  // FIXME: If nb_diam is too large it will iterate a lot
+  if (perio)
+    {
+      while (dirobj<origin_dir)
+        dirobj += ldir;
+      while (dirobj>origin_dir+ldir)
+        dirobj -= ldir;
+    }
+
+  // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
+  assert( ((dirobj>=origin_dir) && (dirobj <= origin_dir+ldir) ));
+
+  const double x2 = (dirobj-origin_dir)/ ddir;
+  int index_dir = (int)(floor(x2)) - offset_dir; // C'est l'index local, donc potentiellement negatif...
+  int ndir;
+  switch(dir)
+    {
+    case 0:
+      ndir = temperature.ni();
+      break;
+    case 1:
+      ndir = temperature.nj();
+      break;
+    case 2:
+      ndir = temperature.nk();
+      break;
+    default:
+      ndir = temperature.ni();
+      break;
+    }
+  Cerr << "index_dir " << index_dir << finl;
+
+  if ((index_dir >=0) && (index_dir < ndir))
+    {
+      // On est sur le bon proc...
+      if (index_dir+upstream_stencil >= ndir)
+        {
+          // On ne veut pas s'embeter sur 2 procs...
+          index_dir = ndir-upstream_stencil;
+        }
+    }
+  else
+    {
+      return;
+    }
+
+  {
+    double imposed[3] = {0., 0., 0.};
+    imposed[dir] = T_imposed;
+    for (int direction = 0; direction < 3; direction++)
+      {
+        int imin;
+        int jmin;
+        int kmin;
+        int imax;
+        int jmax;
+        int kmax;
+        switch (dir)
+          {
+          case 0:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = temperature.nj();
+            kmax = temperature.nk();
+            break;
+          case 1:
+            imin = 0;
+            jmin = index_dir;
+            kmin = 0;
+            imax = temperature.ni();
+            jmax = jmin+upstream_stencil;
+            kmax = temperature.nk();
+            break;
+          case 2:
+            imin = 0;
+            jmin = 0;
+            kmin = index_dir;
+            imax = temperature.ni();
+            jmax = temperature.nj();
+            kmax = kmin+upstream_stencil;
+            break;
+          default:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = temperature.nj();
+            kmax = temperature.nk();
+            break;
+          }
+        for (int k = kmin; k < kmax; k++)
+          for (int j = jmin; j < jmax; j++)
+            for (int i = imin; i < imax; i++)
+              temperature(i,j,k) = imposed[direction];
+      }
+//    if (side_temperature)
+//    {
+//    	DoubleTab indices_side(3,4,3);
+//    	for (int i = 0; i < indices_side.dimension(0); i++)
+//      	for (int j = 0; j < indices_side.dimension(1); j++)
+//        	for (int k = 0; k < indices_side.dimension(2); k++)
+//        		//
+//    	Cerr << "Not implemented yet..." << finl;
+//    	for (int direction = 0; direction < 3; direction++)
+//				{
+//					if ((direction != dir) && geom.get_periodic_flag(direction))
+//					{
+//						int imin;
+//						int jmin;
+//						int kmin;
+//						int imax;
+//						int jmax;
+//						int kmax;
+//						switch (dir)
+//							{
+//							case 0:
+//								imin = 0;
+//								jmin = 0;
+//								kmin = 0;
+//								imax = temperature.ni();
+//								jmax = 0;
+//								kmax = 0;
+//								break;
+//							case 1:
+//								imin = 0;
+//								jmin = 0;
+//								kmin = 0;
+//								imax = 0;
+//								jmax = temperature.nj();
+//								kmax = 0;
+//								break;
+//							case 2:
+//								imin = 0;
+//								jmin = 0;
+//								kmin = 0;
+//								imax = stencil_side;
+//								jmax = temperature.nj();
+//								kmax = temperature.nk();
+//
+//								imin = temperature.ni()-stencil_side;
+//								jmin = 0;
+//								kmin = 0;
+//								imax = temperature.ni();
+//								jmax = temperature.nj();
+//								kmax = temperature.nk();
+//								break;
+//							default:
+//								imin = index_dir;
+//								jmin = 0;
+//								kmin = 0;
+//								imax = imin+upstream_stencil;
+//								jmax = temperature.nj();
+//								kmax = temperature.nk();
+//								break;
+//							}
+//						for (int k = kmin; k < kmax; k++)
+//							for (int j = jmin; j < jmax; j++)
+//								for (int i = imin; i < imax; i++)
+//									temperature(i,j,k) = imposed[direction];
+//					}
+//				}
+//    }
+  }
 }
