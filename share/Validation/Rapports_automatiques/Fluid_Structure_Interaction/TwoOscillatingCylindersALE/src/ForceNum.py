@@ -33,12 +33,11 @@ t = np.loadtxt('TwoOscillatingCylinders_pb_Force_pression.out', unpack=True, use
 t_adim = Omega*t # dimensionless time
 
 # Numerical
+Fpx_left = np.loadtxt('TwoOscillatingCylinders_pb_Force_pression.out', unpack=True, usecols=[5]) # pressure x-axis for left cylinder
+Fvx_left = np.loadtxt('TwoOscillatingCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[5]) # viscous force x-axis for left cylinder
 
-Fpx_left = np.loadtxt('TwoOscillatingCylinders_pb_Force_pression.out', unpack=True, usecols=[3]) # pressure x-axis for left cylinder
-Fvx_left = np.loadtxt('TwoOscillatingCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[3]) # viscous force x-axis for left cylinder
-
-Fpx_right = np.loadtxt('TwoOscillatingCylinders_pb_Force_pression.out', unpack=True, usecols=[5]) # pressure x-axis for right cylinder
-Fvx_right = np.loadtxt('TwoOscillatingCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[5]) # viscous force x-axis for right cylinder
+Fpx_right = np.loadtxt('TwoOscillatingCylinders_pb_Force_pression.out', unpack=True, usecols=[3]) # pressure x-axis for right cylinder
+Fvx_right = np.loadtxt('TwoOscillatingCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[3]) # viscous force x-axis for right cylinder
 
 Fx_left = Fvx_left + Fpx_left # total fluid force x-axis for left cylinder
 Fx_right = Fvx_right + Fpx_right # total fluid force x-axis for right cylinder
