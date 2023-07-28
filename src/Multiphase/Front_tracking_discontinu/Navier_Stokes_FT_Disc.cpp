@@ -2282,7 +2282,7 @@ void correct_indicatrice_face_bord(const int num_face,
   // Correction de l'indicatrice face :
   const int n0 = face_voisins(num_face, 0);
   const int n1 = face_voisins(num_face, 1);
-  if (n0*n1<0)
+  if ((n0==-1) or (n1==-1))
     {
       // On a boundary face
       const int outward_normal = (n0 == -1) ? -1 : 1 ;
