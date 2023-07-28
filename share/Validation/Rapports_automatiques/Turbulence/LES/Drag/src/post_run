@@ -24,12 +24,12 @@ fi
 symetrie=0 && [ "`grep Axe $jdd.data | grep -i symetrie`" != "" ] && symetrie=1
 
 # Verification que les bords sont correctement ranges
-[ "`awk '/#            Time/ {print $3}' $jdd"_pb_Force_pression.out"`" != "Forme_X" ] && echo "La colonne 2 doit contenir Forme_X" && exit -1
-[ "`awk '/#            Time/ {print $3}' $jdd"_pb_Contrainte_visqueuse.out"`" != "Forme_X" ] && echo "La colonne 2 doit contenir Forme_X" && exit -1
+[ "`awk '/#            Time/ {print $7}' $jdd"_pb_Force_pression.out"`" != "Forme_X" ] && echo "La colonne 6 doit contenir Forme_X" && exit -1
+[ "`awk '/#            Time/ {print $7}' $jdd"_pb_Contrainte_visqueuse.out"`" != "Forme_X" ] && echo "La colonne 6 doit contenir Forme_X" && exit -1
 
 # Recuperation des forces
-fp=`tail -1 $jdd"_pb_Force_pression.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$2}'`
-fv=`tail -1 $jdd"_pb_Contrainte_visqueuse.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$2}'`
+fp=`tail -1 $jdd"_pb_Force_pression.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$6}'`
+fv=`tail -1 $jdd"_pb_Contrainte_visqueuse.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$6}'`
 
 # Affichage:
 echo $cas" "$jdd
