@@ -117,6 +117,14 @@ public:
   {
     return div_coeff_grad_T_volume_ ;
   }
+  const IJK_Field_double& get_eulerian_distance() const
+  {
+    return eulerian_distance_;
+  }
+  const IJK_Field_double& get_eulerian_curvature() const
+  {
+    return eulerian_curvature_ ;
+  }
   const IJK_Field_double& get_temperature_adim_bulles() const
   {
     return temperature_adim_bulles_;
@@ -168,6 +176,9 @@ protected:
   virtual void add_temperature_diffusion();
   virtual void compute_diffusion_increment()=0;
   virtual void correct_temperature_for_eulerian_fluxes()=0;
+  void compute_eulerian_distance();
+  void enforce_zero_value_eulerian_distance();
+
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
   void calculer_energies(double& E_liq_pure,
@@ -309,7 +320,18 @@ protected:
   double global_energy_;
   int calulate_grad_T_;
   int rho_cp_post_;
+  /*
+   * For Ghost fluid method
+   */
 
+  int n_iter_distance_;
+  int compute_distance_;
+  int compute_curvature_;
+  int compute_grad_T_interface_;
+  IJK_Field_double eulerian_distance_;
+  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_;
+  IJK_Field_double eulerian_curvature_;
+  IJK_Field_double eulerian_grad_T_interface_;
 };
 
 #endif /* IJK_Thermal_base_included */

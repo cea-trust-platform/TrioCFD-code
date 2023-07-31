@@ -122,6 +122,11 @@ public :
 
   int lire_motcle_non_standard(const Motcle& un_mot, Entree& is) override;
   // fin de methode pour bulles fixes
+  const Domaine_dis& get_domaine_dis() const
+  {
+    return refdomaine_dis_.valeur();
+  };
+
   int get_nb_bulles_reelles() const
   {
     return nb_bulles_reelles_;

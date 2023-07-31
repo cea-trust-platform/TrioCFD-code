@@ -27,6 +27,8 @@
 #include <IJK_FT.h>
 #include <IJK_FT_Post.h>
 #include <IJK_switch_FT.h>
+#include <IJK_Ghost_Fluid_tools.h>
+//#include <IJK_Interfaces.h>
 
 Implemente_base_sans_constructeur( IJK_Thermal_base, "IJK_Thermal_base", Objet_U ) ;
 
@@ -91,6 +93,11 @@ IJK_Thermal_base::IJK_Thermal_base()
   nb_diam_upstream_=0;
   side_temperature_=0;;
   stencil_side_=2;
+
+  n_iter_distance_=3;
+  compute_grad_T_interface_ = 0;
+  compute_curvature_ = 0;
+  compute_distance_= 0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -246,6 +253,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
   param.ajouter_flag("side_temperature", &side_temperature_);
   param.ajouter("stencil_side", &stencil_side_);
+  param.ajouter("n_iter_distance", &n_iter_distance_);
 }
 
 /********************************************
@@ -413,13 +421,45 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
     {
       source_temperature_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
       ecart_source_t_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
-      nalloc +=2;
+      nalloc += 2;
     }
-  if ((liste_post_instantanes_.size() && liste_post_instantanes_.contient_("GRAD_T"))
-      || (ref_ijk_ft_.non_nul() && ref_ijk_ft_->t_debut_statistiques() <  1.e10 ))
+
+  // TODO: Check with Aymeric
+  calulate_grad_T_ = (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("GRAD_T"))
+                     || (ref_ijk_ft_.non_nul() && ref_ijk_ft_->t_debut_statistiques() <  1.e10 );
+  if (calulate_grad_T_)
     {
       allocate_velocity(grad_T_, splitting, 1);
-      nalloc +=3 ;
+      nalloc += 3;
+    }
+
+  compute_grad_T_interface_ = compute_grad_T_interface_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("GRAD_T_INTERFACE"));
+  compute_curvature_ = compute_curvature_ || compute_grad_T_interface_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("CURVATURE"));
+  compute_distance_ = compute_distance_ || compute_curvature_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("DISTANCE"));
+  if (compute_distance_)
+    {
+      eulerian_distance_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+//      eulerian_distance_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
+      allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
+//      allocate_velocity(eulerian_normal_vectors_, splitting, 1);
+      nalloc += 3;
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      eulerian_normal_vectors_.echange_espace_virtuel();
+    }
+  if (compute_curvature_)
+    {
+      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+//      eulerian_curvature_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
+      eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
+    }
+  if (compute_grad_T_interface_)
+    {
+      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+//      eulerian_grad_T_interface_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
+      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
     }
 
   compute_cell_volume();
@@ -560,7 +600,7 @@ void IJK_Thermal_base::sauvegarder_temperature(Nom& lata_name, int idx)
 {
   fichier_reprise_temperature_ = lata_name;
   timestep_reprise_temperature_ = 1;
-  dumplata_scalar(lata_name,Nom("TEMPERATURE_")+Nom(idx) , temperature_, 0 /*we store a 0 */);
+  dumplata_scalar(lata_name, Nom("TEMPERATURE_") + Nom(idx) , temperature_, 0 /*we store a 0 */);
 }
 
 /********************************************
@@ -578,6 +618,14 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Correct the temperature field using either the ghost-fluid
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
+  compute_eulerian_distance();
+//  compute_eulerian_curvature();
+//  compute_grad_T_interface();
+//  propagate_grad_T_interface();
+//  evaluate_temperature_extension();
+
+  enforce_zero_value_eulerian_distance();
+
   correct_temperature_for_eulerian_fluxes();
 
   double nb_diam_upstream_velocity = ref_ijk_ft_->get_nb_diam_upstream();
@@ -625,6 +673,35 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
        << Tmin << " " << Tmax
        << finl;
   return;
+}
+
+void IJK_Thermal_base::compute_eulerian_distance()
+{
+  if (compute_distance_)
+    compute_eulerian_normal_distance_field(ref_ijk_ft_->get_interface(),
+                                           eulerian_distance_,
+                                           eulerian_normal_vectors_,
+                                           n_iter_distance_);
+  else
+    Cerr << "Don't compute the distance" << finl;
+}
+
+void IJK_Thermal_base::enforce_zero_value_eulerian_distance()
+{
+  if (compute_distance_)
+    {
+      const int nx = eulerian_distance_.ni();
+      const int ny = eulerian_distance_.nj();
+      const int nz = eulerian_distance_.nk();
+      static const double invalid_distance_value = -1.e30;
+      for (int k=0; k < nz ; k++)
+        for (int j=0; j< ny; j++)
+          for (int i=0; i < nx; i++)
+            if (eulerian_distance_(i,j,k)<invalid_distance_value)
+              eulerian_distance_(i,j,k) = 0.;
+    }
+  else
+    Cerr << "Eulerian distance has not been computed" << finl;
 }
 
 // Convect temperature field by velocity.
@@ -1757,72 +1834,5 @@ void IJK_Thermal_base::force_upstream_temperature(IJK_Field_double& temperature,
             for (int i = imin; i < imax; i++)
               temperature(i,j,k) = imposed[direction];
       }
-//    if (side_temperature)
-//    {
-//    	DoubleTab indices_side(3,4,3);
-//    	for (int i = 0; i < indices_side.dimension(0); i++)
-//      	for (int j = 0; j < indices_side.dimension(1); j++)
-//        	for (int k = 0; k < indices_side.dimension(2); k++)
-//        		//
-//    	Cerr << "Not implemented yet..." << finl;
-//    	for (int direction = 0; direction < 3; direction++)
-//				{
-//					if ((direction != dir) && geom.get_periodic_flag(direction))
-//					{
-//						int imin;
-//						int jmin;
-//						int kmin;
-//						int imax;
-//						int jmax;
-//						int kmax;
-//						switch (dir)
-//							{
-//							case 0:
-//								imin = 0;
-//								jmin = 0;
-//								kmin = 0;
-//								imax = temperature.ni();
-//								jmax = 0;
-//								kmax = 0;
-//								break;
-//							case 1:
-//								imin = 0;
-//								jmin = 0;
-//								kmin = 0;
-//								imax = 0;
-//								jmax = temperature.nj();
-//								kmax = 0;
-//								break;
-//							case 2:
-//								imin = 0;
-//								jmin = 0;
-//								kmin = 0;
-//								imax = stencil_side;
-//								jmax = temperature.nj();
-//								kmax = temperature.nk();
-//
-//								imin = temperature.ni()-stencil_side;
-//								jmin = 0;
-//								kmin = 0;
-//								imax = temperature.ni();
-//								jmax = temperature.nj();
-//								kmax = temperature.nk();
-//								break;
-//							default:
-//								imin = index_dir;
-//								jmin = 0;
-//								kmin = 0;
-//								imax = imin+upstream_stencil;
-//								jmax = temperature.nj();
-//								kmax = temperature.nk();
-//								break;
-//							}
-//						for (int k = kmin; k < kmax; k++)
-//							for (int j = jmin; j < jmax; j++)
-//								for (int i = imin; i < imax; i++)
-//									temperature(i,j,k) = imposed[direction];
-//					}
-//				}
-//    }
   }
 }

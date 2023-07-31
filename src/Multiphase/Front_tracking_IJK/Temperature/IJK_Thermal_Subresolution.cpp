@@ -76,6 +76,16 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   calulate_grad_T_=0;
   // TODO: Implement ghost fluid if necessary
   ghost_fluid_ = 0;
+  /*
+   * Be careful, it plays a role for allocating the fields in
+   * IJK_Thermal_base::initialize
+   */
+  if (ghost_fluid_)
+    {
+      compute_grad_T_interface_ = 1;
+      compute_curvature_ = 1;
+      compute_distance_= 1;
+    }
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);

@@ -54,6 +54,8 @@ public :
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
   inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
+  inline const IJK_Field_double& get_eulerian_distance() const { return valeur().get_eulerian_distance(); }
+  inline const IJK_Field_double& get_eulerian_curvature() const { return valeur().get_eulerian_curvature(); }
   inline const double& get_E0() const { return valeur().get_E0(); };
   inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
   inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };

@@ -1619,8 +1619,7 @@ void IJK_Thermique::calculer_gradient_temperature(const IJK_Field_double& temper
       grad_T[dir].data() = 0.;
     }
 
-  add_gradient_temperature(temperature, 1. /*constant*/ ,  grad_T[0], grad_T[1], grad_T[2],boundary_conditions_, lambda_);
-
+  add_gradient_temperature(temperature, 1. /*constant*/ ,  grad_T[0], grad_T[1], grad_T[2], boundary_conditions_, lambda_);
 
   for (int dir = 0; dir < 3; dir++)
     {

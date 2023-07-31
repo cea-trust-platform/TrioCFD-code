@@ -88,6 +88,8 @@ int IJK_Thermal_Multiple_Subresolutions::initialize(const IJK_Splitting& splitti
   temperature_vapour_.allocate(splitting, IJK_Splitting::ELEM, 2);
   nalloc += 1;
 
+  compute_distance_ = compute_distance_ || ghost_fluid_;
+
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
 }

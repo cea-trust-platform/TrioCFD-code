@@ -112,6 +112,9 @@ void IJK_Thermal::posttraiter_tous_champs_thermal(Motcles& liste, const int idx)
   liste.add("ECART_T_ANA");
   liste.add("DIV_LAMBDA_GRAD_T_VOLUME");
   liste.add("GRAD_T");
+  //
+  liste.add("DISTANCE");
+  liste.add("CURVATURE");
   if (thermal_rank_==0 || thermal_rank_==1)
     {
       /*
@@ -208,6 +211,28 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     {
       const FixedVector<IJK_Field_double, 3>& grad_T = get_grad_T();
       n++, dumplata_vector(lata_name, nom_grad, grad_T[0], grad_T[1], grad_T[2], latastep);
+    }
+  oss.str("");
+
+  /*
+   * DISTANCE
+   */
+  oss << "DISTANCE_" << lata_suffix << idx;
+  Nom nom_distance(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("DISTANCE") || liste_post_instantanes.contient_(nom_distance)))
+    {
+      n++, dumplata_scalar(lata_name, nom_distance, get_eulerian_distance(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * CURVATURE
+   */
+  oss << "CURVATURE_" << lata_suffix << idx;
+  Nom nom_curvature(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("CURVATURE") || liste_post_instantanes.contient_(nom_curvature)))
+    {
+      n++, dumplata_scalar(lata_name, nom_curvature, get_eulerian_curvature(), latastep);
     }
   oss.str("");
 
