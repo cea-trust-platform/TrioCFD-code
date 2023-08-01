@@ -39,6 +39,8 @@
 Implemente_instanciable( Echange_contact_VDF_FT_Disc_solid, "Echange_contact_VDF_FT_Disc_solid", Echange_contact_VDF_FT_Disc ) ;
 // XD echange_contact_vdf_ft_disc_solid condlim_base echange_contact_vdf_ft_disc_solid 1 echange_conatct_vdf en prescisant la phase
 
+int meme_point2(const DoubleVect& a,const DoubleVect& b);
+
 Sortie& Echange_contact_VDF_FT_Disc_solid::printOn( Sortie& os ) const
 {
   Echange_contact_VDF_FT_Disc::printOn( os );
@@ -132,92 +134,110 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
 
   Probleme_base& pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_autre_pb_));
-  if (sub_type(Probleme_FT_Disc_gen, pb_gen))
+  const Probleme_FT_Disc_gen *pbft =
+    dynamic_cast<const Probleme_FT_Disc_gen*> (&pb_gen);
+  if (pbft->tcl ().is_activated ())
     {
-      const Probleme_FT_Disc_gen *pbft = dynamic_cast<const Probleme_FT_Disc_gen*> (&pb_gen);
-      if (pbft->tcl ().is_activated ())
+      DoubleTab& mon_phi = phi_ext_->valeurs ();
+      mon_phi = 0;
+      for (int n = 0; n < 2; n++)
         {
-          DoubleTab& mon_phi = phi_ext_->valeurs ();
-          mon_phi = 0;
-          for (int n = 0; n < 2; n++)
+          numero_T_ = n;
+          int taille = mon_h.dimension (0);
+          double I_ref_ = 1.;
+          if (n == 1)
+            I_ref_ = 0;
+
+          for (int ii = 0; ii < taille; ii++)
             {
-              numero_T_ = n;
-              int taille = mon_h.dimension (0);
-              double I_ref_ = 1.;
-              if (n == 1)
-                I_ref_ = 0;
-
-              for (int ii = 0; ii < taille; ii++)
+              if (I (ii, 0) > 0 && I (ii, 0) < 1 && (I_ref_ == 1))
                 {
-                  if (I (ii, 0) > 0 && I (ii, 0) < 1 && (I_ref_ == 1))
+                  for (int jj = 0; jj < nb_comp; jj++)
                     {
-                      for (int jj = 0; jj < nb_comp; jj++)
+
+                      const Triple_Line_Model_FT_Disc *tcl =
+                        pbft ? &pbft->tcl () : nullptr;
+
+                      const ArrOfInt& faces_with_CL_contrib =
+                        tcl->boundary_faces ();
+                      const ArrOfDouble& Q_from_CL = tcl->Q ();
+
+                      const Domaine_VF& le_dom = ref_cast(
+                                                   Domaine_VF, mon_dom_cl_dis->domaine_dis ().valeur ());
+                      const IntTab& face_voisins = le_dom.face_voisins ();
+                      const DoubleVect& surface = le_dom.face_surfaces ();
+                      const DoubleTab& xv = le_dom.xv (); // centre gravite of surface
+
+                      // num_face in solid-Domaine
+                      const int face = ii
+                                       + frontiere_dis ().frontiere ().num_premiere_face ();
+
+                      // surface gravity center of mixed cell
+                      // in Solid domain
+
+                      DoubleVect x1 (dimension);
+                      for (int k = 0; k < dimension; k++)
                         {
-
-                          const Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl () : nullptr;
-
-                          const ArrOfInt& faces_with_CL_contrib = tcl->boundary_faces ();
-                          const ArrOfDouble& Q_from_CL = tcl->Q ();
-
-                          const Domaine_VF& le_dom = ref_cast( Domaine_VF, mon_dom_cl_dis->domaine_dis ().valeur ());
-                          const IntTab& face_voisins = le_dom.face_voisins ();
-                          const DoubleVect& surface = le_dom.face_surfaces ();
-
-                          // const int face = ii+ frontiere_dis().frontiere().num_premiere_face();
-                          // const int face = ii+ T_ext().frontiere_dis().frontiere().num_premiere_face();
-
-                          const Champ_front_calc& ch = ref_cast( Champ_front_calc, T_autre_pb ().valeur ());
-                          const Front_VF& front_vf = ref_cast(Front_VF, ch.front_dis ());
-                          // num_face in Liquid-Domaine
-                          const int face = ii + front_vf.num_premiere_face ();
-
-                          const int nb_contact_line_contribution = faces_with_CL_contrib.size_array ();
-                          int nb_contrib = 0;
-                          double flux_local = 0.;
-                          hh_imp (ii, jj) = 0.;
-
-                          for (int idx = 0; idx < nb_contact_line_contribution;
-                               idx++)
-                            {
-                              // element i
-
-                              const int facei = faces_with_CL_contrib[idx];
-
-                              if (facei == face)
-                                {
-                                  nb_contrib++;
-                                  const double sign = (face_voisins (face, 0) == -1) ? -1. : 1.;
-
-                                  // const int elemi = face_voisins(faces, 0)+face_voisins(faces, 1)+1;
-                                  const int faces = ii + frontiere_dis ().frontiere ().num_premiere_face ();
-                                  const double TCL_wall_flux = Q_from_CL[idx]
-                                                               / surface (faces);
-                                  // val should be : -rho*Cp * flux(W)
-                                  // probably because the whole energy equation is written with rhoCp somewhere...
-                                  // and the sign should be negative for incoming flux (towards the fluid) by convention.
-                                  const double val = -sign * TCL_wall_flux;
-                                  if (nb_contrib == 1)
-                                    flux_local = val;
-                                  // hh_imp(ii,jj) = val/( mon_inco(elemi, 0) - Text(ii));
-                                  else
-                                    flux_local += val;
-                                  // hh_imp(ii,jj) += val/( mon_inco(elemi, 0) - Text(ii));
-                                }
-                            }
-                          mon_phi (ii, jj) += flux_local;
-
-                          const Equation_base& mon_eqn =
-                            domaine_Cl_dis ().equation ();
-                          const DoubleTab& mon_inco =
-                            mon_eqn.inconnue ().valeurs ();
-
-                          const int faces = ii + frontiere_dis ().frontiere ().num_premiere_face ();
-                          const int elemi = face_voisins (faces, 0) + face_voisins (faces, 1) + 1;
-
-                          mon_Ti (ii, jj) = mon_inco (elemi, 0) + flux_local / mon_h (ii);
+                          x1[k] = xv (face, k);
                         }
 
+                      // Liquid domain
+                      const Champ_front_calc& ch = ref_cast(
+                                                     Champ_front_calc, T_autre_pb ().valeur ());
+                      const Domaine_VDF& zvdf_2 = ref_cast(Domaine_VDF,
+                                                           ch.domaine_dis ());
+                      const DoubleTab& xv2 = zvdf_2.xv ();
+
+                      const int nb_contact_line_contribution =
+                        faces_with_CL_contrib.size_array ();
+                      int nb_contrib = 0;
+                      double flux_local = 0.;
+                      hh_imp (ii, jj) = 0.;
+
+                      for (int idx = 0; idx < nb_contact_line_contribution;
+                           idx++)
+                        {
+                          const int facei = faces_with_CL_contrib[idx];
+
+                          // In case of parallelization:
+                          // raccord in solid domain and aces_with_CL_contrib may not in the same proc
+                          // => Not same way to number faces
+                          // use Gravity center to to check correspondence
+                          DoubleVect x2 (dimension);
+                          for (int k = 0; k < dimension; k++)
+                            {
+                              x2[k] = xv2 (facei, k);
+                            }
+
+                          if (meme_point2 (x1, x2))
+                            {
+                              nb_contrib++;
+                              const double sign =
+                                (face_voisins (face, 0) == -1) ? -1. : 1.;
+                              const double TCL_wall_flux = Q_from_CL[idx]
+                                                           / surface (face);
+                              const double val = -sign * TCL_wall_flux;
+                              if (nb_contrib == 1)
+                                flux_local = val;
+                              else
+                                flux_local += val;
+                            }
+                        }
+                      mon_phi (ii, jj) += flux_local;
+
+                      const Equation_base& mon_eqn =
+                        domaine_Cl_dis ().equation ();
+                      const DoubleTab& mon_inco =
+                        mon_eqn.inconnue ().valeurs ();
+
+
+                      const int elemi = face_voisins (face, 0)
+                                        + face_voisins (face, 1) + 1;
+
+                      mon_Ti (ii, jj) = mon_inco (elemi, 0)
+                                        + flux_local / mon_h (ii);
                     }
+
                 }
             }
         }
