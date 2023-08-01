@@ -459,6 +459,9 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
    */
 
   // Vertex coordinates of the eulerian domain
+  interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
+  curvature.echange_espace_virtuel(curvature.ghost());
+
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "compute_eulerian_curvature_field_from_interface");
   statistiques().begin_count(stat_counter);
 
@@ -611,19 +614,48 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
 
 void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& distance,
                                                             const IJK_Field_double& indicator,
+                                                            const IJK_Field_double& interfacial_area,
                                                             const	IJK_Field_double& temperature,
                                                             IJK_Field_double& grad_T_interface)
 {
   /*
    * Compute the normal temperature gradient at the bubble interface
+   * Write in the ijk manner !
    */
+  static const double invalid_value = -1.e30;
+  static const double liquid_indicator = 1 - 1e-8;
   const int ni = temperature.ni();
   const int nj = temperature.nj();
   const int nk = temperature.nk();
+  grad_T_interface.data() = 0.;
+  grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-        grad_T_interface(i,j,k) = temperature(i,j,k) / distance(i,j,k);
+        {
+          const double ai = interfacial_area(i,j,k);
+          if (ai > invalid_value)
+            for (int ii=-1; ii < 2; ii++)
+              for (int jj=-1; jj < 2; jj++)
+                for (int kk=-1; kk < 2; kk++)
+                  {
+                    const int x_dir = (ii!=0 && jj==0 && kk==0);
+                    const int y_dir = (jj!=0 && ii==0 && kk==0);
+                    const int z_dir = (kk!=0 && ii==0 && jj==0);
+                    //                  if (ii!=0 && jj!=0 && kk!=0)
+                    if (x_dir || y_dir || z_dir)
+                      {
+                        const double d = distance(i+ii,j+jj,k+kk);
+                        const double indic = indicator(i+ii,j+jj,k+kk);
+                        if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
+                          {
+                            const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
+                            grad_T_interface(i+ii,j+jj,k+kk) = temperature_liquid / d;
+                          }
+                      }
+                  }
+        }
+  grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
   /*
    * Check if indicatrice of the neighbours is zero + interfacial_area to locate the mixed cells
    */

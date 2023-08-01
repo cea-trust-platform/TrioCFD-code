@@ -129,6 +129,10 @@ public:
   {
     return interfacial_area_;
   }
+  const IJK_Field_double& get_grad_T_interface() const
+  {
+    return eulerian_grad_T_interface_;
+  }
   const IJK_Field_double& get_temperature_adim_bulles() const
   {
     return temperature_adim_bulles_;
@@ -186,6 +190,7 @@ protected:
   void compute_eulerian_curvature_from_interface();
   void enforce_zero_value_eulerian_curvature();
   void enforce_max_value_eulerian_curvature();
+  void compute_eulerian_grad_T_interface();
   void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);

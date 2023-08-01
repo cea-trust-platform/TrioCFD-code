@@ -450,19 +450,24 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   if (compute_curvature_)
     {
       // Laplacian(d) necessitates 0 ghost cells like div_lambda_grad_T
-      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
+      // but if calculated using the neighbours maybe 1
+      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
       nalloc += 1;
       eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
+      // Only calculated in the mixed cells ghost_cells = 0
       interfacial_area_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
       nalloc += 1;
       interfacial_area_.echange_espace_virtuel(interfacial_area_.ghost());
     }
   if (compute_grad_T_interface_)
     {
-      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-//      eulerian_grad_T_interface_.allocate(splitting, IJK_Splitting::ELEM, 2);
+      // 1 ghost cell for eulerian_grad_T_interface_ and temperature_ft_ to access its neighbour
+      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
       nalloc += 1;
       eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      temperature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+      nalloc += 1;
+      temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
     }
 
   // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
@@ -628,12 +633,13 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   //  compute_eulerian_curvature();
   compute_eulerian_curvature_from_interface();
   //  enforce_zero_value_eulerian_curvature();
-  //  compute_grad_T_interface();
+  compute_eulerian_grad_T_interface();
   //  propagate_grad_T_interface();
   //  evaluate_temperature_extension();
 
   enforce_zero_value_eulerian_distance();
   enforce_max_value_eulerian_curvature();
+  enforce_max_value_eulerian_field(interfacial_area_);
 
   correct_temperature_for_eulerian_fluxes();
 
@@ -687,6 +693,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 void IJK_Thermal_base::compute_eulerian_distance()
 {
   if (compute_distance_)
+    // TODO: Do we need to perform an echange_virtuel with interfaces ?
     compute_eulerian_normal_distance_field(ref_ijk_ft_->get_interface(),
                                            eulerian_distance_,
                                            eulerian_normal_vectors_,
@@ -721,7 +728,8 @@ void IJK_Thermal_base::compute_eulerian_curvature_from_interface()
 {
   if (compute_curvature_)
     {
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      interfacial_area_.echange_espace_virtuel(interfacial_area_.ghost());
+      eulerian_normal_vectors_.echange_espace_virtuel();
       int nb_groups = ref_ijk_ft_->get_interface().nb_groups();
       // Boucle debute a -1 pour faire l'indicatrice globale.
       // S'il n'y a pas de groupes de bulles (monophasique ou monodisperse), on passe exactement une fois dans la boucle
@@ -736,7 +744,6 @@ void IJK_Thermal_base::compute_eulerian_curvature_from_interface()
                                                           n_iter_distance_,
                                                           igroup);
         }
-      enforce_max_value_eulerian_field(interfacial_area_);
     }
   else
     Cerr << "Don't compute the eulerian curvature field" << finl;
@@ -760,6 +767,27 @@ void IJK_Thermal_base::enforce_max_value_eulerian_curvature()
     }
   else
     Cerr << "Eulerian curvature has not been computed" << finl;
+}
+
+void IJK_Thermal_base::compute_eulerian_grad_T_interface()
+{
+  if (compute_grad_T_interface_)
+    {
+      temperature_ft_.data() = 0.;
+      temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+      ref_ijk_ft_->redistribute_to_splitting_ft_elem(temperature_, temperature_ft_);
+      temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      interfacial_area_.echange_espace_virtuel(interfacial_area_.ghost());
+      compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_,
+                                                             ref_ijk_ft_->itfce().I_ft(),
+                                                             interfacial_area_,
+                                                             temperature_ft_,
+                                                             eulerian_grad_T_interface_);
+    }
+  else
+    Cerr << "Don't compute the grad_T_interface field" << finl;
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)

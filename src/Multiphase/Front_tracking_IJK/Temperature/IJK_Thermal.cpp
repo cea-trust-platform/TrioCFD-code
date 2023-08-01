@@ -247,6 +247,39 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  /*
+   * GRAD_T_INTERFACE
+   */
+  oss << "GRAD_T_INTERFACE_" << lata_suffix << idx;
+  Nom nom_grad_T_interface(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("GRAD_T_INTERFACE") || liste_post_instantanes.contient_(nom_grad_T_interface)))
+    {
+      n++, dumplata_scalar(lata_name, nom_grad_T_interface, get_grad_T_interface(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * TEMPERATURE_FT
+   */
+  oss << "TEMPERATURE_FT_" << lata_suffix << idx;
+  Nom nom_temperature_ft(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("TEMPERATURE_FT") || liste_post_instantanes.contient_(nom_temperature_ft)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temperature_ft, get_temperature_ft(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * INDICATOR_FT
+   */
+  oss << "INDICATOR_FT_" << lata_suffix << idx;
+  Nom nom_indicator_ft(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("INDICATOR_FT") || liste_post_instantanes.contient_(nom_indicator_ft)))
+    {
+      n++, dumplata_scalar(lata_name, nom_indicator_ft, ref_ijk_ft_->itfce().I_ft(), latastep);
+    }
+  oss.str("");
+
   return n;
 }
 

@@ -57,6 +57,7 @@ public :
   inline const IJK_Field_double& get_eulerian_distance() const { return valeur().get_eulerian_distance(); }
   inline const IJK_Field_double& get_eulerian_curvature() const { return valeur().get_eulerian_curvature(); }
   inline const IJK_Field_double& get_interfacial_area() const { return valeur().get_interfacial_area(); }
+  inline const IJK_Field_double& get_grad_T_interface() const { return valeur().get_grad_T_interface(); }
   inline const double& get_E0() const { return valeur().get_E0(); };
   inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
   inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };

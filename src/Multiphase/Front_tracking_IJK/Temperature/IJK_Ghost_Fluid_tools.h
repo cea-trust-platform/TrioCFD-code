@@ -54,10 +54,11 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
                                                      const int& n_iter,
                                                      int igroup);
 
-void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& grad_T_int,
-                                                            const IJK_Field_double& curvature,
-                                                            const IJK_Field_double& distance,
-                                                            int taylor_expansion_order);
+void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& distance,
+                                                            const IJK_Field_double& indicator,
+                                                            const IJK_Field_double& interfacial_area,
+                                                            const	IJK_Field_double& temperature,
+                                                            IJK_Field_double& grad_T_interface);
 
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
                                                               const IJK_Field_double& interfacial_area,
