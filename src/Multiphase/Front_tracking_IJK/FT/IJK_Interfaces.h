@@ -271,6 +271,11 @@ public :
     return num_compo_;
   }
 
+  const ArrOfInt& get_compo_to_group() const
+  {
+    return compo_to_group_;
+  };
+
   // Methode qui parcourt les facettes contenues dans la cellule num_elem
   // pour trouver la phase de sa cellule voisine
   // Donnees d'entree:

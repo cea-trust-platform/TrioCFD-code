@@ -23,6 +23,98 @@
 #include <Probleme_base.h>
 #include <DebogIJK.h>
 #include <stat_counters.h>
+#include <Operateur_IJK_elem_diff.h>
+
+static int decoder_numero_bulle(const int code)
+{
+  const int num_bulle = code >>6;
+  return num_bulle;
+}
+
+static void extrapolate(const Domaine_VF& domaine_vf,
+                        const IJK_Field_double& interfacial_area,
+                        const IJK_Field_double& distance,
+                        IJK_Field_double& field,
+                        const int stencil_width)
+{
+  const double invalid_test = -1.e30;
+  const IntTab& elem_faces = domaine_vf.elem_faces();
+  const IntTab& faces_elem = domaine_vf.face_voisins();
+  const int nb_faces_elem = elem_faces.dimension(1);
+  const int nb_elem = elem_faces.dimension(0);
+  IJK_Field_double field_old;
+  const IJK_Splitting& splitting_distance = distance.get_splitting();
+  /*
+   * n_iterations = stencil_width is the minimum to get a propagation of information from the interface to the border
+   * of the extrapolation. But doing more will lead to smoother values... And it probably costs close to nothing
+   */
+  const double n_iterations = 5 * stencil_width;
+  for (int iteration = 0; iteration < n_iterations; iteration++)
+    {
+      // Copy the old field value as we do not want to use the current iteration values.
+      field_old = field;
+      // La valeur sur un element est la moyenne des valeurs sur les elements voisins
+      for (int i_elem = 0; i_elem < nb_elem; i_elem++)
+        {
+          // Do not touch field in interfacial cells.
+          // Iterate on other values.
+          const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(i_elem);
+          const double d = distance(num_elem_ijk[DIRECTION_I],
+                                    num_elem_ijk[DIRECTION_J],
+                                    num_elem_ijk[DIRECTION_K]);
+          const double interfacial_area_elem = interfacial_area(num_elem_ijk[DIRECTION_I],
+                                                                num_elem_ijk[DIRECTION_J],
+                                                                num_elem_ijk[DIRECTION_K]);
+          if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
+            {
+              double sum_field = 0.;
+              double coeff = 0.;
+              for (int i_face = 0; i_face < nb_faces_elem; i_face++)
+                {
+                  const int face = elem_faces(i_elem, i_face);
+                  const int neighbour = faces_elem(face, 0) + faces_elem(face, 1) - i_elem;
+                  if (neighbour >= 0)
+                    {
+                      // Not a boundary...
+                      const Int3 num_elem_neighbour_ijk = splitting_distance.convert_packed_to_ijk_cell(neighbour);
+                      double field_neighbour = field_old(num_elem_neighbour_ijk[DIRECTION_I],
+                                                         num_elem_neighbour_ijk[DIRECTION_J],
+                                                         num_elem_neighbour_ijk[DIRECTION_K]);
+                      const double distance_neighbour = distance(num_elem_neighbour_ijk[DIRECTION_I],
+                                                                 num_elem_neighbour_ijk[DIRECTION_J],
+                                                                 num_elem_neighbour_ijk[DIRECTION_K]);
+                      if (distance_neighbour > invalid_test)
+                        {
+                          // Give more weight in the smoothing to values closer to the interface:
+                          if (fabs(distance_neighbour) < -1.e30)
+                            {
+                              Cerr << "Distance is very much at zero whereas interfacial_area is zero too... Pathological case to be looked into closely. " << finl;
+                              Cerr << "Is it from a Break-up or coalescence? " << finl;
+                              Cerr << "see Convection_Diffusion_Temperature_FT_Disc and static void extrapolate" << finl;
+                              Cerr << "Contact TRUST support." << finl;
+                              Process::exit();
+                            }
+                          /*
+                           * TODO: Check the difference between extrapolate_champ_elem
+                           * and extrapolate from Convection_Diffusion_Temperature_FT_Disc.cpp
+                           */
+//                          const double inv_distance_squared = 1./ (distance_neighbour * distance_neighbour);
+//                          sum_field += field_neighbour * inv_distance_squared;
+//                          coeff += inv_distance_squared;
+                          sum_field += field_neighbour;
+                          coeff++;
+                        }
+                    }
+                }
+              if (coeff > 0.)
+                field(num_elem_ijk[DIRECTION_I],
+                      num_elem_ijk[DIRECTION_J],
+                      num_elem_ijk[DIRECTION_K]) = sum_field / coeff;
+            }
+        }
+      field.echange_espace_virtuel(field.ghost());
+    }
+}
 
 void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //  ref_problem_ft_disc,
                                             IJK_Field_double& distance_field,
@@ -246,7 +338,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
               int k;
               for (k = 0; k < nb_elem_voisins; k++)
                 {
-                  // Look for a neighbour by the phase k
+                  // Look for a neighbour by the face k
                   const int face = elem_faces(elem, k);
                   const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
                   const Int3 num_elem_voisin_ijk = splitting_distance.convert_packed_to_ijk_cell(e_voisin);
@@ -308,41 +400,260 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   statistiques().end_count(stat_counter);
 }
 
-void compute_eulerian_normal_vector_field(const IJK_Field_double& distance, const FixedVector<IJK_Field_double, 3>& normal_vect)
+//void compute_eulerian_normal_vector_field(const IJK_Field_double& distance, const FixedVector<IJK_Field_double, 3>& normal_vect)
+//{
+//  /*
+//   * Compute the gradient of the normal distance field
+//   */
+//
+//}
+
+void compute_eulerian_curvature_field_from_distance_field(const IJK_Field_double& distance,
+                                                          IJK_Field_double& curvature,
+                                                          const IJK_Field_local_double& boundary_flux_kmin,
+                                                          const IJK_Field_local_double& boundary_flux_kmax)
 {
   /*
-   * Compute the gradient of the normal distance field
+   * Compute the divergence of the normal vector field or the laplacian of the eulerian distance field
    */
+  // Laplacian operator
+  Operateur_IJK_elem_diff laplacian_distance;
+  laplacian_distance.typer_diffusion_op("uniform");
+  // Initialise with unit lambda
+  laplacian_distance.initialize(distance.get_splitting());
+  const double lambda = 1.;
+  laplacian_distance.set_uniform_lambda(lambda);
+  // Calculate Laplacian(dist)
+  laplacian_distance.calculer(distance, curvature, boundary_flux_kmin, boundary_flux_kmax);
+  const IJK_Grid_Geometry& geom = curvature.get_splitting().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  const double vol = dx * dy * dz;
+  const int nx = curvature.ni();
+  const int ny = curvature.nj();
+  const int nz = curvature.nk();
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        curvature(i,j,k) /= vol;
+  curvature.echange_espace_virtuel(curvature.ghost());
+}
+
+void compute_eulerian_curvature_field_from_normal_vector_field(const FixedVector<IJK_Field_double, 3>& normal_vect,
+                                                               IJK_Field_double& curvature)
+{
 
 }
 
-void compute_eulerian_curvature_field(const FixedVector<IJK_Field_double, 3>& normal_vect, const IJK_Field_double& curvature)
+void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field_double, 3>& normal_vect,
+                                                     const IJK_Interfaces& interfaces,
+                                                     IJK_Field_double& interfacial_area,
+                                                     IJK_Field_double& curvature,
+                                                     const int& n_iter,
+                                                     const int igroup)
 {
   /*
-   * Compute the divergence of the normal vector field
+   * From IJK_Interfaces::calculer_normales_et_aires_interfaciales
+   * Called in update_stat_ft IJK_FT through an instance of IJK_FT_Post !!!!!
    */
 
+  // Vertex coordinates of the eulerian domain
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "compute_eulerian_curvature_field_from_interface");
+  statistiques().begin_count(stat_counter);
+
+  static const double invalid_curvature_value = -1.e30;
+
+  interfacial_area.data() = invalid_curvature_value * 1.1;
+  curvature.data() = invalid_curvature_value * 1.1;
+
+  // Vertex coordinates of the eulerian domain
+  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+  const int nb_elem = mon_dom_dis.domaine().nb_elem();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  const IJK_Splitting& splitting_curvature = normal_vect.get_splitting();
+
+  const Maillage_FT_IJK& maillage = interfaces.maillage_ft_ijk();
+  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
+  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+  const IntTab& facettes = maillage.facettes();
+  const ArrOfDouble& courbure = maillage.get_update_courbure_sommets();
+
+  const int n_fa7 = maillage.nb_facettes();
+  // Calculate the curvature in the cells crossed by the interface
+  const ArrOfInt& compo_facette = maillage.compo_connexe_facettes();
+  ArrOfInt compo_to_group = interfaces.get_compo_to_group();
+  for (int fa7 = 0; fa7 < n_fa7; fa7++)
+    {
+      int icompo = compo_facette[fa7];
+      if (icompo<0)
+        {
+          // Portion d'interface ghost. On recherche le vrai numero
+          icompo = decoder_numero_bulle(-icompo);
+        }
+      if ((compo_to_group[icompo] != igroup) && (igroup != -1))
+        continue;
+      const double sf = surface_facettes[fa7];
+      int index = intersections.index_facette()[fa7];
+      while (index >= 0)
+        {
+          const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+          const int num_elem = data.numero_element_;
+          const Int3 ijk = splitting_curvature.convert_packed_to_ijk_cell(num_elem);
+          const double surf = data.fraction_surface_intersection_ * sf;
+          for (int isom = 0; isom < 3; isom++)
+            {
+              const int num_som = facettes(fa7, isom);
+              const double kappa = courbure[num_som];
+              // No volume consideration
+              if (curvature(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) < invalid_curvature_value)
+                curvature(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) = kappa * surf / 3.;
+              else
+                curvature(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) += kappa * surf / 3.;
+            }
+          if (interfacial_area(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) < invalid_curvature_value)
+            interfacial_area(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) = surf;
+          else
+            interfacial_area(ijk[DIRECTION_I], ijk[DIRECTION_J], ijk[DIRECTION_K]) += surf;
+          index = data.index_element_suivant_;
+        }
+    }
+  interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
+  curvature.echange_espace_virtuel(curvature.ghost());
+  {
+    const int nx = curvature.ni();
+    const int ny = curvature.nj();
+    const int nz = curvature.nk();
+    for (int k=0; k < nz ; k++)
+      for (int j=0; j< ny; j++)
+        for (int i=0; i < nx; i++)
+          if (curvature(i,j,k) > invalid_curvature_value)
+            curvature(i,j,k) /= interfacial_area(i,j,k);
+  }
+  interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
+  curvature.echange_espace_virtuel(curvature.ghost());
+
+  // Get back the cells filled with non-zero normal vectors
+  ArrOfIntFT liste_elements;
+  {
+    for (int elem = 0; elem < nb_elem; elem++)
+      {
+        const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
+        double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+        double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+        double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+        double norme2 = nx*nx + ny*ny + nz*nz;
+        if (norme2 > 0.)
+          liste_elements.append_array(elem);
+      }
+  }
+  const IntTab& face_voisins = domaine_vf.face_voisins();
+  const IntTab& elem_faces   = domaine_vf.elem_faces();
+  const int nb_elem_voisins = elem_faces.line_size();
+
+  // Curvature calculation at the interface
+  IJK_Field_double terme_src_curv(curvature);
+  IJK_Field_double tmp_curv(curvature);
+
+  for (int iteration = 0; iteration < n_iter; iteration++)
+    {
+      int i_elem, elem;
+      const int liste_elem_size = liste_elements.size_array();
+      for (i_elem = 0; i_elem < liste_elem_size; i_elem++)
+        {
+          elem = liste_elements[i_elem];
+          const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
+          if (terme_src_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) > invalid_curvature_value)
+            {
+              // For all the element already crossed by the interface, the value is not computed again
+              tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = curvature(num_elem_ijk[DIRECTION_I],
+                                                                                                                    num_elem_ijk[DIRECTION_J],
+                                                                                                                    num_elem_ijk[DIRECTION_K]);
+            }
+          else
+            {
+              // For the others, we compute a distance value per neighbour
+              double ncontrib = 0.;
+              double sum_kappa = 0.;
+              int k;
+              for (k = 0; k < nb_elem_voisins; k++)
+                {
+                  // Look for a neighbour by the face k
+                  const int face = elem_faces(elem, k);
+                  const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                  const Int3 num_elem_voisin_ijk = splitting_curvature.convert_packed_to_ijk_cell(e_voisin);
+                  if (e_voisin >= 0) // Not on a boundary
+                    {
+                      const double curvature_voisin = curvature(num_elem_voisin_ijk[DIRECTION_I],
+                                                                num_elem_voisin_ijk[DIRECTION_J],
+                                                                num_elem_voisin_ijk[DIRECTION_K]);
+                      if (curvature_voisin > invalid_curvature_value)
+                        {
+                          // Average normal distance between an element and its neighbours
+
+                          sum_kappa += curvature_voisin;
+                          ncontrib++;
+                        }
+                    }
+                }
+              // Averaging the distances obtained from neighbours
+              if (ncontrib > 0.)
+                {
+                  double kappa = sum_kappa / ncontrib;
+                  tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = kappa;
+                }
+            }
+        }
+      curvature = tmp_curv;
+      curvature.echange_espace_virtuel(curvature.ghost());
+    }
 }
 
-void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& grad_T_int,
-                                                            const IJK_Field_double& curvature,
-                                                            const IJK_Field_double& distance,
-                                                            int taylor_expansion_order)
+void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& distance,
+                                                            const IJK_Field_double& indicator,
+                                                            const	IJK_Field_double& temperature,
+                                                            IJK_Field_double& grad_T_interface)
 {
   /*
    * Compute the normal temperature gradient at the bubble interface
    */
-
+  const int ni = temperature.ni();
+  const int nj = temperature.nj();
+  const int nk = temperature.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        grad_T_interface(i,j,k) = temperature(i,j,k) / distance(i,j,k);
+  /*
+   * Check if indicatrice of the neighbours is zero + interfacial_area to locate the mixed cells
+   */
 }
 
-void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& grad_T_int,
-                                                              const IJK_Field_double& indicator,
-                                                              const IJK_Field_double& distance)
+void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
+                                                              const IJK_Field_double& interfacial_area,
+                                                              const IJK_Field_double& distance,
+                                                              IJK_Field_double& temperature,
+                                                              const int stencil_width)
 {
   /*
    * Propagate value of grad_T_int stored in pure liquid phase towards the vapour phase and mixed cells
    */
-
+  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+  extrapolate(domaine_vf, interfacial_area, distance, temperature, stencil_width);
+//  ArrOfIntFT liste_elements;
+//  {
+//    for (int elem = 0; elem < nb_elem; elem++)
+//      {
+//        const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
+//        double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+//        double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+//        double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+//        double norme2 = nx*nx + ny*ny + nz*nz;
+//        if (norme2 > 0.)
+//          liste_elements.append_array(elem);
+//      }
+//  }
 }
 
 void compute_eulerian_extended_temperature(const IJK_Field_double& grad_T_int,

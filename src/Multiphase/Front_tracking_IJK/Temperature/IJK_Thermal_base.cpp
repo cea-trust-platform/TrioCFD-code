@@ -438,29 +438,34 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   compute_distance_ = compute_distance_ || compute_curvature_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("DISTANCE"));
   if (compute_distance_)
     {
-      eulerian_distance_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
-//      eulerian_distance_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      // Laplacian(d) necessitates 2 ghost cells like temperature
+      eulerian_distance_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
       nalloc += 1;
+      // grad(d) necessitates 1 ghost cell ?
       allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
-//      allocate_velocity(eulerian_normal_vectors_, splitting, 1);
       nalloc += 3;
       eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
       eulerian_normal_vectors_.echange_espace_virtuel();
     }
   if (compute_curvature_)
     {
-      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
-//      eulerian_curvature_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      // Laplacian(d) necessitates 0 ghost cells like div_lambda_grad_T
+      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
       nalloc += 1;
       eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
+      interfacial_area_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      interfacial_area_.echange_espace_virtuel(interfacial_area_.ghost());
     }
   if (compute_grad_T_interface_)
     {
-      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
-//      eulerian_grad_T_interface_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+//      eulerian_grad_T_interface_.allocate(splitting, IJK_Splitting::ELEM, 2);
       nalloc += 1;
       eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
     }
+
+  // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
 
   compute_cell_volume();
   // Cout << "End of " << que_suis_je() << "::initialize()" << finl;
@@ -619,12 +624,16 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
   compute_eulerian_distance();
-//  compute_eulerian_curvature();
-//  compute_grad_T_interface();
-//  propagate_grad_T_interface();
-//  evaluate_temperature_extension();
+
+  //  compute_eulerian_curvature();
+  compute_eulerian_curvature_from_interface();
+  //  enforce_zero_value_eulerian_curvature();
+  //  compute_grad_T_interface();
+  //  propagate_grad_T_interface();
+  //  evaluate_temperature_extension();
 
   enforce_zero_value_eulerian_distance();
+  enforce_max_value_eulerian_curvature();
 
   correct_temperature_for_eulerian_fluxes();
 
@@ -683,25 +692,123 @@ void IJK_Thermal_base::compute_eulerian_distance()
                                            eulerian_normal_vectors_,
                                            n_iter_distance_);
   else
-    Cerr << "Don't compute the distance" << finl;
+    Cerr << "Don't compute the eulerian distance field" << finl;
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_distance()
 {
   if (compute_distance_)
-    {
-      const int nx = eulerian_distance_.ni();
-      const int ny = eulerian_distance_.nj();
-      const int nz = eulerian_distance_.nk();
-      static const double invalid_distance_value = -1.e30;
-      for (int k=0; k < nz ; k++)
-        for (int j=0; j< ny; j++)
-          for (int i=0; i < nx; i++)
-            if (eulerian_distance_(i,j,k)<invalid_distance_value)
-              eulerian_distance_(i,j,k) = 0.;
-    }
+    enforce_zero_value_eulerian_field(eulerian_distance_);
   else
     Cerr << "Eulerian distance has not been computed" << finl;
+}
+
+void IJK_Thermal_base::compute_eulerian_curvature()
+{
+  if (compute_curvature_)
+    {
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      compute_eulerian_curvature_field_from_distance_field(eulerian_distance_,
+                                                           eulerian_curvature_,
+                                                           boundary_flux_kmin_,
+                                                           boundary_flux_kmax_);
+    }
+  else
+    Cerr << "Don't compute the eulerian curvature field" << finl;
+}
+
+void IJK_Thermal_base::compute_eulerian_curvature_from_interface()
+{
+  if (compute_curvature_)
+    {
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      int nb_groups = ref_ijk_ft_->get_interface().nb_groups();
+      // Boucle debute a -1 pour faire l'indicatrice globale.
+      // S'il n'y a pas de groupes de bulles (monophasique ou monodisperse), on passe exactement une fois dans la boucle
+      if (nb_groups == 1)
+        nb_groups = 0; // Quand il n'y a qu'un groupe, on ne posttraite pas les choses pour ce groupe unique puisque c'est identique au cas global
+      for (int igroup = -1; igroup < nb_groups; igroup++)
+        {
+          compute_eulerian_curvature_field_from_interface(eulerian_normal_vectors_,
+                                                          ref_ijk_ft_->get_interface(),
+                                                          interfacial_area_,
+                                                          eulerian_curvature_,
+                                                          n_iter_distance_,
+                                                          igroup);
+        }
+      enforce_max_value_eulerian_field(interfacial_area_);
+    }
+  else
+    Cerr << "Don't compute the eulerian curvature field" << finl;
+}
+
+void IJK_Thermal_base::enforce_zero_value_eulerian_curvature()
+{
+  if (compute_curvature_)
+    {
+      enforce_zero_value_eulerian_field(eulerian_curvature_);
+    }
+  else
+    Cerr << "Eulerian curvature has not been computed" << finl;
+}
+
+void IJK_Thermal_base::enforce_max_value_eulerian_curvature()
+{
+  if (compute_curvature_)
+    {
+      enforce_max_value_eulerian_field(eulerian_curvature_);
+    }
+  else
+    Cerr << "Eulerian curvature has not been computed" << finl;
+}
+
+void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)
+{
+  const int nx = eulerian_field.ni();
+  const int ny = eulerian_field.nj();
+  const int nz = eulerian_field.nk();
+  static const double invalid_distance_value = -1.e30;
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        if (eulerian_field(i,j,k) < invalid_distance_value)
+          eulerian_field(i,j,k) = 0.;
+}
+
+void IJK_Thermal_base::enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field)
+{
+  double eulerian_field_max = -1.e20;
+  const int nx = eulerian_field.ni();
+  const int ny = eulerian_field.nj();
+  const int nz = eulerian_field.nk();
+  static const double invalid_distance_value = -1.e30;
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        eulerian_field_max = std::max(eulerian_field_max, eulerian_field(i,j,k));
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        if (eulerian_field(i,j,k) < invalid_distance_value)
+          eulerian_field(i,j,k) = eulerian_field_max;
+}
+
+void IJK_Thermal_base::enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field)
+{
+  double eulerian_field_min = 1.e20;
+  const int nx = eulerian_field.ni();
+  const int ny = eulerian_field.nj();
+  const int nz = eulerian_field.nk();
+  static const double invalid_distance_value = -1.e30;
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        eulerian_field_min = std::min(eulerian_field_min, eulerian_field(i,j,k));
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        if (eulerian_field(i,j,k) < invalid_distance_value)
+          eulerian_field(i,j,k) = eulerian_field_min;
 }
 
 // Convect temperature field by velocity.

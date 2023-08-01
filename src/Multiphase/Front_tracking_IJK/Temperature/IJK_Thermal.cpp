@@ -236,6 +236,17 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  /*
+   * INTERFACIAL AREA
+   */
+  oss << "INTERFACIAL_AREA_" << lata_suffix << idx;
+  Nom nom_interfacial_area(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("INTERFACIAL_AREA") || liste_post_instantanes.contient_(nom_interfacial_area)))
+    {
+      n++, dumplata_scalar(lata_name, nom_interfacial_area, get_interfacial_area(), latastep);
+    }
+  oss.str("");
+
   return n;
 }
 

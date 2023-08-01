@@ -125,6 +125,10 @@ public:
   {
     return eulerian_curvature_ ;
   }
+  const IJK_Field_double& get_interfacial_area() const
+  {
+    return interfacial_area_;
+  }
   const IJK_Field_double& get_temperature_adim_bulles() const
   {
     return temperature_adim_bulles_;
@@ -178,6 +182,13 @@ protected:
   virtual void correct_temperature_for_eulerian_fluxes()=0;
   void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
+  void compute_eulerian_curvature();
+  void compute_eulerian_curvature_from_interface();
+  void enforce_zero_value_eulerian_curvature();
+  void enforce_max_value_eulerian_curvature();
+  void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
+  void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
+  void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
@@ -331,6 +342,7 @@ protected:
   IJK_Field_double eulerian_distance_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_;
   IJK_Field_double eulerian_curvature_;
+  IJK_Field_double interfacial_area_;
   IJK_Field_double eulerian_grad_T_interface_;
 };
 
