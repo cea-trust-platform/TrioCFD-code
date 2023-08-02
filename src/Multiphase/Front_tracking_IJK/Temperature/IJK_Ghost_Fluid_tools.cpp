@@ -185,6 +185,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   /*
    * Compute the normal distance to the interface
    */
+  const bool use_ijk = true;
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "compute_eulerian_normal_distance_field");
   statistiques().begin_count(stat_counter);
 
@@ -207,6 +208,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
 
   // Same splitting for the normal vector field
   const IJK_Splitting& splitting_distance = distance_field.get_splitting();
+  const IJK_Grid_Geometry& geom = splitting_distance.get_grid_geometry();
 
   /*
    * M.G: Copy of B.M from Transport_Interfaces_FT_Disc::calculer_distance_interface
@@ -312,70 +314,121 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
    * Check the how fast it is compared to using elem_faces matrix
    */
   int iteration;
-  for (iteration = 0; iteration < n_iter; iteration++)
+  if (use_ijk)
     {
-      /*
-       * Smoothing iterator, in theory:
-       * normal = normal + (source_term - laplacian(normal)) * factor
-       * converge towards laplacian(normal) = source_term
-       * in practice:
-       * normal = average(normal on neighbours) + source_term
-       */
-      const double un_sur_ncontrib = 1. / (1. + nb_elem_voisins);
-      int elem, i, k;
-      for (elem = 0; elem < nb_elem; elem++)
+      int neighbours_i[6] = NEIGHBOURS_I;
+      int neighbours_j[6] = NEIGHBOURS_J;
+      int neighbours_k[6] = NEIGHBOURS_K;
+      const int ni = normal_vect[0].ni();
+      const int nj = normal_vect[0].nj();
+      const int nk = normal_vect[0].nk();
+      int m;
+      for (iteration = 0; iteration < n_iter; iteration++)
         {
-          // Averaging the normal vector on the neighbours
-          double n[3] = {0., 0., 0.};
-          const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
-          for (i = 0; i < dim; i++)
-            {
-              n[i] = normal_vect[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-            }
-          for (k = 0; k < nb_elem_voisins; k++)
-            {
-              // We look for the neighbour by face k
-              const int face = elem_faces(elem, k);
-              const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
-              const Int3 num_elem_voisin_ijk = splitting_distance.convert_packed_to_ijk_cell(e_voisin);
-              if (e_voisin >= 0) // Not on a boundary
-                for (i = 0; i < dim; i++)
-                  n[i] += normal_vect[i](num_elem_voisin_ijk[DIRECTION_I],num_elem_voisin_ijk[DIRECTION_J],num_elem_voisin_ijk[DIRECTION_K]);
-            }
-          for (i = 0; i < dim; i++)
-            {
-              tmp[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) =
-                terme_src[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) + n[i] * un_sur_ncontrib;
-            }
+          /*
+           * Smoothing iterator, in theory:
+           * normal = normal + (source_term - laplacian(normal)) * factor
+           * converge towards laplacian(normal) = source_term
+           * in practice:
+           * normal = average(normal on neighbours) + source_term
+           */
+
+          const double un_sur_ncontrib = 1. / (1. + nb_elem_voisins);
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
+                {
+                  // Averaging the normal vector on the neighbours
+                  double n[3] = {0., 0., 0.};
+                  for (m = 0; m < dim; m++)
+                    n[m] = normal_vect[m](i,j,k);
+                  for (int l=0; l<6; l++)
+                    {
+                      const int ii = neighbours_i[l];
+                      const int jj = neighbours_j[l];
+                      const int kk = neighbours_k[l];
+                      for (m = 0; m < dim; m++)
+                        n[m] += normal_vect[m](i+ii,j+jj,k+kk);
+                    }
+                  for (m = 0; m < dim; m++)
+                    tmp[m](i,j,k) = terme_src[m](i,j,k) + n[m] * un_sur_ncontrib;
+                }
+          normal_vect = tmp;
+          normal_vect.echange_espace_virtuel();
         }
-      normal_vect = tmp;
-      normal_vect.echange_espace_virtuel();
+    }
+  else
+    {
+      for (iteration = 0; iteration < n_iter; iteration++)
+        {
+          /*
+           * Smoothing iterator, in theory:
+           * normal = normal + (source_term - laplacian(normal)) * factor
+           * converge towards laplacian(normal) = source_term
+           * in practice:
+           * normal = average(normal on neighbours) + source_term
+           */
+          const double un_sur_ncontrib = 1. / (1. + nb_elem_voisins);
+          int elem, i, k;
+          for (elem = 0; elem < nb_elem; elem++)
+            {
+              // Averaging the normal vector on the neighbours
+              double n[3] = {0., 0., 0.};
+              const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
+              for (i = 0; i < dim; i++)
+                {
+                  n[i] = normal_vect[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+                }
+              for (k = 0; k < nb_elem_voisins; k++)
+                {
+                  // We look for the neighbour by face k
+                  const int face = elem_faces(elem, k);
+                  const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                  const Int3 num_elem_voisin_ijk = splitting_distance.convert_packed_to_ijk_cell(e_voisin);
+                  if (e_voisin >= 0) // Not on a boundary
+                    for (i = 0; i < dim; i++)
+                      n[i] += normal_vect[i](num_elem_voisin_ijk[DIRECTION_I],num_elem_voisin_ijk[DIRECTION_J],num_elem_voisin_ijk[DIRECTION_K]);
+                }
+              for (i = 0; i < dim; i++)
+                {
+                  tmp[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) =
+                    terme_src[i](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) + n[i] * un_sur_ncontrib;
+                }
+            }
+          normal_vect = tmp;
+          normal_vect.echange_espace_virtuel();
+        }
     }
   /*
    * We normalise the normal vector and we create a list of elements
    * for whom the normal is known
    */
   ArrOfIntFT liste_elements;
-  {
-    int elem;
-    for (elem = 0; elem < nb_elem; elem++)
-      {
-        const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
-        double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double norme2 = nx*nx + ny*ny + nz*nz;
-        if (norme2 > 0.)
-          {
-            double i_norme = 1. / sqrt(norme2);
-            normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = nx * i_norme;
-            normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = ny * i_norme;
-            normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = nz * i_norme;
-            liste_elements.append_array(elem);
-          }
-      }
-    normal_vect.echange_espace_virtuel(); // This swap is essential
-  }
+  if (!use_ijk)
+    {
+      int elem;
+      for (elem = 0; elem < nb_elem; elem++)
+        {
+          const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
+          double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double norme2 = nx*nx + ny*ny + nz*nz;
+          if (norme2 > 0.)
+            {
+              double i_norme = 1. / sqrt(norme2);
+              normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = nx * i_norme;
+              normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = ny * i_norme;
+              normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = nz * i_norme;
+              liste_elements.append_array(elem);
+            }
+        }
+      normal_vect.echange_espace_virtuel(); // This swap is essential ?
+    }
+  else
+    {
+      normal_vect.echange_espace_virtuel(); // This swap is essential ?
+    }
   // Distance calculation at the interface
   /*
    * TODO: Convert the distance propagation using ijk indexes
@@ -384,87 +437,155 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   IJK_Field_double terme_src_dist(distance_field);
   IJK_Field_double tmp_dist(distance_field);
 
-  for (iteration = 0; iteration < n_iter; iteration++)
+  if (use_ijk)
     {
-      int i_elem, elem;
-      const int liste_elem_size = liste_elements.size_array();
-      for (i_elem = 0; i_elem < liste_elem_size; i_elem++)
+      int neighbours_i[6] = NEIGHBOURS_I;
+      int neighbours_j[6] = NEIGHBOURS_J;
+      int neighbours_k[6] = NEIGHBOURS_K;
+      const int ni = normal_vect[0].ni();
+      const int nj = normal_vect[0].nj();
+      const int nk = normal_vect[0].nk();
+      for (iteration = 0; iteration < n_iter; iteration++)
         {
-          elem = liste_elements[i_elem];
-          const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
-          if (terme_src_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) > invalid_distance_value)
-            {
-              // For all the element already crossed by the interface, the value is not computed again
-              tmp_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = distance_field(num_elem_ijk[DIRECTION_I],
-                                                                                                                         num_elem_ijk[DIRECTION_J],
-                                                                                                                         num_elem_ijk[DIRECTION_K]);
-            }
-          else
-            {
-              // For the others, we compute a distance value per neighbour
-              double ncontrib = 0.;
-              double somme_distances = 0.;
-              int k;
-              for (k = 0; k < nb_elem_voisins; k++)
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
                 {
-                  // Look for a neighbour by the face k
-                  const int face = elem_faces(elem, k);
-                  const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
-                  const Int3 num_elem_voisin_ijk = splitting_distance.convert_packed_to_ijk_cell(e_voisin);
-                  if (e_voisin >= 0) // Not on a boundary
+                  // For all the element already crossed by the interface, the value is not computed again
+                  if (terme_src_dist(i,j,k) > invalid_distance_value)
+                    tmp_dist(i,j,k) = distance_field(i,j,k);
+                  else
                     {
-                      const double distance_voisin = distance_field(num_elem_voisin_ijk[DIRECTION_I],
-                                                                    num_elem_voisin_ijk[DIRECTION_J],
-                                                                    num_elem_voisin_ijk[DIRECTION_K]);
-                      if (distance_voisin > invalid_distance_value)
+                      // For the others, we compute a distance value per neighbour
+                      double ncontrib = 0.;
+                      double somme_distances = 0.;
+                      for (int l = 0; l < 6; l++)
                         {
-                          // Average normal distance between an element and its neighbours
-                          double nx = normal_vect[0](num_elem_ijk[DIRECTION_I],
-                                                     num_elem_ijk[DIRECTION_J],
-                                                     num_elem_ijk[DIRECTION_K]) +
-                                      normal_vect[0](num_elem_voisin_ijk[DIRECTION_I],
-                                                     num_elem_voisin_ijk[DIRECTION_J],
-                                                     num_elem_voisin_ijk[DIRECTION_K]);
-                          double ny = normal_vect[1](num_elem_ijk[DIRECTION_I],
-                                                     num_elem_ijk[DIRECTION_J],
-                                                     num_elem_ijk[DIRECTION_K]) +
-                                      normal_vect[1](num_elem_voisin_ijk[DIRECTION_I],
-                                                     num_elem_voisin_ijk[DIRECTION_J],
-                                                     num_elem_voisin_ijk[DIRECTION_K]);
-                          double nz = normal_vect[2](num_elem_ijk[DIRECTION_I],
-                                                     num_elem_ijk[DIRECTION_J],
-                                                     num_elem_ijk[DIRECTION_K]) +
-                                      normal_vect[2](num_elem_voisin_ijk[DIRECTION_I],
-                                                     num_elem_voisin_ijk[DIRECTION_J],
-                                                     num_elem_voisin_ijk[DIRECTION_K]);
-                          double norm2 = nx*nx + ny*ny + nz*nz;
-                          if (norm2 > 0.)
+                          // Look for a neighbour
+                          const int ii = neighbours_i[l];
+                          const int jj = neighbours_j[l];
+                          const int kk = neighbours_k[l];
+                          const double distance_voisin = distance_field(i+ii, j+jj, k+kk);
+                          if (distance_voisin > invalid_distance_value)
                             {
-                              double i_norm = 1./sqrt(norm2);
-                              nx *= i_norm;
-                              ny *= i_norm;
-                              nz *= i_norm;
+                              // Average normal distance between an element and its neighbours
+                              double nx = normal_vect[0](i,j,k) + normal_vect[0](i+ii, j+jj, k+kk);
+                              double ny = normal_vect[1](i,j,k) + normal_vect[1](i+ii, j+jj, k+kk);
+                              double nz = normal_vect[2](i,j,k) + normal_vect[2](i+ii, j+jj, k+kk);
+                              double norm2 = nx*nx + ny*ny + nz*nz;
+                              if (norm2 > 0.)
+                                {
+                                  double i_norm = 1./sqrt(norm2);
+                                  nx *= i_norm;
+                                  ny *= i_norm;
+                                  nz *= i_norm;
+                                }
+                              // Element to neighbour vector calculation
+                              double dx = - geom.get_constant_delta(DIRECTION_I) * ii;
+                              double dy = - geom.get_constant_delta(DIRECTION_J) * jj;
+                              double dz = - geom.get_constant_delta(DIRECTION_K) * kk;
+                              double d = nx * dx + ny * dy + nz * dz + distance_voisin;
+                              somme_distances += d;
+                              ncontrib++;
                             }
-                          // Element to neighbour vector calculation
-                          double dx = centre_element(elem, 0) - centre_element(e_voisin, 0);
-                          double dy = centre_element(elem, 1) - centre_element(e_voisin, 1);
-                          double dz = centre_element(elem, 2) - centre_element(e_voisin, 2);
-                          double d = nx * dx + ny * dy + nz * dz + distance_voisin;
-                          somme_distances += d;
-                          ncontrib++;
                         }
+                      // Averaging the distances obtained from neighbours
+                      if (ncontrib > 0.)
+                        {
+                          double d = somme_distances / ncontrib;
+                          tmp_dist(i,j,k) = d;
+                        }
+
                     }
                 }
-              // Averaging the distances obtained from neighbours
-              if (ncontrib > 0.)
-                {
-                  double d = somme_distances / ncontrib;
-                  tmp_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = d;
-                }
-            }
         }
       distance_field = tmp_dist;
       distance_field.echange_espace_virtuel(distance_field.ghost());
+    }
+  else
+    {
+      for (iteration = 0; iteration < n_iter; iteration++)
+        {
+          int i_elem, elem;
+          const int liste_elem_size = liste_elements.size_array();
+          for (i_elem = 0; i_elem < liste_elem_size; i_elem++)
+            {
+              elem = liste_elements[i_elem];
+              const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
+              if (terme_src_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) > invalid_distance_value)
+                {
+                  // For all the element already crossed by the interface, the value is not computed again
+                  tmp_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = distance_field(num_elem_ijk[DIRECTION_I],
+                                                                                                                             num_elem_ijk[DIRECTION_J],
+                                                                                                                             num_elem_ijk[DIRECTION_K]);
+                }
+              else
+                {
+                  // For the others, we compute a distance value per neighbour
+                  double ncontrib = 0.;
+                  double somme_distances = 0.;
+                  int k;
+                  for (k = 0; k < nb_elem_voisins; k++)
+                    {
+                      // Look for a neighbour by the face k
+                      const int face = elem_faces(elem, k);
+                      const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                      const Int3 num_elem_voisin_ijk = splitting_distance.convert_packed_to_ijk_cell(e_voisin);
+                      if (e_voisin >= 0) // Not on a boundary
+                        {
+                          const double distance_voisin = distance_field(num_elem_voisin_ijk[DIRECTION_I],
+                                                                        num_elem_voisin_ijk[DIRECTION_J],
+                                                                        num_elem_voisin_ijk[DIRECTION_K]);
+                          if (distance_voisin > invalid_distance_value)
+                            {
+                              // Average normal distance between an element and its neighbours
+                              double nx = normal_vect[0](num_elem_ijk[DIRECTION_I],
+                                                         num_elem_ijk[DIRECTION_J],
+                                                         num_elem_ijk[DIRECTION_K]) +
+                                          normal_vect[0](num_elem_voisin_ijk[DIRECTION_I],
+                                                         num_elem_voisin_ijk[DIRECTION_J],
+                                                         num_elem_voisin_ijk[DIRECTION_K]);
+                              double ny = normal_vect[1](num_elem_ijk[DIRECTION_I],
+                                                         num_elem_ijk[DIRECTION_J],
+                                                         num_elem_ijk[DIRECTION_K]) +
+                                          normal_vect[1](num_elem_voisin_ijk[DIRECTION_I],
+                                                         num_elem_voisin_ijk[DIRECTION_J],
+                                                         num_elem_voisin_ijk[DIRECTION_K]);
+                              double nz = normal_vect[2](num_elem_ijk[DIRECTION_I],
+                                                         num_elem_ijk[DIRECTION_J],
+                                                         num_elem_ijk[DIRECTION_K]) +
+                                          normal_vect[2](num_elem_voisin_ijk[DIRECTION_I],
+                                                         num_elem_voisin_ijk[DIRECTION_J],
+                                                         num_elem_voisin_ijk[DIRECTION_K]);
+                              double norm2 = nx*nx + ny*ny + nz*nz;
+                              if (norm2 > 0.)
+                                {
+                                  double i_norm = 1./sqrt(norm2);
+                                  nx *= i_norm;
+                                  ny *= i_norm;
+                                  nz *= i_norm;
+                                }
+                              // Element to neighbour vector calculation
+                              double dx = centre_element(elem, 0) - centre_element(e_voisin, 0);
+                              double dy = centre_element(elem, 1) - centre_element(e_voisin, 1);
+                              double dz = centre_element(elem, 2) - centre_element(e_voisin, 2);
+                              double d = nx * dx + ny * dy + nz * dz + distance_voisin;
+                              somme_distances += d;
+                              ncontrib++;
+                            }
+                        }
+                    }
+                  // Averaging the distances obtained from neighbours
+                  if (ncontrib > 0.)
+                    {
+                      double d = somme_distances / ncontrib;
+                      tmp_dist(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = d;
+                    }
+                }
+            }
+          distance_field = tmp_dist;
+          distance_field.echange_espace_virtuel(distance_field.ghost());
+        }
     }
   statistiques().end_count(stat_counter);
 }
@@ -527,7 +648,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
    * From IJK_Interfaces::calculer_normales_et_aires_interfaciales
    * Called in update_stat_ft IJK_FT through an instance of IJK_FT_Post !!!!!
    */
-
+  const bool use_ijk = true;
   // Vertex coordinates of the eulerian domain
   interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
   curvature.echange_espace_virtuel(curvature.ghost());
@@ -593,6 +714,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
     }
   interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
   curvature.echange_espace_virtuel(curvature.ghost());
+
   {
     const int nx = curvature.ni();
     const int ny = curvature.nj();
@@ -610,6 +732,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
                   {
                     Cerr << "Interfacial_area is very much at zero... Pathological case to be looked into closely. " << finl;
                     Cerr << "Curvature is set to invalid value to be overwritten by its neighbours" << finl;
+                    // Be careful if the distance is not calculated well the spreading algorithm will not work
                     curvature(i,j,k) = invalid_curvature_value * 1.1;
                     // Process::exit();
                   }
@@ -625,22 +748,19 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
 
   // Get back the cells filled with non-zero normal vectors
   ArrOfIntFT liste_elements;
-  {
-    for (int elem = 0; elem < nb_elem; elem++)
-      {
-        const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
-        double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-        double norme2 = nx*nx + ny*ny + nz*nz;
-        if (norme2 > 0.)
-          liste_elements.append_array(elem);
-      }
-  }
-  const IntTab& face_voisins = domaine_vf.face_voisins();
-  const IntTab& elem_faces   = domaine_vf.elem_faces();
-  const int nb_elem_voisins = elem_faces.line_size();
-
+  if (!use_ijk)
+    {
+      for (int elem = 0; elem < nb_elem; elem++)
+        {
+          const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
+          double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+          double norme2 = nx*nx + ny*ny + nz*nz;
+          if (norme2 > 0.)
+            liste_elements.append_array(elem);
+        }
+    }
   // Curvature calculation at the interface
   IJK_Field_double terme_src_curv(curvature);
   IJK_Field_double tmp_curv(curvature);
@@ -649,58 +769,109 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
    * TODO: Convert the kappa propagation using ijk indexes
    * Check the how fast it is compared to using elem_faces matrix
    */
-
-  for (int iteration = 0; iteration < n_iter; iteration++)
+  if (use_ijk)
     {
-      int i_elem, elem;
-      const int liste_elem_size = liste_elements.size_array();
-      for (i_elem = 0; i_elem < liste_elem_size; i_elem++)
+      int neighbours_i[6] = NEIGHBOURS_I;
+      int neighbours_j[6] = NEIGHBOURS_J;
+      int neighbours_k[6] = NEIGHBOURS_K;
+      const int ni = normal_vect[0].ni();
+      const int nj = normal_vect[0].nj();
+      const int nk = normal_vect[0].nk();
+      for (int iteration = 0; iteration < n_iter; iteration++)
         {
-          elem = liste_elements[i_elem];
-          const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
-          if (terme_src_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) > invalid_curvature_value)
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
+                // For all the element already crossed by the interface, the value is not computed again
+                if (terme_src_curv(i,j,k) > invalid_curvature_value)
+                  tmp_curv(i,j,k) = curvature(i,j,k);
+                else
+                  {
+                    // For the others, we compute a distance value per neighbour
+                    double ncontrib = 0.;
+                    double sum_kappa = 0.;
+                    for (int l = 0; l < 6; l++)
+                      {
+                        // Look for a neighbour
+                        const int ii = neighbours_i[l];
+                        const int jj = neighbours_j[l];
+                        const int kk = neighbours_k[l];
+                        const double curvature_voisin = curvature(i+ii,j+jj,k+kk);
+                        if (curvature_voisin > invalid_curvature_value)
+                          {
+                            // Average normal distance between an element and its neighbours
+                            sum_kappa += curvature_voisin;
+                            ncontrib++;
+                          }
+                      }
+                    // Averaging the distances obtained from neighbours
+                    if (ncontrib > 0.)
+                      {
+                        double kappa = sum_kappa / ncontrib;
+                        tmp_curv(i,j,k) = kappa;
+                      }
+                  }
+          curvature = tmp_curv;
+          curvature.echange_espace_virtuel(curvature.ghost());
+        }
+    }
+  else
+    {
+      const IntTab& face_voisins = domaine_vf.face_voisins();
+      const IntTab& elem_faces   = domaine_vf.elem_faces();
+      const int nb_elem_voisins = elem_faces.line_size();
+      for (int iteration = 0; iteration < n_iter; iteration++)
+        {
+          int i_elem, elem;
+          const int liste_elem_size = liste_elements.size_array();
+          for (i_elem = 0; i_elem < liste_elem_size; i_elem++)
             {
-              // For all the element already crossed by the interface, the value is not computed again
-              tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = curvature(num_elem_ijk[DIRECTION_I],
-                                                                                                                    num_elem_ijk[DIRECTION_J],
-                                                                                                                    num_elem_ijk[DIRECTION_K]);
-            }
-          else
-            {
-              // For the others, we compute a distance value per neighbour
-              double ncontrib = 0.;
-              double sum_kappa = 0.;
-              int k;
-              for (k = 0; k < nb_elem_voisins; k++)
+              elem = liste_elements[i_elem];
+              const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
+              if (terme_src_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) > invalid_curvature_value)
                 {
-                  // Look for a neighbour by the face k
-                  const int face = elem_faces(elem, k);
-                  const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
-                  const Int3 num_elem_voisin_ijk = splitting_curvature.convert_packed_to_ijk_cell(e_voisin);
-                  if (e_voisin >= 0) // Not on a boundary
+                  // For all the element already crossed by the interface, the value is not computed again
+                  tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = curvature(num_elem_ijk[DIRECTION_I],
+                                                                                                                        num_elem_ijk[DIRECTION_J],
+                                                                                                                        num_elem_ijk[DIRECTION_K]);
+                }
+              else
+                {
+                  // For the others, we compute a distance value per neighbour
+                  double ncontrib = 0.;
+                  double sum_kappa = 0.;
+                  int k;
+                  for (k = 0; k < nb_elem_voisins; k++)
                     {
-                      const double curvature_voisin = curvature(num_elem_voisin_ijk[DIRECTION_I],
-                                                                num_elem_voisin_ijk[DIRECTION_J],
-                                                                num_elem_voisin_ijk[DIRECTION_K]);
-                      if (curvature_voisin > invalid_curvature_value)
+                      // Look for a neighbour by the face k
+                      const int face = elem_faces(elem, k);
+                      const int e_voisin = face_voisins(face, 0) + face_voisins(face, 1) - elem;
+                      const Int3 num_elem_voisin_ijk = splitting_curvature.convert_packed_to_ijk_cell(e_voisin);
+                      if (e_voisin >= 0) // Not on a boundary
                         {
-                          // Average normal distance between an element and its neighbours
+                          const double curvature_voisin = curvature(num_elem_voisin_ijk[DIRECTION_I],
+                                                                    num_elem_voisin_ijk[DIRECTION_J],
+                                                                    num_elem_voisin_ijk[DIRECTION_K]);
+                          if (curvature_voisin > invalid_curvature_value)
+                            {
+                              // Average normal distance between an element and its neighbours
 
-                          sum_kappa += curvature_voisin;
-                          ncontrib++;
+                              sum_kappa += curvature_voisin;
+                              ncontrib++;
+                            }
                         }
                     }
-                }
-              // Averaging the distances obtained from neighbours
-              if (ncontrib > 0.)
-                {
-                  double kappa = sum_kappa / ncontrib;
-                  tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = kappa;
+                  // Averaging the distances obtained from neighbours
+                  if (ncontrib > 0.)
+                    {
+                      double kappa = sum_kappa / ncontrib;
+                      tmp_curv(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = kappa;
+                    }
                 }
             }
+          curvature = tmp_curv;
+          curvature.echange_espace_virtuel(curvature.ghost());
         }
-      curvature = tmp_curv;
-      curvature.echange_espace_virtuel(curvature.ghost());
     }
 }
 
@@ -714,13 +885,16 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
    * Compute the normal temperature gradient at the bubble interface
    * Write in the ijk manner !
    */
+  int neighbours_i[6] = NEIGHBOURS_I;
+  int neighbours_j[6] = NEIGHBOURS_J;
+  int neighbours_k[6] = NEIGHBOURS_K;
   static const double invalid_value = INVALID_TEST;
   static const double liquid_indicator = LIQUID_INDICATOR_TEST;
   const int ni = temperature.ni();
   const int nj = temperature.nj();
   const int nk = temperature.nk();
+  //  grad_T_interface.data() = 1.1 * invalid_value;
   grad_T_interface.data() = 0.;
-//  grad_T_interface.data() = 1.1 * invalid_value;
   grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -728,26 +902,22 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
         {
           const double ai = interfacial_area(i,j,k);
           if (ai > invalid_value)
-            for (int ii=-1; ii < 2; ii++)
-              for (int jj=-1; jj < 2; jj++)
-                for (int kk=-1; kk < 2; kk++)
-                  {
-                    const int x_dir = (ii!=0 && jj==0 && kk==0);
-                    const int y_dir = (jj!=0 && ii==0 && kk==0);
-                    const int z_dir = (kk!=0 && ii==0 && jj==0);
-                    //                  if (ii!=0 && jj!=0 && kk!=0)
-                    if (x_dir || y_dir || z_dir)
-                      {
-                        const double d = distance(i+ii,j+jj,k+kk);
-                        const double indic = indicator(i+ii,j+jj,k+kk);
-                        if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
+            {
+              for (int l=0; l < 6; l++)
+                {
+                  const int ii = neighbours_i[l];
+                  const int jj = neighbours_j[l];
+                  const int kk = neighbours_k[l];
+                  const double d = distance(i+ii,j+jj,k+kk);
+                  const double indic = indicator(i+ii,j+jj,k+kk);
 //                        if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) < invalid_value)
-                          {
-                            const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
-                            grad_T_interface(i+ii,j+jj,k+kk) = temperature_liquid / d;
-                          }
-                      }
-                  }
+                  if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
+                    {
+                      const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
+                      grad_T_interface(i+ii,j+jj,k+kk) = temperature_liquid / d;
+                    }
+                }
+            }
         }
   grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
   /*
