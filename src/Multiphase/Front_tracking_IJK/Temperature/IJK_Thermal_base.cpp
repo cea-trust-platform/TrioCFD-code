@@ -98,6 +98,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   compute_grad_T_interface_ = 0;
   compute_curvature_ = 0;
   compute_distance_= 0;
+  ghost_fluid_ = 0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -204,6 +205,7 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
   os << "nb_diam_upstream" << nb_diam_upstream_;
   os << "side_temperature" << side_temperature_;
   os << "stencil_side" << stencil_side_;
+  os << "    ghost_fluid" <<  " " << ghost_fluid_ << "\n";
 
   os<< "  }\n";
   return os;
@@ -251,9 +253,8 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
   param.ajouter("upstream_temperature", &upstream_temperature_);
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
-  param.ajouter_flag("side_temperature", &side_temperature_);
-  param.ajouter("stencil_side", &stencil_side_);
   param.ajouter("n_iter_distance", &n_iter_distance_);
+  param.ajouter_flag("ghost_fluid", &ghost_fluid_);
 }
 
 /********************************************
@@ -433,7 +434,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       nalloc += 3;
     }
 
-  compute_grad_T_interface_ = compute_grad_T_interface_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("GRAD_T_INTERFACE"));
+  compute_grad_T_interface_ = ghost_fluid_ || compute_grad_T_interface_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("GRAD_T_INTERFACE"));
   compute_curvature_ = compute_curvature_ || compute_grad_T_interface_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("CURVATURE"));
   compute_distance_ = compute_distance_ || compute_curvature_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("DISTANCE"));
   if (compute_distance_)
@@ -624,24 +625,24 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double current_time = ref_ijk_ft_->get_current_time();
   const double ene_ini = compute_global_energy(d_temperature_);
 
+  // Correct the vapour and mixed cells values
+  correct_temperature_for_eulerian_fluxes();
   /*
    * Correct the temperature field using either the ghost-fluid
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
   compute_eulerian_distance();
-
-  //  compute_eulerian_curvature();
   compute_eulerian_curvature_from_interface();
-  //  enforce_zero_value_eulerian_curvature();
   compute_eulerian_grad_T_interface();
-  //  propagate_grad_T_interface();
-  //  evaluate_temperature_extension();
+  propagate_eulerian_grad_T_interface();
+  compute_eulerian_temperature_ghost();
 
+  /*
+   * For post-processing purposes
+   */
   enforce_zero_value_eulerian_distance();
   enforce_max_value_eulerian_curvature();
   enforce_max_value_eulerian_field(interfacial_area_);
-
-  correct_temperature_for_eulerian_fluxes();
 
   double nb_diam_upstream_velocity = ref_ijk_ft_->get_nb_diam_upstream();
   if (nb_diam_upstream_ == 0.)
@@ -650,7 +651,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
     force_upstream_temperature(temperature_, upstream_temperature_,
                                ref_ijk_ft_->get_interface(), nb_diam_upstream_,
                                ref_ijk_ft_->get_upstream_dir(), ref_ijk_ft_->get_direction_gravite(),
-                               ref_ijk_ft_->get_upstream_stencil(), side_temperature_, stencil_side_);
+                               ref_ijk_ft_->get_upstream_stencil());
 
   compute_temperature_convection(velocity);
 
@@ -788,6 +789,41 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
     }
   else
     Cerr << "Don't compute the grad_T_interface field" << finl;
+}
+
+void IJK_Thermal_base::propagate_eulerian_grad_T_interface()
+{
+  if (compute_grad_T_interface_)
+    {
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      propagate_eulerian_normal_temperature_gradient_interface(ref_ijk_ft_->itfce(),
+                                                               eulerian_distance_,
+                                                               eulerian_grad_T_interface_,
+                                                               n_iter_distance_);
+    }
+  else
+    Cerr << "Don't compute the grad_T_interface field" << finl;
+}
+
+void IJK_Thermal_base::compute_eulerian_temperature_ghost()
+{
+  if (ghost_fluid_)
+    {
+      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
+      eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
+      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
+      compute_eulerian_extended_temperature(ref_ijk_ft_->itfce().I_ft(),
+                                            eulerian_distance_,
+                                            eulerian_curvature_,
+                                            eulerian_grad_T_interface_,
+                                            temperature_ft_);
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(temperature_ft_, temperature_);
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+    }
+  else
+    Cerr << "Don't compute the ghost temperature field" << finl;
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)
@@ -1841,8 +1877,7 @@ void IJK_Thermal_base::compute_interfacial_temperature2(ArrOfDouble& interfacial
 void IJK_Thermal_base::force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
                                                   const IJK_Interfaces& interfaces, double nb_diam,
                                                   int upstream_dir, int gravity_dir,
-                                                  int upstream_stencil, int side_temperature,
-                                                  int stencil_side)
+                                                  int upstream_stencil)
 {
   int dir = 0;
   if (upstream_dir == -1)
@@ -1902,8 +1937,7 @@ void IJK_Thermal_base::force_upstream_temperature(IJK_Field_double& temperature,
       ndir = temperature.ni();
       break;
     }
-  Cerr << "index_dir " << index_dir << finl;
-
+  // Cerr << "index_dir " << index_dir << finl;
   if ((index_dir >=0) && (index_dir < ndir))
     {
       // On est sur le bon proc...

@@ -191,6 +191,8 @@ protected:
   void enforce_zero_value_eulerian_curvature();
   void enforce_max_value_eulerian_curvature();
   void compute_eulerian_grad_T_interface();
+  void propagate_eulerian_grad_T_interface();
+  void compute_eulerian_temperature_ghost();
   void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
@@ -216,8 +218,7 @@ protected:
 
   void force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
                                   const IJK_Interfaces& interfaces, double nb_diam, int upstream_dir,
-                                  int gravity_dir, int upstream_stencil,
-                                  int side_temperature, int stencil_side);
+                                  int gravity_dir, int upstream_stencil);
 
   /*
    * Patch to conserve energy
@@ -336,10 +337,11 @@ protected:
   double global_energy_;
   int calulate_grad_T_;
   int rho_cp_post_;
+
   /*
    * For Ghost fluid method
    */
-
+  int ghost_fluid_;
   int n_iter_distance_;
   int compute_distance_;
   int compute_curvature_;

@@ -68,7 +68,6 @@ protected :
   int diffusion_flux_correction_;
   int convective_flux_correction_;
 
-  int ghost_fluid_;
   int override_vapour_mixed_values_; // For debug purposes
 
 };

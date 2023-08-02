@@ -925,7 +925,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
   const IJK_Splitting& splitting = vx.get_splitting();
   const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
 
-  bool perio =  geom.get_periodic_flag(dir);
+  bool perio = geom.get_periodic_flag(dir);
 
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
@@ -936,7 +936,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
   const double ldir = geom.get_domain_length(dir) ;
   if (nb_diam == 0.)
     nb_diam = (ldir/Dbdir) / 2;
-  double dirobj = dirb + nb_diam*Dbdir;
+  double dirobj = dirb + nb_diam * Dbdir;
 
   // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
   const double ddir = geom.get_constant_delta(dir);
@@ -955,7 +955,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
   // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
   assert( ((dirobj>=origin_dir) && (dirobj <= origin_dir+ldir) ));
 
-  const double x2 = (dirobj-origin_dir)/ ddir;
+  const double x2 = (dirobj - origin_dir)/ ddir;
   int index_dir = (int)(floor(x2)) - offset_dir; // C'est l'index local, donc potentiellement negatif...
   int ndir;
   switch(dir)
@@ -973,8 +973,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
       ndir = vx.ni();
       break;
     }
-  Cerr << "index_dir " << index_dir << finl;
-
+  // Cerr << "index_dir " << index_dir << finl;
   if ((index_dir >=0) && (index_dir < ndir))
     {
       // On est sur le bon proc...
@@ -4871,3 +4870,8 @@ void IJK_FT_double::redistribute_to_splitting_ft_elem(const IJK_Field_double& in
   redistribute_to_splitting_ft_elem_.redistribute(input_field, output_field);
 }
 
+void IJK_FT_double::redistribute_from_splitting_ft_elem(const IJK_Field_double& input_field,
+                                                        IJK_Field_double& output_field)
+{
+  redistribute_from_splitting_ft_elem_.redistribute(input_field, output_field);
+}

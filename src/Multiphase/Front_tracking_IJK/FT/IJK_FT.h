@@ -246,6 +246,9 @@ public :
   void redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,
                                          IJK_Field_double& output_field);
 
+  void redistribute_from_splitting_ft_elem(const IJK_Field_double& input_field,
+                                           IJK_Field_double& output_field);
+
 protected :
   // Interdit constructeur par copie et operateur copie
   IJK_FT_double(const IJK_FT_double& x);

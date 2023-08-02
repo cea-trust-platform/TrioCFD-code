@@ -34,7 +34,6 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
   convective_flux_correction_ = 0;
   diffusion_flux_correction_ = 0;
-  ghost_fluid_ = 0;
   override_vapour_mixed_values_ = 0;
 }
 
@@ -44,7 +43,6 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
   os << "  {\n";
   os << "    convective_flux_correction" <<  " " << convective_flux_correction_ << "\n";
   os << "    diffusion_flux_correction" <<  " " << diffusion_flux_correction_ << "\n";
-  os << "    ghost_fluid" <<  " " << ghost_fluid_ << "\n";
   os << "    override_vapour_mixed_values" <<  " " << override_vapour_mixed_values_ << "\n";
   os << "  \n}";
   return os;
@@ -53,6 +51,8 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
 Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 {
   IJK_Thermal_base::readOn( is );
+  if (ghost_fluid_)
+    override_vapour_mixed_values_ = 1;
   return is;
 }
 
@@ -61,7 +61,6 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   IJK_Thermal_base::set_param(param);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
   param.ajouter_flag("diffusion_flux_correction", &diffusion_flux_correction_);
-  param.ajouter_flag("ghost_fluid", &ghost_fluid_);
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
 }
 
@@ -74,8 +73,6 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   //  calulate_grad_T_ = 1;
   // TODO: Reused grad T calculation
   calulate_grad_T_=0;
-  // TODO: Implement ghost fluid if necessary
-  ghost_fluid_ = 0;
   /*
    * Be careful, it plays a role for allocating the fields in
    * IJK_Thermal_base::initialize
@@ -140,30 +137,23 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
 
 void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
 {
-  if (!ghost_fluid_)
+  if (override_vapour_mixed_values_)
     {
-      if (override_vapour_mixed_values_)
-        {
-          const int ni = temperature_.ni();
-          const int nj = temperature_.nj();
-          const int nk = temperature_.nk();
-          for (int k = 0; k < nk; k++)
-            for (int j = 0; j < nj; j++)
-              for (int i = 0; i < ni; i++)
-                {
-                  const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-                  if (std::fabs(1.-indic)>1.e-8) // Mixed cells and pure vapour cells
-                    { temperature_(i,j,k) = 0; }
-                }
-        }
+      const int ni = temperature_.ni();
+      const int nj = temperature_.nj();
+      const int nk = temperature_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+              if (fabs(1.-indic)>1.e-8) // Mixed cells and pure vapour cells
+                { temperature_(i,j,k) = 0; }
+            }
+    }
 // TODO: Temperature sub-resolution (Weak coupling)
 //			else
 //				{
 //
 //				}
-    }
-  else
-    {
-
-    }
 }

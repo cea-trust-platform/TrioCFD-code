@@ -23,6 +23,14 @@
 #include <IJK_Interfaces.h>
 #include <Maillage_FT_IJK.h>
 
+#define INVALID_TEST -1.e30
+#define LIQUID_INDICATOR_TEST 1.-1.e-8
+#define VAPOUR_INDICATOR_TEST 1.e-8
+#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
+#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class IJK_Ghost_Fluid_tools
@@ -61,13 +69,12 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                                                             IJK_Field_double& grad_T_interface);
 
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
-                                                              const IJK_Field_double& interfacial_area,
                                                               const IJK_Field_double& distance,
-                                                              IJK_Field_double& temperature,
+                                                              IJK_Field_double& grad_T_interface,
                                                               const int stencil_width);
 
-void compute_eulerian_extended_temperature(const IJK_Field_double& grad_T_int,
-                                           const IJK_Field_double& temperature,
-                                           const IJK_Field_double& curvature,
+void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
-                                           int taylor_expansion_order);
+                                           const IJK_Field_double& curvature,
+                                           const IJK_Field_double& grad_T_interface,
+                                           IJK_Field_double& temperature);

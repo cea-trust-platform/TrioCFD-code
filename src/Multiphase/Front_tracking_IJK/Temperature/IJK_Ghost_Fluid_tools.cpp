@@ -31,18 +31,19 @@ static int decoder_numero_bulle(const int code)
   return num_bulle;
 }
 
-static void extrapolate(const Domaine_VF& domaine_vf,
-                        const IJK_Field_double& interfacial_area,
-                        const IJK_Field_double& distance,
-                        IJK_Field_double& field,
-                        const int stencil_width)
+static void extrapolate_with_elem_faces_connectivity(const Domaine_VF& domaine_vf,
+                                                     const IJK_Field_double& distance,
+                                                     IJK_Field_double& field,
+                                                     const int stencil_width)
 {
-  const double invalid_test = -1.e30;
+  const double invalid_test = INVALID_TEST;
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_faces_elem = elem_faces.dimension(1);
   const int nb_elem = elem_faces.dimension(0);
   IJK_Field_double field_old;
+  // Use to locate the initial non-zero values
+  IJK_Field_double field_ini(field);
   const IJK_Splitting& splitting_distance = distance.get_splitting();
   /*
    * n_iterations = stencil_width is the minimum to get a propagation of information from the interface to the border
@@ -51,6 +52,7 @@ static void extrapolate(const Domaine_VF& domaine_vf,
   const double n_iterations = 5 * stencil_width;
   for (int iteration = 0; iteration < n_iterations; iteration++)
     {
+      // Necessary !!!
       // Copy the old field value as we do not want to use the current iteration values.
       field_old = field;
       // La valeur sur un element est la moyenne des valeurs sur les elements voisins
@@ -62,10 +64,15 @@ static void extrapolate(const Domaine_VF& domaine_vf,
           const double d = distance(num_elem_ijk[DIRECTION_I],
                                     num_elem_ijk[DIRECTION_J],
                                     num_elem_ijk[DIRECTION_K]);
-          const double interfacial_area_elem = interfacial_area(num_elem_ijk[DIRECTION_I],
-                                                                num_elem_ijk[DIRECTION_J],
-                                                                num_elem_ijk[DIRECTION_K]);
-          if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
+//          const double interfacial_area_elem = interfacial_area(num_elem_ijk[DIRECTION_I],
+//                                                                num_elem_ijk[DIRECTION_J],
+//                                                                num_elem_ijk[DIRECTION_K]);
+          // Need a value of distance but don't overwrite the first calculated value
+//          if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
+          const double field_ini_val = field_ini(num_elem_ijk[DIRECTION_I],
+                                                 num_elem_ijk[DIRECTION_J],
+                                                 num_elem_ijk[DIRECTION_K]);
+          if ((d > invalid_test) && (field_ini_val == 0))
             {
               double sum_field = 0.;
               double coeff = 0.;
@@ -83,19 +90,20 @@ static void extrapolate(const Domaine_VF& domaine_vf,
                       const double distance_neighbour = distance(num_elem_neighbour_ijk[DIRECTION_I],
                                                                  num_elem_neighbour_ijk[DIRECTION_J],
                                                                  num_elem_neighbour_ijk[DIRECTION_K]);
+                      // Don't use zero values
+//                      if ((distance_neighbour > invalid_test) && (field_neighbour != 0))
+                      // Use zero_values grad_T_ decreasing with distance
                       if (distance_neighbour > invalid_test)
                         {
                           // Give more weight in the smoothing to values closer to the interface:
-                          if (fabs(distance_neighbour) < -1.e30)
+                          if (fabs(distance_neighbour) < INVALID_TEST)
                             {
                               Cerr << "Distance is very much at zero whereas interfacial_area is zero too... Pathological case to be looked into closely. " << finl;
-                              Cerr << "Is it from a Break-up or coalescence? " << finl;
-                              Cerr << "see Convection_Diffusion_Temperature_FT_Disc and static void extrapolate" << finl;
                               Cerr << "Contact TRUST support." << finl;
                               Process::exit();
                             }
                           /*
-                           * TODO: Check the difference between extrapolate_champ_elem
+                           * TODO: Check the difference between extrapoler_champ_elem
                            * and extrapolate from Convection_Diffusion_Temperature_FT_Disc.cpp
                            */
 //                          const double inv_distance_squared = 1./ (distance_neighbour * distance_neighbour);
@@ -107,11 +115,64 @@ static void extrapolate(const Domaine_VF& domaine_vf,
                     }
                 }
               if (coeff > 0.)
-                field(num_elem_ijk[DIRECTION_I],
-                      num_elem_ijk[DIRECTION_J],
-                      num_elem_ijk[DIRECTION_K]) = sum_field / coeff;
+                {
+                  field(num_elem_ijk[DIRECTION_I],
+                        num_elem_ijk[DIRECTION_J],
+                        num_elem_ijk[DIRECTION_K]) = sum_field / coeff;
+                }
             }
         }
+      field.echange_espace_virtuel(field.ghost());
+    }
+}
+
+static void extrapolate_with_ijk_indices(const IJK_Field_double& distance,
+                                         IJK_Field_double& field,
+                                         const int stencil_width)
+{
+  int neighbours_i[6] = NEIGHBOURS_I;
+  int neighbours_j[6] = NEIGHBOURS_J;
+  int neighbours_k[6] = NEIGHBOURS_K;
+  const double invalid_test = INVALID_TEST;
+  const double n_iterations = 5 * stencil_width;
+  const int ni = field.ni();
+  const int nj = field.nj();
+  const int nk = field.nk();
+  IJK_Field_double field_old;
+  IJK_Field_double field_ini = field;
+  for (int iteration = 0; iteration < n_iterations; iteration++)
+    {
+      field_old = field;
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double d = distance(i,j,k);
+              const double field_ini_val = field_ini(i,j,k);
+              if ((d > invalid_test) && (field_ini_val == 0))
+                {
+                  double sum_field = 0.;
+                  double coeff = 0.;
+                  for (int l=0; l<6; l++)
+                    {
+                      const int ii = neighbours_i[l];
+                      const int jj = neighbours_j[l];
+                      const int kk = neighbours_k[l];
+                      const double distance_neighbour = distance(i+ii,j+jj,k+kk);
+                      const double field_neighbour = field_old(i+ii,j+jj,k+kk);
+                      // Don't use zero values
+//										if ((distance_neighbour > invalid_test) && field_neighbour != 0))
+                      // Use zero_values grad_T_ decreasing with distance
+                      if (distance_neighbour > invalid_test)
+                        {
+                          sum_field += field_neighbour;
+                          coeff++;
+                        }
+                    }
+                  if (coeff > 0.)
+                    field(i,j,k) = sum_field / coeff;
+                }
+            }
       field.echange_espace_virtuel(field.ghost());
     }
 }
@@ -127,7 +188,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "compute_eulerian_normal_distance_field");
   statistiques().begin_count(stat_counter);
 
-  static const double invalid_distance_value = -1.e30;
+  static const double invalid_distance_value = INVALID_TEST;
   const int dim = 3; // in IJK
 
   // Vertex coordinates of the eulerian domain
@@ -246,6 +307,10 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   const int nb_elem_voisins = elem_faces.line_size();
 
   // Normal vector calculation at the element location:
+  /*
+   * TODO: Convert the normal vector propagation using ijk indexes
+   * Check the how fast it is compared to using elem_faces matrix
+   */
   int iteration;
   for (iteration = 0; iteration < n_iter; iteration++)
     {
@@ -312,6 +377,10 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
     normal_vect.echange_espace_virtuel(); // This swap is essential
   }
   // Distance calculation at the interface
+  /*
+   * TODO: Convert the distance propagation using ijk indexes
+   * Check the how fast it is compared to using elem_faces matrix
+   */
   IJK_Field_double terme_src_dist(distance_field);
   IJK_Field_double tmp_dist(distance_field);
 
@@ -416,6 +485,7 @@ void compute_eulerian_curvature_field_from_distance_field(const IJK_Field_double
   /*
    * Compute the divergence of the normal vector field or the laplacian of the eulerian distance field
    */
+
   // Laplacian operator
   Operateur_IJK_elem_diff laplacian_distance;
   laplacian_distance.typer_diffusion_op("uniform");
@@ -465,7 +535,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "compute_eulerian_curvature_field_from_interface");
   statistiques().begin_count(stat_counter);
 
-  static const double invalid_curvature_value = -1.e30;
+  static const double invalid_curvature_value = INVALID_TEST;
 
   interfacial_area.data() = invalid_curvature_value * 1.1;
   curvature.data() = invalid_curvature_value * 1.1;
@@ -530,8 +600,25 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
     for (int k=0; k < nz ; k++)
       for (int j=0; j< ny; j++)
         for (int i=0; i < nx; i++)
-          if (curvature(i,j,k) > invalid_curvature_value)
-            curvature(i,j,k) /= interfacial_area(i,j,k);
+          {
+            const double kappa = curvature(i,j,k);
+            const double ai = interfacial_area(i,j,k);
+            // TODO: Why do I get a floating point exception ?
+            if ((kappa > invalid_curvature_value) && (ai > invalid_curvature_value))
+              {
+                if (fabs(ai) < DMINFLOAT)
+                  {
+                    Cerr << "Interfacial_area is very much at zero... Pathological case to be looked into closely. " << finl;
+                    Cerr << "Curvature is set to invalid value to be overwritten by its neighbours" << finl;
+                    curvature(i,j,k) = invalid_curvature_value * 1.1;
+                    // Process::exit();
+                  }
+                else
+                  {
+                    curvature(i,j,k) = kappa / ai;
+                  }
+              }
+          }
   }
   interfacial_area.echange_espace_virtuel(interfacial_area.ghost());
   curvature.echange_espace_virtuel(curvature.ghost());
@@ -557,6 +644,11 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
   // Curvature calculation at the interface
   IJK_Field_double terme_src_curv(curvature);
   IJK_Field_double tmp_curv(curvature);
+
+  /*
+   * TODO: Convert the kappa propagation using ijk indexes
+   * Check the how fast it is compared to using elem_faces matrix
+   */
 
   for (int iteration = 0; iteration < n_iter; iteration++)
     {
@@ -622,12 +714,13 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
    * Compute the normal temperature gradient at the bubble interface
    * Write in the ijk manner !
    */
-  static const double invalid_value = -1.e30;
-  static const double liquid_indicator = 1 - 1e-8;
+  static const double invalid_value = INVALID_TEST;
+  static const double liquid_indicator = LIQUID_INDICATOR_TEST;
   const int ni = temperature.ni();
   const int nj = temperature.nj();
   const int nk = temperature.nk();
   grad_T_interface.data() = 0.;
+//  grad_T_interface.data() = 1.1 * invalid_value;
   grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -648,6 +741,7 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                         const double d = distance(i+ii,j+jj,k+kk);
                         const double indic = indicator(i+ii,j+jj,k+kk);
                         if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
+//                        if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) < invalid_value)
                           {
                             const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
                             grad_T_interface(i+ii,j+jj,k+kk) = temperature_liquid / d;
@@ -662,40 +756,55 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
 }
 
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
-                                                              const IJK_Field_double& interfacial_area,
                                                               const IJK_Field_double& distance,
-                                                              IJK_Field_double& temperature,
+                                                              IJK_Field_double& grad_T_interface,
                                                               const int stencil_width)
 {
   /*
    * Propagate value of grad_T_int stored in pure liquid phase towards the vapour phase and mixed cells
    */
-  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
-  extrapolate(domaine_vf, interfacial_area, distance, temperature, stencil_width);
-//  ArrOfIntFT liste_elements;
-//  {
-//    for (int elem = 0; elem < nb_elem; elem++)
-//      {
-//        const Int3 num_elem_ijk = splitting_curvature.convert_packed_to_ijk_cell(elem);
-//        double nx = normal_vect[0](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-//        double ny = normal_vect[1](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-//        double nz = normal_vect[2](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
-//        double norme2 = nx*nx + ny*ny + nz*nz;
-//        if (norme2 > 0.)
-//          liste_elements.append_array(elem);
-//      }
-//  }
+  const bool use_ijk = true;
+  if (use_ijk)
+    {
+      // Using the ijk indices
+      extrapolate_with_ijk_indices(distance, grad_T_interface, stencil_width);
+    }
+  else
+    {
+      // Using the elem_faces connectivity matrix of TrioCFD
+      const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
+      extrapolate_with_elem_faces_connectivity(domaine_vf, distance, grad_T_interface, stencil_width);
+    }
 }
 
-void compute_eulerian_extended_temperature(const IJK_Field_double& grad_T_int,
-                                           const IJK_Field_double& temperature,
-                                           const IJK_Field_double& curvature,
+void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
-                                           int taylor_expansion_order)
+                                           const IJK_Field_double& curvature,
+                                           const IJK_Field_double& grad_T_interface,
+                                           IJK_Field_double& temperature)
 {
   /*
    * Compute the extended temperature field using prppagated values of the temperature gradient
    */
-
+  const double invalid_test = INVALID_TEST;
+  const int ni = temperature.ni();
+  const int nj = temperature.nj();
+  const int nk = temperature.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indicator_vapour = fabs(1 - indicator(i,j,k));
+          const double d = distance(i,j,k);
+          const double grad_T = grad_T_interface(i,j,k);
+          const double temperature_val = temperature(i,j,k);
+          if ((d > invalid_test) && (indicator_vapour > VAPOUR_INDICATOR_TEST) && (grad_T != 0) && (temperature_val == 0))
+            {
+              const double kappa = curvature(i,j,k);
+              const double temperature_ghost = d * grad_T * (1. - 0.5 * kappa * d + kappa * kappa * d * d / 6);
+              temperature(i,j,k) = temperature_ghost;
+            }
+        }
+  temperature.echange_espace_virtuel(temperature.ghost());
 }
