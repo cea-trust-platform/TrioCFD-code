@@ -16,7 +16,7 @@ Mailler dom_fluide
 	{ 
 	origine 0. 0. 
 	longueurs 1. 1.
-	nombre_de_noeuds 51 101
+	nombre_de_noeuds 251 501
 	
 	}
 	{
@@ -35,7 +35,7 @@ Mailler dom_solide
 	{ 
 	origine 0. 0.
 	longueurs 1. 1.  
-	nombre_de_noeuds 51 3
+	nombre_de_noeuds 251 11
 	
 	}
 	{
@@ -119,7 +119,7 @@ convection_diffusion_temperature_ft_disc      thermique_vapeur
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
-  Qtcl 0
+  Qtcl 100.
   lv 10.e-9
 #  coeffa -1.9291
   coeffb  4.03634 #
