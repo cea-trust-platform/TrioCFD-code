@@ -25,7 +25,6 @@ class Operateur_IJK_elem_conv_base_double : public Operateur_IJK_elem_base_doubl
 {
   Declare_base(Operateur_IJK_elem_conv_base_double);
 public:
-  // { stored_curv_fram_layer_z_ = -1000; }
   void initialize(const IJK_Splitting& splitting) override;
   virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
   virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };
@@ -83,6 +82,7 @@ protected:
   const IJK_Field_local_double *indicatrice_;
 
   bool is_corrected_;
+  bool is_grad_;
 
 private:
 

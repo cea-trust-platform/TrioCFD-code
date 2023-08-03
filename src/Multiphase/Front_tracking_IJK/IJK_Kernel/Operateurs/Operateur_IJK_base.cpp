@@ -279,15 +279,16 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
     tmp[i].ref_ij(storage, i);
   IJK_Field_local_double *flux_zmin = &tmp[0];
   IJK_Field_local_double *flux_zmax = &tmp[1];    // flux a travers la face zmax des volumes de controles
-  IJK_Field_local_double * const flux_x = &tmp[2]; // pointer will not change, content will change
-  IJK_Field_local_double * const flux_y = &tmp[3];
+  IJK_Field_local_double *const flux_x = &tmp[2]; // pointer will not change, content will change
+  IJK_Field_local_double *const flux_y = &tmp[3];
 
   compute_flux_z(*flux_zmin, 0);
-  // TODO: correct_flux_z_min();
-  // fluxes_to_correct ?
-  // Critere fabs(fluxes_to_correct)<DMAX_FLOAT ?
-  // Zero valeur admissible
-
+  /*
+   * TODO: correct_flux_z_min();
+   * fluxes_to_correct ?
+   * Critere fabs(fluxes_to_correct)<DMAX_FLOAT ?
+   * Zero valeur admissible
+   */
   const int kmax = dx.nk();
   for (int k = 0; k < kmax; k++)
     {
@@ -301,4 +302,93 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
     }
 }
 
+void Operateur_IJK_elem_base_double::compute_grad(FixedVector<IJK_Field_double, 3>& dx)
+{
+  IJK_Field_local_double storage;
+  storage.allocate(dx[0].ni()+1, dx[0].nj()+1, 4, 0);
+  IJK_Field_local_double tmp[4];
+  for (int i = 0; i < 4; i++)
+    tmp[i].ref_ij(storage, i);
+  IJK_Field_local_double *flux_zmin = &tmp[0];
+  IJK_Field_local_double *flux_zmax = &tmp[1];    // flux a travers la face zmax des volumes de controles
+  IJK_Field_local_double *const flux_x = &tmp[2]; // pointer will not change, content will change
+  IJK_Field_local_double *const flux_y = &tmp[3];
 
+  compute_flux_z(*flux_zmin, 0);
+
+  const int kmax = dx[0].nk();
+  for (int k = 0; k < kmax; k++)
+    {
+      compute_flux_x(*flux_x, k);
+      compute_flux_y(*flux_y, k);
+      compute_flux_z(*flux_zmax, k+1);
+      fill_grad_field_x_(*flux_x, dx, k);
+      fill_grad_field_y_(*flux_y, dx, k);
+      fill_grad_field_z_(*flux_zmin, *flux_zmax, dx, k);
+      swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
+    }
+}
+
+void Operateur_IJK_elem_base_double::compute_grad_x(IJK_Field_double& dx)
+{
+  IJK_Field_local_double storage;
+  storage.allocate(dx.ni()+1, dx.nj()+1, 1, 0);
+  IJK_Field_local_double tmp;
+  tmp.ref_ij(storage, 0);
+  IJK_Field_local_double *const flux_x = &tmp;
+  const int kmax = dx.nk();
+  for (int k = 0; k < kmax; k++)
+    {
+      compute_flux_x(*flux_x, k);
+      fill_grad_field_x_y_(*flux_x, dx, k, 0);
+    }
+}
+
+void Operateur_IJK_elem_base_double::compute_grad_y(IJK_Field_double& dx)
+{
+  IJK_Field_local_double storage;
+  storage.allocate(dx.ni()+1, dx.nj()+1, 1, 0);
+  IJK_Field_local_double tmp;
+  tmp.ref_ij(storage, 0);
+  IJK_Field_local_double *const flux_y = &tmp;
+  const int kmax = dx.nk();
+  for (int k = 0; k < kmax; k++)
+    {
+      compute_flux_y(*flux_y, k);
+      fill_grad_field_x_y_(*flux_y, dx, k, 1);
+    }
+}
+
+void Operateur_IJK_elem_base_double::compute_grad_z(IJK_Field_double& dx)
+{
+  IJK_Field_local_double storage;
+  storage.allocate(dx.ni()+1, dx.nj()+1, 2, 0);
+  IJK_Field_local_double tmp[2];
+  for (int i = 0; i < 2; i++)
+    tmp[i].ref_ij(storage, i);
+  IJK_Field_local_double *flux_zmin = &tmp[0];
+  IJK_Field_local_double *flux_zmax = &tmp[1];
+  compute_flux_z(*flux_zmin, 0);
+  const int kmax = dx.nk();
+  for (int k = 0; k < kmax; k++)
+    {
+      compute_flux_z(*flux_zmax, k+1);
+      fill_grad_field_z_(*flux_zmin, *flux_zmax, dx, k);
+      swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
+    }
+}
+
+void Operateur_IJK_elem_base_double::fill_grad_field_x_(IJK_Field_local_double& flux, FixedVector<IJK_Field_double, 3>& resu, int k)
+{
+  fill_grad_field_x_y_(flux, resu[0], k, 0);
+}
+
+void Operateur_IJK_elem_base_double::fill_grad_field_y_(IJK_Field_local_double& flux, FixedVector<IJK_Field_double, 3>& resu, int k)
+{
+  fill_grad_field_x_y_(flux, resu[1], k, 1);
+}
+
+void Operateur_IJK_elem_base_double::fill_grad_field_z_(IJK_Field_local_double& flux_min, IJK_Field_local_double& flux_max, FixedVector<IJK_Field_double, 3>& resu, int k)
+{
+  fill_grad_field_z_(flux_min, flux_max, resu[2], k);
+}

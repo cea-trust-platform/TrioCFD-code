@@ -67,6 +67,7 @@ public :
                                               int& n);
   int init_thermals(const IJK_Splitting& splitting);
   void prepare_thermals(const char *lataname);
+  int ghost_fluid_flag();
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;

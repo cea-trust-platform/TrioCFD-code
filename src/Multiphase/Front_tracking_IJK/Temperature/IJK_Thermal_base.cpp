@@ -99,6 +99,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   compute_curvature_ = 0;
   compute_distance_= 0;
   ghost_fluid_ = 0;
+  compute_grad_T_elem_ = 0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -443,7 +444,8 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_distance_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
       nalloc += 1;
       // grad(d) necessitates 1 ghost cell ?
-      allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
+      allocate_cell_vector(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
+//      allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
       nalloc += 3;
       eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
       eulerian_normal_vectors_.echange_espace_virtuel();
@@ -471,6 +473,16 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
     }
 
+  compute_grad_T_elem_ = compute_grad_T_elem_ || liste_post_instantanes_.contient_("GRAD_T_ELEM")
+                         || liste_post_instantanes_.contient_("GRAD_T_DIR_X_ELEM") || liste_post_instantanes_.contient_("GRAD_T_DIR_Y_ELEM")
+                         || liste_post_instantanes_.contient_("GRAD_T_DIR_Z_ELEM");
+  if (compute_grad_T_elem_)
+    {
+      allocate_cell_vector(grad_T_elem_, splitting, 1);
+      nalloc += 3;
+      grad_T_elem_.echange_espace_virtuel();
+      temperature_grad_op_centre_.initialize(splitting);
+    }
   // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
 
   compute_cell_volume();
@@ -661,6 +673,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   add_temperature_source();
   const double ene_postSource = compute_global_energy(d_temperature_);
 
+  compute_temperature_gradient_elem();
   calculer_gradient_temperature(temperature_,grad_T_);
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time
@@ -873,6 +886,21 @@ void IJK_Thermal_base::enforce_min_value_eulerian_field(IJK_Field_double& euleri
       for (int i=0; i < nx; i++)
         if (eulerian_field(i,j,k) < invalid_distance_value)
           eulerian_field(i,j,k) = eulerian_field_min;
+}
+
+void IJK_Thermal_base::compute_temperature_gradient_elem()
+{
+  if (compute_grad_T_elem_)
+    {
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+      for (int dir=0; dir<3; dir++)
+        grad_T_elem_[dir].data()=0;
+      grad_T_elem_.echange_espace_virtuel();
+      temperature_grad_op_centre_.calculer_grad(temperature_, grad_T_elem_);
+      grad_T_elem_.echange_espace_virtuel();
+    }
+  else
+    Cerr << "The temperature gradient at the cell centres is not computed" << finl;
 }
 
 // Convect temperature field by velocity.

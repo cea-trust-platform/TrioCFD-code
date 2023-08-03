@@ -279,3 +279,15 @@ void IJK_Thermals::ecrire_fichier_reprise(SFichier& fichier, const char *lata_na
   if (flag_list_not_empty)
     fichier << " } \n" ;
 }
+
+int IJK_Thermals::ghost_fluid_flag()
+{
+  int ghost_fluid = 0;
+  for (auto& itr : (*this))
+    {
+      ghost_fluid = itr.get_ghost_fluid_flag();
+      if (ghost_fluid)
+        return ghost_fluid;
+    }
+  return ghost_fluid;
+}

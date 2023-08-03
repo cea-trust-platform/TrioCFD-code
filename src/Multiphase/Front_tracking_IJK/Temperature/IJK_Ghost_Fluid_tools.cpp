@@ -27,7 +27,7 @@
 
 static int decoder_numero_bulle(const int code)
 {
-  const int num_bulle = code >>6;
+  const int num_bulle = code >> 6;
   return num_bulle;
 }
 
@@ -68,7 +68,7 @@ static void extrapolate_with_elem_faces_connectivity(const Domaine_VF& domaine_v
 //                                                                num_elem_ijk[DIRECTION_J],
 //                                                                num_elem_ijk[DIRECTION_K]);
           // Need a value of distance but don't overwrite the first calculated value
-//          if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
+          // if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
           const double field_ini_val = field_ini(num_elem_ijk[DIRECTION_I],
                                                  num_elem_ijk[DIRECTION_J],
                                                  num_elem_ijk[DIRECTION_K]);
@@ -91,7 +91,7 @@ static void extrapolate_with_elem_faces_connectivity(const Domaine_VF& domaine_v
                                                                  num_elem_neighbour_ijk[DIRECTION_J],
                                                                  num_elem_neighbour_ijk[DIRECTION_K]);
                       // Don't use zero values
-//                      if ((distance_neighbour > invalid_test) && (field_neighbour != 0))
+                      // if ((distance_neighbour > invalid_test) && (field_neighbour != 0))
                       // Use zero_values grad_T_ decreasing with distance
                       if (distance_neighbour > invalid_test)
                         {
@@ -161,7 +161,7 @@ static void extrapolate_with_ijk_indices(const IJK_Field_double& distance,
                       const double distance_neighbour = distance(i+ii,j+jj,k+kk);
                       const double field_neighbour = field_old(i+ii,j+jj,k+kk);
                       // Don't use zero values
-//										if ((distance_neighbour > invalid_test) && field_neighbour != 0))
+                      // if ((distance_neighbour > invalid_test) && field_neighbour != 0))
                       // Use zero_values grad_T_ decreasing with distance
                       if (distance_neighbour > invalid_test)
                         {
@@ -310,8 +310,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
 
   // Normal vector calculation at the element location:
   /*
-   * TODO: Convert the normal vector propagation using ijk indexes
-   * Check the how fast it is compared to using elem_faces matrix
+   * TODO: Check the how fast it is compared to using elem_faces matrix
    */
   int iteration;
   if (use_ijk)
@@ -431,8 +430,7 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
     }
   // Distance calculation at the interface
   /*
-   * TODO: Convert the distance propagation using ijk indexes
-   * Check the how fast it is compared to using elem_faces matrix
+   * TODO: Check the how fast it is compared to using elem_faces matrix
    */
   IJK_Field_double terme_src_dist(distance_field);
   IJK_Field_double tmp_dist(distance_field);
@@ -590,14 +588,6 @@ void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //
   statistiques().end_count(stat_counter);
 }
 
-//void compute_eulerian_normal_vector_field(const IJK_Field_double& distance, const FixedVector<IJK_Field_double, 3>& normal_vect)
-//{
-//  /*
-//   * Compute the gradient of the normal distance field
-//   */
-//
-//}
-
 void compute_eulerian_curvature_field_from_distance_field(const IJK_Field_double& distance,
                                                           IJK_Field_double& curvature,
                                                           const IJK_Field_local_double& boundary_flux_kmin,
@@ -725,7 +715,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
           {
             const double kappa = curvature(i,j,k);
             const double ai = interfacial_area(i,j,k);
-            // TODO: Why do I get a floating point exception ?
+            // TODO: Why do I get a floating point exception ? Interface portion too small ?
             if ((kappa > invalid_curvature_value) && (ai > invalid_curvature_value))
               {
                 if (fabs(ai) < DMINFLOAT)
@@ -766,8 +756,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
   IJK_Field_double tmp_curv(curvature);
 
   /*
-   * TODO: Convert the kappa propagation using ijk indexes
-   * Check the how fast it is compared to using elem_faces matrix
+   * TODO: Check the how fast it is compared to using elem_faces matrix
    */
   if (use_ijk)
     {
@@ -855,7 +844,6 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
                           if (curvature_voisin > invalid_curvature_value)
                             {
                               // Average normal distance between an element and its neighbours
-
                               sum_kappa += curvature_voisin;
                               ncontrib++;
                             }
@@ -910,7 +898,7 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                   const int kk = neighbours_k[l];
                   const double d = distance(i+ii,j+jj,k+kk);
                   const double indic = indicator(i+ii,j+jj,k+kk);
-//                        if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) < invalid_value)
+                  // if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) < invalid_value)
                   if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
                     {
                       const double temperature_liquid = temperature(i+ii,j+jj,k+kk);

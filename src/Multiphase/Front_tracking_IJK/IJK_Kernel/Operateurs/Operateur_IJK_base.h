@@ -85,15 +85,22 @@ public:
   virtual void initialize(const IJK_Splitting& splitting)=0;
   virtual void compute_set(IJK_Field_double& dx);
   virtual void compute_add(IJK_Field_double& dx);
+  virtual void compute_grad(FixedVector<IJK_Field_double, 3>& dx);
+  virtual void compute_grad_x(IJK_Field_double& dx);
+  virtual void compute_grad_y(IJK_Field_double& dx);
+  virtual void compute_grad_z(IJK_Field_double& dx);
 protected:
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
   virtual void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) = 0;
-
 private:
   void compute_(IJK_Field_double& dx, bool add);
-
+  virtual void fill_grad_field_x_y_(IJK_Field_local_double& flux, IJK_Field_double& resu, int k, int dir) { ; };
+  virtual void fill_grad_field_z_(IJK_Field_local_double& flux_min, IJK_Field_local_double& flux_max, IJK_Field_double& resu, int k) { ; };
+  void fill_grad_field_x_(IJK_Field_local_double& flux, FixedVector<IJK_Field_double, 3>& resu, int k);
+  void fill_grad_field_y_(IJK_Field_local_double& flux, FixedVector<IJK_Field_double, 3>& resu, int k);
+  void fill_grad_field_z_(IJK_Field_local_double& flux_min, IJK_Field_local_double& flux_max, FixedVector<IJK_Field_double, 3>& resu, int k);
 };
 
 #endif

@@ -32,6 +32,7 @@ Operateur_IJK_elem_conv_base_double::Operateur_IJK_elem_conv_base_double()
   indicatrice_ = 0;
 
   is_corrected_ = false;
+  is_grad_ = false;
 }
 
 Sortie& Operateur_IJK_elem_conv_base_double::printOn(Sortie& os) const
@@ -67,8 +68,8 @@ void Operateur_IJK_elem_conv_base_double::calculer(const IJK_Field_double& field
   input_field_ = &field;
   stored_curv_fram_layer_z_ = -1000; // put a non-existant layer index: curv_fram will be computed at first call
   // Storage for curvature and fram limiter. We need 1 ghost layer:
-  //  flux at left of the leftmost field data requires curv and fram on the element at left
-  //  flux at the right of the rightmost field data requires on the element at right
+  // flux at left of the leftmost field data requires curv and fram on the element at left
+  // flux at the right of the rightmost field data requires on the element at right
   // We need 4 layers of temporary storage: curv and fram, and, for each, two consecutive layers in z
   const int ni = field.ni();
   const int nj = field.nj();

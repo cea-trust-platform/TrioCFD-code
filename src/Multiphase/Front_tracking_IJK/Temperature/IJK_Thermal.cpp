@@ -280,6 +280,42 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  /*
+   * GRAD_T_DIR_X_ELEM
+   */
+  oss << "GRAD_T_DIR_X_ELEM_" << lata_suffix << idx;
+  Nom nom_grad_T_dir_x(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("GRAD_T_DIR_X_ELEM") || liste_post_instantanes.contient_("GRAD_T_ELEM")
+       || liste_post_instantanes.contient_(nom_grad_T_dir_x)))
+    {
+      n++, dumplata_scalar(lata_name, nom_grad_T_dir_x, get_gradient_temperature_elem()[0], latastep);
+    }
+  oss.str("");
+
+  /*
+   * GRAD_T_DIR_Y_ELEM
+   */
+  oss << "GRAD_T_DIR_Y_ELEM_" << lata_suffix << idx;
+  Nom nom_grad_T_dir_y(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("GRAD_T_DIR_Y_ELEM_") || liste_post_instantanes.contient_("GRAD_T_ELEM")
+       || liste_post_instantanes.contient_(nom_grad_T_dir_y)))
+    {
+      n++, dumplata_scalar(lata_name, nom_grad_T_dir_y, get_gradient_temperature_elem()[1], latastep);
+    }
+  oss.str("");
+
+  /*
+   * GRAD_T_DIR_Z_ELEM
+   */
+  oss << "GRAD_T_DIR_Z_ELEM_" << lata_suffix << idx;
+  Nom nom_grad_T_dir_z(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("GRAD_T_DIR_Z_ELEM_") || liste_post_instantanes.contient_("GRAD_T_ELEM")
+       || liste_post_instantanes.contient_(nom_grad_T_dir_z)))
+    {
+      n++, dumplata_scalar(lata_name, nom_grad_T_dir_z, get_gradient_temperature_elem()[2], latastep);
+    }
+  oss.str("");
+
   return n;
 }
 

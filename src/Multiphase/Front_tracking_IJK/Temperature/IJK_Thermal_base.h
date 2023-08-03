@@ -30,6 +30,7 @@
 #include <IJK_Lata_writer.h>
 #include <Operateur_IJK_elem_conv.h>
 #include <Operateur_IJK_elem_diff.h>
+#include <OpGradCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
@@ -141,6 +142,14 @@ public:
   {
     return grad_T_ ;
   }
+  const FixedVector<IJK_Field_double, 3>& get_gradient_temperature_elem() const
+  {
+    return grad_T_elem_ ;
+  }
+  const int& get_ghost_fluid_flag() const
+  {
+    return ghost_fluid_;
+  };
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
   virtual double compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx);
@@ -196,6 +205,7 @@ protected:
   void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
+  void compute_temperature_gradient_elem();
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
@@ -308,6 +318,7 @@ protected:
   Operateur_IJK_elem_conv temperature_convection_op_;
   Operateur_IJK_elem_diff temperature_diffusion_op_;
   IJK_Field_double div_coeff_grad_T_volume_;
+  OpGradCentre2IJKScalar_double temperature_grad_op_centre_;
 
   /*
    * Fields
@@ -351,6 +362,8 @@ protected:
   IJK_Field_double eulerian_curvature_;
   IJK_Field_double interfacial_area_;
   IJK_Field_double eulerian_grad_T_interface_;
+  FixedVector<IJK_Field_double, 3> grad_T_elem_;
+  int compute_grad_T_elem_;
 };
 
 #endif /* IJK_Thermal_base_included */

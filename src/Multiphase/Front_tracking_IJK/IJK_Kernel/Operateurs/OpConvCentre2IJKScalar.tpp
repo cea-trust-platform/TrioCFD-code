@@ -20,12 +20,43 @@
 template <DIRECTION _DIR_>
 void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
 {
+  Simd_double velocity(1.);
+  if (is_grad_)
+    {
+      /*
+       * TODO: Associate pointers to create a dummy field
+       * May be dangerous but I don't want to create multiple copy
+       * or instantiate a dummy field ! What do you think ?
+       */
+      input_velocity_x_ = input_field_;
+      input_velocity_y_ = input_field_;
+      input_velocity_z_ = input_field_;
+    }
   ConstIJK_double_ptr velocity_dir(get_input_velocity(_DIR_), 0, 0, k_layer);
   ConstIJK_double_ptr input_field(*input_field_, 0, 0, k_layer);
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
   const int nx = _DIR_==DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni();
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
-  const double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+  double surface = 1.;
+  if (!is_grad_)
+    {
+      surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+      // uniform in i and j directions
+    }
+  else
+    {
+      switch(_DIR_)
+        {
+        case DIRECTION::X:
+          surface = 1 / channel_data_.get_delta_x();
+          break;
+        case DIRECTION::Y:
+          surface = 1 / channel_data_.get_delta_y();
+          break;
+        case DIRECTION::Z:
+          break;
+        }
+    }
 
   if(_DIR_ == DIRECTION::Z)
     {
@@ -55,8 +86,8 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
     {
       for (int i = 0; i < imax; i += vsize)
         {
-          Simd_double velocity;
-          velocity_dir.get_center(i, velocity);
+          if (!is_grad_)
+            velocity_dir.get_center(i, velocity);
           Simd_double T0, T1; // scalar value at left and at right of the computed flux
           input_field.get_left_center(_DIR_,i, T0, T1);
           Simd_double flux = (T0 + T1) * 0.5;
@@ -67,7 +98,8 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
       if (j+1==jmax)
         break;
       input_field.next_j();
-      velocity_dir.next_j();
+      if (!is_grad_)
+        velocity_dir.next_j();
       resu_ptr.next_j();
     }
 
