@@ -225,15 +225,9 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       type += motbidon;
       is >> motbidon;
       if ( motbidon != accfermee)
-        {
-          Cerr << " No option are now readable "<< finl;
-          Cerr << " for the turbulent diffusive term" << finl;
+        Cerr << " No option are now readable for the turbulent diffusive term" << finl;
 
-        }
-      if ( discr == "VEF" )
-        {
-          type += "_const_P1NC" ;
-        }
+      if ( discr == "VEF" ) type += "_P1NC" ;
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(*this);
       Cerr << terme_diffusif.valeur().que_suis_je() << finl;
