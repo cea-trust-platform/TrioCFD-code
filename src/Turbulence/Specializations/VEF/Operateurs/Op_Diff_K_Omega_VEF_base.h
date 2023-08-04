@@ -36,6 +36,7 @@ class Champ_Don_base;
 class Domaine_dis;
 class Domaine_Cl_dis;
 class Champ_Inc;
+class Modele_turbulence_hyd_K_Omega;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -66,9 +67,16 @@ public:
 protected:
   double Prdt_K;
   double Prdt_Omega;
+
+  // For SST model
+  static constexpr double SIGMA_OMEGA1 = 0.5;
+  static constexpr double SIGMA_OMEGA2 = 0.856;
+
   REF(Champ_Fonc) diffusivite_turbulente_;
   REF(Champ_Don_base) tmp;
   REF(Champ_base) diffusivite_;
+  REF(Modele_turbulence_hyd_K_Omega) turbulence_model;
+
 };
 
 //

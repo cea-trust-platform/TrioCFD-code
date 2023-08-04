@@ -22,7 +22,11 @@
 #ifndef Modele_turbulence_hyd_K_Omega_included
 #define Modele_turbulence_hyd_K_Omega_included
 
+#include <TRUSTTabs_forward.h>
 #include <Transport_K_Omega.h>
+
+class Motcle;
+class Champ_Inc;
 
 /*! @brief Classe Modele_turbulence_hyd_K_Omega Cette classe represente le modele de turbulence (k, omega) pour les
  *
@@ -50,6 +54,11 @@ public:
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
 
+  void init_tab_blenderF1();
+
+  inline const DoubleTab& get_blenderF1() const;
+  inline DoubleTab& get_blenderF1();
+
   void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega,
                                     DoubleTab& turbulent_viscosity);
 
@@ -65,6 +74,7 @@ public:
 protected:
   Transport_K_Omega eqn_transport_K_Omega;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  Champ_Inc blenderF1; // Blending field for SST model
 
 };
 
@@ -117,6 +127,27 @@ inline const Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K
 {
   return eqn_transport_K_Omega;
 }
+
+/*! @brief Returns the blending field F1.
+ *
+ *     (version const)
+ *
+ * @return (DoubleTab&) blenderF1
+ */
+inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1() const
+{
+  return blenderF1.valeurs();
+}
+
+/*! @brief Returns the blending field F1.
+ *
+ * @return (DoubleTab&) blenderF1
+ */
+inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1()
+{
+  return blenderF1.valeurs();
+}
+
 
 inline int Modele_turbulence_hyd_K_Omega::nombre_d_equations() const
 {

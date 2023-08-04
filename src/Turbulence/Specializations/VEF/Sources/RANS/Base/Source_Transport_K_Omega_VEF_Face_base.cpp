@@ -97,6 +97,9 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
   DoubleTab gradKgradOmega (nb_faces_);
   compute_cross_diffusion(gradKgradOmega);
 
+  if (turbulence_model->get_model_variant() == "SST")
+    compute_blending_F1(gradKgradOmega);
+
   const DoubleTab& TKE = get_K_pour_production(); // voir les classes filles
   calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, production_TKE,
                               TKE, velocity, visco_turb,

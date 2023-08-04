@@ -58,6 +58,8 @@ public:
                  int num_face, int num2, int dimension, int num_elem,
                  double diffu_turb, const DoubleTab& diffu, int is_mu_unif,
                  const ArrOfDouble& inv_Prdt) const;
+
+  double blender(double const val1, double const val2, int const face) const;
   // Methodes pour l implicite.
 
   inline void dimensionner(Matrice_Morse&) const override;

@@ -25,9 +25,9 @@
 
 #include <Motcle.h>
 #include <Mod_turb_hyd_RANS_2eq.h>
+
 class Equation_base;
 class Transport_K_Omega_base;
-
 
 /*! @brief Classe Mod_turb_hyd_RANS_komega Classe de base des modeles de type RANS_komega
  *
@@ -60,6 +60,7 @@ public:
   inline double get_OMEGA_MAX() const;
   inline double get_K_MIN() const;
   inline int get_lquiet() const;
+  inline const Motcle& get_model_variant() const;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
@@ -73,9 +74,13 @@ protected:
   double Prandtl_K, Prandtl_Omega; // cAlan beware! rename and put in 2eq ?
   double OMEGA_MIN, OMEGA_MAX, K_MIN;
   int lquiet;
-  Motcle model_variant; // default model will be k-omega SST.
-
+  Motcle model_variant; // default model will be k-omega
 };
+
+inline const Motcle& Mod_turb_hyd_RANS_komega::get_model_variant() const
+{
+  return model_variant;
+}
 
 inline double Mod_turb_hyd_RANS_komega::get_Prandtl_K() const
 {

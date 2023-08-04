@@ -292,10 +292,18 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
     }
 }
 
+void Modele_turbulence_hyd_K_Omega::init_tab_blenderF1()
+{
+  int const n = la_viscosite_turbulente.valeurs().dimension(0);
+  blenderF1.valeurs().resize(n);
+}
+
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
 {
   eqn_transp_K_Omega().preparer_calcul();
   Mod_turb_hyd_RANS_komega::preparer_calcul();
+
+  init_tab_blenderF1();
 
   // GF quand on demarre un calcul il est bon d'utliser la ldp
   // encore plus quand on fait une reprise !!!!!!!!

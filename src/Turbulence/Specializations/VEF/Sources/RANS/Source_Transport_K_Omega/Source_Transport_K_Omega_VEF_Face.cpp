@@ -19,7 +19,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Source_Transport_K_Omega_VEF_Face.h>
 #include <Operateur_Grad.h>
 #include <TRUSTTabs_forward.h>
 #include <Source_Transport_K_Omega_VEF_Face.h>
@@ -46,6 +45,7 @@ void Source_Transport_K_Omega_VEF_Face::associer_pb(const Probleme_base& pb)
 {
   Source_Transport_K_Omega_VEF_Face_base::associer_pb(pb);
   eqn_K_Omega = ref_cast(Transport_K_Omega, equation());
+  turbulence_model = ref_cast(Modele_turbulence_hyd_K_Omega, eqn_K_Omega->modele_turbulence());
 }
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 {
@@ -54,9 +54,7 @@ const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() const
 {
-  const Modele_turbulence_hyd_K_Omega& mod = ref_cast(Modele_turbulence_hyd_K_Omega,
-                                                      eqn_K_Omega->modele_turbulence());
-  return mod.loi_paroi().valeur().Cisaillement_paroi();
+  return turbulence_model->loi_paroi().valeur().Cisaillement_paroi();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() const
@@ -66,10 +64,40 @@ const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() cons
 
 const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
 {
-  const Modele_turbulence_hyd_K_Omega& mod = ref_cast(Modele_turbulence_hyd_K_Omega,
-                                                      eqn_K_Omega->modele_turbulence());
-  return mod.loi_paroi().valeur().que_suis_je();
+  return turbulence_model->loi_paroi().valeur().que_suis_je();
 }
+
+void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega)
+{
+
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
+  const DoubleTab& kinematic_viscosity = get_visc_turb();
+  const DoubleTab& distmin = le_dom_VEF->y_faces(); // Minimum distance to the edge
+  // DoubleTab& tmpF1 = turbulence_model->get_blenderF1(); // The blending field F1
+  DoubleTab& tmpF1 = turbulence_model->get_blenderF1();
+
+  // Loop on faces
+  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
+    {
+      double const dmin = distmin(face);
+      double const enerK = K_Omega(face, 0);
+      double const omega = K_Omega(face, 1);
+
+      double const tmp1 = sqrt(enerK)/(BETA_K*omega*dmin);
+      double const tmp2 = 500.0*kinematic_viscosity(face)/(omega*dmin*dmin);
+      double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(gradKgradOmega(face)*dmin);
+      double const arg1 = std::min(std::max(tmp1, tmp2), tmp3); // Common name of the variable
+      tmpF1(face) = std::tanh(arg1*arg1*arg1*arg1);
+    }
+}
+
+double Source_Transport_K_Omega_VEF_Face::blender(double const val1, double const val2,
+                                                  int const face) const
+{
+  const DoubleTab& F1 = turbulence_model->get_blenderF1();
+  return F1(face)*val1 + (1 - F1(face))*val2;
+}
+
 
 void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradKgradOmega) const
 {
@@ -102,9 +130,9 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
                                                   ref_cast(Pb_Hydraulique_Turbulent,
                                                            mon_equation->probleme()).equation(0));
   const DoubleTab& velocity_field_face = eqHyd.vitesse().valeurs(); // Velocity on faces
-  const int nbr_velocity_components = velocity_field_face.line_size();
+  const int nbr_velocity_components = velocity_field_face.dimension(1);
   const DoubleTab& pressure = eqHyd.pression().valeurs();
-  const int total_number_of_faces = pressure.size_totale(); // find a better name than nb_tot
+  const int total_number_of_faces = pressure.dimension(0); // find a better name than nb_tot
   gradK_elem.resize(total_number_of_faces, nbr_velocity_components);
   gradOmega_elem.resize(total_number_of_faces, nbr_velocity_components);
   // resize_gradient_tab(gradK);
@@ -157,10 +185,19 @@ void Source_Transport_K_Omega_VEF_Face::fill_resu(const DoubleVect& volumes_entr
       resu(face, 0) += (ProdK(face) - BETA_K*K_Omega(face, 0)*K_Omega(face, 1))*volumes_entrelaces(face);
       if (K_Omega(face, 0) >= LeK_MIN)
         {
-          double sigma_d = (gradKgradOmega(face) > 0) ? 1/8 : 0;
-          resu(face, 1) += ALPHA_OMEGA*ProdK(face)*K_Omega(face, 1)/K_Omega(face, 0); // production
-          resu(face, 1) += - BETA_OMEGA*K_Omega(face, 1)*K_Omega(face, 1); // dissipation
-          resu(face, 1) += sigma_d/K_Omega(face, 1)*gradKgradOmega(face); // cross diffusion
+          double cALPHA = ALPHA_OMEGA;
+          double cBETA = BETA_OMEGA;
+          double cSIGMA = (gradKgradOmega(face) > 0) ? 1/8 : 0;
+          if (turbulence_model->get_model_variant() == "SST")
+            {
+              cALPHA = blender(GAMMA1, GAMMA2, face);
+              cBETA = blender(BETA1, BETA2, face);
+              cSIGMA = 2*(1 - turbulence_model->get_blenderF1()(face)*SIGMA_OMEGA2);
+            }
+
+          resu(face, 1) += cALPHA*ProdK(face)*K_Omega(face, 1)/K_Omega(face, 0); // production
+          resu(face, 1) += - cBETA*K_Omega(face, 1)*K_Omega(face, 1); // dissipation
+          resu(face, 1) += cSIGMA/K_Omega(face, 1)*gradKgradOmega(face); // cross diffusion
           resu(face, 1) *= volumes_entrelaces(face);
         }
     }

@@ -29,6 +29,7 @@
 class Transport_K_Omega;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
+class Modele_turbulence_hyd_K_Omega;
 
 class Source_Transport_K_Omega_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
 {
@@ -47,14 +48,15 @@ public :
   inline void mettre_a_jour(double temps) override { Calcul_Production_K_VEF::mettre_a_jour(temps); }
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { /* Do Nothing */ }
 
-  virtual void compute_cross_diffusion(DoubleTab&) const { return not_implemented<void>(__func__); };
-
+  virtual void compute_cross_diffusion(DoubleTab& gradKgradOmega) const { return not_implemented<void>(__func__); };
+  virtual void compute_blending_F1(DoubleTab& gradKgradOmega) { return not_implemented<void>(__func__); };
 
 protected :
   DoubleTab& ajouter_komega(DoubleTab&) const;
 
   REF(Domaine_VEF) le_dom_VEF;
   REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  REF(Modele_turbulence_hyd_K_Omega) turbulence_model;
 
   // Constants for the classic k-omega model Wilcox 1988
   static constexpr double BETA_K = 0.09; // Cmu or BETA_STAR, but clearer with _K
@@ -63,6 +65,18 @@ protected :
   static constexpr double SIGMA_OMEGA = 0.5; // SIGMA
   static constexpr double ALPHA_OMEGA = 5./9.; // ALPHA
 
+  // Constants for the k-omega SST model
+  static constexpr double SIGMA_K1 = 0.85;
+  static constexpr double SIGMA_K2 = 1.0;
+  static constexpr double SIGMA_OMEGA1 = 0.5;
+  static constexpr double SIGMA_OMEGA2 = 0.856;
+  static constexpr double BETA1 = 0.075;
+  static constexpr double BETA2 = 0.0828;
+  static constexpr double KAPPA = 0.41;
+  double const GAMMA1 = BETA1/BETA_K - SIGMA_OMEGA1*KAPPA*KAPPA/sqrt(BETA_K);
+  double const GAMMA2 = BETA2/BETA_K - SIGMA_OMEGA2*KAPPA*KAPPA/sqrt(BETA_K);
+
+  std::map<std::string, DoubleTab> contrib_komega;
 
 private:
   // methodes a surcharger sinon throw !!

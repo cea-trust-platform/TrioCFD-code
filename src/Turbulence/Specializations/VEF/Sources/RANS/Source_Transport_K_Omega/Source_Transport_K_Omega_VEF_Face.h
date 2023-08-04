@@ -41,7 +41,9 @@ public:
   DoubleTab& ajouter(DoubleTab&) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
-  void compute_cross_diffusion(DoubleTab&) const override;
+  void compute_cross_diffusion(DoubleTab& gradKgradOmega) const override;
+  void compute_blending_F1(DoubleTab& gradKgradOmega) override;
+  double blender(double const val1, double const val2, int const face) const;
 
 protected:
   void associer_pb(const Probleme_base& pb) override;
