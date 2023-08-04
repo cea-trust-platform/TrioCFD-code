@@ -33,7 +33,7 @@ Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Therm
 IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
   convective_flux_correction_ = 0;
-  diffusion_flux_correction_ = 0;
+  diffusive_flux_correction_ = 0;
   override_vapour_mixed_values_ = 0;
 }
 
@@ -42,7 +42,7 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
   IJK_Thermal_base::printOn( os );
   os << "  {\n";
   os << "    convective_flux_correction" <<  " " << convective_flux_correction_ << "\n";
-  os << "    diffusion_flux_correction" <<  " " << diffusion_flux_correction_ << "\n";
+  os << "    diffusive_flux_correction" <<  " " << diffusive_flux_correction_ << "\n";
   os << "    override_vapour_mixed_values" <<  " " << override_vapour_mixed_values_ << "\n";
   os << "  \n}";
   return os;
@@ -53,6 +53,8 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
   IJK_Thermal_base::readOn( is );
   if (ghost_fluid_)
     override_vapour_mixed_values_ = 1;
+  if (convective_flux_correction_ || diffusive_flux_correction_)
+    compute_grad_T_elem_ = 1;
   return is;
 }
 
@@ -60,7 +62,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 {
   IJK_Thermal_base::set_param(param);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
-  param.ajouter_flag("diffusion_flux_correction", &diffusion_flux_correction_);
+  param.ajouter_flag("diffusive_flux_correction", &diffusive_flux_correction_);
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
 }
 
@@ -92,7 +94,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   /*TODO:
    * Change the operators to add fluxes corrections (Maybe not)
    */
-  if (diffusion_flux_correction_)
+  if (diffusive_flux_correction_)
     {
       temperature_diffusion_op_.typer("OpDiffUniformIJKScalarCorrection_double");
       temperature_convection_op_.initialize(splitting);
@@ -147,8 +149,8 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
           for (int i = 0; i < ni; i++)
             {
               const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-              if (fabs(1.-indic)>1.e-8) // Mixed cells and pure vapour cells
-                { temperature_(i,j,k) = 0; }
+              if (fabs(1.-indic) > 1.e-8) // Mixed cells and pure vapour cells
+                { temperature_(i,j,k) = 0.; }
             }
     }
 // TODO: Temperature sub-resolution (Weak coupling)
@@ -156,4 +158,28 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
 //				{
 //
 //				}
+}
+
+void IJK_Thermal_Subresolution::correct_temperature_for_visu()
+{
+  /*
+   * Correct only if the temperature gradient is post-processed
+   * If not we may want to reconstruct the gradient field in Python
+   * using the ghost temperature !
+   */
+  if (liste_post_instantanes_.contient_("GRAD_T_ELEM"))
+    {
+      const int ni = temperature_.ni();
+      const int nj = temperature_.nj();
+      const int nk = temperature_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double temperature = temperature_(i,j,k);
+              if (temperature > 0)
+                temperature_(i,j,k) = 0;
+            }
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+    }
 }

@@ -177,10 +177,14 @@ static void extrapolate_with_ijk_indices(const IJK_Field_double& distance,
     }
 }
 
-void compute_eulerian_normal_distance_field(const IJK_Interfaces& interfaces, //  ref_problem_ft_disc,
-                                            IJK_Field_double& distance_field,
-                                            FixedVector<IJK_Field_double, 3>& normal_vect,
-                                            const int& n_iter)
+/*
+ * TODO: Store the facets' barycentres
+ */
+void compute_eulerian_normal_distance_facet_barycentre_field(const IJK_Interfaces& interfaces, //  ref_problem_ft_disc,
+                                                             IJK_Field_double& distance_field,
+                                                             FixedVector<IJK_Field_double, 3>& normal_vect,
+                                                             FixedVector<IJK_Field_double, 3>& facets_barycentre,
+                                                             const int& n_iter)
 {
   /*
    * Compute the normal distance to the interface

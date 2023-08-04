@@ -39,13 +39,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void compute_eulerian_normal_distance_field(const IJK_Interfaces& interface, // REF(Probleme_base) ref_problem_ft_disc_,
-                                            IJK_Field_double& distance,
-                                            FixedVector<IJK_Field_double, 3>& normal_vect,
-                                            const int& n_iter);
-
-//void compute_eulerian_normal_vector_field(const IJK_Field_double& distance,
-//                                          const FixedVector<IJK_Field_double, 3>& normal_vect);
+void compute_eulerian_normal_distance_facet_barycentre_field(const IJK_Interfaces& interface,
+                                                             IJK_Field_double& distance,
+                                                             FixedVector<IJK_Field_double, 3>& normal_vect,
+                                                             FixedVector<IJK_Field_double, 3>& facets_barycentre,
+                                                             const int& n_iter);
 
 void compute_eulerian_curvature_field_from_distance_field(const IJK_Field_double& distance,
                                                           IJK_Field_double& curvature,

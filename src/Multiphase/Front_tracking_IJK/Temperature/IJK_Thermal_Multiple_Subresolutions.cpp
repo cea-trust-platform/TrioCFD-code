@@ -48,16 +48,6 @@ Sortie& IJK_Thermal_Multiple_Subresolutions::printOn( Sortie& os ) const
 Entree& IJK_Thermal_Multiple_Subresolutions::readOn( Entree& is )
 {
   IJK_Thermal_Subresolution::readOn( is );
-  main_phase_ = 0;
-  uniform_lambda_vap_=0;
-  uniform_alpha_vap_=0;
-  /*
-   * Parse the datafile
-   */
-  Param param(que_suis_je());
-  param.ajouter_flag("main_phase_", &main_phase_);
-  param.lire_avec_accolades(is);
-
   /*
    * The main phase is called liquid because it is mainly used in bubbly flows
    * It will directly influence which phase uses the temperature_ field attribute.
@@ -76,6 +66,11 @@ Entree& IJK_Thermal_Multiple_Subresolutions::readOn( Entree& is )
       uniform_alpha_ = lambda_vapour_ / (ref_ijk_ft_->get_rho_v() * cp_vapour_);
     }
   return is;
+}
+
+void IJK_Thermal_Multiple_Subresolutions::set_param( Param& param )
+{
+  param.ajouter_flag("main_phase_", &main_phase_);
 }
 
 int IJK_Thermal_Multiple_Subresolutions::initialize(const IJK_Splitting& splitting, const int idx)

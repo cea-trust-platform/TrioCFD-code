@@ -95,24 +95,31 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
     }
 
   double d0 = 0., d1 = 0.;
-  double surface = 0.;
-  if(_DIR_ == DIRECTION::X)
+  double surface = 1.;
+  switch(_DIR_)
     {
+    case DIRECTION::X:
       d0 = channel_data_.get_delta_x() * 0.5;
       d1 = d0;
-      surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
-    }
-  if(_DIR_ == DIRECTION::Y)
-    {
+      if (!is_hess_)
+        surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+      else
+        surface = 1 / (channel_data_.get_delta_x() * channel_data_.get_delta_x());
+      break;
+    case DIRECTION::Y:
       d0 = channel_data_.get_delta_y() * 0.5;
       d1 = d0;
-      surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
-    }
-  if(_DIR_ == DIRECTION::Z)
-    {
+      if (!is_hess_)
+        surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+      else
+        surface = 1 / (channel_data_.get_delta_y() * channel_data_.get_delta_y());
+      break;
+    case DIRECTION::Z:
       d0 = channel_data_.get_delta_z()[k_layer-1] * 0.5;
       d1 = channel_data_.get_delta_z()[k_layer] * 0.5;
-      surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+      if (!is_hess_)
+        surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+      break;
     }
 
   Simd_double lambda_m1(uniform_lambda);

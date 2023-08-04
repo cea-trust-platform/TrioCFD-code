@@ -14,72 +14,53 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_Thermal_Multiple_Subresolutions.h
-// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
+// File      : OpHessCentre2IJKScalar.h
+// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_Thermal_Multiple_Subresolutions_included
-#define IJK_Thermal_Multiple_Subresolutions_included
+#ifndef OpHessCentre2IJKScalar_included
+#define OpHessCentre2IJKScalar_included
 
-#include <IJK_Thermal_Subresolution.h>
-#include <IJK_Field.h>
-#include <Boundary_Conditions_Thermique.h>
-#include <IJK_Splitting.h>
-#include <IJK_Field.h>
-#include <Parser.h>
-#include <IJK_Lata_writer.h>
-#include <OpConvQuickIJKScalar.h>
-#include <OpConvCentre2IJKScalar.h>
-#include <Ouvrir_fichier.h>
-#include <Corrige_flux_FT.h>
-#include <TRUST_Ref.h>
 #include <Operateur_IJK_elem_diff_base.h>
-#include <OpConvAmontIJK.h>
-#include <OpConvDiscQuickIJKScalar.h>
-#include <OpConvCentre4IJK.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class IJK_Thermal_Multiple_Subresolutions
+// .DESCRIPTION : class OpHessCentre2IJKScalar
 //
-// <Description of class IJK_Thermal_Multiple_Subresolutions>
+// <Description of class OpHessCentre2IJKScalar>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-
-class IJK_Thermal_Multiple_Subresolutions : public IJK_Thermal_Subresolution
+class OpHessCentre2IJKScalar_double : public OpDiffUniformIJKScalar_double
 {
 
-  Declare_instanciable( IJK_Thermal_Multiple_Subresolutions ) ;
+  Declare_instanciable( OpHessCentre2IJKScalar_double ) ;
 
-public :
+public:
+  void calculer_hess(const IJK_Field_double& field,
+                     FixedVector<IJK_Field_double, 3>& result,
+                     const IJK_Field_local_double& boundary_flux_kmin,
+                     const IJK_Field_local_double& boundary_flux_kmax);
 
-  int initialize(const IJK_Splitting& splitting, const int idx) override;
-  void update_thermal_properties() override;
-  void set_param(Param& param) override;
+  void calculer_hess_xx(const IJK_Field_double& field,
+                        IJK_Field_double& result,
+                        const IJK_Field_local_double& boundary_flux_kmin,
+                        const IJK_Field_local_double& boundary_flux_kmax);
 
-protected :
+  void calculer_hess_yy(const IJK_Field_double& field,
+                        IJK_Field_double& result,
+                        const IJK_Field_local_double& boundary_flux_kmin,
+                        const IJK_Field_local_double& boundary_flux_kmax);
 
-  /*
-   * Treat the second phase like it is vapour !
-   */
-
-  IJK_Field_double temperature_vapour_;
-  IJK_Field_double div_coeff_grad_T_vapour_volume_;
-  FixedVector<IJK_Field_double, 3> grad_T_vapour_;
-
-  void correct_temperature_vapour_for_eulerian_fluxes();
-
-  OpDiffUniformIJKScalar_double diffusion_temperature_vapour_op_;
-
-  int main_phase_;
-  int diffusion_flux_vapour_correction_;
-  int convective_flux_vapour_correction_;
-
-  double uniform_lambda_vap_;
-  double uniform_alpha_vap_;
-
+  void calculer_hess_zz(const IJK_Field_double& field,
+                        IJK_Field_double& result,
+                        const IJK_Field_local_double& boundary_flux_kmin,
+                        const IJK_Field_local_double& boundary_flux_kmax);
+protected:
+  const double unit_lambda_ = 1.;
+  void fill_grad_field_x_y_(IJK_Field_local_double& flux, IJK_Field_double& resu, int k, int dir) override;
+  void fill_grad_field_z_(IJK_Field_local_double& flux_min, IJK_Field_local_double& flux_max, IJK_Field_double& resu, int k) override;
 };
 
-#endif /* IJK_Thermal_Multiple_Subresolutions_included */
+#endif /* OpHessCentre2IJKScalar_included */

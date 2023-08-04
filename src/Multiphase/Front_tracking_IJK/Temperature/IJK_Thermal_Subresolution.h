@@ -62,10 +62,11 @@ protected :
 
   void compute_diffusion_increment() override;
   void correct_temperature_for_eulerian_fluxes() override;
+  void correct_temperature_for_visu() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
-  int diffusion_flux_correction_;
+  int diffusive_flux_correction_;
   int convective_flux_correction_;
 
   int override_vapour_mixed_values_; // For debug purposes

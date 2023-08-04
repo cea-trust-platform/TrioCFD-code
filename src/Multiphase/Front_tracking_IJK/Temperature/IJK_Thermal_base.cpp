@@ -100,6 +100,9 @@ IJK_Thermal_base::IJK_Thermal_base()
   compute_distance_= 0;
   ghost_fluid_ = 0;
   compute_grad_T_elem_ = 0;
+  compute_hess_T_elem_ = 0.;
+  compute_hess_diag_T_elem_ = 0.;
+  compute_hess_cross_T_elem_ = 0.;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -478,11 +481,42 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
                          || liste_post_instantanes_.contient_("GRAD_T_DIR_Z_ELEM");
   if (compute_grad_T_elem_)
     {
-      allocate_cell_vector(grad_T_elem_, splitting, 1);
+      allocate_cell_vector(grad_T_elem_, splitting, 0); // 1 or 0 ?
       nalloc += 3;
       grad_T_elem_.echange_espace_virtuel();
       temperature_grad_op_centre_.initialize(splitting);
     }
+
+  compute_hess_T_elem_ = compute_hess_T_elem_ || liste_post_instantanes_.contient_("HESS_T_ELEM");
+  compute_hess_diag_T_elem_ = compute_hess_T_elem_ || compute_hess_diag_T_elem_ || liste_post_instantanes_.contient_("HESS_DIAG_T_ELEM")
+                              || liste_post_instantanes_.contient_("HESS_XX_T_ELEM") || liste_post_instantanes_.contient_("HESS_YY_T_ELEM")
+                              || liste_post_instantanes_.contient_("HESS_ZZ_T_ELEM");
+  compute_hess_cross_T_elem_ = compute_hess_T_elem_ || compute_hess_cross_T_elem_ || liste_post_instantanes_.contient_("HESS_CROSS_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_XY_T_ELEM") || liste_post_instantanes_.contient_("HESS_XZ_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_YX_T_ELEM") || liste_post_instantanes_.contient_("HESS_YZ_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_ZX_T_ELEM") || liste_post_instantanes_.contient_("HESS_ZY_T_ELEM");
+  compute_hess_T_elem_ = compute_hess_diag_T_elem_ && compute_hess_cross_T_elem_;
+
+  if (compute_hess_diag_T_elem_)
+    {
+      allocate_cell_vector(hess_diag_T_elem_, splitting, 0);  // 1 or 0 ?
+      nalloc += 3;
+      hess_diag_T_elem_.echange_espace_virtuel();
+      temperature_hess_op_centre_.initialize(splitting);
+    }
+
+  if (compute_hess_cross_T_elem_)
+    {
+      allocate_cell_vector(hess_cross_T_elem_, splitting, 0);  // 1 or 0 ?
+      nalloc += 3;
+      hess_cross_T_elem_.echange_espace_virtuel();
+      /*
+       * TODO: Cross derivatives (adapt the diffusion operator ?)
+       * Pb with Finite Volume Op, can not really relate on the fluxes
+       * to derive the cross derivatives...
+       */
+    }
+
   // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
 
   compute_cell_volume();
@@ -593,6 +627,7 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
       ref_ijk_ft_->euler_explicit_update(d_temperature_, temperature_, k);
     }
   temperature_.echange_espace_virtuel(temperature_.ghost());
+  correct_temperature_for_visu();
   const double ene_post = compute_global_energy();
   Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
        << " " << ene_ini
@@ -674,6 +709,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double ene_postSource = compute_global_energy(d_temperature_);
 
   compute_temperature_gradient_elem();
+  compute_temperature_hessian_diag_elem();
   calculer_gradient_temperature(temperature_,grad_T_);
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time
@@ -708,10 +744,11 @@ void IJK_Thermal_base::compute_eulerian_distance()
 {
   if (compute_distance_)
     // TODO: Do we need to perform an echange_virtuel with interfaces ?
-    compute_eulerian_normal_distance_field(ref_ijk_ft_->get_interface(),
-                                           eulerian_distance_,
-                                           eulerian_normal_vectors_,
-                                           n_iter_distance_);
+    compute_eulerian_normal_distance_facet_barycentre_field(ref_ijk_ft_->get_interface(),
+                                                            eulerian_distance_,
+                                                            eulerian_normal_vectors_,
+                                                            eulerian_normal_vectors_,
+                                                            n_iter_distance_);
   else
     Cerr << "Don't compute the eulerian distance field" << finl;
 }
@@ -898,6 +935,22 @@ void IJK_Thermal_base::compute_temperature_gradient_elem()
       grad_T_elem_.echange_espace_virtuel();
       temperature_grad_op_centre_.calculer_grad(temperature_, grad_T_elem_);
       grad_T_elem_.echange_espace_virtuel();
+    }
+  else
+    Cerr << "The temperature gradient at the cell centres is not computed" << finl;
+}
+
+void IJK_Thermal_base::compute_temperature_hessian_diag_elem()
+{
+  if (compute_hess_diag_T_elem_)
+    {
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+      for (int dir=0; dir<3; dir++)
+        hess_diag_T_elem_[dir].data()=0;
+      hess_diag_T_elem_.echange_espace_virtuel();
+      temperature_hess_op_centre_.calculer_hess(temperature_, hess_diag_T_elem_,
+                                                boundary_flux_kmin_, boundary_flux_kmax_);
+      hess_diag_T_elem_.echange_espace_virtuel();
     }
   else
     Cerr << "The temperature gradient at the cell centres is not computed" << finl;

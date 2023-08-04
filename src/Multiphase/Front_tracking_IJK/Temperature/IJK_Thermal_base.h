@@ -31,6 +31,7 @@
 #include <Operateur_IJK_elem_conv.h>
 #include <Operateur_IJK_elem_diff.h>
 #include <OpGradCentre2IJKScalar.h>
+#include <OpHessCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
@@ -146,6 +147,14 @@ public:
   {
     return grad_T_elem_ ;
   }
+  const FixedVector<IJK_Field_double, 3>& get_hessian_diag_temperature_elem() const
+  {
+    return hess_diag_T_elem_ ;
+  }
+  const FixedVector<IJK_Field_double, 3>& get_hessian_cross_temperature_elem() const
+  {
+    return hess_cross_T_elem_ ;
+  }
   const int& get_ghost_fluid_flag() const
   {
     return ghost_fluid_;
@@ -206,6 +215,8 @@ protected:
   void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
   void compute_temperature_gradient_elem();
+  void compute_temperature_hessian_diag_elem();
+  virtual void correct_temperature_for_visu() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
@@ -319,6 +330,8 @@ protected:
   Operateur_IJK_elem_diff temperature_diffusion_op_;
   IJK_Field_double div_coeff_grad_T_volume_;
   OpGradCentre2IJKScalar_double temperature_grad_op_centre_;
+  OpHessCentre2IJKScalar_double temperature_hess_op_centre_;
+
 
   /*
    * Fields
@@ -350,7 +363,7 @@ protected:
   int rho_cp_post_;
 
   /*
-   * For Ghost fluid method
+   * For Ghost fluid method & Subresolution or Post-processing
    */
   int ghost_fluid_;
   int n_iter_distance_;
@@ -362,8 +375,23 @@ protected:
   IJK_Field_double eulerian_curvature_;
   IJK_Field_double interfacial_area_;
   IJK_Field_double eulerian_grad_T_interface_;
-  FixedVector<IJK_Field_double, 3> grad_T_elem_;
   int compute_grad_T_elem_;
+  FixedVector<IJK_Field_double, 3> grad_T_elem_;
+  /*
+   * hess(T) = grad(grad(T))
+   * Only 6 coefficients in
+   * cartesian coordinate system
+   * | * * * |
+   * | - * * |
+   * | - - * |
+   *   FixedVector<IJK_Field_double, 6> grad_grad_T_elem_;
+   */
+  FixedVector<IJK_Field_double, 3> hess_diag_T_elem_;
+  FixedVector<IJK_Field_double, 3> hess_cross_T_elem_;
+  FixedVector<IJK_Field_double, 3> facets_barycentre;
+  int compute_hess_T_elem_;
+  int compute_hess_diag_T_elem_;
+  int compute_hess_cross_T_elem_;
 };
 
 #endif /* IJK_Thermal_base_included */

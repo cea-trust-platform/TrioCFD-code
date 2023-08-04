@@ -36,6 +36,7 @@ Operateur_IJK_elem_diff_base_double::Operateur_IJK_elem_diff_base_double()
   is_corrected_ = false;
 
   perio_k_ = false;
+  is_hess_ = false;
 }
 
 Sortie& Operateur_IJK_elem_diff_base_double::printOn(Sortie& os) const
@@ -66,42 +67,6 @@ const IJK_Field_local_double& Operateur_IJK_elem_diff_base_double::get_model(DIR
   return *coeff_field_x_;
 }
 
-//const IJK_Field_local_double& Operateur_IJK_elem_diff_base_double::get_lambda_vectorial(DIRECTION _DIR_)
-//{
-//  assert(is_vectorial_);
-//  switch(_DIR_)
-//    {
-//    case DIRECTION::X:
-//      return *lambda_vector_x_;
-//    case DIRECTION::Y:
-//      return *lambda_vector_y_;
-//    case DIRECTION::Z:
-//      return *lambda_vector_z_;
-//    default:
-//      Cerr << "Error in Operateur_IJK_elem_diff_base_double::get_lambda_vectorial: wrong direction..." << finl;
-//      Process::exit();
-//    }
-//  return *lambda_vector_x_;
-//}
-//
-//const IJK_Field_local_double& Operateur_IJK_elem_diff_base_double::get_structural_model(DIRECTION _DIR_)
-//{
-//  assert(is_structural_);
-//  switch(_DIR_)
-//    {
-//    case DIRECTION::X:
-//      return *structural_model_x_;
-//    case DIRECTION::Y:
-//      return *structural_model_y_;
-//    case DIRECTION::Z:
-//      return *structural_model_z_;
-//    default:
-//      Cerr << "Error in Operateur_IJK_elem_diff_base_double::get_strucutral_model: wrong direction..." << finl;
-//      Process::exit();
-//    }
-//  return *structural_model_x_;
-//}
-
 void Operateur_IJK_elem_diff_base_double::initialize(const IJK_Splitting& splitting)
 {
   channel_data_.initialize(splitting);
@@ -118,7 +83,6 @@ void Operateur_IJK_elem_diff_base_double::calculer(const IJK_Field_double& field
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_set(result);
   input_field_ = 0;
-//  uniform_lambda_ = 0;
   lambda_ = 0;
   coeff_field_x_ = 0;
   coeff_field_y_ = 0;
@@ -136,7 +100,6 @@ void Operateur_IJK_elem_diff_base_double::ajouter(const IJK_Field_double& field,
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_add(result);
   input_field_ = 0;
-//  uniform_lambda_ = 0;
   lambda_ = 0;
   coeff_field_x_ = 0;
   coeff_field_y_ = 0;
@@ -241,180 +204,3 @@ Entree& OpDiffStructuralOnlyIJKScalar_double::readOn(Entree& is)
   //  Operateur_IJK_elem_diff_base_double::readOn(is);
   return is;
 }
-
-//void OpDiffUniformIJKScalar_double::calculer(const IJK_Field_double& field,
-//																							const double& lambda,
-//																							IJK_Field_double& result,
-//																							const IJK_Field_local_double& boundary_flux_kmin,
-//																							const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  uniform_lambda_ = lambda;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  uniform_lambda_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffIJKScalar_double::calculer(const IJK_Field_double& field,
-//                                      const IJK_Field_double& lambda,
-//                                      IJK_Field_double& result,
-//                                      const IJK_Field_local_double& boundary_flux_kmin,
-//                                      const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_ = &lambda;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  lambda_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffAnisotropicIJKScalar_double::calculer(const IJK_Field_double& field,
-//                                                 const IJK_Field_double& lambda,
-//                                                 IJK_Field_double& result,
-//                                                 const IJK_Field_local_double& boundary_flux_kmin,
-//                                                 const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_ = &lambda;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  lambda_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffAnisotropicIJKScalar_double::ajouter(const IJK_Field_double& field,
-//                                                const IJK_Field_double& lambda,
-//                                                IJK_Field_double& result,
-//                                                const IJK_Field_local_double& boundary_flux_kmin,
-//                                                const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_ = &lambda;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_add(result);
-//  input_field_ = 0;
-//  lambda_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//
-//void OpDiffVectorialIJKScalar_double::calculer(const IJK_Field_double& field,
-//                                               const IJK_Field_double& lambda_vector_x,
-//                                               const IJK_Field_double& lambda_vector_y,
-//                                               const IJK_Field_double& lambda_vector_z,
-//                                               IJK_Field_double& result,
-//                                               const IJK_Field_local_double& boundary_flux_kmin,
-//                                               const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_vector_x_ = &lambda_vector_x;
-//  lambda_vector_y_ = &lambda_vector_y;
-//  lambda_vector_z_ = &lambda_vector_z;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  lambda_vector_x_ = 0;
-//  lambda_vector_y_ = 0;
-//  lambda_vector_z_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//
-//
-//void OpDiffVectorialAnisotropicIJKScalar_double::calculer(const IJK_Field_double& field,
-//                                                          const IJK_Field_double& lambda_vector_x,
-//                                                          const IJK_Field_double& lambda_vector_y,
-//                                                          const IJK_Field_double& lambda_vector_z,
-//                                                          IJK_Field_double& result,
-//                                                          const IJK_Field_local_double& boundary_flux_kmin,
-//                                                          const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_vector_x_ = &lambda_vector_x;
-//  lambda_vector_y_ = &lambda_vector_y;
-//  lambda_vector_z_ = &lambda_vector_z;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  lambda_vector_x_ = 0;
-//  lambda_vector_y_ = 0;
-//  lambda_vector_z_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffVectorialAnisotropicIJKScalar_double::ajouter(const IJK_Field_double& field,
-//                                                         const IJK_Field_double& lambda_vector_x,
-//                                                         const IJK_Field_double& lambda_vector_y,
-//                                                         const IJK_Field_double& lambda_vector_z,
-//                                                         IJK_Field_double& result,
-//                                                         const IJK_Field_local_double& boundary_flux_kmin,
-//                                                         const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  lambda_vector_x_ = &lambda_vector_x;
-//  lambda_vector_y_ = &lambda_vector_y;
-//  lambda_vector_z_ = &lambda_vector_z;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_add(result);
-//  input_field_ = 0;
-//  lambda_vector_x_ = 0;
-//  lambda_vector_y_ = 0;
-//  lambda_vector_z_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffIJKScalarStructuralOnly_double::calculer(const IJK_Field_double& field,
-//                                                    const IJK_Field_double& structural_model_x,
-//                                                    const IJK_Field_double& structural_model_y,
-//                                                    const IJK_Field_double& structural_model_z,
-//                                                    IJK_Field_double& result,
-//                                                    const IJK_Field_local_double& boundary_flux_kmin,
-//                                                    const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  structural_model_x_ = &structural_model_x;
-//  structural_model_y_ = &structural_model_y;
-//  structural_model_z_ = &structural_model_z;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_set(result);
-//  input_field_ = 0;
-//  structural_model_x_ = 0;
-//  structural_model_y_ = 0;
-//  structural_model_z_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}
-//
-//void OpDiffIJKScalarStructuralOnly_double::ajouter(const IJK_Field_double& field,
-//                                                   const IJK_Field_double& structural_model_x,
-//                                                   const IJK_Field_double& structural_model_y,
-//                                                   const IJK_Field_double& structural_model_z,
-//                                                   IJK_Field_double& result,
-//                                                   const IJK_Field_local_double& boundary_flux_kmin,
-//                                                   const IJK_Field_local_double& boundary_flux_kmax)
-//{
-//  input_field_ = &field;
-//  structural_model_x_ = &structural_model_x;
-//  structural_model_y_ = &structural_model_y;
-//  structural_model_z_ = &structural_model_z;
-//  boundary_flux_kmin_ = &boundary_flux_kmin;
-//  boundary_flux_kmax_ = &boundary_flux_kmax;
-//  compute_add(result);
-//  input_field_ = 0;
-//  structural_model_x_ = 0;
-//  structural_model_y_ = 0;
-//  structural_model_z_ = 0;
-//  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
-//}

@@ -86,6 +86,7 @@ protected:
   bool is_structural_;
   bool is_uniform_;
   bool is_corrected_;
+  bool is_hess_;
 
 };
 
