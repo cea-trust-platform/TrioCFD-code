@@ -216,6 +216,7 @@ protected:
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
   void compute_temperature_gradient_elem();
   void compute_temperature_hessian_diag_elem();
+  void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,

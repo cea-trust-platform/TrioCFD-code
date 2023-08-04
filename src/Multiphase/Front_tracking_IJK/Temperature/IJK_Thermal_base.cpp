@@ -476,16 +476,6 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
     }
 
-  compute_grad_T_elem_ = compute_grad_T_elem_ || liste_post_instantanes_.contient_("GRAD_T_ELEM")
-                         || liste_post_instantanes_.contient_("GRAD_T_DIR_X_ELEM") || liste_post_instantanes_.contient_("GRAD_T_DIR_Y_ELEM")
-                         || liste_post_instantanes_.contient_("GRAD_T_DIR_Z_ELEM");
-  if (compute_grad_T_elem_)
-    {
-      allocate_cell_vector(grad_T_elem_, splitting, 0); // 1 or 0 ?
-      nalloc += 3;
-      grad_T_elem_.echange_espace_virtuel();
-      temperature_grad_op_centre_.initialize(splitting);
-    }
 
   compute_hess_T_elem_ = compute_hess_T_elem_ || liste_post_instantanes_.contient_("HESS_T_ELEM");
   compute_hess_diag_T_elem_ = compute_hess_T_elem_ || compute_hess_diag_T_elem_ || liste_post_instantanes_.contient_("HESS_DIAG_T_ELEM")
@@ -494,8 +484,23 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   compute_hess_cross_T_elem_ = compute_hess_T_elem_ || compute_hess_cross_T_elem_ || liste_post_instantanes_.contient_("HESS_CROSS_T_ELEM")
                                || liste_post_instantanes_.contient_("HESS_XY_T_ELEM") || liste_post_instantanes_.contient_("HESS_XZ_T_ELEM")
                                || liste_post_instantanes_.contient_("HESS_YX_T_ELEM") || liste_post_instantanes_.contient_("HESS_YZ_T_ELEM")
-                               || liste_post_instantanes_.contient_("HESS_ZX_T_ELEM") || liste_post_instantanes_.contient_("HESS_ZY_T_ELEM");
+                               || liste_post_instantanes_.contient_("HESS_ZX_T_ELEM") || liste_post_instantanes_.contient_("HESS_ZY_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_XZ_ZX_T_ELEM") || liste_post_instantanes_.contient_("HESS_ZX_XZ_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_YZ_ZY_T_ELEM") || liste_post_instantanes_.contient_("HESS_ZY_YZ_T_ELEM")
+                               || liste_post_instantanes_.contient_("HESS_XY_YX_T_ELEM") || liste_post_instantanes_.contient_("HESS_YX_XY_T_ELEM");
+
   compute_hess_T_elem_ = compute_hess_diag_T_elem_ && compute_hess_cross_T_elem_;
+
+  compute_grad_T_elem_ = compute_hess_cross_T_elem_ || compute_grad_T_elem_ || liste_post_instantanes_.contient_("GRAD_T_ELEM")
+                         || liste_post_instantanes_.contient_("GRAD_T_DIR_X_ELEM") || liste_post_instantanes_.contient_("GRAD_T_DIR_Y_ELEM")
+                         || liste_post_instantanes_.contient_("GRAD_T_DIR_Z_ELEM");
+  if (compute_grad_T_elem_)
+    {
+      allocate_cell_vector(grad_T_elem_, splitting, 1); // 1 or 0 ?
+      nalloc += 3;
+      grad_T_elem_.echange_espace_virtuel();
+      temperature_grad_op_centre_.initialize(splitting);
+    }
 
   if (compute_hess_diag_T_elem_)
     {
@@ -710,6 +715,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 
   compute_temperature_gradient_elem();
   compute_temperature_hessian_diag_elem();
+  compute_temperature_hessian_cross_elem();
   calculer_gradient_temperature(temperature_,grad_T_);
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time
@@ -951,6 +957,23 @@ void IJK_Thermal_base::compute_temperature_hessian_diag_elem()
       temperature_hess_op_centre_.calculer_hess(temperature_, hess_diag_T_elem_,
                                                 boundary_flux_kmin_, boundary_flux_kmax_);
       hess_diag_T_elem_.echange_espace_virtuel();
+    }
+  else
+    Cerr << "The temperature gradient at the cell centres is not computed" << finl;
+}
+
+void IJK_Thermal_base::compute_temperature_hessian_cross_elem()
+{
+  if (compute_hess_cross_T_elem_)
+    {
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+      for (int dir=0; dir<3; dir++)
+        hess_cross_T_elem_[dir].data()=0;
+      hess_cross_T_elem_.echange_espace_virtuel();
+      temperature_grad_op_centre_.calculer_grad_z(grad_T_elem_[1], hess_cross_T_elem_[0]);
+      temperature_grad_op_centre_.calculer_grad_z(grad_T_elem_[0], hess_cross_T_elem_[1]);
+      temperature_grad_op_centre_.calculer_grad_y(grad_T_elem_[0], hess_cross_T_elem_[2]);
+      hess_cross_T_elem_.echange_espace_virtuel();
     }
   else
     Cerr << "The temperature gradient at the cell centres is not computed" << finl;

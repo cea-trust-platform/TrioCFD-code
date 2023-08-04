@@ -353,76 +353,112 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   oss.str("");
 
   /*
-   * HESS_T_DIR_XY_ELEM
+   * HESS_T_DIR_XY_YX_ELEM
    */
-  oss << "HESS_T_DIR_XY_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_xy(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_XY_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xy))
+  oss << "HESS_T_DIR_XY_YX_ELEM_" << lata_suffix << idx;
+  Nom nom_hess_T_dir_xy_yx(oss.str().c_str());
+  if (liste_post_instantanes.contient_("HESS_T_DIR_XY_YX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xy_yx))
     {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xy, get_hessian_cross_temperature_elem()[2], latastep);
+      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xy_yx, get_hessian_cross_temperature_elem()[2], latastep);
     }
   oss.str("");
 
   /*
-   * HESS_T_DIR_YX_ELEM
+   * HESS_T_DIR_XZ_ZX_ELEM
    */
-  oss << "HESS_T_DIR_YX_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_yx(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_YX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_yx))
+  oss << "HESS_T_DIR_XZ_ZX_ELEM_" << lata_suffix << idx;
+  Nom nom_hess_T_dir_xz_zx(oss.str().c_str());
+  if (liste_post_instantanes.contient_("HESS_T_DIR_XZ_ZX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xz_zx))
     {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_yx, get_hessian_cross_temperature_elem()[2], latastep);
-    }
-  oss.str("");
-
-  /*
-   * HESS_T_DIR_XZ_ELEM
-   */
-  oss << "HESS_T_DIR_XZ_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_xz(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_XZ_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xz))
-    {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xz, get_hessian_cross_temperature_elem()[1], latastep);
-    }
-  oss.str("");
-
-  /*
-   * HESS_T_DIR_ZX_ELEM
-   */
-  oss << "HESS_T_DIR_ZX_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_zx(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_ZX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_zx))
-    {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_zx, get_hessian_cross_temperature_elem()[1], latastep);
+      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xz_zx, get_hessian_cross_temperature_elem()[1], latastep);
     }
   oss.str("");
 
   /*
    * HESS_T_DIR_YZ_ELEM
    */
-  oss << "HESS_T_DIR_YZ_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_yz(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_YZ_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_yz))
+  oss << "HESS_T_DIR_YZ_ZY_ELEM_" << lata_suffix << idx;
+  Nom nom_hess_T_dir_yz_zy(oss.str().c_str());
+  if (liste_post_instantanes.contient_("HESS_T_DIR_YZ_ZY_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_yz_zy))
     {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_yz, get_hessian_cross_temperature_elem()[0], latastep);
+      n++, dumplata_scalar(lata_name, nom_hess_T_dir_yz_zy, get_hessian_cross_temperature_elem()[0], latastep);
     }
   oss.str("");
+
+//  /*
+//   * HESS_T_DIR_XY_ELEM
+//   */
+//  oss << "HESS_T_DIR_XY_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_xy(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_XY_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xy))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xy, get_hessian_cross_temperature_elem()[2], latastep);
+//    }
+//  oss.str("");
+//
+//  /*
+//   * HESS_T_DIR_YX_ELEM
+//   */
+//  oss << "HESS_T_DIR_YX_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_yx(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_YX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_yx))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_yx, get_hessian_cross_temperature_elem()[2], latastep);
+//    }
+//  oss.str("");
+
+  /*
+   * HESS_T_DIR_XZ_ELEM
+   */
+//  oss << "HESS_T_DIR_XZ_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_xz(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_XZ_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_xz))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_xz, get_hessian_cross_temperature_elem()[1], latastep);
+//    }
+//  oss.str("");
+
+  /*
+   * HESS_T_DIR_ZX_ELEM
+   */
+//  oss << "HESS_T_DIR_ZX_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_zx(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_ZX_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_zx))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_zx, get_hessian_cross_temperature_elem()[1], latastep);
+//    }
+//  oss.str("");
+
+  /*
+   * HESS_T_DIR_YZ_ELEM
+   */
+//  oss << "HESS_T_DIR_YZ_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_yz(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_YZ_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_yz))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_yz, get_hessian_cross_temperature_elem()[0], latastep);
+//    }
+//  oss.str("");
 
   /*
    * HESS_T_DIR_YX_ELEM
    */
-  oss << "HESS_T_DIR_ZY_ELEM_" << lata_suffix << idx;
-  Nom nom_hess_T_dir_zy(oss.str().c_str());
-  if (liste_post_instantanes.contient_("HESS_T_DIR_ZY_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
-      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_zy))
-    {
-      n++, dumplata_scalar(lata_name, nom_hess_T_dir_zy, get_hessian_cross_temperature_elem()[0], latastep);
-    }
-  oss.str("");
+//  oss << "HESS_T_DIR_ZY_ELEM_" << lata_suffix << idx;
+//  Nom nom_hess_T_dir_zy(oss.str().c_str());
+//  if (liste_post_instantanes.contient_("HESS_T_DIR_ZY_ELEM") || liste_post_instantanes.contient_("HESS_CROSS_T_ELEM")
+//      || liste_post_instantanes.contient_("HESS_T_ELEM") || liste_post_instantanes.contient_(nom_hess_T_dir_zy))
+//    {
+//      n++, dumplata_scalar(lata_name, nom_hess_T_dir_zy, get_hessian_cross_temperature_elem()[0], latastep);
+//    }
+//  oss.str("");
 
   return n;
 }
