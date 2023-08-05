@@ -42,16 +42,19 @@
 #include <communications.h>
 #include <Faces.h>
 
+#include <vector>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.)
+Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.), meshMotionModel_(0)
 {
   beam = new Beam_model();
+  str_mesh_model = new Structural_dynamic_mesh_model() ;
 }
 Domaine_ALE::~Domaine_ALE()
 {
   delete beam;
+  delete str_mesh_model ;
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -1171,4 +1174,88 @@ void  Domaine_ALE::computeFluidForceOnBeam()
       ofs_1<<endl;
       ofs_1.close();
     }
+}
+
+void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  double var_double;
+
+  int npropmin = str_mesh_model->getMinNumberOfMaterialProperties() ;
+  std::vector<std::string> name_prop(npropmin) ;
+  std::vector<double> val_prop(npropmin) ;
+  int nprop = 0 ;
+
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error reading structural dynamic mesh model\n";
+      Cerr << "A " << accolade_ouverte << " was expected instead of \n"
+           << motlu;
+      exit();
+    }
+  while(1)
+    {
+      // lecture d'un nom variable ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if(motlu=="Mfront_library")
+        {
+          is >> nomlu;
+          std::string const mfront_lib_path(nomlu) ;
+          str_mesh_model->setMfrontLibraryPath(mfront_lib_path) ;
+        }
+      if(motlu=="Mfront_model_name")
+        {
+          is >> nomlu;
+          std::string const mfront_model_name(nomlu) ;
+          str_mesh_model->setMfrontModelName(mfront_model_name) ;
+        }
+      if(motlu=="Mfront_material_properties")
+        {
+          is >> motlu;
+          if (motlu != accolade_ouverte)
+            {
+              Cerr << "Error reading Mfront material properties\n";
+              Cerr << "A " << accolade_ouverte << " was expected instead of \n"
+                   << motlu;
+              exit();
+            }
+          while (1)
+            {
+              is >> motlu ;
+              std::string const nom_prop(motlu) ;
+              is >> var_double ;
+              if ( nprop <= npropmin)
+                {
+                  name_prop[nprop] = nom_prop ;
+                  val_prop[nprop] = var_double ;
+                }
+              else
+                {
+                  name_prop.push_back(nom_prop) ;
+                  val_prop.push_back(var_double) ;
+                }
+              nprop++ ;
+              if (motlu == accolade_fermee)
+                break;
+            }
+        }
+      if(motlu=="Inertial_Damping")
+        {
+          is >> var_double;
+          str_mesh_model->setInertialDamping(var_double) ;
+        }
+      if(motlu=="Time_Step_Safety_Coefficient")
+        {
+          is >> var_double;
+          str_mesh_model->setDtSafetyCoefficient(var_double) ;
+        }
+      if (motlu == accolade_fermee)
+        break;
+    }
+
 }
