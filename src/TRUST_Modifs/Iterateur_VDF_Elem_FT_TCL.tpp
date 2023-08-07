@@ -107,7 +107,6 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
                                                                         matrices_t mats, DoubleTab& resu, const tabs_t& semi_impl) const
 {
   const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
-
   Type_Double flux(N), aii(N), ajj(N), aef(N);
   int boundary_index = -1;
   if (le_dom.valeur().front_VF(num_cl).le_nom() == frontiere_dis.le_nom())
