@@ -32,6 +32,7 @@
 #include <communications.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
+#include <Discretisation_base.h>
 
 Implemente_base_sans_constructeur(Paroi_hyd_base_EF,"Paroi_hyd_base_EF",Turbulence_paroi_base);
 Paroi_hyd_base_EF::Paroi_hyd_base_EF():flag_face_keps_imposee_(0)

@@ -38,8 +38,8 @@ void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse,
 void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
 {
   const Domaine_Cl_VEF& domaine_cl_VEF = le_dom_Cl_VEF.valeur();
-  const Domaine_VEF& domaine_VEF = domaine_cl_VEF.domaine_VEF();
-  const Domaine_VEF_PreP1b& domaine_VEF_p = ref_cast(Domaine_VEF_PreP1b, le_dom_VF.valeur());
+  const Domaine_VEF& domaine_VEF = domaine_cl_VEF.domaine_vef();
+  const Domaine_VEF& domaine_VEF_p = ref_cast(Domaine_VEF, le_dom_VF.valeur());
   const Domaine& domaine = domaine_VEF_p.domaine();
 
   const DoubleTab& face_normales = domaine_VEF.face_normales();
