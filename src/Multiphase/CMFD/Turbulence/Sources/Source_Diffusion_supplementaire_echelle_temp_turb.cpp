@@ -44,3 +44,4 @@ void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
       if sub_type(Echange_impose_base, cond_lim_loc.valeur()) f_grad_tau_fixe = 0;
     }
 }
+
