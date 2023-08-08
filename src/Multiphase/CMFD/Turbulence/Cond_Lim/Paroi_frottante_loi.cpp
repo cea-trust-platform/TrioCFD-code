@@ -186,7 +186,7 @@ void Paroi_frottante_loi::me_calculer()
       if (y_plus_loc>1)
         {
           valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_domaine, n)*u_tau(f_domaine, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-          valeurs_coeff_grad_(f, n) = fac_coeff_grad_ * 1/mu_tot_loc * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_domaine, n)*u_tau(f_domaine, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+          valeurs_coeff_grad_(f, n) = fac_coeff_grad_ * (alp ? (*alp)(e, n) : 1) * std::min(1./y_loc, 1/mu_tot_loc * rho(e, n) * u_tau(f_domaine, n)*u_tau(f_domaine, n)/norm_u_parallel); // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
         }
       else
         {

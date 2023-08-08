@@ -41,7 +41,7 @@ public :
   static void calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
-    return { "alpha_rho_k", calculer_alpha_rho_k };
+    return { "k", calculer_alpha_rho_k };
   }
 
 protected:

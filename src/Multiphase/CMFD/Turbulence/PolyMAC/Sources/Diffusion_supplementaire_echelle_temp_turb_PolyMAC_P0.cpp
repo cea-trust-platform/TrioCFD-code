@@ -46,6 +46,8 @@ Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is
 
 void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
+  Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices, semi_impl) ;
+
   const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Champ_Elem_PolyMAC_P0&                   tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
 
@@ -85,27 +87,30 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
 {
   const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const Domaine_Cl_PolyMAC&                 zcl = ref_cast(Domaine_Cl_PolyMAC, equation().domaine_Cl_dis().valeur());
-  const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
+//  const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
   const Champ_Elem_PolyMAC_P0&              tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
   const DoubleTab&                      tab_tau = semi_impl.count("tau") ? semi_impl.at("tau") : tau.valeurs();
   const DoubleTab&                tab_tau_passe = tau.passe();
+  const DoubleTab& k = equation().probleme().get_champ("k").valeurs();
 
   const IntTab&                             fcl = tau.fcl(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
-  const Op_Diff_Turbulent_PolyMAC_P0_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Elem, eq.operateur(0).l_op_base());
-  const DoubleTab&                       nu_tot = Op_diff_loc.nu(), &xp = domaine.xp(), &xv = domaine.xv();
+//  const Op_Diff_Turbulent_PolyMAC_P0_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Elem, eq.operateur(0).l_op_base());
+//  const DoubleTab&                       nu_tot = Op_diff_loc.nu();
+  const DoubleTab& xp = domaine.xp(), &xv = domaine.xv();
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces();
 
   int N = tab_tau.dimension(1), nf = domaine.nb_faces(), ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), D = dimension ;
 
-  Matrice_Morse *Mtau = (matrices.count("tau") && !semi_impl.count("tau")) ? matrices.at("tau") : nullptr;
+  Matrice_Morse *Mtau = matrices.count("tau") ? matrices.at("tau") : nullptr;
+  Matrice_Morse *Mk = matrices.count("k") ? matrices.at("k") : nullptr;
 
   DoubleTrav grad_sqrt_tau_faces(nf, N);
   DoubleTrav grad_sqrt_tau_elems(ne, N*D);
   DoubleTrav grad_tau_sqrt_tau_faces ;
   DoubleTrav grad_tau_sqrt_tau_elems ;
-  if (Mtau) grad_tau_sqrt_tau_faces = DoubleTrav(nf, N), grad_sqrt_tau_elems = DoubleTrav(ne, N*D);
+  if (!semi_impl.count("tau") && (Mtau)) grad_tau_sqrt_tau_faces = DoubleTrav(nf, N), grad_tau_sqrt_tau_elems = DoubleTrav(ne, N*D);
   if (f_grad_tau_fixe) tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   else tau.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on recalcule le fgrad a chaque pas de temps
   const IntTab& fg_d = tau.fgrad_d, fg_e = tau.fgrad_e;             // Tables used in domaine_PolyMAC_P0::fgrad
@@ -132,7 +137,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
           }
       }
 
-  if (Mtau)
+  if (!semi_impl.count("tau") && (Mtau))
     for (int f = 0; f < nf; f++)
       for (int n=0 ; n<N ; n++)
         {
@@ -160,7 +165,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
         for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
           grad_sqrt_tau_elems(e, N*d+n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_sqrt_tau_faces(f, n);
 
-  if (Mtau)
+  if  (!semi_impl.count("tau") && (Mtau))
     for (int e = 0; e < ne; e++)
       for (int n=0 ; n<N ; n++)
         for (int d = 0; d < D; d++)
@@ -171,13 +176,14 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
     for (int n=0 ; n<N ; n++)
       {
         // Second membre
-        double fac = pe(e)*ve(e) ;
-        double secmem_en = 0 ;
+        double fac = 0 ;
+        for (int d = 0; d<D; d++) fac += grad_sqrt_tau_elems(e, N*d+n)* ((!semi_impl.count("tau") && (Mtau)) ? grad_tau_sqrt_tau_elems(e, N*d+n) :grad_sqrt_tau_elems(e, N*d+n));
+        fac *= pe(e)*ve(e) ;
+        secmem(e, n) += fac * -8  * sigma_tau_ * tab_tau(e,n) * k(e,n) ;
+        if (Mtau) (*Mtau)(N * e + n, N * e + n) += fac * 8  * sigma_tau_ * k(e,n)  ;
+        if (Mk)   (*Mk)(N * e + n, N * e + n) += fac * 8  * sigma_tau_ * tab_tau(e,n)  ;
 
-        for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau_elems(e, N*d+n)* ((Mtau) ? grad_tau_sqrt_tau_elems(e, N*d+n) :grad_sqrt_tau_elems(e, N*d+n));
-        secmem(e, n) += fac * -8  * nu_tot(e, n) * secmem_en;
-
-        if (Mtau)
+        if  (!semi_impl.count("tau") && (Mtau))
           {
             for (int i = 0, f; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
               for (int j = fg_d(f); j < fg_d(f+1) ; j++)
@@ -187,7 +193,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
                     for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                       {
                         double inv_sqrt_tau = (tab_tau_passe(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau_passe(ed, n)) : std::sqrt(1/limiter_tau_);
-                        (*Mtau)(N * e + n, N * ed + n) += fac * 8  * nu_tot(e, n) * grad_sqrt_tau_elems(e, N*d+n) * (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * f_w(j) * inv_sqrt_tau ;
+                        (*Mtau)(N * e + n, N * ed + n) += pe(e)*ve(e) * 8  * sigma_tau_ * tab_tau(e,n) * k(e,n) * grad_sqrt_tau_elems(e, N*d+n) * (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * f_w(j) * inv_sqrt_tau ;
                       }
                 }
           }
