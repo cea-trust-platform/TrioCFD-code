@@ -4,6 +4,8 @@
 
 #include <Interprete_geometrique_base.h>
 #include <stdexcept>
+#include <vector>
+#include <map>
 
 #include <MGIS/Behaviour/Behaviour.hxx>
 #include <MGIS/Behaviour/BehaviourDataView.hxx>
@@ -42,16 +44,48 @@ public:
   // End Mfront behaviour
   // --------------------
 
-  inline void setElasticityModulus(const double& E) ;
-  inline void setPoissonRatio(const double& nu) ;
+  inline void setDensity(const double& rho) ;
   inline void setInertialDamping(const double& D) ;
   inline void setDtSafetyCoefficient(const double& c) ;
-  inline int getMinNumberOfMaterialProperties() const ;
+  inline void setYoungModulus(const double& E) ; // Temporary for stability only
+  inline void addMaterialProperty(const std::string name, const std::vector<double> val) ;
+  inline int getNbNodesPerElem() ;
+  inline double getDensity() ;
+  inline double getYoungModulus() ; // Temporary for stability only
+  inline double getDampingCoefficient() ;
+  inline void setMassElem(const double& mass) ;
 
   void initMfrontBehaviour() ;
-  void initDynamicMeshProblem(const int nsom, const int nelem) ;
+  void initDynamicMeshProblem(const int nsom, const int nelem, const MD_Vector& md) ;
 
-  void computeInternalForces() ;
+  void setLocalFields(const int elnodes[4], int elem) ;
+  void computeInternalForces(double volume, double xlong, double E) ;
+  void setGlobalFields(const int elnodes[4]) ;
+  double computeCriticalDt(double volume, double xlong, double E) ;
+
+  // Global vectors and arrays for dynamic time integration
+  // ------------------------------------------------------
+
+  DoubleTab B0 ;
+  DoubleTab Ft ;
+  DoubleTab Stress ;
+
+  DoubleTab x ;
+  DoubleTab u ;
+  DoubleTab v ;
+  DoubleTab vp ;
+  DoubleTab a ;
+  DoubleTab ff ;
+
+  DoubleVect mass ;
+
+  // Public variables
+  // ----------------
+
+  int gridNStep ;
+  double gridTime ;
+  double gridDt ;
+  bool isMassBuilt ;
 
 protected:
 
@@ -80,10 +114,7 @@ protected:
    - `Tridimensional`
   */
 
-  int minNumberOfMaterialProperties_ = 2 ;
-
-  double elasticityModulus_ = 0;
-  double poissonRatio_ = 0;
+  std::map<std::string,std::vector<double>> matp_ ; // MFront material properties
 
   double rdt_ = 1.;    // this is used by mgis
 
@@ -108,13 +139,11 @@ protected:
   // Parameters and global variables
   // -------------------------------
 
-  double inertialDamping_ = 0;
+  double inertialDamping_ ;
+  double density_  ;
   double dtSafetyCoefficient_ = 0.8 ;
+  double youngModulus_ ; // temporary for stability only
 
-  int nstep_ ; // number of steps performed in structural dynamics integration
-  double time_ ; // internal time counter
-
-  int nbn_ ; // number of vertex nodes
   int nSymSize_ ; // length of non-symetric tensor in Voigt notation
   int symSize_ ; // length of symetric tensor in Voigt notation
   DoubleTab Eta_ ; // Shape function derivatives
@@ -123,6 +152,7 @@ protected:
   // -----------------------------------------------
 
   int iel_ ; // id of current element
+  int nbn_ ; // number of vertex nodes
   DoubleTab xl_ ; // local current coordinates
   DoubleTab ul_ ; // local nodal displacements
   DoubleTab fl_ ; // local nodal forces
@@ -132,16 +162,7 @@ protected:
   // Global vectors and arrays for dynamic time integration
   // ------------------------------------------------------
 
-  DoubleTab B0_ ;
-  DoubleTab Ft_ ;
-  DoubleTab Stress_ ;
-
-  DoubleTab x_ ;
-  DoubleTab u_ ;
-  DoubleTab v_ ;
-  DoubleTab vp_ ;
-  DoubleTab a_ ;
-  DoubleTab ff_ ;
+  DoubleVect massElem_ ;
 
   // Functions
   // ---------
@@ -178,14 +199,9 @@ inline void Structural_dynamic_mesh_model::setMfrontModelName(const std::string&
   h_ = h ;
 }
 
-inline void Structural_dynamic_mesh_model::setElasticityModulus(const double& E)
+inline void Structural_dynamic_mesh_model::setDensity(const double& rho)
 {
-  elasticityModulus_ = E ;
-}
-
-inline void Structural_dynamic_mesh_model::setPoissonRatio(const double& nu)
-{
-  poissonRatio_ = nu ;
+  density_ = rho ;
 }
 
 inline void Structural_dynamic_mesh_model::setInertialDamping(const double& D)
@@ -198,9 +214,39 @@ inline void Structural_dynamic_mesh_model::setDtSafetyCoefficient(const double& 
   dtSafetyCoefficient_ = c ;
 }
 
-inline int Structural_dynamic_mesh_model::getMinNumberOfMaterialProperties() const
+inline void Structural_dynamic_mesh_model::setYoungModulus(const double& E)
 {
-  return minNumberOfMaterialProperties_ ;
+  youngModulus_ = E ;
+}
+
+inline void Structural_dynamic_mesh_model::addMaterialProperty(const std::string name, const std::vector<double> val)
+{
+  matp_.insert(std::pair<std::string, std::vector<double>>(name, val)) ;
+}
+
+inline int Structural_dynamic_mesh_model::getNbNodesPerElem()
+{
+  return nbn_ ;
+}
+
+inline double Structural_dynamic_mesh_model::getDensity()
+{
+  return density_ ;
+}
+
+inline double Structural_dynamic_mesh_model::getYoungModulus()
+{
+  return youngModulus_ ;
+}
+
+inline double Structural_dynamic_mesh_model::getDampingCoefficient()
+{
+  return inertialDamping_ ;
+}
+
+inline void Structural_dynamic_mesh_model::setMassElem(const double& mass)
+{
+  massElem_[iel_] = mass ;
 }
 
 #endif

@@ -118,7 +118,9 @@ protected:
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
   double tempsComputeForceOnBeam; // Time at which the fluid force acting on the Beam is computed.
-  int meshMotionModel_ ; // Model for ALE mesh motion, 0 = laplacian, 1 = dynamic mesh model
+  int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
+  void solveDynamicMeshProblem_(double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityNodes,
+                                DoubleTab& outputMeshVelocity, int nbSom, int nbElem, int nbSomElem, IntTab& sommets) ;
 
 };
 

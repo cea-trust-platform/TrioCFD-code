@@ -42,8 +42,6 @@
 #include <communications.h>
 #include <Faces.h>
 
-#include <vector>
-
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
 Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), associate_eq(false),  tempsComputeForceOnBeam(0.), meshMotionModel_(0)
@@ -362,6 +360,10 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
 
   vit_maillage=0.;
   DoubleTab vit_bords(vit_maillage);
+
+  IntVect tag_nodes_bords(nb_som()) ;
+  MD_Vector_tools::creer_tableau_distribue(md, tag_nodes_bords);
+
   //DoubleTab tab_champ_front(vit_maillage);
   for (n=0; n<nb_bords_ALE; n++)
     {
@@ -471,7 +473,60 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
   //If ALE boundary velocity is zero, then ALE mesh velocity is directly zero (= default initialization value). Otherwise laplacien() is used.
   if(vit_bords.mp_max_abs_vect() >=1.e-12)
     {
-      laplacien(le_domaine_dis, pb, vit_bords, vit_maillage);
+      switch (meshMotionModel_)
+        {
+        case(0) : // Laplacien
+          laplacien(le_domaine_dis, pb, vit_bords, vit_maillage);
+          break ;
+
+        case(1) : // Structural dynamics
+
+          // Tag nodes with imposed velocity
+          tag_nodes_bords = 0 ;
+          const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+          for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
+            {
+              //for n_bord
+              const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int num1 = le_bord.num_premiere_face();
+              int num2 = num1 + le_bord.nb_faces();
+
+              for (int face=num1; face<num2; face++)
+                {
+                  int elem=domaine_VEF.face_voisins(face,0);
+                  for(int isom=0; isom<dimension; isom++)
+                    {
+                      int som=domaine_VEF.face_sommets(face,isom);
+                      som=get_renum_som_perio(som);
+                      tag_nodes_bords[som] = 1 ;
+                    }
+                }
+            }
+
+          tag_nodes_bords.echange_espace_virtuel() ;
+
+          // Initialize x with current coordinates
+          for (int i=0; i<N_som; i++)
+            {
+              for (int k=0; k<dimension; k++)
+                str_mesh_model->x(i,k) = coord(i,k) ;
+            }
+
+          // Solve explicit dynamic problem giving mesh displacement and velocity at time "temps"
+          int nbSom = nb_som() ;
+          int nbElem = nb_elem() ;
+          int nbSomElem= nb_som_elem() ;
+          IntTab& sommets = les_elems() ;
+
+          solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets) ;
+          break ;
+
+        default :
+          Cerr << "Unknown model for ALE grid motion" << finl ;
+          exit();
+        }
       check_NoZero_ALE = true;
     }
   else
@@ -1184,10 +1239,7 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
   Nom nomlu;
   double var_double;
 
-  int npropmin = str_mesh_model->getMinNumberOfMaterialProperties() ;
-  std::vector<std::string> name_prop(npropmin) ;
-  std::vector<double> val_prop(npropmin) ;
-  int nprop = 0 ;
+  std::vector<double> val_prop ;
 
   is >> motlu;
   if (motlu != accolade_ouverte)
@@ -1214,35 +1266,39 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
           std::string const mfront_model_name(nomlu) ;
           str_mesh_model->setMfrontModelName(mfront_model_name) ;
         }
-      if(motlu=="Mfront_material_properties")
+      if(motlu=="Mfront_material_property")
         {
           is >> motlu;
           if (motlu != accolade_ouverte)
             {
-              Cerr << "Error reading Mfront material properties\n";
+              Cerr << "Error reading Mfront material property\n";
               Cerr << "A " << accolade_ouverte << " was expected instead of \n"
                    << motlu;
               exit();
             }
+          is >> motlu ;
+          std::string const nom_prop(motlu) ;
           while (1)
             {
-              is >> motlu ;
-              std::string const nom_prop(motlu) ;
               is >> var_double ;
-              if ( nprop <= npropmin)
-                {
-                  name_prop[nprop] = nom_prop ;
-                  val_prop[nprop] = var_double ;
-                }
-              else
-                {
-                  name_prop.push_back(nom_prop) ;
-                  val_prop.push_back(var_double) ;
-                }
-              nprop++ ;
+              val_prop.push_back(var_double) ;
+
               if (motlu == accolade_fermee)
                 break;
             }
+
+          str_mesh_model->addMaterialProperty(nom_prop, val_prop) ;
+        }
+      // Temporary: YoungModulus is needed only for stability, it should be extracted back from Mfront in some way
+      if(motlu=="YoungModulus")
+        {
+          is >> var_double;
+          str_mesh_model->setYoungModulus(var_double) ;
+        }
+      if(motlu=="Density")
+        {
+          is >> var_double;
+          str_mesh_model->setDensity(var_double) ;
         }
       if(motlu=="Inertial_Damping")
         {
@@ -1256,6 +1312,134 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
         }
       if (motlu == accolade_fermee)
         break;
+    }
+
+  if(str_mesh_model->getDensity() == 0.)
+    {
+      Cerr << "Error: density not provided" << finl;
+      exit();
+    }
+  // Temporary: YoungModulus is needed only for stability, it should be extracted back from Mfront in some way
+  if(str_mesh_model->getYoungModulus() == 0.)
+    {
+      Cerr << "Error: Young modulus not provided" << finl;
+      exit();
+    }
+
+}
+
+void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                                           DoubleTab& outputMeshVelocity, int nbSom, int nbElem, int nbSomElem, IntTab& sommets)
+{
+
+  DoubleTab x0(str_mesh_model->x) ; // Copy coordinates at the beginning of the step
+  double tt = str_mesh_model->gridTime ;
+  double t0 = tt ;
+  bool loopOnGridProblem = true ;
+
+  while (loopOnGridProblem)
+    {
+      // Adjust the grid time step for smooth arrival at time = temps
+      if (str_mesh_model->gridDt >= temps - tt)
+        {
+          str_mesh_model->gridDt = temps - tt ;
+          loopOnGridProblem = false ; // final time reached after this last step
+        }
+      else if (str_mesh_model->gridDt >= 0.5 * (temps - tt)) // Avoid excessive time step variations
+        {
+          str_mesh_model->gridDt = 0.5 * (temps - tt) ;
+        }
+
+      double Dt = str_mesh_model->gridDt ;
+      tt += Dt ;
+
+      // Update mid-step velocities, displacements and coordinates
+      for (int i=0; i<nbSom; i++)
+        {
+          for (int j=0; j<dimension; j++)
+            {
+              str_mesh_model->vp(i,j) = str_mesh_model->v(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
+              if (imposedVelocityTag[j] == 1)
+                {
+                  str_mesh_model->vp(i,j) = imposedVelocity(j,i) ; // Apply imposed velocity from the boundary
+                }
+              double du = Dt * str_mesh_model->vp(i,j) ;
+              str_mesh_model->u(i,j) += du ;
+              str_mesh_model->x(i,j) += du ;
+            }
+        }
+
+      // Compute internal forces
+      str_mesh_model->ff = 0. ;
+      int nbn = str_mesh_model->getNbNodesPerElem() ;
+      int elnodes[nbn] ;
+      double volume ;
+      double xlong ;
+      double E ;
+      double density = str_mesh_model->getDensity() ;
+      double dts ;
+
+      str_mesh_model->gridDt = 1.E12 ; // Initialize gridDt at <huge>
+
+      for (int elem=0; elem<nbElem; elem++)
+        {
+          for (int i=0; i< nbn; i++)
+            {
+              elnodes[i] = get_renum_som_perio(sommets(elem,i)) ;
+            }
+
+          str_mesh_model->setLocalFields(elnodes, elem) ; // x, u global to local + elem id
+
+          str_mesh_model->computeInternalForces(volume, xlong, E) ; // local force computation on element elem
+
+          str_mesh_model->setGlobalFields(elnodes) ; // ff back to global
+
+          if (!str_mesh_model->isMassBuilt)
+            {
+              str_mesh_model->setMassElem(volume * density) ;
+              for (int i=0; i< nbn; i++)
+                {
+                  int ii = elnodes[i] ;
+                  str_mesh_model->mass[ii] += volume * density / nbn ;
+                }
+            }
+
+          // Set next time step
+          dts = str_mesh_model->computeCriticalDt(volume, xlong, E) ;
+          str_mesh_model->gridDt = std::min(str_mesh_model->gridDt, dts) ;
+        }
+
+      MD_Vector_tools::echange_espace_virtuel(str_mesh_model->ff, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+      if (!str_mesh_model->isMassBuilt)
+        {
+          MD_Vector_tools::echange_espace_virtuel(str_mesh_model->mass, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+          str_mesh_model->isMassBuilt = true ;
+        }
+
+      // Compute accelerations and full step velocities
+      double rhs ;
+      double den ;
+      double d = str_mesh_model->getDampingCoefficient() ;
+      for (int i=0; i<nbSom; i++)
+        {
+          for (int j=0; j<dimension; j++)
+            {
+              rhs = -str_mesh_model->ff(i,j) - d * str_mesh_model->mass[j] * str_mesh_model->vp(i,j) ;
+              den = str_mesh_model->mass[j] * (1. + 0.5 * d * Dt) ;
+              str_mesh_model->a(i,j) = rhs / den ;
+              str_mesh_model->v(i,j) = str_mesh_model->vp(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
+            }
+        }
+    } // End time loop on grid problem
+
+  str_mesh_model->gridTime = tt ;
+
+  for (int i=0; i<nbSom; i++)
+    {
+      for (int j=0; j<dimension; j++)
+        {
+          outputMeshVelocity(i,j) = (str_mesh_model->x(i,j) - x0(i,j)) / (tt - t0) ;
+        }
     }
 
 }

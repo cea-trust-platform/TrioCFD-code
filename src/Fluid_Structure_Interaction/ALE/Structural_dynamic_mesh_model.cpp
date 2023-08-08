@@ -13,10 +13,15 @@ Structural_dynamic_mesh_model::Structural_dynamic_mesh_model()
   l_ = "unset string" ;
   f_ = "unset string" ;
   h_ = "unset string" ;
-  elasticityModulus_ = 0. ;
-  poissonRatio_ = 0. ;
+
+  density_ = 0. ;
   inertialDamping_ = 0. ;
-  time_ = 0. ;
+  youngModulus_ = 0. ;
+
+  gridNStep = 0 ;
+  gridTime = 0. ;
+  gridDt = 0. ;
+  isMassBuilt = false ;
 
 }
 Structural_dynamic_mesh_model::~Structural_dynamic_mesh_model()
@@ -65,34 +70,103 @@ void Structural_dynamic_mesh_model::initMfrontBehaviour()
         case (2) :
           Cerr << "Use default Mfront hypothesis for 2D (PlaneStrain)" << finl ;
           h_ = "PlaneStrain" ;
+          break ;
         case (3) :
           Cerr << "Use default Mfront hypothesis for 3D (Tridimensional)" << finl ;
           h_ = "Tridimensional" ;
+          break ;
         }
 
     }
   hypothesis_= mgis::behaviour::fromString(h_) ;
 
+  // dt/rdt
+  mgisBehaviourData_.dt  = 0.;
+  mgisBehaviourData_.rdt = &rdt_;
+
+  mgisBehaviourData_.s0.material_properties = nullptr;
+  mgisBehaviourData_.s1.material_properties = nullptr;
+
   load_behaviour_(StressMeasureKind::cauchy, TangentOperatorKind::none) ;
   if ( nbIvars_ > 0)
     {
-      // Error: only pure elastic behaviours are allowed for mesh motion
+      Cerr << "Wrong Mfront behaviour for structural dynamic mesh motion" << finl ;
+      Cerr << "Only pure elastic materials are allowed" << finl ;
+      exit();
     }
   if ( nbEvars_ > 0)
     {
-      // Error: no external variables are allowed for mesh motion
+      Cerr << "Wrong Mfront behaviour for structural dynamic mesh motion" << finl ;
+      Cerr << "No external variable allowed" << finl ;
+      exit();
+    }
+
+  // Check and fill material properties for Mfront behaviour
+  matpSize_                                 = mgis::behaviour::getArraySize(mgisBehaviour_.mps, hypothesis_);
+  double *s0MaterialProperties              = new double[matpSize_];
+  double *s1MaterialProperties              = new double[matpSize_];
+  mgisBehaviourData_.s0.material_properties = s0MaterialProperties;
+  mgisBehaviourData_.s1.material_properties = s1MaterialProperties;
+  for (auto mps : mgisBehaviour_.mps)
+    {
+      size_t vOffset = mgis::behaviour::getVariableOffset(mgisBehaviour_.mps, mps.name, hypothesis_);
+      size_t vSize   = mgis::behaviour::getVariableSize(mps, hypothesis_);
+      auto it        = matp_.find(mps.name);
+      if (it != matp_.end())
+        {
+          if (vSize != (it->second).size())
+            {
+              Cerr << "Error with input for Mfront behaviour " << f_ << finl ;
+              Cerr << "The number of scalar values must be " << vSize << " for property " << mps.name << finl ;
+              exit();
+            }
+          for (size_t i = 0; i < vSize; ++i)
+            {
+              s0MaterialProperties[vOffset + i] = it->second[i];
+              s1MaterialProperties[vOffset + i] = it->second[i];
+            }
+        }
+      else
+        {
+          Cerr << "Error with input for Mfront behaviour " << f_ << finl ;
+          Cerr << "Missing data for for property " << mps.name << finl ;
+          exit();
+        }
     }
 
 }
 
-void Structural_dynamic_mesh_model:: initDynamicMeshProblem(const int nsom, const int nelem)
+void Structural_dynamic_mesh_model:: initDynamicMeshProblem(const int nsom, const int nelem, const MD_Vector& md)
 {
-  x_.resize(nsom,dimension) ;
-  u_.resize(nsom,dimension) ;
-  v_.resize(nsom,dimension) ;
-  vp_.resize(nsom,dimension) ;
-  a_.resize(nsom,dimension) ;
-  ff_.resize(nsom,dimension) ;
+  x.resize(nsom,dimension) ;
+  u.resize(nsom,dimension) ;
+  v.resize(nsom,dimension) ;
+  vp.resize(nsom,dimension) ;
+  a.resize(nsom,dimension) ;
+  ff.resize(nsom,dimension) ;
+
+  mass.resize(nsom) ;
+
+  B0.resize(nelem,dimension*nbn_) ;
+  Ft.resize(nelem, nSymSize_) ;
+  Stress.resize(nelem, symSize_) ;
+
+  massElem_.resize(nelem) ;
+
+  // Only ff and mass need to be built as distributed arrays
+  MD_Vector_tools::creer_tableau_distribue(md, ff) ;
+  MD_Vector_tools::creer_tableau_distribue(md, mass) ;
+
+  u=0 ;
+  v=0 ;
+  vp=0 ;
+  a=0 ;
+  ff=0 ;
+  mass=0. ;
+
+  Ft = 0. ;
+  Stress = 0. ;
+  massElem_ = 0. ;
 
   switch (dimension)
     {
@@ -108,6 +182,8 @@ void Structural_dynamic_mesh_model:: initDynamicMeshProblem(const int nsom, cons
       Eta_(2,1) = -1. ;
       Eta_(2,2) =  0. ;
       Eta_(2,3) =  1. ;
+
+      break ;
     case (3) :
       nbn_ = 4 ;
       nSymSize_ = 9 ;
@@ -126,6 +202,8 @@ void Structural_dynamic_mesh_model:: initDynamicMeshProblem(const int nsom, cons
       Eta_(3,2) =  0. ;
       Eta_(3,3) =  0. ;
       Eta_(3,4) =  1. ;
+
+      break ;
     }
 
   xl_.resize(nbn_,dimension) ;
@@ -134,12 +212,9 @@ void Structural_dynamic_mesh_model:: initDynamicMeshProblem(const int nsom, cons
 
   B0l_.resize(dimension,nbn_) ;
 
-  B0_.resize(nelem,dimension*nbn_) ;
-  Ft_.resize(nelem, nSymSize_) ;
-  Stress_.resize(nelem, symSize_) ;
 }
 
-void Structural_dynamic_mesh_model::computeInternalForces()
+void Structural_dynamic_mesh_model::computeInternalForces(double Vol, double Xlong, double E)
 {
 
   // Integration with 1 single gauss point on triangular (dimension=2) or tetrahedral (dimension=3) finite element
@@ -161,8 +236,6 @@ void Structural_dynamic_mesh_model::computeInternalForces()
     }
 
   double Det ;
-  double Vol ;
-  double Xlong ;
   DoubleTab InvJac(dimension, dimension) ;
   double aux ;
   switch (dimension)
@@ -176,11 +249,13 @@ void Structural_dynamic_mesh_model::computeInternalForces()
       InvJac(1,1) =  Jac(0,0) * aux ;
 
       triangleSurfLength_(Vol, Xlong, Det) ;
+
+      break ;
     case (3) :
       Det= Jac(0,0) * (Jac(1,1) * Jac(2,2) - Jac(1,2) * Jac(2,1))
            - Jac(0,1) * (Jac(1,0) * Jac(2,2) - Jac(1,2) * Jac(2,0))
            + Jac(0,2) * (Jac(1,0) * Jac(2,1) - Jac(1,1) * Jac(2,0)) ;
-      aux = 0. / Det ;
+      aux = 1. / Det ;
       InvJac(0,0) =  (Jac(1,1) * Jac(2,2) - Jac(2,1) * Jac(1,2)) * aux ;
       InvJac(0,1) = -(Jac(0,1) * Jac(2,2) - Jac(2,1) * Jac(0,2)) * aux ;
       InvJac(0,2) =  (Jac(0,1) * Jac(1,2) - Jac(1,1) * Jac(0,2)) * aux ;
@@ -192,6 +267,8 @@ void Structural_dynamic_mesh_model::computeInternalForces()
       InvJac(2,2) =  (Jac(0,0) * Jac(1,1) - Jac(1,0) * Jac(0,1)) * aux ;
 
       tetrahedronVolLength_(Vol, Xlong, Det) ;
+
+      break ;
     }
 
   DoubleTab B(dimension, nbn_) ;
@@ -207,48 +284,48 @@ void Structural_dynamic_mesh_model::computeInternalForces()
         }
     }
 
-  if (nstep_ == 0) setB0_(B) ; // save B matrix on initial configuration
+  if (gridNStep == 0) setB0_(B) ; // save B matrix on initial configuration
 
   //  Next transformation gradient
 
-  double Ftpdt[nSymSize_] ;
-  for (int i=0; i<nSymSize_; i++) { Ftpdt[i] = 0 ; }
+  double ftpdt[nSymSize_] ;
+  for (int i=0; i<nSymSize_; i++) { ftpdt[i] = 0 ; }
 
 #define _xikbjk(i,j) xl_(i,k)*B0l_(j,k)
   for (int k=0; k<nbn_; k++)
     {
-      Ftpdt[0] += _xikbjk(0,0); // F11=x1k*dNk/dx01
-      Ftpdt[1] += _xikbjk(1,1); // F22=x2k*dNk/dx02
-      Ftpdt[3] += _xikbjk(0,1); // F12=x1k*dNk/dx02
-      Ftpdt[4] += _xikbjk(1,0); // F21=x2k*dNk/dx01
+      ftpdt[0] += _xikbjk(0,0); // F11=x1k*dNk/dx01
+      ftpdt[1] += _xikbjk(1,1); // F22=x2k*dNk/dx02
+      ftpdt[3] += _xikbjk(0,1); // F12=x1k*dNk/dx02
+      ftpdt[4] += _xikbjk(1,0); // F21=x2k*dNk/dx01
       if (dimension == 3)
         {
-          Ftpdt[2] += _xikbjk(2,2); // F33=x3k*dNk/dx03
-          Ftpdt[5] += _xikbjk(0,2); // F13=x1k*dNk/dx03
-          Ftpdt[6] += _xikbjk(2,0); // F31=x3k*dNk/dx01
-          Ftpdt[7] += _xikbjk(1,2); // F23=x2k*dNk/dx03
-          Ftpdt[8] += _xikbjk(2,1); // F32=x3k*dNk/dx02
+          ftpdt[2] += _xikbjk(2,2); // F33=x3k*dNk/dx03
+          ftpdt[5] += _xikbjk(0,2); // F13=x1k*dNk/dx03
+          ftpdt[6] += _xikbjk(2,0); // F31=x3k*dNk/dx01
+          ftpdt[7] += _xikbjk(1,2); // F23=x2k*dNk/dx03
+          ftpdt[8] += _xikbjk(2,1); // F32=x3k*dNk/dx02
         }
     }
 
   //  Integrate material behavior
 
-  double Ft[nSymSize_] ;
-  for (int i=0; i<nSymSize_; i++) { Ft[i] = Ft_(iel_,i) ; }
+  double ft[nSymSize_] ;
+  for (int i=0; i<nSymSize_; i++) { ft[i] = Ft(iel_,i) ; }
 
-  double Stress[symSize_] ;
-  for (int i=0; i<symSize_; i++) { Stress[i] = Stress_(iel_,i) ; }
+  double stress[symSize_] ;
+  for (int i=0; i<symSize_; i++) { stress[i] = Stress(iel_,i) ; }
 
   double voidInternalVars[0] ;
   double voidExternalVars[0] ;
   double K[stiffnessMatrixMinSize_] ;
   K[0] = 0.; // Stiffness matrix not computed, see mfront/mgis convention
 
-  integrate_behaviour_(Stress, voidInternalVars, voidExternalVars, K, Ft, Ftpdt) ;
+  integrate_behaviour_(stress, voidInternalVars, voidExternalVars, K, ft, ftpdt) ;
 
   // Update stress and transformation gradient
-  for (int i=0; i<symSize_; i++) { Stress_(iel_,i) = Stress[i] ; }
-  for (int i=0; i<nSymSize_; i++) { Ft_(iel_,i) = Ftpdt[i] ; }
+  for (int i=0; i<symSize_; i++) { Stress(iel_,i) = stress[i] ; }
+  for (int i=0; i<nSymSize_; i++) { Ft(iel_,i) = ftpdt[i] ; }
 
   //  Compute local forces
   aux = 1./sqrt(2.) ;
@@ -267,6 +344,7 @@ void Structural_dynamic_mesh_model::computeInternalForces()
           fl_(1,k) += Vol * (B(0,k) * cauchy[2] + B(1,k) * cauchy[1]) ;
         }
 
+      break ;
     case (3) :
       cauchy[0] = Stress[0] ;
       cauchy[1] = Stress[1] ;
@@ -281,7 +359,12 @@ void Structural_dynamic_mesh_model::computeInternalForces()
           fl_(1,k) += Vol * (B(0,k) * cauchy[3] + B(1,k) * cauchy[1] + B(2,k) * cauchy[4]) ;
           fl_(2,k) += Vol * (B(0,k) * cauchy[5] + B(1,k) * cauchy[4] + B(2,k) * cauchy[2]) ;
         }
+
+      break ;
     }
+
+  // Temporary export of Young Modulus
+  E = youngModulus_ ;
 
 }
 
@@ -372,7 +455,7 @@ void Structural_dynamic_mesh_model::setB0_(const DoubleTab& B)
     {
       for (int i=0; i < nbn_ ; i++)
         {
-          B0_(iel_,pos) = B(j,i) ;
+          B0(iel_,pos) = B(j,i) ;
           pos++ ;
         }
     }
@@ -459,9 +542,57 @@ void Structural_dynamic_mesh_model::integrate_behaviour_(double *const stress,  
   if (ierr == -1)
     {
       // Message::error("Integration of the behavior failed");
+      Cerr << "Error: Integration of the behaviour with Mfront failed" << finl ;
+      exit() ;
     }
   else if (ierr == 0)
     {
       // Message::warning("Integration of the behavior unreliable");
+      Cerr << "Warning: Integration of the behaviour with Mfront unreliable" << finl ;
     }
+}
+
+void Structural_dynamic_mesh_model::setLocalFields(const int elnodes[4], int elem)
+{
+
+  iel_ = elem ;
+
+  nbn_ = 3 ;
+  if (dimension == 3) nbn_ = 4 ;
+
+  for (int j=0; j<dimension; j++)
+    {
+      for (int i=0; i<nbn_; i++)
+        {
+          int isom = elnodes[i] ;
+          xl_(i,j) = x(j,isom) ;
+          ul_(i,j) = u(j,isom) ;
+        }
+    }
+}
+
+void Structural_dynamic_mesh_model::setGlobalFields(const int elnodes[4])
+{
+
+  for (int j=0; j<dimension; j++)
+    {
+      for (int i=0; i<nbn_; i++)
+        {
+          int isom = elnodes[i] ;
+          ff(j,isom) += fl_(i,j) ;
+        }
+    }
+}
+
+double Structural_dynamic_mesh_model::computeCriticalDt(double Vol, double Xlong, double E)
+{
+
+  // Current density
+  double currDensity = massElem_(iel_) / Vol ;
+
+  // Speed of sound
+  double cSound = sqrt(E / currDensity) ;
+
+  return Xlong / cSound ;
+
 }
