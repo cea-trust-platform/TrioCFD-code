@@ -57,14 +57,7 @@ public :
   void completer();
   int associer_(Objet_U& ob) override;
   void set_param(Param& p);
-  double get_Qtcl()
-  {
-//   return Qtcl_;
-    //  Qtcl_ = coeffb_ + coeffa_*(theta_app_*22/(7*180));
-//   Cerr << "coeffb " << coeffb_ << " coeffa " << coeffa_ << "theta " << (theta_app_) << finl;
-    //  return (coeffb_ + coeffa_*(theta_app_))*(6.2/(theta_app_));
-    return Qtcl_;
-  };
+  double get_Qtcl(const int num_face);
   const double& get_lv() const
   {
     return lv_;
@@ -94,6 +87,10 @@ public :
     return capillary_effect_on_theta_activated_;
   };
 
+  const int& is_read_via_file() const
+  {
+    return read_via_file_;
+  };
   const int& tag_tcl() const
   {
     return tag_tcl_;
@@ -128,11 +125,8 @@ public :
   void correct_wall_adjacent_temperature_according_to_TCL_fluxes(DoubleTab& temperature) const;
   void set_wall_adjacent_temperature_according_to_TCL_model(DoubleTab& temperature) const;
   void correct_TCL_energy_evolution(DoubleTab& temperature) const;
-  void set_theta_app(double val)
-  {
-    theta_app_= val;
-    Cerr << "theta_app inside set_theta_app " << theta_app_ << finl;
-  };
+  double get_theta_app(const int num_face);
+
 
   void associer_eq_temperature(const Convection_Diffusion_Temperature_FT_Disc& eq_temp);
   void associer_eq_ns(const Equation_base& eq);
@@ -173,6 +167,10 @@ protected :
   double kl_cond_; // We store the liquid conductivity for easy access.
   double rhocpl_;
   int inout_method_ = 0;
+  // Tabulation TCL model
+  int read_via_file_ ;
+  Nom Nom_ficher_tcl_;
+  DoubleTab tab_Mtcl_;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.

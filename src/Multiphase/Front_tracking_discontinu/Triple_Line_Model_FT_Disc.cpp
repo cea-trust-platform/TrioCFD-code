@@ -29,6 +29,10 @@
 #include <Domaine_VF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
+#include <LecFicDiffuse.h>
+#include <Domaine_Cl_VDF.h>
+#include <Echange_contact_VDF_FT_Disc.h>
+
 
 static const double TSAT_CONSTANTE = 0.;
 
@@ -60,6 +64,7 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   initial_CL_xcoord_(0.),
   kl_cond_(-1.),  // Invalid
   rhocpl_(-1.),  // Invalid
+  read_via_file_(0),
   integration_time_(0.),
   instant_mmicro_evap_(0.),
   instant_mmeso_evap_(0.),
@@ -69,7 +74,6 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   integrated_vmicro_evap_(0.),
   integrated_vmeso_evap_(0.),
   vevap_int_(0.)
-
 {
 }
 
@@ -94,6 +98,41 @@ Entree& Triple_Line_Model_FT_Disc::readOn( Entree& is )
   p.lire_avec_accolades_depuis(is);
   if (!deactivate_)
     activated_ = true;
+  if (read_via_file_)
+    {
+      LecFicDiffuse fic;
+      fic.ouvrir(Nom_ficher_tcl_);
+      Cerr << "Reading of the ascii file : " << Nom_ficher_tcl_ << finl;
+
+      int nb_colons = 5; // nb colons in the
+
+      for (int k = 0; k < nb_colons; k++)
+        {
+          Nom name_colon_;
+          fic >> name_colon_;
+          Cerr << "--Name of the " << k + 1 << "-th colon : " << name_colon_
+               << finl;
+        }
+
+
+      double tmp;
+      ArrOfDouble list_val;
+      list_val.set_smart_resize(1);
+
+      while (fic.get(&tmp, 1))
+        {
+          list_val.append_array(tmp);
+        }
+
+      int nb_lines = list_val.size_array () / nb_colons;
+      tab_Mtcl_.resize (nb_colons, nb_lines);
+
+      for (int i = 0; i < nb_lines; i++)
+        for (int k = 0; k < nb_colons; k++)
+          {
+            tab_Mtcl_ (k, i) = list_val[i * nb_colons + k];
+          }
+    }
   return is;
 }
 
@@ -111,6 +150,8 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
   p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entire Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
+  p.ajouter("read_via_file", &read_via_file_);
+  p.ajouter("file_name", &Nom_ficher_tcl_); // X_D_ADD_P floattant Input file to set TCL model
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
   p.ajouter_flag("deactivate", &deactivate_);
@@ -1183,7 +1224,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 const double temps = ns.schema_temps().temps_courant();
                 {
                   // const double v = volumes[elem];
-                  double Qtot = get_Qtcl();
+                  double Qtot = get_Qtcl(num_face);
 //                     if (dI_dt(elem) > 0.)
 //                       {
 //                         Qtot = 0.;
@@ -1785,3 +1826,112 @@ void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_T
       temperature(elem) = Twall - flux*d/kl_cond_; // Can be done several times, no problem.
     }
 }
+
+double Triple_Line_Model_FT_Disc:: get_Qtcl(const int num_face)
+{
+//   return Qtcl_;
+  //  Qtcl_ = coeffb_ + coeffa_*(theta_app_*22/(7*180));
+//   Cerr << "coeffb " << coeffb_ << " coeffa " << coeffa_ << "theta " << (theta_app_) << finl;
+  //  return (coeffb_ + coeffa_*(theta_app_))*(6.2/(theta_app_));
+  if (read_via_file_)
+    {
+      const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
+                             num_face);
+
+      const int num_col = 1; // colon number corresponding to Qtcl
+
+      int ind = 0;
+      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (0, ind) < Twall)
+        {
+          ++ind;
+        }
+      if (ind == 0)
+        {
+          if (!est_egal (tab_Mtcl_ (0, ind), 0))
+            Qtcl_ =  tab_Mtcl_ (num_col, ind) *Twall / tab_Mtcl_ (0, ind);
+          else
+            Qtcl_ = 0. ;
+        }
+      else if (ind == tab_Mtcl_.dimension (1))
+        {
+          Qtcl_ = tab_Mtcl_ (num_col, ind - 1);
+        }
+      else
+        {
+          double x1 = tab_Mtcl_ (0, ind - 1);
+          double x2 = tab_Mtcl_ (0, ind);
+          double y1 = tab_Mtcl_ (num_col, ind - 1);
+          double y2 = tab_Mtcl_ (num_col, ind);
+          assert(!est_egal (x1, x2));
+          Qtcl_ = y1 + (y2 - y1) * (Twall - x1) / (x2 - x1);
+        }
+    }
+  return Qtcl_;
+}
+
+double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
+{
+  if (read_via_file_)
+    {
+      /*
+      double Twall = 0.;
+      const Domaine_Cl_dis_base& zcldis = ref_cast(
+                                            Domaine_Cl_dis_base, ref_eq_temp_->domaine_Cl_dis ().valeur ());
+      const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
+      const Cond_lim& la_cl = zclvdf.la_cl_de_la_face (num_face);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const int ndeb = le_bord.num_premiere_face();
+      if (sub_type(Echange_contact_VDF_FT_Disc, la_cl.valeur ()))
+        {
+          const Echange_contact_VDF_FT_Disc& la_cl_typee = ref_cast(
+                                                             Echange_contact_VDF_FT_Disc, la_cl.valeur ());
+          const double T_imp = la_cl_typee.Ti_wall (num_face - ndeb);
+          Twall = T_imp;
+        }
+      else if (sub_type(Echange_impose_base, la_cl.valeur ()))
+        {
+          const Echange_impose_base& la_cl_typee = ref_cast(Echange_impose_base,
+                                                            la_cl.valeur ());
+          const double T_imp = la_cl_typee.T_ext (num_face - ndeb);
+          Twall = T_imp;
+        }
+      else
+        {
+          Cerr
+              << "How can we set Twall when temperature(elem) is not valid? Or is it?"
+              << finl;
+          Process::exit ();
+        }*/
+
+      const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
+                             num_face);
+
+      const int num_col = 2; // colon number corresponding to theta_app
+
+      int ind = 0;
+      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (0, ind) < Twall)
+        {
+          ++ind;
+        }
+      if (ind == 0)
+        {
+          theta_app_ = tab_Mtcl_ (num_col, 0);
+        }
+      else if (ind == tab_Mtcl_.dimension (1))
+        {
+          theta_app_ = tab_Mtcl_ (num_col, ind - 1);
+        }
+      else
+        {
+          double x1 = tab_Mtcl_ (0, ind - 1);
+          double x2 = tab_Mtcl_ (0, ind);
+          double y1 = tab_Mtcl_ (num_col, ind - 1);
+          double y2 = tab_Mtcl_ (num_col, ind);
+          assert(!est_egal (x1, x2));
+          theta_app_ = y1 + (y2 - y1) * (Twall - x1) / (x2 - x1);
+        }
+    }
+  return theta_app_;
+}
+
+

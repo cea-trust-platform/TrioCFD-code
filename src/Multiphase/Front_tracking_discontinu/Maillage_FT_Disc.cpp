@@ -6100,6 +6100,30 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
                            << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
                     }
+
+                  if (refequation_transport_.non_nul())
+                    {
+                      const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+                      const Probleme_base& pb = eq_interfaces.get_probleme_base();
+                      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+                      Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+
+                      int face_loc;
+                      const Domaine_Cl_dis_base& zcl =
+                        equation_transport ().get_probleme_base ().equation (
+                          0).domaine_Cl_dis ().valeur ();
+                      const Cond_lim_base& type_cl =
+                        zcl.condition_limite_de_la_face_reelle (face,
+                                                                face_loc);
+                      bool is_wall = (sub_type(Dirichlet_paroi_fixe, type_cl) || sub_type(Dirichlet_paroi_defilante,type_cl));
+
+                      if (tcl.is_activated() && tcl.is_read_via_file() && is_wall )
+                        {
+                          double theta_app = tcl.get_theta_app(face)/180.*M_PI;
+                          costheta = cos(theta_app);
+                          Cerr << "[TCL-model] Contact_angle apparent= " << (theta_app/M_PI)*180 << finl;
+                        }
+                    }
 #endif
                   // Normale unitaire au bord
                   double nfx, nfy, nfz;
