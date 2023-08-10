@@ -107,6 +107,7 @@ void ComputeValParCompoInCell::calculer_moyennes_interface_element_pour_compo(
       Cerr << "bary: " << bary[0] << " " << bary[1] << " " << bary[2] << finl;
       Cerr << "normale: " << normale[0] << " " << normale[1] << " " << normale[2] << finl;
       Process::exit();
+
     }
 
   const double norm = normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2];

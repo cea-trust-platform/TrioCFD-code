@@ -40,6 +40,8 @@
 #include <memory>
 #include <stat_counters.h>
 #include <vector>
+#include <map>
+
 // #define SMOOTHING_RHO
 // #define GB_VERBOSE
 
@@ -56,6 +58,8 @@ IJK_Interfaces::IJK_Interfaces()
 {
   old_en_premier_ = true;
 }
+
+
 // Ajoute ceci dans le fichier lata maitre:
 //  GEOM meshname type_elem=TRIANGLE_3D
 //  CHAMP SOMMETS  filename.step.meshname.SOMMETS geometry=meshname size=... composantes=3
@@ -668,14 +672,16 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
 // Maybe needed to post-pro initial condition :
   if (compute_vint)
     {
-      if (compute_distance_autres_interfaces_ || (delta_p_max_repulsion_ > 0. && portee_force_repulsion_ > 0.))
+      if (compute_distance_autres_interfaces_ || (delta_p_max_repulsion_ > 0. && portee_force_repulsion_ > 0.) || 1)
         {
           DoubleTab vr_to_closer; // The velocity of the closest neighbour
           // Also calls to compute_vinterp.
           calculer_distance_autres_compo_connexe2(distance_autres_interfaces_, vr_to_closer);
         }
       else
-        compute_vinterp();
+        {
+          compute_vinterp();
+        }
     }
   // Mise en place des compteurs :
 
@@ -3469,6 +3475,7 @@ void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
   // jour.
 
   // Il y a au moins une phase continue :
+  Cerr << "!!!!!!! IJK_Interfaces::calculer_indicatrice compo bulles_reelles bulles_ghost " << nb_compo_in_num_compo_ << " " << nb_bulles_reelles_ << " " << nb_bulles_ghost_ << finl;
   assert(nb_compo_in_num_compo_ - (nb_bulles_reelles_ + nb_bulles_ghost_) > 0);
   statistiques().end_count(search_connex_components_counter_);
 
@@ -4732,15 +4739,43 @@ static inline double calculer_carre_distance_sommet_facette(const Vecteur3& coor
   return d;
 }
 
+static void fill_relative_velocity(const DoubleTab& vinterp_tmp, const DoubleTab& vinterp, const IntTab& facettes, int id_facette, int som, DoubleTab& vr_to_other)
+{
+  const double un_tiers = 1. / 3.;
+  if (id_facette == -1)
+    {
+      // Noone else is found in the given neighbourhood... default value for vr
+      // is set to zero... why not?
+      for (int idir = 0; idir < 3; idir++)
+        vr_to_other(som, idir) = 0.;
+    }
+  else
+    {
+      // indexes of the 3 vertices of the facette:
+      const int isom0 = facettes(id_facette, 0);
+      const int isom1 = facettes(id_facette, 1);
+      const int isom2 = facettes(id_facette, 2);
+      for (int idir = 0; idir < 3; idir++)
+        {
+          // Carreful, one is an index in the list (i), whereas "isomN" are
+          // indexes in the mesh!
+          const double velocity_me = vinterp_tmp(som, idir);
+          const double velocity_other =
+            un_tiers  * (vinterp(isom0, idir) + vinterp(isom1, idir) + vinterp(isom2, idir));
+          vr_to_other(som, idir) = velocity_me - velocity_other;
+        }
+    }
+}
+
 // Warning : sizes are for nb_sommets in the list sommets_a_tester, not for
 // mesh!! vr_to_other : the relative velocity to the closest marker.
-void IJK_Interfaces::calculer_distance_autres_compo_connexe(const DoubleTab& sommets_a_tester,
-                                                            const ArrOfInt& compo_connexe_sommets,
-                                                            const DoubleTab& vinterp_tmp,
-                                                            const Maillage_FT_IJK& mesh,
-                                                            ArrOfDouble& distance,
-                                                            DoubleTab& vr_to_other,
-                                                            const double distmax)
+void IJK_Interfaces::calculer_distance_autres_compo_connexe_octree(const DoubleTab& sommets_a_tester,
+                                                                   const ArrOfInt& compo_connexe_sommets,
+                                                                   const DoubleTab& vinterp_tmp,
+                                                                   const Maillage_FT_IJK& mesh,
+                                                                   ArrOfDouble& distance,
+                                                                   DoubleTab& vr_to_other,
+                                                                   const double distmax)
 {
   // Construction d'un octree avec les facettes du maillage
   Octree_Double octree;
@@ -4756,7 +4791,6 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe(const DoubleTab& som
   const int nb_som = sommets_a_tester.dimension(0);
   distance.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
   distance = distmax;
-  const double un_tiers = 1. / 3.;
   vr_to_other.resize(nb_som, 3, Array_base::NOCOPY_NOINIT);
   vr_to_other = -1e5; // Invalid value
   assert(vinterp_tmp.dimension(0) == nb_som);
@@ -4764,6 +4798,7 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe(const DoubleTab& som
     {
       Vecteur3 coord(sommets_a_tester, i);
       const int compo_connexe_som = compo_connexe_sommets[i];
+
       double dmin = distmax * distmax;
 
       // Recherche dans l'octree des facettes proches de ce point:
@@ -4791,29 +4826,142 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe(const DoubleTab& som
           // dmin = std::min(d, dmin);
         }
       distance[i] = std::min(distance[i], sqrt(dmin));
-      if (idx_facette == -1)
+      fill_relative_velocity(vinterp_tmp,vinterp_, facettes, idx_facette, i, vr_to_other);
+
+    }
+}
+
+
+static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int dir2, int n,
+                                                      const Int3& nb_elem_loc, const Int3& ijk,
+                                                      const std::map<std::array<int,3>, std::set<int>>& bary_ijk_loc, const DoubleTab& bary,
+                                                      const ArrOfInt& compo_connexe_facettes, const int compo_connexe_som,
+                                                      const double x, const double y, const double z,
+                                                      double& distance, int& id_facette )
+{
+
+  for(int sens=0; sens<2; sens++)
+    {
+      int a = sens == 0 ? std::max(ijk[dir0]-n,0) : std::min(ijk[dir0]+n,nb_elem_loc[dir0]);
+      for(int b=std::max(ijk[dir1]-n,0); b<std::min(ijk[dir1]+n,nb_elem_loc[dir1]); b++)
+        for(int c=std::max(ijk[dir2]-n,0); c<std::min(ijk[dir2]+n,nb_elem_loc[dir2]); c++)
+          {
+            std::array<int,3> current_ijk;
+            current_ijk[0] = a;
+            current_ijk[1] = b;
+            current_ijk[2] = c;
+            std::set<int> bary_in_current_ijk = bary_ijk_loc.at(current_ijk);
+            for(const auto b_fa7: bary_in_current_ijk)
+              {
+                if(compo_connexe_facettes[b_fa7] != compo_connexe_som)
+                  {
+                    //computing distance between the center of mass of this face and the vertice I'm searching the closest neighbour of
+                    double dist = (bary(b_fa7,0)-x)*(bary(b_fa7,0)-x) + (bary(b_fa7,1)-y)*(bary(b_fa7,1)-y) + (bary(b_fa7,2)-z)*(bary(b_fa7,2)-z);
+                    distance = std::min(sqrt(dist),distance);
+                    //if(som == 0) Cerr << " distance som 0 = " << distance[som] << finl;
+                    id_facette = b_fa7;
+                  }
+              }
+          }
+    }
+
+}
+
+void IJK_Interfaces::calculer_distance_autres_compo_connexe_ijk(const DoubleTab& sommets_a_tester,
+                                                                const ArrOfInt& compo_connexe_sommets,
+                                                                const DoubleTab& vinterp_tmp,
+                                                                const Maillage_FT_IJK& mesh,
+                                                                ArrOfDouble& distance,
+                                                                DoubleTab& vr_to_other,
+                                                                const double distmax)
+{
+  const IntTab& facettes = mesh.facettes();
+  const ArrOfInt& compo_connexe_facettes = mesh.compo_connexe_facettes();
+  const int nb_som = sommets_a_tester.dimension(0);
+  const int nb_fa7 = facettes.dimension(0);
+
+  const IJK_Splitting& splitting = I_ft().get_splitting(); // ToDo: check which splitting (ft or ns) we need
+  Int3 ijk_glob, ijk_loc, useless;
+  Int3 nb_elem_loc;
+  for(int dir=0; dir<3; dir++)
+    nb_elem_loc[dir] = splitting.get_nb_elem_local(dir);
+
+  distance.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
+  distance = distmax;
+  vr_to_other.resize(nb_som, 3, Array_base::NOCOPY_NOINIT);
+  vr_to_other = -1e5; // Invalid value
+  assert(vinterp_tmp.dimension(0) == nb_som);
+
+  DoubleTab bary(nb_fa7,3);
+  // for each i,j,k cell of my local domain, list of all the centers of mass that it contains
+  std::map<std::array<int,3>, std::set<int>> bary_ijk_loc;
+  for (int fa7=0; fa7<nb_fa7; fa7++)
+    {
+      // computing simple center of mass for each faces
+      int s0 = facettes(fa7,0), s1 = facettes(fa7,1), s2 = facettes(fa7,2);
+      for(int dir=0; dir<3; dir++)
+        bary(fa7,dir) = (sommets_a_tester(s0,dir) + sommets_a_tester(s1,dir) + sommets_a_tester(s2,dir)) / 3.;
+
+      splitting.search_elem(bary(fa7,0), bary(fa7,1), bary(fa7,2), ijk_glob, ijk_loc, useless);
+      std::array<int,3> ijk;
+      for(int dir=0; dir<3; dir++) ijk[dir] = ijk_loc[dir];
+      bary_ijk_loc[ijk].insert(fa7);
+    }
+
+  for (int som=0; som<nb_som; som++)
+    {
+      double x=sommets_a_tester(som,0), y=sommets_a_tester(som,1), z=sommets_a_tester(som,2);
+      splitting.search_elem(x, y, z, ijk_glob, ijk_loc, useless);
+      const int compo_connexe_som = compo_connexe_sommets[som];
+
+      bool local_domain_checked = false;
+      int n_layer = 0;
+      int id_facette = -1; //id of the closest face found
+      double& dist = distance[som];
+
+      // we stop searching for the closest neighbour if we found one, or if the entire local domain has been covered
+      while(!local_domain_checked && id_facette==-1)
         {
-          // Noone else is found in the given neighbourhood... default value for vr
-          // is set to zero... why not?
-          for (int idir = 0; idir < 3; idir++)
-            vr_to_other(i, idir) = 0.;
+          // checking left and right neighbourhood of my cell
+          check_neighbouring_layer_in_one_direction(0 /*fixed dir*/, 1, 2, n_layer,
+                                                    nb_elem_loc, ijk_loc,
+                                                    bary_ijk_loc, bary,
+                                                    compo_connexe_facettes, compo_connexe_som,
+                                                    x, y, z,
+                                                    dist, id_facette );
+
+          // check for up and down neighbourhood
+          check_neighbouring_layer_in_one_direction(1 /*fixed dir*/, 0, 2, n_layer,
+                                                    nb_elem_loc, ijk_loc,
+                                                    bary_ijk_loc, bary,
+                                                    compo_connexe_facettes, compo_connexe_som,
+                                                    x, y, z,
+                                                    dist, id_facette );
+
+
+
+          // check for front and bach neighbourhood
+          check_neighbouring_layer_in_one_direction(2 /*fixed dir*/, 0, 1, n_layer,
+                                                    nb_elem_loc, ijk_loc,
+                                                    bary_ijk_loc, bary,
+                                                    compo_connexe_facettes, compo_connexe_som,
+                                                    x, y, z,
+                                                    dist, id_facette );
+
+
+          // have we checked the whole local domain yet ?
+          int i=ijk_loc[0], j=ijk_loc[1], k=ijk_loc[2];
+          local_domain_checked = i-n_layer <= 0 && i+n_layer>= nb_elem_loc[0]
+                                 && j-n_layer <= 0 && j+n_layer>= nb_elem_loc[1]
+                                 && k-n_layer <= 0 && k+n_layer>= nb_elem_loc[2];
+
+          // next layer
+          n_layer++;
         }
-      else
-        {
-          // indexes of the 3 vertices of the facette:
-          const int isom0 = facettes(idx_facette, 0);
-          const int isom1 = facettes(idx_facette, 1);
-          const int isom2 = facettes(idx_facette, 2);
-          for (int idir = 0; idir < 3; idir++)
-            {
-              // Carreful, one is an index in the list (i), whereas "isomN" are
-              // indexes in the mesh!
-              const double velocity_me = vinterp_tmp(i, idir);
-              const double velocity_other =
-                un_tiers * (vinterp_(isom0, idir) + vinterp_(isom1, idir) + vinterp_(isom2, idir));
-              vr_to_other(i, idir) = velocity_me - velocity_other;
-            }
-        }
+
+      // Once the closest neighbour is found, fill velocity
+      fill_relative_velocity(vinterp_tmp,vinterp_, facettes, id_facette, som, vr_to_other);
+
     }
 }
 
@@ -4849,7 +4997,8 @@ void IJK_Interfaces::recursive_calcul_distance_chez_voisin(DoubleTab& vinterp_tm
   vinterp_tmp.set_smart_resize(1);
   if (dir == 3)
     {
-      calculer_distance_autres_compo_connexe(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
+      //calculer_distance_autres_compo_connexe_octree(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
+      calculer_distance_autres_compo_connexe_ijk(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
     }
   else
     {
@@ -5055,7 +5204,6 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe2(ArrOfDouble& distan
                                         distmax);
   //statistiques().end_count(cnt_CalculerDistance);
 }
-
 
 // Methodes outils permettant depuis GDB d'ecrire des fichiers tracables dans gnuplot
 // Le nom du fichier de sortie est mis en dur dans le code:
@@ -5848,6 +5996,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
   // dans les cellules pour chaque compo. Le but est de le faire une fois
   // pour toute de maniere synchronisee (et pas au moment ou on calcule la
   // force par exemple).
+  maillage_ft_ijk_.nettoyer_maillage();
   val_par_compo_in_cell_computation_.calculer_valeur_par_compo(
 #ifdef SMOOTHING_RHO
     delta_rho,

@@ -645,13 +645,21 @@ protected:
                                              double distmax);
   void calculer_distance_autres_compo_connexe2(ArrOfDouble& distance,
                                                DoubleTab& v_closer);
-  void calculer_distance_autres_compo_connexe(const DoubleTab& sommets_a_tester,
-                                              const ArrOfInt& compo_connexe_sommets,
-                                              const DoubleTab& vinterp_tmp,
-                                              const Maillage_FT_IJK& mesh,
-                                              ArrOfDouble& distance,
-                                              DoubleTab& v_closer,
-                                              const double distmax);
+  void calculer_distance_autres_compo_connexe_octree(const DoubleTab& sommets_a_tester,
+                                                     const ArrOfInt& compo_connexe_sommets,
+                                                     const DoubleTab& vinterp_tmp,
+                                                     const Maillage_FT_IJK& mesh,
+                                                     ArrOfDouble& distance,
+                                                     DoubleTab& v_closer,
+                                                     const double distmax);
+
+  void calculer_distance_autres_compo_connexe_ijk(const DoubleTab& sommets_a_tester,
+                                                  const ArrOfInt& compo_connexe_sommets,
+                                                  const DoubleTab& vinterp_tmp,
+                                                  const Maillage_FT_IJK& mesh,
+                                                  ArrOfDouble& distance,
+                                                  DoubleTab& v_closer,
+                                                  const double distmax);
 
 // reference vers le splitting_ft_ pour les interfaces :
   REF(IJK_Splitting) ref_splitting_;
