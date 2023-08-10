@@ -126,6 +126,8 @@ Read TCL
   ym 3.785e-6
   sm 4.946e-6
   initial_CL_xcoord 6.0297e-5 # Incorrect. To be computed by Vinod #
+  read_via_file 1
+  file_name test.txt
 }
 
 Champ_Uniforme gravite

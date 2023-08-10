@@ -126,6 +126,8 @@ Read TCL
   ym 3.785e-6
   sm 4.946e-6
   initial_CL_xcoord 6.0297e-5 # Incorrect. To be computed by Vinod #
+  read_via_file 1
+  file_name test.txt
 }
 
 Champ_Uniforme gravite
@@ -192,7 +194,7 @@ Lire pb1
 		# interpolation_repere_local #
 		methode_interpolation_v vdf_lineaire
 		methode_transport vitesse_interpolee hydraulique
-	        conditions_initiales { fonction x^2+(y-0.0001*cos(50.0*pi/180.0))^2-0.0001^2 }
+	        conditions_initiales { fonction x^2+(y-0.0005*cos(50.0*pi/180.0))^2-0.0005^2 }
 		VOFlike_correction_volume 1
 
 		 nb_iterations_correction_volume 1 # to get the correct dI/dt #
@@ -222,7 +224,7 @@ Lire pb1
  		}
 		boundary_conditions
 		{
-		 bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 50+90*(x_lt_3.e-5)
+		 bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 50+90*(x_lt_3.e-4)
       		 right  Paroi_FT_disc Symetrie
       		 up     Paroi_FT_disc Symetrie
       		 left   Paroi_FT_disc Symetrie
