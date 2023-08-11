@@ -81,6 +81,7 @@ public :
   inline const DoubleTab& getOldJacobian() const;
   inline const DoubleTab& getNewJacobian();
   inline const DoubleTab& getNewJacobian() const;
+  inline int getMeshMotionModel() const ;
 
 
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
@@ -95,6 +96,9 @@ public :
   const DoubleVect& getFluidForceOnBeam();
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
+  const DoubleVect& getMeshPbPressure() const ;
+  const DoubleVect& getMeshPbVonMises() const ;
+  const DoubleTab& getMeshPbForceFace() const ;
 protected:
 
   double dt_;
@@ -119,8 +123,9 @@ protected:
   bool associate_eq;
   double tempsComputeForceOnBeam; // Time at which the fluid force acting on the Beam is computed.
   int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
-  void solveDynamicMeshProblem_(double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityNodes,
-                                DoubleTab& outputMeshVelocity, int nbSom, int nbElem, int nbSomElem, IntTab& sommets) ;
+  void solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                                DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                                const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
 
 };
 
@@ -168,6 +173,11 @@ inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
+}
+
+inline int Domaine_ALE::getMeshMotionModel() const
+{
+  return meshMotionModel_ ;
 }
 
 #endif

@@ -43,6 +43,9 @@ public :
 protected :
   Champ_Inc ALEMeshVelocity_;
   Champ_Inc ALEMeshTotalDisplacement_;
+  Champ_Inc ALEMeshStructuralPressure_;
+  Champ_Inc ALEMeshStructuralVonMises_;
+  Champ_Inc ALEMeshStructuralForces_;
 };
 
 #endif

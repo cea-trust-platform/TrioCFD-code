@@ -39,7 +39,8 @@ public:
   // ----------------
 
   inline void setMfrontLibraryPath(const std::string& l) ;
-  inline void setMfrontModelName(const std::string& h) ;
+  inline void setMfrontModelName(const std::string& f) ;
+  inline void setMfrontHypothesis(const std::string& h) ;
 
   // End Mfront behaviour
   // --------------------
@@ -54,21 +55,22 @@ public:
   inline double getYoungModulus() ; // Temporary for stability only
   inline double getDampingCoefficient() ;
   inline void setMassElem(const double& mass) ;
+  inline const DoubleVect& getMeshPbPressure() const ;
+  inline const DoubleVect& getMeshPbVonMises() const ;
+  inline const DoubleTab& getMeshPbForceFace() const ;
+  inline void applyDtCoefficient() ;
 
   void initMfrontBehaviour() ;
-  void initDynamicMeshProblem(const int nsom, const int nelem, const MD_Vector& md) ;
+  void initDynamicMeshProblem(const int nsom, const int nelem, const int nface, const MD_Vector& md, const MD_Vector& mde, const MD_Vector& mdf) ;
 
-  void setLocalFields(const int elnodes[4], int elem) ;
-  void computeInternalForces(double volume, double xlong, double E) ;
-  void setGlobalFields(const int elnodes[4]) ;
-  double computeCriticalDt(double volume, double xlong, double E) ;
+  void setLocalFields(const int elnodes[4], const int elem) ;
+  void computeInternalForces(double& volume, double& xlong, double& E, double& Pressure, double& VonMises) ;
+  void setGlobalFields(const int elnodes[4], const double Pressure, const double VonMises) ;
+  double computeCriticalDt(const double volume, const double xlong, const double E) ;
+  void computeForceFaces(const int nb_faces, const int nb_som_face, const IntTab& face_sommets) ;
 
   // Global vectors and arrays for dynamic time integration
   // ------------------------------------------------------
-
-  DoubleTab B0 ;
-  DoubleTab Ft ;
-  DoubleTab Stress ;
 
   DoubleTab x ;
   DoubleTab u ;
@@ -141,7 +143,7 @@ protected:
 
   double inertialDamping_ ;
   double density_  ;
-  double dtSafetyCoefficient_ = 0.8 ;
+  double dtSafetyCoefficient_ = 0.5 ;
   double youngModulus_ ; // temporary for stability only
 
   int nSymSize_ ; // length of non-symetric tensor in Voigt notation
@@ -162,13 +164,22 @@ protected:
   // Global vectors and arrays for dynamic time integration
   // ------------------------------------------------------
 
+  DoubleTab B0_ ;
+  DoubleTab Ft_ ;
+  DoubleTab Stress_ ;
+
   DoubleVect massElem_ ;
+
+  // Fields for post-processing
+  DoubleVect meshPbPressure_ ;
+  DoubleVect meshPbVonMises_ ;
+  DoubleTab  meshPbForceFace_ ;
 
   // Functions
   // ---------
 
-  void triangleSurfLength_(double aire, double xlong, const double Det);
-  void tetrahedronVolLength_(double vol, double xlong, const double Det);
+  void triangleSurfLength_(double& aire, double& xlong, const double Det);
+  void tetrahedronVolLength_(double& vol, double& xlong, const double Det);
   void setB0_(const DoubleTab& B) ;
 
 private:
@@ -178,11 +189,14 @@ private:
 
   int nbIvars_;
   int nbEvars_;
+  int sizeEvars_ ;
   int matpSize_;
   int KSize_;
   mgis::behaviour::Hypothesis hypothesis_;
 
   bool loaded_ = false;
+
+  DoubleTab mfrontEvars_ ;
 
   // End Mfront behaviour
   // --------------------
@@ -194,7 +208,12 @@ inline void Structural_dynamic_mesh_model::setMfrontLibraryPath(const std::strin
   l_ = l ;
 }
 
-inline void Structural_dynamic_mesh_model::setMfrontModelName(const std::string& h)
+inline void Structural_dynamic_mesh_model::setMfrontModelName(const std::string& f)
+{
+  f_ = f ;
+}
+
+inline void Structural_dynamic_mesh_model::setMfrontHypothesis(const std::string& h)
 {
   h_ = h ;
 }
@@ -247,6 +266,26 @@ inline double Structural_dynamic_mesh_model::getDampingCoefficient()
 inline void Structural_dynamic_mesh_model::setMassElem(const double& mass)
 {
   massElem_[iel_] = mass ;
+}
+
+inline const DoubleVect& Structural_dynamic_mesh_model::getMeshPbPressure() const
+{
+  return meshPbPressure_ ;
+}
+
+inline const DoubleVect& Structural_dynamic_mesh_model::getMeshPbVonMises() const
+{
+  return meshPbVonMises_ ;
+}
+
+inline const DoubleTab& Structural_dynamic_mesh_model::getMeshPbForceFace() const
+{
+  return meshPbForceFace_ ;
+}
+
+inline void Structural_dynamic_mesh_model::applyDtCoefficient()
+{
+  gridDt *= dtSafetyCoefficient_ ;
 }
 
 #endif

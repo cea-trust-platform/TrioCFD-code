@@ -304,18 +304,31 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 {
   //Cerr << "Domaine_ALE::initialiser  " << finl;
 
+  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
+  int nb_faces=le_dom_VF.nb_faces();
+  int nb_faces_tot=le_dom_VF.nb_faces_tot();
+  int nb_som_face=le_dom_VF.nb_som_face();
+  IntTab& face_sommets=le_dom_VF.face_sommets();
+  const MD_Vector& mdf = le_dom_VF.md_vector_faces();
+
+  if(meshMotionModel_ == 1)
+    {
+      // Initialize fictitious dynamic problem for grid motion
+      str_mesh_model->initMfrontBehaviour() ;
+
+      int nsom = nb_som() ;
+      int nelem = nb_elem() ;
+      const MD_Vector& md = md_vector_sommets();
+      const MD_Vector& mde = md_vector_elements();
+      str_mesh_model->initDynamicMeshProblem(nsom, nelem, nb_faces, md, mde, mdf) ;
+    }
+
   deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
   //On initialise les vitesses aux faces
-  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
-  int nb_faces=le_dom_VF.nb_faces();
-  int nb_faces_tot=le_dom_VF.nb_faces_tot();
-  int nb_som_face=le_dom_VF.nb_som_face();
-  IntTab& face_sommets=le_dom_VF.face_sommets();
-
   if(!associate_eq)
     {
       const Equation_base& equation=pb.equation(0);
@@ -324,8 +337,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
     }
 
   vf.resize(nb_faces, dimension);
-  const MD_Vector& md = le_dom_VF.md_vector_faces();
-  MD_Vector_tools::creer_tableau_distribue(md, vf);
+  MD_Vector_tools::creer_tableau_distribue(mdf, vf);
 
   calculer_vitesse_faces(ALE_mesh_velocity,nb_faces_tot,nb_som_face,face_sommets);
 
@@ -519,8 +531,12 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
           int nbElem = nb_elem() ;
           int nbSomElem= nb_som_elem() ;
           IntTab& sommets = les_elems() ;
+          int nbFace = domaine_VEF.nb_faces() ;
+          int nbSomFace = domaine_VEF.nb_som_face() ;
+          const IntTab& face_sommets = domaine_VEF.face_sommets() ;
 
-          solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets) ;
+          solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets,
+                                   nbFace, nbSomFace, face_sommets) ;
           break ;
 
         default :
@@ -1233,6 +1249,8 @@ void  Domaine_ALE::computeFluidForceOnBeam()
 
 void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
 {
+  meshMotionModel_ = 1 ;
+
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   Motcle motlu;
@@ -1259,12 +1277,21 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
           is >> nomlu;
           std::string const mfront_lib_path(nomlu) ;
           str_mesh_model->setMfrontLibraryPath(mfront_lib_path) ;
+          continue ;
         }
       if(motlu=="Mfront_model_name")
         {
           is >> nomlu;
           std::string const mfront_model_name(nomlu) ;
           str_mesh_model->setMfrontModelName(mfront_model_name) ;
+          continue ;
+        }
+      if(motlu=="Mfront_hypothesis")
+        {
+          is >> nomlu;
+          std::string const mfront_hypothesis(nomlu) ;
+          str_mesh_model->setMfrontHypothesis(mfront_hypothesis) ;
+          continue ;
         }
       if(motlu=="Mfront_material_property")
         {
@@ -1276,39 +1303,51 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
                    << motlu;
               exit();
             }
-          is >> motlu ;
-          std::string const nom_prop(motlu) ;
+          is >> nomlu ;
+          std::string const nom_prop(nomlu) ;
+          val_prop.clear() ;
+          is >> var_double ;
           while (1)
             {
-              is >> var_double ;
               val_prop.push_back(var_double) ;
 
+              is >> motlu ;
               if (motlu == accolade_fermee)
                 break;
+              else
+                {
+                  std::string const strnum(motlu) ;
+                  var_double = std::stod(strnum) ;
+                }
             }
 
           str_mesh_model->addMaterialProperty(nom_prop, val_prop) ;
+          continue ;
         }
       // Temporary: YoungModulus is needed only for stability, it should be extracted back from Mfront in some way
       if(motlu=="YoungModulus")
         {
           is >> var_double;
           str_mesh_model->setYoungModulus(var_double) ;
+          continue ;
         }
       if(motlu=="Density")
         {
           is >> var_double;
           str_mesh_model->setDensity(var_double) ;
+          continue ;
         }
       if(motlu=="Inertial_Damping")
         {
           is >> var_double;
           str_mesh_model->setInertialDamping(var_double) ;
+          continue ;
         }
       if(motlu=="Time_Step_Safety_Coefficient")
         {
           is >> var_double;
           str_mesh_model->setDtSafetyCoefficient(var_double) ;
+          continue ;
         }
       if (motlu == accolade_fermee)
         break;
@@ -1328,8 +1367,9 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
 
 }
 
-void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
-                                           DoubleTab& outputMeshVelocity, int nbSom, int nbElem, int nbSomElem, IntTab& sommets)
+void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                                           DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                                           const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets)
 {
 
   DoubleTab x0(str_mesh_model->x) ; // Copy coordinates at the beginning of the step
@@ -1359,9 +1399,9 @@ void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& impose
           for (int j=0; j<dimension; j++)
             {
               str_mesh_model->vp(i,j) = str_mesh_model->v(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
-              if (imposedVelocityTag[j] == 1)
+              if (imposedVelocityTag[i] == 1)
                 {
-                  str_mesh_model->vp(i,j) = imposedVelocity(j,i) ; // Apply imposed velocity from the boundary
+                  str_mesh_model->vp(i,j) = imposedVelocity(i,j) ; // Apply imposed velocity from the boundary
                 }
               double du = Dt * str_mesh_model->vp(i,j) ;
               str_mesh_model->u(i,j) += du ;
@@ -1378,6 +1418,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& impose
       double E ;
       double density = str_mesh_model->getDensity() ;
       double dts ;
+      double pressure ;
+      double vonmises ;
 
       str_mesh_model->gridDt = 1.E12 ; // Initialize gridDt at <huge>
 
@@ -1388,11 +1430,11 @@ void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& impose
               elnodes[i] = get_renum_som_perio(sommets(elem,i)) ;
             }
 
-          str_mesh_model->setLocalFields(elnodes, elem) ; // x, u global to local + elem id
+          str_mesh_model->setLocalFields(elnodes, elem) ; // x, u, B0 global to local + elem id
 
-          str_mesh_model->computeInternalForces(volume, xlong, E) ; // local force computation on element elem
+          str_mesh_model->computeInternalForces(volume, xlong, E, pressure, vonmises) ; // local force computation on element elem
 
-          str_mesh_model->setGlobalFields(elnodes) ; // ff back to global
+          str_mesh_model->setGlobalFields(elnodes, pressure, vonmises) ; // ff back to global + store elem pressure and vonmises for postprocessing
 
           if (!str_mesh_model->isMassBuilt)
             {
@@ -1424,15 +1466,19 @@ void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& impose
         {
           for (int j=0; j<dimension; j++)
             {
-              rhs = -str_mesh_model->ff(i,j) - d * str_mesh_model->mass[j] * str_mesh_model->vp(i,j) ;
-              den = str_mesh_model->mass[j] * (1. + 0.5 * d * Dt) ;
+              rhs = -str_mesh_model->ff(i,j) - d * str_mesh_model->mass[i] * str_mesh_model->vp(i,j) ;
+              den = str_mesh_model->mass[i] * (1. + 0.5 * d * Dt) ;
               str_mesh_model->a(i,j) = rhs / den ;
               str_mesh_model->v(i,j) = str_mesh_model->vp(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
             }
         }
-    } // End time loop on grid problem
 
-  str_mesh_model->gridTime = tt ;
+      str_mesh_model->gridNStep += 1 ;
+      str_mesh_model->applyDtCoefficient() ;
+      str_mesh_model->gridTime = tt ;
+      Cerr << "Grid dynamic problem, dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", time= " << tt << ", target fluid time= " << temps << finl ;
+
+    } // End time loop on grid problem
 
   for (int i=0; i<nbSom; i++)
     {
@@ -1442,4 +1488,22 @@ void Domaine_ALE::solveDynamicMeshProblem_(double temps, const DoubleTab& impose
         }
     }
 
+  // Compute forces at face centers for postprocessing only
+  str_mesh_model->computeForceFaces(nbFace,nbSomFace,face_sommets) ;
+
+}
+
+const DoubleVect& Domaine_ALE::getMeshPbPressure() const
+{
+  return str_mesh_model->getMeshPbPressure() ;
+}
+
+const DoubleVect& Domaine_ALE::getMeshPbVonMises() const
+{
+  return str_mesh_model->getMeshPbVonMises() ;
+}
+
+const DoubleTab& Domaine_ALE::getMeshPbForceFace() const
+{
+  return str_mesh_model->getMeshPbForceFace() ;
 }
