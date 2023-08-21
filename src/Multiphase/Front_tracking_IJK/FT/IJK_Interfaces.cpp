@@ -4842,9 +4842,10 @@ static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int di
 
   for(int sens=0; sens<2; sens++)
     {
-      int a = sens == 0 ? std::max(ijk[dir0]-n,0) : std::min(ijk[dir0]+n,nb_elem_loc[dir0]);
-      for(int b=std::max(ijk[dir1]-n,0); b<std::min(ijk[dir1]+n,nb_elem_loc[dir1]); b++)
-        for(int c=std::max(ijk[dir2]-n,0); c<std::min(ijk[dir2]+n,nb_elem_loc[dir2]); c++)
+      int zero = 0;
+      int a = sens == 0 ? std::max(ijk[dir0]-n,zero) : std::min(ijk[dir0]+n,nb_elem_loc[dir0]);
+      for(int b=std::max(ijk[dir1]-n,zero); b<std::min(ijk[dir1]+n,nb_elem_loc[dir1]); b++)
+        for(int c=std::max(ijk[dir2]-n,zero); c<std::min(ijk[dir2]+n,nb_elem_loc[dir2]); c++)
           {
             std::array<int,3> current_ijk;
             current_ijk[0] = a;
