@@ -35,6 +35,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   convective_flux_correction_ = 0;
   diffusive_flux_correction_ = 0;
   override_vapour_mixed_values_ = 0;
+  compute_eulerian_compo_ = 1;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const

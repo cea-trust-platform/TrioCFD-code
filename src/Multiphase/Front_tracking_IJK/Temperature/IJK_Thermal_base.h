@@ -135,6 +135,18 @@ public:
   {
     return eulerian_grad_T_interface_;
   }
+  const IJK_Field_double& get_eulerian_compo_connex() const
+  {
+    return eulerian_compo_connex_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_ns() const
+  {
+    return eulerian_compo_connex_ns_;
+  }
+  const IJK_Field_double& get_eulerian_rising_velocities() const
+  {
+    return eulerian_rising_velocities_;
+  }
   const IJK_Field_double& get_temperature_adim_bulles() const
   {
     return temperature_adim_bulles_;
@@ -154,6 +166,10 @@ public:
   const FixedVector<IJK_Field_double, 3>& get_hessian_cross_temperature_elem() const
   {
     return hess_cross_T_elem_ ;
+  }
+  const FixedVector<IJK_Field_double, 3>& get_bary() const
+  {
+    return eulerian_facets_barycentre_;
   }
   const int& get_ghost_fluid_flag() const
   {
@@ -211,6 +227,8 @@ protected:
   void compute_eulerian_grad_T_interface();
   void propagate_eulerian_grad_T_interface();
   void compute_eulerian_temperature_ghost();
+  void compute_eulerian_bounding_box_fill_compo();
+  void compute_rising_velocities();
   void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_max_value_eulerian_field(IJK_Field_double& eulerian_field);
   void enforce_min_value_eulerian_field(IJK_Field_double& eulerian_field);
@@ -373,6 +391,7 @@ protected:
   int compute_grad_T_interface_;
   IJK_Field_double eulerian_distance_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_;
+  FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_;
   IJK_Field_double eulerian_curvature_;
   IJK_Field_double interfacial_area_;
   IJK_Field_double eulerian_grad_T_interface_;
@@ -393,6 +412,16 @@ protected:
   int compute_hess_T_elem_;
   int compute_hess_diag_T_elem_;
   int compute_hess_cross_T_elem_;
+
+  int compute_eulerian_compo_;
+  IJK_Field_double eulerian_compo_connex_;
+  IJK_Field_double eulerian_compo_connex_ns_;
+
+  int compute_rising_velocities_;
+  int fill_rising_velocities_;
+  DoubleTab rising_velocities_;
+  DoubleTab rising_vectors_;
+  IJK_Field_double eulerian_rising_velocities_;
 };
 
 #endif /* IJK_Thermal_base_included */

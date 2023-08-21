@@ -460,6 +460,76 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
 //    }
 //  oss.str("");
 
+  /*
+   * BARY_X
+   */
+  oss << "BARY_X_" << lata_suffix << idx;
+  Nom nom_bary_x(oss.str().c_str());
+  if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_X") || liste_post_instantanes.contient_(nom_bary_x))
+    {
+      n++, dumplata_scalar(lata_name, nom_bary_x, get_bary()[0], latastep);
+    }
+  oss.str("");
+
+  /*
+   * BARY_Y
+   */
+  oss << "BARY_Y_" << lata_suffix << idx;
+  Nom nom_bary_y(oss.str().c_str());
+  if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_Y") || liste_post_instantanes.contient_(nom_bary_y))
+    {
+      n++, dumplata_scalar(lata_name, nom_bary_y, get_bary()[1], latastep);
+    }
+  oss.str("");
+
+  /*
+   * BARY_Z
+   */
+  oss << "BARY_Z_" << lata_suffix << idx;
+  Nom nom_bary_z(oss.str().c_str());
+  if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_Z") || liste_post_instantanes.contient_(nom_bary_z))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_bary_z, get_bary()[2], latastep);
+    }
+  oss.str("");
+
+  /*
+   * EULERIAN_COMPO
+   */
+  oss << "EULERIAN_COMPO_" << lata_suffix << idx;
+  Nom nom_eulerian_compo(oss.str().c_str());
+  if (liste_post_instantanes.contient_("EULERIAN_COMPO") || liste_post_instantanes.contient_(nom_eulerian_compo))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_eulerian_compo, get_eulerian_compo_connex(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * EULERIAN_COMPO
+   */
+  oss << "EULERIAN_COMPO_NS_" << lata_suffix << idx;
+  Nom nom_eulerian_compo_ns(oss.str().c_str());
+  if (liste_post_instantanes.contient_("EULERIAN_COMPO_NS") || liste_post_instantanes.contient_(nom_eulerian_compo_ns))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_eulerian_compo_ns, get_eulerian_compo_connex_ns(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * RISING_VELOCITIES
+   */
+  oss << "RISING_VELOCITIES_" << lata_suffix << idx;
+  Nom nom_eulerian_rising_velocities(oss.str().c_str());
+  if (liste_post_instantanes.contient_("RISING_VELOCITIES") || liste_post_instantanes.contient_(nom_eulerian_rising_velocities))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_eulerian_rising_velocities, get_eulerian_rising_velocities(), latastep);
+    }
+  oss.str("");
+
   return n;
 }
 

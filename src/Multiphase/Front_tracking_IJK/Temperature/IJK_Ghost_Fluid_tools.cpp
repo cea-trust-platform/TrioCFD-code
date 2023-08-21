@@ -297,6 +297,9 @@ void compute_eulerian_normal_distance_facet_barycentre_field(const IJK_Interface
                 distance_field(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = distance;
               }
           }
+        const Int3 num_elem_ijk = splitting_distance.convert_packed_to_ijk_cell(elem);
+        for (int j = 0; j < dim; j++)
+          facets_barycentre[j](num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]) = centre[j];
       }
     distance_field.echange_espace_virtuel(distance_field.ghost());
     normal_vect.echange_espace_virtuel();
