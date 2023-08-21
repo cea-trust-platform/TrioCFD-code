@@ -4851,16 +4851,19 @@ static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int di
             current_ijk[0] = a;
             current_ijk[1] = b;
             current_ijk[2] = c;
-            std::set<int> bary_in_current_ijk = bary_ijk_loc.at(current_ijk);
-            for(const auto b_fa7: bary_in_current_ijk)
+            if(bary_ijk_loc.find(current_ijk)!=bary_ijk_loc.end())
               {
-                if(compo_connexe_facettes[b_fa7] != compo_connexe_som)
+                std::set<int> bary_in_current_ijk = bary_ijk_loc.at(current_ijk);
+                for(const auto b_fa7: bary_in_current_ijk)
                   {
-                    //computing distance between the center of mass of this face and the vertice I'm searching the closest neighbour of
-                    double dist = (bary(b_fa7,0)-x)*(bary(b_fa7,0)-x) + (bary(b_fa7,1)-y)*(bary(b_fa7,1)-y) + (bary(b_fa7,2)-z)*(bary(b_fa7,2)-z);
-                    distance = std::min(sqrt(dist),distance);
-                    //if(som == 0) Cerr << " distance som 0 = " << distance[som] << finl;
-                    id_facette = b_fa7;
+                    if(compo_connexe_facettes[b_fa7] != compo_connexe_som)
+                      {
+                        //computing distance between the center of mass of this face and the vertice I'm searching the closest neighbour of
+                        double dist = (bary(b_fa7,0)-x)*(bary(b_fa7,0)-x) + (bary(b_fa7,1)-y)*(bary(b_fa7,1)-y) + (bary(b_fa7,2)-z)*(bary(b_fa7,2)-z);
+                        distance = std::min(sqrt(dist),distance);
+                        //if(som == 0) Cerr << " distance som 0 = " << distance[som] << finl;
+                        id_facette = b_fa7;
+                      }
                   }
               }
           }
