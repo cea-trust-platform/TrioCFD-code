@@ -27,6 +27,7 @@
 #include <IJK_FT.h>
 #include <Corrige_flux_FT.h>
 #include <OpConvDiscQuickIJKScalar.h>
+#include <IJK_Ghost_Fluid_tools.h>
 
 Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Thermal_Subresolution", IJK_Thermal_base ) ;
 
@@ -106,6 +107,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       temperature_diffusion_op_.initialize(splitting);
     }
 
+  thermal_local_subproblems_.associer(ref_ijk_ft_);
+
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
 }
@@ -183,4 +186,67 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
             }
       temperature_.echange_espace_virtuel(temperature_.ghost());
     }
+}
+
+void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
+{
+  // FIXME : Should I use IJK_Field_local_double
+  //	IJK_Field_local_double eulerian_normal_vectors_ns;
+  //	IJK_Field_local_double eulerian_facets_barycentre_ns;
+  //	const int ni = eulerian_normal_vectors_[0].ni;
+  //	const int nj = eulerian_normal_vectors_[0].nj;
+  //	const int nk = eulerian_normal_vectors_[0].nk;
+  //	const int ng= eulerian_normal_vectors_[0].ghost();
+  //	eulerian_normal_vectors_ns.allocate(ni, nj, nk, ng);
+  //	eulerian_facets_barycentre_ns.allocate(ni, nj, nk, ng);
+  // FIXME : Work with FT fields
+  //	compute_mixed_cells_number(ref_ijk_ft_->itfce().I());
+  //  thermal_local_subproblems_.add_subproblems(mixed_cells_number_);
+  //  FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_ns;
+  //  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ns;
+  //  IJK_Splitting splitting = temperature_.get_splitting();
+  //  allocate_cell_vector(eulerian_facets_barycentre_ns, splitting, 0);
+  //  allocate_cell_vector(eulerian_normal_vectors_ns, splitting, 0);
+  //  eulerian_facets_barycentre_ns.echange_espace_virtuel();
+  //  eulerian_normal_vectors_ns.echange_espace_virtuel();
+  //  for (int dir=0; dir < 3; dir++)
+  //    {
+  //      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_facets_barycentre_[dir], eulerian_facets_barycentre_ns[dir]);
+  //      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_normal_vectors_[dir], eulerian_normal_vectors_ns[dir]);
+  //    }
+  const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I_ft();
+  const int ni = temperature_ft_.ni();
+  const int nj = temperature_ft_.nj();
+  const int nk = temperature_ft_.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        if (fabs(indicator(i,j,k)) > VAPOUR_INDICATOR_TEST && fabs(indicator(i,j,k)) < LIQUID_INDICATOR_TEST)
+          {
+            thermal_local_subproblems_.associate_sub_problem_to_inputs(i, j, k,
+                                                                       eulerian_compo_connex_,
+                                                                       eulerian_distance_,
+                                                                       eulerian_curvature_,
+                                                                       eulerian_facets_barycentre_,
+                                                                       eulerian_normal_vectors_,
+                                                                       rising_velocities_,
+                                                                       rising_vectors_);
+          }
+
+}
+
+/*
+ * TODO:
+ */
+void IJK_Thermal_Subresolution::solve_thermal_subproblems()
+{
+
+}
+
+/*
+ * TODO:
+ */
+void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
+{
+
 }

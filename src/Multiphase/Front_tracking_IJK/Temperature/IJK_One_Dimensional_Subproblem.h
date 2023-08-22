@@ -23,6 +23,13 @@
 #define IJK_One_Dimensional_Subproblem_included
 
 #include <Objet_U.h>
+#include <IJK_Field.h>
+#include <IJK_Interfaces.h>
+#include <Linear_algebra_tools.h>
+#include <FixedVector.h>
+#include <TRUSTArrays.h>
+#include <TRUSTTab.h>
+// #include <TRUSTArray.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -38,7 +45,26 @@ class IJK_One_Dimensional_Subproblem : public Objet_U
   Declare_instanciable( IJK_One_Dimensional_Subproblem ) ;
 
 public :
-
+  void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
+  void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
+  void associate_compos(int compo_connex, int compo_group) { compo_connex_ = compo_connex; compo_group_ = compo_group; };
+  void associate_interface_related_parameters(double distance, double curvature, ArrOfDouble facet_barycentre, ArrOfDouble normal_vector)
+  {
+    distance_ = distance;
+    curvature_ = curvature;
+    facet_barycentre_ = facet_barycentre;
+    normal_vector_compo_ = normal_vector;
+  };
+  void associate_rising_velocity(double bubble_rising_velocity, ArrOfDouble bubble_rising_vector)
+  {
+    bubble_rising_velocity_ = bubble_rising_velocity;
+    bubble_rising_vector_ = bubble_rising_vector;
+  };
+  void associate_sub_problem_to_inputs(int i, int j, int k, int compo_connex,
+                                       double distance, double curvature,
+                                       ArrOfDouble facet_barycentre,
+                                       ArrOfDouble normal_vector,
+                                       double bubble_rising_velocity, ArrOfDouble bubble_rising_vector);
 protected :
   int index_i_ = 0, index_j_ = 0, index_k_ = 0;
   int compo_connex_ = -1;
@@ -46,23 +72,26 @@ protected :
   double distance_ = 0.;
   double curvature_ = 0.;
   double osculating_radius_ = 0.;
-  double bubble_relative_velocity_ = 0.;
-  double osculating_sphere_centre_[3] = {0., 0., 0.};
-  double normal_vector_compo_[3] = {0., 0., 0.};
+  ArrOfDouble normal_vector_compo_ = ArrOfDouble(3);
+
+  double bubble_rising_velocity_ = 0.;
+  ArrOfDouble bubble_rising_vector_ = ArrOfDouble(3);
+
+  ArrOfDouble osculating_sphere_centre_ = ArrOfDouble(3);
   /*
    * Several ways to calculate the tangential vector !
    * Either by considering a unique tangential vector (pure spherical)
-   * Or two tangential vector (osculating sphere)
+   * Or two tangential vectors (osculating sphere)
    */
-  double first_tangential_vector_compo_[3] = {0., 0., 0.};
-  double azymuthal_vector_compo[3] = {0., 0., 0.};
-  double second_tangential_vector_compo_[3] = {0., 0., 0.};
+  ArrOfDouble first_tangential_vector_compo_ = ArrOfDouble(3);
+  ArrOfDouble azymuthal_vector_compo = ArrOfDouble(3);
+  ArrOfDouble second_tangential_vector_compo_ = ArrOfDouble(3);
   //
-  double bary_compo_[3] = {0., 0., 0.};
-  double temperature_gradient_compo_[3] = {0., 0., 0.};
-  double temperature_hessian_compo_[3][3] = {{0., 0., 0.}, {0., 0., 0.}, {0., 0., 0.}};
+  ArrOfDouble facet_barycentre_ = ArrOfDouble(3);
+  ArrOfDouble temperature_gradient_compo_ = ArrOfDouble(3);
+  DoubleTab temperature_hessian_compo_ = DoubleTab(3,3);
   double normal_interfacial_gradient_ = 0;
-  double normal_interfacial_gradient_compo_[3] = {0., 0., 0.};
+  ArrOfDouble normal_interfacial_gradient_compo_ = ArrOfDouble(3);
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

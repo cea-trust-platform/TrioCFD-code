@@ -724,6 +724,12 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   compute_eulerian_temperature_ghost();
   compute_eulerian_bounding_box_fill_compo();
   compute_rising_velocities();
+
+  /*
+   * Compute sub-problems (For Subresolution Child classes only !)
+   */
+  compute_subproblems();
+
   /*
    * For post-processing purposes
    */
@@ -938,7 +944,7 @@ void IJK_Thermal_base::compute_rising_velocities()
   if (compute_rising_velocities_)
     {
       int nb_bubbles = ref_ijk_ft_->itfce().get_nb_bulles_reelles();
-      rising_velocities_ = DoubleTab(nb_bubbles);
+      rising_velocities_ = ArrOfDouble(nb_bubbles);
       rising_vectors_ = DoubleTab(nb_bubbles, 3);
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
                               eulerian_compo_connex_ns_, ref_ijk_ft_->get_direction_gravite(),
@@ -952,6 +958,13 @@ void IJK_Thermal_base::compute_rising_velocities()
     }
   else
     Cerr << "Don't compute the ghost temperature field" << finl;
+}
+
+void IJK_Thermal_base::compute_subproblems()
+{
+  initialise_thermal_subproblems();
+  solve_thermal_subproblems();
+  apply_thermal_flux_correction();
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)
@@ -1001,6 +1014,20 @@ void IJK_Thermal_base::enforce_min_value_eulerian_field(IJK_Field_double& euleri
       for (int i=0; i < nx; i++)
         if (eulerian_field(i,j,k) < invalid_distance_value)
           eulerian_field(i,j,k) = eulerian_field_min;
+}
+
+void IJK_Thermal_base::compute_mixed_cells_number(const IJK_Field_double& indicator)
+{
+  mixed_cells_number_ = 0.;
+  const int nx = indicator.ni();
+  const int ny = indicator.nj();
+  const int nz = indicator.nk();
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        if (fabs(indicator(i,j,k)) > 1e-8 && fabs(1-indicator(i,j,k)) > 1e-8)
+          mixed_cells_number_ += 1;
+  Cerr << "There are " << mixed_cells_number_ << "mixed cells." << finl;
 }
 
 void IJK_Thermal_base::compute_temperature_gradient_elem()

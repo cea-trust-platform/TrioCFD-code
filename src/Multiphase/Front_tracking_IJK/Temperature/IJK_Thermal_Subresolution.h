@@ -37,6 +37,8 @@
 #include <OpConvAmontIJK.h>
 #include <OpConvDiscQuickIJKScalar.h>
 #include <OpConvCentre4IJK.h>
+#include <IJK_One_Dimensional_Subproblems.h>
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -63,6 +65,9 @@ protected :
   void compute_diffusion_increment() override;
   void correct_temperature_for_eulerian_fluxes() override;
   void correct_temperature_for_visu() override;
+  void initialise_thermal_subproblems() override;
+  void solve_thermal_subproblems() override;
+  void apply_thermal_flux_correction() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
@@ -70,6 +75,7 @@ protected :
   int convective_flux_correction_;
 
   int override_vapour_mixed_values_; // For debug purposes
+  IJK_One_Dimensional_Subproblems thermal_local_subproblems_;
 
 };
 

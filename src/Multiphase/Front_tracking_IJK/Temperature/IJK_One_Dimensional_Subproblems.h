@@ -26,6 +26,7 @@
 #include <TRUSTList.h>
 #include <TRUST_List.h>
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class IJK_One_Dimensional_Subproblems
@@ -34,14 +35,36 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+class IJK_FT_double;
+class Switch_FT_double;
+
 class IJK_One_Dimensional_Subproblems : public LIST(IJK_One_Dimensional_Subproblem)
 {
 
-  Declare_instanciable( IJK_One_Dimensional_Subproblems ) ;
+  Declare_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems);
 
 public :
+  IJK_One_Dimensional_Subproblems() { ; };
+  IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft);
+  void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
+  void add_subproblems(int n);
+  void associate_sub_problem_to_inputs(int i, int j, int k,
+                                       const IJK_Field_double& eulerian_compo_connex,
+                                       const IJK_Field_double& eulerian_distance,
+                                       const IJK_Field_double& eulerian_curvature,
+                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
+                                       FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre,
+                                       ArrOfDouble rising_velocities,
+                                       DoubleTab rising_vectors);
+  const int& get_subproblems_counter() const
+  {
+    return subproblems_counter_;
+  }
 
 protected :
+  int max_subproblems_ = 0;
+  int subproblems_counter_ = 0;
+  REF(IJK_FT_double) ref_ijk_ft_;
 
 };
 

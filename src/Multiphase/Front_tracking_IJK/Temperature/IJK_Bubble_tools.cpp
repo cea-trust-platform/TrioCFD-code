@@ -21,6 +21,20 @@
 
 #include <IJK_Bubble_tools.h>
 
+
+static int decoder_numero_bulle(const int code)
+{
+  const int num_bulle = code >> 6;
+  return num_bulle;
+}
+
+/* FROM void IJK_Interfaces::calculer_volume_bulles
+ * L'index de la bulle ghost est (entre -1 et -nbulles_ghost):
+ * const int idx_ghost = get_ghost_number_from_compo(compo);
+ * // On la place en fin de tableau :
+ * compo = nbulles_reelles - 1 - idx_ghost;
+ */
+
 void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex)
 {
   /*
@@ -31,8 +45,22 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
   */
   interfaces.calculer_bounding_box_bulles(bounding_box);
   int nb_bubbles = interfaces.get_nb_bulles_reelles();
+  int nb_ghost_bubbles = interfaces.get_nb_bulles_ghost();
   eulerian_compo_connex.data() = -1;
   eulerian_compo_connex.echange_espace_virtuel(eulerian_compo_connex.ghost());
+  IntTab ghost_to_real_bubble(nb_ghost_bubbles);
+  for (int l = 0; l < nb_ghost_bubbles; l++)
+    {
+      const int ighost = interfaces.ghost_compo_converter(l);
+      const int ibulle_reelle = decoder_numero_bulle(-ighost);
+      ghost_to_real_bubble(l) = ibulle_reelle;
+    }
+  Cerr << "Ghost to real bubble : " << ghost_to_real_bubble;
+  ArrOfDouble bubbles_volume;
+  DoubleTab bubbles_barycentre;
+  interfaces.calculer_volume_bulles(bubbles_volume, bubbles_barycentre);
+  Cerr << "bubbles_volume" << bubbles_volume;
+  Cerr << "bubbles_barycentre" << bubbles_barycentre;
   /*
    * Considered a constant grid spacing
    */
@@ -56,12 +84,20 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
   double origin[3] = {origin_x, origin_y, origin_z};
   //
   DoubleTab min_max_larger_box(nb_bubbles, 3, 2);
+  DoubleTab min_max_larger_box_absolute(nb_bubbles, 3, 2);
   for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
     {
       for (int dir = 0; dir < 3; dir++)
-        min_max_larger_box(ibubble, dir, 0) = origin[dir] + trunc((bounding_box(ibubble, dir, 0) - geom_origin[dir]) / delta_xyz[dir]) * delta_xyz[dir];
+        {
+          min_max_larger_box(ibubble, dir, 0) = origin[dir] + trunc((bounding_box(ibubble, dir, 0) - geom_origin[dir]) / delta_xyz[dir])
+                                                * delta_xyz[dir];
+          min_max_larger_box_absolute(ibubble, dir, 0) = min_max_larger_box(ibubble, dir, 0) - bubbles_barycentre(ibubble, dir);
+        }
       for (int dir = 0; dir < 3; dir++)
-        min_max_larger_box(ibubble, dir, 1) = origin[dir] + trunc((bounding_box(ibubble, dir, 1) - geom_origin[dir] + delta_xyz[dir]) / delta_xyz[dir]) * delta_xyz[dir];
+        {
+          min_max_larger_box(ibubble, dir, 1) = origin[dir] + trunc((bounding_box(ibubble, dir, 1) - geom_origin[dir] + delta_xyz[dir]) / delta_xyz[dir]) * delta_xyz[dir];
+          min_max_larger_box_absolute(ibubble, dir, 1) = min_max_larger_box(ibubble, dir, 1) - bubbles_barycentre(ibubble, dir);
+        }
     }
   const int nk = eulerian_compo_connex.nk();
   const int nj = eulerian_compo_connex.nj();
@@ -70,7 +106,7 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-        for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
+        for (int ibubble = 0; ibubble < (nb_bubbles + nb_ghost_bubbles); ibubble++)
           {
             const double cell_pos_x = origin_x + (i + 0.5) * delta_xyz[0];
             const double cell_pos_y = origin_y + (j + 0.5) * delta_xyz[1];
@@ -78,16 +114,38 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
             double cell_pos[3] = {cell_pos_x, cell_pos_y, cell_pos_z};
             const double chi_l = indic(i,j,k);
             int cell_pos_bool = true;
+            int bubble_index;
             for (int dir = 0; dir < 3; dir++)
-              cell_pos_bool = (cell_pos_bool && cell_pos[dir] > min_max_larger_box(ibubble, dir, 0) && cell_pos[dir] < min_max_larger_box(ibubble, dir, 1));
+              {
+                double min_box;
+                double max_box;
+                if (ibubble < nb_bubbles)
+                  {
+                    bubble_index = ibubble;
+                    min_box = min_max_larger_box(bubble_index, dir, 0);
+                    max_box = min_max_larger_box(bubble_index, dir, 1);
+                  }
+                else
+                  {
+                    bubble_index = ghost_to_real_bubble(ibubble - nb_bubbles);
+                    min_box = min_max_larger_box_absolute(bubble_index, dir, 0) + bubbles_barycentre(ibubble, dir);
+                    max_box = min_max_larger_box_absolute(bubble_index, dir, 1) + bubbles_barycentre(ibubble, dir);
+                  }
+                cell_pos_bool = (cell_pos_bool && cell_pos[dir] > min_box && cell_pos[dir] < max_box);
+              }
             if (cell_pos_bool && fabs(1.-chi_l) > 1.e-8)
-              eulerian_compo_connex(i,j,k) = ibubble;
+              eulerian_compo_connex(i,j,k) = bubble_index;
           }
+}
+
+void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex)
+{
+
 }
 
 void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
                              const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
-                             DoubleTab& rising_velocities, DoubleTab& rising_vectors)
+                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors)
 {
   const int nk = eulerian_compo_connex_ns.nk();
   const int nj = eulerian_compo_connex_ns.nj();
@@ -98,16 +156,18 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
   DoubleTab sum_velocity_x_indicator(nb_bubbles);
   DoubleTab sum_velocity_y_indicator(nb_bubbles);
   DoubleTab sum_velocity_z_indicator(nb_bubbles);
-  for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
-    {
-      sum_indicator(ibubble) = 0.;
-      sum_velocity_x_indicator(ibubble) = 0.;
-      sum_velocity_y_indicator(ibubble) = 0.;
-      sum_velocity_z_indicator(ibubble) = 0.;
-      rising_velocities(ibubble) = 0.;
-      for (int dir=0; dir < 3 ; dir++)
-        rising_vectors(ibubble, dir) = 0.;
-    }
+//  for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
+//    {
+////      sum_indicator(ibubble) = 0.;
+////      sum_velocity_x_indicator(ibubble) = 0.;
+////      sum_velocity_y_indicator(ibubble) = 0.;
+////      sum_velocity_z_indicator(ibubble) = 0.;
+////      rising_velocities(ibubble) = 0.;
+//// FIXME: Maybe rising_vectors = DoubleTab(ibubble, dir); initialise to zero ?
+//      for (int dir=0; dir < 3 ; dir++)
+//        rising_vectors = DoubleTab(ibubble, dir);
+//      // rising_vectors(ibubble, dir) = 0.;
+//    }
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -148,7 +208,7 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
     }
 }
 
-void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const DoubleTab& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
 {
   const int nk = eulerian_compo_connex_ns.nk();
   const int nj = eulerian_compo_connex_ns.nj();

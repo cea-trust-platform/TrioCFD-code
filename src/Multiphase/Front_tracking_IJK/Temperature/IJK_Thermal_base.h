@@ -236,6 +236,10 @@ protected:
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
+  virtual void compute_subproblems();
+  virtual void initialise_thermal_subproblems() { ; };
+  virtual void solve_thermal_subproblems() { ; };
+  virtual void apply_thermal_flux_correction() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
@@ -413,13 +417,15 @@ protected:
   int compute_hess_diag_T_elem_;
   int compute_hess_cross_T_elem_;
 
+  int mixed_cells_number_ = 0;
+  void compute_mixed_cells_number(const IJK_Field_double& indicator);
   int compute_eulerian_compo_;
   IJK_Field_double eulerian_compo_connex_;
   IJK_Field_double eulerian_compo_connex_ns_;
 
   int compute_rising_velocities_;
   int fill_rising_velocities_;
-  DoubleTab rising_velocities_;
+  ArrOfDouble rising_velocities_;
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;
 };
