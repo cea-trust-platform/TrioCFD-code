@@ -59,16 +59,32 @@ public :
   int initialize(const IJK_Splitting& splitting, const int idx) override;
   void update_thermal_properties() override;
   void set_param(Param& param) override;
+  void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
 
 protected :
 
   void compute_diffusion_increment() override;
   void correct_temperature_for_eulerian_fluxes() override;
   void correct_temperature_for_visu() override;
+  void compute_overall_probes_parameters() override;
+  void compute_radial_convection_diffusion_operators(DoubleTab& radial_first_order_operator_raw,
+                                                     DoubleTab& radial_second_order_operator_raw,
+                                                     DoubleTab& radial_first_order_operator,
+                                                     DoubleTab& radial_second_order_operator,
+                                                     DoubleTab& radial_diffusion_matrix,
+                                                     DoubleTab& radial_convection_matrix);
+  void compute_first_order_operator_raw(DoubleTab& radial_first_order_operator);
+  void compute_first_order_operator(DoubleTab& radial_first_order_operator, double dr);
+  void compute_second_order_operator(DoubleTab& radial_second_order_operator, double dr);
+  void compute_second_order_operator_raw(DoubleTab& radial_second_order_operator);
+  void compute_radial_convection_operator(const DoubleTab& radial_first_order_operator,
+                                          DoubleTab& radial_convection_matrix);
+  void compute_radial_diffusion_operator(const DoubleTab& radial_second_order_operator,
+                                         DoubleTab& radial_diffusion_matrix);
   void initialise_thermal_subproblems() override;
   void solve_thermal_subproblems() override;
   void apply_thermal_flux_correction() override;
-  int compute_ghost_cell_numbers_for_subproblems(int ghost_init) override;
+  void clean_thermal_subproblems() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
@@ -80,7 +96,15 @@ protected :
   IJK_One_Dimensional_Subproblems thermal_local_subproblems_;
   int points_per_thermal_subproblem_;
   double coeff_distance_diagonal_ = 3.;
-
+  double probe_length_;
+  double dr_;
+  DoubleVect radial_coordinates_;
+  DoubleTab radial_first_order_operator_raw_;
+  DoubleTab radial_second_order_operator_raw_;
+  DoubleTab radial_first_order_operator_;
+  DoubleTab radial_second_order_operator_;
+  DoubleTab radial_diffusion_matrix_;
+  DoubleTab radial_convection_matrix_;
 
 };
 

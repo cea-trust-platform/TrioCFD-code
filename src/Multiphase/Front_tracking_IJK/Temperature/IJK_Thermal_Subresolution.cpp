@@ -191,6 +191,104 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
     }
 }
 
+void IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init)
+{
+  int ghost_cells;
+  compute_cell_diagonal(splitting);
+  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  double maximum_distance = cell_diagonal_ * coeff_distance_diagonal_;
+  const int max_dx = (int) trunc(maximum_distance / dx + 1);
+  const int max_dy = (int) trunc(maximum_distance / dy + 1);
+  const int max_dz = (int) trunc(maximum_distance / dz + 1);
+  ghost_cells = std::max(max_dx, std::max(max_dy, max_dz));
+  if (ghost_cells < ghost_init)
+    ghost_cells = ghost_init;
+  ghost_cells_ = ghost_cells;
+}
+
+void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
+{
+  dr_ = probe_length_ / (points_per_thermal_subproblem_ - 1);
+  for (int i=0; i < points_per_thermal_subproblem_; i++)
+    radial_coordinates_(i) = i * dr_;
+
+  /*
+   * Compute the matrices for Finite-Differences
+   */
+  compute_radial_convection_diffusion_operators(radial_first_order_operator_raw_, radial_second_order_operator_raw_,
+                                                radial_first_order_operator_, radial_second_order_operator_,
+                                                radial_convection_matrix_, radial_diffusion_matrix_);
+}
+
+void IJK_Thermal_Subresolution::compute_radial_convection_diffusion_operators(DoubleTab& radial_first_order_operator_raw,
+                                                                              DoubleTab& radial_second_order_operator_raw,
+                                                                              DoubleTab& radial_first_order_operator,
+                                                                              DoubleTab& radial_second_order_operator,
+                                                                              DoubleTab& radial_diffusion_matrix,
+                                                                              DoubleTab& radial_convection_matrix)
+{
+  /*
+   * Compute the matrices for Finite-Differences
+   */
+  compute_first_order_operator_raw(radial_first_order_operator_raw);
+  compute_second_order_operator_raw(radial_second_order_operator_raw);
+  compute_first_order_operator(radial_first_order_operator, dr_);
+  compute_second_order_operator(radial_second_order_operator, dr_);
+  compute_radial_convection_operator(radial_first_order_operator, radial_convection_matrix);
+  compute_radial_diffusion_operator(radial_second_order_operator, radial_convection_matrix);
+}
+
+/*
+ * FIXME : Should be moved to a class of tools
+ */
+
+void IJK_Thermal_Subresolution::compute_first_order_operator_raw(DoubleTab& radial_first_order_operator)
+{
+  /*
+   * Compute the first-order matrix for Finite-Differences
+   */
+  // TODO:
+}
+
+void IJK_Thermal_Subresolution::compute_first_order_operator(DoubleTab& radial_first_order_operator, double dr)
+{
+  radial_first_order_operator /= dr;
+}
+
+void IJK_Thermal_Subresolution::compute_second_order_operator_raw(DoubleTab& radial_second_order_operator)
+{
+  /*
+   * Compute the second-order matrix for Finite-Differences
+   */
+  // TODO:
+}
+
+void IJK_Thermal_Subresolution::compute_second_order_operator(DoubleTab& radial_second_order_operator, double dr)
+{
+  radial_second_order_operator /= pow(dr, 2);
+}
+
+void IJK_Thermal_Subresolution::compute_radial_convection_operator(const DoubleTab& radial_first_order_operator,
+                                                                   DoubleTab& radial_convection_matrix)
+{
+  /*
+   * Compute the matrices for Finite-Differences
+   */
+
+}
+
+void IJK_Thermal_Subresolution::compute_radial_diffusion_operator(const DoubleTab& radial_second_order_operator,
+                                                                  DoubleTab& radial_diffusion_matrix)
+{
+  /*
+   * Compute the matrices for Finite-Differences
+   */
+
+}
+
 void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
 {
   // FIXME : Should I use IJK_Field_local_double
@@ -241,6 +339,15 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                        points_per_thermal_subproblem_,
                                                                        uniform_alpha_,
                                                                        coeff_distance_diagonal_,
+                                                                       cell_diagonal_,
+                                                                       dr_,
+                                                                       radial_coordinates_,
+                                                                       radial_first_order_operator_raw_,
+                                                                       radial_second_order_operator_raw_,
+                                                                       radial_first_order_operator_,
+                                                                       radial_second_order_operator_,
+                                                                       radial_diffusion_matrix_,
+                                                                       radial_convection_matrix_,
                                                                        ref_ijk_ft_->itfce(),
                                                                        temperature_,
                                                                        temperature_ft_,
@@ -269,19 +376,8 @@ void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
 
 }
 
-int IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(int ghost_init)
+void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
-  int ghost_cells;
-  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
-  const double dx = geom.get_constant_delta(DIRECTION_I);
-  const double dy = geom.get_constant_delta(DIRECTION_J);
-  const double dz = geom.get_constant_delta(DIRECTION_K);
-  double maximum_distance = cell_diagonal_ * coeff_distance_diagonal_;
-  const int max_dx = (int) trunc(maximum_distance / dx + 1);
-  const int max_dy = (int) trunc(maximum_distance / dy + 1);
-  const int max_dz = (int) trunc(maximum_distance / dz + 1);
-  ghost_cells = std::max(max_dx, std::max(max_dy, max_dz));
-  if (ghost_cells < ghost_init)
-    ghost_cells = ghost_init;
-  return ghost_cells;
+  thermal_local_subproblems_.clean();
 }
+

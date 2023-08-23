@@ -41,12 +41,12 @@ class Switch_FT_double;
 class IJK_One_Dimensional_Subproblems : public LIST(IJK_One_Dimensional_Subproblem)
 {
 
-  Declare_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems);
+  Declare_instanciable(IJK_One_Dimensional_Subproblems);
 
 public :
-  IJK_One_Dimensional_Subproblems() { ; };
   IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
+  void clean();
   void add_subproblems(int n);
   void associate_sub_problem_to_inputs(int i, int j, int k,
                                        const IJK_Field_double& eulerian_compo_connex,
@@ -57,9 +57,18 @@ public :
                                        FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                        ArrOfDouble rising_velocities,
                                        DoubleTab rising_vectors,
-                                       int points_per_thermal_subproblem,
-                                       double alpha,
-                                       double coeff_distance_diagonal,
+                                       const int& points_per_thermal_subproblem,
+                                       const double& alpha,
+                                       const double& coeff_distance_diagonal,
+                                       const double& cell_diagonal,
+                                       const double& dr_base,
+                                       const DoubleVect& radial_coordinates,
+                                       const DoubleTab& radial_first_order_operator_raw,
+                                       const DoubleTab& radial_second_order_operator_raw,
+                                       const DoubleTab& radial_first_order_operator,
+                                       const DoubleTab& radial_second_order_operator,
+                                       const DoubleTab& radial_diffusion_matrix,
+                                       const DoubleTab& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
                                        const IJK_Field_double& temperature,
                                        const IJK_Field_double& temperature_ft,

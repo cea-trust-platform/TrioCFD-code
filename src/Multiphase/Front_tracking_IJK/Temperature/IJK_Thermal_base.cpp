@@ -320,7 +320,6 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
   nalloc += 2;
   compute_cell_volume();
-  compute_cell_diagonal();
 
   if (!diff_temp_negligible_)
     div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
@@ -486,7 +485,6 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       nalloc += 1;
       eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
       //
-      ghost_cells_ = compute_ghost_cell_numbers_for_subproblems(1);
       temperature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, ghost_cells_);
       nalloc += 1;
       temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
@@ -577,9 +575,9 @@ void IJK_Thermal_base::compute_cell_volume()
   vol_ = dx*dy*dz;
 }
 
-void IJK_Thermal_base::compute_cell_diagonal()
+void IJK_Thermal_base::compute_cell_diagonal(const IJK_Splitting& splitting)
 {
-  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
+  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
   const double dy = geom.get_constant_delta(DIRECTION_J);
   const double dz = geom.get_constant_delta(DIRECTION_K);
@@ -740,9 +738,16 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   compute_rising_velocities();
 
   /*
+   * Compute gradients and hessian of the temperature after the ghost fluid extension
+   */
+  compute_temperature_gradient_elem();
+  compute_temperature_hessian_diag_elem();
+  compute_temperature_hessian_cross_elem();
+
+  /*
    * Compute sub-problems (For Subresolution Child classes only !)
    */
-  compute_subproblems();
+  compute_thermal_subproblems();
 
   /*
    * For post-processing purposes
@@ -761,17 +766,18 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
                                ref_ijk_ft_->get_upstream_stencil());
 
   compute_temperature_convection(velocity);
-
   const double ene_postConv = compute_global_energy(d_temperature_);
   add_temperature_diffusion();
   const double ene_postDiffu = compute_global_energy(d_temperature_);
   add_temperature_source();
   const double ene_postSource = compute_global_energy(d_temperature_);
 
-  compute_temperature_gradient_elem();
-  compute_temperature_hessian_diag_elem();
-  compute_temperature_hessian_cross_elem();
-  calculer_gradient_temperature(temperature_,grad_T_);
+  /*
+   * Clean_subproblems !
+   */
+  clean_thermal_subproblems();
+
+  // calculer_gradient_temperature(temperature_, grad_T_);
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time
        << " " << ene_ini
@@ -974,7 +980,7 @@ void IJK_Thermal_base::compute_rising_velocities()
     Cerr << "Don't compute the ghost temperature field" << finl;
 }
 
-void IJK_Thermal_base::compute_subproblems()
+void IJK_Thermal_base::compute_thermal_subproblems()
 {
   initialise_thermal_subproblems();
   solve_thermal_subproblems();

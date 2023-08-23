@@ -23,11 +23,18 @@
 #include <IJK_FT.h>
 #include <IJK_switch_FT.h>
 
-Implemente_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems, "IJK_One_Dimensional_Subproblems", LIST(IJK_One_Dimensional_Subproblem));
+Implemente_instanciable(IJK_One_Dimensional_Subproblems, "IJK_One_Dimensional_Subproblems", LIST(IJK_One_Dimensional_Subproblem));
 
-IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft)
+IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
 {
   ref_ijk_ft_ = ijk_ft;
+}
+
+void IJK_One_Dimensional_Subproblems::clean()
+{
+  max_subproblems_ = 0;
+  subproblems_counter_ = 0;
+  vide();
 }
 
 Sortie& IJK_One_Dimensional_Subproblems::printOn( Sortie& os ) const
@@ -60,9 +67,18 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                                                       ArrOfDouble rising_velocities,
                                                                       DoubleTab rising_vectors,
-                                                                      int points_per_thermal_subproblem,
-                                                                      double alpha,
-                                                                      double coeff_distance_diagonal,
+                                                                      const int& points_per_thermal_subproblem,
+                                                                      const double& alpha,
+                                                                      const double& coeff_distance_diagonal,
+                                                                      const double& cell_diagonal,
+                                                                      const double& dr_base,
+                                                                      const DoubleVect& radial_coordinates,
+                                                                      const DoubleTab& radial_first_order_operator_raw,
+                                                                      const DoubleTab& radial_second_order_operator_raw,
+                                                                      const DoubleTab& radial_first_order_operator,
+                                                                      const DoubleTab& radial_second_order_operator,
+                                                                      const DoubleTab& radial_diffusion_matrix,
+                                                                      const DoubleTab& radial_convection_matrix,
                                                                       const IJK_Interfaces& interfaces,
                                                                       const IJK_Field_double& temperature,
                                                                       const IJK_Field_double& temperature_ft,
@@ -102,6 +118,15 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                     points_per_thermal_subproblem,
                                                                     alpha,
                                                                     coeff_distance_diagonal,
+                                                                    cell_diagonal,
+                                                                    dr_base,
+                                                                    radial_coordinates,
+                                                                    radial_first_order_operator_raw,
+                                                                    radial_second_order_operator_raw,
+                                                                    radial_first_order_operator,
+                                                                    radial_second_order_operator,
+                                                                    radial_diffusion_matrix,
+                                                                    radial_convection_matrix,
                                                                     interfaces,
                                                                     eulerian_distance,
                                                                     eulerian_curvature,

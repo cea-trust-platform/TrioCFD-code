@@ -70,7 +70,7 @@ public :
   inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };
   inline const int& get_ghost_fluid_flag() const { return valeur().get_ghost_fluid_flag(); };
   inline const int& get_probes_ghost_cells() { return valeur().get_ghost_cells();};
-
+  inline void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { return valeur().compute_ghost_cell_numbers_for_subproblems(splitting, ghost_init); };
   /*
    * Setters
    */

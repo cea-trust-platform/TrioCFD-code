@@ -23,9 +23,9 @@
 #include <IJK_FT.h>
 #include <IJK_switch_FT.h>
 
-Implemente_instanciable_sans_constructeur( IJK_Thermals, "IJK_Thermals", LIST(IJK_Thermal) ) ;
+Implemente_instanciable( IJK_Thermals, "IJK_Thermals", LIST(IJK_Thermal) ) ;
 
-IJK_Thermals::IJK_Thermals(const IJK_FT_double& ijk_ft)
+IJK_Thermals::IJK_Thermals(const IJK_FT_double& ijk_ft) : IJK_Thermals()
 {
   ref_ijk_ft_ = ijk_ft;
 }
@@ -290,6 +290,14 @@ int IJK_Thermals::ghost_fluid_flag()
         return ghost_fluid;
     }
   return ghost_fluid;
+}
+
+
+
+void IJK_Thermals::compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init)
+{
+  for (auto& itr : (*this))
+    itr.compute_ghost_cell_numbers_for_subproblems(splitting, ghost_init);
 }
 
 int IJK_Thermals::get_probes_ghost_cells(int ghost_init)

@@ -212,13 +212,12 @@ public:
 #if 0
   void ecrire_reprise_thermique(SFichier& fichier);
 #endif
-
+  virtual void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { ghost_cells_ = ghost_init; };
 
 protected:
 
   void compute_cell_volume();
-  void compute_cell_diagonal();
-  virtual int compute_ghost_cell_numbers_for_subproblems(int ghost_init) { return ghost_init; };
+  void compute_cell_diagonal(const IJK_Splitting& splitting);
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
   void compute_temperature_convection(const FixedVector<IJK_Field_double, 3>& velocity);
   virtual void add_temperature_diffusion();
@@ -242,10 +241,12 @@ protected:
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
-  virtual void compute_subproblems();
+  virtual void compute_thermal_subproblems();
+  virtual void compute_overall_probes_parameters() { ; };
   virtual void initialise_thermal_subproblems() { ; };
   virtual void solve_thermal_subproblems() { ; };
   virtual void apply_thermal_flux_correction() { ; };
+  virtual void clean_thermal_subproblems() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);

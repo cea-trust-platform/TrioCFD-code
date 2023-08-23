@@ -134,7 +134,7 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
                 cell_pos_bool = (cell_pos_bool && cell_pos[dir] > min_box && cell_pos[dir] < max_box);
               }
             // if (cell_pos_bool && fabs(1.-chi_l) > 1.e-8)
-            if (cell_pos_bool && fabs(chi_l) < VAPOUR_INDICATOR_TEST)
+            if (cell_pos_bool && fabs(chi_l) < LIQUID_INDICATOR_TEST)
               eulerian_compo_connex(i,j,k) = bubble_index;
           }
 }

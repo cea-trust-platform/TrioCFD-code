@@ -40,10 +40,9 @@ class Switch_FT_double;
 class IJK_Thermals : public LIST(IJK_Thermal)
 {
 
-  Declare_instanciable_sans_constructeur( IJK_Thermals ) ;
+  Declare_instanciable( IJK_Thermals ) ;
 
 public :
-  IJK_Thermals() { ; };
   IJK_Thermals(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
@@ -69,6 +68,7 @@ public :
   void prepare_thermals(const char *lataname);
   int ghost_fluid_flag();
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
+  void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init);
   int get_probes_ghost_cells(int ghost_init);
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;

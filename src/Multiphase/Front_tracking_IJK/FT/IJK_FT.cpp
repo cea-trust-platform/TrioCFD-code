@@ -2142,6 +2142,24 @@ void IJK_FT_double::run()
       potential_phi_.data() = 0.;
     }
 
+  // thermals_.initialize(splitting_, nalloc);
+
+  // GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
+  // Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
+  // alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
+  // allocate_velocity(velocity_ft_, splitting_ft_, 0);
+  /*
+   * FIXME: Allocate based on the thermal subproblems
+   * as the thermal probes necessitates several ghost cells to interpolate velocity !
+   * Check the difference between elem and faces ? and for interpolation of the velocity ?
+   */
+  int ft_ghost_cells = 4;
+  thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
+  ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
+  allocate_velocity(velocity_ft_, splitting_ft_, ft_ghost_cells);
+//  allocate_velocity(velocity_ft_, splitting_ft_, 4);
+  nalloc += 3;
+
   if (!disable_diphasique_)
     {
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
@@ -2181,19 +2199,6 @@ void IJK_FT_double::run()
 
 // C'est ici aussi qu'on alloue les champs de temperature.
   nalloc += initialise();
-
-// GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
-// Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
-// alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
-// allocate_velocity(velocity_ft_, splitting_ft_, 0);
-  /*
-   * FIXME: Allocate based on the thermal subproblems
-   * as the thermal probes necessitates several ghost cells to interpolate velocity !
-   * Check the difference between elem and faces ? and for interpolation of the velocity ?
-   */
-  int ft_ghost_cells = thermals_.get_probes_ghost_cells(4);
-  allocate_velocity(velocity_ft_, splitting_ft_, ft_ghost_cells);
-  nalloc += 3;
 
 //  rho_field_.echange_espace_virtuel(2);
 //  recalculer_rho_de_chi(chi_, rho_field_, 2);
