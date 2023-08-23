@@ -52,10 +52,24 @@ public :
                                        const IJK_Field_double& eulerian_compo_connex,
                                        const IJK_Field_double& eulerian_distance,
                                        const IJK_Field_double& eulerian_curvature,
-                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
+                                       const IJK_Field_double& eulerian_interfacial_area,
                                        FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre,
+                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                        ArrOfDouble rising_velocities,
-                                       DoubleTab rising_vectors);
+                                       DoubleTab rising_vectors,
+                                       int points_per_thermal_subproblem,
+                                       double alpha,
+                                       double coeff_distance_diagonal,
+                                       const IJK_Interfaces& interfaces,
+                                       const IJK_Field_double& temperature,
+                                       const IJK_Field_double& temperature_ft,
+                                       const FixedVector<IJK_Field_double, 3>& velocity,
+                                       const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
+
+
   const int& get_subproblems_counter() const
   {
     return subproblems_counter_;

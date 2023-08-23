@@ -37,6 +37,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   diffusive_flux_correction_ = 0;
   override_vapour_mixed_values_ = 0;
   compute_eulerian_compo_ = 1;
+  points_per_thermal_subproblem_ = 32;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -66,6 +67,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
   param.ajouter_flag("diffusive_flux_correction", &diffusive_flux_correction_);
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
+  param.ajouter("points_per_thermal_subproblem", &points_per_thermal_subproblem_);
+  param.ajouter("coeff_distance_diagonal", &coeff_distance_diagonal_);
 }
 
 int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const int idx)
@@ -214,6 +217,9 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
   //      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_facets_barycentre_[dir], eulerian_facets_barycentre_ns[dir]);
   //      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_normal_vectors_[dir], eulerian_normal_vectors_ns[dir]);
   //    }
+  // FIXME: should I perform this on the extended fields ? or original ?
+  // If so, I need to convert, distance, curvature, interfacial_area earlier !
+  // Or I need to calculate gradient and hessian fields using the temperature_ft_ mesh !
   const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I_ft();
   const int ni = temperature_ft_.ni();
   const int nj = temperature_ft_.nj();
@@ -227,12 +233,24 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                        eulerian_compo_connex_,
                                                                        eulerian_distance_,
                                                                        eulerian_curvature_,
+                                                                       eulerian_interfacial_area_,
                                                                        eulerian_facets_barycentre_,
                                                                        eulerian_normal_vectors_,
                                                                        rising_velocities_,
-                                                                       rising_vectors_);
-          }
+                                                                       rising_vectors_,
+                                                                       points_per_thermal_subproblem_,
+                                                                       uniform_alpha_,
+                                                                       coeff_distance_diagonal_,
+                                                                       ref_ijk_ft_->itfce(),
+                                                                       temperature_,
+                                                                       temperature_ft_,
+                                                                       ref_ijk_ft_->get_velocity(),
+                                                                       ref_ijk_ft_->get_velocity_ft(),
+                                                                       grad_T_elem_,
+                                                                       hess_diag_T_elem_,
+                                                                       hess_cross_T_elem_);
 
+          }
 }
 
 /*
@@ -249,4 +267,21 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
 {
 
+}
+
+int IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(int ghost_init)
+{
+  int ghost_cells;
+  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  double maximum_distance = cell_diagonal_ * coeff_distance_diagonal_;
+  const int max_dx = (int) trunc(maximum_distance / dx + 1);
+  const int max_dy = (int) trunc(maximum_distance / dy + 1);
+  const int max_dz = (int) trunc(maximum_distance / dz + 1);
+  ghost_cells = std::max(max_dx, std::max(max_dy, max_dz));
+  if (ghost_cells < ghost_init)
+    ghost_cells = ghost_init;
+  return ghost_cells;
 }

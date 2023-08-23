@@ -133,7 +133,8 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
                   }
                 cell_pos_bool = (cell_pos_bool && cell_pos[dir] > min_box && cell_pos[dir] < max_box);
               }
-            if (cell_pos_bool && fabs(1.-chi_l) > 1.e-8)
+            // if (cell_pos_bool && fabs(1.-chi_l) > 1.e-8)
+            if (cell_pos_bool && fabs(chi_l) < VAPOUR_INDICATOR_TEST)
               eulerian_compo_connex(i,j,k) = bubble_index;
           }
 }
@@ -188,6 +189,10 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
         }
   for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
     {
+      sum_indicator(ibubble) = Process::mp_sum(sum_indicator(ibubble));
+      sum_velocity_x_indicator(ibubble) = Process::mp_sum(sum_velocity_x_indicator(ibubble));
+      sum_velocity_y_indicator(ibubble) = Process::mp_sum(sum_velocity_y_indicator(ibubble));
+      sum_velocity_z_indicator(ibubble) = Process::mp_sum(sum_velocity_z_indicator(ibubble));
       sum_velocity_x_indicator(ibubble) /= sum_indicator(ibubble);
       sum_velocity_y_indicator(ibubble) /= sum_indicator(ibubble);
       sum_velocity_z_indicator(ibubble) /= sum_indicator(ibubble);

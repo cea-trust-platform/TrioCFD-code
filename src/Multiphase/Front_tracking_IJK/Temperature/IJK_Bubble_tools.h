@@ -26,6 +26,12 @@
 #include <IJK_Interfaces.h>
 #include <Maillage_FT_IJK.h>
 
+#define INVALID_TEST -1.e30
+#define LIQUID_INDICATOR_TEST 1.-1.e-8
+#define VAPOUR_INDICATOR_TEST 1.e-8
+#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
+#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class IJK_Bubble_tools

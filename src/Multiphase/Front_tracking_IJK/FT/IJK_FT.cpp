@@ -2053,8 +2053,10 @@ void IJK_FT_double::run()
   splitting_.get_local_mesh_delta(DIRECTION_K, 2 /* ghost cells */,
                                   delta_z_local_);
   Cerr << "IJK_FT_double::run()" << finl;
+  int nalloc = 0;
   allocate_velocity(velocity_, splitting_, 2);
   allocate_velocity(d_velocity_, splitting_, 1);
+  nalloc += 6;
   // GAB, qdm
   if (test_etapes_et_bilan_)
     {
@@ -2070,26 +2072,32 @@ void IJK_FT_double::run()
       allocate_velocity(d_v_diff_et_conv_, splitting_, 1);
       allocate_velocity(terme_convection_mass_solver_, splitting_, 1);
       allocate_velocity(terme_diffusion_mass_solver_, splitting_, 1);
+      nalloc += 36;
     }
   //
   pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  nalloc += 1;
 
   if (include_pressure_gradient_in_ustar_)
     {
       d_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       if (get_time_scheme() == RK3_FT)
         RK3_F_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
     }
 
   // On utilise aussi rhov pour le bilan de forces et pour d'autres formes de convection...
   //  if (!(expression_derivee_acceleration_ == Nom("0")))
   allocate_velocity(rho_v_, splitting_, 1);
+  nalloc += 3;
 
   molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+  nalloc += 3;
   if (use_inv_rho_)
     inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+  nalloc += 1;
   //  rho_batard_.allocate(splitting_, IJK_Splitting::ELEM, 2);
 
   if (diffusion_alternative_)
@@ -2098,20 +2106,25 @@ void IJK_FT_double::run()
       unit_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       unit_.data() = 1.;
       unit_.echange_espace_virtuel(unit_.ghost());
+      nalloc += 4;
     }
 
   if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_rhou"))
     {
       div_rhou_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
     }
   allocate_velocity(psi_velocity_, splitting_, 2);
+  nalloc += 3;
 
 #ifdef SMOOTHING_RHO
   // Pour le smoothing :
   rho_field_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 2);
+  nalloc += 1;
 #endif
   // champs pour post-traitement :
-  post_.alloc_fields();
+  // post_.alloc_fields();
+  nalloc += post_.alloc_fields();
 
   // Allocation du terme source variable spatialement:
   int flag_variable_source = false;
@@ -2123,16 +2136,11 @@ void IJK_FT_double::run()
       allocate_velocity(variable_source_, splitting_, 1);
       flag_variable_source = true;
       potential_phi_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+      nalloc += 4;
       for (int dir = 0; dir < 3; dir++)
         variable_source_[dir].data() = 0.;
       potential_phi_.data() = 0.;
     }
-
-  //GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
-  // Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
-  // alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
-  //  allocate_velocity(velocity_ft_, splitting_ft_, 0);
-  allocate_velocity(velocity_ft_, splitting_ft_, 4);
 
   if (!disable_diphasique_)
     {
@@ -2144,9 +2152,11 @@ void IJK_FT_double::run()
       allocate_velocity(terme_repulsion_interfaces_ft_, splitting_ft_, 1);
       allocate_velocity(terme_abs_repulsion_interfaces_ns_, splitting_, 1);
       allocate_velocity(terme_abs_repulsion_interfaces_ft_, splitting_ft_, 1);
+      nalloc += 18;
     }
 
-  int nalloc = 24;
+  // FIXME: on a oublie pleins de choses la !
+  // int nalloc = 24;
   nalloc += post_.alloc_velocity_and_co(flag_variable_source);
   if (get_time_scheme() == RK3_FT)
     {
@@ -2171,6 +2181,20 @@ void IJK_FT_double::run()
 
 // C'est ici aussi qu'on alloue les champs de temperature.
   nalloc += initialise();
+
+// GB : Je ne sais pas si on a besoin d'un ghost... Je crois que oui. Lequel?
+// Si la a vitesse ft doit transporter les sommets virtuels des facettes reelles,
+// alors il faut un domaine ghost de la taille de la longueur maximale des arretes.
+// allocate_velocity(velocity_ft_, splitting_ft_, 0);
+  /*
+   * FIXME: Allocate based on the thermal subproblems
+   * as the thermal probes necessitates several ghost cells to interpolate velocity !
+   * Check the difference between elem and faces ? and for interpolation of the velocity ?
+   */
+  int ft_ghost_cells = thermals_.get_probes_ghost_cells(4);
+  allocate_velocity(velocity_ft_, splitting_ft_, ft_ghost_cells);
+  nalloc += 3;
+
 //  rho_field_.echange_espace_virtuel(2);
 //  recalculer_rho_de_chi(chi_, rho_field_, 2);
   Cerr << " Allocating " << nalloc << " arrays, approx total size= "

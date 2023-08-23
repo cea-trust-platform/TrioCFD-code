@@ -129,7 +129,7 @@ public:
   }
   const IJK_Field_double& get_interfacial_area() const
   {
-    return interfacial_area_;
+    return eulerian_interfacial_area_;
   }
   const IJK_Field_double& get_grad_T_interface() const
   {
@@ -175,6 +175,10 @@ public:
   {
     return ghost_fluid_;
   };
+  const int& get_ghost_cells() const
+  {
+    return ghost_cells_;
+  };
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
   virtual double compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx);
@@ -213,6 +217,8 @@ public:
 protected:
 
   void compute_cell_volume();
+  void compute_cell_diagonal();
+  virtual int compute_ghost_cell_numbers_for_subproblems(int ghost_init) { return ghost_init; };
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
   void compute_temperature_convection(const FixedVector<IJK_Field_double, 3>& velocity);
   virtual void add_temperature_diffusion();
@@ -360,6 +366,8 @@ protected:
    * Fields
    */
   double vol_;
+  double cell_diagonal_;
+  int ghost_cells_;
   IJK_Field_double rho_cp_;
   IJK_Field_double rho_cp_T_;
   IJK_Field_double temperature_;
@@ -397,7 +405,7 @@ protected:
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_;
   FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_;
   IJK_Field_double eulerian_curvature_;
-  IJK_Field_double interfacial_area_;
+  IJK_Field_double eulerian_interfacial_area_;
   IJK_Field_double eulerian_grad_T_interface_;
   int compute_grad_T_elem_;
   FixedVector<IJK_Field_double, 3> grad_T_elem_;

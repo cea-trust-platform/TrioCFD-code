@@ -69,6 +69,8 @@ public :
   inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
   inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };
   inline const int& get_ghost_fluid_flag() const { return valeur().get_ghost_fluid_flag(); };
+  inline const int& get_probes_ghost_cells() { return valeur().get_ghost_cells();};
+
   /*
    * Setters
    */

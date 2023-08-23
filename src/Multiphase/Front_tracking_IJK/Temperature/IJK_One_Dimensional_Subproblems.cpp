@@ -55,10 +55,22 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       const IJK_Field_double& eulerian_compo_connex,
                                                                       const IJK_Field_double& eulerian_distance,
                                                                       const IJK_Field_double& eulerian_curvature,
+                                                                      const IJK_Field_double& eulerian_interfacial_area,
                                                                       FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre,
                                                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                                                       ArrOfDouble rising_velocities,
-                                                                      DoubleTab rising_vectors)
+                                                                      DoubleTab rising_vectors,
+                                                                      int points_per_thermal_subproblem,
+                                                                      double alpha,
+                                                                      double coeff_distance_diagonal,
+                                                                      const IJK_Interfaces& interfaces,
+                                                                      const IJK_Field_double& temperature,
+                                                                      const IJK_Field_double& temperature_ft,
+                                                                      const FixedVector<IJK_Field_double, 3>& velocity,
+                                                                      const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                                                      const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+                                                                      const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+                                                                      const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
 {
   bool create_subproblems_iteratively = true;
   if (subproblems_counter_ < max_subproblems_ || create_subproblems_iteratively)
@@ -71,6 +83,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
 
       const double distance = eulerian_distance(i, j ,k);
       const double curvature = eulerian_curvature(i, j ,k);
+      const double interfacial_area = eulerian_interfacial_area(i, j ,k);
       //
       IJK_Splitting splitting = eulerian_compo_connex.get_splitting();
       const double bubble_rising_velocity = rising_velocities(compo_connex);
@@ -83,9 +96,25 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
       IJK_One_Dimensional_Subproblem subproblem;
       (*this).add(subproblem);
       (*this)[subproblems_counter_].associate_sub_problem_to_inputs(i, j, k, compo_connex,
-                                                                    distance, curvature,
+                                                                    distance, curvature, interfacial_area,
                                                                     facet_barycentre, normal_vector,
-                                                                    bubble_rising_velocity, bubble_rising_vector);
+                                                                    bubble_rising_velocity, bubble_rising_vector,
+                                                                    points_per_thermal_subproblem,
+                                                                    alpha,
+                                                                    coeff_distance_diagonal,
+                                                                    interfaces,
+                                                                    eulerian_distance,
+                                                                    eulerian_curvature,
+                                                                    eulerian_interfacial_area,
+                                                                    eulerian_normal_vectors,
+                                                                    eulerian_facets_barycentre,
+                                                                    temperature,
+                                                                    temperature_ft,
+                                                                    velocity,
+                                                                    velocity_ft,
+                                                                    grad_T_elem,
+                                                                    hess_diag_T_elem,
+                                                                    hess_cross_T_elem);
       subproblems_counter_++;
     }
   else

@@ -69,6 +69,7 @@ public :
   void prepare_thermals(const char *lataname);
   int ghost_fluid_flag();
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
+  int get_probes_ghost_cells(int ghost_init);
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;

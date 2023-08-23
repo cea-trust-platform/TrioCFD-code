@@ -37,9 +37,9 @@ public:
 
   inline void set_lambda(const IJK_Field_local_double& lambda) { lambda_ = &lambda; };
 
-  inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
-                              IJK_Field_local_double& coeff_field_y,
-                              IJK_Field_local_double& coeff_field_z)
+  inline void set_coeff_x_y_z(const IJK_Field_local_double& coeff_field_x,
+                              const IJK_Field_local_double& coeff_field_y,
+                              const IJK_Field_local_double& coeff_field_z)
   {
     coeff_field_x_ = &coeff_field_x;
     coeff_field_y_ = &coeff_field_y;

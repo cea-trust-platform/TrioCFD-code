@@ -68,6 +68,7 @@ protected :
   void initialise_thermal_subproblems() override;
   void solve_thermal_subproblems() override;
   void apply_thermal_flux_correction() override;
+  int compute_ghost_cell_numbers_for_subproblems(int ghost_init) override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
@@ -75,7 +76,11 @@ protected :
   int convective_flux_correction_;
 
   int override_vapour_mixed_values_; // For debug purposes
+
   IJK_One_Dimensional_Subproblems thermal_local_subproblems_;
+  int points_per_thermal_subproblem_;
+  double coeff_distance_diagonal_ = 3.;
+
 
 };
 

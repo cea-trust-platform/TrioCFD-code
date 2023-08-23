@@ -291,3 +291,15 @@ int IJK_Thermals::ghost_fluid_flag()
     }
   return ghost_fluid;
 }
+
+int IJK_Thermals::get_probes_ghost_cells(int ghost_init)
+{
+  int ghost_cells = ghost_init;
+  for (auto& itr : (*this))
+    {
+      const int itr_ghost_cells = itr.get_probes_ghost_cells();
+      if (itr_ghost_cells > ghost_cells)
+        ghost_cells = itr_ghost_cells;
+    }
+  return ghost_cells;
+}
