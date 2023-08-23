@@ -88,6 +88,7 @@ protected :
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
+  int disable_subresolution_;
   int diffusive_flux_correction_;
   int convective_flux_correction_;
 

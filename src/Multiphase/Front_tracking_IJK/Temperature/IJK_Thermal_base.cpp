@@ -982,6 +982,7 @@ void IJK_Thermal_base::compute_rising_velocities()
 
 void IJK_Thermal_base::compute_thermal_subproblems()
 {
+  compute_overall_probes_parameters();
   initialise_thermal_subproblems();
   solve_thermal_subproblems();
   apply_thermal_flux_correction();

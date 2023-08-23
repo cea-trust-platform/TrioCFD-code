@@ -113,7 +113,7 @@ protected :
                                             const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
-  void associate_probe_parameters(int points_per_thermal_subproblem,
+  void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
                                   const double& coeff_distance_diagonal,
                                   const double& cell_diagonal,

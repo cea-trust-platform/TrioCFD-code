@@ -149,7 +149,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int i, int 
   // FIXME: What happen with highly deformable bubbles (concave interface portions) ?
 }
 
-void IJK_One_Dimensional_Subproblem::associate_probe_parameters(int points_per_thermal_subproblem,
+void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
                                                                 const double& alpha,
                                                                 const double& coeff_distance_diagonal,
                                                                 const double& cell_diagonal,
@@ -173,12 +173,6 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(int points_per_t
     points_per_thermal_subproblem_ = points_per_thermal_subproblem_base_;
   else
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
-  /*
-   * Following attributes differ anyway !
-   */
-  osculating_radial_coordinates_ = DoubleVect(*points_per_thermal_subproblem_);
-  radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
-  osculating_radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
 }
 
 void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const DoubleTab& radial_first_order_operator_raw,
@@ -223,7 +217,12 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
         radial_coordinates_modified_(i) = i * dr_;
       // (*radial_coordinates_)(i) = i * dr_;
     }
-  osculating_radial_coordinates_ = DoubleVect(*radial_coordinates_);
+  /*
+   * Following attributes differ anyway !
+   */
+  osculating_radial_coordinates_ = DoubleVect(*points_per_thermal_subproblem_);
+  radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
+  osculating_radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
   osculating_radial_coordinates_ += osculating_radius_;
   for (i=0; i < *points_per_thermal_subproblem_; i++)
     for (int dir=0; dir<3; dir++)

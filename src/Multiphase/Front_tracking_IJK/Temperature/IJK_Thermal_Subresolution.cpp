@@ -33,11 +33,14 @@ Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Therm
 
 IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
+  disable_subresolution_=0;
   convective_flux_correction_ = 0;
   diffusive_flux_correction_ = 0;
   override_vapour_mixed_values_ = 0;
   compute_eulerian_compo_ = 1;
   points_per_thermal_subproblem_ = 32;
+  dr_ = 0.;
+  probe_length_=0.;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -64,6 +67,7 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 void IJK_Thermal_Subresolution::set_param( Param& param )
 {
   IJK_Thermal_base::set_param(param);
+  param.ajouter_flag("disable_subresolution", &disable_subresolution_);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
   param.ajouter_flag("diffusive_flux_correction", &diffusive_flux_correction_);
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
@@ -211,16 +215,21 @@ void IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(const
 
 void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
 {
-  dr_ = probe_length_ / (points_per_thermal_subproblem_ - 1);
-  for (int i=0; i < points_per_thermal_subproblem_; i++)
-    radial_coordinates_(i) = i * dr_;
+  if (!disable_subresolution_)
+    {
+      probe_length_ = points_per_thermal_subproblem_ * coeff_distance_diagonal_ * cell_diagonal_;
+      dr_ = probe_length_ / (points_per_thermal_subproblem_ - 1);
+      radial_coordinates_ = DoubleVect(points_per_thermal_subproblem_);
+      for (int i=0; i < points_per_thermal_subproblem_; i++)
+        radial_coordinates_(i) = i * dr_;
 
-  /*
-   * Compute the matrices for Finite-Differences
-   */
-  compute_radial_convection_diffusion_operators(radial_first_order_operator_raw_, radial_second_order_operator_raw_,
-                                                radial_first_order_operator_, radial_second_order_operator_,
-                                                radial_convection_matrix_, radial_diffusion_matrix_);
+      /*
+       * Compute the matrices for Finite-Differences
+       */
+      compute_radial_convection_diffusion_operators(radial_first_order_operator_raw_, radial_second_order_operator_raw_,
+                                                    radial_first_order_operator_, radial_second_order_operator_,
+                                                    radial_convection_matrix_, radial_diffusion_matrix_);
+    }
 }
 
 void IJK_Thermal_Subresolution::compute_radial_convection_diffusion_operators(DoubleTab& radial_first_order_operator_raw,
@@ -318,46 +327,49 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
   // FIXME: should I perform this on the extended fields ? or original ?
   // If so, I need to convert, distance, curvature, interfacial_area earlier !
   // Or I need to calculate gradient and hessian fields using the temperature_ft_ mesh !
-  const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I_ft();
-  const int ni = temperature_ft_.ni();
-  const int nj = temperature_ft_.nj();
-  const int nk = temperature_ft_.nk();
-  for (int k = 0; k < nk; k++)
-    for (int j = 0; j < nj; j++)
-      for (int i = 0; i < ni; i++)
-        if (fabs(indicator(i,j,k)) > VAPOUR_INDICATOR_TEST && fabs(indicator(i,j,k)) < LIQUID_INDICATOR_TEST)
-          {
-            thermal_local_subproblems_.associate_sub_problem_to_inputs(i, j, k,
-                                                                       eulerian_compo_connex_,
-                                                                       eulerian_distance_,
-                                                                       eulerian_curvature_,
-                                                                       eulerian_interfacial_area_,
-                                                                       eulerian_facets_barycentre_,
-                                                                       eulerian_normal_vectors_,
-                                                                       rising_velocities_,
-                                                                       rising_vectors_,
-                                                                       points_per_thermal_subproblem_,
-                                                                       uniform_alpha_,
-                                                                       coeff_distance_diagonal_,
-                                                                       cell_diagonal_,
-                                                                       dr_,
-                                                                       radial_coordinates_,
-                                                                       radial_first_order_operator_raw_,
-                                                                       radial_second_order_operator_raw_,
-                                                                       radial_first_order_operator_,
-                                                                       radial_second_order_operator_,
-                                                                       radial_diffusion_matrix_,
-                                                                       radial_convection_matrix_,
-                                                                       ref_ijk_ft_->itfce(),
-                                                                       temperature_,
-                                                                       temperature_ft_,
-                                                                       ref_ijk_ft_->get_velocity(),
-                                                                       ref_ijk_ft_->get_velocity_ft(),
-                                                                       grad_T_elem_,
-                                                                       hess_diag_T_elem_,
-                                                                       hess_cross_T_elem_);
+  if (!disable_subresolution_)
+    {
+      const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I_ft();
+      const int ni = temperature_ft_.ni();
+      const int nj = temperature_ft_.nj();
+      const int nk = temperature_ft_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            if (fabs(indicator(i,j,k)) > VAPOUR_INDICATOR_TEST && fabs(indicator(i,j,k)) < LIQUID_INDICATOR_TEST)
+              {
+                thermal_local_subproblems_.associate_sub_problem_to_inputs(i, j, k,
+                                                                           eulerian_compo_connex_,
+                                                                           eulerian_distance_,
+                                                                           eulerian_curvature_,
+                                                                           eulerian_interfacial_area_,
+                                                                           eulerian_facets_barycentre_,
+                                                                           eulerian_normal_vectors_,
+                                                                           rising_velocities_,
+                                                                           rising_vectors_,
+                                                                           points_per_thermal_subproblem_,
+                                                                           uniform_alpha_,
+                                                                           coeff_distance_diagonal_,
+                                                                           cell_diagonal_,
+                                                                           dr_,
+                                                                           radial_coordinates_,
+                                                                           radial_first_order_operator_raw_,
+                                                                           radial_second_order_operator_raw_,
+                                                                           radial_first_order_operator_,
+                                                                           radial_second_order_operator_,
+                                                                           radial_diffusion_matrix_,
+                                                                           radial_convection_matrix_,
+                                                                           ref_ijk_ft_->itfce(),
+                                                                           temperature_,
+                                                                           temperature_ft_,
+                                                                           ref_ijk_ft_->get_velocity(),
+                                                                           ref_ijk_ft_->get_velocity_ft(),
+                                                                           grad_T_elem_,
+                                                                           hess_diag_T_elem_,
+                                                                           hess_cross_T_elem_);
 
-          }
+              }
+    }
 }
 
 /*
@@ -365,7 +377,10 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
  */
 void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
+  if (!disable_subresolution_)
+    {
 
+    }
 }
 
 /*
@@ -373,11 +388,17 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
  */
 void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
 {
+  if (!disable_subresolution_)
+    {
 
+    }
 }
 
 void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
-  thermal_local_subproblems_.clean();
+  if (!disable_subresolution_)
+    {
+      thermal_local_subproblems_.clean();
+    }
 }
 
