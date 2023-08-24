@@ -9,27 +9,67 @@ domaine dom
 
 # BEGIN MESH #
 Mailler dom
-{  
-    pave pave1
+{
+
+   Pave pave1
    { 
    origine 0. 0.
-   longueurs 1. 1. 
-   nombre_de_noeuds @Nx@ @Nz@
+   longueurs 0.333 0.333 
+   nombre_de_noeuds @Nx1@ @Ny1@
+   Facteurs 1. 1.0
    }
    {
-   bord left     X = 0.          0. <= Y <= 1.
-   bord right    X = 1.         0. <= Y <= 1.
-   bord bot      Y = 0.          0. <= X <= 1.
-   bord up       Y = 1.        0. <= X <= 1.
+   bord left1     X = 0.          0. <= Y <= 0.333
+   bord bot1      Y = 0.          0. <= X <= 0.333
+   } ,
+   
+   Pave pave2
+   { 
+   origine 0.333 0.
+   longueurs 0.667 0.333 
+   nombre_de_noeuds @Nx2@ @Ny1@
+   Facteurs 1.05 1.0
+   }
+   {
+   bord bot2      Y = 0.          0.333 <= X <= 1.
+   bord right1    X = 1.          0. <= Y <= 0.333
+   } ,
+   
+   Pave pave3
+   { 
+   origine 0. 0.333
+   longueurs 0.333 0.667 
+   nombre_de_noeuds @Nx1@ @Ny2@
+   Facteurs 1.0 1.05
+   }
+   {
+   bord top1     Y = 1.          0. <= X <= 0.333
+   bord left2    X = 0.          0.333 <= Y <= 1.
+   } ,
+   
+   Pave pave4
+   { 
+   origine 0.333 0.333
+   longueurs 0.667 0.667 
+   nombre_de_noeuds @Nx2@ @Ny2@
+   Facteurs 1.05 1.05
+   }
+   {
+   bord top2      Y = 1.          0.333 <= X <= 1.
+   bord right2    X = 1.          0.333 <= Y <= 1.
    }
 }
+RegroupeBord dom bot { bot1 bot2 } 
+RegroupeBord dom up { top1 top2 } 
+RegroupeBord dom left { left1 left2 } 
+RegroupeBord dom right { right1 right2 } 
 transformer dom x*@rmax@ y*@zmax@
 # END MESH #
 
 # BEGIN PARTITION
 Partition dom
 {
-   Partitionneur tranche { tranches 3 18 }
+   Partitionneur tranche { tranches @nprocx@ @nprocy@ }
    Larg_joint 2
    Nom_Zones DOM
 }
@@ -39,6 +79,7 @@ END PARTITION #
 # BEGIN SCATTER 
 Scatter ../MESH/DOM.Zones dom
  END SCATTER #
+ 
 
 Probleme_FT_Disc_gen pb
 Fluide_Incompressible  liquid_water
@@ -79,15 +120,16 @@ Lire fluide
 Schema_Euler_explicite  sch
 Lire sch
 {
-   nb_pas_dt_max 1000000000
+   nb_pas_dt_max 1000000000 # 12 HACK #
    tinit 0.0
-   tmax 5. 
+   tmax 15. # 50e-3 #
    tcpumax 23.75
-   dt_start dt_min
-   dt_min 1.e-12
-   dt_max 1.e-4 
+   dt_min 1.e-18
+   dt_max 1.e-3
+               # 1e-7 is necessary on coa test otherwise it is unstable at 89.4e-4 with remesh BEST #
    dt_impr 2.e-6
-   dt_sauv 500
+   impr_diffusion_implicite 1
+   dt_sauv 0.5
    facsec 1.
    seuil_statio 1e-12
    diffusion_implicite 1
@@ -114,7 +156,7 @@ Associate pb fluide
 Associate pb sch
 VDF dis
 Discretize pb dis
-system "mkdir -p lata-steady"
+system "mkdir -p lata"
 option_vdf { All_options } # To set the BC of pressure on the Boundary, not at the center of ghost cells! #
 Lire pb
 {
@@ -136,17 +178,15 @@ Lire pb
       equation_temperature_mpoint thermique
       new_mass_source   # -> it's a flag, when not activated, the variable is 0 #
       # when new_mass_source is used, it forces the use of the new jump(1/rho)*ai*mp as a source term in the RHS of Poisson instead of the historical div(delta_u) #
-      interpol_indic_pour_dI_dt interp_ai_based
-      terme_gravite rho_g  # grad_I or rho_g : Boussinesq only works with rho_g! #
+      interpol_indic_pour_dI_dt interp_modifiee # interp_ai_based #
+      OutletCorrection_pour_dI_dt CORRECTION_GHOST_INDIC
+      terme_gravite grad_I
       boussinesq_approximation
       boundary_conditions 
       {
-      # right   sortie_libre_rho_variable champ_front_fonc_xyz 1 -958.37*9.81*(Y-0.003) cela depend de l'option terme_gravite #
-      right Symetrie
+      right   sortie_libre_rho_variable champ_front_fonc_xyz 1 0. # -958.37*9.81*(Y-0.009) cela depend de l'option terme_gravite #
       bot     paroi_fixe 
-      up      sortie_libre_rho_variable champ_front_uniforme 1 0. 
-      # up     paroi_fixe #
-      # up      sortie_libre_rho_variable champ_front_fonc_xyz 1 -958.37*9.81*(3.1e-3-0.003) #
+      up      sortie_libre_rho_variable champ_front_uniforme 1 0.
       left    Symetrie
       }
    }
@@ -156,7 +196,7 @@ Lire pb
       # interpolation_repere_local #
       methode_interpolation_v vdf_lineaire
       methode_transport vitesse_interpolee hydraulique
-      conditions_initiales { fonction 1. } 
+      conditions_initiales { fonction 1. }
       VOFlike_correction_volume 1 # Flag to activate the VOF-like volume conservation (dI/dt) #
       nb_iterations_correction_volume 1 # to get the correct dI/dt #
       nb_lissage_correction_volume 1 # To smooth the dI/dt correction to avoid pikes on the interface #
@@ -178,23 +218,6 @@ Lire pb
                     lissage_courbure_iterations_si_remaillage 5
       }
       # End Remesh Best #
-      # Bloc Remesh Vinod 
-      remaillage { 
-                pas 1e-11
-                nb_iter_remaillage 5
-                critere_arete 0.35
-                critere_remaillage 0.35
-                pas_lissage 1e-11
-                relax_barycentrage 1
-                facteur_longueur_ideale 1.0
-                nb_iter_barycentrage 2
-                nb_iter_correction_volume 3
-                seuil_dvolume_residuel 1e-15
-                lissage_courbure_coeff -0.02
-                lissage_courbure_iterations_systematique 3
-                lissage_courbure_iterations_si_remaillage 5
-      }
-      End Remesh Vinod #
       collisions
       {
                 active
@@ -205,7 +228,7 @@ Lire pb
       parcours_interface { Correction_Parcours_Thomas }
       boundary_conditions
       {
-      bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 @theta@ # +90*(x_lt_3.e-5) to pinch contact line #
+      bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 @theta@*(x_ge_200.e-6)+135*(x_lt_200.e-6) # to pinch contact line #
       right  Paroi_FT_disc Symetrie
       up     Paroi_FT_disc Symetrie
       left   Paroi_FT_disc Symetrie
@@ -214,10 +237,12 @@ Lire pb
    
    thermique
    {
-        parametre_equation parametre_diffusion_implicite
+      parametre_equation parametre_diffusion_implicite
         {
             solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
         }
+      # Pb quand on fait ça, il ne calcul pas le dt_stab de convection en FTD?? #
+      # Parametre_equation parametre_implicite { resolution_explicite } #
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
@@ -230,11 +255,10 @@ Lire pb
                 bot   paroi_temperature_imposee champ_front_Uniforme 1 @dT@
                 up    frontiere_ouverte T_ext Champ_front_Uniforme 1 0.0
                 # paroi paroi_adiabatique #
-                right   symetrie
-                # right   frontiere_ouverte T_ext Champ_front_Fonc_xyz 1 (@dT@*(1-erf(y/@delta_th@))) #
+                right   frontiere_ouverte T_ext Champ_front_Fonc_xyz 1 (@dT@*(1-erf(y/@delta_th@)))
                 left    Symetrie
                 }
-              conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 (@dT@*(1-erf(y/@delta_th@))+0.1*sin(6.2831*x/@rmax@)) }
+              conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 (@dT@*(1-erf(y/@delta_th@))+0.01*sin(6.2831*x/@rmax@)) }
    }
    postraitement 
    {
@@ -264,14 +288,32 @@ Lire pb
    {
     postraitement_ft_lata post1 { 
      format Lata 
-     fichier lata-steady/post 
+     fichier lata/steady 
      champs dt_post 5.0e-2 { 
         VOLUME_MAILLE elem 
         indicatrice_interf elem 
         temperature_thermique elem 
         vitesse faces 
         pression elem 
-     }
+        mpoint_thermique elem 
+        interfacial_area elem 
+        distance_interface_elem_interf elem
+        # pression_laplacien_d elem 
+        second_membre_projection elem 
+        vitesse_conv_thermique faces 
+        vitesse_delta_interface faces 
+        terme_convection_vitesse faces 
+        terme_diffusion_vitesse faces #
+        # flux_tmp_interf faces  #
+     } 
+     interfaces interf { 
+        courbure som 
+        vitesse som 
+        vitesse_repere_local som 
+        COMPO_CONNEXE elem 
+        PE elem 
+        PE_LOCAL elem 
+     } 
     }   
    }
 
