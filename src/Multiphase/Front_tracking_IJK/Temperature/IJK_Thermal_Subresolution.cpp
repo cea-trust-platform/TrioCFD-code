@@ -73,6 +73,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
   param.ajouter("points_per_thermal_subproblem", &points_per_thermal_subproblem_);
   param.ajouter("coeff_distance_diagonal", &coeff_distance_diagonal_);
+  param.ajouter("finite_difference_assembler", &finite_difference_assembler_);
+
 }
 
 int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const int idx)
@@ -232,18 +234,20 @@ void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
     }
 }
 
-void IJK_Thermal_Subresolution::compute_radial_convection_diffusion_operators(DoubleTab& radial_first_order_operator_raw,
-                                                                              DoubleTab& radial_second_order_operator_raw,
-                                                                              DoubleTab& radial_first_order_operator,
-                                                                              DoubleTab& radial_second_order_operator,
-                                                                              DoubleTab& radial_diffusion_matrix,
-                                                                              DoubleTab& radial_convection_matrix)
+void IJK_Thermal_Subresolution::compute_radial_convection_diffusion_operators(Matrice& radial_first_order_operator_raw,
+                                                                              Matrice& radial_second_order_operator_raw,
+                                                                              Matrice& radial_first_order_operator,
+                                                                              Matrice& radial_second_order_operator,
+                                                                              Matrice& radial_diffusion_matrix,
+                                                                              Matrice& radial_convection_matrix)
 {
   /*
    * Compute the matrices for Finite-Differences
    */
   compute_first_order_operator_raw(radial_first_order_operator_raw);
   compute_second_order_operator_raw(radial_second_order_operator_raw);
+  radial_first_order_operator = Matrice(radial_first_order_operator_raw);
+  radial_second_order_operator = Matrice(radial_second_order_operator_raw);
   compute_first_order_operator(radial_first_order_operator, dr_);
   compute_second_order_operator(radial_second_order_operator, dr_);
   compute_radial_convection_operator(radial_first_order_operator, radial_convection_matrix);
@@ -254,34 +258,43 @@ void IJK_Thermal_Subresolution::compute_radial_convection_diffusion_operators(Do
  * FIXME : Should be moved to a class of tools
  */
 
-void IJK_Thermal_Subresolution::compute_first_order_operator_raw(DoubleTab& radial_first_order_operator)
+void IJK_Thermal_Subresolution::compute_first_order_operator_raw(Matrice& radial_first_order_operator)
 {
   /*
    * Compute the first-order matrix for Finite-Differences
    */
   // TODO:
+  int check_nb_elem;
+  check_nb_elem = finite_difference_assembler_.build(radial_first_order_operator, points_per_thermal_subproblem_, 1);
+  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+
 }
 
-void IJK_Thermal_Subresolution::compute_first_order_operator(DoubleTab& radial_first_order_operator, double dr)
+void IJK_Thermal_Subresolution::compute_first_order_operator(Matrice& radial_first_order_operator, double dr)
 {
-  radial_first_order_operator /= dr;
+  const double dr_inv = 1 / dr;
+  radial_first_order_operator *= dr_inv;
 }
 
-void IJK_Thermal_Subresolution::compute_second_order_operator_raw(DoubleTab& radial_second_order_operator)
+void IJK_Thermal_Subresolution::compute_second_order_operator_raw(Matrice& radial_second_order_operator)
 {
   /*
    * Compute the second-order matrix for Finite-Differences
    */
   // TODO:
+  int check_nb_elem;
+  check_nb_elem = finite_difference_assembler_.build(radial_second_order_operator, points_per_thermal_subproblem_, 1);
+  Cerr << "Check_nb_elem" << check_nb_elem << finl;
 }
 
-void IJK_Thermal_Subresolution::compute_second_order_operator(DoubleTab& radial_second_order_operator, double dr)
+void IJK_Thermal_Subresolution::compute_second_order_operator(Matrice& radial_second_order_operator, double dr)
 {
-  radial_second_order_operator /= pow(dr, 2);
+  const double dr_squared_inv = 1 / pow(dr, 2);
+  radial_second_order_operator *= dr_squared_inv;
 }
 
-void IJK_Thermal_Subresolution::compute_radial_convection_operator(const DoubleTab& radial_first_order_operator,
-                                                                   DoubleTab& radial_convection_matrix)
+void IJK_Thermal_Subresolution::compute_radial_convection_operator(const Matrice& radial_first_order_operator,
+                                                                   Matrice& radial_convection_matrix)
 {
   /*
    * Compute the matrices for Finite-Differences
@@ -289,8 +302,8 @@ void IJK_Thermal_Subresolution::compute_radial_convection_operator(const DoubleT
 
 }
 
-void IJK_Thermal_Subresolution::compute_radial_diffusion_operator(const DoubleTab& radial_second_order_operator,
-                                                                  DoubleTab& radial_diffusion_matrix)
+void IJK_Thermal_Subresolution::compute_radial_diffusion_operator(const Matrice& radial_second_order_operator,
+                                                                  Matrice& radial_diffusion_matrix)
 {
   /*
    * Compute the matrices for Finite-Differences
@@ -379,7 +392,9 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
   if (!disable_subresolution_)
     {
-
+      one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_.valeur(),
+                                                                           thermal_subproblems_rhs_assembly_,
+                                                                           thermal_subproblems_temperature_solution_);
     }
 }
 

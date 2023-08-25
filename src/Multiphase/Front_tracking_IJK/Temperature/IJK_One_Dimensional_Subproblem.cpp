@@ -115,12 +115,12 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int i, int 
                                                                      const double& cell_diagonal,
                                                                      const double& dr_base,
                                                                      const DoubleVect& radial_coordinates,
-                                                                     const DoubleTab& radial_first_order_operator_raw,
-                                                                     const DoubleTab& radial_second_order_operator_raw,
-                                                                     const DoubleTab& radial_first_order_operator,
-                                                                     const DoubleTab& radial_second_order_operator,
-                                                                     const DoubleTab& radial_diffusion_matrix,
-                                                                     const DoubleTab& radial_convection_matrix,
+                                                                     const Matrice& radial_first_order_operator_raw,
+                                                                     const Matrice& radial_second_order_operator_raw,
+                                                                     const Matrice& radial_first_order_operator,
+                                                                     const Matrice& radial_second_order_operator,
+                                                                     const Matrice& radial_diffusion_matrix,
+                                                                     const Matrice& radial_convection_matrix,
                                                                      const IJK_Interfaces& interfaces,
                                                                      const IJK_Field_local_double& eulerian_distance,
                                                                      const IJK_Field_local_double& eulerian_curvature,
@@ -175,12 +175,12 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
 }
 
-void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const DoubleTab& radial_first_order_operator_raw,
-                                                                           const DoubleTab& radial_second_order_operator_raw,
-                                                                           const DoubleTab& radial_first_order_operator,
-                                                                           const DoubleTab& radial_second_order_operator,
-                                                                           const DoubleTab& radial_diffusion_matrix,
-                                                                           const DoubleTab& radial_convection_matrix)
+void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
+                                                                           const Matrice& radial_second_order_operator_raw,
+                                                                           const Matrice& radial_first_order_operator,
+                                                                           const Matrice& radial_second_order_operator,
+                                                                           const Matrice& radial_diffusion_matrix,
+                                                                           const Matrice& radial_convection_matrix)
 {
   radial_first_order_operator_raw_base_ = &radial_first_order_operator_raw;
   radial_second_order_operator_raw_base_ = &radial_second_order_operator_raw;

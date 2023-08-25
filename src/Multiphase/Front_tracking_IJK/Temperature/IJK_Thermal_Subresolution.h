@@ -38,6 +38,7 @@
 #include <OpConvDiscQuickIJKScalar.h>
 #include <OpConvCentre4IJK.h>
 #include <IJK_One_Dimensional_Subproblems.h>
+#include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -67,20 +68,20 @@ protected :
   void correct_temperature_for_eulerian_fluxes() override;
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters() override;
-  void compute_radial_convection_diffusion_operators(DoubleTab& radial_first_order_operator_raw,
-                                                     DoubleTab& radial_second_order_operator_raw,
-                                                     DoubleTab& radial_first_order_operator,
-                                                     DoubleTab& radial_second_order_operator,
-                                                     DoubleTab& radial_diffusion_matrix,
-                                                     DoubleTab& radial_convection_matrix);
-  void compute_first_order_operator_raw(DoubleTab& radial_first_order_operator);
-  void compute_first_order_operator(DoubleTab& radial_first_order_operator, double dr);
-  void compute_second_order_operator(DoubleTab& radial_second_order_operator, double dr);
-  void compute_second_order_operator_raw(DoubleTab& radial_second_order_operator);
-  void compute_radial_convection_operator(const DoubleTab& radial_first_order_operator,
-                                          DoubleTab& radial_convection_matrix);
-  void compute_radial_diffusion_operator(const DoubleTab& radial_second_order_operator,
-                                         DoubleTab& radial_diffusion_matrix);
+  void compute_radial_convection_diffusion_operators(Matrice& radial_first_order_operator_raw,
+                                                     Matrice& radial_second_order_operator_raw,
+                                                     Matrice& radial_first_order_operator,
+                                                     Matrice& radial_second_order_operator,
+                                                     Matrice& radial_diffusion_matrix,
+                                                     Matrice& radial_convection_matrix);
+  void compute_first_order_operator_raw(Matrice& radial_first_order_operator);
+  void compute_first_order_operator(Matrice& radial_first_order_operator, double dr);
+  void compute_second_order_operator(Matrice& radial_second_order_operator, double dr);
+  void compute_second_order_operator_raw(Matrice& radial_second_order_operator);
+  void compute_radial_convection_operator(const Matrice& radial_first_order_operator,
+                                          Matrice& radial_convection_matrix);
+  void compute_radial_diffusion_operator(const Matrice& radial_second_order_operator,
+                                         Matrice& radial_diffusion_matrix);
   void initialise_thermal_subproblems() override;
   void solve_thermal_subproblems() override;
   void apply_thermal_flux_correction() override;
@@ -100,13 +101,21 @@ protected :
   double probe_length_;
   double dr_;
   DoubleVect radial_coordinates_;
-  DoubleTab radial_first_order_operator_raw_;
-  DoubleTab radial_second_order_operator_raw_;
-  DoubleTab radial_first_order_operator_;
-  DoubleTab radial_second_order_operator_;
-  DoubleTab radial_diffusion_matrix_;
-  DoubleTab radial_convection_matrix_;
-
+  Matrice radial_first_order_operator_raw_;
+  Matrice radial_second_order_operator_raw_;
+  Matrice radial_first_order_operator_;
+  Matrice radial_second_order_operator_;
+  Matrice radial_diffusion_matrix_;
+  Matrice radial_convection_matrix_;
+  /*
+   * Thermal subproblems are regrouped in a single linear system AX=b
+   * on each processor !
+   */
+  IJK_Finite_Difference_One_Dimensional_Matrix_Assembler finite_difference_assembler_;
+  Matrice thermal_subproblems_matrix_assembly_;
+  DoubleVect thermal_subproblems_rhs_assembly_;
+  DoubleVect thermal_subproblems_temperature_solution_;
+  SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

@@ -31,6 +31,7 @@
 #include <TRUSTTab.h>
 #include <Vecteur3.h>
 #include <Matrice33.h>
+#include <Matrice.h>
 
 // #include <TRUSTArray.h>
 
@@ -62,12 +63,12 @@ public :
                                        const double& cell_diagonal,
                                        const double& dr_base,
                                        const DoubleVect& radial_coordinates,
-                                       const DoubleTab& radial_first_order_operator_raw,
-                                       const DoubleTab& radial_second_order_operator_raw,
-                                       const DoubleTab& radial_first_order_operator,
-                                       const DoubleTab& radial_second_order_operator,
-                                       const DoubleTab& radial_diffusion_matrix,
-                                       const DoubleTab& radial_convection_matrix,
+                                       const Matrice& radial_first_order_operator_raw,
+                                       const Matrice& radial_second_order_operator_raw,
+                                       const Matrice& radial_first_order_operator,
+                                       const Matrice& radial_second_order_operator,
+                                       const Matrice& radial_diffusion_matrix,
+                                       const Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
                                        const IJK_Field_local_double& eulerian_distance,
                                        const IJK_Field_local_double& eulerian_curvature,
@@ -119,12 +120,12 @@ protected :
                                   const double& cell_diagonal,
                                   const double& dr_base,
                                   const DoubleVect& radial_coordinates);
-  void associate_finite_difference_operators(const DoubleTab& radial_first_order_operator_raw,
-                                             const DoubleTab& radial_second_order_operator_raw,
-                                             const DoubleTab& radial_first_order_operator,
-                                             const DoubleTab& radial_second_order_operator,
-                                             const DoubleTab& radial_diffusion_matrix,
-                                             const DoubleTab& radial_convection_matrix);
+  void associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
+                                             const Matrice& radial_second_order_operator_raw,
+                                             const Matrice& radial_first_order_operator,
+                                             const Matrice& radial_second_order_operator,
+                                             const Matrice& radial_diffusion_matrix,
+                                             const Matrice& radial_convection_matrix);
   void initialise_thermal_probe();
   const int *  increase_number_of_points();
   void initialise_finite_difference_operators();
@@ -200,12 +201,12 @@ protected :
   const double * dr_base_ = 0;
   const DoubleVect* radial_coordinates_base_;
 
-  const DoubleTab* radial_first_order_operator_raw_base_;
-  const DoubleTab* radial_second_order_operator_raw_base_;
-  const DoubleTab* radial_first_order_operator_base_;
-  const DoubleTab* radial_second_order_operator_base_;
-  const DoubleTab* radial_diffusion_matrix_base_;
-  const DoubleTab* radial_convection_matrix_base_;
+  const Matrice* radial_first_order_operator_raw_base_;
+  const Matrice* radial_second_order_operator_raw_base_;
+  const Matrice* radial_first_order_operator_base_;
+  const Matrice* radial_second_order_operator_base_;
+  const Matrice* radial_diffusion_matrix_base_;
+  const Matrice* radial_convection_matrix_base_;
 
   double dr_=0.;
   const DoubleVect * radial_coordinates_;
