@@ -200,7 +200,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           // Loop on real faces
-          ArrOfDouble vit_face_loc(dimension);
+          //ArrOfDouble vit_face_loc(dimension);
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
           for (int ind_face=ndeb; ind_face<nfin; ind_face++)

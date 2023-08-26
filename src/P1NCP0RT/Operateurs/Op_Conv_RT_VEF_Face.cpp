@@ -61,8 +61,8 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Champ_Inc_base& la_vitesse=vitesse();
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
-  DoubleTab transporte_face_;
-  DoubleTab vitesse_face_;
+  //DoubleTab transporte_face_;
+  //DoubleTab vitesse_face_;
 
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const Domaine& domaine = domaine_VEF.domaine();
@@ -289,8 +289,8 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
-  int nfac = domaine.nb_faces_elem();
-  int nsom = domaine.nb_som_elem();
+  //int nfac = domaine.nb_faces_elem();
+  //int nsom = domaine.nb_som_elem();
   const IntTab& elem_sommets = domaine.les_elems();
   //const DoubleTab& coord_sommets=domaine.domaine().les_sommets();
   // Pour le traitement de la convection on distingue les polyedres
@@ -304,7 +304,7 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
   double psc;
-  DoubleTab pscl=0;
+  //DoubleTab pscl=0;
   int i,j,n_bord;
   int num_face;
   int ncomp_ch_transporte;
@@ -321,14 +321,14 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // soit transporte=transporte_ et vitesse_face=phi*vitesse_
   // cela depend si on transporte avec phi u ou avec u.
   const DoubleTab& vitesse_face=modif_par_porosite_si_flag(vitesse_face_absolue,vitesse_face_,marq,porosite_face);
-  ArrOfInt face(nfac);
-  ArrOfDouble vs(dimension);
-  ArrOfDouble vc(dimension);
-  DoubleTab vsom(nsom,dimension);
-  ArrOfDouble cc(dimension);
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  //ArrOfInt face(nfac);
+  //ArrOfDouble vs(dimension);
+  //ArrOfDouble vc(dimension);
+  //DoubleTab vsom(nsom,dimension);
+  //ArrOfDouble cc(dimension);
+  //const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
 
-  Nom nom_elem=type_elemvef.que_suis_je();
+  //Nom nom_elem=type_elemvef.que_suis_je();
 
 
 

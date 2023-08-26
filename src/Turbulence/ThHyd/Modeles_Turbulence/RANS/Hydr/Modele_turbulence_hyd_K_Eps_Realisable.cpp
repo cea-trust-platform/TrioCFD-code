@@ -183,7 +183,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
               Process::exit(-1);
             }
         }
-      ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
+      //ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
           const double k = tabKEps(n,0);

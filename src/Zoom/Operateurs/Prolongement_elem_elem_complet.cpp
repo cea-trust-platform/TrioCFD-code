@@ -85,7 +85,7 @@ void Prolongement_elem_elem_complet::prolonger(Domaine_VF& domaine_VFG,
 
   DoubleVect coord_somG;
   coord_somG.resize(dimension);
-  ArrOfInt elem;
+  //ArrOfInt elem;
   int compo;
 
   int nb_elemG_pour_prolongement;

@@ -757,7 +757,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   int nb_compo=0;
 
   int dimension=Objet_U::dimension;
-  DoubleVect coef(Objet_U::dimension);
+  //DoubleVect coef(Objet_U::dimension);
 
   const DoubleTab& tab_beta = ch_beta.valeurs();
   G = 0;

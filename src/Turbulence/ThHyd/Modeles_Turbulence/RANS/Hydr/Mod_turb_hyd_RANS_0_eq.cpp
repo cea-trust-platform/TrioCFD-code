@@ -244,8 +244,8 @@ void Mod_turb_hyd_RANS_0_eq::imprimer (Sortie& os )  const
         Nom fic=fichier_K_eps_sortie_.nom_me(me());
 
         Nom nom_post=K_eps_sortie_.le_nom();
-        Nom nom_dom=dom.le_nom();
-        Nom nom_dom_inc= dom.le_nom();
+        //Nom nom_dom=dom.le_nom();
+        //Nom nom_dom_inc= dom.le_nom();
         Nom type_elem=dom.type_elem()->que_suis_je();
         assert(K_eps_sortie_.valeurs().dimension(0)==dom.nb_elem());
         EcrMED ecr_med(fic, dom);

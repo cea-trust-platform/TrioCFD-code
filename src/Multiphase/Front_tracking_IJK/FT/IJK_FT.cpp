@@ -1095,7 +1095,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
     {
       Nom xyz_name(fichier_sauvegarde);
       xyz_name += ".xyz";
-      Nom xyz_name_ascii = xyz_name + "_ascii";
+      // Nom xyz_name_ascii = xyz_name + "_ascii";
       dumpxyz_vector(velocity_, xyz_name, true);
       //  dumpxyz_vector(velocity_, xyz_name_ascii, false);
     }

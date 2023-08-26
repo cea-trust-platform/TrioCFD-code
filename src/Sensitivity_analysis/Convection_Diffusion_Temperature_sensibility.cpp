@@ -106,7 +106,7 @@ int Convection_Diffusion_Temperature_sensibility::lire_motcle_non_standard(const
           Cerr<<"when Convection_Diffusion_Temperature_sensibility is used."<<finl;
           exit();
         }
-      const Motcle velocity;
+      //const Motcle velocity;
       associate_evaluator_field( name_state_pb,name_velocity_state_field);
       return 1;
     }

@@ -1470,7 +1470,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
       int el0,el1;
       double vol0,vol1;
       DoubleTab kappa_face(prov_face.dimension(0),nb_comp*nb_comp);
-      DoubleTab cface(prov_face.dimension(0),nb_comp);
+      //DoubleTab cface(prov_face.dimension(0),nb_comp);
       for (int j=0; j<nb_comp*nb_comp; j++)
         {
           for (int fac=ndeb; fac<nbfaces; fac++)

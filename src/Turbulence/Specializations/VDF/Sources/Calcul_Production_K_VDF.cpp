@@ -50,7 +50,7 @@ calculer_terme_production_K(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF
   const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
-  IntVect element(4);
+  //IntVect element(4);
 
   S = 0. ;
 
@@ -594,7 +594,7 @@ calculer_terme_production_K_BiK(const Domaine_VDF& domaine_VDF, const Domaine_Cl
   const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
-  IntVect element(4);
+  //IntVect element(4);
 
   S = 0. ;
 

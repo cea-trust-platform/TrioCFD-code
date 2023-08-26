@@ -89,7 +89,7 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 
       if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
-          ArrOfDouble acc_loc_tot(dimension);
+          //ArrOfDouble acc_loc_tot(dimension);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();

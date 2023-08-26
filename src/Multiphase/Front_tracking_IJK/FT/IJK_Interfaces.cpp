@@ -5433,9 +5433,9 @@ void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& 
 {
   //////////////////////////////////// CALCUL DES VITESSE MOYENNE PAR BULLES ///////////////////////////////////////
   const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const DoubleTab& sommets = mesh.sommets() ; // Tableau des coordonnees des marqueurs.
-  int nbsom = sommets.dimension(0);
-  DoubleTab deplacement(nbsom,3);
+  //const DoubleTab& sommets = mesh.sommets() ; // Tableau des coordonnees des marqueurs.
+  //int nbsom = sommets.dimension(0);
+  //DoubleTab deplacement(nbsom,3);
 
   compute_vinterp(); // to resize and fill vinterp_
 
