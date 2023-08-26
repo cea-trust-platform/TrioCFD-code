@@ -20,7 +20,7 @@
 #include <Domaine_VEF.h>
 #include <CL_Types_include.h>
 
-extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
+extern double calculer_coef_som(int rang_elem, int dimension, int& nb_face_diri, int *indice_diri);
 Implemente_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face,"Op_Conv_RT_VEF_P1NC",Op_Conv_VEF_Face);
 // XD convection_RT convection_deriv RT 0 Keyword to use RT projection for P1NCP0RT discretization
 
@@ -82,7 +82,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
     // Cout<<"Op_Conv_RT_VEF_Face::ajouter RT\n";
     // Traitement des CL de Dirichlet
     int nb_face_diri=0;
-    ArrOfInt indice_diri(dimension+1);
+    int indice_diri[4];
     int modif_traitement_diri=0;
     if (sub_type(Domaine_VEF,domaine_VEF))
       modif_traitement_diri=ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet();
@@ -98,9 +98,12 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
                 int numSom=elem_sommets(elem, i);
                 for (dim=0; dim<dimension; dim++) coordSommet(i,dim)=coord_sommets(numSom,dim);
               }
-
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
+              {
+                int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
+                int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+                calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
+              }
             volume=volumes(elem);
             double invVol  = 1./(12*volume);
             double invVol2 = invVol/volume;
@@ -193,7 +196,11 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
             DoubleTab FacesNormales(dimension+1,dimension);
             DoubleVect vitFaceNormale(dimension+1);
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
+              {
+                int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
+                int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+                calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
+              }
             volume=volumes(elem);
             for (dim=0; dim<dimension; dim++) rotVit(dim)=0.;
             for (i=0; i<=dimension; i++)
