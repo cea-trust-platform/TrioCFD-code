@@ -130,7 +130,7 @@ Lire pb
 		
 		solveur_pression GCP { 
 			precond ssor { omega 1.5 } 
-			seuil 1.0e-08 
+			seuil 1.0e-12
 			 
 		}
 		convection { muscl }
