@@ -76,7 +76,7 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
   const IntTab& f_e = domaine.face_voisins();
 
   const DoubleTab& rho = pbm.milieu().masse_volumique().passe(),
-                   &press = pbm.eq_qdm.pression().passe(),
+                   &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
                     &qpi = ref_cast(Flux_interfacial_PolyMAC_P0P1NC, src_flux_interfacial_.valeur()).qpi(),
                      &dnuc = ref_cast(Op_Diff_PolyMAC_P0_Elem, pbm.equation(2).operateur(0).l_op_base()).d_nucleation();
 

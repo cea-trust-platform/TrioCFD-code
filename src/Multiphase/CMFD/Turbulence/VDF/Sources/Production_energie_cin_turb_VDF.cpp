@@ -79,7 +79,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
                         *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
                          *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr;
 
-  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
+  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
   const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 

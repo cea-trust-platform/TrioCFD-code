@@ -134,8 +134,8 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   // Cas bouillant : on passe par qpi
   if ( (pbm) && pbm->has_correlation("flux_parietal") )
     {
-      const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.sources().dernier().valeur()).qpi(),
-                       &press = pbm->eq_qdm.pression()->passe();
+      const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, pbm->equation_energie().sources().dernier().valeur()).qpi(),
+                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression()->passe();
       int nb_max_sat = N*(N-1)/2;
 
       /* limiteur de changement de phase : pas mis dans la V0 de cette force */

@@ -105,7 +105,7 @@ void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, Doub
   const Equation_base& eqn = ref_cast(Equation_base, obj);
   const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
   const Champ_base& ch_rho = fl.masse_volumique();
-  const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).eq_masse.inconnue().valeur() : NULL,
+  const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue().valeur() : NULL,
                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL; //pas toujours un Champ_Inc
   const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : NULL, &rho = ch_rho.valeurs(), &k = eqn.inconnue().valeurs();
 
