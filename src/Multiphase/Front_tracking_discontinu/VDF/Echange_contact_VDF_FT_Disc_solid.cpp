@@ -147,6 +147,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
       const Front_VF& front_vf = ref_cast(Front_VF, ch.front_dis ());
 
+
       const Cond_lim_base& la_cl = zclvdf.condition_limite_de_la_frontiere(front_vf.frontiere().le_nom());
 
       if (sub_type(Echange_contact_VDF_FT_Disc, la_cl))
@@ -156,14 +157,41 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
           const DoubleTab& autre_phi  = la_cl_typee.phi_ext()->valeurs ();
 
+
+
+          // trace_elem_xxx(x, y) is elelmet-based function, X should be is indiced with element number
+          // when several paves are used (progressive mesh), the elem-number is not continued at BC
+          // create an elelmet-based Field phi_filed, filled the value of autre_phi at the boundary
+
+
+          const Equation_base& autre_eqn = ref_cast(Equation_base, ch.domaine_Cl_dis().equation());
+          const DoubleTab& autre_inco =autre_eqn.inconnue ().valeurs ();
+
+          DoubleTab phi_filed(autre_inco);
+          phi_filed = 0.;
+
+          const Domaine_dis_base& domainedis = ref_cast(Domaine_dis_base, ch.domaine_dis());
+          const IntTab& face_voisins_loc = domainedis.face_voisins();
+
+          for (int ii = 0; ii < autre_phi.dimension (0); ii++)
+            {
+              const int face_loc = ii + front_vf.frontiere().num_premiere_face();
+              int elem = face_voisins_loc(face_loc, 0);
+              if (elem == -1)
+                elem = face_voisins_loc(face_loc, 1);
+              phi_filed(elem) = autre_phi(ii);
+            }
+
           Nom nom_racc1=frontiere_dis().frontiere().le_nom();
           if (mon_dom_cl_dis -> domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
             {
-              front_vf.frontiere ().trace_elem_distant (autre_phi, mon_phi);
+              // front_vf.frontiere ().trace_elem_distant (autre_phi, mon_phi);
+              front_vf.frontiere ().trace_elem_distant (phi_filed, mon_phi);
             }
           else // Raccord_local_homogene
             {
-              front_vf.frontiere ().trace_elem_local (autre_phi, mon_phi);
+              // front_vf.frontiere ().trace_elem_local (autre_phi, mon_phi);
+              front_vf.frontiere ().trace_elem_local (phi_filed, mon_phi);
             }
         }
 
