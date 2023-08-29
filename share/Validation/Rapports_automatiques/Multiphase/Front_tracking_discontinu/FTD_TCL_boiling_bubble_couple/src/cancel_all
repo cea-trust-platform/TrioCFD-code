@@ -1,0 +1,2 @@
+#!/bin/bash
+squeue -u gb218285 | awk '{print $1}' | grep -v JOBID | xargs scancel
