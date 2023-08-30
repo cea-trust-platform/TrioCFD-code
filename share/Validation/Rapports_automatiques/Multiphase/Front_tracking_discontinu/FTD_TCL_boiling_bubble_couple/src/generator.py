@@ -17,7 +17,7 @@ host=socket.gethostname()[0:5]
 runs = os.path.join(root, f"RUNS-{host}")
 if not os.path.isdir(root): os.mkdir(root)
 
-file_list = ["post_run", "clean", "visit_Re_Nu2.py"]
+file_list = ["post_run", "clean", "visit_Re_Nu2.py", "model.txt"]
 
 
 def meshing(Nx_regu, Ny_regu, per_regu=0.333):
@@ -120,7 +120,7 @@ class Case:
             fic = (os.path.join(calc_dir, "source.data"))
             cmd = ["sed", "-i", "-e", f"\"s/n_extend_meso 4/n_extend_meso {nmeso}/\""]
             if (nmeso == "1"):
-                new_timestep = self.timestep /10. # A smaller timestep is required with meso=1
+                new_timestep = float(self.timestep) /10. # A smaller timestep is required with meso=1
                 cmd.extend(["-e", f"\"s/timestep .*/timestep {new_timestep}/\""])
             cmd.append(f"{fic}")
             st = " ".join(cmd)

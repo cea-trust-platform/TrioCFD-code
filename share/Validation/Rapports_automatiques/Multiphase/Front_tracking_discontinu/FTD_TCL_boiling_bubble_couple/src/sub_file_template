@@ -41,7 +41,7 @@ if [ ! -f .not_reprise ] ; then
        fi
     fi
     # In the next folder:
-    mkdir -p ../R$next && cp sub_file clean visit_Re_Nu2.py ${jdd}.data ../R$next && cd ../R$next/
+    mkdir -p ../R$next && cp sub_file clean visit_Re_Nu2.py model.txt ${jdd}.data ../R$next && cd ../R$next/
     sed -i "s/R$n/R$next/" sub_file
     sed -i "s/R$before/R$n/;s/nb_pas_dt_max 10$/nb_pas_dt_max 10000000/" ${jdd}.data
     [ $n == 0 ] && sed -i -e "/resume_last_time .*steady/d" \

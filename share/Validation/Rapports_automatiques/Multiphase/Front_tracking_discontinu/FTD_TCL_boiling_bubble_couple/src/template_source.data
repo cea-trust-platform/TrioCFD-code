@@ -200,13 +200,13 @@ Triple_Line_Model_FT_Disc TCL
 Read TCL 
 { # TCL #
   # deactivate TCL #
-  Qtcl 30.450 # TCL #
-  ym 3.785e-6 # TCL #
-  sm 4.946e-6 # TCL #
+  # Qtcl 30.450  TCL #
+  ym 2.130e-6 # TCL #
+  sm 4.956e-6 # TCL #
   n_extend_meso 4 # TCL #
   inout_method approx # TCL #
   read_via_file 1  # TCL #
-  file_name test.txt # TCL #
+  file_name model.txt # TCL #
 } # TCL #
 
 Champ_Uniforme gravite
@@ -474,7 +474,7 @@ Post_processing
 	{
 		Format lata
 		fichier slata/post
-		fields dt_post 5.e-7
+		fields dt_post 1.0e-4
 		{
 		    temperature elem
 		}
