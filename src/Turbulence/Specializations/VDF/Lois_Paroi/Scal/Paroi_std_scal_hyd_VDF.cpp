@@ -30,7 +30,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Probleme_base.h>
 #include <Fluide_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Constituant.h>
@@ -122,7 +122,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   // flux et l'impression du Nusselt.
 
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
   const DoubleVect& tab_u_star = loi.valeur().tab_u_star();
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();

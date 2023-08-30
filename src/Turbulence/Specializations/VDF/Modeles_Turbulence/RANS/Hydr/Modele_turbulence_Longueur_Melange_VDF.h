@@ -33,7 +33,7 @@ class Domaine_VDF;
  *
  *     ATTENTION : modele code que pour un canal 2D horizontal !!!!
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
 class Modele_turbulence_Longueur_Melange_VDF : public Mod_turb_hyd_RANS_0_eq
 {

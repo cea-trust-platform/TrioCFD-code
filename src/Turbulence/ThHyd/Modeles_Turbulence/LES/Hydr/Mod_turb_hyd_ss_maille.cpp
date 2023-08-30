@@ -31,43 +31,43 @@
 #include <Paroi_std_hyd_VDF_diphasique.h>
 #include <Milieu_base.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_ss_maille,"Mod_turb_hyd_ss_maille",Mod_turb_hyd_base);
+Implemente_base_sans_constructeur(Mod_turb_hyd_ss_maille,"Mod_turb_hyd_ss_maille",Modele_turbulence_hyd_base);
 
 Mod_turb_hyd_ss_maille::Mod_turb_hyd_ss_maille()
 {
   methode="volume"; // Parametre par defaut pour calculer la longueur caracteristique
 }
-/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Mod_turb_hyd_ss_maille::printOn(Sortie& is) const
 {
-  return Mod_turb_hyd_base::printOn(is);
+  return Modele_turbulence_hyd_base::printOn(is);
 }
 
 
-/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Mod_turb_hyd_ss_maille::readOn(Entree& is)
 {
-  Mod_turb_hyd_base::readOn(is);
+  Modele_turbulence_hyd_base::readOn(is);
   return is;
 }
 
 void Mod_turb_hyd_ss_maille::set_param(Param& param)
 {
-  Mod_turb_hyd_base::set_param(param);
+  Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("longueur_maille",&methode);
 }
 
 int Mod_turb_hyd_ss_maille::preparer_calcul()
 {
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   if (methode!="??")
     Cerr << "The characteristic length of the subgrid scale model is calculated with the method : " << methode << finl;
   calculer_longueurs_caracteristiques();
@@ -77,13 +77,13 @@ int Mod_turb_hyd_ss_maille::preparer_calcul()
 
 /*! @brief Discretise le modele de turbulence.
  *
- * Appelle Mod_turb_hyd_base::discretiser()
+ * Appelle Modele_turbulence_hyd_base::discretiser()
  *     Initialise les integrales statistiques.
  *
  */
 void Mod_turb_hyd_ss_maille::discretiser()
 {
-  Mod_turb_hyd_base::discretiser();
+  Modele_turbulence_hyd_base::discretiser();
   discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
   champs_compris_.ajoute_champ(energie_cinetique_turb_);
 }

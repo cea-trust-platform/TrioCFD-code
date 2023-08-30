@@ -38,7 +38,7 @@
 #include <time.h>
 #include <SFichier.h>
 #include <Navier_Stokes_std.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(ParoiVDF_TBLE,"Paroi_TBLE_VDF",Paroi_hyd_base_VDF);

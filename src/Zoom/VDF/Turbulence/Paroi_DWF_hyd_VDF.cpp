@@ -23,7 +23,7 @@
 
 #include <Paroi_DWF_hyd_VDF.h>
 #include <Navier_Stokes_std.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Domaine_Cl_VDF.h>
@@ -144,7 +144,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
           if (sub_type(Navier_Stokes_std,pb_fin->equation(i)))
             {
               const RefObjU& modele_turbulence = pb_fin->equation(i).get_modele(TURBULENCE);
-              if (modele_turbulence.non_nul() && sub_type(Mod_turb_hyd_base,modele_turbulence.valeur()) && (cl.le_nom() == "Interface"))
+              if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()) && (cl.le_nom() == "Interface"))
                 {
                   Nom champ("Champ_front_zoom pbMG ");
                   champ+=pb_fin->le_nom();

@@ -26,7 +26,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Equation_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Paroi_loi_WW_hyd_VDF,"loi_WW_hydr_VDF",Paroi_std_hyd_VDF);
