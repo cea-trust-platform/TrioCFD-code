@@ -131,7 +131,7 @@ Lire pb
 			portance_interfaciale { beta $beta_lift } ,
 			Dispersion_bulles { beta $beta_disp } ,
 			Correction_Lubchenko { beta_lift $beta_lift beta_disp $beta_disp } ,
-			Injection_QDM_nulle 
+			Injection_QDM_nulle { } 
         }
     }
     Masse_Multiphase
