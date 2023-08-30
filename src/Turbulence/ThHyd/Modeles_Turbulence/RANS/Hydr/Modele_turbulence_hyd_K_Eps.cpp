@@ -22,7 +22,7 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>

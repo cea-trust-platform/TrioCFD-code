@@ -24,7 +24,7 @@
 #include <Probleme_base.h>
 #include <Domaine_VF.h>
 #include <TRUSTTabs.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <stat_counters.h>
 #include <Param.h>
 #include <Champ_Inc_P0_base.h>

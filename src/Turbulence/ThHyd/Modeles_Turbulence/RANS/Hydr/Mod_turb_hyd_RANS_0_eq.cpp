@@ -21,7 +21,7 @@
 
 #include <Mod_turb_hyd_RANS_0_eq.h>
 #include <Discretisation_base.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Motcle.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
