@@ -24,7 +24,7 @@
 #include <Probleme_base.h>
 #include <Param.h>
 #include <Discretisation_base.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Debog.h>
 #include <stat_counters.h>
 #include <Paroi_std_hyd_VEF_diphasique.h>

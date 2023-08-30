@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Navier_Stokes_std.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Schema_Temps_base.h>

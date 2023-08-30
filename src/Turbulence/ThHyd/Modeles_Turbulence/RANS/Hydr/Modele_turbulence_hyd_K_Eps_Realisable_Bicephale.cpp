@@ -29,7 +29,7 @@
 #include <stat_counters.h>
 #include <Param.h>
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
 #include <TRUSTTrav.h>
 #include <communications.h>
