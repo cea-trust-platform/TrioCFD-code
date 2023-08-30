@@ -2504,21 +2504,21 @@ void IJK_FT_double::run()
                   //inv_rho_field_.echange_espace_virtuel(inv_rho_field_.ghost());
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
-                                                   1., pressure_rhs_, check_divergence_,
+                                                   1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
                                                    poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
                 }
               else
                 {
                   pressure_projection_with_rho(rho_field_, velocity_[0],
                                                velocity_[1], velocity_[2], pressure_, 1.,
-                                               pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
                 }
 
             }
           else
             {
               pressure_projection(velocity_[0], velocity_[1], velocity_[2],
-                                  pressure_, 1., pressure_rhs_, check_divergence_,
+                                  pressure_, 1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
                                   poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           copy_field_values(pressure_ghost_cells_, pressure_);
@@ -4032,13 +4032,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (!include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
               // GAB --> C'est plutot ici que l(on ajoute le terme_pression !!)
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           d_pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
 
               // Then update the pressure field :
               const int kmax = pressure_.nk();
@@ -4128,23 +4128,17 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
           if (use_inv_rho_in_poisson_solver_)
             {
-              pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2],
-                                               d_pressure_, timestep_,
-                                               pressure_rhs_,
-                                               check_divergence_, poisson_solver_,
-                                               boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+              pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
+                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
 #ifdef PROJECTION_DE_LINCREMENT_DV
               // On l'a fait avant pour etre sur qu'elle soit bien dans la derivee stockee...
 #else
-              pressure_projection_with_rho(rho_field_,
-                                           velocity_[0], velocity_[1],  velocity_[2],
-                                           d_pressure_, timestep_,
-                                           pressure_rhs_,
-                                           check_divergence_, poisson_solver_,
-                                           boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+              pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
+                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 #endif
             }
 
@@ -4164,23 +4158,17 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         {
           if (use_inv_rho_in_poisson_solver_)
             {
-              pressure_projection_with_inv_rho(inv_rho_field_,
-                                               velocity_[0], velocity_[1],  velocity_[2],
-                                               pressure_, timestep_,
-                                               pressure_rhs_,
-                                               check_divergence_, poisson_solver_,
-                                               boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+              pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
+                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
 #ifdef PROJECTION_DE_LINCREMENT_DV
 #else
-              pressure_projection_with_rho(rho_field_,
-                                           velocity_[0], velocity_[1],  velocity_[2],
-                                           pressure_, timestep_,
-                                           pressure_rhs_,
-                                           check_divergence_, poisson_solver_,
-                                           boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+
+              pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
+                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
 #endif
             }
         }
@@ -4254,12 +4242,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           if (include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           d_pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
         }
 #else
@@ -4331,7 +4319,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           // Cerr << " Option a tester si besoin. " << finl;
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
-                                           pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
         }
       else
         {
@@ -4340,7 +4328,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 #else
           pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                        fractionnal_timestep,
-                                       pressure_rhs_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                       pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
           // GAB TODO : cest a peu pres ici qu'il faudra travailler pour recuperer le
           // terme de pression
 #endif
