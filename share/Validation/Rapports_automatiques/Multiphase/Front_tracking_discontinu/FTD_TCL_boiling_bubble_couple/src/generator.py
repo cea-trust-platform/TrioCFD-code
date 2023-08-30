@@ -53,10 +53,11 @@ class Case:
         launcher += " -A gen7712 "
         pass
 
-    def __init__(self, cases, repo, resolution):
+    def __init__(self, cases, repo, resolution, timestep):
         self.cases = cases
         self.directory = repo
         self.resolution = resolution  # in µm
+        self.timestep = timestep
         self.dx = float(resolution) * 1e-6
         self.dict = copy.deepcopy(cases.dict)
         # 1/3 is regular mesh:
@@ -73,6 +74,7 @@ class Case:
         self.dict["Ny2"] = Ny2 + 1
         self.dict["Ny3"] = Ny3 + 1
         self.dict["nprocx"] = 3
+        self.dict["timestep"] = timestep
         if self.bash:
             self.dict["nprocy"] = 4
         else:
@@ -87,7 +89,7 @@ class Case:
         # The pre_run in steady creates and fills MESH directory
         self.createSteady()
         self.createNOTCL("NOTCL")
-        for nmeso in self.cases.nmeso.split("-"):
+        for nmeso in self.cases.nmeso.split("_"):
             self.createTCLcase(f"TCL{nmeso}", nmeso=nmeso)
         return ok
 
@@ -116,8 +118,11 @@ class Case:
 
         if nmeso is not None:
             fic = (os.path.join(calc_dir, "source.data"))
-            cmd = f"sed -i 's/n_extend_meso 4/n_extend_meso {nmeso}/' {fic}"
-            cmd = ["sed", "-i", "-e", f"\"s/n_extend_meso 4/n_extend_meso {nmeso}/\"", f"{fic}"]
+            cmd = ["sed", "-i", "-e", f"\"s/n_extend_meso 4/n_extend_meso {nmeso}/\""]
+            if (nmeso == "1"):
+                new_timestep = self.timestep /10. # A smaller timestep is required with meso=1
+                cmd.extend(["-e", f"\"s/timestep .*/timestep {new_timestep}/\""])
+            cmd.append(f"{fic}")
             st = " ".join(cmd)
             try:
                 os.system(st)
@@ -278,9 +283,10 @@ class Case:
 
 
 class Cases:
-    def __init__(self, case, resolution, nmeso, Lx, Ly, ZZ, dT, theta, r0=0.0002):
+    def __init__(self, case, resolution, nmeso, Lx, Ly, ZZ, dT, theta, timestep="1e-7", r0=0.0002):
         self.name = case
         self.M = resolution  # in µm
+        self.timestep = timestep
         self.nmeso = nmeso
         self.Lx = Lx
         self.Ly = Ly
@@ -301,9 +307,10 @@ class Cases:
     def createCases(self, root='.'):
         ok = True
         os.makedirs(os.path.join(root, self.name), exist_ok=True)
-        for resol in self.M.split("-"):
+        timesteps = self.timestep.split("_")
+        for idx, resol in enumerate(self.M.split("_")):
             repo = os.path.join(root, self.name, f"M{resol}")
-            cas = Case(self, repo, resol)
+            cas = Case(self, repo, resol, timestep=timesteps[idx])
             ok = cas.createCase() and ok
             if not ok: return ok
             self.dcases[(self.name, f"M{resol}")] = cas
@@ -338,9 +345,9 @@ hMs = [3.8]  # in µm
 Qmicros = [30.5]
 Ms = ["40"]  # Mesh sizes in µm
 nmesos = ["1"]
-dts = 1e-8 * unit
+dts = ["1.e-7"]
 tmaxs = 50e-3 * unit
-r0 = [0.0002]  # initial bubble radius
+r0s = [0.00026]  # initial bubble radius
 nb_pas_dt_max = 1000000000 * unit
 
 d_all = {}
@@ -351,9 +358,11 @@ for idx, config in enumerate(configurations):
     theta = thetas[idx]
     dT = dTs[idx]
     M = Ms[idx]
+    dt= dts[idx]
     nmeso = nmesos[idx]
+    r0=r0s[idx]
     print(f"CONFIGURATION: {config} {r} {z} {M} $dT $theta $sM $hM $Qmicro $eth $r0 $Ntot")
-    cas = Cases(config, resolution=M, nmeso=nmeso, Lx=r, Ly=z, ZZ=zz, dT=dT, theta=theta)
+    cas = Cases(config, resolution=M, nmeso=nmeso, Lx=r, Ly=z, ZZ=zz, dT=dT, theta=theta, r0=r0, timestep=dt)
     ok = cas.createCases(root=runs)
     d_all[config] = cas
     print("CASES CREATED:")

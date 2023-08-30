@@ -5,13 +5,10 @@ dimension 2
 PrecisionGeom 1e-18
 bidim_axi 
 
-
 domaine dom_fluide
 domaine dom_solide
 
 # BEGIN MESH #
-
-
 Mailler dom_fluide
 {
 
@@ -100,8 +97,6 @@ Mailler dom_solide
 RegroupeBord dom_solide sbot { sbot1 sbot2 } 
 RegroupeBord dom_solide sup { sup1 sup2 } 
 transformer dom_solide x*@rmax@ (y-1.)*@zsol@     
-
-
 # END MESH #
 
 # BEGIN PARTITION
@@ -176,8 +171,8 @@ Schema_Euler_explicite  sch
 Lire sch
 {
    nb_pas_dt_max 1000000000 # 12 HACK #
-   tinit 0.0
-   tmax 15. # 50e-3 #
+   tinit -15.0
+   tmax 0. # 50e-3 #
    tcpumax 23.75
    dt_min 1.e-18
    dt_max 1.e-3
@@ -196,13 +191,12 @@ Lire sch
 
 Champ_Uniforme gravite
 Lire gravite 2 0. -9.81
-Associate fluide gravite
+Associate fluide gravite 
 
 Navier_stokes_FT_disc                         hydraulique
 Transport_interfaces_FT_disc                  interf
 convection_diffusion_temperature_ft_disc      thermique
 convection_diffusion_temperature_ft_disc      thermique_vapeur 
-
 Associate pb1 dom_fluide
 Associate pb1 hydraulique
 Associate pb1 thermique
@@ -408,7 +402,7 @@ Lire pb1
    }
 
 sauvegarde binaire steady.sauv
-# resume_last_time binaire ../R0/steady.sauv #
+# resume_last_time binaire ../R0/source.sauv #
 
 }
 Read pb2
@@ -438,7 +432,7 @@ Post_processing
 	}
 
 sauvegarde binaire steady_sod.sauv
-# Reprise binaire ../R0/steady_sod.sauv #
+# Reprise binaire ../R0/source_sod.sauv #
 }
 EcritureLectureSpecial 0
 

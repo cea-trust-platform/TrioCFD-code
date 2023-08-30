@@ -5,13 +5,10 @@ dimension 2
 PrecisionGeom 1e-18
 bidim_axi 
 
-
 domaine dom_fluide
 domaine dom_solide
 
 # BEGIN MESH #
-
-
 Mailler dom_fluide
 {
 
@@ -100,8 +97,6 @@ Mailler dom_solide
 RegroupeBord dom_solide sbot { sbot1 sbot2 } 
 RegroupeBord dom_solide sup { sup1 sup2 } 
 transformer dom_solide x*@rmax@ (y-1.)*@zsol@     
-
-
 # END MESH #
 
 # BEGIN PARTITION
@@ -126,7 +121,7 @@ END PARTITION #
 Scatter ../../MESH/DOM_FLUIDE.Zones dom_fluide
 Scatter ../../MESH/DOM_SOLIDE.Zones dom_solide
  END SCATTER #
-
+ 
 # cette zone est la zone d'integration des flux de concentration en sortie #
 Sous_zone zone_sortie
 Associer zone_sortie dom_fluide
@@ -186,9 +181,9 @@ Lire sch
    nb_pas_dt_max 1000000000 # 12 HACK #
    tinit 0.0
    tmax 15.60
-   tcpumax 523.75
+   tcpumax 23.
    dt_min 1.e-18
-   dt_max 1.E-7
+   dt_max @timestep@
                # 1e-7 is necessary on coa test otherwise it is unstable at 89.4e-4 with remesh BEST #
    dt_impr 2.e-6
    impr_diffusion_implicite 1
@@ -216,7 +211,7 @@ Read TCL
 
 Champ_Uniforme gravite
 Lire gravite 2 0. -9.81
-Associate fluide gravite
+Associate fluide gravite 
 Associate sol gravite
 
 Navier_stokes_FT_disc                         hydraulique
@@ -423,7 +418,7 @@ Lire pb1
         pression elem 
         mpoint_thermique elem
 	mpoint_thermique_vapeur elem 
-        interfacial_area elem
+        interfacial_area elem 
         distance_interface_elem_interf elem
         # pression_laplacien_d elem 
         second_membre_projection elem
@@ -444,12 +439,14 @@ Lire pb1
      } 
     }   
    }
-sauvegarde binaire source.sauv 
+
+sauvegarde binaire source.sauv
 sauvegarde xyz source.xyz
-resume_last_time binaire steady.sauv
+resume_last_time binaire ../../STEADY/steady.sauv
 # Reprise binaire ../R0/source.sauv #
 # Reprise xyz ../R0/source.xyz #
 # resume_last_time xyz ../R0/source.xyz #
+
 }
 
 Read pb2
@@ -485,7 +482,7 @@ Post_processing
 
 sauvegarde binaire source_sod.sauv
 sauvegarde xyz source_sod.xyz
-resume_last_time binaire steady_sod.sauv
+resume_last_time binaire ../../STEADY/steady_sod.sauv
 # Reprise binaire ../R0/source.sauv #
 # Reprise xyz ../R0/source.xyz #
 # resume_last_time xyz ../R0/source.xyz #
