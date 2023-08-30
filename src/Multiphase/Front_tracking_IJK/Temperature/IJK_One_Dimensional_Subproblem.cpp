@@ -27,37 +27,38 @@ Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
 {
-  points_per_thermal_subproblem_ = 0;
-  points_per_thermal_subproblem_base_ = 0;
-  alpha_ = 0;
-  coeff_distance_diagonal_ = 0;
-  cell_diagonal_ = 0;
+  points_per_thermal_subproblem_ = nullptr;
+  points_per_thermal_subproblem_base_ = nullptr;
+  alpha_ = nullptr;
+  coeff_distance_diagonal_ = nullptr;
+  cell_diagonal_ = nullptr;
 
-  interfaces_ = 0;
-  eulerian_distance_ = 0;
-  eulerian_curvature_ = 0;
-  eulerian_interfacial_area_ = 0;
-  eulerian_normal_vect_ = 0;
-  eulerian_facets_barycentre_ = 0;
+  interfaces_ = nullptr;
+  eulerian_distance_ = nullptr;
+  eulerian_curvature_ = nullptr;
+  eulerian_interfacial_area_ = nullptr;
+  eulerian_normal_vect_ = nullptr;
+  eulerian_facets_barycentre_ = nullptr;
 
-  temperature_ = 0;
-  temperature_ft_ = 0;
-  velocity_ = 0;
-  velocity_ft_ = 0;
+  temperature_ = nullptr;
+  temperature_ft_ = nullptr;
+  velocity_ = nullptr;
+  velocity_ft_ = nullptr;
 
-  grad_T_elem_ = 0;
-  hess_diag_T_elem_ = 0;
-  hess_cross_T_elem_ = 0;
+  grad_T_elem_ = nullptr;
+  hess_diag_T_elem_ = nullptr;
+  hess_cross_T_elem_ = nullptr;
 
-  radial_coordinates_ = 0;
-  radial_coordinates_base_ = 0;
+  radial_coordinates_ = nullptr;
+  radial_coordinates_base_ = nullptr;
 
-  radial_first_order_operator_raw_base_ = 0;
-  radial_second_order_operator_raw_base_ = 0;
-  radial_first_order_operator_base_ = 0;
-  radial_second_order_operator_base_ = 0;
-  radial_diffusion_matrix_base_ = 0;
-  radial_convection_matrix_base_ = 0;
+  radial_first_order_operator_raw_base_ = nullptr;
+  radial_second_order_operator_raw_base_ = nullptr;
+  radial_first_order_operator_base_ = nullptr;
+  radial_second_order_operator_base_ = nullptr;
+  radial_diffusion_matrix_base_ = nullptr;
+  radial_convection_matrix_base_ = nullptr;
+  radial_velocity_convection_matrix_base_=nullptr;
 }
 
 Sortie& IJK_One_Dimensional_Subproblem::printOn( Sortie& os ) const
@@ -101,7 +102,8 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   hess_cross_T_elem_ = &hess_cross_T_elem ;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int i, int j, int k, int compo_connex,
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_problem_index,
+                                                                     int i, int j, int k, int compo_connex,
                                                                      double distance,
                                                                      double curvature,
                                                                      double interfacial_area,
@@ -119,8 +121,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int i, int 
                                                                      const Matrice& radial_second_order_operator_raw,
                                                                      const Matrice& radial_first_order_operator,
                                                                      const Matrice& radial_second_order_operator,
-                                                                     const Matrice& radial_diffusion_matrix,
-                                                                     const Matrice& radial_convection_matrix,
+                                                                     Matrice& radial_diffusion_matrix,
+                                                                     Matrice& radial_convection_matrix,
                                                                      const IJK_Interfaces& interfaces,
                                                                      const IJK_Field_local_double& eulerian_distance,
                                                                      const IJK_Field_local_double& eulerian_curvature,
@@ -135,6 +137,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int i, int 
                                                                      const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                                                      const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
 {
+  sub_problem_index_ = sub_problem_index;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_interface_related_parameters(distance, curvature, interfacial_area, facet_barycentre, normal_vector);
@@ -179,8 +182,8 @@ void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const
                                                                            const Matrice& radial_second_order_operator_raw,
                                                                            const Matrice& radial_first_order_operator,
                                                                            const Matrice& radial_second_order_operator,
-                                                                           const Matrice& radial_diffusion_matrix,
-                                                                           const Matrice& radial_convection_matrix)
+                                                                           Matrice& radial_diffusion_matrix,
+                                                                           Matrice& radial_convection_matrix)
 {
   radial_first_order_operator_raw_base_ = &radial_first_order_operator_raw;
   radial_second_order_operator_raw_base_ = &radial_second_order_operator_raw;
@@ -224,23 +227,22 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
   radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
   osculating_radial_coordinates_cartesian_compo_ = DoubleTab(*points_per_thermal_subproblem_, 3);
   osculating_radial_coordinates_ += osculating_radius_;
+  osculating_radial_coordinates_inv_ = DoubleVect(*points_per_thermal_subproblem_);
   for (i=0; i < *points_per_thermal_subproblem_; i++)
-    for (int dir=0; dir<3; dir++)
-      {
-        radial_coordinates_cartesian_compo_(i, dir) = (*radial_coordinates_)(i) * normal_vector_compo_[dir];
-        osculating_radial_coordinates_cartesian_compo_(i, dir) = osculating_radial_coordinates_(i) * normal_vector_compo_[dir];
-      }
+    {
+      osculating_radial_coordinates_inv_[i] = 1 / osculating_radial_coordinates_[i];
+      for (int dir=0; dir<3; dir++)
+        {
+          radial_coordinates_cartesian_compo_(i, dir) = (*radial_coordinates_)(i) * normal_vector_compo_[dir];
+          osculating_radial_coordinates_cartesian_compo_(i, dir) = osculating_radial_coordinates_(i) * normal_vector_compo_[dir];
+        }
+    }
 }
 
 const int * IJK_One_Dimensional_Subproblem::increase_number_of_points()
 {
   increased_point_numbers_ = *points_per_thermal_subproblem_base_;
   return &increased_point_numbers_;
-}
-
-void IJK_One_Dimensional_Subproblem::initialise_finite_difference_operators()
-{
-
 }
 
 /*
@@ -260,4 +262,35 @@ void IJK_One_Dimensional_Subproblem::initialise_finite_difference_operators()
  *     |
  */
 
+void IJK_One_Dimensional_Subproblem::interpolate_velocity_on_probes()
+{
+
+}
+
+void IJK_One_Dimensional_Subproblem::reinitialise_local_finite_difference_operators()
+{
+
+}
+
+void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                                                   DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                                   const int& boundary_condition_interface,
+                                                                                   const double& interfacial_boundary_condition_value,
+                                                                                   const int& boundary_condition_end,
+                                                                                   const double& impose_user_boundary_condition_end_value)
+{
+  interpolate_velocity_on_probes();
+  const double alpha_inv = 1 / *alpha_;
+  DoubleVect osculating_radial_coefficient = osculating_radial_coordinates_inv_;
+  osculating_radial_coefficient *= 2;
+  radial_convection_prefactor_ = radial_velocity_;
+  radial_convection_prefactor_ *= alpha_inv;
+  radial_convection_prefactor_ +=	osculating_radial_coefficient;
+  const int boundary_conditions = 1;
+  Matrice radial_convection_matrix_base_test;
+  finite_difference_assembler.scale_matrix_subproblem_by_vector(radial_convection_matrix_base_,
+                                                                radial_convection_prefactor_,
+                                                                sub_problem_index_,
+                                                                boundary_conditions);
+}
 

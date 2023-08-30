@@ -2878,7 +2878,7 @@ static int check_somme_drapeau(const ArrOfInt& drapeau_liquide)
 //
 //
 
-// The method have to recieve the extended field indic_ft because
+// The method have to receive the extended field indic_ft because
 // the splitting and the conversion "num_elem = s.convert_ijk_cell_to_packed(i,
 // j, k);" are required for num_compo_ which is on domaineVDF which is on the
 // extended domain

@@ -77,8 +77,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       const Matrice& radial_second_order_operator_raw,
                                                                       const Matrice& radial_first_order_operator,
                                                                       const Matrice& radial_second_order_operator,
-                                                                      const Matrice& radial_diffusion_matrix,
-                                                                      const Matrice& radial_convection_matrix,
+                                                                      Matrice& radial_diffusion_matrix,
+                                                                      Matrice& radial_convection_matrix,
                                                                       const IJK_Interfaces& interfaces,
                                                                       const IJK_Field_double& temperature,
                                                                       const IJK_Field_double& temperature_ft,
@@ -111,7 +111,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
         }
       IJK_One_Dimensional_Subproblem subproblem;
       (*this).add(subproblem);
-      (*this)[subproblems_counter_].associate_sub_problem_to_inputs(i, j, k, compo_connex,
+      (*this)[subproblems_counter_].associate_sub_problem_to_inputs(subproblems_counter_,
+                                                                    i, j, k, compo_connex,
                                                                     distance, curvature, interfacial_area,
                                                                     facet_barycentre, normal_vector,
                                                                     bubble_rising_velocity, bubble_rising_vector,
@@ -146,4 +147,21 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
     {
       Cerr << max_subproblems_ << "subproblems were expected but" << subproblems_counter_ << "subproblem try to be associated with the list of subproblems";
     }
+}
+
+void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                                                    DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                                    const int& boundary_condition_interface,
+                                                                                    const double& interfacial_boundary_condition_value,
+                                                                                    const int& boundary_condition_end,
+                                                                                    const double& impose_user_boundary_condition_end_value)
+{
+  for (auto& itr : *this)
+    itr.compute_radial_convection_diffusion_operators(finite_difference_assembler,
+                                                      thermal_subproblems_rhs_assembly,
+                                                      boundary_condition_interface,
+                                                      interfacial_boundary_condition_value,
+                                                      boundary_condition_end,
+                                                      impose_user_boundary_condition_end_value);
+
 }

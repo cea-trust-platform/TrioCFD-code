@@ -23,6 +23,7 @@
 #define IJK_One_Dimensional_Subproblems_included
 
 #include <IJK_One_Dimensional_Subproblem.h>
+#include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 #include <TRUSTList.h>
 #include <TRUST_List.h>
 
@@ -67,8 +68,8 @@ public :
                                        const Matrice& radial_second_order_operator_raw,
                                        const Matrice& radial_first_order_operator,
                                        const Matrice& radial_second_order_operator,
-                                       const Matrice& radial_diffusion_matrix,
-                                       const Matrice& radial_convection_matrix,
+                                       Matrice& radial_diffusion_matrix,
+                                       Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
                                        const IJK_Field_double& temperature,
                                        const IJK_Field_double& temperature_ft,
@@ -77,7 +78,12 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
-
+  void compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                     DoubleVect& thermal_subproblems_rhs_assembly,
+                                                     const int& boundary_condition_interface,
+                                                     const double& interfacial_boundary_condition_value,
+                                                     const int& boundary_condition_end,
+                                                     const double& impose_user_boundary_condition_end_value);
 
   const int& get_subproblems_counter() const
   {

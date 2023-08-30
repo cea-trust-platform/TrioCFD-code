@@ -776,6 +776,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Clean_subproblems !
    */
   clean_thermal_subproblems();
+  correct_temperature_increment_for_interface_leaving_cell();
 
   // calculer_gradient_temperature(temperature_, grad_T_);
 
@@ -982,10 +983,14 @@ void IJK_Thermal_base::compute_rising_velocities()
 
 void IJK_Thermal_base::compute_thermal_subproblems()
 {
+  /*
+   * FIXME: Do the first step only at the first iteration
+   */
   compute_overall_probes_parameters();
+  // compute_radial_convection_diffusion_operators();
   initialise_thermal_subproblems();
-  solve_thermal_subproblems();
-  apply_thermal_flux_correction();
+  // solve_thermal_subproblems();
+  // apply_thermal_flux_correction();
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)

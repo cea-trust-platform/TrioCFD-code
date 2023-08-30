@@ -223,6 +223,7 @@ protected:
   virtual void add_temperature_diffusion();
   virtual void compute_diffusion_increment()=0;
   virtual void correct_temperature_for_eulerian_fluxes()=0;
+  virtual void correct_temperature_increment_for_interface_leaving_cell() { ; };
   void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
   void compute_eulerian_curvature();
@@ -243,6 +244,7 @@ protected:
   virtual void correct_temperature_for_visu() { ; };
   virtual void compute_thermal_subproblems();
   virtual void compute_overall_probes_parameters() { ; };
+  virtual void compute_radial_convection_diffusion_operators() { ; };
   virtual void initialise_thermal_subproblems() { ; };
   virtual void solve_thermal_subproblems() { ; };
   virtual void apply_thermal_flux_correction() { ; };

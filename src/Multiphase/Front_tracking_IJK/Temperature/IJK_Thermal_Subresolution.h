@@ -65,23 +65,23 @@ public :
 protected :
 
   void compute_diffusion_increment() override;
+  void correct_temperature_increment_for_interface_leaving_cell() override;
   void correct_temperature_for_eulerian_fluxes() override;
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters() override;
-  void compute_radial_convection_diffusion_operators(Matrice& radial_first_order_operator_raw,
-                                                     Matrice& radial_second_order_operator_raw,
-                                                     Matrice& radial_first_order_operator,
-                                                     Matrice& radial_second_order_operator,
-                                                     Matrice& radial_diffusion_matrix,
-                                                     Matrice& radial_convection_matrix);
+  void compute_radial_convection_diffusion_operators() override;
+  void compute_radial_first_second_order_operators(Matrice& radial_first_order_operator_raw,
+                                                   Matrice& radial_second_order_operator_raw,
+                                                   Matrice& radial_first_order_operator,
+                                                   Matrice& radial_second_order_operator);
   void compute_first_order_operator_raw(Matrice& radial_first_order_operator);
   void compute_first_order_operator(Matrice& radial_first_order_operator, double dr);
   void compute_second_order_operator(Matrice& radial_second_order_operator, double dr);
   void compute_second_order_operator_raw(Matrice& radial_second_order_operator);
-  void compute_radial_convection_operator(const Matrice& radial_first_order_operator,
-                                          Matrice& radial_convection_matrix);
-  void compute_radial_diffusion_operator(const Matrice& radial_second_order_operator,
-                                         Matrice& radial_diffusion_matrix);
+  void initialise_radial_convection_operator(const Matrice& radial_first_order_operator,
+                                             Matrice& radial_convection_matrix);
+  void initialise_radial_diffusion_operator(const Matrice& radial_second_order_operator,
+                                            Matrice& radial_diffusion_matrix);
   void initialise_thermal_subproblems() override;
   void solve_thermal_subproblems() override;
   void apply_thermal_flux_correction() override;
@@ -89,9 +89,12 @@ protected :
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
+  int disable_mixed_cells_increment_;
+  int allow_temperature_correction_for_visu_;
   int disable_subresolution_;
   int diffusive_flux_correction_;
   int convective_flux_correction_;
+  int subproblem_temperature_extension_; // ghost fluid extension based on the interfacial gradient computed with the subproblem
 
   int override_vapour_mixed_values_; // For debug purposes
 
@@ -116,6 +119,15 @@ protected :
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
   SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
+  // DoubleVect radial_convective_vector_prefactor_;
+  // DoubleVect diffusive_vector_prefactor_;
+
+  int boundary_condition_interface_;
+  double interfacial_boundary_condition_value_;
+  int impose_boundary_condition_interface_from_simulation_;
+  int boundary_condition_end_;
+  double end_boundary_condition_value_;
+  int impose_user_boundary_condition_end_value_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

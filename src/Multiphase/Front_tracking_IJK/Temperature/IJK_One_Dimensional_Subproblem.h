@@ -32,6 +32,7 @@
 #include <Vecteur3.h>
 #include <Matrice33.h>
 #include <Matrice.h>
+#include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 
 // #include <TRUSTArray.h>
 
@@ -49,7 +50,8 @@ class IJK_One_Dimensional_Subproblem : public Objet_U
   Declare_instanciable( IJK_One_Dimensional_Subproblem ) ;
 
 public :
-  void associate_sub_problem_to_inputs(int i, int j, int k, int compo_connex,
+  void associate_sub_problem_to_inputs(int sub_problem_index,
+                                       int i, int j, int k, int compo_connex,
                                        double distance,
                                        double curvature,
                                        double interfacial_area,
@@ -67,8 +69,8 @@ public :
                                        const Matrice& radial_second_order_operator_raw,
                                        const Matrice& radial_first_order_operator,
                                        const Matrice& radial_second_order_operator,
-                                       const Matrice& radial_diffusion_matrix,
-                                       const Matrice& radial_convection_matrix,
+                                       Matrice& radial_diffusion_matrix,
+                                       Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
                                        const IJK_Field_local_double& eulerian_distance,
                                        const IJK_Field_local_double& eulerian_curvature,
@@ -82,6 +84,13 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
+
+  void compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                     DoubleVect& thermal_subproblems_rhs_assembly,
+                                                     const int& boundary_condition_interface,
+                                                     const double& interfacial_boundary_condition_value,
+                                                     const int& boundary_condition_end,
+                                                     const double& impose_user_boundary_condition_end_value);
 
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -124,16 +133,18 @@ protected :
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,
                                              const Matrice& radial_second_order_operator,
-                                             const Matrice& radial_diffusion_matrix,
-                                             const Matrice& radial_convection_matrix);
+                                             Matrice& radial_diffusion_matrix,
+                                             Matrice& radial_convection_matrix);
   void initialise_thermal_probe();
   const int *  increase_number_of_points();
-  void initialise_finite_difference_operators();
+  void interpolate_velocity_on_probes();
+  void reinitialise_local_finite_difference_operators();
 
   /*
    * FIXME: Should I use only references or just for IJK_Field_local_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?
    */
+  int sub_problem_index_ = 0;
   int index_i_ = 0, index_j_ = 0, index_k_ = 0;
   int compo_connex_ = -1;
   int compo_group_ = -1;
@@ -201,19 +212,34 @@ protected :
   const double * dr_base_ = 0;
   const DoubleVect* radial_coordinates_base_;
 
-  const Matrice* radial_first_order_operator_raw_base_;
-  const Matrice* radial_second_order_operator_raw_base_;
-  const Matrice* radial_first_order_operator_base_;
-  const Matrice* radial_second_order_operator_base_;
-  const Matrice* radial_diffusion_matrix_base_;
-  const Matrice* radial_convection_matrix_base_;
+  const Matrice *radial_first_order_operator_raw_base_;
+  const Matrice *radial_second_order_operator_raw_base_;
+  const Matrice *radial_first_order_operator_base_;
+  const Matrice *radial_second_order_operator_base_;
+  /*
+   * Pointers to non-constant matrice
+   * FIXME: Should I declare constant pointers ?
+   */
+  Matrice * radial_diffusion_matrix_base_;
+  Matrice * radial_convection_matrix_base_;
+  const Matrice *radial_velocity_convection_matrix_base_;
+//  const Matrice* tangential_velocity_convection_matrix_base_;
+//  const Matrice* azymuthal_velocity_convection_matrix_base_;
 
   double dr_=0.;
   const DoubleVect * radial_coordinates_;
   DoubleVect radial_coordinates_modified_;
   DoubleVect osculating_radial_coordinates_;
+  DoubleVect osculating_radial_coordinates_inv_;
   DoubleTab radial_coordinates_cartesian_compo_;
   DoubleTab osculating_radial_coordinates_cartesian_compo_;
+
+  DoubleVect radial_velocity_;
+  DoubleVect first_tangential_velocity_;
+  DoubleVect azymuthal_velocity_;
+  DoubleVect second_tangential_velocity_;
+  DoubleVect radial_convection_prefactor_;
+
 
 };
 
