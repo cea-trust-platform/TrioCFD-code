@@ -70,7 +70,7 @@ Read sch
     dt_impr 1e-8
     facsec 1
     facsec_max 1
-    nb_pas_dt_max 50000
+    nb_pas_dt_max $nb_pas_dt_max 
     seuil_statio 1e-4
     solveur ice
     {
@@ -197,7 +197,7 @@ Lire pb
         }
 		sources
 		{
-			Production_energie_cin_turb  ,
+			Production_energie_cin_turb   ,
 			Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 		}
     }
