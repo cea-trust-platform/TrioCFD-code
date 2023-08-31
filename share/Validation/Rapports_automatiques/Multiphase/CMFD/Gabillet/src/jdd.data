@@ -1,0 +1,323 @@
+
+# PARALLEL NOT #
+
+Dimension 2
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	pave bloc1
+	{
+		origine 0 0
+		longueurs 1.290 0.025
+		nombre_de_noeuds $nx1 $ny
+		}
+		{
+		bord entree	 X = 0.         0. <= Y <= 0.025
+		bord wall	 Y = 0. 	    0. <= X <= 1.290
+		bord wall	 Y = 0.025 	    0. <= X <= 1.290
+		} ,
+	pave bloc2
+	{
+		origine 1.290 0
+		longueurs 0.405 0.025
+		nombre_de_noeuds $nx2 $ny
+		}
+		{
+		bord wall	 	 Y = 0.025	 1.290 <= X <= 1.695
+		bord wall	 	 Y = 0.0	 1.290 <= X <= 1.390
+		bord wall	 	 Y = 0.0	 1.595 <= X <= 1.695
+		bord entree_air	 Y = 0.	     1.390 <= X <= 1.595
+		} ,
+	pave bloc3
+	{
+		origine 1.695 0
+		longueurs .80 0.025
+		nombre_de_noeuds $nx3 $ny
+		}
+		{
+		bord wall	 X = 2.495      0.    <= Y <= 0.025
+		bord wall	 Y = 0. 	    1.695 <= X <= 2.495
+		bord sortie	 Y = 0.025 	    2.445 <= X <= 2.495	
+		bord wall	 Y = 0.025 	    1.695 <= X <= 2.445
+		} 
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        /* Choose Nb_parts so to have ~ 25000 cells per processor */
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$schema
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax 8
+    dt_impr 1e-8
+    facsec 1
+    facsec_max 1
+    nb_pas_dt_max 50000
+    seuil_statio 1e-4
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 omega 1e-5 }
+        iter_min 2
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Pb_Multiphase pb
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Lire pb
+{
+	Milieu_composite
+	{
+		liquide_eau Fluide_Incompressible {	mu champ_uniforme 1 1.002e-3 rho champ_uniforme     1 998.30 lambda Champ_Uniforme  1 0.604 Cp Champ_Uniforme      1 75.366 beta_th Champ_Uniforme 1 0 }
+		gaz_air Fluide_Incompressible { mu champ_uniforme      1 1.85e-5 rho champ_uniforme     1 1.2 lambda Champ_Uniforme  1 0.023 Cp Champ_Uniforme      1 1006 beta_th Champ_Uniforme 1 0 }
+		interface_eau_air interface_sigma_constant  { tension_superficielle 0.0728 }
+	}
+
+    correlations
+    {
+    	loi_paroi $WLu
+    	flux_interfacial coef_constant { liquide_eau 1e10 gaz_air 1e10 } 
+		frottement_interfacial tomiyama { contamination 2 }
+		masse_ajoutee coef_constant { beta .5 inj_ajoutee_liquide 4.   inj_ajoutee_gaz 4. }
+    	portance_interfaciale sugrue { }
+    	Dispersion_bulles turbulente_burns { }
+		diametre_bulles champ champ_fonc_xyz dom 2 0 $diametre_bulles 
+    }
+    QDM_Multiphase
+    {
+        evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        convection { amont }
+        diffusion  { turbulente k_omega { } }
+        initial_conditions
+        {
+            vitesse  champ_fonc_xyz dom 4 1.16 1.16 0 0
+            pression Champ_Fonc_xyz dom 1 1e5
+        }
+		conditions_limites	
+		{
+	    entree_air paroi_frottante_loi { }
+            wall paroi_frottante_loi { }
+            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 4 1.16 1.16 0 0
+            sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 1e5
+      	}
+		sources
+        { 
+			source_qdm Champ_Fonc_xyz dom 4 0 0 -9.81 -9.81 ,
+			frottement_interfacial { } ,
+			portance_interfaciale { beta $beta_lift } ,
+			Dispersion_bulles { beta $beta_disp } ,
+			Correction_Lubchenko { beta_lift $beta_lift beta_disp $beta_disp } ,
+			Injection_QDM_nulle { } 
+        }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom 2 1 0 }
+        convection { amont }
+		conditions_limites	
+		{
+			entree_air Neumann_paroi Champ_Front_fonc_xyz 2 0 1.2*$flux_entree_air
+			wall paroi 
+			entree	frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
+			sortie	frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
+		}
+        sources { }
+    }
+    Energie_Multiphase
+    {
+        diffusion { }
+        convection { amont }
+        initial_conditions { temperature Champ_Uniforme 2 0 0 }
+        boundary_conditions
+        {
+            entree_air paroi_adiabatique
+            wall paroi_adiabatique 
+			entree	frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+			sortie	frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+        }
+        sources 
+        { 
+        	flux_interfacial 
+        }
+    }
+    taux_dissipation_turbulent
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { omega Champ_Fonc_xyz dom 1 10. }
+        boundary_conditions
+        {
+            entree_air Cond_lim_omega_demi { }
+            wall 	Cond_lim_omega_demi { }
+			entree	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 10.
+			sortie	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 10.
+        }
+		sources
+		{
+			Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+			Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+			Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 } 
+		}
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 0.01 }
+        boundary_conditions
+        {
+            entree_air Cond_lim_k_simple_flux_nul
+            wall	   Cond_lim_k_simple_flux_nul
+			entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+			sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+        }
+		sources
+		{
+			Production_energie_cin_turb  ,
+			Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+		}
+    }
+    Postraitement
+	{
+		Definition_champs 	{
+					d_bulles	refChamp { Pb_champ pb diametre_bulles } 
+                                       gradient_p        refChamp { Pb_champ pb gradient_pression }
+					diff_v		operateur_eqn	{
+									numero_op 0
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					conv_v		operateur_eqn	{
+									numero_op 1
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					grav_v		operateur_eqn	{
+									numero_source 0
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					drag		operateur_eqn	{
+									numero_source 1
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					lift		operateur_eqn	{
+									numero_source 2
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					disp		operateur_eqn	{
+									numero_source 3
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					lub		operateur_eqn	{
+									numero_source 4
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+					inj		operateur_eqn	{
+									numero_source 5
+									sources { refChamp { pb_champ pb vitesse } }
+									}
+
+					}
+		sondes			{
+					k_a    	k      		periode 1e8 segment $ny 1.421 $y0_sonde    1.421 $y1_sonde					
+					k_b    	k      		periode 1e8 segment $ny 1.483 $y0_sonde    1.483 $y1_sonde					
+					k_c    	k      		periode 1e8 segment $ny 1.545 $y0_sonde    1.545 $y1_sonde					
+					
+					vitesse_eau_a		vitesse_liquide_eau	periode 1e8 position_like k_a					
+					vitesse_eau_b		vitesse_liquide_eau	periode 1e8 position_like k_b					
+					vitesse_eau_c		vitesse_liquide_eau	periode 1e8 position_like k_c					
+					
+					vitesse_air_a		vitesse_gaz_air	periode 1e8 position_like k_a					
+					vitesse_air_b		vitesse_gaz_air	periode 1e8 position_like k_b					
+					vitesse_air_c		vitesse_gaz_air	periode 1e8 position_like k_c					
+
+					alpha_eau_a		alpha_liquide_eau	periode 1e8 position_like k_a					
+					alpha_air_a		alpha_gaz_air  	periode 1e8 position_like k_a					
+					alpha_eau_b		alpha_liquide_eau	periode 1e8 position_like k_b					
+					alpha_air_b		alpha_gaz_air		periode 1e8 position_like k_b										
+					alpha_eau_c		alpha_liquide_eau	periode 1e8 position_like k_c					
+					alpha_air_c		alpha_gaz_air  	periode 1e8 position_like k_c	
+
+					omega_a		omega			periode 1e8 position_like k_a
+					omega_b		omega			periode 1e8 position_like k_b
+					omega_c		omega			periode 1e8 position_like k_c
+					
+					diametre_a		d_bulles		periode 1e8 position_like k_a
+					diametre_b		d_bulles		periode 1e8 position_like k_b
+					diametre_c		d_bulles		periode 1e8 position_like k_c
+					
+					pression_a		pression		periode 1e8 position_like k_a
+					pression_b		pression		periode 1e8 position_like k_b
+					pression_c		pression		periode 1e8 position_like k_c
+					
+					diff_v_a		diff_v			periode 1e8 position_like k_a
+					conv_v_a		conv_v			periode 1e8 position_like k_a
+					press_a		gradient_p	periode 1e8 position_like k_a
+					grav_v_a		grav_v			periode 1e8 position_like k_a
+					drag_a			drag			periode 1e8 position_like k_a
+					lift_a			lift			periode 1e8 position_like k_a
+					disp_a			disp			periode 1e8 position_like k_a
+					lub_a			lub			periode 1e8 position_like k_a
+					inj_a			inj			periode 1e8 position_like k_a
+
+					
+					diff_v_b		diff_v			periode 1e8 position_like k_b
+					conv_v_b		conv_v			periode 1e8 position_like k_b
+					press_b		gradient_p	periode 1e8 position_like k_b
+					grav_v_b		grav_v			periode 1e8 position_like k_b
+					drag_b			drag			periode 1e8 position_like k_b
+					lift_b			lift			periode 1e8 position_like k_b
+					disp_b			disp			periode 1e8 position_like k_b
+					lub_b			lub			periode 1e8 position_like k_b
+					inj_b			inj			periode 1e8 position_like k_b
+
+					
+					diff_v_c		diff_v			periode 1e8 position_like k_c
+					conv_v_c		conv_v			periode 1e8 position_like k_c
+					press_c		gradient_p	periode 1e8 position_like k_c
+					grav_v_c		grav_v			periode 1e8 position_like k_c
+					drag_c			drag			periode 1e8 position_like k_c
+					lift_c			lift			periode 1e8 position_like k_c
+					disp_c			disp			periode 1e8 position_like k_c
+					lub_c			lub			periode 1e8 position_like k_c
+					inj_c			inj			periode 1e8 position_like k_c
+					
+					}
+		Format lml
+		fields dt_post 1e8
+		{
+		    diametre_bulles elem 
+			k elem
+			omega elem
+			alpha elem
+			vitesse elem
+			pression elem
+		}
+	}
+}
+
+Resoudre pb
+
+Fin

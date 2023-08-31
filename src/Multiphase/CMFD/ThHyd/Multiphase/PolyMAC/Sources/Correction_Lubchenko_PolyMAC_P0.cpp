@@ -95,15 +95,16 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                    &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
-                     &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
                         &y_elem = domaine.y_elem(),
@@ -254,15 +255,16 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                    &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
-                     &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),

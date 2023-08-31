@@ -86,15 +86,16 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matric
 
 void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
                    &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),
-                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().valeurs(),
-                     &alpha_p = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                      &press_p = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
-                       &temp_p  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
+                    &alpha = pbm.equation_masse().inconnue().valeurs(),
+                     &alpha_p = pbm.equation_masse().inconnue().passe(),
+                      &press_p = ref_cast(QDM_Multiphase,pbm.equation_qdm()).pression().passe(),
+                       &temp_p  = pbm.equation_energie().inconnue().passe(),
                         &rho_p   = equation().milieu().masse_volumique().passe(),
                          &nu_p = equation().probleme().get_champ("viscosite_cinematique").passe(),
                           *tab_k_p = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").passe() : NULL,
@@ -103,7 +104,7 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
                              *omega = equation().probleme().has_champ("omega") ? &equation().probleme().get_champ("omega").valeurs() : NULL ;
 
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
-  int N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), Nk = (tab_k) ? (*tab_k).line_size() : -1, Np = equation().probleme().get_champ("pression").valeurs().line_size();
+  int N = pbm.nb_phases(), Nk = (tab_k) ? (*tab_k).line_size() : -1, Np = equation().probleme().get_champ("pression").valeurs().line_size();
 
   std::string Type_diss = "other"; // omega, tau or other dissipation
   if (tau) Type_diss = "tau";
