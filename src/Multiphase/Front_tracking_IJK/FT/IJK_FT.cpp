@@ -2230,7 +2230,9 @@ void IJK_FT_double::run()
   nalloc += 1;
 
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
-    pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, 1, rho_vapeur_, rho_liquide_);
+    {
+      pressure_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 1, rho_vapeur_, rho_liquide_);
+    }
   else
     pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
   nalloc += 1;
@@ -2253,7 +2255,7 @@ void IJK_FT_double::run()
 
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   nalloc += 1;
-
+  pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
 
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
