@@ -45,6 +45,7 @@ void IJK_Thermals::associer(const IJK_FT_double& ijk_ft)
 {
   ref_ijk_ft_ = ijk_ft;
   associer_post(ijk_ft.get_post());
+  associer_interface_intersections(ijk_ft.itfce().get_intersection_ijk_cell(), ijk_ft.itfce().get_intersection_ijk_face());
   for (auto& itr : *this)
     itr.associer(ijk_ft);
 }
@@ -61,6 +62,15 @@ void IJK_Thermals::associer_switch(const Switch_FT_double& ijk_ft_switch)
   ref_ijk_ft_switch_ = ijk_ft_switch;
   for (auto& itr : *this)
     itr.associer_switch(ref_ijk_ft_switch_);
+}
+
+void IJK_Thermals::associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                                    const Intersection_Interface_ijk_face& intersection_ijk_face)
+{
+  ref_intersection_ijk_cell_ = intersection_ijk_cell;
+  ref_intersection_ijk_face_ = intersection_ijk_face;
+  for (auto& itr : *this)
+    itr.associer_interface_intersections(intersection_ijk_cell, intersection_ijk_face);
 }
 
 void IJK_Thermals::sauvegarder_temperature(Nom& lata_name)

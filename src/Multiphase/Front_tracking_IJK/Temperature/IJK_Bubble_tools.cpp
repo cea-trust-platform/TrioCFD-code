@@ -35,7 +35,7 @@ static int decoder_numero_bulle(const int code)
  * compo = nbulles_reelles - 1 - idx_ghost;
  */
 
-void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex)
+void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex, DoubleTab& bubbles_barycentre)
 {
   /*
   * bounding_box(b, dir, m) :
@@ -57,7 +57,7 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
     }
   Cerr << "Ghost to real bubble : " << ghost_to_real_bubble;
   ArrOfDouble bubbles_volume;
-  DoubleTab bubbles_barycentre;
+  // DoubleTab bubbles_barycentre;
   interfaces.calculer_volume_bulles(bubbles_volume, bubbles_barycentre);
   Cerr << "bubbles_volume" << bubbles_volume;
   Cerr << "bubbles_barycentre" << bubbles_barycentre;
@@ -157,18 +157,6 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
   DoubleTab sum_velocity_x_indicator(nb_bubbles);
   DoubleTab sum_velocity_y_indicator(nb_bubbles);
   DoubleTab sum_velocity_z_indicator(nb_bubbles);
-//  for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
-//    {
-////      sum_indicator(ibubble) = 0.;
-////      sum_velocity_x_indicator(ibubble) = 0.;
-////      sum_velocity_y_indicator(ibubble) = 0.;
-////      sum_velocity_z_indicator(ibubble) = 0.;
-////      rising_velocities(ibubble) = 0.;
-//// FIXME: Maybe rising_vectors = DoubleTab(ibubble, dir); initialise to zero ?
-//      for (int dir=0; dir < 3 ; dir++)
-//        rising_vectors = DoubleTab(ibubble, dir);
-//      // rising_vectors(ibubble, dir) = 0.;
-//    }
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)

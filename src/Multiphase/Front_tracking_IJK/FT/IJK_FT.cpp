@@ -1560,8 +1560,6 @@ int IJK_FT_double::initialise()
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
-
-
   /*
    * Compute mean rho_g using the indicator function
    */

@@ -14,40 +14,23 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_Bubble_tools.h
+// File      : Corrige_flux_FT_temperature_subresolution.cpp
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_Bubble_tools_included
-#define IJK_Bubble_tools_included
+#include <Corrige_flux_FT_temperature_subresolution.h>
 
-#include <IJK_Field.h>
-#include <IJK_Interfaces.h>
-#include <Maillage_FT_IJK.h>
+Implemente_instanciable( Corrige_flux_FT_temperature_subresolution, "Corrige_flux_FT_temperature_subresolution", Corrige_flux_FT_base ) ;
 
-#define INVALID_TEST -1.e30
-#define LIQUID_INDICATOR_TEST 1.-1.e-8
-#define VAPOUR_INDICATOR_TEST 1.e-8
-#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
-#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
-#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class IJK_Bubble_tools
-//
-// <Description of class IJK_Bubble_tools>
-//
-/////////////////////////////////////////////////////////////////////////////
+Sortie& Corrige_flux_FT_temperature_subresolution::printOn( Sortie& os ) const
+{
+  Corrige_flux_FT_base::printOn( os );
+  return os;
+}
 
-// Fill compo using a dummy bounding box
-void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex, DoubleTab& bubbles_barycentre);
-// TODO: Fill compo starting from interfacial cells
-void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex);
-
-void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
-                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors);
-void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
-                          IJK_Field_double& eulerian_rising_velocity);
-#endif /* IJK_Bubble_tools_included */
+Entree& Corrige_flux_FT_temperature_subresolution::readOn( Entree& is )
+{
+  Corrige_flux_FT_base::readOn( is );
+  return is;
+}

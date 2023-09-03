@@ -32,6 +32,7 @@
 #include <Linear_algebra_tools.h>
 #include <Boundary_Conditions.h>
 #include <IJK_Interfaces.h>
+#include <Intersection_Interface_ijk.h>
 #include <Redistribute_Field.h>
 #include <Parser.h>
 #include <IJK_FT_Post.h>
@@ -173,6 +174,16 @@ public :
   {
     return upstream_stencil_;
   }
+//  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
+//  {
+//    return intersection_ijk_cell_;
+//  }
+//  Intersection_Interface_ijk_face& get_intersection_ijk_face()
+//  {
+//    return intersection_ijk_face_;
+//  }
+//  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const {return intersection_ijk_cell_;}
+//  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const {return intersection_ijk_face_;}
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
@@ -217,6 +228,7 @@ public :
   // const IJK_Field_double& get_indicatrice_ft() const {return interfaces_.indicatrice_ft(); }
   // const IJK_Field_double& get_indicatrice_ft_next() const {return interfaces_.indicatrice_ft_next(); }
   const IJK_Interfaces& itfce() const {return interfaces_;}
+  IJK_Interfaces& get_set_interface() {return interfaces_;}
   int disable_diphasique() const {return disable_diphasique_;}
   // Redistribute_Field& redistrib_to_ft_elem() const {return redistribute_to_splitting_ft_elem_;}
   // FixedVector<Redistribute_Field, 3>& redistrib_to_ft_face() const {return redistribute_to_splitting_ft_faces_;}

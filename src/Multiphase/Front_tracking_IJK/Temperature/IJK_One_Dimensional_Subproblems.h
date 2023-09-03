@@ -58,6 +58,7 @@ public :
                                        FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                        ArrOfDouble rising_velocities,
                                        DoubleTab rising_vectors,
+                                       DoubleTab bubbles_barycentre,
                                        const int& points_per_thermal_subproblem,
                                        const double& alpha,
                                        const double& coeff_distance_diagonal,
@@ -77,13 +78,25 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
-  void compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
-                                                     DoubleVect& thermal_subproblems_rhs_assembly,
-                                                     const int& boundary_condition_interface,
-                                                     const double& interfacial_boundary_condition_value,
-                                                     const int& boundary_condition_end,
-                                                     const double& impose_user_boundary_condition_end_value);
+                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                       Matrice& thermal_subproblems_matrix_assembly,
+                                       DoubleVect& thermal_subproblems_rhs_assembly,
+                                       DoubleVect& thermal_subproblems_temperature_solution,
+                                       const int& source_terms_type,
+                                       const int& source_terms_correction);
+  void compute_radial_convection_diffusion_operators();
+  void impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                  const int& boundary_condition_interface,
+                                  const double& interfacial_boundary_condition_value,
+                                  const int& impose_boundary_condition_interface_from_simulation,
+                                  const int& boundary_condition_end,
+                                  const double& end_boundary_condition_value,
+                                  const int& impose_user_boundary_condition_end_value);
+  void compute_add_source_terms();
+  void retrieve_temperature_solutions();
+  void compute_local_temperature_gradient_solutions();
+
 
   const int& get_subproblems_counter() const
   {

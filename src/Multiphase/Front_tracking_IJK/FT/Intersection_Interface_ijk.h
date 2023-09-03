@@ -35,32 +35,37 @@
 #ifndef Interface_ijk_included
 #define Interface_ijk_included
 
-#include <IJK_Splitting.h>
 #include <Objet_U.h>
+#include <IJK_Field.h>
+#include <IJK_Splitting.h>
 #include <IJK_Field_forward.h>
-#include <IJK_Interfaces.h>
 
 /*! @brief : class Interface_ijk_face
  *
  *  Cette classe regroupe les information concernant les mailles qui sont
  *  coupées par l'interface (leur numéro par exemple).
- *
- *
- *
  */
 
-class Intersection_Interface_ijk
-{
-public:
-  Intersection_Interface_ijk() {};
-  virtual ~Intersection_Interface_ijk() {};
+class IJK_Interfaces;
 
+class Intersection_Interface_ijk : public Objet_U
+{
+  Declare_base_sans_constructeur(Intersection_Interface_ijk);
+public:
+  Intersection_Interface_ijk()
+  {
+    champ_face_mouillees_a_jour_ = false;
+    n_diph_ = 1;
+    interfaces_=nullptr;
+    splitting_=nullptr;
+    updated_flag_=false;
+  };
   virtual int initialize(const IJK_Splitting& splitting,
                          const IJK_Interfaces& interfaces) = 0;
 
-  // Cette méthode permet de récupérer à partir des postions projetées sur
-  // l'interface des postions à une certaine distance, dans la direction
-  // normale. Ensuite on interpolera le field à ces postions de manière
+  // Cette méthode permet de récupérer à partir des positions projetées sur
+  // l'interface des positions à une certaine distance, dans la direction
+  // normale. Ensuite on interpolera le field à ces positions de manière
   // monophasique car on sera loin de l'interface (et on ne prend pas en compte
   // le cas ou les bulles sont proches).
   static void get_position_interpolation_normal_interf(
@@ -91,6 +96,10 @@ protected:
   // Intersection_Interface_ijk_face n'est pas propriétaire de ces objets, pas
   // de gestion de la mémoire.
   const IJK_Interfaces *interfaces_;
+  /*
+   * TODO: create pointers that point to object
+   * shared with IJK_Interfaces ?
+   */
   const IJK_Splitting *splitting_;
 
   // Le nombre de cellules diphasiques.
@@ -105,6 +114,7 @@ protected:
   // faces mouillées sur l'interface
   bool champ_face_mouillees_a_jour_;
 
+  bool updated_flag_;
   // Ici on recupere l'interface moyenne sur une cellule telle quelle etait au debut du
   // pas de temps.
   void get_mean_interface_cell(const int elem, Vecteur3& normale, Vecteur3& bary) const;
@@ -112,10 +122,9 @@ protected:
 
 class Intersection_Interface_ijk_face : public Intersection_Interface_ijk
 {
+  Declare_instanciable_sans_constructeur(Intersection_Interface_ijk_face);
 public:
-  Intersection_Interface_ijk_face() {};
-  ~Intersection_Interface_ijk_face() {};
-
+  Intersection_Interface_ijk_face() : Intersection_Interface_ijk() {};
   int initialize(const IJK_Splitting& splitting,
                  const IJK_Interfaces& interfaces) override;
 
@@ -152,10 +161,9 @@ protected:
 
 class Intersection_Interface_ijk_cell : public Intersection_Interface_ijk
 {
+  Declare_instanciable_sans_constructeur(Intersection_Interface_ijk_cell);
 public:
-  Intersection_Interface_ijk_cell() {};
-  ~Intersection_Interface_ijk_cell() {};
-
+  Intersection_Interface_ijk_cell() : Intersection_Interface_ijk() {};
   int initialize(const IJK_Splitting& splitting,
                  const IJK_Interfaces& interfaces) override;
 

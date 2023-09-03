@@ -64,6 +64,8 @@ public:
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
+  void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                        const Intersection_Interface_ijk_face& intersection_ijk_face);
   void euler_time_step(const double timestep);
   void rk3_sub_step(const int rk_step,
                     const double total_timestep,
@@ -119,25 +121,41 @@ public:
   {
     return div_coeff_grad_T_volume_ ;
   }
-  const IJK_Field_double& get_eulerian_distance() const
+  const IJK_Field_double& get_eulerian_distance_ft() const
   {
-    return eulerian_distance_;
+    return eulerian_distance_ft_;
   }
-  const IJK_Field_double& get_eulerian_curvature() const
+  const IJK_Field_double& get_eulerian_curvature_ft() const
   {
-    return eulerian_curvature_ ;
+    return eulerian_curvature_ft_ ;
   }
-  const IJK_Field_double& get_interfacial_area() const
+  const IJK_Field_double& get_interfacial_area_ft() const
   {
-    return eulerian_interfacial_area_;
+    return eulerian_interfacial_area_ft_;
   }
-  const IJK_Field_double& get_grad_T_interface() const
+  const IJK_Field_double& get_grad_T_interface_ft() const
   {
-    return eulerian_grad_T_interface_;
+    return eulerian_grad_T_interface_ft_;
   }
-  const IJK_Field_double& get_eulerian_compo_connex() const
+  const IJK_Field_double& get_eulerian_compo_connex_ft() const
   {
-    return eulerian_compo_connex_;
+    return eulerian_compo_connex_ft_;
+  }
+  const IJK_Field_double& get_eulerian_distance_ns() const
+  {
+    return eulerian_distance_ns_;
+  }
+  const IJK_Field_double& get_eulerian_curvature_ns() const
+  {
+    return eulerian_curvature_ns_ ;
+  }
+  const IJK_Field_double& get_interfacial_area_ns() const
+  {
+    return eulerian_interfacial_area_ns_;
+  }
+  const IJK_Field_double& get_grad_T_interface_ns() const
+  {
+    return eulerian_grad_T_interface_ns_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ns() const
   {
@@ -169,7 +187,7 @@ public:
   }
   const FixedVector<IJK_Field_double, 3>& get_bary() const
   {
-    return eulerian_facets_barycentre_;
+    return eulerian_facets_barycentre_ft_;
   }
   const int& get_ghost_fluid_flag() const
   {
@@ -242,12 +260,7 @@ protected:
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
-  virtual void compute_thermal_subproblems();
-  virtual void compute_overall_probes_parameters() { ; };
-  virtual void compute_radial_convection_diffusion_operators() { ; };
-  virtual void initialise_thermal_subproblems() { ; };
-  virtual void solve_thermal_subproblems() { ; };
-  virtual void apply_thermal_flux_correction() { ; };
+  virtual void compute_thermal_subproblems() { ; };
   virtual void clean_thermal_subproblems() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
@@ -284,6 +297,8 @@ protected:
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;
   REF(Switch_FT_double) ref_ijk_ft_switch_;
+  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
   Corrige_flux_FT corrige_flux_;
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
   int rang_;
@@ -382,6 +397,7 @@ protected:
 
   /*
    * Fields FT
+   * TODO: Clean FT_fields and redistribute curvature, interfacial_area if necessary
    */
   IJK_Field_double temperature_ft_;
 
@@ -404,12 +420,22 @@ protected:
   int compute_distance_;
   int compute_curvature_;
   int compute_grad_T_interface_;
-  IJK_Field_double eulerian_distance_;
-  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_;
-  FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_;
-  IJK_Field_double eulerian_curvature_;
-  IJK_Field_double eulerian_interfacial_area_;
-  IJK_Field_double eulerian_grad_T_interface_;
+  /*
+   * TODO: Move fields and avoid redundancies in IJK_Interfaces
+   * Clean FT_fields
+   */
+  IJK_Field_double eulerian_distance_ft_;
+  IJK_Field_double eulerian_distance_ns_;
+  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ft_;
+  FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_ft_;
+  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ns_;
+  FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_ns_;
+  IJK_Field_double eulerian_curvature_ft_;
+  IJK_Field_double eulerian_curvature_ns_;
+  IJK_Field_double eulerian_interfacial_area_ft_;
+  IJK_Field_double eulerian_interfacial_area_ns_;
+  IJK_Field_double eulerian_grad_T_interface_ft_;
+  IJK_Field_double eulerian_grad_T_interface_ns_;
   int compute_grad_T_elem_;
   FixedVector<IJK_Field_double, 3> grad_T_elem_;
   /*
@@ -431,7 +457,7 @@ protected:
   int mixed_cells_number_ = 0;
   void compute_mixed_cells_number(const IJK_Field_double& indicator);
   int compute_eulerian_compo_;
-  IJK_Field_double eulerian_compo_connex_;
+  IJK_Field_double eulerian_compo_connex_ft_;
   IJK_Field_double eulerian_compo_connex_ns_;
 
   int compute_rising_velocities_;
@@ -439,6 +465,8 @@ protected:
   ArrOfDouble rising_velocities_;
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;
+  DoubleTab bubbles_barycentre_;
+
 };
 
 #endif /* IJK_Thermal_base_included */

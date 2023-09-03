@@ -54,11 +54,15 @@ public :
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
   inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
-  inline const IJK_Field_double& get_eulerian_distance() const { return valeur().get_eulerian_distance(); }
-  inline const IJK_Field_double& get_eulerian_curvature() const { return valeur().get_eulerian_curvature(); }
-  inline const IJK_Field_double& get_interfacial_area() const { return valeur().get_interfacial_area(); }
-  inline const IJK_Field_double& get_grad_T_interface() const { return valeur().get_grad_T_interface(); }
-  inline const IJK_Field_double& get_eulerian_compo_connex() const { return valeur().get_eulerian_compo_connex(); }
+  inline const IJK_Field_double& get_eulerian_distance_ft() const { return valeur().get_eulerian_distance_ft(); }
+  inline const IJK_Field_double& get_eulerian_curvature_ft() const { return valeur().get_eulerian_curvature_ft(); }
+  inline const IJK_Field_double& get_interfacial_area_ft() const { return valeur().get_interfacial_area_ft(); }
+  inline const IJK_Field_double& get_grad_T_interface_ft() const { return valeur().get_grad_T_interface_ft(); }
+  inline const IJK_Field_double& get_eulerian_compo_connex_ft() const { return valeur().get_eulerian_compo_connex_ft(); }
+  inline const IJK_Field_double& get_eulerian_distance_ns() const { return valeur().get_eulerian_distance_ns(); }
+  inline const IJK_Field_double& get_eulerian_curvature_ns() const { return valeur().get_eulerian_curvature_ns(); }
+  inline const IJK_Field_double& get_interfacial_area_ns() const { return valeur().get_interfacial_area_ns(); }
+  inline const IJK_Field_double& get_grad_T_interface_ns() const { return valeur().get_grad_T_interface_ns(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ns() const { return valeur().get_eulerian_compo_connex_ns(); }
   inline const IJK_Field_double& get_eulerian_rising_velocities() const {return valeur().get_eulerian_rising_velocities(); }
   inline const FixedVector<IJK_Field_double, 3>& get_bary() const { return valeur().get_bary(); }
@@ -86,6 +90,8 @@ public :
   inline void associer(const IJK_FT_double& ijk_ft);
   inline void associer_post(const IJK_FT_Post& ijk_ft_post);
   inline void associer_switch(const Switch_FT_double& ijk_ft_switch);
+  inline void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                               const Intersection_Interface_ijk_face& intersection_ijk_face);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
                                  const double dxmin) const;
@@ -124,6 +130,8 @@ protected:
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;
   REF(Switch_FT_double) ref_ijk_ft_switch_;
+  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
 };
 
 inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
@@ -157,6 +165,14 @@ inline void IJK_Thermal::associer_switch(const Switch_FT_double& ijk_ft_switch)
 {
   ref_ijk_ft_switch_ = ijk_ft_switch;
   valeur().associer_switch(ref_ijk_ft_switch_);
+}
+
+inline void IJK_Thermal::associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                                          const Intersection_Interface_ijk_face& intersection_ijk_face)
+{
+  ref_intersection_ijk_cell_ = intersection_ijk_cell;
+  ref_intersection_ijk_face_ = intersection_ijk_face;
+  valeur().associer_interface_intersections(intersection_ijk_cell, intersection_ijk_face);
 }
 
 inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)

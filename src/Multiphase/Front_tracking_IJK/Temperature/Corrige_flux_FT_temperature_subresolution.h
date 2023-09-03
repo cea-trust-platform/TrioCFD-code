@@ -14,40 +14,54 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_Bubble_tools.h
+// File      : Corrige_flux_FT_temperature_subresolution.h
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_Bubble_tools_included
-#define IJK_Bubble_tools_included
+#ifndef Corrige_flux_FT_temperature_subresolution_included
+#define Corrige_flux_FT_temperature_subresolution_included
 
-#include <IJK_Field.h>
-#include <IJK_Interfaces.h>
-#include <Maillage_FT_IJK.h>
+#include <Corrige_flux_FT_base.h>
 
-#define INVALID_TEST -1.e30
-#define LIQUID_INDICATOR_TEST 1.-1.e-8
-#define VAPOUR_INDICATOR_TEST 1.e-8
-#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
-#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
-#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class IJK_Bubble_tools
+// .DESCRIPTION : class Corrige_flux_FT_temperature_subresolution
 //
-// <Description of class IJK_Bubble_tools>
+// <Description of class Corrige_flux_FT_temperature_subresolution>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-// Fill compo using a dummy bounding box
-void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex, DoubleTab& bubbles_barycentre);
-// TODO: Fill compo starting from interfacial cells
-void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex);
+class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
+{
 
-void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
-                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors);
-void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
-                          IJK_Field_double& eulerian_rising_velocity);
-#endif /* IJK_Bubble_tools_included */
+  Declare_instanciable( Corrige_flux_FT_temperature_subresolution ) ;
+
+public :
+
+  void initialize(const IJK_Splitting& splitting,
+                  const IJK_Field_double& field,
+                  const IJK_Interfaces& interfaces,
+                  const IJK_FT_double& ijk_ft,
+                  Intersection_Interface_ijk_face& intersection_ijk_face,
+                  Intersection_Interface_ijk_cell& intersection_ijk_cell) override { ; };
+
+  /*
+   * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
+   * l'interface. On remplace les flux donnes en entree par ces flux la.
+   */
+  void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
+                           const int k_layer, const int dir) override { ; };
+  void update() override { ; };
+
+  void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
+                                         const double dist, const DoubleTab& positions, const DoubleTab& normale,
+                                         ArrOfDouble& temperature_interp, ArrOfDouble& flux_normal_interp,
+                                         ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
+                                         DoubleTab& coo_vap) const override { ; };
+
+protected :
+
+};
+
+#endif /* Corrige_flux_FT_temperature_subresolution_included */

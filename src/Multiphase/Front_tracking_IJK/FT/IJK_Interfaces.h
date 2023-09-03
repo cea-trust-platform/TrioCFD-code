@@ -36,6 +36,7 @@
 #include <SurfaceVapeurIJKComputation.h>
 #include <ComputeValParCompoInCell.h>
 #include <TRUST_Ref.h>
+#include <Intersection_Interface_ijk.h>
 
 class IJK_FT_double;
 class Domaine_dis;
@@ -507,7 +508,6 @@ public :
   // }
 
   // Les composantes (dir) du vecteur normal moyen pour chaque compo comnnexe
-  // (c) de bulle dans le maille (compo = max_nb_of_compo_ * c + dir)
   const double& nI(const int compo, const int i, const int j, const int k) const
   {
     return normal_of_interf_ns_[old()][compo](i, j, k);
@@ -587,6 +587,23 @@ public :
   const int& nb_compo_traversantes(const int i, const int j, const int k) const
   {
     return nb_compo_traversante_[next()](i,j,k);
+  }
+
+  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const
+  {
+    return intersection_ijk_cell_;
+  }
+  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const
+  {
+    return intersection_ijk_face_;
+  }
+  Intersection_Interface_ijk_cell& get_set_intersection_ijk_cell()
+  {
+    return intersection_ijk_cell_;
+  }
+  Intersection_Interface_ijk_face& get_set_intersection_ijk_face()
+  {
+    return intersection_ijk_face_;
   }
 
 protected:
@@ -830,6 +847,10 @@ protected:
   FixedVector<FixedVector<IJK_Field_double, max_authorized_nb_of_components_>, 2> repuls_par_compo_;
   FixedVector<FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>, 2> normale_par_compo_;
   FixedVector<FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>, 2> bary_par_compo_;
+
+  Intersection_Interface_ijk_cell intersection_ijk_cell_;
+  Intersection_Interface_ijk_face intersection_ijk_face_;
+
 };
 
 #endif /* IJK_Interfaces_included */

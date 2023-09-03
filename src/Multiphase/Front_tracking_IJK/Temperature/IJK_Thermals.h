@@ -47,6 +47,8 @@ public :
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
+  void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell_,
+                                        const Intersection_Interface_ijk_face& intersection_ijk_face_);
   void sauvegarder_temperature(Nom& lata_name);
   void sauvegarder_thermals(SFichier& fichier);
   void compute_timestep(double& dt_thermals, const double dxmin);
@@ -74,6 +76,8 @@ protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;
   REF(Switch_FT_double) ref_ijk_ft_switch_;
+  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
 
 };
 

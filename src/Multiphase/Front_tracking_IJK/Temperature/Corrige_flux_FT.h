@@ -42,7 +42,9 @@ public :
   inline void initialize(const IJK_Splitting& splitting,
                          const IJK_Field_double& field,
                          const IJK_Interfaces& interfaces,
-                         const IJK_FT_double& ijk_ft);
+                         const IJK_FT_double& ijk_ft,
+                         Intersection_Interface_ijk_face& intersection_ijk_face,
+                         Intersection_Interface_ijk_cell& intersection_ijk_cell);
   inline void set_physical_parameters(const double rhocpl,
                                       const double rhocpv,
                                       const double ldal,
@@ -61,9 +63,11 @@ public :
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
                                         const IJK_Field_double& field,
                                         const IJK_Interfaces& interfaces,
-                                        const IJK_FT_double& ijk_ft)
+                                        const IJK_FT_double& ijk_ft,
+                                        Intersection_Interface_ijk_face& intersection_ijk_face,
+                                        Intersection_Interface_ijk_cell& intersection_ijk_cell)
 {
-  valeur().initialize(splitting, field, interfaces, ijk_ft);
+  valeur().initialize(splitting, field, interfaces, ijk_ft, intersection_ijk_face, intersection_ijk_cell);
 }
 
 inline void Corrige_flux_FT::set_physical_parameters(const double rhocpl,

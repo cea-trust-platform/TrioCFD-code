@@ -41,7 +41,21 @@
 #include <Param.h>
 #include <stat_counters.h>
 
-Implemente_base(Corrige_flux_FT_base, "Corrige_flux_FT_base", Objet_U);
+Implemente_base_sans_constructeur(Corrige_flux_FT_base, "Corrige_flux_FT_base", Objet_U);
+
+Corrige_flux_FT_base::Corrige_flux_FT_base()
+{
+  interfaces_ = nullptr;
+  field_ = nullptr;
+  splitting_ = nullptr;
+  rhocp_l_=0.;
+  rhocp_v_=0.;
+  lda_l_=0.;
+  lda_v_=0.;
+  intersection_ijk_face_ = nullptr;
+  intersection_ijk_cell_ = nullptr;
+}
+
 
 Sortie& Corrige_flux_FT_base::printOn( Sortie& os ) const
 {
@@ -58,7 +72,9 @@ Entree& Corrige_flux_FT_base::readOn( Entree& is )
 void Corrige_flux_FT_base::initialize(const IJK_Splitting& splitting,
                                       const IJK_Field_double& field,
                                       const IJK_Interfaces& interfaces,
-                                      const IJK_FT_double& ijk_ft)
+                                      const IJK_FT_double& ijk_ft,
+                                      Intersection_Interface_ijk_face& intersection_ijk_face,
+                                      Intersection_Interface_ijk_cell& intersection_ijk_cell)
 {
   /*
    * TODO: est-ce que les pointeurs restent bien toujours les meme ?
@@ -69,6 +85,8 @@ void Corrige_flux_FT_base::initialize(const IJK_Splitting& splitting,
   field_ = &field;
   splitting_ = &splitting;
   ref_ijk_ft_ = ijk_ft;
+  intersection_ijk_face_ = &intersection_ijk_face;
+  intersection_ijk_cell_ = &intersection_ijk_cell;
 }
 
 void Corrige_flux_FT_base::set_physical_parameters(const double rhocpl,

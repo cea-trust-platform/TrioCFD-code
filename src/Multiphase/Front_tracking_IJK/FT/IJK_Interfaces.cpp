@@ -707,6 +707,8 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
       const Domaine& domaine = domaine_vf.domaine();
       domaine.creer_tableau_elements(num_compo_);
     }
+  intersection_ijk_cell_.initialize(splitting_NS, *this);
+  intersection_ijk_face_.initialize(splitting_NS, *this);
 }
 
 void IJK_Interfaces::associer(const IJK_FT_double& ijk_ft)

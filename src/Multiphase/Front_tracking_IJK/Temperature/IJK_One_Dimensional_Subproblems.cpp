@@ -67,6 +67,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       FixedVector<IJK_Field_double, 3> eulerian_normal_vectors,
                                                                       ArrOfDouble rising_velocities,
                                                                       DoubleTab rising_vectors,
+                                                                      DoubleTab bubbles_barycentre,
                                                                       const int& points_per_thermal_subproblem,
                                                                       const double& alpha,
                                                                       const double& coeff_distance_diagonal,
@@ -86,7 +87,13 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                                                      const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
+                                                                      const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+                                                                      IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                                      Matrice& thermal_subproblems_matrix_assembly,
+                                                                      DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                      DoubleVect& thermal_subproblems_temperature_solution,
+                                                                      const int& source_terms_type,
+                                                                      const int& source_terms_correction)
 {
   bool create_subproblems_iteratively = true;
   if (subproblems_counter_ < max_subproblems_ || create_subproblems_iteratively)
@@ -94,6 +101,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
       ArrOfDouble bubble_rising_vector(3);
       ArrOfDouble normal_vector(3);
       ArrOfDouble facet_barycentre(3);
+      ArrOfDouble bubble_barycentre(3);
       const int compo_connex = int(eulerian_compo_connex(i, j, k));
       // Need for a Navier-Stokes field (NOT FT)
 
@@ -108,14 +116,17 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
           facet_barycentre(dir) = eulerian_facets_barycentre[dir](i, j, k);
           normal_vector(dir) = eulerian_normal_vectors[dir](i, j, k);
           bubble_rising_vector(dir) = rising_vectors(compo_connex, dir);
+          bubble_barycentre(dir) = bubbles_barycentre(compo_connex, dir);
         }
-      IJK_One_Dimensional_Subproblem subproblem;
+      IJK_One_Dimensional_Subproblem subproblem(ref_ijk_ft_);
       (*this).add(subproblem);
       (*this)[subproblems_counter_].associate_sub_problem_to_inputs(subproblems_counter_,
                                                                     i, j, k, compo_connex,
                                                                     distance, curvature, interfacial_area,
                                                                     facet_barycentre, normal_vector,
-                                                                    bubble_rising_velocity, bubble_rising_vector,
+                                                                    bubble_rising_velocity,
+                                                                    bubble_rising_vector,
+                                                                    bubble_barycentre,
                                                                     points_per_thermal_subproblem,
                                                                     alpha,
                                                                     coeff_distance_diagonal,
@@ -140,7 +151,13 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                     velocity_ft,
                                                                     grad_T_elem,
                                                                     hess_diag_T_elem,
-                                                                    hess_cross_T_elem);
+                                                                    hess_cross_T_elem,
+                                                                    finite_difference_assembler,
+                                                                    thermal_subproblems_matrix_assembly,
+                                                                    thermal_subproblems_rhs_assembly,
+                                                                    thermal_subproblems_temperature_solution,
+                                                                    source_terms_type,
+                                                                    source_terms_correction);
       subproblems_counter_++;
     }
   else
@@ -149,19 +166,45 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
     }
 }
 
-void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operators(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
-                                                                                    DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                                    const int& boundary_condition_interface,
-                                                                                    const double& interfacial_boundary_condition_value,
-                                                                                    const int& boundary_condition_end,
-                                                                                    const double& impose_user_boundary_condition_end_value)
+void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operators()
 {
   for (auto& itr : *this)
-    itr.compute_radial_convection_diffusion_operators(finite_difference_assembler,
-                                                      thermal_subproblems_rhs_assembly,
-                                                      boundary_condition_interface,
-                                                      interfacial_boundary_condition_value,
-                                                      boundary_condition_end,
-                                                      impose_user_boundary_condition_end_value);
-
+    itr.compute_radial_convection_diffusion_operators();
 }
+
+void IJK_One_Dimensional_Subproblems::impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                 const int& boundary_condition_interface,
+                                                                 const double& interfacial_boundary_condition_value,
+                                                                 const int& impose_boundary_condition_interface_from_simulation,
+                                                                 const int& boundary_condition_end,
+                                                                 const double& end_boundary_condition_value,
+                                                                 const int& impose_user_boundary_condition_end_value)
+{
+  for (auto& itr : *this)
+    itr.impose_boundary_conditions(thermal_subproblems_rhs_assembly,
+                                   boundary_condition_interface,
+                                   interfacial_boundary_condition_value,
+                                   impose_boundary_condition_interface_from_simulation,
+                                   boundary_condition_end,
+                                   end_boundary_condition_value,
+                                   impose_user_boundary_condition_end_value);
+}
+
+void IJK_One_Dimensional_Subproblems::compute_add_source_terms()
+{
+  for (auto& itr : *this)
+    itr.compute_add_source_terms();
+}
+
+void IJK_One_Dimensional_Subproblems::retrieve_temperature_solutions()
+{
+  for (auto& itr : *this)
+    itr.retrieve_temperature_solution();
+}
+
+void IJK_One_Dimensional_Subproblems::compute_local_temperature_gradient_solutions()
+{
+  for (auto& itr : *this)
+    itr.compute_local_temperature_gradient_solution();
+}
+

@@ -33,6 +33,24 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Intersection_Interface_ijk.h>
+#include <IJK_Navier_Stokes_tools.h>
+#include <IJK_Interfaces.h>
+
+/*
+ * Intersection_Interface_ijk
+ */
+
+Implemente_base_sans_constructeur(Intersection_Interface_ijk, "Intersection_Interface_ijk", Objet_U);
+
+Sortie& Intersection_Interface_ijk::printOn(Sortie& os) const
+{
+  return os;
+}
+
+Entree& Intersection_Interface_ijk::readOn(Entree& is)
+{
+  return is;
+}
 
 void Intersection_Interface_ijk::projete_interface(
   const Vecteur3& normale,
@@ -97,19 +115,33 @@ void Intersection_Interface_ijk::get_mean_interface_cell(
   assert(no_pb);
 }
 
-int Intersection_Interface_ijk_face::initialize(
-  const IJK_Splitting& splitting, const IJK_Interfaces& interfaces)
+/*
+ * Intersection_Interface_ijk_face
+ */
+
+Implemente_instanciable_sans_constructeur(Intersection_Interface_ijk_face, "Intersection_Interface_ijk_face", Intersection_Interface_ijk);
+
+Sortie& Intersection_Interface_ijk_face::printOn(Sortie& os) const
+{
+  return os;
+}
+
+Entree& Intersection_Interface_ijk_face::readOn(Entree& is)
+{
+  return is;
+}
+
+int Intersection_Interface_ijk_face::initialize(const IJK_Splitting& splitting, const IJK_Interfaces& interfaces)
 {
   // TODO: est-ce que les pointeurs restent bien toujours les meme ?
   // Si oui je peux ne les initialiser qu'une fois, sinon il faudra
   // les mettre à jour.
   interfaces_ = &interfaces;
   splitting_ = &splitting;
-  champ_face_mouillees_a_jour_ = false;
-  n_diph_ = 1;
-  idiph_ijk_[0].allocate(splitting, IJK_Splitting::FACES_I, 2);
-  idiph_ijk_[1].allocate(splitting, IJK_Splitting::FACES_J, 2);
-  idiph_ijk_[2].allocate(splitting, IJK_Splitting::FACES_K, 2);
+  allocate_velocity(idiph_ijk_, splitting, 2);
+//	idiph_ijk_[0].allocate(splitting, IJK_Splitting::FACES_I, 2);
+//	idiph_ijk_[1].allocate(splitting, IJK_Splitting::FACES_J, 2);
+//	idiph_ijk_[2].allocate(splitting, IJK_Splitting::FACES_K, 2);
   return 1;
 }
 
@@ -266,10 +298,28 @@ void Intersection_Interface_ijk_face::calcul_projection_bary_face_mouillee_inter
 
 void Intersection_Interface_ijk_face::maj_interpolation_coo_on_interfaces()
 {
-  calcul_projection_bary_face_mouillee_interface_moy(
-    postions_on_interf_, ijkf_interfaces_, normal_on_interf_, dist_to_interf_);
+  calcul_projection_bary_face_mouillee_interface_moy(postions_on_interf_,
+                                                     ijkf_interfaces_,
+                                                     normal_on_interf_,
+                                                     dist_to_interf_);
   champ_face_mouillees_a_jour_ = true;
   //TODO: maj de dist_interf_
+}
+
+/*
+ * Intersection_Interface_ijk_cell
+ */
+
+Implemente_instanciable_sans_constructeur(Intersection_Interface_ijk_cell, "Intersection_Interface_ijk_cell", Intersection_Interface_ijk);
+
+Sortie& Intersection_Interface_ijk_cell::printOn(Sortie& os) const
+{
+  return os;
+}
+
+Entree& Intersection_Interface_ijk_cell::readOn(Entree& is)
+{
+  return is;
 }
 
 int Intersection_Interface_ijk_cell::initialize(

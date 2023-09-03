@@ -47,9 +47,7 @@ class IJK_Finite_Difference_One_Dimensional_Matrix_Assembler : public Objet_U
 public :
   void set_param(Param& param);
   int build(Matrice& matrix, const int& nb_elem, const int& derivative_order);
-  void modify_rhs_for_bc(const Matrice& matrix,
-                         Matrice& modified_matrix,
-                         const DoubleVect& rhs,
+  void modify_rhs_for_bc(Matrice& modified_matrix,
                          DoubleVect& modified_rhs,
                          const int& ini_boundary_conditions,
                          const int& end_boundary_conditions);
@@ -57,16 +55,30 @@ public :
                               const DoubleVect& vector,
                               const int& boundary_conditions);
   void scale_matrix_subproblem_by_vector(Matrice * matrix, const DoubleVect& vector, const int& subproblem_index, const int& boundary_conditions);
-  void scale_matrix_subproblem_by_vector(Matrice& matrix, DoubleVect& vector, const int& subproblem_index, const int& boundary_conditions);
   void impose_boundary_conditions(Matrice& modified_matrix,
                                   DoubleVect& mdified_rhs,
                                   const int& ini_boundary_conditions,
                                   const double& interfacial_value,
                                   const int& end_boundary_conditions,
-                                  const double& end_values);
+                                  const double& end_values,
+                                  const double& dr_inv);
+  void impose_boundary_conditions_subproblem(Matrice * matrix,
+                                             DoubleVect * global_rhs,
+                                             DoubleVect& local_rhs,
+                                             const int& ini_boundary_conditions,
+                                             const double& interfacial_value,
+                                             const int& end_boundary_conditions,
+                                             const double& end_value,
+                                             const int& subproblem_index,
+                                             const double& dr_inv);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
   void initialise_matrix_subproblems(Matrice& matrix_subproblems, Matrice& fd_operator, const int& subproblems);
+  void reinitialise_matrix_subproblem(Matrice& matrix_subproblems,
+                                      Matrice& fd_operator,
+                                      const int& nb_subproblems);
+  void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly, const DoubleVect& rhs_assembly);
+  void compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res);
 
 protected :
   enum Fd_coefficient_type_ { forward, centred, backward };

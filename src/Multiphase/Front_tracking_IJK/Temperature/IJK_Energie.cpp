@@ -182,7 +182,9 @@ int IJK_Energie::initialize(const IJK_Splitting& splitting, const int idx)
     ref_ijk_ft_->get_splitting_ns(),
     temperature_,
     ref_ijk_ft_->itfce(),
-    ref_ijk_ft_);
+    ref_ijk_ft_,
+    ref_ijk_ft_->get_set_interface().get_set_intersection_ijk_face(),
+    ref_ijk_ft_->get_set_interface().get_set_intersection_ijk_cell());
 
   energy_convection_op_quick_interface_.set_corrige_flux(corrige_flux_);
   energy_convection_op_quick_interface_.initialize(splitting);

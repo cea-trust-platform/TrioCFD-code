@@ -453,51 +453,78 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
 
   if (compute_distance_)
     {
+      /*
+       * TODO: Move to IJK_Interfaces
+       */
       // Laplacian(d) necessitates 2 ghost cells like temperature
-      eulerian_distance_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+      eulerian_distance_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
       nalloc += 1;
       // grad(d) necessitates 1 ghost cell ?
-      allocate_cell_vector(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
-//      allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
+      allocate_cell_vector(eulerian_normal_vectors_ft_, ref_ijk_ft_->get_splitting_ft(), 1);
+      // allocate_velocity(eulerian_normal_vectors_, ref_ijk_ft_->get_splitting_ft(), 1);
       nalloc += 3;
-      allocate_cell_vector(eulerian_facets_barycentre_, ref_ijk_ft_->get_splitting_ft(), 0);
+      allocate_cell_vector(eulerian_facets_barycentre_ft_, ref_ijk_ft_->get_splitting_ft(), 0);
       nalloc += 3;
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
-      eulerian_normal_vectors_.echange_espace_virtuel();
-      eulerian_facets_barycentre_.echange_espace_virtuel();
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      eulerian_normal_vectors_ft_.echange_espace_virtuel();
+      eulerian_facets_barycentre_ft_.echange_espace_virtuel();
+      eulerian_distance_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      /*
+       * TODO: This is already calculated in IJK_Interfaces
+       * Keep it for now and clean later
+       */
+      allocate_cell_vector(eulerian_normal_vectors_ns_, splitting, 1);
+      allocate_cell_vector(eulerian_facets_barycentre_ns_, splitting, 1);
+      nalloc += 7;
+      eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
+      eulerian_normal_vectors_ns_.echange_espace_virtuel();
+      eulerian_facets_barycentre_ns_.echange_espace_virtuel();
     }
   if (compute_curvature_)
     {
       // Laplacian(d) necessitates 0 ghost cells like div_lambda_grad_T
       // but if calculated using the neighbours maybe 1
-      eulerian_curvature_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+      eulerian_curvature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
       nalloc += 1;
-      eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
+      eulerian_curvature_ft_.echange_espace_virtuel(eulerian_curvature_ft_.ghost());
       // Only calculated in the mixed cells ghost_cells = 0
-      eulerian_interfacial_area_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
+      eulerian_interfacial_area_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
       nalloc += 1;
-      eulerian_interfacial_area_.echange_espace_virtuel(eulerian_interfacial_area_.ghost());
+      eulerian_interfacial_area_ft_.echange_espace_virtuel(eulerian_interfacial_area_ft_.ghost());
+      /*
+       * TODO: This is already calculated in IJK_Interfaces
+       * Keep it for now and clean later
+       */
+      eulerian_curvature_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      eulerian_curvature_ns_.echange_espace_virtuel(eulerian_curvature_ns_.ghost());
+      nalloc += 2;
+      eulerian_interfacial_area_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      eulerian_interfacial_area_ns_.echange_espace_virtuel(eulerian_interfacial_area_ns_.ghost());
     }
   if (compute_grad_T_interface_)
     {
       // 1 ghost cell for eulerian_grad_T_interface_ and temperature_ft_ to access its neighbour
-      eulerian_grad_T_interface_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+      eulerian_grad_T_interface_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
       nalloc += 1;
-      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      eulerian_grad_T_interface_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
+      //
+      eulerian_grad_T_interface_ns_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc += 1;
+      eulerian_grad_T_interface_ns_.echange_espace_virtuel(eulerian_grad_T_interface_ns_.ghost());
       //
       temperature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, ghost_cells_);
       nalloc += 1;
-      temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      temperature_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
     }
 
   compute_eulerian_compo_ = compute_eulerian_compo_ || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("EULERIAN_COMPO"))
                             || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("EULERIAN_COMPO_NS"));
   if (compute_eulerian_compo_)
     {
-      eulerian_compo_connex_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+      eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
       nalloc += 1;
-      eulerian_compo_connex_.data() = -1.;
-      eulerian_compo_connex_.echange_espace_virtuel(eulerian_compo_connex_.ghost());
+      eulerian_compo_connex_ft_.data() = -1.;
+      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
 
       eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
       nalloc += 1;
@@ -667,6 +694,13 @@ void IJK_Thermal_base::associer_switch(const Switch_FT_double& ijk_ft_switch)
   ref_ijk_ft_switch_ = ijk_ft_switch;
 }
 
+void IJK_Thermal_base::associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                                        const Intersection_Interface_ijk_face& intersection_ijk_face)
+{
+  ref_intersection_ijk_cell_ = intersection_ijk_cell;
+  ref_intersection_ijk_face_ = intersection_ijk_face;
+}
+
 void IJK_Thermal_base::euler_time_step(const double timestep)
 {
   calculer_dT(ref_ijk_ft_->get_velocity());
@@ -754,7 +788,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    */
   enforce_zero_value_eulerian_distance();
   enforce_max_value_eulerian_curvature();
-  enforce_max_value_eulerian_field(eulerian_interfacial_area_);
+  enforce_max_value_eulerian_field(eulerian_interfacial_area_ft_);
 
   double nb_diam_upstream_velocity = ref_ijk_ft_->get_nb_diam_upstream();
   if (nb_diam_upstream_ == 0.)
@@ -811,12 +845,24 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 void IJK_Thermal_base::compute_eulerian_distance()
 {
   if (compute_distance_)
-    // TODO: Do we need to perform an echange_virtuel with interfaces ?
-    compute_eulerian_normal_distance_facet_barycentre_field(ref_ijk_ft_->get_interface(),
-                                                            eulerian_distance_,
-                                                            eulerian_normal_vectors_,
-                                                            eulerian_facets_barycentre_,
-                                                            n_iter_distance_);
+    {
+      // TODO: Do we need to perform an echange_virtuel with interfaces ?
+      compute_eulerian_normal_distance_facet_barycentre_field(ref_ijk_ft_->get_interface(),
+                                                              eulerian_distance_ft_,
+                                                              eulerian_normal_vectors_ft_,
+                                                              eulerian_facets_barycentre_ft_,
+                                                              n_iter_distance_);
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      eulerian_distance_ns_.data() = 0.;
+      eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_distance_ft_, eulerian_distance_ns_);
+      eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
+      for(int dir=0; dir<3; dir++)
+        {
+          ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_normal_vectors_ft_[dir], eulerian_normal_vectors_ns_[dir]);
+          ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_facets_barycentre_ft_[dir], eulerian_facets_barycentre_ns_[dir]);
+        }
+    }
   else
     Cerr << "Don't compute the eulerian distance field" << finl;
 }
@@ -824,7 +870,10 @@ void IJK_Thermal_base::compute_eulerian_distance()
 void IJK_Thermal_base::enforce_zero_value_eulerian_distance()
 {
   if (compute_distance_)
-    enforce_zero_value_eulerian_field(eulerian_distance_);
+    {
+      enforce_zero_value_eulerian_field(eulerian_distance_ft_);
+      enforce_zero_value_eulerian_field(eulerian_distance_ns_);
+    }
   else
     Cerr << "Eulerian distance has not been computed" << finl;
 }
@@ -833,11 +882,16 @@ void IJK_Thermal_base::compute_eulerian_curvature()
 {
   if (compute_curvature_)
     {
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
-      compute_eulerian_curvature_field_from_distance_field(eulerian_distance_,
-                                                           eulerian_curvature_,
+      /*
+       * Laplacian operator may not work properly with FT_field ?
+       */
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      compute_eulerian_curvature_field_from_distance_field(eulerian_distance_ft_,
+                                                           eulerian_curvature_ft_,
                                                            boundary_flux_kmin_,
                                                            boundary_flux_kmax_);
+      eulerian_curvature_ft_.echange_espace_virtuel(eulerian_curvature_ft_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_curvature_ft_, eulerian_curvature_ns_);
     }
   else
     Cerr << "Don't compute the eulerian curvature field" << finl;
@@ -847,8 +901,8 @@ void IJK_Thermal_base::compute_eulerian_curvature_from_interface()
 {
   if (compute_curvature_)
     {
-      eulerian_interfacial_area_.echange_espace_virtuel(eulerian_interfacial_area_.ghost());
-      eulerian_normal_vectors_.echange_espace_virtuel();
+      eulerian_interfacial_area_ft_.echange_espace_virtuel(eulerian_interfacial_area_ft_.ghost());
+      eulerian_normal_vectors_ft_.echange_espace_virtuel();
       int nb_groups = ref_ijk_ft_->get_interface().nb_groups();
       // Boucle debute a -1 pour faire l'indicatrice globale.
       // S'il n'y a pas de groupes de bulles (monophasique ou monodisperse), on passe exactement une fois dans la boucle
@@ -856,13 +910,17 @@ void IJK_Thermal_base::compute_eulerian_curvature_from_interface()
         nb_groups = 0; // Quand il n'y a qu'un groupe, on ne posttraite pas les choses pour ce groupe unique puisque c'est identique au cas global
       for (int igroup = -1; igroup < nb_groups; igroup++)
         {
-          compute_eulerian_curvature_field_from_interface(eulerian_normal_vectors_,
+          compute_eulerian_curvature_field_from_interface(eulerian_normal_vectors_ft_,
                                                           ref_ijk_ft_->get_interface(),
-                                                          eulerian_interfacial_area_,
-                                                          eulerian_curvature_,
+                                                          eulerian_interfacial_area_ft_,
+                                                          eulerian_curvature_ft_,
                                                           n_iter_distance_,
                                                           igroup);
         }
+      eulerian_interfacial_area_ft_.echange_espace_virtuel(eulerian_interfacial_area_ft_.ghost());
+      eulerian_curvature_ft_.echange_espace_virtuel(eulerian_curvature_ft_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_interfacial_area_ft_, eulerian_interfacial_area_ns_);
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_curvature_ft_, eulerian_curvature_ns_);
     }
   else
     Cerr << "Don't compute the eulerian curvature field" << finl;
@@ -872,7 +930,7 @@ void IJK_Thermal_base::enforce_zero_value_eulerian_curvature()
 {
   if (compute_curvature_)
     {
-      enforce_zero_value_eulerian_field(eulerian_curvature_);
+      enforce_zero_value_eulerian_field(eulerian_curvature_ft_);
     }
   else
     Cerr << "Eulerian curvature has not been computed" << finl;
@@ -882,7 +940,8 @@ void IJK_Thermal_base::enforce_max_value_eulerian_curvature()
 {
   if (compute_curvature_)
     {
-      enforce_max_value_eulerian_field(eulerian_curvature_);
+      enforce_max_value_eulerian_field(eulerian_curvature_ft_);
+      enforce_max_value_eulerian_field(eulerian_curvature_ns_);
     }
   else
     Cerr << "Eulerian curvature has not been computed" << finl;
@@ -897,13 +956,21 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
       temperature_.echange_espace_virtuel(temperature_.ghost());
       ref_ijk_ft_->redistribute_to_splitting_ft_elem(temperature_, temperature_ft_);
       temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
-      eulerian_interfacial_area_.echange_espace_virtuel(eulerian_interfacial_area_.ghost());
-      compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_,
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      eulerian_interfacial_area_ft_.echange_espace_virtuel(eulerian_interfacial_area_ft_.ghost());
+      compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_ft_,
                                                              ref_ijk_ft_->itfce().I_ft(),
-                                                             eulerian_interfacial_area_,
+                                                             eulerian_interfacial_area_ft_,
                                                              temperature_ft_,
-                                                             eulerian_grad_T_interface_);
+                                                             eulerian_grad_T_interface_ft_);
+      /*
+       * TODO:
+       */
+      compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_ns_,
+                                                             ref_ijk_ft_->itfce().I(),
+                                                             eulerian_interfacial_area_ns_,
+                                                             temperature_,
+                                                             eulerian_grad_T_interface_ns_);
     }
   else
     Cerr << "Don't compute the grad_T_interface field" << finl;
@@ -913,12 +980,25 @@ void IJK_Thermal_base::propagate_eulerian_grad_T_interface()
 {
   if (compute_grad_T_interface_)
     {
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
-      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      eulerian_grad_T_interface_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
       propagate_eulerian_normal_temperature_gradient_interface(ref_ijk_ft_->itfce(),
-                                                               eulerian_distance_,
-                                                               eulerian_grad_T_interface_,
+                                                               eulerian_distance_ft_,
+                                                               eulerian_grad_T_interface_ft_,
                                                                n_iter_distance_);
+      eulerian_grad_T_interface_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
+
+      eulerian_grad_T_interface_ns_.echange_espace_virtuel(eulerian_grad_T_interface_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_grad_T_interface_ft_, eulerian_grad_T_interface_ns_);
+      /*
+       * FIXME: Extrapolate with NS field is not a good idea
+       */
+//      eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
+//      eulerian_grad_T_interface_ns_.echange_espace_virtuel(eulerian_grad_T_interface_ns_.ghost());
+//      propagate_eulerian_normal_temperature_gradient_interface(ref_ijk_ft_->itfce(),
+//                                                               eulerian_distance_ns_,
+//                                                               eulerian_grad_T_interface_ns_,
+//                                                               n_iter_distance_);
     }
   else
     Cerr << "Don't compute the grad_T_interface field" << finl;
@@ -928,16 +1008,26 @@ void IJK_Thermal_base::compute_eulerian_temperature_ghost()
 {
   if (ghost_fluid_)
     {
-      eulerian_distance_.echange_espace_virtuel(eulerian_distance_.ghost());
-      eulerian_curvature_.echange_espace_virtuel(eulerian_curvature_.ghost());
-      eulerian_grad_T_interface_.echange_espace_virtuel(eulerian_grad_T_interface_.ghost());
+      eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
+      eulerian_curvature_ft_.echange_espace_virtuel(eulerian_curvature_ft_.ghost());
+      eulerian_grad_T_interface_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
       temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
       compute_eulerian_extended_temperature(ref_ijk_ft_->itfce().I_ft(),
-                                            eulerian_distance_,
-                                            eulerian_curvature_,
-                                            eulerian_grad_T_interface_,
+                                            eulerian_distance_ft_,
+                                            eulerian_curvature_ft_,
+                                            eulerian_grad_T_interface_ft_,
                                             temperature_ft_);
-      ref_ijk_ft_->redistribute_from_splitting_ft_elem(temperature_ft_, temperature_);
+      // ref_ijk_ft_->redistribute_from_splitting_ft_elem(temperature_ft_, temperature_);
+
+      eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
+      eulerian_curvature_ns_.echange_espace_virtuel(eulerian_curvature_ns_.ghost());
+      eulerian_grad_T_interface_ns_.echange_espace_virtuel(eulerian_grad_T_interface_ns_.ghost());
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+      compute_eulerian_extended_temperature(ref_ijk_ft_->itfce().I(),
+                                            eulerian_distance_ns_,
+                                            eulerian_curvature_ns_,
+                                            eulerian_grad_T_interface_ns_,
+                                            temperature_);
       temperature_.echange_espace_virtuel(temperature_.ghost());
     }
   else
@@ -949,11 +1039,11 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
   if (compute_eulerian_compo_)
     {
       DoubleTab bounding_box;
-      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box, eulerian_compo_connex_);
-      eulerian_compo_connex_.echange_espace_virtuel(eulerian_compo_connex_.ghost());
+      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box, eulerian_compo_connex_ft_, bubbles_barycentre_);
+      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
       eulerian_compo_connex_ns_.data() = -1;
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_, eulerian_compo_connex_ns_);
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
     }
   else
@@ -970,6 +1060,9 @@ void IJK_Thermal_base::compute_rising_velocities()
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
                               eulerian_compo_connex_ns_, ref_ijk_ft_->get_direction_gravite(),
                               rising_velocities_, rising_vectors_);
+      /*
+       * FIXME: Use the velocity of the interface instead ?
+       */
       if (fill_rising_velocities_)
         {
           eulerian_rising_velocities_.data() = 0.;
@@ -979,18 +1072,6 @@ void IJK_Thermal_base::compute_rising_velocities()
     }
   else
     Cerr << "Don't compute the ghost temperature field" << finl;
-}
-
-void IJK_Thermal_base::compute_thermal_subproblems()
-{
-  /*
-   * FIXME: Do the first step only at the first iteration
-   */
-  compute_overall_probes_parameters();
-  // compute_radial_convection_diffusion_operators();
-  initialise_thermal_subproblems();
-  // solve_thermal_subproblems();
-  // apply_thermal_flux_correction();
 }
 
 void IJK_Thermal_base::enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field)

@@ -231,6 +231,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
    */
   {
     const int backward_derivative_size = (*backward_derivative)[precision_order_-1][0].size();
+    int end_counter = non_zero_values_counter - 1 + stencil_backward;
     const int last_column = (nb_elem - 1);
     for (int i=0; i < backward_derivative_size; i++)
       {
@@ -238,8 +239,9 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
         const double fd_coeff = (*backward_derivative)[precision_order_-1][1](i);
         if (fd_coeff != 0)
           {
-            matrix_column_indices[non_zero_values_counter] = last_column + indices + FORTRAN_INDEX_INI;
-            matrix_values[non_zero_values_counter] = fd_coeff;
+            matrix_column_indices[end_counter] = last_column + indices + FORTRAN_INDEX_INI;
+            matrix_values[end_counter] = fd_coeff;
+            end_counter--;
             non_zero_values_counter++;
           }
       }
@@ -280,7 +282,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
   end_sparse_matrix.dimensionner(nb_elem-2, nb_elem, stencil_backward);
   core_sparse_matrix.dimensionner(1, nb_elem, stencil_centred);
    */
-
+  sparse_matrix.compacte(remove);
   block_matrix.assert_check_block_matrix_structure();
   return non_zero_elem;
 }
@@ -292,9 +294,12 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices_subpro
   const int dim = block_matrix_A.dim(0);
   for (int i=0; i<dim ; i++)
     {
-      Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, block_matrix_A.get_bloc(i,i).valeur());
-      Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, block_matrix_B.get_bloc(i,i).valeur());
+      Matrice_Bloc& sub_block_matrix_A  = ref_cast(Matrice_Bloc, block_matrix_A.get_bloc(i,i).valeur());
+      Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, sub_block_matrix_A.get_bloc(0,0).valeur());
+      Matrice_Bloc& sub_block_matrix_B  = ref_cast(Matrice_Bloc, block_matrix_B.get_bloc(i,i).valeur());
+      Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, sub_block_matrix_B.get_bloc(0,0).valeur());
       sparse_matrix_A += sparse_matrix_B;
+      Cerr << 1 << finl;
     }
 }
 
@@ -325,11 +330,31 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
   // const int nb_sub_problems = block_matrix_subproblems.dim(0);
   for (int i=0; i<nb_subproblems; i++)
     {
-      block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
-      Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+      // block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
+      // Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+      block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Bloc");
+      Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(i,i).valeur());
+      block_matrix.dimensionner(1,1);
+      block_matrix.get_bloc(0,0).typer("Matrice_Morse");
+      Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
       sparse_matrix = Matrice_Morse(fd_operator_morse);
     }
 }
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix_subproblem(Matrice& matrix_subproblems,
+                                                                                            Matrice& fd_operator,
+                                                                                            const int& nb_subproblems)
+{
+  Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, matrix_subproblems.valeur());
+  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(nb_subproblems,nb_subproblems).valeur());
+  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+
+  Matrice_Bloc& fd_operator_bloc =ref_cast(Matrice_Bloc, fd_operator.valeur());
+  Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator_bloc.get_bloc(0,0).valeur());
+
+  sparse_matrix = Matrice_Morse(fd_operator_morse);
+}
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vector(Matrice& matrix,
                                                                                     const DoubleVect& vector,
                                                                                     const int& boundary_conditions)
@@ -337,6 +362,8 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
   /*
    * Don't scale the first and last row (where B.Cs are applied)
    */
+  Matrice_Bloc& block_matrix = ref_cast(Matrice_Bloc, matrix.valeur());
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
   DoubleVect vector_tmp = vector;
   if (boundary_conditions)
     {
@@ -346,7 +373,20 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
   /*
    * TODO FIXME: I want a matrix in the end
    */
-  // matrix *= vector_tmp;
+  sparse_matrix *= vector_tmp;
+//  const int nb_lines = sparse_matrix.nb_lignes();
+//  int non_zero_values_counter = 0;
+//  int j;
+//  ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
+//  for (int i=0 ; i < nb_lines; i++)
+//    {
+//      const int non_zero_coeff_per_line = sparse_matrix.nb_vois(i);
+//      for (j=0; j < non_zero_coeff_per_line; j++)
+//        {
+//          matrix_values[non_zero_values_counter] *= vector_tmp[i];
+//          non_zero_values_counter++;
+//        }
+//    }
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subproblem_by_vector(Matrice * matrix,
@@ -359,29 +399,50 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subpro
   scale_matrix_by_vector(sub_matrix, vector, boundary_conditions);
 }
 
-void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subproblem_by_vector(Matrice& matrix,
-                                                                                               DoubleVect& vector,
-                                                                                               const int& subproblem_index,
-                                                                                               const int& boundary_conditions)
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_conditions_subproblem(Matrice * matrix,
+                                                                                                   DoubleVect * global_rhs,
+                                                                                                   DoubleVect& local_rhs,
+                                                                                                   const int& ini_boundary_conditions,
+                                                                                                   const double& interfacial_value,
+                                                                                                   const int& end_boundary_conditions,
+                                                                                                   const double& end_value,
+                                                                                                   const int& subproblem_index,
+                                                                                                   const double& dr_inv)
 {
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, matrix.valeur());
+  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*matrix).valeur());
   Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
-  scale_matrix_by_vector(sub_matrix, vector, boundary_conditions);
+  impose_boundary_conditions(sub_matrix,
+                             local_rhs,
+                             ini_boundary_conditions,
+                             interfacial_value,
+                             end_boundary_conditions,
+                             end_value,
+                             dr_inv);
+  /*
+   * Fill global RHS
+   */
+  const int global_rhs_size = (*global_rhs).size();
+  const int local_rhs_size = local_rhs.size();
+  const int index_start = global_rhs_size - local_rhs_size;
+  for (int i=0; i<local_rhs.size(); i++)
+    (*global_rhs)[i + index_start] = local_rhs[i];
 }
+
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_conditions(Matrice& modified_matrix,
                                                                                         DoubleVect& modified_rhs,
                                                                                         const int& ini_boundary_conditions,
                                                                                         const double& interfacial_value,
                                                                                         const int& end_boundary_conditions,
-                                                                                        const double& end_value)
+                                                                                        const double& end_value,
+                                                                                        const double& dr_inv)
 {
-  Matrice matrix = Matrice(modified_matrix);
-  DoubleVect rhs = modified_rhs;
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, matrix.valeur());
+  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, modified_matrix.valeur());
   Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
+  ArrOfInt& matrix_column_indices = sparse_matrix.get_set_tab2();
+  Cerr << matrix_column_indices[0] << finl;
   const int nb_lines = sparse_matrix.nb_lignes();
   const int nb_coeff = sparse_matrix.nb_coeff();
   {
@@ -398,11 +459,28 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
           matrix_values[0] = 1.;
           for (int i=1; i<non_zero_elem_ini; i++)
             matrix_values[i] = 0.;
-          rhs[0] = interfacial_value;
+          modified_rhs[0] = interfacial_value;
         }
         break;
       case neumann:
-        rhs[0] = interfacial_value;
+        {
+          // Refill with first order finite difference coefficients
+          const int stencil_forward = non_zero_stencil_values(first_order_derivative_forward_);
+          const int non_zero_elem_ini = non_zero_coeff_per_line[1] - FORTRAN_INDEX_INI;
+          int counter_fd_coeff = 0;
+          for (int i=0; i < non_zero_elem_ini; i++)
+            {
+              if (i < stencil_forward)
+                {
+                  const double fd_coeff = first_order_derivative_forward_[precision_order_-1][1](counter_fd_coeff);
+                  matrix_values[i] = fd_coeff * dr_inv;
+                  counter_fd_coeff++;
+                }
+              else
+                matrix_values[i] = 0.;
+            }
+          modified_rhs[0] = interfacial_value;
+        }
         break;
       case flux_jump:
         Cerr << "Flux_jump condition necessitates a sub-problem in each phase : not implemented yet !" << finl;
@@ -413,7 +491,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
           matrix_values[0] = 1.;
           for (int i=1; i<non_zero_elem_ini; i++)
             matrix_values[i] = 0.;
-          rhs[0] = 0.;
+          modified_rhs[0] = 0.;
         }
         break;
       }
@@ -426,31 +504,51 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
       {
       case dirichlet:
         {
-          const int non_zero_elem_end = non_zero_coeff_per_line[nb_lines] - FORTRAN_INDEX_INI;
-          matrix_values[nb_coeff - 1] = 1.;
-          for (int i=nb_lines - 1; i > (nb_lines-non_zero_elem_end); i--)
+          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+          const int last_index = nb_coeff - 1;
+          matrix_values[last_index] = 1.;
+          for (int i=last_index - 1; i > ( last_index - non_zero_elem_end); i--)
             matrix_values[i] = 0.;
-          rhs[0] = interfacial_value;
+          modified_rhs[modified_rhs.size() - 1] = end_value;
         }
         break;
       case neumann:
+        {
+          // Refill with first order finite difference coefficients
+          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+          const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+          int counter_fd_coeff = 0;
+          for (int i=0; i < non_zero_elem_end; i++)
+            {
+              const int index = i + nb_coeff - non_zero_elem_end;
+              if (index + stencil_backward >= nb_coeff)
+                {
+                  const double fd_coeff = first_order_derivative_backward_[precision_order_-1][1](counter_fd_coeff);
+                  matrix_values[index] = fd_coeff * dr_inv;
+                  counter_fd_coeff++;
+                }
+              else
+                matrix_values[index] = 0.;
+            }
+          modified_rhs[modified_rhs.size() - 1] = end_value;
+        }
         break;
       default:
         {
-          const int non_zero_elem_end = non_zero_coeff_per_line[nb_lines] - FORTRAN_INDEX_INI;
-          matrix_values[nb_coeff - 1] = 1.;
-          for (int i=nb_lines - 1; i > (nb_lines-non_zero_elem_end); i--)
+          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+          const int last_index = nb_coeff - 1;
+          matrix_values[last_index] = 1.;
+          for (int i = last_index - 1; i > (last_index - non_zero_elem_end); i--)
             matrix_values[i] = 0.;
-          rhs[0] = -1.;
+          modified_rhs[modified_rhs.size() - 1] = -1.;
         }
         break;
       }
   }
   sparse_matrix.compacte(remove);
-  if ((ini_boundary_conditions == dirichlet) || (end_boundary_conditions == dirichlet))
-    modify_rhs_for_bc(matrix,
-                      modified_matrix,
-                      rhs,
+  if ((ini_boundary_conditions != neumann && ini_boundary_conditions != flux_jump)
+      || (end_boundary_conditions != neumann))
+    modify_rhs_for_bc(modified_matrix,
                       modified_rhs,
                       ini_boundary_conditions,
                       end_boundary_conditions);
@@ -459,9 +557,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
 /*
  * Modifcations of the rhs to apply BCs to the resolved 1D field
  */
-void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(const Matrice& matrix,
-                                                                               Matrice& modified_matrix,
-                                                                               const DoubleVect& rhs,
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(Matrice& modified_matrix,
                                                                                DoubleVect& modified_rhs,
                                                                                const int& ini_boundary_conditions,
                                                                                const int& end_boundary_conditions)
@@ -469,31 +565,40 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(c
   /*
    * Copy the matrix into modified matrix
    */
-  modified_matrix = Matrice(matrix);
   Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, modified_matrix.valeur());
   Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
+
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
   ArrOfInt& matrix_column_indices = sparse_matrix.get_set_tab2();
   const int nb_lines = sparse_matrix.nb_lignes();
   const int nb_column = sparse_matrix.nb_colonnes();
 
+  const DoubleVect rhs = modified_rhs;
   /*
    * Get the modified rhs
    */
-  modified_rhs = rhs;
-  if (ini_boundary_conditions != dirichlet)
+  if (ini_boundary_conditions == neumann && ini_boundary_conditions == flux_jump)
     modified_rhs[0] = 0.;
-  if (end_boundary_conditions != dirichlet)
+  if (end_boundary_conditions == neumann)
     modified_rhs[modified_rhs.size() - 1] = 0.;
-  DoubleVect rhs_tmp = modified_rhs;
-  modified_rhs = matrix * modified_rhs;
-  modified_rhs -= rhs_tmp;
-  modified_rhs *= -1.;
-  modified_rhs += rhs;
+
+  /*
+   * Build B_BCs = A * X_BC
+   * and B_modif = B - B_BC
+   */
+  // modified_rhs = sparse_matrix * rhs;
+  sparse_matrix.multvect(rhs, modified_rhs);
+
+  //
+  //  modified_rhs -= rhs;
+  //  modified_rhs *= -1.;
+  //  modified_rhs += rhs;
 
   /*
    * Remove useless coefficients
+   * and build A_modif
+   * A_modif X = B_modif
    */
   for (int j=2; j<nb_lines; j++)
     {
@@ -503,11 +608,25 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(c
       const int column_index = matrix_column_indices[index_sparse] - FORTRAN_INDEX_INI;
       if (column_index == 0)
         matrix_values[index_sparse] = 0.;
-      if ((nb_column - 1) == 0)
+      if (column_index == (nb_column - 1))
         matrix_values[index_sparse] = 0.;
     }
 
   sparse_matrix.compacte(remove);
 }
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly, const DoubleVect& rhs_assembly)
+{
+
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res)
+{
+  //  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*fd_operator).valeur());
+  //  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+  // res = sparse_matrix * solution;
+  res = (*fd_operator) * solution;
+}
+
 
 

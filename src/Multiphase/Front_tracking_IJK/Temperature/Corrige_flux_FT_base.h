@@ -65,7 +65,10 @@ class Corrige_flux_FT_base : public Objet_U
 public:
   virtual void initialize(const IJK_Splitting& splitting,
                           const IJK_Field_double& field,
-                          const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft);
+                          const IJK_Interfaces& interfaces,
+                          const IJK_FT_double& ijk_ft,
+                          Intersection_Interface_ijk_face& intersection_ijk_face,
+                          Intersection_Interface_ijk_cell& intersection_ijk_cell);
 
   void set_physical_parameters(const double rhocpl,
                                const double rhocpv,
@@ -91,8 +94,12 @@ protected:
   const IJK_Splitting *splitting_;
   REF(IJK_FT_double) ref_ijk_ft_;
 
+
   double rhocp_l_, rhocp_v_;
   double lda_l_, lda_v_;
+
+  Intersection_Interface_ijk_face * intersection_ijk_face_;
+  Intersection_Interface_ijk_cell * intersection_ijk_cell_;
   /*
    * TODO: mettre ces méthodes dans une petite classe pour parcourir
    * les trois directions.

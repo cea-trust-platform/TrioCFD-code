@@ -63,13 +63,15 @@ public :
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
 
 protected :
-
+  void compute_thermal_subproblems() override;
   void compute_diffusion_increment() override;
   void correct_temperature_increment_for_interface_leaving_cell() override;
   void correct_temperature_for_eulerian_fluxes() override;
   void correct_temperature_for_visu() override;
-  void compute_overall_probes_parameters() override;
-  void compute_radial_convection_diffusion_operators() override;
+  void compute_overall_probes_parameters();
+  void compute_radial_subresolution_convection_diffusion_operators();
+  void impose_subresolution_boundary_conditions();
+  void compute_add_subresolution_source_terms();
   void compute_radial_first_second_order_operators(Matrice& radial_first_order_operator_raw,
                                                    Matrice& radial_second_order_operator_raw,
                                                    Matrice& radial_first_order_operator,
@@ -82,9 +84,9 @@ protected :
                                              Matrice& radial_convection_matrix);
   void initialise_radial_diffusion_operator(const Matrice& radial_second_order_operator,
                                             Matrice& radial_diffusion_matrix);
-  void initialise_thermal_subproblems() override;
-  void solve_thermal_subproblems() override;
-  void apply_thermal_flux_correction() override;
+  void initialise_thermal_subproblems();
+  void solve_thermal_subproblems();
+  void apply_thermal_flux_correction();
   void clean_thermal_subproblems() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
@@ -128,6 +130,8 @@ protected :
   int boundary_condition_end_;
   double end_boundary_condition_value_;
   int impose_user_boundary_condition_end_value_;
+  int source_terms_type_;
+  int source_terms_correction_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

@@ -39,10 +39,12 @@ class Corrige_flux_FT_temperature_conv : public Corrige_flux_FT_base
 
 public:
 
-  void initialize(const IJK_Splitting& splitting, const IJK_Field_double& field,
-                  const IJK_Interfaces& interfaces, const IJK_FT_double& ijk_ft) override;
-//                  const double rhocp_l, const double rhocp_v, const double lda_l,
-//                  const double lda_v);
+  void initialize(const IJK_Splitting& splitting,
+                  const IJK_Field_double& field,
+                  const IJK_Interfaces& interfaces,
+                  const IJK_FT_double& ijk_ft,
+                  Intersection_Interface_ijk_face& intersection_ijk_face,
+                  Intersection_Interface_ijk_cell& intersection_ijk_cell) override;
 
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
                            const int k_layer, const int dir) override;
@@ -97,11 +99,14 @@ protected:
   IJK_MonofluidVar rho_cp_;
   IJK_MonofluidVar lda_;
 
+
+  // FIXME: Move Intersection_Interface_ijk_face to IJK_Interfaces
   /* C'est un peu bizarre de le mettre ici, mais c'est probablement le plus
    * simple. Cet objet calcul / stocke les coo de projection entre les barys des
    * faces mouillées et l'interface.
    */
-  Intersection_Interface_ijk_face intersection_ijk_face_;
+  // Intersection_Interface_ijk_face intersection_ijk_face_;
+
   /* Les tableaux pour stocker les valeurs aux points de part et d'autre de
    * l'interface.
    * ArrOfDouble temp_vap1_, temp_liqu1_;
@@ -119,10 +124,11 @@ protected:
    */
   DoubleTab temperature_barys_;
 
+  // FIXME: Move Intersection_Interface_ijk_cell to IJK_Interfaces
   /* Cet objet calcul / stocke les coo de projection des centres des
    * cellules diphasique sur l'interface.
    */
-  Intersection_Interface_ijk_cell intersection_ijk_cell_;
+  // Intersection_Interface_ijk_cell intersection_ijk_cell_;
   /* Dans ce tableau on stocke les température liquid et vapeur ghost des cell
    * diph.
    */
