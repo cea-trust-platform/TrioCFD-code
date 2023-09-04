@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
+31/08/23 (TrioCFD) New feature : CMFD - Two-phase adiabatic flow with VDF numerical scheme
 07/07/23 (TrioCFD) New feature : Hilber-Hughes-Taylor (HHT) time discretisation for the mechanical model (Beam)
 07/07/23 (TrioCFD) New feature : New feature: possibility to have multiple beams in the partitioned explicit serial coupling between the ALE module and the Beam model
 06/07/23 (TrioCFD) Bug fixed   : Periodic boundary conditions in ALE module

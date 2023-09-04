@@ -29,7 +29,7 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-	nb_pas_dt_max 3
+	nb_pas_dt_max 1
     tmax 8
     dt_impr 1e-8
     facsec 1
@@ -160,7 +160,7 @@ Lire pb
         }
 		sources
 		{
-			Production_energie_cin_turb ,
+			Production_energie_cin_turb  ,
 			Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 		}
     }
