@@ -26,7 +26,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Fluide_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Constituant.h>
@@ -58,7 +58,7 @@ int Paroi_scal_analytique_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   int elem;
   double dist=-1;
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = le_modele.loi_paroi();
   const DoubleVect& tab_u_star = loi.valeur().tab_u_star();
   const Equation_base& eqn = mon_modele_turb_scal->equation();

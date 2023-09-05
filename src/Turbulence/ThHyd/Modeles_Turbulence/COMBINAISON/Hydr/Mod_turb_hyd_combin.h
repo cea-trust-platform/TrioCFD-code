@@ -22,7 +22,7 @@
 #ifndef Mod_turb_hyd_combin_included
 #define Mod_turb_hyd_combin_included
 
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Vector.h>
 #include <Parser_U.h>
@@ -47,9 +47,9 @@
  *    Choix d une loi de paroi (eventuellement negligeable) a preciser par l utilisateur
  *
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_combin : public Mod_turb_hyd_base
+class Mod_turb_hyd_combin : public Modele_turbulence_hyd_base
 {
   Declare_instanciable_sans_constructeur(Mod_turb_hyd_combin);
 

@@ -26,15 +26,15 @@
 #define CSMS1 0.112        // Constante viscosite turbulente modele sous maille selectif
 #define CSM2 0.37       // Constante energie cinetique turbulente modele sous maille
 
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 /*! @brief Classe Mod_turb_hyd_ss_maille Classe representant le modele de turbulence sous maille pour les
  *
  *     equations de Navier-Stokes.
  *
- * @sa Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_K_Eps
  */
-class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
+class Mod_turb_hyd_ss_maille : public Modele_turbulence_hyd_base
 {
 
   Declare_base_sans_constructeur(Mod_turb_hyd_ss_maille);

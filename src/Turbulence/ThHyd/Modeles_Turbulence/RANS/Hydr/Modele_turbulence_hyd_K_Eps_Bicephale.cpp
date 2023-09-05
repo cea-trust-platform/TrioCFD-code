@@ -22,7 +22,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
@@ -405,7 +405,7 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
 {
   eqn_transp_K().preparer_calcul();
   eqn_transp_Eps().preparer_calcul();
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   // GF pour initialiser la loi de paroi thermique en TBLE
   if (equation().probleme().nombre_d_equations()>1)
     {

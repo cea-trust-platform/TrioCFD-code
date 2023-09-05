@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Y_plus_Champ_P1NC.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Milieu_base.h>
 #include <Champ_P1NC.h>
 
@@ -46,7 +46,7 @@ void Y_plus_Champ_P1NC::me_calculer(double tps)
   if (nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique")
     {
       const RefObjU& modele_turbulence = mon_champ().equation().get_modele(TURBULENCE);
-      const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base, modele_turbulence.valeur());
+      const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
       const Nom& nom_loipar = loipar.que_suis_je();
 

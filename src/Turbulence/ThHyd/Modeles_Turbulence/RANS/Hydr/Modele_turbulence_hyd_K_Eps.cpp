@@ -22,7 +22,7 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
@@ -383,7 +383,7 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K_Eps, const Schema_Temps
 int Modele_turbulence_hyd_K_Eps::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   // GF pour initialiser la loi de paroi thermique en TBLE
   if (equation().probleme().nombre_d_equations()>1)
     {

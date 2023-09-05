@@ -37,7 +37,7 @@
 #include <Probleme_base.h>
 #include <Terme_Boussinesq_VDF_Face.h>
 #include <Navier_Stokes_std.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 Implemente_instanciable_sans_constructeur(ParoiVDF_TBLE_LRM,"Paroi_TBLE_LRM_VDF",Paroi_hyd_base_VDF);
 

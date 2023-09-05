@@ -185,7 +185,7 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
   DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
   Equation_base& eq_NS_turb = equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_NS_turb.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Champ_Fonc& champ = ref_cast(Champ_Fonc,mod_turb_hydr.viscosite_turbulente());
 
   Debog::verifier("la_viscosite_turbulente",champ.valeurs());

@@ -29,7 +29,7 @@
 #include <stat_counters.h>
 #include <Param.h>
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
 #include <TRUSTTrav.h>
 #include <communications.h>
@@ -166,7 +166,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
 {
   eqn_transp_K().preparer_calcul();
   eqn_transp_Eps().preparer_calcul();
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   // GF pour initialiser la loi de paroi thermique en TBLE
 //   if (equation().probleme().nombre_d_equations()>1)
 //     {
