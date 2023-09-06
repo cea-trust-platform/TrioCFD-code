@@ -2075,7 +2075,7 @@ void IJK_FT_double::run()
   allocate_velocity(velocity_ft_, splitting_ft_, 4);
 
   // pour les conditions de shear-periodicite --> interpolation de la pression monofluide
-  kappa_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
+  kappa_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 2);
   kappa_ft_ns_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   if (!disable_diphasique_)
     {

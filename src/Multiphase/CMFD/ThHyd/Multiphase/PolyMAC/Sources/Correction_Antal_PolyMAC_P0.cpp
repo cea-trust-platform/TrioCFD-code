@@ -21,17 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Correction_Antal_PolyMAC_P0.h>
-#include <Pb_Multiphase.h>
-#include <Portance_interfaciale_PolyMAC_P0.h>
-#include <Portance_interfaciale_base.h>
-#include <Op_Diff_Turbulent_PolyMAC_P0_Face.h>
-#include <Dispersion_bulles_PolyMAC_P0.h>
-#include <Dispersion_bulles_base.h>
 #include <Champ_Face_PolyMAC_P0.h>
-#include <Milieu_composite.h>
-#include <Viscosite_turbulente_base.h>
-#include <Matrix_tools.h>
-#include <Array_tools.h>
+#include <Pb_Multiphase.h>
 #include <math.h>
 
 Implemente_instanciable(Correction_Antal_PolyMAC_P0, "Correction_Antal_Face_PolyMAC_P0", Source_base);
@@ -70,7 +61,7 @@ void Correction_Antal_PolyMAC_P0::completer() // We must wait for all readOn's t
 }
 
 
-void Correction_Antal_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const // The necessary dimensionner_bloc is taken care of in the dispersion_bulles_PolyMAC_P0 and Portance_interfaciale_PolyMAC_P0 functions
+void Correction_Antal_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
 }
 
@@ -78,10 +69,10 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
 {
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
+                   &alpha = ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe(),
                     &rho   = equation().milieu().masse_volumique().passe(),
                      &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs();
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(),
                 &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(),
@@ -148,9 +139,9 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
               for (d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
 
               fac *= pf(f) * vf(f) ;
-              a_l = (    alpha(f_e(f, 0), k)*vf_dir(f,0) +    alpha(f_e(f, 1), k)*vf_dir(f,1) ) / vf(f);
-              rho_l=(    rho(f_e(f, 0), n_l)*vf_dir(f,0) +    rho(f_e(f, 1), n_l)*vf_dir(f,1) ) / vf(f);
-              db_l= ( d_bulles(f_e(f, 0), k)*vf_dir(f,0) + d_bulles(f_e(f, 1), k)*vf_dir(f,1) ) / vf(f);
+              a_l = (    alpha(f_e(f, 0), k)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? alpha(e, k)*vf_dir(f,1) : 0)  ) / vf(f);
+              rho_l=(    rho(f_e(f, 0), n_l)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? rho(e, n_l)*vf_dir(f,1) : 0)  ) / vf(f);
+              db_l= ( d_bulles(f_e(f, 0), k)*vf_dir(f,0) +    ((e = f_e(f, 1))>0 ? d_bulles(e, k)*vf_dir(f,1):0) ) / vf(f);
 
               secmem_l = fac * 2. * a_l * rho_l * dv(k,n_l) * dv(k,n_l) / db_l * std::max(0., Cw1_ + Cw2_*db_l/(2.*y_faces(f))) ;
 
@@ -162,6 +153,7 @@ void Correction_Antal_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
 
   for ( e = 0; e < ne_tot; e++)
     {
+      pvit_l = 0;
       // Fill velocity at the element
       for (d = 0 ; d<D ; d++)
         for (k = 0 ; k<N ; k++)

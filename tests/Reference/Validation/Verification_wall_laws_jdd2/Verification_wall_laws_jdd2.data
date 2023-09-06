@@ -38,7 +38,7 @@ Scatter dom.Zones dom
 END SCATTER #
 
 
-PolyMAC_P0  dis
+PolyMAC_P0 dis  
 
 Schema_euler_implicite sch
 Read sch
@@ -79,13 +79,13 @@ Lire pb
     correlations
     {
         loi_paroi adaptative { }
-        flux_parietal adaptatif
+         flux_parietal adaptatif  
     }
     QDM_Multiphase
     {
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
-        convection { centre }
+        convection { amont }
         diffusion  { turbulente k_omega { } }
         initial_conditions
         {
@@ -94,7 +94,7 @@ Lire pb
         }
         conditions_limites
         {
-            wall Paroi_frottante_loi { }
+            wall  Paroi_frottante_loi { } 
             symm symetrie
             entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 3 0 y 0
             sortie frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 3 0 y 0

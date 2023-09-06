@@ -37,7 +37,7 @@ class Source_Production_echelle_temp_taux_diss_turb: public Sources_Multiphase_b
 {
   Declare_base(Source_Production_echelle_temp_taux_diss_turb);
 public :
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override ;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override =0;
 
 protected:

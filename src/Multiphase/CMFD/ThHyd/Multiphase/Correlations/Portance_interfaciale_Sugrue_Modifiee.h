@@ -32,6 +32,7 @@ public:
 protected:
   double g_=9.81;
   int n_l = -1; //phase liquide
+  double alpha_lim_=1.e-5;
 };
 
 #endif

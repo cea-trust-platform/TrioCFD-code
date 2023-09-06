@@ -29,7 +29,7 @@
 #include <Echange_impose_base.h>
 #include <Domaine_PolyMAC_P0.h>
 #include <Domaine_Cl_PolyMAC.h>
-#include <QDM_Multiphase.h>
+#include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
@@ -94,7 +94,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
   const IntTab&                             fcl = tau.fcl(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
   const Op_Diff_Turbulent_PolyMAC_P0_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Elem, eq.operateur(0).l_op_base());
-  const DoubleTab&                       mu_tot = Op_diff_loc.nu(), &xp = domaine.xp(), &xv = domaine.xv();
+  const DoubleTab&                       nu_tot = Op_diff_loc.nu(), &xp = domaine.xp(), &xv = domaine.xv();
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces();
 
@@ -173,10 +173,6 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
               grad_tau_sqrt_tau(nf_tot + D*e+d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_tau_sqrt_tau(f, n);
           }
 
-  DoubleTrav sec_m(tab_tau); //residus
-  matrices_t mat_m; //derivees vides
-  eq.operateur(0).l_op_base().ajouter_blocs(mat_m, sec_m, semi_impl);
-
   for(int e = 0 ; e < ne ; e++)
     for (int n=0 ; n<N ; n++)
       {
@@ -185,7 +181,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
         double secmem_en = 0 ;
 
         for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau(nf_tot + D*e+d, n)* ((Mtau) ? grad_tau_sqrt_tau(nf_tot + D*e+d, n) :grad_sqrt_tau(nf_tot + D*e+d, n));
-        secmem(e, n) += fac * -8  * mu_tot(e, n) * secmem_en;
+        secmem(e, n) += fac * -8  * nu_tot(e, n) * secmem_en;
 
         if (Mtau)
           {
@@ -197,7 +193,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
                     for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                       {
                         double inv_sqrt_tau = (tab_tau_passe(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau_passe(ed, n)) : std::sqrt(1/limiter_tau_);
-                        (*Mtau)(N * e + n, N * ed + n) += fac * 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * f_w(j) * inv_sqrt_tau ;
+                        (*Mtau)(N * e + n, N * ed + n) += fac * 8  * nu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * f_w(j) * inv_sqrt_tau ;
                       }
                 }
           }

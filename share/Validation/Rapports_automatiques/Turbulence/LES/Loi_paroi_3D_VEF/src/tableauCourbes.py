@@ -3,6 +3,9 @@
 import optparse
 import math
 import os
+import shutil
+import glob
+import re
 
 def properties():
     # ouverture des fichiers
@@ -168,15 +171,23 @@ if __name__ == '__main__':
 
     Uerror = Uerr(Uth,Utr)
 
-    #copie du dernier fichier Moyennes_spatiales_vitesse_rho_mu
-    #recuperation du fichier
-    #derniere ligne du ls
-    ficLS = os.popen('ls -rt Moyennes_spatiales_vitesse_rho_mu_*')
-    lignes = ficLS.readlines()
-    Ligne = lignes[-1]
-    #suppression du \n en fin de nom
-    nomFic = Ligne[:len(Ligne)-1]
-    os.popen('cp '+nomFic+' Moyennes_spatiales_vitesse_rho_mu')
+    
+    # Recuperation du dernier fichier de moyenne (celui au temps le plus eleve)
+    theList = glob.glob(r'Moyennes_spatiales_vitesse_rho_mu_*')
+    theTime = -1.0
+    nomFic=""
+    for f in theList:
+      # the time of the file is gotten (as string) and casted to float
+      m = re.search('[0-9]+(\.[0-9]+)?', f)
+      timeOfTheFile = float(m[0])
+      if (timeOfTheFile > theTime):
+        theTime = timeOfTheFile
+        nomFic = f
+
+    assert(nomFic != "")
+
+    # Copie du dernier fichier en "Moyennes_spatiales_vitesse_rho_mu"
+    shutil.copy(nomFic, 'Moyennes_spatiales_vitesse_rho_mu')
 
     #ecriture des fichiers gnuplot et tableaux
     ecritureFichier(Uth,forcTh,Utr,forcTr,Uerror,nu)
