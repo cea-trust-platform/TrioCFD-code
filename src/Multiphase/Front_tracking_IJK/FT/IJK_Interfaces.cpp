@@ -672,16 +672,14 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
 // Maybe needed to post-pro initial condition :
   if (compute_vint)
     {
-      if (compute_distance_autres_interfaces_ || (delta_p_max_repulsion_ > 0. && portee_force_repulsion_ > 0.) || 1)
+      if (compute_distance_autres_interfaces_ || (delta_p_max_repulsion_ > 0. && portee_force_repulsion_ > 0.))
         {
           DoubleTab vr_to_closer; // The velocity of the closest neighbour
           // Also calls to compute_vinterp.
           calculer_distance_autres_compo_connexe2(distance_autres_interfaces_, vr_to_closer);
         }
       else
-        {
-          compute_vinterp();
-        }
+        compute_vinterp();
     }
   // Mise en place des compteurs :
 
@@ -3475,7 +3473,6 @@ void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
   // jour.
 
   // Il y a au moins une phase continue :
-  Cerr << "!!!!!!! IJK_Interfaces::calculer_indicatrice compo bulles_reelles bulles_ghost " << nb_compo_in_num_compo_ << " " << nb_bulles_reelles_ << " " << nb_bulles_ghost_ << finl;
   assert(nb_compo_in_num_compo_ - (nb_bulles_reelles_ + nb_bulles_ghost_) > 0);
   statistiques().end_count(search_connex_components_counter_);
 
@@ -4302,7 +4299,6 @@ static inline double determinant(const Vecteur3& v1, const Vecteur3& v2, const V
   Vecteur3::produit_vectoriel(v1, v2, tmp);
   return Vecteur3::produit_scalaire(tmp, v3);
 }
-
 // A et B sont les points du segment.
 // C, D et E les sommets du triangle.
 // Retourne false dans les cas pathologiques ou un determinant est nul.
@@ -4832,6 +4828,7 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_octree(const DoubleT
 }
 
 
+// search for the center of mass of a neighbouring face among all cells at distance n from the current cell IJK (in a given direction)
 static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int dir2, int n,
                                                       const Int3& nb_elem_loc, const Int3& ijk,
                                                       const std::map<std::array<int,3>, std::set<int>>& bary_ijk_loc, const DoubleTab& bary,
@@ -4861,7 +4858,6 @@ static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int di
                         //computing distance between the center of mass of this face and the vertice I'm searching the closest neighbour of
                         double dist = (bary(b_fa7,0)-x)*(bary(b_fa7,0)-x) + (bary(b_fa7,1)-y)*(bary(b_fa7,1)-y) + (bary(b_fa7,2)-z)*(bary(b_fa7,2)-z);
                         distance = std::min(sqrt(dist),distance);
-                        //if(som == 0) Cerr << " distance som 0 = " << distance[som] << finl;
                         id_facette = b_fa7;
                       }
                   }
@@ -4871,6 +4867,23 @@ static void check_neighbouring_layer_in_one_direction(int dir0, int dir1, int di
 
 }
 
+/* @brief For each vertex of the front mesh, compute the distance and the relative velocity to the nearest face belonging to another bubble based on the IJK discretization :
+ * starting from the IJK-cell containing my vertex, we progressively search the neighbouring layers until we find the center of mass of a face of another bubble
+ * (or we reach the border of the domain)
+ * Exemple :
+ * checking layer 1:     checking layer 2:        checking layer 3 (and we stop here, as we found the barycenter of a neighbouring face)
+ *                                                |x|x|x|x|x|x|x|
+ *                        |x|x|x|x|x|             |x|_|_|_|_|_|x|
+ *  |x|x|x|               |x|_|_|_|x|             |x|_|_|_|_|_|x|
+ *  |x|o|x|               |x|_|o|_|x|             |x|_|_|o|_|_|x|
+ *  |x|x|x|               |x|_|_|_|x|             |x|_|_|_|_|_|x|
+ *                        |x|x|x|x|x|             |x|x|x|x|x|x|b|
+ *
+ * WARNING: here, we compute the distance between a vertice and a face as the distance between the vertice and the center of mass of the face.
+ * In the method calculer_distance_autres_compo_connexe_octree, the distance taken into account is the shortest distance between the vertex
+ * and a set of points on the surface of the face. So the results of the two algorithms may differ
+ * WARNING: this algorithm is not validated and is slower than calculer_distance_autres_compo_connexe_octree. To be used only if you encounter a memory problem with the other method
+ */
 void IJK_Interfaces::calculer_distance_autres_compo_connexe_ijk(const DoubleTab& sommets_a_tester,
                                                                 const ArrOfInt& compo_connexe_sommets,
                                                                 const DoubleTab& vinterp_tmp,
@@ -4884,7 +4897,7 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_ijk(const DoubleTab&
   const int nb_som = sommets_a_tester.dimension(0);
   const int nb_fa7 = facettes.dimension(0);
 
-  const IJK_Splitting& splitting = I_ft().get_splitting(); // ToDo: check which splitting (ft or ns) we need
+  const IJK_Splitting& splitting = I_ft().get_splitting();
   Int3 ijk_glob, ijk_loc, useless;
   Int3 nb_elem_loc;
   for(int dir=0; dir<3; dir++)
@@ -4944,7 +4957,7 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_ijk(const DoubleTab&
 
 
 
-          // check for front and bach neighbourhood
+          // check for front and back neighbourhood
           check_neighbouring_layer_in_one_direction(2 /*fixed dir*/, 0, 1, n_layer,
                                                     nb_elem_loc, ijk_loc,
                                                     bary_ijk_loc, bary,
