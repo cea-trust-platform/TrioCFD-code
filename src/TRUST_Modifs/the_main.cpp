@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,37 +12,19 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Source_Production_echelle_temp_taux_diss_turb.cpp
-// Directory:   $TRUST_ROOT/src/Turbulence/Sources
-// Version:     /main/13
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#include <Source_Production_echelle_temp_taux_diss_turb.h>
-
-#include <Pb_Multiphase.h>
-#include <Matrix_tools.h>
-#include <Array_tools.h>
-#include <Domaine_VF.h>
-
-Implemente_base(Source_Production_echelle_temp_taux_diss_turb,"Source_Production_echelle_temp_taux_diss_turb", Sources_Multiphase_base);
-
-Sortie& Source_Production_echelle_temp_taux_diss_turb::printOn(Sortie& os) const
+#include <MAIN.h>
+#include <mon_main.h>
+#include <Schema_Comm_Vecteurs.h>
+True_int main(True_int argc, char** argv)
 {
-  return os;
+  mon_main* p=NULL;
+
+  // Changement de comportement dans TrioCFD par rapport a TRUST
+  check_comm_vector = true;
+
+  int st= main_TRUST(argc,argv,p,0);
+  if (p)
+    delete p;
+  return st;
 }
-
-Entree& Source_Production_echelle_temp_taux_diss_turb::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("alpha_omega", &alpha_omega_, Param::REQUIRED);
-  param.lire_avec_accolades_depuis(is);
-  Cout << "alpha_omega = " << alpha_omega_ << finl ;
-
-  equation().probleme().creer_champ("gradient_vitesse"); // Besoin du gradient de vitesse
-
-  return is;
-}
-

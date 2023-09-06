@@ -23,10 +23,10 @@
 #include <BilanQdmVEF.h>
 #include <Equation_base.h>
 #include <Schema_Temps_base.h>
-#include <Domaine_VEF_PreP1b.h>
+#include <Domaine_VEF.h>
 #include <Operateur.h>
 #include <Operateur_base.h>
-#include <VEFPreP1B.h>
+#include <VEF_discretisation.h>
 #include <Discretisation_base.h>
 
 extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
@@ -190,8 +190,8 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
   int nb_face_diri=0;
   ArrOfInt indice_diri(dimension+1);
   int modif_traitement_diri=0;
-  if (sub_type(Domaine_VEF_PreP1b,domaine_VEF))
-    modif_traitement_diri=ref_cast(Domaine_VEF_PreP1b,domaine_VEF).get_modif_div_face_dirichlet();
+  if (sub_type(Domaine_VEF,domaine_VEF))
+    modif_traitement_diri=ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet();
   for (int elem=0; elem<nb_elem_tot; elem++)
     {
       if (modif_traitement_diri)
@@ -249,7 +249,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
       la_source.valeur().valeur_aux_elems(les_positions,les_polygones,
                                           valeurs_source);
 
-      if ( sub_type(VEFPreP1B, equation().discretisation()) && (ref_cast(VEFPreP1B, equation().discretisation()).get_alphaRT() ) )
+      if ( sub_type(VEF_discretisation, equation().discretisation()) && (ref_cast(VEF_discretisation, equation().discretisation()).get_alphaRT() ) )
         {
           // coordonnees des sommets locaux opposes
           DoubleTab coord_sommets_loc(dimension+1,dimension);

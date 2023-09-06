@@ -16,8 +16,8 @@ T = 1./f #period of displacement
 w = 2.*np.pi*f   #angular frequency of displacement
 
 t = np.loadtxt('DIVA_pb_Force_pression.out', unpack=True, usecols=[0]) 
-Fpx_centre, Fpy_centre, Fpx_nord, Fpy_nord, Fpx_sud, Fpy_sud, Fpx_est, Fpy_est, Fpx_ouest, Fpy_ouest = np.loadtxt('DIVA_pb_Force_pression.out', unpack=True, usecols=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
-Fvx_centre, Fvy_centre, Fvx_nord, Fvy_nord, Fvx_sud, Fvy_sud, Fvx_est, Fvy_est, Fvx_ouest, Fvy_ouest = np.loadtxt('DIVA_pb_Contrainte_visqueuse.out', unpack=True, usecols=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+Fpx_sud, Fpy_sud, Fpx_ouest, Fpy_ouest, Fpx_nord, Fpy_nord, Fpx_est, Fpy_est, Fpx_centre, Fpy_centre = np.loadtxt('DIVA_pb_Force_pression.out', unpack=True, usecols=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+Fvx_sud, Fvy_sud, Fvx_ouest, Fvy_ouest, Fvx_nord, Fvy_nord, Fvx_est, Fvy_est, Fvx_centre, Fvy_centre = np.loadtxt('DIVA_pb_Contrainte_visqueuse.out', unpack=True, usecols=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
 Fx_centre = Fpx_centre + Fvx_centre  
 Fy_centre = Fpy_centre + Fvy_centre 

@@ -76,22 +76,12 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
 
       Nom nb_inc;
       nb_inc ="_";
-      if ((terme_diffusif.diffusivite().nb_comp() != 1) && ((disc=="VDF")))
-        nb_inc = "_Multi_inco_";
-
-      Nom type_diff;
-      if (disc == "VDF") type_diff = ""; /* pas de const/var en VDF */
-      else
-        {
-          if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
-          else type_diff = "var_";
-        }
+      if ((terme_diffusif.diffusivite().nb_comp() != 1) && ((disc=="VDF"))) nb_inc = "_Multi_inco_";
 
       Nom type_inco=eqn.inconnue()->que_suis_je();
 
       type+=disc;
       type+=nb_inc ;
-      type+=type_diff;
       type+=(type_inco.suffix("Champ_"));
       if (Objet_U::axi) type+="_Axi";
       type+="_stab";
@@ -105,42 +95,23 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
     {
       Nom disc = eqn.discretisation().que_suis_je();
       // les operateurs C_D_Turb_T sont communs aux discretisations VEF et VEFP1B
-      if(disc=="VEFPreP1B")
-        disc="VEF";
-      type+=disc;
+      if (disc == "VEFPreP1B") disc = "VEF";
+      type += disc;
 
       Nom nb_inc;
       nb_inc = "_";
-      if ((terme_diffusif.diffusivite().nb_comp() != 1) && ((disc=="VDF")))
-        nb_inc = "_Multi_inco_";
+      if ((terme_diffusif.diffusivite().nb_comp() != 1) && ((disc == "VDF"))) nb_inc = "_Multi_inco_";
 
-      type+= nb_inc ;
+      type += nb_inc;
 
-      Nom type_diff;
-      if (disc == "VDF") type_diff = ""; /* pas de const/var en VDF */
-      else
-        {
-          if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
-          else type_diff = "var_";
-        }
+      Nom type_inco = eqn.inconnue()->que_suis_je();
+      if (type_inco == "Champ_Q1_EF") type += "Q1";
+      else type += (type_inco.suffix("Champ_"));
 
-      type+= type_diff;
-
-      Nom type_inco=eqn.inconnue()->que_suis_je();
-      if (type_inco=="Champ_Q1_EF")
-        {
-          type+="Q1";
-        }
-      else
-        {
-          type+=(type_inco.suffix("Champ_"));
-        }
-
-      if (Objet_U::axi)
-        type+="_Axi";
+      if (Objet_U::axi) type += "_Axi";
 
       if (motbidon != accfermee) type += Nom("_") + motbidon, is >> motbidon;
-      assert (motbidon == accfermee);
+      assert(motbidon == accfermee);
 
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(eqn);

@@ -139,46 +139,26 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
   Nom discr=discretisation().que_suis_je();
   // les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
   if(discr=="VEFPreP1B") discr="VEF";
+
   type+=discr;
 
   Nom nb_inc;
-  if (terme_diffusif.diffusivite().nb_comp() == 1)
-    nb_inc = "_";
-  else
-    nb_inc = "_Multi_inco_";
+  if (terme_diffusif.diffusivite().nb_comp() == 1) nb_inc = "_";
+  else nb_inc = "_Multi_inco_";
   type+= nb_inc ;
 
-  Nom type_diff;
-
-  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
-  else
-    {
-      if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
-      else type_diff = "var_";
-    }
-
-  type+= type_diff;
-
   Nom type_inco=inconnue()->que_suis_je();
-  if (type_inco=="Champ_Q1_EF")
-    {
-      type+="Q1";
-    }
-  else
-    {
-      type+=(type_inco.suffix("Champ_"));
-    }
+  if (type_inco == "Champ_Q1_EF") type += "Q1";
+  else type += (type_inco.suffix("Champ_"));
 
-  if (axi)
-    type+="_Axi";
+  if (axi) type+="_Axi";
 
   Motcle motbidon;
   is >>  motbidon;
   if (motbidon!=accouverte)
     {
-      Cerr << "A { was expected while reading" << finl;
-      Cerr << "the turbulent diffusive term" << finl;
-      exit();
+      Cerr << "A { was expected while reading the turbulent diffusive term" << finl;
+      Process::exit();
     }
   is >>  motbidon;
   if (motbidon=="negligeable")
@@ -245,15 +225,9 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       type += motbidon;
       is >> motbidon;
       if ( motbidon != accfermee)
-        {
-          Cerr << " No option are now readable "<< finl;
-          Cerr << " for the turbulent diffusive term" << finl;
+        Cerr << " No option are now readable for the turbulent diffusive term" << finl;
 
-        }
-      if ( discr == "VEF" )
-        {
-          type += "_const_P1NC" ;
-        }
+      if ( discr == "VEF" ) type += "_P1NC" ;
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(*this);
       Cerr << terme_diffusif.valeur().que_suis_je() << finl;

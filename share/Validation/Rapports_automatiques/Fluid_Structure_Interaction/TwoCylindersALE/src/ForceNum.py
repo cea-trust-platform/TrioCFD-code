@@ -16,8 +16,8 @@ f = nu*Sk/D1**2. #frequency of displacement
 T = 1./f #period of displacement
 w = 2.*np.pi*f   #angular frequency of displacement
 
-t, Fpx = np.loadtxt('TwoCylinders_pb_Force_pression.out', unpack=True, usecols=[0,1])
-Fvx = np.loadtxt('TwoCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[1])
+t, Fpx = np.loadtxt('TwoCylinders_pb_Force_pression.out', unpack=True, usecols=[0,3])
+Fvx = np.loadtxt('TwoCylinders_pb_Contrainte_visqueuse.out', unpack=True, usecols=[3])
     
 Fx = Fvx + Fpx #force per unit length of cylinder
 m_self = 2./5./T*np.trapz(np.sin(w*t)*Fx,t)/(rho*np.pi*(D1/2.)**2.*u*D1*w**2.)
