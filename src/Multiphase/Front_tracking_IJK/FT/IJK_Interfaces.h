@@ -754,6 +754,7 @@ protected:
   // Si souhaite, une valeur differente pour les parois :
   double portee_wall_repulsion_;
   double delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
+  int no_octree_method_ = 0;    // to use the IJK-discretization to search for closest faces of vertices instead of the octree method (disabled by default)
 
   ArrOfDoubleFT distance_autres_interfaces_;
 

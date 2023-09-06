@@ -385,6 +385,7 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   param.ajouter("portee_wall_repulsion", &portee_wall_repulsion_);
   param.ajouter("delta_p_wall_max_repulsion", &delta_p_wall_max_repulsion_);
   param.ajouter_flag("active_repulsion_paroi", &active_repulsion_paroi_);
+  param.ajouter("no_octree_method", &no_octree_method_);  // XD_ADD_P if the bubbles repel each other, what method should be used to compute relative velocities? Octree method by default, otherwise we used the IJK discretization
   param.ajouter_flag("follow_colors", &follow_colors_);
   param.ajouter_flag("compute_distance_autres_interfaces", &compute_distance_autres_interfaces_); // XD_ADD_P rien not_set
   param.ajouter("reprise_colors", &through_yminus_);
@@ -5014,8 +5015,10 @@ void IJK_Interfaces::recursive_calcul_distance_chez_voisin(DoubleTab& vinterp_tm
   vinterp_tmp.set_smart_resize(1);
   if (dir == 3)
     {
-      //calculer_distance_autres_compo_connexe_octree(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
-      calculer_distance_autres_compo_connexe_ijk(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
+      if(!no_octree_method_)
+        calculer_distance_autres_compo_connexe_octree(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
+      else
+        calculer_distance_autres_compo_connexe_ijk(coord_sommets, compo_sommet, vinterp_tmp, mesh, distance, vr_to_other, distmax);
     }
   else
     {
