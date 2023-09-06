@@ -6016,7 +6016,7 @@ void IJK_Interfaces::calculer_indicatrice_next(
   // dans les cellules pour chaque compo. Le but est de le faire une fois
   // pour toute de maniere synchronisee (et pas au moment ou on calcule la
   // force par exemple).
-  maillage_ft_ijk_.nettoyer_maillage();
+
   val_par_compo_in_cell_computation_.calculer_valeur_par_compo(
 #ifdef SMOOTHING_RHO
     delta_rho,
