@@ -65,6 +65,8 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   kl_cond_(-1.),  // Invalid
   rhocpl_(-1.),  // Invalid
   read_via_file_(0),
+  Rc_tcl_GridN_(4),
+  thetaC_tcl_(150.),
   integration_time_(0.),
   instant_mmicro_evap_(0.),
   instant_mmeso_evap_(0.),
@@ -151,6 +153,8 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entire Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
   p.ajouter("read_via_file", &read_via_file_);
+  p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // X_D_ADD_P floattant Radiate of nucleate site; [in number of grids]
+  p.ajouter("thetaC_tcl", &thetaC_tcl_); // X_D_ADD_P floattant imposed contact angle [in degree] to force bubble pinching / necking once TCL entre nucleate site
   p.ajouter("file_name", &Nom_ficher_tcl_); // X_D_ADD_P floattant Input file to set TCL model
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
@@ -1183,8 +1187,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                   const IntTab& faces_elem = domaine_vf.face_voisins();
                   const int nb_faces_voisins = elem_faces.dimension(1);
                   // Struggle to get the boundary face
-                  int i;
-                  for (i=0; i<nb_faces_voisins; i++)
+                  bool Not_find_ = true;
+                  for (int i=0; i<nb_faces_voisins; i++)
                     {
                       num_face = elem_faces(elem,i);
                       // If it's a boundary face, one of the neighbours doesnot exist so it has "-1".
@@ -1192,10 +1196,19 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                       const int elemb = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;
                       if (elem == elemb)
                         {
-                          break;
+                          const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
+                          const Cond_lim& la_cl_by_face = zclvdf.la_cl_de_la_face (num_face);
+                          bool is_wall =sub_type(Dirichlet_paroi_fixe,
+                                                 la_cl_by_face.valeur ()) || sub_type(Dirichlet_paroi_defilante,la_cl_by_face.valeur());
+                          if (is_wall)
+                            {
+                              Not_find_ = false;
+                              break;
+                            }
                         }
                     }
-                  if (i==nb_faces_voisins)
+
+                  if (Not_find_)
                     {
                       Cerr << "No boundary face found in this element "<< elem
                            <<  " because the first front-element is steep and long enough to go all the way up "
@@ -1929,6 +1942,18 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
           double y2 = tab_Mtcl_ (num_col, ind);
           assert(!est_egal (x1, x2));
           theta_app_ = y1 + (y2 - y1) * (Twall - x1) / (x2 - x1);
+        }
+      // if num <= 1, i.e., =0 or =1 we do not change the theta_app_:No numerical forcing breakup
+      // else replaced by a big value for forcing numerical breakup
+      if ( Rc_tcl_GridN_ >= 1)
+        {
+          const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur ();
+          const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis ().valeur ());
+          int elem_voisin = zvdf.face_voisins (num_face, 0) + zvdf.face_voisins (num_face, 1) + 1;
+          const double cell_size = 2. * std::fabs (zvdf.dist_face_elem0 (num_face, elem_voisin));
+          const double xwall_ = zvdf.xv(num_face, 0);
+          if (xwall_ <= cell_size*Rc_tcl_GridN_ )
+            theta_app_ = thetaC_tcl_;
         }
     }
   return theta_app_;

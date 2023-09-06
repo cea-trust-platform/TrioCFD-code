@@ -174,16 +174,16 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                   const int facei = faces_with_CL_contrib[idx];
                   bool Not_find_ = true;
 
-                  int ii=-1;
-                  do
+                  int ii;
+                  for (ii=0; ii<taille; ii++)
                     {
-                      ii++;
-                      const int face = ii
-                                       + frontiere_dis ().frontiere ().num_premiere_face ();
+                      const int face = ii + frontiere_dis ().frontiere ().num_premiere_face ();
                       if (facei == face)
-                        Not_find_ = false;
+                        {
+                          Not_find_ = false;
+                          break;
+                        }
                     }
-                  while (ii<taille && Not_find_);
 
                   const double sign = (face_voisins (facei, 0) == -1) ? -1. : 1.;
                   const double TCL_wall_flux = Q_from_CL[idx] / surface (facei);

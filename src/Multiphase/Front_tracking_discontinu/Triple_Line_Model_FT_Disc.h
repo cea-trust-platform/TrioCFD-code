@@ -91,6 +91,14 @@ public :
   {
     return read_via_file_;
   };
+  const int& Rc_tcl_GridN() const
+  {
+    return Rc_tcl_GridN_;
+  };
+  const double& thetaC_tcl() const
+  {
+    return thetaC_tcl_;
+  };
   const int& tag_tcl() const
   {
     return tag_tcl_;
@@ -171,6 +179,12 @@ protected :
   int read_via_file_ ;
   Nom Nom_ficher_tcl_;
   DoubleTab tab_Mtcl_;
+  // parameters to force numerical breakup
+  // Radiate of nucleate site; [in number of grids]
+  // Distance below which the theta_app will be replaced by a big contact angle thetaC_tcl_ [in degree]
+  // to force bubble pinching / necking
+  int Rc_tcl_GridN_;
+  double thetaC_tcl_;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.

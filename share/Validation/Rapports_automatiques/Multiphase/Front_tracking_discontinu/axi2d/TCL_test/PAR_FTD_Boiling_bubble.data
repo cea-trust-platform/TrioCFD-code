@@ -74,7 +74,7 @@ Mailler dom_solide
    origine 0. 0.
    longueurs 0.333 1.
    nombre_de_noeuds 76 26
-   Facteurs 1.0 1.05
+   Facteurs 1.0 1.
    }
    {
    raccord local homogene sup1     Y = 1.          0. <= X <= 0.333
@@ -87,7 +87,7 @@ Mailler dom_solide
    origine 0.333 0.
    longueurs 0.667 1. 
    nombre_de_noeuds 44 26
-   Facteurs 1.05 1.05
+   Facteurs 1.05 1.
    }
    {
    raccord local homogene sup2      Y = 1.          0.333 <= X <= 1.
@@ -179,6 +179,9 @@ Read TCL
   initial_CL_xcoord 6.0297e-5 # Incorrect. To be computed by Vinod #
   read_via_file 1
   file_name test.txt
+  Rc_tcl_GridN 10
+  thetaC_tcl 150.
+  
 }
 
 Champ_Uniforme gravite
@@ -245,7 +248,7 @@ Lire pb1
 		# interpolation_repere_local #
 		methode_interpolation_v vdf_lineaire
 		methode_transport vitesse_interpolee hydraulique
-	        conditions_initiales { fonction x^2+(y-0.0005*cos(50.0*pi/180.0))^2-0.0005^2 }
+	        conditions_initiales { fonction x^2+(y-0.00025*cos(50.0*pi/180.0))^2-0.00025^2 }
 		VOFlike_correction_volume 1
 
 		 nb_iterations_correction_volume 1 # to get the correct dI/dt #
@@ -362,7 +365,7 @@ Lire pb1
    liste_postraitements
    {
     postraitement_ft_lata post1 { 
-     format Lata 
+     format lata 
      fichier lata/post 
      champs dt_post 1.0e-13 { 
         VOLUME_MAILLE elem 
