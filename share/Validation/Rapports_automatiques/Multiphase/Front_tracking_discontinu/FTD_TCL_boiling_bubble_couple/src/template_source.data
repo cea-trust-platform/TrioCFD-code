@@ -73,7 +73,7 @@ Mailler dom_solide
    origine 0. 0.
    longueurs 0.333 1.
    nombre_de_noeuds @Nx1@ @Ny3@
-   Facteurs 1.0 1.05
+   Facteurs 1.0 1.0
    }
    {
    raccord distant homogene sup1     Y = 1.          0. <= X <= 0.333
@@ -86,7 +86,7 @@ Mailler dom_solide
    origine 0.333 0.
    longueurs 0.667 1. 
    nombre_de_noeuds @Nx2@ @Ny3@
-   Facteurs 1.05 1.05
+   Facteurs 1.05 1.0
    }
    {
    raccord distant homogene sup2      Y = 1.          0.333 <= X <= 1.
@@ -200,7 +200,7 @@ Triple_Line_Model_FT_Disc TCL
 Read TCL 
 { # TCL #
   # deactivate TCL #
-  # Qtcl 30.450  TCL #
+  Qtcl 30.450 #  TCL #
   ym 2.130e-6 # TCL #
   sm 4.956e-6 # TCL #
   n_extend_meso 4 # TCL #
@@ -457,7 +457,7 @@ Read pb2
 		boundary_conditions {
 			sleft symetrie
 			sright   PAROI_ADIABATIQUE
-			sbot paroi_flux_impose Champ_front_fonc_xyz 1 0.
+			sbot paroi_flux_impose Champ_front_fonc_xyz 1 @pws@
 			sup  echange_contact_VDF_FT_Disc_solid {
 				autre_probleme pb1
 				autre_bord bot 
@@ -485,7 +485,7 @@ sauvegarde xyz source_sod.xyz
 resume_last_time binaire ../../STEADY/steady_sod.sauv
 # Reprise binaire ../R0/source.sauv #
 # Reprise xyz ../R0/source.xyz #
-# resume_last_time xyz ../R0/source.xyz #
+# resume_last_time xyz ../R0/source_sod.xyz #
 }
 EcritureLectureSpecial 0
 

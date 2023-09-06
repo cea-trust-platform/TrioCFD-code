@@ -28,14 +28,22 @@ if [ ${dir:0:1} == "R" ] ; then
         sed -i ''$line',$d' lata/post.lata
       fi
       mv lata $list ${next}/
+      if [ -f slata/post.lata ] ; then
+        line=$(grep -n TEMPS slata/post.lata | tail -n1 | awk -F: '{print $1}')
+        time=$(grep -n TEMPS slata/post.lata | tail -n1 | awk '{print $2}')
+        echo "Deleting last time", $time, " from slata/post.lata"
+        cp slata/post.lata slata/post.lata.bkp
+        sed -i ''$line',$d' slata/post.lata
+      fi
+      mv slata $list ${next}/
       [ -n "$listrm" ] && \rm $listrm ${jdd}.dump ${jdd}.stop ${jdd}*.log ${jdd}.progress
       tar xzf txt-dat.tgz injection.txt
       [ -f short_$err ] && [ ! -f ${next}/$err ] && cp short_$err ${next}/$err
     else
-      rm -rf lata
+      rm -rf lata slata
     fi
 else
-    rm -rf lata
+    rm -rf lata slata
 fi
 echo "Cleaning ok"
 exit 0

@@ -73,7 +73,7 @@ Mailler dom_solide
    origine 0. 0.
    longueurs 0.333 1.
    nombre_de_noeuds @Nx1@ @Ny3@
-   Facteurs 1.0 1.05
+   Facteurs 1.0 1.0
    }
    {
    raccord distant homogene sup1     Y = 1.          0. <= X <= 0.333
@@ -86,7 +86,7 @@ Mailler dom_solide
    origine 0.333 0.
    longueurs 0.667 1. 
    nombre_de_noeuds @Nx2@ @Ny3@
-   Facteurs 1.05 1.05
+   Facteurs 1.05 1.0
    }
    {
    raccord distant homogene sup2      Y = 1.          0.333 <= X <= 1.
@@ -372,7 +372,7 @@ Lire pb1
     postraitement_ft_lata post1 { 
      format Lata 
      fichier lata/steady 
-     champs dt_post 5.0e-2 { 
+     champs dt_post 1.0e-4 { 
         VOLUME_MAILLE elem 
         indicatrice_interf elem 
         temperature_thermique elem 

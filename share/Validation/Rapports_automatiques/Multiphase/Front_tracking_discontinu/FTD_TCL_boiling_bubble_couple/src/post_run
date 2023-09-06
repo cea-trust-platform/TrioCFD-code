@@ -35,7 +35,7 @@ grep "theta_app_degree=" short_$err | awk '{print $9, $11}' > theta_app.txt
 if [ -f lata/post-interf-ascii.lata ] ; then
    echo "Generate interface-position.txt"
    echo "# t    rmin rmax xmax ymax ymin rcl" > interface-position.txt
-   for fic in `ls -n lata/post-interf-ascii_post.lata.INTERFACES.0.*[0-9] | awk '{print $NF}'`
+   for fic in `ls -n lata/post-interf-ascii_post.lata.INTERFACES.15.*[0-9] | awk '{print $NF}'`
    do
       time=$(echo $fic | awk -FFACES. '{print $2}')
       sed '1d;$d' $fic | awk 'NR == 1 { xmax=$1; xcl=$1; ymax=$2; ymin=$2; rmin=sqrt($1*$1+$2*$2) ; rmax=sqrt($1*$1+$2*$2) }
