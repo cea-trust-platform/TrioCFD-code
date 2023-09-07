@@ -55,6 +55,25 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   source_terms_type_=2;
   source_terms_correction_=0;
+
+  fd_solver_type_ = "Solv_Cholesky";
+  fd_solvers_ = Motcles(4);
+  {
+    fd_solvers_[0] = "Solv_Cholesky";
+    fd_solvers_[1] = "Solv_Cholesky";
+    fd_solvers_[2] = "Solv_Cholesky";
+    fd_solvers_[3] = "Solv_Cholesky";
+  }
+  fd_solvers_jdd_ = Motcles(4);
+  {
+    fd_solvers_jdd_[0] = "thermal_fd_solver_1";
+    fd_solvers_jdd_[1] = "thermal_fd_solver_2";
+    fd_solvers_jdd_[2] = "thermal_fd_solver_3";
+    fd_solvers_jdd_[3] = "thermal_fd_solver_4";
+  }
+  fd_solver_rank_ = 0;
+  // one_dimensional_advection_diffusion_thermal_solver_.nommer("finite_difference_solver");
+  // one_dimensional_advection_diffusion_thermal_solver_.typer("Solv_GCP");
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -85,6 +104,7 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
       boundary_condition_end_ = 0; // Dirichlet
       impose_user_boundary_condition_end_value_ = 1;
     }
+
   return is;
 }
 
@@ -121,7 +141,59 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.dictionnaire("tangential_conv_2D_tangential_diffusion_2D", 4);
   param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 5);
   param.ajouter_flag("source_terms_correction", &source_terms_correction_);
+
+  for (int i=0; i<fd_solvers_jdd_.size(); i++)
+    param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
+
+int IJK_Thermal_Subresolution::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+{
+  read_fd_solver(mot, is);
+  return 1;
+}
+
+void IJK_Thermal_Subresolution::read_fd_solver(const Motcle& mot, Entree& is)
+{
+  Nom type = "";
+  fd_solver_rank_ = fd_solvers_jdd_.search(mot);
+  type += fd_solvers_[fd_solver_rank_];
+  fd_solver_type_ = fd_solvers_[fd_solver_rank_];
+  one_dimensional_advection_diffusion_thermal_solver_.typer(type);
+  is >> one_dimensional_advection_diffusion_thermal_solver_;
+  Cerr << "Finite difference solver: " << fd_solver_type_ << finl;
+}
+
+/* Entree& IJK_Thermal_Subresolution::read_fd_solver(Entree& is)
+{
+  Motcle word;
+  is >> word;
+  Nom type = "";
+  fd_solver_rank_ = fd_solvers_.search(word);
+  switch(fd_solver_rank_)
+    {
+    case 0:
+      type += "Solv_Cholesky";
+      break;
+    case 1:
+      type += "Solv_Cholesky";
+      break;
+    case 2:
+      type += "Solv_Cholesky";
+      break;
+    case 3:
+      type += "Solv_Cholesky";
+      break;
+    default:
+      type += "Solv_Cholesky";
+      fd_solver_rank_ = 0;
+      break;
+    }
+  fd_solver_type_ = fd_solvers_[fd_solver_rank_];
+  one_dimensional_advection_diffusion_thermal_solver_.typer(type);
+  // one_dimensional_advection_diffusion_thermal_solver_ >> valeur(); // readOn
+  return is;
+} */
+
 
 int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const int idx)
 {
@@ -165,8 +237,11 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);
-  one_dimensional_advection_diffusion_thermal_solver_.nommer("finite_difference_solver");
-  one_dimensional_advection_diffusion_thermal_solver_.typer("");
+
+  if (one_dimensional_advection_diffusion_thermal_solver_.est_nul())
+    {
+      one_dimensional_advection_diffusion_thermal_solver_.typer(fd_solvers_[0]);
+    }
 
   corrige_flux_.set_physical_parameters(cp_liquid_ * ref_ijk_ft_->get_rho_l(),
                                         cp_vapour_ * ref_ijk_ft_->get_rho_v(),
@@ -287,9 +362,14 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
    */
   compute_overall_probes_parameters();
   initialise_thermal_subproblems();
+
   compute_radial_subresolution_convection_diffusion_operators();
+
+  temperature_.echange_espace_virtuel(temperature_.ghost());
   impose_subresolution_boundary_conditions();
+
   compute_add_subresolution_source_terms();
+
   solve_thermal_subproblems();
   // apply_thermal_flux_correction();
 }
@@ -307,6 +387,7 @@ void IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(const
   const int max_dy = (int) trunc(maximum_distance / dy + 1);
   const int max_dz = (int) trunc(maximum_distance / dz + 1);
   ghost_cells = std::max(max_dx, std::max(max_dy, max_dz));
+  // Add one or more cell ??
   if (ghost_cells < ghost_init)
     ghost_cells = ghost_init;
   ghost_cells_ = ghost_cells;
@@ -530,12 +611,23 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
   if (!disable_subresolution_)
     {
       thermal_subproblems_temperature_solution_.resize(thermal_subproblems_rhs_assembly_.size());
+      check_wrong_values_rhs();
       one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_.valeur(),
                                                                            thermal_subproblems_rhs_assembly_,
                                                                            thermal_subproblems_temperature_solution_);
       // thermal_local_subproblems_.retrieve_temperature_solutions();
       // thermal_local_subproblems_.compute_local_temperature_gradient_solutions();
     }
+}
+
+void IJK_Thermal_Subresolution::check_wrong_values_rhs()
+{
+  Cerr << "Check the modified RHS: INI" << finl;
+  const double fd_second_order_magnitude = pow(dr_,2) * 1e2;
+  for (int i=0; i<thermal_subproblems_rhs_assembly_.size(); i++)
+    if (thermal_subproblems_rhs_assembly_[i] > fd_second_order_magnitude)
+      Cerr << "Check the modified RHS values: " << thermal_subproblems_rhs_assembly_[i] << finl;
+  Cerr << "Check the modified RHS: END" << finl;
 }
 
 /*

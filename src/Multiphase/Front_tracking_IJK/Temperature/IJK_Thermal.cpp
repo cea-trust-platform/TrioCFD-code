@@ -95,7 +95,7 @@ Entree& IJK_Thermal::typer_thermal( Entree& is )
     }
   thermal_problem_type_=thermal_words_[thermal_rank_];
   typer(type);
-  is >> valeur();
+  is >> valeur(); // Call the readOn
   return is;
 }
 

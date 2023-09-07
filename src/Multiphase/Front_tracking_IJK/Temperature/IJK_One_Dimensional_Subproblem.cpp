@@ -324,7 +324,7 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
   for (int dir=0; dir<3; dir++)
     {
       DoubleVect interfacial_velocity_component(1);
-      ijk_interpolate_skip_unknown_points((*velocity_)[dir], facet_barycentre, interfacial_velocity_component, 1.e10);
+      ijk_interpolate_skip_unknown_points((*velocity_)[dir], facet_barycentre, interfacial_velocity_component, INVALID_INTERP);
       interfacial_velocity_compo_[0] = interfacial_velocity_component[0];
     }
   if (interfacial_velocity_compo_.length() < INVALID_VELOCITY)
@@ -445,7 +445,7 @@ void IJK_One_Dimensional_Subproblem::interpolate_cartesian_velocities_on_probes(
           vel_compo = &x_velocity_;
           break;
         }
-      ijk_interpolate_skip_unknown_points((*velocity_)[dir], coordinates_cartesian_compo_, *vel_compo, 1.e10);
+      ijk_interpolate_skip_unknown_points((*velocity_)[dir], coordinates_cartesian_compo_, *vel_compo, INVALID_INTERP);
     }
 }
 
@@ -496,7 +496,7 @@ void IJK_One_Dimensional_Subproblem::project_basis_onto_cartesian_dir(const int&
 void IJK_One_Dimensional_Subproblem::interpolate_temperature_on_probe()
 {
   temperature_interp_.resize(*points_per_thermal_subproblem_);
-  ijk_interpolate_skip_unknown_points(*temperature_, coordinates_cartesian_compo_, temperature_interp_, 1.e10);
+  ijk_interpolate_skip_unknown_points(*temperature_, coordinates_cartesian_compo_, temperature_interp_, INVALID_INTERP);
 }
 
 void IJK_One_Dimensional_Subproblem::interpolate_temperature_gradient_on_probe()
@@ -504,7 +504,7 @@ void IJK_One_Dimensional_Subproblem::interpolate_temperature_gradient_on_probe()
   for (int dir = 0; dir < 3; dir++)
     {
       grad_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
-      ijk_interpolate_skip_unknown_points((*grad_T_elem_)[dir], coordinates_cartesian_compo_, grad_T_elem_interp_[dir], 1.e10);
+      ijk_interpolate_skip_unknown_points((*grad_T_elem_)[dir], coordinates_cartesian_compo_, grad_T_elem_interp_[dir], INVALID_INTERP);
     }
 }
 
@@ -528,8 +528,8 @@ void IJK_One_Dimensional_Subproblem::interpolate_temperature_hessian_on_probe()
     {
       hess_diag_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
       hess_cross_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
-      ijk_interpolate_skip_unknown_points((*hess_diag_T_elem_)[dir], coordinates_cartesian_compo_, hess_diag_T_elem_interp_[dir], 1.e10);
-      ijk_interpolate_skip_unknown_points((*hess_cross_T_elem_)[dir], coordinates_cartesian_compo_, hess_cross_T_elem_interp_[dir], 1.e10);
+      ijk_interpolate_skip_unknown_points((*hess_diag_T_elem_)[dir], coordinates_cartesian_compo_, hess_diag_T_elem_interp_[dir], INVALID_INTERP);
+      ijk_interpolate_skip_unknown_points((*hess_cross_T_elem_)[dir], coordinates_cartesian_compo_, hess_cross_T_elem_interp_[dir], INVALID_INTERP);
     }
 }
 
@@ -585,6 +585,9 @@ void IJK_One_Dimensional_Subproblem::impose_boundary_conditions(DoubleVect& ther
                                                                 const int& impose_user_boundary_condition_end_value)
 {
   interpolate_temperature_on_probe();
+  for (int i=0; i<temperature_interp_.size(); i++)
+    if (fabs(temperature_interp_[i]) > INVALID_INTERP_TEST)
+      Cerr << "Error in the temperature_interpolation" << temperature_interp_[i] << finl;
   if (!impose_boundary_condition_interface_from_simulation)
     interfacial_boundary_condition_value_ = interfacial_boundary_condition_value;
   else

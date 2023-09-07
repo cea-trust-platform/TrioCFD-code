@@ -55,12 +55,12 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
       const int ibulle_reelle = decoder_numero_bulle(-ighost);
       ghost_to_real_bubble(l) = ibulle_reelle;
     }
-  Cerr << "Ghost to real bubble : " << ghost_to_real_bubble;
+  // Cerr << "Ghost to real bubble : " << ghost_to_real_bubble;
   ArrOfDouble bubbles_volume;
   // DoubleTab bubbles_barycentre;
   interfaces.calculer_volume_bulles(bubbles_volume, bubbles_barycentre);
-  Cerr << "bubbles_volume" << bubbles_volume;
-  Cerr << "bubbles_barycentre" << bubbles_barycentre;
+  // Cerr << "bubbles_volume" << bubbles_volume;
+  // Cerr << "bubbles_barycentre" << bubbles_barycentre;
   /*
    * Considered a constant grid spacing
    */

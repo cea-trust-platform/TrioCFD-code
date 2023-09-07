@@ -90,7 +90,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   conserv_energy_global_ = 0;
   vol_ = 0.;
   cell_diagonal_ = 0.;
-  ghost_cells_ = 0;
+  ghost_cells_ = 2;
   rho_cp_post_ = 0;
 
   nb_diam_upstream_ = 0;
@@ -316,7 +316,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   /*
    * Fields
    */
-  temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
+  temperature_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
   nalloc += 2;
   compute_cell_volume();

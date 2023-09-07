@@ -61,6 +61,9 @@ public :
   void update_thermal_properties() override;
   void set_param(Param& param) override;
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
+  // Entree& read_fd_solver(Entree& is);
+  void read_fd_solver(const Motcle& mot, Entree& is);
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
 protected :
   void compute_thermal_subproblems() override;
@@ -84,6 +87,7 @@ protected :
                                              Matrice& radial_convection_matrix);
   void initialise_radial_diffusion_operator(const Matrice& radial_second_order_operator,
                                             Matrice& radial_diffusion_matrix);
+  void check_wrong_values_rhs();
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
   void apply_thermal_flux_correction();
@@ -121,6 +125,10 @@ protected :
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
   SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
+  Motcles fd_solvers_;
+  Motcles fd_solvers_jdd_;
+  int fd_solver_rank_;
+  Nom fd_solver_type_;
   // DoubleVect radial_convective_vector_prefactor_;
   // DoubleVect diffusive_vector_prefactor_;
 

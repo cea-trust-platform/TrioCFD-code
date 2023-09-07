@@ -173,11 +173,8 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
   const int core_lines = (nb_elem - 2);
   non_zero_elem = stencil_forward + stencil_backward + stencil_centred * (nb_elem - 2);
   // Cast the finite difference matrix
-  matrix.typer("Matrice_Bloc");
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, matrix.valeur());
-  block_matrix.dimensionner(1,1);
-  block_matrix.get_bloc(0,0).typer("Matrice_Morse");
-  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+  matrix.typer("Matrice_Morse");
+  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, matrix.valeur());
   sparse_matrix.dimensionner(nb_elem, nb_elem, non_zero_elem);
 
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
@@ -248,42 +245,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
     non_zero_coeff_per_line[last_column + 1] = non_zero_values_counter + FORTRAN_INDEX_INI;
   }
 
-  /*
-   * FIXME : Do three blocks ?
-   */
-  /*
-  block_matrix.dimensionner(3,1);
-  block_matrix.get_bloc(0,0) = typer("Matrice_Morse");
-  block_matrix.get_bloc(1,0) = typer("Matrice_Morse");
-  block_matrix.get_bloc(1,0) = typer("Matrice_Morse_Sym");
-  block_matrix.get_bloc(2,0) = typer("Matrice_Morse");
-  Matrice_Morse& ini_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
-  Matrice_Morse& end_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(2,0).valeur());
-  Matrice_Morse& core_sparse_matrix;
-  Matrice_Morse_Sym& core_sparse_matrix_sym;
-  switch(core_matrix_type_)
-  	{
-  	case centred:
-  //			core_sparse_matrix  = ref_cast(Matrice_Morse_Sym, block_matrix.get_bloc(1,0).valeur());
-  		core_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(1,0).valeur());
-  		break;
-  	case forward:
-  		core_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(1,0).valeur());
-  		break;
-  	case backward:
-  		core_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(1,0).valeur());
-  		break;
-  	default:
-  //			core_sparse_matrix  = ref_cast(Matrice_Morse_Sym, block_matrix.get_bloc(1,0).valeur());
-  		core_sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(1,0).valeur());
-  		break;
-  	}
-  ini_sparse_matrix.dimensionner(1, nb_elem, stencil_forward);
-  end_sparse_matrix.dimensionner(nb_elem-2, nb_elem, stencil_backward);
-  core_sparse_matrix.dimensionner(1, nb_elem, stencil_centred);
-   */
   sparse_matrix.compacte(remove);
-  block_matrix.assert_check_block_matrix_structure();
   return non_zero_elem;
 }
 
@@ -294,25 +256,19 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices_subpro
   const int dim = block_matrix_A.dim(0);
   for (int i=0; i<dim ; i++)
     {
-      Matrice_Bloc& sub_block_matrix_A  = ref_cast(Matrice_Bloc, block_matrix_A.get_bloc(i,i).valeur());
-      Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, sub_block_matrix_A.get_bloc(0,0).valeur());
-      Matrice_Bloc& sub_block_matrix_B  = ref_cast(Matrice_Bloc, block_matrix_B.get_bloc(i,i).valeur());
-      Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, sub_block_matrix_B.get_bloc(0,0).valeur());
+      Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse,  block_matrix_A.get_bloc(i,i).valeur());
+      Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, block_matrix_B.get_bloc(i,i).valeur());
       sparse_matrix_A += sparse_matrix_B;
       // Don't forget to call sort_stencil() !
       sparse_matrix_A.sort_stencil();
-      Cerr << "Convection and Diffusion matrices have been assembled. "<< finl;
+      // Cerr << "Convection and Diffusion matrices have been assembled. "<< finl;
     }
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices(Matrice& matrix_A, Matrice& matrix_B)
 {
-  Matrice_Bloc& block_matrix_A =ref_cast(Matrice_Bloc, matrix_A.valeur());
-  Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, block_matrix_A.get_bloc(0,0).valeur());
-
-  Matrice_Bloc& block_matrix_B =ref_cast(Matrice_Bloc, matrix_B.valeur());
-  Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, block_matrix_B.get_bloc(0,0).valeur());
-
+  Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, matrix_A.valeur());
+  Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, matrix_B.valeur());
   sparse_matrix_A += sparse_matrix_B;
 }
 
@@ -324,8 +280,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
   Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, matrix_subproblems.valeur());
   block_matrix_subproblems.dimensionner(nb_subproblems,nb_subproblems);
 
-  Matrice_Bloc& fd_operator_bloc =ref_cast(Matrice_Bloc, fd_operator.valeur());
-  Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator_bloc.get_bloc(0,0).valeur());
+  Matrice_Morse& fd_operator_sparse = ref_cast(Matrice_Morse, fd_operator.valeur());
 
   for (int i=0; i<nb_subproblems; i++)
     {
@@ -333,21 +288,14 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
         if (j != i)
           {
             // Same structure for zeros
-            block_matrix_subproblems.get_bloc(i,j).typer("Matrice_Bloc");
-            Matrice_Bloc& block_matrix_zeros =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(i,j).valeur());
-            block_matrix_zeros.dimensionner(1,1);
-            block_matrix_zeros.get_bloc(0,0).typer("Matrice_Morse");
-            // Initialise zero values ?
-            Matrice_Morse& sparse_matrix_zeros  = ref_cast(Matrice_Morse, block_matrix_zeros.get_bloc(0,0).valeur());
-            sparse_matrix_zeros.dimensionner(fd_operator_morse.nb_lignes(), fd_operator_morse.nb_colonnes(), fd_operator_morse.nb_coeff());
+            block_matrix_subproblems.get_bloc(i,j).typer("Matrice_Morse");
+            Matrice_Morse& sparse_matrix_zeros  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,j).valeur());
+            sparse_matrix_zeros.dimensionner(fd_operator_sparse.nb_lignes(), fd_operator_sparse.nb_colonnes(), fd_operator_sparse.nb_coeff());
             sparse_matrix_zeros.compacte(remove);
           }
-      block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Bloc");
-      Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(i,i).valeur());
-      block_matrix.dimensionner(1,1);
-      block_matrix.get_bloc(0,0).typer("Matrice_Morse");
-      Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
-      sparse_matrix = Matrice_Morse(fd_operator_morse);
+      block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
+      Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+      sparse_matrix = Matrice_Morse(fd_operator_sparse);
     }
 }
 
@@ -356,11 +304,9 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix
                                                                                             const int& nb_subproblems)
 {
   Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, matrix_subproblems.valeur());
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(nb_subproblems,nb_subproblems).valeur());
-  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
 
-  Matrice_Bloc& fd_operator_bloc =ref_cast(Matrice_Bloc, fd_operator.valeur());
-  Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator_bloc.get_bloc(0,0).valeur());
+  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(nb_subproblems,nb_subproblems).valeur());
+  Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator.valeur());
 
   sparse_matrix = Matrice_Morse(fd_operator_morse);
 }
@@ -372,8 +318,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
   /*
    * Don't scale the first and last row (where B.Cs are applied)
    */
-  Matrice_Bloc& block_matrix = ref_cast(Matrice_Bloc, matrix.valeur());
-  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, matrix.valeur());
   DoubleVect vector_tmp = vector;
   if (boundary_conditions)
     {
@@ -448,8 +393,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                                                                                         const double& end_value,
                                                                                         const double& dr_inv)
 {
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, modified_matrix.valeur());
-  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, modified_matrix.valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
   const int nb_lines = sparse_matrix.nb_lignes();
@@ -574,8 +518,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
   /*
    * Copy the matrix into modified matrix
    */
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, modified_matrix.valeur());
-  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, modified_matrix.valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
 
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
@@ -625,6 +568,10 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
     }
 
   sparse_matrix.compacte(remove);
+
+//  for (int i=0; i<modified_rhs.size(); i++)
+//    if (fabs(modified_rhs[i]) > 1.e9)
+//      Cerr << "Check the modified RHS" << modified_rhs[i] << finl;
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly, const DoubleVect& rhs_assembly)
@@ -634,11 +581,6 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(Do
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res)
 {
-  //  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*fd_operator).valeur());
-  //  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
-  // res = sparse_matrix * solution;
   res = (*fd_operator) * solution;
 }
-
-
 

@@ -36,6 +36,8 @@
 
 // #include <TRUSTArray.h>
 #define INVALID_VELOCITY 1e-12
+#define INVALID_INTERP 1.e20
+#define INVALID_INTERP_TEST 1.e19
 
 /////////////////////////////////////////////////////////////////////////////
 //
