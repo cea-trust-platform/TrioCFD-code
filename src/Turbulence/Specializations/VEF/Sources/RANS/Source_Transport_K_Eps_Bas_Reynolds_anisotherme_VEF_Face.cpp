@@ -83,7 +83,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
       Cerr << "Error 'interpolation_viscosite_turbulente' must be equal to '0' in this case." << finl;
       Process::exit();
     }
-  calculer_terme_production_K(domaine_VEF,domaine_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb, _interpolation_viscosite_turbulente);
+  calculer_terme_production_K(domaine_VEF,domaine_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb, _interpolation_viscosite_turbulente, _coefficient_limiteur);
 
   // C'est l'objet de type domaine_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
