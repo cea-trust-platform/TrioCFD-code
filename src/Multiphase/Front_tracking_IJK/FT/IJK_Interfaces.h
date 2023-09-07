@@ -645,13 +645,21 @@ protected:
                                              double distmax);
   void calculer_distance_autres_compo_connexe2(ArrOfDouble& distance,
                                                DoubleTab& v_closer);
-  void calculer_distance_autres_compo_connexe(const DoubleTab& sommets_a_tester,
-                                              const ArrOfInt& compo_connexe_sommets,
-                                              const DoubleTab& vinterp_tmp,
-                                              const Maillage_FT_IJK& mesh,
-                                              ArrOfDouble& distance,
-                                              DoubleTab& v_closer,
-                                              const double distmax);
+  void calculer_distance_autres_compo_connexe_octree(const DoubleTab& sommets_a_tester,
+                                                     const ArrOfInt& compo_connexe_sommets,
+                                                     const DoubleTab& vinterp_tmp,
+                                                     const Maillage_FT_IJK& mesh,
+                                                     ArrOfDouble& distance,
+                                                     DoubleTab& v_closer,
+                                                     const double distmax);
+
+  void calculer_distance_autres_compo_connexe_ijk(const DoubleTab& sommets_a_tester,
+                                                  const ArrOfInt& compo_connexe_sommets,
+                                                  const DoubleTab& vinterp_tmp,
+                                                  const Maillage_FT_IJK& mesh,
+                                                  ArrOfDouble& distance,
+                                                  DoubleTab& v_closer,
+                                                  const double distmax);
 
 // reference vers le splitting_ft_ pour les interfaces :
   REF(IJK_Splitting) ref_splitting_;
@@ -746,6 +754,7 @@ protected:
   // Si souhaite, une valeur differente pour les parois :
   double portee_wall_repulsion_;
   double delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
+  int no_octree_method_ = 0;    // to use the IJK-discretization to search for closest faces of vertices instead of the octree method (disabled by default)
 
   ArrOfDoubleFT distance_autres_interfaces_;
 
