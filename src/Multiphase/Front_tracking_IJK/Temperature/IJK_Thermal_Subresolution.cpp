@@ -53,7 +53,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   end_boundary_condition_value_ = -1;
   impose_user_boundary_condition_end_value_=0;
 
-  source_terms_type_=0;
+  source_terms_type_=2;
   source_terms_correction_=0;
 }
 
@@ -113,12 +113,13 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("end_boundary_condition_value", &end_boundary_condition_value_);
   param.ajouter_flag("impose_user_boundary_condition_end_value", &impose_user_boundary_condition_end_value_);
 
-  // tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_2D, tangential_conv_3D_tangentual_diffusion_3D
   param.ajouter("source_terms_type", &source_terms_type_);
-  param.dictionnaire("tangential_conv_2D", 0);
-  param.dictionnaire("tangential_conv_3D", 1);
-  param.dictionnaire("tangential_conv_2D_tangential_diffusion_2D", 2);
-  param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 3);
+  param.dictionnaire("linear_diffusion", 0);
+  param.dictionnaire("spherical_diffusion",1);
+  param.dictionnaire("tangential_conv_2D", 2);
+  param.dictionnaire("tangential_conv_3D", 3);
+  param.dictionnaire("tangential_conv_2D_tangential_diffusion_2D", 4);
+  param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 5);
   param.ajouter_flag("source_terms_correction", &source_terms_correction_);
 }
 
@@ -164,6 +165,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);
+  one_dimensional_advection_diffusion_thermal_solver_.nommer("finite_difference_solver");
+  one_dimensional_advection_diffusion_thermal_solver_.typer("");
 
   corrige_flux_.set_physical_parameters(cp_liquid_ * ref_ijk_ft_->get_rho_l(),
                                         cp_vapour_ * ref_ijk_ft_->get_rho_v(),
@@ -287,7 +290,7 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   compute_radial_subresolution_convection_diffusion_operators();
   impose_subresolution_boundary_conditions();
   compute_add_subresolution_source_terms();
-  // solve_thermal_subproblems();
+  solve_thermal_subproblems();
   // apply_thermal_flux_correction();
 }
 
@@ -313,7 +316,7 @@ void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
 {
   if (!disable_subresolution_)
     {
-      probe_length_ = points_per_thermal_subproblem_ * coeff_distance_diagonal_ * cell_diagonal_;
+      probe_length_ = coeff_distance_diagonal_ * cell_diagonal_;
       dr_ = probe_length_ / (points_per_thermal_subproblem_ - 1);
       radial_coordinates_ = DoubleVect(points_per_thermal_subproblem_);
       for (int i=0; i < points_per_thermal_subproblem_; i++)
@@ -526,11 +529,12 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
   if (!disable_subresolution_)
     {
+      thermal_subproblems_temperature_solution_.resize(thermal_subproblems_rhs_assembly_.size());
       one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_.valeur(),
                                                                            thermal_subproblems_rhs_assembly_,
                                                                            thermal_subproblems_temperature_solution_);
-      thermal_local_subproblems_.retrieve_temperature_solutions();
-      thermal_local_subproblems_.compute_local_temperature_gradient_solutions();
+      // thermal_local_subproblems_.retrieve_temperature_solutions();
+      // thermal_local_subproblems_.compute_local_temperature_gradient_solutions();
     }
 }
 

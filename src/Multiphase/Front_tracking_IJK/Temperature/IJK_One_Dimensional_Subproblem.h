@@ -301,7 +301,7 @@ protected :
   FixedVector<DoubleVect, 3> hess_cross_T_elem_interp_;
 
   int source_terms_type_=0;
-  enum Source_terms { tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_2D, tangential_conv_3D_tangentual_diffusion_3D};
+  enum Source_terms { linear_diffusion, spherical_diffusion, tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_2D, tangential_conv_3D_tangentual_diffusion_3D};
   DoubleVect normal_temperature_gradient_;
   DoubleVect tangential_temperature_gradient_first_;
   DoubleVect tangential_temperature_gradient_second_;

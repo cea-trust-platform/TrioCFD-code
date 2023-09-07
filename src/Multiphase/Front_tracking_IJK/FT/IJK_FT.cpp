@@ -2052,7 +2052,10 @@ void IJK_FT_double::run()
                                   delta_z_local_);
   Cerr << "IJK_FT_double::run()" << finl;
   int nalloc = 0;
-  allocate_velocity(velocity_, splitting_, 2);
+  int ft_ghost_cells = 2;
+  thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
+  ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
+  allocate_velocity(velocity_, splitting_, ft_ghost_cells);
   allocate_velocity(d_velocity_, splitting_, 1);
   nalloc += 6;
   // GAB, qdm
@@ -2151,11 +2154,14 @@ void IJK_FT_double::run()
    * as the thermal probes necessitates several ghost cells to interpolate velocity !
    * Check the difference between elem and faces ? and for interpolation of the velocity ?
    */
-  int ft_ghost_cells = 4;
-  thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
-  ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
+  /*
+   * Finally use the ns velocity field for the thermal sub-problems
+   */
+  // thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
+  // ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
+  ft_ghost_cells = 4;
   allocate_velocity(velocity_ft_, splitting_ft_, ft_ghost_cells);
-//  allocate_velocity(velocity_ft_, splitting_ft_, 4);
+  //  allocate_velocity(velocity_ft_, splitting_ft_, 4);
   nalloc += 3;
 
   if (!disable_diphasique_)

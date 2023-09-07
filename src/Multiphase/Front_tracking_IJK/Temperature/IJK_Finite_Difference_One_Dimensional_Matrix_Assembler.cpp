@@ -299,18 +299,18 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices_subpro
       Matrice_Bloc& sub_block_matrix_B  = ref_cast(Matrice_Bloc, block_matrix_B.get_bloc(i,i).valeur());
       Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, sub_block_matrix_B.get_bloc(0,0).valeur());
       sparse_matrix_A += sparse_matrix_B;
-      Cerr << 1 << finl;
+      // Don't forget to call sort_stencil() !
+      sparse_matrix_A.sort_stencil();
+      Cerr << "Convection and Diffusion matrices have been assembled. "<< finl;
     }
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices(Matrice& matrix_A, Matrice& matrix_B)
 {
   Matrice_Bloc& block_matrix_A =ref_cast(Matrice_Bloc, matrix_A.valeur());
-  // block_matrix_A.get_bloc(0,0).typer("Matrice_Morse");
   Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, block_matrix_A.get_bloc(0,0).valeur());
 
   Matrice_Bloc& block_matrix_B =ref_cast(Matrice_Bloc, matrix_B.valeur());
-  // block_matrix_A.get_bloc(0,0).typer("Matrice_Morse");
   Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, block_matrix_B.get_bloc(0,0).valeur());
 
   sparse_matrix_A += sparse_matrix_B;
@@ -327,11 +327,21 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
   Matrice_Bloc& fd_operator_bloc =ref_cast(Matrice_Bloc, fd_operator.valeur());
   Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator_bloc.get_bloc(0,0).valeur());
 
-  // const int nb_sub_problems = block_matrix_subproblems.dim(0);
   for (int i=0; i<nb_subproblems; i++)
     {
-      // block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
-      // Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+      for (int j=0; j<nb_subproblems; j++)
+        if (j != i)
+          {
+            // Same structure for zeros
+            block_matrix_subproblems.get_bloc(i,j).typer("Matrice_Bloc");
+            Matrice_Bloc& block_matrix_zeros =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(i,j).valeur());
+            block_matrix_zeros.dimensionner(1,1);
+            block_matrix_zeros.get_bloc(0,0).typer("Matrice_Morse");
+            // Initialise zero values ?
+            Matrice_Morse& sparse_matrix_zeros  = ref_cast(Matrice_Morse, block_matrix_zeros.get_bloc(0,0).valeur());
+            sparse_matrix_zeros.dimensionner(fd_operator_morse.nb_lignes(), fd_operator_morse.nb_colonnes(), fd_operator_morse.nb_coeff());
+            sparse_matrix_zeros.compacte(remove);
+          }
       block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Bloc");
       Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, block_matrix_subproblems.get_bloc(i,i).valeur());
       block_matrix.dimensionner(1,1);
@@ -374,6 +384,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
    * TODO FIXME: I want a matrix in the end
    */
   sparse_matrix *= vector_tmp;
+  sparse_matrix.compacte(remove);
 //  const int nb_lines = sparse_matrix.nb_lignes();
 //  int non_zero_values_counter = 0;
 //  int j;
@@ -441,8 +452,6 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
   Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, block_matrix.get_bloc(0,0).valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
-  ArrOfInt& matrix_column_indices = sparse_matrix.get_set_tab2();
-  Cerr << matrix_column_indices[0] << finl;
   const int nb_lines = sparse_matrix.nb_lignes();
   const int nb_coeff = sparse_matrix.nb_coeff();
   {
@@ -604,12 +613,15 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
     {
       const int non_zero_elem_core_series = non_zero_coeff_per_line[j] - FORTRAN_INDEX_INI;
       const int non_zero_elem_core = non_zero_coeff_per_line[j] - non_zero_coeff_per_line[j-1];
-      const int index_sparse = non_zero_elem_core_series - non_zero_elem_core;
-      const int column_index = matrix_column_indices[index_sparse] - FORTRAN_INDEX_INI;
-      if (column_index == 0)
-        matrix_values[index_sparse] = 0.;
-      if (column_index == (nb_column - 1))
-        matrix_values[index_sparse] = 0.;
+      for (int i = 0; i < non_zero_elem_core; i++)
+        {
+          const int index_sparse = non_zero_elem_core_series - non_zero_elem_core + i;
+          const int column_index = matrix_column_indices[index_sparse] - FORTRAN_INDEX_INI;
+          if (column_index == 0)
+            matrix_values[index_sparse] = 0.;
+          if (column_index == (nb_column - 1))
+            matrix_values[index_sparse] = 0.;
+        }
     }
 
   sparse_matrix.compacte(remove);

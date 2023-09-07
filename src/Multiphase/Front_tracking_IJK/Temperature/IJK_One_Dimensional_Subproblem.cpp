@@ -552,16 +552,21 @@ void IJK_One_Dimensional_Subproblem::initialise_radial_diffusion_operator_local(
 
 void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operators()
 {
-  interpolate_project_velocities_on_probes();
   const double alpha_inv = - 1 / *alpha_;
   DoubleVect osculating_radial_coefficient = osculating_radial_coordinates_inv_;
   osculating_radial_coefficient *= 2;
-  if (correct_radial_velocity_)
-    radial_convection_prefactor_ = radial_velocity_corrected_;
-  else
-    radial_convection_prefactor_ = radial_velocity_;
-  radial_convection_prefactor_ *= alpha_inv;
-  radial_convection_prefactor_ +=	osculating_radial_coefficient;
+  radial_convection_prefactor_.resize(*points_per_thermal_subproblem_);
+  if (source_terms_type_ != linear_diffusion && source_terms_type_ != spherical_diffusion)
+    {
+      interpolate_project_velocities_on_probes();
+      if (correct_radial_velocity_)
+        radial_convection_prefactor_ = radial_velocity_corrected_;
+      else
+        radial_convection_prefactor_ = radial_velocity_;
+      radial_convection_prefactor_ *= alpha_inv;
+    }
+  if (source_terms_type_ != linear_diffusion)
+    radial_convection_prefactor_ +=	osculating_radial_coefficient;
   const int boundary_conditions = 0;
   initialise_radial_convection_operator_local();
   initialise_radial_diffusion_operator_local();
@@ -608,69 +613,72 @@ void IJK_One_Dimensional_Subproblem::impose_boundary_conditions(DoubleVect& ther
 
 void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
 {
-  interpolate_temperature_gradient_on_probe();
-  project_temperature_gradient_on_probes();
-
-  if (source_terms_type_ == tangential_conv_2D_tangential_diffusion_2D ||
-      source_terms_type_ == tangential_conv_3D_tangentual_diffusion_3D)
+  if (source_terms_type_ != linear_diffusion && source_terms_type_ != spherical_diffusion)
     {
-      interpolate_temperature_hessian_on_probe();
-      project_temperature_hessian_on_probes();
-    }
-  /*
-   * Compute at least the tangential convection
-   */
-  tangential_convection_source_terms_first_ = tangential_temperature_gradient_first_;
-  if (correct_tangential_temperature_gradient_)
-    correct_tangential_temperature_gradient(tangential_convection_source_terms_first_);
-  tangential_convection_source_terms_first_ *= first_tangential_velocity_;
-  const double alpha_inv = 1 / *alpha_;
-  tangential_convection_source_terms_first_ *= alpha_inv;
-  switch (source_terms_type_)
-    {
-    case 0:
-      tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
-      source_terms_ = tangential_convection_source_terms_;
-      break;
-    case 1:
-      tangential_convection_source_terms_second_ = tangential_temperature_gradient_second_;
-      if (correct_tangential_temperature_gradient_)
-        correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
-      tangential_convection_source_terms_second_ *= second_tangential_velocity_;
-      tangential_convection_source_terms_second_ *= alpha_inv;
-      tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
-      tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
-      source_terms_ = tangential_convection_source_terms_;
-      break;
-    case 2:
-      tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
-      source_terms_ = tangential_convection_source_terms_;
-      // tangential_diffusion_source_terms_;
-      // if (correct_tangential_temperature_hessian_)
-      // 	correct_tangential_temperature_hessian(tangential_diffusion_source_terms_)
-      source_terms_ += tangential_diffusion_source_terms_;
-      break;
-    case 3:
-      tangential_convection_source_terms_second_ = tangential_temperature_gradient_second_;
-      if (correct_tangential_temperature_gradient_)
-        correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
-      tangential_convection_source_terms_second_ *= second_tangential_velocity_;
-      tangential_convection_source_terms_second_ *= alpha_inv;
-      tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
-      tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
-      source_terms_ = tangential_convection_source_terms_;
-      // tangential_diffusion_source_terms_;
-      // if (correct_tangential_temperature_hessian_)
-      // 	correct_tangential_temperature_hessian(tangential_diffusion_source_terms_)
-      source_terms_ += tangential_diffusion_source_terms_;
-      break;
-    default:
-      tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
-      source_terms_ = tangential_convection_source_terms_;
-      break;
-    }
+      interpolate_temperature_gradient_on_probe();
+      project_temperature_gradient_on_probes();
 
-  (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_, rhs_assembly_);
+      if (source_terms_type_ == tangential_conv_2D_tangential_diffusion_2D ||
+          source_terms_type_ == tangential_conv_3D_tangentual_diffusion_3D)
+        {
+          interpolate_temperature_hessian_on_probe();
+          project_temperature_hessian_on_probes();
+        }
+      /*
+       * Compute at least the tangential convection
+       */
+      tangential_convection_source_terms_first_ = tangential_temperature_gradient_first_;
+      if (correct_tangential_temperature_gradient_)
+        correct_tangential_temperature_gradient(tangential_convection_source_terms_first_);
+      tangential_convection_source_terms_first_ *= first_tangential_velocity_;
+      const double alpha_inv = 1 / *alpha_;
+      tangential_convection_source_terms_first_ *= alpha_inv;
+      switch (source_terms_type_)
+        {
+        case 0:
+          tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
+          source_terms_ = tangential_convection_source_terms_;
+          break;
+        case 1:
+          tangential_convection_source_terms_second_ = tangential_temperature_gradient_second_;
+          if (correct_tangential_temperature_gradient_)
+            correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
+          tangential_convection_source_terms_second_ *= second_tangential_velocity_;
+          tangential_convection_source_terms_second_ *= alpha_inv;
+          tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
+          tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
+          source_terms_ = tangential_convection_source_terms_;
+          break;
+        case 2:
+          tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
+          source_terms_ = tangential_convection_source_terms_;
+          // tangential_diffusion_source_terms_;
+          // if (correct_tangential_temperature_hessian_)
+          // 	correct_tangential_temperature_hessian(tangential_diffusion_source_terms_)
+          source_terms_ += tangential_diffusion_source_terms_;
+          break;
+        case 3:
+          tangential_convection_source_terms_second_ = tangential_temperature_gradient_second_;
+          if (correct_tangential_temperature_gradient_)
+            correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
+          tangential_convection_source_terms_second_ *= second_tangential_velocity_;
+          tangential_convection_source_terms_second_ *= alpha_inv;
+          tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
+          tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
+          source_terms_ = tangential_convection_source_terms_;
+          // tangential_diffusion_source_terms_;
+          // if (correct_tangential_temperature_hessian_)
+          // 	correct_tangential_temperature_hessian(tangential_diffusion_source_terms_)
+          source_terms_ += tangential_diffusion_source_terms_;
+          break;
+        default:
+          tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
+          source_terms_ = tangential_convection_source_terms_;
+          break;
+        }
+
+      (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_, rhs_assembly_);
+    }
 }
 
 void IJK_One_Dimensional_Subproblem::correct_tangential_temperature_gradient(DoubleVect& tangential_convection_source_terms)
