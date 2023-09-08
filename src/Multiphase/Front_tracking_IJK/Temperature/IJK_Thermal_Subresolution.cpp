@@ -142,6 +142,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 5);
   param.ajouter_flag("source_terms_correction", &source_terms_correction_);
 
+  // param.ajouter("thermal_fd_solver", &one_dimensional_advection_diffusion_thermal_solver_);
   for (int i=0; i<fd_solvers_jdd_.size(); i++)
     param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
@@ -162,37 +163,6 @@ void IJK_Thermal_Subresolution::read_fd_solver(const Motcle& mot, Entree& is)
   is >> one_dimensional_advection_diffusion_thermal_solver_;
   Cerr << "Finite difference solver: " << fd_solver_type_ << finl;
 }
-
-/* Entree& IJK_Thermal_Subresolution::read_fd_solver(Entree& is)
-{
-  Motcle word;
-  is >> word;
-  Nom type = "";
-  fd_solver_rank_ = fd_solvers_.search(word);
-  switch(fd_solver_rank_)
-    {
-    case 0:
-      type += "Solv_Cholesky";
-      break;
-    case 1:
-      type += "Solv_Cholesky";
-      break;
-    case 2:
-      type += "Solv_Cholesky";
-      break;
-    case 3:
-      type += "Solv_Cholesky";
-      break;
-    default:
-      type += "Solv_Cholesky";
-      fd_solver_rank_ = 0;
-      break;
-    }
-  fd_solver_type_ = fd_solvers_[fd_solver_rank_];
-  one_dimensional_advection_diffusion_thermal_solver_.typer(type);
-  // one_dimensional_advection_diffusion_thermal_solver_ >> valeur(); // readOn
-  return is;
-} */
 
 
 int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const int idx)
@@ -241,19 +211,26 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   if (one_dimensional_advection_diffusion_thermal_solver_.est_nul())
     {
       one_dimensional_advection_diffusion_thermal_solver_.typer(fd_solvers_[0]);
+      /*
+       * Add default solver parameters
+       */
     }
 
+  /*
+   * Considered constant values
+   */
   corrige_flux_.set_physical_parameters(cp_liquid_ * ref_ijk_ft_->get_rho_l(),
                                         cp_vapour_ * ref_ijk_ft_->get_rho_v(),
                                         lambda_liquid_,
                                         lambda_vapour_);
-  corrige_flux_.initialize(
+  corrige_flux_.initialize_with_subproblems(
     ref_ijk_ft_->get_splitting_ns(),
     temperature_,
     ref_ijk_ft_->itfce(),
     ref_ijk_ft_,
     ref_ijk_ft_->get_set_interface().get_set_intersection_ijk_face(),
-    ref_ijk_ft_->get_set_interface().get_set_intersection_ijk_cell());
+    ref_ijk_ft_->get_set_interface().get_set_intersection_ijk_cell(),
+    thermal_local_subproblems_);
 
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
@@ -633,7 +610,7 @@ void IJK_Thermal_Subresolution::check_wrong_values_rhs()
 /*
  * TODO:
  */
-void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
+void IJK_Thermal_Subresolution::prepare_thermal_flux_correction()
 {
   if (!disable_subresolution_)
     {
@@ -642,7 +619,8 @@ void IJK_Thermal_Subresolution::apply_thermal_flux_correction()
        * projected onto x-dir, y-dir, z-dir + coordinates along the probe
        * Use ijk_Intersections_interfaces
        */
-      // corrige_flux_->apply_thermal_flux_correction()
+      corrige_flux_->update();
+      // corrige_flux_->();
     }
 }
 

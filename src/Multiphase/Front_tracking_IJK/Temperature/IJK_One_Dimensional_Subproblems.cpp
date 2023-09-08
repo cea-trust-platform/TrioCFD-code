@@ -208,3 +208,25 @@ void IJK_One_Dimensional_Subproblems::compute_local_temperature_gradient_solutio
     itr.compute_local_temperature_gradient_solution();
 }
 
+void IJK_One_Dimensional_Subproblems::get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const
+{
+  (*this)[subproblem_index].get_ijk_indices(i,j,k);
+}
+
+double IJK_One_Dimensional_Subproblems::get_interfacial_gradient_corrected(int i)
+{
+  return (*this)[i].get_interfacial_gradient_corrected();
+}
+
+double IJK_One_Dimensional_Subproblems::get_temperature_profile_at_point(const int& i, const double& dist) const
+{
+  return (*this)[i].get_temperature_profile_at_point(dist);
+}
+
+double IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const
+{
+  return (*this)[i].get_temperature_gradient_profile_at_point(dist, dir);
+}
+
+
+

@@ -23,6 +23,7 @@
 #define Corrige_flux_FT_included
 
 #include <Corrige_flux_FT_base.h>
+#include <IJK_One_Dimensional_Subproblems.h>
 #include <TRUST_Deriv.h>
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -45,6 +46,13 @@ public :
                          const IJK_FT_double& ijk_ft,
                          Intersection_Interface_ijk_face& intersection_ijk_face,
                          Intersection_Interface_ijk_cell& intersection_ijk_cell);
+  inline void initialize_with_subproblems(const IJK_Splitting& splitting,
+                                          const IJK_Field_double& field,
+                                          const IJK_Interfaces& interfaces,
+                                          const IJK_FT_double& ijk_ft,
+                                          Intersection_Interface_ijk_face& intersection_ijk_face,
+                                          Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                          const IJK_One_Dimensional_Subproblems& thermal_local_subproblems);
   inline void set_physical_parameters(const double rhocpl,
                                       const double rhocpv,
                                       const double ldal,
@@ -58,6 +66,10 @@ public :
                                                 ArrOfDouble& temperature_interp, ArrOfDouble& flux_normal_interp,
                                                 ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                                 DoubleTab& coo_vap) const;
+  inline void compute_temperature_cell_centre(IJK_Field_double& temperature,
+                                              IJK_Field_double& d_temperature) const;
+  inline void compute_temperature_face_centre();
+  inline void compute_thermal_fluxes_face_centre();
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -68,6 +80,17 @@ inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
                                         Intersection_Interface_ijk_cell& intersection_ijk_cell)
 {
   valeur().initialize(splitting, field, interfaces, ijk_ft, intersection_ijk_face, intersection_ijk_cell);
+}
+
+inline void Corrige_flux_FT::initialize_with_subproblems(const IJK_Splitting& splitting,
+                                                         const IJK_Field_double& field,
+                                                         const IJK_Interfaces& interfaces,
+                                                         const IJK_FT_double& ijk_ft,
+                                                         Intersection_Interface_ijk_face& intersection_ijk_face,
+                                                         Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                                         const IJK_One_Dimensional_Subproblems& thermal_local_subproblems)
+{
+  valeur().initialize_with_subproblems(splitting, field, interfaces, ijk_ft, intersection_ijk_face, intersection_ijk_cell, thermal_local_subproblems);
 }
 
 inline void Corrige_flux_FT::set_physical_parameters(const double rhocpl,
@@ -115,5 +138,21 @@ inline void Corrige_flux_FT::calcul_temperature_flux_interface(const IJK_Field_d
                                              coo_liqu,
                                              coo_vap);
 }
+
+inline void Corrige_flux_FT::compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const
+{
+  valeur().compute_temperature_cell_centre(temperature, d_temperature);
+}
+
+inline void Corrige_flux_FT::compute_temperature_face_centre()
+{
+  valeur().compute_temperature_face_centre();
+}
+
+inline void Corrige_flux_FT::compute_thermal_fluxes_face_centre()
+{
+  valeur().compute_thermal_fluxes_face_centre();
+}
+
 
 #endif /* Corrige_flux_FT_included */

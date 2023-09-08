@@ -39,6 +39,7 @@
 #include <OpConvCentre4IJK.h>
 #include <IJK_One_Dimensional_Subproblems.h>
 #include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
+#include <IJK_SolveSys_FD_thermal.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@ protected :
   void check_wrong_values_rhs();
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
-  void apply_thermal_flux_correction();
+  void prepare_thermal_flux_correction();
   void clean_thermal_subproblems() override;
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
@@ -125,6 +126,7 @@ protected :
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
   SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
+  //IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
   Motcles fd_solvers_;
   Motcles fd_solvers_jdd_;
   int fd_solver_rank_;

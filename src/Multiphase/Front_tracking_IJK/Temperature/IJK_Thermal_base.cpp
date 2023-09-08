@@ -782,7 +782,13 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Compute sub-problems (For Subresolution Child classes only !)
    */
   compute_thermal_subproblems();
-
+  /*
+   * Convective and Diffusive fluxes
+   */
+  if (!conv_temperature_negligible_)
+    corrige_flux_->compute_temperature_face_centre();
+  if (!diff_temp_negligible_)
+    corrige_flux_->compute_thermal_fluxes_face_centre();
   /*
    * For post-processing purposes
    */
@@ -805,6 +811,11 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double ene_postDiffu = compute_global_energy(d_temperature_);
   add_temperature_source();
   const double ene_postSource = compute_global_energy(d_temperature_);
+
+  /*
+   * Interpolate a value at the cell centre
+   */
+  corrige_flux_->compute_temperature_cell_centre(temperature_, d_temperature_);
 
   /*
    * Clean_subproblems !

@@ -35,6 +35,8 @@
 #include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 
 // #include <TRUSTArray.h>
+#define INVALID_TEMPERATURE 1e10
+#define INVALID_FIELD 1e10
 #define INVALID_VELOCITY 1e-12
 #define INVALID_INTERP 1.e20
 #define INVALID_INTERP_TEST 1.e19
@@ -108,6 +110,11 @@ public :
   void compute_add_source_terms();
   void retrieve_temperature_solution();
   void compute_local_temperature_gradient_solution();
+  void get_ijk_indices(int& i, int& j, int& k) const;
+  double get_interfacial_gradient_corrected() const;
+  double get_field_profile_at_point(const double& dist, const DoubleVect& field) const;
+  double get_temperature_profile_at_point(const double& dist) const;
+  double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
 
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -176,6 +183,7 @@ protected :
   void project_temperature_hessian_on_probes();
   void correct_tangential_temperature_gradient(DoubleVect& tangential_convection_source_terms);
   void correct_tangential_temperature_hessian(DoubleVect& tangential_diffusion_source_terms);
+  void find_interval(const double& dist, int& left_interval, int& right_interval) const;
   /*
    * FIXME: Should I use only references or just for IJK_Field_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?

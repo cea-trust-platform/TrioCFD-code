@@ -96,6 +96,13 @@ Entree& IJK_One_Dimensional_Subproblem::readOn( Entree& is )
   return is;
 }
 
+void IJK_One_Dimensional_Subproblem::get_ijk_indices(int& i, int& j, int& k) const
+{
+  i = (int) index_i_;
+  j = (int) index_j_;
+  k = (int) index_k_;
+}
+
 void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
                                                                           const IJK_Field_double& eulerian_distance,
                                                                           const IJK_Field_double& eulerian_curvature,
@@ -728,6 +735,95 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   project_basis_onto_cartesian_dir(2, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
                                    normal_vector_compo_, *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_,
                                    temperature_z_gradient_solution_);
+}
+
+double IJK_One_Dimensional_Subproblem::get_interfacial_gradient_corrected() const
+{
+  return normal_temperature_gradient_solution_[0];
+}
+
+double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& dist, const DoubleVect& field) const
+{
+  double field_value = INVALID_TEMPERATURE;// temperature_solution_;
+  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
+    {
+      /*
+       * Dummy dichotomy and linear interpolation along the probe
+       */
+      int left_interval = 0;
+      int right_interval = *points_per_thermal_subproblem_-1;
+      find_interval(dist, left_interval, right_interval);
+      const double field_interp = (field[right_interval] - field[left_interval])
+                                  / ((*radial_coordinates_)[right_interval] - (*radial_coordinates_)[left_interval]) *
+                                  (dist-(*radial_coordinates_)[left_interval]) + field[left_interval];
+      field_value = field_interp;
+    }
+  if (dist < (*radial_coordinates_)[0])
+    {
+      const double interfacial_temperature_gradient_solution = get_interfacial_gradient_corrected();
+      field_value = interfacial_temperature_gradient_solution * dist;
+    }
+  return field_value;
+}
+
+double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const double& dist) const
+{
+  return get_field_profile_at_point(dist, temperature_solution_);
+}
+//  double temperature_cell_centre = INVALID_TEMPERATURE;// temperature_solution_;
+//  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
+//    {
+//      /*
+//       * Dummy dichotomy and linear interpolation along the probe
+//       */
+//      int left_interval = 0;
+//      int right_interval = *points_per_thermal_subproblem_-1;
+//      find_interval(dist, left_interval, right_interval);
+//      const double temperature_interp = (temperature_solution_[right_interval] - temperature_solution_[left_interval])
+//                                        / ((*radial_coordinates_)[right_interval] - (*radial_coordinates_)[left_interval]) *
+//                                        (dist-(*radial_coordinates_)[left_interval]) + temperature_solution_[left_interval];
+//      temperature_cell_centre = temperature_interp;
+//    }
+//  if (dist < (*radial_coordinates_)[0])
+//    {
+//      const double interfacial_temperature_gradient_solution = get_interfacial_gradient_corrected();
+//      temperature_cell_centre = interfacial_temperature_gradient_solution * dist;
+//    }
+//  return temperature_cell_centre;
+
+double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const
+{
+  double temperature_gradient = 0;
+  switch(dir)
+    {
+    case 0:
+      temperature_gradient = get_field_profile_at_point(dist, temperature_x_gradient_solution_);
+      break;
+    case 1:
+      temperature_gradient = get_field_profile_at_point(dist, temperature_y_gradient_solution_);
+      break;
+    case 2:
+      temperature_gradient = get_field_profile_at_point(dist, temperature_z_gradient_solution_);
+      break;
+    default:
+      temperature_gradient = get_field_profile_at_point(dist, temperature_x_gradient_solution_);
+      break;
+    }
+  return temperature_gradient;
+}
+
+
+void IJK_One_Dimensional_Subproblem::find_interval(const double& dist, int& left_interval, int& right_interval) const
+{
+  int mid_interval = left_interval + (right_interval - left_interval) / 2;
+  while ((right_interval - left_interval) != 1)
+    {
+      if (dist > (*radial_coordinates_)[mid_interval])
+        left_interval = mid_interval;
+      else
+        right_interval = mid_interval;
+      mid_interval = left_interval + (right_interval - left_interval) / 2;
+    }
 }
 
 

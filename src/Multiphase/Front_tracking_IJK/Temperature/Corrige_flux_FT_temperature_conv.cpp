@@ -84,8 +84,7 @@ void Corrige_flux_FT_temperature_conv::update()
   interp_back_to_bary_faces(temp_vap, temp_liqu);
 
   // Puis des températures ghost pour les flux à proximité de l'interface
-  intersection_ijk_cell_->maj_interpolation_coo_on_interfaces(
-    ref_ijk_ft_->itfce().I());
+  intersection_ijk_cell_->update_interpolations_cell_centres_on_interface();
 
   temp_vap.resize(intersection_ijk_cell_->n());
   temp_liqu.resize(intersection_ijk_cell_->n());
@@ -465,6 +464,9 @@ void Corrige_flux_FT_temperature_conv::update_temperature_ghost(const ArrOfDoubl
   for (int i_diph = 0; i_diph < n_diph; i_diph++)
     {
       const double di = intersection_ijk_cell_->dist_interf()(i_diph);
+      /*
+       * FIXME : Calcul de di tout le temps positif ?!
+       */
       temperature_ghost_(i_diph, 0) =
         temp_interface_cell_(i_diph) + di * q_interface_cell_(i_diph) / ldav;
       temperature_ghost_(i_diph, 1) =

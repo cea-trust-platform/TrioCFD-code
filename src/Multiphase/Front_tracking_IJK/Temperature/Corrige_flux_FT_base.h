@@ -46,6 +46,7 @@
 #include <Ouvrir_fichier.h>
 #include <TRUST_Ref.h>
 #include <ParcoursIJKDir.h>
+#include <IJK_One_Dimensional_Subproblems.h>
 
 class IJK_FT_double;
 
@@ -70,6 +71,14 @@ public:
                           Intersection_Interface_ijk_face& intersection_ijk_face,
                           Intersection_Interface_ijk_cell& intersection_ijk_cell);
 
+  virtual void initialize_with_subproblems(const IJK_Splitting& splitting,
+                                           const IJK_Field_double& field,
+                                           const IJK_Interfaces& interfaces,
+                                           const IJK_FT_double& ijk_ft,
+                                           Intersection_Interface_ijk_face& intersection_ijk_face,
+                                           Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                           const IJK_One_Dimensional_Subproblems& thermal_local_subproblems);
+
   void set_physical_parameters(const double rhocpl,
                                const double rhocpv,
                                const double ldal,
@@ -87,6 +96,10 @@ public:
                                                  ArrOfDouble& temperature_interp, ArrOfDouble& flux_normal_interp,
                                                  ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                                  DoubleTab& coo_vap) const = 0 ;
+
+  virtual void compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const { ; };
+  virtual void compute_temperature_face_centre() { ; };
+  virtual void compute_thermal_fluxes_face_centre() { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

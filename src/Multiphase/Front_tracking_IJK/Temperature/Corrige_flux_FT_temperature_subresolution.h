@@ -23,6 +23,7 @@
 #define Corrige_flux_FT_temperature_subresolution_included
 
 #include <Corrige_flux_FT_base.h>
+#include <IJK_One_Dimensional_Subproblems.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -31,6 +32,7 @@
 // <Description of class Corrige_flux_FT_temperature_subresolution>
 //
 /////////////////////////////////////////////////////////////////////////////
+#define FACES_DIR {0, 0, 1, 1, 2, 2}
 
 class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
 {
@@ -39,12 +41,15 @@ class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
 
 public :
 
-  void initialize(const IJK_Splitting& splitting,
-                  const IJK_Field_double& field,
-                  const IJK_Interfaces& interfaces,
-                  const IJK_FT_double& ijk_ft,
-                  Intersection_Interface_ijk_face& intersection_ijk_face,
-                  Intersection_Interface_ijk_cell& intersection_ijk_cell) override { ; };
+  void initialize_with_subproblems(const IJK_Splitting& splitting,
+                                   const IJK_Field_double& field,
+                                   const IJK_Interfaces& interfaces,
+                                   const IJK_FT_double& ijk_ft,
+                                   Intersection_Interface_ijk_face& intersection_ijk_face,
+                                   Intersection_Interface_ijk_cell& intersection_ijk_cell,
+                                   const IJK_One_Dimensional_Subproblems& thermal_subproblems) override;
+
+  void associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems);
 
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
@@ -52,7 +57,6 @@ public :
    */
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
                            const int k_layer, const int dir) override { ; };
-  void update() override { ; };
 
   void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
                                          const double dist, const DoubleTab& positions, const DoubleTab& normale,
@@ -60,8 +64,24 @@ public :
                                          ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                          DoubleTab& coo_vap) const override { ; };
 
-protected :
+  void update() override;
+  void check_subproblems_consistency();
+  void compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const override;
+  void compute_temperature_face_centre() override;
+  void compute_thermal_fluxes_face_centre() override;
+  void clean();
+  void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
 
+protected :
+  DoubleVect dist_;
+  IntVect pure_face_unique_;
+  DoubleVect convective_fluxes_;
+  DoubleVect convective_fluxes_unique_;
+  DoubleVect diffusive_fluxes_;
+  DoubleVect diffusive_fluxes_unique_;
+  const IJK_One_Dimensional_Subproblems * thermal_subproblems_;
+  bool has_checked_consistency_;
+  ArrOfInt ijk_intersections_subproblems_indices_;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

@@ -96,7 +96,10 @@ public :
   void compute_add_source_terms();
   void retrieve_temperature_solutions();
   void compute_local_temperature_gradient_solutions();
-
+  void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
+  double get_interfacial_gradient_corrected(int i);
+  double get_temperature_profile_at_point(const int& i, const double& dist) const;
+  double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
 
   const int& get_subproblems_counter() const
   {
