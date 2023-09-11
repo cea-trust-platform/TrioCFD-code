@@ -64,6 +64,7 @@ void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
   Mod_turb_hyd_RANS_komega::set_param(param);
   param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P Nom Model variant for k-omega (default value SST)
+  Cout << "model_variant " << model_variant << "\n";
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
@@ -171,7 +172,17 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const DoubleTab
       if (tab_K_Omega(i, 1) <= OMEGA_MIN)
         turbulent_viscosity[i] = 0;
       else
-        turbulent_viscosity[i] = tab_K_Omega(i, 0)/tab_K_Omega(i, 1); // k/omega
+        {
+          if (model_variant == "SST")
+            {
+              // SST variant from the TurbModel group formulation
+              const double tmpmax = std::max(CST_A1*tab_K_Omega(i, 1),
+                                             get_enstrophy()[i]*get_fieldF2()[i]);
+              turbulent_viscosity[i] = tab_K_Omega(i, 0)*CST_A1/tmpmax;
+            }
+          else
+            turbulent_viscosity[i] = tab_K_Omega(i, 0)/tab_K_Omega(i, 1); // k/omega
+        }
     }
 }
 
@@ -292,10 +303,28 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
     }
 }
 
-void Modele_turbulence_hyd_K_Omega::init_tab_blenderF1()
+void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 {
-  int const n = la_viscosite_turbulente.valeurs().dimension(0);
-  blenderF1.valeurs().resize(n);
+  // de la taille de K_Omega, et pas de la_viscosite_turbulente ?
+  int const n = K_Omega().valeurs().dimension(0);
+
+  Cerr << "K_Omega().valeurs().nb_dim() " << K_Omega().valeurs().nb_dim() << "\n";
+  Cerr << "K_Omega().valeurs().size() " << K_Omega().valeurs().size() << "\n";
+  Cerr << "K_Omega().valeurs().dimension(0) " << K_Omega().valeurs().dimension(0) << "\n";
+  Cerr << "K_Omega().valeurs().dimension(1) " << K_Omega().valeurs().dimension(1) << "\n";
+
+  Cerr << "blenderF1.nb_dim()" << blenderF1.nb_dim() << "\n";
+  Cerr << "blenderF1.size()" << blenderF1.size() << "\n";
+  Cerr << "blenderF1.dimension(0) " << blenderF1.dimension(0) << "\n";
+  blenderF1.resize(n);
+  Cerr << "blenderF1.nb_dim()" << blenderF1.nb_dim() << "\n";
+  Cerr << "blenderF1.size()" << blenderF1.size() << "\n";
+  Cerr << "blenderF1.dimension(0) " << blenderF1.dimension(0) << "\n";
+
+  fieldF2.resize(n);
+  enstrophy.resize(n);
+
+  // le_champ_K_Omega.valeur().equation().domaine_dis().domaine().init_dist_paroi_globale
 }
 
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
@@ -303,7 +332,7 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
   eqn_transp_K_Omega().preparer_calcul();
   Mod_turb_hyd_RANS_komega::preparer_calcul();
 
-  init_tab_blenderF1();
+  init_F1_F2_enstrophy();
 
   // GF quand on demarre un calcul il est bon d'utliser la ldp
   // encore plus quand on fait une reprise !!!!!!!!
@@ -365,6 +394,7 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   loipar.calculer_hyd(ch_K_Omega);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour loiparoi after", 1);
   eqn_transp_K_Omega().controler_K_Omega();
+
   calculer_viscosite_turbulente(ch_K_Omega.temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_Omega par rho

@@ -67,14 +67,14 @@ const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
   return turbulence_model->loi_paroi().valeur().que_suis_je();
 }
 
-void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega)
+void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega) const
 {
 
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   const DoubleTab& kinematic_viscosity = get_visc_turb();
   const DoubleTab& distmin = le_dom_VEF->y_faces(); // Minimum distance to the edge
-  // DoubleTab& tmpF1 = turbulence_model->get_blenderF1(); // The blending field F1
-  DoubleTab& tmpF1 = turbulence_model->get_blenderF1();
+  DoubleTab& tmpF1 = ref_cast_non_const(DoubleTab, turbulence_model->get_blenderF1());
+  DoubleTab& tmpF2 = ref_cast_non_const(DoubleTab, turbulence_model->get_fieldF2());
 
   // Loop on faces
   for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
@@ -88,6 +88,9 @@ void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgrad
       double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(gradKgradOmega(face)*dmin);
       double const arg1 = std::min(std::max(tmp1, tmp2), tmp3); // Common name of the variable
       tmpF1(face) = std::tanh(arg1*arg1*arg1*arg1);
+
+      double const arg2 = std::max(2.*tmp1, tmp2);
+      tmpF2(face) = std::tanh(arg2*arg2);
     }
 }
 
@@ -132,7 +135,7 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   const DoubleTab& velocity_field_face = eqHyd.vitesse().valeurs(); // Velocity on faces
   const int nbr_velocity_components = velocity_field_face.dimension(1);
   const DoubleTab& pressure = eqHyd.pression().valeurs();
-  const int total_number_of_faces = pressure.dimension(0); // find a better name than nb_tot
+  const int total_number_of_faces = pressure.size_totale(); // find a better name than nb_tot
   gradK_elem.resize(total_number_of_faces, nbr_velocity_components);
   gradOmega_elem.resize(total_number_of_faces, nbr_velocity_components);
   // resize_gradient_tab(gradK);

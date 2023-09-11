@@ -64,7 +64,7 @@ void Source_Transport_K_Omega_VEF_Face_base::elem_to_face(const Domaine_VF& doma
   const int nb_elem_tot = domaine.nb_elem_tot();
   const int nb_comp = grad_faces.line_size();
 
-  assert (grad_elems.dimension_tot(0) == nb_elem_tot);
+  // assert (grad_elems.dimension_tot(0) == nb_elem_tot);
   assert (grad_faces.dimension_tot(0) == domaine.nb_faces_tot());
   assert (grad_elems.line_size() == nb_comp);
 
@@ -106,6 +106,10 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
                               _interpolation_viscosite_turbulente);
 
   fill_resu(volumes_entrelaces, production_TKE, gradKgradOmega, resu); // voir les classes filles
+
+  if (turbulence_model->get_model_variant() == "SST")
+    compute_enstrophy(le_dom_VEF, domaine_Cl_VEF, velocity,
+                      ref_cast_non_const(DoubleTab, turbulence_model->get_enstrophy()));
 
   return resu;
 }

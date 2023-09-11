@@ -23,6 +23,7 @@
 #define Source_Transport_K_Omega_VEF_Face_base_included
 
 #include <Calcul_Production_K_VEF.h>
+#include <Tensors_Computation_VEF.h>
 #include <Source_Transport_proto.h>
 #include <TRUST_Ref.h>
 
@@ -31,7 +32,10 @@ class Domaine_Cl_VEF;
 class Domaine_VEF;
 class Modele_turbulence_hyd_K_Omega;
 
-class Source_Transport_K_Omega_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF, public Source_Transport_proto
+class Source_Transport_K_Omega_VEF_Face_base: public Source_base,
+  public Source_Transport_proto,
+  public Calcul_Production_K_VEF,
+  public Tensors_Computation_VEF
 {
   Declare_base_sans_constructeur(Source_Transport_K_Omega_VEF_Face_base);
 public :
@@ -49,7 +53,7 @@ public :
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { /* Do Nothing */ }
 
   virtual void compute_cross_diffusion(DoubleTab& gradKgradOmega) const { return not_implemented<void>(__func__); };
-  virtual void compute_blending_F1(DoubleTab& gradKgradOmega) { return not_implemented<void>(__func__); };
+  virtual void compute_blending_F1(DoubleTab& gradKgradOmega) const { return not_implemented<void>(__func__); };
 
 protected :
   DoubleTab& ajouter_komega(DoubleTab&) const;

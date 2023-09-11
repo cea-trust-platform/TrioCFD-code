@@ -75,6 +75,7 @@ protected:
   double OMEGA_MIN, OMEGA_MAX, K_MIN;
   int lquiet;
   Motcle model_variant; // default model will be k-omega
+  static constexpr double CST_A1 = 0.31;
 };
 
 inline const Motcle& Mod_turb_hyd_RANS_komega::get_model_variant() const

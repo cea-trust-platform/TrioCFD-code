@@ -27,6 +27,7 @@
 
 class Motcle;
 class Champ_Inc;
+class Tensors_Computation_VEF;
 
 /*! @brief Classe Modele_turbulence_hyd_K_Omega Cette classe represente le modele de turbulence (k, omega) pour les
  *
@@ -54,10 +55,14 @@ public:
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
 
-  void init_tab_blenderF1();
+  void init_F1_F2_enstrophy();
 
   inline const DoubleTab& get_blenderF1() const;
   inline DoubleTab& get_blenderF1();
+  inline const DoubleTab& get_fieldF2() const;
+  inline DoubleTab& get_fieldF2();
+  inline const DoubleTab& get_enstrophy() const;
+  inline DoubleTab& get_enstrophy();
 
   void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega,
                                     DoubleTab& turbulent_viscosity);
@@ -74,7 +79,9 @@ public:
 protected:
   Transport_K_Omega eqn_transport_K_Omega;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
-  Champ_Inc blenderF1; // Blending field for SST model
+  DoubleTab blenderF1; // Blending field for SST model
+  DoubleTab fieldF2; // for the turbulent viscosity in the SST model
+  DoubleTab enstrophy; // for the turbulent viscosity in the SST model
 
 };
 
@@ -136,7 +143,7 @@ inline const Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K
  */
 inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1() const
 {
-  return blenderF1.valeurs();
+  return blenderF1;
 }
 
 /*! @brief Returns the blending field F1.
@@ -145,9 +152,48 @@ inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1() const
  */
 inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1()
 {
-  return blenderF1.valeurs();
+  return blenderF1;
 }
 
+/*! @brief Returns the field F2.
+ *
+ *     (version const)
+ *
+ * @return (DoubleTab&) blenderF2
+ */
+inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2() const
+{
+  return fieldF2;
+}
+
+/*! @brief Returns the field F2.
+ *
+ * @return (DoubleTab&) fieldF2
+ */
+inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2()
+{
+  return fieldF2;
+}
+
+/*! @brief Returns the field enstrophy.
+ *
+ *     (version const)
+ *
+ * @return (DoubleTab&) enstrophy
+ */
+inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy() const
+{
+  return enstrophy;
+}
+
+/*! @brief Returns the field F2.
+ *
+ * @return (DoubleTab&) fieldF2
+ */
+inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy()
+{
+  return enstrophy;
+}
 
 inline int Modele_turbulence_hyd_K_Omega::nombre_d_equations() const
 {

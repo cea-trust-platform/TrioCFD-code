@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,47 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_Omega_VEF_Face.h
+// File:        Tensors_Computation_VEF.h
 // Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Sources
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_K_Omega_VEF_Face_included
-#define Source_Transport_K_Omega_VEF_Face_included
+#ifndef Tensors_Computation_VEF_included
+#define Tensors_Computation_VEF_included
 
-#include <Source_Transport_K_Omega_VEF_Face_base.h>
-#include <TRUST_Ref.h>
+#include <TRUSTTabs_forward.h>
+#include <Champ_Don.h>
+#include <Front_VF.h>
+#include <Periodique.h>
 
-class Transport_K_Omega;
+class Domaine_Cl_VEF;
+class Domaine_VEF;
 
-/*! @brief class Source_Transport_K_Eps_VEF_Face Cette classe represente le terme source qui figure dans l'equation
- *
- *  de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
- *  ne sont pas couplees a la thermique ou a l'equation de convection-diffusion d'une concentration.
- *
- */
-class Source_Transport_K_Omega_VEF_Face : public Source_Transport_K_Omega_VEF_Face_base
+class Tensors_Computation_VEF
 {
-  Declare_instanciable_sans_constructeur(Source_Transport_K_Omega_VEF_Face);
-public:
-  Source_Transport_K_Omega_VEF_Face(double cte1 = C1__, double cte2 = C2__) : Source_Transport_K_Omega_VEF_Face_base(cte1, cte2) { }
-  DoubleTab& ajouter(DoubleTab&) const override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
-
-  void compute_cross_diffusion(DoubleTab& gradKgradOmega) const override;
-  void compute_blending_F1(DoubleTab& gradKgradOmega) const override;
-  double blender(double const val1, double const val2, int const face) const;
-
 protected:
-  void associer_pb(const Probleme_base& pb) override;
-  REF(Transport_K_Omega) eqn_K_Omega;
+  Tensors_Computation_VEF() { }
 
-private:
-  const DoubleTab& get_visc_turb() const override;
-  const DoubleTab& get_cisaillement_paroi() const override;
-  const DoubleTab& get_K_pour_production() const override;
-  const Nom get_type_paroi() const override;
-  void fill_resu(const DoubleVect& , const DoubleTrav& , const DoubleTab&, DoubleTab& ) const override;
+  void compute_enstrophy(const Domaine_VEF&, const Domaine_Cl_VEF&,
+                         const DoubleTab& velocity, DoubleTab& enstrophy) const;
+  void antisym_loop_edge_faces(const Domaine_VEF& dom_VEF, const Domaine_Cl_VEF& dom_BC_VEF,
+                               const DoubleTab& gradient_elem, DoubleTab& enstrophy) const;
+  void antisym_loop_edges_general(const Domaine_VEF& dom_VEF, const Front_VF& the_edge,
+                                  const DoubleTab& gradient_elem, DoubleTab& enstrophy) const;
+  void antisym_loop_edges_periodiqueBC(const Domaine_VEF& dom_VEF, const Front_VF& the_edge,
+                                       const DoubleTab& gradient_elem, DoubleTab& enstrophy) const;
+  void antisym_loop_internal_faces(const Domaine_VEF& dom_VEF, const DoubleTab& gradient_elem,
+                                   DoubleTab& enstrophy) const;
 };
 
-#endif /* Source_Transport_K_Omega_VEF_Face_included */
+#endif // Tensors_Computation_VEF_included
