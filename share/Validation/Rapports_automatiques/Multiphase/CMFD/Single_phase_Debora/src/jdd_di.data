@@ -4,7 +4,7 @@ Dimension 3
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh $mesh
+read_med { domain dom mesh mesh file 1_canal_1.med }
 # END MESH #
 
 # BEGIN PARTITION
@@ -23,7 +23,7 @@ Scatter DOM.Zones dom
 END SCATTER #
 
 PolyMAC_P0  dis
-option_covimac { traitement_axi }
+option_PolyMAC_P0 { traitement_axi }
 
 
 Schema_euler_implicite sch
@@ -32,11 +32,11 @@ Read sch
     tinit 0
     tmax 8
     dt_impr 1e-8
-    facsec 20
-    facsec_max 20
+    facsec 1
+    facsec_max 1
     nb_pas_dt_max $nb_pas_dt_max
     seuil_statio 1.e-3
-    solveur sets
+    solveur ice
     {
         criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e-5 k 1e-5 omega 1e-3  }
         iter_min 2
@@ -168,7 +168,7 @@ Lire pb
         }
         sources
         {
-            Production_energie_cin_turb ,
+            Production_energie_cin_turb  { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }
@@ -176,6 +176,7 @@ Lire pb
 	{
 		sondes		{
 					temperature temperature_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
+					vitesse vitesse_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
 					}
 		format lml
 		champs binaire dt_post 1.e8

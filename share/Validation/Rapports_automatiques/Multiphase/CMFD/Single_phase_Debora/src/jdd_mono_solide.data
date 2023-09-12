@@ -199,7 +199,7 @@ Lire pbm
         }
         sources
         {
-            Production_energie_cin_turb ,
+            Production_energie_cin_turb { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }
@@ -239,7 +239,7 @@ Read pbc
     conduction
     {
         diffusion   { }
-        initial_conditions  { temperature  champ_fonc_xyz dom_solide  1  $Ts0 }
+        initial_conditions  { temperature  champ_fonc_xyz dom_solide  1  $Tl0 }
         boundary_conditions
         {
             outside          paroi_adiabatique

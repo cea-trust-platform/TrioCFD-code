@@ -4,7 +4,7 @@ Dimension 3
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh 1_canal_1.med
+read_med { domain dom mesh mesh file 1_canal_1.med }
 # END MESH #
 
 # BEGIN PARTITION
@@ -23,7 +23,7 @@ Scatter DOM.Zones dom
 END SCATTER #
 
 PolyMAC_P0  dis
-option_covimac { traitement_axi }
+option_PolyMAC_P0 { traitement_axi }
 
 
 Schema_euler_implicite sch
@@ -150,7 +150,7 @@ Lire pb
         }
         sources
         {
-            Production_energie_cin_turb ,
+            Production_energie_cin_turb  { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }
