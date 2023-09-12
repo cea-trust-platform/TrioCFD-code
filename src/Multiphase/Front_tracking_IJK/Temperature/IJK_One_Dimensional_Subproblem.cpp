@@ -21,6 +21,8 @@
 
 #include <IJK_One_Dimensional_Subproblem.h>
 #include <IJK_Navier_Stokes_tools.h>
+#include <Ouvrir_fichier.h>
+#include <IJK_FT.h>
 
 Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_One_Dimensional_Subproblem", Objet_U ) ;
 
@@ -29,6 +31,7 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   points_per_thermal_subproblem_ = nullptr;
   points_per_thermal_subproblem_base_ = nullptr;
   alpha_ = nullptr;
+  lambda_ = nullptr;
   coeff_distance_diagonal_ = nullptr;
   cell_diagonal_ = nullptr;
 
@@ -144,6 +147,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_pro
                                                                      ArrOfDouble bubble_barycentre,
                                                                      const int& points_per_thermal_subproblem,
                                                                      const double& alpha,
+                                                                     const double& lambda,
                                                                      const double& coeff_distance_diagonal,
                                                                      const double& cell_diagonal,
                                                                      const double& dr_base,
@@ -181,7 +185,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_pro
   associate_rising_velocity(bubble_rising_velocity, bubble_rising_vector, bubble_barycentre);
   associate_eulerian_fields_references(interfaces, eulerian_distance, eulerian_curvature, eulerian_interfacial_area, eulerian_normal_vect,
                                        eulerian_facets_barycentre, temperature, temperature_ft, velocity, velocity_ft, grad_T_elem, hess_diag_T_elem, hess_cross_T_elem);
-  associate_probe_parameters(points_per_thermal_subproblem, alpha, coeff_distance_diagonal, cell_diagonal, dr_base, radial_coordinates);
+  associate_probe_parameters(points_per_thermal_subproblem, alpha, lambda, coeff_distance_diagonal, cell_diagonal, dr_base, radial_coordinates);
   associate_finite_difference_operators(radial_first_order_operator_raw, radial_second_order_operator_raw,
                                         radial_first_order_operator, radial_second_order_operator,
                                         radial_diffusion_matrix, radial_convection_matrix);
@@ -199,6 +203,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_pro
 
 void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
                                                                 const double& alpha,
+                                                                const double& lambda,
                                                                 const double& coeff_distance_diagonal,
                                                                 const double& cell_diagonal,
                                                                 const double& dr_base,
@@ -210,6 +215,7 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
   points_per_thermal_subproblem_base_ = &points_per_thermal_subproblem;
   coeff_distance_diagonal_ = &coeff_distance_diagonal;
   alpha_ = &alpha;
+  lambda_ = &lambda;
   cell_diagonal_ = &cell_diagonal;
   dr_base_ = &dr_base;
   radial_coordinates_base_ = &radial_coordinates;
@@ -241,6 +247,7 @@ void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const
 void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
 {
   compute_interface_basis_vectors();
+  compute_pure_spherical_basis_vectors();
   /*
    *  Curvature is negative for a convex bubble
    *  but R should be positive in that case
@@ -287,6 +294,7 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
           coordinates_cartesian_compo_(i, dir) = radial_coordinates_cartesian_compo_(i, dir) + facet_barycentre_[dir];
         }
     }
+  surface_ = (*eulerian_interfacial_area_)(index_i_, index_j_, index_k_);
   rhs_assembly_.resize(*points_per_thermal_subproblem_);
 }
 
@@ -383,6 +391,32 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
       first_tangential_vector_compo_solver_= &first_tangential_vector_compo_;
       second_tangential_vector_compo_solver_ = &second_tangential_vector_compo_;
     }
+}
+
+void IJK_One_Dimensional_Subproblem::compute_pure_spherical_basis_vectors()
+{
+  /*
+   * FIXME: It is align with gravity z but it should be modified to be align with the gravity dir
+   */
+  r_sph_ = sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
+                + facet_barycentre_relative_[1] * facet_barycentre_relative_[1]
+                + facet_barycentre_relative_[2] * facet_barycentre_relative_[2]);
+  theta_sph_ = atan(sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
+                         + facet_barycentre_relative_[1] * facet_barycentre_relative_[1])/ facet_barycentre_relative_[2]);
+  phi_sph_ = atan(facet_barycentre_relative_[1] / facet_barycentre_relative_[0]);
+
+  for (int dir=0; dir<3; dir++)
+    er_sph_[dir] = facet_barycentre_relative_[dir] / r_sph_;
+
+  const double length = sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
+                             + facet_barycentre_relative_[1] * facet_barycentre_relative_[1]);
+  for (int dir=0; dir<2; dir++)
+    etheta_sph_[dir] = facet_barycentre_relative_[dir] * facet_barycentre_relative_[2] / (r_sph_ * length);
+  etheta_sph_[2] = - facet_barycentre_relative_[2] * length / r_sph_;
+
+  ephi_sph_ = {0., 0., 0.};
+  ephi_sph_[0] = - facet_barycentre_relative_[1];
+  ephi_sph_[1] = facet_barycentre_relative_[0];
 }
 
 const int * IJK_One_Dimensional_Subproblem::increase_number_of_points()
@@ -485,19 +519,22 @@ void IJK_One_Dimensional_Subproblem::project_cartesian_onto_basis_vector(const D
     projection[i] = compo_x[i] * basis[0] + compo_y[i] * basis[1] + compo_z[i] * basis[2];
 }
 
-void IJK_One_Dimensional_Subproblem::project_basis_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
-                                                                      const Vecteur3& basis_u, const Vecteur3& basis_v, const Vecteur3& basis_w,
-                                                                      DoubleVect& projection)
+void IJK_One_Dimensional_Subproblem::project_basis_vector_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
+                                                                             const Vecteur3& basis_u, const Vecteur3& basis_v, const Vecteur3& basis_w,
+                                                                             DoubleVect& projection)
 {
-  const int size_x = compo_u.size();
-//  const int size_y = compo_v.size();
-//  const int size_z = compo_w.size();
-//  const int size_projection = projection.size();
-//  assert((size_x == size_y) && (size_x == size_z) && (size_x == size_projection));
-//  Cerr << "size_x << size_y << size_z << size_projection" <<  finl;
-//  Cerr << size_x << size_y << size_z << size_projection <<  finl;
-  for (int i=0; i<size_x; i++)
-    projection[i] = compo_u[i] * basis_u[dir] + compo_v[i] * basis_v[dir] + compo_w[i] * basis_w[dir];
+  const int size_u = compo_u.size();
+  const int size_v = compo_v.size();
+  const int size_w = compo_w.size();
+  for (int i=0; i<projection.size(); i++)
+    {
+      if (i< size_u)
+        projection[i] += compo_u[i] * basis_u[dir];
+      if (i< size_v)
+        projection[i] += compo_v[i] * basis_v[dir];
+      if (i< size_w)
+        projection[i] += compo_w[i] * basis_w[dir];
+    }
 }
 
 void IJK_One_Dimensional_Subproblem::interpolate_temperature_on_probe()
@@ -571,6 +608,14 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
       else
         radial_convection_prefactor_ = radial_velocity_;
       radial_convection_prefactor_ *= alpha_inv;
+    }
+  else
+    {
+      radial_velocity_.resize(*points_per_thermal_subproblem_);
+      radial_velocity_corrected_.resize(*points_per_thermal_subproblem_);
+      first_tangential_velocity_.resize(*points_per_thermal_subproblem_);
+      second_tangential_velocity_.resize(*points_per_thermal_subproblem_);
+      azymuthal_velocity_.resize(*points_per_thermal_subproblem_);
     }
   if (source_terms_type_ != linear_diffusion)
     radial_convection_prefactor_ +=	osculating_radial_coefficient;
@@ -705,12 +750,11 @@ void IJK_One_Dimensional_Subproblem::correct_tangential_temperature_hessian(Doub
     tangential_diffusion_source_terms_tmp[i] -= tangential_diffusion_source_terms_tmp[0];
 }
 
-
 void IJK_One_Dimensional_Subproblem::retrieve_temperature_solution()
 {
   temperature_solution_.resize(rhs_assembly_.size());
   for (int i=start_index_; i<end_index_; i++)
-    temperature_solution_[i-start_index_] = (*thermal_subproblems_temperature_solution_)[start_index_];
+    temperature_solution_[i - start_index_] = (*thermal_subproblems_temperature_solution_)[i];
 }
 
 void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution()
@@ -724,17 +768,26 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   (*finite_difference_assembler_).compute_operator(radial_second_order_operator_base_, temperature_solution_, normal_temperature_double_derivative_solution_);
 
   temperature_x_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_onto_cartesian_dir(0, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                   normal_vector_compo_, *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_,
-                                   temperature_x_gradient_solution_);
+  project_basis_vector_onto_cartesian_dir(0, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          temperature_x_gradient_solution_);
   temperature_y_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_onto_cartesian_dir(1, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                   normal_vector_compo_, *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_,
-                                   temperature_y_gradient_solution_);
+  project_basis_vector_onto_cartesian_dir(1, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          temperature_y_gradient_solution_);
   temperature_z_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_onto_cartesian_dir(2, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                   normal_vector_compo_, *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_,
-                                   temperature_z_gradient_solution_);
+  project_basis_vector_onto_cartesian_dir(2, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          temperature_z_gradient_solution_);
+
+  if (source_terms_type_ == linear_diffusion && source_terms_type_ == spherical_diffusion)
+    {
+      tangential_temperature_gradient_first_.resize(*points_per_thermal_subproblem_);
+      tangential_temperature_gradient_second_.resize(*points_per_thermal_subproblem_);
+    }
+
+  thermal_flux_ = normal_temperature_gradient_solution_;
+  thermal_flux_*= ((*lambda_) * surface_);
 }
 
 double IJK_One_Dimensional_Subproblem::get_interfacial_gradient_corrected() const
@@ -742,10 +795,54 @@ double IJK_One_Dimensional_Subproblem::get_interfacial_gradient_corrected() cons
   return normal_temperature_gradient_solution_[0];
 }
 
+void IJK_One_Dimensional_Subproblem::compute_local_velocity_gradient()
+{
+  normal_velocity_normal_gradient_.resize(*points_per_thermal_subproblem_);
+  tangential_velocity_normal_gradient_.resize(*points_per_thermal_subproblem_);
+  second_tangential_velocity_normal_gradient_.resize(*points_per_thermal_subproblem_);
+  azymuthal_velocity_normal_gradient_.resize(*points_per_thermal_subproblem_);
+
+  if (source_terms_type_ != linear_diffusion && source_terms_type_ != spherical_diffusion)
+    {
+      (*finite_difference_assembler_).compute_operator(radial_first_order_operator_base_,
+                                                       radial_velocity_,
+                                                       normal_velocity_normal_gradient_);
+      (*finite_difference_assembler_).compute_operator(radial_first_order_operator_base_,
+                                                       first_tangential_velocity_,
+                                                       tangential_velocity_normal_gradient_);
+      (*finite_difference_assembler_).compute_operator(radial_first_order_operator_base_,
+                                                       second_tangential_velocity_,
+                                                       second_tangential_velocity_normal_gradient_);
+      (*finite_difference_assembler_).compute_operator(radial_first_order_operator_base_,
+                                                       azymuthal_velocity_,
+                                                       azymuthal_velocity_normal_gradient_);
+    }
+}
+
+double IJK_One_Dimensional_Subproblem::get_normal_velocity_normal_gradient() const
+{
+  return normal_velocity_normal_gradient_[0];
+}
+
+double IJK_One_Dimensional_Subproblem::get_tangential_velocity_normal_gradient() const
+{
+  return tangential_velocity_normal_gradient_[0];
+}
+
+double IJK_One_Dimensional_Subproblem::get_second_tangential_velocity_normal_gradient() const
+{
+  return second_tangential_velocity_normal_gradient_[0];
+}
+
+double IJK_One_Dimensional_Subproblem::get_azymuthal_velocity_normal_gradient() const
+{
+  return azymuthal_velocity_normal_gradient_[0];
+}
+
 double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& dist, const DoubleVect& field) const
 {
   double field_value = INVALID_TEMPERATURE;// temperature_solution_;
-  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
+  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_-1])
     {
       /*
        * Dummy dichotomy and linear interpolation along the probe
@@ -770,26 +867,6 @@ double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const do
 {
   return get_field_profile_at_point(dist, temperature_solution_);
 }
-//  double temperature_cell_centre = INVALID_TEMPERATURE;// temperature_solution_;
-//  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
-//    {
-//      /*
-//       * Dummy dichotomy and linear interpolation along the probe
-//       */
-//      int left_interval = 0;
-//      int right_interval = *points_per_thermal_subproblem_-1;
-//      find_interval(dist, left_interval, right_interval);
-//      const double temperature_interp = (temperature_solution_[right_interval] - temperature_solution_[left_interval])
-//                                        / ((*radial_coordinates_)[right_interval] - (*radial_coordinates_)[left_interval]) *
-//                                        (dist-(*radial_coordinates_)[left_interval]) + temperature_solution_[left_interval];
-//      temperature_cell_centre = temperature_interp;
-//    }
-//  if (dist < (*radial_coordinates_)[0])
-//    {
-//      const double interfacial_temperature_gradient_solution = get_interfacial_gradient_corrected();
-//      temperature_cell_centre = interfacial_temperature_gradient_solution * dist;
-//    }
-//  return temperature_cell_centre;
 
 double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const
 {
@@ -812,7 +889,6 @@ double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point
   return temperature_gradient;
 }
 
-
 void IJK_One_Dimensional_Subproblem::find_interval(const double& dist, int& left_interval, int& right_interval) const
 {
   int mid_interval = left_interval + (right_interval - left_interval) / 2;
@@ -826,4 +902,89 @@ void IJK_One_Dimensional_Subproblem::find_interval(const double& dist, int& left
     }
 }
 
+void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs()
+{
+  post_process_interfacial_quantities();
+  post_process_radial_quantities();
+}
+
+void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities()
+{
+  if (Process::je_suis_maitre())
+    {
+      const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+      Nom probe_name = Nom("thermal_subproblems_interfacial_quantities") + Nom(".out");
+      Nom probe_header = Nom("tstep\ttime\tsubproblem\ttemperature_gradient\ttemperature_double_deriv"
+                             "ttemperature_gradient_tangential\ttemperature_gradient_tangential2\ttemperature_gradient_azymuthal"
+                             "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                             "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
+      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+      fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+      fic << sub_problem_index_;
+      fic << normal_temperature_gradient_solution_[0] << normal_temperature_double_derivative_solution_[0];
+      fic << tangential_temperature_gradient_first_[0];
+      fic << tangential_temperature_gradient_second_[0] << azymuthal_temperature_gradient_[0];
+      fic << surface_ << thermal_flux_[0] << *lambda_ << *alpha_ << Pr_l_;
+      fic << x_velocity_[0] << y_velocity_[0] << z_velocity_[0];
+      fic << radial_velocity_[0] << radial_velocity_corrected_[0];
+      fic << first_tangential_velocity_[0];
+      fic << second_tangential_velocity_[0] << azymuthal_velocity_[0];
+      fic << normal_velocity_normal_gradient_[0] << tangential_velocity_normal_gradient_[0];
+      fic << second_tangential_velocity_normal_gradient_[0] << azymuthal_velocity_normal_gradient_[0];
+      fic << finl;
+      fic.close();
+    }
+}
+
+void IJK_One_Dimensional_Subproblem::post_process_radial_quantities()
+{
+  if (Process::je_suis_maitre())
+    {
+      const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+      Nom probe_name = Nom("thermal_subproblem_") + Nom(sub_problem_index_) + ("_radial_quantities_time_index_")
+                       + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+      Nom probe_header = Nom("tstep\ttime\tsubproblem\tradial_coord\ttemperature_interp\ttemperature_solution"
+                             "\ttemperature_gradient\ttemperature_double_deriv"
+                             "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                             "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
+      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+      for (int i=0; i<(*points_per_thermal_subproblem_); i++)
+        {
+          fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+          fic << sub_problem_index_;
+          fic << (*radial_coordinates_)[i] << temperature_interp_[i] << temperature_solution_[i];
+          fic << normal_temperature_gradient_[i] << normal_temperature_double_derivative_solution_[i];
+          fic << surface_ << thermal_flux_[i] << *lambda_ << *alpha_ << Pr_l_;
+          fic << x_velocity_[i] << y_velocity_[i] << z_velocity_[i];
+          fic << radial_velocity_[i] << radial_velocity_corrected_[i];
+          fic << first_tangential_velocity_[i];
+          fic << second_tangential_velocity_[i] << azymuthal_velocity_[i];
+          fic << normal_velocity_normal_gradient_[i] << tangential_velocity_normal_gradient_[i];
+          fic << second_tangential_velocity_normal_gradient_[i] << azymuthal_velocity_normal_gradient_[i];
+          fic << finl;
+        }
+      fic.close();
+    }
+}
+
+//  double temperature_cell_centre = INVALID_TEMPERATURE;// temperature_solution_;
+//  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
+//    {
+//      /*
+//       * Dummy dichotomy and linear interpolation along the probe
+//       */
+//      int left_interval = 0;
+//      int right_interval = *points_per_thermal_subproblem_-1;
+//      find_interval(dist, left_interval, right_interval);
+//      const double temperature_interp = (temperature_solution_[right_interval] - temperature_solution_[left_interval])
+//                                        / ((*radial_coordinates_)[right_interval] - (*radial_coordinates_)[left_interval]) *
+//                                        (dist-(*radial_coordinates_)[left_interval]) + temperature_solution_[left_interval];
+//      temperature_cell_centre = temperature_interp;
+//    }
+//  if (dist < (*radial_coordinates_)[0])
+//    {
+//      const double interfacial_temperature_gradient_solution = get_interfacial_gradient_corrected();
+//      temperature_cell_centre = interfacial_temperature_gradient_solution * dist;
+//    }
+//  return temperature_cell_centre;
 

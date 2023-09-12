@@ -443,7 +443,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
   Vecteur3 normale_interf {0., 0., .0};
   Vecteur3 bary_face {0., 0., .0};
   Vecteur3 position {0., 0., .0};
-  int nb_diph = ijk_interfaces_.size();
+  const int nb_diph = n_diph_; // ijk_interfaces_.size();
   positions.resize(nb_diph, 3, 6);
   indices_voisins.resize(nb_diph, 6);
   int neighbours_i[6] = NEIGHBOURS_I;
@@ -506,11 +506,12 @@ void Intersection_Interface_ijk_cell::compute_face_to_correct()
   /*
    * FIXME: Can we use an append_array of something ?
    */
-  int nb_diph = ijk_interfaces_.size();
+  const int nb_diph = n_diph_;
   int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
   int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
   int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
   int nb_faces_to_correct = 0;
+  ijk_pure_face_neighbours_.resize(nb_diph, 6);
   for (int i_diph=0; i_diph<nb_diph ; i_diph++)
     {
       const int i = ijk_interfaces_(i_diph, 0);

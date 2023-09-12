@@ -24,6 +24,8 @@ class Operateur_IJK_elem_diff_base_double : public Operateur_IJK_elem_base_doubl
 public:
   Operateur_IJK_elem_diff_base_double();
   virtual void initialize(const IJK_Splitting& splitting) override;
+  virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
+  virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };
   virtual void calculer(const IJK_Field_double& field,
                         IJK_Field_double& result,
                         const IJK_Field_local_double& boundary_flux_kmin,
@@ -81,6 +83,9 @@ protected:
   const IJK_Field_local_double *boundary_flux_kmin_;
   const IJK_Field_local_double *boundary_flux_kmax_;
 
+  Corrige_flux_FT *corrige_flux_;
+  const IJK_Field_local_double *indicatrice_;
+
   bool is_anisotropic_;
   bool is_vectorial_;
   bool is_structural_;
@@ -102,6 +107,8 @@ class OpDiffUniformIJKScalarCorrection_double : public Operateur_IJK_elem_diff_b
   Declare_instanciable_sans_constructeur(OpDiffUniformIJKScalarCorrection_double);
 public:
   OpDiffUniformIJKScalarCorrection_double() : Operateur_IJK_elem_diff_base_double() { is_uniform_ = true, is_corrected_ = true; }
+private:
+  void correct_flux(IJK_Field_local_double *const flux, const int k_layer, const int dir) override;
 };
 
 class OpDiffIJKScalar_double : public Operateur_IJK_elem_diff_base_double

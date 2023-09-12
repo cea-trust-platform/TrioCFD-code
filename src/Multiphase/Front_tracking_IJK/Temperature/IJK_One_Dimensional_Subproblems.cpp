@@ -37,6 +37,11 @@ void IJK_One_Dimensional_Subproblems::clean()
   vide();
 }
 
+void IJK_One_Dimensional_Subproblems::clean_add()
+{
+
+}
+
 Sortie& IJK_One_Dimensional_Subproblems::printOn( Sortie& os ) const
 {
   return os;
@@ -70,6 +75,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       DoubleTab bubbles_barycentre,
                                                                       const int& points_per_thermal_subproblem,
                                                                       const double& alpha,
+                                                                      const double& lambda,
                                                                       const double& coeff_distance_diagonal,
                                                                       const double& cell_diagonal,
                                                                       const double& dr_base,
@@ -129,6 +135,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                     bubble_barycentre,
                                                                     points_per_thermal_subproblem,
                                                                     alpha,
+                                                                    lambda,
                                                                     coeff_distance_diagonal,
                                                                     cell_diagonal,
                                                                     dr_base,
@@ -208,6 +215,12 @@ void IJK_One_Dimensional_Subproblems::compute_local_temperature_gradient_solutio
     itr.compute_local_temperature_gradient_solution();
 }
 
+void IJK_One_Dimensional_Subproblems::compute_local_velocity_gradient()
+{
+  for (auto& itr : *this)
+    itr.compute_local_velocity_gradient();
+}
+
 void IJK_One_Dimensional_Subproblems::get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const
 {
   (*this)[subproblem_index].get_ijk_indices(i,j,k);
@@ -228,5 +241,9 @@ double IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_at_poin
   return (*this)[i].get_temperature_gradient_profile_at_point(dist, dir);
 }
 
-
+void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs()
+{
+  for (auto& itr : *this)
+    itr.thermal_subresolution_outputs();
+}
 

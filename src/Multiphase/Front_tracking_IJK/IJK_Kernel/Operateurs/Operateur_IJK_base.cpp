@@ -199,6 +199,10 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
   compute_flux_z_vy(*flux_vy_zmin, 0);
   compute_flux_z_vz(*flux_vz_zmin, 0);
 
+//  correct_flux(flux_zmin, -1, 0);
+//  correct_flux(flux_zmin, -1, 1);
+//  correct_flux(flux_zmin, -1, 2);
+
   // At the bottom end of the domain, there is more layer of unknowns for vz:
   const int kmax = std::max(std::max(dvx.nk(), dvy.nk()), dvz.nk());
   for (int k = 0; k < kmax ; k++)
@@ -209,6 +213,10 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_x_vz(*flux_x, k);
           compute_flux_y_vz(*flux_y, k);
           compute_flux_z_vz(*flux_zmax, k+1);
+
+//          correct_flux(flux_x, k, 2);
+//          correct_flux(flux_y, k, 2);
+//          correct_flux(flux_zmax, k, 2);
 
           Operator_IJK_div(*flux_x, *flux_y, *flux_vz_zmin, *flux_zmax, dvz, k, add);
 
@@ -221,6 +229,10 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_y_vx(*flux_y, k);
           compute_flux_z_vx(*flux_zmax, k+1);
 
+//          correct_flux(flux_x, k, 0);
+//          correct_flux(flux_y, k, 0);
+//          correct_flux(flux_zmax, k, 0);
+
           Operator_IJK_div(*flux_x, *flux_y, *flux_vx_zmin, *flux_zmax, dvx, k, add);
 
           exec_after_divergence_flux_x(dvx, k);
@@ -231,6 +243,10 @@ void Operateur_IJK_faces_base_double::compute_(IJK_Field_double& dvx, IJK_Field_
           compute_flux_x_vy(*flux_x, k);
           compute_flux_y_vy(*flux_y, k);
           compute_flux_z_vy(*flux_zmax, k+1);
+
+//          correct_flux(flux_x, k, 1);
+//          correct_flux(flux_y, k, 1);
+//          correct_flux(flux_zmax, k, 1);
 
           Operator_IJK_div(*flux_x, *flux_y, *flux_vy_zmin, *flux_zmax, dvy, k, add);
 
@@ -283,6 +299,7 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
   IJK_Field_local_double *const flux_y = &tmp[3];
 
   compute_flux_z(*flux_zmin, 0);
+  correct_flux(flux_zmin, -1, 2);
   /*
    * TODO: correct_flux_z_min();
    * fluxes_to_correct ?
@@ -295,8 +312,14 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
       compute_flux_x(*flux_x, k);
       compute_flux_y(*flux_y, k);
       compute_flux_z(*flux_zmax, k+1);
-      // TODO: correct_flux()
-      // Subresolution
+      /*
+       * Correct the fluxes before it is summed
+       * with Operator_IJK_div
+       */
+      correct_flux(flux_x, k, 0);
+      correct_flux(flux_y, k, 1);
+      correct_flux(flux_zmin, k, 2);
+      correct_flux(flux_zmax, k, 2);
       Operator_IJK_div(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
       swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
     }

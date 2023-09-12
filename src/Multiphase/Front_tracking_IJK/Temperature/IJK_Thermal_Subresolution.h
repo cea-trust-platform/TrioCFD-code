@@ -40,7 +40,7 @@
 #include <IJK_One_Dimensional_Subproblems.h>
 #include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 #include <IJK_SolveSys_FD_thermal.h>
-
+#include <MD_Vector_tools.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -92,7 +92,12 @@ protected :
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
+  void compute_temperature_face_centre() override;
+  void compute_thermal_fluxes_face_centre() override;
+  void compute_temperature_cell_centres() override;
   void clean_thermal_subproblems() override;
+  void clean_add_thermal_subproblems();
+  void thermal_subresolution_outputs();
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
@@ -123,10 +128,12 @@ protected :
    */
   IJK_Finite_Difference_One_Dimensional_Matrix_Assembler finite_difference_assembler_;
   Matrice thermal_subproblems_matrix_assembly_;
+  Matrice thermal_subproblems_matrix_assembly_for_solver_;
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
-  SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
-  //IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
+  // SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
+  IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
+  MD_Vector md_;
   Motcles fd_solvers_;
   Motcles fd_solvers_jdd_;
   int fd_solver_rank_;

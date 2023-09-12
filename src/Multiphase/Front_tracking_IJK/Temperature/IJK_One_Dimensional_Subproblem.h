@@ -48,6 +48,7 @@
 // <Description of class IJK_One_Dimensional_Subproblem>
 //
 /////////////////////////////////////////////////////////////////////////////
+class IJK_FT_double;
 
 class IJK_One_Dimensional_Subproblem : public Objet_U
 {
@@ -69,6 +70,7 @@ public :
                                        ArrOfDouble bubbles_barycentre,
                                        const int& points_per_thermal_subproblem,
                                        const double& alpha,
+                                       const double& lambda,
                                        const double& coeff_distance_diagonal,
                                        const double& cell_diagonal,
                                        const double& dr_base,
@@ -110,12 +112,19 @@ public :
   void compute_add_source_terms();
   void retrieve_temperature_solution();
   void compute_local_temperature_gradient_solution();
-  void get_ijk_indices(int& i, int& j, int& k) const;
   double get_interfacial_gradient_corrected() const;
+
+  void compute_local_velocity_gradient();
+  double get_normal_velocity_normal_gradient() const;
+  double get_tangential_velocity_normal_gradient() const;
+  double get_second_tangential_velocity_normal_gradient() const;
+  double get_azymuthal_velocity_normal_gradient() const;
+
+  void get_ijk_indices(int& i, int& j, int& k) const;
   double get_field_profile_at_point(const double& dist, const DoubleVect& field) const;
   double get_temperature_profile_at_point(const double& dist) const;
   double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
-
+  void thermal_subresolution_outputs();
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
@@ -150,6 +159,7 @@ protected :
                                             const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
   void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
+                                  const double& lambda,
                                   const double& coeff_distance_diagonal,
                                   const double& cell_diagonal,
                                   const double& dr_base,
@@ -162,6 +172,7 @@ protected :
                                              Matrice& radial_convection_matrix);
   void initialise_thermal_probe();
   void compute_interface_basis_vectors();
+  void compute_pure_spherical_basis_vectors();
   const int *  increase_number_of_points();
   void compute_first_order_operator_local(Matrice& radial_first_order_operator);
   void compute_second_order_operator_local(Matrice& second_first_order_operator);
@@ -173,9 +184,9 @@ protected :
   void project_velocities_on_probes();
   void correct_radial_velocity();
   void project_cartesian_onto_basis_vector(const DoubleVect& compo_x, const DoubleVect& compo_y, const DoubleVect& compo_z, const Vecteur3& basis, DoubleVect& projection);
-  void project_basis_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
-                                        const Vecteur3& basis_u, const Vecteur3& basis_v, const Vecteur3& basis_w,
-                                        DoubleVect& projection);
+  void project_basis_vector_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
+                                               const Vecteur3& basis_u, const Vecteur3& basis_v, const Vecteur3& basis_w,
+                                               DoubleVect& projection);
   void interpolate_temperature_on_probe();
   void interpolate_temperature_gradient_on_probe();
   void project_temperature_gradient_on_probes();
@@ -184,6 +195,9 @@ protected :
   void correct_tangential_temperature_gradient(DoubleVect& tangential_convection_source_terms);
   void correct_tangential_temperature_hessian(DoubleVect& tangential_diffusion_source_terms);
   void find_interval(const double& dist, int& left_interval, int& right_interval) const;
+
+  void post_process_radial_quantities();
+  void post_process_interfacial_quantities();
   /*
    * FIXME: Should I use only references or just for IJK_Field_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?
@@ -239,9 +253,19 @@ protected :
   int increased_point_numbers_ = 32;
   // FIXME: Should alpha_liq be constant, or a reference ?
   const double * alpha_;
+  const double * lambda_;
+  double Pr_l_ = 0.;
   const double * coeff_distance_diagonal_;
   const double * cell_diagonal_;
   double probe_length_ = 0.;
+  double surface_ = 0.;
+
+  double r_sph_ = 0.;
+  double theta_sph_ = 0.;
+  double phi_sph_ = 0.;
+  Vecteur3 er_sph_;
+  Vecteur3 etheta_sph_;
+  Vecteur3 ephi_sph_;
 
   /*
    * References to IJK_Field_double to avoid copy of large fields
@@ -343,7 +367,12 @@ protected :
   DoubleVect temperature_x_gradient_solution_;
   DoubleVect temperature_y_gradient_solution_;
   DoubleVect temperature_z_gradient_solution_;
+  DoubleVect thermal_flux_;
 
+  DoubleVect normal_velocity_normal_gradient_;
+  DoubleVect tangential_velocity_normal_gradient_;
+  DoubleVect second_tangential_velocity_normal_gradient_;
+  DoubleVect azymuthal_velocity_normal_gradient_;
 
   REF(IJK_FT_double) ref_ijk_ft_;
 

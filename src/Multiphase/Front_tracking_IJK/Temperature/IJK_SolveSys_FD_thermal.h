@@ -39,7 +39,10 @@ class IJK_SolveSys_FD_thermal : public SolveurSys
 
 public :
 
+  void cast_by_default();
+
 protected :
+  Nom solver_by_default = "Solv_GCP";
 
 };
 

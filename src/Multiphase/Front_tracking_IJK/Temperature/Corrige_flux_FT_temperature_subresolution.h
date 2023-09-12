@@ -51,12 +51,20 @@ public :
 
   void associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems);
 
+  void set_convection_negligible(const int& convection_negligible) override { convection_negligible_ = convection_negligible; };
+  void set_diffusion_negligible(const int& diffusion_negligible) override { diffusion_negligible_ = diffusion_negligible; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
    * l'interface. On remplace les flux donnes en entree par ces flux la.
    */
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
                            const int k_layer, const int dir) override { ; };
+
+  void corrige_flux_conv_faceIJ(IJK_Field_local_double *const flux,
+                                const int k_layer, const int dir) { corrige_flux_faceIJ(flux, k_layer, dir); };
+
+  void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
+                                const int k_layer, const int dir) override { ; };
 
   void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
                                          const double dist, const DoubleTab& positions, const DoubleTab& normale,
@@ -82,6 +90,8 @@ protected :
   const IJK_One_Dimensional_Subproblems * thermal_subproblems_;
   bool has_checked_consistency_;
   ArrOfInt ijk_intersections_subproblems_indices_;
+  int convection_negligible_ = 0;
+  int diffusion_negligible_ = 0;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

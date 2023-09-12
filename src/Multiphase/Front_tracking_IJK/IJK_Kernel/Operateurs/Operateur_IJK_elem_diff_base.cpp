@@ -19,15 +19,15 @@ Implemente_base_sans_constructeur(Operateur_IJK_elem_diff_base_double, "Operateu
 
 Operateur_IJK_elem_diff_base_double::Operateur_IJK_elem_diff_base_double()
 {
-  input_field_ = 0;
-  uniform_lambda_ = 0;
-  lambda_ = 0;
+  input_field_ = nullptr;
+  uniform_lambda_ = nullptr;
+  lambda_ = nullptr;
 
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 
-  coeff_field_x_ =0;
-  coeff_field_y_ =0;
-  coeff_field_z_ =0;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
 
   is_anisotropic_ = false;
   is_vectorial_ = false;
@@ -37,6 +37,9 @@ Operateur_IJK_elem_diff_base_double::Operateur_IJK_elem_diff_base_double()
 
   perio_k_ = false;
   is_hess_ = false;
+
+  corrige_flux_ = nullptr;
+  indicatrice_ = nullptr;
 }
 
 Sortie& Operateur_IJK_elem_diff_base_double::printOn(Sortie& os) const
@@ -133,6 +136,11 @@ Entree& OpDiffUniformIJKScalarCorrection_double::readOn(Entree& is)
 {
   //  Operateur_IJK_elem_diff_base_double::readOn(is);
   return is;
+}
+
+void OpDiffUniformIJKScalarCorrection_double::correct_flux(IJK_Field_local_double *const flux, const int k_layer, const int dir)
+{
+  corrige_flux_->corrige_flux_diff_faceIJ(flux, k_layer, dir);
 }
 
 Implemente_instanciable_sans_constructeur(OpDiffIJKScalar_double, "OpDiffIJKScalar_double", Operateur_IJK_elem_diff_base_double);

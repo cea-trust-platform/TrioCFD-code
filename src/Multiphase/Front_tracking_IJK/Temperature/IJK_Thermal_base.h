@@ -261,6 +261,9 @@ protected:
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
   virtual void compute_thermal_subproblems() { ; };
+  virtual void compute_temperature_face_centre() {};
+  virtual void compute_thermal_fluxes_face_centre() {};
+  virtual void compute_temperature_cell_centres() { ; };
   virtual void clean_thermal_subproblems() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,

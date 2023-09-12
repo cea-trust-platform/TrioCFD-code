@@ -52,6 +52,7 @@ protected:
   // Mais pas sur. Je pense que ca ne marche pas si on appelle
   // la methode de OpConv..base elle les trouvera qd meme.
   void compute_set(IJK_Field_double& dx) override;
+  void correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir) override;
   //   void compute_add(IJK_Field_double& dx) final;
 
 public:

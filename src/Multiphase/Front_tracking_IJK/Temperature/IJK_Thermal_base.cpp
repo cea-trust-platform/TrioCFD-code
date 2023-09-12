@@ -257,7 +257,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
-  param.ajouter_flag("diff_temp_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
+  param.ajouter_flag("diff_temperature_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
   param.ajouter("temperature_convection_op", &temperature_convection_op_);
   param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
@@ -786,9 +786,11 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Convective and Diffusive fluxes
    */
   if (!conv_temperature_negligible_)
-    corrige_flux_->compute_temperature_face_centre();
+    compute_temperature_face_centre();
+  //corrige_flux_->compute_temperature_face_centre();
   if (!diff_temp_negligible_)
-    corrige_flux_->compute_thermal_fluxes_face_centre();
+    compute_thermal_fluxes_face_centre();
+  // corrige_flux_->compute_thermal_fluxes_face_centre();
   /*
    * For post-processing purposes
    */
@@ -815,15 +817,15 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   /*
    * Interpolate a value at the cell centre
    */
-  corrige_flux_->compute_temperature_cell_centre(temperature_, d_temperature_);
+  compute_temperature_cell_centres();
 
   /*
    * Clean_subproblems !
    */
   clean_thermal_subproblems();
-  correct_temperature_increment_for_interface_leaving_cell();
+  correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
 
-  // calculer_gradient_temperature(temperature_, grad_T_);
+  // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time
        << " " << ene_ini

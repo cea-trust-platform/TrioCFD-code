@@ -48,6 +48,7 @@ public :
   IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
   void clean();
+  void clean_add();
   void add_subproblems(int n);
   void associate_sub_problem_to_inputs(int i, int j, int k,
                                        const IJK_Field_double& eulerian_compo_connex,
@@ -61,6 +62,7 @@ public :
                                        DoubleTab bubbles_barycentre,
                                        const int& points_per_thermal_subproblem,
                                        const double& alpha,
+                                       const double& lambda,
                                        const double& coeff_distance_diagonal,
                                        const double& cell_diagonal,
                                        const double& dr_base,
@@ -96,10 +98,12 @@ public :
   void compute_add_source_terms();
   void retrieve_temperature_solutions();
   void compute_local_temperature_gradient_solutions();
+  void compute_local_velocity_gradient();
   void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
   double get_interfacial_gradient_corrected(int i);
   double get_temperature_profile_at_point(const int& i, const double& dist) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
+  void thermal_subresolution_outputs();
 
   const int& get_subproblems_counter() const
   {

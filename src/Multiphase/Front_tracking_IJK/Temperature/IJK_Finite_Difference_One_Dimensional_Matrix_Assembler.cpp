@@ -542,10 +542,10 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
   // modified_rhs = sparse_matrix * rhs;
   sparse_matrix.multvect(rhs, modified_rhs);
 
-  //
-  //  modified_rhs -= rhs;
-  //  modified_rhs *= -1.;
-  //  modified_rhs += rhs;
+
+  modified_rhs -= rhs;
+  modified_rhs *= -1.;
+  modified_rhs += rhs;
 
   /*
    * Remove useless coefficients
@@ -581,6 +581,8 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(Do
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res)
 {
-  res = (*fd_operator) * solution;
+  const Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, (*fd_operator).valeur());
+  sparse_matrix.multvect(solution, res);
+  // res = (*fd_operator) * solution;
 }
 

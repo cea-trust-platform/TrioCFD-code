@@ -72,6 +72,11 @@ Entree& OpConvQuickInterfaceIJKScalar_double::readOn(Entree& is)
   return is;
 }
 
+void OpConvQuickInterfaceIJKScalar_double::correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir)
+{
+  corrige_flux_->corrige_flux_faceIJ(flux, k_layer, dir);
+}
+
 static inline void swap_data(IJK_Field_local_double *& a,
                              IJK_Field_local_double *& b)
 {
@@ -180,12 +185,3 @@ void OpConvQuickInterfaceIJKScalar_double::compute_set(IJK_Field_double& dx)
                 flux_zmax); // conserve le flux en z pour la couche z suivante
     }
 }
-
-// void OpConvQuickInterfaceIJKScalar_double::compute_add(IJK_Field_double& dx)
-// {
-// }
-
-// OpConvQuickInterfaceIJKScalar_double::~OpConvQuickInterfaceIJKScalar_double()
-// {
-//   delete correction_;
-// }

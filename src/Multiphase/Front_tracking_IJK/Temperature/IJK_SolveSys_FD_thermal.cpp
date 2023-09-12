@@ -21,6 +21,7 @@
 
 #include <IJK_SolveSys_FD_thermal.h>
 #include <Param.h>
+#include <Solv_GCP.h>
 
 Implemente_instanciable( IJK_SolveSys_FD_thermal, "IJK_SolveSys_FD_thermal", SolveurSys ) ;
 
@@ -42,6 +43,19 @@ Entree& IJK_SolveSys_FD_thermal::readOn( Entree& is )
   type_solv_sys+=solver_name;
   typer(type_solv_sys);
 
+  nommer(Nom("thermal_fd_solver_") + solver_name);
+
   is >> valeur();
   return is;
+}
+
+void IJK_SolveSys_FD_thermal::cast_by_default()
+{
+  typer(solver_by_default);
+  /*
+   * Fill the required params (example)
+   */
+  Solv_GCP& gcp_solver = ref_cast(Solv_GCP, valeur());
+  gcp_solver.set_seuil(1e-10);
+  gcp_solver.get_precond().detach();
 }
