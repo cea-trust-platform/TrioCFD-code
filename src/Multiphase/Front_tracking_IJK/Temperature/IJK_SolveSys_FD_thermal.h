@@ -23,6 +23,9 @@
 #define IJK_SolveSys_FD_thermal_included
 
 #include <SolveurSys.h>
+#define default_seuil 1e-12
+#define default_seuil_char "1e-12"
+#define default_nb_iter_max "100"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -39,11 +42,13 @@ class IJK_SolveSys_FD_thermal : public SolveurSys
 
 public :
 
-  void cast_by_default();
+  void cast_iterative_solver_by_default();
+  void cast_direct_solver_by_default();
 
 protected :
-  Nom solver_by_default = "Solv_GCP";
-
+  Nom iterative_solver_by_default_ = "Solv_Gmres";
+  Nom direct_solver_by_default_ = "Solv_Petsc";
+  Nom petsc_solver_by_default_ = "LU";
 };
 
 #endif /* IJK_SolveSys_FD_thermal_included */

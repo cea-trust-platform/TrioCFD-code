@@ -215,12 +215,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   compute_overall_probes_parameters();
 
   if (one_dimensional_advection_diffusion_thermal_solver_.est_nul())
-    {
-      one_dimensional_advection_diffusion_thermal_solver_.typer(fd_solvers_[0]);
-      /*
-       * Add default solver parameters
-       */
-    }
+    one_dimensional_advection_diffusion_thermal_solver_.cast_direct_solver_by_default();
 
   /*
    * Considered constant values
@@ -626,10 +621,11 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
       md_.copy(md_std);
       MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_);
       MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_);
-
+      Cerr << "Finite-difference thermal sub-resolution has started !" << finl;
       one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_.valeur(),
                                                                            thermal_subproblems_rhs_assembly_,
                                                                            thermal_subproblems_temperature_solution_);
+      Cerr << "Finite-difference thermal sub-resolution has finished !" << finl;
       thermal_local_subproblems_.retrieve_temperature_solutions();
       thermal_local_subproblems_.compute_local_temperature_gradient_solutions();
       thermal_local_subproblems_.compute_local_velocity_gradient();

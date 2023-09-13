@@ -21,7 +21,8 @@
 
 #include <IJK_SolveSys_FD_thermal.h>
 #include <Param.h>
-#include <Solv_GCP.h>
+#include <Solv_Gmres.h>
+#include <Solv_Petsc.h>
 
 Implemente_instanciable( IJK_SolveSys_FD_thermal, "IJK_SolveSys_FD_thermal", SolveurSys ) ;
 
@@ -39,23 +40,55 @@ Entree& IJK_SolveSys_FD_thermal::readOn( Entree& is )
   param.ajouter("thermal_fd_solver",&solver_name, Param::REQUIRED);
   param.lire_sans_accolade(is);
 
-  Nom type_solv_sys("Solv_");
-  type_solv_sys+=solver_name;
-  typer(type_solv_sys);
-
-  nommer(Nom("thermal_fd_solver_") + solver_name);
-
-  is >> valeur();
+  if (solver_name == "direct")
+    cast_direct_solver_by_default();
+  else if (solver_name == "iterative")
+    cast_iterative_solver_by_default();
+  else
+    {
+      Nom type_solv_sys("Solv_");
+      type_solv_sys+=solver_name;
+      typer(type_solv_sys);
+      nommer(Nom("thermal_fd_solver_") + solver_name);
+      is >> valeur();
+    }
   return is;
 }
 
-void IJK_SolveSys_FD_thermal::cast_by_default()
+void IJK_SolveSys_FD_thermal::cast_iterative_solver_by_default()
 {
-  typer(solver_by_default);
+  typer(iterative_solver_by_default_);
+  nommer(Nom("thermal_fd_solver_") + iterative_solver_by_default_);
   /*
    * Fill the required params (example)
    */
-  Solv_GCP& gcp_solver = ref_cast(Solv_GCP, valeur());
-  gcp_solver.set_seuil(1e-10);
-  gcp_solver.get_precond().detach();
+  Solv_Gmres& gmres_solver = ref_cast(Solv_Gmres, valeur());
+  gmres_solver.set_seuil(default_seuil);
+}
+
+void IJK_SolveSys_FD_thermal::cast_direct_solver_by_default()
+{
+  typer(direct_solver_by_default_);
+  nommer(Nom("thermal_fd_solver_") + direct_solver_by_default_ + Nom("_") + petsc_solver_by_default_);
+  Solv_Petsc& petsc_solver = ref_cast(Solv_Petsc, valeur());
+  Nom solver_params("");
+  Nom left_bracket("{");
+  Nom right_bracket("}");
+  Nom spacing(" ");
+  solver_params += petsc_solver_by_default_ + spacing + left_bracket + spacing;
+  /*
+   * Add params by default
+   */
+  solver_params += Nom("nb_it_max") + spacing + Nom(default_nb_iter_max) + spacing;
+  solver_params += right_bracket;
+  Cerr << "Thermal F-D Solver:" << solver_params << finl;
+  istringstream solver_params_istringstream(solver_params.getChar());
+  istream& solver_params_istream = solver_params_istringstream;
+  Entree solver_params_entry(solver_params_istream);
+  /*
+   * Fake a readOn
+   */
+  //solver_params_entry >> solver_params;
+  petsc_solver.nommer(le_nom());
+  solver_params_entry >> petsc_solver;
 }

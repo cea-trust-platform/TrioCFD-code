@@ -23,6 +23,43 @@
 
 Implemente_instanciable_sans_constructeur( IJK_Finite_Difference_One_Dimensional_Matrix_Assembler, "IJK_Finite_Difference_One_Dimensional_Matrix_Assembler", Objet_U ) ;
 
+// static IntVect arg_sort(DoubleVect matrix_column_indices)
+static std::vector<int> arg_sort(DoubleVect matrix_column_indices)
+{
+  const int n = matrix_column_indices.size();
+  // IntVect indices(n);
+  std::vector<int> indices(n);
+  for (int j=0; j<n; j++)
+    indices[j]=j;
+  std::sort(indices.begin(), indices.end(), [&matrix_column_indices](int i, int j) {return matrix_column_indices[i] < matrix_column_indices[j];});
+  return indices;
+}
+
+static void sort_stencil(Matrice_Morse& sparse_matrix)
+{
+  DoubleVect& matrix_values = sparse_matrix.get_set_coeff();
+  IntVect& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
+  IntVect& matrix_column_indices = sparse_matrix.get_set_tab2();
+  for (int i = 0; i + 1 < non_zero_coeff_per_line.size(); i++) //indice de ligne
+    {
+      const int index_ini = non_zero_coeff_per_line[i] - FORTRAN_INDEX_INI;
+      const int index_end = non_zero_coeff_per_line[i+1] - FORTRAN_INDEX_INI;
+      int n = index_end - index_ini;
+      DoubleVect matrix_column_indices_local(n);
+      DoubleVect matrix_values_local(n);
+      for (int j=0; j<n; j++)
+        {
+          matrix_column_indices_local(j) = matrix_column_indices(j + index_ini);
+          matrix_values_local(j) = matrix_values(j + index_ini);
+        }
+      std::vector<int> indices;
+      indices = arg_sort(matrix_column_indices_local);
+      for (int j=0; j<n; j++)
+        if (j != indices[j])
+          matrix_values[j + index_ini] = matrix_values_local[indices[j]];
+    }
+}
+
 IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::IJK_Finite_Difference_One_Dimensional_Matrix_Assembler()
 {
   precision_order_ = 2;
@@ -246,6 +283,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build(Matrice& matri
   }
 
   sparse_matrix.compacte(remove);
+  // sparse_matrix.sort_stencil();
   return non_zero_elem;
 }
 
@@ -259,7 +297,8 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices_subpro
       Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse,  block_matrix_A.get_bloc(i,i).valeur());
       Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, block_matrix_B.get_bloc(i,i).valeur());
       sparse_matrix_A += sparse_matrix_B;
-      // Don't forget to call sort_stencil() !
+      // Don't forget to call my own sort_stencil() !
+      sort_stencil(sparse_matrix_A);
       sparse_matrix_A.sort_stencil();
       // Cerr << "Convection and Diffusion matrices have been assembled. "<< finl;
     }
@@ -330,19 +369,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
    */
   sparse_matrix *= vector_tmp;
   sparse_matrix.compacte(remove);
-//  const int nb_lines = sparse_matrix.nb_lignes();
-//  int non_zero_values_counter = 0;
-//  int j;
-//  ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
-//  for (int i=0 ; i < nb_lines; i++)
-//    {
-//      const int non_zero_coeff_per_line = sparse_matrix.nb_vois(i);
-//      for (j=0; j < non_zero_coeff_per_line; j++)
-//        {
-//          matrix_values[non_zero_values_counter] *= vector_tmp[i];
-//          non_zero_values_counter++;
-//        }
-//    }
+
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subproblem_by_vector(Matrice * matrix,
@@ -499,6 +526,8 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
       }
   }
   sparse_matrix.compacte(remove);
+  // sparse_matrix.sort_stencil();
+
   if ((ini_boundary_conditions != neumann && ini_boundary_conditions != flux_jump)
       || (end_boundary_conditions != neumann))
     modify_rhs_for_bc(modified_matrix,
@@ -568,6 +597,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
     }
 
   sparse_matrix.compacte(remove);
+  // sparse_matrix.sort_stencil();
 
 //  for (int i=0; i<modified_rhs.size(); i++)
 //    if (fabs(modified_rhs[i]) > 1.e9)

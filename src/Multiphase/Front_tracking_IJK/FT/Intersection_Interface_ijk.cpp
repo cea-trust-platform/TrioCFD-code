@@ -452,7 +452,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
   int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
   int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
   int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
-  int nb_faces_to_correct;
+  int nb_faces_to_correct = 0.;
   for (int i_diph=0; i_diph<nb_diph ; i_diph++)
     {
       const int i = indices(i_diph, 0);

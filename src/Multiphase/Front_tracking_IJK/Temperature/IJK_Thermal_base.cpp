@@ -763,13 +763,21 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Correct the temperature field using either the ghost-fluid
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
+  Cerr << "Start the Ghost-fluid (GFM) approach" << finl;
   compute_eulerian_distance();
+  Cerr << "Br1 (GFM) approach" << finl;
   compute_eulerian_curvature_from_interface();
+  Cerr << "Br2 (GFM) approach" << finl;
   compute_eulerian_grad_T_interface();
+  Cerr << "Br3 (GFM) approach" << finl;
   propagate_eulerian_grad_T_interface();
+  Cerr << "Br4 (GFM) approach" << finl;
   compute_eulerian_temperature_ghost();
+  Cerr << "Br5 (GFM) approach" << finl;
   compute_eulerian_bounding_box_fill_compo();
+  Cerr << "Br6 (GFM) approach" << finl;
   compute_rising_velocities();
+  Cerr << "End the Ghost-fluid (GFM) approach" << finl;
 
   /*
    * Compute gradients and hessian of the temperature after the ghost fluid extension
@@ -1052,7 +1060,9 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
   if (compute_eulerian_compo_)
     {
       DoubleTab bounding_box;
+      Cerr << "Test_err_ini" << finl;
       compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box, eulerian_compo_connex_ft_, bubbles_barycentre_);
+      Cerr << "Test_err_end" << finl;
       eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
       eulerian_compo_connex_ns_.data() = -1;
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
