@@ -68,6 +68,7 @@ public:
   void setGlobalFields(const int elnodes[4], const double Pressure, const double VonMises) ;
   double computeCriticalDt(const double volume, const double xlong, const double E) ;
   void computeForceFaces(const int nb_faces, const int nb_som_face, const IntTab& face_sommets) ;
+  void checkElemOrientation(int elnodes[4], const int elem) ;
 
   // Global vectors and arrays for dynamic time integration
   // ------------------------------------------------------
@@ -160,6 +161,8 @@ protected:
   DoubleTab fl_ ; // local nodal forces
 
   DoubleTab B0l_ ; // local B matrix on initial configuration
+
+  IntVect invertNum_ ; // need for inverting elem numerotation or not
 
   // Global vectors and arrays for dynamic time integration
   // ------------------------------------------------------

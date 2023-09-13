@@ -206,6 +206,8 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
   Ft_.resize(nelem, nSymSize_) ;
   Stress_.resize(nelem, symSize_) ;
 
+  invertNum_.resize(nelem) ;
+
   massElem_.resize(nelem) ;
 
   meshPbPressure_.resize(nelem) ;
@@ -227,6 +229,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
 
   B0_ = 0. ;
   Stress_ = 0. ;
+  invertNum_ = 0 ; // 0 = no numerotation inversion by default
   massElem_ = 0. ;
   mfrontEvars_ = 0. ;
 
@@ -713,6 +716,99 @@ void Structural_dynamic_mesh_model::computeForceFaces(const int nb_faces, const 
               meshPbForceFace_(i,j) += ff(face_sommets(i,s),j);
             }
           meshPbForceFace_(i,j)/=nb_som_face;
+        }
+    }
+
+}
+
+void Structural_dynamic_mesh_model::checkElemOrientation(int elnodes[4], const int elem)
+{
+
+  if (gridNStep == 0)
+    {
+      DoubleTab Jac(dimension, dimension) ;
+      double Det, Vol, Xlong ;
+      int nbn ;
+      DoubleTab xl ;
+
+      switch (dimension)
+        {
+        case (2) :
+          nbn = 3 ;
+
+          break ;
+        case (3) :
+          nbn = 4 ;
+
+          break ;
+        }
+
+      for (int i=0; i<nbn; i++)
+        {
+          int isom = elnodes[i] ;
+          for (int j=0; j<dimension; j++)
+            {
+              xl_(i,j) = x(isom,j) ;
+            }
+        }
+
+      Jac=0 ;
+      for (int k=0; k < nbn; k++)
+        {
+          for (int j=0; j < dimension; j++)
+            {
+              for (int i=0; i < dimension ; i++)
+                {
+                  Jac(j,i) += Eta_(j,k) * xl_(k,i) ;
+                }
+            }
+        }
+
+      switch (dimension)
+        {
+        case (2) :
+          Det = Jac(0,0) * Jac(1,1) - Jac(0,1) * Jac(1,0) ;
+          triangleSurfLength_(Vol, Xlong, Det) ;
+
+          break ;
+        case (3) :
+          Det= Jac(0,0) * (Jac(1,1) * Jac(2,2) - Jac(1,2) * Jac(2,1))
+               - Jac(0,1) * (Jac(1,0) * Jac(2,2) - Jac(1,2) * Jac(2,0))
+               + Jac(0,2) * (Jac(1,0) * Jac(2,1) - Jac(1,1) * Jac(2,0)) ;
+          tetrahedronVolLength_(Vol, Xlong, Det) ;
+
+          break ;
+        }
+
+      if (Vol <= 0.) invertNum_[elem] = 1 ;
+
+    }
+
+  if (invertNum_[elem] == 1)
+    {
+      // negative volume in mesh numbering, invert vertices numbering in elnodes
+      int i1, i2, i3, i4 ;
+
+      switch (dimension)
+        {
+        case (2) :
+          i1 = elnodes[0] ;
+          i2 = elnodes[1] ;
+          i3 = elnodes[2] ;
+          elnodes[0] = i1 ;
+          elnodes[1] = i3 ;
+          elnodes[2] = i2 ;
+
+          break ;
+        case (3) :
+          i1 = elnodes[0] ;
+          i2 = elnodes[1] ;
+          i3 = elnodes[2] ;
+          i4 = elnodes[3] ;
+          elnodes[0] = i3 ;
+          elnodes[1] = i2 ;
+          elnodes[2] = i1 ;
+          elnodes[3] = i4 ;
         }
     }
 

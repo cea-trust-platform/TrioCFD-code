@@ -1430,6 +1430,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
               elnodes[i] = get_renum_som_perio(sommets(elem,i)) ;
             }
 
+          str_mesh_model->checkElemOrientation(elnodes, elem) ; // check orientation to ensure a positive element volume
+
           str_mesh_model->setLocalFields(elnodes, elem) ; // x, u, B0 global to local + elem id
 
           str_mesh_model->computeInternalForces(volume, xlong, E, pressure, vonmises) ; // local force computation on element elem
@@ -1480,17 +1482,24 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
 
     } // End time loop on grid problem
 
-  for (int i=0; i<nbSom; i++)
+  if (tt > t0)
     {
-      for (int j=0; j<dimension; j++)
+      for (int i=0; i<nbSom; i++)
         {
-          outputMeshVelocity(i,j) = (str_mesh_model->x(i,j) - x0(i,j)) / (tt - t0) ;
+          for (int j=0; j<dimension; j++)
+            {
+              outputMeshVelocity(i,j) = (str_mesh_model->x(i,j) - x0(i,j)) / (tt - t0) ;
+            }
         }
+
+    }
+  else
+    {
+      outputMeshVelocity = 0. ;
     }
 
   // Compute forces at face centers for postprocessing only
   str_mesh_model->computeForceFaces(nbFace,nbSomFace,face_sommets) ;
-
 }
 
 const DoubleVect& Domaine_ALE::getMeshPbPressure() const
