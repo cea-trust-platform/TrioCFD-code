@@ -520,7 +520,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
           tag_nodes_bords.echange_espace_virtuel() ;
 
           // Initialize x with current coordinates
-          for (int i=0; i<N_som; i++)
+          for (int i=0; i<nb_som(); i++)
             {
               for (int k=0; k<dimension; k++)
                 str_mesh_model->x(i,k) = coord(i,k) ;
