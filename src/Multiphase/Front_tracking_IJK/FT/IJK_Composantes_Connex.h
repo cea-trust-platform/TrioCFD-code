@@ -14,44 +14,75 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_Bubble_tools.h
-// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
+// File      : IJK_Composantes_Connex.h
+// Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/FT
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_Bubble_tools_included
-#define IJK_Bubble_tools_included
+#ifndef IJK_Composantes_Connex_included
+#define IJK_Composantes_Connex_included
 
+#include <Objet_U.h>
 #include <IJK_Field.h>
-#include <IJK_Interfaces.h>
-#include <Maillage_FT_IJK.h>
 
-#define INVALID_TEST -1.e30
-#define LIQUID_INDICATOR_TEST 1.-1.e-8
-#define VAPOUR_INDICATOR_TEST 1.e-8
-#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
-#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
-#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class IJK_Bubble_tools
+// .DESCRIPTION : class IJK_Composantes_Connex
 //
-// <Description of class IJK_Bubble_tools>
+// <Description of class IJK_Composantes_Connex>
 //
 /////////////////////////////////////////////////////////////////////////////
+class IJK_FT_double;
+class IJK_Interfaces;
+class IJK_Composantes_Connex : public Objet_U
+{
 
-// Fill compo using a dummy bounding box
-void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
-                                     DoubleTab& bounding_box,
-                                     IJK_Field_double& eulerian_compo_connex,
-                                     IJK_Field_double& eulerian_compo_connex_ghost,
-                                     DoubleTab& bubbles_barycentre);
-// TODO: Fill compo starting from interfacial cells
-void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex);
+  Declare_instanciable( IJK_Composantes_Connex ) ;
 
-void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
-                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors);
-void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
-                          IJK_Field_double& eulerian_rising_velocity);
-#endif /* IJK_Bubble_tools_included */
+public :
+  int initialize(const IJK_Splitting& splitting, const IJK_Interfaces& interfaces);
+  void associer(const IJK_FT_double& ijk_ft);
+  void compute_bounding_box_fill_compo_connex();
+
+  const IJK_Field_double& get_eulerian_compo_connex_ft() const
+  {
+    return eulerian_compo_connex_ft_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex() const
+  {
+    return eulerian_compo_connex_ns_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const
+  {
+    return eulerian_compo_connex_ghost_ft_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_ghost() const
+  {
+    return eulerian_compo_connex_ghost_ns_;
+  }
+
+  const DoubleTab& get_bounding_box() const
+  {
+    return bounding_box_;
+  }
+  const DoubleTab& get_bubbles_barycentre() const
+  {
+    return bubbles_barycentre_;
+  }
+
+protected :
+  REF(IJK_FT_double) ref_ijk_ft_;
+  const IJK_Interfaces * interfaces_ = nullptr;
+
+  IJK_Field_double eulerian_compo_connex_ft_;
+  IJK_Field_double eulerian_compo_connex_ns_;
+  IJK_Field_double eulerian_compo_connex_ghost_ft_;
+  IJK_Field_double eulerian_compo_connex_ghost_ns_;
+
+  DoubleTab bounding_box_;
+  DoubleTab bubbles_barycentre_;
+
+  bool is_updated_ = false;
+};
+
+#endif /* IJK_Composantes_Connex_included */

@@ -35,7 +35,11 @@ static int decoder_numero_bulle(const int code)
  * compo = nbulles_reelles - 1 - idx_ghost;
  */
 
-void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab& bounding_box, IJK_Field_double& eulerian_compo_connex, DoubleTab& bubbles_barycentre)
+void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
+                                     DoubleTab& bounding_box,
+                                     IJK_Field_double& eulerian_compo_connex,
+                                     IJK_Field_double& eulerian_compo_connex_ghost,
+                                     DoubleTab& bubbles_barycentre)
 {
   /*
   * bounding_box(b, dir, m) :
@@ -48,6 +52,8 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
   int nb_ghost_bubbles = interfaces.get_nb_bulles_ghost();
   eulerian_compo_connex.data() = -1;
   eulerian_compo_connex.echange_espace_virtuel(eulerian_compo_connex.ghost());
+  eulerian_compo_connex_ghost.data() = -1;
+  eulerian_compo_connex_ghost.echange_espace_virtuel(eulerian_compo_connex_ghost.ghost());
   IntTab ghost_to_real_bubble(nb_ghost_bubbles);
   for (int l = 0; l < nb_ghost_bubbles; l++)
     {
@@ -99,6 +105,9 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
           min_max_larger_box_absolute(ibubble, dir, 1) = min_max_larger_box(ibubble, dir, 1) - bubbles_barycentre(ibubble, dir);
         }
     }
+  /*
+   * FT fields
+   */
   const int nk = eulerian_compo_connex.nk();
   const int nj = eulerian_compo_connex.nj();
   const int ni = eulerian_compo_connex.ni();
@@ -133,9 +142,17 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces, DoubleTab
                   }
                 cell_pos_bool = (cell_pos_bool && cell_pos[dir] > min_box && cell_pos[dir] < max_box);
               }
-            // if (cell_pos_bool && fabs(1.-chi_l) > 1.e-8)
-            if (cell_pos_bool && fabs(chi_l) < LIQUID_INDICATOR_TEST)
-              eulerian_compo_connex(i,j,k) = bubble_index;
+            if (fabs(chi_l) < LIQUID_INDICATOR_TEST)
+              {
+                if (cell_pos_bool)
+                  {
+                    eulerian_compo_connex(i,j,k) = bubble_index;
+                    eulerian_compo_connex_ghost(i,j,k) = ibubble;
+                  }
+                // else
+                // Cerr << "A cell seems mixed but its coordinates is not in the bounding box" << finl;
+              }
+
           }
 }
 

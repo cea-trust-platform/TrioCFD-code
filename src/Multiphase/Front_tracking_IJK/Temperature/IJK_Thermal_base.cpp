@@ -110,6 +110,8 @@ IJK_Thermal_base::IJK_Thermal_base()
   compute_eulerian_compo_ = 0;
   compute_rising_velocities_ = 0;
   fill_rising_velocities_ = 0;
+
+  debug_ = 0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -266,6 +268,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
   param.ajouter("n_iter_distance", &n_iter_distance_);
   param.ajouter_flag("ghost_fluid", &ghost_fluid_);
+  param.ajouter_flag("debug", &debug_);
 }
 
 /********************************************
@@ -468,13 +471,13 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
       eulerian_normal_vectors_ft_.echange_espace_virtuel();
       eulerian_facets_barycentre_ft_.echange_espace_virtuel();
-      eulerian_distance_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
       /*
        * TODO: This is already calculated in IJK_Interfaces
        * Keep it for now and clean later
        */
+      eulerian_distance_ns_.allocate(splitting, IJK_Splitting::ELEM, 2);
       allocate_cell_vector(eulerian_normal_vectors_ns_, splitting, 1);
-      allocate_cell_vector(eulerian_facets_barycentre_ns_, splitting, 1);
+      allocate_cell_vector(eulerian_facets_barycentre_ns_, splitting, 0);
       nalloc += 7;
       eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
       eulerian_normal_vectors_ns_.echange_espace_virtuel();
@@ -495,7 +498,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
        * TODO: This is already calculated in IJK_Interfaces
        * Keep it for now and clean later
        */
-      eulerian_curvature_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      eulerian_curvature_ns_.allocate(splitting, IJK_Splitting::ELEM, 1);
       eulerian_curvature_ns_.echange_espace_virtuel(eulerian_curvature_ns_.ghost());
       nalloc += 2;
       eulerian_interfacial_area_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
@@ -526,9 +529,23 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_compo_connex_ft_.data() = -1.;
       eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
 
+      eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+      nalloc += 1;
+      eulerian_compo_connex_ghost_ft_.data() = -1.;
+      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+
       eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
       nalloc += 1;
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+
+      eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+
+//	    eulerian_compo_connex_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ft());
+//	    eulerian_compo_connex_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex());
+//	    eulerian_compo_connex_ghost_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost_ft());
+//	    eulerian_compo_connex_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost());
     }
 
   compute_rising_velocities_ = compute_rising_velocities_ ||
@@ -562,7 +579,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
                          || liste_post_instantanes_.contient_("GRAD_T_DIR_Z_ELEM");
   if (compute_grad_T_elem_)
     {
-      allocate_cell_vector(grad_T_elem_, splitting, 1); // 1 or 0 ?
+      allocate_cell_vector(grad_T_elem_, splitting, ghost_cells_); // 1 or 0 ?
       nalloc += 3;
       grad_T_elem_.echange_espace_virtuel();
       temperature_grad_op_centre_.initialize(splitting);
@@ -570,7 +587,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
 
   if (compute_hess_diag_T_elem_)
     {
-      allocate_cell_vector(hess_diag_T_elem_, splitting, 0);  // 1 or 0 ?
+      allocate_cell_vector(hess_diag_T_elem_, splitting, ghost_cells_);  // 1 or 0 ?
       nalloc += 3;
       hess_diag_T_elem_.echange_espace_virtuel();
       temperature_hess_op_centre_.initialize(splitting);
@@ -578,7 +595,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
 
   if (compute_hess_cross_T_elem_)
     {
-      allocate_cell_vector(hess_cross_T_elem_, splitting, 0);  // 1 or 0 ?
+      allocate_cell_vector(hess_cross_T_elem_, splitting, ghost_cells_);  // 1 or 0 ?
       nalloc += 3;
       hess_cross_T_elem_.echange_espace_virtuel();
       /*
@@ -763,25 +780,35 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Correct the temperature field using either the ghost-fluid
    * approach or the laminar sub-resolution approach (and zero values for debug)
    */
-  Cerr << "Start the Ghost-fluid (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Start the Ghost-fluid (GFM) approach" << finl;
   compute_eulerian_distance();
-  Cerr << "Br1 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br1 (GFM approach)" << finl;
   compute_eulerian_curvature_from_interface();
-  Cerr << "Br2 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br2 (GFM approach)" << finl;
   compute_eulerian_grad_T_interface();
-  Cerr << "Br3 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br3 (GFM approach)" << finl;
   propagate_eulerian_grad_T_interface();
-  Cerr << "Br4 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br4 (GFM approach)" << finl;
   compute_eulerian_temperature_ghost();
-  Cerr << "Br5 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br5 (GFM approach)" << finl;
   compute_eulerian_bounding_box_fill_compo();
-  Cerr << "Br6 (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "Br6 (GFM approach)" << finl;
   compute_rising_velocities();
-  Cerr << "End the Ghost-fluid (GFM) approach" << finl;
+  if (debug_)
+    Cerr << "End the Ghost-fluid (GFM) approach" << finl;
 
   /*
    * Compute gradients and hessian of the temperature after the ghost fluid extension
    */
+  if (debug_)
+    Cerr << "Compute temperature derivatives" << finl;
   compute_temperature_gradient_elem();
   compute_temperature_hessian_diag_elem();
   compute_temperature_hessian_cross_elem();
@@ -789,16 +816,27 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   /*
    * Compute sub-problems (For Subresolution Child classes only !)
    */
+  if (debug_)
+    Cerr << "Compute thermal subproblems" << finl;
   compute_thermal_subproblems();
   /*
    * Convective and Diffusive fluxes
    */
+
   if (!conv_temperature_negligible_)
     compute_temperature_face_centre();
   //corrige_flux_->compute_temperature_face_centre();
   if (!diff_temp_negligible_)
     compute_thermal_fluxes_face_centre();
   // corrige_flux_->compute_thermal_fluxes_face_centre();
+
+  /*
+   * Interpolate a value for the QUICK SCHEME (first call)
+   */
+  if (debug_)
+    Cerr << "Compute temperature mixed cell centres" << finl;
+  compute_temperature_cell_centres();
+
   /*
    * For post-processing purposes
    */
@@ -823,7 +861,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double ene_postSource = compute_global_energy(d_temperature_);
 
   /*
-   * Interpolate a value at the cell centre
+   * Erase the temperature increment (second call)
    */
   compute_temperature_cell_centres();
 
@@ -1059,15 +1097,21 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
 {
   if (compute_eulerian_compo_)
     {
-      DoubleTab bounding_box;
-      Cerr << "Test_err_ini" << finl;
-      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box, eulerian_compo_connex_ft_, bubbles_barycentre_);
-      Cerr << "Test_err_end" << finl;
+      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box_,
+                                      eulerian_compo_connex_ft_, eulerian_compo_connex_ghost_ft_,
+                                      bubbles_barycentre_);
       eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+
       eulerian_compo_connex_ns_.data() = -1;
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
       ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
       eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+
+      eulerian_compo_connex_ghost_ns_.data() = -1;
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
     }
   else
     Cerr << "Don't compute the eulerian bubbles' components (composantes connexes)" << finl;
@@ -1083,6 +1127,10 @@ void IJK_Thermal_base::compute_rising_velocities()
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
                               eulerian_compo_connex_ns_, ref_ijk_ft_->get_direction_gravite(),
                               rising_velocities_, rising_vectors_);
+//      compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
+//                              ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex(),
+//															ref_ijk_ft_->get_direction_gravite(),
+//                              rising_velocities_, rising_vectors_);
       /*
        * FIXME: Use the velocity of the interface instead ?
        */

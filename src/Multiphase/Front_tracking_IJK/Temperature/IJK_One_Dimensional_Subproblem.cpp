@@ -28,6 +28,8 @@ Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
 {
+  debug_ = 0;
+
   points_per_thermal_subproblem_ = nullptr;
   points_per_thermal_subproblem_base_ = nullptr;
   alpha_ = nullptr;
@@ -135,7 +137,8 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   hess_cross_T_elem_ = &hess_cross_T_elem ;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_problem_index,
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
+                                                                     int sub_problem_index,
                                                                      int i, int j, int k, int compo_connex,
                                                                      double distance,
                                                                      double curvature,
@@ -178,6 +181,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int sub_pro
                                                                      const int& source_terms_type,
                                                                      const int& source_terms_correction)
 {
+  debug_ = debug;
   sub_problem_index_ = sub_problem_index;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
@@ -246,8 +250,16 @@ void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const
 
 void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
 {
+  if (debug_)
+    Cerr << "Compute interface basis vectors" << finl;
   compute_interface_basis_vectors();
+
+  if (debug_)
+    Cerr << "Compute pure spherical basis vectors" << finl;
   compute_pure_spherical_basis_vectors();
+
+  if (debug_)
+    Cerr << "Compute probe parameters" << finl;
   /*
    *  Curvature is negative for a convex bubble
    *  but R should be positive in that case
@@ -322,6 +334,12 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
 //	normal_vector_compo_;
 
   facet_barycentre_relative_ = facet_barycentre_ - bubble_barycentre_;
+  if (debug_)
+    {
+      Cerr << "bubble_barycentre_"<< bubble_barycentre_[0] << " ; " << bubble_barycentre_[1] << " ; " << bubble_barycentre_[2] << finl;
+      Cerr << "facet_barycentre_"<< facet_barycentre_[0] << " ; " << facet_barycentre_[1] << " ; " << facet_barycentre_[2] << finl;
+      Cerr << "facet_barycentre_relative_"<< facet_barycentre_relative_[0] << " ; " << facet_barycentre_relative_[1] << " ; " << facet_barycentre_relative_[2] << finl;
+    }
   Vecteur3 facet_barycentre_relative_normed = facet_barycentre_relative_;
   const double facet_barycentre_relative_norm = facet_barycentre_relative_normed.length();
   facet_barycentre_relative_normed *= (1 / facet_barycentre_relative_norm);
@@ -398,18 +416,41 @@ void IJK_One_Dimensional_Subproblem::compute_pure_spherical_basis_vectors()
   /*
    * FIXME: It is align with gravity z but it should be modified to be align with the gravity dir
    */
+  if (debug_)
+    Cerr << "r_sph_ calculation"  << finl;
   r_sph_ = sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
                 + facet_barycentre_relative_[1] * facet_barycentre_relative_[1]
                 + facet_barycentre_relative_[2] * facet_barycentre_relative_[2]);
+  if (debug_)
+    {
+      Cerr << "r_sph_ = " << r_sph_ << finl;
+      Cerr << "theta_sph_ calculation"  << finl;
+    }
   theta_sph_ = atan(sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
                          + facet_barycentre_relative_[1] * facet_barycentre_relative_[1])/ facet_barycentre_relative_[2]);
+  if (debug_)
+    {
+      Cerr << "theta_sph_ = " << theta_sph_ << finl;
+      Cerr << "phi_sph_ calculation"  << finl;
+    }
   phi_sph_ = atan(facet_barycentre_relative_[1] / facet_barycentre_relative_[0]);
 
+  if (debug_)
+    {
+      Cerr << "phi_sph_ = " << phi_sph_ << finl;
+      Cerr << "er_sph_ calculation"  << finl;
+    }
   for (int dir=0; dir<3; dir++)
     er_sph_[dir] = facet_barycentre_relative_[dir] / r_sph_;
 
   const double length = sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
                              + facet_barycentre_relative_[1] * facet_barycentre_relative_[1]);
+
+  if (debug_)
+    {
+      Cerr << "er_sph_ = " << er_sph_[0] << finl;
+      Cerr << "etheta_sph_ calculation"  << finl;
+    }
   for (int dir=0; dir<2; dir++)
     etheta_sph_[dir] = facet_barycentre_relative_[dir] * facet_barycentre_relative_[2] / (r_sph_ * length);
   etheta_sph_[2] = - facet_barycentre_relative_[2] * length / r_sph_;

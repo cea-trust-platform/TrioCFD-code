@@ -141,6 +141,18 @@ public:
   {
     return eulerian_compo_connex_ft_;
   }
+  const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const
+  {
+    return eulerian_compo_connex_ghost_ft_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_ns() const
+  {
+    return eulerian_compo_connex_ns_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const
+  {
+    return eulerian_compo_connex_ghost_ns_;
+  }
   const IJK_Field_double& get_eulerian_distance_ns() const
   {
     return eulerian_distance_ns_;
@@ -156,10 +168,6 @@ public:
   const IJK_Field_double& get_grad_T_interface_ns() const
   {
     return eulerian_grad_T_interface_ns_;
-  }
-  const IJK_Field_double& get_eulerian_compo_connex_ns() const
-  {
-    return eulerian_compo_connex_ns_;
   }
   const IJK_Field_double& get_eulerian_rising_velocities() const
   {
@@ -289,6 +297,7 @@ protected:
                                   const IJK_Interfaces& interfaces, double nb_diam, int upstream_dir,
                                   int gravity_dir, int upstream_stencil);
 
+  int debug_;
   /*
    * Patch to conserve energy
    */
@@ -427,6 +436,7 @@ protected:
    * TODO: Move fields and avoid redundancies in IJK_Interfaces
    * Clean FT_fields
    */
+  DoubleTab bounding_box_;
   IJK_Field_double eulerian_distance_ft_;
   IJK_Field_double eulerian_distance_ns_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ft_;
@@ -462,6 +472,13 @@ protected:
   int compute_eulerian_compo_;
   IJK_Field_double eulerian_compo_connex_ft_;
   IJK_Field_double eulerian_compo_connex_ns_;
+  IJK_Field_double eulerian_compo_connex_ghost_ft_;
+  IJK_Field_double eulerian_compo_connex_ghost_ns_;
+
+//  IJK_Field_double * eulerian_compo_connex_ft_;
+//	IJK_Field_double * eulerian_compo_connex_ns_;
+//	IJK_Field_double * eulerian_compo_connex_ghost_ft_;
+//	IJK_Field_double * eulerian_compo_connex_ghost_ns_;
 
   int compute_rising_velocities_;
   int fill_rising_velocities_;

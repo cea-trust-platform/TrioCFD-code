@@ -63,7 +63,8 @@ void IJK_One_Dimensional_Subproblems::add_subproblems(int n)
   max_subproblems_ = n;
 }
 
-void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int j, int k,
+void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
+                                                                      int i, int j, int k,
                                                                       const IJK_Field_double& eulerian_compo_connex,
                                                                       const IJK_Field_double& eulerian_distance,
                                                                       const IJK_Field_double& eulerian_curvature,
@@ -102,13 +103,21 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
                                                                       const int& source_terms_correction)
 {
   bool create_subproblems_iteratively = true;
+  debug_ = debug;
   if (subproblems_counter_ < max_subproblems_ || create_subproblems_iteratively)
     {
       ArrOfDouble bubble_rising_vector(3);
       ArrOfDouble normal_vector(3);
       ArrOfDouble facet_barycentre(3);
       ArrOfDouble bubble_barycentre(3);
+      if (debug_)
+        Cerr << "Mixed cell indices (i,j,k) : (" << i << ";" << j << ";" << k << ")" << finl;
       const int compo_connex = int(eulerian_compo_connex(i, j, k));
+      if (debug_)
+        {
+          Cerr << "compo_connex : " << compo_connex << finl;
+          Cerr << "bubbles_barycentre : " << bubbles_barycentre << finl;
+        }
       // Need for a Navier-Stokes field (NOT FT)
 
       const double distance = eulerian_distance(i, j ,k);
@@ -126,7 +135,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int i, int
         }
       IJK_One_Dimensional_Subproblem subproblem(ref_ijk_ft_);
       (*this).add(subproblem);
-      (*this)[subproblems_counter_].associate_sub_problem_to_inputs(subproblems_counter_,
+      (*this)[subproblems_counter_].associate_sub_problem_to_inputs(debug,
+                                                                    subproblems_counter_,
                                                                     i, j, k, compo_connex,
                                                                     distance, curvature, interfacial_area,
                                                                     facet_barycentre, normal_vector,

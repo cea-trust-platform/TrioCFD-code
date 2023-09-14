@@ -342,17 +342,29 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   /*
    * FIXME: Do the first step only at the first iteration
    */
+  if (debug_)
+    Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
 
+  if (debug_)
+    Cerr << "Compute radial subresolution convection and diffusion operators" << finl;
   compute_radial_subresolution_convection_diffusion_operators();
 
+  if (debug_)
+    Cerr << "Impose boundary conditions" << finl;
   temperature_.echange_espace_virtuel(temperature_.ghost());
   impose_subresolution_boundary_conditions();
 
+  if (debug_)
+    Cerr << "Add source terms" << finl;
   compute_add_subresolution_source_terms();
 
+  if (debug_)
+    Cerr << "Solve thermal subproblems" << finl;
   solve_thermal_subproblems();
 
+  if (debug_)
+    Cerr << "Prepare thermal flux correction" << finl;
   prepare_thermal_flux_correction();
 
   // apply_thermal_flux_correction();
@@ -490,7 +502,22 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
           for (int i = 0; i < ni; i++)
             if (fabs(indicator(i,j,k)) > VAPOUR_INDICATOR_TEST && fabs(indicator(i,j,k)) < LIQUID_INDICATOR_TEST)
               {
-                thermal_local_subproblems_.associate_sub_problem_to_inputs(i, j, k,
+                if (debug_)
+                  {
+                    Cerr << "Liquid Indicator : " << indicator(i,j,k) << finl;
+                    for (int i_bulle=0; i_bulle < bounding_box_.dimension(0); i_bulle++)
+                      {
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,0,0) << finl;
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,0,1) << finl;
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,1,0) << finl;
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,1,1) << finl;
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,2,0) << finl;
+                        Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,2,1) << finl;
+                      }
+
+                  }
+                thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
+                                                                           i, j, k,
                                                                            eulerian_compo_connex_ns_,
                                                                            eulerian_distance_ns_,
                                                                            eulerian_curvature_ns_,

@@ -563,6 +563,30 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   oss.str("");
 
   /*
+   * EULERIAN_COMPO
+   */
+  oss << "EULERIAN_COMPO_GHOST_FT_" << lata_suffix << idx;
+  Nom nom_eulerian_compo_ghost_ft(oss.str().c_str());
+  if (liste_post_instantanes.contient_("EULERIAN_COMPO_GHOST_FT") || liste_post_instantanes.contient_(nom_eulerian_compo_ghost_ft))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_eulerian_compo_ghost_ft, get_eulerian_compo_connex_ghost_ft(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * EULERIAN_COMPO
+   */
+  oss << "EULERIAN_COMPO_GHOST_" << lata_suffix << idx;
+  Nom nom_eulerian_compo_ghost(oss.str().c_str());
+  if (liste_post_instantanes.contient_("EULERIAN_COMPO_GHOST") || liste_post_instantanes.contient_(nom_eulerian_compo_ghost))
+
+    {
+      n++, dumplata_scalar(lata_name, nom_eulerian_compo_ghost, get_eulerian_compo_connex_ghost_ns(), latastep);
+    }
+  oss.str("");
+
+  /*
    * RISING_VELOCITIES
    */
   oss << "RISING_VELOCITIES_" << lata_suffix << idx;

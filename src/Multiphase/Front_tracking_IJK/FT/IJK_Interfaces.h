@@ -37,6 +37,7 @@
 #include <ComputeValParCompoInCell.h>
 #include <TRUST_Ref.h>
 #include <Intersection_Interface_ijk.h>
+#include <IJK_Composantes_Connex.h>
 
 class IJK_FT_double;
 class Domaine_dis;
@@ -605,6 +606,15 @@ public :
   {
     return intersection_ijk_face_;
   }
+  const IJK_Composantes_Connex& get_ijk_compo_connex() const
+  {
+    return ijk_compo_connex_;
+  }
+
+  void compute_compo_connex_from_bounding_box()
+  {
+    ijk_compo_connex_.compute_bounding_box_fill_compo_connex();
+  }
 
 protected:
   // Met a jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
@@ -850,6 +860,8 @@ protected:
 
   Intersection_Interface_ijk_cell intersection_ijk_cell_;
   Intersection_Interface_ijk_face intersection_ijk_face_;
+
+  IJK_Composantes_Connex ijk_compo_connex_;
 
 };
 

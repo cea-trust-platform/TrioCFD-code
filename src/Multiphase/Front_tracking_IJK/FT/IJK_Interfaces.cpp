@@ -707,14 +707,20 @@ void IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
       const Domaine& domaine = domaine_vf.domaine();
       domaine.creer_tableau_elements(num_compo_);
     }
+
+  /*
+   * TODO: Add nalloc
+   */
   intersection_ijk_cell_.initialize(splitting_NS, *this);
   intersection_ijk_face_.initialize(splitting_NS, *this);
+  ijk_compo_connex_.initialize(splitting_NS, *this);
 }
 
 void IJK_Interfaces::associer(const IJK_FT_double& ijk_ft)
 {
   ref_ijk_ft_ = ijk_ft;
   is_diphasique_ =  1 - ref_ijk_ft_->disable_diphasique();
+  ijk_compo_connex_.associer(ijk_ft);
   // liste_post_instantanes_ = ijk_ft.post_.get_liste_post_instantanes();
 }
 
@@ -1192,6 +1198,7 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
     }
   mp_sum_for_each_item(volumes);
   mp_sum_for_each_item(centre_gravite);
+  Cerr << "volumes : " << volumes << finl;
   for (int i = 0; i < nbulles_tot; i++)
     {
       // const double x = 1./volumes[i];

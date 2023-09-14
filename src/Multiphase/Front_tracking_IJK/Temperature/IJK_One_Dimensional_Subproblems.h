@@ -50,7 +50,8 @@ public :
   void clean();
   void clean_add();
   void add_subproblems(int n);
-  void associate_sub_problem_to_inputs(int i, int j, int k,
+  void associate_sub_problem_to_inputs(int debug,
+                                       int i, int j, int k,
                                        const IJK_Field_double& eulerian_compo_connex,
                                        const IJK_Field_double& eulerian_distance,
                                        const IJK_Field_double& eulerian_curvature,
@@ -111,6 +112,7 @@ public :
   }
 
 protected :
+  int debug_ = 0;
   int max_subproblems_ = 0;
   int subproblems_counter_ = 0;
   REF(IJK_FT_double) ref_ijk_ft_;

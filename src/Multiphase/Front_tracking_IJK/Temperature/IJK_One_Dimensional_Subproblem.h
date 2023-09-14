@@ -58,7 +58,8 @@ class IJK_One_Dimensional_Subproblem : public Objet_U
 public :
   IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
-  void associate_sub_problem_to_inputs(int sub_problem_index,
+  void associate_sub_problem_to_inputs(int debug,
+                                       int sub_problem_index,
                                        int i, int j, int k, int compo_connex,
                                        double distance,
                                        double curvature,
@@ -198,6 +199,8 @@ protected :
 
   void post_process_radial_quantities();
   void post_process_interfacial_quantities();
+
+  int debug_;
   /*
    * FIXME: Should I use only references or just for IJK_Field_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?
