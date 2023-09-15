@@ -1418,10 +1418,11 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       double E ;
       double density = str_mesh_model->getDensity() ;
       double dts ;
+      double dtmin ;
       double pressure ;
       double vonmises ;
 
-      str_mesh_model->gridDt = 1.E12 ; // Initialize gridDt at <huge>
+      dtmin = 1.E12 ; // Initialize dtmin at <huge>
 
       for (int elem=0; elem<nbElem; elem++)
         {
@@ -1450,8 +1451,10 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
 
           // Set next time step
           dts = str_mesh_model->computeCriticalDt(volume, xlong, E) ;
-          str_mesh_model->gridDt = std::min(str_mesh_model->gridDt, dts) ;
+          dtmin = std::min(dtmin, dts) ;
         }
+
+      str_mesh_model->gridDt = mp_min(dtmin) ;
 
       MD_Vector_tools::echange_espace_virtuel(str_mesh_model->ff, MD_Vector_tools::EV_SOMME_ECHANGE) ;
       if (!str_mesh_model->isMassBuilt)
