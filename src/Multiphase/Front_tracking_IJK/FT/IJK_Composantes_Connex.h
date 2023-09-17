@@ -69,6 +69,10 @@ public :
   {
     return bubbles_barycentre_;
   }
+  const DoubleTab& get_min_max_larger_box() const
+  {
+    return min_max_larger_box_;
+  }
 
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
@@ -81,6 +85,7 @@ protected :
 
   DoubleTab bounding_box_;
   DoubleTab bubbles_barycentre_;
+  DoubleTab min_max_larger_box_;
 
   bool is_updated_ = false;
 };

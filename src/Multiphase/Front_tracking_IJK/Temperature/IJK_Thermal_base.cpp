@@ -112,6 +112,11 @@ IJK_Thermal_base::IJK_Thermal_base()
   fill_rising_velocities_ = 0;
 
   debug_ = 0;
+
+  eulerian_compo_connex_ft_ = nullptr;
+  eulerian_compo_connex_ns_ = nullptr;
+  eulerian_compo_connex_ghost_ft_ = nullptr;
+  eulerian_compo_connex_ghost_ns_ = nullptr;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -298,7 +303,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   /*
    * Convection operator
    * If temperature_convection_op_ is not written in the .data
-   * the operator is initialised with uniform_lambda & centre2
+   * the operator is initialised with quick
    * in Operateur_IJK_elem_conv.h
    */
 
@@ -524,28 +529,29 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
                             || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("EULERIAN_COMPO_NS"));
   if (compute_eulerian_compo_)
     {
-      eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-      nalloc += 1;
-      eulerian_compo_connex_ft_.data() = -1.;
-      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+      indicator_test_.allocate(splitting, IJK_Splitting::ELEM, 0);
+//      eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+//      nalloc += 1;
+//      eulerian_compo_connex_ft_.data() = -1.;
+//      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+//
+//      eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+//      nalloc += 1;
+//      eulerian_compo_connex_ghost_ft_.data() = -1.;
+//      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+//
+//      eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+//      nalloc += 1;
+//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+//
+//      eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+//      nalloc += 1;
+//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
 
-      eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-      nalloc += 1;
-      eulerian_compo_connex_ghost_ft_.data() = -1.;
-      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
-
-      eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-      nalloc += 1;
-      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-
-      eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-      nalloc += 1;
-      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-
-//	    eulerian_compo_connex_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ft());
-//	    eulerian_compo_connex_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex());
-//	    eulerian_compo_connex_ghost_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost_ft());
-//	    eulerian_compo_connex_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost());
+      eulerian_compo_connex_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ft());
+      eulerian_compo_connex_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex());
+      eulerian_compo_connex_ghost_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost_ft());
+      eulerian_compo_connex_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost());
     }
 
   compute_rising_velocities_ = compute_rising_velocities_ ||
@@ -864,12 +870,13 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Erase the temperature increment (second call)
    */
   compute_temperature_cell_centres();
+  set_zero_temperature_increment();
 
   /*
    * Clean_subproblems !
    */
   clean_thermal_subproblems();
-  correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
+  // correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
 
   // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces
 
@@ -1097,21 +1104,28 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
 {
   if (compute_eulerian_compo_)
     {
-      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box_,
-                                      eulerian_compo_connex_ft_, eulerian_compo_connex_ghost_ft_,
-                                      bubbles_barycentre_);
-      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
-      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+      bubbles_barycentre_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre();
+      bounding_box_= ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bounding_box();
+      min_max_larger_box_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_min_max_larger_box();
 
-      eulerian_compo_connex_ns_.data() = -1;
-      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
-      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(ref_ijk_ft_->itfce().I_ft(), indicator_test_);
 
-      eulerian_compo_connex_ghost_ns_.data() = -1;
-      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
-      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+//      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box_,
+//                                      eulerian_compo_connex_ft_, eulerian_compo_connex_ghost_ft_,
+//                                      bubbles_barycentre_);
+//      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+//      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+//
+//      eulerian_compo_connex_ns_.data() = -1;
+//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+//      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
+//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+//
+//      eulerian_compo_connex_ghost_ns_.data() = -1;
+//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+//      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
+//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+
     }
   else
     Cerr << "Don't compute the eulerian bubbles' components (composantes connexes)" << finl;
@@ -1275,9 +1289,7 @@ void IJK_Thermal_base::compute_temperature_convection(const FixedVector<IJK_Fiel
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
-            {
-              d_temperature_(i,j,k) /= vol_ ;
-            }
+            d_temperature_(i,j,k) /= vol_ ;
     }
   statistiques().end_count(cnt_conv_temp);
   DebogIJK::verifier("op_conv(rho)", d_temperature_);
@@ -2274,7 +2286,8 @@ void IJK_Thermal_base::force_upstream_temperature(IJK_Field_double& temperature,
 
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
-  interfaces.calculer_bounding_box_bulles(bounding_box);
+  // interfaces.calculer_bounding_box_bulles(bounding_box);
+  bounding_box = interfaces.get_ijk_compo_connex().get_bounding_box();
   // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
   const double Dbdir = bounding_box(0, dir, 1) - bounding_box(0, dir, 0);
   const double dirb  = ( bounding_box(0, dir, 1) + bounding_box(0, dir, 0) ) / 2.;

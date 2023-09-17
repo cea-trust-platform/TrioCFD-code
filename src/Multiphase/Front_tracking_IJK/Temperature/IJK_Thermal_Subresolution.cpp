@@ -34,7 +34,7 @@ Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Therm
 IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
   disable_mixed_cells_increment_=1;
-  allow_temperature_correction_for_visu_=1;
+  allow_temperature_correction_for_visu_=0;
   subproblem_temperature_extension_=0;
   disable_subresolution_=0;
   convective_flux_correction_ = 0;
@@ -279,15 +279,10 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
           for (int i = 0; i < ni; i++)
             {
               const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-              if (fabs(1.-indic) > 1.e-8) // Mixed cells and pure vapour cells
+              if (fabs(indic) < LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
                 { temperature_(i,j,k) = 0.; }
             }
     }
-// TODO: Temperature sub-resolution (Weak coupling)
-//			else
-//				{
-//
-//				}
 }
 
 void IJK_Thermal_Subresolution::correct_temperature_increment_for_interface_leaving_cell()
@@ -318,7 +313,7 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
    * If not we may want to reconstruct the gradient field in Python
    * using the ghost temperature !
    */
-  if (liste_post_instantanes_.contient_("GRAD_T_ELEM") || allow_temperature_correction_for_visu_)
+  if (liste_post_instantanes_.contient_("GRAD_T_ELEM") && allow_temperature_correction_for_visu_)
     {
       const int ni = temperature_.ni();
       const int nj = temperature_.nj();
@@ -365,6 +360,7 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
 
   if (debug_)
     Cerr << "Prepare thermal flux correction" << finl;
+  update_intersections();
   prepare_thermal_flux_correction();
 
   // apply_thermal_flux_correction();
@@ -504,7 +500,9 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
               {
                 if (debug_)
                   {
-                    Cerr << "Liquid Indicator : " << indicator(i,j,k) << finl;
+                    Cerr << "Liquid Indicator (Old): " << indicator(i,j,k) << finl;
+                    Cerr << "Liquid Indicator (Next): " << ref_ijk_ft_->itfce().In()(i,j,k) << finl;
+                    Cerr << "Indicator test: " << indicator_test_(i,j,k) << finl;
                     for (int i_bulle=0; i_bulle < bounding_box_.dimension(0); i_bulle++)
                       {
                         Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,0,0) << finl;
@@ -513,12 +511,19 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                         Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,1,1) << finl;
                         Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,2,0) << finl;
                         Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,2,1) << finl;
+
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,0,0) << finl;
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,0,1) << finl;
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,1,0) << finl;
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,1,1) << finl;
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,2,0) << finl;
+                        Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,2,1) << finl;
                       }
 
                   }
                 thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
                                                                            i, j, k,
-                                                                           eulerian_compo_connex_ns_,
+                                                                           *eulerian_compo_connex_ns_,
                                                                            eulerian_distance_ns_,
                                                                            eulerian_curvature_ns_,
                                                                            eulerian_interfacial_area_ns_,
@@ -672,6 +677,13 @@ void IJK_Thermal_Subresolution::check_wrong_values_rhs()
 /*
  * TODO:
  */
+
+void IJK_Thermal_Subresolution::update_intersections()
+{
+  if (!disable_subresolution_)
+    corrige_flux_->update_intersections();
+}
+
 void IJK_Thermal_Subresolution::prepare_thermal_flux_correction()
 {
   if (!disable_subresolution_)
@@ -693,13 +705,25 @@ void IJK_Thermal_Subresolution::compute_thermal_fluxes_face_centre()
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres()
 {
   if (!disable_subresolution_)
-    corrige_flux_->compute_temperature_cell_centre(temperature_, d_temperature_);
+    corrige_flux_->compute_temperature_cell_centre(temperature_);
+}
+
+void IJK_Thermal_Subresolution::set_zero_temperature_increment()
+{
+  if (!disable_subresolution_)
+    corrige_flux_->set_zero_temperature_increment(d_temperature_);
 }
 
 void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
   if (!disable_subresolution_)
     thermal_local_subproblems_.clean();
+}
+
+void IJK_Thermal_Subresolution::clean_ijk_intersections()
+{
+  if (!disable_subresolution_)
+    corrige_flux_->clean();
 }
 
 void IJK_Thermal_Subresolution::clean_add_thermal_subproblems()

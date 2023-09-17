@@ -111,6 +111,11 @@ public :
     return subproblems_counter_;
   }
 
+  double get_min_temperature() const;
+  double get_max_temperature() const;
+  double get_min_temperature_domain_ends() const;
+  double get_max_temperature_domain_ends() const;
+
 protected :
   int debug_ = 0;
   int max_subproblems_ = 0;

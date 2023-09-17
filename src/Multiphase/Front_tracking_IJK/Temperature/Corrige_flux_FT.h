@@ -62,18 +62,20 @@ public :
                                   const int dir);
   inline void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                        const int k_layer, const int dir);
+  inline void update_intersections();
   inline void update();
   inline void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
                                                 const double dist, const DoubleTab& positions, const DoubleTab& normale,
                                                 ArrOfDouble& temperature_interp, ArrOfDouble& flux_normal_interp,
                                                 ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                                 DoubleTab& coo_vap) const;
-  inline void compute_temperature_cell_centre(IJK_Field_double& temperature,
-                                              IJK_Field_double& d_temperature) const;
+  inline void compute_temperature_cell_centre(IJK_Field_double& temperature) const;
+  inline void set_zero_temperature_increment(IJK_Field_double& d_temperature) const;
   inline void compute_temperature_face_centre();
   inline void compute_thermal_fluxes_face_centre();
   inline void set_convection_negligible(const int& convection_negligible);
   inline void set_diffusion_negligible(const int& diffusion_negligible);
+  void clean();
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -111,6 +113,11 @@ inline void Corrige_flux_FT::corrige_flux_faceIJ(IJK_Field_local_double *const f
   valeur().corrige_flux_faceIJ(flux, k_layer, dir);
 }
 
+inline void Corrige_flux_FT::update_intersections()
+{
+  valeur().update_intersections();
+}
+
 inline void Corrige_flux_FT::update()
 {
   valeur().update();
@@ -143,9 +150,14 @@ inline void Corrige_flux_FT::calcul_temperature_flux_interface(const IJK_Field_d
                                              coo_vap);
 }
 
-inline void Corrige_flux_FT::compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const
+inline void Corrige_flux_FT::compute_temperature_cell_centre(IJK_Field_double& temperature) const
 {
-  valeur().compute_temperature_cell_centre(temperature, d_temperature);
+  valeur().compute_temperature_cell_centre(temperature);
+}
+
+inline void Corrige_flux_FT::set_zero_temperature_increment(IJK_Field_double& d_temperature) const
+{
+  valeur().set_zero_temperature_increment(d_temperature);
 }
 
 inline void Corrige_flux_FT::compute_temperature_face_centre()
@@ -174,5 +186,9 @@ inline void Corrige_flux_FT::set_diffusion_negligible(const int& diffusion_negli
   valeur().set_diffusion_negligible(diffusion_negligible);
 }
 
+inline void Corrige_flux_FT::clean()
+{
+  valeur().clean();
+}
 
 #endif /* Corrige_flux_FT_included */

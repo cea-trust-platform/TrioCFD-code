@@ -72,14 +72,15 @@ public :
                                          ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                          DoubleTab& coo_vap) const override { ; };
 
+  void update_intersections() override;
   void update() override;
-  void check_subproblems_consistency();
-  void compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const override;
+  void associate_indices_and_check_subproblems_consistency();
+  void compute_temperature_cell_centre(IJK_Field_double& temperature) const override;
+  void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_temperature_face_centre() override;
   void compute_thermal_fluxes_face_centre() override;
-  void clean();
+  void clean() override;
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
-
 protected :
   DoubleVect dist_;
   IntVect pure_face_unique_;
@@ -92,6 +93,7 @@ protected :
   ArrOfInt ijk_intersections_subproblems_indices_;
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
+  int debug_=0;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

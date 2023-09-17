@@ -168,6 +168,127 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::non_zero_stencil_val
   return non_zero_elem;
 }
 
+int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::get_max_operators(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_conv,
+                                                                              const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_diff)
+{
+  int non_zero_elem = 0;
+  const int stencil_width_conv = fd_operator_conv[precision_order_-1][0].size();
+  const int stencil_width_diff = fd_operator_diff[precision_order_-1][0].size();
+  int stencil_width_max = std::max(stencil_width_conv, stencil_width_diff);
+  for (int i=0; i<stencil_width_max; i++)
+    {
+      if (i<stencil_width_conv && i<stencil_width_diff)
+        {
+          non_zero_elem++;
+          if (fd_operator_conv[precision_order_-1][0](i) != fd_operator_diff[precision_order_-1][0](i))
+            non_zero_elem++;
+        }
+      else if (i<stencil_width_conv)
+        non_zero_elem++;
+      else
+        non_zero_elem++;
+    }
+  return non_zero_elem;
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::get_max_stencil(const int& nb_elem,
+                                                                             int& non_zero_elem_max,
+                                                                             int& stencil_forward_max,
+                                                                             int& stencil_centred_max,
+                                                                             int& stencil_backward_max)
+{
+  int stencil_forward_size = 0;
+  int stencil_centred_size = 0;
+  int stencil_backward_size = 0;
+  switch (equation_type_)
+    {
+    case advection_diffusion:
+      stencil_forward_size = second_order_derivative_forward_[precision_order_-1][1].size();
+      stencil_centred_size = second_order_derivative_centred_[precision_order_-1][1].size();
+      stencil_backward_size = second_order_derivative_backward_[precision_order_-1][1].size();
+      // Dummy
+      //			stencil_forward_size = std::max(stencil_forward_size, first_order_derivative_forward_[precision_order_-1][1].size());
+      //			stencil_centred_size = std::max(stencil_forward_size, first_order_derivative_centred_[precision_order_-1][1].size());
+      //			stencil_backward_size = std::max(stencil_forward_size, first_order_derivative_backward_[precision_order_-1][1].size());
+      // Not Dummy
+      stencil_forward_size = get_max_operators(first_order_derivative_forward_, second_order_derivative_forward_);
+      stencil_centred_size = get_max_operators(first_order_derivative_centred_, second_order_derivative_centred_);
+      stencil_backward_size = get_max_operators(first_order_derivative_backward_, second_order_derivative_backward_);
+      break;
+    case linear_diffusion:
+      stencil_forward_size = second_order_derivative_forward_[precision_order_-1][1].size();
+      stencil_centred_size = second_order_derivative_centred_[precision_order_-1][1].size();
+      stencil_backward_size = second_order_derivative_backward_[precision_order_-1][1].size();
+      break;
+    default:
+      stencil_forward_size = second_order_derivative_forward_[precision_order_-1][1].size();
+      stencil_centred_size = second_order_derivative_centred_[precision_order_-1][1].size();
+      stencil_backward_size = second_order_derivative_backward_[precision_order_-1][1].size();
+      break;
+    }
+  stencil_forward_max = stencil_forward_size;
+  stencil_centred_max = stencil_centred_size;
+  stencil_backward_max = stencil_backward_size;
+  const int core_lines = (nb_elem - 2);
+  non_zero_elem_max = stencil_forward_max + stencil_centred_max + stencil_backward_max * core_lines;
+}
+
+int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pattern(Matrice& matrix, const int& nb_elem, const int& derivative_order)
+{
+  int non_zero_elem = 0;
+//  int stencil_forward = 0;
+//  int stencil_centred = 0;
+//  int stencil_backward = 0;
+//  FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> * forward_derivative = nullptr;
+//  FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> * centred_derivative = nullptr;
+//  FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> * backward_derivative = nullptr;
+//  switch(derivative_order)
+//    {
+//    case first:
+//      stencil_forward = non_zero_stencil_values(first_order_derivative_forward_);
+//      stencil_centred = non_zero_stencil_values(first_order_derivative_centred_);
+//      stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+//      forward_derivative = &first_order_derivative_forward_;
+//      centred_derivative = &first_order_derivative_centred_;
+//      backward_derivative = &first_order_derivative_backward_;
+//      break;
+//    case second:
+//      stencil_forward = non_zero_stencil_values(second_order_derivative_forward_);
+//      stencil_centred = non_zero_stencil_values(second_order_derivative_centred_);
+//      stencil_backward = non_zero_stencil_values(second_order_derivative_backward_);
+//      forward_derivative = &second_order_derivative_forward_;
+//      centred_derivative = &second_order_derivative_centred_;
+//      backward_derivative = &second_order_derivative_backward_;
+//      break;
+//    default:
+//      stencil_forward = non_zero_stencil_values(first_order_derivative_forward_);
+//      stencil_centred = non_zero_stencil_values(first_order_derivative_centred_);
+//      stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+//      forward_derivative = &first_order_derivative_forward_;
+//      centred_derivative = &first_order_derivative_centred_;
+//      backward_derivative = &first_order_derivative_backward_;
+//      break;
+//    }
+//  get_max_stencil(nb_elem, non_zero_elem, stencil_forward, stencil_centred, stencil_backward);
+//  // Cast the finite difference matrix
+//  matrix.typer("Matrice_Morse");
+//  Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, matrix.valeur());
+//  sparse_matrix.dimensionner(nb_elem, nb_elem, non_zero_elem);
+//
+//  ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
+//  ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
+//  ArrOfInt& matrix_column_indices = sparse_matrix.get_set_tab2();
+//
+//  // Fortran start at one
+//  int non_zero_values_counter = 0;
+//
+//  /*
+//   * TODO: Re-write the matrix filling routines
+//   */
+
+  return non_zero_elem;
+}
+
 /*
  *
  */

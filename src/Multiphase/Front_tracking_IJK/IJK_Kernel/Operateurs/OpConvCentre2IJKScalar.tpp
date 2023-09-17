@@ -40,8 +40,20 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
   double surface = 1.;
   if (!is_grad_)
     {
-      surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+      // surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
       // uniform in i and j directions
+      switch(_DIR_)
+        {
+        case DIRECTION::X:
+          surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+          break;
+        case DIRECTION::Y:
+          surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+          break;
+        case DIRECTION::Z:
+          surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+          break;
+        }
     }
   else
     {
@@ -89,7 +101,7 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
           if (!is_grad_)
             velocity_dir.get_center(i, velocity);
           Simd_double T0, T1; // scalar value at left and at right of the computed flux
-          input_field.get_left_center(_DIR_,i, T0, T1);
+          input_field.get_left_center(_DIR_, i, T0, T1);
           Simd_double flux = (T0 + T1) * 0.5;
           flux = flux * velocity * surface;
           resu_ptr.put_val(i, flux);

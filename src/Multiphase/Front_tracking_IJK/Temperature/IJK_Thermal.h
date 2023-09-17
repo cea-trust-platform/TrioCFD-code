@@ -67,8 +67,10 @@ public :
   inline const IJK_Field_double& get_interfacial_area_ns() const { return valeur().get_interfacial_area_ns(); }
   inline const IJK_Field_double& get_grad_T_interface_ns() const { return valeur().get_grad_T_interface_ns(); }
   inline const IJK_Field_double& get_eulerian_rising_velocities() const {return valeur().get_eulerian_rising_velocities(); }
-  inline const FixedVector<IJK_Field_double, 3>& get_bary() const { return valeur().get_bary(); }
+  inline const FixedVector<IJK_Field_double, 3> get_bary() const { return valeur().get_bary(); }
   inline FixedVector<IJK_Field_double, 3> get_gradient_temperature_elem() { return valeur().get_gradient_temperature_elem(); }
+  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ns() const { return valeur().get_normal_vector_ns(); }
+  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ft() const { return valeur().get_normal_vector_ft(); }
   inline FixedVector<IJK_Field_double, 3> get_hessian_diag_temperature_elem() { return valeur().get_hessian_diag_temperature_elem(); }
   inline FixedVector<IJK_Field_double, 3> get_hessian_cross_temperature_elem() { return valeur().get_hessian_cross_temperature_elem(); }
   inline const double& get_E0() const { return valeur().get_E0(); };
@@ -104,6 +106,12 @@ public :
                                    const double fractionnal_timestep, const double time, const double dE);
   inline void compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
                                                ArrOfDouble& flux_normal_interp);
+
+  inline void update_intersections() { valeur().update_intersections(); };
+  inline void clean_ijk_intersections() { valeur().clean_ijk_intersections(); };
+
+  inline void compute_eulerian_curvature_from_interface();
+
   void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
   int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
                                              const char * lata_name,
@@ -214,6 +222,11 @@ inline void IJK_Thermal::compute_interfacial_temperature2(ArrOfDouble& interfaci
                                                           ArrOfDouble& flux_normal_interp)
 {
   return valeur().compute_interfacial_temperature2(interfacial_temperature, flux_normal_interp);
+}
+
+inline void IJK_Thermal::compute_eulerian_curvature_from_interface()
+{
+  valeur().compute_eulerian_curvature_from_interface();
 }
 
 #endif /* IJK_Thermal_included */

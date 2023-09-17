@@ -41,7 +41,22 @@ void OpConvQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, co
   const int nx = _DIR_==DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni();
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
   const double dx = channel_data_.get_delta_x();
-  const double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+
+  // const double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+  // double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+  double surface =1.;
+  switch(_DIR_)
+    {
+    case DIRECTION::X:
+      surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+      break;
+    case DIRECTION::Y:
+      surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+      break;
+    case DIRECTION::Z:
+      surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+      break;
+    }
   if(_DIR_==DIRECTION::Z)
     {
       // Are we on the wall ?

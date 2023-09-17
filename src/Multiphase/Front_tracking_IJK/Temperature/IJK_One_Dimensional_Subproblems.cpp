@@ -257,3 +257,23 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs()
     itr.thermal_subresolution_outputs();
 }
 
+double IJK_One_Dimensional_Subproblems::get_min_temperature() const
+{
+  return (*this)[0].get_min_temperature();
+}
+
+double IJK_One_Dimensional_Subproblems::get_max_temperature() const
+{
+  return (*this)[0].get_max_temperature();
+}
+
+double IJK_One_Dimensional_Subproblems::get_min_temperature_domain_ends() const
+{
+  return (*this)[0].get_min_temperature_domain_ends();
+}
+
+double IJK_One_Dimensional_Subproblems::get_max_temperature_domain_ends() const
+{
+  return (*this)[0].get_max_temperature_domain_ends();
+}
+

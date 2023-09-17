@@ -84,8 +84,8 @@ public:
   const DoubleTab& norm_interf() const { return normal_on_interf_; };
   const DoubleTab& dist_interf() const { return dist_to_interf_; };
 
-  void set_pas_a_jour() { projected_on_interface_flag_ = false; };
-  bool is_a_jour() const { return projected_on_interface_flag_; };
+  virtual void set_pas_a_jour() { projected_on_interface_flag_ = false; };
+  virtual bool is_a_jour() const { return projected_on_interface_flag_; };
 
   // On projete le point bary_vap qui est localisé sur une face sur le plan
   // passant par bary, selon la normale qui est donnee. Ce point est appelé ici
@@ -194,6 +194,16 @@ public:
   }
   void update_interpolations_cell_centres_on_interface();
   void update_interpolations_cell_faces_on_interface();
+
+  void update_interpolations_cell_centres_on_interface_new();
+  void update_interpolations_cell_faces_on_interface_new();
+
+  void update_interpolations_cell_centres_on_interface(const IJK_Field_double& interfaces);
+  void update_interpolations_cell_faces_on_interface(const IJK_Field_double& interfaces);
+
+  void set_pas_a_jour() override { projected_on_interface_flag_ = false; face_centres_projected_on_interface_flag_ = false;};
+  bool is_a_jour() const override { return (projected_on_interface_flag_ && face_centres_projected_on_interface_flag_); };
+
 
 protected:
   // Le tableau qui donne pour chaque face coupée par l'interface :

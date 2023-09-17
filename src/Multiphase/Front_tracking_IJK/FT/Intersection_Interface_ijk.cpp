@@ -533,11 +533,11 @@ void Intersection_Interface_ijk_cell::compute_face_to_correct()
     }
 }
 
-void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface()
+void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface(const IJK_Field_double& interfaces)
 {
   if (!projected_on_interface_flag_)
     {
-      calcul_projection_centre_sur_interface_moy(interfaces_->I(),
+      calcul_projection_centre_sur_interface_moy(interfaces,
                                                  positions_on_interf_,
                                                  ijk_interfaces_,
                                                  normal_on_interf_,
@@ -547,11 +547,11 @@ void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_inte
     }
 }
 
-void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interface()
+void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interface(const IJK_Field_double& interfaces)
 {
   if (!face_centres_projected_on_interface_flag_)
     {
-      calcul_projection_centre_faces_sur_interface_moy(interfaces_->I(),
+      calcul_projection_centre_faces_sur_interface_moy(interfaces,
                                                        ijk_interfaces_,
                                                        normal_on_interf_,
                                                        positions_pure_faces_on_interf_,
@@ -561,4 +561,46 @@ void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interf
       compute_face_to_correct();
       face_centres_projected_on_interface_flag_ = true;
     }
+}
+
+void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface()
+{
+  update_interpolations_cell_centres_on_interface(interfaces_->I());
+//  if (!projected_on_interface_flag_)
+//    {
+//      calcul_projection_centre_sur_interface_moy(interfaces_->I(),
+//                                                 positions_on_interf_,
+//                                                 ijk_interfaces_,
+//                                                 normal_on_interf_,
+//                                                 dist_to_interf_);
+//      compute_face_to_correct();
+//      projected_on_interface_flag_ = true;
+//    }
+}
+
+void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interface()
+{
+  update_interpolations_cell_faces_on_interface(interfaces_->I());
+//  if (!face_centres_projected_on_interface_flag_)
+//    {
+//      calcul_projection_centre_faces_sur_interface_moy(interfaces_->I(),
+//                                                       ijk_interfaces_,
+//                                                       normal_on_interf_,
+//                                                       positions_pure_faces_on_interf_,
+//                                                       ijk_pure_face_neighbours_,
+//                                                       ijk_pure_face_to_correct_,
+//                                                       dist_pure_faces_to_interf_);
+//      compute_face_to_correct();
+//      face_centres_projected_on_interface_flag_ = true;
+//    }
+}
+
+void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface_new()
+{
+  update_interpolations_cell_centres_on_interface(interfaces_->In());
+}
+
+void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interface_new()
+{
+  update_interpolations_cell_faces_on_interface(interfaces_->In());
 }

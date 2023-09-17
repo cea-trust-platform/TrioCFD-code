@@ -61,6 +61,69 @@ Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interp
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
 {
+  frozen_velocity_=0;
+  reprise_=0;
+  timestep_facsec_=0.;
+  p_seuil_min_=0.;
+  cfl_=0.;
+  fo_=0.;
+  oh_=0.;
+  vitesse_entree_=0.;
+  vitesse_upstream_=0.;
+  upstream_dir_=0;
+  upstream_stencil_=0;
+  nb_diam_upstream_=0.;
+  rho_liquide_=0.;
+  rho_vapeur_=0.;
+  rho_moyen_=0.;
+  mu_liquide_=0.;
+  mu_vapeur_=0.;
+  sigma_=0.;
+  direction_gravite_=0;
+  disable_solveur_poisson_=0;
+  resolution_fluctuations_=0;
+  disable_diffusion_qdm_=0;
+  disable_convection_qdm_=0;
+  disable_source_interf_=0;
+  frozen_velocity_=0;
+  velocity_reset_=0;
+  improved_initial_pressure_guess_=0;
+  include_pressure_gradient_in_ustar_=0;
+  use_inv_rho_for_mass_solver_and_calculer_rho_v_=0;
+  use_inv_rho_in_poisson_solver_=0;
+  use_inv_rho_=0;
+  correction_bilan_qdm_=0;
+  refuse_patch_conservation_QdM_RK3_source_interf_=0;
+  test_etapes_et_bilan_=0;
+  add_initial_field_=0;
+  diffusion_alternative_=0;
+  suppression_rejetons_=0;
+  disable_diphasique_=0;
+  time_scheme_=0;
+  store_RK3_source_acc_=0.;
+  store_RK3_fac_sv_=0.;
+  current_time_=0.;
+  current_time_at_rk3_step_=0.;
+  tstep_=0;
+  timestep_=0.;
+  sauvegarder_xyz_=0;
+  timestep_reprise_vitesse_=0;
+  ijk_splitting_ft_extension_=0;
+  pression_ap_proj_=0.;
+  check_divergence_=0;
+  coef_force_time_n_=0;
+  facteur_variable_source_=0;
+  coef_ammortissement_=0;
+  dt_sauvegarde_=0;
+  nb_timesteps_=0;
+  vol_bulle_monodisperse_=0;
+  coef_rayon_force_rappel_=0;
+  terme_source_acceleration_=0;
+  coef_mean_force_=0;
+  coef_immobilisation_=0;
+  rk_step_=0;
+  p_seuil_max_=0;
+  compute_force_init_=0;
 }
 
 IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
@@ -1375,16 +1438,21 @@ double IJK_FT_double::find_timestep(const double max_timestep,
         dt_cfl = std::min(dt_cfl, delta / max_v * 0.5);
     }
   dt_cfl *= cfl;
+
   const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
   double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
   if (disable_diffusion_qdm_)
     dt_fo = 1.e20;
+
   /*
    * Popinet et.al 2018 (review surface tension calculation)
    * Au cas ou sigma = 0, on utilise (sigma + 1e-20)
    */
   double ideal_length_factor = get_remaillage_ft_ijk().get_facteur_longueur_ideale();
-  const double dt_oh  = sqrt((rho_liquide_ + rho_vapeur_) / (2 * M_PI) * lg_cube_raw * pow(ideal_length_factor, 3) / (sigma_ + 1e-20)) * oh;
+  double dt_oh  = sqrt((rho_liquide_ + rho_vapeur_) / (2 * M_PI) * lg_cube_raw * pow(ideal_length_factor, 3) / (sigma_ + 1e-20)) * oh;
+  if (disable_convection_qdm_)
+    dt_oh = 1.e20;
+
   // Seems underestimated !
   //  const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
   const double dt_eq_velocity = 1. / (1./dt_cfl + 1./dt_fo + 1./dt_oh);
@@ -2340,6 +2408,7 @@ void IJK_FT_double::run()
       rho_field_.data() = rho_liquide_;
       rho_moyen_ = rho_liquide_;
       molecular_mu_.data() = mu_liquide_;
+
       // C'est deja fait dans l'initialize (aucune raison de ne pas le faire)
       // indicatrice_ns_.data() = 1.;
       // indicatrice_ns_next_.data() = 1.;
@@ -4259,6 +4328,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 {
   static Stat_Counter_Id deplacement_interf_counter_ = statistiques().new_counter(1, "Deplacement de l'interface");
   statistiques().begin_count(deplacement_interf_counter_);
+
   if (disable_diphasique_ || interfaces_.is_frozen())
     return;
   //  Calculer vitesse_ft (etendue) a partir du champ de vitesse.
@@ -4267,16 +4337,19 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
         if (i==0)
-          {
-            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-          }
+          velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
         else
-          {
-            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
-          }
+          velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
       }
-
   }
+
+  /*
+   * Calculation of intersections on interface at time (n)
+   */
+  thermals_.compute_eulerian_curvature_from_interface();
+  thermals_.clean_ijk_intersections();
+  // thermals_.update_intersections(); // no need as IJK_intersections call interfaces_nI interfaces_xI
+  interfaces_.compute_compo_connex_from_bounding_box();
 
   // On supprime les duplicatas avant le transport :
   interfaces_.supprimer_duplicata_bulles();
@@ -4306,8 +4379,9 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     gravite_,
     delta_rho,
     sigma_,
-    /*Pour post-traitement : post_.rebuilt_indic()
-    */
+    /*
+     * Pour post-traitement : post_.rebuilt_indic()
+     */
 #ifdef SMOOTHING_RHO
     /* Pour le smoothing : */
     rho_field_ft_,
@@ -4334,13 +4408,9 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
       {
         redistribute_to_splitting_ft_faces_[i].redistribute(velocity_[i], velocity_ft_[i]);
         if (i==0)
-          {
-            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-          }
+          velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
         else
-          {
-            velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
-          }
+          velocity_ft_[i].echange_espace_virtuel(velocity_ft_[i].ghost());
       }
   }
 
@@ -4350,6 +4420,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
+
   statistiques().end_count(deplacement_interf_counter_);
   // On verra a la fin du pas de temps si certaines bulles reeles sont trop proche du bord
   // du domaine etendu. Pour l'instant, dans les sous dt, on ne les transferts pas.
@@ -4416,7 +4487,9 @@ void IJK_FT_double::maj_indicatrice_rho_mu(const bool parcourir)
 
   static Stat_Counter_Id calculer_rho_mu_indicatrice_counter_= statistiques().new_counter(2, "Calcul Rho Mu Indicatrice");
   statistiques().begin_count(calculer_rho_mu_indicatrice_counter_);
+
   // En diphasique sans bulle (pour cas tests), on
+
   if (interfaces_.get_nb_bulles_reelles() == 0)
     {
       rho_field_.data() = rho_liquide_;
@@ -4494,9 +4567,8 @@ void IJK_FT_double::update_rho_v()
       calculer_rho_harmonic_v(rho_field_, velocity_, rho_v_);
     }
   else
-    {
-      calculer_rho_v(rho_field_, velocity_, rho_v_);
-    }
+    calculer_rho_v(rho_field_, velocity_, rho_v_);
+
 }
 
 // Transfert du maillage ft vers ns de champs aux faces :
@@ -4532,6 +4604,7 @@ void IJK_FT_double::fill_variable_source_and_potential_phi(const double time)
 //          const double end_of_substep_time = time + compute_fractionnal_timestep_rk3(timestep_,rk_step);
 //          set_field_data(variable_source_[dir], expression_variable_source_[dir], grad_I_ns_[dir], end_of_substep_time);
     }
+
   if (expression_potential_phi_ != "??")
     {
       set_field_data(potential_phi_, expression_potential_phi_, time);
@@ -4578,9 +4651,7 @@ Vecteur3 IJK_FT_double::calculer_inv_rho_grad_p_moyen(const IJK_Field_double& rh
     }
   // calculer_rho_v(inv_rho, champ, inv_rho_champ);
   for (int dir=0; dir<3; dir++)
-    {
-      resu[dir] = calculer_v_moyen(champ[dir]);
-    }
+    resu[dir] = calculer_v_moyen(champ[dir]);
 
   return resu;
 }
@@ -4605,9 +4676,8 @@ Vecteur3 IJK_FT_double::calculer_grad_p_moyen(const IJK_Field_double& pression)
       champ[dir].echange_espace_virtuel(1);
     }
   for (int dir=0; dir<3; dir++)
-    {
-      resu[dir] = calculer_v_moyen(champ[dir]);
-    }
+    resu[dir] = calculer_v_moyen(champ[dir]);
+
 
   return resu;
 }
@@ -4635,9 +4705,7 @@ Vecteur3 IJK_FT_double::calculer_grad_p_over_rho_moyen(const IJK_Field_double& p
       champ[dir].echange_espace_virtuel(1);
     }
   for (int dir=0; dir<3; dir++)
-    {
-      resu[dir] = calculer_v_moyen(champ[dir]);
-    }
+    resu[dir] = calculer_v_moyen(champ[dir]);
 
   return resu;
 }
@@ -4743,7 +4811,6 @@ void IJK_FT_double::write_check_etapes_et_termes(int rk_step)
           fic_test << finl;
           fic_test.close();
           Cout << "check etapes et termes fini" << finl;
-
         }
     }
 }
@@ -4766,6 +4833,7 @@ double IJK_FT_double::calculer_moyenne_de_phase_liq(const IJK_Field_double& vx)
   const int nj = vx.nj();
   const int nk = vx.nk();
   double v_moy = 0.;
+
 #ifndef VARIABLE_DZ
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -4816,13 +4884,12 @@ double IJK_FT_double::calculer_moyenne_de_phase_vap(const IJK_Field_double& vx)
   const int nj = vx.nj();
   const int nk = vx.nk();
   double v_moy = 0.;
+
 #ifndef VARIABLE_DZ
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
         v_moy += vx(i,j,k)*(1-interfaces_.I(i,j,k));
-
-
 
   // somme sur tous les processeurs.
   v_moy = Process::mp_sum(v_moy);

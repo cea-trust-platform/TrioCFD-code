@@ -139,19 +139,19 @@ public:
   }
   const IJK_Field_double& get_eulerian_compo_connex_ft() const
   {
-    return eulerian_compo_connex_ft_;
+    return *eulerian_compo_connex_ft_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const
   {
-    return eulerian_compo_connex_ghost_ft_;
+    return *eulerian_compo_connex_ghost_ft_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ns() const
   {
-    return eulerian_compo_connex_ns_;
+    return *eulerian_compo_connex_ns_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const
   {
-    return eulerian_compo_connex_ghost_ns_;
+    return *eulerian_compo_connex_ghost_ns_;
   }
   const IJK_Field_double& get_eulerian_distance_ns() const
   {
@@ -184,6 +184,14 @@ public:
   const FixedVector<IJK_Field_double, 3>& get_gradient_temperature_elem() const
   {
     return grad_T_elem_ ;
+  }
+  const FixedVector<IJK_Field_double, 3>& get_normal_vector_ns() const
+  {
+    return eulerian_normal_vectors_ns_;
+  }
+  const FixedVector<IJK_Field_double, 3>& get_normal_vector_ft() const
+  {
+    return eulerian_normal_vectors_ft_;
   }
   const FixedVector<IJK_Field_double, 3>& get_hessian_diag_temperature_elem() const
   {
@@ -239,6 +247,9 @@ public:
   void ecrire_reprise_thermique(SFichier& fichier);
 #endif
   virtual void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { ghost_cells_ = ghost_init; };
+  void compute_eulerian_curvature_from_interface();
+  virtual void update_intersections() { ; };
+  virtual void clean_ijk_intersections() { ; };
 
 protected:
 
@@ -253,7 +264,6 @@ protected:
   void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
   void compute_eulerian_curvature();
-  void compute_eulerian_curvature_from_interface();
   void enforce_zero_value_eulerian_curvature();
   void enforce_max_value_eulerian_curvature();
   void compute_eulerian_grad_T_interface();
@@ -272,6 +282,7 @@ protected:
   virtual void compute_temperature_face_centre() {};
   virtual void compute_thermal_fluxes_face_centre() {};
   virtual void compute_temperature_cell_centres() { ; };
+  virtual void set_zero_temperature_increment() { ; };
   virtual void clean_thermal_subproblems() { ; };
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
@@ -437,6 +448,7 @@ protected:
    * Clean FT_fields
    */
   DoubleTab bounding_box_;
+  DoubleTab min_max_larger_box_;
   IJK_Field_double eulerian_distance_ft_;
   IJK_Field_double eulerian_distance_ns_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ft_;
@@ -470,15 +482,18 @@ protected:
   int mixed_cells_number_ = 0;
   void compute_mixed_cells_number(const IJK_Field_double& indicator);
   int compute_eulerian_compo_;
-  IJK_Field_double eulerian_compo_connex_ft_;
-  IJK_Field_double eulerian_compo_connex_ns_;
-  IJK_Field_double eulerian_compo_connex_ghost_ft_;
-  IJK_Field_double eulerian_compo_connex_ghost_ns_;
 
-//  IJK_Field_double * eulerian_compo_connex_ft_;
-//	IJK_Field_double * eulerian_compo_connex_ns_;
-//	IJK_Field_double * eulerian_compo_connex_ghost_ft_;
-//	IJK_Field_double * eulerian_compo_connex_ghost_ns_;
+//  IJK_Field_double eulerian_compo_connex_ft_;
+//  IJK_Field_double eulerian_compo_connex_ns_;
+//  IJK_Field_double eulerian_compo_connex_ghost_ft_;
+//  IJK_Field_double eulerian_compo_connex_ghost_ns_;
+
+  const IJK_Field_double * eulerian_compo_connex_ft_;
+  const IJK_Field_double * eulerian_compo_connex_ns_;
+  const IJK_Field_double * eulerian_compo_connex_ghost_ft_;
+  const IJK_Field_double * eulerian_compo_connex_ghost_ns_;
+
+  IJK_Field_double indicator_test_;
 
   int compute_rising_velocities_;
   int fill_rising_velocities_;
@@ -486,7 +501,6 @@ protected:
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;
   DoubleTab bubbles_barycentre_;
-
 };
 
 #endif /* IJK_Thermal_base_included */

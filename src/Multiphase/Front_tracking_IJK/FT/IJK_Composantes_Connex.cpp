@@ -71,8 +71,11 @@ void IJK_Composantes_Connex::associer(const IJK_FT_double& ijk_ft)
 
 void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
 {
-  compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box_,
-                                  eulerian_compo_connex_ft_, eulerian_compo_connex_ghost_ft_,
+  compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(),
+                                  bounding_box_,
+                                  min_max_larger_box_,
+                                  eulerian_compo_connex_ft_,
+                                  eulerian_compo_connex_ghost_ft_,
                                   bubbles_barycentre_);
   eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
   eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());

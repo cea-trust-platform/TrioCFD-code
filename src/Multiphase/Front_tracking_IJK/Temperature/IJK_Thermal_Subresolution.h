@@ -92,10 +92,13 @@ protected :
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
+  void update_intersections() override;
   void compute_temperature_face_centre() override;
   void compute_thermal_fluxes_face_centre() override;
   void compute_temperature_cell_centres() override;
+  void set_zero_temperature_increment() override;
   void clean_thermal_subproblems() override;
+  void clean_ijk_intersections() override;
   void clean_add_thermal_subproblems();
   void thermal_subresolution_outputs();
   /* compute_rho_cp_u_mean() May be clearly overridden later */

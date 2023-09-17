@@ -503,9 +503,9 @@ void compute_eulerian_normal_distance_facet_barycentre_field(const IJK_Interface
 
                     }
                 }
+          distance_field = tmp_dist;
+          distance_field.echange_espace_virtuel(distance_field.ghost());
         }
-      distance_field = tmp_dist;
-      distance_field.echange_espace_virtuel(distance_field.ghost());
     }
   else
     {

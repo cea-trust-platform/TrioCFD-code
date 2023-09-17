@@ -72,6 +72,11 @@ public :
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init);
   int get_probes_ghost_cells(int ghost_init);
+
+  void update_intersections();
+  void clean_ijk_intersections();
+  void compute_eulerian_curvature_from_interface();
+
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;

@@ -1008,6 +1008,34 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities()
     }
 }
 
+double IJK_One_Dimensional_Subproblem::get_min_temperature() const
+{
+  double min_temperature_value=1e20;
+  for (int i=0; i<temperature_solution_.size(); i++)
+    min_temperature_value = std::min(min_temperature_value, temperature_solution_[i]);
+  return min_temperature_value;
+}
+
+double IJK_One_Dimensional_Subproblem::get_max_temperature() const
+{
+  double max_temperature_value=-1e20;
+  for (int i=0; i<temperature_solution_.size(); i++)
+    max_temperature_value = std::max(max_temperature_value, temperature_solution_[i]);
+  return max_temperature_value;
+}
+
+double IJK_One_Dimensional_Subproblem::get_min_temperature_domain_ends() const
+{
+  double min_temperature_value = std::min(temperature_solution_[0], temperature_solution_[temperature_solution_.size()-1]);
+  return min_temperature_value;
+}
+
+double IJK_One_Dimensional_Subproblem::get_max_temperature_domain_ends() const
+{
+  double min_temperature_value = std::max(temperature_solution_[0], temperature_solution_[temperature_solution_.size()-1]);
+  return min_temperature_value;
+}
+
 //  double temperature_cell_centre = INVALID_TEMPERATURE;// temperature_solution_;
 //  if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_])
 //    {

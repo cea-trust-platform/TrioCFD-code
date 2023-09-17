@@ -37,6 +37,7 @@ static int decoder_numero_bulle(const int code)
 
 void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                                      DoubleTab& bounding_box,
+                                     DoubleTab& min_max_larger_box,
                                      IJK_Field_double& eulerian_compo_connex,
                                      IJK_Field_double& eulerian_compo_connex_ghost,
                                      DoubleTab& bubbles_barycentre)
@@ -89,7 +90,8 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
   double geom_origin[3] = {geom_origin_x, geom_origin_y, geom_origin_z};
   double origin[3] = {origin_x, origin_y, origin_z};
   //
-  DoubleTab min_max_larger_box(nb_bubbles, 3, 2);
+  // DoubleTab min_max_larger_box(nb_bubbles, 3, 2);
+  min_max_larger_box.resize(nb_bubbles, 3, 2);
   DoubleTab min_max_larger_box_absolute(nb_bubbles, 3, 2);
   for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)
     {
@@ -111,7 +113,8 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
   const int nk = eulerian_compo_connex.nk();
   const int nj = eulerian_compo_connex.nj();
   const int ni = eulerian_compo_connex.ni();
-  const IJK_Field_double& indic = interfaces.I_ft();
+  // const IJK_Field_double& indic = interfaces.I_ft();
+  const IJK_Field_double& indic = interfaces.In_ft();
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -149,8 +152,8 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                     eulerian_compo_connex(i,j,k) = bubble_index;
                     eulerian_compo_connex_ghost(i,j,k) = ibubble;
                   }
-                // else
-                // Cerr << "A cell seems mixed but its coordinates is not in the bounding box" << finl;
+                if (fabs(chi_l) > VAPOUR_INDICATOR_TEST)
+                  Cerr << "A mixed cell value has been found but not in the bounding box" << finl;
               }
 
           }
@@ -162,12 +165,12 @@ void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_
 }
 
 void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
+                             const IJK_Field_double * eulerian_compo_connex_ns, const int& gravity_dir,
                              ArrOfDouble& rising_velocities, DoubleTab& rising_vectors)
 {
-  const int nk = eulerian_compo_connex_ns.nk();
-  const int nj = eulerian_compo_connex_ns.nj();
-  const int ni = eulerian_compo_connex_ns.ni();
+  const int nk = (* eulerian_compo_connex_ns).nk();
+  const int nj = (* eulerian_compo_connex_ns).nj();
+  const int ni = (* eulerian_compo_connex_ns).ni();
   const IJK_Field_double& indic = interfaces.I();
   int nb_bubbles = interfaces.get_nb_bulles_reelles();
   DoubleTab sum_indicator(nb_bubbles);
@@ -182,7 +185,7 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
           const double vel_x = velocity[0](i,j,k);
           const double vel_y = velocity[1](i,j,k);
           const double vel_z = velocity[2](i,j,k);
-          double compo_connex = eulerian_compo_connex_ns(i,j,k);
+          double compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
           int int_compo_connex = (int) compo_connex;
           if (int_compo_connex >= 0)
             {
@@ -218,16 +221,17 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
     }
 }
 
-void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+// void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+void fill_rising_velocity(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
 {
-  const int nk = eulerian_compo_connex_ns.nk();
-  const int nj = eulerian_compo_connex_ns.nj();
-  const int ni = eulerian_compo_connex_ns.ni();
+  const int nk = (*eulerian_compo_connex_ns).nk();
+  const int nj = (*eulerian_compo_connex_ns).nj();
+  const int ni = (*eulerian_compo_connex_ns).ni();
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
         {
-          double compo_connex = eulerian_compo_connex_ns(i,j,k);
+          double compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
           int int_compo_connex = (int) compo_connex;
           if (int_compo_connex >= 0)
             {

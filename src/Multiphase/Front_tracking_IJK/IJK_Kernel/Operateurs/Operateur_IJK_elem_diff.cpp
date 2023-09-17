@@ -75,6 +75,7 @@ Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
   is >> word;
   Nom type(get_diffusion_op_type(word));
   typer(type);
+  Cerr << "Operateur_IJK_elem_diff cast to " << type << finl;
   is >> valeur();
   is_cast_=true;
   return is;
@@ -86,6 +87,7 @@ void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (
   Motcle word(diffusion_op);
   Nom type(get_diffusion_op_type(word));
   typer(type);
+  Cerr << "Operateur_IJK_elem_diff cast to " << type << finl;
   is_cast_=true;
 }
 

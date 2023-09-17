@@ -87,10 +87,10 @@ public:
 protected:
   void set_next_elem();
   void set_indices_to_keep();
-  int dir_;
-  int i_;
-  int j_;
-  int k_;
+  int dir_=0;
+  int i_=0;
+  int j_=0;
+  int k_=0;
   ArrOfInt next_elem_;
   ArrOfInt indices_to_keep_;
 };

@@ -126,6 +126,11 @@ public :
   double get_temperature_profile_at_point(const double& dist) const;
   double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
   void thermal_subresolution_outputs();
+
+  double get_min_temperature() const;
+  double get_max_temperature() const;
+  double get_min_temperature_domain_ends() const;
+  double get_max_temperature_domain_ends() const;
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };

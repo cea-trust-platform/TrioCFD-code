@@ -51,9 +51,10 @@ Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
 Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
 {
   typer_convection_op(is);
-  Param param(que_suis_je());
-  set_param(param);
-  param.lire_sans_accolade(is);
+//  Param param(que_suis_je());
+//  set_param(param);
+//  param.lire_sans_accolade(is);
+//  is >> valeur();
   return is;
 }
 
@@ -74,6 +75,7 @@ Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
   is >> word;
   Motcle type(get_convection_op_type(word));
   typer(type);
+  Cerr << "Operateur_IJK_elem_conv cast to " << type << finl;
   is >> valeur();
   is_cast_=true;
   return is;
@@ -85,6 +87,7 @@ void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
   Motcle word(convection_op);
   Motcle type(get_convection_op_type(word));
   typer(type);
+  Cerr << "Operateur_IJK_elem_conv cast to " << type << finl;
   is_cast_=true;
 }
 

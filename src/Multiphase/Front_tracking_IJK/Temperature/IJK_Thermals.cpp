@@ -290,6 +290,7 @@ void IJK_Thermals::ecrire_fichier_reprise(SFichier& fichier, const char *lata_na
     fichier << " } \n" ;
 }
 
+
 int IJK_Thermals::ghost_fluid_flag()
 {
   int ghost_fluid = 0;
@@ -301,7 +302,6 @@ int IJK_Thermals::ghost_fluid_flag()
     }
   return ghost_fluid;
 }
-
 
 
 void IJK_Thermals::compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init)
@@ -320,4 +320,22 @@ int IJK_Thermals::get_probes_ghost_cells(int ghost_init)
         ghost_cells = itr_ghost_cells;
     }
   return ghost_cells;
+}
+
+void IJK_Thermals::update_intersections()
+{
+  for (auto& itr : (*this))
+    itr.update_intersections();
+}
+
+void IJK_Thermals::clean_ijk_intersections()
+{
+  for (auto& itr : (*this))
+    itr.clean_ijk_intersections();
+}
+
+void IJK_Thermals::compute_eulerian_curvature_from_interface()
+{
+  for (auto& itr : (*this))
+    itr.compute_eulerian_curvature_from_interface();
 }

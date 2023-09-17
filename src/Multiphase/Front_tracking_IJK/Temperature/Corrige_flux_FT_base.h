@@ -93,6 +93,7 @@ public:
   virtual void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                         const int k_layer, const int dir) { ; };
 
+  virtual void update_intersections() { ; };
   virtual void update()=0;
 
   virtual void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
@@ -101,11 +102,14 @@ public:
                                                  ArrOfDouble& temp_liqu, ArrOfDouble& temp_vap, DoubleTab& coo_liqu,
                                                  DoubleTab& coo_vap) const = 0 ;
 
-  virtual void compute_temperature_cell_centre(IJK_Field_double& temperature, IJK_Field_double& d_temperature) const { ; };
+
+  virtual void compute_temperature_cell_centre(IJK_Field_double& temperature) const { ; };
+  virtual void set_zero_temperature_increment(IJK_Field_double& d_temperature) const { ; };
   virtual void compute_temperature_face_centre() { ; };
   virtual void compute_thermal_fluxes_face_centre() { ; };
   virtual void set_convection_negligible(const int& convection_negligible) { ; };
   virtual void set_diffusion_negligible(const int& diffusion_negligible) { ; };
+  virtual void clean() { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

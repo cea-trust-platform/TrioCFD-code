@@ -2049,9 +2049,8 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box) const
   mp_min_for_each_item(bounding_box);
   for (int ibulle = 0; ibulle < nbulles; ibulle++)
     for (direction = 0; direction < 3; direction++)
-      {
-        bounding_box(ibulle, direction, 1) = -bounding_box(ibulle, direction, 1); // a present on a le max.
-      }
+      bounding_box(ibulle, direction, 1) = -bounding_box(ibulle, direction, 1); // a present on a le max.
+
 }
 
 // Methode pour creer les duplication de bulles lorsquelles sorte du
