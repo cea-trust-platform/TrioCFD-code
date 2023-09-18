@@ -1501,6 +1501,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       outputMeshVelocity = 0. ;
     }
 
+  outputMeshVelocity.echange_espace_virtuel();
+
   // Compute forces at face centers for postprocessing only
   str_mesh_model->computeForceFaces(nbFace,nbSomFace,face_sommets) ;
 }
