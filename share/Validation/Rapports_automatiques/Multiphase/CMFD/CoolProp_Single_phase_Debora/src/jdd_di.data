@@ -4,7 +4,7 @@ Dimension 3
 Domaine dom
 
 # BEGIN MESH #
-Lire_med family_names_from_group_names dom mesh 1_canal_1.med
+read_med { domain dom mesh mesh file 1_canal_1.med }
 # END MESH #
 
 # BEGIN PARTITION
@@ -23,20 +23,20 @@ Scatter DOM.Zones dom
 END SCATTER #
 
 PolyMAC_P0  dis
-option_covimac { traitement_axi }
+option_PolyMAC_P0 { traitement_axi }
 
 
 Schema_euler_implicite sch
 Read sch
 {
     tinit 0
-    tmax 10 
+    tmax 8
     dt_impr 1e-8
-    facsec 20
-    facsec_max 20
+    facsec 1
+    facsec_max 1
     nb_pas_dt_max $nb_pas_dt_max
     seuil_statio 1.e-3
-    solveur sets
+    solveur ice
     {
         criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e-5 k 1e-5 omega 1e-3  }
         iter_min 2
@@ -60,57 +60,75 @@ Lire pb
     correlations
     {
     	loi_paroi adaptative { }
-    	flux_parietal  adaptatif
+    	flux_interfacial coef_constant { liquide_r134a 1.e8 gaz_r134a 1.e8  }
+    	flux_parietal Kurul_podowski adaptatif { }
+	    frottement_interfacial tomiyama { }
+	    masse_ajoutee coef_constant { beta .5 } 
+    	portance_interfaciale sugrue { }
+    	dispersion_bulles turbulente_burns { }
+	    diametre_bulles champ champ_uniforme 2 0 1.e-3
     }
     QDM_Multiphase
     {
         evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
-        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        solveur_pression petsc cholesky { quiet }
         convection { amont }
-        diffusion  { turbulente k_omega { }  }
+        diffusion  { turbulente k_omega { } }
         initial_conditions
         {
-            vitesse  champ_fonc_t 3 0. 0. $u_0 
+            vitesse  champ_fonc_t 6 0 0 0 0 $u_0 $u_0 
             pression Champ_uniforme 1 $P0
         }
-        conditions_limites	
-        {
+	    conditions_limites	
+	    {
             wall_hot  paroi_frottante_loi { } 
             wall_cold paroi_frottante_loi { }
-            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_t 3 0 0 $u_0
+            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_t 6 0 0 0 0 $u_0 $u_0
             top frontiere_ouverte_pression_imposee champ_front_uniforme 1 $P0
-            symetrie symetrie
+			symetrie symetrie
+      	}
+        sources
+        { 
+            frottement_interfacial { } ,
+            portance_interfaciale { beta 1 } ,
+            Dispersion_bulles { beta 1 } ,
+            Correction_Lubchenko { beta_disp 1 beta_lift 1 }
         }
-	    sources { }
     }
     Masse_Multiphase
     {
-        initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
+        initial_conditions { alpha Champ_Fonc_xyz dom 2 1 0 }
         convection { amont }
         conditions_limites	
         {
             wall_hot  paroi
             wall_cold paroi	    
-            bottom	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
-            top	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1 
+            bottom	frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
+            top	frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
             symetrie paroi
         }
-        sources { }
+        sources 
+        { 
+            flux_interfacial
+        }
     }
     Energie_Multiphase
     {
         diffusion { turbulente SGDH { Pr_t 0.9 } }
         convection { amont }
-        initial_conditions { temperature Champ_Uniforme 1 $Tl0  }
+        initial_conditions { temperature Champ_Uniforme 2 $Tl0 $Tg0  }
         boundary_conditions
         {
             wall_hot  neumann_paroi champ_front_fonc_t 1 $P_surf
             wall_cold paroi_adiabatique	    
-            bottom	frontiere_ouverte T_ext Champ_Front_Uniforme 1 $Tl0
-            top	frontiere_ouverte T_ext Champ_Front_Uniforme 1 $Tl0
+            bottom	frontiere_ouverte T_ext Champ_Front_Uniforme 2 $Tl0 $Tg0
+            top	frontiere_ouverte T_ext Champ_Front_Uniforme 2 $Tl0 $Tg0
             symetrie paroi_adiabatique
         }
-        sources { }
+        sources 
+        { 
+        	flux_interfacial 
+        }
     }
 
     taux_dissipation_turbulent
@@ -160,19 +178,12 @@ Lire pb
 					temperature temperature_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
 					vitesse vitesse_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
 					}
-		format lata
+		format lml
 		champs binaire dt_post 1.e8
 					{
 					temperature elem
 					vitesse elem
 					pression elem
-                    k elem
-                    omega elem
-                    viscosite_turbulente_liquide_r134a elem
-                    omega_residu elem
-                    k_residu elem
-                    vitesse_residu elem
-                    temperature_residu elem
 					}
 	}
 }

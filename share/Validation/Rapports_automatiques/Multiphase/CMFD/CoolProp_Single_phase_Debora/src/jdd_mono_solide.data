@@ -239,7 +239,7 @@ Read pbc
     conduction
     {
         diffusion   { }
-        initial_conditions  { temperature  champ_fonc_xyz dom_solide  1  $Ts0 }
+        initial_conditions  { temperature  champ_fonc_xyz dom_solide  1  $Tl0 }
         boundary_conditions
         {
             outside          paroi_adiabatique
