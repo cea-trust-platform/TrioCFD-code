@@ -156,6 +156,21 @@ public:
     return delta_y_;
   }
 
+  double get_delta_xyz(int k_layer, int dir)
+  {
+    switch (dir)
+      {
+      case 0:
+        return delta_x_;
+      case 1:
+        return delta_y_;
+      case 2:
+        return delta_z_[k_layer];
+      default:
+        return delta_x_;
+      }
+  }
+
 protected:
   // Total number of mesh cells in the k direction (in global mesh)
   int nb_elem_k_tot_;
