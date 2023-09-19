@@ -909,6 +909,72 @@ double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const do
   return get_field_profile_at_point(dist, temperature_solution_);
 }
 
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const
+{
+  const int nb_values = (int) pow(4., (double) levels);
+  DoubleVect discrete_values(nb_values);
+  double surface = get_discrete_surface_at_level(dir, levels);
+  double value;
+  int value_counter = 0;
+  if (levels==0)
+    {
+      value = get_field_profile_at_point(dist, field);
+      discrete_values(0) = value * surface;
+    }
+  else
+    {
+      double dl1_ini = 0.;
+      double dl2_ini = 0.;
+      Vecteur3 point_coords_ini = {0., 0., 0.};
+      get_field_discrete_value_recursive(1, levels + 1, dir, dist, surface, field, dl1_ini, dl2_ini, point_coords_ini, discrete_values, value_counter);
+    }
+  return discrete_values;
+}
+
+void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
+                                                                        const int& dir, const double& dist,
+                                                                        const double& surface,
+                                                                        const DoubleVect& field,
+                                                                        const double dl1_parent,
+                                                                        const double dl2_parent,
+                                                                        Vecteur3& point_coords_parent,
+                                                                        DoubleVect& discrete_values,
+                                                                        int& value_counter) const
+{
+  if (ilevel != max_level)
+    {
+      const double neighbours_first_dir[4] = NEIGHBOURS_FIRST_DIR;
+      const double neighbours_second_dir[4] = NEIGHBOURS_SECOND_DIR;
+      for(int i=ilevel; ilevel<max_level; i++)
+        for(int l=0; l<4; l++)
+          {
+            const double first_dir = neighbours_first_dir[l];
+            const double second_dir = neighbours_second_dir[l];
+            double dl1;
+            double dl2;
+            Vecteur3 point_coords = {0., 0., 0.};
+            get_discrete_two_dimensional_spacing(dir, ilevel, first_dir, second_dir, dl1, dl2, point_coords);
+            dl1 += dl1_parent;
+            dl2 += dl2_parent;
+            point_coords += point_coords_parent;
+            get_field_discrete_value_recursive(ilevel + 1, max_level, dir, dist, surface, field, dl1, dl2, point_coords, discrete_values, value_counter);
+          }
+    }
+  else
+    {
+      const double dist_increment = Vecteur3::produit_scalaire(point_coords_parent, normal_vector_compo_);
+      const double dist_value = dist + dist_increment;
+      const double value = get_field_profile_at_point(dist_value, field);
+      discrete_values(value_counter) = value * surface;
+      value_counter++;
+    }
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+{
+  return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_);
+}
+
 double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const
 {
   double temperature_gradient = 0;
@@ -941,6 +1007,75 @@ void IJK_One_Dimensional_Subproblem::find_interval(const double& dist, int& left
         right_interval = mid_interval;
       mid_interval = left_interval + (right_interval - left_interval) / 2;
     }
+}
+
+void IJK_One_Dimensional_Subproblem::get_discrete_two_dimensional_spacing(const int& dir, const int& levels,
+                                                                          const double& first_dir, const double& second_dir,
+                                                                          double& dl1, double& dl2,
+                                                                          Vecteur3& point_coords) const
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  switch(dir)
+    {
+    case 0:
+      dl1 = dy;
+      dl2 = dz;
+      point_coords[1] = dl1 * first_dir;
+      point_coords[2] = dl2 * second_dir;
+      break;
+    case 1:
+      dl1 = dx;
+      dl2 = dz;
+      point_coords[0] = dl1 * first_dir;
+      point_coords[2] = dl2 * second_dir;
+      break;
+    case 2:
+      dl1 = dx;
+      dl2 = dy;
+      point_coords[0] = dl1 * first_dir;
+      point_coords[1] = dl2 * second_dir;
+      break;
+    default:
+      dl1 = dx;
+      dl2 = dy;
+      point_coords[0] = dl1 * first_dir;
+      point_coords[1] = dl2 * second_dir;
+      break;
+    }
+  dl1 /= pow(2., (double) levels + 1.);
+  dl2 /= pow(2., (double) levels + 1.);
+  dl1 *= first_dir;
+  dl2 *= second_dir;
+  point_coords *= (1 / pow(2., (double) levels + 1.));
+}
+
+double IJK_One_Dimensional_Subproblem::get_discrete_surface_at_level(const int& dir, const int& level) const
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  double surface = 0.;
+  switch(dir)
+    {
+    case 0:
+      surface = (dy*dz);
+      break;
+    case 1:
+      surface = (dx*dz);
+      break;
+    case 2:
+      surface = (dx*dy);
+      break;
+    default:
+      surface = (dx*dy);
+      break;
+    }
+  surface /= pow(pow(2., (double) level), 2.);
+  return surface;
 }
 
 void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs()

@@ -209,6 +209,73 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_face_centre(
   // check_pure_fluxes_duplicates(convective_fluxes_, convective_fluxes_unique_, pure_face_unique_, 0);
 }
 
+void Corrige_flux_FT_temperature_subresolution::compute_temperature_face_centre_discrete_integral()
+{
+  const int level = level_;
+  int faces_dir[6] = FACES_DIR;
+  convective_fluxes_.set_smart_resize(1);
+  convective_fluxes_.reset();
+  dist_.set_smart_resize(1);
+  dist_.reset();
+  const DoubleTab& dist_interf = intersection_ijk_cell_->dist_pure_faces_interf();
+  // const DoubleTab& pos_pure_faces_interf = intersection_ijk_cell_->pos_pure_faces_interf();
+  // positions.resize(nb_diph, 3, 6);
+  for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+    {
+      // double surface = 0.;
+      const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
+      for (int l=0; l<6; l++)
+        {
+          const int dir = faces_dir[l];
+          const int is_neighbour_pure_liquid = intersection_ijk_cell_->get_ijk_pure_face_neighbours(intersection_ijk_cell_index, l);
+          if (is_neighbour_pure_liquid)
+            {
+              const double dist = dist_interf(intersection_ijk_cell_index, l);
+              // const Vecteur3 pos_pure_face = {pos_pure_faces_interf(intersection_ijk_cell_index, 0, l),
+              // 																pos_pure_faces_interf(intersection_ijk_cell_index, 1, l),
+              //																pos_pure_faces_interf(intersection_ijk_cell_index, 2, l)};
+              DoubleVect discrete_temperature_integral = thermal_subproblems_->get_temperature_profile_discrete_integral_at_point(i, dist, level, dir);
+              double flux_face = 0;
+              // surface = get_discrete_surface_at_level(dir, level);
+              for (int val=0; val < discrete_temperature_integral.size(); val++)
+                flux_face += discrete_temperature_integral[val];
+              convective_fluxes_.append_array(flux_face);
+              dist_.append_array(dist);
+            }
+        }
+    }
+  /*
+   * Useless if a treat a sub-problem per mixed cells
+   * May be useful if a treat one subproblem per interface portion
+   */
+  // check_pure_fluxes_duplicates(convective_fluxes_, convective_fluxes_unique_, pure_face_unique_, 0);
+}
+
+void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(const int& dir, const int& level)
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  double surface = 0.;
+  switch(dir)
+    {
+    case 0:
+      surface = (dy*dz);
+      break;
+    case 1:
+      surface = (dx*dz);
+      break;
+    case 2:
+      surface = (dx*dy);
+      break;
+    default:
+      surface = (dx*dy);
+      break;
+    }
+  surface /= pow(pow(2, level), 2);
+}
+
 void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_centre()
 {
   int faces_dir[6] = FACES_DIR;
@@ -288,6 +355,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_ijk_pure_faces_indices()
 
 void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproblems_indices_by_k_layers()
 {
+  // TODO: Get the numbers of k layers from another field ?
   const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
   index_face_i_sorted_.resize(nb_k_layer);
   index_face_j_sorted_.resize(nb_k_layer);

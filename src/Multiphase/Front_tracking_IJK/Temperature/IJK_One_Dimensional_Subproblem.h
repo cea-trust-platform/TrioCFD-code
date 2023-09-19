@@ -40,6 +40,8 @@
 #define INVALID_VELOCITY 1e-12
 #define INVALID_INTERP 1.e20
 #define INVALID_INTERP_TEST 1.e19
+#define NEIGHBOURS_FIRST_DIR {-1., -1., 1., 1.}
+#define NEIGHBOURS_SECOND_DIR {-1., 1., -1., 1.}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -124,7 +126,22 @@ public :
   void get_ijk_indices(int& i, int& j, int& k) const;
   double get_field_profile_at_point(const double& dist, const DoubleVect& field) const;
   double get_temperature_profile_at_point(const double& dist) const;
+  DoubleVect get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const;
+  DoubleVect get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
+  void get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
+                                          const int& dir, const double& dist,
+                                          const double& surface,
+                                          const DoubleVect& field,
+                                          const double dl1_parent,
+                                          const double dl2_parent,
+                                          Vecteur3& point_coords_parent,
+                                          DoubleVect& discrete_values,
+                                          int& value_counter) const;
   double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
+  void get_discrete_two_dimensional_spacing(const int& dir, const int& level,
+                                            const double& first_dir, const double& second_dir,
+                                            double& dl1, double& dl2, Vecteur3& point_coords) const;
+  double get_discrete_surface_at_level(const int& dir, const int& level) const;
   void thermal_subresolution_outputs();
 
   double get_min_temperature() const;

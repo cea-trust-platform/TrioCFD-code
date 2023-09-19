@@ -81,6 +81,8 @@ public :
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_temperature_face_centre() override;
   void compute_thermal_fluxes_face_centre() override;
+  void compute_temperature_face_centre_discrete_integral();
+  void get_discrete_surface_at_level(const int& dir, const int& level);
   void clean() override;
   void compute_ijk_pure_faces_indices() override;
   void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
@@ -112,6 +114,7 @@ protected :
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
   int debug_=0;
+  int level_=0;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */
