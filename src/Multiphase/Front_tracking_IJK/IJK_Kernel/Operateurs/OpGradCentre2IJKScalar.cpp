@@ -38,10 +38,10 @@ void OpGradCentre2IJKScalar_double::calculer_grad(const IJK_Field_double& field,
 {
   input_field_ = &field;
   compute_grad(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 }
 
 void OpGradCentre2IJKScalar_double::calculer_grad_x(const IJK_Field_double& field,
@@ -49,10 +49,10 @@ void OpGradCentre2IJKScalar_double::calculer_grad_x(const IJK_Field_double& fiel
 {
   input_field_ = &field;
   compute_grad_x(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 }
 
 void OpGradCentre2IJKScalar_double::calculer_grad_y(const IJK_Field_double& field,
@@ -60,10 +60,10 @@ void OpGradCentre2IJKScalar_double::calculer_grad_y(const IJK_Field_double& fiel
 {
   input_field_ = &field;
   compute_grad_y(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 }
 
 void OpGradCentre2IJKScalar_double::calculer_grad_z(const IJK_Field_double& field,
@@ -71,10 +71,10 @@ void OpGradCentre2IJKScalar_double::calculer_grad_z(const IJK_Field_double& fiel
 {
   input_field_ = &field;
   compute_grad_z(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 }
 
 void OpGradCentre2IJKScalar_double::fill_grad_field_x_y_(IJK_Field_local_double& flux, IJK_Field_double& resu, int k, int dir)
@@ -103,6 +103,7 @@ void OpGradCentre2IJKScalar_double::fill_grad_field_z_(IJK_Field_local_double& f
   for (int i=0; i < ni; i++)
     for (int j=0; j < nj; j++)
       {
+        // TODO: What happen if dz is not constant ? The FD operator is no longer define
         double dz_inv = 1 / channel_data_.get_delta_z()[k];
         resu(i,j,k) = (flux_max(i,j,0) - flux_min(i,j,0)) * dz_inv;
       }

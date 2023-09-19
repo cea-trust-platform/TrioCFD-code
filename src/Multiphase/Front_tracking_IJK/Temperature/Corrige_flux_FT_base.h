@@ -110,6 +110,8 @@ public:
   virtual void set_convection_negligible(const int& convection_negligible) { ; };
   virtual void set_diffusion_negligible(const int& diffusion_negligible) { ; };
   virtual void clean() { ; };
+  virtual void compute_ijk_pure_faces_indices() { ; };
+  virtual void sort_ijk_intersections_subproblems_indices_by_k_layers() { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

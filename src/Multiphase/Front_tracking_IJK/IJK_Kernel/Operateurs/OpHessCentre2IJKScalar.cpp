@@ -48,12 +48,12 @@ void OpHessCentre2IJKScalar_double::calculer_hess(const IJK_Field_double& field,
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_grad(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 void OpHessCentre2IJKScalar_double::calculer_hess_xx(const IJK_Field_double& field,
@@ -65,12 +65,12 @@ void OpHessCentre2IJKScalar_double::calculer_hess_xx(const IJK_Field_double& fie
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_grad_x(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 void OpHessCentre2IJKScalar_double::calculer_hess_yy(const IJK_Field_double& field,
@@ -82,12 +82,12 @@ void OpHessCentre2IJKScalar_double::calculer_hess_yy(const IJK_Field_double& fie
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_grad_y(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 void OpHessCentre2IJKScalar_double::calculer_hess_zz(const IJK_Field_double& field,
@@ -99,12 +99,12 @@ void OpHessCentre2IJKScalar_double::calculer_hess_zz(const IJK_Field_double& fie
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_grad_z(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 void OpHessCentre2IJKScalar_double::fill_grad_field_x_y_(IJK_Field_local_double& flux, IJK_Field_double& resu, int k, int dir)

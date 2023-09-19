@@ -96,6 +96,7 @@ protected :
   void compute_temperature_face_centre() override;
   void compute_thermal_fluxes_face_centre() override;
   void compute_temperature_cell_centres() override;
+  void prepare_ij_fluxes_k_layers() override;
   void set_zero_temperature_increment() override;
   void clean_thermal_subproblems() override;
   void clean_ijk_intersections() override;

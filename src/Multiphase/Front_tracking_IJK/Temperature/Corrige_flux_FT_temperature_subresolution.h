@@ -24,7 +24,9 @@
 
 #include <Corrige_flux_FT_base.h>
 #include <IJK_One_Dimensional_Subproblems.h>
-
+#define NEIGHBOURS_FACES_I {0, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_FACES_J {0, 0, 0, 1, 0, 0}
+#define NEIGHBOURS_FACES_K {0, 0, 0, 0, 0, 1}
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class Corrige_flux_FT_temperature_subresolution
@@ -80,6 +82,8 @@ public :
   void compute_temperature_face_centre() override;
   void compute_thermal_fluxes_face_centre() override;
   void clean() override;
+  void compute_ijk_pure_faces_indices() override;
+  void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
 protected :
   DoubleVect dist_;
@@ -91,6 +95,20 @@ protected :
   const IJK_One_Dimensional_Subproblems * thermal_subproblems_;
   bool has_checked_consistency_;
   ArrOfInt ijk_intersections_subproblems_indices_;
+  /*
+   * To be used in the operator
+   * Store (i, j, flux) at a given row (k)
+   * convective_flux_x_sorted_.pushback(double_tab_ij_flux)
+   */
+  std::vector<IntVect> index_face_i_sorted_;
+  std::vector<IntVect> index_face_j_sorted_;
+  std::vector<DoubleVect> convective_flux_x_sorted_;
+  std::vector<DoubleVect> convective_flux_y_sorted_;
+  std::vector<DoubleVect> convective_flux_z_sorted_;
+  std::vector<DoubleVect> diffusive_flux_x_sorted_;
+  std::vector<DoubleVect> diffusive_flux_y_sorted_;
+  std::vector<DoubleVect> diffusive_flux_z_sorted_;
+  FixedVector<IntVect,4> ijk_faces_to_correct_;
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
   int debug_=0;

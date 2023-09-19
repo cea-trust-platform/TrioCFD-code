@@ -436,7 +436,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
                                                                                        const DoubleTab& normales_interf,
                                                                                        DoubleTab& positions,
                                                                                        IntTab& indices_voisins,
-                                                                                       IntTab& indices_faces_corrections,
+                                                                                       FixedVector<DoubleVect, 3>& indices_faces_corrections,
                                                                                        DoubleTab& distance_centre_faces_interface) const
 {
   Vecteur3 bary_interf {0., 0., .0};
@@ -446,6 +446,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
   const int nb_diph = n_diph_; // ijk_interfaces_.size();
   positions.resize(nb_diph, 3, 6);
   indices_voisins.resize(nb_diph, 6);
+  distance_centre_faces_interface.resize(nb_diph, 6);
   int neighbours_i[6] = NEIGHBOURS_I;
   int neighbours_j[6] = NEIGHBOURS_J;
   int neighbours_k[6] = NEIGHBOURS_K;
@@ -477,28 +478,29 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
           /*
            * Check if the neighbours is a pure liquid cell !
            */
-          if (1. - indicatrice(i+ii, j+jj, k+kk) < LOCAL_EPS)
+          if (fabs(1.-indicatrice(i+ii, j+jj, k+kk)) < LOCAL_EPS)
             {
               indices_voisins(i_diph, l) = l+1;
               nb_faces_to_correct++;
               if (ii)
-                bary_face = splitting_->get_coords_of_dof(ii+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_I);
+                bary_face = splitting_->get_coords_of_dof(i+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_I);
               if (jj)
-                bary_face = splitting_->get_coords_of_dof(ii+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_J);
+                bary_face = splitting_->get_coords_of_dof(i+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_J);
               if (kk)
-                bary_face = splitting_->get_coords_of_dof(ii+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_K);
+                bary_face = splitting_->get_coords_of_dof(i+ii_f, j+jj_f, k+kk_f, IJK_Splitting::FACES_K);
               const double nx = normales_interf(i_diph, 0);
               const double ny = normales_interf(i_diph, 1);
               const double nz = normales_interf(i_diph, 2);
               normale_interf = {nx, ny, nz};
               projete_interface(normale_interf, bary_interf, bary_face, position);
-              distance_point_point_signe(position, bary_face, normale_interf, distance_centre_faces_interface(i_diph, l));
               for (int c = 0; c < 3; c++)
-                positions(i_diph, c) = position[c];
+                positions(i_diph, c, l) = position[c];
+              distance_point_point_signe(position, bary_face, normale_interf, distance_centre_faces_interface(i_diph, l));
             }
         }
     }
-  indices_faces_corrections.resize(nb_faces_to_correct,3);
+  for (int dir=0; dir<3; dir++)
+    indices_faces_corrections[dir].resize(nb_faces_to_correct);
 }
 
 void Intersection_Interface_ijk_cell::compute_face_to_correct()
@@ -510,8 +512,7 @@ void Intersection_Interface_ijk_cell::compute_face_to_correct()
   int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
   int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
   int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
-  int nb_faces_to_correct = 0;
-  ijk_pure_face_neighbours_.resize(nb_diph, 6);
+  int nb_faces_to_correct = 0.;
   for (int i_diph=0; i_diph<nb_diph ; i_diph++)
     {
       const int i = ijk_interfaces_(i_diph, 0);
@@ -524,10 +525,16 @@ void Intersection_Interface_ijk_cell::compute_face_to_correct()
           const int kk_f = neighbours_faces_k[l];
           if (ijk_pure_face_neighbours_(i_diph, l))
             {
-              ijk_pure_face_to_correct_(nb_faces_to_correct, 0) = i + ii_f;
-              ijk_pure_face_to_correct_(nb_faces_to_correct, 1) = j + jj_f;
-              ijk_pure_face_to_correct_(nb_faces_to_correct, 2) = k + kk_f;
+              DoubleVect& i_pure_face_to_correct = ijk_pure_face_to_correct_[0];
+              DoubleVect& j_pure_face_to_correct = ijk_pure_face_to_correct_[1];
+              DoubleVect& k_pure_face_to_correct = ijk_pure_face_to_correct_[2];
+              i_pure_face_to_correct[nb_faces_to_correct] = (i + ii_f);
+              j_pure_face_to_correct[nb_faces_to_correct] = (j + jj_f);
+              k_pure_face_to_correct[nb_faces_to_correct] = (k + kk_f);
               nb_faces_to_correct++;
+              // i_pure_face_to_correct.append_array(i + ii_f);
+              // j_pure_face_to_correct.append_array(j + jj_f);
+              // k_pure_face_to_correct.append_array(k + kk_f);
             }
         }
     }
@@ -542,7 +549,6 @@ void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_inte
                                                  ijk_interfaces_,
                                                  normal_on_interf_,
                                                  dist_to_interf_);
-      compute_face_to_correct();
       projected_on_interface_flag_ = true;
     }
 }
@@ -566,33 +572,11 @@ void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interf
 void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface()
 {
   update_interpolations_cell_centres_on_interface(interfaces_->I());
-//  if (!projected_on_interface_flag_)
-//    {
-//      calcul_projection_centre_sur_interface_moy(interfaces_->I(),
-//                                                 positions_on_interf_,
-//                                                 ijk_interfaces_,
-//                                                 normal_on_interf_,
-//                                                 dist_to_interf_);
-//      compute_face_to_correct();
-//      projected_on_interface_flag_ = true;
-//    }
 }
 
 void Intersection_Interface_ijk_cell::update_interpolations_cell_faces_on_interface()
 {
   update_interpolations_cell_faces_on_interface(interfaces_->I());
-//  if (!face_centres_projected_on_interface_flag_)
-//    {
-//      calcul_projection_centre_faces_sur_interface_moy(interfaces_->I(),
-//                                                       ijk_interfaces_,
-//                                                       normal_on_interf_,
-//                                                       positions_pure_faces_on_interf_,
-//                                                       ijk_pure_face_neighbours_,
-//                                                       ijk_pure_face_to_correct_,
-//                                                       dist_pure_faces_to_interf_);
-//      compute_face_to_correct();
-//      face_centres_projected_on_interface_flag_ = true;
-//    }
 }
 
 void Intersection_Interface_ijk_cell::update_interpolations_cell_centres_on_interface_new()

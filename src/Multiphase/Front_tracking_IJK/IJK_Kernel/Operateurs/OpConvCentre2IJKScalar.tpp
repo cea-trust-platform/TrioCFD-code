@@ -39,23 +39,7 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
   double surface = 1.;
   if (!is_grad_)
-    {
-      // surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
-      // uniform in i and j directions
-      surface = channel_data_.get_surface(k_layer, 1, (int) _DIR_);
-//      switch(_DIR_)
-//        {
-//        case DIRECTION::X:
-//          surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
-//          break;
-//        case DIRECTION::Y:
-//          surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
-//          break;
-//        case DIRECTION::Z:
-//          surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
-//          break;
-//        }
-    }
+    surface = channel_data_.get_surface(k_layer, 1, (int) _DIR_);
   else
     {
       switch(_DIR_)

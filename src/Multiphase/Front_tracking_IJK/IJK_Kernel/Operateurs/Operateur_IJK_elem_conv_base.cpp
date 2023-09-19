@@ -21,15 +21,15 @@ Operateur_IJK_elem_conv_base_double::Operateur_IJK_elem_conv_base_double()
 {
 
   stored_curv_fram_layer_z_ = -1000;
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
   perio_k_ = false;
   stored_curv_fram_layer_z_ = 0; // which (local) layer is currently stored in layer 0 of the tmp array ?
 
-  corrige_flux_ = 0;
-  indicatrice_ = 0;
+  corrige_flux_ = nullptr;
+  indicatrice_ = nullptr;
 
   is_corrected_ = false;
   is_grad_ = false;
@@ -49,10 +49,10 @@ void Operateur_IJK_elem_conv_base_double::initialize(const IJK_Splitting& splitt
 {
   perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
   channel_data_.initialize(splitting);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 }
 
 void Operateur_IJK_elem_conv_base_double::calculer(const IJK_Field_double& field,
@@ -75,10 +75,10 @@ void Operateur_IJK_elem_conv_base_double::calculer(const IJK_Field_double& field
   const int nj = field.nj();
   tmp_curv_fram_.allocate(ni, nj, 4, 1);
   compute_set(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 
 }
 
@@ -102,10 +102,10 @@ void Operateur_IJK_elem_conv_base_double::ajouter(const IJK_Field_double& field,
   const int nj = field.nj();
   tmp_curv_fram_.allocate(ni, nj, 4, 1);
   compute_add(result);
-  input_field_ = 0;
-  input_velocity_x_ = 0;
-  input_velocity_y_ = 0;
-  input_velocity_z_ = 0;
+  input_field_ = nullptr;
+  input_velocity_x_ = nullptr;
+  input_velocity_y_ = nullptr;
+  input_velocity_z_ = nullptr;
 
 }
 

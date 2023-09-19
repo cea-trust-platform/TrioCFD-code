@@ -32,7 +32,7 @@ void OpConvDiscQuickIJKScalar_double::calculer(const IJK_Field_double& field,
                                                IJK_Field_double& result)
 {
   Operateur_IJK_elem_conv_base_double::calculer(field, vx, vy, vz, result);
-  input_indicatrice_ = 0;
+  input_indicatrice_ = nullptr;
 
 }
 
@@ -41,7 +41,7 @@ void OpConvDiscQuickIJKScalar_double::ajouter(const IJK_Field_double& field,
                                               IJK_Field_double& result)
 {
   Operateur_IJK_elem_conv_base_double::ajouter(field, vx, vy, vz, result);
-  input_indicatrice_ = 0;
+  input_indicatrice_ = nullptr;
 
 }
 

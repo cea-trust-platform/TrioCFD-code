@@ -186,7 +186,7 @@ public:
   const DoubleTab& pos_pure_faces_interf() const { return positions_pure_faces_on_interf_; };
   const DoubleTab& dist_pure_faces_interf() const { return dist_pure_faces_to_interf_; };
   const int& get_ijk_pure_face_neighbours(int i_diph, int neighbour) const { return ijk_pure_face_neighbours_(i_diph, neighbour); };
-  const IntTab& get_ijk_pure_face_to_correct() const { return ijk_pure_face_to_correct_; };
+  FixedVector<DoubleVect, 3>& get_set_ijk_pure_face_to_correct() { return ijk_pure_face_to_correct_; };
 
   int get_nb_diph()
   {
@@ -214,7 +214,7 @@ protected:
    * -1 if the neighbouring cells in not pure
    */
   IntTab ijk_pure_face_neighbours_;
-  IntTab ijk_pure_face_to_correct_;
+  FixedVector<DoubleVect, 3> ijk_pure_face_to_correct_;
   // Le tableau qui donne pour un triplet ijk le numéro de la cellule diphasique
   // correspondante (-1. si la cellule n'est pas diphasique).
   IJK_Field_int idiph_ijk_;
@@ -238,7 +238,7 @@ protected:
                                                         const DoubleTab& normale_interf,
                                                         DoubleTab& positions,
                                                         IntTab& indices_voisins,
-                                                        IntTab& indices_faces_corrections,
+                                                        FixedVector<DoubleVect, 3>& indices_faces_corrections,
                                                         DoubleTab& distance_centre_faces_interface) const;
 
   void compute_face_to_correct();

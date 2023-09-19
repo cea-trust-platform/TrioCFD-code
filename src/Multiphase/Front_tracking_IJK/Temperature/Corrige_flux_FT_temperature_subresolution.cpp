@@ -67,8 +67,10 @@ void Corrige_flux_FT_temperature_subresolution::update_intersections()
   /*
    * TODO update with face cell centres positions
    */
-  if (!convection_negligible_ && !diffusion_negligible_)
+  if (!convection_negligible_ || !diffusion_negligible_)
     intersection_ijk_cell_->update_interpolations_cell_faces_on_interface();
+
+  Cerr << "The intersections have been updated" << finl;
 }
 
 void Corrige_flux_FT_temperature_subresolution::update()
@@ -239,12 +241,95 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
   // check_pure_fluxes_duplicates(convective_fluxes_, convective_fluxes_unique_, pure_face_unique_, 1);
 }
 
+void Corrige_flux_FT_temperature_subresolution::compute_ijk_pure_faces_indices()
+{
+  /*
+   * Be careful, the ijk_intersection class is not sorting the faces the same way
+   */
+//	FixedVector<DoubleVect, 3>& ijk_faces_to_correct = intersection_ijk_cell_->get_set_ijk_pure_face_to_correct();
+  int faces_dir[6] = FACES_DIR;
+  int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
+  int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
+  int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
+  int nb_faces_to_correct = 0;
+  for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+    {
+      const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
+      const int ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
+      const int ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
+      const int ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+      for (int l=0; l<6; l++)
+        {
+          const int is_neighbour_pure_liquid = intersection_ijk_cell_->get_ijk_pure_face_neighbours(intersection_ijk_cell_index, l);
+          if (is_neighbour_pure_liquid)
+            {
+              const int ii_f = neighbours_faces_i[l];
+              const int jj_f = neighbours_faces_j[l];
+              const int kk_f = neighbours_faces_k[l];
+              IntVect& i_pure_face_to_correct = ijk_faces_to_correct_[0];
+              IntVect& j_pure_face_to_correct = ijk_faces_to_correct_[1];
+              IntVect& k_pure_face_to_correct = ijk_faces_to_correct_[2];
+              IntVect& dir_pure_face_to_correct = ijk_faces_to_correct_[3];
+              i_pure_face_to_correct[nb_faces_to_correct] = (ijk_indices_i + ii_f);
+              j_pure_face_to_correct[nb_faces_to_correct] = (ijk_indices_j + jj_f);
+              k_pure_face_to_correct[nb_faces_to_correct] = (ijk_indices_k + kk_f);
+              dir_pure_face_to_correct[nb_faces_to_correct] = faces_dir[l];
+              nb_faces_to_correct++;
+            }
+        }
+    }
+  const int convective_fluxes_size = convective_fluxes_.size();
+  const int diffusive_fluxes_size = diffusive_fluxes_.size();
+  if (convective_fluxes_size > 0)
+    assert(convective_fluxes_size ==  ijk_faces_to_correct_[0].size());
+  if (diffusive_fluxes_size > 0)
+    assert(diffusive_fluxes_size == ijk_faces_to_correct_[0].size());
+}
+
+void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproblems_indices_by_k_layers()
+{
+  const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
+  index_face_i_sorted_.resize(nb_k_layer);
+  index_face_j_sorted_.resize(nb_k_layer);
+  convective_flux_x_sorted_.resize(nb_k_layer);
+  convective_flux_y_sorted_.resize(nb_k_layer);
+  convective_flux_z_sorted_.resize(nb_k_layer);
+  diffusive_flux_x_sorted_.resize(nb_k_layer);
+  diffusive_flux_y_sorted_.resize(nb_k_layer);
+  diffusive_flux_z_sorted_.resize(nb_k_layer);
+  FixedVector<std::vector<DoubleVect>*,3> convective_fluxes;
+  convective_fluxes[0] = &convective_flux_x_sorted_;
+  convective_fluxes[1] = &convective_flux_y_sorted_;
+  convective_fluxes[2] = &convective_flux_z_sorted_;
+  FixedVector<std::vector<DoubleVect>*,3> diffusive_fluxes;
+  diffusive_fluxes[0] = &diffusive_flux_x_sorted_;
+  diffusive_fluxes[1] = &diffusive_flux_y_sorted_;
+  diffusive_fluxes[2] = &diffusive_flux_z_sorted_;
+
+  IntVect& i_pure_face_to_correct = ijk_faces_to_correct_[0];
+  IntVect& j_pure_face_to_correct = ijk_faces_to_correct_[1];
+  IntVect& k_pure_face_to_correct = ijk_faces_to_correct_[2];
+  IntVect& dir_pure_face_to_correct = ijk_faces_to_correct_[3];
+  const int nb_fluxes = ijk_faces_to_correct_[0].size();
+  for (int i_flux=0; i_flux < nb_fluxes; i_flux++)
+    {
+      const int k = k_pure_face_to_correct[i_flux];
+      const int dir = dir_pure_face_to_correct[i_flux];
+      std::vector<DoubleVect>* flux = convective_fluxes[dir];
+      (*flux)[k].append_array(convective_fluxes_[i_flux]);
+      index_face_i_sorted_[k].append_array(i_pure_face_to_correct[i_flux]);
+      index_face_j_sorted_[k].append_array(j_pure_face_to_correct[i_flux]);
+    }
+}
+
+
 void Corrige_flux_FT_temperature_subresolution::check_pure_fluxes_duplicates(const DoubleVect& fluxes,
                                                                              DoubleVect& fluxes_unique,
                                                                              IntVect& pure_face_unique,
                                                                              const int known_unique)
 {
-  const IntTab pure_face_to_correct = intersection_ijk_cell_->get_ijk_pure_face_to_correct();
+  // FixedVector<DoubleVect, 3>& pure_face_to_correct = intersection_ijk_cell_->get_set_ijk_pure_face_to_correct();
+  FixedVector<IntVect, 4>& pure_face_to_correct = ijk_faces_to_correct_;
   const int nb_fluxes = fluxes.size();
   fluxes_unique.set_smart_resize(1);
   fluxes_unique.reset();
@@ -264,15 +349,15 @@ void Corrige_flux_FT_temperature_subresolution::check_pure_fluxes_duplicates(con
       shared_face.reset();
       for (i=0; i<nb_fluxes; i++)
         {
-          const int i_f = pure_face_to_correct(i, 0);
-          const int j_f = pure_face_to_correct(i, 1);
-          const int k_f = pure_face_to_correct(i, 2);
+          const int i_f = pure_face_to_correct[0](i);
+          const int j_f = pure_face_to_correct[1](i);
+          const int k_f = pure_face_to_correct[2](i);
           for (int j=i; j<nb_fluxes; j++)
             if (i != j)
               {
-                const int i_ff = pure_face_to_correct(j, 0);
-                const int j_ff = pure_face_to_correct(j, 1);
-                const int k_ff = pure_face_to_correct(j, 2);
+                const int i_ff = pure_face_to_correct[0](j);
+                const int j_ff = pure_face_to_correct[1](j);
+                const int k_ff = pure_face_to_correct[2](j);
                 if ((i_f==i_ff) && (j_f==j_ff) && (k_f==k_ff))
                   {
                     if (shared_face.size() == 0)

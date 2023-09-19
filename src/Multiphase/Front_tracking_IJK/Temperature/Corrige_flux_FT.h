@@ -75,7 +75,9 @@ public :
   inline void compute_thermal_fluxes_face_centre();
   inline void set_convection_negligible(const int& convection_negligible);
   inline void set_diffusion_negligible(const int& diffusion_negligible);
-  void clean();
+  inline void clean();
+  inline void compute_ijk_pure_faces_indices();
+  inline void sort_ijk_intersections_subproblems_indices_by_k_layers();
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -189,6 +191,16 @@ inline void Corrige_flux_FT::set_diffusion_negligible(const int& diffusion_negli
 inline void Corrige_flux_FT::clean()
 {
   valeur().clean();
+}
+
+inline void Corrige_flux_FT::compute_ijk_pure_faces_indices()
+{
+  valeur().compute_ijk_pure_faces_indices();
+}
+
+inline void Corrige_flux_FT::sort_ijk_intersections_subproblems_indices_by_k_layers()
+{
+  valeur().sort_ijk_intersections_subproblems_indices_by_k_layers();
 }
 
 #endif /* Corrige_flux_FT_included */

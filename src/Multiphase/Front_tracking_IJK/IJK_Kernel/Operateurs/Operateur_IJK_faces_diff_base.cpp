@@ -50,22 +50,22 @@ Entree& Operateur_IJK_faces_diff_base_double::readOn(Entree& is)
 
 Operateur_IJK_faces_diff_base_double::Operateur_IJK_faces_diff_base_double()
 {
-  vx_ = 0;
-  vy_ = 0;
-  vz_ = 0;
+  vx_ = nullptr;
+  vy_ = nullptr;
+  vz_ = nullptr;
 
-  uniform_nu_=0;
-  nu_ = 0;
-  divergence_ = 0;
+  uniform_nu_= nullptr;
+  nu_ = nullptr;
+  divergence_ = nullptr;
 
-  coeff_tensor_xx_ = 0;
-  coeff_tensor_xy_ = 0;
-  coeff_tensor_xz_ = 0;
-  coeff_tensor_yx_ = 0;
-  coeff_tensor_yy_ = 0;
-  coeff_tensor_yz_ = 0;
-  coeff_tensor_zx_ = 0;
-  coeff_tensor_zy_ = 0;
+  coeff_tensor_xx_ = nullptr;
+  coeff_tensor_xy_ = nullptr;
+  coeff_tensor_xz_ = nullptr;
+  coeff_tensor_yx_ = nullptr;
+  coeff_tensor_yy_ = nullptr;
+  coeff_tensor_yz_ = nullptr;
+  coeff_tensor_zx_ = nullptr;
+  coeff_tensor_zy_ = nullptr;
   coeff_tensor_zz_ = 0;
 
   is_uniform_ = false;
@@ -188,17 +188,17 @@ void Operateur_IJK_faces_diff_base_double::ajouter(const IJK_Field_double& vx, c
   vy_ = &vy;
   vz_ = &vz;
   compute_add(dvx, dvy, dvz);
-  nu_=0;
-  divergence_ = 0;
-  coeff_tensor_xx_ = 0;
-  coeff_tensor_xy_ = 0;
-  coeff_tensor_xz_ = 0;
-  coeff_tensor_yx_ = 0;
-  coeff_tensor_yy_ = 0;
-  coeff_tensor_yz_ = 0;
-  coeff_tensor_zx_ = 0;
-  coeff_tensor_zy_ = 0;
-  coeff_tensor_zz_ = 0;
+  nu_ = nullptr;
+  divergence_ = nullptr;
+  coeff_tensor_xx_ = nullptr;
+  coeff_tensor_xy_ = nullptr;
+  coeff_tensor_xz_ = nullptr;
+  coeff_tensor_yx_ = nullptr;
+  coeff_tensor_yy_ = nullptr;
+  coeff_tensor_yz_ = nullptr;
+  coeff_tensor_zx_ = nullptr;
+  coeff_tensor_zy_ = nullptr;
+  coeff_tensor_zz_ = nullptr;
   statistiques().end_count(diffusion_counter_);
 }
 
@@ -209,17 +209,17 @@ void Operateur_IJK_faces_diff_base_double::calculer(const IJK_Field_double& vx, 
   vx_ = &vx;
   vy_ = &vy;
   vz_ = &vz;
-  nu_=0;
-  divergence_ = 0;
-  coeff_tensor_xx_ = 0;
-  coeff_tensor_xy_ = 0;
-  coeff_tensor_xz_ = 0;
-  coeff_tensor_yx_ = 0;
-  coeff_tensor_yy_ = 0;
-  coeff_tensor_yz_ = 0;
-  coeff_tensor_zx_ = 0;
-  coeff_tensor_zy_ = 0;
-  coeff_tensor_zz_ = 0;
+  nu_ = nullptr;
+  divergence_ = nullptr;
+  coeff_tensor_xx_ = nullptr;
+  coeff_tensor_xy_ = nullptr;
+  coeff_tensor_xz_ = nullptr;
+  coeff_tensor_yx_ = nullptr;
+  coeff_tensor_yy_ = nullptr;
+  coeff_tensor_yz_ = nullptr;
+  coeff_tensor_zx_ = nullptr;
+  coeff_tensor_zy_ = nullptr;
+  coeff_tensor_zz_ = nullptr;
   compute_set(dvx, dvy, dvz);
   statistiques().end_count(diffusion_counter_);
 }

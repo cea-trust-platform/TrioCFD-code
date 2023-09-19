@@ -19,7 +19,7 @@ Implemente_instanciable_sans_constructeur(OpConvCentre4IJK_double, "OpConvCentre
 
 OpConvCentre4IJK_double::OpConvCentre4IJK_double()
 {
-  div_rho_u_=0;
+  div_rho_u_=nullptr;
   last_computed_klayer_for_div_rhou_=0;
 }
 
@@ -116,7 +116,7 @@ void OpConvCentre4IJK_double::calculer(const IJK_Field_double& inputx, const IJK
                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
   Operateur_IJK_faces_conv_base_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
-  div_rho_u_ = 0;
+  div_rho_u_ = nullptr;
 }
 
 void OpConvCentre4IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
@@ -124,7 +124,7 @@ void OpConvCentre4IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_
                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
   Operateur_IJK_faces_conv_base_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
-  div_rho_u_ = 0;
+  div_rho_u_ = nullptr;
 }
 
 // Calcule, sur la couche k_layer de mailles, l'integrale sur la maille de div(rho_v)
@@ -173,8 +173,8 @@ void OpConvCentre4IJK_double::calculer_avec_u_div_rhou(const IJK_Field_double& r
 
   compute_set(dvx, dvy, dvz);
 
-  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
-  div_rho_u_ = 0;
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = nullptr;
+  div_rho_u_ = nullptr;
   statistiques().end_count(convection_counter_);
 
 }
@@ -198,8 +198,8 @@ void OpConvCentre4IJK_double::ajouter_avec_u_div_rhou(const IJK_Field_double& rh
 
   compute_add(dvx, dvy, dvz);
 
-  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
-  div_rho_u_ = 0;
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = nullptr;
+  div_rho_u_ = nullptr;
   statistiques().end_count(convection_counter_);
 
 }

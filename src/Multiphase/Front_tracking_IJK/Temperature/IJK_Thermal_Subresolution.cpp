@@ -708,6 +708,15 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres()
     corrige_flux_->compute_temperature_cell_centre(temperature_);
 }
 
+void IJK_Thermal_Subresolution::prepare_ij_fluxes_k_layers()
+{
+  if ((!disable_subresolution_) && (convective_flux_correction_ || diffusive_flux_correction_))
+    {
+      corrige_flux_->compute_ijk_pure_faces_indices();
+      corrige_flux_->sort_ijk_intersections_subproblems_indices_by_k_layers();
+    }
+}
+
 void IJK_Thermal_Subresolution::set_zero_temperature_increment()
 {
   if (!disable_subresolution_)

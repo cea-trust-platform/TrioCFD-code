@@ -40,24 +40,10 @@ void OpConvQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, co
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
   const int nx = _DIR_==DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni();
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
-  // const double dx = channel_data_.get_delta_x();
   const double delta_xyz = channel_data_.get_delta_xyz(k_layer, (int) _DIR_);
 
-  // const double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
   double surface =1.;
   surface = channel_data_.get_surface(k_layer, 1, (int) _DIR_);
-//  switch(_DIR_)
-//    {
-//    case DIRECTION::X:
-//      surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
-//      break;
-//    case DIRECTION::Y:
-//      surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
-//      break;
-//    case DIRECTION::Z:
-//      surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
-//      break;
-//    }
 
   if(_DIR_==DIRECTION::Z)
     {
@@ -80,7 +66,6 @@ void OpConvQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, co
         }
     }
 
-  // const double dx_squared_over_8 = dx * dx * 0.125;
   const double delta_squared_over_8 = delta_xyz * delta_xyz * 0.125;
   const int imax = nx;
   const int jmax = ny;

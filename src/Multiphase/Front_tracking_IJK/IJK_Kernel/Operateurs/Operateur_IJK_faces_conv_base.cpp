@@ -19,13 +19,13 @@ Implemente_base_sans_constructeur(Operateur_IJK_faces_conv_base_double, "Operate
 
 Operateur_IJK_faces_conv_base_double::Operateur_IJK_faces_conv_base_double()
 {
-  vx_ = 0;
-  vy_ = 0;
-  vz_ = 0;
+  vx_ = nullptr;
+  vy_ = nullptr;
+  vz_ = nullptr;
   perio_k_ = false;
-  inputx_ = 0;
-  inputy_ = 0;
-  inputz_ = 0;
+  inputx_ = nullptr;
+  inputy_ = nullptr;
+  inputz_ = nullptr;
 }
 
 Sortie& Operateur_IJK_faces_conv_base_double::printOn(Sortie& os) const
@@ -59,7 +59,7 @@ void Operateur_IJK_faces_conv_base_double::calculer(const IJK_Field_double& inpu
 
   compute_set(dvx, dvy, dvz);
 
-  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = nullptr;
   statistiques().end_count(convection_counter_);
 }
 
@@ -78,6 +78,6 @@ void Operateur_IJK_faces_conv_base_double::ajouter(const IJK_Field_double& input
 
   compute_add(dvx, dvy, dvz);
 
-  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = nullptr;
   statistiques().end_count(convection_counter_);
 }
