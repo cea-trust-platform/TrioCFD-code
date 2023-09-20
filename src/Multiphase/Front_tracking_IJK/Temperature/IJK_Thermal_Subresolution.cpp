@@ -74,6 +74,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   fd_solver_rank_ = 0;
   // one_dimensional_advection_diffusion_thermal_solver_.nommer("finite_difference_solver");
   // one_dimensional_advection_diffusion_thermal_solver_.typer("Solv_GCP");
+  discrete_integral_ = 0;
+  quadtree_levels_ = 1;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -145,6 +147,9 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   // param.ajouter("thermal_fd_solver", &one_dimensional_advection_diffusion_thermal_solver_);
   param.ajouter("thermal_fd_solver", &one_dimensional_advection_diffusion_thermal_solver_);
 
+  param.ajouter_flag("discrete_integral", &discrete_integral_);
+  param.ajouter("quadtree_levels", &quadtree_levels_);
+
 //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
 //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
@@ -192,6 +197,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
 
   corrige_flux_.typer("Corrige_flux_FT_temperature_subresolution");
+  corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
   //  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
 
@@ -692,16 +698,16 @@ void IJK_Thermal_Subresolution::prepare_thermal_flux_correction()
     corrige_flux_->update();
 }
 
-void IJK_Thermal_Subresolution::compute_temperature_face_centre()
+void IJK_Thermal_Subresolution::compute_convective_fluxes_face_centre()
 {
   if (!disable_subresolution_ && convective_flux_correction_)
-    corrige_flux_->compute_temperature_face_centre();
+    corrige_flux_->compute_thermal_convective_fluxes();
 }
 
-void IJK_Thermal_Subresolution::compute_thermal_fluxes_face_centre()
+void IJK_Thermal_Subresolution::compute_diffusive_fluxes_face_centre()
 {
   if (!disable_subresolution_ && diffusive_flux_correction_)
-    corrige_flux_->compute_thermal_fluxes_face_centre();
+    corrige_flux_->compute_thermal_diffusive_fluxes();
 }
 
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres()

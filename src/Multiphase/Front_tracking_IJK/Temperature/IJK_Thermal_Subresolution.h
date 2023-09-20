@@ -93,8 +93,8 @@ protected :
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
   void update_intersections() override;
-  void compute_temperature_face_centre() override;
-  void compute_thermal_fluxes_face_centre() override;
+  void compute_convective_fluxes_face_centre() override;
+  void compute_diffusive_fluxes_face_centre() override;
   void compute_temperature_cell_centres() override;
   void prepare_ij_fluxes_k_layers() override;
   void set_zero_temperature_increment() override;
@@ -142,6 +142,8 @@ protected :
   Motcles fd_solvers_jdd_;
   int fd_solver_rank_;
   Nom fd_solver_type_;
+  int discrete_integral_;
+  int quadtree_levels_;
   // DoubleVect radial_convective_vector_prefactor_;
   // DoubleVect diffusive_vector_prefactor_;
 

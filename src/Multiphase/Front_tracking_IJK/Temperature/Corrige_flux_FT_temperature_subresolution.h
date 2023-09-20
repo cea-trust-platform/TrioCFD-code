@@ -56,6 +56,7 @@ public :
 
   void set_convection_negligible(const int& convection_negligible) override { convection_negligible_ = convection_negligible; };
   void set_diffusion_negligible(const int& diffusion_negligible) override { diffusion_negligible_ = diffusion_negligible; };
+  void set_fluxes_feedback_params(const int discrete_integral, const int levels) override { discrete_integral_ = discrete_integral; levels_ = levels; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
    * l'interface. On remplace les flux donnes en entree par ces flux la.
@@ -87,15 +88,23 @@ public :
   void associate_indices_and_check_subproblems_consistency();
   void compute_temperature_cell_centre(IJK_Field_double& temperature) const override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
-  void compute_temperature_face_centre() override;
-  void compute_thermal_fluxes_face_centre() override;
-  void compute_temperature_face_centre_discrete_integral();
+  void compute_thermal_convective_fluxes() override;
+  void compute_thermal_diffusive_fluxes() override;
+  void compute_thermal_convective_fluxes_face_centre();
+  void compute_thermal_diffusive_fluxes_face_centre();
+  void compute_thermal_fluxes_face_centre(DoubleVect& fluxes, const int fluxes_type);
+  double compute_thermal_flux_face_centre(const int fluxes_type, const int& index_subproblem, const double& dist, const int& dir);
+  void compute_thermal_convective_fluxes_face_centre_discrete_integral();
+  void compute_thermal_diffusive_fluxes_face_centre_discrete_integral();
+  void compute_thermal_fluxes_face_centre_discrete_integral(DoubleVect& fluxes, const int fluxes_type);
+  DoubleVect compute_thermal_flux_face_centre_discrete_integral(const int fluxes_type, const int& index_subproblem, const double& dist, const int& dir);
   void get_discrete_surface_at_level(const int& dir, const int& level);
   void clean() override;
   void compute_ijk_pure_faces_indices() override;
   void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
 protected :
+  enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;
   IntVect pure_face_unique_;
   DoubleVect convective_fluxes_;
@@ -126,7 +135,8 @@ protected :
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
   int debug_=0;
-  int level_=0;
+  int levels_=0;
+  int discrete_integral_=0;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

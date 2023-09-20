@@ -830,9 +830,9 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    */
 
   if (!conv_temperature_negligible_)
-    compute_temperature_face_centre();
+    compute_convective_fluxes_face_centre();
   if (!diff_temp_negligible_)
-    compute_thermal_fluxes_face_centre();
+    compute_diffusive_fluxes_face_centre();
   if (!conv_temperature_negligible_ || !diff_temp_negligible_)
     prepare_ij_fluxes_k_layers();
 

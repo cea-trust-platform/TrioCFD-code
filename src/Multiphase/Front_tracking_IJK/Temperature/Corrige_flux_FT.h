@@ -71,10 +71,13 @@ public :
                                                 DoubleTab& coo_vap) const;
   inline void compute_temperature_cell_centre(IJK_Field_double& temperature) const;
   inline void set_zero_temperature_increment(IJK_Field_double& d_temperature) const;
-  inline void compute_temperature_face_centre();
-  inline void compute_thermal_fluxes_face_centre();
+  inline void compute_thermal_convective_fluxes();
+  inline void compute_thermal_diffusive_fluxes();
+
   inline void set_convection_negligible(const int& convection_negligible);
   inline void set_diffusion_negligible(const int& diffusion_negligible);
+  inline void set_fluxes_feedback_params(const int discrete_integral, const int levels);
+
   inline void clean();
   inline void compute_ijk_pure_faces_indices();
   inline void sort_ijk_intersections_subproblems_indices_by_k_layers();
@@ -156,14 +159,14 @@ inline void Corrige_flux_FT::set_zero_temperature_increment(IJK_Field_double& d_
   valeur().set_zero_temperature_increment(d_temperature);
 }
 
-inline void Corrige_flux_FT::compute_temperature_face_centre()
+inline void Corrige_flux_FT::compute_thermal_convective_fluxes()
 {
-  valeur().compute_temperature_face_centre();
+  valeur().compute_thermal_convective_fluxes();
 }
 
-inline void Corrige_flux_FT::compute_thermal_fluxes_face_centre()
+inline void Corrige_flux_FT::compute_thermal_diffusive_fluxes()
 {
-  valeur().compute_thermal_fluxes_face_centre();
+  valeur().compute_thermal_diffusive_fluxes();
 }
 
 inline void Corrige_flux_FT::corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
@@ -180,6 +183,11 @@ inline void Corrige_flux_FT::set_convection_negligible(const int& convection_neg
 inline void Corrige_flux_FT::set_diffusion_negligible(const int& diffusion_negligible)
 {
   valeur().set_diffusion_negligible(diffusion_negligible);
+}
+
+inline void Corrige_flux_FT::set_fluxes_feedback_params(const int discrete_integral, const int levels)
+{
+  valeur().set_fluxes_feedback_params(discrete_integral, levels);
 }
 
 inline void Corrige_flux_FT::clean()

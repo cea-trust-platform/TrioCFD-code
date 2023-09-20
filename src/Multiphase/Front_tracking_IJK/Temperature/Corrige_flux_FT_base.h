@@ -79,6 +79,8 @@ public:
                                            Intersection_Interface_ijk_cell& intersection_ijk_cell,
                                            const IJK_One_Dimensional_Subproblems& thermal_local_subproblems);
 
+  virtual void set_fluxes_feedback_params(const int discrete_integral, const int levels) { ; };
+
   void set_physical_parameters(const double rhocpl,
                                const double rhocpv,
                                const double ldal,
@@ -105,8 +107,10 @@ public:
 
   virtual void compute_temperature_cell_centre(IJK_Field_double& temperature) const { ; };
   virtual void set_zero_temperature_increment(IJK_Field_double& d_temperature) const { ; };
-  virtual void compute_temperature_face_centre() { ; };
-  virtual void compute_thermal_fluxes_face_centre() { ; };
+
+  virtual void compute_thermal_convective_fluxes() { ; };
+  virtual void compute_thermal_diffusive_fluxes() { ; };
+
   virtual void set_convection_negligible(const int& convection_negligible) { ; };
   virtual void set_diffusion_negligible(const int& diffusion_negligible) { ; };
   virtual void clean() { ; };

@@ -920,79 +920,6 @@ double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const do
   return get_field_profile_at_point(dist, temperature_solution_);
 }
 
-double IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const
-{
-  double temperature_interp = get_field_profile_at_point(dist, temperature_solution_);
-  double velocity_interp = get_velocity_component_at_point(dist, dir);
-  return temperature_interp * velocity_interp;
-}
-
-DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const
-{
-  const int nb_values = (int) pow(4., (double) levels);
-  DoubleVect discrete_values(nb_values);
-  double surface = get_discrete_surface_at_level(dir, levels);
-  double value;
-  int value_counter = 0;
-  if (levels==0)
-    {
-      value = get_field_profile_at_point(dist, field);
-      discrete_values(0) = value * surface;
-    }
-  else
-    {
-      double dl1_ini = 0.;
-      double dl2_ini = 0.;
-      Vecteur3 point_coords_ini = {0., 0., 0.};
-      get_field_discrete_value_recursive(1, levels + 1, dir, dist, surface, field, dl1_ini, dl2_ini, point_coords_ini, discrete_values, value_counter);
-    }
-  return discrete_values;
-}
-
-void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
-                                                                        const int& dir, const double& dist,
-                                                                        const double& surface,
-                                                                        const DoubleVect& field,
-                                                                        const double dl1_parent,
-                                                                        const double dl2_parent,
-                                                                        Vecteur3& point_coords_parent,
-                                                                        DoubleVect& discrete_values,
-                                                                        int& value_counter) const
-{
-  if (ilevel != max_level)
-    {
-      const double neighbours_first_dir[4] = NEIGHBOURS_FIRST_DIR;
-      const double neighbours_second_dir[4] = NEIGHBOURS_SECOND_DIR;
-      for(int i=ilevel; ilevel<max_level; i++)
-        for(int l=0; l<4; l++)
-          {
-            const double first_dir = neighbours_first_dir[l];
-            const double second_dir = neighbours_second_dir[l];
-            double dl1;
-            double dl2;
-            Vecteur3 point_coords = {0., 0., 0.};
-            get_discrete_two_dimensional_spacing(dir, ilevel, first_dir, second_dir, dl1, dl2, point_coords);
-            dl1 += dl1_parent;
-            dl2 += dl2_parent;
-            point_coords += point_coords_parent;
-            get_field_discrete_value_recursive(ilevel + 1, max_level, dir, dist, surface, field, dl1, dl2, point_coords, discrete_values, value_counter);
-          }
-    }
-  else
-    {
-      const double dist_increment = Vecteur3::produit_scalaire(point_coords_parent, normal_vector_compo_);
-      const double dist_value = dist + dist_increment;
-      const double value = get_field_profile_at_point(dist_value, field);
-      discrete_values(value_counter) = value * surface;
-      value_counter++;
-    }
-}
-
-DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
-{
-  return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_);
-}
-
 double IJK_One_Dimensional_Subproblem::get_velocity_component_at_point(const double& dist, const int& dir) const
 {
   double velocity = 0;
@@ -1033,6 +960,147 @@ double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point
       break;
     }
   return temperature_gradient;
+}
+
+double IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const
+{
+  double temperature_interp = get_field_profile_at_point(dist, temperature_solution_);
+  double velocity_interp = get_velocity_component_at_point(dist, dir);
+  return temperature_interp * velocity_interp;
+}
+
+double IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivity_profile_at_point(const double& dist, const int& dir) const
+{
+  double diffusive_flux = 0;
+  diffusive_flux = get_temperature_gradient_profile_at_point(dist, dir);
+  diffusive_flux *= (*alpha_);
+  return diffusive_flux;
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_velocity_weighting_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field, const int vel) const
+{
+  const int nb_values = (int) pow(4., (double) levels);
+  DoubleVect discrete_values(nb_values);
+  double surface = get_discrete_surface_at_level(dir, levels);
+  double value;
+  double velocity;
+  int value_counter = 0;
+  if (levels==0)
+    {
+      velocity = get_velocity_weighting(dist, dir, vel);
+      value = get_field_profile_at_point(dist, field);
+      discrete_values(0) = value * surface * velocity;
+    }
+  else
+    {
+      double dl1_ini = 0.;
+      double dl2_ini = 0.;
+      Vecteur3 point_coords_ini = {0., 0., 0.};
+      get_field_discrete_value_recursive(1, levels + 1, dir, dist, vel, surface, field, dl1_ini, dl2_ini, point_coords_ini, discrete_values, value_counter);
+    }
+  return discrete_values;
+}
+
+void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
+                                                                        const int& dir, const double& dist,
+                                                                        const int& vel,
+                                                                        const double& surface,
+                                                                        const DoubleVect& field,
+                                                                        const double dl1_parent,
+                                                                        const double dl2_parent,
+                                                                        Vecteur3& point_coords_parent,
+                                                                        DoubleVect& discrete_values,
+                                                                        int& value_counter) const
+{
+  if (ilevel != max_level)
+    {
+      const double neighbours_first_dir[4] = NEIGHBOURS_FIRST_DIR;
+      const double neighbours_second_dir[4] = NEIGHBOURS_SECOND_DIR;
+      for(int i=ilevel; i<max_level; i++)
+        {
+          if (i==ilevel)
+            {
+              for(int l=0; l<4; l++)
+                {
+                  const double first_dir = neighbours_first_dir[l];
+                  const double second_dir = neighbours_second_dir[l];
+                  double dl1;
+                  double dl2;
+                  Vecteur3 point_coords = {0., 0., 0.};
+                  get_discrete_two_dimensional_spacing(dir, ilevel, first_dir, second_dir, dl1, dl2, point_coords);
+                  dl1 += dl1_parent;
+                  dl2 += dl2_parent;
+                  point_coords += point_coords_parent;
+                  get_field_discrete_value_recursive(i+1, max_level, dir, dist, vel, surface, field, dl1, dl2, point_coords, discrete_values, value_counter);
+                }
+            }
+        }
+    }
+  else
+    {
+      const double dist_increment = Vecteur3::produit_scalaire(point_coords_parent, normal_vector_compo_);
+      const double dist_value = dist + dist_increment;
+      const double value = get_field_profile_at_point(dist_value, field);
+      const double velocity = get_velocity_weighting(dist, dir, vel);
+      discrete_values(value_counter) = value * surface * velocity;
+      value_counter++;
+    }
+}
+
+double IJK_One_Dimensional_Subproblem::get_velocity_weighting(const double& dist, const int& dir, const int vel) const
+{
+  if (vel)
+    return get_velocity_component_at_point(dist, dir);
+  else
+    return 1.;
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const
+{
+  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir, field, 0);
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_times_velocity_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const
+{
+  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir, field, 1);
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+{
+  return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_);
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+{
+  return get_field_times_velocity_discrete_integral_at_point(dist, levels, dir, temperature_solution_);
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+{
+  DoubleVect temperature_gradient;
+  switch(dir)
+    {
+    case 0:
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_x_gradient_solution_);
+      break;
+    case 1:
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_y_gradient_solution_);
+      break;
+    case 2:
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_z_gradient_solution_);
+      break;
+    default:
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_x_gradient_solution_);
+      break;
+    }
+  return temperature_gradient;
+}
+
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+{
+  DoubleVect diffusive_flux = get_temperature_gradient_profile_discrete_integral_at_point(dist, levels, dir);
+  diffusive_flux *= (*alpha_);
+  return diffusive_flux;
 }
 
 void IJK_One_Dimensional_Subproblem::find_interval(const double& dist, int& left_interval, int& right_interval) const
