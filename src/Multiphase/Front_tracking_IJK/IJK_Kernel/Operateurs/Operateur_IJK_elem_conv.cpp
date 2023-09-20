@@ -133,3 +133,21 @@ Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
   type += suffix_;
   return type;
 }
+
+void Operateur_IJK_elem_conv::calculer(const IJK_Field_double& field,
+                                       const IJK_Field_double& vx,
+                                       const IJK_Field_double& vy,
+                                       const IJK_Field_double& vz,
+                                       IJK_Field_double& result)
+{
+  valeur().calculer(field, vx, vy, vz, result);
+}
+
+void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
+                                      const IJK_Field_double& vx,
+                                      const IJK_Field_double& vy,
+                                      const IJK_Field_double& vz,
+                                      IJK_Field_double& result)
+{
+  valeur().ajouter(field, vx, vy, vz, result);
+}

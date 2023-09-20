@@ -192,3 +192,27 @@ void Operateur_IJK_elem_diff::set_conductivity_coefficient(const double& uniform
     }
 }
 
+
+void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
+                                       IJK_Field_double& result,
+                                       const IJK_Field_local_double& boundary_flux_kmin,
+                                       const IJK_Field_local_double& boundary_flux_kmax)
+{
+  return valeur().calculer(field,
+                           result,
+                           boundary_flux_kmin,
+                           boundary_flux_kmax);
+}
+
+
+void Operateur_IJK_elem_diff::ajouter(const IJK_Field_double& field,
+                                      IJK_Field_double& result,
+                                      const IJK_Field_local_double& boundary_flux_kmin,
+                                      const IJK_Field_local_double& boundary_flux_kmax)
+{
+  return valeur().ajouter(field,
+                          result,
+                          boundary_flux_kmin,
+                          boundary_flux_kmax);
+}
+

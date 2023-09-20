@@ -246,6 +246,11 @@ double IJK_One_Dimensional_Subproblems::get_temperature_profile_at_point(const i
   return (*this)[i].get_temperature_profile_at_point(dist);
 }
 
+double IJK_One_Dimensional_Subproblems::get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const
+{
+  return (*this)[i].get_temperature_times_velocity_profile_at_point(dist, dir);
+}
+
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
   return (*this)[i].get_temperature_profile_discrete_integral_at_point(dist, level, dir);

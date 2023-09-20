@@ -103,6 +103,7 @@ public :
   void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
   double get_interfacial_gradient_corrected(int i);
   double get_temperature_profile_at_point(const int& i, const double& dist) const;
+  double get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const;
   DoubleVect get_temperature_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
   void thermal_subresolution_outputs();

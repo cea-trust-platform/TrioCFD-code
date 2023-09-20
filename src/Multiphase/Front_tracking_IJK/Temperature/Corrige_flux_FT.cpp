@@ -34,3 +34,9 @@ Entree& Corrige_flux_FT::readOn( Entree& is )
   DERIV(Corrige_flux_FT_base)::readOn( is );
   return is;
 }
+
+void Corrige_flux_FT::corrige_flux_faceIJ(IJK_Field_local_double *const flux,
+                                          const int k_layer, const int dir)
+{
+  valeur().corrige_flux_faceIJ(flux, k_layer, dir);
+}

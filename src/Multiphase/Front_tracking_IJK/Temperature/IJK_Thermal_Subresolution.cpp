@@ -202,13 +202,15 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     {
       // Use an operator that override compute_set() with corrige_flux;
       temperature_diffusion_op_.typer("OpDiffUniformIJKScalarCorrection_double");
-      temperature_convection_op_.initialize(splitting);
+      temperature_diffusion_op_.initialize(splitting);
+      temperature_diffusion_op_.set_corrige_flux(corrige_flux_);
     }
   if (convective_flux_correction_)
     {
       // Use an operator that override compute_set() with corrige_flux;
       temperature_convection_op_.typer("OpConvQuickInterfaceIJKScalar_double");
-      temperature_diffusion_op_.initialize(splitting);
+      temperature_convection_op_.initialize(splitting);
+      temperature_convection_op_.set_corrige_flux(corrige_flux_);
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);

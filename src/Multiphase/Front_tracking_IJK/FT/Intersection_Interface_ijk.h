@@ -192,6 +192,10 @@ public:
   {
     return ijk_interfaces_.dimension(0);
   }
+  int get_nb_faces_to_correct()
+  {
+    return ijk_pure_face_to_correct_[0].size();
+  }
   void update_interpolations_cell_centres_on_interface();
   void update_interpolations_cell_faces_on_interface();
 

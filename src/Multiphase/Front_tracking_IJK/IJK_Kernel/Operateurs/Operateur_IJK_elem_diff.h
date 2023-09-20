@@ -42,14 +42,14 @@ public :
   inline void initialize(const IJK_Splitting& splitting);
   inline void compute_set(IJK_Field_double& dx);
   inline void compute_add(IJK_Field_double& dx);
-  inline void calculer(const IJK_Field_double& field,
-                       IJK_Field_double& result,
-                       const IJK_Field_local_double& boundary_flux_kmin,
-                       const IJK_Field_local_double& boundary_flux_kmax);
-  inline void ajouter(const IJK_Field_double& field,
-                      IJK_Field_double& result,
-                      const IJK_Field_local_double& boundary_flux_kmin,
-                      const IJK_Field_local_double& boundary_flux_kmax);
+  void calculer(const IJK_Field_double& field,
+                IJK_Field_double& result,
+                const IJK_Field_local_double& boundary_flux_kmin,
+                const IJK_Field_local_double& boundary_flux_kmax);
+  void ajouter(const IJK_Field_double& field,
+               IJK_Field_double& result,
+               const IJK_Field_local_double& boundary_flux_kmin,
+               const IJK_Field_local_double& boundary_flux_kmax);
   /*
    * ReadOn
    */
@@ -76,6 +76,8 @@ public :
                                     IJK_Field_local_double& coeff_field_x,
                                     IJK_Field_local_double& coeff_field_y,
                                     IJK_Field_local_double& coeff_field_z);
+  inline void set_corrige_flux(Corrige_flux_FT& corrige_flux);
+
 protected:
   Motcles diffusion_op_words_;
   Nom prefix_;
@@ -103,30 +105,6 @@ inline void Operateur_IJK_elem_diff::compute_add(IJK_Field_double& dx)
   valeur().compute_add(dx);
 }
 
-inline void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
-                                              IJK_Field_double& result,
-                                              const IJK_Field_local_double& boundary_flux_kmin,
-                                              const IJK_Field_local_double& boundary_flux_kmax)
-{
-  return valeur().calculer(field,
-                           result,
-                           boundary_flux_kmin,
-                           boundary_flux_kmax);
-}
-
-
-inline void Operateur_IJK_elem_diff::ajouter(const IJK_Field_double& field,
-                                             IJK_Field_double& result,
-                                             const IJK_Field_local_double& boundary_flux_kmin,
-                                             const IJK_Field_local_double& boundary_flux_kmax)
-{
-  return valeur().ajouter(field,
-                          result,
-                          boundary_flux_kmin,
-                          boundary_flux_kmax);
-}
-
-
 inline void Operateur_IJK_elem_diff::set_uniform_lambda(const double& uniform_lambda)
 {
   return valeur().set_uniform_lambda(uniform_lambda);
@@ -143,5 +121,11 @@ inline void Operateur_IJK_elem_diff::set_coeff_x_y_z(IJK_Field_local_double& coe
 {
   return valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
 }
+
+inline void Operateur_IJK_elem_diff::set_corrige_flux(Corrige_flux_FT& corrige_flux)
+{
+  valeur().set_corrige_flux(corrige_flux);
+}
+
 
 #endif /* Operateur_IJK_elem_diff_included */

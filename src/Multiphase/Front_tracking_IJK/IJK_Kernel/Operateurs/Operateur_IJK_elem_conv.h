@@ -40,16 +40,16 @@ public :
   inline void initialize(const IJK_Splitting& splitting);
   inline void compute_set(IJK_Field_double& dx);
   inline void compute_add(IJK_Field_double& dx);
-  inline void calculer(const IJK_Field_double& field,
-                       const IJK_Field_double& vx,
-                       const IJK_Field_double& vy,
-                       const IJK_Field_double& vz,
-                       IJK_Field_double& result);
-  inline void ajouter(const IJK_Field_double& field,
-                      const IJK_Field_double& vx,
-                      const IJK_Field_double& vy,
-                      const IJK_Field_double& vz,
-                      IJK_Field_double& result);
+  void calculer(const IJK_Field_double& field,
+                const IJK_Field_double& vx,
+                const IJK_Field_double& vy,
+                const IJK_Field_double& vz,
+                IJK_Field_double& result);
+  void ajouter(const IJK_Field_double& field,
+               const IJK_Field_double& vx,
+               const IJK_Field_double& vy,
+               const IJK_Field_double& vz,
+               IJK_Field_double& result);
   Nom get_convection_op_type(Motcle word);
   /*
    * ReadOn
@@ -97,24 +97,6 @@ inline void Operateur_IJK_elem_conv::compute_add(IJK_Field_double& dx)
 inline void Operateur_IJK_elem_conv::set_corrige_flux(Corrige_flux_FT& corrige_flux)
 {
   valeur().set_corrige_flux(corrige_flux);
-}
-
-inline void Operateur_IJK_elem_conv::calculer(const IJK_Field_double& field,
-                                              const IJK_Field_double& vx,
-                                              const IJK_Field_double& vy,
-                                              const IJK_Field_double& vz,
-                                              IJK_Field_double& result)
-{
-  valeur().calculer(field, vx, vy, vz, result);
-}
-
-inline void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
-                                             const IJK_Field_double& vx,
-                                             const IJK_Field_double& vy,
-                                             const IJK_Field_double& vz,
-                                             IJK_Field_double& result)
-{
-  valeur().ajouter(field, vx, vy, vz, result);
 }
 
 #endif /* Operateur_IJK_elem_conv_included */

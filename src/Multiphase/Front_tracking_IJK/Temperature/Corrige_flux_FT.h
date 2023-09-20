@@ -57,9 +57,9 @@ public :
                                       const double rhocpv,
                                       const double ldal,
                                       const double ldav);
-  inline void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
-                                  const int k_layer,
-                                  const int dir);
+  void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
+                           const int k_layer,
+                           const int dir);
   inline void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                        const int k_layer, const int dir);
   inline void update_intersections();
@@ -107,12 +107,6 @@ inline void Corrige_flux_FT::set_physical_parameters(const double rhocpl,
                                                      const double ldav)
 {
   valeur().set_physical_parameters(rhocpl, rhocpv, ldal, ldav);
-}
-
-inline void Corrige_flux_FT::corrige_flux_faceIJ(IJK_Field_local_double *const flux,
-                                                 const int k_layer, const int dir)
-{
-  valeur().corrige_flux_faceIJ(flux, k_layer, dir);
 }
 
 inline void Corrige_flux_FT::update_intersections()

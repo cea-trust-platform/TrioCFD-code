@@ -299,7 +299,7 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
   IJK_Field_local_double *const flux_y = &tmp[3];
 
   compute_flux_z(*flux_zmin, 0);
-  correct_flux(flux_zmin, -1, 2);
+  correct_flux(flux_zmin, 0, 2);
   /*
    * TODO: correct_flux_z_min();
    * fluxes_to_correct ?
@@ -318,8 +318,7 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
        */
       correct_flux(flux_x, k, 0);
       correct_flux(flux_y, k, 1);
-      correct_flux(flux_zmin, k, 2);
-      correct_flux(flux_zmax, k, 2);
+      correct_flux(flux_zmin, k+1, 2);
       Operator_IJK_div(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
       swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
     }

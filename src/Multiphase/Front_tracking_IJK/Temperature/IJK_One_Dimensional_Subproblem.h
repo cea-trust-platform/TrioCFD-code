@@ -126,6 +126,7 @@ public :
   void get_ijk_indices(int& i, int& j, int& k) const;
   double get_field_profile_at_point(const double& dist, const DoubleVect& field) const;
   double get_temperature_profile_at_point(const double& dist) const;
+  double get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const;
   DoubleVect get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const;
   DoubleVect get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
   void get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
@@ -137,6 +138,7 @@ public :
                                           Vecteur3& point_coords_parent,
                                           DoubleVect& discrete_values,
                                           int& value_counter) const;
+  double get_velocity_component_at_point(const double& dist, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
   void get_discrete_two_dimensional_spacing(const int& dir, const int& level,
                                             const double& first_dir, const double& second_dir,
@@ -348,6 +350,9 @@ protected :
   DoubleVect x_velocity_;
   DoubleVect y_velocity_;
   DoubleVect z_velocity_;
+  DoubleVect x_velocity_corrected_;
+  DoubleVect y_velocity_corrected_;
+  DoubleVect z_velocity_corrected_;
   DoubleVect radial_velocity_;
   DoubleVect radial_velocity_corrected_;
   DoubleVect first_tangential_velocity_;

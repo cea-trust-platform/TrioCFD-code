@@ -35,6 +35,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #define FACES_DIR {0, 0, 1, 1, 2, 2}
+#define FLUX_SIGN {-1, 1, -1, 1, -1, 1}
 
 class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
 {
@@ -59,14 +60,21 @@ public :
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
    * l'interface. On remplace les flux donnes en entree par ces flux la.
    */
+  void corrige_flux_faceIJ_any_flux(IJK_Field_local_double *const flux,
+                                    std::vector<ArrOfDouble>& subgrid_fluxes_x,
+                                    std::vector<ArrOfDouble>& subgrid_fluxes_y,
+                                    std::vector<ArrOfDouble>& subgrid_fluxes_z,
+                                    const int k_layer,
+                                    const int dir);
+
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
-                           const int k_layer, const int dir) override { ; };
+                           const int k_layer, const int dir) override;
 
   void corrige_flux_conv_faceIJ(IJK_Field_local_double *const flux,
                                 const int k_layer, const int dir) { corrige_flux_faceIJ(flux, k_layer, dir); };
 
   void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
-                                const int k_layer, const int dir) override { ; };
+                                const int k_layer, const int dir) override;
 
   void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
                                          const double dist, const DoubleTab& positions, const DoubleTab& normale,
@@ -102,14 +110,18 @@ protected :
    * Store (i, j, flux) at a given row (k)
    * convective_flux_x_sorted_.pushback(double_tab_ij_flux)
    */
-  std::vector<IntVect> index_face_i_sorted_;
-  std::vector<IntVect> index_face_j_sorted_;
-  std::vector<DoubleVect> convective_flux_x_sorted_;
-  std::vector<DoubleVect> convective_flux_y_sorted_;
-  std::vector<DoubleVect> convective_flux_z_sorted_;
-  std::vector<DoubleVect> diffusive_flux_x_sorted_;
-  std::vector<DoubleVect> diffusive_flux_y_sorted_;
-  std::vector<DoubleVect> diffusive_flux_z_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_x_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_sorted_;
+  std::vector<ArrOfDouble> convective_flux_x_sorted_;
+  std::vector<ArrOfDouble> convective_flux_y_sorted_;
+  std::vector<ArrOfDouble> convective_flux_z_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_x_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_y_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
   FixedVector<IntVect,4> ijk_faces_to_correct_;
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;

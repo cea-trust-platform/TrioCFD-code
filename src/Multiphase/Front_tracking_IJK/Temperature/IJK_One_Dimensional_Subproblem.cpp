@@ -495,6 +495,7 @@ void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices()
 void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
 {
   radial_velocity_.resize(*points_per_thermal_subproblem_);
+  radial_velocity_corrected_.resize(*points_per_thermal_subproblem_);
   first_tangential_velocity_.resize(*points_per_thermal_subproblem_);
   second_tangential_velocity_.resize(*points_per_thermal_subproblem_);
   azymuthal_velocity_.resize(*points_per_thermal_subproblem_);
@@ -502,6 +503,10 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
   x_velocity_.resize(*points_per_thermal_subproblem_);
   y_velocity_.resize(*points_per_thermal_subproblem_);
   z_velocity_.resize(*points_per_thermal_subproblem_);
+
+  x_velocity_corrected_.resize(*points_per_thermal_subproblem_);
+  y_velocity_corrected_.resize(*points_per_thermal_subproblem_);
+  z_velocity_corrected_.resize(*points_per_thermal_subproblem_);
 
   interpolate_cartesian_velocities_on_probes();
   project_velocities_on_probes();
@@ -537,7 +542,18 @@ void IJK_One_Dimensional_Subproblem::project_velocities_on_probes()
   project_cartesian_onto_basis_vector(x_velocity_, y_velocity_, z_velocity_, *first_tangential_vector_compo_solver_, first_tangential_velocity_);
   project_cartesian_onto_basis_vector(x_velocity_, y_velocity_, z_velocity_, *second_tangential_vector_compo_solver_, second_tangential_velocity_);
   project_cartesian_onto_basis_vector(x_velocity_, y_velocity_, z_velocity_, azymuthal_vector_compo_, azymuthal_velocity_);
+
   correct_radial_velocity();
+
+  project_basis_vector_onto_cartesian_dir(0, first_tangential_velocity_, second_tangential_velocity_, radial_velocity_corrected_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          x_velocity_corrected_);
+  project_basis_vector_onto_cartesian_dir(1, first_tangential_velocity_, second_tangential_velocity_, radial_velocity_corrected_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          y_velocity_corrected_);
+  project_basis_vector_onto_cartesian_dir(2, first_tangential_velocity_, second_tangential_velocity_, radial_velocity_corrected_,
+                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                          z_velocity_corrected_);
 }
 
 void IJK_One_Dimensional_Subproblem::correct_radial_velocity()
@@ -641,9 +657,10 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
   DoubleVect osculating_radial_coefficient = osculating_radial_coordinates_inv_;
   osculating_radial_coefficient *= 2;
   radial_convection_prefactor_.resize(*points_per_thermal_subproblem_);
+
+  interpolate_project_velocities_on_probes();
   if (source_terms_type_ != linear_diffusion && source_terms_type_ != spherical_diffusion)
     {
-      interpolate_project_velocities_on_probes();
       if (correct_radial_velocity_)
         radial_convection_prefactor_ = radial_velocity_corrected_;
       else
@@ -651,13 +668,7 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
       radial_convection_prefactor_ *= alpha_inv;
     }
   else
-    {
-      radial_velocity_.resize(*points_per_thermal_subproblem_);
-      radial_velocity_corrected_.resize(*points_per_thermal_subproblem_);
-      first_tangential_velocity_.resize(*points_per_thermal_subproblem_);
-      second_tangential_velocity_.resize(*points_per_thermal_subproblem_);
-      azymuthal_velocity_.resize(*points_per_thermal_subproblem_);
-    }
+    Cerr << "Diffusion case : don't compute the radial convection pre-factor" << finl;
   if (source_terms_type_ != linear_diffusion)
     radial_convection_prefactor_ +=	osculating_radial_coefficient;
   const int boundary_conditions = 0;
@@ -909,6 +920,13 @@ double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const do
   return get_field_profile_at_point(dist, temperature_solution_);
 }
 
+double IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const
+{
+  double temperature_interp = get_field_profile_at_point(dist, temperature_solution_);
+  double velocity_interp = get_velocity_component_at_point(dist, dir);
+  return temperature_interp * velocity_interp;
+}
+
 DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const
 {
   const int nb_values = (int) pow(4., (double) levels);
@@ -973,6 +991,27 @@ void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const in
 DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
 {
   return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_);
+}
+
+double IJK_One_Dimensional_Subproblem::get_velocity_component_at_point(const double& dist, const int& dir) const
+{
+  double velocity = 0;
+  switch(dir)
+    {
+    case 0:
+      velocity = get_field_profile_at_point(dist, x_velocity_);
+      break;
+    case 1:
+      velocity = get_field_profile_at_point(dist, y_velocity_);
+      break;
+    case 2:
+      velocity = get_field_profile_at_point(dist, z_velocity_);
+      break;
+    default:
+      velocity = get_field_profile_at_point(dist, x_velocity_);
+      break;
+    }
+  return velocity;
 }
 
 double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const
