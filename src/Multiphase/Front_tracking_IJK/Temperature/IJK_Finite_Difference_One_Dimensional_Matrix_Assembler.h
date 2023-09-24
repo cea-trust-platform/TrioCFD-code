@@ -47,6 +47,7 @@ class IJK_Finite_Difference_One_Dimensional_Matrix_Assembler : public Objet_U
 public :
   void set_param(Param& param);
   int build(Matrice& matrix, const int& nb_elem, const int& derivative_order);
+  int build_with_unknown_pattern(Matrice& matrix, const int& nb_elem, const int& derivative_order);
   int build_with_known_pattern(Matrice& matrix, const int& nb_elem, const int& derivative_order);
   void modify_rhs_for_bc(Matrice& modified_matrix,
                          DoubleVect& modified_rhs,
@@ -153,7 +154,20 @@ protected :
   int precision_order_;
   int reduce_side_precision_;
   int core_matrix_type_;
-  int equation_type_ = 0;
+  int equation_type_;
+  int nb_elem_;
+  int non_zero_elem_;
+  int stencil_forward_max_;
+  int stencil_centred_max_;
+  int stencil_backward_max_;
+  int forward_left_offset_[2] = {0, 0};
+  int forward_right_offset_[2] = {0, 0};
+  int centred_left_offset_[2] = {0, 0};
+  int centred_right_offset_[2] = {0, 0};
+  int backward_left_offset_[2] = {0, 0};
+  int backward_right_offset_[2] = {0, 0};
+  bool computed_stencil_;
+  int known_pattern_=1;
 
   void set_operators_size(const std::vector<std::vector<double>>& fd_operator_vector, FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator);
   void set_operators_indices(const std::vector<std::vector<double>>& fd_operator_vector,
@@ -161,12 +175,14 @@ protected :
                              const int& fd_coefficient_type);
   int non_zero_stencil_values(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator);
   int get_max_operators(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_conv,
-                        const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_diff);
+                        const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_diff,
+                        int (&stencil_left_offset) [2], int (&stencil_right_offset) [2]);
   void get_max_stencil(const int& nb_elem,
                        int& non_zero_elem_max,
                        int& stencil_forward_max,
                        int& stencil_centred_max,
                        int& stencil_backward_max);
+  void compute_stencil_properties(const int nb_elem);
   void fill_lines(Matrice& matrix);
 
 };

@@ -213,6 +213,12 @@ void IJK_One_Dimensional_Subproblems::compute_add_source_terms()
     itr.compute_add_source_terms();
 }
 
+void IJK_One_Dimensional_Subproblems::retrieve_radial_quantities()
+{
+  for (auto& itr : *this)
+    itr.retrieve_radial_quantities();
+}
+
 void IJK_One_Dimensional_Subproblems::retrieve_temperature_solutions()
 {
   for (auto& itr : *this)
@@ -281,10 +287,10 @@ DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_diffu
   return (*this)[i].get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(dist, level, dir);
 }
 
-void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs()
+void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(SFichier& fic, const int rank)
 {
   for (auto& itr : *this)
-    itr.thermal_subresolution_outputs();
+    itr.thermal_subresolution_outputs(fic, rank);
 }
 
 double IJK_One_Dimensional_Subproblems::get_min_temperature() const

@@ -76,6 +76,7 @@ public :
   void update_intersections();
   void clean_ijk_intersections();
   void compute_eulerian_curvature_from_interface();
+  void thermal_subresolution_outputs();
 
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;

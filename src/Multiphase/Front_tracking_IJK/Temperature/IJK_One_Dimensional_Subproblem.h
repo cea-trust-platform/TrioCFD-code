@@ -114,6 +114,7 @@ public :
                                   const int& impose_user_boundary_condition_end_value);
   void compute_add_source_terms();
   void retrieve_temperature_solution();
+  void retrieve_radial_quantities();
   void compute_local_temperature_gradient_solution();
   double get_interfacial_gradient_corrected() const;
 
@@ -152,7 +153,7 @@ public :
                                             const double& first_dir, const double& second_dir,
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;
   double get_discrete_surface_at_level(const int& dir, const int& level) const;
-  void thermal_subresolution_outputs();
+  void thermal_subresolution_outputs(SFichier& fic, const int rank);
 
   double get_min_temperature() const;
   double get_max_temperature() const;
@@ -229,8 +230,8 @@ protected :
   void correct_tangential_temperature_hessian(DoubleVect& tangential_diffusion_source_terms);
   void find_interval(const double& dist, int& left_interval, int& right_interval) const;
 
-  void post_process_radial_quantities();
-  void post_process_interfacial_quantities();
+  void post_process_interfacial_quantities(SFichier& fic, const int rank);
+  void post_process_radial_quantities(const int rank);
 
   int debug_;
   /*
@@ -413,6 +414,7 @@ protected :
   DoubleVect azymuthal_velocity_normal_gradient_;
 
   REF(IJK_FT_double) ref_ijk_ft_;
+  bool is_updated_=false;
 
 };
 

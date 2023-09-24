@@ -757,3 +757,10 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal_interface_ref(const Motc
   oss.str("");
   return n;
 }
+
+void IJK_Thermal::thermal_subresolution_outputs(SFichier& fic)
+{
+  if (thermal_rank_==0 || thermal_rank_==1)
+    valeur().set_thermal_subresolution_outputs(fic);
+}
+

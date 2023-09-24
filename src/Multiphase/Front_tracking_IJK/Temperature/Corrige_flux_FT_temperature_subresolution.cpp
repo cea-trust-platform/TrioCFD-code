@@ -226,8 +226,8 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
                   surf_face *= splitting_->get_grid_geometry().get_constant_delta(c);
               surf_face *= flux_sign[l];
               const double dist = dist_interf(intersection_ijk_cell_index, l);
-              const double temperature_face = compute_thermal_flux_face_centre(fluxes_type, i, dist, dir);
-              const double flux_face = temperature_face * surf_face;
+              const double local_flux_face = compute_thermal_flux_face_centre(fluxes_type, i, dist, dir);
+              const double flux_face = local_flux_face * surf_face;
               fluxes[counter_faces] = flux_face;
               dist_[counter_faces] = dist;
               counter_faces++;
@@ -288,10 +288,10 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
           if (is_neighbour_pure_liquid)
             {
               const double dist = dist_interf(intersection_ijk_cell_index, l);
-              DoubleVect discrete_temperature_integral = compute_thermal_flux_face_centre_discrete_integral(fluxes_type, i, dist, dir);
+              DoubleVect discrete_flux_integral = compute_thermal_flux_face_centre_discrete_integral(fluxes_type, i, dist, dir);
               double flux_face = 0;
-              for (int val=0; val < discrete_temperature_integral.size(); val++)
-                flux_face += discrete_temperature_integral[val];
+              for (int val=0; val < discrete_flux_integral.size(); val++)
+                flux_face += discrete_flux_integral[val];
               flux_face *= flux_sign[l];
               fluxes[counter_faces] = flux_face;
               dist_[counter_faces] = dist;

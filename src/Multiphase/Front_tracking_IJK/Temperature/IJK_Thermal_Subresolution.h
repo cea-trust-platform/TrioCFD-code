@@ -65,6 +65,7 @@ public :
   // Entree& read_fd_solver(Entree& is);
   void read_fd_solver(const Motcle& mot, Entree& is);
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void set_thermal_subresolution_outputs(SFichier& fic) override;
 
 protected :
   void compute_thermal_subproblems() override;
@@ -101,7 +102,7 @@ protected :
   void clean_thermal_subproblems() override;
   void clean_ijk_intersections() override;
   void clean_add_thermal_subproblems();
-  void thermal_subresolution_outputs();
+
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 

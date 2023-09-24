@@ -591,8 +591,12 @@ void IJK_Thermal_Subresolution::initialise_radial_convection_operator(const Matr
   /*
    * Compute the convection matrices for Finite-Differences
    */
+  if (debug_)
+    Cerr << "Initialise the Radial convection operator" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
   finite_difference_assembler_.initialise_matrix_subproblems(radial_convection_matrix, radial_first_order_operator_, nb_subproblems);
+  if (debug_)
+    Cerr << "Radial convection operator has been initialised." << finl;
 }
 
 void IJK_Thermal_Subresolution::initialise_radial_diffusion_operator(const Matrice& radial_second_order_operator,
@@ -601,8 +605,12 @@ void IJK_Thermal_Subresolution::initialise_radial_diffusion_operator(const Matri
   /*
    * Compute the diffusion matrices for Finite-Differences
    */
+  if (debug_)
+    Cerr << "Initialise the Radial diffusion operator" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
   finite_difference_assembler_.initialise_matrix_subproblems(radial_diffusion_matrix, radial_second_order_operator_, nb_subproblems);
+  if (debug_)
+    Cerr << "Radial diffusion operator has been initialised." << finl;
 }
 
 void IJK_Thermal_Subresolution::impose_subresolution_boundary_conditions()
@@ -666,9 +674,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
                                                                            thermal_subproblems_rhs_assembly_,
                                                                            thermal_subproblems_temperature_solution_);
       Cerr << "Finite-difference thermal sub-resolution has finished !" << finl;
-      thermal_local_subproblems_.retrieve_temperature_solutions();
-      thermal_local_subproblems_.compute_local_temperature_gradient_solutions();
-      thermal_local_subproblems_.compute_local_velocity_gradient();
+      thermal_local_subproblems_.retrieve_radial_quantities();
     }
 }
 
@@ -749,10 +755,10 @@ void IJK_Thermal_Subresolution::clean_add_thermal_subproblems()
     thermal_local_subproblems_.clean_add();
 }
 
-void IJK_Thermal_Subresolution::thermal_subresolution_outputs()
+void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(SFichier& fic)
 {
   if (!disable_subresolution_)
-    thermal_local_subproblems_.thermal_subresolution_outputs();
+    thermal_local_subproblems_.thermal_subresolution_outputs(fic, rang_);
 }
 
 

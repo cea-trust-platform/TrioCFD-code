@@ -129,6 +129,7 @@ public :
                                                            const double current_time,
                                                            const int idx);
   Entree& typer_thermal( Entree& is );
+  void thermal_subresolution_outputs(SFichier& fic);
 
 protected:
   int thermal_rank_;

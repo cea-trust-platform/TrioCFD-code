@@ -97,6 +97,7 @@ public :
                                   const double& end_boundary_condition_value,
                                   const int& impose_user_boundary_condition_end_value);
   void compute_add_source_terms();
+  void retrieve_radial_quantities();
   void retrieve_temperature_solutions();
   void compute_local_temperature_gradient_solutions();
   void compute_local_velocity_gradient();
@@ -110,7 +111,7 @@ public :
   DoubleVect get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
   double get_temperature_gradient_times_diffusivity_profile_at_point(const int& i, const double& dist, const int& dir) const;
-  void thermal_subresolution_outputs();
+  void thermal_subresolution_outputs(SFichier& fic, const int rank);
 
   const int& get_subproblems_counter() const
   {

@@ -250,6 +250,7 @@ public:
   void compute_eulerian_curvature_from_interface();
   virtual void update_intersections() { ; };
   virtual void clean_ijk_intersections() { ; };
+  virtual void set_thermal_subresolution_outputs(SFichier& fic) { ; };
 
 protected:
 

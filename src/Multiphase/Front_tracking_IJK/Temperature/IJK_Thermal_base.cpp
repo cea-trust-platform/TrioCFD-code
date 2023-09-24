@@ -780,8 +780,14 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double current_time = ref_ijk_ft_->get_current_time();
   const double ene_ini = compute_global_energy(d_temperature_);
 
+  /*
+   * Clean_subproblems !
+   */
+  clean_thermal_subproblems();
+
   // Correct the vapour and mixed cells values
   correct_temperature_for_eulerian_fluxes();
+
   /*
    * Correct the temperature field using either the ghost-fluid
    * approach or the laminar sub-resolution approach (and zero values for debug)
@@ -872,12 +878,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   compute_temperature_cell_centres();
   set_zero_temperature_increment();
 
-  /*
-   * Clean_subproblems !
-   */
-  clean_thermal_subproblems();
   // correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
-
   // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time

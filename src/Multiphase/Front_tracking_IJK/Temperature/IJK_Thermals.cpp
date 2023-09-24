@@ -339,3 +339,21 @@ void IJK_Thermals::compute_eulerian_curvature_from_interface()
   for (auto& itr : (*this))
     itr.compute_eulerian_curvature_from_interface();
 }
+
+void IJK_Thermals::thermal_subresolution_outputs()
+{
+  const int reset = 1;
+  Nom probe_name = Nom("_thermal_subproblems_interfacial_quantities_time_index_") + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+  Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\ttemperature_interp\ttemperature_solution"
+                         "\ttemperature_gradient\ttemperature_gradient_sol"
+                         "\ttemperature_double_deriv_sol"
+                         "ttemperature_gradient_tangential\ttemperature_gradient_tangential2\ttemperature_gradient_azymuthal"
+                         "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                         "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
+
+  SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+  for (auto& itr : (*this))
+    itr.thermal_subresolution_outputs(fic);
+  fic.close();
+}
+

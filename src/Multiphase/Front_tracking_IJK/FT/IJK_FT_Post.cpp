@@ -932,7 +932,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
      * TODO: Clean IJK_Thermique et IJK_Energie
      */
     thermals_.posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, n);
-
+    thermals_.thermal_subresolution_outputs();
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
   }
 
