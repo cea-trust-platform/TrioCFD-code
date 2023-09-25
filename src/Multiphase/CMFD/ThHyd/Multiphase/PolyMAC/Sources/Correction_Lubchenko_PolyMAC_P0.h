@@ -53,6 +53,7 @@ public :
 protected:
   void ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
   void ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+  void ajouter_blocs_BIF(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
 
   int n_l = -1; //phase liquide
   int is_turb = 0;
