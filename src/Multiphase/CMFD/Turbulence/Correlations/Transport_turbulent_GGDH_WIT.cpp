@@ -30,6 +30,7 @@
 #include <math.h>
 #include <TRUSTTab_parts.h>
 #include <cmath>
+#include <Viscosite_turbulente_multiple.h>
 
 Implemente_instanciable(Transport_turbulent_GGDH_WIT, "Transport_turbulent_GGDH_WIT", Transport_turbulent_base);
 
@@ -41,10 +42,11 @@ Sortie& Transport_turbulent_GGDH_WIT::printOn(Sortie& os) const
 Entree& Transport_turbulent_GGDH_WIT::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("Aspect_ratio", &gamma_);
-  param.ajouter("Influence_area", &delta_);
-  param.ajouter("C_s", &C_s);
-  param.ajouter("Limiteur_alpha", &limiteur_alpha_, Param::REQUIRED);
+  param.ajouter("Aspect_ratio", &gamma_); // rapport d'aspet des bulles
+  param.ajouter("Influence_area", &delta_); // paramètre modèle d'Alméras 2014 (taille du sillage)
+  param.ajouter("C_s", &C_s); // paramètre modèle d'Alméras 2014
+  //param.ajouter("vitesse_rel_attendue", &ur_user, Param::REQUIRED); // valeur de ur à prendre si u_r(i,0)=0
+  param.ajouter("Limiteur_alpha", &limiteur_alpha_, Param::REQUIRED); // valeur minimal de (1-alpha) pour utiliser le modèle d'Alméras
   param.lire_avec_accolades_depuis(is);
 
   if ((C_s <0) && (dimension == 2)) C_s = 1;
@@ -58,8 +60,8 @@ void Transport_turbulent_GGDH_WIT::modifier_mu(const Convection_Diffusion_std& e
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    alp = pb_->get_champ("alpha").passe(), diam = pb_->get_champ("diametre_bulles").valeurs(),
                    &tab_u = pb_->get_champ("vitesse").passe();
-  int i, nl = nu.dimension(0), N = nu.dimension(1), d, db, D = dimension, i_part=-1;
-  if (N!= 1) Process::exit("Only the liquid phase can have WIT for now");
+  int i, nl = nu.dimension(0), N = alp.dimension(1), d, db, D = dimension, i_part=-1;
+  //if (N!= 1) Process::exit("Only the liquid phase can have WIT for now");
   DoubleTrav Rij(0, N, D, D);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);
 
@@ -82,7 +84,8 @@ void Transport_turbulent_GGDH_WIT::modifier_mu(const Convection_Diffusion_std& e
       for (d = 0; d < D; d++)
         for (db = 0; db < D; db++)
           {
-            double temps_carac = 2./3. * 1./(delta_*delta_*delta_)*diam(i, 0) / (pow(gamma_, 2./3.)*alp(i, 0)*u_r(i,0));
+            //double ur = (u_r(i,0)!=0) ? u_r(i,0) : ur_user; // vitesse relative (on ne peut pas diviser par 0)
+            double temps_carac = (u_r(i,0)!=0) ? 2./3. * 1./(delta_*delta_*delta_)*diam(i, 0) / (pow(gamma_, 2./3.)*alp(i, 0)*u_r(i,0)) : 0 ; // si u_r=0 alors pas de WIT donc pas de diffusion du WIT
             nu(i, 0, d, db) += alp(i, 0) * mu0(i, 0) / nu0(i, 0) * C_s * std::max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));
           }
 }
