@@ -102,10 +102,10 @@ void Traitement_particulier_NS_THI_VDF::calcul_spectre(void)
 
 void Traitement_particulier_NS_THI_VDF::sorties_globales(void)
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis.domaine();
-  int nb_som = domaine.nb_som();
-  DoubleTab vit(nb_som,dimension);
+  //const Domaine_dis& zdis = mon_equation->domaine_dis();
+  //const Domaine& domaine = zdis.domaine();
+  //int nb_som = domaine.nb_som();
+  //DoubleTab vit(nb_som,dimension);
   double temps_crt = mon_equation->inconnue().temps();
 
   // dans ce fichier : il y aura : tps_crt, Ec, D, Skewness

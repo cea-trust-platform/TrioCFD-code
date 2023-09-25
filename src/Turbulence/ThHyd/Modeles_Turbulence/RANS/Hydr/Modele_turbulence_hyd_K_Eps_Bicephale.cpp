@@ -115,7 +115,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
 
   Nom type=chK.que_suis_je();
   const DoubleTab& tab_K = chK.valeurs();
-  Nom type_Eps=chEps.que_suis_je();
+  //Nom type_Eps=chEps.que_suis_je();
   const DoubleTab& tab_Eps = chEps.valeurs();
 
   DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
@@ -312,8 +312,8 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K,const Champ_Inc& le_cha
               Process::exit(-1);
             }
         }
-      ConstDoubleTab_parts parts(le_champ_K.valeurs());
-      ConstDoubleTab_parts parts2(le_champ_Eps.valeurs());
+      //ConstDoubleTab_parts parts(le_champ_K.valeurs());
+      //ConstDoubleTab_parts parts2(le_champ_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
           const double k = K(n);

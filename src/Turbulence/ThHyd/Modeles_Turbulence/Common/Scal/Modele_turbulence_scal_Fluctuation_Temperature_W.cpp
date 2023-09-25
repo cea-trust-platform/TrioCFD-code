@@ -54,7 +54,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::set_param(Param& param)
 int Modele_turbulence_scal_Fluctuation_Temperature_W::lire_motcle_non_standard(const Motcle& mot, Entree& s)
 {
   Cerr << "Lecture des parametres du modele de fluctuation thermique. Il doit y avoir deux types d'equation." << finl;
-  Motcle accouverte = "{" , accfermee = "}" ;
+  //Motcle accouverte = "{" , accfermee = "}" ;
   Motcles les_mots(1);
   {
     les_mots[0] = "Transport_Fluctuation_Temperature_W";

@@ -86,7 +86,7 @@ void Paroi_TBLE_QDM::set_param(Param& param)
 
 int Paroi_TBLE_QDM::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  Motcle motlu;
+  //Motcle motlu;
   if (mot=="stats")
     {
       oui_stats=1;

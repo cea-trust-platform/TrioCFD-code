@@ -20,7 +20,7 @@
 #include <Domaine_VEF.h>
 #include <CL_Types_include.h>
 
-extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
+extern double calculer_coef_som(int rang_elem, int dimension, int& nb_face_diri, int *indice_diri);
 Implemente_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face,"Op_Conv_RT_VEF_P1NC",Op_Conv_VEF_Face);
 // XD convection_RT convection_deriv RT 0 Keyword to use RT projection for P1NCP0RT discretization
 
@@ -61,8 +61,8 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Champ_Inc_base& la_vitesse=vitesse();
   const DoubleTab& vitesse_face_absolue=la_vitesse.valeurs();
-  DoubleTab transporte_face_;
-  DoubleTab vitesse_face_;
+  //DoubleTab transporte_face_;
+  //DoubleTab vitesse_face_;
 
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const Domaine& domaine = domaine_VEF.domaine();
@@ -82,7 +82,7 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
     // Cout<<"Op_Conv_RT_VEF_Face::ajouter RT\n";
     // Traitement des CL de Dirichlet
     int nb_face_diri=0;
-    ArrOfInt indice_diri(dimension+1);
+    int indice_diri[4];
     int modif_traitement_diri=0;
     if (sub_type(Domaine_VEF,domaine_VEF))
       modif_traitement_diri=ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet();
@@ -98,9 +98,12 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
                 int numSom=elem_sommets(elem, i);
                 for (dim=0; dim<dimension; dim++) coordSommet(i,dim)=coord_sommets(numSom,dim);
               }
-
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
+              {
+                int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
+                int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+                calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
+              }
             volume=volumes(elem);
             double invVol  = 1./(12*volume);
             double invVol2 = invVol/volume;
@@ -193,7 +196,11 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
             DoubleTab FacesNormales(dimension+1,dimension);
             DoubleVect vitFaceNormale(dimension+1);
             if (modif_traitement_diri)
-              calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
+              {
+                int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
+                int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+                calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
+              }
             volume=volumes(elem);
             for (dim=0; dim<dimension; dim++) rotVit(dim)=0.;
             for (i=0; i<=dimension; i++)
@@ -289,8 +296,8 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
 
-  int nfac = domaine.nb_faces_elem();
-  int nsom = domaine.nb_som_elem();
+  //int nfac = domaine.nb_faces_elem();
+  //int nsom = domaine.nb_som_elem();
   const IntTab& elem_sommets = domaine.les_elems();
   //const DoubleTab& coord_sommets=domaine.domaine().les_sommets();
   // Pour le traitement de la convection on distingue les polyedres
@@ -304,7 +311,7 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
   double psc;
-  DoubleTab pscl=0;
+  //DoubleTab pscl=0;
   int i,j,n_bord;
   int num_face;
   int ncomp_ch_transporte;
@@ -321,14 +328,14 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
   // soit transporte=transporte_ et vitesse_face=phi*vitesse_
   // cela depend si on transporte avec phi u ou avec u.
   const DoubleTab& vitesse_face=modif_par_porosite_si_flag(vitesse_face_absolue,vitesse_face_,marq,porosite_face);
-  ArrOfInt face(nfac);
-  ArrOfDouble vs(dimension);
-  ArrOfDouble vc(dimension);
-  DoubleTab vsom(nsom,dimension);
-  ArrOfDouble cc(dimension);
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  //ArrOfInt face(nfac);
+  //ArrOfDouble vs(dimension);
+  //ArrOfDouble vc(dimension);
+  //DoubleTab vsom(nsom,dimension);
+  //ArrOfDouble cc(dimension);
+  //const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
 
-  Nom nom_elem=type_elemvef.que_suis_je();
+  //Nom nom_elem=type_elemvef.que_suis_je();
 
 
 

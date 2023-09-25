@@ -94,10 +94,10 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Domai
   const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
   //  int nb_elem = le_dom.nb_elem();
   //  int nb_elem_tot = le_dom.nb_elem_tot();
-  const Domaine& domaine=le_dom.domaine();
+  //const Domaine& domaine=le_dom.domaine();
 
-  int nb_faces_elem = domaine.nb_faces_elem();
-  IntTrav numfa(nb_faces_elem);
+  //int nb_faces_elem = domaine.nb_faces_elem();
+  //IntTrav numfa(nb_faces_elem);
   double coef;
   //  const IntTab& elem_faces = le_dom.elem_faces();
   const IntTab& face_voisins = le_dom.face_voisins();

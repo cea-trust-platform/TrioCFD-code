@@ -325,7 +325,7 @@ void ComputeValParCompoInCell::calculer_moy_field_sommet_par_compo(
                       const double surface_facette = surface_facettes[fa7];
                       const double surf = data.fraction_surface_intersection_ * surface_facette;
                       // Les coordonnees du barycentre de la fraction de facette :
-                      Vecteur3 coord_barycentre_fraction(0., 0., 0.);
+                      //Vecteur3 coord_barycentre_fraction(0., 0., 0.);
                       for (int isom = 0; isom < 3; isom++)
                         {
                           // numero du sommet dans le tableau sommets

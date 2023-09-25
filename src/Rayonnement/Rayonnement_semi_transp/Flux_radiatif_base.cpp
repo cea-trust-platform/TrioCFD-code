@@ -45,8 +45,8 @@ Sortie& Flux_radiatif_base::printOn(Sortie& s ) const
  */
 Entree& Flux_radiatif_base::readOn(Entree& is)
 {
-  Nom nom_pb, nom_bord;
-  Motcle nom_champ;
+  //Nom nom_pb, nom_bord;
+  //Motcle nom_champ;
 
   Motcle motlu;
   Motcles les_motcles(2);
