@@ -35,6 +35,7 @@
 #include <Triple_Line_Model_FT_Disc.h>
 #include <Domaine_VF.h>
 #include <Front_VF.h>
+#include <EcrFicPartage.h>
 
 
 Implemente_instanciable( Echange_contact_VDF_FT_Disc, "Echange_contact_VDF_FT_Disc", Echange_contact_VDF ) ;
@@ -57,6 +58,7 @@ Entree& Echange_contact_VDF_FT_Disc::readOn( Entree& s )
   param.ajouter("autre_bord",&nom_bord,Param::REQUIRED); // XD_ADD_P chaine name of other boundary
   param.ajouter("autre_champ_temperature",&nom_champ,Param::REQUIRED); // XD_ADD_P chaine name of other field
   param.ajouter("nom_mon_indicatrice",&nom_champ_indicatrice_,Param::REQUIRED);  // XD_ADD_P chaine name of indicatrice
+  param.ajouter("dt_impr_Tw",&dt_impr_Tw_);
   int phase;
   param.ajouter("phase",&phase,Param::REQUIRED); // XD_ADD_P int phase
   param.lire_avec_accolades(s);
@@ -140,6 +142,8 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
   Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
 
+  Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
+
   if (pbft-> tcl().is_activated())
     {
 
@@ -154,8 +158,6 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
           Triple_Line_Model_FT_Disc *tcl = pbft ? &pbft->tcl() : nullptr;
           const ArrOfDouble& Q_from_CL = tcl->Q();
           const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
-
-          Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
           const IntTab& face_voisins = le_dom.face_voisins();
           const DoubleVect& surface= le_dom.face_surfaces();
 
@@ -213,11 +215,64 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   mon_h.echange_espace_virtuel();
   Echange_global_impose::mettre_a_jour(temps);
   mon_Ti.echange_espace_virtuel();
-  Ti_wall_.mettre_a_jour(temps);
+  Ti_wall_.mettre_a_jour (temps);
+
+  // print Twall, phi_ext_, h_imp_
+
+
+  const Schema_Temps_base& sch = mon_dom_cl_dis->equation().schema_temps();
+  double temps_courant = sch.temps_courant();
+  double temps_prec = sch.temps_precedent();
+  double dt= sch.pas_de_temps() ;
+
+  if (dt_impr_Tw_ != DMAXFLOAT)
+    {
+      bool is_imp = sch.temps_final_atteint () || sch.nb_pas_dt_max_atteint ();
+      is_imp = is_imp || (dt_impr_Tw_ <= dt);
+
+      if (!is_imp)
+        {
+          // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+          double i, j, epsilon = 1.e-8;
+          modf (temps_courant / dt_impr_Tw_ + epsilon, &i);
+          modf (temps_prec / dt_impr_Tw_ + epsilon, &j);
+          is_imp = ( i>j );
+        }
+
+      if (is_imp)
+        {
+
+          int ndeb = frontiere_dis ().frontiere ().num_premiere_face ();
+          int nfin = ndeb + frontiere_dis ().frontiere ().nb_faces ();
+
+
+          EcrFicPartage filTwall;
+          Nom fichier=Objet_U::nom_du_cas()+"_"+nom_pb+"_"+frontiere_dis ().frontiere ().le_nom()+"_"+"twall.face";
+
+          // On cree le fichier au premier pas de temps si il n'y a pas reprise
+          if ( est_egal(temps_prec, 0) && !pb_gen.reprise_effectuee())
+            {
+              filTwall.ouvrir(fichier);
+            }
+          // Sinon on l'ouvre
+          else
+            {
+              filTwall.ouvrir(fichier,ios::app);
+            }
+
+
+
+
+          for (int face = ndeb; face < nfin; face++)
+            {
+              filTwall << temps << " " << le_dom.xv (face, 0) << " "
+                       << le_dom.xv (face, 1) << " " << Ti_wall (face - ndeb) << finl;
+            }
+          filTwall.syncfile ();
+        }
+    }
 
 }
-
-
 
 void Echange_contact_VDF_FT_Disc::completer()
 {
@@ -367,3 +422,5 @@ double Echange_contact_VDF_FT_Disc::Ti_wall(int i) const
   exit();
   return 0.;
 }
+
+

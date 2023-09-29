@@ -6101,7 +6101,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                            << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
                     }
 
-                  if (refequation_transport_.non_nul())
+                  if (refequation_transport_.non_nul() && (sommet_elem_[som[i2]]>0))
                     {
                       const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
                       const Probleme_base& pb = eq_interfaces.get_probleme_base();

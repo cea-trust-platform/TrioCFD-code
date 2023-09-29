@@ -99,6 +99,18 @@ public :
   {
     return thetaC_tcl_;
   };
+  const int& reinjection_tcl() const
+  {
+    return reinjection_tcl_;
+  };
+  const bool& ready_inject_tcl() const
+  {
+    return ready_inject_tcl_;
+  };
+  const double& tempC_tcl() const
+  {
+    return tempC_tcl_;
+  };
   const int& tag_tcl() const
   {
     return tag_tcl_;
@@ -179,12 +191,27 @@ protected :
   int read_via_file_ ;
   Nom Nom_ficher_tcl_;
   DoubleTab tab_Mtcl_;
+  int num_colon_tab_;
   // parameters to force numerical breakup
-  // Radiate of nucleate site; [in number of grids]
+  // Radius of nucleate site; [in number of grids]
   // Distance below which the theta_app will be replaced by a big contact angle thetaC_tcl_ [in degree]
   // to force bubble pinching / necking
   int Rc_tcl_GridN_;
   double thetaC_tcl_;
+  // parameters injection seed nucleate
+  // Size: Using the same Radius defined above (Rc_tcl_gridN_), [in number of grids]
+  // Use the average temperature in the same zone to tell if nucleate site is activted and inject bubbles
+  // Temperature beyond which the site is activeted [in K] T-Tsat
+  // in this case,  we need the initial value for contact angle, thetaC_tcl_ will be used
+  // reinjection: if a re-injection of interface if nessaire
+  int reinjection_tcl_;
+  double tempC_tcl_;
+  bool ready_inject_tcl_;
+  // To summeray:
+  //        - when reinjection_tcl_ is 0;  i.e., by default, the pinching breakup with be used,
+  //           Rc_tcl_GridN_ thetaC_tcl_ control the breakup, thetaC_tcl_ should be large
+  //        - when reinjection_tcl_ is 1;  i.e., there is no the pinching breakup. The bubble goes away directly, we reinject seed
+  //           Rc_tcl_GridN_ thetaC_tcl_ control the initial shape, thetaC_tcl_ should be small...
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.

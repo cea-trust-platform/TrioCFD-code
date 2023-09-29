@@ -1703,7 +1703,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
 
       if (sub_type(Echange_contact_VDF_FT_Disc, la_cl.valeur()))
         {
-          Cerr << "Echange_contact_VDF_FT_Disc" << finl;
+          // Cerr << "Echange_contact_VDF_FT_Disc" << finl;
           /* Le terme de flux calcule a partir du (phi_ext) s'ecrit :
           //                           phi_ext_*Surf
           //                           avec phi_ext : heat flux density at the surface.
