@@ -34,7 +34,7 @@
 #include <Constituant.h>
 #include <Fluide_base.h>
 #include <EFichier.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Probleme_base.h>
 #include <Echange_contact_VDF.h>
 #include <SFichier.h>
@@ -394,7 +394,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   // flux et l'impression du Nusselt.
 
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
   const DoubleVect& tab_ustar = loi.valeur().tab_u_star();
 

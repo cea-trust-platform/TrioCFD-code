@@ -40,60 +40,6 @@ profils_thermo traitement_particulier_base profils_thermo 0 non documente
   attr bloc bloc_lecture bloc 0 not_set
 brech traitement_particulier_base brech 0 non documente
   attr bloc bloc_lecture bloc 0 not_set
-
-pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr constituant constituant constituant 1 Constituents.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr constituant constituant constituant 1 Constituents.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
-  attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr constituant constituant constituant 1 Constituents.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr constituant constituant constituant 1 Constituents.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem. 
-  attr constituant constituant constituant 1 Constituents.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-pb_thermohydraulique_especes_turbulent_qc pb_avec_passif pb_thermohydraulique_especes_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
-  attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
-navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
-convection_diffusion_espece_multi_turbulent_qc eqn_base convection_diffusion_espece_multi_turbulent_qc -1 not_set
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
-  attr espece espece espece 0 not_set
-modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
 mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
   attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
   attr longueur_maille chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) longueur_maille 1 different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
@@ -195,8 +141,6 @@ boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps
 field_uniform_keps_from_ud field_base field_uniform_keps_from_ud 1 field which allows to impose on a domain K and EPS values derived from U velocity and D hydraulic diameter
   attr u floattant u 0 value of velocity specified in boundary condition.
   attr d floattant d 0 value of hydraulic diameter specified in boundary condition
-paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to designate a Robin boundary condition (a.u+b.du/dn=c) associated with the Pironneau methodology for the wall laws. The value of given by the delta option is the distance between the mesh (where symmetry boundary condition is applied) and the fictious wall. This boundary condition needs the definition of the dedicated source terms (Source_Robin or Source_Robin_Scalaire) according the equations used.
-  attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
 diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.

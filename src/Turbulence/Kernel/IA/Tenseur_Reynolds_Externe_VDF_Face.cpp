@@ -146,7 +146,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
 
       eqn_NS_ = ref_cast(Navier_Stokes_Turbulent,eqn);
 
-      const Mod_turb_hyd& modele_turbulence = eqn_NS_.valeur().modele_turbulence();
+      const Modele_turbulence_hyd& modele_turbulence = eqn_NS_.valeur().modele_turbulence();
 
       const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence.valeur());
 

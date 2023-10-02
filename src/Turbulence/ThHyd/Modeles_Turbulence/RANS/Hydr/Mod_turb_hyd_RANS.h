@@ -23,7 +23,7 @@
 #ifndef Mod_turb_hyd_RANS_included
 #define Mod_turb_hyd_RANS_included
 
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
 class Equation_base;
 class Transport_K_Eps_base;
@@ -31,9 +31,9 @@ class Transport_K_Eps_base;
 
 /*! @brief Classe Mod_turb_hyd_RANS Classe de base des modeles de type RANS
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS : public Mod_turb_hyd_base
+class Mod_turb_hyd_RANS : public Modele_turbulence_hyd_base
 {
 
   Declare_base_sans_constructeur(Mod_turb_hyd_RANS);

@@ -24,7 +24,7 @@
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 Implemente_instanciable(Paroi_Cisaillement_Imp_VEF,"UTAU_IMP_VEF",Paroi_hyd_base_VEF);
 

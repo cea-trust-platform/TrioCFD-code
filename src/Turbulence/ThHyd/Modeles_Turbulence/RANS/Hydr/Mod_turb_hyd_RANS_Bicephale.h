@@ -23,7 +23,7 @@
 #ifndef Mod_turb_hyd_RANS_Bicephale_included
 #define Mod_turb_hyd_RANS_Bicephale_included
 
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 class Equation_base;
 class Transport_K_ou_Eps_base;
@@ -31,9 +31,9 @@ class Transport_K_ou_Eps_base;
 
 /*! @brief Classe Mod_turb_hyd_RANS_Bicephale Classe de base des modeles de type RANS en formulation bicephale : les equations de k et epsilon sont gerees separement
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS_Bicephale : public Mod_turb_hyd_base
+class Mod_turb_hyd_RANS_Bicephale : public Modele_turbulence_hyd_base
 {
 
   Declare_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale);

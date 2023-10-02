@@ -71,7 +71,7 @@ void Modele_turbulence_Longueur_Melange_VDF::set_param(Param& param)
 
 int Modele_turbulence_Longueur_Melange_VDF::preparer_calcul( )
 {
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   mettre_a_jour(0.);
   return 1;
 }

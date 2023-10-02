@@ -24,7 +24,7 @@
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale,"Mod_turb_hyd_RANS_Bicephale",Mod_turb_hyd_base);
+Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale,"Mod_turb_hyd_RANS_Bicephale",Modele_turbulence_hyd_base);
 // // XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
@@ -36,30 +36,30 @@ Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
   LeK_MIN = 1.e-10;
   lquiet = 0;
 }
-/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Mod_turb_hyd_RANS_Bicephale::printOn(Sortie& is) const
 {
-  return Mod_turb_hyd_base::printOn(is);
+  return Modele_turbulence_hyd_base::printOn(is);
 }
 
 
-/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Mod_turb_hyd_RANS_Bicephale::readOn(Entree& is)
 {
-  Mod_turb_hyd_base::readOn(is);
+  Modele_turbulence_hyd_base::readOn(is);
   return is;
 }
 void Mod_turb_hyd_RANS_Bicephale::set_param(Param& param)
 {
-  Mod_turb_hyd_base::set_param(param);
+  Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("eps_min",&LeEPS_MIN); // // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
   param.ajouter("eps_max",&LeEPS_MAX); // // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
   param.ajouter("k_min",&LeK_MIN); // // XD_ADD_P double Lower limitation of k (default value 1.e-10).
@@ -96,7 +96,7 @@ const Champ_base& Mod_turb_hyd_RANS_Bicephale::get_champ(const Motcle& nom) cons
 
   try
     {
-      return Mod_turb_hyd_base::get_champ(nom);
+      return Modele_turbulence_hyd_base::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -121,7 +121,7 @@ const Champ_base& Mod_turb_hyd_RANS_Bicephale::get_champ(const Motcle& nom) cons
 }
 void Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Mod_turb_hyd_base::get_noms_champs_postraitables(nom,opt);
+  Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom,opt);
 
   int i;
   int nb_eq = nombre_d_equations();
@@ -143,7 +143,7 @@ void Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(Noms& nom,Option
 int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
 {
 
-  Mod_turb_hyd_base::sauvegarder(os);
+  Modele_turbulence_hyd_base::sauvegarder(os);
   return ( eqn_transp_K().sauvegarder(os) + eqn_transp_Eps().sauvegarder(os) );
 }
 
@@ -158,7 +158,7 @@ int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
  */
 int Mod_turb_hyd_RANS_Bicephale::reprendre(Entree& is)
 {
-  Mod_turb_hyd_base::reprendre(is);
+  Modele_turbulence_hyd_base::reprendre(is);
   if (mon_equation.non_nul())
     {
       return ( eqn_transp_K().reprendre(is) * eqn_transp_Eps().reprendre(is) );
