@@ -1,0 +1,68 @@
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : OpConvIJKQuickScalar.h
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+#ifndef OpConvIJKQuickScalar_include
+
+#include <IJK_Splitting.h>
+#include <Operateur_IJK_base.h>
+#include <Operateur_IJK_data_channel.h>
+
+#Pmacro DEF_Op(ST,CASE,_OP_NAME_)
+
+class _OP_NAME__ST : public Operateur_IJK_elem_base_ST
+{
+ public:
+  _OP_NAME__ST() { stored_curv_fram_layer_z_ = -1000; }
+  void initialize(const IJK_Splitting & splitting);
+  void calculer(const IJK_Field_ST & field,
+		const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
+		IJK_Field_ST & result);
+  void ajouter(const IJK_Field_ST & field,
+	       const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
+	       IJK_Field_ST & result);
+ protected:
+  
+#Pforeach DIR (x y z)
+  void compute_curv_fram_DIR(int k_layer);
+  void compute_flux_DIR(IJK_Field_local_ST & resu, const int k_layer);
+#Pendforeach(DIR)
+
+  Operateur_IJK_data_channel channel_data_;
+
+  // Pointers to input data (set by calculer, used by compute_flux_...)
+  const IJK_Field_local_ST *input_field_;
+  const IJK_Field_local_ST *input_velocity_x_;
+  const IJK_Field_local_ST *input_velocity_y_;
+  const IJK_Field_local_ST *input_velocity_z_;
+
+  // Temporary array to store curvature and fram coefficients
+  // for the current computed flux.
+  // layer k=0 and k=1 are used for "curv", k=2 and k=3 are used for "fram".
+  // layer k=0 and k=2 store the previous values computed in direction "k" (which is used 2 times)
+  IJK_Field_local_ST tmp_curv_fram_;
+  int stored_curv_fram_layer_z_; // which (local) layer is currently stored in layer 0 of the tmp array ?
+  
+};
+#Pendmacro(DEF_Op)
+#Pusemacro(DEF_Op)(double,No_Centre2,OpConvIJKQuickScalar)
+#Pusemacro(DEF_Op)(double,Yes_Centre2,OpConvCentre2IJKScalar)
+
+
+#endif

@@ -1,0 +1,98 @@
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : Operateur_IJK_base.h
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+#ifndef Operateur_IJK_base_H
+#define Operateur_IJK_base_H
+
+#include <IJK_Field.h>
+#include <IJK_Field_simd_tools.h>
+#include <IJK_Splitting.h>
+
+#Pmacro DEFMACRO(ST)
+inline void putzero(IJK_Field_local_ST & flux)
+{
+  const int vsize = Simd_ST::size();
+  const int ni = flux.ni();
+  const int nj = flux.nj();
+  ST *ptr = &flux(0,0,0);
+  ST *end_ptr = &flux(ni-1,nj-1,0);
+  const int n = end_ptr - ptr + 1;
+  Simd_ST zero = 0.;
+  for (int i = 0; i < n; i += vsize)
+    SimdPut(ptr+i, zero);
+}
+
+// Base class for operators on velocity field.
+// It provides the structure for "conservative finite volume" operators:
+//  The operator computes fluxes between the control volumes, then computes the 
+//  divergence of the fluxes (div_set() and div_add() method).
+// The derived class must implement a public "compute" method that will call compute_set()
+// or compute_add() (see for example OpDiffTurbIJK_ST and OpConvCentre4IJK_ST)
+// It must also implement the compute_flux...() methods to compute fluxes between the control volumes.
+class Operateur_IJK_faces_base_ST
+{
+ public:
+  virtual ~Operateur_IJK_faces_base_ST() {};
+  virtual double compute_dtstab_convection_local(IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
+ protected:
+#Pforeach _OP_(set add)
+  void compute__OP_(IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
+#Pendforeach(_OP_)
+
+  // The derived class must implement the computation of fluxes (9 methods)
+  // See for example classes OpDiffTurbIJK_ST and OpConvCentre4IJK_ST.
+#Pforeach DIR (x y z)
+#Pforeach COMPO (x y z)
+  virtual void compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer) = 0;
+#Pendforeach(COMPO)
+#Pendforeach(DIR)
+
+  // The derived class might implement (optional) supplemental computations,
+  // the method is called after computing the divergence of the flux
+  // (example, use it to add velocity * divergence(velocity) for compressible flows)
+  // Default implementation does nothing.
+#Pforeach DIR (x y z)
+  virtual void exec_after_divergence_flux_DIR(IJK_Field_ST & resu, const int k_layer) { };
+#Pendforeach(DIR)
+  
+};
+
+// Same, but base class for operator on cell centered scalar datapeeb
+class Operateur_IJK_elem_base_ST
+{
+ public:
+  virtual ~Operateur_IJK_elem_base_ST() {};
+ protected:
+#Pforeach _OP_(set add)
+  void compute__OP_(IJK_Field_ST & dx);
+#Pendforeach(_OP_)
+
+  // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
+#Pforeach DIR (x y z)
+  virtual void compute_flux_DIR(IJK_Field_local_ST & resu, const int k_layer) = 0;
+#Pendforeach(DIR)
+};
+#Pendmacro(DEFMACRO)
+
+#Pusemacro(DEFMACRO)(double)
+// class FloatVect is missing, cannot implement operators for float type for the moment:
+// usemacro(DEFMACRO)(float)
+
+#endif
