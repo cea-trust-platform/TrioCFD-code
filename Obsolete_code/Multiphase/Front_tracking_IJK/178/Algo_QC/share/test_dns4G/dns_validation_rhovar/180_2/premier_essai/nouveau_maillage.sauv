@@ -1,0 +1,10 @@
+# Fichier ecrit lors de l'execution du jdd interpolate.data #
+{
+ tinit 9.99000000000000021e+00
+ terme_acceleration_init 0.00000000000000000e+00
+ p_thermo_init 2.14072000000000000e+05
+ fichier_reprise_vitesse nouveau_maillage.sauv.lata
+ fichier_reprise_rho nouveau_maillage.sauv.lata
+ timestep_reprise_vitesse 1
+ timestep_reprise_rho 1
+}

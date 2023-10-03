@@ -1,0 +1,83 @@
+# 
+15/05/2013
+Benoit Mathieu et Adrien Toutant
+Canal turbulent isotherme pour validation du qc
+
+Calcul identique au calcul de verification vdf/ijk mais maillage uniforme en k
+#
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 384
+  nbelem_j 384
+  nbelem_k 1536
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_j 0.093764
+  uniform_domain_size_k 0.029846
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 6
+  nproc_j 8
+  nproc_k 2
+  process_grouping_i 2
+  process_grouping_j 4
+  process_grouping_k 2
+}
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 1
+  nb_pas_dt_max 17000
+  multigrid_solver {
+   coarsen_operators 6
+        # k/i=25 j/i=2 #
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 3 } # k/i=12.5 nk=768 #
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 } # k/i=6.25 nk=384 #
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 } # k/i=3.1 nk=192 #
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 2 coarsen_k 2 } # k/i=1.55 j/i=1 nj=192 nk=96 #
+	Coarsen_Operator_Uniform {  }  # ni=192 nj=96 nk=48 #
+	Coarsen_Operator_Uniform {  }  # ni=96  nj=48 nk=24 #
+    ghost_size 5
+    pre_smooth_steps 2 9 4
+    smooth_steps 2 9 4
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil  3e-6 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 3e-5
+    nb_full_mg_steps 2 2 1 
+    solver_precision mixed
+    impr
+  }
+  timestep_facsec 1.
+  
+  tinit 0.
+  expression_vx_init 4.7*z*(0.029846-z)*4/(0.029846*0.029846)
+  expression_vy_init (sin((x-0.093764)/0.093764*6.28318530717959)*sin(z/0.046882*6.28318530717959)+sin((x-0.093764)/0.093764*6.28318530717959*6)*sin(z/0.046882*6.28318530717959*4)*sin(y/(4*0.029846)*6.28318530717959*4)+sin((x-0.093764)/0.093764*6.28318530717959*2)*sin(z/0.046882*6.28318530717959*1)*sin(y/(4*0.029846)*6.28318530717959*7))*y*(0.029846-y)*4/(0.029846*0.029846)+sin(10526.009024960777*y)
+  expression_vz_init 0.
+
+  expression_t_init  293.0
+
+  dt_post 5000
+  champs_a_postraiter 3 velocity pressure temperature
+  dt_sauvegarde 5000
+  nom_sauvegarde dns.sauv
+  check_stop_file dns.stop
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 293.0
+  p_thermo_init       1.0E5
+  cp                  1005.0
+  gamma               1.4 
+
+  terme_force_init    0.0
+  expression_derivee_force (2.96795-v_moyen)*4e8-(force-2.2)*4e4
+}

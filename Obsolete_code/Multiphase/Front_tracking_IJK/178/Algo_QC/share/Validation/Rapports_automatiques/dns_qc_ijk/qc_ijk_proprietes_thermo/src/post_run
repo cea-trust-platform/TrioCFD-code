@@ -1,0 +1,2 @@
+#!/bin/sh
+cp moyenne_spatiale_0.001000.txt profils_thermo.txt

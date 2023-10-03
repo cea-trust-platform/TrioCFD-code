@@ -1,0 +1,301 @@
+# SOLV_TYPE can be GCP MG MG_GMRES #
+# PARALLEL OK 4 #
+# PARAI J K are number of procs in each direction #
+# MESH is MESH64x128x16 or MESH128x128x128 #
+
+
+
+# Le decoupage dans le solveur mg est inverse car j et k sont inverses (dans la version poreux et adrien) #
+
+
+
+
+
+
+
+
+
+
+
+
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+Domaine dom_post
+
+# Codage d'origine du maillage:
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Longueurs  0.093764 0.029846 0.027
+
+		Nombre_de_Noeuds 65 129 17
+		tanh_taille_premiere_maille 8.29e-5
+
+		}
+		{
+		Bord periox   X = 0.          0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord periox   X = 0.093764    0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord perioz   Z = 0.          0. <= X <= 0.093764     0. <= Y <= 0.029846
+		Bord perioz   Z = 0.027    0. <= X <= 0.093764     0. <= Y <= 0.029846  
+		Bord bas      Y = 0.          0. <= X <= 0.093764     0. <= Z <= 0.027
+		Bord haut     Y = 0.029846    0. <= X <= 0.093764     0. <= Z <= 0.027
+		}
+	}
+#
+
+
+
+MaillerParallel
+{
+	domain dom
+	nb_nodes 3  65 129 17
+# DEBUT MAILLAGE #
+	splitting 3 1 1 1
+# FIN MAILLAGE #
+# DEBUT LECTURE 
+	splitting 3 2 1 2
+FIN LECTURE #
+	ghost_thickness 2
+	perio_x
+	perio_z
+	function_coord_x  0.093764*x
+	file_coord_y coord_k_level0.txt
+	function_coord_z 0.027*z
+	boundary_xmin periox
+	boundary_xmax periox
+	boundary_ymin bas
+	boundary_ymax haut
+	boundary_zmin perioz
+	boundary_zmax perioz
+}
+MaillerParallel
+{
+	domain dom_post
+	nb_nodes 3  9 129 5
+# DEBUT MAILLAGE #
+	splitting 3 1 1 1
+# FIN MAILLAGE #
+# DEBUT LECTURE 
+	splitting 3 2 1 2
+FIN LECTURE #
+	ghost_thickness 2
+	perio_x
+	perio_z
+	function_coord_x  0.093764*x
+	file_coord_y coord_k_level0.txt
+	function_coord_z 0.027*z
+	boundary_xmin periox
+	boundary_xmax periox
+	boundary_ymin bas
+	boundary_ymax haut
+	boundary_zmin perioz
+	boundary_zmax perioz
+}
+
+ 
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches 2 1 2 }
+	Larg_joint 2
+	Nom_Zones dom
+		Periodique 2 periox perioz
+}
+
+Fin
+ FIN DECOUPAGE # 
+
+
+
+VDF dis
+/*
+
+Runge_Kutta_Rationnel_ordre_2 sch_ex 
+*/
+
+Runge_Kutta_ordre_3 sch_rk
+Lire sch_rk
+{
+        tinit 0
+        tmax 5
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.01
+        seuil_statio 1.e-8
+	nb_pas_dt_max 3
+}
+
+
+schema_euler_explicite sch_ex
+Lire sch_ex
+{
+        tinit 0.
+	nb_pas_dt_max 3000
+        tmax 0.25
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	dt_start dt_calc
+        seuil_statio 1.e-8
+	
+	diffusion_implicite 0
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature (1.461e-6*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        lambda Champ_Fonc_Fonction 1 temperature (1.93198026315789000e-3*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth conservation_masse
+}
+
+Associer pb dom
+Associer pb sch_rk
+Associer pb fluide
+
+Discretiser pb dis
+# Debog pb seq faces 1e-6 0 #
+IJK_discretization vdf_to_ijk
+Lire vdf_to_ijk
+{
+	vdf_problem pb
+	# DEBUT MAILLAGE #
+	splitting 3 1 1 1
+	# FIN MAILLAGE # 
+	# DEBUT LECTURE 
+	splitting 3 2 1 2
+         FIN LECTURE #
+	y_maps_to k
+	z_maps_to j
+	perio_i
+	perio_j
+}
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+                solveur_pression multigrille_adrien {
+
+		       solver_precision mixed
+			# coarsened meshes in k direction have been generated with generate_coarse.sh #
+			coarsen_operators 5
+				Coarsen_Operator_K { file_z_coord coord_k_level1.txt }
+				Coarsen_Operator_K { file_z_coord coord_k_level2.txt }
+				Coarsen_Operator_K { file_z_coord coord_k_level3.txt }	
+				Coarsen_Operator_Uniform {  }
+				Coarsen_Operator_Uniform {  }
+
+
+			pre_smooth_steps 1  6 
+			smooth_steps 1 6 
+			relax_jacobi 1 0.65
+			solveur_grossier GCP { 
+				seuil  1e-9  
+				precond ssor { omega 1.5 } 
+			}
+			check_residu 1
+			seuil  1e-9 
+			impr
+			nb_full_mg_steps 2 3 1 
+			# iterations_gmres 3 n_krilov 2 nb_full_mg_steps 2 2 1 #
+		}
+
+
+                convection { quick }
+                diffusion { }
+                Sources 
+		{ 
+			Canal_perio { Bord periox h 0.0149 } 
+		}	
+		conditions_initiales 
+		{
+                        vitesse champ_init_canal_sinal 3  { Ucent 15. h 0.0149  ampli_sin 2. omega 67.01 ampli_bruit 0.0 dir_wall 1 dir_flow 0 }
+                }
+                conditions_limites 
+		{
+                        periox   periodique
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		} 
+		Traitement_particulier
+                    		{
+                                Canal
+                            			{
+                                                dt_impr_moy_spat 0.025
+                                                dt_impr_moy_temp 0.025
+						debut_stat 10.
+						fin_stat 20.
+						}
+                                } 
+  
+	}
+				
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources { }
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 
+293.+293.*y/0.029846+sin(x*221.72+5.10)*4.51*sin(y*210.52+0.25)*1.62*sin(z*384.98+5.16)*1.83+sin(x*221.72+0.22)*9.54*sin(y*842.08+3.11)*1.24*sin(z*384.98+0.50)*6.44+sin(x*221.72+5.53)*5.90*sin(y*1894.68+1.84)*1.55*sin(z*384.98+1.74)*1.01+sin(x*886.86+3.43)*0.57*sin(y*210.52+4.88)*9.10*sin(z*384.98+5.40)*2.76+sin(x*886.86+5.01)*2.38*sin(y*842.08+4.91)*3.94*sin(z*384.98+5.25)*4.25+sin(x*886.86+3.82)*2.29*sin(y*1894.68+1.56)*2.77*sin(z*384.98+4.01)*9.67+sin(x*1995.44+5.73)*2.43*sin(y*210.52+2.36)*3.07*sin(z*384.98+4.77)*4.75+sin(x*1995.44+5.72)*1.40*sin(y*842.08+3.94)*3.79*sin(z*384.98+0.18)*3.20+sin(x*1995.44+2.82)*3.31*sin(y*1894.68+0.91)*2.05*sin(z*384.98+1.50)*2.75
+
+}
+		conditions_limites 
+                {
+                 	periox periodique
+			perioz periodique 
+ /*		        haut paroi_flux_impose Champ_Front_Uniforme 1  170.
+			bas paroi_flux_impose Champ_Front_Uniforme 1  -170. */
+			haut paroi_temperature_imposee champ_front_uniforme 1 580.
+			bas paroi_temperature_imposee champ_front_uniforme 1 290.
+		}
+		Modele_turbulence Prandtl
+		{ 
+ 		turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+         { 
+
+	
+		domaine dom_post			
+			format lml
+			Champs  dt_post 1
+			{
+      				vitesse elem
+      				masse_volumique elem
+				temperature_qc elem
+				viscosite_dynamique elem
+				pression elem
+      				viscosite_turbulente elem
+         		}
+        										        
+        }
+	
+	
+
+}
+
+Resoudre pb
+Fin
+

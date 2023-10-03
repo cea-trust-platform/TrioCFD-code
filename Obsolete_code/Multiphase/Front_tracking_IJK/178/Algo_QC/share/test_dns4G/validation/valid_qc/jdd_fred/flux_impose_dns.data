@@ -1,0 +1,67 @@
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 200
+  nbelem_j 2
+  nbelem_k 400
+  uniform_domain_size_i 4.
+  uniform_domain_size_j 0.8
+  uniform_domain_size_k 1.
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+DNS_QC_double
+{
+  ijk_splitting grid_splitting
+  
+  timestep 5
+  timestep_facsec 0.8
+  nb_pas_dt_max 2000
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 3
+      Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+	  
+    ghost_size 2
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-9 precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 3 1
+  }
+  t_paroi_impose_kmin 300. /* temperature paroi froide */
+  t_paroi_impose_kmax 600. /* temperature paroi chaude */
+  p_thermo_init       100000.
+  cp                  1005
+  gamma               1.4
+  calcul_2d
+  expression_vx_init 0.045*z*(1.-z)*4/(1.*1.)
+  expression_vy_init 0.
+  expression_vz_init 0.0045*sin(x*6.28318530717959*10/4.)*z*(1.-z)*4/(1.*1.) 
+
+ /* expression_t_init  293.+10*sin(z*6.28318530717959*1/4.)+2*sin(x*6.28318530717959*10/4.) */
+  expression_t_init 300.+300*z
+
+  terme_acceleration_init         0
+  expression_derivee_acceleration (0.05-v_moyen)*100-sqrt(100*4)*acceleration
+
+  dt_post 10
+  champs_a_postraiter 1 tous
+}
+
+Fin

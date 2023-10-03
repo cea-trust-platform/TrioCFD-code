@@ -1,0 +1,14 @@
+Parameters {
+	Title "canal_turbulent_anisotherme_leger D calculation"
+	Author "fauchet"
+	VersionTrio_U 1.7.4
+ 	TestCase . canal_turbulent_anisotherme_leger.data
+}
+chapitre {
+
+    title "Verfication stat / aux refs " 
+     description \include_text_file(comp_moyenne_spatiale_0.000430.txt)
+     description \include_text_file(comp_statistiques_0.000430.txt)
+
+}
+
