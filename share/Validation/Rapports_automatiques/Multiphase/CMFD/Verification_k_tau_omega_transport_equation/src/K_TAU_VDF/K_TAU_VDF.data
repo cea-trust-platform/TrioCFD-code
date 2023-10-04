@@ -37,12 +37,9 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-VDF  dis
-option_VDF 
-{
+vdf  dis
+option_vdf { all_options  }
 
-all_options
-}
 
 Schema_euler_implicite sch
 Read sch
@@ -67,6 +64,7 @@ Discretize pb dis
 
 Lire pb
 {
+
     Milieu_composite
     {
         liquide_eau Fluide_Incompressible
@@ -79,6 +77,7 @@ Lire pb
         }
 
     }
+
     correlations
     {
     }
@@ -88,7 +87,7 @@ Lire pb
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
         convection { amont }
-        diffusion  { turbulente k_omega { } }
+        diffusion  { turbulente k_tau { } }
         initial_conditions
         {
             vitesse  champ_fonc_xyz dom 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
@@ -144,27 +143,28 @@ Lire pb
         }
         sources
         {
-            Production_energie_cin_turb  ,
+            Production_energie_cin_turb { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }
-    taux_dissipation_turbulent
+    echelle_temporelle_turbulente
     {
         equation_non_resolue	(t>0)
         diffusion { turbulente SGDH { sigma 0.5 } }
         convection { centre }
-        initial_conditions { omega Champ_Fonc_xyz dom 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09) }
+        initial_conditions { tau Champ_Fonc_xyz dom 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09 }
         boundary_conditions
         {
-            periox	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
-            perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
-            perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 (sin(2*3.14*y)+2)/((cos(2*3.14*y)+2)*0.09)
+            periox	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
+            perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
+            perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
         }
         sources
         {
             Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
             Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
             Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+            , diffusion_supplementaire_echelle_temp_turb
         }
     }
     Postraitement
@@ -186,28 +186,32 @@ Lire pb
                 numero_op 1
                 sources { refChamp { pb_champ pb k } }
             }
-            prod_omega 	operateur_eqn	{
+            prod_tau 	operateur_eqn	{
                 numero_source 0
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb tau } }
             }
-            diss_omega 	operateur_eqn	{
+            diss_tau 	operateur_eqn	{
                 numero_source 1
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb tau } }
             }
-            diff_crois_omega operateur_eqn	{
+            diff_crois_tau	operateur_eqn	{
                 numero_source 2
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb tau } }
             }
-            diff_omega	operateur_eqn	{
+            diff_sup_tau  operateur_eqn     {
+                numero_source 3
+                sources { refChamp { pb_champ pb tau } }
+            }
+            diff_tau	operateur_eqn	{
                 numero_op 0
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb tau } }
             }
-            conv_omega 	operateur_eqn	{
+            conv_tau 	operateur_eqn	{
                 numero_op 1
-                sources { refChamp { pb_champ pb omega } }
+                sources { refChamp { pb_champ pb tau } }
             }
             epsilon         transformation {
-                methode formule expression 1 0.09*k_loc*omega_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb omega nom_source omega_loc  } }
+                methode formule expression 1 0.09*k_loc/tau_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb tau nom_source tau_loc  } }
             }
         }
         sondes			{
@@ -216,7 +220,7 @@ Lire pb
             vitesseZ	vitesseZ		periode 1 position_like vitesseX
 
             k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
-            omega		omega			periode 1 position_like k
+            tau		tau			periode 1 position_like k
             epsilon	epsilon		periode 1 position_like k
             nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
 
@@ -225,18 +229,22 @@ Lire pb
             diff_k 	diff_k 		periode 1 position_like k
             conv_k 	conv_k 		periode 1 position_like k
 
-            prod_omega 	prod_omega 		periode 1 position_like omega
-            diss_omega 	diss_omega 		periode 1 position_like omega
-            diff_omega 	diff_omega 		periode 1 position_like omega
-            conv_omega 	conv_omega 		periode 1 position_like omega
-            diff_crois_omega diff_crois_omega		periode 1 position_like omega
+            prod_tau 	prod_tau 		periode 1 position_like tau
+            diss_tau 	diss_tau 		periode 1 position_like tau
+            diff_tau 	diff_tau 		periode 1 position_like tau
+            conv_tau 	conv_tau 		periode 1 position_like tau
+            diff_crois_tau diff_crois_tau           periode 1 position_like tau
+            diff_sup_tau diff_sup_tau		periode 1 position_like tau
+
+
+            grad_v		gradient_vitesse_liquide_eau periode 1 position_like tau
 
             vitesseX_bord	vitesseX		periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
             vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
             vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
 
             k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
-            omega_bord	omega			periode 1 position_like k_bord
+            tau_bord	tau			periode 1 position_like k_bord
             epsilon_bord	epsilon		periode 1 position_like k_bord
             nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
 
@@ -245,24 +253,25 @@ Lire pb
             diff_k_bord 	diff_k 		periode 1 position_like k_bord
             conv_k_bord 	conv_k 		periode 1 position_like k_bord
 
-            prod_omega_bord 	prod_omega 		periode 1 position_like omega_bord
-            diss_omega_bord 	diss_omega 		periode 1 position_like omega_bord
-            diff_omega_bord 	diff_omega 		periode 1 position_like omega_bord
-            conv_omega_bord 	conv_omega 		periode 1 position_like omega_bord
+            prod_tau_bord 	prod_tau 		periode 1 position_like tau_bord
+            diss_tau_bord 	diss_tau 		periode 1 position_like tau_bord
+            diff_tau_bord 	diff_tau 		periode 1 position_like tau_bord
+            conv_tau_bord 	conv_tau 		periode 1 position_like tau_bord
         }
         format lata
         champs binaire dt_post 1e6
         {
             k elem
-            omega elem
+            tau elem
             vitesse elem
             viscosite_turbulente_liquide_eau elem
-	    gradient_vitesse elem
+	    gradient_vitesse_liquide_eau elem
             prod_k elem
             diss_k elem
-            diss_omega elem
-            prod_omega elem
-            diff_crois_omega elem
+            diss_tau elem
+            prod_tau elem
+            diff_crois_tau elem
+            diff_sup_tau elem
         }
     }
 }
