@@ -73,7 +73,7 @@ Entree& Sonde_IJK::readOn( Entree& is )
 {
 
   Motcle motlu;
-  Motcle accolade_ouverte("{");
+  //Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   int nbre_points;
   // initialisation de periode par defaut

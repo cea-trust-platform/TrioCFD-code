@@ -292,7 +292,7 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K_Eps, const Schema_Temps
               Process::exit(-1);
             }
         }
-      ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
+      //ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
           const double k = K_Eps(n,0);

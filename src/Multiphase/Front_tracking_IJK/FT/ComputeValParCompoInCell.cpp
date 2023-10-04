@@ -107,6 +107,7 @@ void ComputeValParCompoInCell::calculer_moyennes_interface_element_pour_compo(
       Cerr << "bary: " << bary[0] << " " << bary[1] << " " << bary[2] << finl;
       Cerr << "normale: " << normale[0] << " " << normale[1] << " " << normale[2] << finl;
       Process::exit();
+
     }
 
   const double norm = normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2];
@@ -324,7 +325,7 @@ void ComputeValParCompoInCell::calculer_moy_field_sommet_par_compo(
                       const double surface_facette = surface_facettes[fa7];
                       const double surf = data.fraction_surface_intersection_ * surface_facette;
                       // Les coordonnees du barycentre de la fraction de facette :
-                      Vecteur3 coord_barycentre_fraction(0., 0., 0.);
+                      //Vecteur3 coord_barycentre_fraction(0., 0., 0.);
                       for (int isom = 0; isom < 3; isom++)
                         {
                           // numero du sommet dans le tableau sommets

@@ -102,16 +102,16 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter_blocs(m
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Domaine_VDF& domaine_VDF, DoubleTab& gteta2 ,const DoubleTab& fluctu_temp, double beta,const DoubleVect& grav) const
 {
   // gteta2 est discretise au centre des elements
-  const int nb_elem = domaine_VDF.nb_elem(), nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  const int nb_elem = domaine_VDF.nb_elem();
+  //DoubleTrav u_teta(nb_faces);
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.grav . tetacarre
-  const Domaine& le_dom=domaine_VDF.domaine();
-  const int nb_faces_elem = le_dom.nb_faces_elem();
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //const int nb_faces_elem = le_dom.nb_faces_elem();
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++) gteta2(elem,dim) = beta*grav(dim)*fluctu_temp(elem,0) ;
@@ -122,17 +122,17 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Domaine_VDF& domaine_VDF,DoubleTab& gteta2 ,const DoubleTab& fluctu_temp,const DoubleTab& beta,const DoubleVect& grav) const
 {
   // gteta2 est discretise au centre des elements
-  const int nb_elem = domaine_VDF.nb_elem(), nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  const int nb_elem = domaine_VDF.nb_elem();//, nb_faces= domaine_VDF.nb_faces();
+  //DoubleTrav u_teta(nb_faces);
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.grav . tetacarre
-  const Domaine& le_dom=domaine_VDF.domaine();
-  const int nb_faces_elem = le_dom.nb_faces_elem();
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //const int nb_faces_elem = le_dom.nb_faces_elem();
 
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++) gteta2(elem,dim) = beta(elem)*grav(dim)*fluctu_temp(elem,0) ;

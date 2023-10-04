@@ -56,8 +56,8 @@ Entree& Paroi_ODVM_scal_VDF::readOn(Entree& is)
 {
 
   Motcle mot_lu;
-  Motcle accolade_ouverte("{");
-  Motcle accolade_fermee("}");
+  //Motcle accolade_ouverte("{");
+  //Motcle accolade_fermee("}");
 
   // Valeurs par defaut
   N= 10;
@@ -78,11 +78,11 @@ Entree& Paroi_ODVM_scal_VDF::readOn(Entree& is)
     les_mots[3]="STATS";
     les_mots[4]="CHECK_FILES";
   }
-  Motcle acc_ouverte("{");
+  //Motcle acc_ouverte("{");
   Motcle acc_fermee("}");
 
   is >> mot_lu;
-  assert(mot_lu==accolade_ouverte);
+  assert(mot_lu=="{");
   is >> mot_lu;
   while(mot_lu != acc_fermee)
     {
@@ -338,32 +338,31 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const DoubleTab& xv = domaine_VDF.xv();
   // TEMP
   //  GF ne marche pas en // et les tests avec num_face==2402  bof..
-  if (0)
-    {
-      //////////////////////////////////////////////////////////////////////////////
-      //Sondes calculs Re_tau =395
-      //////////////////////////////////////////////////////////////////////////////
-      SFichier fic_sonde_temp_31("sonde_ODVM_yp_3_1.dat",ios::app); // impression sonde 3
-      SFichier fic_sonde_temp_61("sonde_ODVM_yp_6_1.dat",ios::app); // impression sonde 6
-      SFichier fic_sonde_temp_91("sonde_ODVM_yp_9_1.dat",ios::app); // impression sonde 9
+#ifdef bidon
+  //////////////////////////////////////////////////////////////////////////////
+  //Sondes calculs Re_tau =395
+  //////////////////////////////////////////////////////////////////////////////
+  SFichier fic_sonde_temp_31("sonde_ODVM_yp_3_1.dat",ios::app); // impression sonde 3
+  SFichier fic_sonde_temp_61("sonde_ODVM_yp_6_1.dat",ios::app); // impression sonde 6
+  SFichier fic_sonde_temp_91("sonde_ODVM_yp_9_1.dat",ios::app); // impression sonde 9
 
-      SFichier fic_sonde_temp_32("sonde_ODVM_yp_3_2.dat",ios::app); // impression sonde 3
-      SFichier fic_sonde_temp_62("sonde_ODVM_yp_6_2.dat",ios::app); // impression sonde 6
-      SFichier fic_sonde_temp_92("sonde_ODVM_yp_9_2.dat",ios::app); // impression sonde 9
+  SFichier fic_sonde_temp_32("sonde_ODVM_yp_3_2.dat",ios::app); // impression sonde 3
+  SFichier fic_sonde_temp_62("sonde_ODVM_yp_6_2.dat",ios::app); // impression sonde 6
+  SFichier fic_sonde_temp_92("sonde_ODVM_yp_9_2.dat",ios::app); // impression sonde 9
 
-      SFichier fic_sonde_temp_33("sonde_ODVM_yp_3_3.dat",ios::app); // impression sonde 3
-      SFichier fic_sonde_temp_63("sonde_ODVM_yp_6_3.dat",ios::app); // impression sonde 6
-      SFichier fic_sonde_temp_93("sonde_ODVM_yp_9_3.dat",ios::app); // impression sonde 9
+  SFichier fic_sonde_temp_33("sonde_ODVM_yp_3_3.dat",ios::app); // impression sonde 3
+  SFichier fic_sonde_temp_63("sonde_ODVM_yp_6_3.dat",ios::app); // impression sonde 6
+  SFichier fic_sonde_temp_93("sonde_ODVM_yp_9_3.dat",ios::app); // impression sonde 9
 
-      SFichier fic_sonde_temp_34("sonde_ODVM_yp_3_4.dat",ios::app); // impression sonde 3
-      SFichier fic_sonde_temp_64("sonde_ODVM_yp_6_4.dat",ios::app); // impression sonde 6
-      SFichier fic_sonde_temp_94("sonde_ODVM_yp_9_4.dat",ios::app); // impression sonde 9
+  SFichier fic_sonde_temp_34("sonde_ODVM_yp_3_4.dat",ios::app); // impression sonde 3
+  SFichier fic_sonde_temp_64("sonde_ODVM_yp_6_4.dat",ios::app); // impression sonde 6
+  SFichier fic_sonde_temp_94("sonde_ODVM_yp_9_4.dat",ios::app); // impression sonde 9
 
-      SFichier fic_sonde_temp_35("sonde_ODVM_yp_3_5.dat",ios::app); // impression sonde 3
-      SFichier fic_sonde_temp_65("sonde_ODVM_yp_6_5.dat",ios::app); // impression sonde 6
-      SFichier fic_sonde_temp_95("sonde_ODVM_yp_9_5.dat",ios::app); // impression sonde 9
-      ////////////////////////////////////////////////////////////////////////////////
-    }
+  SFichier fic_sonde_temp_35("sonde_ODVM_yp_3_5.dat",ios::app); // impression sonde 3
+  SFichier fic_sonde_temp_65("sonde_ODVM_yp_6_5.dat",ios::app); // impression sonde 6
+  SFichier fic_sonde_temp_95("sonde_ODVM_yp_9_5.dat",ios::app); // impression sonde 9
+  ////////////////////////////////////////////////////////////////////////////////
+#endif
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int l_unif;
   double visco=-1;

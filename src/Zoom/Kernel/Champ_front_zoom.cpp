@@ -51,7 +51,7 @@ Sortie& Champ_front_zoom::printOn(Sortie& os) const
 Entree& Champ_front_zoom::readOn(Entree& is)
 {
   //Cerr << "Dans Champ_front_zoom::readOn(Entree& is) " << finl;
-  Nom nature;
+  //Nom nature;
   is >>  nom_pbMG_ >> nom_pbG_ >>  nom_pbF_ >> bord_ >> nom_inco_ ;
   fixer_nb_comp(1); // sinon boom !
   return is;

@@ -76,7 +76,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
-  const DoubleTab& vit = ch.valeurs(), pvit = ch.valeurs(),
+  const DoubleTab& vit = ch.valeurs(),
                    &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
                     &alpha = cha.passe();
 

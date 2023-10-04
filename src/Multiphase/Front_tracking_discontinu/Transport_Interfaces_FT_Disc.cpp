@@ -4584,9 +4584,9 @@ void Transport_Interfaces_FT_Disc::calcul_nb_traverse( const DoubleTab& xe, cons
   const ArrOfInt& index_elem = intersection.index_elem() ;
   const DoubleTab& normale_facettes = maillage.get_update_normale_facettes() ;
   const IntTab& facettes = maillage.facettes() ;
-  const int nb_som  = facettes.line_size() ;
+  //const int nb_som  = facettes.line_size() ;
   const DoubleTab& sommets = maillage.sommets() ;
-  IntTab Som( nb_som ) ;
+  //IntTab Som( nb_som ) ;
   // Pour un element donne, on parcourt ces facettes
   int index = index_elem[elem] ;
   const double precision = Objet_U::precision_geom ;

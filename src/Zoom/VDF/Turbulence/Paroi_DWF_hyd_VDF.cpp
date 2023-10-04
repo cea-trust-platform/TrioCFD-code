@@ -98,8 +98,8 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
 
   Probleme_base& pb_thhyd = mon_modele_turb_hyd->equation().probleme();
 
-  Nom nom_pbmg("export Pb_MG pbMG");
-  EChaine ch_pbmg(nom_pbmg);
+  //Nom nom_pbmg("export Pb_MG pbMG");
+  //EChaine ch_pbmg(nom_pbmg);
   //interpreter(ch_pbmg);
 
   Nom pbMGName("pbMG");

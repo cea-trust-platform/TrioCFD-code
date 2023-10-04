@@ -1095,7 +1095,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
     {
       Nom xyz_name(fichier_sauvegarde);
       xyz_name += ".xyz";
-      Nom xyz_name_ascii = xyz_name + "_ascii";
+      // Nom xyz_name_ascii = xyz_name + "_ascii";
       dumpxyz_vector(velocity_, xyz_name, true);
       //  dumpxyz_vector(velocity_, xyz_name_ascii, false);
     }
@@ -1359,7 +1359,7 @@ int IJK_FT_double::initialise()
       std::cout << "in initialise i_offset : " << gbz_splitting.get_offset_local(DIRECTION_I) << std::endl;
       std::cout << "Process::me()" << Process::me() << std::endl;
       forcage_.compute_initial_chouippe(nproc_tot,my_geom,my_ni,my_nj,my_nk,gbz_splitting,nom_sauvegarde_);
-      statistiques().begin_count(m2);
+      statistiques().begin_count(m2_counter_);
       Cout << "AF compute_initial_chouippe" << finl;
     }
 
@@ -1462,7 +1462,6 @@ int IJK_FT_double::initialise()
   // TODO: a valider
   // if (!disable_diphasique_)
   interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
-
   nalloc += post_.initialise(reprise_);
 
   // statistiques...
@@ -3656,7 +3655,7 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
                                           // const int rk_step
                                          )
 {
-  statistiques().begin_count(m2);
+  statistiques().begin_count(m2_counter_);
   if (forcage_.get_forced_advection()==-1)
     {
       ArrOfDouble mean_u_liq;
@@ -3673,11 +3672,11 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
       Cout << "AF : update_advection_length" << finl;
     }
   forcage_.compute_THI_force(time_iteration,dt,current_time,splitting_);
-  statistiques().end_count(m2);
 
+  statistiques().end_count(m2_counter_);
 
+  statistiques().begin_count(m3_counter_);
 
-  statistiques().begin_count(m3);
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
   for(int dir=0; dir<3; dir++)
     {
@@ -3698,7 +3697,7 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
               velocity_[dir](i,j,k) += force[dir](i,j,k)*inv_cell_mass*dt;
             }
     }
-  statistiques().end_count(m3);
+  statistiques().end_count(m3_counter_);
 
 }
 
@@ -3711,7 +3710,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
                                                          // const int rk_step
                                                         )
 {
-  statistiques().begin_count(m2);
+  statistiques().begin_count(m2_counter_);
   if (forcage_.get_forced_advection()==-1)
     {
       /* Advection du champ de force par mean{u_l}^l */
@@ -3732,12 +3731,10 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
       forcage_.update_advection_length(dt);
     }
   forcage_.compute_THI_force(time_iteration,dt,current_time,splitting_);
-  statistiques().end_count(m2);
-  // forcage_.get_force_ph2() a quelques cellules fantomes, on doit les comuniuer aux procs voisins, notament en vue de produire des champs cell_force_ph justes.
-  // forcage_.get_force_ph2()[0].echange_espace_virtuel(forcage_.get_force_ph2()[0].ghost());
-  // forcage_.get_force_ph2()[1].echange_espace_virtuel(forcage_.get_force_ph2()[1].ghost());
-  // forcage_.get_force_ph2()[2].echange_espace_virtuel(forcage_.get_force_ph2()[2].ghost());
-  statistiques().begin_count(m3);
+  statistiques().end_count(m2_counter_);
+
+  statistiques().begin_count(m3_counter_);
+
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
 
   for(int dir=0; dir<3; dir++)
@@ -3788,7 +3785,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
         }
       d_velocity_[dir].echange_espace_virtuel(d_velocity_[dir].ghost());
     }
-  statistiques().end_count(m3);
+  statistiques().end_count(m3_counter_);
   Cout << "end of from_spect_to_phys_opti2_advection" << finl;
 }
 // -----------------------------------------------------------------------------------
@@ -5074,4 +5071,3 @@ IJK_Field_double IJK_FT_double::scalar_fields_product(const IJK_Field_double& S1
   // Communication avec tous les process ?
   return resu;
 }
-

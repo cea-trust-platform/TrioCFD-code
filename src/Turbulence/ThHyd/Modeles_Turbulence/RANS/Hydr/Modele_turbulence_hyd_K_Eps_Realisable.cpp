@@ -128,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN)
             visco_turb_K_eps_Rea[i] = 0;
           else
             visco_turb_K_eps_Rea[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -142,7 +142,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
     {
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN)
             visco_turb[i] = 0;
           else
             visco_turb[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -183,7 +183,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
               Process::exit(-1);
             }
         }
-      ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
+      //ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
           const double k = tabKEps(n,0);

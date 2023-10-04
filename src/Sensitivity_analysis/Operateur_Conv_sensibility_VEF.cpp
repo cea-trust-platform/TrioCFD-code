@@ -964,10 +964,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   ArrOfDouble vc(dimension);
   ArrOfDouble vc_inco(dimension);
   ArrOfDouble cc(dimension);
-  DoubleVect xc(dimension);
+  //DoubleVect xc(dimension);
   DoubleTab vsom(nsom,dimension);
   DoubleTab vsom_inco(nsom,dimension);
-  DoubleTab xsom(nsom,dimension);
+  //DoubleTab xsom(nsom,dimension);
 
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
@@ -1357,10 +1357,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   ArrOfDouble vc(dimension);
   ArrOfDouble vc_state(dimension);
   ArrOfDouble cc(dimension);
-  DoubleVect xc(dimension);
+  //DoubleVect xc(dimension);
   DoubleTab vsom(nsom,dimension);
   DoubleTab vsom_state(nsom,dimension);
-  DoubleTab xsom(nsom,dimension);
+  //DoubleTab xsom(nsom,dimension);
 
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
@@ -2044,8 +2044,8 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   int n_bord0;
   double valA;//,flux;
-  DoubleVect n(Objet_U::dimension);
-  DoubleTrav Tgrad(Objet_U::dimension,Objet_U::dimension);
+  //DoubleVect n(Objet_U::dimension);
+  //DoubleTrav Tgrad(Objet_U::dimension,Objet_U::dimension);
 
   // On dimensionne et initialise le tableau des bilans de flux:
   tab_flux_bords.resize(domaine_VEF.nb_faces_bord(),nb_comp);

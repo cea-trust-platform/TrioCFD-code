@@ -58,7 +58,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_sta
 {
 
   Cerr << "Lecture des parametres du modele de fluctuation thermique." << finl;
-  Motcle accouverte = "{" , accfermee = "}" ;
+  //Motcle accouverte = "{" , accfermee = "}" ;
   Motcles les_mots(2);
   {
     les_mots[0] = "Transport_Fluctuation_Temperature_W_Bas_Re";
