@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir -p regul
 
 cp ibc_ftd/* regul/
