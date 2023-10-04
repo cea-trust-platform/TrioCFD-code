@@ -169,7 +169,11 @@ agit
 	    type_vitesse_imposee analytique
 	    n_iterations_interpolation_ibc 1
             seuil_convergence_uzawa 1e-16 
-            nb_iteration_max_uzawa 50000 
+            
+            # the parameter 'nb_iteration_max_uzawa' shall be set to : #
+            # - 50000 for validation #
+            # - 100 for non-regression #
+            nb_iteration_max_uzawa 100 
     }
     cuve
     {
