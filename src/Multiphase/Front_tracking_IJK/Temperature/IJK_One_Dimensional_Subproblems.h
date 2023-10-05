@@ -61,6 +61,8 @@ public :
                                        ArrOfDouble rising_velocities,
                                        DoubleTab rising_vectors,
                                        DoubleTab bubbles_barycentre,
+                                       int advected_frame_of_reference,
+                                       int neglect_frame_of_reference_radial_advection,
                                        const int& points_per_thermal_subproblem,
                                        const double& alpha,
                                        const double& lambda,

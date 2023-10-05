@@ -477,6 +477,10 @@ protected:
   FixedVector<IJK_Field_double, 3> hess_diag_T_elem_;
   FixedVector<IJK_Field_double, 3> hess_cross_T_elem_;
   FixedVector<IJK_Field_double, 3> facets_barycentre;
+  IJK_Field_double d_temperature_uncorrected_;
+  IJK_Field_double div_coeff_grad_T_volume_uncorrected_;
+  Operateur_IJK_elem_conv temperature_convection_op_uncorrected_;
+  Operateur_IJK_elem_diff temperature_diffusion_op_uncorrected_;
   int compute_hess_T_elem_;
   int compute_hess_diag_T_elem_;
   int compute_hess_cross_T_elem_;

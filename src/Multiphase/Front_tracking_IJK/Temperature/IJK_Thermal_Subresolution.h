@@ -156,6 +156,9 @@ protected :
   int impose_user_boundary_condition_end_value_;
   int source_terms_type_;
   int source_terms_correction_;
+  int advected_frame_of_reference_;
+  int neglect_frame_of_reference_radial_advection_;
+  int approximate_temperature_increment_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

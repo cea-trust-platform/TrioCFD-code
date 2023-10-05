@@ -76,6 +76,9 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   // one_dimensional_advection_diffusion_thermal_solver_.typer("Solv_GCP");
   discrete_integral_ = 0;
   quadtree_levels_ = 1;
+  advected_frame_of_reference_=0;
+  neglect_frame_of_reference_radial_advection_=1;
+  approximate_temperature_increment_=0;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -94,6 +97,8 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
   IJK_Thermal_base::readOn( is );
   if (ghost_fluid_)
     override_vapour_mixed_values_ = 1;
+  if (!ghost_fluid_)
+    approximate_temperature_increment_ = 0;
   if (convective_flux_correction_ || diffusive_flux_correction_)
     compute_grad_T_elem_ = 1;
   if (boundary_condition_interface_ == -1 && (!impose_boundary_condition_interface_from_simulation_ && interfacial_boundary_condition_value_!=0.))
@@ -149,9 +154,12 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 
   param.ajouter_flag("discrete_integral", &discrete_integral_);
   param.ajouter("quadtree_levels", &quadtree_levels_);
+  param.ajouter_flag("advected_frame_of_reference", &advected_frame_of_reference_);
+  param.ajouter_flag("neglect_frame_of_reference_radial_advection", &neglect_frame_of_reference_radial_advection_);
+  param.ajouter_flag("approximate_temperature_increment", &approximate_temperature_increment_);
 
-//  for (int i=0; i<fd_solvers_jdd_.size(); i++)
-//    param.ajouter_non_std(fd_solvers_jdd_[i], this);
+  //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
+  //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
 
 int IJK_Thermal_Subresolution::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -217,6 +225,19 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       temperature_convection_op_.typer("OpConvQuickInterfaceIJKScalar_double");
       temperature_convection_op_.initialize(splitting);
       temperature_convection_op_.set_corrige_flux(corrige_flux_);
+    }
+
+  if (approximate_temperature_increment_)
+    {
+      d_temperature_uncorrected_.allocate(splitting, IJK_Splitting::ELEM, 2);
+      div_coeff_grad_T_volume_uncorrected_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 2;
+      // Centre2
+      temperature_diffusion_op_.typer("standard");
+      temperature_diffusion_op_.initialize(splitting);
+      // Quick
+      temperature_convection_op_.typer("standard");
+      temperature_convection_op_.initialize(splitting);
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);
@@ -540,6 +561,8 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            rising_velocities_,
                                                                            rising_vectors_,
                                                                            bubbles_barycentre_,
+                                                                           advected_frame_of_reference_,
+                                                                           neglect_frame_of_reference_radial_advection_,
                                                                            points_per_thermal_subproblem_,
                                                                            uniform_alpha_,
                                                                            uniform_lambda_,

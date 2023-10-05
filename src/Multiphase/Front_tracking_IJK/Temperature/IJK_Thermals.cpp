@@ -349,7 +349,13 @@ void IJK_Thermals::thermal_subresolution_outputs()
                          "\ttemperature_double_deriv_sol"
                          "ttemperature_gradient_tangential\ttemperature_gradient_tangential2\ttemperature_gradient_azymuthal"
                          "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
-                         "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
+                         "\tu_x\tu_y\tu_z"
+                         "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
+                         "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
+                         "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
+                         "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
+                         "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
+                         "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
 
   SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
   for (auto& itr : (*this))

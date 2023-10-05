@@ -71,6 +71,8 @@ public :
                                        double bubble_rising_velocity,
                                        ArrOfDouble bubble_rising_vector,
                                        ArrOfDouble bubbles_barycentre,
+                                       int advected_frame_of_reference,
+                                       int neglect_frame_of_reference_radial_advection,
                                        const int& points_per_thermal_subproblem,
                                        const double& alpha,
                                        const double& lambda,
@@ -117,6 +119,7 @@ public :
   void retrieve_radial_quantities();
   void compute_local_temperature_gradient_solution();
   double get_interfacial_gradient_corrected() const;
+  double get_interfacial_double_derivative_corrected() const;
 
   void compute_local_velocity_gradient();
   double get_normal_velocity_normal_gradient() const;
@@ -125,7 +128,7 @@ public :
   double get_azymuthal_velocity_normal_gradient() const;
 
   void get_ijk_indices(int& i, int& j, int& k) const;
-  double get_field_profile_at_point(const double& dist, const DoubleVect& field) const;
+  double get_field_profile_at_point(const double& dist, const DoubleVect& field, const int temp_bool) const;
   double get_temperature_profile_at_point(const double& dist) const;
   double get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const;
   DoubleVect get_field_discrete_integral_velocity_weighting_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field, const int vel) const;
@@ -176,6 +179,8 @@ protected :
     bubble_rising_velocity_ = bubble_rising_velocity;
     bubble_rising_vector_ = Vecteur3(bubble_rising_vector);
     bubble_barycentre_ = Vecteur3(bubble_barycentre);
+    bubble_rising_velocity_compo_ =  bubble_rising_vector_;
+    bubble_rising_velocity_compo_ *= bubble_rising_velocity_;
   };
 
   void associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
@@ -216,6 +221,9 @@ protected :
   void interpolate_project_velocities_on_probes();
   void interpolate_cartesian_velocities_on_probes();
   void project_velocities_on_probes();
+  void correct_velocities();
+  void correct_velocity(const DoubleVect& velocity, DoubleVect& velocity_corrected);
+  void correct_velocity_rise(const DoubleVect& velocity, const Vecteur3& basis, DoubleVect& velocity_corrected);
   void correct_radial_velocity();
   void project_cartesian_onto_basis_vector(const DoubleVect& compo_x, const DoubleVect& compo_y, const DoubleVect& compo_z, const Vecteur3& basis, DoubleVect& projection);
   void project_basis_vector_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
@@ -226,6 +234,17 @@ protected :
   void project_temperature_gradient_on_probes();
   void interpolate_temperature_hessian_on_probe();
   void project_temperature_hessian_on_probes();
+  void approximate_partial_temperature_time_increment();
+  void approximate_temperature_material_derivatives();
+  void approximate_temperature_material_derivatives(const Vecteur3& normal_vector_compo,
+                                                    const Vecteur3& first_tangential_vector_compo,
+                                                    const Vecteur3& second_tangential_vector_compo,
+                                                    const DoubleVect& radial_velocity_frame,
+                                                    const DoubleVect& first_tangential_velocity_frame,
+                                                    const DoubleVect& second_tangential_velocity_frame,
+                                                    const DoubleVect& temperature_time_increment,
+                                                    DoubleVect& convective_term,
+                                                    DoubleVect& material_derivative);
   void correct_tangential_temperature_gradient(DoubleVect& tangential_convection_source_terms);
   void correct_tangential_temperature_hessian(DoubleVect& tangential_diffusion_source_terms);
   void find_interval(const double& dist, int& left_interval, int& right_interval) const;
@@ -234,6 +253,8 @@ protected :
   void post_process_radial_quantities(const int rank);
 
   int debug_;
+  int advected_frame_of_reference_=1;
+  int neglect_frame_of_reference_radial_advection_=1;
   /*
    * FIXME: Should I use only references or just for IJK_Field_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?
@@ -251,6 +272,7 @@ protected :
 
   double bubble_rising_velocity_ = 0.;
   Vecteur3 bubble_rising_vector_;
+  Vecteur3 bubble_rising_velocity_compo_;
   Vecteur3 bubble_barycentre_;
   Vecteur3 facet_barycentre_relative_;
 
@@ -271,7 +293,7 @@ protected :
   Vecteur3 azymuthal_vector_compo_raw_;
   Vecteur3 azymuthal_vector_compo_;
 
-  bool tangential_from_rising_vel = false;
+  bool tangential_from_rising_vel_ = false;
   Vecteur3 * first_tangential_vector_compo_solver_;
   Vecteur3 * second_tangential_vector_compo_solver_;
 
@@ -363,12 +385,43 @@ protected :
   DoubleVect y_velocity_corrected_;
   DoubleVect z_velocity_corrected_;
   DoubleVect radial_velocity_;
+  DoubleVect radial_velocity_advected_frame_;
+  DoubleVect radial_velocity_static_frame_;
   DoubleVect radial_velocity_corrected_;
   DoubleVect first_tangential_velocity_;
-  DoubleVect azymuthal_velocity_;
+  DoubleVect first_tangential_velocity_advected_frame_;
+  DoubleVect first_tangential_velocity_static_frame_;
+  DoubleVect first_tangential_velocity_corrected_;
   DoubleVect second_tangential_velocity_;
+  DoubleVect second_tangential_velocity_advected_frame_;
+  DoubleVect second_tangential_velocity_static_frame_;
+  DoubleVect second_tangential_velocity_corrected_;
+  DoubleVect first_tangential_velocity_from_rising_dir_;
+  DoubleVect first_tangential_velocity_from_rising_dir_advected_frame_;
+  DoubleVect first_tangential_velocity_from_rising_dir_static_frame_;
+  DoubleVect first_tangential_velocity_from_rising_dir_corrected_;
+  DoubleVect azymuthal_velocity_;
+  DoubleVect azymuthal_velocity_advected_frame_;
+  DoubleVect azymuthal_velocity_static_frame_;
+  DoubleVect azymuthal_velocity_corrected_;
+  DoubleVect * first_tangential_velocity_solver_;
+  DoubleVect * second_tangential_velocity_solver_;
   DoubleVect radial_convection_prefactor_;
   DoubleVect temperature_interp_;
+  DoubleVect temperature_time_increment_;
+  DoubleVect temperature_time_increment_from_eulerian_;
+  DoubleVect material_derivative_advected_frame_;
+  DoubleVect material_derivative_static_frame_;
+  DoubleVect material_derivative_advected_frame_rising_;
+  DoubleVect material_derivative_static_frame_rising_;
+  DoubleVect material_derivative_velocity_advected_frame_;
+  DoubleVect material_derivative_velocity_static_frame_;
+  DoubleVect material_derivative_velocity_advected_frame_rising_;
+  DoubleVect material_derivative_velocity_static_frame_rising_;
+  DoubleVect convective_term_advected_frame_;
+  DoubleVect convective_term_static_frame_;
+  DoubleVect convective_term_advected_frame_rising_;
+  DoubleVect convective_term_static_frame_rising_;
   FixedVector<DoubleVect, 3> grad_T_elem_interp_;
   FixedVector<DoubleVect, 3> hess_diag_T_elem_interp_;
   FixedVector<DoubleVect, 3> hess_cross_T_elem_interp_;
@@ -378,7 +431,10 @@ protected :
   DoubleVect normal_temperature_gradient_;
   DoubleVect tangential_temperature_gradient_first_;
   DoubleVect tangential_temperature_gradient_second_;
+  DoubleVect tangential_temperature_gradient_first_from_rising_dir_;
   DoubleVect azymuthal_temperature_gradient_;
+  DoubleVect * tangential_temperature_gradient_first_solver_;
+  DoubleVect * tangential_temperature_gradient_second_solver_;
   DoubleVect tangential_hessian_contribution_;
   DoubleVect tangential_convection_source_terms_first_;
   DoubleVect tangential_convection_source_terms_second_;
@@ -409,9 +465,13 @@ protected :
   DoubleVect thermal_flux_;
 
   DoubleVect normal_velocity_normal_gradient_;
-  DoubleVect tangential_velocity_normal_gradient_;
+  DoubleVect first_tangential_velocity_normal_gradient_;
   DoubleVect second_tangential_velocity_normal_gradient_;
   DoubleVect azymuthal_velocity_normal_gradient_;
+  DoubleVect first_tangential_velocity_gradient_from_rising_dir_;
+
+  int order_approx_temperature_ext_=1;
+  int avoid_post_processing_all_terms_=0;
 
   REF(IJK_FT_double) ref_ijk_ft_;
   bool is_updated_=false;
