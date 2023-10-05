@@ -99,6 +99,7 @@ public :
                                   const double& end_boundary_condition_value,
                                   const int& impose_user_boundary_condition_end_value);
   void compute_add_source_terms();
+  void approximate_temperature_increment_material_derivative();
   void retrieve_radial_quantities();
   void retrieve_temperature_solutions();
   void compute_local_temperature_gradient_solutions();

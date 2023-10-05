@@ -77,6 +77,7 @@ protected :
   void compute_radial_subresolution_convection_diffusion_operators();
   void impose_subresolution_boundary_conditions();
   void compute_add_subresolution_source_terms();
+  void approximate_temperature_increment_material_derivative();
   void compute_radial_first_second_order_operators(Matrice& radial_first_order_operator_raw,
                                                    Matrice& radial_second_order_operator_raw,
                                                    Matrice& radial_first_order_operator,

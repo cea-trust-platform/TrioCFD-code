@@ -384,6 +384,10 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   compute_add_subresolution_source_terms();
 
   if (debug_)
+    Cerr << "Compute material derivative (modelling)" << finl;
+  approximate_temperature_increment_material_derivative();
+
+  if (debug_)
     Cerr << "Solve thermal subproblems" << finl;
   solve_thermal_subproblems();
 
@@ -657,6 +661,14 @@ void IJK_Thermal_Subresolution::compute_add_subresolution_source_terms()
   if (!disable_subresolution_)
     {
       thermal_local_subproblems_.compute_add_source_terms();
+    }
+}
+
+void IJK_Thermal_Subresolution::approximate_temperature_increment_material_derivative()
+{
+  if (!disable_subresolution_)
+    {
+      thermal_local_subproblems_.approximate_temperature_increment_material_derivative();
     }
 }
 

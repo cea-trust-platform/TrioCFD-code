@@ -115,6 +115,7 @@ public :
                                   const double& end_boundary_condition_value,
                                   const int& impose_user_boundary_condition_end_value);
   void compute_add_source_terms();
+  void approximate_temperature_increment_material_derivative();
   void retrieve_temperature_solution();
   void retrieve_radial_quantities();
   void compute_local_temperature_gradient_solution();
@@ -234,6 +235,9 @@ protected :
   void project_temperature_gradient_on_probes();
   void interpolate_temperature_hessian_on_probe();
   void project_temperature_hessian_on_probes();
+  void retrieve_temperature_diffusion_spherical_on_probes();
+  void compute_projection_matrix_cartesian_to_local_spherical();
+  void project_matrix_on_basis(const Matrice33& projection_matrix, const Matrice33& inverse_projection_matrix, const Matrice33& matrix, Matrice33& projected_matrix);
   void approximate_partial_temperature_time_increment();
   void approximate_temperature_material_derivatives();
   void approximate_temperature_material_derivatives(const Vecteur3& normal_vector_compo,
@@ -299,6 +303,10 @@ protected :
 
   Vecteur3 interfacial_temperature_gradient_compo_;
   Matrice33 interfacial_temperature_hessian_compo_;
+  Matrice33 projection_matrix_;
+  Matrice33 inverse_projection_matrix_;
+  Matrice33 projection_matrix_from_rising_;
+  Matrice33 inverse_projection_matrix_from_rising_;
 
   double normal_interfacial_gradient_ = 0;
   Vecteur3 normal_interfacial_gradient_compo_;
@@ -425,9 +433,16 @@ protected :
   FixedVector<DoubleVect, 3> grad_T_elem_interp_;
   FixedVector<DoubleVect, 3> hess_diag_T_elem_interp_;
   FixedVector<DoubleVect, 3> hess_cross_T_elem_interp_;
+  FixedVector<DoubleVect, 3> hess_diag_T_elem_spherical_;
+  FixedVector<DoubleVect, 3> hess_cross_T_elem_spherical_;
+  FixedVector<DoubleVect, 3> hess_diag_T_elem_spherical_from_rising_;
+  FixedVector<DoubleVect, 3> hess_cross_T_elem_spherical_from_rising_;
+  DoubleVect temperature_diffusion_hessian_trace_;
+  DoubleVect radial_temperature_diffusion_;
+  DoubleVect tangential_temperature_diffusion_;
 
   int source_terms_type_=0;
-  enum Source_terms { linear_diffusion, spherical_diffusion, tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_2D, tangential_conv_3D_tangentual_diffusion_3D};
+  enum Source_terms { linear_diffusion, spherical_diffusion, tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_3D, tangential_conv_3D_tangentual_diffusion_3D};
   DoubleVect normal_temperature_gradient_;
   DoubleVect tangential_temperature_gradient_first_;
   DoubleVect tangential_temperature_gradient_second_;

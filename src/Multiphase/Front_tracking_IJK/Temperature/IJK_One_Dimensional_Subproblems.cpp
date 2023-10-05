@@ -217,6 +217,12 @@ void IJK_One_Dimensional_Subproblems::compute_add_source_terms()
     itr.compute_add_source_terms();
 }
 
+void IJK_One_Dimensional_Subproblems::approximate_temperature_increment_material_derivative()
+{
+  for (auto& itr : *this)
+    itr.approximate_temperature_increment_material_derivative();
+}
+
 void IJK_One_Dimensional_Subproblems::retrieve_radial_quantities()
 {
   for (auto& itr : *this)
