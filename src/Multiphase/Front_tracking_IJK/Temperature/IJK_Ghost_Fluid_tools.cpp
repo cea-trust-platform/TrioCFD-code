@@ -873,6 +873,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
 void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_double& distance,
                                                             const IJK_Field_double& indicator,
                                                             const IJK_Field_double& interfacial_area,
+                                                            const IJK_Field_double& curvature,
                                                             const	IJK_Field_double& temperature,
                                                             IJK_Field_double& grad_T_interface)
 {
@@ -909,7 +910,11 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                   if ((indic > liquid_indicator) && (d > invalid_value) && grad_T_interface(i+ii,j+jj,k+kk) == 0)
                     {
                       const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
-                      grad_T_interface(i+ii,j+jj,k+kk) = temperature_liquid / d;
+                      const double second_order_gradient = temperature_liquid / d;
+                      const double kappa = curvature(i+ii,j+jj,k+kk);
+                      // TODO: Check sign kappa
+                      const double grad_T_modified = second_order_gradient * (1. - 0.5 * kappa * d);
+                      grad_T_interface(i+ii,j+jj,k+kk) = grad_T_modified;
                     }
                 }
             }
@@ -946,7 +951,7 @@ void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfac
 void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
                                            const IJK_Field_double& curvature,
-                                           const IJK_Field_double& grad_T_interface,
+                                           IJK_Field_double& grad_T_interface,
                                            IJK_Field_double& temperature)
 {
   /*
@@ -967,7 +972,7 @@ void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
           if ((d > invalid_test) && (indicator_vapour > VAPOUR_INDICATOR_TEST) && (grad_T != 0) && (temperature_val == 0))
             {
               const double kappa = curvature(i,j,k);
-              const double temperature_ghost = d * grad_T * (1. - 0.5 * kappa * d + kappa * kappa * d * d / 6);
+              const double temperature_ghost = d * grad_T * (1. + 0.5 * kappa * d + kappa * kappa * d * d / 6.);
               temperature(i,j,k) = temperature_ghost;
             }
         }

@@ -143,10 +143,11 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("source_terms_type", &source_terms_type_);
   param.dictionnaire("linear_diffusion", 0);
   param.dictionnaire("spherical_diffusion",1);
-  param.dictionnaire("tangential_conv_2D", 2);
-  param.dictionnaire("tangential_conv_3D", 3);
-  param.dictionnaire("tangential_conv_2D_tangential_diffusion_2D", 4);
-  param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 5);
+  param.dictionnaire("spherical_diffusion_approx",2);
+  param.dictionnaire("tangential_conv_2D", 3);
+  param.dictionnaire("tangential_conv_3D", 4);
+  param.dictionnaire("tangential_conv_2D_tangential_diffusion_3D", 5);
+  param.dictionnaire("tangential_conv_3D_tangentual_diffusion_3D", 6);
   param.ajouter_flag("source_terms_correction", &source_terms_correction_);
 
   // param.ajouter("thermal_fd_solver", &one_dimensional_advection_diffusion_thermal_solver_);

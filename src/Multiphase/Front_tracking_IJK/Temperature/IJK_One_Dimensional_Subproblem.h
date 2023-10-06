@@ -437,12 +437,16 @@ protected :
   FixedVector<DoubleVect, 3> hess_cross_T_elem_spherical_;
   FixedVector<DoubleVect, 3> hess_diag_T_elem_spherical_from_rising_;
   FixedVector<DoubleVect, 3> hess_cross_T_elem_spherical_from_rising_;
+  DoubleVect temperature_diffusion_hessian_cartesian_trace_;
   DoubleVect temperature_diffusion_hessian_trace_;
   DoubleVect radial_temperature_diffusion_;
   DoubleVect tangential_temperature_diffusion_;
 
   int source_terms_type_=0;
-  enum Source_terms { linear_diffusion, spherical_diffusion, tangential_conv_2D, tangential_conv_3D, tangential_conv_2D_tangential_diffusion_3D, tangential_conv_3D_tangentual_diffusion_3D};
+  enum Source_terms { linear_diffusion, spherical_diffusion, spherical_diffusion_approx,
+                      tangential_conv_2D, tangential_conv_3D,
+                      tangential_conv_2D_tangential_diffusion_3D, tangential_conv_3D_tangentual_diffusion_3D
+                    };
   DoubleVect normal_temperature_gradient_;
   DoubleVect tangential_temperature_gradient_first_;
   DoubleVect tangential_temperature_gradient_second_;

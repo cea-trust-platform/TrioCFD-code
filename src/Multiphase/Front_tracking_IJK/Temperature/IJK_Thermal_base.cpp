@@ -1025,9 +1025,11 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
       temperature_ft_.echange_espace_virtuel(temperature_ft_.ghost());
       eulerian_distance_ft_.echange_espace_virtuel(eulerian_distance_ft_.ghost());
       eulerian_interfacial_area_ft_.echange_espace_virtuel(eulerian_interfacial_area_ft_.ghost());
+      eulerian_curvature_ft_.echange_espace_virtuel(eulerian_curvature_ft_.ghost());
       compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_ft_,
                                                              ref_ijk_ft_->itfce().I_ft(),
                                                              eulerian_interfacial_area_ft_,
+                                                             eulerian_curvature_ft_,
                                                              temperature_ft_,
                                                              eulerian_grad_T_interface_ft_);
       /*
@@ -1036,6 +1038,7 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
       compute_eulerian_normal_temperature_gradient_interface(eulerian_distance_ns_,
                                                              ref_ijk_ft_->itfce().I(),
                                                              eulerian_interfacial_area_ns_,
+                                                             eulerian_curvature_ns_,
                                                              temperature_,
                                                              eulerian_grad_T_interface_ns_);
     }
