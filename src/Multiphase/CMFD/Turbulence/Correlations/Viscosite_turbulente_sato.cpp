@@ -61,7 +61,6 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
   const DoubleTab& alpha = pb_->get_champ("alpha").passe();
   const DoubleTab& tab_grad = pbm->get_champ("gradient_vitesse").passe();
 
-  int Ne = domaine.nb_elem_tot();
   int id_phase_porteuse = 0;
   int id_phase_disperse = 1;
   int D = dimension;
@@ -78,15 +77,17 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
     if (p_u[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
   if (i_part < 0) Process::exit("Viscosite_turbulente_sato : inconsistency between velocity and Rij!");
   const DoubleTab& u = p_u[i_part]; //le bon tableau
-  DoubleTrav u_r(u.dimension(0), 1);
-  for (int i = 0; i < Ne; i++)
+  DoubleTrav u_r(R_ij.dimension(0), 1);
+  double u_r_carre;
+  for (int i = 0; i < R_ij.dimension(0); i++)
     {
-      for (int d = 0; d < D; d++) u_r(i, 0) += (u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse))*(u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse)); // relative speed = gas speed - liquid speed
-      u_r(i, 0) = std::sqrt(u_r(i, 0));
+      u_r_carre = 0.;
+      for (int d = 0; d < D; d++) u_r_carre += (u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse))*(u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse)); // relative speed = gas speed - liquid speed
+      u_r(i, 0) = std::sqrt(u_r_carre);
     }
 
   // Tenseur Reynolds de Sato
-  for( int e = 0 ; e < Ne ; e++) // elements
+  for( int e = 0 ; e < R_ij.dimension(0) ; e++) // elements
     {
       //dv = ch.v_norm(vit, vit, e, -1, id_phase_porteuse, id_phase_disperse, nullptr, nullptr); // Calcul la norme de la vitesse relative
       nu_sato = coef_sato * alpha(e, id_phase_disperse) * d_bulles(e, id_phase_disperse) * u_r(e,0); // Calcul viscosité de sato
