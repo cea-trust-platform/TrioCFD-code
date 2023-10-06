@@ -45,6 +45,8 @@ public:
   const Equation_base& equation(int i) const override;
   Equation_base& equation(int i) override;
 
+  bool is_pb_FT() override { return true ; }
+
   //
   // Methodes reimplementees de Probleme_base :
   //
