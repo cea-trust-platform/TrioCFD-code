@@ -20,7 +20,7 @@
 #include <Domaine_VEF.h>
 #include <CL_Types_include.h>
 
-extern double calculer_coef_som(int rang_elem, int dimension, int& nb_face_diri, int *indice_diri);
+extern double calculer_coef_som(True_int rang_elem, True_int dimension, True_int& nb_face_diri, True_int *indice_diri);
 Implemente_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face,"Op_Conv_RT_VEF_P1NC",Op_Conv_VEF_Face);
 // XD convection_RT convection_deriv RT 0 Keyword to use RT projection for P1NCP0RT discretization
 
@@ -81,8 +81,8 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
     double volume;
     // Cout<<"Op_Conv_RT_VEF_Face::ajouter RT\n";
     // Traitement des CL de Dirichlet
-    int nb_face_diri=0;
-    int indice_diri[4];
+    True_int nb_face_diri=0;
+    True_int indice_diri[4];
     int modif_traitement_diri=0;
     if (sub_type(Domaine_VEF,domaine_VEF))
       modif_traitement_diri=ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet();
@@ -100,8 +100,8 @@ DoubleTab& Op_Conv_RT_VEF_Face::ajouter(const DoubleTab& transporte,
               }
             if (modif_traitement_diri)
               {
-                int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
-                int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+                True_int rang_elem = (True_int)domaine_VEF.rang_elem_non_std()(elem);
+                True_int type_elem = rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
                 calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
               }
             volume=volumes(elem);
