@@ -64,26 +64,21 @@ Read mon_schema
 	seuil_statio 1.e-15
 }
 
-# I define a medium #
-Fluide_Incompressible milieu
-Read milieu
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Discretize pb ma_discretisation
+
+Read pb
+{
+Fluide_Incompressible 
 {
 	mu Champ_Uniforme 1 1.007e-3
 	rho Champ_Uniforme 1 1000
 }
 
-# Gravity vector definition 
-Uniform_field my_gravity
-Read my_gravity 2 0.0 0.0 #
 
-# Association between the different objects #
-Associate pb dom
-Associate pb mon_schema
-Associate pb milieu
-Discretize pb ma_discretisation
 
-Read pb
-{
 	Navier_Stokes_standard_ALE
 	{
 		# Pressure matrix solved with #
