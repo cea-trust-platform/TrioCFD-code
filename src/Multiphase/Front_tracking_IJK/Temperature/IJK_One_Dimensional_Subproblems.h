@@ -52,6 +52,7 @@ public :
   void add_subproblems(int n);
   void associate_sub_problem_to_inputs(int debug,
                                        int i, int j, int k,
+                                       double global_time_step,
                                        const IJK_Field_double& eulerian_compo_connex,
                                        const IJK_Field_double& eulerian_distance,
                                        const IJK_Field_double& eulerian_curvature,
@@ -92,7 +93,12 @@ public :
                                        DoubleVect& thermal_subproblems_temperature_solution_ini,
                                        DoubleVect& thermal_subproblems_temperature_solution,
                                        const int& source_terms_type,
-                                       const int& source_terms_correction);
+                                       const int& source_terms_correction,
+                                       bool& is_first_time_step,
+                                       const int& first_time_step_temporal,
+                                       const int& first_time_step_explicit,
+                                       const double& local_fourier,
+                                       const double& local_cfl);
   void compute_radial_convection_diffusion_operators();
   void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
                                                        DoubleVect& thermal_subproblems_temperature_solution_ini,
@@ -128,6 +134,9 @@ public :
   double get_max_temperature() const;
   double get_min_temperature_domain_ends() const;
   double get_max_temperature_domain_ends() const;
+  double get_min_euler_time_step(int& nb_iter_explicit);
+  void set_local_time_step(const double& local_time_step);
+  void prepare_temporal_schemes();
 
 protected :
   int debug_ = 0;

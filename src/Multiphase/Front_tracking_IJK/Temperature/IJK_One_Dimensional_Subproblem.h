@@ -64,7 +64,9 @@ public :
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
   void associate_sub_problem_to_inputs(int debug,
                                        int sub_problem_index,
-                                       int i, int j, int k, int compo_connex,
+                                       int i, int j, int k,
+                                       double global_time_step,
+                                       int compo_connex,
                                        double distance,
                                        double curvature,
                                        double interfacial_area,
@@ -109,9 +111,15 @@ public :
                                        DoubleVect& thermal_subproblems_temperature_solution_ini,
                                        DoubleVect& thermal_subproblems_temperature_solution,
                                        const int& source_terms_type,
-                                       const int& source_terms_correction);
+                                       const int& source_terms_correction,
+                                       bool& is_first_time_step,
+                                       const int& first_time_step_temporal,
+                                       const int& first_time_step_explicit,
+                                       const double& local_fourier,
+                                       const double& local_cfl);
 
   void compute_radial_convection_diffusion_operators();
+  void prepare_temporal_schemes();
   void prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
                                    DoubleVect& thermal_subproblems_temperature_solution_ini,
                                    const int& boundary_condition_interface,
@@ -178,8 +186,21 @@ public :
   double get_max_temperature() const;
   double get_min_temperature_domain_ends() const;
   double get_max_temperature_domain_ends() const;
+  const double& get_local_time_step_round() const
+  {
+    return local_time_step_round_;
+  };
+  const int& get_nb_iter_explicit() const
+  {
+    return nb_iter_explicit_;
+  };
+  void set_local_time_step(const double& local_time_step)
+  {
+    local_time_step_overall_ = local_time_step;
+  };
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
+  void associate_sub_problem_temporal_params(bool is_first_time_step, int first_time_step_temporal, int first_time_step_explicit, double local_fourier, double local_cfl);
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
   void associate_compos(int compo_connex, int compo_group) { compo_connex_ = compo_connex; compo_group_ = compo_group; };
   void associate_interface_related_parameters(double distance, double curvature, double interfacial_area, ArrOfDouble facet_barycentre, ArrOfDouble normal_vector)
@@ -536,6 +557,9 @@ protected :
   double local_fourier_ = 1.;
   double local_cfl_ = 1.;
   double max_u_;
+  double local_time_step_round_ = 0.;
+  double local_time_step_overall_ = 0.;
+  int nb_iter_explicit_ = 0;
 
 };
 

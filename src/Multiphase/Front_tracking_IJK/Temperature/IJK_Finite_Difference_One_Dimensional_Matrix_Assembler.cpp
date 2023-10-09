@@ -92,7 +92,7 @@ IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::IJK_Finite_Difference_On
       identity_coefficient_[i][0] = DoubleVect(1);
       identity_coefficient_[i][0](0) = 0.;
       identity_coefficient_[i][1] = DoubleVect(1);
-      identity_coefficient_[i][0](0) = 1.;
+      identity_coefficient_[i][1](0) = 1.;
     }
 }
 
@@ -186,7 +186,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::non_zero_stencil_val
 
 int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::get_max_operators(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_conv,
                                                                               const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_diff,
-                                                                              int (&stencil_left_offset) [2], int (&stencil_right_offset) [2])
+                                                                              int (&stencil_left_offset) [3], int (&stencil_right_offset) [3])
 {
   std::vector<int> indices_op;
   const int stencil_width_conv = fd_operator_conv[precision_order_-1][0].size();
@@ -195,6 +195,8 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::get_max_operators(co
   int min_diff = 0;
   int max_conv = 0;
   int max_diff = 0;
+  int min_identity = 0;
+  int max_identity = 0;
   int i;
   for (i=0; i<stencil_width_conv; i++)
     {
@@ -212,28 +214,23 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::get_max_operators(co
       if (std::find(indices_op.begin(), indices_op.end(), index) == indices_op.end())
         indices_op.push_back(index);
     }
-  const int left_offset = (int) fabs(min_diff-min_conv);
-  const int right_offset = (int) fabs(max_diff-max_conv);
-  if (min_conv < min_diff)
-    {
-      stencil_left_offset[0] = 0;
-      stencil_left_offset[1] = left_offset;
-    }
-  else
-    {
-      stencil_left_offset[0] = left_offset;
-      stencil_left_offset[1] = 0;
-    }
-  if (max_conv < max_diff)
-    {
-      stencil_right_offset[0] = right_offset;
-      stencil_right_offset[1] = 0;
-    }
-  else
-    {
-      stencil_right_offset[0] = 0;
-      stencil_right_offset[1] = right_offset;
-    }
+  const int min_conv_diff_identity = std::min(std::min(min_conv, min_diff), min_identity);
+  const int max_conv_diff_identity = std::max(std::max(max_conv, max_diff), max_identity);
+
+  const int left_offset_conv = (int) fabs(min_conv-min_conv_diff_identity);
+  const int right_offset_conv = (int) fabs(max_conv-max_conv_diff_identity);
+  const int left_offset_diff = (int) fabs(min_diff-min_conv_diff_identity);
+  const int right_offset_diff = (int) fabs(max_diff-max_conv_diff_identity);
+  const int left_offset_identity = (int) fabs(min_identity-min_conv_diff_identity);
+  const int right_offset_identity = (int) fabs(max_identity-max_conv_diff_identity);
+
+  stencil_left_offset[0] = left_offset_conv;
+  stencil_left_offset[1] = left_offset_diff;
+  stencil_left_offset[2] = left_offset_identity;
+  stencil_right_offset[0] = right_offset_conv;
+  stencil_right_offset[1] = right_offset_diff;
+  stencil_right_offset[2] = right_offset_identity;
+
   int non_zero_elem = (int) indices_op.size();
   return non_zero_elem;
 }
@@ -336,6 +333,9 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pat
   Cerr << (*centred_derivative)	[precision_order_-1][0](0) << finl;
   Cerr << (*backward_derivative)[precision_order_-1][0](0) << finl;
 
+  int derivative_offset = derivative_order;
+  if (derivative_order==identity)
+    derivative_offset = 2;
 //
 //  // Fortran start at one
 //  int non_zero_values_counter = 0;
@@ -351,8 +351,8 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pat
    */
   {
     const int forward_derivative_size = (*forward_derivative)[precision_order_-1][0].size();
-    const int forward_left_offset = forward_left_offset_[derivative_order];
-    const int forward_right_offset = forward_right_offset_[derivative_order];
+    const int forward_left_offset = forward_left_offset_[derivative_offset];
+    const int forward_right_offset = forward_right_offset_[derivative_offset];
     for (int i=0; i < forward_left_offset; i++)
       {
         matrix_column_indices[non_zero_values_counter] = i + FORTRAN_INDEX_INI;
@@ -378,8 +378,8 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pat
    */
   {
     const int centred_derivative_size = (*centred_derivative)[precision_order_-1][0].size();
-    const int centred_left_offset = centred_left_offset_[derivative_order];
-    const int centred_right_offset = centred_right_offset_[derivative_order];
+    const int centred_left_offset = centred_left_offset_[derivative_offset];
+    const int centred_right_offset = centred_right_offset_[derivative_offset];
     for (int j=1; j<(core_lines+1); j++)
       {
         for (int i=0; i < centred_left_offset; i++)
@@ -409,8 +409,8 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pat
    */
   {
     const int backward_derivative_size = (*backward_derivative)[precision_order_-1][0].size();
-    int backward_left_offset = backward_left_offset_[derivative_order];
-    int backward_right_offset = backward_right_offset_[derivative_order];
+    int backward_left_offset = backward_left_offset_[derivative_offset];
+    int backward_right_offset = backward_right_offset_[derivative_offset];
     int end_counter = non_zero_values_counter - 1 + backward_derivative_size + backward_left_offset + backward_right_offset;
     const int last_column = (nb_elem - 1);
     for (int i=0; i < backward_right_offset; i++)
@@ -930,6 +930,20 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(co
   // res = (*fd_operator) * solution;
 }
 
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::apply_euler_time_step(Matrice * convection_matrix,
+                                                                                   Matrice * diffusion_matrix,
+                                                                                   const int& subproblem_index,
+                                                                                   const double& local_time_step)
+{
+  Matrice_Bloc& convection_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
+  Matrice& convection_sub_matrix = convection_block_matrix.get_bloc(subproblem_index, subproblem_index);
+  convection_sub_matrix *= local_time_step;
+
+  Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*diffusion_matrix).valeur());
+  Matrice& diffusion_sub_matrix = diffusion_block_matrix.get_bloc(subproblem_index, subproblem_index);
+  diffusion_sub_matrix *= local_time_step;
+}
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix,
                                                                                                        Matrice * diffusion_matrix,
                                                                                                        const int& subproblem_index)
@@ -938,7 +952,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::correct_sign_tempor
   Matrice& convection_sub_matrix = convection_block_matrix.get_bloc(subproblem_index, subproblem_index);
   convection_sub_matrix *= (-1);
 
-  Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
+  Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*diffusion_matrix).valeur());
   Matrice& diffusion_sub_matrix = diffusion_block_matrix.get_bloc(subproblem_index, subproblem_index);
   diffusion_sub_matrix *= (-1);
 }

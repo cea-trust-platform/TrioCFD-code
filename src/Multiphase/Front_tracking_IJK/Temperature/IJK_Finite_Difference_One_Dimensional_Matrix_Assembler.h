@@ -88,6 +88,7 @@ public :
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
                         const DoubleVect& rhs_assembly);
   void compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res);
+  void apply_euler_time_step(Matrice * convection_matrix, Matrice * diffusion_matrix, const int& subproblem_index, const double& local_time_step);
   void correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix, Matrice * diffusion_matrix, const int& subproblem_index);
 
 protected :
@@ -171,12 +172,12 @@ protected :
   int stencil_forward_max_;
   int stencil_centred_max_;
   int stencil_backward_max_;
-  int forward_left_offset_[2] = {0, 0};
-  int forward_right_offset_[2] = {0, 0};
-  int centred_left_offset_[2] = {0, 0};
-  int centred_right_offset_[2] = {0, 0};
-  int backward_left_offset_[2] = {0, 0};
-  int backward_right_offset_[2] = {0, 0};
+  int forward_left_offset_[3] = {0, 0, 0};
+  int forward_right_offset_[3] = {0, 0, 0};
+  int centred_left_offset_[3] = {0, 0, 0};
+  int centred_right_offset_[3] = {0, 0, 0};
+  int backward_left_offset_[3] = {0, 0, 0};
+  int backward_right_offset_[3] = {0, 0, 0};
   bool computed_stencil_;
   int known_pattern_=1;
 
@@ -187,7 +188,7 @@ protected :
   int non_zero_stencil_values(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator);
   int get_max_operators(const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_conv,
                         const FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE>& fd_operator_diff,
-                        int (&stencil_left_offset) [2], int (&stencil_right_offset) [2]);
+                        int (&stencil_left_offset) [3], int (&stencil_right_offset) [3]);
   void get_max_stencil(const int& nb_elem,
                        int& non_zero_elem_max,
                        int& stencil_forward_max,

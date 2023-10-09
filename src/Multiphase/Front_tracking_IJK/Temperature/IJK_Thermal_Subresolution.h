@@ -75,6 +75,8 @@ protected :
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters();
   void compute_radial_subresolution_convection_diffusion_operators();
+  void compute_local_substep();
+  void prepare_temporal_schemes();
   void compute_source_terms_impose_subresolution_boundary_conditions();
   void compute_add_subresolution_source_terms();
   void compute_subresolution_temporal_explicit_implicit_matrices();
@@ -171,6 +173,10 @@ protected :
   bool is_first_time_step_;
   int first_time_step_temporal_;
   int first_time_step_explicit_;
+  int first_time_step_implicit_;
+  int nb_iter_explicit_local_ = 0;
+  double local_fourier_;
+  double local_cfl_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

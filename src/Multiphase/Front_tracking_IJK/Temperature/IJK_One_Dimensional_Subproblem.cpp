@@ -149,9 +149,25 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   hess_cross_T_elem_ = &hess_cross_T_elem ;
 }
 
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(bool is_first_time_step,
+                                                                           int first_time_step_temporal,
+                                                                           int first_time_step_explicit,
+                                                                           double local_fourier,
+                                                                           double local_cfl)
+{
+  is_first_time_step_ = is_first_time_step;
+  first_time_step_temporal_ = first_time_step_temporal;
+  first_time_step_explicit_ = first_time_step_explicit;
+  local_fourier_ = local_fourier;
+  local_cfl_ = local_cfl;
+}
+
+
 void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      int sub_problem_index,
-                                                                     int i, int j, int k, int compo_connex,
+                                                                     int i, int j, int k,
+                                                                     double global_time_step,
+                                                                     int compo_connex,
                                                                      double distance,
                                                                      double curvature,
                                                                      double interfacial_area,
@@ -196,12 +212,19 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      DoubleVect& thermal_subproblems_temperature_solution_ini,
                                                                      DoubleVect& thermal_subproblems_temperature_solution,
                                                                      const int& source_terms_type,
-                                                                     const int& source_terms_correction)
+                                                                     const int& source_terms_correction,
+                                                                     bool& is_first_time_step,
+                                                                     const int& first_time_step_temporal,
+                                                                     const int& first_time_step_explicit,
+                                                                     const double& local_fourier,
+                                                                     const double& local_cfl)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
+  global_time_step_ = global_time_step;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
+  associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl);
   associate_interface_related_parameters(distance, curvature, interfacial_area, facet_barycentre, normal_vector);
   associate_rising_velocity(bubble_rising_velocity, bubble_rising_vector, bubble_barycentre);
   associate_eulerian_fields_references(interfaces, eulerian_distance, eulerian_curvature, eulerian_interfacial_area, eulerian_normal_vect,
@@ -512,9 +535,16 @@ void IJK_One_Dimensional_Subproblem::compute_local_time_step()
           local_dt_cfl_ = dr_ * max_u_inv  * local_cfl_;
           local_time_step_ = std::min(local_dt_cfl_, local_dt_fo_);
           local_time_step_ = std::min(local_time_step_, global_time_step_);
+
+          nb_iter_explicit_ = (int) (global_time_step_ / local_time_step_);
+          nb_iter_explicit_++;
+          local_time_step_round_ = global_time_step_ / (double) nb_iter_explicit_;
         }
       else
-        local_time_step_ = global_time_step_;
+        {
+          local_time_step_ = global_time_step_;
+          local_time_step_round_ = local_time_step_;
+        }
     }
 }
 
@@ -550,7 +580,7 @@ void IJK_One_Dimensional_Subproblem::compute_second_order_operator_local(Matrice
 
 void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices()
 {
-  if (!  global_probes_characteristics_)
+  if (!global_probes_characteristics_)
     {
       compute_identity_matrix_local(identity_matrix_explicit_implicit_local_);
       compute_first_order_operator_local(radial_first_order_operator_local_);
@@ -909,11 +939,22 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
                                                                     radial_convection_prefactor_,
                                                                     sub_problem_index_,
                                                                     boundary_conditions);
+}
 
-  if (!first_time_step_explicit_)
-    (*finite_difference_assembler_).correct_sign_temporal_schemes_subproblems(radial_convection_matrix_base_,
-                                                                              radial_diffusion_matrix_base_,
-                                                                              sub_problem_index_);
+void IJK_One_Dimensional_Subproblem::prepare_temporal_schemes()
+{
+  if (first_time_step_temporal_)
+    {
+      if (first_time_step_explicit_)
+        (*finite_difference_assembler_).apply_euler_time_step(radial_convection_matrix_base_,
+                                                              radial_diffusion_matrix_base_,
+                                                              sub_problem_index_,
+                                                              local_time_step_overall_);
+      else
+        (*finite_difference_assembler_).correct_sign_temporal_schemes_subproblems(radial_convection_matrix_base_,
+                                                                                  radial_diffusion_matrix_base_,
+                                                                                  sub_problem_index_);
+    }
 }
 
 void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
@@ -1084,7 +1125,7 @@ void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
 
       if (first_time_step_temporal_)
         {
-          source_terms_ *= local_time_step_;
+          source_terms_ *= local_time_step_overall_;
           rhs_assembly_ = source_terms_;
           if (first_time_step_explicit_)
             rhs_assembly_[0] = 0.;

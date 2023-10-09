@@ -82,7 +82,10 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   is_first_time_step_ = false;
   first_time_step_temporal_ = 0;
+  first_time_step_implicit_ = 0;
   first_time_step_explicit_ = 1;
+  local_fourier_ = 1.;
+  local_cfl_ = 1.;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -164,6 +167,9 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("approximate_temperature_increment", &approximate_temperature_increment_);
 
   param.ajouter_flag("first_time_step_temporal", &first_time_step_temporal_);
+  param.ajouter_flag("first_time_step_implicit", &first_time_step_implicit_);
+  param.ajouter("local_fourier", &local_fourier_);
+  param.ajouter("local_cfl", &local_cfl_);
 
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
   //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
@@ -248,6 +254,10 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);
+
+  is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+  first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
+  first_time_step_explicit_ = !first_time_step_implicit_;
   compute_overall_probes_parameters();
 
   if (one_dimensional_advection_diffusion_thermal_solver_.est_nul())
@@ -370,6 +380,8 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
 
 void IJK_Thermal_Subresolution::compute_thermal_subproblems()
 {
+  is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+  first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
   /*
    * FIXME: Do the first step only at the first iteration
    */
@@ -380,6 +392,11 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   if (debug_)
     Cerr << "Compute radial subresolution convection and diffusion operators" << finl;
   compute_radial_subresolution_convection_diffusion_operators();
+
+  if (debug_)
+    Cerr << "Compute local substep for the first iter" << finl;
+  compute_local_substep();
+  prepare_temporal_schemes();
 
   if (debug_)
     Cerr << "Prepare boundary conditions, compute source terms and impose boundary conditions" << finl;
@@ -440,7 +457,7 @@ void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
         {
           int check_nb_elem;
           check_nb_elem = finite_difference_assembler_.build(identity_matrix_explicit_implicit_, points_per_thermal_subproblem_, -1);
-          Cerr << "Check_nb_elem" << check_nb_elem << finl;
+          Cerr << "Check_nb_elem: " << check_nb_elem << finl;
         }
     }
 }
@@ -473,7 +490,7 @@ void IJK_Thermal_Subresolution::compute_first_order_operator_raw(Matrice& radial
   // TODO:
   int check_nb_elem;
   check_nb_elem = finite_difference_assembler_.build(radial_first_order_operator, points_per_thermal_subproblem_, 0);
-  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+  Cerr << "Check_nb_elem: " << check_nb_elem << finl;
 
 }
 
@@ -491,7 +508,7 @@ void IJK_Thermal_Subresolution::compute_second_order_operator_raw(Matrice& radia
   // TODO:
   int check_nb_elem;
   check_nb_elem = finite_difference_assembler_.build(radial_second_order_operator, points_per_thermal_subproblem_, 1);
-  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+  Cerr << "Check_nb_elem: " << check_nb_elem << finl;
 }
 
 void IJK_Thermal_Subresolution::compute_second_order_operator(Matrice& radial_second_order_operator, double dr)
@@ -565,6 +582,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                   }
                 thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
                                                                            i, j, k,
+                                                                           ref_ijk_ft_->get_timestep(),
                                                                            *eulerian_compo_connex_ns_,
                                                                            eulerian_distance_ns_,
                                                                            eulerian_curvature_ns_,
@@ -605,11 +623,17 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            thermal_subproblems_temperature_solution_ini_,
                                                                            thermal_subproblems_temperature_solution_,
                                                                            source_terms_type_,
-                                                                           source_terms_correction_);
+                                                                           source_terms_correction_,
+                                                                           is_first_time_step_,
+                                                                           first_time_step_temporal_,
+                                                                           first_time_step_explicit_,
+                                                                           local_fourier_,
+                                                                           local_cfl_);
 
               }
     }
 }
+
 
 void IJK_Thermal_Subresolution::compute_radial_subresolution_convection_diffusion_operators()
 {
@@ -623,11 +647,6 @@ void IJK_Thermal_Subresolution::compute_radial_subresolution_convection_diffusio
       initialise_radial_convection_operator(radial_first_order_operator_, radial_convection_matrix_);
       initialise_radial_diffusion_operator(radial_second_order_operator_, radial_diffusion_matrix_);
       thermal_local_subproblems_.compute_radial_convection_diffusion_operators();
-
-      thermal_subproblems_matrix_assembly_ = radial_convection_matrix_;
-      finite_difference_assembler_.sum_matrices_subproblems(thermal_subproblems_matrix_assembly_, radial_diffusion_matrix_);
-      if (first_time_step_temporal_)
-        finite_difference_assembler_.sum_matrices_subproblems(thermal_subproblems_matrix_assembly_, identity_matrix_explicit_implicit_);
     }
 }
 
@@ -640,7 +659,7 @@ void IJK_Thermal_Subresolution::initialise_identity_matrices(Matrice& identity_m
   if (debug_)
     Cerr << "Initialise the Identity matrices" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
-  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix, identity_matrix_subproblems, nb_subproblems);
+  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix_subproblems, identity_matrix, nb_subproblems);
   if (debug_)
     Cerr << "Radial convection operator has been initialised." << finl;
 }
@@ -671,6 +690,31 @@ void IJK_Thermal_Subresolution::initialise_radial_diffusion_operator(Matrice& ra
   finite_difference_assembler_.initialise_matrix_subproblems(radial_diffusion_matrix, radial_second_order_operator, nb_subproblems);
   if (debug_)
     Cerr << "Radial diffusion operator has been initialised." << finl;
+}
+
+void IJK_Thermal_Subresolution::compute_local_substep()
+{
+  if (!disable_subresolution_)
+    if (first_time_step_temporal_)
+      {
+        const double local_time_step = thermal_local_subproblems_.get_min_euler_time_step(nb_iter_explicit_local_);
+        Cerr << "Local timestep: " << local_time_step << finl;
+        Cerr << "Number of sub-steps: " << nb_iter_explicit_local_ << finl;
+        thermal_local_subproblems_.set_local_time_step(local_time_step);
+      }
+}
+
+void IJK_Thermal_Subresolution::prepare_temporal_schemes()
+{
+  if (!disable_subresolution_)
+    {
+      if (first_time_step_temporal_)
+        thermal_local_subproblems_.prepare_temporal_schemes();
+      thermal_subproblems_matrix_assembly_ = radial_convection_matrix_;
+      finite_difference_assembler_.sum_matrices_subproblems(thermal_subproblems_matrix_assembly_, radial_diffusion_matrix_);
+      if (first_time_step_temporal_)
+        finite_difference_assembler_.sum_matrices_subproblems(thermal_subproblems_matrix_assembly_, identity_matrix_subproblems_);
+    }
 }
 
 void IJK_Thermal_Subresolution::compute_source_terms_impose_subresolution_boundary_conditions()
@@ -719,8 +763,13 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
       if (is_first_time_step_ && first_time_step_temporal_ && first_time_step_explicit_)
         {
           Cerr << "Finite-difference Explicit thermal sub-resolution !" << finl;
-          thermal_subproblems_temperature_solution_ = bloc_matrix_solver * thermal_subproblems_temperature_solution_ini_;
-          thermal_subproblems_temperature_solution_ += thermal_subproblems_rhs_assembly_;
+          DoubleVect thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_ini_;
+          for (int i=0; i<nb_iter_explicit_local_; i++)
+            {
+              thermal_subproblems_temperature_solution_ = thermal_subproblems_matrix_assembly_for_solver_ * thermal_subproblems_temperature_solution_tmp;
+              thermal_subproblems_temperature_solution_ += thermal_subproblems_rhs_assembly_;
+              thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_;
+            }
         }
       else
         {

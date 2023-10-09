@@ -65,6 +65,7 @@ void IJK_One_Dimensional_Subproblems::add_subproblems(int n)
 
 void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       int i, int j, int k,
+                                                                      double global_time_step,
                                                                       const IJK_Field_double& eulerian_compo_connex,
                                                                       const IJK_Field_double& eulerian_distance,
                                                                       const IJK_Field_double& eulerian_curvature,
@@ -105,7 +106,12 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
                                                                       DoubleVect& thermal_subproblems_temperature_solution,
                                                                       const int& source_terms_type,
-                                                                      const int& source_terms_correction)
+                                                                      const int& source_terms_correction,
+                                                                      bool& is_first_time_step,
+                                                                      const int& first_time_step_temporal,
+                                                                      const int& first_time_step_explicit,
+                                                                      const double& local_fourier,
+                                                                      const double& local_cfl)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -142,9 +148,14 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
       (*this).add(subproblem);
       (*this)[subproblems_counter_].associate_sub_problem_to_inputs(debug,
                                                                     subproblems_counter_,
-                                                                    i, j, k, compo_connex,
-                                                                    distance, curvature, interfacial_area,
-                                                                    facet_barycentre, normal_vector,
+                                                                    i, j, k,
+                                                                    global_time_step,
+                                                                    compo_connex,
+                                                                    distance,
+                                                                    curvature,
+                                                                    interfacial_area,
+                                                                    facet_barycentre,
+                                                                    normal_vector,
                                                                     bubble_rising_velocity,
                                                                     bubble_rising_vector,
                                                                     bubble_barycentre,
@@ -184,7 +195,12 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     thermal_subproblems_temperature_solution_ini,
                                                                     thermal_subproblems_temperature_solution,
                                                                     source_terms_type,
-                                                                    source_terms_correction);
+                                                                    source_terms_correction,
+                                                                    is_first_time_step,
+                                                                    first_time_step_temporal,
+                                                                    first_time_step_explicit,
+                                                                    local_fourier,
+                                                                    local_cfl);
       subproblems_counter_++;
     }
   else
@@ -324,4 +340,29 @@ double IJK_One_Dimensional_Subproblems::get_max_temperature_domain_ends() const
 {
   return (*this)[0].get_max_temperature_domain_ends();
 }
+
+double IJK_One_Dimensional_Subproblems::get_min_euler_time_step(int& nb_iter_explicit)
+{
+  double min_euler_time_step = 1e20;
+  nb_iter_explicit = 1;
+  for (auto& itr : *this)
+    {
+      min_euler_time_step = std::min(min_euler_time_step, itr.get_local_time_step_round());
+      nb_iter_explicit = std::max(nb_iter_explicit, itr.get_nb_iter_explicit());
+    }
+  return min_euler_time_step;
+}
+
+void IJK_One_Dimensional_Subproblems::set_local_time_step(const double& local_time_step)
+{
+  for (auto& itr : *this)
+    itr.set_local_time_step(local_time_step);
+}
+
+void IJK_One_Dimensional_Subproblems::prepare_temporal_schemes()
+{
+  for (auto& itr : *this)
+    itr.prepare_temporal_schemes();
+}
+
 
