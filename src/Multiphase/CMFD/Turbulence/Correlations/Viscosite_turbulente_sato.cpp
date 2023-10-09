@@ -42,6 +42,17 @@ Entree& Viscosite_turbulente_sato::readOn(Entree& is)
   param.ajouter("coef_sato", &coef_sato);
   param.lire_avec_accolades_depuis(is);
 
+  //identification des phases
+  Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr ;
+
+  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
+  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
+
+  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
+
+  pbm->creer_champ("distance_paroi_globale"); // Besoin de distance a la paroi
+
   return is;
 }
 
@@ -61,45 +72,45 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
   const DoubleTab& alpha = pb_->get_champ("alpha").passe();
   const DoubleTab& tab_grad = pbm->get_champ("gradient_vitesse").passe();
 
-  int id_phase_porteuse = 0;
-  int id_phase_disperse = 1;
   int D = dimension;
   int nf_tot = domaine.nb_faces_tot();
+  int N = alpha.dimension(1);
 
   // Déclarer de nouvelles variables
-  //double grad_vit_r; // gradient vitesse relative
+
   double S_ij; // taux de déformation : S = 0.5*(gradV+gradV^T)
   double nu_sato; // viscosité de sato
-  // Calcul de la norme de la vitesse relative
+  // Champ de vitesse
   ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_P0, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
   int i_part = -1;
   for (int i = 0; i < p_u.size(); i++)
     if (p_u[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
   if (i_part < 0) Process::exit("Viscosite_turbulente_sato : inconsistency between velocity and Rij!");
   const DoubleTab& u = p_u[i_part]; //le bon tableau
+  // vitesse relative
   DoubleTrav u_r(R_ij.dimension(0), 1);
   double u_r_carre;
-  for (int i = 0; i < R_ij.dimension(0); i++)
-    {
-      u_r_carre = 0.;
-      for (int d = 0; d < D; d++) u_r_carre += (u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse))*(u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse)); // relative speed = gas speed - liquid speed
-      u_r(i, 0) = std::sqrt(u_r_carre);
-    }
 
   // Tenseur Reynolds de Sato
+
   for( int e = 0 ; e < R_ij.dimension(0) ; e++) // elements
-    {
-      //dv = ch.v_norm(vit, vit, e, -1, id_phase_porteuse, id_phase_disperse, nullptr, nullptr); // Calcul la norme de la vitesse relative
-      nu_sato = coef_sato * alpha(e, id_phase_disperse) * d_bulles(e, id_phase_disperse) * u_r(e,0); // Calcul viscosité de sato
-      for (int i = 0; i < D; i++) // dimension i
-        for (int j = 0; j < D; j++) // dimension j
-          {
-            //grad_vit_r = tab_grad(nf_tot + i + e * D , D * id_phase_disperse + j) - tab_grad(nf_tot + i + e * D , D * id_phase_porteuse + j); // gradient de la vitesse relative
-            S_ij = tab_grad(nf_tot + i + e * D , D * id_phase_porteuse + j) + tab_grad(nf_tot + j + e * D , D * id_phase_porteuse + i);
-            R_ij(e, 1, i, j) = 0 ; // No BIT for gas phase
-            R_ij(e, 0, i, j) = - nu_sato * S_ij; // <u_i'u_j'> = - 2 * nu_sato * S_ij
-          }
-    }
+    for (int i = 0; i < D; i++)                 // dimension i
+      for (int j = 0; j < D; j++)               // dimension j
+        for (int k = 0; k < N; k++)             // phases
+          if (k!=n_l)                           // iteration sur phases gazeuses
+            {
+              // Calcul de la norme de la vitesse relative
+              u_r_carre = 0.;
+              for (int d = 0; d < D; d++) u_r_carre += (u(e, d, k) - u(e, d, n_l))*(u(e, d, k) - u(e, d, n_l)); // relative speed = gas speed - liquid speed
+              u_r(e, 0) = std::sqrt(u_r_carre);
+              // Calcul de la viscosite de Sato
+              nu_sato = coef_sato * alpha(e, k) * d_bulles(e, k) * u_r(e,0);
+              // Tenseur des taux de déformations Sij = gradv_ij + gradv_ji (facteur 1/2 supprimé car il se simplifie après)
+              S_ij = tab_grad(nf_tot + i + e * D , D * n_l + j) + tab_grad(nf_tot + j + e * D , D * n_l + i);
+              // Tenseur de Reynolds BIA
+              R_ij(e, k, i, j) = 0 ; // No BIT for gas phase
+              R_ij(e, 0, i, j) -= nu_sato * S_ij; // <u_i'u_j'> = - nu_sato * S_ij
+            }
 }
 
 void Viscosite_turbulente_sato::k_over_eps(DoubleTab& k_sur_eps) const

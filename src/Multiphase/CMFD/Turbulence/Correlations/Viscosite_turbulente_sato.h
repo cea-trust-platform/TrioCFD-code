@@ -42,6 +42,7 @@ public:
 
 private:
   double coef_sato = 0.6; // coefficient du modèle ajusté par Sato
+  int n_l = -1; // phase liquide
 };
 
 #endif
