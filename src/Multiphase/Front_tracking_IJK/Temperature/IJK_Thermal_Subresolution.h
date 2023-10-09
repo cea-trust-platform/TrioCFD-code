@@ -75,8 +75,9 @@ protected :
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters();
   void compute_radial_subresolution_convection_diffusion_operators();
-  void impose_subresolution_boundary_conditions();
+  void compute_source_terms_impose_subresolution_boundary_conditions();
   void compute_add_subresolution_source_terms();
+  void compute_subresolution_temporal_explicit_implicit_matrices();
   void approximate_temperature_increment_material_derivative();
   void compute_radial_first_second_order_operators(Matrice& radial_first_order_operator_raw,
                                                    Matrice& radial_second_order_operator_raw,
@@ -86,9 +87,11 @@ protected :
   void compute_first_order_operator(Matrice& radial_first_order_operator, double dr);
   void compute_second_order_operator(Matrice& radial_second_order_operator, double dr);
   void compute_second_order_operator_raw(Matrice& radial_second_order_operator);
-  void initialise_radial_convection_operator(const Matrice& radial_first_order_operator,
+  void initialise_identity_matrices(Matrice& identity_matrix,
+                                    Matrice& identity_matrix_subproblems);
+  void initialise_radial_convection_operator(Matrice& radial_first_order_operator,
                                              Matrice& radial_convection_matrix);
-  void initialise_radial_diffusion_operator(const Matrice& radial_second_order_operator,
+  void initialise_radial_diffusion_operator(Matrice& radial_second_order_operator,
                                             Matrice& radial_diffusion_matrix);
   void check_wrong_values_rhs();
   void initialise_thermal_subproblems();
@@ -122,10 +125,12 @@ protected :
   double probe_length_;
   double dr_;
   DoubleVect radial_coordinates_;
+  Matrice identity_matrix_explicit_implicit_;
   Matrice radial_first_order_operator_raw_;
   Matrice radial_second_order_operator_raw_;
   Matrice radial_first_order_operator_;
   Matrice radial_second_order_operator_;
+  Matrice identity_matrix_subproblems_;
   Matrice radial_diffusion_matrix_;
   Matrice radial_convection_matrix_;
   /*
@@ -135,10 +140,12 @@ protected :
   IJK_Finite_Difference_One_Dimensional_Matrix_Assembler finite_difference_assembler_;
   Matrice thermal_subproblems_matrix_assembly_;
   Matrice thermal_subproblems_matrix_assembly_for_solver_;
+  DoubleVect thermal_subproblems_temperature_solution_ini_;
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
   // SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
   IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
+  IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_implicit_;
   MD_Vector md_;
   Motcles fd_solvers_;
   Motcles fd_solvers_jdd_;
@@ -160,6 +167,10 @@ protected :
   int advected_frame_of_reference_;
   int neglect_frame_of_reference_radial_advection_;
   int approximate_temperature_increment_;
+
+  bool is_first_time_step_;
+  int first_time_step_temporal_;
+  int first_time_step_explicit_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

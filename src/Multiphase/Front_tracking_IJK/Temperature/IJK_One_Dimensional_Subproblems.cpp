@@ -83,10 +83,12 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const double& cell_diagonal,
                                                                       const double& dr_base,
                                                                       const DoubleVect& radial_coordinates,
+                                                                      const Matrice& identity_matrix_explicit_implicit,
                                                                       const Matrice& radial_first_order_operator_raw,
                                                                       const Matrice& radial_second_order_operator_raw,
                                                                       const Matrice& radial_first_order_operator,
                                                                       const Matrice& radial_second_order_operator,
+                                                                      Matrice& identity_matrix_subproblems,
                                                                       Matrice& radial_diffusion_matrix,
                                                                       Matrice& radial_convection_matrix,
                                                                       const IJK_Interfaces& interfaces,
@@ -100,6 +102,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
                                                                       Matrice& thermal_subproblems_matrix_assembly,
                                                                       DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                      DoubleVect& thermal_subproblems_temperature_solution_ini,
                                                                       DoubleVect& thermal_subproblems_temperature_solution,
                                                                       const int& source_terms_type,
                                                                       const int& source_terms_correction)
@@ -154,10 +157,12 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     cell_diagonal,
                                                                     dr_base,
                                                                     radial_coordinates,
+                                                                    identity_matrix_explicit_implicit,
                                                                     radial_first_order_operator_raw,
                                                                     radial_second_order_operator_raw,
                                                                     radial_first_order_operator,
                                                                     radial_second_order_operator,
+                                                                    identity_matrix_subproblems,
                                                                     radial_diffusion_matrix,
                                                                     radial_convection_matrix,
                                                                     interfaces,
@@ -176,6 +181,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     finite_difference_assembler,
                                                                     thermal_subproblems_matrix_assembly,
                                                                     thermal_subproblems_rhs_assembly,
+                                                                    thermal_subproblems_temperature_solution_ini,
                                                                     thermal_subproblems_temperature_solution,
                                                                     source_terms_type,
                                                                     source_terms_correction);
@@ -193,28 +199,24 @@ void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operat
     itr.compute_radial_convection_diffusion_operators();
 }
 
-void IJK_One_Dimensional_Subproblems::impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                 const int& boundary_condition_interface,
-                                                                 const double& interfacial_boundary_condition_value,
-                                                                 const int& impose_boundary_condition_interface_from_simulation,
-                                                                 const int& boundary_condition_end,
-                                                                 const double& end_boundary_condition_value,
-                                                                 const int& impose_user_boundary_condition_end_value)
+void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                                      DoubleVect& thermal_subproblems_temperature_solution_ini,
+                                                                                      const int& boundary_condition_interface,
+                                                                                      const double& interfacial_boundary_condition_value,
+                                                                                      const int& impose_boundary_condition_interface_from_simulation,
+                                                                                      const int& boundary_condition_end,
+                                                                                      const double& end_boundary_condition_value,
+                                                                                      const int& impose_user_boundary_condition_end_value)
 {
   for (auto& itr : *this)
-    itr.impose_boundary_conditions(thermal_subproblems_rhs_assembly,
-                                   boundary_condition_interface,
-                                   interfacial_boundary_condition_value,
-                                   impose_boundary_condition_interface_from_simulation,
-                                   boundary_condition_end,
-                                   end_boundary_condition_value,
-                                   impose_user_boundary_condition_end_value);
-}
-
-void IJK_One_Dimensional_Subproblems::compute_add_source_terms()
-{
-  for (auto& itr : *this)
-    itr.compute_add_source_terms();
+    itr.compute_source_terms_impose_boundary_conditions(thermal_subproblems_rhs_assembly,
+                                                        thermal_subproblems_temperature_solution_ini,
+                                                        boundary_condition_interface,
+                                                        interfacial_boundary_condition_value,
+                                                        impose_boundary_condition_interface_from_simulation,
+                                                        boundary_condition_end,
+                                                        end_boundary_condition_value,
+                                                        impose_user_boundary_condition_end_value);
 }
 
 void IJK_One_Dimensional_Subproblems::approximate_temperature_increment_material_derivative()

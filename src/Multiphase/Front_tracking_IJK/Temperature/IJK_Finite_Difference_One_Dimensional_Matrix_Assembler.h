@@ -63,7 +63,10 @@ public :
                                   const double& interfacial_value,
                                   const int& end_boundary_conditions,
                                   const double& end_values,
-                                  const double& dr_inv);
+                                  const double& dr_inv,
+                                  const int& first_time_step_temporal,
+                                  const int& first_time_step_explicit,
+                                  const DoubleVect& temperature_ini_temporal_schemes);
   void impose_boundary_conditions_subproblem(Matrice * matrix,
                                              DoubleVect * global_rhs,
                                              DoubleVect& local_rhs,
@@ -72,18 +75,23 @@ public :
                                              const int& end_boundary_conditions,
                                              const double& end_value,
                                              const int& subproblem_index,
-                                             const double& dr_inv);
+                                             const double& dr_inv,
+                                             const int& first_time_step_temporal,
+                                             const int& first_time_step_explicit,
+                                             const DoubleVect& temperature_ini_temporal_schemes);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
   void initialise_matrix_subproblems(Matrice& matrix_subproblems, Matrice& fd_operator, const int& subproblems);
   void reinitialise_matrix_subproblem(Matrice& matrix_subproblems,
                                       Matrice& fd_operator,
                                       const int& nb_subproblems);
-  void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly, const DoubleVect& rhs_assembly);
+  void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
+                        const DoubleVect& rhs_assembly);
   void compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res);
+  void correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix, Matrice * diffusion_matrix, const int& subproblem_index);
 
 protected :
-  enum Fd_coefficient_type_ { forward, centred, backward };
+  enum Fd_coefficient_type_ { identity=-1, forward, centred, backward };
   enum Precision_Order_ { first_order, second_order };
   enum Derivative_Order_ { first, second };
   // enum Boundary_conditions { dirichlet, neumann, flux_jump };
@@ -96,7 +104,10 @@ protected :
   enum Remove_zero_coeff { keep, remove, remove_close_zero };
   enum Equation_type { advection_diffusion, linear_diffusion };
 
-
+  /*
+   * Identity matrix
+   */
+  FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> identity_coefficient_;
   /*
    * First order derivatives
    */

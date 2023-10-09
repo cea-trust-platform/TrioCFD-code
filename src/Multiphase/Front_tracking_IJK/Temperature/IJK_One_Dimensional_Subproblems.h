@@ -70,10 +70,12 @@ public :
                                        const double& cell_diagonal,
                                        const double& dr_base,
                                        const DoubleVect& radial_coordinates,
+                                       const Matrice& identity_matrix_explicit_implicit,
                                        const Matrice& radial_first_order_operator_raw,
                                        const Matrice& radial_second_order_operator_raw,
                                        const Matrice& radial_first_order_operator,
                                        const Matrice& radial_second_order_operator,
+                                       Matrice& identity_matrix_subproblems,
                                        Matrice& radial_diffusion_matrix,
                                        Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
@@ -87,18 +89,19 @@ public :
                                        IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
                                        Matrice& thermal_subproblems_matrix_assembly,
                                        DoubleVect& thermal_subproblems_rhs_assembly,
+                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
                                        DoubleVect& thermal_subproblems_temperature_solution,
                                        const int& source_terms_type,
                                        const int& source_terms_correction);
   void compute_radial_convection_diffusion_operators();
-  void impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                  const int& boundary_condition_interface,
-                                  const double& interfacial_boundary_condition_value,
-                                  const int& impose_boundary_condition_interface_from_simulation,
-                                  const int& boundary_condition_end,
-                                  const double& end_boundary_condition_value,
-                                  const int& impose_user_boundary_condition_end_value);
-  void compute_add_source_terms();
+  void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
+                                                       const int& boundary_condition_interface,
+                                                       const double& interfacial_boundary_condition_value,
+                                                       const int& impose_boundary_condition_interface_from_simulation,
+                                                       const int& boundary_condition_end,
+                                                       const double& end_boundary_condition_value,
+                                                       const int& impose_user_boundary_condition_end_value);
   void approximate_temperature_increment_material_derivative();
   void retrieve_radial_quantities();
   void retrieve_temperature_solutions();

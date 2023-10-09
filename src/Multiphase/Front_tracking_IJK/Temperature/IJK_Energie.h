@@ -42,7 +42,7 @@
 #include <IJK_Splitting.h>
 #include <MonofluidVar.h>
 #include <Objet_U.h>
-#include <OpConvQuickInterfaceIJKScalar.h>
+#include <OpConvQuickInterfaceOnefluidIJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Parser.h>
 #include <TRUST_Ref.h>
@@ -153,7 +153,7 @@ protected:
   Corrige_flux_FT corrige_flux_;
 //  Corrige_flux_FT_temperature_conv corrige_flux_temp_conv_;
 
-  OpConvQuickInterfaceIJKScalar_double energy_convection_op_quick_interface_;
+  OpConvQuickInterfaceOnefluidIJKScalar_double energy_convection_op_quick_interface_;
   OpDiffIJKScalar_double diffusion_temperature_op_;
 
   int diff_temp_negligible_;

@@ -40,6 +40,8 @@
 #define INVALID_VELOCITY 1e-12
 #define INVALID_INTERP 1.e20
 #define INVALID_INTERP_TEST 1.e19
+#define INVALID_VELOCITY_CFL 1e-20
+#define INVALID_SOURCE_TERM 1e-20
 #define NEIGHBOURS_FIRST_DIR {-1., -1., 1., 1.}
 #define NEIGHBOURS_SECOND_DIR {-1., 1., -1., 1.}
 
@@ -80,10 +82,12 @@ public :
                                        const double& cell_diagonal,
                                        const double& dr_base,
                                        const DoubleVect& radial_coordinates,
+                                       const Matrice& identity_matrix_explicit_implicit_raw,
                                        const Matrice& radial_first_order_operator_raw,
                                        const Matrice& radial_second_order_operator_raw,
                                        const Matrice& radial_first_order_operator,
                                        const Matrice& radial_second_order_operator,
+                                       Matrice& identity_matrix_subproblems,
                                        Matrice& radial_diffusion_matrix,
                                        Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
@@ -102,19 +106,30 @@ public :
                                        IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
                                        Matrice& thermal_subproblems_matrix_assembly,
                                        DoubleVect& thermal_subproblems_rhs_assembly,
+                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
                                        DoubleVect& thermal_subproblems_temperature_solution,
                                        const int& source_terms_type,
                                        const int& source_terms_correction);
 
   void compute_radial_convection_diffusion_operators();
-  void impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                  const int& boundary_condition_interface,
-                                  const double& interfacial_boundary_condition_value,
-                                  const int& impose_boundary_condition_interface_from_simulation,
-                                  const int& boundary_condition_end,
-                                  const double& end_boundary_condition_value,
-                                  const int& impose_user_boundary_condition_end_value);
+  void prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                   DoubleVect& thermal_subproblems_temperature_solution_ini,
+                                   const int& boundary_condition_interface,
+                                   const double& interfacial_boundary_condition_value,
+                                   const int& impose_boundary_condition_interface_from_simulation,
+                                   const int& boundary_condition_end,
+                                   const double& end_boundary_condition_value,
+                                   const int& impose_user_boundary_condition_end_value);
+  void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
+                                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
+                                                       const int& boundary_condition_interface,
+                                                       const double& interfacial_boundary_condition_value,
+                                                       const int& impose_boundary_condition_interface_from_simulation,
+                                                       const int& boundary_condition_end,
+                                                       const double& end_boundary_condition_value,
+                                                       const int& impose_user_boundary_condition_end_value);
   void compute_add_source_terms();
+  void compute_temporal_explicit_implicit_matrices();
   void approximate_temperature_increment_material_derivative();
   void retrieve_temperature_solution();
   void retrieve_radial_quantities();
@@ -208,12 +223,16 @@ protected :
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,
                                              const Matrice& radial_second_order_operator,
+                                             const Matrice& identity_matrix_explicit_implicit,
+                                             Matrice& identity_matrix_subproblems,
                                              Matrice& radial_diffusion_matrix,
                                              Matrice& radial_convection_matrix);
   void initialise_thermal_probe();
   void compute_interface_basis_vectors();
   void compute_pure_spherical_basis_vectors();
+  void compute_local_time_step();
   const int *  increase_number_of_points();
+  void compute_identity_matrix_local(Matrice& identity_matrix_explicit_implicit);
   void compute_first_order_operator_local(Matrice& radial_first_order_operator);
   void compute_second_order_operator_local(Matrice& second_first_order_operator);
   void recompute_finite_difference_matrices();
@@ -255,6 +274,8 @@ protected :
 
   void post_process_interfacial_quantities(SFichier& fic, const int rank);
   void post_process_radial_quantities(const int rank);
+
+  enum Boundary_conditions { dirichlet, neumann, flux_jump };
 
   int debug_;
   int advected_frame_of_reference_=1;
@@ -312,7 +333,7 @@ protected :
   Vecteur3 normal_interfacial_gradient_compo_;
 
   // FIXME: Should each probes have their own number of points ?
-  bool global_probes_characteristics = true;
+  bool global_probes_characteristics_ = true;
 
   const int * points_per_thermal_subproblem_base_;
   const int * points_per_thermal_subproblem_;
@@ -357,12 +378,15 @@ protected :
   // FIXME: Should I use DoubleTab instead ?
   const DoubleVect* radial_coordinates_base_;
 
+  const Matrice *identity_matrix_explicit_implicit_base_;
   const Matrice *radial_first_order_operator_raw_base_;
   const Matrice *radial_second_order_operator_raw_base_;
   const Matrice *radial_first_order_operator_base_;
   const Matrice *radial_second_order_operator_base_;
+  const Matrice *identity_matrix_explicit_implicit_;
   const Matrice *radial_first_order_operator_;
   const Matrice *radial_second_order_operator_;
+  Matrice identity_matrix_explicit_implicit_local_;
   Matrice radial_first_order_operator_local_;
   Matrice radial_second_order_operator_local_;
 
@@ -370,6 +394,7 @@ protected :
    * Pointers to non-constant matrice
    * FIXME: Should I declare constant pointers ?
    */
+  Matrice *identity_matrix_subproblems_;
   Matrice *radial_diffusion_matrix_base_;
   Matrice *radial_convection_matrix_base_;
   const Matrice *radial_velocity_convection_matrix_base_;
@@ -469,6 +494,7 @@ protected :
   Matrice * thermal_subproblems_matrix_assembly_;
   DoubleVect * thermal_subproblems_rhs_assembly_;
   DoubleVect * thermal_subproblems_temperature_solution_;
+  DoubleVect * thermal_subproblems_temperature_solution_ini_;
   DoubleVect rhs_assembly_;
   double interfacial_boundary_condition_value_;
   double end_boundary_condition_value_;
@@ -489,11 +515,27 @@ protected :
   DoubleVect azymuthal_velocity_normal_gradient_;
   DoubleVect first_tangential_velocity_gradient_from_rising_dir_;
 
+  double delta_T_subcooled_overheated_ = -1.;
+
   int order_approx_temperature_ext_=1;
   int avoid_post_processing_all_terms_=0;
 
   REF(IJK_FT_double) ref_ijk_ft_;
-  bool is_updated_=false;
+  bool is_updated_ = false;
+
+  DoubleVect temperature_ini_temporal_schemes_;
+  bool is_first_time_step_ = false;
+  int first_time_step_temporal_ = 0;
+  int first_time_step_explicit_ = 1;
+  double global_dt_cfl_ = 0.;
+  double global_dt_fo_ = 0.;
+  double global_time_step_ = 0.;
+  double local_dt_cfl_ = 0.;
+  double local_dt_fo_ = 0.;
+  double local_time_step_ = 0.;
+  double local_fourier_ = 1.;
+  double local_cfl_ = 1.;
+  double max_u_;
 
 };
 

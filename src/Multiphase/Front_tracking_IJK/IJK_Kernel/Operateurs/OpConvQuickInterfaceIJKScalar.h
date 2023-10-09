@@ -32,13 +32,13 @@
 // Directory : $IJK_ROOT/src/IJK/OpVDF
 //
 /////////////////////////////////////////////////////////////////////////////
-#include <Corrige_flux_FT.h>
+#ifndef OpConvQuickInterfaceIJKScalar_double_included
+#define OpConvQuickInterfaceIJKScalar_double_included
+
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
 #include <Operateur_IJK_data_channel.h>
 #include <OpConvQuickIJKScalar.h>
-
-class Corrige_flux_FT;
 
 class OpConvQuickInterfaceIJKScalar_double  : public OpConvQuickIJKScalar_double
 {
@@ -49,25 +49,7 @@ public:
 
 protected:
   void correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir) override;
-
-  // Ces methodes devraient cacher les methodes de OpConv..._base
-  // Mais pas sur. Je pense que ca ne marche pas si on appelle
-  // la methode de OpConv..base elle les trouvera qd meme.
-  // void compute_set(IJK_Field_double& dx) override;
-  //   void compute_add(IJK_Field_double& dx) final;
 public:
-//  virtual void initialize(const IJK_Splitting& splitting,
-//                          Corrige_flux_FT& corrige_flux);
-//  virtual void initialize(const IJK_Splitting& splitting,
-//  												const IJK_Field& indicatrice,
-//                  				Corrige_flux_FT& corrige_flux);
-  // using OpConvIJKQuickScalar_double::calculer;
-  // using OpConvIJKQuickScalar_double::ajouter;
-  // OpConvIJKQuickScalarInterface_double() :
-  // correction_{}
-  // {
-  // }
-  // void calculer(const IJK_Field_double& convect, const IJK_Field_double&
-  // disc_prop, const IJK_Field_double& vx, const IJK_Field_double& vy, const
-  // IJK_Field_double& vz, IJK_Field_double& res);
 };
+
+#endif /* OpConvQuickInterfaceIJKScalar_double */

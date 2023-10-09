@@ -85,6 +85,15 @@ IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::IJK_Finite_Difference_On
   set_operators_indices(second_order_derivative_centred_vector_, second_order_derivative_centred_, 1);
   // Backward
   set_operators_indices(second_order_derivative_backward_vector_, second_order_derivative_backward_, 2);
+
+  //Identity
+  for(int i=0; i<MAX_ORDER_DERIVATIVE; i++)
+    {
+      identity_coefficient_[i][0] = DoubleVect(1);
+      identity_coefficient_[i][0](0) = 0.;
+      identity_coefficient_[i][1] = DoubleVect(1);
+      identity_coefficient_[i][0](0) = 1.;
+    }
 }
 
 Sortie& IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::printOn( Sortie& os ) const
@@ -288,6 +297,11 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_known_pat
   FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> * backward_derivative = nullptr;
   switch(derivative_order)
     {
+    case identity:
+      forward_derivative = &identity_coefficient_;
+      centred_derivative = &identity_coefficient_;
+      backward_derivative = &identity_coefficient_;
+      break;
     case first:
       forward_derivative = &first_order_derivative_forward_;
       centred_derivative = &first_order_derivative_centred_;
@@ -441,6 +455,11 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_unknown_p
   FixedVector<FixedVector<DoubleVect,2>,MAX_ORDER_DERIVATIVE> * backward_derivative = nullptr;
   switch(derivative_order)
     {
+    case identity:
+      forward_derivative = &identity_coefficient_;
+      centred_derivative = &identity_coefficient_;
+      backward_derivative = &identity_coefficient_;
+      break;
     case first:
       stencil_forward = non_zero_stencil_values(first_order_derivative_forward_);
       stencil_centred = non_zero_stencil_values(first_order_derivative_centred_);
@@ -650,7 +669,10 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                                                                                                    const int& end_boundary_conditions,
                                                                                                    const double& end_value,
                                                                                                    const int& subproblem_index,
-                                                                                                   const double& dr_inv)
+                                                                                                   const double& dr_inv,
+                                                                                                   const int& first_time_step_temporal,
+                                                                                                   const int& first_time_step_explicit,
+                                                                                                   const DoubleVect& temperature_ini_temporal_schemes)
 {
   Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*matrix).valeur());
   Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
@@ -660,7 +682,10 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                              interfacial_value,
                              end_boundary_conditions,
                              end_value,
-                             dr_inv);
+                             dr_inv,
+                             first_time_step_temporal,
+                             first_time_step_explicit,
+                             temperature_ini_temporal_schemes);
   /*
    * Fill global RHS
    */
@@ -678,20 +703,32 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                                                                                         const double& interfacial_value,
                                                                                         const int& end_boundary_conditions,
                                                                                         const double& end_value,
-                                                                                        const double& dr_inv)
+                                                                                        const double& dr_inv,
+                                                                                        const int& first_time_step_temporal,
+                                                                                        const int& first_time_step_explicit,
+                                                                                        const DoubleVect& temperature_ini_temporal_schemes)
 {
   Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, modified_matrix.valeur());
   ArrOfDouble& matrix_values = sparse_matrix.get_set_coeff();
   ArrOfInt& non_zero_coeff_per_line = sparse_matrix.get_set_tab1();
   const int nb_lines = sparse_matrix.nb_lignes();
   const int nb_coeff = sparse_matrix.nb_coeff();
+  double interfacial_value_rhs;
+  int ini_boundary_conditions_static_temporal = ini_boundary_conditions;
+  if (first_time_step_temporal)
+    {
+      interfacial_value_rhs = temperature_ini_temporal_schemes[0];
+      ini_boundary_conditions_static_temporal = dirichlet;
+    }
+  else
+    interfacial_value_rhs = interfacial_value;
   {
     /*
      * Consider a constant interfacial temperature value at saturation
      * A jump condition could be implemented later by equating
      * the fluxes crossing the interface
      */
-    switch(ini_boundary_conditions)
+    switch(ini_boundary_conditions_static_temporal)
       {
       case dirichlet:
         {
@@ -699,7 +736,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
           matrix_values[0] = 1.;
           for (int i=1; i<non_zero_elem_ini; i++)
             matrix_values[i] = 0.;
-          modified_rhs[0] = interfacial_value;
+          modified_rhs[0] = interfacial_value_rhs;
         }
         break;
       case neumann:
@@ -739,64 +776,67 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
   /*
    * The probe's end will never be coupled to a sub-resolution in the other phase
    */
-  {
-    switch(end_boundary_conditions)
-      {
-      case dirichlet:
+  if (!first_time_step_temporal)
+    {
+      switch(end_boundary_conditions)
         {
-          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
-          const int last_index = nb_coeff - 1;
-          matrix_values[last_index] = 1.;
-          for (int i=last_index - 1; i > ( last_index - non_zero_elem_end); i--)
-            matrix_values[i] = 0.;
-          modified_rhs[modified_rhs.size() - 1] = end_value;
+        case dirichlet:
+          {
+            const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+            const int last_index = nb_coeff - 1;
+            matrix_values[last_index] = 1.;
+            for (int i=last_index - 1; i > ( last_index - non_zero_elem_end); i--)
+              matrix_values[i] = 0.;
+            modified_rhs[modified_rhs.size() - 1] = end_value;
+          }
+          break;
+        case neumann:
+          {
+            // Refill with first order finite difference coefficients
+            const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+            const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+            int counter_fd_coeff = 0;
+            for (int i=0; i < non_zero_elem_end; i++)
+              {
+                const int index = i + nb_coeff - non_zero_elem_end;
+                if (index + stencil_backward >= nb_coeff)
+                  {
+                    const double fd_coeff = first_order_derivative_backward_[precision_order_-1][1](counter_fd_coeff);
+                    matrix_values[index] = fd_coeff * dr_inv;
+                    counter_fd_coeff++;
+                  }
+                else
+                  matrix_values[index] = 0.;
+              }
+            modified_rhs[modified_rhs.size() - 1] = end_value;
+          }
+          break;
+        default:
+          {
+            const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+            const int last_index = nb_coeff - 1;
+            matrix_values[last_index] = 1.;
+            for (int i = last_index - 1; i > (last_index - non_zero_elem_end); i--)
+              matrix_values[i] = 0.;
+            modified_rhs[modified_rhs.size() - 1] = -1.;
+          }
+          break;
         }
-        break;
-      case neumann:
-        {
-          // Refill with first order finite difference coefficients
-          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
-          const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
-          int counter_fd_coeff = 0;
-          for (int i=0; i < non_zero_elem_end; i++)
-            {
-              const int index = i + nb_coeff - non_zero_elem_end;
-              if (index + stencil_backward >= nb_coeff)
-                {
-                  const double fd_coeff = first_order_derivative_backward_[precision_order_-1][1](counter_fd_coeff);
-                  matrix_values[index] = fd_coeff * dr_inv;
-                  counter_fd_coeff++;
-                }
-              else
-                matrix_values[index] = 0.;
-            }
-          modified_rhs[modified_rhs.size() - 1] = end_value;
-        }
-        break;
-      default:
-        {
-          const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
-          const int last_index = nb_coeff - 1;
-          matrix_values[last_index] = 1.;
-          for (int i = last_index - 1; i > (last_index - non_zero_elem_end); i--)
-            matrix_values[i] = 0.;
-          modified_rhs[modified_rhs.size() - 1] = -1.;
-        }
-        break;
-      }
-  }
+    }
+  else
+    Cerr << "First iteration is done with Euler implicit or explicit" << finl;
   // TODO: Maybe remove this one
   if (!known_pattern_)
     sparse_matrix.compacte(remove);
 
   // sparse_matrix.sort_stencil();
-
-  if ((ini_boundary_conditions != neumann && ini_boundary_conditions != flux_jump)
-      || (end_boundary_conditions != neumann))
-    modify_rhs_for_bc(modified_matrix,
-                      modified_rhs,
-                      ini_boundary_conditions,
-                      end_boundary_conditions);
+  if (!(first_time_step_temporal && first_time_step_explicit))
+    if ((ini_boundary_conditions != neumann && ini_boundary_conditions != flux_jump)
+        || (end_boundary_conditions != neumann))
+      modify_rhs_for_bc(modified_matrix,
+                        modified_rhs,
+                        ini_boundary_conditions,
+                        end_boundary_conditions);
 }
 
 /*
@@ -870,9 +910,17 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
 //      Cerr << "Check the modified RHS" << modified_rhs[i] << finl;
 }
 
-void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly, const DoubleVect& rhs_assembly)
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
+                                                                              const DoubleVect& rhs_assembly)
 {
-
+  /*
+   * Fill global RHS
+   */
+  const int global_rhs_size = (*thermal_subproblems_rhs_assembly).size();
+  const int local_rhs_size = rhs_assembly.size();
+  const int index_start = global_rhs_size - local_rhs_size;
+  for (int i=0; i<rhs_assembly.size(); i++)
+    (*thermal_subproblems_rhs_assembly)[i + index_start] = rhs_assembly[i];
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res)
@@ -881,4 +929,18 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(co
   sparse_matrix.multvect(solution, res);
   // res = (*fd_operator) * solution;
 }
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix,
+                                                                                                       Matrice * diffusion_matrix,
+                                                                                                       const int& subproblem_index)
+{
+  Matrice_Bloc& convection_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
+  Matrice& convection_sub_matrix = convection_block_matrix.get_bloc(subproblem_index, subproblem_index);
+  convection_sub_matrix *= (-1);
+
+  Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
+  Matrice& diffusion_sub_matrix = diffusion_block_matrix.get_bloc(subproblem_index, subproblem_index);
+  diffusion_sub_matrix *= (-1);
+}
+
 
