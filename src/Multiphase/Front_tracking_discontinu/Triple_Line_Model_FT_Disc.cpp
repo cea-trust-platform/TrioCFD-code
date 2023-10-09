@@ -65,10 +65,17 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   kl_cond_(-1.),  // Invalid
   rhocpl_(-1.),  // Invalid
   read_via_file_(0),
+  nb_colon_tab_(5),
+  num_colon_tem_(0),
+  num_colon_app_(1),
+  num_colon_qtcl_(2),
   Rc_tcl_GridN_(4),
+  Rc_inject_(8e-05),
   thetaC_tcl_(150.),
   reinjection_tcl_(0),
   tempC_tcl_(10.),
+  ready_inject_tcl_(0),
+  distri_first_facette_(0),
   integration_time_(0.),
   instant_mmicro_evap_(0.),
   instant_mmeso_evap_(0.),
@@ -105,10 +112,18 @@ Entree& Triple_Line_Model_FT_Disc::readOn( Entree& is )
   if (read_via_file_)
     {
       LecFicDiffuse fic;
-      fic.ouvrir(Nom_ficher_tcl_);
+      if(!fic.ouvrir(Nom_ficher_tcl_))
+        {
+          Cerr << " File " <<Nom_ficher_tcl_<< " doesn't exist. To generate it, please, check JDD " << finl;
+          exit();
+        }
+
+
+
+
       Cerr << "Reading of the ascii file : " << Nom_ficher_tcl_ << finl;
 
-      int nb_colons = 5; // nb colons in the
+      const int nb_colons = nb_colon_tab_; // nb colons in the readed file
 
       for (int k = 0; k < nb_colons; k++)
         {
@@ -156,11 +171,17 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
   p.ajouter("read_via_file", &read_via_file_);
   p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // X_D_ADD_P floattant Radiate of nucleate site; [in number of grids]
+  // p.ajouter("Rc_inject", &Rc_inject_);
   p.ajouter("thetaC_tcl", &thetaC_tcl_); // X_D_ADD_P floattant imposed contact angle [in degree] to force bubble pinching / necking once TCL entre nucleate site
   p.ajouter_flag("reinjection_tcl", &reinjection_tcl_); // see in _.h file
+  p.ajouter_flag("distri_first_facette", &distri_first_facette_); // see in _.h file
   p.ajouter("tempC_tcl", &tempC_tcl_); // see in _.h file
   p.ajouter("file_name", &Nom_ficher_tcl_); // X_D_ADD_P floattant Input file to set TCL model
-  p.ajouter("num_colon", &num_colon_tab_);
+  p.ajouter("nb_colon", &nb_colon_tab_);
+  p.ajouter("num_colon_tem", &num_colon_tem_);
+  // p.ajouter("num_colon_vel", &num_colon_vel_);
+  p.ajouter("num_colon_app", &num_colon_app_);
+  p.ajouter("num_colon_qtcl", &num_colon_qtcl_);
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
   p.ajouter_flag("deactivate", &deactivate_);
@@ -313,12 +334,34 @@ void Triple_Line_Model_FT_Disc::completer()
     {
       // ymeso has not been initialised. n_ext_meso is used instead:
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
-      int num_face_bord_with_tcl = get_any_tcl_face();
-      if (num_face_bord_with_tcl>0)
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      // get wall BC frontiere nb
+      int num_bord = -1;
+      for (int i=0; i<zcldis.nb_cond_lim(); i++)
         {
-          int elem_voisin = zvdf.face_voisins(num_face_bord_with_tcl, 0) + zvdf.face_voisins(num_face_bord_with_tcl, 1) +1;
-          const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face_bord_with_tcl,elem_voisin));
+          const Cond_lim& la_cl = zcldis.les_conditions_limites(i);
+          // For each BC, we check its type to see if it's a wall:
+          // BC for hydraulic equation
+          bool is_wall = sub_type(Dirichlet_paroi_fixe,la_cl.valeur())
+                         || sub_type(Dirichlet_paroi_defilante,la_cl.valeur());
+          if (is_wall)
+            {
+              num_bord = i;
+              break;
+            }
+        }
+      if (num_bord<0)
+        Process::exit( "[TCL: ymeso]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
+
+      const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
+      const int nb_face = fr.nb_faces();
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+      // get TCL cells
+      if (nb_face>0)
+        {
+          const int num_face= 0;
+          int elem_voisin = zvdf.face_voisins(num_face, 0) + zvdf.face_voisins(num_face, 1) +1;
+          const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
           ymeso_ = cell_height * n_ext_meso_;
         }
       ymeso_ = Process::mp_max(ymeso_);
@@ -326,6 +369,45 @@ void Triple_Line_Model_FT_Disc::completer()
     }
   ymeso_ -= Objet_U::precision_geom;
   ymeso_ = std::fmax(ymeso_,DMINFLOAT);
+
+  if (reinjection_tcl())
+    {
+      const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      // get wall BC frontiere nb
+      int num_bord = -1;
+      for (int i=0; i<zcldis.nb_cond_lim(); i++)
+        {
+          const Cond_lim& la_cl = zcldis.les_conditions_limites(i);
+          // For each BC, we check its type to see if it's a wall:
+          // BC for hydraulic equation
+          bool is_wall = sub_type(Dirichlet_paroi_fixe,la_cl.valeur())
+                         || sub_type(Dirichlet_paroi_defilante,la_cl.valeur());
+          if (is_wall)
+            {
+              num_bord = i;
+              break;
+            }
+        }
+      if (num_bord<0)
+        Process::exit( "[TCL: Re-injection]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
+
+      const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
+      const int nb_face = fr.nb_faces();
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+      // supposing deltax = deltay in the first thermal layer
+      if (nb_face>0)
+        {
+          const int num_face= 0;
+          int elem_voisin = zvdf.face_voisins(num_face, 0) + zvdf.face_voisins(num_face, 1) +1;
+          const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
+          Rc_inject_ = cell_height * Rc_tcl_GridN_;
+        }
+      Rc_inject_ = Process::mp_max(Rc_inject_);
+      Cerr << "[TCL] Rc_inject_ is set to " << Rc_inject_ << " according to provided Rc_tcl_GridN_ " << Rc_tcl_GridN_ << finl;
+    }
+  // Rc_tcl_GridN_ -= Objet_U::precision_geom;
+  Rc_inject_ = std::fmax(Rc_inject_,DMINFLOAT);
 
   // how to access fluid diphasique? Through (eq_ns or pb)? We have neither so far.
   // const Fluide_Diphasique& fluid_dipha = ref_cast(Fluide_Diphasique, milieu); -> no it's not a Fluide_diphasique
@@ -1025,7 +1107,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // const int dim3 = Objet_U::dimension == 3;
   const Transport_Interfaces_FT_Disc& eq_transport = ref_eq_interf_.valeur();
   const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
-  // const IntTab& facettes = maillage.facettes();
+  const IntTab& facettes = maillage.facettes();
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
   // const ArrOfInt& index_facette_elem = intersections.index_facette();
   // const DoubleTab& sommets = maillage.sommets();
@@ -1094,6 +1176,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   const IntTab& elem_faces = zvdf.elem_faces();
 
+
+
+
   // 1. First loop on contact line cells:
   // Micro cells: 1, at wall BC + 2, 0<indicatrice <1 3, height < ym
   {
@@ -1113,14 +1198,14 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                        || sub_type(Dirichlet_paroi_defilante,la_cl.valeur());
         if (is_wall)
           {
-            Cerr << "[TCL: MICRO]: Wall-type BC found at " <<
+            Cerr << "[TCL]: Wall-type BC found at " <<
                  bc_name <<finl;
             num_bord = i;
             break;
           }
       }
     if (num_bord<0)
-      Process::exit( "[TCL: MICRO]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
+      Process::exit( "[TCL]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
 
     const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
     const int nb_first_face = fr.num_premiere_face();
@@ -1143,14 +1228,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             if (index < 0)
               Process::exit( "[TCL]: !!! INDICATTICE and FT are NOT CONSISTENT " );
             else
-              Cerr << "[TCL: MICRO] FOUND interface cell at #" << elemi <<" with face number #" << num_face << finl;
+              Cerr << "[TCL] FOUND interface cell at #" << elemi <<" with face number #" << num_face << finl;
 
-            Cerr << "[TCL] Searching MICRO CELLS (INTERFACE + 1.e-10m<Y<YM) among Neighboorhood cells of iElem #" << elemi << finl;
-            Cerr << "[TCL] Searching MESO CELLS (INTERFACE + YM<Y<YMeso) among Neighboorhood cells of iElem #" << elemi << finl;
-            // loop to find all cells with interface
-
-
-            Cerr << "[TCL START Searching cells from Elem #" << elemi << " and face #" << num_face << finl;
 
             ArrOfInt future_new_elems;
             future_new_elems.set_smart_resize(1);
@@ -1166,41 +1245,89 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             int iface = a + b;
 
 
+            if (distri_first_facette())
+              {
+                while (index >= 0)   // loop effective when one facette has go through serveral mesh
+                  {
+                    const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+
+                    const int fa7 = data.numero_facette_;
+                    const int sommet0 = facettes(fa7, 0);
+                    const int sommet1 = facettes(fa7, 1);
+
+                    if ((!maillage.sommet_ligne_contact(sommet0)) && (!maillage.sommet_ligne_contact(sommet1)))
+                      {
+                        // Process::exit("[TCL: MICRO] !!! BC cell found BUT not part of the first facette, as none of the sommet touch WALL, checking FT setting" );
+                        Cerr<< "[TCL: MICRO] !!!  part of the first facette, but not a TCL , as none of the sommet touch WALL, checking FT setting" << finl;
+                      }
+                    else
+                      {
+                        const int elem = data.numero_element_;
+
+                        if (is_in_list(list_micro_elems,elem))
+                          continue;
+                        else
+                          {
+                            Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
+                            list_micro_elems.append_array(elem);
+
+                            Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                            Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                            const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
+                            list_micro_faces.append_array(num_face_wall);
+                            Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                          }
+                      }
+                    index = data.index_element_suivant_;
+                  }
+
+              }
+
+
+
+
+            Cerr << "[TCL] Check if this CELL A MICRO and/or MESO cell" << finl;
+
+
             const double dist1 = std::fabs(zvdf.dist_face_elem0(num_face,elemi)); // h
             const double half_cell_height1 = std::fabs(zvdf.dist_face_elem0(elem_faces(elemi,iface),elemi)); // half distanct to furface parallel to wall
             const double hcell_top = dist1+half_cell_height1;
             const double hcell_bot = dist1-half_cell_height1;
 
-            if (hcell_top <= ym_ + Objet_U::precision_geom)
+            if (hcell_top <= ym_ + Objet_U::precision_geom && !is_in_list(list_micro_elems,elemi))
               {
                 Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elemi
-                     << " among Neighboorhood cells of iElem #" << elemi
                      << finl;
                 list_micro_elems.append_array(elemi);
-                future_new_elems.append_array(elemi);
-
                 list_micro_faces.append_array(num_face);
                 Cerr << "[TCL: MICRO]: Corresponding face number at wall "
                      << num_face << finl;
+                future_new_elems.append_array(elemi);
               }
             else if (hcell_bot <= ym_ + Objet_U::precision_geom)
               {
-                Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi <<" among Neighboorhood cells of iElem #" << elemi << finl;
-                list_micro_elems.append_array(elemi);
-                list_meso_elems.append_array(elemi);
-                future_new_elems.append_array(elemi);
+                Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
+                if (!is_in_list(list_micro_elems,elemi))
+                  {
+                    list_micro_elems.append_array(elemi);
+                    list_micro_faces.append_array(num_face);
+                  }
 
-                list_micro_faces.append_array(num_face);
-                list_meso_faces.append_array(num_face);
+                if (!is_in_list(list_meso_elems,elemi))
+                  {
+                    list_meso_faces.append_array(num_face);
+                    list_meso_elems.append_array(elemi);
+                  }
+
+                future_new_elems.append_array(elemi);
                 Cerr
                     << "[TCL: MICRO+MESO]: Corresponding face number at wall "
                     << num_face << finl;
 
               }
-            else if (hcell_bot <= ymeso_ + Objet_U::precision_geom)
+            else if (hcell_bot <= ymeso_ + Objet_U::precision_geom && !is_in_list(list_meso_elems,elemi) )
               {
                 Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elemi
-                     << " among Neighboorhood cells of iElem #" << elemi
                      << finl;
                 list_meso_elems.append_array(elemi);
                 future_new_elems.append_array(elemi);
@@ -1209,14 +1336,13 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 Cerr << "[TCL: MESO]: Corresponding face number at wall "
                      << num_face << finl;
               }
-            else
-              {
-                Cerr << "[TCL:] HOWEVER ## elem " << elemi
-                     << " NOT part of MICRO or Macro Region" << finl;
-                break;
-              }
 
 
+
+            Cerr << "[TCL] Searching MICRO CELLS (INTERFACE + 1.e-10m<Y<YM) among Neighboorhood cells of iElem #" << elemi << finl;
+            Cerr << "[TCL] Searching MESO CELLS (INTERFACE + YM<Y<YMeso) among Neighboorhood cells of iElem #" << elemi << finl;
+            // loop to find all cells with interface
+            Cerr << "[TCL START Searching cells from Elem #" << elemi << " and face #" << num_face << finl;
 
             future_new_elems.append_array(elemi); // Initialize the list with the current micro cells
             while (future_new_elems.size_array()) // There are some elements to deal with
@@ -1241,7 +1367,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                           continue; // This element is not crossed by the interface. Go to the next face.
                         // We won't want to do ielem twice (unless it was a micro elem)
                         // Have we seen this element already in the TCL list?
-                        if (is_in_list(list_micro_elems,elem_voisin) || is_in_list(list_meso_elems,elem_voisin))
+                        if (is_in_list(list_micro_elems,elem_voisin) && is_in_list(list_meso_elems,elem_voisin))
                           continue;
 
                         Cerr << "[TCL ] FOUND interface cell #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
@@ -1254,6 +1380,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                         const double hcell_up = dist+half_cell_height;
                         if (hcell_up <= ym_+Objet_U::precision_geom)
                           {
+                            if (is_in_list(list_micro_elems,elem_voisin))
+                              continue;
                             Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
                             list_micro_elems.append_array(elem_voisin);
                             future_new_elems.append_array(elem_voisin);
@@ -1267,22 +1395,30 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                         else if (hcell_dn <= ym_+Objet_U::precision_geom)
                           {
                             Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-                            list_micro_elems.append_array(elem_voisin);
-                            list_meso_elems.append_array(elem_voisin);
-                            future_new_elems.append_array(elem_voisin);
-
                             Cerr << "[TCL: MICRO+MESO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
                             Cerr << "[TCL: MICRO+MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
                             const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
-                            list_micro_faces.append_array(num_face_wall);
-                            list_meso_faces.append_array(num_face_wall);
+
+                            future_new_elems.append_array(elem_voisin);
+                            if (!is_in_list(list_micro_elems,elem_voisin))
+                              {
+                                list_micro_elems.append_array(elem_voisin);
+                                list_micro_faces.append_array(num_face_wall);
+                              }
+
+                            if (!is_in_list(list_meso_elems,elem_voisin))
+                              {
+                                list_meso_elems.append_array(elem_voisin);
+                                list_meso_faces.append_array(num_face_wall);
+                              }
                             Cerr << "[TCL: MICRO+MESO]: Corresponding face number at wall " << num_face_wall << finl;
 
                           }
                         else if (hcell_dn<=ymeso_+Objet_U::precision_geom)
                           {
+                            if (is_in_list(list_meso_elems,elem_voisin))
+                              continue;
                             Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-
                             list_meso_elems.append_array(elem_voisin);
                             future_new_elems.append_array(elem_voisin);
 
@@ -1301,468 +1437,475 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                       }
                   }
               }
-
-            Cerr << "[TCL: MICRO]: list_micro_elems, number of elems " << list_micro_elems << finl;
-            Cerr << "[TCL: MICRO]: list_micro_faces number of elems " << list_micro_faces << finl;
-            Cerr <<  " *************************************** " << finl;
-            Cerr << "[TCL: MESO]: list_meso_elems number of elems " << list_meso_elems << finl;
-            Cerr << "[TCL: MESO]: list_meso_faces number of elems" << list_meso_faces << finl;
-
           }
+      } // ==========================fin==============loop 1===================
 
-      }
-    // ==========================fin==============loop 1===================
-  }
-
-  // 2. send loop to fill-in micro contribution
-  // We have our list of cells, we can complete their contribution and add them to the list
-  {
-    const double nn = list_micro_elems.size_array();
-    for (int idx=0; idx<nn; idx++)
-      {
-        const int elem = list_micro_elems[idx];
-        const int num_face = list_micro_faces[idx];
-
-        double surface_tot = 0.;
-        DoubleTab in_out(2,Objet_U::dimension); // The coords of left and right points where the interface cross the cell boundary
-        FTd_vecteur3 norm_elem = {0., 0., 0.};
-        if (inout_method_ == EXACT)
-          {
-            get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
-          }
-        else if (inout_method_ == APPROX)
-          {
-            const int korient= zvdf.orientation(num_face);
-            compute_approximate_interface_inout(zvdf, korient,
-                                                elem, num_face,
-                                                in_out, norm_elem, surface_tot);
-          }
-        else
-          {
-            // both methods are used and compared :
-            get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
-
-            DoubleTab in_out_approx(2,Objet_U::dimension);
-            FTd_vecteur3 norm_elem_approx = {0., 0., 0.};
-            double surface_tot_approx = 0.;
-            const int korient= zvdf.orientation(num_face);
-            compute_approximate_interface_inout(zvdf, korient,
-                                                elem, num_face,
-                                                in_out_approx, norm_elem_approx, surface_tot_approx);
-            Cerr << "comparison of approx to exact method in elem " << elem << finl;
-            // in_out(0,0) -> x_in
-            // in_out(0,1) -> y_in
-            // in_out(1,0) -> x_out
-            // in_out(1,1) -> y_out
-            // Sorting points in/out with point 'in' closer to origin than 'ou' for the comparison:
-            const double d0 = std::sqrt(in_out(0,0)*in_out(0,0)+in_out(0,1)*in_out(0,1));
-            const double d1 = std::sqrt(in_out(1,0)*in_out(1,0)+in_out(1,1)*in_out(1,1));
-            const double x_in = (d0<d1) ? in_out(0,0) : in_out(1,0);
-            const double y_in = (d0<d1) ? in_out(0,1) : in_out(1,1);
-            const double x_ou = (d0<d1) ? in_out(1,0) : in_out(0,0);
-            const double y_ou = (d0<d1) ? in_out(1,1) : in_out(0,1);
-            // approx points
-            const double da0 = std::sqrt(in_out_approx(0,0)*in_out_approx(0,0)+in_out_approx(0,1)*in_out_approx(0,1));
-            const double da1 = std::sqrt(in_out_approx(1,0)*in_out_approx(1,0)+in_out_approx(1,1)*in_out_approx(1,1));
-            const double xa_in = (da0<da1) ? in_out_approx(0,0) : in_out_approx(1,0);
-            const double ya_in = (da0<da1) ? in_out_approx(0,1) : in_out_approx(1,1);
-            const double xa_ou = (da0<da1) ? in_out_approx(1,0) : in_out_approx(0,0);
-            const double ya_ou = (da0<da1) ? in_out_approx(1,1) : in_out_approx(0,1);
-            if ((std::fabs(x_in-xa_in)>DMINFLOAT) or (std::fabs(x_ou-xa_ou)>DMINFLOAT))
-              Cerr << "inout x -- exact "
-                   << x_in << " "
-                   << x_ou << " approx "
-                   << xa_in << " "
-                   << xa_ou << " delta "
-                   << x_in-xa_in << " "
-                   << x_ou-xa_ou  << finl;
-            if ((std::fabs(y_in-ya_in)>DMINFLOAT) or (std::fabs(y_ou-ya_ou)>DMINFLOAT))
-              Cerr << "inout y -- exact "
-                   << y_in << " "
-                   << y_ou << " approx "
-                   << ya_in << " "
-                   << ya_ou << " delta "
-                   << y_in-ya_in << " "
-                   << y_ou-ya_ou  << finl;
-            if ((std::fabs(norm_elem[0]-norm_elem_approx[0])>DMINFLOAT) or
-                (std::fabs(norm_elem[1]-norm_elem_approx[1])>DMINFLOAT))
-              Cerr << "normal_elem -- exact " << norm_elem[0] << " " << norm_elem[1]
-                   << " approx " << norm_elem_approx[0] << " " << norm_elem_approx[1]
-                   << " delta " << norm_elem[0]-norm_elem_approx[0] << " " << norm_elem[1]-norm_elem_approx[1]
-                   << finl;
-            if (std::fabs(surface_tot-surface_tot_approx)>DMINFLOAT)
-              Cerr << "surface -- exact "
-                   << surface_tot << " approx "
-                   << surface_tot_approx  << " delta "
-                   << surface_tot-surface_tot_approx << finl;
-            Cerr << "End of comparison" << finl;
-          }
-        double factor = surface_tot/pow(volumes[elem], 2./3.);
-        if (factor < 1.e-6)
-          {
-            Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
-            continue; // skip cells crossed by almost no interface.
-          }
-
-        // The offset distance should be accounted for because the methods in_out counts the origin at the cell
-        {
-          // in_out are real absolute coordinates.
-          // We should make the "y" a normal distance to TCL
-          const int korient = zvdf.orientation(num_face);
-          const double xwall =zvdf.xv(num_face, korient);
-          in_out(0,korient) -= xwall;
-          in_out(1,korient) -= xwall;
-          //in_out(0,1) += dist;
-          //in_out(1,1) += dist;
-          if (zvdf.dist_face_elem0(num_face,elem)>0)
-            {
-              // The face is on top of the element, so distance will be negative.
-              // We want to count it positive by convention so :
-              in_out(0,korient) *= -1;
-              in_out(1,korient) *= -1;
-            }
-          assert(in_out(0,korient) >=-Objet_U::precision_geom);
-          assert(in_out(1,korient) >=-Objet_U::precision_geom);
-        }
-        const double xl = in_out(0,0);
-        const double yl = in_out(0,1);
-        const double xr = in_out(1,0);
-        const double yr = in_out(1,1);
-        // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
+    // Cerr << "[TCL: MICRO]: list_micro_elems number of elems: " << list_micro_elems << finl;
+    // Cerr << "[TCL: MICRO]: list_micro_faces number of faces: " << list_micro_faces << finl;
+    // Cerr <<  " *************************************** " << finl;
+    // Cerr << "[TCL: MESO]: list_meso_elems number of elems: " << list_meso_elems << finl;
+    // Cerr << "[TCL: MESO]: list_meso_faces number of faces: " << list_meso_faces << finl;
 
 
-
-        double circum_dis = 1.;
-        if (Objet_U::bidim_axi)
-          {
-            double radial_dis = (xr + xl)/2;
-            const double angle_bidim_axi = Maillage_FT_Disc::angle_bidim_axi();
-            circum_dis = angle_bidim_axi*radial_dis;
-            Cerr << "[TCL: MICRO:] FILLING LIST MICRO [bidim_axi] circum_dis = " << circum_dis << finl;
-          }
-
-
-        const double ytop = std::fmax(yr,yl);
-        const double ybot = std::fmin(yr,yl);
-
-        // Micro region is between 1.e-10 and ym_:
-        const double ymin = exp(-19);
-
-        double Qtot = get_Qtcl(num_face);
-        double Qmicro = log(std::fmin(ym_,std::fmax(ytop,ymin))/ std::fmin(ym_,std::fmax(ybot,ymin))) / (log(ym_) +19.)*Qtot;
-
-        double Q_int = Qmicro*circum_dis; // unit of Q_int is W
-
-
-
-
-        if (first_call_for_this_mesh)
-          {
-            // We update values and integrals only at the first call
-            instant_mmicro_evap_ += (Q_int/Lvap)*dt;
-            instant_vmicro_evap_ = instant_mmicro_evap_*jump_inv_rho; // '=' not '+=' because the '+=' is already in instant_mmicro_evap_
-          }
-
-
-        elems_with_CL_contrib.append_array(elem);
-        num_faces.append_array(num_face);
-        mpoint_from_CL.append_array(Q_int/(surface_tot*Lvap));
-        Q_from_CL.append_array(Q_int);
-        list_micro_Qtot.append_array(Qmicro/Qtot);
-
-
-        instant_Qmicro += Qmicro;
-
-        Cerr.precision(16);
-        Cerr << "[TCL: MICRO]:" << " Instantaneous tcl-evaporation = "<< instant_vmicro_evap_ << finl;
-        Cerr << "[TCL: MICRO] time  = " << integration_time_ << " Qmicro= " << Qmicro << " Qint " << Q_int << finl;
-        Cerr.precision(7);
-
-
-      }
-  }
-
-  instant_Qmicro = mp_sum(instant_Qmicro);
-
-  Cerr << " ********* VALUES OF MICRO CONTRIBUTION *************** " << finl;
-  Cerr << " nb_contact_line_contribution " << Q_from_CL.size_array() << finl;
-  Cerr << "# elem \t face \t Q  \t\t fraction \t mp" << finl;
-  for (int idx = 0; idx < Q_from_CL.size_array(); idx++)
+    // 2. send loop to fill-in micro contribution
+    // We have our list of cells, we can complete their contribution and add them to the list
     {
-      Cerr << elems_with_CL_contrib[idx] << " \t " <<  num_faces[idx] << " \t "
-           << Q_from_CL[idx] << " \t " <<  list_micro_Qtot[idx] << " \t "
-           << mpoint_from_CL[idx] << " \t " << finl;
-    }
-  Cerr << " ************************************************************* " << finl;
+      const double nn = list_micro_elems.size_array();
+      for (int idx=0; idx<nn; idx++)
+        {
+          const int elem = list_micro_elems[idx];
+          const int num_face = list_micro_faces[idx];
 
+          double surface_tot = 0.;
+          DoubleTab in_out(2,Objet_U::dimension); // The coords of left and right points where the interface cross the cell boundary
+          FTd_vecteur3 norm_elem = {0., 0., 0.};
+          if (inout_method_ == EXACT)
+            {
+              get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
+            }
+          else if (inout_method_ == APPROX)
+            {
+              const int korient= zvdf.orientation(num_face);
+              compute_approximate_interface_inout(zvdf, korient,
+                                                  elem, num_face,
+                                                  in_out, norm_elem, surface_tot);
+            }
+          else
+            {
+              // both methods are used and compared :
+              get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
+
+              DoubleTab in_out_approx(2,Objet_U::dimension);
+              FTd_vecteur3 norm_elem_approx = {0., 0., 0.};
+              double surface_tot_approx = 0.;
+              const int korient= zvdf.orientation(num_face);
+              compute_approximate_interface_inout(zvdf, korient,
+                                                  elem, num_face,
+                                                  in_out_approx, norm_elem_approx, surface_tot_approx);
+              Cerr << "comparison of approx to exact method in elem " << elem << finl;
+              // in_out(0,0) -> x_in
+              // in_out(0,1) -> y_in
+              // in_out(1,0) -> x_out
+              // in_out(1,1) -> y_out
+              // Sorting points in/out with point 'in' closer to origin than 'ou' for the comparison:
+              const double d0 = std::sqrt(in_out(0,0)*in_out(0,0)+in_out(0,1)*in_out(0,1));
+              const double d1 = std::sqrt(in_out(1,0)*in_out(1,0)+in_out(1,1)*in_out(1,1));
+              const double x_in = (d0<d1) ? in_out(0,0) : in_out(1,0);
+              const double y_in = (d0<d1) ? in_out(0,1) : in_out(1,1);
+              const double x_ou = (d0<d1) ? in_out(1,0) : in_out(0,0);
+              const double y_ou = (d0<d1) ? in_out(1,1) : in_out(0,1);
+              // approx points
+              const double da0 = std::sqrt(in_out_approx(0,0)*in_out_approx(0,0)+in_out_approx(0,1)*in_out_approx(0,1));
+              const double da1 = std::sqrt(in_out_approx(1,0)*in_out_approx(1,0)+in_out_approx(1,1)*in_out_approx(1,1));
+              const double xa_in = (da0<da1) ? in_out_approx(0,0) : in_out_approx(1,0);
+              const double ya_in = (da0<da1) ? in_out_approx(0,1) : in_out_approx(1,1);
+              const double xa_ou = (da0<da1) ? in_out_approx(1,0) : in_out_approx(0,0);
+              const double ya_ou = (da0<da1) ? in_out_approx(1,1) : in_out_approx(0,1);
+              if ((std::fabs(x_in-xa_in)>DMINFLOAT) or (std::fabs(x_ou-xa_ou)>DMINFLOAT))
+                Cerr << "inout x -- exact "
+                     << x_in << " "
+                     << x_ou << " approx "
+                     << xa_in << " "
+                     << xa_ou << " delta "
+                     << x_in-xa_in << " "
+                     << x_ou-xa_ou  << finl;
+              if ((std::fabs(y_in-ya_in)>DMINFLOAT) or (std::fabs(y_ou-ya_ou)>DMINFLOAT))
+                Cerr << "inout y -- exact "
+                     << y_in << " "
+                     << y_ou << " approx "
+                     << ya_in << " "
+                     << ya_ou << " delta "
+                     << y_in-ya_in << " "
+                     << y_ou-ya_ou  << finl;
+              if ((std::fabs(norm_elem[0]-norm_elem_approx[0])>DMINFLOAT) or
+                  (std::fabs(norm_elem[1]-norm_elem_approx[1])>DMINFLOAT))
+                Cerr << "normal_elem -- exact " << norm_elem[0] << " " << norm_elem[1]
+                     << " approx " << norm_elem_approx[0] << " " << norm_elem_approx[1]
+                     << " delta " << norm_elem[0]-norm_elem_approx[0] << " " << norm_elem[1]-norm_elem_approx[1]
+                     << finl;
+              if (std::fabs(surface_tot-surface_tot_approx)>DMINFLOAT)
+                Cerr << "surface -- exact "
+                     << surface_tot << " approx "
+                     << surface_tot_approx  << " delta "
+                     << surface_tot-surface_tot_approx << finl;
+              Cerr << "End of comparison" << finl;
+            }
+          double factor = surface_tot/pow(volumes[elem], 2./3.);
+          if (factor < 1.e-6)
+            {
+              Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
+              continue; // skip cells crossed by almost no interface.
+            }
+
+          // The offset distance should be accounted for because the methods in_out counts the origin at the cell
+          {
+            // in_out are real absolute coordinates.
+            // We should make the "y" a normal distance to TCL
+            const int korient = zvdf.orientation(num_face);
+            const double xwall =zvdf.xv(num_face, korient);
+            in_out(0,korient) -= xwall;
+            in_out(1,korient) -= xwall;
+            //in_out(0,1) += dist;
+            //in_out(1,1) += dist;
+            if (zvdf.dist_face_elem0(num_face,elem)>0)
+              {
+                // The face is on top of the element, so distance will be negative.
+                // We want to count it positive by convention so :
+                in_out(0,korient) *= -1;
+                in_out(1,korient) *= -1;
+              }
+            assert(in_out(0,korient) >=-Objet_U::precision_geom);
+            assert(in_out(1,korient) >=-Objet_U::precision_geom);
+          }
+          const double xl = in_out(0,0);
+          const double yl = in_out(0,1);
+          const double xr = in_out(1,0);
+          const double yr = in_out(1,1);
+          // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
+
+
+
+          double circum_dis = 1.;
+          if (Objet_U::bidim_axi)
+            {
+              double radial_dis = (xr + xl)/2;
+              const double angle_bidim_axi = Maillage_FT_Disc::angle_bidim_axi();
+              circum_dis = angle_bidim_axi*radial_dis;
+              Cerr << "[TCL: MICRO:] FILLING LIST MICRO [bidim_axi] circum_dis = " << circum_dis << finl;
+            }
+
+
+          const double ytop = std::fmax(yr,yl);
+          const double ybot = std::fmin(yr,yl);
+
+          // Micro region is between 1.e-10 and ym_:
+          const double ymin = exp(-19);
+
+          double Qtot = get_Qtcl(num_face);
+          double Qmicro = 0.;
+
+          if(!distri_first_facette())
+            Qmicro = log(std::fmin(ym_,std::fmax(ytop,ymin))/ std::fmin(ym_,std::fmax(ybot,ymin))) / (log(ym_) +19.)*Qtot;
+          else
+            {
+              const int index=intersections.index_elem()[elem]; // index > 0 if Front presents
+              const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+              const double fraction = data.fraction_surface_intersection_;
+              Qmicro = fraction*Qtot;
+            }
+
+          double Q_int = Qmicro*circum_dis; // unit of Q_int is W
+
+          if (first_call_for_this_mesh)
+            {
+              // We update values and integrals only at the first call
+              instant_mmicro_evap_ += (Q_int/Lvap)*dt;
+              instant_vmicro_evap_ = instant_mmicro_evap_*jump_inv_rho; // '=' not '+=' because the '+=' is already in instant_mmicro_evap_
+            }
+
+
+          elems_with_CL_contrib.append_array(elem);
+          num_faces.append_array(num_face);
+          mpoint_from_CL.append_array(Q_int/(surface_tot*Lvap));
+          Q_from_CL.append_array(Q_int);
+          list_micro_Qtot.append_array(Qmicro/Qtot);
+
+
+          instant_Qmicro += Qmicro;
+
+          Cerr.precision(16);
+          Cerr << "[TCL: MICRO]:" << " Instantaneous tcl-evaporation = "<< instant_vmicro_evap_ << finl;
+          Cerr << "[TCL: MICRO] time  = " << integration_time_ << " Qmicro= " << Qmicro << " Qint " << Q_int << finl;
+          Cerr.precision(7);
+
+
+        }
+    }
+
+    instant_Qmicro = mp_sum(instant_Qmicro);
+
+    if (elems_with_CL_contrib.size_array()>0)
+      {
+        Cerr << " nb_contact_line_contribution " << Q_from_CL.size_array() << finl;
+        Cerr << " ********* VALUES OF MICRO CONTRIBUTION *************** " << finl;
+        Cerr << "elem\t| face\t| Q\t\t| mp\t\t| fraction" << finl;
+        for (int idx = 0; idx < Q_from_CL.size_array(); idx++)
+          {
+            Cerr << elems_with_CL_contrib[idx] << "\t| " <<  num_faces[idx] << "\t| "
+                 << Q_from_CL[idx] << "\t| " <<   mpoint_from_CL[idx] << "\t| "
+                 <<list_micro_Qtot[idx] << finl;
+          }
+        Cerr << " ************************************************************* " << finl;
+      }
 
 // 3. Third loop to fill-in meso contribution
 // We have our list of cells, we can complete their contribution and add them to the list
-  {
-    const double nn = list_meso_elems.size_array();
-    for (int idx=0; idx<nn; idx++)
+    {
+      const double nn = list_meso_elems.size_array();
+      for (int idx=0; idx<nn; idx++)
+        {
+          const int elem = list_meso_elems[idx];
+          const int num_face = list_meso_faces[idx];
+
+
+          double surface_tot = 0.;
+          DoubleTab in_out(2,Objet_U::dimension); // The coords of left and right points where the interface cross the cell boundary
+          FTd_vecteur3 norm_elem = {0., 0., 0.};
+          if (inout_method_ == EXACT)
+            {
+              get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
+            }
+          else if (inout_method_ == APPROX)
+            {
+              const int korient= zvdf.orientation(num_face);
+              compute_approximate_interface_inout(zvdf, korient,
+                                                  elem, num_face,
+                                                  in_out, norm_elem, surface_tot);
+            }
+          else
+            {
+              // both methods are used and compared :
+              get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
+
+              DoubleTab in_out_approx(2,Objet_U::dimension);
+              FTd_vecteur3 norm_elem_approx = {0., 0., 0.};
+              double surface_tot_approx = 0.;
+              const int korient= zvdf.orientation(num_face);
+              compute_approximate_interface_inout(zvdf, korient,
+                                                  elem, num_face,
+                                                  in_out_approx, norm_elem_approx, surface_tot_approx);
+              Cerr << "comparison of approx to exact method in elem " << elem << finl;
+              // in_out(0,0) -> x_in
+              // in_out(0,1) -> y_in
+              // in_out(1,0) -> x_out
+              // in_out(1,1) -> y_out
+              // Sorting points in/out with point 'in' closer to origin than 'ou' for the comparison:
+              const double d0 = std::sqrt(in_out(0,0)*in_out(0,0)+in_out(0,1)*in_out(0,1));
+              const double d1 = std::sqrt(in_out(1,0)*in_out(1,0)+in_out(1,1)*in_out(1,1));
+              const double x_in = (d0<d1) ? in_out(0,0) : in_out(1,0);
+              const double y_in = (d0<d1) ? in_out(0,1) : in_out(1,1);
+              const double x_ou = (d0<d1) ? in_out(1,0) : in_out(0,0);
+              const double y_ou = (d0<d1) ? in_out(1,1) : in_out(0,1);
+              // approx points
+              const double da0 = std::sqrt(in_out_approx(0,0)*in_out_approx(0,0)+in_out_approx(0,1)*in_out_approx(0,1));
+              const double da1 = std::sqrt(in_out_approx(1,0)*in_out_approx(1,0)+in_out_approx(1,1)*in_out_approx(1,1));
+              const double xa_in = (da0<da1) ? in_out_approx(0,0) : in_out_approx(1,0);
+              const double ya_in = (da0<da1) ? in_out_approx(0,1) : in_out_approx(1,1);
+              const double xa_ou = (da0<da1) ? in_out_approx(1,0) : in_out_approx(0,0);
+              const double ya_ou = (da0<da1) ? in_out_approx(1,1) : in_out_approx(0,1);
+              if ((std::fabs(x_in-xa_in)>DMINFLOAT) or (std::fabs(x_ou-xa_ou)>DMINFLOAT))
+                Cerr << "inout x -- exact "
+                     << x_in << " "
+                     << x_ou << " approx "
+                     << xa_in << " "
+                     << xa_ou << " delta "
+                     << x_in-xa_in << " "
+                     << x_ou-xa_ou  << finl;
+              if ((std::fabs(y_in-ya_in)>DMINFLOAT) or (std::fabs(y_ou-ya_ou)>DMINFLOAT))
+                Cerr << "inout y -- exact "
+                     << y_in << " "
+                     << y_ou << " approx "
+                     << ya_in << " "
+                     << ya_ou << " delta "
+                     << y_in-ya_in << " "
+                     << y_ou-ya_ou  << finl;
+              if ((std::fabs(norm_elem[0]-norm_elem_approx[0])>DMINFLOAT) or
+                  (std::fabs(norm_elem[1]-norm_elem_approx[1])>DMINFLOAT))
+                Cerr << "normal_elem -- exact " << norm_elem[0] << " " << norm_elem[1]
+                     << " approx " << norm_elem_approx[0] << " " << norm_elem_approx[1]
+                     << " delta " << norm_elem[0]-norm_elem_approx[0] << " " << norm_elem[1]-norm_elem_approx[1]
+                     << finl;
+              if (std::fabs(surface_tot-surface_tot_approx)>DMINFLOAT)
+                Cerr << "surface -- exact "
+                     << surface_tot << " approx "
+                     << surface_tot_approx  << " delta "
+                     << surface_tot-surface_tot_approx << finl;
+              Cerr << "End of comparison" << finl;
+            }
+          double factor = surface_tot/pow(volumes[elem], 2./3.);
+          if (factor < 1.e-6)
+            {
+              Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
+              continue; // skip cells crossed by almost no interface.
+            }
+
+          // The offset distance should be accounted for because the methods in_out counts the origin at the cell
+          {
+            // in_out are real absolute coordinates.
+            // We should make the "y" a normal distance to TCL
+            const int korient = zvdf.orientation(num_face);
+            const double xwall =zvdf.xv(num_face, korient);
+            in_out(0,korient) -= xwall;
+            in_out(1,korient) -= xwall;
+            //in_out(0,1) += dist;
+            //in_out(1,1) += dist;
+            if (zvdf.dist_face_elem0(num_face,elem)>0)
+              {
+                // The face is on top of the element, so distance will be negative.
+                // We want to count it positive by convention so :
+                in_out(0,korient) *= -1;
+                in_out(1,korient) *= -1;
+              }
+            assert(in_out(0,korient) >=-Objet_U::precision_geom);
+            assert(in_out(1,korient) >=-Objet_U::precision_geom);
+          }
+          const double xl = in_out(0,0);
+          const double yl = in_out(0,1);
+          const double xr = in_out(1,0);
+          const double yr = in_out(1,1);
+
+          // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
+          double theta_app_loc = compute_local_cos_theta(parcours, num_face, norm_elem);
+          double Q_meso = 0.;
+          double Q_int = compute_Qint(in_out, theta_app_loc, num_face, Q_meso);
+          //  const double value = jump_inv_rho*Q_int/Lvap;
+          //  Cerr << "[TCL-meso] Local source in elem=["  << elem << "] with value= " << value << "[m2.s-1]" << finl;
+          //  Cerr << "Qint= " << Q_int << finl;
+
+          if (first_call_for_this_mesh)
+            {
+              // We update values and integrals only at the first call
+              instant_mmeso_evap_ += (Q_int/Lvap)*dt;                   // total mass of liquid evaporated
+              instant_vmeso_evap_ = (instant_mmeso_evap_*jump_inv_rho); // total volume of liquid evaporated
+              integrated_vmeso_evap_ = instant_vmeso_evap_;
+            }
+          Cerr.precision(16);
+          Cerr << "[TCL: MESO] time  = " << integration_time_ << " Qmeso= " << Q_meso << " Qint " << Q_int << finl;
+          Cerr.precision(7);
+          // Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
+          elems_with_CL_contrib.append_array(elem);
+          //mpoint_from_CL.append_array((Q_meso*surface_tot/v)/Lvap); // VP: replaced Q_int by Q_meso....unit--kg/m^2.s
+          double x1=0., y1=0.;
+          double x2=0., y2=0.;
+          // point 0 will be the left if (left lower than right)&&(M lower than left)
+          // otherwise, it should be point M if M is in the elem
+          double x0=0., y0=0.;
+          if (yl<yr)
+            {
+              x1=xl;
+              y1=yl;
+              x2=xr;
+              y2=yr;
+            }
+          else
+            {
+              x2=xl;
+              y2=yl;
+              x1=xr;
+              y1=yr;
+            }
+          if (ym_<=y1)
+            {
+              // micro not in that cell:
+              x0=x1;
+              y0=y1;
+            }
+          else if(ym_<=y2)
+            {
+              // point M is in that cell:
+              // ie PART of the interface is in micro.
+              y0=ym_;
+              const double f = (y0-y1)/(y2-y1);
+              x0=x1+f*(x2-x1);
+              Cerr << "[x0 vs x_cl] t= "<< integration_time_ << " elem= " << elem << " x0/x_cl " << x0<< " " <<x_cl_<< finl;
+            }
+          else
+            {
+              // That cell is fully micro ie ym>y2>y1
+              // in that case, smeso should be 0. :
+              x0=x2;
+              y0=y2;
+            }
+          const double dx = x2-x0;
+          const double dy = y2-y0;
+          const double s_meso = sqrt(dx*dx+dy*dy);
+          if (s_meso<DMINFLOAT)
+            {
+              // Qmeso is probably zero too
+              mpoint_from_CL.append_array(0.);
+            }
+          else
+            {
+              mpoint_from_CL.append_array(Q_int/(surface_tot*Lvap)); // LW 2023.27.09 coherance with Qint used in Q_from_CL to compute a mean weighted by surface_tot
+            }
+          instant_Qmeso += Q_meso;
+          {
+            // comparison s_meso as dist_LR to the reconstruction based on surface_tot
+            // Si la CL est dans la maille...
+            if ((Objet_U::bidim_axi) && ((xr-x_cl_)*(xl-x_cl_)<=0.))
+              {
+                double S_micro = Maillage_FT_Disc::angle_bidim_axi()*x_cl_*sm_;
+                const double rm = 0.5*(xr+xl);
+                const double s_meso_assessed = (surface_tot-S_micro)/(Maillage_FT_Disc::angle_bidim_axi()*rm);
+                Cerr.precision(16);
+                Cerr << "[TCL: MESO: Assessment-S_meso] t= "<< integration_time_ << " elem= " << elem << " LR= " ;
+                Cerr << s_meso <<  " Ameso/2pir= " << s_meso_assessed << " err(%)= " << 50.*std::abs(s_meso_assessed-s_meso)/(s_meso_assessed+s_meso) << finl;
+                Cerr.precision(7);
+              }
+          }
+          Q_from_CL.append_array(Q_int);
+          num_faces.append_array(num_face);
+          // instant_mmeso_evap_ += Q_int/Lvap;                      // total mass of liquid evaporated
+          // instant_vmeso_evap_ += instant_mmeso_evap_/rho_phase_1; // total volume of liquid evaporated
+        }
+    }
+    instant_Qmeso = mp_sum(instant_Qmeso);
+
+    const double verbosity=1;
+    if (verbosity)
       {
-        const int elem = list_meso_elems[idx];
-        const int num_face = list_meso_faces[idx];
+        const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
+        if (nb_contact_line_contribution>0 )
+          {
+            const double t = ns.schema_temps().temps_courant();
+            Cerr << " time " << t << finl;
+            Cerr << " nb_contact_line_contribution " << nb_contact_line_contribution << finl;
+            Cerr << " ********* VALUES OF CONTACT LINE CONTRIBUTION *************** " << finl;
+            Cerr << "elem\t| face\t| Q\t\t| mp" << finl;
+            for (int idx = 0; idx < nb_contact_line_contribution; idx++)
+              {
+                Cerr << elems_with_CL_contrib[idx] << "\t| " <<  num_faces[idx] << "\t| "
+                     << Q_from_CL[idx] << "\t| " << mpoint_from_CL[idx]  << finl;
+              }
+            Cerr << " ************************************************************* " << finl;
+            Cerr << "[instant-Q] time micro meso " << t << " " <<
+                 instant_Qmicro << " " << instant_Qmeso << finl;
+            Cerr << " ************************************************************* " << finl;
+          }
+      }
 
+    // double micro_mevap = instant_mmicro_evap_ + instant_mmeso_evap_;
+    // You want the total value on all processors:
+    // micro_mevap = Process::mp_sum(micro_mevap);
 
-        double surface_tot = 0.;
-        DoubleTab in_out(2,Objet_U::dimension); // The coords of left and right points where the interface cross the cell boundary
-        FTd_vecteur3 norm_elem = {0., 0., 0.};
-        if (inout_method_ == EXACT)
-          {
-            get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
-          }
-        else if (inout_method_ == APPROX)
-          {
-            const int korient= zvdf.orientation(num_face);
-            compute_approximate_interface_inout(zvdf, korient,
-                                                elem, num_face,
-                                                in_out, norm_elem, surface_tot);
-          }
-        else
-          {
-            // both methods are used and compared :
-            get_in_out_coords(zvdf, elem, dt, in_out, norm_elem, surface_tot);
+    // Temporary code : Later, we will either (i) fill elems_ directly without using a temporary elems_with_CL_contrib
+    // or (ii) make a list without repetition (summing up values for micro and meso together)
+    // Store :
 
-            DoubleTab in_out_approx(2,Objet_U::dimension);
-            FTd_vecteur3 norm_elem_approx = {0., 0., 0.};
-            double surface_tot_approx = 0.;
-            const int korient= zvdf.orientation(num_face);
-            compute_approximate_interface_inout(zvdf, korient,
-                                                elem, num_face,
-                                                in_out_approx, norm_elem_approx, surface_tot_approx);
-            Cerr << "comparison of approx to exact method in elem " << elem << finl;
-            // in_out(0,0) -> x_in
-            // in_out(0,1) -> y_in
-            // in_out(1,0) -> x_out
-            // in_out(1,1) -> y_out
-            // Sorting points in/out with point 'in' closer to origin than 'ou' for the comparison:
-            const double d0 = std::sqrt(in_out(0,0)*in_out(0,0)+in_out(0,1)*in_out(0,1));
-            const double d1 = std::sqrt(in_out(1,0)*in_out(1,0)+in_out(1,1)*in_out(1,1));
-            const double x_in = (d0<d1) ? in_out(0,0) : in_out(1,0);
-            const double y_in = (d0<d1) ? in_out(0,1) : in_out(1,1);
-            const double x_ou = (d0<d1) ? in_out(1,0) : in_out(0,0);
-            const double y_ou = (d0<d1) ? in_out(1,1) : in_out(0,1);
-            // approx points
-            const double da0 = std::sqrt(in_out_approx(0,0)*in_out_approx(0,0)+in_out_approx(0,1)*in_out_approx(0,1));
-            const double da1 = std::sqrt(in_out_approx(1,0)*in_out_approx(1,0)+in_out_approx(1,1)*in_out_approx(1,1));
-            const double xa_in = (da0<da1) ? in_out_approx(0,0) : in_out_approx(1,0);
-            const double ya_in = (da0<da1) ? in_out_approx(0,1) : in_out_approx(1,1);
-            const double xa_ou = (da0<da1) ? in_out_approx(1,0) : in_out_approx(0,0);
-            const double ya_ou = (da0<da1) ? in_out_approx(1,1) : in_out_approx(0,1);
-            if ((std::fabs(x_in-xa_in)>DMINFLOAT) or (std::fabs(x_ou-xa_ou)>DMINFLOAT))
-              Cerr << "inout x -- exact "
-                   << x_in << " "
-                   << x_ou << " approx "
-                   << xa_in << " "
-                   << xa_ou << " delta "
-                   << x_in-xa_in << " "
-                   << x_ou-xa_ou  << finl;
-            if ((std::fabs(y_in-ya_in)>DMINFLOAT) or (std::fabs(y_ou-ya_ou)>DMINFLOAT))
-              Cerr << "inout y -- exact "
-                   << y_in << " "
-                   << y_ou << " approx "
-                   << ya_in << " "
-                   << ya_ou << " delta "
-                   << y_in-ya_in << " "
-                   << y_ou-ya_ou  << finl;
-            if ((std::fabs(norm_elem[0]-norm_elem_approx[0])>DMINFLOAT) or
-                (std::fabs(norm_elem[1]-norm_elem_approx[1])>DMINFLOAT))
-              Cerr << "normal_elem -- exact " << norm_elem[0] << " " << norm_elem[1]
-                   << " approx " << norm_elem_approx[0] << " " << norm_elem_approx[1]
-                   << " delta " << norm_elem[0]-norm_elem_approx[0] << " " << norm_elem[1]-norm_elem_approx[1]
-                   << finl;
-            if (std::fabs(surface_tot-surface_tot_approx)>DMINFLOAT)
-              Cerr << "surface -- exact "
-                   << surface_tot << " approx "
-                   << surface_tot_approx  << " delta "
-                   << surface_tot-surface_tot_approx << finl;
-            Cerr << "End of comparison" << finl;
-          }
-        double factor = surface_tot/pow(volumes[elem], 2./3.);
-        if (factor < 1.e-6)
-          {
-            Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
-            continue; // skip cells crossed by almost no interface.
-          }
-
-        // The offset distance should be accounted for because the methods in_out counts the origin at the cell
-        {
-          // in_out are real absolute coordinates.
-          // We should make the "y" a normal distance to TCL
-          const int korient = zvdf.orientation(num_face);
-          const double xwall =zvdf.xv(num_face, korient);
-          in_out(0,korient) -= xwall;
-          in_out(1,korient) -= xwall;
-          //in_out(0,1) += dist;
-          //in_out(1,1) += dist;
-          if (zvdf.dist_face_elem0(num_face,elem)>0)
-            {
-              // The face is on top of the element, so distance will be negative.
-              // We want to count it positive by convention so :
-              in_out(0,korient) *= -1;
-              in_out(1,korient) *= -1;
-            }
-          assert(in_out(0,korient) >=-Objet_U::precision_geom);
-          assert(in_out(1,korient) >=-Objet_U::precision_geom);
-        }
-        const double xl = in_out(0,0);
-        const double yl = in_out(0,1);
-        const double xr = in_out(1,0);
-        const double yr = in_out(1,1);
-
-        // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
-        double theta_app_loc = compute_local_cos_theta(parcours, num_face, norm_elem);
-        double Q_meso = 0.;
-        double Q_int = compute_Qint(in_out, theta_app_loc, num_face, Q_meso);
-        //  const double value = jump_inv_rho*Q_int/Lvap;
-        //  Cerr << "[TCL-meso] Local source in elem=["  << elem << "] with value= " << value << "[m2.s-1]" << finl;
-        //  Cerr << "Qint= " << Q_int << finl;
-
-        if (first_call_for_this_mesh)
-          {
-            // We update values and integrals only at the first call
-            instant_mmeso_evap_ += (Q_int/Lvap)*dt;                   // total mass of liquid evaporated
-            instant_vmeso_evap_ = (instant_mmeso_evap_*jump_inv_rho); // total volume of liquid evaporated
-            integrated_vmeso_evap_ = instant_vmeso_evap_;
-          }
-        Cerr.precision(16);
-        Cerr << "[TCL: MESO] time  = " << integration_time_ << " Qmeso= " << Q_meso << " Qint " << Q_int << finl;
-        Cerr.precision(7);
-        // Cerr << "time = " << integration_time_ << " instantaneous mass-meso-evaporation = " << instant_mmeso_evap_ << " instantaneous meso-evaporation = " << instant_vmeso_evap_ << finl;
-        elems_with_CL_contrib.append_array(elem);
-        //mpoint_from_CL.append_array((Q_meso*surface_tot/v)/Lvap); // VP: replaced Q_int by Q_meso....unit--kg/m^2.s
-        double x1=0., y1=0.;
-        double x2=0., y2=0.;
-        // point 0 will be the left if (left lower than right)&&(M lower than left)
-        // otherwise, it should be point M if M is in the elem
-        double x0=0., y0=0.;
-        if (yl<yr)
-          {
-            x1=xl;
-            y1=yl;
-            x2=xr;
-            y2=yr;
-          }
-        else
-          {
-            x2=xl;
-            y2=yl;
-            x1=xr;
-            y1=yr;
-          }
-        if (ym_<=y1)
-          {
-            // micro not in that cell:
-            x0=x1;
-            y0=y1;
-          }
-        else if(ym_<=y2)
-          {
-            // point M is in that cell:
-            // ie PART of the interface is in micro.
-            y0=ym_;
-            const double f = (y0-y1)/(y2-y1);
-            x0=x1+f*(x2-x1);
-            Cerr << "[x0 vs x_cl] t= "<< integration_time_ << " elem= " << elem << " x0/x_cl " << x0<< " " <<x_cl_<< finl;
-          }
-        else
-          {
-            // That cell is fully micro ie ym>y2>y1
-            // in that case, smeso should be 0. :
-            x0=x2;
-            y0=y2;
-          }
-        const double dx = x2-x0;
-        const double dy = y2-y0;
-        const double s_meso = sqrt(dx*dx+dy*dy);
-        if (s_meso<DMINFLOAT)
-          {
-            // Qmeso is probably zero too
-            mpoint_from_CL.append_array(0.);
-          }
-        else
-          {
-            mpoint_from_CL.append_array(Q_int/(surface_tot*Lvap)); // LW 2023.27.09 coherance with Qint used in Q_from_CL to compute a mean weighted by surface_tot
-          }
-        instant_Qmeso += Q_meso;
-        {
-          // comparison s_meso as dist_LR to the reconstruction based on surface_tot
-          // Si la CL est dans la maille...
-          if ((Objet_U::bidim_axi) && ((xr-x_cl_)*(xl-x_cl_)<=0.))
-            {
-              double S_micro = Maillage_FT_Disc::angle_bidim_axi()*x_cl_*sm_;
-              const double rm = 0.5*(xr+xl);
-              const double s_meso_assessed = (surface_tot-S_micro)/(Maillage_FT_Disc::angle_bidim_axi()*rm);
-              Cerr.precision(16);
-              Cerr << "[TCL: MESO: Assessment-S_meso] t= "<< integration_time_ << " elem= " << elem << " LR= " ;
-              Cerr << s_meso <<  " Ameso/2pir= " << s_meso_assessed << " err(%)= " << 50.*std::abs(s_meso_assessed-s_meso)/(s_meso_assessed+s_meso) << finl;
-              Cerr.precision(7);
-            }
-        }
-        Q_from_CL.append_array(Q_int);
-        num_faces.append_array(num_face);
-        // instant_mmeso_evap_ += Q_int/Lvap;                      // total mass of liquid evaporated
-        // instant_vmeso_evap_ += instant_mmeso_evap_/rho_phase_1; // total volume of liquid evaporated
+    elems_.resize_array(0); // to empty the list
+    boundary_faces_.resize_array(0);
+    mp_.resize_array(0);
+    Q_.resize_array(0);
+    const int nn = elems_with_CL_contrib.size_array();
+    assert(num_faces.size_array() == nn);
+    assert(mpoint_from_CL.size_array() == nn);
+    assert(Q_from_CL.size_array() == nn);
+    for (int idx = 0; idx < nn; idx++)
+      {
+        const int elem = elems_with_CL_contrib[idx];
+        elems_.append_array(elem);
+        boundary_faces_.append_array(num_faces[idx]);
+        mp_.append_array(mpoint_from_CL[idx]);
+        Q_.append_array(Q_from_CL[idx]);
+      }
+    // GB 2023.04.07: a time integral. Formulae modified but not validated.
+    const double collect_vevap = Process::mp_sum(instant_vmicro_evap_ + instant_vmeso_evap_)*dt;
+    if (Process::je_suis_maitre())
+      {
+        vevap_int_ +=collect_vevap;
+        Cerr << "[TCL: MICRO+MESO] vevap_int_(micro+meso) = " << vevap_int_ << " time = " << integration_time_ << finl;
       }
   }
-  instant_Qmeso = mp_sum(instant_Qmeso);
-
-  const double verbosity=1;
-  if (verbosity)
-    {
-      const int nb_contact_line_contribution = elems_with_CL_contrib.size_array();
-      if (nb_contact_line_contribution>0 )
-        {
-          const double t = ns.schema_temps().temps_courant();
-          Cerr << " ********* VALUES OF CONTACT LINE CONTRIBUTION *************** " << finl;
-          Cerr << " time " << t << finl;
-          Cerr << " nb_contact_line_contribution " << nb_contact_line_contribution << finl;
-          Cerr << "# elem \t face \t Q \t\t mp" << finl;
-          for (int idx = 0; idx < nb_contact_line_contribution; idx++)
-            {
-              Cerr << elems_with_CL_contrib[idx] << " \t " <<  num_faces[idx] << " \t "
-                   << Q_from_CL[idx] << " \t " << mpoint_from_CL[idx] << " \t " << finl;
-            }
-          Cerr << " ************************************************************* " << finl;
-          Cerr << "[instant-Q] time micro meso " << t << " " <<
-               instant_Qmicro << " " << instant_Qmeso << finl;
-          Cerr << " ************************************************************* " << finl;
-        }
-    }
-
-  // double micro_mevap = instant_mmicro_evap_ + instant_mmeso_evap_;
-  // You want the total value on all processors:
-  // micro_mevap = Process::mp_sum(micro_mevap);
-
-  // Temporary code : Later, we will either (i) fill elems_ directly without using a temporary elems_with_CL_contrib
-  // or (ii) make a list without repetition (summing up values for micro and meso together)
-  // Store :
-
-  elems_.resize_array(0); // to empty the list
-  boundary_faces_.resize_array(0);
-  mp_.resize_array(0);
-  Q_.resize_array(0);
-  const int nn = elems_with_CL_contrib.size_array();
-  assert(num_faces.size_array() == nn);
-  assert(mpoint_from_CL.size_array() == nn);
-  assert(Q_from_CL.size_array() == nn);
-  for (int idx = 0; idx < nn; idx++)
-    {
-      const int elem = elems_with_CL_contrib[idx];
-      elems_.append_array(elem);
-      boundary_faces_.append_array(num_faces[idx]);
-      mp_.append_array(mpoint_from_CL[idx]);
-      Q_.append_array(Q_from_CL[idx]);
-    }
-  // GB 2023.04.07: a time integral. Formulae modified but not validated.
-  const double collect_vevap = Process::mp_sum(instant_vmicro_evap_ + instant_vmeso_evap_)*dt;
-  if (Process::je_suis_maitre())
-    {
-      vevap_int_ +=collect_vevap;
-      Cerr << "[TCL: MICRO+MESO] vevap_int_(micro+meso) = " << vevap_int_ << " time = " << integration_time_ << finl;
-    }
 }
 
 // correct mpoint with values from TCL model.
@@ -1912,17 +2055,18 @@ double Triple_Line_Model_FT_Disc:: get_Qtcl(const int num_face)
       const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
                              num_face);
 
-      const int num_col = 2; // colon number corresponding to Qtcl
+      const int num_col = num_colon_qtcl_; // colon number corresponding to Qtcl
+      const int num_tem = num_colon_tem_;
 
       int ind = 0;
-      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (0, ind) < Twall)
+      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (num_tem, ind) < Twall)
         {
           ++ind;
         }
       if (ind == 0)
         {
-          if (!est_egal (tab_Mtcl_ (0, ind), 0))
-            Qtcl_ =  tab_Mtcl_ (num_col, ind) *Twall / tab_Mtcl_ (0, ind);
+          if (!est_egal (tab_Mtcl_ (num_tem, ind), 0))
+            Qtcl_ =  tab_Mtcl_ (num_col, ind) *Twall / tab_Mtcl_ (num_tem, ind);
           else
             Qtcl_ = 0. ;
         }
@@ -1932,8 +2076,8 @@ double Triple_Line_Model_FT_Disc:: get_Qtcl(const int num_face)
         }
       else
         {
-          double x1 = tab_Mtcl_ (0, ind - 1);
-          double x2 = tab_Mtcl_ (0, ind);
+          double x1 = tab_Mtcl_ (num_tem, ind - 1);
+          double x2 = tab_Mtcl_ (num_tem, ind);
           double y1 = tab_Mtcl_ (num_col, ind - 1);
           double y2 = tab_Mtcl_ (num_col, ind);
           assert(!est_egal (x1, x2));
@@ -1980,10 +2124,11 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
       const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
                              num_face);
 
-      const int num_col = 1; // colon number corresponding to theta_app
+      const int num_col = num_colon_app_; // colon number corresponding to theta_app
+      const int num_tem = num_colon_tem_;
 
       int ind = 0;
-      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (0, ind) < Twall)
+      while (ind < tab_Mtcl_.dimension (1) && tab_Mtcl_ (num_tem, ind) < Twall)
         {
           ++ind;
         }
@@ -1997,8 +2142,8 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
         }
       else
         {
-          double x1 = tab_Mtcl_ (0, ind - 1);
-          double x2 = tab_Mtcl_ (0, ind);
+          double x1 = tab_Mtcl_ (num_tem, ind - 1);
+          double x2 = tab_Mtcl_ (num_tem, ind);
           double y1 = tab_Mtcl_ (num_col, ind - 1);
           double y2 = tab_Mtcl_ (num_col, ind);
           assert(!est_egal (x1, x2));
@@ -2010,8 +2155,25 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
         {
           const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur ();
           const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis ().valeur ());
+
+          const IntVect& orientation = zvdf.orientation();
+          const IntTab& elem_faces = zvdf.elem_faces();
+
           int elem_voisin = zvdf.face_voisins (num_face, 0) + zvdf.face_voisins (num_face, 1) + 1;
-          const double cell_size = 2. * std::fabs (zvdf.dist_face_elem0 (num_face, elem_voisin));
+          int numfacex = -1;
+
+          const int nb_voisins = elem_faces.dimension(1);
+          for (int iv=0; iv < nb_voisins; iv++)
+            {
+              const int num_face2 = elem_faces(elem_voisin,iv);
+              if (orientation(num_face2) == 0 )
+                {
+                  numfacex = num_face2;
+                  break;
+                }
+            }
+          assert(numfacex>=0);
+          const double cell_size = 2. * std::fabs (zvdf.dist_face_elem0 (numfacex, elem_voisin));
           const double xwall_ = zvdf.xv(num_face, 0);
           if (xwall_ <= cell_size*Rc_tcl_GridN() )
             theta_app_ = thetaC_tcl();

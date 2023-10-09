@@ -142,7 +142,9 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
   Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
 
-  Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
+  const Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
+  const DoubleVect& surface= le_dom.face_surfaces();
+
 
   if (pbft-> tcl().is_activated())
     {
@@ -159,7 +161,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
           const ArrOfDouble& Q_from_CL = tcl->Q();
           const ArrOfInt& faces_with_CL_contrib = tcl-> boundary_faces();
           const IntTab& face_voisins = le_dom.face_voisins();
-          const DoubleVect& surface= le_dom.face_surfaces();
+
 
           const int nb_contact_line_contribution = faces_with_CL_contrib.size_array();
 
@@ -207,7 +209,6 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                     }
                 }
             }
-
         }
     }
 
@@ -216,6 +217,52 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Echange_global_impose::mettre_a_jour(temps);
   mon_Ti.echange_espace_virtuel();
   Ti_wall_.mettre_a_jour (temps);
+
+
+  // check if to inject a new nuclateion seed
+  // only check in the liquid - equation
+
+  if ((pbft->tcl ().reinjection_tcl ()) && (indicatrice_ref_ == 1) )
+    {
+      bool& ready_inject = pbft->tcl ().ready_inject_tcl ();
+      ready_inject = false;
+      {
+        int BC_has_tcl = 0;
+
+        for (int ii = 0; ii < taille; ii++)
+          if (!est_egal (I (ii, 0), indicatrice_ref_))
+            {
+              BC_has_tcl = 1;
+            }
+        BC_has_tcl = Process::mp_max (BC_has_tcl);
+
+        if (BC_has_tcl == 0)
+          {
+            double sum_T = 0;
+            double sum_surface = 0;
+
+            for (int ii = 0; ii < taille; ii++)
+              {
+                const int face = ii
+                                 + frontiere_dis ().frontiere ().num_premiere_face ();
+                if (le_dom.xv (face, 0) <= pbft->tcl ().Rc_inject ())
+                  {
+                    sum_surface += surface (face);
+                    sum_T += surface (face) * mon_Ti (ii, 0);
+                  }
+              }
+
+            sum_T = Process::mp_sum (sum_T);
+            sum_surface = Process::mp_sum (sum_surface);
+
+            sum_T = (sum_surface > DMINFLOAT) ? sum_T / sum_surface : 0;
+
+            ready_inject = (sum_T >= pbft->tcl ().tempC_tcl ()) ? true : false;
+          }
+      }
+      ready_inject = Process::mp_sum (ready_inject);
+    }
+
 
   // print Twall, phi_ext_, h_imp_
 
@@ -262,11 +309,21 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
 
 
+          if(je_suis_maitre())
+            {
+              filTwall << finl;
+              if (dimension == 2)
+                {
+                  filTwall << "--------------------------------------------------------------------------------------------" << finl;
+                  filTwall << "Time\t\t| X\t\t\t| Y\t\t\t| Twall" << finl;
+                  filTwall << "--------------------------------------------------------------------------------------------" << finl;
+                }
+            }
+
 
           for (int face = ndeb; face < nfin; face++)
             {
-              filTwall << temps << " " << le_dom.xv (face, 0) << " "
-                       << le_dom.xv (face, 1) << " " << Ti_wall (face - ndeb) << finl;
+              filTwall << temps << "\t| " << le_dom.xv (face, 0) << "\t| " << le_dom.xv (face, 1) << "\t| " << Ti_wall (face - ndeb) << finl;
             }
           filTwall.syncfile ();
         }

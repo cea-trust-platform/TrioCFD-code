@@ -95,6 +95,10 @@ public :
   {
     return Rc_tcl_GridN_;
   };
+  const double& Rc_inject() const
+  {
+    return Rc_inject_;
+  };
   const double& thetaC_tcl() const
   {
     return thetaC_tcl_;
@@ -103,7 +107,15 @@ public :
   {
     return reinjection_tcl_;
   };
+  const int& distri_first_facette() const
+  {
+    return distri_first_facette_;
+  };
   const bool& ready_inject_tcl() const
+  {
+    return ready_inject_tcl_;
+  };
+  bool& ready_inject_tcl()
   {
     return ready_inject_tcl_;
   };
@@ -191,12 +203,24 @@ protected :
   int read_via_file_ ;
   Nom Nom_ficher_tcl_;
   DoubleTab tab_Mtcl_;
-  int num_colon_tab_;
+  // total nb of colons
+  int nb_colon_tab_;
+  // num -colon for temperature
+  int num_colon_tem_;
+  // num -colon for velocity
+  // int num_colon_vel_;
+  // num -colon for theta app
+  int num_colon_app_;
+  // num -colon for Qtcl
+  int num_colon_qtcl_;
+
+
   // parameters to force numerical breakup
   // Radius of nucleate site; [in number of grids]
   // Distance below which the theta_app will be replaced by a big contact angle thetaC_tcl_ [in degree]
   // to force bubble pinching / necking
   int Rc_tcl_GridN_;
+  double Rc_inject_;
   double thetaC_tcl_;
   // parameters injection seed nucleate
   // Size: Using the same Radius defined above (Rc_tcl_gridN_), [in number of grids]
@@ -212,6 +236,9 @@ protected :
   //           Rc_tcl_GridN_ thetaC_tcl_ control the breakup, thetaC_tcl_ should be large
   //        - when reinjection_tcl_ is 1;  i.e., there is no the pinching breakup. The bubble goes away directly, we reinject seed
   //           Rc_tcl_GridN_ thetaC_tcl_ control the initial shape, thetaC_tcl_ should be small...
+
+  // if to distribute the Qtcl into the first facette
+  int distri_first_facette_;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.
