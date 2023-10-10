@@ -53,7 +53,6 @@ protected :
   Champ_front Ti_wall_;
   double indicatrice_ref_;
   Nom nom_champ_indicatrice_, nom_bord_oppose_;
-  double dt_impr_Tw_=DMAXFLOAT;
 };
 
 #endif /* Echange_contact_VDF_FT_Disc_included */

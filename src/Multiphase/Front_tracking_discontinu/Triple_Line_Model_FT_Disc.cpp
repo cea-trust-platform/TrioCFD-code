@@ -359,7 +359,7 @@ void Triple_Line_Model_FT_Disc::completer()
       // get TCL cells
       if (nb_face>0)
         {
-          const int num_face= 0;
+          const int num_face= fr.num_premiere_face();;
           int elem_voisin = zvdf.face_voisins(num_face, 0) + zvdf.face_voisins(num_face, 1) +1;
           const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
           ymeso_ = cell_height * n_ext_meso_;
@@ -398,7 +398,7 @@ void Triple_Line_Model_FT_Disc::completer()
       // supposing deltax = deltay in the first thermal layer
       if (nb_face>0)
         {
-          const int num_face= 0;
+          const int num_face=  fr.num_premiere_face();;
           int elem_voisin = zvdf.face_voisins(num_face, 0) + zvdf.face_voisins(num_face, 1) +1;
           const double cell_height = 2.*std::fabs(zvdf.dist_face_elem0(num_face,elem_voisin));
           Rc_inject_ = cell_height * Rc_tcl_GridN_;
