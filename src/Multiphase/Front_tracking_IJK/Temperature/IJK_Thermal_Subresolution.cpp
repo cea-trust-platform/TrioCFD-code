@@ -170,6 +170,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("first_time_step_implicit", &first_time_step_implicit_);
   param.ajouter("local_fourier", &local_fourier_);
   param.ajouter("local_cfl", &local_cfl_);
+  param.ajouter("delta_T_subcooled_overheated", &delta_T_subcooled_overheated_);
+  param.ajouter_flag("local_diffusion_fourier_priority", &local_diffusion_fourier_priority_);
 
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
   //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
@@ -381,7 +383,8 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
 void IJK_Thermal_Subresolution::compute_thermal_subproblems()
 {
   is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
-  first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
+  if (is_first_time_step_)
+    first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
   /*
    * FIXME: Do the first step only at the first iteration
    */
@@ -583,6 +586,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                 thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
                                                                            i, j, k,
                                                                            ref_ijk_ft_->get_timestep(),
+                                                                           ref_ijk_ft_->get_current_time(),
                                                                            *eulerian_compo_connex_ns_,
                                                                            eulerian_distance_ns_,
                                                                            eulerian_curvature_ns_,
@@ -628,7 +632,9 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            first_time_step_temporal_,
                                                                            first_time_step_explicit_,
                                                                            local_fourier_,
-                                                                           local_cfl_);
+                                                                           local_cfl_,
+                                                                           min_delta_xyz_,
+                                                                           delta_T_subcooled_overheated_);
 
               }
     }
@@ -701,6 +707,45 @@ void IJK_Thermal_Subresolution::compute_local_substep()
         Cerr << "Local timestep: " << local_time_step << finl;
         Cerr << "Number of sub-steps: " << nb_iter_explicit_local_ << finl;
         thermal_local_subproblems_.set_local_time_step(local_time_step);
+        local_fourier_time_step_probe_length_ = thermal_local_subproblems_.get_local_min_fourier_time_step_probe_length();
+        local_cfl_time_step_probe_length_ = thermal_local_subproblems_.get_local_min_cfl_time_step_probe_length();
+        local_dt_cfl_ = thermal_local_subproblems_.get_local_dt_cfl();
+        local_dt_cfl_min_delta_xyz_ = thermal_local_subproblems_.get_local_dt_cfl_min_delta_xyz();
+        local_dt_cfl_counter_ += (ref_ijk_ft_->get_timestep() / local_dt_cfl_min_delta_xyz_);
+        local_dt_fourier_counter_ += (ref_ijk_ft_->get_timestep() / local_fourier_time_step_probe_length_);
+        if (debug_)
+          {
+            Cerr << "Compare the thermal time-steps" << finl;
+            Cerr << "Current time: "<< ref_ijk_ft_->get_current_time() << finl;
+            Cerr << "local_fourier_time_step_probe_length: " << local_fourier_time_step_probe_length_ << finl;
+            Cerr << "local_cfl_time_step_probe_length: " << local_cfl_time_step_probe_length_ << finl;
+            Cerr << "local_dt_cfl: " << local_dt_cfl_ << finl;
+            Cerr << "local_dt_cfl_min_delta_xyz: " << local_dt_cfl_min_delta_xyz_ << finl;
+            Cerr << "local_dt_cfl_counter: " << local_dt_cfl_counter_ << finl;
+            Cerr << "local_dt_fourier_counter: " << local_dt_fourier_counter_ << finl;
+            Cerr << "dt_cfl: " << ref_ijk_ft_->get_dt_cfl_liq() << finl;
+          }
+        /*
+         * Activate Quasi-static when convection is significant
+         */
+        if (local_dt_cfl_counter_ > 1. && !local_diffusion_fourier_priority_)
+          first_time_step_temporal_ = 0;
+        else if (local_dt_fourier_counter_ > 1.)
+          first_time_step_temporal_ = 0;
+
+        // if (local_fourier_time_step_probe_length_ < local_dt_cfl_ * convection_diffusion_time_scale_factor_)
+        // convection_diffusion_time_scale_factor_ = ref_ijk_ft_->get_dt_cfl_liq() / local_cfl_time_step_probe_length_;
+//        if (local_fourier_time_step_probe_length_ < (convection_diffusion_time_scale_factor_ * local_cfl_time_step_probe_length_))
+//          {
+//            //TODO: Check that it works (or ref_ijk_ft_->get_timestep() * ref_ijk_ft_->get_tstep())
+//            // double current_time = ref_ijk_ft_->get_current_time();
+//            // if ((current_time > local_fourier_time_step_probe_length_) || (local_dt_cfl_counter_ > 1.))
+//        		if (local_dt_fourier_counter_ > 1. || (local_dt_cfl_counter_ > 1. && !local_diffusion_fourier_priority_))
+//              first_time_step_temporal_ = 0;
+//          }
+//        else
+//        	if (local_dt_cfl_counter_ > 1.)
+//        		first_time_step_temporal_ = 0;
       }
 }
 
@@ -760,7 +805,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
       Matrice_Bloc& bloc_matrix_solver  = ref_cast(Matrice_Bloc, thermal_subproblems_matrix_assembly_.valeur());
       bloc_matrix_solver.block_to_morse(sparse_matrix_solver);
 
-      if (is_first_time_step_ && first_time_step_temporal_ && first_time_step_explicit_)
+      if (first_time_step_temporal_ && first_time_step_explicit_)
         {
           Cerr << "Finite-difference Explicit thermal sub-resolution !" << finl;
           DoubleVect thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_ini_;
@@ -770,6 +815,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
               thermal_subproblems_temperature_solution_ += thermal_subproblems_rhs_assembly_;
               thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_;
             }
+          Cerr << "Finite-difference Explicit thermal sub-resolution has finished in "<< nb_iter_explicit_local_ << "iterations!" << finl;
         }
       else
         {
@@ -786,7 +832,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
           md_.copy(md_std);
           MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_);
           MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_);
-          if (is_first_time_step_ && first_time_step_temporal_ && !first_time_step_explicit_)
+          if (first_time_step_temporal_ && !first_time_step_explicit_)
             {
               if (one_dimensional_advection_diffusion_thermal_solver_implicit_.est_nul())
                 one_dimensional_advection_diffusion_thermal_solver_implicit_.cast_direct_solver_by_default();
@@ -811,12 +857,15 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 
 void IJK_Thermal_Subresolution::check_wrong_values_rhs()
 {
-  Cerr << "Check the modified RHS: INI" << finl;
-  const double fd_second_order_magnitude = 1 / pow(dr_,2) * 1e3;
-  for (int i=0; i<thermal_subproblems_rhs_assembly_.size(); i++)
-    if (fabs(thermal_subproblems_rhs_assembly_[i]) > fd_second_order_magnitude)
-      Cerr << "Check the modified RHS values: " << thermal_subproblems_rhs_assembly_[i] << finl;
-  Cerr << "Check the modified RHS: END" << finl;
+  if (debug_)
+    {
+      Cerr << "Check the modified RHS: INI" << finl;
+      const double fd_second_order_magnitude = 1 / pow(dr_,2) * 1e3;
+      for (int i=0; i<thermal_subproblems_rhs_assembly_.size(); i++)
+        if (fabs(thermal_subproblems_rhs_assembly_[i]) > fd_second_order_magnitude)
+          Cerr << "Check the modified RHS values: " << thermal_subproblems_rhs_assembly_[i] << finl;
+      Cerr << "Check the modified RHS: END" << finl;
+    }
 }
 
 /*

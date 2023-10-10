@@ -59,7 +59,7 @@ public:
   virtual int initialize(const IJK_Splitting& splitting, const int idx);
   virtual void update_thermal_properties();
   double compute_timestep(const double timestep,
-                          const double dxmin) const;
+                          const double dxmin);
 
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
@@ -255,6 +255,7 @@ public:
 protected:
 
   void compute_cell_volume();
+  void compute_min_cell_delta();
   void compute_cell_diagonal(const IJK_Splitting& splitting);
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
   void compute_temperature_convection(const FixedVector<IJK_Field_double, 3>& velocity);
@@ -331,6 +332,7 @@ protected:
   /*
    * Physical parameters and inputs
    */
+  double dt_fo_;
   double fo_;
   double cp_liquid_, cp_vapour_;
   double lambda_liquid_, lambda_vapour_;
@@ -409,6 +411,7 @@ protected:
    * Fields
    */
   double vol_;
+  double min_delta_xyz_;
   double cell_diagonal_;
   int ghost_cells_;
   IJK_Field_double rho_cp_;

@@ -58,7 +58,7 @@ public :
   int initialize(const IJK_Splitting& splitting, const int idx) override;
   double compute_timestep(const double timestep,
                           const double rho_l, const double rho_v,
-                          const double dxmin) const;
+                          const double dxmin);
   void update_thermal_properties() override;
   void set_param( Param& param ) override;
 

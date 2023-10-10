@@ -104,7 +104,7 @@ void IJK_Thermals::sauvegarder_thermals(SFichier& fichier)
 
 void IJK_Thermals::compute_timestep(double& dt_thermals, const double dxmin)
 {
-  for (const auto& itr : (*this))
+  for (auto& itr : (*this))
     {
       const double dt_th = itr.compute_timestep(dt_thermals, dxmin);
       // We take the most restrictive of all thermal problems and use it for all:

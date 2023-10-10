@@ -174,9 +174,18 @@ protected :
   int first_time_step_temporal_;
   int first_time_step_explicit_;
   int first_time_step_implicit_;
+  int local_diffusion_fourier_priority_ = 0;
   int nb_iter_explicit_local_ = 0;
   double local_fourier_;
   double local_cfl_;
+  double delta_T_subcooled_overheated_=-1.;
+  double convection_diffusion_time_scale_factor_ = 1.;
+  double local_fourier_time_step_probe_length_ = 0.;
+  double local_cfl_time_step_probe_length_ = 0.;
+  double local_dt_cfl_ = 0.;
+  double local_dt_cfl_min_delta_xyz_ = 0.;
+  double local_dt_cfl_counter_ = 0.;
+  double local_dt_fourier_counter_ = 0.;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

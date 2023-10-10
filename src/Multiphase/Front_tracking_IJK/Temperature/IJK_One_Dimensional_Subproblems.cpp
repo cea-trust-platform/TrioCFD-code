@@ -66,6 +66,7 @@ void IJK_One_Dimensional_Subproblems::add_subproblems(int n)
 void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       int i, int j, int k,
                                                                       double global_time_step,
+                                                                      double current_time,
                                                                       const IJK_Field_double& eulerian_compo_connex,
                                                                       const IJK_Field_double& eulerian_distance,
                                                                       const IJK_Field_double& eulerian_curvature,
@@ -107,11 +108,13 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       DoubleVect& thermal_subproblems_temperature_solution,
                                                                       const int& source_terms_type,
                                                                       const int& source_terms_correction,
-                                                                      bool& is_first_time_step,
-                                                                      const int& first_time_step_temporal,
+                                                                      const bool& is_first_time_step,
+                                                                      int& first_time_step_temporal,
                                                                       const int& first_time_step_explicit,
                                                                       const double& local_fourier,
-                                                                      const double& local_cfl)
+                                                                      const double& local_cfl,
+                                                                      const double& min_delta_xyz,
+                                                                      const double& delta_T_subcooled_overheated)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -150,6 +153,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     subproblems_counter_,
                                                                     i, j, k,
                                                                     global_time_step,
+                                                                    current_time,
                                                                     compo_connex,
                                                                     distance,
                                                                     curvature,
@@ -200,7 +204,9 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     first_time_step_temporal,
                                                                     first_time_step_explicit,
                                                                     local_fourier,
-                                                                    local_cfl);
+                                                                    local_cfl,
+                                                                    min_delta_xyz,
+                                                                    delta_T_subcooled_overheated);
       subproblems_counter_++;
     }
   else
@@ -351,6 +357,72 @@ double IJK_One_Dimensional_Subproblems::get_min_euler_time_step(int& nb_iter_exp
       nb_iter_explicit = std::max(nb_iter_explicit, itr.get_nb_iter_explicit());
     }
   return min_euler_time_step;
+}
+
+double IJK_One_Dimensional_Subproblems::get_local_max_fourier_time_step_probe_length()
+{
+  double max_local_fourier_time_step_probe_length = 0.;
+  for (auto& itr : *this)
+    {
+      max_local_fourier_time_step_probe_length = std::max(max_local_fourier_time_step_probe_length,
+                                                          itr.get_local_fourier_time_step_probe_length());
+    }
+  return max_local_fourier_time_step_probe_length;
+}
+
+
+double IJK_One_Dimensional_Subproblems::get_local_max_cfl_time_step_probe_length()
+{
+  double max_local_cfl_time_step_probe_length = 0.;
+  for (auto& itr : *this)
+    {
+      max_local_cfl_time_step_probe_length = std::max(max_local_cfl_time_step_probe_length,
+                                                      itr.get_local_cfl_time_step_probe_length());
+    }
+  return max_local_cfl_time_step_probe_length;
+}
+
+double IJK_One_Dimensional_Subproblems::get_local_min_fourier_time_step_probe_length()
+{
+  double min_local_fourier_time_step_probe_length = 1.e20;
+  for (auto& itr : *this)
+    {
+      min_local_fourier_time_step_probe_length = std::min(min_local_fourier_time_step_probe_length,
+                                                          itr.get_local_fourier_time_step_probe_length());
+    }
+  return min_local_fourier_time_step_probe_length;
+}
+
+
+double IJK_One_Dimensional_Subproblems::get_local_min_cfl_time_step_probe_length()
+{
+  double min_local_cfl_time_step_probe_length = 1.e20;
+  for (auto& itr : *this)
+    {
+      min_local_cfl_time_step_probe_length = std::min(min_local_cfl_time_step_probe_length,
+                                                      itr.get_local_cfl_time_step_probe_length());
+    }
+  return min_local_cfl_time_step_probe_length;
+}
+
+double IJK_One_Dimensional_Subproblems::get_local_dt_cfl()
+{
+  double min_local_dt_cfl = 1.e20;
+  for (auto& itr : *this)
+    {
+      min_local_dt_cfl = std::min(min_local_dt_cfl, itr.get_local_dt_cfl());
+    }
+  return min_local_dt_cfl;
+}
+
+double IJK_One_Dimensional_Subproblems::get_local_dt_cfl_min_delta_xyz()
+{
+  double min_local_dt_cfl_min_delta_xyz = 1.e20;
+  for (auto& itr : *this)
+    {
+      min_local_dt_cfl_min_delta_xyz = std::min(min_local_dt_cfl_min_delta_xyz, itr.get_local_dt_cfl_min_delta_xyz());
+    }
+  return min_local_dt_cfl_min_delta_xyz;
 }
 
 void IJK_One_Dimensional_Subproblems::set_local_time_step(const double& local_time_step)

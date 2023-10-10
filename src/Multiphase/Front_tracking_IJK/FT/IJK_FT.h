@@ -174,6 +174,34 @@ public :
   {
     return upstream_stencil_;
   }
+  const double& get_dt_cfl() const
+  {
+    return dt_cfl_;
+  }
+  const double& get_dt_fo() const
+  {
+    return dt_fo_;
+  }
+  const double& get_dt_oh() const
+  {
+    return dt_oh_;
+  }
+  const double& get_dt_cfl_liq() const
+  {
+    return dt_cfl_liq_;
+  }
+  const double& get_dt_cfl_vap_() const
+  {
+    return dt_cfl_vap_;
+  }
+  const double& get_dt_fo_liq() const
+  {
+    return dt_fo_liq_;
+  }
+  const double& get_dt_fo_vap_() const
+  {
+    return dt_fo_vap_;
+  }
 //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
 //  {
 //    return intersection_ijk_cell_;
@@ -631,6 +659,13 @@ protected :
   LIST(IJK_Energie) energie_;
   IJK_Thermals thermals_;
 
+  double dt_cfl_ = 1.e20;
+  double dt_fo_ = 1.e20;
+  double dt_oh_ = 1.e20;
+  double dt_fo_liq_ = 1.e20;
+  double dt_fo_vap_ = 1.e20;
+  double dt_cfl_liq_ = 1.e20;
+  double dt_cfl_vap_ = 1.e20;
 };
 
 #endif /* IJK_FT_included */

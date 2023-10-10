@@ -933,28 +933,31 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(co
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::apply_euler_time_step(Matrice * convection_matrix,
                                                                                    Matrice * diffusion_matrix,
                                                                                    const int& subproblem_index,
-                                                                                   const double& local_time_step)
+                                                                                   const double& local_time_step,
+                                                                                   const double& alpha)
 {
   Matrice_Bloc& convection_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
   Matrice& convection_sub_matrix = convection_block_matrix.get_bloc(subproblem_index, subproblem_index);
-  convection_sub_matrix *= local_time_step;
+  convection_sub_matrix *= (local_time_step * alpha);
 
   Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*diffusion_matrix).valeur());
   Matrice& diffusion_sub_matrix = diffusion_block_matrix.get_bloc(subproblem_index, subproblem_index);
-  diffusion_sub_matrix *= local_time_step;
+  diffusion_sub_matrix *= (local_time_step * alpha);
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix,
                                                                                                        Matrice * diffusion_matrix,
-                                                                                                       const int& subproblem_index)
+                                                                                                       const int& subproblem_index,
+                                                                                                       const double& local_time_step,
+                                                                                                       const double& alpha)
 {
   Matrice_Bloc& convection_block_matrix =ref_cast(Matrice_Bloc, (*convection_matrix).valeur());
   Matrice& convection_sub_matrix = convection_block_matrix.get_bloc(subproblem_index, subproblem_index);
-  convection_sub_matrix *= (-1);
+  convection_sub_matrix *= (- local_time_step * alpha);
 
   Matrice_Bloc& diffusion_block_matrix =ref_cast(Matrice_Bloc, (*diffusion_matrix).valeur());
   Matrice& diffusion_sub_matrix = diffusion_block_matrix.get_bloc(subproblem_index, subproblem_index);
-  diffusion_sub_matrix *= (-1);
+  diffusion_sub_matrix *= (- local_time_step * alpha);
 }
 
 

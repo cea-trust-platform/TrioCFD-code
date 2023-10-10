@@ -1405,7 +1405,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
 {
   statistiques().begin_count(dt_counter_);
 
-  double dt_cfl = 1.e20;
+  dt_cfl_ = 1.e20;
   double dxmin = 1.e20;
   // On ne connait pas la longueur minimum du maillage lagrangien, mais on en prend une approximation :
   // lg \approx 1.7 delta
@@ -1435,27 +1435,32 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       dxmin = std::min(delta, dxmin);
       // QUESTION GAB : pourquoi on ne reprend pas dxmin ?
       if (max_v>0)
-        dt_cfl = std::min(dt_cfl, delta / max_v * 0.5);
+        dt_cfl_ = std::min(dt_cfl_, delta / max_v * 0.5);
     }
-  dt_cfl *= cfl;
+  dt_cfl_ *= cfl;
+  dt_cfl_liq_ = dt_cfl_;
+  dt_cfl_vap_ = dt_cfl_;
 
-  const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
-  double dt_fo  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  //  const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
+  //  dt_fo_  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
+  dt_fo_liq_ = dxmin*dxmin/((mu_liquide_/rho_liquide_) + 1.e-20) * fo * 0.125;
+  dt_fo_vap_ =dxmin*dxmin/((mu_vapeur_/rho_vapeur_) + 1.e-20) * fo * 0.125; ;
+  dt_fo_ = std::min(dt_fo_liq_, dt_fo_vap_);
   if (disable_diffusion_qdm_)
-    dt_fo = 1.e20;
+    dt_fo_ = 1.e20;
 
   /*
    * Popinet et.al 2018 (review surface tension calculation)
    * Au cas ou sigma = 0, on utilise (sigma + 1e-20)
    */
   double ideal_length_factor = get_remaillage_ft_ijk().get_facteur_longueur_ideale();
-  double dt_oh  = sqrt((rho_liquide_ + rho_vapeur_) / (2 * M_PI) * lg_cube_raw * pow(ideal_length_factor, 3) / (sigma_ + 1e-20)) * oh;
+  dt_oh_  = sqrt((rho_liquide_ + rho_vapeur_) / (2 * M_PI) * lg_cube_raw * pow(ideal_length_factor, 3) / (sigma_ + 1e-20)) * oh;
   if (disable_convection_qdm_)
-    dt_oh = 1.e20;
+    dt_oh_ = 1.e20;
 
   // Seems underestimated !
   //  const double dt_oh  = sqrt((rho_liquide_+rho_vapeur_)/2. * lg_cube/(sigma_+1e-20) ) * oh;
-  const double dt_eq_velocity = 1. / (1./dt_cfl + 1./dt_fo + 1./dt_oh);
+  const double dt_eq_velocity = 1. / (1./dt_cfl_ + 1./dt_fo_ + 1./dt_oh_);
 
   /*
    * TODO: Change this block with DERIV CLASS IJK_Thermal
@@ -1487,7 +1492,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier(".dt_ev","tstep\ttime\ttimestep\tdt_cfl\tdt_fo\tdt_oh\tdt_diff_th",reset);
       fic<< tstep_<<" "<< current_time_<<" "<<dt;
-      fic<<" "<<dt_cfl<<" "<<dt_fo<<" "<<dt_oh;
+      fic<<" "<<dt_cfl_<<" "<<dt_fo_<<" "<<dt_oh_;
       fic<<" "<<dt_thermique; // If no thermal equation, value will be large.
       fic<<" "<<dt_energie; // If no thermal equation, value will be large.
       fic<<" "<<dt_thermals; // If no thermal equation, value will be large.

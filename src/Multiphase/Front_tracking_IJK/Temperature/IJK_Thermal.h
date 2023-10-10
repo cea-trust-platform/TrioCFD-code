@@ -98,7 +98,7 @@ public :
                                                const Intersection_Interface_ijk_face& intersection_ijk_face);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
-                                 const double dxmin) const;
+                                 const double dxmin);
   inline double compute_global_energy();
   inline void calculer_ecart_T_ana() { valeur().calculer_ecart_T_ana(); };
   inline void euler_rustine_step(const double timestep, const double dE);
@@ -191,7 +191,7 @@ inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)
   valeur().sauvegarder_temperature(lata_name, idx);
 }
 
-inline double IJK_Thermal::compute_timestep(const double timestep, const double dxmin) const
+inline double IJK_Thermal::compute_timestep(const double timestep, const double dxmin)
 {
   return valeur().compute_timestep(timestep, dxmin);
 }

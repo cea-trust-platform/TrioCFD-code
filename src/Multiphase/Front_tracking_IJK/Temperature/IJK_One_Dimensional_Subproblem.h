@@ -66,6 +66,7 @@ public :
                                        int sub_problem_index,
                                        int i, int j, int k,
                                        double global_time_step,
+                                       double current_time,
                                        int compo_connex,
                                        double distance,
                                        double curvature,
@@ -112,11 +113,13 @@ public :
                                        DoubleVect& thermal_subproblems_temperature_solution,
                                        const int& source_terms_type,
                                        const int& source_terms_correction,
-                                       bool& is_first_time_step,
-                                       const int& first_time_step_temporal,
+                                       const bool& is_first_time_step,
+                                       int& first_time_step_temporal,
                                        const int& first_time_step_explicit,
                                        const double& local_fourier,
-                                       const double& local_cfl);
+                                       const double& local_cfl,
+                                       const double& min_delta_xyz,
+                                       const double& delta_T_subcooled_overheated);
 
   void compute_radial_convection_diffusion_operators();
   void prepare_temporal_schemes();
@@ -198,9 +201,30 @@ public :
   {
     local_time_step_overall_ = local_time_step;
   };
+  const double& get_local_fourier_time_step_probe_length() const
+  {
+    return local_fourier_time_step_probe_length_;
+  };
+  const double& get_local_cfl_time_step_probe_length() const
+  {
+    return local_cfl_time_step_probe_length_;
+  };
+  const double& get_local_dt_cfl() const
+  {
+    return local_dt_cfl_;
+  };
+  const double& get_local_dt_cfl_min_delta_xyz() const
+  {
+    return local_dt_cfl_min_delta_xyz_;
+  };
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
-  void associate_sub_problem_temporal_params(bool is_first_time_step, int first_time_step_temporal, int first_time_step_explicit, double local_fourier, double local_cfl);
+  void associate_sub_problem_temporal_params(const bool& is_first_time_step,
+                                             int& first_time_step_temporal,
+                                             const int& first_time_step_explicit,
+                                             const double& local_fourier,
+                                             const double& local_cfl,
+                                             const double& min_delta_xyz);
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
   void associate_compos(int compo_connex, int compo_group) { compo_connex_ = compo_connex; compo_group_ = compo_group; };
   void associate_interface_related_parameters(double distance, double curvature, double interfacial_area, ArrOfDouble facet_barycentre, ArrOfDouble normal_vector)
@@ -261,6 +285,7 @@ protected :
   void initialise_radial_diffusion_operator_local();
   void interpolate_project_velocities_on_probes();
   void interpolate_cartesian_velocities_on_probes();
+  void compute_velocity_magnitude();
   void project_velocities_on_probes();
   void correct_velocities();
   void correct_velocity(const DoubleVect& velocity, DoubleVect& velocity_corrected);
@@ -296,7 +321,7 @@ protected :
   void post_process_interfacial_quantities(SFichier& fic, const int rank);
   void post_process_radial_quantities(const int rank);
 
-  enum Boundary_conditions { dirichlet, neumann, flux_jump };
+  enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
   int debug_;
   int advected_frame_of_reference_=1;
@@ -435,6 +460,7 @@ protected :
   DoubleVect x_velocity_;
   DoubleVect y_velocity_;
   DoubleVect z_velocity_;
+  DoubleVect velocity_magnitude_;
   DoubleVect x_velocity_corrected_;
   DoubleVect y_velocity_corrected_;
   DoubleVect z_velocity_corrected_;
@@ -546,8 +572,9 @@ protected :
 
   DoubleVect temperature_ini_temporal_schemes_;
   bool is_first_time_step_ = false;
-  int first_time_step_temporal_ = 0;
+  int * first_time_step_temporal_;
   int first_time_step_explicit_ = 1;
+  double current_time_ = 0.;
   double global_dt_cfl_ = 0.;
   double global_dt_fo_ = 0.;
   double global_time_step_ = 0.;
@@ -556,10 +583,15 @@ protected :
   double local_time_step_ = 0.;
   double local_fourier_ = 1.;
   double local_cfl_ = 1.;
+  double min_delta_xyz_=0.;
   double max_u_;
   double local_time_step_round_ = 0.;
   double local_time_step_overall_ = 0.;
+  double local_fourier_time_step_probe_length_ = 0.;
+  double local_cfl_time_step_probe_length_ = 0.;
+  double local_dt_cfl_min_delta_xyz_=0.;
   int nb_iter_explicit_ = 0;
+  int max_u_cartesian_ = 1;
 
 };
 

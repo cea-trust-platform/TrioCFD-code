@@ -46,6 +46,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   /*
    * Physical parameters
    */
+  dt_fo_=1.e20;
   cp_liquid_=1.;
   cp_vapour_=0.;
   lambda_liquid_=1.;
@@ -328,6 +329,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
   nalloc += 2;
   compute_cell_volume();
+  compute_min_cell_delta();
 
   if (!diff_temp_negligible_)
     div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
@@ -625,6 +627,15 @@ void IJK_Thermal_base::compute_cell_volume()
   vol_ = dx*dy*dz;
 }
 
+void IJK_Thermal_base::compute_min_cell_delta()
+{
+  const IJK_Grid_Geometry& geom = d_temperature_.get_splitting().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  min_delta_xyz_ = std::min(std::min(dx,dy),dz);
+}
+
 void IJK_Thermal_base::compute_cell_diagonal(const IJK_Splitting& splitting)
 {
   const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
@@ -683,7 +694,7 @@ void IJK_Thermal_base::update_thermal_properties()
 // CFL value is not computed as it is the same as for the velocity equation.
 // The calculation should be stable if Fo <= 1.0 (thanks to the 0.5 in the formula below).
 double IJK_Thermal_base::compute_timestep(const double timestep,
-                                          const double dxmin) const
+                                          const double dxmin)
 {
   double alpha_max;
   double rho_l = ref_ijk_ft_->get_rho_l();
@@ -696,9 +707,9 @@ double IJK_Thermal_base::compute_timestep(const double timestep,
     {
       alpha_max = std::max(lambda_liquid_ / (rho_l * cp_liquid_), lambda_vapour_ / (rho_v * cp_vapour_));
     }
-  double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
-  if (diff_temp_negligible_) dt_fo = 1.e20;
-  return dt_fo;
+  dt_fo_ = dxmin * dxmin / (alpha_max + 1.e-20) * fo_ * 0.125; // 1/6 ou 1/8 ?
+  if (diff_temp_negligible_) dt_fo_ = 1.e20;
+  return dt_fo_;
 }
 
 void IJK_Thermal_base::associer(const IJK_FT_double& ijk_ft)

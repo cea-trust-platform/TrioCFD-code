@@ -88,8 +88,16 @@ public :
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
                         const DoubleVect& rhs_assembly);
   void compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res);
-  void apply_euler_time_step(Matrice * convection_matrix, Matrice * diffusion_matrix, const int& subproblem_index, const double& local_time_step);
-  void correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix, Matrice * diffusion_matrix, const int& subproblem_index);
+  void apply_euler_time_step(Matrice * convection_matrix,
+                             Matrice * diffusion_matrix,
+                             const int& subproblem_index,
+                             const double& local_time_step,
+                             const double& alpha);
+  void correct_sign_temporal_schemes_subproblems(Matrice * convection_matrix,
+                                                 Matrice * diffusion_matrix,
+                                                 const int& subproblem_index,
+                                                 const double& local_time_step,
+                                                 const double& alpha);
 
 protected :
   enum Fd_coefficient_type_ { identity=-1, forward, centred, backward };
