@@ -94,8 +94,10 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       Matrice& radial_diffusion_matrix,
                                                                       Matrice& radial_convection_matrix,
                                                                       const IJK_Interfaces& interfaces,
+                                                                      const double& indicator,
                                                                       const IJK_Field_double& temperature,
                                                                       const IJK_Field_double& temperature_ft,
+                                                                      const IJK_Field_double& temperature_before_extrapolation,
                                                                       const FixedVector<IJK_Field_double, 3>& velocity,
                                                                       const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
@@ -114,7 +116,11 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const double& local_fourier,
                                                                       const double& local_cfl,
                                                                       const double& min_delta_xyz,
-                                                                      const double& delta_T_subcooled_overheated)
+                                                                      const double& delta_T_subcooled_overheated,
+                                                                      const int& first_time_step_varying_probes,
+                                                                      const int& probe_variations_priority,
+                                                                      const int& disable_interpolation_in_mixed_cells,
+                                                                      const int& max_u_radial)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -181,6 +187,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     radial_diffusion_matrix,
                                                                     radial_convection_matrix,
                                                                     interfaces,
+                                                                    indicator,
                                                                     eulerian_distance,
                                                                     eulerian_curvature,
                                                                     eulerian_interfacial_area,
@@ -188,6 +195,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     eulerian_facets_barycentre,
                                                                     temperature,
                                                                     temperature_ft,
+                                                                    temperature_before_extrapolation,
                                                                     velocity,
                                                                     velocity_ft,
                                                                     grad_T_elem,
@@ -206,13 +214,59 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     local_fourier,
                                                                     local_cfl,
                                                                     min_delta_xyz,
-                                                                    delta_T_subcooled_overheated);
+                                                                    delta_T_subcooled_overheated,
+                                                                    first_time_step_varying_probes,
+                                                                    probe_variations_priority,
+                                                                    disable_interpolation_in_mixed_cells,
+                                                                    max_u_radial);
       subproblems_counter_++;
     }
   else
     {
       Cerr << max_subproblems_ << "subproblems were expected but" << subproblems_counter_ << "subproblem try to be associated with the list of subproblems";
     }
+}
+
+void IJK_One_Dimensional_Subproblems::interpolate_project_velocities_on_probes()
+{
+  for (auto& itr : *this)
+    itr.interpolate_project_velocities_on_probes();
+}
+
+void IJK_One_Dimensional_Subproblems::reajust_probes_length()
+{
+  for (auto& itr : *this)
+    itr.reajust_probe_length();
+}
+
+int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled(const int& probe_variations_priority)
+{
+  if (probe_variations_priority)
+    return get_probe_variations_enabled_priority();
+  else
+    return get_probe_variations_enabled_non_priority();
+}
+
+int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled_priority()
+{
+  int probe_variations_enabled = 0;
+  for (auto& itr : *this)
+    probe_variations_enabled = (probe_variations_enabled || itr.get_probe_variations_enabled());
+  return probe_variations_enabled;
+}
+
+int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled_non_priority()
+{
+  int probe_variations_enabled = 1;
+  for (auto& itr : *this)
+    probe_variations_enabled = (probe_variations_enabled && itr.get_probe_variations_enabled());
+  return probe_variations_enabled;
+}
+
+void IJK_One_Dimensional_Subproblems::compute_modified_probe_length(const int& probe_variations_enabled)
+{
+  for (auto& itr : *this)
+    itr.compute_modified_probe_length(probe_variations_enabled);
 }
 
 void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operators()

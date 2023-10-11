@@ -90,6 +90,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   global_energy_ = 0;
   conserv_energy_global_ = 0;
   vol_ = 0.;
+  min_delta_xyz_ = 0.;
   cell_diagonal_ = 0.;
   ghost_cells_ = 2;
   rho_cp_post_ = 0;
@@ -797,6 +798,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   clean_thermal_subproblems();
 
   // Correct the vapour and mixed cells values
+  store_temperature_before_extrapolation();
   correct_temperature_for_eulerian_fluxes();
 
   /*
@@ -887,7 +889,12 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Erase the temperature increment (second call)
    */
   compute_temperature_cell_centres();
+
+  /*
+   * In case of the subresolution or not
+   */
   set_zero_temperature_increment();
+  correct_temperature_increment_for_interface_leaving_cell();
 
   // correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
   // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces

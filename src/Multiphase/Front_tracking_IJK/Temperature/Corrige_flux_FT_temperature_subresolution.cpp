@@ -75,17 +75,6 @@ void Corrige_flux_FT_temperature_subresolution::update_intersections()
 
 void Corrige_flux_FT_temperature_subresolution::update()
 {
-//  ArrOfDouble temp_vap, temp_liqu;
-//  temp_vap.set_smart_resize(1);
-//  temp_liqu.set_smart_resize(1);
-//  // On commence par calculer les temperatures aux faces mouillées
-//  intersection_ijk_cell_->update_interpolations_cell_centres_on_interface();
-//  /*
-//   * TODO update with face cell centres positions
-//   */
-//  if (!convection_negligible_ && !diffusion_negligible_)
-//    intersection_ijk_cell_->update_interpolations_cell_faces_on_interface();
-
   associate_indices_and_check_subproblems_consistency();
 }
 

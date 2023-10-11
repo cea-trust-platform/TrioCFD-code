@@ -94,6 +94,7 @@ public :
                                        Matrice& radial_diffusion_matrix,
                                        Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
+                                       const double& indicator,
                                        const IJK_Field_double& eulerian_distance,
                                        const IJK_Field_double& eulerian_curvature,
                                        const IJK_Field_double& eulerian_interfacial_area,
@@ -101,6 +102,7 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
                                        const IJK_Field_double& temperature,
                                        const IJK_Field_double& temperature_ft,
+                                       const IJK_Field_double& temperature_before_extrapolation,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
@@ -119,8 +121,16 @@ public :
                                        const double& local_fourier,
                                        const double& local_cfl,
                                        const double& min_delta_xyz,
-                                       const double& delta_T_subcooled_overheated);
-
+                                       const double& delta_T_subcooled_overheated,
+                                       const int& first_time_step_varying_probes,
+                                       const int& probe_variations_priority,
+                                       const int& disable_interpolation_in_mixed_cells,
+                                       const int& max_u_radial);
+  void interpolate_project_velocities_on_probes();
+  void reajust_probe_length();
+  void compute_modified_probe_length_condition();
+  void compute_distance_cell_centre();
+  void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void prepare_temporal_schemes();
   void prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
@@ -217,6 +227,10 @@ public :
   {
     return local_dt_cfl_min_delta_xyz_;
   };
+  const int& get_probe_variations_enabled() const
+  {
+    return probe_variations_enabled_;
+  };
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
   void associate_sub_problem_temporal_params(const bool& is_first_time_step,
@@ -225,6 +239,9 @@ protected :
                                              const double& local_fourier,
                                              const double& local_cfl,
                                              const double& min_delta_xyz);
+  void associate_varying_probes_params(const int& first_time_step_varying_probes,
+                                       const int& probe_variations_priority,
+                                       const int& disable_interpolation_in_mixed_cells);
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
   void associate_compos(int compo_connex, int compo_group) { compo_connex_ = compo_connex; compo_group_ = compo_group; };
   void associate_interface_related_parameters(double distance, double curvature, double interfacial_area, ArrOfDouble facet_barycentre, ArrOfDouble normal_vector)
@@ -245,6 +262,7 @@ protected :
   };
 
   void associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
+                                            const double& indicator,
                                             const IJK_Field_double& eulerian_distance,
                                             const IJK_Field_double& eulerian_curvature,
                                             const IJK_Field_double& eulerian_interfacial_area,
@@ -252,6 +270,7 @@ protected :
                                             const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
                                             const IJK_Field_double& temperature,
                                             const IJK_Field_double& temperature_ft,
+                                            const IJK_Field_double& temperature_before_extrapolation,
                                             const FixedVector<IJK_Field_double, 3>& velocity,
                                             const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                             const FixedVector<IJK_Field_double, 3>& grad_T_elem,
@@ -275,15 +294,18 @@ protected :
   void initialise_thermal_probe();
   void compute_interface_basis_vectors();
   void compute_pure_spherical_basis_vectors();
+  void compute_local_discretisation();
   void compute_local_time_step();
   const int *  increase_number_of_points();
   void compute_identity_matrix_local(Matrice& identity_matrix_explicit_implicit);
   void compute_first_order_operator_local(Matrice& radial_first_order_operator);
   void compute_second_order_operator_local(Matrice& second_first_order_operator);
   void recompute_finite_difference_matrices();
+  void compute_first_order_operator_local_varying_probe_length(const Matrice * radial_first_order_operator);
+  void compute_second_order_operator_local_varying_probe_length(const Matrice * radial_second_order_operator);
+  void recompute_finite_difference_matrices_varying_probe_length();
   void initialise_radial_convection_operator_local();
   void initialise_radial_diffusion_operator_local();
-  void interpolate_project_velocities_on_probes();
   void interpolate_cartesian_velocities_on_probes();
   void compute_velocity_magnitude();
   void project_velocities_on_probes();
@@ -405,6 +427,7 @@ protected :
    * Similar to operators !
    */
   const IJK_Interfaces * interfaces_;
+  double indicator_=0.5;
   const IJK_Field_double * eulerian_distance_;
   const IJK_Field_double * eulerian_curvature_;
   const IJK_Field_double * eulerian_interfacial_area_;
@@ -413,6 +436,7 @@ protected :
 
   const IJK_Field_double * temperature_;
   const IJK_Field_double * temperature_ft_;
+  const IJK_Field_double * temperature_before_extrapolation_;
   const FixedVector<IJK_Field_double, 3> * velocity_;
   const FixedVector<IJK_Field_double, 3> * velocity_ft_;
 
@@ -570,6 +594,9 @@ protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   bool is_updated_ = false;
 
+  /*
+   * Some tries to do explicit temporal variations at the beginning
+   */
   DoubleVect temperature_ini_temporal_schemes_;
   bool is_first_time_step_ = false;
   int * first_time_step_temporal_;
@@ -593,6 +620,20 @@ protected :
   int nb_iter_explicit_ = 0;
   int max_u_cartesian_ = 1;
 
+  /*
+   * Some tries to make the probe length varies at the beginning of the simulation
+   */
+  int first_time_step_varying_probes_ = 0;
+  int probe_variations_enabled_ = 0;
+  int probe_variations_priority_ = 0;
+  double cfl_probe_length_ = 0.;
+  double fourier_probe_length_ = 0.;
+  double max_cfl_fourier_probe_length_ = 0.;
+  int velocities_calculation_counter_ = 0;
+  int disable_interpolation_in_mixed_cells_ = 0;
+  int short_probe_condition_ = 0;
+  int max_u_radial_=0;
+  double cell_centre_distance_ = 0;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

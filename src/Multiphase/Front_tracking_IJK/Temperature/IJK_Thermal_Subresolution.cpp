@@ -34,6 +34,7 @@ Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Therm
 IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
   disable_mixed_cells_increment_=1;
+  enable_mixed_cells_increment_=0;
   allow_temperature_correction_for_visu_=0;
   subproblem_temperature_extension_=0;
   disable_subresolution_=0;
@@ -132,7 +133,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("points_per_thermal_subproblem", &points_per_thermal_subproblem_);
   param.ajouter("coeff_distance_diagonal", &coeff_distance_diagonal_);
   param.ajouter("finite_difference_assembler", &finite_difference_assembler_);
-  param.ajouter_flag("disable_mixed_cells_increment", &disable_mixed_cells_increment_);
+  // param.ajouter_flag("disable_mixed_cells_increment", &disable_mixed_cells_increment_);
+  param.ajouter_flag("enable_mixed_cells_increment", &enable_mixed_cells_increment_);
   param.ajouter_flag("allow_temperature_correction_for_visu", &allow_temperature_correction_for_visu_);
 
   param.ajouter("boundary_condition_interface", &boundary_condition_interface_);
@@ -172,6 +174,11 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("local_cfl", &local_cfl_);
   param.ajouter("delta_T_subcooled_overheated", &delta_T_subcooled_overheated_);
   param.ajouter_flag("local_diffusion_fourier_priority", &local_diffusion_fourier_priority_);
+
+  param.ajouter_flag("first_time_step_varying_probes", &first_time_step_varying_probes_);
+  param.ajouter_flag("probe_variations_priority", &probe_variations_priority_);
+  param.ajouter_flag("max_u_radial", &max_u_radial_);
+
 
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
   //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
@@ -219,6 +226,9 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
 
+  if (first_time_step_varying_probes_)
+    temperature_before_extrapolation_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
+
   corrige_flux_.typer("Corrige_flux_FT_temperature_subresolution");
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
   //  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
@@ -227,6 +237,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   /*TODO:
    * Change the operators to add fluxes corrections (Maybe not)
    */
+
+  disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
   if (diffusive_flux_correction_)
     {
       // Use an operator that override compute_set() with corrige_flux;
@@ -260,6 +272,9 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
   first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
   first_time_step_explicit_ = !first_time_step_implicit_;
+  if (first_time_step_varying_probes_)
+    first_time_step_temporal_ = 0;
+  probe_variations_enabled_ = first_time_step_varying_probes_;
   compute_overall_probes_parameters();
 
   if (one_dimensional_advection_diffusion_thermal_solver_.est_nul())
@@ -328,8 +343,28 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
             {
               const double indic = ref_ijk_ft_->itfce().I(i,j,k);
               if (fabs(indic) < LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
-                { temperature_(i,j,k) = 0.; }
+                temperature_(i,j,k) = 0.;
             }
+    }
+}
+
+void IJK_Thermal_Subresolution::store_temperature_before_extrapolation()
+{
+  if (first_time_step_varying_probes_)
+    {
+      temperature_before_extrapolation_.data() = 0;
+      const int ni = temperature_.ni();
+      const int nj = temperature_.nj();
+      const int nk = temperature_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+              if (fabs(indic) > VAPOUR_INDICATOR_TEST)
+                temperature_before_extrapolation_(i,j,k) = temperature_(i,j,k);
+            }
+      temperature_before_extrapolation_.echange_espace_virtuel(temperature_before_extrapolation_.ghost());
     }
 }
 
@@ -341,7 +376,7 @@ void IJK_Thermal_Subresolution::correct_temperature_increment_for_interface_leav
   const int ni = d_temperature_.ni();
   const int nj = d_temperature_.nj();
   const int nk = d_temperature_.nk();
-  if (disable_mixed_cells_increment_ && (!subproblem_temperature_extension_ || ghost_fluid_))
+  if (disable_mixed_cells_increment_ && disable_subresolution_ && ghost_fluid_)
     {
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
@@ -391,6 +426,25 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   if (debug_)
     Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
+
+  int varying_probes_length = 1;
+  const int varying_probes = first_time_step_varying_probes_;
+  do
+    {
+      if (debug_)
+        Cerr << "Interpolate the velocities on probes and compute local cfl fourier conditions" << finl;
+      interpolate_project_velocities_on_probes();
+      if (varying_probes_length)
+        reajust_probes_length();
+      else
+        probe_variations_enabled_ = 0;
+      varying_probes_length--;
+    }
+  while (probe_variations_enabled_);
+
+  if (debug_)
+    if(varying_probes && !first_time_step_varying_probes_)
+      Cerr << "Probes length is now fixed" << finl;
 
   if (debug_)
     Cerr << "Compute radial subresolution convection and diffusion operators" << finl;
@@ -614,8 +668,10 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            radial_diffusion_matrix_,
                                                                            radial_convection_matrix_,
                                                                            ref_ijk_ft_->itfce(),
+                                                                           indicator(i,j,k),
                                                                            temperature_,
                                                                            temperature_ft_,
+                                                                           temperature_before_extrapolation_,
                                                                            ref_ijk_ft_->get_velocity(),
                                                                            ref_ijk_ft_->get_velocity_ft(),
                                                                            grad_T_elem_,
@@ -634,12 +690,34 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            local_fourier_,
                                                                            local_cfl_,
                                                                            min_delta_xyz_,
-                                                                           delta_T_subcooled_overheated_);
+                                                                           delta_T_subcooled_overheated_,
+                                                                           first_time_step_varying_probes_,
+                                                                           probe_variations_priority_,
+                                                                           disable_interpolation_in_mixed_cells_,
+                                                                           max_u_radial_);
 
               }
     }
 }
 
+void IJK_Thermal_Subresolution::interpolate_project_velocities_on_probes()
+{
+  if (!disable_subresolution_)
+    thermal_local_subproblems_.interpolate_project_velocities_on_probes();
+}
+
+void IJK_Thermal_Subresolution::reajust_probes_length()
+{
+  if (!disable_subresolution_)
+    if (first_time_step_varying_probes_)
+      {
+        thermal_local_subproblems_.reajust_probes_length();
+        //
+        probe_variations_enabled_ = thermal_local_subproblems_.get_probe_variations_enabled(probe_variations_priority_);
+        first_time_step_varying_probes_ = probe_variations_enabled_;
+        thermal_local_subproblems_.compute_modified_probe_length(probe_variations_enabled_);
+      }
+}
 
 void IJK_Thermal_Subresolution::compute_radial_subresolution_convection_diffusion_operators()
 {
@@ -665,7 +743,7 @@ void IJK_Thermal_Subresolution::initialise_identity_matrices(Matrice& identity_m
   if (debug_)
     Cerr << "Initialise the Identity matrices" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
-  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix_subproblems, identity_matrix, nb_subproblems);
+  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix_subproblems, identity_matrix, nb_subproblems, first_time_step_varying_probes_);
   if (debug_)
     Cerr << "Radial convection operator has been initialised." << finl;
 }
@@ -679,7 +757,7 @@ void IJK_Thermal_Subresolution::initialise_radial_convection_operator(Matrice& r
   if (debug_)
     Cerr << "Initialise the Radial convection operator" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
-  finite_difference_assembler_.initialise_matrix_subproblems(radial_convection_matrix, radial_first_order_operator, nb_subproblems);
+  finite_difference_assembler_.initialise_matrix_subproblems(radial_convection_matrix, radial_first_order_operator, nb_subproblems, first_time_step_varying_probes_);
   if (debug_)
     Cerr << "Radial convection operator has been initialised." << finl;
 }
@@ -693,7 +771,7 @@ void IJK_Thermal_Subresolution::initialise_radial_diffusion_operator(Matrice& ra
   if (debug_)
     Cerr << "Initialise the Radial diffusion operator" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
-  finite_difference_assembler_.initialise_matrix_subproblems(radial_diffusion_matrix, radial_second_order_operator, nb_subproblems);
+  finite_difference_assembler_.initialise_matrix_subproblems(radial_diffusion_matrix, radial_second_order_operator, nb_subproblems, first_time_step_varying_probes_);
   if (debug_)
     Cerr << "Radial diffusion operator has been initialised." << finl;
 }
@@ -898,7 +976,7 @@ void IJK_Thermal_Subresolution::compute_diffusive_fluxes_face_centre()
 
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ && disable_mixed_cells_increment_)
     corrige_flux_->compute_temperature_cell_centre(temperature_);
 }
 
@@ -913,7 +991,7 @@ void IJK_Thermal_Subresolution::prepare_ij_fluxes_k_layers()
 
 void IJK_Thermal_Subresolution::set_zero_temperature_increment()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ && disable_mixed_cells_increment_)
     corrige_flux_->set_zero_temperature_increment(d_temperature_);
 }
 

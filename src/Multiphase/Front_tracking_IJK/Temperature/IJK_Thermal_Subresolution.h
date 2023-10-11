@@ -72,8 +72,11 @@ protected :
   void compute_diffusion_increment() override;
   void correct_temperature_increment_for_interface_leaving_cell() override;
   void correct_temperature_for_eulerian_fluxes() override;
+  void store_temperature_before_extrapolation() override;
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters();
+  void interpolate_project_velocities_on_probes();
+  void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();
   void compute_local_substep();
   void prepare_temporal_schemes();
@@ -113,6 +116,7 @@ protected :
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
   int disable_mixed_cells_increment_;
+  int enable_mixed_cells_increment_;
   int allow_temperature_correction_for_visu_;
   int disable_subresolution_;
   int diffusive_flux_correction_;
@@ -170,6 +174,9 @@ protected :
   int neglect_frame_of_reference_radial_advection_;
   int approximate_temperature_increment_;
 
+  /*
+   * Some tries to do explicit temporal variations at the beginning
+   */
   bool is_first_time_step_;
   int first_time_step_temporal_;
   int first_time_step_explicit_;
@@ -186,6 +193,16 @@ protected :
   double local_dt_cfl_min_delta_xyz_ = 0.;
   double local_dt_cfl_counter_ = 0.;
   double local_dt_fourier_counter_ = 0.;
+
+  /*
+   * Some tries to make the probe length varies at the beginning of the simulation
+   */
+  int first_time_step_varying_probes_ = 0;
+  int probe_variations_enabled_ = 0;
+  int probe_variations_priority_ = 0;
+  int disable_interpolation_in_mixed_cells_ = 0;
+  int keep_temperature_extrapolated_from_LRS_ = 0;
+  int max_u_radial_=0;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

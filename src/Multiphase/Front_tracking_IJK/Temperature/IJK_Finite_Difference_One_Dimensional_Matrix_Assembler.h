@@ -81,8 +81,11 @@ public :
                                              const DoubleVect& temperature_ini_temporal_schemes);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
-  void initialise_matrix_subproblems(Matrice& matrix_subproblems, Matrice& fd_operator, const int& subproblems);
-  void reinitialise_matrix_subproblem(Matrice& matrix_subproblems,
+  void initialise_matrix_subproblems(Matrice& matrix_subproblems,
+                                     Matrice& fd_operator,
+                                     const int& subproblems,
+                                     const int& first_time_step_varying_probes);
+  void reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                       Matrice& fd_operator,
                                       const int& nb_subproblems);
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,

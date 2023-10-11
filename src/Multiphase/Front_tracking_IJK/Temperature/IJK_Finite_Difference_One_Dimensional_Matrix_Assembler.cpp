@@ -595,8 +595,13 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices(Matric
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_subproblems(Matrice& matrix_subproblems,
                                                                                            Matrice& fd_operator,
-                                                                                           const int& nb_subproblems)
+                                                                                           const int& nb_subproblems,
+                                                                                           const int& first_time_step_varying_probes)
 {
+  /*
+   * Work only for constant number of points on probes
+   * TODO: Adapt for varying numbers of points
+   */
   matrix_subproblems.typer("Matrice_Bloc");
   Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, matrix_subproblems.valeur());
   block_matrix_subproblems.dimensionner(nb_subproblems,nb_subproblems);
@@ -615,16 +620,19 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
             sparse_matrix_zeros.compacte(remove);
           }
       block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
-      Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
-      sparse_matrix = Matrice_Morse(fd_operator_sparse);
+      if (!first_time_step_varying_probes)
+        {
+          Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+          sparse_matrix = Matrice_Morse(fd_operator_sparse);
+        }
     }
 }
 
-void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix_subproblem(Matrice& matrix_subproblems,
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                                                                             Matrice& fd_operator,
                                                                                             const int& nb_subproblems)
 {
-  Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, matrix_subproblems.valeur());
+  Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, (*matrix_subproblems).valeur());
 
   Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(nb_subproblems,nb_subproblems).valeur());
   Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, fd_operator.valeur());

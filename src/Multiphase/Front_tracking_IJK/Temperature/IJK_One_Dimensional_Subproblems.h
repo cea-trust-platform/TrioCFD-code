@@ -81,8 +81,10 @@ public :
                                        Matrice& radial_diffusion_matrix,
                                        Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
+                                       const double& indicator,
                                        const IJK_Field_double& temperature,
                                        const IJK_Field_double& temperature_ft,
+                                       const IJK_Field_double& temperature_before_extrapolation,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
@@ -101,7 +103,14 @@ public :
                                        const double& local_fourier,
                                        const double& local_cfl,
                                        const double& min_delta_xyz,
-                                       const double& delta_T_subcooled_overheated);
+                                       const double& delta_T_subcooled_overheated,
+                                       const int& first_time_step_varying_probes,
+                                       const int& probe_variations_priority,
+                                       const int& disable_interpolation_in_mixed_cells,
+                                       const int& max_u_radial);
+  void interpolate_project_velocities_on_probes();
+  void reajust_probes_length();
+  void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
                                                        DoubleVect& thermal_subproblems_temperature_solution_ini,
@@ -144,6 +153,9 @@ public :
   double get_local_min_cfl_time_step_probe_length();
   double get_local_dt_cfl();
   double get_local_dt_cfl_min_delta_xyz();
+  int get_probe_variations_enabled(const int& probe_variations_priority);
+  int get_probe_variations_enabled_priority();
+  int get_probe_variations_enabled_non_priority();
   void set_local_time_step(const double& local_time_step);
   void prepare_temporal_schemes();
 

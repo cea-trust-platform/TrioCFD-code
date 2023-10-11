@@ -262,6 +262,7 @@ protected:
   virtual void add_temperature_diffusion();
   virtual void compute_diffusion_increment()=0;
   virtual void correct_temperature_for_eulerian_fluxes()=0;
+  virtual void store_temperature_before_extrapolation() { ; };
   virtual void correct_temperature_increment_for_interface_leaving_cell() { ; };
   void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
@@ -417,6 +418,7 @@ protected:
   IJK_Field_double rho_cp_;
   IJK_Field_double rho_cp_T_;
   IJK_Field_double temperature_;
+  IJK_Field_double temperature_before_extrapolation_;
   IJK_Field_double d_temperature_; // Temperature increment.
   IJK_Field_double RK3_F_temperature_; // Temporary storage for substeps in the RK3 algorithm.
   FixedVector<IJK_Field_double, 3> storage_; // Temporary storage for fluxes calculation.
