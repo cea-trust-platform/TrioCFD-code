@@ -25,7 +25,7 @@ void OpConvCentre2IJKScalar_double::compute_flux_(IJK_Field_local_double& resu, 
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
   const int nx = _DIR_==DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni();
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
-  const double surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+  const double surface = channel_data_.get_surface(k_layer, 1, (int)_DIR_);
 
   if(_DIR_ == DIRECTION::Z)
     {
