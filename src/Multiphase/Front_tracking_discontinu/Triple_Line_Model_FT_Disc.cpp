@@ -1230,10 +1230,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             else
               Cerr << "[TCL] FOUND interface cell at #" << elemi <<" with face number #" << num_face << finl;
 
-
-            ArrOfInt future_new_elems;
-            future_new_elems.set_smart_resize(1);
-
             const int korient = orientation(num_face); // 0:x 1:y or 2:z (gives the direction it is normal to the wall)
             const double xwall = zvdf.xv(num_face, korient);
             double nwall[3] = { 0., 0., 0. }; // Away from the wall by convention here
@@ -1258,15 +1254,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     if ((!maillage.sommet_ligne_contact(sommet0)) && (!maillage.sommet_ligne_contact(sommet1)))
                       {
                         // Process::exit("[TCL: MICRO] !!! BC cell found BUT not part of the first facette, as none of the sommet touch WALL, checking FT setting" );
-                        Cerr<< "[TCL: MICRO] !!!  part of the first facette, but not a TCL , as none of the sommet touch WALL, checking FT setting" << finl;
+                        Cerr<< "[TCL: MICRO] !!!  Attenion !!! part of the BC, but not a TCL , as none of the sommet touch WALL" << finl;
                       }
                     else
                       {
                         const int elem = data.numero_element_;
-
-                        if (is_in_list(list_micro_elems,elem))
-                          continue;
-                        else
+                        if (!is_in_list(list_micro_elems,elem))
                           {
                             Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
                             list_micro_elems.append_array(elem);
@@ -1280,14 +1273,39 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                       }
                     index = data.index_element_suivant_;
                   }
+              }
+            else
+              {
+                const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+
+                const int fa7 = data.numero_facette_;
+                const int sommet0 = facettes(fa7, 0);
+                const int sommet1 = facettes(fa7, 1);
+
+                if ((!maillage.sommet_ligne_contact(sommet0)) && (!maillage.sommet_ligne_contact(sommet1)))
+                  {
+                    // Process::exit("[TCL: MICRO] !!! BC cell found BUT not part of the first facette, as none of the sommet touch WALL, checking FT setting" );
+                    Cerr<< "[TCL: MICRO] !!!  part of the first facette, but not a TCL , as none of the sommet touch WALL, checking FT setting" << finl;
+                  }
+                else
+                  {
+                    const int elem = data.numero_element_;
+                    if (!is_in_list(list_micro_elems,elem))
+                      {
+                        Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
+                        list_micro_elems.append_array(elem);
+
+                        Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                        Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                        const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
+                        list_micro_faces.append_array(num_face_wall);
+                        Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                      }
+                  }
 
               }
 
-
-
-
             Cerr << "[TCL] Check if this CELL A MICRO and/or MESO cell" << finl;
-
 
             const double dist1 = std::fabs(zvdf.dist_face_elem0(num_face,elemi)); // h
             const double half_cell_height1 = std::fabs(zvdf.dist_face_elem0(elem_faces(elemi,iface),elemi)); // half distanct to furface parallel to wall
@@ -1302,7 +1320,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 list_micro_faces.append_array(num_face);
                 Cerr << "[TCL: MICRO]: Corresponding face number at wall "
                      << num_face << finl;
-                future_new_elems.append_array(elemi);
               }
             else if (hcell_bot <= ym_ + Objet_U::precision_geom)
               {
@@ -1319,7 +1336,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     list_meso_elems.append_array(elemi);
                   }
 
-                future_new_elems.append_array(elemi);
                 Cerr
                     << "[TCL: MICRO+MESO]: Corresponding face number at wall "
                     << num_face << finl;
@@ -1330,7 +1346,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elemi
                      << finl;
                 list_meso_elems.append_array(elemi);
-                future_new_elems.append_array(elemi);
 
                 list_meso_faces.append_array(num_face);
                 Cerr << "[TCL: MESO]: Corresponding face number at wall "
@@ -1343,6 +1358,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             Cerr << "[TCL] Searching MESO CELLS (INTERFACE + YM<Y<YMeso) among Neighboorhood cells of iElem #" << elemi << finl;
             // loop to find all cells with interface
             Cerr << "[TCL START Searching cells from Elem #" << elemi << " and face #" << num_face << finl;
+
+            ArrOfInt future_new_elems;
+            future_new_elems.set_smart_resize(1);
 
             future_new_elems.append_array(elemi); // Initialize the list with the current micro cells
             while (future_new_elems.size_array()) // There are some elements to deal with
@@ -2091,7 +2109,7 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
 {
   if (read_via_file_)
     {
-      /*
+
       double Twall = 0.;
       const Domaine_Cl_dis_base& zcldis = ref_cast(
                                             Domaine_Cl_dis_base, ref_eq_temp_->domaine_Cl_dis ().valeur ());
@@ -2119,10 +2137,10 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
               << "How can we set Twall when temperature(elem) is not valid? Or is it?"
               << finl;
           Process::exit ();
-        }*/
+        }
 
-      const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
-                             num_face);
+      // const double Twall = ref_eq_temp_.valeur ().get_Twall_at_face (
+      //                       num_face);
 
       const int num_col = num_colon_app_; // colon number corresponding to theta_app
       const int num_tem = num_colon_tem_;

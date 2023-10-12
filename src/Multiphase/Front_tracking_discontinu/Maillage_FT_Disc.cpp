@@ -6137,7 +6137,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                                                                 face_loc);
                       bool is_wall = (sub_type(Dirichlet_paroi_fixe, type_cl) || sub_type(Dirichlet_paroi_defilante,type_cl));
 
-                      if (tcl.is_activated() && tcl.is_read_via_file() && is_wall )
+                      if (tcl.is_read_via_file() && is_wall )
                         {
                           double theta_app = tcl.get_theta_app(face)/180.*M_PI;
                           costheta = cos(theta_app);
