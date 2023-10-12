@@ -1165,10 +1165,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   list_micro_elems.set_smart_resize(1);
   ArrOfInt list_micro_faces;
   list_micro_faces.set_smart_resize(1);
+  ArrOfInt list_micro_indexs;
+  list_micro_indexs.set_smart_resize(1);
 
   // list of Qtot W/m from TCL model for printing
-  ArrOfDouble list_micro_Qtot;
-  list_micro_Qtot.set_smart_resize(1);
+  ArrOfDouble list_micro_fraction;
+  list_micro_fraction.set_smart_resize(1);
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
@@ -1268,6 +1270,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                             Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
                             const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
                             list_micro_faces.append_array(num_face_wall);
+                            list_micro_indexs.append_array(index);
                             Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
                           }
                       }
@@ -1314,17 +1317,20 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 
             if (hcell_top <= ym_ + Objet_U::precision_geom && !is_in_list(list_micro_elems,elemi))
               {
-                Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elemi
-                     << finl;
-                list_micro_elems.append_array(elemi);
-                list_micro_faces.append_array(num_face);
-                Cerr << "[TCL: MICRO]: Corresponding face number at wall "
-                     << num_face << finl;
+                if (!is_in_list(list_micro_elems,elemi) && !distri_first_facette())
+                  {
+                    Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elemi
+                         << finl;
+                    list_micro_elems.append_array(elemi);
+                    list_micro_faces.append_array(num_face);
+                    Cerr << "[TCL: MICRO]: Corresponding face number at wall "
+                         << num_face << finl;
+                  }
               }
             else if (hcell_bot <= ym_ + Objet_U::precision_geom)
               {
                 Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
-                if (!is_in_list(list_micro_elems,elemi))
+                if (!distri_first_facette() && !is_in_list(list_micro_elems,elemi))
                   {
                     list_micro_elems.append_array(elemi);
                     list_micro_faces.append_array(num_face);
@@ -1398,17 +1404,17 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                         const double hcell_up = dist+half_cell_height;
                         if (hcell_up <= ym_+Objet_U::precision_geom)
                           {
-                            if (is_in_list(list_micro_elems,elem_voisin))
-                              continue;
-                            Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-                            list_micro_elems.append_array(elem_voisin);
+                            if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
+                              {
+                                Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
+                                list_micro_elems.append_array(elem_voisin);
+                                Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                                Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                                const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
+                                list_micro_faces.append_array(num_face_wall);
+                                Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                              }
                             future_new_elems.append_array(elem_voisin);
-
-                            Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                            Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
-                            const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
-                            list_micro_faces.append_array(num_face_wall);
-                            Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
                           }
                         else if (hcell_dn <= ym_+Objet_U::precision_geom)
                           {
@@ -1418,7 +1424,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                             const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
 
                             future_new_elems.append_array(elem_voisin);
-                            if (!is_in_list(list_micro_elems,elem_voisin))
+                            if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
                               {
                                 list_micro_elems.append_array(elem_voisin);
                                 list_micro_faces.append_array(num_face_wall);
@@ -1601,14 +1607,19 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 
           double Qtot = get_Qtcl(num_face);
           double Qmicro = 0.;
+          double fraction = 0.;
 
           if(!distri_first_facette())
-            Qmicro = log(std::fmin(ym_,std::fmax(ytop,ymin))/ std::fmin(ym_,std::fmax(ybot,ymin))) / (log(ym_) +19.)*Qtot;
+            {
+              Qmicro = log(std::fmin(ym_,std::fmax(ytop,ymin))/ std::fmin(ym_,std::fmax(ybot,ymin))) / (log(ym_) +19.)*Qtot;
+              fraction = log(std::fmin(ym_,std::fmax(ytop,ymin))/ std::fmin(ym_,std::fmax(ybot,ymin))) / (log(ym_) +19.);
+            }
           else
             {
-              const int index=intersections.index_elem()[elem]; // index > 0 if Front presents
+              // const int index=intersections.index_elem()[elem]; // index > 0 if Front presents
+              const int index= list_micro_indexs[idx];
               const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-              const double fraction = data.fraction_surface_intersection_;
+              fraction = data.fraction_surface_intersection_;
               Qmicro = fraction*Qtot;
             }
 
@@ -1626,7 +1637,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
           num_faces.append_array(num_face);
           mpoint_from_CL.append_array(Q_int/(surface_tot*Lvap));
           Q_from_CL.append_array(Q_int);
-          list_micro_Qtot.append_array(Qmicro/Qtot);
+          list_micro_fraction.append_array(fraction);
 
 
           instant_Qmicro += Qmicro;
@@ -1651,7 +1662,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
           {
             Cerr << elems_with_CL_contrib[idx] << "\t| " <<  num_faces[idx] << "\t| "
                  << Q_from_CL[idx] << "\t| " <<   mpoint_from_CL[idx] << "\t| "
-                 <<list_micro_Qtot[idx] << finl;
+                 <<list_micro_fraction[idx] << finl;
           }
         Cerr << " ************************************************************* " << finl;
       }
