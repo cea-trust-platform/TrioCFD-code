@@ -1239,7 +1239,7 @@ void IJK_Thermal_base::compute_mixed_cells_number(const IJK_Field_double& indica
   for (int k=0; k < nz ; k++)
     for (int j=0; j< ny; j++)
       for (int i=0; i < nx; i++)
-        if (fabs(indicator(i,j,k)) > 1e-8 && fabs(1-indicator(i,j,k)) > 1e-8)
+        if (fabs(indicator(i,j,k)) > VAPOUR_INDICATOR_TEST && indicator(i,j,k) < LIQUID_INDICATOR_TEST)
           mixed_cells_number_ += 1;
   Cerr << "There are " << mixed_cells_number_ << "mixed cells." << finl;
 }

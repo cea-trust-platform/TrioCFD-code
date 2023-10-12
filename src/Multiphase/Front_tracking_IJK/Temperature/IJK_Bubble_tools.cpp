@@ -152,10 +152,7 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                     eulerian_compo_connex(i,j,k) = bubble_index;
                     eulerian_compo_connex_ghost(i,j,k) = ibubble;
                   }
-                if (fabs(chi_l) > VAPOUR_INDICATOR_TEST)
-                  Cerr << "A mixed cell value has been found but not in the bounding box" << finl;
               }
-
           }
 }
 

@@ -44,6 +44,16 @@
 #define INVALID_SOURCE_TERM 1e-20
 #define NEIGHBOURS_FIRST_DIR {-1., -1., 1., 1.}
 #define NEIGHBOURS_SECOND_DIR {-1., 1., -1., 1.}
+#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
+#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
+#define NEIGHBOURS_FACES_I {0, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_FACES_J {0, 0, 0, 1, 0, 0}
+#define NEIGHBOURS_FACES_K {0, 0, 0, 0, 0, 1}
+#define LIQUID_INDICATOR_TEST 1.-1.e-12
+#define VAPOUR_INDICATOR_TEST 1.e-12
+#define FACES_DIR {0, 0, 1, 1, 2, 2}
+#define FLUX_SIGN {-1, 1, -1, 1, -1, 1}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -130,6 +140,14 @@ public :
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
   void compute_distance_cell_centre();
+  void compute_distance_faces_centres();
+  double compute_min_distance_pure_face_centre();
+  double compute_min_distance_pure_face_vertices();
+  void compute_vertex_position(const int& vertex_number,
+                               const int& face_dir,
+                               const Vecteur3& bary_face,
+                               double& distance_vertex_centre,
+                               Vecteur3& bary_vertex);
   void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void prepare_temporal_schemes();
@@ -634,6 +652,9 @@ protected :
   int short_probe_condition_ = 0;
   int max_u_radial_=0;
   double cell_centre_distance_ = 0;
+  FixedVector<bool,6> pure_liquid_neighbours_;
+  FixedVector<double,6> face_centres_distance_;
+  FixedVector<FixedVector<double,4>,6> vertices_centres_distance_;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

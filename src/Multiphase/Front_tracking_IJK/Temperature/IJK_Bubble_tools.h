@@ -27,8 +27,8 @@
 #include <Maillage_FT_IJK.h>
 
 #define INVALID_TEST -1.e30
-#define LIQUID_INDICATOR_TEST 1.-1.e-8
-#define VAPOUR_INDICATOR_TEST 1.e-8
+#define LIQUID_INDICATOR_TEST 1.-1.e-12
+#define VAPOUR_INDICATOR_TEST 1.e-12
 #define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
 #define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
 #define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}

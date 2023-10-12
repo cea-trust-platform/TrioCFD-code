@@ -721,8 +721,11 @@ void IJK_One_Dimensional_Subproblem::reajust_probe_length()
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 {
-  cfl_probe_length_ = (max_u_ * global_time_step_) / local_cfl_; // Add 3D constants ?
-  fourier_probe_length_ = sqrt(((*alpha_ * global_time_step_)) / local_fourier_); // Add 3D constants ?
+//  cfl_probe_length_ = (max_u_ * global_time_step_) / local_cfl_; // Add 3D constants ?
+//  fourier_probe_length_ = sqrt(((*alpha_ * global_time_step_)) / local_fourier_); // Add 3D constants ?
+  const double current_time = ref_ijk_ft_->get_current_time();
+  cfl_probe_length_ = (max_u_ * current_time) / local_cfl_; // Add 3D constants ?
+  fourier_probe_length_ = sqrt(((*alpha_ * current_time)) / local_fourier_); // Add 3D constants ?
   max_cfl_fourier_probe_length_ = std::max(cfl_probe_length_, fourier_probe_length_);
   if (max_cfl_fourier_probe_length_ < probe_length_)
     {
@@ -731,20 +734,23 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
       if (indicator_ < 0.5)
         {
           compute_distance_cell_centre();
-          if (cell_centre_distance_ > max_cfl_fourier_probe_length_)
-            short_probe_condition_ = 0;
+          if (max_cfl_fourier_probe_length_ < cell_centre_distance_)
+            short_probe_condition_ = 1;
           else
-            short_probe_condition_ = 1.;
+            short_probe_condition_ = 0;
         }
       // FIXME : Need the distance to the pure cell face centres !
-//      else
-//      {
-//
-//      	if (max_cfl_fourier_probe_length_ > (min_delta_xyz_ / 2))
-//      		short_probe_condition_ = 0;
-//      	else
-//      		short_probe_condition_= 1.;
-//      }
+      else
+        {
+          compute_distance_faces_centres();
+          const double min_distance_pure_face_centre = compute_min_distance_pure_face_centre();
+          const double min_distance_pure_vertex_centre = compute_min_distance_pure_face_vertices();
+          const double min_distance_face_centre_vertex = std::min(min_distance_pure_face_centre, min_distance_pure_vertex_centre);
+          if (max_cfl_fourier_probe_length_ < min_distance_face_centre_vertex)
+            short_probe_condition_ = 1;
+          else
+            short_probe_condition_= 0;
+        }
       probe_variations_enabled_ = 1;
     }
   else
@@ -754,6 +760,8 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 /*
  * TODO: Use ijk_intersections_interface instead !
  * and avoid redundancy...
+ * Compare Calculation with mean_over_compo()
+ * not weighted by the surface
  */
 void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
 {
@@ -762,6 +770,134 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
   facet_to_cell_centre *= -1;
   facet_to_cell_centre += centre;
   cell_centre_distance_ = Vecteur3::produit_scalaire(facet_to_cell_centre, normal_vector_compo_);
+}
+
+/*
+ * TODO: Use ijk_intersections_interface instead !
+ * and avoid redundancy...
+ * Compare Calculation with mean_over_compo()
+ * not weighted by the surface
+ */
+void IJK_One_Dimensional_Subproblem::compute_distance_faces_centres()
+{
+  Vecteur3 bary_face {0., 0., .0};
+  Vecteur3 vector_relative {0., 0., 0.};
+  Vecteur3 bary_vertex {0., 0., 0.};
+  int neighbours_i[6] = NEIGHBOURS_I;
+  int neighbours_j[6] = NEIGHBOURS_J;
+  int neighbours_k[6] = NEIGHBOURS_K;
+  int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
+  int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
+  int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
+  int face_dir[6] = FACES_DIR;
+  int m;
+  for (int l=0; l<6; l++)
+    {
+      const int ii = neighbours_i[l];
+      const int jj = neighbours_j[l];
+      const int kk = neighbours_k[l];
+      const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_+ii, index_j_+jj, index_k_+kk);
+      if (fabs(indic_neighbour) > LIQUID_INDICATOR_TEST)
+        {
+          const int ii_f = neighbours_faces_i[l];
+          const int jj_f = neighbours_faces_j[l];
+          const int kk_f = neighbours_faces_k[l];
+          pure_liquid_neighbours_[l] = 1;
+          if (ii)
+            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_I);
+          if (jj)
+            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_J);
+          if (kk)
+            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_K);
+          vector_relative = facet_barycentre_;
+          vector_relative *= (-1);
+          vector_relative += bary_face;
+          const double distance_face_centre = Vecteur3::produit_scalaire(bary_face, normal_vector_compo_);
+          face_centres_distance_[l] = distance_face_centre;
+          for (m=0; m<4; m++)
+            {
+              double distance_vertex_centre = 0.;
+              bary_vertex = vector_relative;
+              compute_vertex_position(m, face_dir[l], bary_face, distance_vertex_centre, bary_vertex);
+              vertices_centres_distance_[l][m] = distance_vertex_centre;
+            }
+        }
+      else
+        {
+          pure_liquid_neighbours_[l] = 0;
+          face_centres_distance_[l] = 0.;
+          for (m=0; m<4; m++)
+            vertices_centres_distance_[l][m] = 0.;
+        }
+    }
+}
+
+double IJK_One_Dimensional_Subproblem::compute_min_distance_pure_face_centre()
+{
+  double min_face_centre_distance = 1.e20;
+  for (int l=0; l<6; l++)
+    if (pure_liquid_neighbours_[l])
+      if(face_centres_distance_[l] > 0)
+        min_face_centre_distance = std::min(min_face_centre_distance, face_centres_distance_[l]);
+  return min_face_centre_distance;
+}
+
+double IJK_One_Dimensional_Subproblem::compute_min_distance_pure_face_vertices()
+{
+  double min_face_vertex_distance = 1.e20;
+  int m;
+  for (int l=0; l<6; l++)
+    if (pure_liquid_neighbours_[l])
+      for (m=0; m<4; m++)
+        if(vertices_centres_distance_[l][m] > 0)
+          min_face_vertex_distance = std::min(min_face_vertex_distance, vertices_centres_distance_[l][m]);
+  return min_face_vertex_distance;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_vertex_position(const int& vertex_number,
+                                                             const int& face_dir,
+                                                             const Vecteur3& bary_face,
+                                                             double& distance_vertex_centre,
+                                                             Vecteur3& bary_vertex)
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  const double neighbours_first_dir[4] = NEIGHBOURS_FIRST_DIR;
+  const double neighbours_second_dir[4] = NEIGHBOURS_SECOND_DIR;
+  Vecteur3 point_coords {0., 0., 0.};
+  double dl1;
+  double dl2;
+  switch(face_dir)
+    {
+    case 0:
+      dl1 = dy / 2.;
+      dl2 = dz / 2.;
+      point_coords[1] = dl1 * neighbours_first_dir[vertex_number];
+      point_coords[2] = dl2 * neighbours_second_dir[vertex_number];
+      break;
+    case 1:
+      dl1 = dx / 2.;
+      dl2 = dz / 2.;
+      point_coords[0] = dl1 * neighbours_first_dir[vertex_number];
+      point_coords[2] = dl2 * neighbours_second_dir[vertex_number];
+      break;
+    case 2:
+      dl1 = dx / 2.;
+      dl2 = dy / 2.;
+      point_coords[0] = dl1 * neighbours_first_dir[vertex_number];
+      point_coords[1] = dl2 * neighbours_second_dir[vertex_number];
+      break;
+    default:
+      dl1 = dx / 2.;
+      dl2 = dy / 2.;
+      point_coords[0] = dl1 * neighbours_first_dir[vertex_number];
+      point_coords[1] = dl2 * neighbours_second_dir[vertex_number];
+      break;
+    }
+  bary_vertex += point_coords;
+  distance_vertex_centre = Vecteur3::produit_scalaire(bary_vertex, normal_vector_compo_);
 }
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& probe_variations_enabled)
