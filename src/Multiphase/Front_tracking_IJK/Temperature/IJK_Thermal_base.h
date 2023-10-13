@@ -255,6 +255,8 @@ public:
   virtual void update_intersections() { ; };
   virtual void clean_ijk_intersections() { ; };
   virtual void set_thermal_subresolution_outputs(SFichier& fic) { ; };
+  virtual void compute_temperature_init();
+  virtual void recompute_temperature_init();
 
 protected:
 

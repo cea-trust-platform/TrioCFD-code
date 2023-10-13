@@ -529,6 +529,7 @@ protected :
 
   // Pour l'option alternative du calcul de la diffusion :
   IJK_Field_double unit_;
+  FixedVector<IJK_Field_double, 3> zero_field_ft_;
   FixedVector<IJK_Field_double, 3> laplacien_velocity_;
 
 #ifdef BIDOUILLE
@@ -666,6 +667,9 @@ protected :
   double dt_fo_vap_ = 1.e20;
   double dt_cfl_liq_ = 1.e20;
   double dt_cfl_vap_ = 1.e20;
+
+  int counter_first_iter_ = 2;
+  int first_step_interface_smoothing_ = 0;
 };
 
 #endif /* IJK_FT_included */

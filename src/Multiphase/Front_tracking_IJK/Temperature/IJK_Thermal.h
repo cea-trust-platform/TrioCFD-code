@@ -87,6 +87,7 @@ public :
   void set_fichier_sauvegarde(const char *lata_name) { valeur().set_fichier_sauvegarde(lata_name); };
 
   inline int initialize(const IJK_Splitting& splitting, const int idx);
+  inline void recompute_temperature_init();
   inline void update_thermal_properties();
   inline void euler_time_step(const double timestep);
   inline void rk3_sub_step(const int rk_step,
@@ -149,6 +150,11 @@ protected:
 inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
 {
   return valeur().initialize(splitting, idx);
+}
+
+inline void IJK_Thermal::recompute_temperature_init()
+{
+  valeur().recompute_temperature_init();
 }
 
 inline void IJK_Thermal::update_thermal_properties()

@@ -407,8 +407,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
     {
       if (expression_T_init_ != "??")
         {
-          Cout << "Temperature initialization from expression \nTini = " << expression_T_init_ << finl;
-          set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->itfce().I(), 0.);
+          compute_temperature_init();
         }
       else
         {
@@ -617,6 +616,18 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
   // Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
+}
+
+void IJK_Thermal_base::compute_temperature_init()
+{
+  Cout << "Temperature initialization from expression \nTini = " << expression_T_init_ << finl;
+  set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->itfce().I(), 0.);
+}
+
+void IJK_Thermal_base::recompute_temperature_init()
+{
+  Cout << "Temperature initialization from expression \nTini = " << expression_T_init_ << finl;
+  set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->itfce().In(), 0.);
 }
 
 void IJK_Thermal_base::compute_cell_volume()

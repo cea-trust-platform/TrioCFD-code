@@ -53,6 +53,7 @@ public :
   void sauvegarder_thermals(SFichier& fichier);
   void compute_timestep(double& dt_thermals, const double dxmin);
   void initialize(const IJK_Splitting& splitting, int& nalloc);
+  void recompute_temperature_init();
   int size_thermal_problem(Nom thermal_problem);
   void update_thermal_properties();
   void euler_time_step(const double timestep);

@@ -1747,6 +1747,7 @@ int IJK_FT_Post::alloc_fields()
   int nalloc = 0;
   rebuilt_indic_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
   potentiel_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
+  nalloc += 2;
   if ((!disable_diphasique_) && ((liste_post_instantanes_.contient_("AIRE_INTERF")) || (liste_post_instantanes_.contient_("TOUS")) || ((t_debut_statistiques_ < 1.e10))))
     {
       ai_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);

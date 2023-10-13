@@ -124,6 +124,12 @@ void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
     }
 }
 
+void IJK_Thermals::recompute_temperature_init()
+{
+  for (auto& itr : (*this))
+    itr.recompute_temperature_init();
+}
+
 int IJK_Thermals::size_thermal_problem(Nom thermal_problem)
 {
   int size=0;

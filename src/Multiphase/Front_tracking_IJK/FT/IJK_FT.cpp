@@ -593,6 +593,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("rho_vapeur", &rho_vapeur_); // XD_ADD_P floattant vapour density
   param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
+  param.ajouter_flag("first_step_interface_smoothing", &first_step_interface_smoothing_);
+
   post_.complete_interpreter(param, is);
 
 // XD attr check_stats rien check_stats 1 Flag to compute additional (xy)-plane averaged statistics
@@ -881,6 +883,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
     itr.associer(*this);
 
   thermals_.associer(*this);
+  first_step_interface_smoothing_ = (first_step_interface_smoothing_ && !(*this).reprise_);
 
   run();
   return is;
@@ -2156,7 +2159,10 @@ void IJK_FT_double::run()
     {
       d_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       if (get_time_scheme() == RK3_FT)
-        RK3_F_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+        {
+          RK3_F_pressure_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+          nalloc += 1;
+        }
       nalloc += 1;
     }
 
@@ -2170,9 +2176,20 @@ void IJK_FT_double::run()
   rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   nalloc += 3;
   if (use_inv_rho_)
-    inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
-  nalloc += 1;
+    {
+      inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+      nalloc += 1;
+    }
   //  rho_batard_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+
+  if (first_step_interface_smoothing_)
+    {
+      allocate_velocity(zero_field_ft_, splitting_ft_, ft_ghost_cells);
+      for (int dir = 0; dir < 3; dir++)
+        zero_field_ft_[dir].data() = 0.;
+      zero_field_ft_.echange_espace_virtuel();
+      nalloc += 3;
+    }
 
   if (diffusion_alternative_)
     {
@@ -2480,10 +2497,13 @@ void IJK_FT_double::run()
   post_.compute_extended_pressures(interfaces_.maillage_ft_ijk());
 //post_.compute_phase_pressures_based_on_poisson(0);
 //post_.compute_phase_pressures_based_on_poisson(1);
-  Cout << "BF posttraiter_champs_instantanes "
-       << current_time_ << " " << tstep_ << finl;
-  post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
-  Cout << "AF posttraiter_champs_instantanes" << finl;
+  if (!first_step_interface_smoothing_)
+    {
+      Cout << "BF posttraiter_champs_instantanes "
+           << current_time_ << " " << tstep_ << finl;
+      post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
+      Cout << "AF posttraiter_champs_instantanes" << finl;
+    }
 
 // GB 2019.01.01 Why immobilisation? if (!disable_diphasique_ && coef_immobilisation_==0.)
   if ((!disable_diphasique_) && suppression_rejetons_)
@@ -2585,9 +2605,21 @@ void IJK_FT_double::run()
             {
               // TODO: aym pour GAB, si tu veux gagner en memoire et virer le doublon n/np1 il faut
               // inserer une methode ici style "mettre_a_jour_valeur_interface_temps_n()"
-              deplacer_interfaces(timestep_,
-                                  -1 /* le numero du sous pas de temps est -1 si on n'est pas en rk3 */,
-                                  var_volume_par_bulle);
+              do
+                {
+                  deplacer_interfaces(timestep_,
+                                      -1 /* le numero du sous pas de temps est -1 si on n'est pas en rk3 */,
+                                      var_volume_par_bulle);
+                  counter_first_iter_--;
+                  if(counter_first_iter_ && first_step_interface_smoothing_)
+                    {
+                      Cout << "BF posttraiter_champs_instantanes " << current_time_ << " " << tstep_ << finl;
+                      post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
+                      Cout << "AF posttraiter_champs_instantanes" << finl;
+                    }
+                }
+              while (counter_first_iter_ && first_step_interface_smoothing_);
+              first_step_interface_smoothing_ = 0;
               parcourir_maillage();
             }
           // Mise a jour de la vitesse (utilise les positions des marqueurs, rho, mu et indic a l'instant n)
@@ -4359,6 +4391,11 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // On supprime les duplicatas avant le transport :
   interfaces_.supprimer_duplicata_bulles();
 
+  /*
+   * TODO: Advect with zero velocity at the beggining of the simulation
+   * to use the remeshing algo
+   */
+  // if (counter_first_iter_ && first_step_interface_smoothing_)
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
                                    rk_step, current_time_);
@@ -4395,6 +4432,10 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 #endif
     current_time_, tstep_
   );
+
+  if (counter_first_iter_ && first_step_interface_smoothing_)
+    thermals_.recompute_temperature_init();
+
   statistiques().end_count(deplacement_interf_counter_);
 }
 
