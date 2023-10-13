@@ -243,12 +243,14 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& first_time_step_varying_probes,
                                                                      const int& probe_variations_priority,
                                                                      const int& disable_interpolation_in_mixed_cells,
-                                                                     const int& max_u_radial)
+                                                                     const int& max_u_radial,
+                                                                     const int& correct_fluxes)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
   global_time_step_ = global_time_step;
   current_time_ = current_time;
+  correct_fluxes_ = correct_fluxes;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
@@ -535,8 +537,10 @@ void IJK_One_Dimensional_Subproblem::compute_local_discretisation()
       else
         {
           dr_ = probe_length_ / (*points_per_thermal_subproblem_ - 1);
+          radial_coordinates_modified_.resize(*points_per_thermal_subproblem_);
           for (i=0; i < *points_per_thermal_subproblem_; i++)
             radial_coordinates_modified_(i) = i * dr_;
+          radial_coordinates_ = &radial_coordinates_modified_;
         }
     }
   else
@@ -547,7 +551,6 @@ void IJK_One_Dimensional_Subproblem::compute_local_discretisation()
        */
       if (!probe_variations_enabled_)
         radial_coordinates_modified_.resize(*points_per_thermal_subproblem_);
-      radial_coordinates_ = &radial_coordinates_modified_;
       dr_ = probe_length_ / (*points_per_thermal_subproblem_ - 1);
       for (i=0; i < *points_per_thermal_subproblem_; i++)
         radial_coordinates_modified_(i) = i * dr_;
@@ -725,29 +728,47 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 //  fourier_probe_length_ = sqrt(((*alpha_ * global_time_step_)) / local_fourier_); // Add 3D constants ?
   const double current_time = ref_ijk_ft_->get_current_time();
   cfl_probe_length_ = (max_u_ * current_time) / local_cfl_; // Add 3D constants ?
-  fourier_probe_length_ = sqrt(((*alpha_ * current_time)) / local_fourier_); // Add 3D constants ?
+  fourier_probe_length_ = sqrt(((*alpha_ * (current_time + global_time_step_))) / local_fourier_); // Add 3D constants ?
   max_cfl_fourier_probe_length_ = std::max(cfl_probe_length_, fourier_probe_length_);
+  /*
+   * TODO: ADD constraint on the temperature because of the displacement of the interface !!!!
+   */
+  cell_temperature_ = (*temperature_before_extrapolation_)(index_i_, index_j_, index_k_);
   if (max_cfl_fourier_probe_length_ < probe_length_)
     {
       if (debug_)
         Cerr << "Probe length should be modified" << finl;
-      if (indicator_ < 0.5)
+      if (!correct_fluxes_)
         {
-          compute_distance_cell_centre();
-          if (max_cfl_fourier_probe_length_ < cell_centre_distance_)
-            short_probe_condition_ = 1;
-          else
-            short_probe_condition_ = 0;
+          if (indicator_ < 0.5)
+            {
+              compute_distance_cell_centre();
+              assert(cell_centre_distance_ >= 0.);
+              if (max_cfl_fourier_probe_length_ < cell_centre_distance_)
+                short_probe_condition_ = 1;
+              else
+                short_probe_condition_ = 0;
+            }
         }
       // FIXME : Need the distance to the pure cell face centres !
       else
         {
+//          const double min_distance_pure_face_centre = compute_min_distance_pure_face_centre();
+//          const double min_distance_pure_vertex_centre = compute_min_distance_pure_face_vertices();
+//          const double min_distance_face_centre_vertex = std::min(min_distance_pure_face_centre, min_distance_pure_vertex_centre);
+//          if (max_cfl_fourier_probe_length_ < min_distance_face_centre_vertex)
           compute_distance_faces_centres();
-          const double min_distance_pure_face_centre = compute_min_distance_pure_face_centre();
-          const double min_distance_pure_vertex_centre = compute_min_distance_pure_face_vertices();
-          const double min_distance_face_centre_vertex = std::min(min_distance_pure_face_centre, min_distance_pure_vertex_centre);
-          if (max_cfl_fourier_probe_length_ < min_distance_face_centre_vertex)
-            short_probe_condition_ = 1;
+          const double max_distance_pure_face_centre = compute_max_distance_pure_face_centre();
+          const double max_distance_pure_vertex_centre = compute_max_distance_pure_face_vertices();
+          const double max_distance_face_centre_vertex = std::max(max_distance_pure_face_centre, max_distance_pure_vertex_centre);
+          if (max_cfl_fourier_probe_length_ < max_distance_face_centre_vertex)
+            {
+              short_probe_condition_ = 1;
+              if (cell_temperature_ != delta_T_subcooled_overheated_)
+                temperature_probe_condition_ = 1;
+              else
+                temperature_probe_condition_ = 0;
+            }
           else
             short_probe_condition_= 0;
         }
@@ -854,6 +875,28 @@ double IJK_One_Dimensional_Subproblem::compute_min_distance_pure_face_vertices()
   return min_face_vertex_distance;
 }
 
+double IJK_One_Dimensional_Subproblem::compute_max_distance_pure_face_centre()
+{
+  double max_face_centre_distance = 0.;
+  for (int l=0; l<6; l++)
+    if (pure_liquid_neighbours_[l])
+      if(face_centres_distance_[l] > 0)
+        max_face_centre_distance = std::max(max_face_centre_distance, face_centres_distance_[l]);
+  return max_face_centre_distance;
+}
+
+double IJK_One_Dimensional_Subproblem::compute_max_distance_pure_face_vertices()
+{
+  double max_face_vertex_distance = 0.;
+  int m;
+  for (int l=0; l<6; l++)
+    if (pure_liquid_neighbours_[l])
+      for (m=0; m<4; m++)
+        if(vertices_centres_distance_[l][m] > 0)
+          max_face_vertex_distance = std::max(max_face_vertex_distance, vertices_centres_distance_[l][m]);
+  return max_face_vertex_distance;
+}
+
 void IJK_One_Dimensional_Subproblem::compute_vertex_position(const int& vertex_number,
                                                              const int& face_dir,
                                                              const Vecteur3& bary_face,
@@ -905,6 +948,7 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& pr
   if (probe_variations_enabled && probe_variations_enabled_)
     {
       probe_length_ = max_cfl_fourier_probe_length_;
+      compute_local_discretisation();
       recompute_finite_difference_matrices_varying_probe_length();
       // probe_variations_enabled_ = 0;
     }
@@ -1720,6 +1764,13 @@ double IJK_One_Dimensional_Subproblem::get_azymuthal_velocity_normal_gradient() 
 double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& dist, const DoubleVect& field, const int temp_bool) const
 {
   double field_value = INVALID_TEMPERATURE;// temperature_solution_;
+  if ((dist < 0 && indicator_>0.5) || (dist > (*radial_coordinates_)[*points_per_thermal_subproblem_-1] && indicator_>0.5))
+    {
+      Cerr << "Probe length: " << probe_length_ << finl;
+      Cerr << "Distance d: " << dist << finl;
+      Cerr << "Indicator I: " << indicator_ << finl;
+      // Process::exit();
+    }
   if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_-1])
     {
       /*
@@ -1765,7 +1816,12 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
       if (temp_bool)
         {
           if (short_probe_condition_)
-            field_value = delta_T_subcooled_overheated_;
+            {
+              if (temperature_probe_condition_)
+                field_value = cell_temperature_;
+              else
+                field_value = delta_T_subcooled_overheated_;
+            }
           else
             field_value = 0.;
         }

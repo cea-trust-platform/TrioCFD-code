@@ -107,7 +107,8 @@ public :
                                        const int& first_time_step_varying_probes,
                                        const int& probe_variations_priority,
                                        const int& disable_interpolation_in_mixed_cells,
-                                       const int& max_u_radial);
+                                       const int& max_u_radial,
+                                       const int& correct_fluxes);
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);

@@ -45,6 +45,8 @@
 #define NEIGHBOURS_FACES_I {0, 1, 0, 0, 0, 0}
 #define NEIGHBOURS_FACES_J {0, 0, 0, 1, 0, 0}
 #define NEIGHBOURS_FACES_K {0, 0, 0, 0, 0, 1}
+#define LIQUID_INDICATOR_TEST 1.-1.e-12
+#define VAPOUR_INDICATOR_TEST 1.e-12
 
 #define LOCAL_EPS 1e-12
 /*! @brief : class Interface_ijk_face

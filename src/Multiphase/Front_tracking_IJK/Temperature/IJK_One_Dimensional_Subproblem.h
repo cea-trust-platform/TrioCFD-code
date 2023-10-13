@@ -135,7 +135,8 @@ public :
                                        const int& first_time_step_varying_probes,
                                        const int& probe_variations_priority,
                                        const int& disable_interpolation_in_mixed_cells,
-                                       const int& max_u_radial);
+                                       const int& max_u_radial,
+                                       const int& correct_fluxes);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -143,6 +144,8 @@ public :
   void compute_distance_faces_centres();
   double compute_min_distance_pure_face_centre();
   double compute_min_distance_pure_face_vertices();
+  double compute_max_distance_pure_face_centre();
+  double compute_max_distance_pure_face_vertices();
   void compute_vertex_position(const int& vertex_number,
                                const int& face_dir,
                                const Vecteur3& bary_face,
@@ -650,11 +653,14 @@ protected :
   int velocities_calculation_counter_ = 0;
   int disable_interpolation_in_mixed_cells_ = 0;
   int short_probe_condition_ = 0;
+  int temperature_probe_condition_ = 0;
   int max_u_radial_=0;
   double cell_centre_distance_ = 0;
   FixedVector<bool,6> pure_liquid_neighbours_;
   FixedVector<double,6> face_centres_distance_;
   FixedVector<FixedVector<double,4>,6> vertices_centres_distance_;
+  int correct_fluxes_ = 0;
+  double cell_temperature_ = 0.;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

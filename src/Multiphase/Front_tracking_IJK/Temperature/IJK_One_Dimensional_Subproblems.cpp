@@ -120,7 +120,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& first_time_step_varying_probes,
                                                                       const int& probe_variations_priority,
                                                                       const int& disable_interpolation_in_mixed_cells,
-                                                                      const int& max_u_radial)
+                                                                      const int& max_u_radial,
+                                                                      const int& correct_fluxes)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -218,7 +219,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     first_time_step_varying_probes,
                                                                     probe_variations_priority,
                                                                     disable_interpolation_in_mixed_cells,
-                                                                    max_u_radial);
+                                                                    max_u_radial,
+                                                                    correct_fluxes);
       subproblems_counter_++;
     }
   else

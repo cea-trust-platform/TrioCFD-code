@@ -362,7 +362,12 @@ void IJK_Thermal_Subresolution::store_temperature_before_extrapolation()
             {
               const double indic = ref_ijk_ft_->itfce().I(i,j,k);
               if (fabs(indic) > VAPOUR_INDICATOR_TEST)
-                temperature_before_extrapolation_(i,j,k) = temperature_(i,j,k);
+                {
+                  if (ref_ijk_ft_->get_current_time() == 0 && !ref_ijk_ft_->get_reprise())
+                    temperature_before_extrapolation_(i,j,k) = delta_T_subcooled_overheated_;
+                  else
+                    temperature_before_extrapolation_(i,j,k) = temperature_(i,j,k);
+                }
             }
       temperature_before_extrapolation_.echange_espace_virtuel(temperature_before_extrapolation_.ghost());
     }
@@ -694,7 +699,8 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            first_time_step_varying_probes_,
                                                                            probe_variations_priority_,
                                                                            disable_interpolation_in_mixed_cells_,
-                                                                           max_u_radial_);
+                                                                           max_u_radial_,
+                                                                           (convective_flux_correction_ || diffusive_flux_correction_));
 
               }
     }

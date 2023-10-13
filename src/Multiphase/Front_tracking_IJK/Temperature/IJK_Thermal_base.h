@@ -97,6 +97,10 @@ public:
   {
     return temperature_ ;
   }
+  const IJK_Field_double& get_temperature_before_extrapolation() const
+  {
+    return temperature_before_extrapolation_ ;
+  }
   IJK_Field_double& get_temperature_ft()
   {
     return temperature_ft_ ;

@@ -166,6 +166,14 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  oss << "TEMPERATURE_BEFORE_EXTRAP_" << lata_suffix << idx;
+  Nom nom_temp_before_extrap(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("TEMPERATURE_BEFORE_EXTRAP")) || (liste_post_instantanes.contient_(nom_temp_before_extrap)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temp_before_extrap, get_temperature_before_extrapolation(), latastep);
+    }
+  oss.str("");
+
   /*
    * TEMPERATURE_ANA
    */
@@ -727,7 +735,9 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal_interface_ref(const Motc
   oss2 << "INTERFACE_PHIN_" << lata_suffix << idx;
   Nom nom_phin(oss2.str().c_str());
 
-  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE")) || (liste_post_instantanes.contient_("INTERFACE_PHIN")) || (liste_post_instantanes.contient_(nom_temp))
+  if ((liste_post_instantanes.contient_("INTERFACE_TEMPERATURE"))
+      || (liste_post_instantanes.contient_("INTERFACE_PHIN"))
+      || (liste_post_instantanes.contient_(nom_temp))
       || (liste_post_instantanes.contient_(nom_phin)))
     {
       //  Computing interfacial temperature at fa7 centre :

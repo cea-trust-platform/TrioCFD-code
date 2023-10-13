@@ -395,7 +395,8 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
       for (int k = 0; k < nk; k++)
         {
           // S'il y a une cellule traversée par l'interface
-          if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > LOCAL_EPS)
+          // if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > LOCAL_EPS)
+          if (fabs(indicatrice(i, j, k)) > VAPOUR_INDICATOR_TEST && fabs(indicatrice(i, j, k)) < LIQUID_INDICATOR_TEST)
             {
               // On renseigne le numéro de cette cellule dans le tableau des
               // cellules diphasiques
@@ -478,7 +479,8 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_faces_sur_interfa
           /*
            * Check if the neighbours is a pure liquid cell !
            */
-          if (fabs(1.-indicatrice(i+ii, j+jj, k+kk)) < LOCAL_EPS)
+          // if (fabs(1.-indicatrice(i+ii, j+jj, k+kk)) < LOCAL_EPS)
+          if (fabs(indicatrice(i+ii, j+jj, k+kk)) > LIQUID_INDICATOR_TEST)
             {
               indices_voisins(i_diph, l) = l+1;
               nb_faces_to_correct++;
