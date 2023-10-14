@@ -1109,7 +1109,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
   const IntTab& facettes = maillage.facettes();
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
-  // const ArrOfInt& index_facette_elem = intersections.index_facette();
+  const ArrOfInt& index_facette_elem = intersections.index_facette();
   // const DoubleTab& sommets = maillage.sommets();
   //      REF(Transport_Interfaces_FT_Disc) & refeq_transport =
   //      variables_internes().ref_eq_interf_proprietes_fluide;
@@ -1184,8 +1184,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // 1. First loop on contact line cells:
   // Micro cells: 1, at wall BC + 2, 0<indicatrice <1 3, height < ym
   {
-    const double temps = ns.schema_temps().temps_courant();
-    Cerr <<  "temps = "  << temps << " ********* TCL ****************************** " << finl;
+    // const double temps = ns.schema_temps().temps_courant();
+    Cerr <<  " ****************************** TCL ****************************** " << finl;
     Cerr << que_suis_je() << "::compute_TCL_fluxes_in_all_boundary_cells() searching TCL cells" <<finl;
     const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
     // get wall BC frontiere nb
@@ -1220,8 +1220,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
         const int num_face = ii + nb_first_face;
         const int elemi = face_voisins (num_face, 0)
                           + face_voisins (num_face, 1) + 1;
-        if (is_in_list(list_micro_elems,elemi) || is_in_list(list_meso_elems,elemi))
-          continue;
+        // if (is_in_list(list_micro_elems,elemi))
+        //  continue;
 
         bool is_interf = (indica(elemi,0)>0.) && (indica(elemi,0)<1.) ;
         if (is_interf)
@@ -1245,70 +1245,82 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 
             if (distri_first_facette())
               {
-                while (index >= 0)   // loop effective when one facette has go through serveral mesh
+                while (index >= 0)       // loop over index inside an elem, loop effective when one facette has go through serveral mesh
                   {
                     const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
-
                     const int fa7 = data.numero_facette_;
                     const int sommet0 = facettes(fa7, 0);
                     const int sommet1 = facettes(fa7, 1);
 
-                    if ((!maillage.sommet_ligne_contact(sommet0)) && (!maillage.sommet_ligne_contact(sommet1)))
+                    if ((maillage.sommet_ligne_contact(sommet0)) || (maillage.sommet_ligne_contact(sommet1)))
                       {
-                        // Process::exit("[TCL: MICRO] !!! BC cell found BUT not part of the first facette, as none of the sommet touch WALL, checking FT setting" );
-                        Cerr<< "[TCL: MICRO] !!!  Attenion !!! part of the BC, but not a TCL , as none of the sommet touch WALL" << finl;
-                      }
-                    else
-                      {
-                        const int elem = data.numero_element_;
-                        if (!is_in_list(list_micro_elems,elem))
+                        int indextmp=index_facette_elem[fa7];
+                        while (indextmp >= 0)
                           {
-                            Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
-                            list_micro_elems.append_array(elem);
+                            const Intersections_Elem_Facettes_Data& datatmp = intersections.data_intersection(indextmp);
+                            const int elem = datatmp.numero_element_;
+                            if (!is_in_list(list_micro_elems,elem))
+                              {
+                                // Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
+                                list_micro_elems.append_array(elem);
 
-                            Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                            Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
-                            const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
-                            list_micro_faces.append_array(num_face_wall);
-                            list_micro_indexs.append_array(index);
-                            Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                // Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                                // Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                                const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
+                                list_micro_faces.append_array(num_face_wall);
+                                list_micro_indexs.append_array(indextmp);
+                                // Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                Cerr << "[TCL: MICRO]: elem " << elem << " | face number at wall " << num_face_wall << finl;
+                              }
+                            indextmp = datatmp.index_element_suivant_;
                           }
+
                       }
-                    index = data.index_element_suivant_;
+                    index = data.index_facette_suivante_;
                   }
               }
             else
               {
-                const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
 
-                const int fa7 = data.numero_facette_;
-                const int sommet0 = facettes(fa7, 0);
-                const int sommet1 = facettes(fa7, 1);
+                while (index >= 0)       // loop over index inside an elem, loop effective when one facette has go through serveral mesh
+                  {
+                    const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+                    const int fa7 = data.numero_facette_;
+                    const int sommet0 = facettes(fa7, 0);
+                    const int sommet1 = facettes(fa7, 1);
 
-                if ((!maillage.sommet_ligne_contact(sommet0)) && (!maillage.sommet_ligne_contact(sommet1)))
-                  {
-                    // Process::exit("[TCL: MICRO] !!! BC cell found BUT not part of the first facette, as none of the sommet touch WALL, checking FT setting" );
-                    Cerr<< "[TCL: MICRO] !!!  part of the first facette, but not a TCL , as none of the sommet touch WALL, checking FT setting" << finl;
-                  }
-                else
-                  {
-                    const int elem = data.numero_element_;
-                    if (!is_in_list(list_micro_elems,elem))
+                    if ((maillage.sommet_ligne_contact(sommet0)) || (maillage.sommet_ligne_contact(sommet1)))
                       {
-                        Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
-                        list_micro_elems.append_array(elem);
+                        int indextmp=index_facette_elem[fa7];
+                        if (indextmp >= 0)
+                          {
+                            const Intersections_Elem_Facettes_Data& datatmp = intersections.data_intersection(indextmp);
+                            const int elem = datatmp.numero_element_;
+                            if (!is_in_list(list_micro_elems,elem))
+                              {
+                                // Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem <<" also part of first facette #" << finl;
+                                list_micro_elems.append_array(elem);
 
-                        Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                        Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
-                        const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
-                        list_micro_faces.append_array(num_face_wall);
-                        Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                // Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                                // Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                                const int num_face_wall = wall_face_towards(iface, elem, num_bord, zvdf);
+                                list_micro_faces.append_array(num_face_wall);
+                                list_micro_indexs.append_array(indextmp);
+                                // Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                Cerr << "[TCL: MICRO]: elem " << elem << " | face number at wall " << num_face_wall << finl;
+                              }
+                          }
+
                       }
+                    index = data.index_facette_suivante_;
+
                   }
+
+
 
               }
 
-            Cerr << "[TCL] Check if this CELL A MICRO and/or MESO cell" << finl;
+            Cerr << "[TCL] Check if this CELL A MICRO and/or MESO cell by h" << finl;
 
             const double dist1 = std::fabs(zvdf.dist_face_elem0(num_face,elemi)); // h
             const double half_cell_height1 = std::fabs(zvdf.dist_face_elem0(elem_faces(elemi,iface),elemi)); // half distanct to furface parallel to wall
@@ -1319,17 +1331,15 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
               {
                 if (!is_in_list(list_micro_elems,elemi) && !distri_first_facette())
                   {
-                    Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elemi
-                         << finl;
+
                     list_micro_elems.append_array(elemi);
                     list_micro_faces.append_array(num_face);
-                    Cerr << "[TCL: MICRO]: Corresponding face number at wall "
-                         << num_face << finl;
+                    Cerr << "[TCL: MICRO]: elem " << elemi << " | face number at wall " << num_face << finl;
                   }
               }
             else if (hcell_bot <= ym_ + Objet_U::precision_geom)
               {
-                Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
+                // Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
                 if (!distri_first_facette() && !is_in_list(list_micro_elems,elemi))
                   {
                     list_micro_elems.append_array(elemi);
@@ -1342,28 +1352,22 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                     list_meso_elems.append_array(elemi);
                   }
 
-                Cerr
-                    << "[TCL: MICRO+MESO]: Corresponding face number at wall "
-                    << num_face << finl;
+                Cerr << "[TCL: MICRO+MESO]: elem " << elemi << " | face number at wall " << num_face << finl;
 
               }
             else if (hcell_bot <= ymeso_ + Objet_U::precision_geom && !is_in_list(list_meso_elems,elemi) )
               {
-                Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elemi
-                     << finl;
                 list_meso_elems.append_array(elemi);
-
                 list_meso_faces.append_array(num_face);
-                Cerr << "[TCL: MESO]: Corresponding face number at wall "
-                     << num_face << finl;
+                Cerr << "[TCL: MESO]: elem " << elemi << " | face number at wall " << num_face << finl;
               }
 
 
 
-            Cerr << "[TCL] Searching MICRO CELLS (INTERFACE + 1.e-10m<Y<YM) among Neighboorhood cells of iElem #" << elemi << finl;
-            Cerr << "[TCL] Searching MESO CELLS (INTERFACE + YM<Y<YMeso) among Neighboorhood cells of iElem #" << elemi << finl;
+            // Cerr << "[TCL] Searching MICRO CELLS (INTERFACE + 1.e-10m<Y<YM) among Neighboorhood cells of iElem #" << elemi << finl;
+            // Cerr << "[TCL] Searching MESO CELLS (INTERFACE + YM<Y<YMeso) among Neighboorhood cells of iElem #" << elemi << finl;
             // loop to find all cells with interface
-            Cerr << "[TCL START Searching cells from Elem #" << elemi << " and face #" << num_face << finl;
+            Cerr << "[TCL] Searching neighboor cells from Elem #" << elemi << " and face #" << num_face << finl;
 
             ArrOfInt future_new_elems;
             future_new_elems.set_smart_resize(1);
@@ -1376,7 +1380,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                 for (int i=0; i< new_elems.size_array(); i++)
                   {
                     const int ielem = new_elems[i];
-                    Cerr << "[TCL ] Searching MICRO (INTERFACE + 1.e-10m<Y<YM)  or MESO (INTERFACE + YM<Y<YMeso) cells among Neighboorhood of iElem #" << ielem << finl;
+                    // Cerr << "[TCL ] Searching MICRO (INTERFACE + 1.e-10m<Y<YM)  or MESO (INTERFACE + YM<Y<YMeso) cells among Neighboorhood of iElem #" << ielem << finl;
                     const int nb_voisins = elem_faces.dimension(1);
                     for (int iv=0; iv < nb_voisins; iv++)
                       {
@@ -1394,7 +1398,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                         if (is_in_list(list_micro_elems,elem_voisin) && is_in_list(list_meso_elems,elem_voisin))
                           continue;
 
-                        Cerr << "[TCL ] FOUND interface cell #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
+                        // Cerr << "[TCL ] FOUND interface cell #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
                         // Here, we are with a new element elem_voisin to append to both lists
 
 
@@ -1406,55 +1410,61 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                           {
                             if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
                               {
-                                Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
+                                // Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
                                 list_micro_elems.append_array(elem_voisin);
-                                Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                                Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                                // Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                                // Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
                                 const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
                                 list_micro_faces.append_array(num_face_wall);
-                                Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                // Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
+                                Cerr << "[TCL: MICRO]: elem " << elem_voisin << " | face number at wall " << num_face_wall << finl;
+                                future_new_elems.append_array(elem_voisin);
                               }
-                            future_new_elems.append_array(elem_voisin);
                           }
                         else if (hcell_dn <= ym_+Objet_U::precision_geom)
                           {
-                            Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-                            Cerr << "[TCL: MICRO+MESO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                            Cerr << "[TCL: MICRO+MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                            // Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
+                            // Cerr << "[TCL: MICRO+MESO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                            // Cerr << "[TCL: MICRO+MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
                             const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
 
-                            future_new_elems.append_array(elem_voisin);
+
                             if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
                               {
                                 list_micro_elems.append_array(elem_voisin);
                                 list_micro_faces.append_array(num_face_wall);
+                                Cerr << "[TCL: MICRO]: elem " << elem_voisin << " | face number at wall " << num_face_wall << finl;
+                                future_new_elems.append_array(elem_voisin);
                               }
 
                             if (!is_in_list(list_meso_elems,elem_voisin))
                               {
                                 list_meso_elems.append_array(elem_voisin);
                                 list_meso_faces.append_array(num_face_wall);
+                                Cerr << "[TCL: MESO]: elem " << elem_voisin << " | face number at wall " << num_face_wall << finl;
+                                if(!is_in_list(future_new_elems,elem_voisin))
+                                  future_new_elems.append_array(elem_voisin);
                               }
-                            Cerr << "[TCL: MICRO+MESO]: Corresponding face number at wall " << num_face_wall << finl;
+                            // Cerr << "[TCL: MICRO+MESO]: Corresponding face number at wall " << num_face_wall << finl;
 
                           }
                         else if (hcell_dn<=ymeso_+Objet_U::precision_geom)
                           {
-                            if (is_in_list(list_meso_elems,elem_voisin))
-                              continue;
-                            Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-                            list_meso_elems.append_array(elem_voisin);
-                            future_new_elems.append_array(elem_voisin);
-
-                            Cerr << "[TCL: MESO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                            Cerr << "[TCL: MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
-                            const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
-                            list_meso_faces.append_array(num_face_wall);
-                            Cerr << "[TCL: MESO]: Corresponding face number at wall " << num_face_wall << finl;
+                            if (!is_in_list(list_meso_elems,elem_voisin))
+                              {
+                                // Cerr << "[TCL: MESO] FOUND  MESO cell  at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
+                                list_meso_elems.append_array(elem_voisin);
+                                // Cerr << "[TCL: MESO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
+                                // Cerr << "[TCL: MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
+                                const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
+                                list_meso_faces.append_array(num_face_wall);
+                                Cerr << "[TCL: MESO]: elem " << elem_voisin << " | face number at wall " << num_face_wall << finl;
+                                future_new_elems.append_array(elem_voisin);
+                              }
                           }
                         else
                           {
-                            Cerr << "[TCL:] HOWEVER ## elem " << elem_voisin << " NOT part of MICRO or Macro Region" << finl;
+                            // Cerr << "[TCL] HOWEVER ## elem " << elem_voisin << " NOT part of MICRO or Macro Region" << finl;
                             break;
                           }
 
