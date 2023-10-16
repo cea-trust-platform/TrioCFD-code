@@ -117,6 +117,9 @@ public:
   virtual void compute_ijk_pure_faces_indices() { ; };
   virtual void sort_ijk_intersections_subproblems_indices_by_k_layers() { ; };
 
+  virtual void set_debug(const int& debug) { ; };
+  virtual void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) { ; };
+
 protected:
   const IJK_Interfaces *interfaces_;
   const IJK_Field_double *field_;

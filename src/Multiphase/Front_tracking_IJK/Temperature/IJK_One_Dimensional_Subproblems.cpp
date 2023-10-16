@@ -121,7 +121,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& probe_variations_priority,
                                                                       const int& disable_interpolation_in_mixed_cells,
                                                                       const int& max_u_radial,
-                                                                      const int& correct_fluxes)
+                                                                      const int& correct_fluxes,
+                                                                      const int& distance_cell_faces_from_lrs)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -220,7 +221,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     probe_variations_priority,
                                                                     disable_interpolation_in_mixed_cells,
                                                                     max_u_radial,
-                                                                    correct_fluxes);
+                                                                    correct_fluxes,
+                                                                    distance_cell_faces_from_lrs);
       subproblems_counter_++;
     }
   else
@@ -340,6 +342,16 @@ double IJK_One_Dimensional_Subproblems::get_interfacial_gradient_corrected(int i
 double IJK_One_Dimensional_Subproblems::get_temperature_profile_at_point(const int& i, const double& dist) const
 {
   return (*this)[i].get_temperature_profile_at_point(dist);
+}
+
+const Vecteur3& IJK_One_Dimensional_Subproblems::get_bary_facet(const int& i) const
+{
+  return (*this)[i].get_bary_facet();
+}
+
+double IJK_One_Dimensional_Subproblems::get_dist_cell_interface(const int& i) const
+{
+  return (*this)[i].get_dist_cell();
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const
@@ -492,5 +504,4 @@ void IJK_One_Dimensional_Subproblems::prepare_temporal_schemes()
   for (auto& itr : *this)
     itr.prepare_temporal_schemes();
 }
-
 

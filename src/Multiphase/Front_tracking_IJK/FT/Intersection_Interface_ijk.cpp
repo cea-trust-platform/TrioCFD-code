@@ -382,7 +382,8 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
     for (int j = 0; j < nj; j++)
       for (int k = 0; k < nk; k++)
         {
-          if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > LOCAL_EPS)
+          //if (indicatrice(i, j, k) * (1. - indicatrice(i, j, k)) > LOCAL_EPS)
+          if (fabs(indicatrice(i, j, k)) > VAPOUR_INDICATOR_TEST && fabs(indicatrice(i, j, k)) < LIQUID_INDICATOR_TEST)
             n_diph_++;
         }
   positions.resize(n_diph_, 3);

@@ -136,7 +136,8 @@ public :
                                        const int& probe_variations_priority,
                                        const int& disable_interpolation_in_mixed_cells,
                                        const int& max_u_radial,
-                                       const int& correct_fluxes);
+                                       const int& correct_fluxes,
+                                       const int& distance_cell_faces_from_lrs);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -251,6 +252,18 @@ public :
   const int& get_probe_variations_enabled() const
   {
     return probe_variations_enabled_;
+  };
+  const double& get_dist_cell() const
+  {
+    return cell_centre_distance_;
+  };
+  const FixedVector<double,6>& get_dist_faces() const
+  {
+    return face_centres_distance_;
+  };
+  const Vecteur3& get_bary_facet() const
+  {
+    return facet_barycentre_;
   };
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -661,6 +674,8 @@ protected :
   FixedVector<FixedVector<double,4>,6> vertices_centres_distance_;
   int correct_fluxes_ = 0;
   double cell_temperature_ = 0.;
+
+  int distance_cell_faces_from_lrs_ = 0;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

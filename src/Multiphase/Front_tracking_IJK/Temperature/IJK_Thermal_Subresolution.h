@@ -67,6 +67,11 @@ public :
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void set_thermal_subresolution_outputs(SFichier& fic) override;
 
+  const IJK_Field_double& get_debug_lrs_cells() const override
+  {
+    return debug_LRS_cells_;
+  }
+
 protected :
   void compute_thermal_subproblems() override;
   void compute_diffusion_increment() override;
@@ -203,6 +208,9 @@ protected :
   int disable_interpolation_in_mixed_cells_ = 0;
   int keep_temperature_extrapolated_from_LRS_ = 0;
   int max_u_radial_=0;
+
+  IJK_Field_double debug_LRS_cells_;
+  int distance_cell_faces_from_lrs_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

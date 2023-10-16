@@ -47,6 +47,7 @@
 
 class IJK_FT_double;
 class Switch_FT_double;
+class IJK_Interfaces;
 
 class IJK_Thermal_base : public Objet_U
 {
@@ -193,6 +194,11 @@ public:
   {
     return eulerian_normal_vectors_ns_;
   }
+  const FixedVector<IJK_Field_double, 3>& get_normal_vector_ns_normed() const
+  {
+    return eulerian_normal_vectors_ns_normed_;
+  }
+
   const FixedVector<IJK_Field_double, 3>& get_normal_vector_ft() const
   {
     return eulerian_normal_vectors_ft_;
@@ -217,6 +223,15 @@ public:
   {
     return ghost_cells_;
   };
+  const int& get_debug() const
+  {
+    return debug_;
+  };
+  virtual const IJK_Field_double& get_debug_lrs_cells() const
+  {
+    return temperature_;
+  };
+
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
   virtual double compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx);
@@ -467,6 +482,7 @@ protected:
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ft_;
   FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_ft_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ns_;
+  FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ns_normed_;
   FixedVector<IJK_Field_double, 3> eulerian_facets_barycentre_ns_;
   IJK_Field_double eulerian_curvature_ft_;
   IJK_Field_double eulerian_curvature_ns_;

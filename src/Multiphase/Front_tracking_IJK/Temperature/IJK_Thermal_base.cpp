@@ -489,6 +489,9 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
       eulerian_normal_vectors_ns_.echange_espace_virtuel();
       eulerian_facets_barycentre_ns_.echange_espace_virtuel();
+      allocate_cell_vector(eulerian_normal_vectors_ns_normed_, splitting, 0);
+      nalloc += 3;
+      eulerian_normal_vectors_ns_normed_.echange_espace_virtuel();
     }
   if (compute_curvature_)
     {
@@ -958,6 +961,30 @@ void IJK_Thermal_base::compute_eulerian_distance()
           ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_normal_vectors_ft_[dir], eulerian_normal_vectors_ns_[dir]);
           ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_facets_barycentre_ft_[dir], eulerian_facets_barycentre_ns_[dir]);
         }
+      eulerian_normal_vectors_ns_normed_[0].data() = 0.;
+      eulerian_normal_vectors_ns_normed_[1].data() = 0.;
+      eulerian_normal_vectors_ns_normed_[2].data() = 0.;
+      const int nx = eulerian_normal_vectors_ns_normed_[0].ni();
+      const int ny = eulerian_normal_vectors_ns_normed_[0].nj();
+      const int nz = eulerian_normal_vectors_ns_normed_[0].nk();
+      for (int k=0; k < nz ; k++)
+        for (int j=0; j< ny; j++)
+          for (int i=0; i < nx; i++)
+            {
+              double norm_x = eulerian_normal_vectors_ns_[0](i,j,k);
+              double norm_y = eulerian_normal_vectors_ns_[1](i,j,k);
+              double norm_z = eulerian_normal_vectors_ns_[2](i,j,k);
+              norm_x *= norm_x;
+              norm_y *= norm_y;
+              norm_z *= norm_z;
+              const double norm = norm_x + norm_y + norm_z;
+              if (norm > 0)
+                {
+                  eulerian_normal_vectors_ns_normed_[0](i,j,k) = eulerian_normal_vectors_ns_[0](i,j,k) / sqrt(norm);
+                  eulerian_normal_vectors_ns_normed_[1](i,j,k) = eulerian_normal_vectors_ns_[1](i,j,k) / sqrt(norm);
+                  eulerian_normal_vectors_ns_normed_[2](i,j,k) = eulerian_normal_vectors_ns_[2](i,j,k) / sqrt(norm);
+                }
+            }
     }
   else
     Cerr << "Don't compute the eulerian distance field" << finl;

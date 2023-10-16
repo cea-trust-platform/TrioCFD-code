@@ -87,6 +87,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   first_time_step_explicit_ = 1;
   local_fourier_ = 1.;
   local_cfl_ = 1.;
+
+  distance_cell_faces_from_lrs_=0.;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -179,6 +181,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("probe_variations_priority", &probe_variations_priority_);
   param.ajouter_flag("max_u_radial", &max_u_radial_);
 
+  param.ajouter_flag("distance_cell_faces_from_lrs", &distance_cell_faces_from_lrs_);
+
 
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
   //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
@@ -231,6 +235,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   corrige_flux_.typer("Corrige_flux_FT_temperature_subresolution");
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
+  corrige_flux_.set_debug(debug_);
+  corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
   //  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
 
@@ -297,6 +303,13 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     thermal_local_subproblems_);
   corrige_flux_->set_convection_negligible(!convective_flux_correction_);
   corrige_flux_->set_diffusion_negligible(!diffusive_flux_correction_);
+
+  if (debug_)
+    {
+      debug_LRS_cells_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      debug_LRS_cells_.data() = -1.;
+    }
 
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
@@ -428,6 +441,9 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   /*
    * FIXME: Do the first step only at the first iteration
    */
+  if (debug_)
+    debug_LRS_cells_.data() = -1.;
+
   if (debug_)
     Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
@@ -640,7 +656,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                         Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,2,0) << finl;
                         Cerr << "Min-Max Bounding box : " << i_bulle << "; " << min_max_larger_box_(i_bulle,2,1) << finl;
                       }
-
+                    debug_LRS_cells_(i,j,k) = indicator(i,j,k);
                   }
                 thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
                                                                            i, j, k,
@@ -700,7 +716,8 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            probe_variations_priority_,
                                                                            disable_interpolation_in_mixed_cells_,
                                                                            max_u_radial_,
-                                                                           (convective_flux_correction_ || diffusive_flux_correction_));
+                                                                           (convective_flux_correction_ || diffusive_flux_correction_),
+                                                                           distance_cell_faces_from_lrs_);
 
               }
     }

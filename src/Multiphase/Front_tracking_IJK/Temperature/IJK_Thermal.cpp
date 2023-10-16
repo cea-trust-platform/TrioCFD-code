@@ -238,7 +238,7 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
    */
   oss << "NORMAL_VECTOR_X_" << lata_suffix << idx;
   Nom nom_normal_vector_x(oss.str().c_str());
-  if (liste_post_instantanes.contient_("NORMAL_VECTOR_X") || liste_post_instantanes.contient_("NORMAL_VECTOR_X") || liste_post_instantanes.contient_(nom_normal_vector_x))
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_X") || liste_post_instantanes.contient_(nom_normal_vector_x))
     {
       n++, dumplata_scalar(lata_name, nom_normal_vector_x, get_normal_vector_ns()[0], latastep);
     }
@@ -249,7 +249,7 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
    */
   oss << "NORMAL_VECTOR_Y_" << lata_suffix << idx;
   Nom nom_normal_vector_y(oss.str().c_str());
-  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y") || liste_post_instantanes.contient_("NORMAL_VECTOR_Y") || liste_post_instantanes.contient_(nom_normal_vector_y))
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y") || liste_post_instantanes.contient_(nom_normal_vector_y))
     {
       n++, dumplata_scalar(lata_name, nom_normal_vector_y, get_normal_vector_ns()[1], latastep);
     }
@@ -260,9 +260,42 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
    */
   oss << "NORMAL_VECTOR_Z_" << lata_suffix << idx;
   Nom nom_normal_vector_z(oss.str().c_str());
-  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z") || liste_post_instantanes.contient_("NORMAL_VECTOR_Z") || liste_post_instantanes.contient_(nom_normal_vector_z))
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z") || liste_post_instantanes.contient_(nom_normal_vector_z))
     {
       n++, dumplata_scalar(lata_name, nom_normal_vector_z, get_normal_vector_ns()[2], latastep);
+    }
+  oss.str("");
+
+  /*
+   * NORMAL_VECTOR_X_NORMED
+   */
+  oss << "NORMAL_VECTOR_X_NORMED_" << lata_suffix << idx;
+  Nom nom_normal_vector_x_normed(oss.str().c_str());
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_X_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_x_normed))
+    {
+      n++, dumplata_scalar(lata_name, nom_normal_vector_x_normed, get_normal_vector_ns_normed()[0], latastep);
+    }
+  oss.str("");
+
+  /*
+   * NORMAL_VECTOR_Y_NORMED
+   */
+  oss << "NORMAL_VECTOR_Y_NORMED_" << lata_suffix << idx;
+  Nom nom_normal_vector_y_normed(oss.str().c_str());
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_y_normed))
+    {
+      n++, dumplata_scalar(lata_name, nom_normal_vector_y_normed, get_normal_vector_ns_normed()[1], latastep);
+    }
+  oss.str("");
+
+  /*
+   * NORMAL_VECTOR_Z_NORMED
+   */
+  oss << "NORMAL_VECTOR_Z_NORMED_" << lata_suffix << idx;
+  Nom nom_normal_vector_z_normed(oss.str().c_str());
+  if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_z_normed))
+    {
+      n++, dumplata_scalar(lata_name, nom_normal_vector_z_normed, get_normal_vector_ns_normed()[2], latastep);
     }
   oss.str("");
 
@@ -672,6 +705,19 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  /*
+   * HESS_T_DIR_YZ_ELEM
+   */
+  if (get_debug())
+    {
+      oss << "DEBUG_LRS_CELLS_" << lata_suffix << idx;
+      Nom nom_debug_lrs_cells(oss.str().c_str());
+      if (liste_post_instantanes.contient_("DEBUG_LRS_CELLS") || liste_post_instantanes.contient_(nom_debug_lrs_cells))
+        {
+          n++, dumplata_scalar(lata_name, nom_debug_lrs_cells, get_debug_lrs_cells(), latastep);
+        }
+      oss.str("");
+    }
   return n;
 }
 

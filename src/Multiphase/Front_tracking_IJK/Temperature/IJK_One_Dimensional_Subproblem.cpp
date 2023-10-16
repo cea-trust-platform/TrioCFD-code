@@ -244,7 +244,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& probe_variations_priority,
                                                                      const int& disable_interpolation_in_mixed_cells,
                                                                      const int& max_u_radial,
-                                                                     const int& correct_fluxes)
+                                                                     const int& correct_fluxes,
+                                                                     const int& distance_cell_faces_from_lrs)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
@@ -274,6 +275,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   correct_tangential_temperature_hessian_ = source_terms_correction;
   advected_frame_of_reference_ = advected_frame_of_reference;
   neglect_frame_of_reference_radial_advection_=neglect_frame_of_reference_radial_advection;
+  distance_cell_faces_from_lrs_ = distance_cell_faces_from_lrs;
   initialise_thermal_probe();
   if (!global_probes_characteristics_)
     (*first_time_step_temporal_) = 0;
@@ -360,6 +362,14 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     Cerr << "Compute local discretisation" << finl;
   compute_local_discretisation();
 
+  if (distance_cell_faces_from_lrs_)
+    {
+      if (debug_)
+        Cerr << "Compute cell and faces distance to the interface" << finl;
+      compute_distance_cell_centre();
+      compute_distance_faces_centres();
+    }
+
   surface_ = (*eulerian_interfacial_area_)(index_i_, index_j_, index_k_);
   rhs_assembly_.resize(*points_per_thermal_subproblem_);
 }
@@ -396,7 +406,7 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
   Vecteur3 normal_contrib;
   const double normal_vector_compo_norm = normal_vector_compo_.length();
   normal_vector_compo_ *= (1 / normal_vector_compo_norm);
-
+  Cerr << "Normal vector norm:" << normal_vector_compo_norm << finl;
   /*
    * First method with tangential direction of maximum velocity variations
    */
@@ -1770,6 +1780,17 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
       Cerr << "Distance d: " << dist << finl;
       Cerr << "Indicator I: " << indicator_ << finl;
       // Process::exit();
+    }
+  if (debug_ && temp_bool)
+    {
+      Cerr << "Radial coordinate ini: " << (*radial_coordinates_)[0] << finl;
+      Cerr << "Radial coordinate end: " << (*radial_coordinates_)[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "Field ini: " << field[0] << finl;
+      Cerr << "Field end: " << field[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "Field interp ini: " << temperature_interp_[0] << finl;
+      Cerr << "Field interp end: " << temperature_interp_[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "Curvature: " << curvature_ << finl;
+      Cerr << "Osculating radius: " << osculating_radius_ << finl;
     }
   if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_-1])
     {

@@ -81,6 +81,9 @@ public :
   inline void clean();
   inline void compute_ijk_pure_faces_indices();
   inline void sort_ijk_intersections_subproblems_indices_by_k_layers();
+
+  inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
+  inline void set_debug(const int& debug);
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -203,6 +206,16 @@ inline void Corrige_flux_FT::compute_ijk_pure_faces_indices()
 inline void Corrige_flux_FT::sort_ijk_intersections_subproblems_indices_by_k_layers()
 {
   valeur().sort_ijk_intersections_subproblems_indices_by_k_layers();
+}
+
+inline void Corrige_flux_FT::set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs)
+{
+  valeur().set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs);
+}
+
+inline void Corrige_flux_FT::set_debug(const int& debug)
+{
+  valeur().set_debug(debug);
 }
 
 #endif /* Corrige_flux_FT_included */

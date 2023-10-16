@@ -108,6 +108,11 @@ void Corrige_flux_FT_temperature_subresolution::associate_indices_and_check_subp
             }
         }
       assert(has_checked_consistency_);
+      if (!has_checked_consistency_)
+        {
+          Cerr << "There is an inconsistency between the LRS sub-problem and the intersection_ijk_elem" << finl;
+          Process::exit();
+        }
     }
   else
     Cerr << "Inconsistency has already be checked" << finl;
@@ -132,13 +137,29 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre(
     {
       const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
       const double dist = dist_interf(intersection_ijk_cell_index, 0);
+      const double dist_sub_res = thermal_subproblems_->get_dist_cell_interface(i);
 
       double temperature_ghost = 0.;
-      temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
+      if (distance_cell_faces_from_lrs_)
+        temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
+      else
+        temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
 
       const int ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
       const int ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
       const int ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+
+      if (debug_)
+        {
+          Cerr << "Distance at cell : " << intersection_ijk_cell_index <<
+               " -- (" << ijk_indices_i << ", " << ijk_indices_j << ", " << ijk_indices_k << ")" << finl;
+          Cerr << "Distance from intersection_ijk_cell: " << dist << finl;
+          Cerr << "Distance from sub-resolution: " << dist_sub_res << finl;
+          Vecteur3 bary_facet_debug = thermal_subproblems_->get_bary_facet(i);
+          Cerr << "Facet barycentre: " << bary_facet_debug[0] << ";"
+               << bary_facet_debug[1] << ";"
+               << bary_facet_debug[2] << finl;
+        }
 
       const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
       const double indic = indicator(ijk_indices_i, ijk_indices_j, ijk_indices_k);

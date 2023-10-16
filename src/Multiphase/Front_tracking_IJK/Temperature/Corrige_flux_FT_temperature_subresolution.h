@@ -57,6 +57,8 @@ public :
   void set_convection_negligible(const int& convection_negligible) override { convection_negligible_ = convection_negligible; };
   void set_diffusion_negligible(const int& diffusion_negligible) override { diffusion_negligible_ = diffusion_negligible; };
   void set_fluxes_feedback_params(const int discrete_integral, const int levels) override { discrete_integral_ = discrete_integral; levels_ = levels; };
+  void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) override { distance_cell_faces_from_lrs_=distance_cell_faces_from_lrs; };
+  void set_debug(const int& debug) override { debug_ = debug; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
    * l'interface. On remplace les flux donnes en entree par ces flux la.
@@ -137,6 +139,8 @@ protected :
   int debug_=0;
   int levels_=0;
   int discrete_integral_=0;
+
+  int distance_cell_faces_from_lrs_=0;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

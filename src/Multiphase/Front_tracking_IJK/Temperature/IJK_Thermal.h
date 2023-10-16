@@ -71,6 +71,7 @@ public :
   inline const FixedVector<IJK_Field_double, 3> get_bary() const { return valeur().get_bary(); }
   inline FixedVector<IJK_Field_double, 3> get_gradient_temperature_elem() { return valeur().get_gradient_temperature_elem(); }
   inline FixedVector<IJK_Field_double, 3> get_normal_vector_ns() const { return valeur().get_normal_vector_ns(); }
+  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ns_normed() const { return valeur().get_normal_vector_ns_normed();}
   inline FixedVector<IJK_Field_double, 3> get_normal_vector_ft() const { return valeur().get_normal_vector_ft(); }
   inline FixedVector<IJK_Field_double, 3> get_hessian_diag_temperature_elem() { return valeur().get_hessian_diag_temperature_elem(); }
   inline FixedVector<IJK_Field_double, 3> get_hessian_cross_temperature_elem() { return valeur().get_hessian_cross_temperature_elem(); }
@@ -80,6 +81,9 @@ public :
   inline const int& get_ghost_fluid_flag() const { return valeur().get_ghost_fluid_flag(); };
   inline const int& get_probes_ghost_cells() { return valeur().get_ghost_cells();};
   inline void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { return valeur().compute_ghost_cell_numbers_for_subproblems(splitting, ghost_init); };
+
+  inline const int& get_debug() { return valeur().get_debug(); };
+  inline const IJK_Field_double& get_debug_lrs_cells() { return valeur().get_debug_lrs_cells(); };
   /*
    * Setters
    */
