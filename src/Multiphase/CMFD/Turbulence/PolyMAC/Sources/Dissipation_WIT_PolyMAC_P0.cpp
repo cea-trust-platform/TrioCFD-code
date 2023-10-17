@@ -72,7 +72,7 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
 {
   const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
-  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
+  //const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();
   const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").valeurs();
   const DoubleTab&                           nu = equation().probleme().get_champ("viscosite_cinematique").passe();
@@ -111,7 +111,8 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
           double Reb = diam(e,k)*u_r/nu(e,n_l);
           int ind_trav = (k>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (k-n_l-1) : (k*(N-1)-(k-1)*(k)/2) + (n_l-k-1);
           double Eo = g_ * std::abs(tab_rho(e, n_l)-tab_rho(e, k)) * diam(e, k)*diam(e, k)/Sigma_tab(e, ind_trav);
+          // Tomiyama codé en dur
           double Cd = (u_r!=0) ? std::max( std::min( 16./Reb*(1+0.15*std::pow(Reb, 0.687)) , 48./Reb )   , 8.*Eo/(3.*(Eo+4.))) : 0; // si u_r=0 alors pas de trainée, pas de WIT donc dissipation=0
-          secmem(e, 0) -= ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * 2. * nu(e, n_l) * Cd * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
+          secmem(e, 0) -= ve(e) * pe(e) * 2. * nu(e, n_l) * Cd * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
         }
 }
