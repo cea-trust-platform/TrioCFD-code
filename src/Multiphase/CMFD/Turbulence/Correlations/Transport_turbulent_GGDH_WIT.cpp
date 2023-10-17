@@ -85,7 +85,7 @@ void Transport_turbulent_GGDH_WIT::modifier_mu(const Convection_Diffusion_std& e
         for (db = 0; db < D; db++)
           {
             //double ur = (u_r(i,0)!=0) ? u_r(i,0) : ur_user; // vitesse relative (on ne peut pas diviser par 0)
-            double temps_carac = (u_r(i,0)!=0) ? 2./3. * 1./(delta_*delta_*delta_)*diam(i, 0) / (pow(gamma_, 2./3.)*alp(i, 0)*u_r(i,0)) : 0 ; // si u_r=0 alors pas de WIT donc pas de diffusion du WIT
-            nu(i, 0, d, db) += alp(i, 0) * mu0(i, 0) / nu0(i, 0) * C_s * std::max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));
+            double temps_carac = (u_r(i,0)!=0) ? 2./3. * 1./(delta_*delta_*delta_)*diam(i, 1) / (pow(gamma_, 2./3.)*alp(i, 1)*u_r(i,0)) : 0 ; // si u_r=0 alors pas de WIT donc pas de diffusion du WIT
+            nu(i, 0, d, db) += mu0(i, 0) / nu0(i, 0) * C_s * std::max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));
           }
 }
