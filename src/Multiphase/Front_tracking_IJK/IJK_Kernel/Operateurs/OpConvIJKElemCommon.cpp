@@ -166,7 +166,11 @@ void OpConvIJKElemCommon_double::compute_curv_fram(DIRECTION _DIR_, int k_layer)
   const int jmax =  _DIR_==DIRECTION::Y ? nj + 1 : nj;
   const int imin = _DIR_ == DIRECTION::X ? -1:0;
   const int jmin = _DIR_ == DIRECTION::Y ? -1:0;
-  /*DEV Dorian et Yanis : bug  i et j min pour rem*/
+  /*
+  *  DEV Dorian DUPUY and Yanis ZATOUT: Bug in curv farm computation
+  *  due to not taking into account the extra cell in the I and J direction
+  *  for the offset in each parallel domain.
+  */
   for (int j = jmin; ; j++)
     {
       int i;
