@@ -1,0 +1,17 @@
+Parameters {
+	Title "Validation de l'operateur de convection de la masse"
+	Author "Dorian Dupuy"
+	VersionTrio_U 1.7.4
+ 	TestCase test_convection_masse test_convection_masse.data
+	Description "Info pour completer un prm: firefox \$TRUST_ROOT/Validation/Outils/Genere_courbe/doc/manuel.xhtml "
+}
+
+Chapter {
+ 
+  	Title "Cas test_convection_masse" 
+
+Description "\latex_(\input{../description_cas.tex}\latex_)"
+
+	description \include_text_file(test_convection_masse/integrale_d_rho.txt)
+}
+

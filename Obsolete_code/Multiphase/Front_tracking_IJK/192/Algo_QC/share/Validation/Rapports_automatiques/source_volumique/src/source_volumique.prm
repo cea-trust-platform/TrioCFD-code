@@ -1,0 +1,34 @@
+parametres {
+	titre "Test 2 d'un nouvel algorithme pour le QC : domaine ouvert avec paroi en bas et source volumique de chaleur"
+	auteur "Adrien"
+	description "On vérifie que l'évolution au cours du temps de la masse volumique suit bien la loi exponentielle prévue analytiquement. On néglige la diffusion et la conduction."
+	casTest . source_volumique.data  en annexe
+}
+Chapitre {
+
+	Figure
+	{
+	labelx Temps (s)
+	labely Masse volumique (kg/m3)
+	
+
+	Titre "Evolution temporelle de la masse volumique"
+	Description "On vérifie que l'évolution au cours du temps de la masse volumique suit bien la loi exponentielle prévue analytiquement."
+	legende bottom
+	inclureDesccourbes 0
+	courbe {
+	fichier evol_glob_net
+	colonnes $1 $3
+	legende calcul
+	style linespoints
+	}
+	courbe {
+
+	fonction  0.995025*exp(-0.00285714*x)
+	legende analytique
+	style lines
+	}
+	}	
+
+	
+}

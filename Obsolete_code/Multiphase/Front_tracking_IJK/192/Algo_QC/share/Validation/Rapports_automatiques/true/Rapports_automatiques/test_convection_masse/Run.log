@@ -1,0 +1,23 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> ../../../../../New_algo_qc_opt
+-> 1.7.8
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_convection_masse data file in the test_convection_masse directory ...
+-> Calculation test_convection_masse produced an error !
+-> Look at the /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/test_convection_masse/build/test_convection_masse/test_convection_masse.err file.
+-> Running the post_run script in the test_convection_masse directory ...
+./post_run: line 5: visit: command not found
+
+
+ erreur_calcul_1
+
+
+-> Error in: python /opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/genererCourbes.py -p test_convection_masse.prm 
+-> Search and fix all the previous errors.

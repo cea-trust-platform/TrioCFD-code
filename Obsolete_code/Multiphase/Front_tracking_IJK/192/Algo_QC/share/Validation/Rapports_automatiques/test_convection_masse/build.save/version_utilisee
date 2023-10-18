@@ -1,0 +1,14 @@
+Petsc initialization succeeded.
+Parallel engine initialized : Comm_Group_Noparallel with 1 processors
+Executable: /home/yanis/Baltiks/Algo_QC_corrected_convection/Algo_QC_1.9.2_opt
+Data file name = ver
+feenableexcept enabled.
+Data file : ver
+Localisation etude: /home/yanis/Baltiks/Algo_QC_corrected_convection/share/Validation/Rapports_automatiques/test_convection_masse/build
+Nom du cas ver
+ code : /home/yanis/Baltiks/Algo_QC_corrected_convection/Algo_QC_1.9.2_opt
+ version : 1.9.2 
+Debut de l'execution 
+MAIN: Reading and executing data file
+MAIN: End of data file
+Arret des processes.

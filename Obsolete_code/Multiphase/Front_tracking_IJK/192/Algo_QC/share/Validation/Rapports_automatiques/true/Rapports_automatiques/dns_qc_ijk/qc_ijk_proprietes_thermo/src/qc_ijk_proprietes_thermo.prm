@@ -1,0 +1,66 @@
+Parametres {
+	Titre "DNS QC : test proprietes thermodynamiques"
+	Description ""
+	Auteur "B.Mathieu, F.Aulery, A.Toutant"
+	CasTest . proprietes_thermo.data
+}
+
+Chapitre {
+	Titre "Proprietes thermo"
+	Description "Calcul des proprietes thermo avec p_thermo=214072, cp=1005, gamma=1.4"
+	Description "Constante specifique gaz=Cp*(1-1/gamma)=287.14285"
+	Description "Rho(T)=(p_thermo/constante_specifique)/T"
+	Description "
+	Figure {
+		labelx Temperature
+		labely Rho
+		InclureDescCourbes 0
+		courbe {
+			fichier profils_thermo.txt 
+			colonnes $18 $17 
+			style points
+			legende calcul			
+		}
+		courbe {
+			fichier profils_thermo.txt 
+			colonnes $18 (745.52439/$18)
+			style lines
+			legende analytique 745.52439/T
+		}
+	}
+	Figure {
+		labelx Temperature
+		labely Mu
+		InclureDescCourbes 0
+		courbe { 
+			fichier profils_thermo.txt 
+			colonnes $18 $39
+			style points
+			legende calcul
+		}
+		courbe {
+			fichier profils_thermo.txt 
+			colonnes $18 (1.461e-6*($18**1.5)/($18+111.))
+			style lines
+			legende analytique 1.461e-6*(T**1.5)/(T+111.)
+		}
+	}
+	Figure {
+		labelx Temperature
+		labely Lambda
+		InclureDescCourbes 0
+		courbe { 
+			fichier profils_thermo.txt 
+			colonnes $18 $40
+			style points
+			legende calcul
+		}
+		courbe { 
+			fichier profils_thermo.txt 
+			colonnes $18 (1.93198026315789000e-3*($18**1.5)/($18+111.))
+			style lines
+			legende analytique 1.93198026315789000e-3*(T**1.5)/(T+111.)
+		}
+	}
+}
+

@@ -1,0 +1,21 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+  File "/opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 95
+    print "codage manquant pour "+str(opt)
+                                ^
+SyntaxError: invalid syntax
+
+-> Binary and version used:
+-> /opt/shared/triou/178/TRUST-1.7.8/exec/TRUST_mpi_opt
+-> 1.7.8
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+
+ erreur_calcul_1
+
+
+-> Error in: python /opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/genererCourbes.py -p test_conduction.prm 
+-> Search and fix all the previous errors.

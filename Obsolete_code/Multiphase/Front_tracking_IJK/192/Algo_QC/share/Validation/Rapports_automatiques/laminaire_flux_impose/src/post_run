@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# on cherche le dernier fichier Moy_temp
+ln -s `ls -rt Moyennes_spatiales_Temp_*|tail -1` Moyennes_spatiales_Temp

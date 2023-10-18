@@ -1,0 +1,1172 @@
+Bad format detected for src/conv.prm:
+src/conv.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.1 directory ...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.01 directory ...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: No data in plot
+
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: No data in plot
+
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: No data in plot
+
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: No data in plot
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: No data in plot
+
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: No data in plot
+
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: No data in plot
+
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: No data in plot
+
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: No data in plot
+
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: No data in plot
+
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: No data in plot
+
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: No data in plot
+
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: No data in plot
+
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: No data in plot
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: No data in plot
+
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: No data in plot
+
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: No data in plot
+
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: No data in plot
+
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: No data in plot
+
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: No data in plot
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./fic.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg))
+Writing index file fic.idx
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./fic.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty))
+(./fic.out) (./fic.out) (./corps.tex [1{/var/lib/texmf/fonts/map/pdftex/updmap/
+pdftex.map}]
+!pdfTeX error: pdflatex (file ../.tmp/fic000.png): reading image file failed
+ ==> Fatal error occurred, no output PDF file produced!
+
+-> File cas-rk380_0.001/cas.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build
+-> PDF generation failed. The PDF report is deleted.  rapport.pdf
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 526, in genererRapport
+    raise Exception("Generation failed!")
+Exception: Generation failed!

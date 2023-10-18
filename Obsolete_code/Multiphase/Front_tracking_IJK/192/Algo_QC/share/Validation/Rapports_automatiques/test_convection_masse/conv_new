@@ -1,0 +1,29 @@
+    const int imax = nx;
+    const int jmax = ny;
+    const int vsize = Simd_double::size();
+    for (int j = 0; ; j++)
+      {
+      for (int i = 0; i < imax; i += vsize) {
+        Simd_double velocity;
+        velocity_dir.get_center(i, velocity);
+        Simd_double T0, T1; // scalar value at left and at right of the computed flux
+        Simd_double fram0, fram1;
+        Simd_double curv0, curv1;
+        input_field.get_left_center(_DIR_, i, T0, T1);
+        fram_values.get_left_center(_DIR_, i, fram0, fram1);
+        curv_values.get_left_center(_DIR_, i, curv0, curv1);
+        Simd_double fram = max(fram0, fram1);
+        Simd_double curv     = select_double(velocity, 0., curv1, curv0);
+        Simd_double T_amont = select_double(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
+        Simd_double flux     = (T0 + T1) * 0.5 - delta_xyz_squared_over_8 * curv;
+            flux         = ((1. - fram) * flux + fram * T_amont) * velocity * surface;
+
+        resu_ptr.put_val(i, flux);}
+      // do not execute end_iloop at last iteration (because of assert on valid j+1)
+      if (j+1==jmax)
+        break;
+    input_field.next_j();
+    velocity_dir.next_j();
+    fram_values.next_j();
+    curv_values.next_j();
+    resu_ptr.next_j();

@@ -1,0 +1,291 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run script prepare in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/New_algo_qc_opt
+-> 1.7.8
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Running the post_run script in the VX_DIRX directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Running the post_run script in the VY_DIRX directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Running the post_run script in the VZ_DIRX directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Running the post_run script in the VX_DIRY directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Running the post_run script in the VY_DIRY directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Running the post_run script in the VZ_DIRY directory ...
+./post_run: line 7: visit: command not found
+./post_run: line 8: visit: command not found
+./post_run: line 9: visit: command not found
+./post_run: line 15: visit: command not found
+./post_run: line 17: visit: command not found
+./post_run: line 16: visit: command not found
+./post_run: line 23: visit: command not found
+./post_run: line 24: visit: command not found
+./post_run: line 25: visit: command not found
+==============================
+-> Building PDF report file...
+==============================
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic003.plot", line 10: warning: Skipping unreadable file "VX_DIRX/simu_dv_x0000.curve"
+"./.tmp/fic003.plot", line 10: warning: Skipping unreadable file "VX_DIRX/ana_dv_x0000.curve"
+"./.tmp/fic003.plot", line 10: warning: Skipping unreadable file "VX_DIRX/error_dv_x0000.curve"
+"./.tmp/fic003.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic007.plot", line 10: warning: Skipping unreadable file "VX_DIRX/simu_dv_y0000.curve"
+"./.tmp/fic007.plot", line 10: warning: Skipping unreadable file "VX_DIRX/ana_dv_y0000.curve"
+"./.tmp/fic007.plot", line 10: warning: Skipping unreadable file "VX_DIRX/error_dv_y0000.curve"
+"./.tmp/fic007.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic011.plot", line 10: warning: Skipping unreadable file "VX_DIRX/simu_dv_z0000.curve"
+"./.tmp/fic011.plot", line 10: warning: Skipping unreadable file "VX_DIRX/ana_dv_z0000.curve"
+"./.tmp/fic011.plot", line 10: warning: Skipping unreadable file "VX_DIRX/error_dv_z0000.curve"
+"./.tmp/fic011.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic015.plot", line 10: warning: Skipping unreadable file "VX_DIRY/simu_dv_x0000.curve"
+"./.tmp/fic015.plot", line 10: warning: Skipping unreadable file "VX_DIRY/ana_dv_x0000.curve"
+"./.tmp/fic015.plot", line 10: warning: Skipping unreadable file "VX_DIRY/error_dv_x0000.curve"
+"./.tmp/fic015.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic019.plot", line 10: warning: Skipping unreadable file "VX_DIRY/simu_dv_y0000.curve"
+"./.tmp/fic019.plot", line 10: warning: Skipping unreadable file "VX_DIRY/ana_dv_y0000.curve"
+"./.tmp/fic019.plot", line 10: warning: Skipping unreadable file "VX_DIRY/error_dv_y0000.curve"
+"./.tmp/fic019.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic023.plot", line 10: warning: Skipping unreadable file "VX_DIRY/simu_dv_z0000.curve"
+"./.tmp/fic023.plot", line 10: warning: Skipping unreadable file "VX_DIRY/ana_dv_z0000.curve"
+"./.tmp/fic023.plot", line 10: warning: Skipping unreadable file "VX_DIRY/error_dv_z0000.curve"
+"./.tmp/fic023.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic027.plot", line 10: warning: Skipping unreadable file "VY_DIRX/simu_dv_x0000.curve"
+"./.tmp/fic027.plot", line 10: warning: Skipping unreadable file "VY_DIRX/ana_dv_x0000.curve"
+"./.tmp/fic027.plot", line 10: warning: Skipping unreadable file "VY_DIRX/error_dv_x0000.curve"
+"./.tmp/fic027.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic031.plot", line 10: warning: Skipping unreadable file "VY_DIRX/simu_dv_y0000.curve"
+"./.tmp/fic031.plot", line 10: warning: Skipping unreadable file "VY_DIRX/ana_dv_y0000.curve"
+"./.tmp/fic031.plot", line 10: warning: Skipping unreadable file "VY_DIRX/error_dv_y0000.curve"
+"./.tmp/fic031.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic035.plot", line 10: warning: Skipping unreadable file "VY_DIRX/simu_dv_z0000.curve"
+"./.tmp/fic035.plot", line 10: warning: Skipping unreadable file "VY_DIRX/ana_dv_z0000.curve"
+"./.tmp/fic035.plot", line 10: warning: Skipping unreadable file "VY_DIRX/error_dv_z0000.curve"
+"./.tmp/fic035.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic039.plot", line 10: warning: Skipping unreadable file "VY_DIRY/simu_dv_x0000.curve"
+"./.tmp/fic039.plot", line 10: warning: Skipping unreadable file "VY_DIRY/ana_dv_x0000.curve"
+"./.tmp/fic039.plot", line 10: warning: Skipping unreadable file "VY_DIRY/error_dv_x0000.curve"
+"./.tmp/fic039.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic043.plot", line 10: warning: Skipping unreadable file "VY_DIRY/simu_dv_y0000.curve"
+"./.tmp/fic043.plot", line 10: warning: Skipping unreadable file "VY_DIRY/ana_dv_y0000.curve"
+"./.tmp/fic043.plot", line 10: warning: Skipping unreadable file "VY_DIRY/error_dv_y0000.curve"
+"./.tmp/fic043.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic047.plot", line 10: warning: Skipping unreadable file "VY_DIRY/simu_dv_z0000.curve"
+"./.tmp/fic047.plot", line 10: warning: Skipping unreadable file "VY_DIRY/ana_dv_z0000.curve"
+"./.tmp/fic047.plot", line 10: warning: Skipping unreadable file "VY_DIRY/error_dv_z0000.curve"
+"./.tmp/fic047.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic051.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/simu_dv_x0000.curve"
+"./.tmp/fic051.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/ana_dv_x0000.curve"
+"./.tmp/fic051.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/error_dv_x0000.curve"
+"./.tmp/fic051.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic055.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/simu_dv_y0000.curve"
+"./.tmp/fic055.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/ana_dv_y0000.curve"
+"./.tmp/fic055.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/error_dv_y0000.curve"
+"./.tmp/fic055.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+sh: visit: command not found
+slice2d_y
+"./.tmp/fic059.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/simu_dv_z0000.curve"
+"./.tmp/fic059.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/ana_dv_z0000.curve"
+"./.tmp/fic059.plot", line 10: warning: Skipping unreadable file "VZ_DIRX/error_dv_z0000.curve"
+"./.tmp/fic059.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic063.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/simu_dv_x0000.curve"
+"./.tmp/fic063.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/ana_dv_x0000.curve"
+"./.tmp/fic063.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/error_dv_x0000.curve"
+"./.tmp/fic063.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic067.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/simu_dv_y0000.curve"
+"./.tmp/fic067.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/ana_dv_y0000.curve"
+"./.tmp/fic067.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/error_dv_y0000.curve"
+"./.tmp/fic067.plot", line 10: No data in plot
+
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+sh: visit: command not found
+slice2d_x
+"./.tmp/fic071.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/simu_dv_z0000.curve"
+"./.tmp/fic071.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/ana_dv_z0000.curve"
+"./.tmp/fic071.plot", line 10: warning: Skipping unreadable file "VZ_DIRY/error_dv_z0000.curve"
+"./.tmp/fic071.plot", line 10: No data in plot
+
+DEBOG : Search file ./.tmp/fic_000_0.png from /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/test_diffusion_gradient/build
+DEBOG : Search file ./.tmp/fic_000_0.png from /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/test_diffusion_gradient/build
+ERROR : Error, graphic file ./.tmp/fic_000_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 91) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))

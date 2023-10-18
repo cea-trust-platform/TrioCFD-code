@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ko=0
+for ref in `ls *.ref`
+do
+  f=`basename $ref .ref`
+  compare_sonde $f $ref -max_delta -max_par_compo 2>&1 > comp_$f
+  [ $? -ne 0 ] && ko=1 && echo PB $f
+  
+done
+exit $ko

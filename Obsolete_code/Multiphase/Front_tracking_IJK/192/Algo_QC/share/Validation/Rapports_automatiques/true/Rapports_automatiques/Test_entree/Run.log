@@ -1,0 +1,25 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run script prepare in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /opt/shared/triou/178/TRUST-1.7.8/exec/TRUST_mpi_opt
+-> 1.7.8
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+-> Running the post_run script in the cas10_1 directory ...
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+-> Running the post_run script in the cas10_0.1 directory ...
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...

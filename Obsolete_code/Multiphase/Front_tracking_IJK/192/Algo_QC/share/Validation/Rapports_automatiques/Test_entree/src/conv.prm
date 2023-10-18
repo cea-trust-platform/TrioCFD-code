@@ -1,0 +1,379 @@
+Parametres {
+	Titre "Convergence du calcul "
+
+
+			
+	  Castest  "cas10_1" "cas.data"  	
+	  Castest  "cas10_0.1" "cas.data"  	
+	  Castest  "cas10_0.01" "cas.data"  	
+	  Castest  "cas10_0.001" "cas.data"    			
+	  Castest  "cas20_1" "cas.data"  	
+	  Castest  "cas20_0.1" "cas.data"  	
+	  Castest  "cas20_0.01" "cas.data"  	
+	  Castest  "cas20_0.001" "cas.data"    			
+	  Castest  "cas40_1" "cas.data"  	
+	  Castest  "cas40_0.1" "cas.data"  	
+	  Castest  "cas40_0.01" "cas.data"  	
+	  Castest  "cas40_0.001" "cas.data"    			
+	  Castest  "cas80_1" "cas.data"  	
+	  Castest  "cas80_0.1" "cas.data"  	
+	  Castest  "cas80_0.01" "cas.data"  	
+	  Castest  "cas80_0.001" "cas.data"    			
+	  Castest  "cas-rk310_1" "cas.data"  	
+	  Castest  "cas-rk310_0.1" "cas.data"  	
+	  Castest  "cas-rk310_0.01" "cas.data"  	
+	  Castest  "cas-rk310_0.001" "cas.data"    			
+	  Castest  "cas-rk320_1" "cas.data"  	
+	  Castest  "cas-rk320_0.1" "cas.data"  	
+	  Castest  "cas-rk320_0.01" "cas.data"  	
+	  Castest  "cas-rk320_0.001" "cas.data"    			
+	  Castest  "cas-rk340_1" "cas.data"  	
+	  Castest  "cas-rk340_0.1" "cas.data"  	
+	  Castest  "cas-rk340_0.01" "cas.data"  	
+	  Castest  "cas-rk340_0.001" "cas.data"    			
+	  Castest  "cas-rk380_1" "cas.data"  	
+	  Castest  "cas-rk380_0.1" "cas.data"  	
+	  Castest  "cas-rk380_0.01" "cas.data"  	
+	  Castest  "cas-rk380_0.001" "cas.data"    	Auteur "GF our MC"
+	InclureData 2
+# Prerequis "./extract_convergence"
+
+Description "Cas test paroi defilante, pour tester convergence en maillage des opérateurs de convection"
+}
+
+Chapitre {
+titre euler_explicite
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps resol 10 "
+			courbe {
+			Legende facsec 1
+		fichier cas10_1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.1
+		fichier cas10_0.1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.01
+		fichier cas10_0.01/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.001
+		fichier cas10_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps resol 20 "
+			courbe {
+			Legende facsec 1
+		fichier cas20_1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.1
+		fichier cas20_0.1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.01
+		fichier cas20_0.01/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.001
+		fichier cas20_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps resol 40 "
+			courbe {
+			Legende facsec 1
+		fichier cas40_1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.1
+		fichier cas40_0.1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.01
+		fichier cas40_0.01/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.001
+		fichier cas40_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps resol 80 "
+			courbe {
+			Legende facsec 1
+		fichier cas80_1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.1
+		fichier cas80_0.1/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.01
+		fichier cas80_0.01/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 		courbe {
+			Legende facsec 0.001
+		fichier cas80_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ }
+ 
+			
+	
+
+} 
+Chapitre {
+titre euler_explicite convergence en maillage 
+
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+		
+	titre "convergence de la vitesse en maillage facsec 0.001"
+
+	
+		
+		courbe {
+			Legende N 10
+		fichier cas10_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 20
+		fichier cas20_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 40
+		fichier cas40_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 80
+		fichier cas80_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+	 
+	}
+			
+} 
+
+Chapitre {
+titre rk3b
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps RK3 resol 10 "
+			courbe {
+			Legende facsec 1
+			fichier cas-rk310_1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.1
+			fichier cas-rk310_0.1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.01
+			fichier cas-rk310_0.01/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.001
+			fichier cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps RK3 resol 20 "
+			courbe {
+			Legende facsec 1
+			fichier cas-rk320_1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.1
+			fichier cas-rk320_0.1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.01
+			fichier cas-rk320_0.01/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.001
+			fichier cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps RK3 resol 40 "
+			courbe {
+			Legende facsec 1
+			fichier cas-rk340_1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.1
+			fichier cas-rk340_0.1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.01
+			fichier cas-rk340_0.01/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.001
+			fichier cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 }
+	
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps RK3 resol 80 "
+			courbe {
+			Legende facsec 1
+			fichier cas-rk380_1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.1
+			fichier cas-rk380_0.1/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.01
+			fichier cas-rk380_0.01/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 		courbe {
+			Legende facsec 0.001
+			fichier cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 }
+ 
+}
+
+ 
+Chapitre {
+titre rk3b convergence en maillage 
+
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+		
+	titre "convergence de la vitesse en maillage facsec 0.001"
+
+	
+		
+		courbe {
+			Legende N 10
+		fichier cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 20
+		fichier cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 40
+		fichier cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+		
+		courbe {
+			Legende N 80
+		fichier cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+	 
+	}
+			
+} 

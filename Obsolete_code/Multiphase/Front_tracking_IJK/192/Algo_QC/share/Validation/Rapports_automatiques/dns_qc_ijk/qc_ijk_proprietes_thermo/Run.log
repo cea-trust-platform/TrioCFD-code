@@ -1,0 +1,18 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the proprietes_thermo data file in the . directory ...
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.

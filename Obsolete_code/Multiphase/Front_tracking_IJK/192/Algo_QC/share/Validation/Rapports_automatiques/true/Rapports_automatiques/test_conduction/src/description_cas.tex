@@ -1,0 +1,68 @@
+Ce cas test correspond \`a la diffusion d'une gaussienne pour la temp\'erature \`a vitesse nulle. Il a pour but le test du terme conductif de l'\'equation de conservation de l'\'energie.
+
+\subsection{Solution analytique}
+
+La condition initiale est
+\begin{equation}
+T\left(x,y,z\right) = 293 \left[1 + e^{-\left(\frac{x-x_0}{s_0}\right)^2-\left(\frac{y-y_0}{s_0}\right)^2-\left(\frac{z-z_0}{s_0}\right)^2}\right].
+\end{equation}
+On a $\lambda\left(T\right)$ tel que dans l'atelier, c'est-\`a-dire
+\begin{equation}
+\lambda\left(T\right) = a_0+a_1 T +a_2 T^2 +a_3 T^3 + a_4 T^4 = a_0 + a_i T^i
+\end{equation}
+avec $i$ allant de $1$ \`a $4$ et
+\begin{align*}
+a_0 ={}& 0.00144059 \\
+a_1 ={}& 0.0000934536 \\
+a_2 ={}& -6.58994\cdot10^{-8} \\
+a_3 ={}& 3.26493\cdot10^{-11} \\
+a_4 ={}& -6.68626\cdot10^{-15} \\
+\end{align*}
+Soit
+\begin{equation}
+T^* = 293\, e^{-\left(\frac{x-x_0}{s_0}\right)^2-\left(\frac{y-y_0}{s_0}\right)^2-\left(\frac{z-z_0}{s_0}\right)^2},
+\end{equation}
+on peut r\'eecrire $T$ en
+\begin{equation}
+T = 293 + T^*
+\end{equation}
+d'o\`u,
+\begin{equation}
+\frac{\partial T}{\partial x} = \left(-2\frac{x-x_0}{s_0^2}\right) T^*,
+\end{equation}
+et
+\begin{equation}
+\lambda \frac{\partial T}{\partial x} = \left(-2\frac{x-x_0}{s_0^2}\right) \left(a_0+a_i T^i\right) T^*,
+\end{equation}
+et
+\begin{equation}
+\frac{\partial}{\partial x} \left(\lambda \frac{\partial T}{\partial x}\right) = \left(a_0 + a_i T^i\right) \left(-\frac{2}{s_0^2} + 4\frac{\left(x-x_0\right)^2}{s_0^4}\right) T^* + \left(i a_i T^{i-1}\right) \left( 4\frac{\left(x-x_0\right)^2}{s_0^4}\right) \left(T^*\right)^2.
+\end{equation}
+Le r\'esultat est similaire pour les directions $y$ et $z$.
+$\nabla\cdot\left(\lambda \nabla T\right)$ est donc donn\'e par :
+\begin{equation}
+\begin{aligned}
+\frac{\partial}{\partial x_j} \left(\lambda \frac{\partial T}{\partial x_j}\right) ={}& \left(a_0 + a_i T^i\right) \left(-\frac{6}{s_0^2} + 4\frac{\left(x-x_0\right)^2+\left(y-y_0\right)^2+\left(z-z_0\right)^2}{s_0^4}\right) T^* \\
+&+ \left(i a_i T^{i-1}\right) \left(4\frac{\left(x-x_0\right)^2+\left(y-y_0\right)^2+\left(z-z_0\right)^2}{s_0^4}\right) \left(T^*\right)^2
+\end{aligned}
+\end{equation}
+soit plus explicitement :
+\begin{equation}
+\begin{aligned}
+\frac{\partial}{\partial x_j} \left(\lambda \frac{\partial T}{\partial x_j}\right) ={}& \left(a_0+a_1 T +a_2 T^2 +a_3 T^3 + a_4 T^4\right) \left(-\frac{6}{s_0^2} + 4\frac{\left(x-x_0\right)^2+\left(y-y_0\right)^2+\left(z-z_0\right)^2}{s_0^4}\right) \\
+&\phantom{aaaaaaaaaaaaaaaa}\left(293\, e^{-\left(\frac{x-x_0}{s_0}\right)^2-\left(\frac{y-y_0}{s_0}\right)^2-\left(\frac{z-z_0}{s_0}\right)^2}\right) \\
+&+ \left(a_1 + 2 a_2 T + 3 a_3 T^2 + 4 a_4 T^3\right) \left(4\frac{\left(x-x_0\right)^2+\left(y-y_0\right)^2+\left(z-z_0\right)^2}{s_0^4}\right) \\
+&\phantom{aaaaaaaaaaaaaaaa}\left(293\, e^{-\left(\frac{x-x_0}{s_0}\right)^2-\left(\frac{y-y_0}{s_0}\right)^2-\left(\frac{z-z_0}{s_0}\right)^2}\right)^2
+\end{aligned}
+\end{equation}
+Les param\`etres du jeu de donn\'ees sont \`a savoir
+\begin{align*}
+s_0 ={}& .1 \\
+x_0 ={}& y_0 = z_0 = .5
+\end{align*}
+
+\subsection{V\'erification des r\'esultats de la simulation}
+
+On compare le r\'esultat de la simulation {\textsf simu\_div\_lambda\_grad\_t} \`a la solution analytique d\'ecrite pr\'ec\'edemment {\textsf ana\_div\_lambda\_grad\_t}. La diff\'erence entre les deux est \textsf{error\_div\_lambda\_grad\_t}. Si tout se passe bien, les r\'esultats de la simulation sont proches de la solution analytique et l'erreur est tr\'es faible devant la valeur totale.
+
+

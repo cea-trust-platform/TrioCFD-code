@@ -1,0 +1,124 @@
+Parametres {
+	Titre "Comparaison code vdf / code ijk pour la DNS QC"
+	Description "Cette fiche lance un premier calcul vdf pour generer un etat initial non trivial mais physiquement valide."
+	Description "Ensuite elle fait une reprise de ce calcul en vdf, puis en ijk, sur 50 pas de temps."
+	Description "On compare les pas de temps de diffusion et de convection, la pression thermodynamique et l'aspect du champ de vitesse entre ijk et vdf."
+	Description "Les résultats sont similaires mais pas identiques, c'est normal car il y a de légères variations dans la méthode numérique."
+	Description "La différence la plus important est sur la pression thermodynamique."
+	Auteur "B.Mathieu, F.Aulery, A.Toutant"
+	
+	CasTest . jdd_vdf.data
+	CasTest . jdd_ijk.data
+}
+
+Chapitre {
+	Titre "Comparaison"
+	Figure {
+		Titre Pas de temps
+		labelx Temps
+		labely dt
+		InclureDescCourbes 0
+		courbe {
+			fichier pas_de_temps_vdf.txt
+			colonnes $1 $2
+			style points
+			legende timestep vdf
+		}
+		courbe {
+			fichier pas_de_temps_ijk.txt
+			colonnes $1 $2
+			style points
+			legende timestep ijk
+		}
+	}	
+	Figure {
+		Titre Pas de temps diffusion qdm
+		labelx Temps
+		labely dt
+		InclureDescCourbes 0
+		courbe {
+			fichier pas_de_temps_vdf.txt
+			colonnes $1 $3
+			style points
+			legende timestep vdf
+		}
+		courbe {
+			fichier pas_de_temps_ijk.txt
+			colonnes $1 $3
+			style points
+			legende timestep ijk
+		}
+	}	
+	Figure {
+		Titre Pas de temps diffusion temperature
+		labelx Temps
+		labely dt
+		InclureDescCourbes 0
+		courbe {
+			fichier pas_de_temps_vdf.txt
+			colonnes $1 $4
+			style points
+			legende timestep vdf
+		}
+		courbe {
+			fichier pas_de_temps_ijk.txt
+			colonnes $1 $4
+			style points
+			legende timestep ijk
+		}
+	}	
+	Figure {
+		Titre Pas de temps convection
+		labelx Temps
+		labely dt
+		InclureDescCourbes 0
+		courbe {
+			fichier pas_de_temps_vdf.txt
+			colonnes $1 $5
+			style points
+			legende timestep vdf
+		}
+		courbe {
+			fichier pas_de_temps_ijk.txt
+			colonnes $1 $5
+			style points
+			legende timestep ijk
+		}
+	}	
+	Figure {
+		Titre Pression thermodynamique
+		labelx Temps
+		labely P thermo
+		InclureDescCourbes 0
+		courbe {
+			fichier evol_glob
+			colonnes $1 $4
+			style points
+			legende vdf
+		}
+		courbe {
+			fichier pthermo_ijk.txt
+			colonnes $1 $2
+			style points
+			legende ijk
+		}
+	}
+	Visu {
+		Title "Velocity_x etat initial"
+		Cycles 0
+		pseudocolor jdd_ijk.sauv.lata grid_geom_dual VELOCITY_X FACES
+		operator_to_all slice2d_y 0 0.001 0
+	}
+	Visu {
+		Title "Velocity_x etat final ijk"
+		Cycles -1
+		pseudocolor jdd_ijk.sauv.lata grid_geom_dual VELOCITY_X FACES
+		operator_to_all slice2d_y 0 0.001 0
+	}
+	Visu {
+		Title "Velocity_x etat final vdf"
+		Cycles -1
+		pseudocolor jdd_vdf.lata dom_dual VITESSE_X FACES
+		operator_to_all slice2d_y 0 0.001 0
+	}
+} 

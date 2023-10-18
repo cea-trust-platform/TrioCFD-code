@@ -1,0 +1,53 @@
+Bad format detected for src/source_volumique.prm:
+src/source_volumique.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the source_volumique data file in the . directory ...
+-> Calculation source_volumique produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build/source_volumique.err file.
+grep: source_volumique.TU: No such file or directory
+grep: source_volumique.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+awk: cannot open evol_glob (No such file or directory)
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Skipping data file with no valid points
+-> File ./source_volumique.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the source_volumique data file in the . directory ...
+-> Calculation source_volumique produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build/source_volumique.err file.
+grep: source_volumique.TU: No such file or directory
+grep: source_volumique.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+awk: cannot open evol_glob (No such file or directory)
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Skipping data file with no valid points
+-> File ./source_volumique.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.

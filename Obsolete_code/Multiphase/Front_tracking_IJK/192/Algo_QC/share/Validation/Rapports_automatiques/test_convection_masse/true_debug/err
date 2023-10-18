@@ -1,0 +1,39 @@
+Initialized MPI with MPI_COMM_WORLD (using all processors)
+Petsc initialization succeeded.
+Parallel engine initialized : Comm_Group_MPI with 18 processors
+Executable: /scratch/yanis/Baltiks/martin_c4c2/Algo_QC/New_algo_qc
+Data file name = test_convection_masse.data
+Running in parallel with 18 processors
+feenableexcept enabled.
+Data file : test_convection_masse.data
+ (removing .data extension)
+Localisation etude: /scratch/yanis/Baltiks/martin_c4c2/Algo_QC/share/Validation/Rapports_automatiques/test_convection_masse/build/test_convection_masse
+Nom du cas test_convection_masse
+ code : /scratch/yanis/Baltiks/martin_c4c2/Algo_QC/New_algo_qc
+ version : 1.7.8 
+Debut de l'execution 
+MAIN: Reading and executing data file
+Reading IJK_Grid_Geometry parameters (grid_geom2)
+ Direction 0 has 72 elements. Total domain size = 0.187528
+ Direction 1 has 72 elements. Total domain size = 0.093764
+Reading coordinates for direction 2 in file coord_k_0.txt
+ Direction 2 has 68 elements. Total domain size = 0.029846
+Reading IJK_Splitting parameters (grid_splitting2)
+ nproc in i, j, k directions = 3 3 2
+ grouping processes in i, j, k directions (node topology) = 1 1 1
+Simulation en mode : DEBIT IMPOSE.
+IJK_problem_double::run()
+ Allocating 21 arrays, approx total size= 3.90188 MB per core
+The diffusion is 'full': the flux is 'molecular_mu * (grad u + grad^T u - 2/3 * div u * Id)'
+The velocity turbulent diffusion is 'none': no turbulent diffusion
+The scalar turbulent diffusion is 'none': no scalar turbulent diffusion
+The turbulent viscosity is not tensorial.
+The turbulent diffusivity is not tensorial.
+Multigrille_Adrien::completer_float
+Multigrille_Adrien::completer_double_for_residue
+T= 0.00000000000000000000e+00 Checkpointing dans le fichier test_convection_masse_lata_0.sauv
+T= 1.53158705659513786268e-04 Checkpointing dans le fichier dns_34.sauv
+T= 1.53158705659513786268e-04 Checkpointing dans le fichier test_convection_masse_lata_1.sauv
+tstep 0 currenttime 1.53158705659513786268e-04 cpu_time 5.51413599999999970436e+00
+MAIN: End of data file
+Arret des processes.

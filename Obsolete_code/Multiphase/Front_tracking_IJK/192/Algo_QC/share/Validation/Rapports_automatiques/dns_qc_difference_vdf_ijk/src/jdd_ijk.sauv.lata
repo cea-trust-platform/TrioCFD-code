@@ -1,0 +1,11 @@
+LATA_V2.1
+titi
+Trio_U
+Format LITTLE_ENDIAN,C_INDEXING,C_ORDERING,F_MARKERS_NO,INT32,REAL32
+Geom grid_geom type_elem=HEXAEDRE
+Champ SOMMETS_IJK_I jdd_ijk.sauv.lata.grid_geom.coordx geometrie=grid_geom size=33 composantes=1
+Champ SOMMETS_IJK_J jdd_ijk.sauv.lata.grid_geom.coordy geometrie=grid_geom size=9 composantes=1
+Champ SOMMETS_IJK_K jdd_ijk.sauv.lata.grid_geom.coordz geometrie=grid_geom size=17 composantes=1
+TEMPS 0.0572303
+Champ VELOCITY jdd_ijk.sauv.lata.0.VELOCITY geometrie=grid_geom size=5049 localisation=FACES composantes=3 nature=vector
+Champ RHO jdd_ijk.sauv.lata.0.RHO geometrie=grid_geom size=4096 localisation=ELEM composantes=1

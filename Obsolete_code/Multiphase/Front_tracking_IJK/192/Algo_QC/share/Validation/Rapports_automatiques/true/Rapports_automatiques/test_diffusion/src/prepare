@@ -1,0 +1,62 @@
+#!/bin/bash
+
+declare -A ref_d_x
+declare -A ref_d_y
+declare -A ref_d_z
+
+ref_d_x[VX_DIRX]="(-16./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(x*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+ref_d_y[VX_DIRX]="0.*x*y*z"
+ref_d_z[VX_DIRX]="(2./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*cos(x*6.28318530717958647)*cos(z*6.28318530717958647*2)"
+
+ref_d_x[VX_DIRY]="(-5.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(y*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+ref_d_y[VX_DIRY]="0.*x*y*z"
+ref_d_z[VX_DIRY]="0.*x*y*z"
+
+ref_d_x[VY_DIRX]="0.*x*y*z"
+ref_d_y[VY_DIRX]="(-5.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(x*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+ref_d_z[VY_DIRX]="0.*x*y*z"
+
+ref_d_x[VY_DIRY]="0.*x*y*z"
+ref_d_y[VY_DIRY]="(-16./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(y*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+ref_d_z[VY_DIRY]="(2./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*cos(y*6.28318530717958647)*cos(z*6.28318530717958647*2)"
+
+ref_d_x[VZ_DIRX]="(2./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*cos(x*6.28318530717958647)*cos(z*6.28318530717958647*2)"
+ref_d_y[VZ_DIRX]="0.*x*y*z"
+ref_d_z[VZ_DIRX]="(-19./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(x*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+
+ref_d_x[VZ_DIRY]="0.*x*y*z"
+ref_d_y[VZ_DIRY]="(2./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*cos(y*6.28318530717958647)*cos(z*6.28318530717958647*2)"
+ref_d_z[VZ_DIRY]="(-19./3.)*2.*0.001*6.28318530717958647*6.28318530717958647*1.8101668014267859e-05*sin(y*6.28318530717958647)*sin(z*6.28318530717958647*2)"
+
+for compo in X Y Z
+do
+  for dir in X Y
+  do
+    fold=V${compo}_DIR$dir
+    mkdir -p $fold
+    cp coord_k_0.txt  coord_k_1.txt $fold/
+    cp instructions2.py $fold/
+    cp post_run $fold/
+    st="2.*0.001*sin($dir*6.28318530717958647)*sin(z*6.28318530717958647*2.)"
+    sed -e "s/expression_v${compo}_init.*$/expression_v${compo}_init $st/I" \
+             model.data > $fold/test_diffusion.data
+    #\rm $fold/instructions.py
+    cat <<EOF > $fold/instructions.py
+# Instructions visit
+DefineScalarExpression("x","coord(grid_geom2)[0]")
+DefineScalarExpression("y","coord(grid_geom2)[1]")
+DefineScalarExpression("z","coord(grid_geom2)[2]")
+DefineScalarExpression("simu_dv_x","D_VELOCITY_X_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)")
+DefineScalarExpression("simu_dv_y","D_VELOCITY_Y_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)")
+DefineScalarExpression("simu_dv_z","D_VELOCITY_Z_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)")
+DefineScalarExpression("ana_dv_x","${ref_d_x[V${compo}_DIR$dir]}")
+DefineScalarExpression("ana_dv_y","${ref_d_y[V${compo}_DIR$dir]}")
+DefineScalarExpression("ana_dv_z","${ref_d_z[V${compo}_DIR$dir]}")
+DefineScalarExpression("error_dv_x","D_VELOCITY_X_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)-${ref_d_x[V${compo}_DIR$dir]}")
+DefineScalarExpression("error_dv_y","D_VELOCITY_Y_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)-${ref_d_y[V${compo}_DIR$dir]}")
+DefineScalarExpression("error_dv_z","D_VELOCITY_Z_FACES_grid_geom2_dual*point_constant(grid_geom2, 1.7828944017115125e+00)-${ref_d_z[V${compo}_DIR$dir]}")
+
+EOF
+  done
+done
+
