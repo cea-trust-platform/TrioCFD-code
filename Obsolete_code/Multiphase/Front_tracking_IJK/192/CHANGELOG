@@ -1,0 +1,1183 @@
+CHANGE LOG
+============
+
+Version actuelle du projet : 174_PROMES_19
+
+[174_PROMES_19] - 2019-03-26
+===================================
+
+Ajout : 
+
+ - Possitibilité d'ajout d'un terme source, mot clé puit (positif pour abaisser
+la température).
+
+Correction :
+
+ - Ecriture des champs de façon parallèle par plan. Il est désormais possible 
+d'avoir un nombre de processeurs effectuant la sauvegarde des champs inférieur
+au nombre total de processeurs.
+
+
+[174_PROMES_18] - 2018-06-24
+===================================
+
+Corrections :
+
+ - Correction signe modèles structurels pour uscalar.
+
+
+[174_PROMES_17] - 2018-04-06
+===================================
+
+Ajouts :
+
+ - Possibilité de filtrage des champs lors de la lecture des champs locaux
+instantanes.
+
+Corrections :
+
+ - Correction de la portee des echange_espace_virtuel pour un grand filtre.
+
+
+[174_PROMES_16] - 2018-03-09
+===================================
+
+Corrections :
+
+ - Correction du filtrage pour des tailles de filtre supérieure à trois
+mailles. Auparavant, les grandeurs filtrées étaient dans ce cas erronées
+aux bords périodiques. Les filtres imposent et supposent une valeur nulle
+aux parois.
+
+ - Corrections du filtrage pour les modèles dynamiques de uscalar.
+
+
+[174_PROMES_15] - 2018-02-21
+===================================
+
+Ajouts :
+
+ - Ajout des modèles de viscosité/diffusivité turbulente VSS, KOBAYASHI.
+
+
+[174_PROMES_14] - 2018-01-26
+===================================
+
+Ajouts :
+
+ - Ajout du mot-clé CONVECTION_QDM_SANS_DIVERGENCE pour supprimer la partie
+conservative (en divergence) du calcul de la convection de la quantité de
+mouvement ('- u div(rho u)' plutot que 'div(rho u u) - u div(rho u)').
+
+ - Ajout modèles structurels CONVECTION 'UU' et CONVECTION_FILTRE pour le
+terme sous-maille en structural_uu. L'intérêt est de pouvoir filter la
+convection à l'intérieur de la dérivée avec CONVECTION_FILTRE.
+
+Corrections :
+
+ - Correction de l'interaction entre CONVECTION_QDM_NEGLIGEABLE et
+CONVECTION_QDM_SANS_RHO.
+
+Utilisation :
+
+Les modèles structurels CONVECTION et CONVECTION_FILTRE permettent de
+réaliser le calcul de la partie en divergence de la convection par un terme
+sous-maille structurel. Dans ce cas, cela doit être fait en concordance
+avec CONVECTION_QDM_SANS_DIVERGENCE et dans formulation VELOCITY avec
+CONVECTION_QDM_SANS_RHO. Par exemple, on utilisera :
+ 
+    + structural_uu
+    + structural_uu_model convection
+    + structural_uu_model_constant 1.
+    + large_eddy_simulation_formulation velocity
+    + convection_qdm_sans_rho
+    + convection_qdm_sans_divergence
+
+
+[174_PROMES_13b] - 2018-01-23
+===================================
+
+Corrections :
+
+ - Correction parallélisme filtre explicite.
+
+
+[174_PROMES_13] - 2018-01-18
+===================================
+
+Ajouts :
+
+ - Posssibilité de filtrage (explicite des termes de la convection de la
+quantité de mouvement et des termes sous-mailles associés afin de permettre
+la réalisation de simulations en mode filtrage explicite. On introduit pour
+cela les mot-clés FILTRAGE_CONVECTION_QDM (filtrage de la convection),
+FILTRAGE_TURBULENT_DIFFUSION_QDM (filtrage du modèle fonctionnel) et
+FILTRAGE_STRUCTURAL_DIFFUSION_QDM (filtrage du modèle structurel).
+Le filtrage est réalisé après le calcul de la divergence du flux. Il n'est
+pas pris en compte pour les méthodes dynamiques. Le filtrage des termes de
+l'équation de conservation de la masse et de l'énergie n'a pas été
+implémenté cat pas jugé utile.
+
+ - Ajout du mot-clé CONVECTION_QDM_SANS_RHO pour calculer la convection de
+la quantité de mouvement comme 'div(u u) - u div(u)' plutot que comme
+'[div(rho u u) - u div(rho u)]/rho'. En DNS ou en LES avec filtre implicite
+(sans filtrage de la convection), les deux façons de calculer la convection
+sont équivalentes (en continue). Ce n'est plus le cas dès lors que l'on
+filtre la convection où cette option devient nécessaire, au moins dans la
+formulation 'Velocity'. 
+
+ - Ajout modèle structurel SU_LAPLACIEN_U de la forme '- 2S(U Laplacien U)'
+[où S(q)=0.5(q+q^T)] pour le terme sous-maille en structural_uu.
+
+ - Ajout du paramètre LAPLACIAN à FILTER_KERNEL_NAME pour simuler un filtre
+différentiel.
+
+Changements :
+
+ - La taille du filtre explicite est maintenant différente selon le filtre
+choisie (intervient par exemple pour les modèles dynamiques). Elle est de
+trois mailles pour le filtre BOX et égale à la taille du filtre implicite
+pour le filtre LAPLACIAN. Auparavant, elle était toujours de trois mailles.
+
+Utilisation :
+
+En résumé, pour faire une simulation en filtrage explicite, on utilisera :
+ 
+    + convection_qdm_sans_rho
+    + filtrage_convection_qdm
+    + filtrage_turbulent_diffusion_qdm
+    + filtrage_structural_diffusion_qdm
+
+
+[174_PROMES_12c] - 2017-12-20
+===================================
+
+Corrections :
+
+ - Correction d'un bug (récemment introduit) au départ de la simulation si
+utilisation du modèle de similarité d'échelle.
+
+
+[174_PROMES_12b] - 2017-12-08
+===================================
+
+Corrections :
+
+ - Correction signe modèle RDS.
+
+
+[174_PROMES_12] - 2017-12-06
+===================================
+
+Ajouts :
+
+ - Ajout du modèle structurel GRADIENT_FILTRE.
+
+ - Ajout du paramètre CLIPPING pour le type de modèle dynamique. Cette
+option met à zéro la constante dynamique si elle est négative sans modifier
+son calcul. Le paramètre TYPE de turbulent_viscosity_dynamic_type TYPE,
+turbulent_diffusivity_dynamic_type TYPE, structural_uu_dynamic_type TYPE et
+structural_uscalar_dynamic_type TYPE est maintenant de la forme
+TYPE = NOM[global][clipping][tensorial|vectorial][_twopass]. Ce type de
+clipping n'est a priori utile que pour des modèles de type viscosité.
+
+Changements :
+
+ - On se place dans un paradigme où le flux sous-maille à la paroi est
+imposé à zéro dans tous les cas : On impose nu à la paroi à zéro dans
+calculer_tau, calculer_pi et Statistiques_dns_ijk ; On impose kappa à la
+paroi à zéro dans Statistiques_dns_ijk ; On impose la taille du filtre à la
+paroi à zéro dans calculer_turbulent_mu calculer_ml calculer_structural_uu
+et Statistiques_dns_ijk ; On impose le flux paroi à zéro si DIR==z et
+COMPO!=z dans l'opérateur de diffusion OpDiffTurbIJK.h.P.
+
+ - En particulier, on impose le flux de chaleur sous-maille à zéro aux
+parois dans la formulation Favre.
+
+Corrections :
+
+ - Correction bug si modèle structurel dynamique et viscosité non dynamique
+présente.
+
+ - Pour les modèles structurels dynamiques, la constante dynamique calculée
+au centre des mailles était multiplié au modèle structurel à la face z pour
+les composantes xz et yz. La constante est maintenant interpolé à la face
+avant multiplication dans ces deux cas.
+
+ - Correction de la cohérence de l'emplacement de la multiplication par rho
+des modèles structurels dans la formulation Favre.
+
+ - Dissociation de la taille du filtre et du maillage dans le postraitement
+Statistiques_dns_ijk.
+
+
+[174_PROMES_11] - 2017-11-28
+===================================
+
+Ajouts :
+
+ - Possibilité d'utiliser des modèles sous-maille structurels (en pratique
+seulement le modèle gradient) avec correction dynamique de la constante.
+
+ - Possibilité d'évaluation dynamique de la constante selon un modèle mixte
+combinant modèle structurel et fonctionnel, c'est-à-dire en prenant en
+compte la présence d'un autre modèle.
+
+ - Possibilité d'évaluation dynamique d'une constante tensorielle d'un
+modele fonctionnel ou structurel.
+
+ - Ajout du mot-clé IJK_GRID_GEOMETRY_POUR_DELTA, permettant d'indiquer le
+IJK_Grid_Geometry d'un maillage dont les valeurs vont être utilisées pour
+déterminer la taille Delta du filtre. Par défaut, la valeur de la taille du
+filtre est identique à celle du maillage. Cette option permet de décorréler
+complétement ces deux notions.
+Dans la direction inhomogène, la taille du filtre est interpolée depuis le
+maillage donnée par IJK_GRID_GEOMETRY_POUR_DELTA sur le maillage donné par
+IJK_SPLITTING. L'interpolation utilisée est linéaire.
+
+Corrections :
+
+ - Correction de la valeur associée à la taille du filtre Delta12 associée
+à la succession des deux filtres 1 et 2 dans les méthodes dynamique.
+Auparavant, Delta12 ~= 3*Delta. Maintenant, Delta^12 ~= 3*Delta sq+ Delta1
+où A sq+ B = sqrt(A*A + B*B).
+
+ - Correction d'une confusion entre le delta du maillage et du filtre dans
+calculer_turbulent_mu. Cette erreur affecte uniquement les modèles
+dynamiques anisotropes.
+
+ - Correction d'une erreur sur le calcul du modèle gradient (valeur de
+delta_z sur la maille précdente mal définie).
+
+Utilisation :
+
+La nouvelle syntaxe pour l'évaluation dynamique de la constante est :
+ 
+    + turbulent_viscosity_dynamic_type TYPE : TYPE est le nom du type
+d'évaluation dynamique de la constante à utiliser pour la viscosite
+turbulente.
+
+    + turbulent_diffusivity_dynamic_type TYPE : TYPE est le nom du type
+d'évaluation dynamique de la constante à utiliser pour la diffusivite
+turbulente.
+
+    + structural_uu_dynamic_type TYPE : TYPE est le nom du type
+d'évaluation dynamique de la constante à utiliser pour le modele structurel
+sur uu.
+
+    + structural_uscalar_dynamic_type TYPE : TYPE est le nom du type
+d'évaluation dynamique de la constante à utiliser pour le modele structurel
+sur uscalar.
+
+Dans les quatres cas, TYPE est composé de un à (éventuellement) quatres
+éléments
+
+     TYPE = NOM[global][tensorial|vectorial][_twopass]
+
+ou     * NOM : indique le nom de la méthode dynamique utilisée. Les valeurs
+       possibles sont DIRECT, DIRECTMIXTE, LILLY, LILLYMIXTE, TWOPARAMETERS
+       et TWONOERROR. La constante C1 (ou C1ij) du modèle C1*f1(U,S,Delta)
+       associée à m1=f1(^U,^S,^Delta))-^(f1(U,S,Delta)), avec ^ le filtre,
+       sachant éventuellement qu'un modèle f2 associée à m2 est présent
+       pour le même terme, et en notant lij la similarité, s'exprime :
+
+           (1) DIRECT:        
+
+                    <lij>
+           C1[ij] = ------
+                    <m1ij>
+
+           (2) DIRECTMIXTE:    
+
+                    <lij - m2ij>
+           C1[ij] = ------------
+                    <m1ij>
+
+           (3) LILLY:       
+
+                    <m1ij lij>
+           C1[ij] = -----------
+                    <m1ij m1ij>
+
+           (4) LILLYMIXTE:   
+
+                    <m1ij lij - m1ij m2ij>
+           C1[ij] = ----------------------
+                    <m1ij m1ij>
+
+           (5) TWOPARAMETERS: 
+
+                    <m1ij lij><m2ij m2ij> - <m2ij lij><m1ij m2ij>
+           C1[ij] = -----------------------------------------------
+                    <m1ij m1ij><m2ij m2ij> - <m1ij m2ij><m1ij m2ij>
+
+           (6) TWONOERROR:   
+
+                    <m1ij m1ij><lij> - <m1ij><m1ij lij>
+                          + <m1ij m2ij><lij> - <m1ij><m2ij lij>
+           C1[ij] = -----------------------------------------------
+                    <m2ij><m1ij m1ij> - <m1ij><m1ij m2ij>
+                          + <m2ij><m1ij m2ij> - <m1ij><m2ij m2ij>
+       
+       NB : On substitura dans ces expression tous les tenseurs Aij par des
+       vecteurs dans le cas d'une diffusivité turbulente.
+
+       * global (facultatif) : indique que la moyenne statistique dans
+       l'expression du calcul dynamique de la constante doit être calculé
+       comme une moyenne volumique (constante globale sur tout le volume)
+       plutot que sur un plan (une constante différente par y).
+
+       * tensorial (facultatif) : indique un calcul de constante pour
+       chaque composante du tenseur plutot qu'une constante unique pour
+       toutes les composantes (pour viscosité turbulente ou modèle
+       structurel sur uu). Sans ce paramètre, les expressions (3-5) sont
+       calculées avec des somme sur i et j implicites. Avec ce paramètre,
+       le calcul est fait pour chaque couple (i,j).
+
+       * vectorial (facultatif) : indique un calcul de constante pour
+       chaque composante du vecteur plutot qu'une constante unique pour
+       toutes les composantes (pour diffusivité turbulente ou modèle
+       structurel sur uscalar). Analogue de 'tensorial' pour une
+       diffusivité turbulente.
+
+       * _twopass (facultatif) : indique que le calcul dynamique de la
+       constante depend du calcul dynamique d'une autre constante (dans le
+       cas d'un modèle mixte). Sans ce paramètre, le modèle mixte est
+       calculé à partir de la valeur de l'autre modèle _avant_ que celui-ci
+       soit mis-à-jour par une constante dynamique.
+
+Exemples de valeurs possibles de TYPE : twoparameters, lillytensorial,
+lillymixteglobal_twopass. Certaines combinaisons ne sont pas sensées.
+Il convient au jeu de données d'indiquer un choix cohérent. Par exemple,
+l'utilisation de 'twoparameters' pour un modèle structurel va normalement
+de pair avec l'utilisation de 'twoparameters' avec un modèle fonctionnel ;
+l'utilisation de lillymixte pour un modèle fonctionnel s'accompagne de
+l'utilisation d'un modèle structurel non dynamique et de lillymixte_twopass
+d'un modèle structurel dynamique (et vice versa).
+Il est toujours possibles d'utiliser les anciens paramètres dynamic_uu,
+dynamicglobal_uu, dynamic_urho, dynamicglobal_urho, dynamic_ut et
+dynamicglobal_ut (maintenant équivalents à lilly et lillyglobal). Leur
+utilisation est déconseillée mais fonctionnent toujours.
+
+
+[174_PROMES_10c] - 2017-11-21
+===================================
+
+Corrections :
+
+ - Correction de l'ajout des modèles Amdscalar, Amdnoclip, Amdscalarnoclip.
+
+
+[174_PROMES_10b] - 2017-11-20
+===================================
+
+Corrections :
+
+ - Correction pas de temps de stabilité modèle anisotrope.
+
+
+[174_PROMES_10] - 2017-11-17
+===================================
+
+Ajouts :
+
+ - Ajout des modèles de viscosité/diffusivité turbulente Amdscalar,
+Amdnoclip, Amdscalarnoclip.
+
+ - Ajout pour pouvoir appliquer un facteur multiplicatif sur chaque
+composante des mot-clés TURBULENT_DIFFUSIVITY_VECTOR_COEFFICIENTS,
+TURBULENT_VISCOSITY_TENSOR_COEFFICIENTS, STRUCTURAL_UU_TENSOR_COEFFICIENTS
+et STRUCTURAL_USCALAR_VECTOR_COEFFICIENTS.
+
+ - Ajout du postraitement des moyennes statistiques liées au modèles
+sous-mailles.
+
+ - Ajout cas test canal_turbulent_anisotherme_leger_avec_modele.
+
+Changements :
+
+ - Modification de l'opérateur de diffusion de la quantité de mouvement
+OpDiffTurbIJK pour permettre l'utilisation d'une viscosité tensorielle.
+
+ - Modification de l'opérateur de diffusion scalaire OpDiffTurbIJKScalar
+pour permettre l'utilisation d'une diffusivité vectorielle.
+
+ - Le calcul des pas de temps de stabilité et des statistiques est
+dorenavant fondée sur l'hypothèse d'une viscosité ou d'une diffusivité
+tensorielle (car plus général). Cela n'est pas équivalent à la version
+précédente dans le cas non tensoriel car la multiplication et l'addition
+des flottants ne sont pas associatives.
+
+Corrections :
+
+ - Correction du pas de temps de stabilité pour un modèle anisotrope.
+
+ - Correction de l'implémentation du modèle de similarité d'échelle
+(cohérence des emplacements de discrétisation).
+
+
+[174_PROMES_9] - 2017-10-17
+===================================
+
+Changements :
+
+ - Possibilité d'utiliser un terme source fixé à débit non contraint.
+Auparavant, la seule possibilité était de donner un débit cible à partir
+duquel était calculé le terme source. Le mot-clé DEBIT_MASSIQUE n'est plus
+obligatoire. Un mot-clé TERME_SOURCE_ACCELERATION_CONSTANT a été ajouté.
+Ces deux mot-clés sont exclusifs.
+
+
+[174_PROMES_8b] - 2017-10-16
+===================================
+
+Corrections :
+
+ - Correction division par zéro dans OpDiffTurbIJKScalar si la diffusivité
+turbulente vaut zéro.
+
+
+[174_PROMES_8] - 2017-10-11
+===================================
+
+Ajouts :
+
+ - Possibilité d'utiliser des modèles sous-maille de type viscosité ou
+diffusivité sous-maille avec correction dynamique globale de la constante
+(constante unique pour tout le domaine) selon la méthode de Lilly
+(contraction de l'erreur avec elle-même).
+
+Corrections :
+
+ - Allocation de la température avec une taille de ghost de 2 au lieu de 1.
+
+ - Correction du flux de chaleur aux parois pour un modèle anisotrope.
+
+ - Correction du modèle de Vreman.
+
+
+[174_PROMES_7c] - 2017-09-27
+===================================
+
+Changements :
+
+ - On impose le flux de masse sous-maille à zéro aux parois.
+
+
+[174_PROMES_7b] - 2017-09-27
+===================================
+
+Corrections :
+
+ - Correction du calcul de la moyenne statistique de MUTURB, KAPPATURB.
+
+
+[174_PROMES_7] - 2017-09-27
+===================================
+
+Ajouts :
+
+ - Moyennes statistiques de MUTURB, KAPPATURB.
+
+
+[174_PROMES_6d] - 2017-09-20
+===================================
+
+Corrections :
+
+ - Correction de l'implémentation du modèle AMD.
+
+
+[174_PROMES_6c] - 2017-09-18
+===================================
+
+Corrections :
+
+ - Mise a jour de rho_paroi_impose_kmin_ et rho_paroi_impose_kmax_ a chaque
+pas de temps.
+
+
+[174_PROMES_6b] - 2017-09-15
+===================================
+
+Corrections :
+
+ - Correction du calcul de dt_diff_mu en parallèle (mp_min_for_each_item).
+
+
+[174_PROMES_6] - 2017-09-13
+===================================
+
+Corrections :
+
+ - Correction d'une erreur sur la convection de la masse QUICK conduisant à
+une perte de masse (et donc pression thermodynamique) au cours de la
+simulation. Les mails suivant expliquent le problème et la correction.
+(note: les mails sont découpés pour ne garder que la partie jugée utile)
+
+    -------- Original Message -------- 
+    Subject: problème de perte de masse IJK 
+    Date: Thursday, September 7, 2017 11:25 CEST 
+    From: dorian.dupuy@promes.cnrs.fr
+    To: benoit.mathieu@cea.fr 
+    CC: adrien.toutant@univ-perp.fr
+
+    On a réalisé avec la maquette IJK QC une simulation d'un canal plan
+    bipériodique anisotherme. La géométrie est telle que la masse piégée
+    dans le domaine doit rester constante au cours de la simulation. Or, on
+    constate qu'au cours de la simulation l'intégrale de la masse volumique
+    sur le domaine diminue au cours du temps, ce qui se traduit par une
+    chute de la pression thermodynamique. La conservation de la masse est
+    donc mal respectée.
+
+    Dans la maquette IJK, le schéma QUICK est utilisé pour la convection de
+    la mase. On a identifié le problème dans le schéma QUICK en faisant des
+    tests en séquentiel. Le flux du schéma QUICK est calculé en fonction de
+    'curv' et 'fram' :
+
+    Simd_double flux = (T0 + T1) * 0.5 - dx_squared_over_8 * curv; flux =
+    ((1. - fram) * flux + fram * T_amont) * velocity * surface;
+
+    'curv' et 'fram' sont préalablement calculés et stockés dans un plan
+    avec la fonction 'compute_curv_fram_DIR' dans la variable
+    'tmp_curv_fram_'.  Pour le calcul du flux, on a besoin des valeurs de
+    'curv' et 'fram' à gauche (maille précédente suivant DIR) :
+
+    fram_values.get_left_center_DIR(i, fram0, fram1);
+    curv_values.get_left_center_DIR(i, curv0, curv1);
+
+    Or, pour le calcul du flux suivant x ou y, à la première maille, les
+    'curv' et 'fram' précédents, 'curv0' et 'fram0', ont la valeur 0 car
+    celui-ci n'a pas été calculé. Le bon comportement serait d'avoir les
+    mêmes valeurs de 'curv' et 'fram' que pour la dernière maille du fait
+    des conditions de périodicités. Aussi, le calcul du premier et dernier
+    flux donne une valeur différente alors qu'il devrait être égaux, ce qui
+    est à l'origine de la non-conservation de la masse.
+
+    -------- Original Message -------- 
+    Subject: RE: problème de perte de masse IJK 
+    Date: Monday, September 11, 2017 11:29 CEST 
+    From: dorian.dupuy@promes.cnrs.fr
+    To: benoit.mathieu@cea.fr
+    CC: adrien.toutant@univ-perp.fr, Gauthier.FAUCHET@cea.fr,
+    Adrien.BRUNETON@cea.fr, Guillaume.BOIS@cea.fr, TRIOU@cea.fr
+     
+    Je penses avoir trouvé une solution pour corriger l'opérateur QUICK.
+    Dans la direction x, la boucle de calcul de 'curv' et 'fram' est
+    faites dans la couche de mailles virtuelles à gauche (i=-1) mais pas
+    à droite (i=imax). Dans la direction y, la boucle de calcul de 'curv'
+    et 'fram' est faites dans la couche de mailles virtuelles à droite
+    mais pas à gauche. Je penses avoir compris qu'il faut pour corriger
+    augmenter l'indice maximal de la boucle pour x, et changer la
+    déclaration de 'input_field', 'curv_values' et 'fram_values' pour y.
+
+    -------- Original Message -------- 
+    Subject: RE: problème de perte de masse IJK 
+    Date: Tuesday, September 12, 2017 17:50 CEST 
+    From: dorian.dupuy@promes.cnrs.fr
+    To: Guillaume.BOIS@cea.fr
+    CC: benoit.mathieu@cea.fr, TRIOU@cea.fr, Gauthier.FAUCHET@cea.fr,
+    adrien.toutant@univ-perp.fr, Adrien.BRUNETON@cea.fr
+     
+    On a besoin de 'curv' et 'fram' de -1 a ni sur x et de -1 a nj sur y.
+    De 0 a ni-1 sur x et de 0 a ni-1 sur y on est dans le domaine. Les
+    mailles -1 et ni, nj sont les mailles de joints.
+    
+    Il faut donc que la boucle sur i aille de i=-1 a i=ni. Cela correspond
+    à imax=ni+1
+    
+    Pour la boucle sur j, la valeur de j n'a il me semble aucune importance
+    car la boucle sur j sert seulement à compter le nombre de next_j() à
+    effectuer. Cependant, comme j débute à -1 tout comme le pointeur, ils
+    ont la même valeur. Aussi, pour la même raison que pour i, il faut
+    poser jmax=nj+1 pour que le dernier pas corresponde a j=nj.
+
+
+[174_PROMES_5] - 2017-08-29
+===================================
+
+Ajouts :
+
+ - Possibilité d'utiliser des modèles sous-maille de type viscosité ou
+diffusivité sous-maille avec correction dynamique de la constante selon la
+méthode de Lilly (contraction de l'erreur avec elle-même).
+
+ - Ajout du modèle de viscosité/diffusivité turbulente RDS.
+
+Changements :
+
+ - Les modèles structurels sont maintenant directement calculés à l'endroit
+approprié (pour uiuj, centre si i=j, arete ij sinon; pour uirho, face i).
+Aussi, il n'ont plus à être interpoler inutilement dans les opérateurs de
+diffusion OpDiffTurbIJKScalar et OpDiffTurbIJKScalar.
+
+ - Pour tous les modèles qui nécessitent l'application d'un filtre test,
+il est nécessaire d'ajouter le mot clé filter_kernel_name dans le jeu de
+données.
+
+ - Changement de l'opérateur de convection 'OpConvIJKQuickScalar' pour être
+compatible avec le compilateur intel sur occigen. On remplace
+
+      double sr = ((t1 - smin) / (smax - smin + DMINFLOAT) - 0.5) * 2.;
+par  
+      double sr = dabs(smax - smin)<DMINFLOAT ? 0. : ((t1 - smin) / (smax - smin) - 0.5) * 2.;
+
+et on remplace
+
+      Simd_double sr = ((t1 - smin) / (smax - smin + DMINFLOAT) - 0.5) * 2.;
+par  
+      Simd_double dsabs = SimdSelect(0, smax - smin, smax - smin, smin - smax);
+      Simd_double ds = SimdSelect(dsabs, DMINFLOAT, 1., smax - smin);
+      Simd_double sr = SimdSelect(dsabs, DMINFLOAT, 0., ((t1 - smin) / ds - 0.5) * 2.);
+
+
+[174_PROMES_4] - 2017-06-27
+===================================
+
+Ajouts :
+
+ - Possibilité d'utiliser des modèles sous-maille de type structurel
+de type gradient et similarité d'échelle pour la convection de la vitesse
+dans les formulations 'Favre' et 'Velocity', la convection de la masse dans
+la formulation 'Velocity' et la divergence de la vitesse dans l'équation de
+conservation de l'énergie dans la formulation 'Favre'.
+
+Utilisation :
+
+La syntaxe choisie pour les mots-clés a mettre dans le jeu de données en
+rapport avec l'ajout des modèles sous-mailles structurels est :
+
+ - Dans tous les cas :
+ 
+    + large_eddy_simulation_formulation FORMULATION : FORMULATION est le
+nom de la formulation à utiliser. Il peut valoir 'FAVRE' ou 'VELOCITY'.
+(de la même manière que pour les modèles de type viscosité ou diffusivité
+sous-maille).
+
+ - Pour un modèle sur la convection de la vitesse :
+ 
+    + structural_uu : Indique que l'on veut utiliser un tel modèle.
+ 
+    + structural_uu_model MODELE : MODELE est le nom du modèle structurel
+à utiliser. Les valeurs possibles sont GRADIENT et SIMILARITY.
+
+    + structural_uu_model_constant NOMBRE : NOMBRE est une constante
+multiplicative à laquelle est multiplié le modèle. En principe, on choisira
+souvent 1.
+ 
+ - Pour un modèle sur la convection de la masse dans la formulation
+'Velocity' ou la divergence de la vitesse dans la formulation 'Favre':
+ 
+    + structural_urho : Indique que l'on veut utiliser un tel modèle.
+
+    + structural_urho_model MODELE : MODELE est le nom du modèle structurel
+à utiliser. Les valeurs possibles sont GRADIENT et SIMILARITY.
+
+    + structural_urho_model_constant NOMBRE : NOMBRE est une constante
+multiplicative à laquelle est multiplié le modèle. En principe, on choisira
+souvent 1.
+
+
+[174_PROMES_3] - 2017-06-21
+===================================
+
+Ajouts :
+
+ - Possibilité d'utiliser des modèles sous-maille de type viscosité ou
+diffusivité sous-maille pour la convection de la vitesse dans les
+formulations 'Favre' et 'Velocity', la convection de la masse dans la
+formulation 'Velocity' et la divergence de la vitesse dans l'équation de
+conservation de l'énergie dans la formulation 'Favre'.
+
+Changements associés :
+
+ - L'appel à mass_solver_with_rho, qui divise d_velocity_ par le volume de
+la maille et par la masse_volumiqe (donc par la masse), a été réecrit comme
+la succession de deux opérations distinctes : density_solver_with_rho qui
+divise par la masse volumiqe, mass_solver_scalar qui divise par le volume.
+Motivation : on peut ainsi intercaler un ajout de terme sous-maille entre
+les deux opérations.
+
+ - Ajout d'un mot clé type_velocity_turbulent_diffusion pour choisir la
+façon dont est calculé la diffusion visqueuse.
+
+ - Modification du pas de temps de stabilité. Un mot clé old_dtstab a été
+ajouté pour utiliser l'ancien pas de temps de stabilité. Le changement est
+motivé par l'ajout des termes sous-mailles et le fait que l'équation de
+conservation de l'énergie ne devrait pas avoir d'effet sur le pas de temps
+car ce n'est pas une équation d'évolution temporelle mais une contrainte
+sur la divergence de la vitesse.
+
+   + Ancien pas de temps de stabilité : Il est calculé à partir d'un pas de
+temps correspondant à la convection et un pas de temps correspondant à la
+diffusion de la température.
+
+   + Nouveau pas de temps de stabilité : Il est calculé s'il n'y a pas de
+modèles sous-maille à partir d'un pas de temps correspondant à la
+convection et un pas de temps correspondant à la diffusion de la quantité
+de mouvement. S'il y a un modèle sur la convection de la vitesse, le pas
+de temps correspondant à la diffusion de la quantité de mouvement est
+modifié pour prendre en compte l'ajout du modèle. S'il y a un modèle pour
+la convection de la masse dans la formulation 'Velocity', le pas de temps
+correspondant à la diffusion est pris comme le minimum des pas de temps
+correspondant à la diffusion de la masse et de la quantité de mouvement.
+
+ - Le cas test canal_turbulent_anisotherme_leger a été modifié en raison du
+changement de pas de temps de stabilité qui ne permet pas de retrouver la
+référence. Une nouvelle référence a été créée à partir des résultats de la
+version actuelle de l'atelier.
+
+Utilisation :
+
+La syntaxe choisie pour choisir le type de la diffusion visqueuse est :
+
+    + type_velocity_turbulent_diffusion TYPE : TYPE indique la manière de
+caluler la diffusion visqueuse. Les valeurs possibles sont SIMPLE,
+SIMPLE_WITH_TRANSPOSE, FULL et NONE.
+
+  SIMPLE: Le flux est 'molecular_mu * grad u'
+  SIMPLE_WITH_TRANSPOSE: Le flux is 'molecular_mu * (grad u + grad^T u)'
+  FULL: Le flux est 'molecular_mu * (grad u + grad^T u - 2/3 * div u * Id)'
+  NONE: Pas de diffusion visqueuse
+
+La syntaxe choisie pour les mots-clés a mettre dans le jeu de données en
+rapport avec l'ajout des modèles sous-mailles est :
+
+ - Dans tous les cas :
+ 
+    + large_eddy_simulation_formulation FORMULATION : FORMULATION est le
+nom de la formulation à utiliser. Il peut valoir 'FAVRE' ou 'VELOCITY'.
+
+ - Pour un modèle de type diffusivité sous-maille :
+ 
+    + turbulent_diffusivity : Indique que l'on veut utiliser un tel modèle.
+ 
+    + turbulent_diffusivity_model MODELE : MODELE est le nom du modèle de
+type diffusivité sous-maille à utiliser. Les valeurs possibles sont
+CONSTANT, UNSRHO, SMAGORINSKY, VREMAN, WALE et AMD.
+
+    + turbulent_diffusivity_model_constant NOMBRE : NOMBRE est la constante
+du modèle. Pour les modèles SMAGORINSKY, WALE et SIGMA, la constante est
+au carré dans le modèle. Pour les autres, c'est simplement une constante
+multiplicative pour la diffusivité sous-maille.
+ 
+ - Pour un modèle de type viscosité sous-maille :
+ 
+    + turbulent_viscosity : Indique que l'on veut utiliser un tel modèle.
+
+    + type_velocity_turbulent_diffusion TYPE : TYPE indique la manière de
+calculer la diffusion turbulente. Comme pour la diffusion visqueuse, les
+valeurs possibles sont SIMPLE, SIMPLE_WITH_TRANSPOSE, FULL et NONE. Pour la
+diffusion visqueuse, on pense que seuls les choix SIMPLE_WITH_TRANSPOSE et
+FULL font sens.
+ 
+    + turbulent_viscosity_model MODELE : MODELE est le nom du modèle de
+type diffusivité sous-maille à utiliser. Les valeurs possibles sont
+CONSTANT, UNSRHO, SMAGORINSKY, VREMAN, WALE et AMD.
+
+    + turbulent_viscosity_model_constant NOMBRE : NOMBRE est la constante
+du modèle. Pour les modèles SMAGORINSKY, WALE et SIGMA, la constante est
+au carré dans le modèle. Pour les autres, c'est simplement une constante
+multiplicative pour la diffusivité sous-maille.
+
+
+[174_PROMES_2] - 2017-04-03
+===================================
+
+Ajouts :
+
+ - Ajout d'un cas test 'test_conduction' pour la conduction (diffusion
+d'une gaussienne) et d'un cas test 'test_diffusion' pour la diffusion de
+la quantité de mouvement (diffusion d'un produit de sinus).
+
+Bugs restants :
+
+ - Pour les cas tests, les profils sont corrects pour les quantités aux
+éléments comme div_lambda_grad_t mais pour les quantités aux faces comme
+la diffusion de la vitesse les points sont en doubles avec deux abscisses
+légèrement différentes pour chaque point.
+
+
+[174_PROMES_1] - 2017-03-31
+===================================
+
+Changements :
+
+ - Passage à la version 1.7.4 de TRUST.
+
+Corrections :
+
+ - Correction d'une erreur sur le calcul de la convection de la vitesse à
+l'origine d'une discontinuité sur le profil de pression dans OpCentre4IJK.
+Le calcul de divergence (rho u) est calculé à partir du rang k=0 au lieu du
+rang k=-1 (On a besoin de la divergence au rang 0 et -1 car on doit ensuite
+pouvoir l'interpoler sur la face correspondant à la vitesse w). Ceci pose
+un problème à chaque jonction de processeur suivant la direction k. Pour
+une raison ou pour une autre, cela se traduit par une discontinuité à
+chaque jonction de processeur sur le profil de la moyenne statistique de
+la pression.
+Une simulation du canal plan bipériodique anisotherme a été réalisé et a
+prouvé que cette correction permet bien de faire disparaître la
+discontinuité de la pression.
+
+
+[172_PROMES_7] - 2016-10-28
+===================================
+
+Corrections :
+
+ - Correction d'une erreur sur le calcul du terme en gradient transposé de
+l'opérateur de diffusion de la quantité de mouvement. Voici un échange de
+mail expliquant l'erreur telle que présente dans la version précédente :
+(note: les mails sont découpés pour ne garder que la partie jugée utile)
+
+    -----Message d'origine-----
+    De : Dorian Dupuy [mailto:dorian.dupuy@etudiant.univ-perp.fr]
+    Envoyé : jeudi 17 novembre 2016 17:54
+    À : BOIS Guillaume <guillaume.bois@cea.fr>
+    Cc : adrien.toutant@univ-perp.fr
+    Objet : RE: Ajout du compressible dans la diffusion. 
+
+    Tout d'abord, si DIR=z et COMPO!=z et que l'on est à la paroi, le
+    calcul du flux est incorrect dans le cas "Yes_LamTrans".
+ 
+         __TYPE__ flux = tau * surface *
+                           #Pif ("TURB"=="Yes_Turb")(t_nu + m_nu)
+                           #Pelif("LAM_TRANS" == "Yes_LamTrans") m_nu * 2.
+                           #Pelse m_nu
+                           #Pendif
+                           ;
+ 
+    Prenons l'exemple DIR=z et COMPO=x. Notons u la composante x de la
+    vitesse et w la composante z. Le flux que l'on doit calculer est : 
+    sigma_xz = mu*(du/dz + dw/dx)*surface (avec dans notre cas dw/dx=0
+    à la paroi). En revanche, le flux calculé par le code est
+    2*mu*(du/dz)*surface.
+ 
+    Aussi, je pense que le facteur 2 dans le cas "Yes_LamTrans" est
+    inapproprié. Le flux devrait simplement être tau * surface * m_nu.
+    En effet, le gradient transposé est nul si DIR=z et COMPO!=z à la
+    paroi, puisque ce sont des dérivées de w par rapport à x ou y (et
+    west toujours nul à la paroi). 
+
+    -----Message d'origine-----
+    De : BOIS Guillaume <guillaume.bois@cea.fr>
+    Envoyé : lundi 21 novembre 2016 08:49
+    À : Dorian Dupuy [mailto:dorian.dupuy@etudiant.univ-perp.fr]
+    Cc : adrien.toutant@univ-perp.fr, antoine.ducluzeau@cea.fr
+    Objet : RE: Ajout du compressible dans la diffusion. 
+
+    En conclusion, je suis d'accord avec toi. Je pense qu'il y avait le *2
+    car la ligne juste au-dessus, on calcule tau en prenant inv_distance_z
+    alors que l'on fait la différence entre v4 et 0 (au mur) qui ne sont
+    séparés que de DZ/2. Et je pense que le commentaire associé était faux.
+    En y regardant de plus près, le tableau inv_distance_z :
+
+        const double inv_distance_z = channel_data_.inv_distance_for\
+                                          _gradient(k_layer, icompo, idir);
+
+    a l'air de déjà contenir ce que l'on veut (DZ/2) donc il n'est plus
+    nécessaire de faire le *2. 
+
+    Peux-tu regarder avec un breakpoint dans gdb que l'on a bien DZ/2 dans
+    inv_distance_z quand on est ligne 2319 du cpp. Si oui, alors il faut
+    effectivement modifier les sources comme en PJ. J'attends ton retour
+    par mail pour confirmer ce changement et l'enregistrer dans la base.
+
+    -----Message d'origine-----
+    De : Dorian Dupuy [mailto:dorian.dupuy@etudiant.univ-perp.fr]
+    Envoyé : lundi 21 novembre 2016 09:55
+    À : BOIS Guillaume <guillaume.bois@cea.fr>
+    Cc : adrien.toutant@univ-perp.fr, antoine.ducluzeau@cea.fr
+    Objet : RE: Ajout du compressible dans la diffusion. 
+
+    Fait. inv_distance_z correspond en effet à l'inverse de la moitié de la
+    taille de la première maille DZ/2. Je confirme donc le changement et
+    ton analyse.
+
+Fin de l'échange de mail.
+
+
+[172_PROMES_6] - 2016-10-28
+===================================
+
+Ajouts :
+
+ - Ajout du terme en gradient transposé (reprise d'un ajout de G. Bois) et
+du terme en divergence dans OpDiffTurbIJK à l'opérateur de diffusion de la
+quantité de mouvement. Aucune condition n'a été implémenté dans le jeu de
+données pour choisir entre les différents opérateurs. Le changement à été
+opéré en dur dans DNS_QC par le type de velocity_diffusion_op_.
+On a
+  OpDiffStdWithLaminarTransposeAndDivergenceIJK_ST velocity_diffusion_op_;
+au lieu de
+  OpDiffIJK_ST velocity_diffusion_op_;
+ou encore
+  OpDiffStdWithLaminarTransposeIJK_ST velocity_diffusion_op_;
+Par ailleurs, l'implémentation du calcul de la diffusion avec la divergence
+nécessite le calcul préalable de la divergence de la vitesse. On a pour
+cela choisi d'ajouter une fonction supplémentaire compute_divergence dans
+IJK_Navier_Stokes_tools.
+
+ - Ajout d'un motclé disable_solveur_poisson dans DNS_QC sur le modèle de
+IJK_FT pour désactiver le solveur pression dans l'équation de conservation
+de la quantité de mouvement.
+
+Corrections :
+
+ - Correction d'une erreur sur le traitement du motclé conv_rho_negligeable
+qui désactive l'équation de conservation de la masse.
+
+
+[172_PROMES_5] - 2016-09-30
+===================================
+
+Corrections :
+
+ - Correction d'une erreur dans le calcul IJK de div_lambda_grad_T.  Le
+calcul effectué est correct dans la direction perpendiculaire aux parois
+mais deux fois trop petit dans les directions homogènes.
+Plus précisement, dans <IJK/src/IJK/OpVDF/OpDiffTurbIJKScalar.cpp.P>, je
+multiplie d0 par 0.5 pour les cas "DIR"=="x" et "DIR"=="y" (d1=d0 ensuite).
+Voici une explication de l'erreur telle que présente dans les versions
+précédentes :
+
+    Dans la fonction compute_flux_DIR de I/s/I/O/OpDiffTurbIJKScalar.cpp.P:
+
+        #Pif ("DIR"=="x")
+                const ST d0 = channel_data_.get_delta_x();
+                const ST d1 = d0;
+        #Pelif ("DIR"=="y")
+                const ST d0 = channel_data_.get_delta_y();
+                const ST d1 = d0;
+        #Pelif ("DIR"=="z")
+                const ST d0 = channel_data_.get_delta_z()[k_layer-1] * 0.5;
+                const ST d1 = channel_data_.get_delta_z()[k_layer] * 0.5;
+
+    On a un " * 0.5" pour "DIR"=="z" et pas pour les autres directions. Ce
+    n'est pas compensé dans le calcul du flux :
+
+        input_field.get_left_center_DIR(i, left_val, right_val);
+        lambda.get_left_center_DIR(i, lambda_m1, lambda_m2);
+        __TYPE__ avg_lambda = SimdDivideMed(lambda_m1 * lambda_m2, \
+                                          d0 * lambda_m2 + d1 * lambda_m1);
+        __TYPE__ flux = (left_val - right_val) * avg_lambda * surface;
+
+    où input_field est la température ; get_left_center_DIR renvoie la
+    valeur et la valeur précédente dans la direction DIR ; avg_lambda n'est
+    pas un lambda mais un lambda_face/(d0 + d1), cette astuce permettant
+    d'éviter un calcul car plus besoin de diviser la différence de
+    température par d0 + d1. On peut donc réanalyser le flux comme :
+
+        __TYPE__ flux = (left_val - right_val)/(d0 + d1) * lambda_face \
+                                                         * surface;
+
+    La différence enter left_val et right_val est d'une maille. La distance
+    d0 + d1 doit donc  être la distance centre à centre entre deux mailles
+    voisines. C'est le  cas pour "DIR"=="z" mais pas pour "DIR"=="y" et
+    "DIR"=="x".
+
+Fin de l'explication.
+
+
+[172_PROMES_4] - 2016-07-03
+===================================
+
+Ajouts :
+
+ - Moyennes statistiques de RHOUU_MOY, RHOVV_MOY, RHOWW_MOY, RHOUV_MOY,
+RHOVW_MOY, RHOUW_MOY, RHOUT_MOY, RHOVT_MOY et RHOWT_MOY.
+
+Bug découvert (mais non résolue) :
+
+ - Avec check_stop_file dns.stop la simulation s'arrete au bout d'un pas
+de temps. Raison inconnue. Changer le nom du fichier résout le problème.
+Le bug n'est pas arrivé avec la version. Meme resultat avec au moins tout
+les 172_PROMES.
+
+
+[172_PROMES_3] - 2016-07-03
+===================================
+
+Ajouts :
+
+ - Statistiques spectrales CONVECTIONTURBULENTE et TERMEPUREMENTSPECTRAL.
+
+
+[172_PROMES_2] - 2016-06-24
+===================================
+
+Changements :
+
+ - Modification de la syntaxe de la lecture des champs locaux instantanes.
+Pour cela, j'utilise la classe Noms = (VECT(Nom)). Ce changement est motive
+par la necessite de lire des lata dans differents repertoire en une
+simulation.
+
+ - Ancienne synataxe :
+
+    + statlata_basename NOM : NOM est le préfixe des fichiers a lire.
+
+    + statlata_latanumberlist N LISTE : LISTE est une liste d'entiers de N
+éléments indentifiant les fichiers a lire.
+Exemple : statlata_latanumberlist 5 1 2 3 4 5.
+Les fichiers lus sont alors :
+ * [NOM][N].sauv
+ * [NOM][N].sauv.lata
+ * [NOM][N].sauv.lata.0.RHO
+ * [NOM][N].sauv.lata.0.VELOCITY
+ * [NOM][N].sauv.lata.0.PRESSURE
+ou NOM est donné par statlata_basename et N prend les valeurs données par
+statlata_latanumberlist soit ici 1, 2, 3, 4 et 5.
+
+ - Nouvelle synataxe :
+
+    + lecture_post_instantanes : indique notre intention de lire les
+champs locaux instantanés.
+
+    + statlata_namelist NOM N LISTE : LISTE est une liste de Nom de N
+éléments indentifiant les fichiers a lire.
+Exemple : statlata_namelist 3 /PATH/NOM_1 /PATH/NOM_2 /PATH/NOM_3.
+Les fichiers lus sont alors :
+ * [/PATH/NOM_N].sauv
+ * [/PATH/NOM_N].sauv.lata
+ * [/PATH/NOM_N].sauv.lata.0.RHO
+ * [/PATH/NOM_N].sauv.lata.0.VELOCITY
+ * [/PATH/NOM_N].sauv.lata.0.PRESSURE
+ou N prend les valeurs données 1, 2, 3.
+
+Bugs restants :
+
+ - Pas d'erreurs evidentes si absence du mot-cle lecture_post_instantanes.
+
+
+[172_PROMES] - 2016-02-04
+===================================
+
+Changements :
+
+ - Passage à la version 1.7.2 de Trio_U.
+
+Rappelons les différences entre l'atelier PROMES et l'atelier GAUTHIER :
+
+ - Fichiers en plus dans l'atelier PROMES :
+
+    + IJK/src/LecFicDistribue_sansnum.cpp
+    + IJK/src/LecFicDistribue_sansnum.h
+    + src/Fourier_trans.cpp
+    + src/Fourier_trans.h
+    + archives/*
+
+ - Fichiers différents entre l'atelier PROMES et l'atelier GAUTHIER :
+
+    + IJK/src/SVtatistiques_dns_ijk.cpp
+    + IJK/src/Statistiques_dns_ijk.h
+    + IJK/src/Statistiques_dns_ijk_FT.h
+    + IJK/src/Statistiques_dns_ijk_monophasique.h
+    + src/DNS_QC/DNS_QC.cpp
+    + src/DNS_QC/DNS_QC.cpp.P
+    + src/DNS_QC/DNS_QC.h
+    + src/DNS_QC/DNS_QC.h.P
+
+
+[171_Adrien_new_7] - 2016-02-03
+===================================
+
+Corrections :
+
+ - Corrections de bugs en rapport avec le calcul des statistiques à partir
+de fichiers lata.
+
+Bugs restants :
+
+ - Lorque l'on essaie de lire un lata dont le nom est donné en chemin
+absolue dans le .sauv, cela ne fonctionne pas.
+Erreur obtenue :
+    [0] LataDB::read_master_file_options failed opening
+        file dns_lata_0.sauv.lata
+    terminate called after throwing an instance of 'LataDBError'
+Si sans rien modifier d'autres, on place les fichiers .lata (mais pas les
+données) dans le répertoire de la simulation, la lecture fonctionne et va
+atteindre les fichiers de données (absent du répertoire de la simulation).
+
+
+[171_Adrien_new_6] - 2016-01-29
+===================================
+
+Ajouts :
+
+ - Possibilité de calculer les statistiques à partir de fichiers lata
+(champs locaux instantanes).
+
+Changements associés :
+
+ - Écriture d'un fichier .sauv à l'écriture d'un .lata pour avoir la
+pression thermodynamique et la force de recirculation.
+
+ - Les fichiers .lata ne sont maintenant écrits que si demandé (auparavant,
+un fichier lata est ecrit meme si aucun champ n'est sauvegardé).
+
+ - Modification du nom des lata pour avoir un .lata par sauvegarde plutôt
+qu'un .lata global regroupant toutes les sauvegardes (lecture facilité).
+On passe de dns.lata{.[N].CHAMP} a dns_lata_[N].sauv.lata{.0.CHAMP}.
+
+Utilisation :
+
+La syntaxe choisie pour les mots-clés a mettre dans le jeu de données en
+rapport avec le calcul des statistiques à partir de fichiers lata est :
+
+ - À l'écriture :
+ 
+    + sauvegarde_post_instantanes : indique notre intention de sauvegarder
+les champs locaux instantanés.
+ 
+    + compteur_post_instantanes : fixe la valeur initiale (entier attendu)
+de la variable compteur_post_instantanes_. Si omis, vaut 0.
+ 
+    + champs_a_postraiter N CHAMPS : indique quels champs postraiter ainsi
+que leur nombre. Pour calculer les statistiques depuis les champs locaux
+sauvegardés, CHAMPS devra contenir RHO, VELOCITY et PRESSURE.
+Exemple : champs_a_postraiter 3 RHO VELOCITY PRESSURE.
+Les fichiers écrits sont alors :
+ * dns_lata_[N].sauv
+ * dns_lata_[N].sauv.lata
+ * dns_lata_[N].sauv.lata.0.RHO
+ * dns_lata_[N].sauv.lata.0.VELOCITY
+ * dns_lata_[N].sauv.lata.0.PRESSURE
+où N est un nombre entier incrementé à chaque sauvegarde, partant de 0 par
+défaut ou par la valeur indiquée par compteur_post_instantanes.
+ 
+  - À la lecture :
+ 
+    + statlata_basename NOM : NOM est le préfixe des fichiers a lire.  Le
+préfixe a l'écriture est dns_lata_ par défaut mais j'aime changer pour la
+lecture les fichiers afin d'éviter tout écrasement.
+ 
+    + statlata_latanumberlist N LISTE : LISTE est une liste d'entiers de N
+éléments indentifiant les fichiers a lire.
+Exemple : statlata_latanumberlist 5 1 2 3 4 5.
+Les fichiers lus sont alors :
+ * [NOM][N].sauv
+ * [NOM][N].sauv.lata
+ * [NOM][N].sauv.lata.0.RHO
+ * [NOM][N].sauv.lata.0.VELOCITY
+ * [NOM][N].sauv.lata.0.PRESSURE
+ou NOM est donné par statlata_basename et N prend les valeurs données par
+statlata_latanumberlist soit ici 1, 2, 3, 4 et 5.
+
+
+Avant 171_Adrien_new_6
+===================================
+
+Principaux changements depuis la simulation SFT (Re_tau=180, 192x128x191).
+
+ - Référence de pression fixée en retirant a chaque pas de temps la moyenne
+de la pression sur le volume. Ceci permet de corriger prms.
+ 
+ - Ajout du calcul des moyennes statistiques de NU2, MU2, LAMBDADTDZ,
+LAMBDAT, RHOTU, RHOWFACE et RHOTWFACE. Notons que LAMBDADTDZ est important
+pour calculer le flux conductif et vérifier que l'on est conservatif.
+ 
+ - Ajout du calcul de la moyenne statistique du TERME_SOURCE_ACCELERATION
+dans le postraitement sur la demi-trace du tenseur des correlations de
+vitesse.
