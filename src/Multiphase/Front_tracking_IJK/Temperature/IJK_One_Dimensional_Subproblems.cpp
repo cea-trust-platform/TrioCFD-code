@@ -349,9 +349,14 @@ const Vecteur3& IJK_One_Dimensional_Subproblems::get_bary_facet(const int& i) co
   return (*this)[i].get_bary_facet();
 }
 
-double IJK_One_Dimensional_Subproblems::get_dist_cell_interface(const int& i) const
+const double& IJK_One_Dimensional_Subproblems::get_dist_cell_interface(const int& i) const
 {
   return (*this)[i].get_dist_cell();
+}
+
+const FixedVector<double,6>& IJK_One_Dimensional_Subproblems::get_dist_faces_interface(const int& i) const
+{
+  return (*this)[i].get_dist_faces();
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const

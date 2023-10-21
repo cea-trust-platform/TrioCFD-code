@@ -35,7 +35,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #define FACES_DIR {0, 0, 1, 1, 2, 2}
-#define FLUX_SIGN {-1, 1, -1, 1, -1, 1}
+// TODO: Be careful to operators ! (Left - Right) values
+#define FLUX_SIGN {-1, -1, -1, -1, -1, 1}
 
 class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
 {

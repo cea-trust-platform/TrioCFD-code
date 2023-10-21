@@ -162,7 +162,7 @@ void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_
 }
 
 void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_double * eulerian_compo_connex_ns, const int& gravity_dir,
+                             const IJK_Field_int * eulerian_compo_connex_ns, const int& gravity_dir,
                              ArrOfDouble& rising_velocities, DoubleTab& rising_vectors)
 {
   const int nk = (* eulerian_compo_connex_ns).nk();
@@ -182,14 +182,13 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
           const double vel_x = velocity[0](i,j,k);
           const double vel_y = velocity[1](i,j,k);
           const double vel_z = velocity[2](i,j,k);
-          double compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
-          int int_compo_connex = (int) compo_connex;
-          if (int_compo_connex >= 0)
+          int compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
+          if (compo_connex >= 0)
             {
-              sum_indicator(int_compo_connex) += chi_v;
-              sum_velocity_x_indicator(int_compo_connex) += chi_v * vel_x;
-              sum_velocity_y_indicator(int_compo_connex) += chi_v * vel_y;
-              sum_velocity_z_indicator(int_compo_connex) += chi_v * vel_z;
+              sum_indicator(compo_connex) += chi_v;
+              sum_velocity_x_indicator(compo_connex) += chi_v * vel_x;
+              sum_velocity_y_indicator(compo_connex) += chi_v * vel_y;
+              sum_velocity_z_indicator(compo_connex) += chi_v * vel_z;
             }
         }
   for (int ibubble = 0; ibubble < nb_bubbles; ibubble++)

@@ -62,7 +62,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   timestep_reprise_temperature_=1;
 
   conv_temperature_negligible_=0;
-  diff_temp_negligible_=0;
+  diff_temperature_negligible_=0;
 
   type_T_source_="??";
   wall_flux_=0;
@@ -119,6 +119,9 @@ IJK_Thermal_base::IJK_Thermal_base()
   eulerian_compo_connex_ns_ = nullptr;
   eulerian_compo_connex_ghost_ft_ = nullptr;
   eulerian_compo_connex_ghost_ns_ = nullptr;
+  eulerian_compo_connex_from_interface_ns_ = nullptr;
+  eulerian_compo_connex_from_interface_ft_ = nullptr;
+  eulerian_compo_connex_from_interface_ns_int_ = nullptr;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -218,7 +221,7 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
   if ( conv_temperature_negligible_)
     os<< "    conv_temperature_negligible \n ";
 
-  if ( diff_temp_negligible_)
+  if ( diff_temperature_negligible_)
     os<< "    diff_temp_negligible \n";
 
   os << "upstream_temperature" << upstream_temperature_;
@@ -266,7 +269,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
-  param.ajouter_flag("diff_temperature_negligible", &diff_temp_negligible_); // XD_ADD_P rien neglect temperature diffusion
+  param.ajouter_flag("diff_temperature_negligible", &diff_temperature_negligible_); // XD_ADD_P rien neglect temperature diffusion
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
   param.ajouter("temperature_convection_op", &temperature_convection_op_);
   param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
@@ -314,7 +317,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
    */
   if (!conv_temperature_negligible_)
     temperature_convection_op_.initialize(splitting);
-  if (!diff_temp_negligible_)
+  if (!diff_temperature_negligible_)
     temperature_diffusion_op_.initialize(splitting);
 
   /*
@@ -332,7 +335,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   compute_cell_volume();
   compute_min_cell_delta();
 
-  if (!diff_temp_negligible_)
+  if (!diff_temperature_negligible_)
     div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
   nalloc += 1;
 
@@ -534,29 +537,13 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
                             || (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("EULERIAN_COMPO_NS"));
   if (compute_eulerian_compo_)
     {
-      indicator_test_.allocate(splitting, IJK_Splitting::ELEM, 0);
-//      eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-//      nalloc += 1;
-//      eulerian_compo_connex_ft_.data() = -1.;
-//      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
-//
-//      eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-//      nalloc += 1;
-//      eulerian_compo_connex_ghost_ft_.data() = -1.;
-//      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
-//
-//      eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-//      nalloc += 1;
-//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-//
-//      eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-//      nalloc += 1;
-//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-
       eulerian_compo_connex_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ft());
       eulerian_compo_connex_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex());
       eulerian_compo_connex_ghost_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost_ft());
       eulerian_compo_connex_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost());
+      eulerian_compo_connex_from_interface_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ft());
+      eulerian_compo_connex_from_interface_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ns());
+      eulerian_compo_connex_from_interface_ns_int_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_int_from_interface_ns());
     }
 
   compute_rising_velocities_ = compute_rising_velocities_ ||
@@ -723,7 +710,7 @@ double IJK_Thermal_base::compute_timestep(const double timestep,
       alpha_max = std::max(lambda_liquid_ / (rho_l * cp_liquid_), lambda_vapour_ / (rho_v * cp_vapour_));
     }
   dt_fo_ = dxmin * dxmin / (alpha_max + 1.e-20) * fo_ * 0.125; // 1/6 ou 1/8 ?
-  if (diff_temp_negligible_) dt_fo_ = 1.e20;
+  if (diff_temperature_negligible_) dt_fo_ = 1.e20;
   return dt_fo_;
 }
 
@@ -821,10 +808,12 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    */
   if (debug_)
     Cerr << "Start the Ghost-fluid (GFM) approach" << finl;
-  compute_eulerian_distance();
-  if (debug_)
-    Cerr << "Br1 (GFM approach)" << finl;
-  compute_eulerian_curvature_from_interface();
+  // if (debug_)
+  //    Cerr << "Br0 (GFM approach)" << finl;
+  // compute_eulerian_distance();
+  // if (debug_)
+  //  Cerr << "Br1 (GFM approach)" << finl;
+  // compute_eulerian_curvature_from_interface();
   if (debug_)
     Cerr << "Br2 (GFM approach)" << finl;
   compute_eulerian_grad_T_interface();
@@ -864,9 +853,9 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 
   if (!conv_temperature_negligible_)
     compute_convective_fluxes_face_centre();
-  if (!diff_temp_negligible_)
+  if (!diff_temperature_negligible_)
     compute_diffusive_fluxes_face_centre();
-  if (!conv_temperature_negligible_ || !diff_temp_negligible_)
+  if (!conv_temperature_negligible_ || !diff_temperature_negligible_)
     prepare_ij_fluxes_k_layers();
 
   /*
@@ -1167,25 +1156,6 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
       bubbles_barycentre_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre();
       bounding_box_= ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bounding_box();
       min_max_larger_box_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_min_max_larger_box();
-
-      ref_ijk_ft_->redistribute_from_splitting_ft_elem(ref_ijk_ft_->itfce().I_ft(), indicator_test_);
-
-//      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(), bounding_box_,
-//                                      eulerian_compo_connex_ft_, eulerian_compo_connex_ghost_ft_,
-//                                      bubbles_barycentre_);
-//      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
-//      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
-//
-//      eulerian_compo_connex_ns_.data() = -1;
-//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-//      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
-//      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-//
-//      eulerian_compo_connex_ghost_ns_.data() = -1;
-//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-//      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
-//      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-
     }
   else
     Cerr << "Don't compute the eulerian bubbles' components (composantes connexes)" << finl;
@@ -1199,7 +1169,7 @@ void IJK_Thermal_base::compute_rising_velocities()
       rising_velocities_ = ArrOfDouble(nb_bubbles);
       rising_vectors_ = DoubleTab(nb_bubbles, 3);
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
-                              eulerian_compo_connex_ns_, ref_ijk_ft_->get_direction_gravite(),
+                              eulerian_compo_connex_from_interface_ns_int_, ref_ijk_ft_->get_direction_gravite(),
                               rising_velocities_, rising_vectors_);
 //      compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
 //                              ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex(),
@@ -1399,7 +1369,7 @@ void IJK_Thermal_base::add_temperature_diffusion()
   temperature_.echange_espace_virtuel(temperature_.ghost());
   DebogIJK::verifier("temp", temperature_);
 
-  if (!diff_temp_negligible_)
+  if (!diff_temperature_negligible_)
     {
       // Performance counters:
       static Stat_Counter_Id cnt_diff_temp = statistiques().new_counter(1, "FT diffusion temperature");

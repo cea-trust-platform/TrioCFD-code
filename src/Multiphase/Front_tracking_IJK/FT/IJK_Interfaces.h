@@ -59,10 +59,10 @@ class IJK_Interfaces : public Objet_U
 
 public :
   IJK_Interfaces();
-  void initialize(const IJK_Splitting& splitting_FT,
-                  const IJK_Splitting& splitting_NS,
-                  const Domaine_dis& domaine_dis,
-                  const bool compute_vint=true);
+  int initialize(const IJK_Splitting& splitting_FT,
+                 const IJK_Splitting& splitting_NS,
+                 const Domaine_dis& domaine_dis,
+                 const bool compute_vint=true);
   void associer(const IJK_FT_double& ijk_ft);
   void posttraiter_tous_champs(Motcles& liste) const;
   int posttraiter_champs_instantanes(const Motcles& liste_post_instantanes,
@@ -614,6 +614,11 @@ public :
   void compute_compo_connex_from_bounding_box()
   {
     ijk_compo_connex_.compute_bounding_box_fill_compo_connex();
+  }
+
+  void compute_compo_connex_from_interface()
+  {
+    ijk_compo_connex_.compute_compo_connex_from_interface();
   }
 
 protected:

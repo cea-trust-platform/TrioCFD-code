@@ -92,3 +92,8 @@ void IJK_SolveSys_FD_thermal::cast_direct_solver_by_default()
   petsc_solver.nommer(le_nom());
   solver_params_entry >> petsc_solver;
 }
+
+void IJK_SolveSys_FD_thermal::reinit()
+{
+  valeur().reinit();
+}

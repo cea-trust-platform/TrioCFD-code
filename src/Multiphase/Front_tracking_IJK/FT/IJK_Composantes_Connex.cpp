@@ -26,6 +26,12 @@
 
 Implemente_instanciable( IJK_Composantes_Connex, "IJK_Composantes_Connex", Objet_U ) ;
 
+static int decoder_numero_bulle(const int code)
+{
+  const int num_bulle = code >> 6;
+  return num_bulle;
+}
+
 Sortie& IJK_Composantes_Connex::printOn( Sortie& os ) const
 {
   Objet_U::printOn( os );
@@ -61,6 +67,24 @@ int IJK_Composantes_Connex::initialize(const IJK_Splitting& splitting, const IJK
   nalloc += 1;
   eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
 
+  eulerian_compo_connex_from_interface_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
+  nalloc += 1;
+  eulerian_compo_connex_from_interface_ft_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ft_.ghost());
+
+  eulerian_compo_connex_from_interface_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+  nalloc += 1;
+  eulerian_compo_connex_from_interface_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ns_.ghost());
+
+  eulerian_compo_connex_from_interface_int_ns_.allocate(splitting, IJK_Splitting::ELEM, 1);
+  nalloc += 1;
+  eulerian_compo_connex_from_interface_int_ns_.data() = -1;
+  eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
+
+  eulerian_compo_connex_valid_compo_field_.allocate(splitting, IJK_Splitting::ELEM, 1);
+  nalloc += 1;
+  eulerian_compo_connex_valid_compo_field_.data() = 0;
+  eulerian_compo_connex_valid_compo_field_.echange_espace_virtuel(eulerian_compo_connex_valid_compo_field_.ghost());
+
   return nalloc;
 }
 
@@ -89,4 +113,151 @@ void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
   eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
   ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
   eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+
+}
+
+void IJK_Composantes_Connex::compute_compo_connex_from_interface()
+{
+  fill_mixed_cell_compo();
+
+  const IJK_Splitting& splitting = eulerian_compo_connex_from_interface_int_ns_.get_splitting();
+  int neighours_i[6] = NEIGHBOURS_I;
+  int neighours_j[6] = NEIGHBOURS_J;
+  int neighours_k[6] = NEIGHBOURS_K;
+
+  const int nx = eulerian_compo_connex_from_interface_int_ns_.ni();
+  const int ny = eulerian_compo_connex_from_interface_int_ns_.nj();
+  const int nz = eulerian_compo_connex_from_interface_int_ns_.nk();
+  ArrOfInt elems_vap;
+  ArrOfInt elems_valid;
+  elems_vap.set_smart_resize(1);
+  elems_valid.set_smart_resize(1);
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        if(eulerian_compo_connex_valid_compo_field_(i,j,k))
+          elems_valid.append_array(splitting.convert_ijk_cell_to_packed(i,j,k));
+
+  int elems_valid_size = elems_valid.size_array();
+  while (elems_valid_size > 0)
+    {
+      ArrOfInt elems_valid_copy = elems_valid;
+      elems_valid.reset();
+      elems_valid.set_smart_resize(1);
+      for (int elem=0; elem<elems_valid_copy.size_array(); elem++)
+        {
+          const Int3 num_elem_ijk = splitting.convert_packed_to_ijk_cell(elems_valid_copy[elem]);
+          const int i = num_elem_ijk[DIRECTION_I];
+          const int j = num_elem_ijk[DIRECTION_J];
+          const int k = num_elem_ijk[DIRECTION_K];
+          const int num_compo = eulerian_compo_connex_from_interface_int_ns_(i,j,k);
+          for (int l = 0; l < 6; l++)
+            {
+              const int ii = neighours_i[l];
+              const int jj = neighours_j[l];
+              const int kk = neighours_k[l];
+              const int num = eulerian_compo_connex_from_interface_int_ns_(i + ii,j + jj,k + kk);
+              const double indic_neighbour =  interfaces_->In()(i + ii,j + jj,k + kk);
+              if (num == -1 && indic_neighbour < VAPOUR_INDICATOR_TEST)
+                {
+                  const int num_elem = splitting.convert_ijk_cell_to_packed(i + ii,j + jj,k + kk);
+                  elems_valid.append_array(num_elem);
+                  eulerian_compo_connex_from_interface_int_ns_(i + ii,j + jj,k + kk) = num_compo;
+                }
+            }
+        }
+      elems_valid_size = elems_valid.size_array();
+      eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
+    }
+}
+
+void IJK_Composantes_Connex::fill_mixed_cell_compo()
+{
+
+  const Domaine_dis_base& mon_dom_dis = interfaces_->get_domaine_dis().valeur();
+  const int nb_elem = mon_dom_dis.domaine().nb_elem();
+  const Maillage_FT_IJK& maillage = interfaces_->maillage_ft_ijk();
+
+  // Same splitting for the normal vector field
+  const IJK_Splitting& splitting_ft = ref_ijk_ft_->get_splitting_ft();
+
+  const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
+  const ArrOfInt& index_elem = intersections.index_elem();
+  eulerian_compo_connex_from_interface_ft_.data() = -1;
+  eulerian_compo_connex_from_interface_ft_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ft_.ghost());
+  // Loop on the elements
+  const ArrOfInt& compo_facettes = maillage.compo_connexe_facettes();
+  ArrOfInt compo_per_cell;
+  ArrOfInt count_compo_per_cell;
+  int counter;
+  for (int elem = 0; elem < nb_elem; elem++)
+    {
+      int index = index_elem[elem];
+      compo_per_cell.reset();
+      count_compo_per_cell.reset();
+      compo_per_cell.set_smart_resize(1);
+      count_compo_per_cell.set_smart_resize(1);
+      // Loop on the facets which cross the element
+      while (index >= 0)
+        {
+          const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+          const int num_facette = data.numero_facette_;
+          // const int n = mesh.nb_facettes();
+          const int compo_facet = compo_facettes[num_facette];
+          const int compo_size_array = compo_per_cell.size_array();
+          counter = 0;
+          for (int l=0; l<compo_size_array; l++)
+            {
+              if (compo_facet == compo_per_cell(l))
+                {
+                  count_compo_per_cell(l) += 1;
+                  break;
+                }
+              counter++;
+            }
+          if (counter == compo_size_array)
+            {
+              int compo_real_ghost;
+              if (compo_facet < 0)
+                compo_real_ghost = decoder_numero_bulle(-compo_facet);
+              else
+                compo_real_ghost = compo_facet;
+              compo_per_cell.append_array(compo_real_ghost);
+              count_compo_per_cell.append_array(1);
+            }
+          index = data.index_facette_suivante_;
+        }
+      const int n = compo_per_cell.size_array();
+      if (n > 0)
+        {
+          // IntVect indices(n);
+          std::vector<int> indices(n);
+          for (int j=0; j<n; j++)
+            indices[j]=j;
+          std::sort(indices.begin(), indices.end(), [&count_compo_per_cell](int i, int j) {return count_compo_per_cell[i] < count_compo_per_cell[j];});
+          const int max_compo_per_cell = compo_per_cell(indices[n-1]);
+          const Int3 num_elem_ijk = splitting_ft.convert_packed_to_ijk_cell(elem);
+          /*
+           * TODO Rewrite redistribute_ft to use IJK_Field_int
+           */
+          eulerian_compo_connex_from_interface_ft_(num_elem_ijk[DIRECTION_I],num_elem_ijk[DIRECTION_J],num_elem_ijk[DIRECTION_K]) = (double) max_compo_per_cell;
+        }
+    }
+  eulerian_compo_connex_from_interface_ft_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ft_.ghost());
+  eulerian_compo_connex_from_interface_ns_.data() = -1;
+  ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_from_interface_ft_, eulerian_compo_connex_from_interface_ns_);
+  eulerian_compo_connex_from_interface_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ns_.ghost());
+  const int nx = eulerian_compo_connex_from_interface_int_ns_.ni();
+  const int ny = eulerian_compo_connex_from_interface_int_ns_.nj();
+  const int nz = eulerian_compo_connex_from_interface_int_ns_.nk();
+  for (int k=0; k < nz ; k++)
+    for (int j=0; j< ny; j++)
+      for (int i=0; i < nx; i++)
+        {
+          eulerian_compo_connex_from_interface_int_ns_(i,j,k) = (int) eulerian_compo_connex_from_interface_ns_(i,j,k);
+          if (eulerian_compo_connex_from_interface_int_ns_(i,j,k) >= 0)
+            eulerian_compo_connex_valid_compo_field_(i,j,k) = 1;
+        }
+  eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
+  eulerian_compo_connex_valid_compo_field_.echange_espace_virtuel(eulerian_compo_connex_valid_compo_field_.ghost());
 }

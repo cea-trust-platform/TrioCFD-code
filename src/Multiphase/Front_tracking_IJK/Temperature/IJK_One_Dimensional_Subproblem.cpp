@@ -768,10 +768,13 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 //          const double min_distance_face_centre_vertex = std::min(min_distance_pure_face_centre, min_distance_pure_vertex_centre);
 //          if (max_cfl_fourier_probe_length_ < min_distance_face_centre_vertex)
           compute_distance_faces_centres();
+          bool has_liquid_neighbours = 1;
+          for (int i=0; i<6; i++)
+            has_liquid_neighbours = has_liquid_neighbours && pure_liquid_neighbours_[i];
           const double max_distance_pure_face_centre = compute_max_distance_pure_face_centre();
           const double max_distance_pure_vertex_centre = compute_max_distance_pure_face_vertices();
           const double max_distance_face_centre_vertex = std::max(max_distance_pure_face_centre, max_distance_pure_vertex_centre);
-          if (max_cfl_fourier_probe_length_ < max_distance_face_centre_vertex)
+          if (max_cfl_fourier_probe_length_ < max_distance_face_centre_vertex || !has_liquid_neighbours)
             {
               short_probe_condition_ = 1;
               if (cell_temperature_ != delta_T_subcooled_overheated_)
@@ -1671,18 +1674,41 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   normal_temperature_double_derivative_solution_.resize(temperature_solution_.size());
   (*finite_difference_assembler_).compute_operator(radial_second_order_operator_, temperature_solution_, normal_temperature_double_derivative_solution_);
 
-  temperature_x_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_vector_onto_cartesian_dir(0, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
-                                          temperature_x_gradient_solution_);
-  temperature_y_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_vector_onto_cartesian_dir(1, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
-                                          temperature_y_gradient_solution_);
-  temperature_z_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
-  project_basis_vector_onto_cartesian_dir(2, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
-                                          *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
-                                          temperature_z_gradient_solution_);
+  if (source_terms_type_ == linear_diffusion
+      || source_terms_type_ == spherical_diffusion
+      || source_terms_type_ == spherical_diffusion_approx)
+    {
+      DoubleVect dummy_tangential_deriv;
+      dummy_tangential_deriv.resize(*points_per_thermal_subproblem_);
+      temperature_x_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(0, dummy_tangential_deriv, dummy_tangential_deriv, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_x_gradient_solution_);
+      temperature_y_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(1, dummy_tangential_deriv, dummy_tangential_deriv, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_y_gradient_solution_);
+      temperature_z_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(2, dummy_tangential_deriv, dummy_tangential_deriv, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_z_gradient_solution_);
+    }
+
+  else
+    {
+      temperature_x_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(0, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_x_gradient_solution_);
+      temperature_y_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(1, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_y_gradient_solution_);
+      temperature_z_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
+      project_basis_vector_onto_cartesian_dir(2, tangential_temperature_gradient_first_, tangential_temperature_gradient_second_, normal_temperature_gradient_solution_,
+                                              *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
+                                              temperature_z_gradient_solution_);
+    }
 
   if ((source_terms_type_ == linear_diffusion
        || source_terms_type_ == spherical_diffusion
@@ -1789,6 +1815,7 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
       Cerr << "Field end: " << field[*points_per_thermal_subproblem_-1] << finl;
       Cerr << "Field interp ini: " << temperature_interp_[0] << finl;
       Cerr << "Field interp end: " << temperature_interp_[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "End_boundary_condition_value: " << end_boundary_condition_value_ << finl;
       Cerr << "Curvature: " << curvature_ << finl;
       Cerr << "Osculating radius: " << osculating_radius_ << finl;
     }
@@ -1910,7 +1937,7 @@ double IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivit
 {
   double diffusive_flux = 0;
   diffusive_flux = get_temperature_gradient_profile_at_point(dist, dir);
-  diffusive_flux *= (*alpha_);
+  diffusive_flux *= (*lambda_); //(*alpha_);
   return diffusive_flux;
 }
 
@@ -2036,7 +2063,7 @@ DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_disc
 DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
 {
   DoubleVect diffusive_flux = get_temperature_gradient_profile_discrete_integral_at_point(dist, levels, dir);
-  diffusive_flux *= (*alpha_);
+  diffusive_flux *= (*lambda_); //(*alpha_);
   return diffusive_flux;
 }
 

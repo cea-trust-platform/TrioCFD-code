@@ -76,6 +76,7 @@ public :
 
   void update_intersections();
   void clean_ijk_intersections();
+  void compute_eulerian_distance();
   void compute_eulerian_curvature_from_interface();
   void thermal_subresolution_outputs();
 

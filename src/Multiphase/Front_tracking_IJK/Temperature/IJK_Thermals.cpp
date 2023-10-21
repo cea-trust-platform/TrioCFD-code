@@ -340,6 +340,12 @@ void IJK_Thermals::clean_ijk_intersections()
     itr.clean_ijk_intersections();
 }
 
+void IJK_Thermals::compute_eulerian_distance()
+{
+  for (auto& itr : (*this))
+    itr.compute_eulerian_distance();
+}
+
 void IJK_Thermals::compute_eulerian_curvature_from_interface()
 {
   for (auto& itr : (*this))

@@ -130,7 +130,8 @@ public :
   void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
   double get_interfacial_gradient_corrected(int i);
   double get_temperature_profile_at_point(const int& i, const double& dist) const;
-  double get_dist_cell_interface(const int& i) const;
+  const double& get_dist_cell_interface(const int& i) const;
+  const FixedVector<double,6>& get_dist_faces_interface(const int& i) const;
   const Vecteur3& get_bary_facet(const int& i) const;
   double get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const;
   DoubleVect get_temperature_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;

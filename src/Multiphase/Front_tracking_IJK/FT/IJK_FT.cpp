@@ -1635,7 +1635,7 @@ int IJK_FT_double::initialise()
   const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
-  interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
+  nalloc += interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
   /*
    * Compute mean rho_g using the indicator function
    */
@@ -4383,10 +4383,12 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   /*
    * Calculation of intersections on interface at time (n)
    */
+  thermals_.compute_eulerian_distance();
   thermals_.compute_eulerian_curvature_from_interface();
   thermals_.clean_ijk_intersections();
   // thermals_.update_intersections(); // no need as IJK_intersections call interfaces_nI interfaces_xI
   interfaces_.compute_compo_connex_from_bounding_box();
+  interfaces_.compute_compo_connex_from_interface();
 
   // On supprime les duplicatas avant le transport :
   interfaces_.supprimer_duplicata_bulles();

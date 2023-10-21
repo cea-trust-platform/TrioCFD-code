@@ -150,6 +150,10 @@ public:
   {
     return *eulerian_compo_connex_ghost_ft_;
   }
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ft() const
+  {
+    return *eulerian_compo_connex_from_interface_ft_;
+  }
   const IJK_Field_double& get_eulerian_compo_connex_ns() const
   {
     return *eulerian_compo_connex_ns_;
@@ -157,6 +161,14 @@ public:
   const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const
   {
     return *eulerian_compo_connex_ghost_ns_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const
+  {
+    return *eulerian_compo_connex_from_interface_ns_;
+  }
+  const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ns() const
+  {
+    return *eulerian_compo_connex_from_interface_ns_int_;
   }
   const IJK_Field_double& get_eulerian_distance_ns() const
   {
@@ -266,6 +278,7 @@ public:
   void ecrire_reprise_thermique(SFichier& fichier);
 #endif
   virtual void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { ghost_cells_ = ghost_init; };
+  void compute_eulerian_distance();
   void compute_eulerian_curvature_from_interface();
   virtual void update_intersections() { ; };
   virtual void clean_ijk_intersections() { ; };
@@ -285,7 +298,6 @@ protected:
   virtual void correct_temperature_for_eulerian_fluxes()=0;
   virtual void store_temperature_before_extrapolation() { ; };
   virtual void correct_temperature_increment_for_interface_leaving_cell() { ; };
-  void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
   void compute_eulerian_curvature();
   void enforce_zero_value_eulerian_curvature();
@@ -414,7 +426,7 @@ protected:
   /*
    * Storage for operators & time scheme
    */
-  int diff_temp_negligible_;
+  int diff_temperature_negligible_;
   int conv_temperature_negligible_;
 
   /*
@@ -525,8 +537,9 @@ protected:
   const IJK_Field_double * eulerian_compo_connex_ns_;
   const IJK_Field_double * eulerian_compo_connex_ghost_ft_;
   const IJK_Field_double * eulerian_compo_connex_ghost_ns_;
-
-  IJK_Field_double indicator_test_;
+  const IJK_Field_double * eulerian_compo_connex_from_interface_ft_;
+  const IJK_Field_double * eulerian_compo_connex_from_interface_ns_;
+  const IJK_Field_int * eulerian_compo_connex_from_interface_ns_int_;
 
   int compute_rising_velocities_;
   int fill_rising_velocities_;

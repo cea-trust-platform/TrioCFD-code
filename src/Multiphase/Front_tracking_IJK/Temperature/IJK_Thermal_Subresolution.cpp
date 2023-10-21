@@ -230,8 +230,10 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
 
-  if (first_time_step_varying_probes_)
-    temperature_before_extrapolation_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
+  temperature_before_extrapolation_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
+  nalloc += 1;
+  temperature_before_extrapolation_.data() = 0.;
+
 
   corrige_flux_.typer("Corrige_flux_FT_temperature_subresolution");
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
@@ -243,6 +245,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   /*TODO:
    * Change the operators to add fluxes corrections (Maybe not)
    */
+  convective_flux_correction_ = convective_flux_correction_ && (!conv_temperature_negligible_);
+  diffusive_flux_correction_ = diffusive_flux_correction_ && (!diff_temperature_negligible_);
 
   disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
   if (diffusive_flux_correction_)
@@ -363,27 +367,30 @@ void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
 
 void IJK_Thermal_Subresolution::store_temperature_before_extrapolation()
 {
-  if (first_time_step_varying_probes_)
-    {
-      temperature_before_extrapolation_.data() = 0;
-      const int ni = temperature_.ni();
-      const int nj = temperature_.nj();
-      const int nk = temperature_.nk();
-      for (int k = 0; k < nk; k++)
-        for (int j = 0; j < nj; j++)
-          for (int i = 0; i < ni; i++)
+  temperature_before_extrapolation_.data() = 0.;
+  temperature_before_extrapolation_.echange_espace_virtuel(temperature_before_extrapolation_.ghost());
+  const int ni = temperature_.ni();
+  const int nj = temperature_.nj();
+  const int nk = temperature_.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+          if (fabs(indic) > VAPOUR_INDICATOR_TEST)
             {
-              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-              if (fabs(indic) > VAPOUR_INDICATOR_TEST)
+              if (ref_ijk_ft_->get_current_time() == 0 && !ref_ijk_ft_->get_reprise())
+                temperature_before_extrapolation_(i,j,k) = delta_T_subcooled_overheated_;
+              else
                 {
-                  if (ref_ijk_ft_->get_current_time() == 0 && !ref_ijk_ft_->get_reprise())
-                    temperature_before_extrapolation_(i,j,k) = delta_T_subcooled_overheated_;
-                  else
-                    temperature_before_extrapolation_(i,j,k) = temperature_(i,j,k);
+                  const double temperature = temperature_(i,j,k);
+                  temperature_before_extrapolation_(i,j,k) = temperature;
                 }
             }
-      temperature_before_extrapolation_.echange_espace_virtuel(temperature_before_extrapolation_.ghost());
-    }
+          else
+            temperature_before_extrapolation_(i,j,k) = 0.;
+        }
+  temperature_before_extrapolation_.echange_espace_virtuel(temperature_before_extrapolation_.ghost());
 }
 
 void IJK_Thermal_Subresolution::correct_temperature_increment_for_interface_leaving_cell()
@@ -639,7 +646,6 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                   {
                     Cerr << "Liquid Indicator (Old): " << indicator(i,j,k) << finl;
                     Cerr << "Liquid Indicator (Next): " << ref_ijk_ft_->itfce().In()(i,j,k) << finl;
-                    Cerr << "Indicator test: " << indicator_test_(i,j,k) << finl;
                     for (int i_bulle=0; i_bulle < bounding_box_.dimension(0); i_bulle++)
                       {
                         Cerr << "Bounding box : " << i_bulle << "; " << bounding_box_(i_bulle,0,0) << finl;
@@ -896,6 +902,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
   if (!disable_subresolution_)
     {
       thermal_subproblems_temperature_solution_.reset();
+      thermal_subproblems_temperature_solution_.set_smart_resize(1);
       thermal_subproblems_temperature_solution_.resize(thermal_subproblems_rhs_assembly_.size());
       check_wrong_values_rhs();
       /*
@@ -931,8 +938,8 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
           MD_Vector_std md_std = MD_Vector_std(thermal_subproblems_rhs_assembly_.size(), thermal_subproblems_rhs_assembly_.size(),
                                                pe_voisins_dummy, items_to_send_dummy, items_to_recv_dummy, blocs_to_recv_dummy);
           md_.copy(md_std);
-          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_);
-          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_);
+          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_); //, Array_base::NOCOPY_NOINIT);
+          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_); //, Array_base::NOCOPY_NOINIT);
           if (first_time_step_temporal_ && !first_time_step_explicit_)
             {
               if (one_dimensional_advection_diffusion_thermal_solver_implicit_.est_nul())
@@ -946,6 +953,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
           else
             {
               Cerr << "Finite-difference thermal sub-resolution has started !" << finl;
+              one_dimensional_advection_diffusion_thermal_solver_.reinit();
               one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_.valeur(),
                                                                                    thermal_subproblems_rhs_assembly_,
                                                                                    thermal_subproblems_temperature_solution_);

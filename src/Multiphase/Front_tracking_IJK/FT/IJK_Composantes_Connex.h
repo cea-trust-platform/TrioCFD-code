@@ -25,6 +25,15 @@
 #include <Objet_U.h>
 #include <IJK_Field.h>
 
+#define DIRECTION_I 0
+#define DIRECTION_J 1
+#define DIRECTION_K 2
+#define LIQUID_INDICATOR_TEST 1.-1.e-12
+#define VAPOUR_INDICATOR_TEST 1.e-12
+#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
+#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class IJK_Composantes_Connex
@@ -43,6 +52,7 @@ public :
   int initialize(const IJK_Splitting& splitting, const IJK_Interfaces& interfaces);
   void associer(const IJK_FT_double& ijk_ft);
   void compute_bounding_box_fill_compo_connex();
+  void compute_compo_connex_from_interface();
 
   const IJK_Field_double& get_eulerian_compo_connex_ft() const
   {
@@ -60,7 +70,18 @@ public :
   {
     return eulerian_compo_connex_ghost_ns_;
   }
-
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ft() const
+  {
+    return eulerian_compo_connex_from_interface_ft_;
+  }
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const
+  {
+    return eulerian_compo_connex_from_interface_ns_;
+  }
+  const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ns() const
+  {
+    return eulerian_compo_connex_from_interface_int_ns_;
+  }
   const DoubleTab& get_bounding_box() const
   {
     return bounding_box_;
@@ -75,6 +96,7 @@ public :
   }
 
 protected :
+  void fill_mixed_cell_compo();
   REF(IJK_FT_double) ref_ijk_ft_;
   const IJK_Interfaces * interfaces_ = nullptr;
 
@@ -82,6 +104,14 @@ protected :
   IJK_Field_double eulerian_compo_connex_ns_;
   IJK_Field_double eulerian_compo_connex_ghost_ft_;
   IJK_Field_double eulerian_compo_connex_ghost_ns_;
+
+  /*
+   * TODO: write redistribute for IJK_Field_int
+   */
+  IJK_Field_double eulerian_compo_connex_from_interface_ft_;
+  IJK_Field_double eulerian_compo_connex_from_interface_ns_;
+  IJK_Field_int eulerian_compo_connex_from_interface_int_ns_;
+  IJK_Field_int eulerian_compo_connex_valid_compo_field_;
 
   DoubleTab bounding_box_;
   DoubleTab bubbles_barycentre_;

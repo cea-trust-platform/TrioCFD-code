@@ -61,8 +61,11 @@ public :
   inline const IJK_Field_double& get_grad_T_interface_ft() const { return valeur().get_grad_T_interface_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ft() const { return valeur().get_eulerian_compo_connex_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const { return valeur().get_eulerian_compo_connex_ghost_ft(); }
+  inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ft() const { return valeur().get_eulerian_compo_connex_from_interface_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ns() const { return valeur().get_eulerian_compo_connex_ns(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const { return valeur().get_eulerian_compo_connex_ghost_ns(); }
+  inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const { return valeur().get_eulerian_compo_connex_from_interface_ns(); }
+  inline const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ns() const { return valeur().get_eulerian_compo_connex_int_from_interface_ns(); }
   inline const IJK_Field_double& get_eulerian_distance_ns() const { return valeur().get_eulerian_distance_ns(); }
   inline const IJK_Field_double& get_eulerian_curvature_ns() const { return valeur().get_eulerian_curvature_ns(); }
   inline const IJK_Field_double& get_interfacial_area_ns() const { return valeur().get_interfacial_area_ns(); }
@@ -117,6 +120,7 @@ public :
   inline void clean_ijk_intersections() { valeur().clean_ijk_intersections(); };
 
   inline void compute_eulerian_curvature_from_interface();
+  inline void compute_eulerian_distance();
 
   void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
   int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
@@ -234,6 +238,11 @@ inline void IJK_Thermal::compute_interfacial_temperature2(ArrOfDouble& interfaci
                                                           ArrOfDouble& flux_normal_interp)
 {
   return valeur().compute_interfacial_temperature2(interfacial_temperature, flux_normal_interp);
+}
+
+inline void IJK_Thermal::compute_eulerian_distance()
+{
+  valeur().compute_eulerian_distance();
 }
 
 inline void IJK_Thermal::compute_eulerian_curvature_from_interface()
