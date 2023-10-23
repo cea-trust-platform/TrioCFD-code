@@ -198,7 +198,7 @@ public :
   DoubleVect get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
   DoubleVect get_temperature_times_velocity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
   DoubleVect get_temperature_gradient_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
-  DoubleVect get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
+  DoubleVect get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
   void get_field_discrete_value_recursive(const int& ilevel, const int& max_level,
                                           const int& dir, const double& dist,
                                           const int& vel,
@@ -211,7 +211,7 @@ public :
                                           int& value_counter) const;
   double get_velocity_component_at_point(const double& dist, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const double& dist, const int& dir) const;
-  double get_temperature_gradient_times_diffusivity_profile_at_point(const double& dist, const int& dir) const;
+  double get_temperature_gradient_times_conductivity_profile_at_point(const double& dist, const int& dir) const;
   void get_discrete_two_dimensional_spacing(const int& dir, const int& level,
                                             const double& first_dir, const double& second_dir,
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;

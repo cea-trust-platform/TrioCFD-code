@@ -138,9 +138,9 @@ public :
   DoubleVect get_temperature_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   DoubleVect get_temperature_times_velocity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   DoubleVect get_temperature_gradient_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
-  DoubleVect get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
+  DoubleVect get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
-  double get_temperature_gradient_times_diffusivity_profile_at_point(const int& i, const double& dist, const int& dir) const;
+  double get_temperature_gradient_times_conductivity_profile_at_point(const int& i, const double& dist, const int& dir) const;
   void thermal_subresolution_outputs(SFichier& fic, const int rank);
 
   const int& get_subproblems_counter() const

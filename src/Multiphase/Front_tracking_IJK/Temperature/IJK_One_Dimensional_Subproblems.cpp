@@ -381,9 +381,9 @@ double IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_at_poin
   return (*this)[i].get_temperature_gradient_profile_at_point(dist, dir);
 }
 
-double IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_diffusivity_profile_at_point(const int& i, const double& dist, const int& dir) const
+double IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_conductivity_profile_at_point(const int& i, const double& dist, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_times_diffusivity_profile_at_point(dist, dir);
+  return (*this)[i].get_temperature_gradient_times_conductivity_profile_at_point(dist, dir);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
@@ -391,9 +391,9 @@ DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_dis
   return (*this)[i].get_temperature_gradient_profile_discrete_integral_at_point(dist, level, dir);
 }
 
-DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
+DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(dist, level, dir);
+  return (*this)[i].get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(dist, level, dir);
 }
 
 void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(SFichier& fic, const int rank)

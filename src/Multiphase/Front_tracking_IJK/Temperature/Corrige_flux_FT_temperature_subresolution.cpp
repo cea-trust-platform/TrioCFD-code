@@ -265,7 +265,7 @@ double Corrige_flux_FT_temperature_subresolution::compute_thermal_flux_face_cent
     case convection:
       return thermal_subproblems_->get_temperature_times_velocity_profile_at_point(index_subproblem, dist, dir);
     case diffusion:
-      return thermal_subproblems_->get_temperature_gradient_times_diffusivity_profile_at_point(index_subproblem, dist, dir);
+      return thermal_subproblems_->get_temperature_gradient_times_conductivity_profile_at_point(index_subproblem, dist, dir);
     default:
       return thermal_subproblems_->get_temperature_times_velocity_profile_at_point(index_subproblem, dist, dir);
     }
@@ -335,7 +335,7 @@ DoubleVect Corrige_flux_FT_temperature_subresolution::compute_thermal_flux_face_
     case convection:
       return thermal_subproblems_->get_temperature_times_velocity_profile_discrete_integral_at_point(index_subproblem, dist, levels_, dir);
     case diffusion:
-      return thermal_subproblems_->get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(index_subproblem, dist, levels_, dir);
+      return thermal_subproblems_->get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(index_subproblem, dist, levels_, dir);
     default:
       return thermal_subproblems_->get_temperature_times_velocity_profile_discrete_integral_at_point(index_subproblem, dist, levels_, dir);
     }

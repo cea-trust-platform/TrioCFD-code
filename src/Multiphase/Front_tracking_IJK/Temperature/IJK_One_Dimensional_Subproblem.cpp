@@ -1955,11 +1955,11 @@ double IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_at
   return temperature_interp * velocity_interp;
 }
 
-double IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivity_profile_at_point(const double& dist, const int& dir) const
+double IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_conductivity_profile_at_point(const double& dist, const int& dir) const
 {
   double diffusive_flux = 0;
   diffusive_flux = get_temperature_gradient_profile_at_point(dist, dir);
-  diffusive_flux *= (*lambda_); //(*alpha_);
+  diffusive_flux *= (*lambda_);
   return diffusive_flux;
 }
 
@@ -2082,10 +2082,10 @@ DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_disc
   return temperature_gradient;
 }
 
-DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_diffusivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
 {
   DoubleVect diffusive_flux = get_temperature_gradient_profile_discrete_integral_at_point(dist, levels, dir);
-  diffusive_flux *= (*lambda_); //(*alpha_);
+  diffusive_flux *= (*lambda_);
   return diffusive_flux;
 }
 

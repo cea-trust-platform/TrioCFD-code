@@ -347,8 +347,7 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
         {
-          double rhocpVol;
-          rhocpVol = rhocp_l * vol_;
+          const double rhocpVol = rhocp_l * vol_;
           const double ope = div_coeff_grad_T_volume_(i,j,k);
           const double resu = ope/rhocpVol;
           d_temperature_(i,j,k) += resu;
