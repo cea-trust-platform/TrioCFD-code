@@ -547,6 +547,7 @@ protected:
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;
   DoubleTab bubbles_barycentre_;
+
 };
 
 #endif /* IJK_Thermal_base_included */

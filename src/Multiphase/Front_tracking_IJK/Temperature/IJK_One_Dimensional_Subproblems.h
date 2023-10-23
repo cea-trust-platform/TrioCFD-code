@@ -109,7 +109,8 @@ public :
                                        const int& disable_interpolation_in_mixed_cells,
                                        const int& max_u_radial,
                                        const int& correct_fluxes,
-                                       const int& distance_cell_faces_from_lrs);
+                                       const int& distance_cell_faces_from_lrs,
+                                       const int& pre_initialise_thermal_subproblems_list);
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);
@@ -163,6 +164,7 @@ public :
   int get_probe_variations_enabled_non_priority();
   void set_local_time_step(const double& local_time_step);
   void prepare_temporal_schemes();
+  const int& get_end_index_subproblem(const int index) const;
 
 protected :
   int debug_ = 0;

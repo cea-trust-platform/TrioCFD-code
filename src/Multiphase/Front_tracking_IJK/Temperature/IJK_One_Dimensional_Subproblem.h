@@ -137,7 +137,8 @@ public :
                                        const int& disable_interpolation_in_mixed_cells,
                                        const int& max_u_radial,
                                        const int& correct_fluxes,
-                                       const int& distance_cell_faces_from_lrs);
+                                       const int& distance_cell_faces_from_lrs,
+                                       const int& pre_initialise_thermal_subproblems_list);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -265,6 +266,10 @@ public :
   {
     return facet_barycentre_;
   };
+  const int& get_end_index_subproblem() const
+  {
+    return end_index_;
+  }
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
   void associate_sub_problem_temporal_params(const bool& is_first_time_step,
@@ -340,6 +345,7 @@ protected :
   void recompute_finite_difference_matrices_varying_probe_length();
   void initialise_radial_convection_operator_local();
   void initialise_radial_diffusion_operator_local();
+  void initialise_identity_operator_local();
   void interpolate_cartesian_velocities_on_probes();
   void compute_velocity_magnitude();
   void project_velocities_on_probes();
@@ -487,13 +493,12 @@ protected :
   const Matrice *radial_second_order_operator_raw_base_;
   const Matrice *radial_first_order_operator_base_;
   const Matrice *radial_second_order_operator_base_;
-  const Matrice *identity_matrix_explicit_implicit_;
   const Matrice *radial_first_order_operator_;
   const Matrice *radial_second_order_operator_;
+  const Matrice *identity_matrix_explicit_implicit_;
   Matrice identity_matrix_explicit_implicit_local_;
   Matrice radial_first_order_operator_local_;
   Matrice radial_second_order_operator_local_;
-
   /*
    * Pointers to non-constant matrice
    * FIXME: Should I declare constant pointers ?
@@ -676,6 +681,7 @@ protected :
   double cell_temperature_ = 0.;
 
   int distance_cell_faces_from_lrs_ = 0;
+  int pre_initialise_thermal_subproblems_list_ = 0;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

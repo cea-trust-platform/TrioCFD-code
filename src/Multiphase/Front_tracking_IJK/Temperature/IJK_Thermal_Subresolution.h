@@ -73,6 +73,7 @@ public :
   }
 
 protected :
+  void reset_subresolution_distributed_vectors();
   void compute_thermal_subproblems() override;
   void compute_diffusion_increment() override;
   void correct_temperature_increment_for_interface_leaving_cell() override;
@@ -80,6 +81,7 @@ protected :
   void store_temperature_before_extrapolation() override;
   void correct_temperature_for_visu() override;
   void compute_overall_probes_parameters();
+  void pre_initialise_thermal_subproblems_matrix();
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();
@@ -103,6 +105,10 @@ protected :
                                              Matrice& radial_convection_matrix);
   void initialise_radial_diffusion_operator(Matrice& radial_second_order_operator,
                                             Matrice& radial_diffusion_matrix);
+  int copy_local_unknwowns_rhs();
+  void convert_into_sparse_matrix(const int& nb_points);
+  void compute_md_vector();
+  void retrieve_temperature_solution();
   void check_wrong_values_rhs();
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
@@ -150,10 +156,16 @@ protected :
    */
   IJK_Finite_Difference_One_Dimensional_Matrix_Assembler finite_difference_assembler_;
   Matrice thermal_subproblems_matrix_assembly_;
-  Matrice thermal_subproblems_matrix_assembly_for_solver_;
   DoubleVect thermal_subproblems_temperature_solution_ini_;
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
+
+  Matrice thermal_subproblems_matrix_assembly_for_solver_;
+  Matrice thermal_subproblems_matrix_assembly_for_solver_reduced_;
+
+  DoubleVect thermal_subproblems_temperature_solution_ini_for_solver_;
+  DoubleVect thermal_subproblems_rhs_assembly_for_solver_;
+  DoubleVect thermal_subproblems_temperature_solution_for_solver_;
   // SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
   IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
   IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_implicit_;
@@ -211,6 +223,10 @@ protected :
 
   IJK_Field_double debug_LRS_cells_;
   int distance_cell_faces_from_lrs_;
+
+  int pre_initialise_thermal_subproblems_list_;
+  int global_probes_characteristics_ = 1;
+  double pre_factor_subproblems_number_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

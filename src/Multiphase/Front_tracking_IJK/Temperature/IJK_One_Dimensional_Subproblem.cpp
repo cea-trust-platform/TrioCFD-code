@@ -245,13 +245,15 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& disable_interpolation_in_mixed_cells,
                                                                      const int& max_u_radial,
                                                                      const int& correct_fluxes,
-                                                                     const int& distance_cell_faces_from_lrs)
+                                                                     const int& distance_cell_faces_from_lrs,
+                                                                     const int& pre_initialise_thermal_subproblems_list)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
   global_time_step_ = global_time_step;
   current_time_ = current_time;
   correct_fluxes_ = correct_fluxes;
+  pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
@@ -308,7 +310,7 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
   /*
    * If each probe differs (create attributes !)
    */
-  if (  global_probes_characteristics_)
+  if (global_probes_characteristics_)
     points_per_thermal_subproblem_ = points_per_thermal_subproblem_base_;
   else
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
@@ -331,6 +333,7 @@ void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const
 
   radial_first_order_operator_ = radial_first_order_operator_base_;
   radial_second_order_operator_ = radial_second_order_operator_base_;
+  identity_matrix_explicit_implicit_ = identity_matrix_explicit_implicit_base_;
 
   identity_matrix_subproblems_ = &identity_matrix_subproblems;
   radial_diffusion_matrix_base_ = &radial_diffusion_matrix;
@@ -668,6 +671,7 @@ void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices()
       compute_identity_matrix_local(identity_matrix_explicit_implicit_local_);
       compute_first_order_operator_local(radial_first_order_operator_local_);
       compute_second_order_operator_local(radial_second_order_operator_local_);
+      identity_matrix_explicit_implicit_local_ = (*identity_matrix_explicit_implicit_base_);
       identity_matrix_explicit_implicit_ = &identity_matrix_explicit_implicit_local_;
       radial_first_order_operator_ = &radial_first_order_operator_local_;
       radial_second_order_operator_ = &radial_second_order_operator_local_;
@@ -691,7 +695,6 @@ void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices_varyin
 {
   compute_first_order_operator_local_varying_probe_length(radial_first_order_operator_raw_base_);
   compute_second_order_operator_local_varying_probe_length(radial_second_order_operator_raw_base_);
-  radial_first_order_operator_ = &radial_first_order_operator_local_;
   radial_second_order_operator_= &radial_second_order_operator_local_;
 }
 
@@ -1273,14 +1276,26 @@ void IJK_One_Dimensional_Subproblem::project_matrix_on_basis(const Matrice33& pr
 
 void IJK_One_Dimensional_Subproblem::initialise_radial_convection_operator_local()
 {
-  if (!global_probes_characteristics_ || first_time_step_varying_probes_)
-    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_convection_matrix_base_, radial_first_order_operator_local_, sub_problem_index_);
+  if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
+    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_convection_matrix_base_,
+                                                                   radial_first_order_operator_,
+                                                                   sub_problem_index_);
 }
 
 void IJK_One_Dimensional_Subproblem::initialise_radial_diffusion_operator_local()
 {
-  if (!global_probes_characteristics_ || first_time_step_varying_probes_)
-    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_diffusion_matrix_base_, radial_second_order_operator_local_, sub_problem_index_);
+  if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
+    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_diffusion_matrix_base_,
+                                                                   radial_second_order_operator_,
+                                                                   sub_problem_index_);
+}
+
+void IJK_One_Dimensional_Subproblem::initialise_identity_operator_local()
+{
+  if ((!global_probes_characteristics_ || pre_initialise_thermal_subproblems_list_) && first_time_step_varying_probes_)
+    (*finite_difference_assembler_).reinitialise_matrix_subproblem(identity_matrix_subproblems_,
+                                                                   identity_matrix_explicit_implicit_,
+                                                                   sub_problem_index_);
 }
 
 void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operators()
@@ -1312,6 +1327,7 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
   const int boundary_conditions = 0;
   initialise_radial_convection_operator_local();
   initialise_radial_diffusion_operator_local();
+  initialise_identity_operator_local();
   (*finite_difference_assembler_).scale_matrix_subproblem_by_vector(radial_convection_matrix_base_,
                                                                     radial_convection_prefactor_,
                                                                     sub_problem_index_,
@@ -1366,15 +1382,20 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& the
     end_boundary_condition_value_ = temperature_interp_[temperature_interp_.size() -1];
 
   const int thermal_subproblems_rhs_size = (*thermal_subproblems_rhs_assembly_).size();
-  start_index_ = thermal_subproblems_rhs_size;
+  if (pre_initialise_thermal_subproblems_list_ && global_probes_characteristics_)
+    start_index_ = (int) (sub_problem_index_ * (*points_per_thermal_subproblem_));
+  else
+    {
+      start_index_ = thermal_subproblems_rhs_size;
+      thermal_subproblems_rhs_assembly.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
+    }
   end_index_ = start_index_ + (*points_per_thermal_subproblem_);
-
-  thermal_subproblems_rhs_assembly.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
 
   if (*first_time_step_temporal_)
     {
       if (first_time_step_explicit_)
-        thermal_subproblems_temperature_solution_ini.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
+        if (!(pre_initialise_thermal_subproblems_list_ && global_probes_characteristics_))
+          thermal_subproblems_temperature_solution_ini.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
       temperature_ini_temporal_schemes_.resize(*points_per_thermal_subproblem_);
       if (boundary_condition_interface == dirichlet || boundary_condition_interface == default_bc)
         temperature_ini_temporal_schemes_[0] = interfacial_boundary_condition_value;
@@ -1426,7 +1447,8 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                         dr_inv_,
                                                                         (*first_time_step_temporal_),
                                                                         first_time_step_explicit_,
-                                                                        temperature_ini_temporal_schemes_);
+                                                                        temperature_ini_temporal_schemes_,
+                                                                        start_index_);
 
   if ((*first_time_step_temporal_) && first_time_step_explicit_)
     (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_, temperature_ini_temporal_schemes_);

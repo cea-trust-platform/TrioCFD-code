@@ -78,7 +78,8 @@ public :
                                              const double& dr_inv,
                                              const int& first_time_step_temporal,
                                              const int& first_time_step_explicit,
-                                             const DoubleVect& temperature_ini_temporal_schemes);
+                                             const DoubleVect& temperature_ini_temporal_schemes,
+                                             const int& start_index);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
   void initialise_matrix_subproblems(Matrice& matrix_subproblems,
@@ -86,7 +87,7 @@ public :
                                      const int& subproblems,
                                      const int& first_time_step_varying_probes);
   void reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
-                                      Matrice& fd_operator,
+                                      const Matrice * fd_operator,
                                       const int& nb_subproblems);
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
                         const DoubleVect& rhs_assembly);
@@ -101,6 +102,17 @@ public :
                                                  const int& subproblem_index,
                                                  const double& local_time_step,
                                                  const double& alpha);
+
+  void pre_initialise_matrix_subproblems(Matrice& matrice, Matrice& fd_operator, const int& max_subproblems_predicted);
+  void complete_empty_matrices_initialisation(Matrice& matrix_subproblems,
+                                              Matrice& fd_operator,
+                                              const int& empty_problem_start_index,
+                                              const int& empty_problem_end_index);
+
+  void reduce_solver_matrix(const Matrice_Morse& thermal_subproblems_matrix_assembly_for_solver,
+                            Matrice_Morse& thermal_subproblems_matrix_assembly_for_solver_reduced,
+                            const int& nb_points,
+                            const int& pre_initialise_thermal_subproblems_list);
 
 protected :
   enum Fd_coefficient_type_ { identity=-1, forward, centred, backward };

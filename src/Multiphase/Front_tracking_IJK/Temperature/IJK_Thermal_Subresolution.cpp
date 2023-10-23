@@ -89,6 +89,9 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   local_cfl_ = 1.;
 
   distance_cell_faces_from_lrs_=0.;
+
+  pre_initialise_thermal_subproblems_list_ = 0;
+  pre_factor_subproblems_number_ = 3.;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -182,6 +185,9 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("max_u_radial", &max_u_radial_);
 
   param.ajouter_flag("distance_cell_faces_from_lrs", &distance_cell_faces_from_lrs_);
+
+  param.ajouter_flag("pre_initialise_thermal_subproblems_list", &pre_initialise_thermal_subproblems_list_);
+  param.ajouter("pre_factor_subproblems_number", &pre_factor_subproblems_number_);
 
 
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
@@ -314,6 +320,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       nalloc += 1;
       debug_LRS_cells_.data() = -1.;
     }
+
+  // double ideal_length_factor = ref_ijk_ft_->get_remaillage_ft_ijk().get_facteur_longueur_ideale();
 
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
@@ -455,6 +463,10 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
     Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
 
+  pre_initialise_thermal_subproblems_matrix();
+
+  reset_subresolution_distributed_vectors();
+
   int varying_probes_length = 1;
   const int varying_probes = first_time_step_varying_probes_;
   do
@@ -544,6 +556,9 @@ void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
           check_nb_elem = finite_difference_assembler_.build(identity_matrix_explicit_implicit_, points_per_thermal_subproblem_, -1);
           Cerr << "Check_nb_elem: " << check_nb_elem << finl;
         }
+
+      thermal_subproblems_matrix_assembly_for_solver_.typer("Matrice_Morse");
+      thermal_subproblems_matrix_assembly_for_solver_reduced_.typer("Matrice_Morse");
     }
 }
 
@@ -723,11 +738,84 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            disable_interpolation_in_mixed_cells_,
                                                                            max_u_radial_,
                                                                            (convective_flux_correction_ || diffusive_flux_correction_),
-                                                                           distance_cell_faces_from_lrs_);
+                                                                           distance_cell_faces_from_lrs_,
+                                                                           pre_initialise_thermal_subproblems_list_);
 
               }
     }
 }
+
+void IJK_Thermal_Subresolution::pre_initialise_thermal_subproblems_matrix()
+{
+  if (ref_ijk_ft_->get_tstep()==0 && pre_initialise_thermal_subproblems_list_)
+    {
+      if (!disable_subresolution_)
+        {
+          const int nb_subproblems_ini = thermal_local_subproblems_.get_subproblems_counter();
+          const int max_subproblems_predicted = (int) ((double) nb_subproblems_ini * pre_factor_subproblems_number_);
+          finite_difference_assembler_.pre_initialise_matrix_subproblems(thermal_subproblems_matrix_assembly_,
+                                                                         radial_second_order_operator_raw_,
+                                                                         max_subproblems_predicted);
+          finite_difference_assembler_.pre_initialise_matrix_subproblems(radial_convection_matrix_,
+                                                                         radial_first_order_operator_raw_,
+                                                                         max_subproblems_predicted);
+          finite_difference_assembler_.pre_initialise_matrix_subproblems(radial_diffusion_matrix_,
+                                                                         radial_second_order_operator_raw_,
+                                                                         max_subproblems_predicted);
+          if (first_time_step_temporal_)
+            finite_difference_assembler_.pre_initialise_matrix_subproblems(identity_matrix_subproblems_,
+                                                                           radial_second_order_operator_raw_,
+                                                                           max_subproblems_predicted);
+          const int vector_size = points_per_thermal_subproblem_ * max_subproblems_predicted;
+          if (first_time_step_temporal_ && first_time_step_explicit_)
+            thermal_subproblems_temperature_solution_ini_.resize(vector_size);
+          thermal_subproblems_rhs_assembly_.resize(vector_size);
+          thermal_subproblems_temperature_solution_.resize(vector_size);
+
+          finite_difference_assembler_.complete_empty_matrices_initialisation(thermal_subproblems_matrix_assembly_,
+                                                                              radial_second_order_operator_raw_,
+                                                                              nb_subproblems_ini, max_subproblems_predicted);
+          finite_difference_assembler_.complete_empty_matrices_initialisation(radial_convection_matrix_,
+                                                                              radial_first_order_operator_raw_,
+                                                                              nb_subproblems_ini, max_subproblems_predicted);
+          finite_difference_assembler_.complete_empty_matrices_initialisation(radial_diffusion_matrix_,
+                                                                              radial_second_order_operator_raw_,
+                                                                              nb_subproblems_ini, max_subproblems_predicted);
+          if (first_time_step_temporal_)
+            finite_difference_assembler_.complete_empty_matrices_initialisation(radial_diffusion_matrix_,
+                                                                                radial_second_order_operator_raw_,
+                                                                                nb_subproblems_ini, max_subproblems_predicted);
+        }
+    }
+}
+
+void IJK_Thermal_Subresolution::reset_subresolution_distributed_vectors()
+{
+  if (!global_probes_characteristics_ || !pre_initialise_thermal_subproblems_list_)
+    {
+      thermal_subproblems_rhs_assembly_.reset();
+      thermal_subproblems_rhs_assembly_.set_smart_resize(1);
+    }
+
+  if (!pre_initialise_thermal_subproblems_list_)
+    {
+      thermal_subproblems_temperature_solution_.reset();
+      thermal_subproblems_temperature_solution_.set_smart_resize(1);
+    }
+  else
+    {
+      if (first_time_step_temporal_ && first_time_step_explicit_)
+        {
+          thermal_subproblems_temperature_solution_ini_for_solver_.reset();
+          thermal_subproblems_temperature_solution_ini_for_solver_.set_smart_resize(1);
+        }
+      thermal_subproblems_rhs_assembly_for_solver_.reset();
+      thermal_subproblems_rhs_assembly_for_solver_.set_smart_resize(1);
+      thermal_subproblems_temperature_solution_for_solver_.reset();
+      thermal_subproblems_temperature_solution_for_solver_.set_smart_resize(1);
+    }
+}
+
 
 void IJK_Thermal_Subresolution::interpolate_project_velocities_on_probes()
 {
@@ -755,10 +843,13 @@ void IJK_Thermal_Subresolution::compute_radial_subresolution_convection_diffusio
       /*
        * Same spatial discretisation on all probes
        */
-      if (first_time_step_temporal_)
-        initialise_identity_matrices(identity_matrix_explicit_implicit_, identity_matrix_subproblems_);
-      initialise_radial_convection_operator(radial_first_order_operator_, radial_convection_matrix_);
-      initialise_radial_diffusion_operator(radial_second_order_operator_, radial_diffusion_matrix_);
+      if (!pre_initialise_thermal_subproblems_list_)
+        {
+          if (first_time_step_temporal_)
+            initialise_identity_matrices(identity_matrix_explicit_implicit_, identity_matrix_subproblems_);
+          initialise_radial_convection_operator(radial_first_order_operator_, radial_convection_matrix_);
+          initialise_radial_diffusion_operator(radial_second_order_operator_, radial_diffusion_matrix_);
+        }
       thermal_local_subproblems_.compute_radial_convection_diffusion_operators();
     }
 }
@@ -772,7 +863,10 @@ void IJK_Thermal_Subresolution::initialise_identity_matrices(Matrice& identity_m
   if (debug_)
     Cerr << "Initialise the Identity matrices" << finl;
   const int nb_subproblems = thermal_local_subproblems_.get_subproblems_counter();
-  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix_subproblems, identity_matrix, nb_subproblems, first_time_step_varying_probes_);
+  finite_difference_assembler_.initialise_matrix_subproblems(identity_matrix_subproblems,
+                                                             identity_matrix,
+                                                             nb_subproblems,
+                                                             first_time_step_varying_probes_);
   if (debug_)
     Cerr << "Radial convection operator has been initialised." << finl;
 }
@@ -873,8 +967,6 @@ void IJK_Thermal_Subresolution::compute_source_terms_impose_subresolution_bounda
 {
   if (!disable_subresolution_)
     {
-      thermal_subproblems_rhs_assembly_.reset();
-      thermal_subproblems_rhs_assembly_.set_smart_resize(1);
       thermal_local_subproblems_.compute_source_terms_impose_boundary_conditions(thermal_subproblems_rhs_assembly_,
                                                                                  thermal_subproblems_temperature_solution_ini_,
                                                                                  boundary_condition_interface_,
@@ -901,17 +993,9 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
   if (!disable_subresolution_)
     {
-      thermal_subproblems_temperature_solution_.reset();
-      thermal_subproblems_temperature_solution_.set_smart_resize(1);
-      thermal_subproblems_temperature_solution_.resize(thermal_subproblems_rhs_assembly_.size());
+      int nb_points = copy_local_unknwowns_rhs();
       check_wrong_values_rhs();
-      /*
-       * Convert into a huge sparse matrix
-       */
-      thermal_subproblems_matrix_assembly_for_solver_.typer("Matrice_Morse");
-      Matrice_Morse& sparse_matrix_solver  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_.valeur());
-      Matrice_Bloc& bloc_matrix_solver  = ref_cast(Matrice_Bloc, thermal_subproblems_matrix_assembly_.valeur());
-      bloc_matrix_solver.block_to_morse(sparse_matrix_solver);
+      convert_into_sparse_matrix(nb_points);
 
       if (first_time_step_temporal_ && first_time_step_explicit_)
         {
@@ -919,7 +1003,7 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
           DoubleVect thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_ini_;
           for (int i=0; i<nb_iter_explicit_local_; i++)
             {
-              thermal_subproblems_temperature_solution_ = thermal_subproblems_matrix_assembly_for_solver_ * thermal_subproblems_temperature_solution_tmp;
+              thermal_subproblems_temperature_solution_ = thermal_subproblems_matrix_assembly_for_solver_reduced_ * thermal_subproblems_temperature_solution_tmp;
               thermal_subproblems_temperature_solution_ += thermal_subproblems_rhs_assembly_;
               thermal_subproblems_temperature_solution_tmp = thermal_subproblems_temperature_solution_;
             }
@@ -927,42 +1011,109 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
         }
       else
         {
-          ArrOfInt pe_voisins_dummy;
-          ArrsOfInt items_to_send_dummy;
-          ArrsOfInt items_to_recv_dummy;
-          ArrsOfInt blocs_to_recv_dummy;
-          pe_voisins_dummy.resize(0);
-          items_to_send_dummy.resize(0);
-          items_to_recv_dummy.resize(0);
-          blocs_to_recv_dummy.resize(0);
-          MD_Vector_std md_std = MD_Vector_std(thermal_subproblems_rhs_assembly_.size(), thermal_subproblems_rhs_assembly_.size(),
-                                               pe_voisins_dummy, items_to_send_dummy, items_to_recv_dummy, blocs_to_recv_dummy);
-          md_.copy(md_std);
-          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_); //, Array_base::NOCOPY_NOINIT);
-          MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_); //, Array_base::NOCOPY_NOINIT);
+
+          compute_md_vector();
           if (first_time_step_temporal_ && !first_time_step_explicit_)
             {
               if (one_dimensional_advection_diffusion_thermal_solver_implicit_.est_nul())
                 one_dimensional_advection_diffusion_thermal_solver_implicit_.cast_direct_solver_by_default();
               Cerr << "Finite-difference thermal sub-resolution has started (Implicit)!" << finl;
-              one_dimensional_advection_diffusion_thermal_solver_implicit_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_.valeur(),
-                                                                                            thermal_subproblems_rhs_assembly_,
-                                                                                            thermal_subproblems_temperature_solution_);
+              one_dimensional_advection_diffusion_thermal_solver_implicit_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_reduced_.valeur(),
+                                                                                            thermal_subproblems_rhs_assembly_for_solver_,
+                                                                                            thermal_subproblems_temperature_solution_for_solver_);
               Cerr << "Finite-difference thermal sub-resolution has finished (Implicit)!" << finl;
             }
           else
             {
               Cerr << "Finite-difference thermal sub-resolution has started !" << finl;
-              one_dimensional_advection_diffusion_thermal_solver_.reinit();
-              one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_.valeur(),
-                                                                                   thermal_subproblems_rhs_assembly_,
-                                                                                   thermal_subproblems_temperature_solution_);
+              one_dimensional_advection_diffusion_thermal_solver_.resoudre_systeme(thermal_subproblems_matrix_assembly_for_solver_reduced_.valeur(),
+                                                                                   thermal_subproblems_rhs_assembly_for_solver_,
+                                                                                   thermal_subproblems_temperature_solution_for_solver_);
               Cerr << "Finite-difference thermal sub-resolution has finished !" << finl;
             }
         }
-      thermal_local_subproblems_.retrieve_radial_quantities();
+      retrieve_temperature_solution();
     }
 }
+
+
+int IJK_Thermal_Subresolution::copy_local_unknwowns_rhs()
+{
+  const int nb_subproblems_ini = thermal_local_subproblems_.get_subproblems_counter();
+  const int nb_points = points_per_thermal_subproblem_ * nb_subproblems_ini;
+  if (!pre_initialise_thermal_subproblems_list_)
+    {
+      thermal_subproblems_temperature_solution_.resize(thermal_subproblems_rhs_assembly_.size());
+      if (first_time_step_temporal_ && first_time_step_explicit_)
+        thermal_subproblems_temperature_solution_ini_for_solver_ = thermal_subproblems_temperature_solution_ini_;
+      thermal_subproblems_rhs_assembly_for_solver_ = thermal_subproblems_rhs_assembly_;
+      thermal_subproblems_temperature_solution_for_solver_ = thermal_subproblems_temperature_solution_;
+    }
+  else
+    {
+      if (first_time_step_temporal_ && first_time_step_explicit_)
+        thermal_subproblems_temperature_solution_ini_for_solver_.resize(nb_points);
+      thermal_subproblems_rhs_assembly_for_solver_.resize(nb_points);
+      thermal_subproblems_temperature_solution_for_solver_.resize(nb_points);
+      for (int i=0; i<nb_points; i++)
+        {
+          if (first_time_step_temporal_ && first_time_step_explicit_)
+            thermal_subproblems_temperature_solution_ini_for_solver_(i) = thermal_subproblems_temperature_solution_ini_(i);
+          thermal_subproblems_rhs_assembly_for_solver_(i) = thermal_subproblems_rhs_assembly_(i);
+          thermal_subproblems_temperature_solution_for_solver_(i) = thermal_subproblems_temperature_solution_(i);
+        }
+    }
+  return nb_points;
+}
+
+
+void IJK_Thermal_Subresolution::convert_into_sparse_matrix(const int& nb_points)
+{
+  /*
+   * Convert into a huge sparse matrix
+   */
+  Matrice_Morse& sparse_matrix_solver  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_.valeur());
+  Matrice_Bloc& bloc_matrix_solver = ref_cast(Matrice_Bloc, thermal_subproblems_matrix_assembly_.valeur());
+  bloc_matrix_solver.block_to_morse(sparse_matrix_solver);
+  Matrice_Morse& sparse_matrix_solver_reduced  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_reduced_.valeur());
+  finite_difference_assembler_.reduce_solver_matrix(sparse_matrix_solver,
+                                                    sparse_matrix_solver_reduced,
+                                                    nb_points,
+                                                    pre_initialise_thermal_subproblems_list_);
+}
+
+void IJK_Thermal_Subresolution::compute_md_vector()
+{
+  one_dimensional_advection_diffusion_thermal_solver_.reinit();
+  ArrOfInt pe_voisins_dummy;
+  ArrsOfInt items_to_send_dummy;
+  ArrsOfInt items_to_recv_dummy;
+  ArrsOfInt blocs_to_recv_dummy;
+  pe_voisins_dummy.resize(0);
+  items_to_send_dummy.resize(0);
+  items_to_recv_dummy.resize(0);
+  blocs_to_recv_dummy.resize(0);
+//          const int last_subproblem_index = thermal_local_subproblems_.get_subproblems_counter();
+//          const int subproblems_vector_size = thermal_local_subproblems_.get_end_index_subproblem(last_subproblem_index-1);
+  const int subproblems_vector_size = thermal_subproblems_temperature_solution_for_solver_.size();
+  MD_Vector_std md_std = MD_Vector_std(subproblems_vector_size, subproblems_vector_size,
+                                       pe_voisins_dummy, items_to_send_dummy,
+                                       items_to_recv_dummy, blocs_to_recv_dummy);
+  md_.copy(md_std);
+  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_for_solver_); //, Array_base::NOCOPY_NOINIT);
+  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_for_solver_); //, Array_base::NOCOPY_NOINIT);
+}
+
+void IJK_Thermal_Subresolution::retrieve_temperature_solution()
+{
+  /*
+   * Retrieve the overall vector
+   */
+  for (int i=0; i<thermal_subproblems_temperature_solution_for_solver_.size(); i++)
+    thermal_subproblems_temperature_solution_(i) = thermal_subproblems_temperature_solution_for_solver_(i);
+  thermal_local_subproblems_.retrieve_radial_quantities();
+}
+
 
 void IJK_Thermal_Subresolution::check_wrong_values_rhs()
 {

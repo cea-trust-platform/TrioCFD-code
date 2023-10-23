@@ -122,7 +122,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& disable_interpolation_in_mixed_cells,
                                                                       const int& max_u_radial,
                                                                       const int& correct_fluxes,
-                                                                      const int& distance_cell_faces_from_lrs)
+                                                                      const int& distance_cell_faces_from_lrs,
+                                                                      const int& pre_initialise_thermal_subproblems_list)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -222,7 +223,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     disable_interpolation_in_mixed_cells,
                                                                     max_u_radial,
                                                                     correct_fluxes,
-                                                                    distance_cell_faces_from_lrs);
+                                                                    distance_cell_faces_from_lrs,
+                                                                    pre_initialise_thermal_subproblems_list);
       subproblems_counter_++;
     }
   else
@@ -508,5 +510,10 @@ void IJK_One_Dimensional_Subproblems::prepare_temporal_schemes()
 {
   for (auto& itr : *this)
     itr.prepare_temporal_schemes();
+}
+
+const int& IJK_One_Dimensional_Subproblems::get_end_index_subproblem(const int index) const
+{
+  return (*this)[index].get_end_index_subproblem();
 }
 
