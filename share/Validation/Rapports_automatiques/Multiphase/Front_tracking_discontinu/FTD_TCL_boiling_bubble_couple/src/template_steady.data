@@ -191,12 +191,14 @@ Lire sch
 
 Champ_Uniforme gravite
 Lire gravite 2 0. -9.81
-Associate fluide gravite 
+Associate fluide gravite
+Associate sol gravite
 
 Navier_stokes_FT_disc                         hydraulique
 Transport_interfaces_FT_disc                  interf
 convection_diffusion_temperature_ft_disc      thermique
 convection_diffusion_temperature_ft_disc      thermique_vapeur 
+
 Associate pb1 dom_fluide
 Associate pb1 hydraulique
 Associate pb1 thermique

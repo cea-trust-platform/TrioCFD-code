@@ -133,7 +133,7 @@ Lire pb
 		boundary_conditions 
 		{
 		libre1   sortie_libre_rho_variable champ_front_uniforme 1 0.
-		haut1    paroi_fixe
+		haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
 		bas1     paroi_fixe 
 		sym1 	 symetrie 
         	}
@@ -149,7 +149,7 @@ Lire pb
 	        conditions_initiales { fonction (tan(@degliq@*pi/180.)*(x-5.e-6-(@offset@e-6))-y) } 
 		iterations_correction_volume 2
 		methode_interpolation_v vdf_lineaire
-        	n_iterations_distance 10
+        	n_iterations_distance 8
 		remaillage {
 			pas -1e-6 
 			nb_iter_remaillage 0 # 1 #

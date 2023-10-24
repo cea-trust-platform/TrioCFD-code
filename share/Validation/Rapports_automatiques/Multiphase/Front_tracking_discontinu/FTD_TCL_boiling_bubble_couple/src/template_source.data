@@ -211,7 +211,7 @@ Read TCL
 
 Champ_Uniforme gravite
 Lire gravite 2 0. -9.81
-Associate fluide gravite 
+Associate fluide gravite
 Associate sol gravite
 
 Navier_stokes_FT_disc                         hydraulique
@@ -284,7 +284,6 @@ Lire pb1
       methode_interpolation_v vdf_lineaire
       methode_transport vitesse_interpolee hydraulique
       conditions_initiales { fonction 1. }
-      injecteur_interfaces injection.txt
       suppression_sous_domaine zone_sortie
       VOFlike_correction_volume 1 # Flag to activate the VOF-like volume conservation (dI/dt) #
       nb_iterations_correction_volume 1 # to get the correct dI/dt #
@@ -464,6 +463,7 @@ Read pb2
 				autre_champ_temperature_indic1 temperature_thermique
 				autre_champ_temperature_indic0 temperature_thermique_vapeur
 				autre_champ_indicatrice indicatrice_interf
+                               dt_impr_Tw 1.e-4
 			}
 
 		}

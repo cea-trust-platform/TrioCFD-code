@@ -1190,6 +1190,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
     // get wall BC frontiere nb
     int num_bord = -1;
+    int nbwall_found = 0;
     for (int i=0; i<zcldis.nb_cond_lim(); i++)
       {
         const Cond_lim& la_cl = zcldis.les_conditions_limites(i);
@@ -1203,9 +1204,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             Cerr << "[TCL]: Wall-type BC found at " <<
                  bc_name <<finl;
             num_bord = i;
-            break;
+            nbwall_found = nbwall_found +1;
+//             break;
           }
       }
+    if (nbwall_found != 1)
+      Process::exit(Nom(nbwall_found) + " wall-type BC found!!!!!  Check JDD, pls" );
     if (num_bord<0)
       Process::exit( "[TCL]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
 
