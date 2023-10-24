@@ -105,6 +105,17 @@ public :
   void clean() override;
   void compute_ijk_pure_faces_indices() override;
   void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
+  void sort_ijk_intersections_subproblems_indices_fluxes_by_k_layers(std::vector<ArrOfInt>& index_face_i_flux_x,
+                                                                     std::vector<ArrOfInt>& index_face_j_flux_x,
+                                                                     std::vector<ArrOfInt>& index_face_i_flux_y,
+                                                                     std::vector<ArrOfInt>& index_face_j_flux_y,
+                                                                     std::vector<ArrOfInt>& index_face_i_flux_z,
+                                                                     std::vector<ArrOfInt>& index_face_j_flux_z,
+                                                                     std::vector<ArrOfDouble>& flux_x,
+                                                                     std::vector<ArrOfDouble>& flux_y,
+                                                                     std::vector<ArrOfDouble>& flux_z,
+                                                                     const DoubleVect& fluxes_subgrid,
+                                                                     const int ini_index);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
 protected :
   enum fluxes_type_ { convection, diffusion };
@@ -140,6 +151,7 @@ protected :
   int debug_=0;
   int levels_=0;
   int discrete_integral_=0;
+  bool flux_init_ = 0;
 
   int distance_cell_faces_from_lrs_=0;
 };
