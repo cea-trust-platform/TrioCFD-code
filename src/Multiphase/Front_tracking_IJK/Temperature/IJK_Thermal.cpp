@@ -174,6 +174,30 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  oss << "TEMPERATURE_CELL_NEIGHBOURS_" << lata_suffix << idx;
+  Nom nom_temp_cell_neighbours(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("TEMPERATURE_CELL_NEIGHBOURS")) || (liste_post_instantanes.contient_(nom_temp_cell_neighbours)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temp_cell_neighbours, get_temperature_cell_neighbours(), latastep);
+    }
+  oss.str("");
+
+  oss << "TEMPERATURE_CELL_NEIGHBOURS_DEBUG_" << lata_suffix << idx;
+  Nom nom_temp_cell_neighbours_debug(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("TEMPERATURE_CELL_NEIGHBOURS_DEBUG")) || (liste_post_instantanes.contient_(nom_temp_cell_neighbours_debug)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temp_cell_neighbours_debug, get_temperature_cell_neighbours_debug(), latastep);
+    }
+  oss.str("");
+
+  oss << "NEIGHBOURS_CORRECTED_" << lata_suffix << idx;
+  Nom nom_temp_cell_neighbours_corrected(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("NEIGHBOURS_CORRECTED")) || (liste_post_instantanes.contient_(nom_temp_cell_neighbours_corrected)))
+    {
+      n++, dumplata_scalar(lata_name, nom_temp_cell_neighbours_corrected, get_cell_neighbours_corrected(), latastep);
+    }
+  oss.str("");
+
   /*
    * TEMPERATURE_ANA
    */

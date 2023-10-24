@@ -102,6 +102,18 @@ public:
   {
     return temperature_before_extrapolation_ ;
   }
+  virtual const IJK_Field_double& get_temperature_cell_neighbours_debug() const
+  {
+    return temperature_;
+  }
+  virtual const IJK_Field_double& get_temperature_cell_neighbours() const
+  {
+    return temperature_;
+  }
+  virtual const IJK_Field_int& get_cell_neighbours_corrected() const
+  {
+    return *eulerian_compo_connex_from_interface_ns_int_;
+  }
   IJK_Field_double& get_temperature_ft()
   {
     return temperature_ft_ ;

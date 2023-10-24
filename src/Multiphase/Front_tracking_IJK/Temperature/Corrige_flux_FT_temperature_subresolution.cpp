@@ -28,6 +28,8 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
 {
   thermal_subproblems_ = nullptr;
   has_checked_consistency_ = false;
+  distance_cell_faces_from_lrs_= 0;
+  correct_temperature_cell_neighbours_ = 0;
 }
 
 void Corrige_flux_FT_temperature_subresolution::associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems)
@@ -171,6 +173,70 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre(
         Cerr << "Ghost temperature: " << temperature_ghost << " is higher than the maximum temperature:" << max_temperature << finl;
 
       temperature(ijk_indices_i, ijk_indices_j, ijk_indices_k) = temperature_ghost;
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
+                                                                                           IJK_Field_int& neighbours_weighting) const
+{
+  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
+    {
+      neighbours_weighting.data() = 0;
+      neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
+      temperature_neighbours.data() = 0.;
+      temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
+      int index_i_problem, index_j_problem, index_k_problem;
+      int index_i_neighbour, index_j_neighbour, index_k_neighbour;
+      int m,l,n;
+      for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+        {
+          if (thermal_subproblems_->get_dxyz_increment_bool(i))
+            {
+              thermal_subproblems_->get_subproblem_ijk_indices(index_i_problem, index_j_problem, index_k_problem, i);
+              const FixedVector<int,3>& pure_neighbours_corrected_sign = thermal_subproblems_->get_pure_neighbours_corrected_sign(i);
+              const std::vector<std::vector<std::vector<bool>>>& pure_neighbours_to_correct = thermal_subproblems_->get_pure_neighbours_to_correct(i);
+              const std::vector<std::vector<std::vector<double>>>& pure_neighbours_corrected_distance = thermal_subproblems_->get_pure_neighbours_corrected_distance(i);
+              const int l_dir_size = (int) pure_neighbours_to_correct.size() -1;
+              const int m_dir_size = (int) pure_neighbours_to_correct[0].size() -1;
+              const int n_dir_size = (int) pure_neighbours_to_correct[0][0].size() -1;
+              for (l=l_dir_size; l>=0; l--)
+                for (m=m_dir_size; m>=0; m--)
+                  for (n=n_dir_size; n>=0; n--)
+                    if (pure_neighbours_to_correct[l][m][n]) // (l!=0 || m!=0 || n!=0) &&
+                      {
+                        const double dist_sub_res = pure_neighbours_corrected_distance[l][m][n];
+                        const double temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
+                        index_i_neighbour = index_i_problem + ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
+                        index_j_neighbour = index_j_problem + ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
+                        index_k_neighbour = index_k_problem + ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
+                        temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost;
+                        neighbours_weighting(index_i_neighbour, index_j_neighbour, index_k_neighbour) += 1;
+                      }
+            }
+        }
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
+                                                                                           IJK_Field_double& temperature_neighbours,
+                                                                                           IJK_Field_int& neighbours_weighting) const
+{
+  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
+    {
+      temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
+      neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
+      const int ni = temperature.ni();
+      const int nj = temperature.nj();
+      const int nk = temperature.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double neighbours_weighting_ijk = (double) neighbours_weighting(i,j,k);
+              if (neighbours_weighting(i,j,k))
+                temperature(i,j,k) = temperature_neighbours(i,j,k) / neighbours_weighting_ijk;
+            }
+      temperature.echange_espace_virtuel(temperature.ghost());
     }
 }
 

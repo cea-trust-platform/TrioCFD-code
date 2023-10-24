@@ -71,6 +71,18 @@ public :
   {
     return debug_LRS_cells_;
   }
+  const IJK_Field_double& get_temperature_cell_neighbours_debug() const override
+  {
+    return temperature_cell_neighbours_debug_;
+  }
+  const IJK_Field_double& get_temperature_cell_neighbours() const override
+  {
+    return temperature_cell_neighbours_;
+  }
+  const IJK_Field_int& get_cell_neighbours_corrected() const override
+  {
+    return neighbours_temperature_to_correct_;
+  }
 
 protected :
   void reset_subresolution_distributed_vectors();
@@ -227,6 +239,14 @@ protected :
   int pre_initialise_thermal_subproblems_list_;
   int global_probes_characteristics_ = 1;
   double pre_factor_subproblems_number_;
+
+  int correct_temperature_cell_neighbours_;
+  int replace_temperature_cell_neighbours_;
+  int neighbours_colinearity_weighting_;
+  IJK_Field_double temperature_cell_neighbours_;
+  IJK_Field_double temperature_cell_neighbours_debug_;
+  IJK_Field_int neighbours_temperature_to_correct_;
+  IJK_Field_double neighbours_temperature_colinearity_weighting_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

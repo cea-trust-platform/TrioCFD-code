@@ -110,7 +110,8 @@ public :
                                        const int& max_u_radial,
                                        const int& correct_fluxes,
                                        const int& distance_cell_faces_from_lrs,
-                                       const int& pre_initialise_thermal_subproblems_list);
+                                       const int& pre_initialise_thermal_subproblems_list,
+                                       const int& correct_temperature_cell_neighbours);
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);
@@ -129,6 +130,10 @@ public :
   void compute_local_temperature_gradient_solutions();
   void compute_local_velocity_gradient();
   void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
+  const int& get_dxyz_increment_bool(const int& subproblem_index) const;
+  const FixedVector<int,3>& get_pure_neighbours_corrected_sign(const int& subproblem_index) const;
+  const std::vector<std::vector<std::vector<bool>>>& get_pure_neighbours_to_correct(const int& subproblem_index) const;
+  const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_distance(const int& subproblem_index) const;
   double get_interfacial_gradient_corrected(int i);
   double get_temperature_profile_at_point(const int& i, const double& dist) const;
   const double& get_dist_cell_interface(const int& i) const;
@@ -165,6 +170,7 @@ public :
   void set_local_time_step(const double& local_time_step);
   void prepare_temporal_schemes();
   const int& get_end_index_subproblem(const int index) const;
+
 
 protected :
   int debug_ = 0;

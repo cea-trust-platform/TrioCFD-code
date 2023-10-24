@@ -50,6 +50,9 @@ public :
   inline Motcles& get_thermal_suffix() { return lata_suffix_; };
   inline const IJK_Field_double& get_temperature() const { return valeur().get_temperature(); };
   inline const IJK_Field_double& get_temperature_before_extrapolation() const { return valeur().get_temperature_before_extrapolation(); }
+  inline const IJK_Field_double& get_temperature_cell_neighbours() const { return valeur().get_temperature_cell_neighbours(); }
+  inline const IJK_Field_double& get_temperature_cell_neighbours_debug() const { return valeur().get_temperature_cell_neighbours_debug(); }
+  inline const IJK_Field_int& get_cell_neighbours_corrected() const { return valeur().get_cell_neighbours_corrected(); }
   inline IJK_Field_double& get_temperature_ft() { return valeur().get_temperature_ft(); }
   inline const IJK_Field_double& get_temperature_ana() const { return valeur().get_temperature_ana(); };
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }

@@ -123,7 +123,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& max_u_radial,
                                                                       const int& correct_fluxes,
                                                                       const int& distance_cell_faces_from_lrs,
-                                                                      const int& pre_initialise_thermal_subproblems_list)
+                                                                      const int& pre_initialise_thermal_subproblems_list,
+                                                                      const int& correct_temperature_cell_neighbours)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -142,7 +143,6 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
           Cerr << "bubbles_barycentre : " << bubbles_barycentre << finl;
         }
       // Need for a Navier-Stokes field (NOT FT)
-
       const double distance = eulerian_distance(i, j ,k);
       const double curvature = eulerian_curvature(i, j ,k);
       const double interfacial_area = eulerian_interfacial_area(i, j ,k);
@@ -224,7 +224,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     max_u_radial,
                                                                     correct_fluxes,
                                                                     distance_cell_faces_from_lrs,
-                                                                    pre_initialise_thermal_subproblems_list);
+                                                                    pre_initialise_thermal_subproblems_list,
+                                                                    correct_temperature_cell_neighbours);
       subproblems_counter_++;
     }
   else
@@ -334,6 +335,26 @@ void IJK_One_Dimensional_Subproblems::compute_local_velocity_gradient()
 void IJK_One_Dimensional_Subproblems::get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const
 {
   (*this)[subproblem_index].get_ijk_indices(i,j,k);
+}
+
+const int& IJK_One_Dimensional_Subproblems::get_dxyz_increment_bool(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_dxyz_increment_bool();
+}
+
+const FixedVector<int,3>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_sign(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_corrected_sign();
+}
+
+const std::vector<std::vector<std::vector<bool>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_to_correct(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_to_correct();
+}
+
+const std::vector<std::vector<std::vector<double>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_distance(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_corrected_distance();
 }
 
 double IJK_One_Dimensional_Subproblems::get_interfacial_gradient_corrected(int i)

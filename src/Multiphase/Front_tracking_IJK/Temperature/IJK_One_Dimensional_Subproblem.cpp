@@ -246,7 +246,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& max_u_radial,
                                                                      const int& correct_fluxes,
                                                                      const int& distance_cell_faces_from_lrs,
-                                                                     const int& pre_initialise_thermal_subproblems_list)
+                                                                     const int& pre_initialise_thermal_subproblems_list,
+                                                                     const int& correct_temperature_cell_neighbours)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
@@ -254,6 +255,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   current_time_ = current_time;
   correct_fluxes_ = correct_fluxes;
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
+  correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
@@ -278,6 +280,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   advected_frame_of_reference_ = advected_frame_of_reference;
   neglect_frame_of_reference_radial_advection_=neglect_frame_of_reference_radial_advection;
   distance_cell_faces_from_lrs_ = distance_cell_faces_from_lrs;
+  // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
+  correct_temperature_cell_neighbours_ = (correct_temperature_cell_neighbours_ && distance_cell_faces_from_lrs_);
   initialise_thermal_probe();
   if (!global_probes_characteristics_)
     (*first_time_step_temporal_) = 0;
@@ -285,7 +289,6 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
   max_u_radial_ = max_u_radial;
   max_u_cartesian_ = !max_u_radial_;
-  // FIXME: What happen with highly deformable bubbles (concave interface portions) ?
 }
 
 void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
@@ -355,6 +358,7 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
   /*
    *  Curvature is negative for a convex bubble
    *  but R should be positive in that case
+   *  FIXME: What happen with highly deformable bubbles (concave interface portions) ?
    */
   if (fabs(curvature_) > DMINFLOAT)
     osculating_radius_ = fabs(2 / curvature_);
@@ -369,8 +373,13 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     {
       if (debug_)
         Cerr << "Compute cell and faces distance to the interface" << finl;
-      compute_distance_cell_centre();
-      compute_distance_faces_centres();
+      if (correct_fluxes_)
+        {
+          compute_distance_cell_centre();
+          compute_distance_faces_centres();
+          if (correct_temperature_cell_neighbours_)
+            compute_distance_cell_centres_neighbours();
+        }
     }
 
   surface_ = (*eulerian_interfacial_area_)(index_i_, index_j_, index_k_);
@@ -737,8 +746,6 @@ void IJK_One_Dimensional_Subproblem::reajust_probe_length()
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 {
-//  cfl_probe_length_ = (max_u_ * global_time_step_) / local_cfl_; // Add 3D constants ?
-//  fourier_probe_length_ = sqrt(((*alpha_ * global_time_step_)) / local_fourier_); // Add 3D constants ?
   const double current_time = ref_ijk_ft_->get_current_time();
   cfl_probe_length_ = (max_u_ * current_time) / local_cfl_; // Add 3D constants ?
   fourier_probe_length_ = sqrt(((*alpha_ * (current_time + global_time_step_))) / local_fourier_); // Add 3D constants ?
@@ -763,13 +770,8 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
                 short_probe_condition_ = 0;
             }
         }
-      // FIXME : Need the distance to the pure cell face centres !
       else
         {
-//          const double min_distance_pure_face_centre = compute_min_distance_pure_face_centre();
-//          const double min_distance_pure_vertex_centre = compute_min_distance_pure_face_vertices();
-//          const double min_distance_face_centre_vertex = std::min(min_distance_pure_face_centre, min_distance_pure_vertex_centre);
-//          if (max_cfl_fourier_probe_length_ < min_distance_face_centre_vertex)
           compute_distance_faces_centres();
           bool has_liquid_neighbours = 1;
           for (int i=0; i<6; i++)
@@ -849,7 +851,7 @@ void IJK_One_Dimensional_Subproblem::compute_distance_faces_centres()
           vector_relative = facet_barycentre_;
           vector_relative *= (-1);
           vector_relative += bary_face;
-          const double distance_face_centre = Vecteur3::produit_scalaire(bary_face, normal_vector_compo_);
+          const double distance_face_centre = Vecteur3::produit_scalaire(vector_relative, normal_vector_compo_);
           face_centres_distance_[l] = distance_face_centre;
           for (m=0; m<4; m++)
             {
@@ -957,6 +959,83 @@ void IJK_One_Dimensional_Subproblem::compute_vertex_position(const int& vertex_n
     }
   bary_vertex += point_coords;
   distance_vertex_centre = Vecteur3::produit_scalaire(bary_vertex, normal_vector_compo_);
+}
+
+void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  int l, m, n;
+
+  int dxyz_increment_max;
+  if (!correct_neighbours_rank_)
+    {
+      const int dx_increment_max = (int) (dx / probe_length_);
+      const int dy_increment_max = (int) (dy / probe_length_);
+      const int dz_increment_max = (int) (dz / probe_length_);
+      dxyz_increment_max = std::max(std::max(dx_increment_max, dy_increment_max), dz_increment_max);
+    }
+  else
+    {
+      dxyz_increment_max = neighbours_corrected_rank_;
+    }
+  /*
+   * 8-1 values for one neighbour in each dir... (Too much, enhance later)
+   * Positive OR Negative dir depending on the normal vector
+   */
+  pure_neighbours_to_correct_.resize(dxyz_increment_max + 1);
+  pure_neighbours_corrected_distance_.resize(dxyz_increment_max + 1);
+  for (l=dxyz_increment_max; l>=0; l--)
+    {
+      pure_neighbours_to_correct_[l].resize(dxyz_increment_max + 1);
+      pure_neighbours_corrected_distance_[l].resize(dxyz_increment_max + 1);
+      for (m=dxyz_increment_max; m>=0; m--)
+        {
+          pure_neighbours_to_correct_[l][m].resize(dxyz_increment_max + 1);
+          pure_neighbours_corrected_distance_[l][m].resize(dxyz_increment_max + 1);
+          for (n=dxyz_increment_max; n>=0; n--)
+            {
+              pure_neighbours_to_correct_[l][m][n] = false;
+              pure_neighbours_corrected_distance_[l][m][n] = 0.;
+            }
+        }
+    }
+
+  double remaining_distance_diag = probe_length_ - cell_centre_distance_;
+  Vecteur3 remaining_distance_diag_projected = normal_vector_compo_;
+  remaining_distance_diag_projected *= remaining_distance_diag;
+  for (int i=0; i<3; i++)
+    pure_neighbours_corrected_sign_[i] = signbit(normal_vector_compo_[i]);
+  int dx_increment = (int) abs(remaining_distance_diag_projected[0] / dx);
+  int dy_increment = (int) abs(remaining_distance_diag_projected[1] / dy);
+  int dz_increment = (int) abs(remaining_distance_diag_projected[2] / dz);
+  dxyz_increment_bool_ = (dx_increment || dy_increment || dz_increment);
+  if (correct_neighbours_rank_)
+    {
+      dx_increment = std::min(dx_increment, dxyz_increment_max);
+      dy_increment = std::min(dy_increment, dxyz_increment_max);
+      dz_increment = std::min(dz_increment, dxyz_increment_max);
+    }
+  for (l=dx_increment; l>=0; l--)
+    for (m=dy_increment; m>=0; m--)
+      for (n=dz_increment; n>=0; n--)
+        if (l!=0 || m!=0 || n!=0)
+          {
+            const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) : l;
+            const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m * (-1) : m;
+            const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) : n;
+            const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir, index_j_ + m_dir, index_k_ + n_dir);
+            if (indic_neighbour > LIQUID_INDICATOR_TEST)
+              {
+                pure_neighbours_to_correct_[l][m][n] = true;
+                pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_
+                                                               + l_dir * normal_vector_compo_[0] * dx
+                                                               + m_dir * normal_vector_compo_[1] * dy
+                                                               + n_dir * normal_vector_compo_[2] * dz;
+              }
+          }
 }
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& probe_variations_enabled)
@@ -1292,7 +1371,7 @@ void IJK_One_Dimensional_Subproblem::initialise_radial_diffusion_operator_local(
 
 void IJK_One_Dimensional_Subproblem::initialise_identity_operator_local()
 {
-  if ((!global_probes_characteristics_ || pre_initialise_thermal_subproblems_list_) && first_time_step_varying_probes_)
+  if ((!global_probes_characteristics_ || pre_initialise_thermal_subproblems_list_) && (*first_time_step_temporal_))
     (*finite_difference_assembler_).reinitialise_matrix_subproblem(identity_matrix_subproblems_,
                                                                    identity_matrix_explicit_implicit_,
                                                                    sub_problem_index_);

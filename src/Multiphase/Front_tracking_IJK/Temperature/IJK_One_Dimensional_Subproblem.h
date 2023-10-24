@@ -138,12 +138,14 @@ public :
                                        const int& max_u_radial,
                                        const int& correct_fluxes,
                                        const int& distance_cell_faces_from_lrs,
-                                       const int& pre_initialise_thermal_subproblems_list);
+                                       const int& pre_initialise_thermal_subproblems_list,
+                                       const int& correct_temperature_cell_neighbours);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
   void compute_distance_cell_centre();
   void compute_distance_faces_centres();
+  void compute_distance_cell_centres_neighbours();
   double compute_min_distance_pure_face_centre();
   double compute_min_distance_pure_face_vertices();
   double compute_max_distance_pure_face_centre();
@@ -269,6 +271,22 @@ public :
   const int& get_end_index_subproblem() const
   {
     return end_index_;
+  }
+  const int& get_dxyz_increment_bool() const
+  {
+    return dxyz_increment_bool_;
+  }
+  const FixedVector<int,3>& get_pure_neighbours_corrected_sign() const
+  {
+    return pure_neighbours_corrected_sign_;
+  }
+  const std::vector<std::vector<std::vector<bool>>>& get_pure_neighbours_to_correct() const
+  {
+    return pure_neighbours_to_correct_;
+  }
+  const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_distance() const
+  {
+    return pure_neighbours_corrected_distance_;
   }
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -682,6 +700,14 @@ protected :
 
   int distance_cell_faces_from_lrs_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;
+
+  int correct_temperature_cell_neighbours_ = 0;
+  int correct_neighbours_rank_ = 1;
+  int neighbours_corrected_rank_ = 1;
+  FixedVector<int,3> pure_neighbours_corrected_sign_;
+  std::vector<std::vector<std::vector<bool>>> pure_neighbours_to_correct_;
+  std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_distance_;
+  int dxyz_increment_bool_=0;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */
