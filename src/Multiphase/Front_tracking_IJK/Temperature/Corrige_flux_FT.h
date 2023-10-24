@@ -71,10 +71,12 @@ public :
                                                 DoubleTab& coo_vap) const;
   inline void compute_temperature_cell_centre(IJK_Field_double& temperature) const;
   inline void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
-                                                         IJK_Field_int& neighbours_weighting) const;
+                                                         IJK_Field_int& neighbours_weighting,
+                                                         IJK_Field_double& neighbours_weighting_colinearity) const;
   inline void replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                          IJK_Field_double& temperature_neighbours,
-                                                         IJK_Field_int& neighbours_weighting) const;
+                                                         IJK_Field_int& neighbours_weighting,
+                                                         IJK_Field_double& neighbours_weighting_colinearity) const;
   inline void set_zero_temperature_increment(IJK_Field_double& d_temperature) const;
   inline void compute_thermal_convective_fluxes();
   inline void compute_thermal_diffusive_fluxes();
@@ -88,7 +90,7 @@ public :
   inline void sort_ijk_intersections_subproblems_indices_by_k_layers();
 
   inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
-  inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours);
+  inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting);
   inline void set_debug(const int& debug);
 };
 
@@ -163,16 +165,19 @@ inline void Corrige_flux_FT::compute_temperature_cell_centre(IJK_Field_double& t
   valeur().compute_temperature_cell_centre(temperature);
 }
 
-inline void Corrige_flux_FT::compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours, IJK_Field_int& neighbours_weighting) const
+inline void Corrige_flux_FT::compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
+                                                                        IJK_Field_int& neighbours_weighting,
+                                                                        IJK_Field_double& neighbours_weighting_colinearity) const
 {
-  valeur().compute_temperature_cell_centre_neighbours(temperature_neighbours, neighbours_weighting);
+  valeur().compute_temperature_cell_centre_neighbours(temperature_neighbours, neighbours_weighting, neighbours_weighting_colinearity);
 }
 
 inline void Corrige_flux_FT::replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                                         IJK_Field_double& temperature_neighbours,
-                                                                        IJK_Field_int& neighbours_weighting) const
+                                                                        IJK_Field_int& neighbours_weighting,
+                                                                        IJK_Field_double& neighbours_weighting_colinearity) const
 {
-  valeur().replace_temperature_cell_centre_neighbours(temperature, temperature_neighbours, neighbours_weighting);
+  valeur().replace_temperature_cell_centre_neighbours(temperature, temperature_neighbours, neighbours_weighting, neighbours_weighting_colinearity);
 }
 
 inline void Corrige_flux_FT::set_zero_temperature_increment(IJK_Field_double& d_temperature) const
@@ -231,9 +236,9 @@ inline void Corrige_flux_FT::set_distance_cell_faces_from_lrs(const int& distanc
   valeur().set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs);
 }
 
-inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours)
+inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting)
 {
-  valeur().set_correction_cell_neighbours(correct_temperature_cell_neighbours);
+  valeur().set_correction_cell_neighbours(correct_temperature_cell_neighbours, neighbours_colinearity_weighting);
 }
 
 inline void Corrige_flux_FT::set_debug(const int& debug)

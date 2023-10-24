@@ -119,13 +119,15 @@ public:
 
   virtual void set_debug(const int& debug) { ; };
   virtual void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) { ; };
-  virtual void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours) { ; };
+  virtual void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting) { ; };
 
   virtual void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
-                                                          IJK_Field_int& neighbours_weighting) const { ; };
+                                                          IJK_Field_int& neighbours_weighting,
+                                                          IJK_Field_double& neighbours_weighting_colinearity) const { ; };
   virtual void replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                           IJK_Field_double& temperature_neighbours,
-                                                          IJK_Field_int& neighbours_weighting) const { ; };
+                                                          IJK_Field_int& neighbours_weighting,
+                                                          IJK_Field_double& neighbours_weighting_colinearity) const { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

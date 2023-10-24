@@ -247,7 +247,10 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& correct_fluxes,
                                                                      const int& distance_cell_faces_from_lrs,
                                                                      const int& pre_initialise_thermal_subproblems_list,
-                                                                     const int& correct_temperature_cell_neighbours)
+                                                                     const int& correct_temperature_cell_neighbours,
+                                                                     const int& correct_neighbours_rank,
+                                                                     const int& neighbours_corrected_rank,
+                                                                     const int& neighbours_colinearity_weighting)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
@@ -256,6 +259,9 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   correct_fluxes_ = correct_fluxes;
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
   correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
+  correct_neighbours_rank_ = correct_neighbours_rank;
+  neighbours_corrected_rank_ = neighbours_corrected_rank;
+  neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
@@ -972,9 +978,9 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
   int dxyz_increment_max;
   if (!correct_neighbours_rank_)
     {
-      const int dx_increment_max = (int) (dx / probe_length_);
-      const int dy_increment_max = (int) (dy / probe_length_);
-      const int dz_increment_max = (int) (dz / probe_length_);
+      const int dx_increment_max = (int) (probe_length_ / dx);
+      const int dy_increment_max = (int) (probe_length_ / dy);
+      const int dz_increment_max = (int) (probe_length_ / dz);
       dxyz_increment_max = std::max(std::max(dx_increment_max, dy_increment_max), dz_increment_max);
     }
   else
@@ -987,18 +993,26 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
    */
   pure_neighbours_to_correct_.resize(dxyz_increment_max + 1);
   pure_neighbours_corrected_distance_.resize(dxyz_increment_max + 1);
+  if (neighbours_colinearity_weighting_)
+    pure_neighbours_corrected_colinearity_.resize(dxyz_increment_max + 1);
   for (l=dxyz_increment_max; l>=0; l--)
     {
       pure_neighbours_to_correct_[l].resize(dxyz_increment_max + 1);
       pure_neighbours_corrected_distance_[l].resize(dxyz_increment_max + 1);
+      if (neighbours_colinearity_weighting_)
+        pure_neighbours_corrected_colinearity_[l].resize(dxyz_increment_max + 1);
       for (m=dxyz_increment_max; m>=0; m--)
         {
           pure_neighbours_to_correct_[l][m].resize(dxyz_increment_max + 1);
           pure_neighbours_corrected_distance_[l][m].resize(dxyz_increment_max + 1);
+          if (neighbours_colinearity_weighting_)
+            pure_neighbours_corrected_colinearity_[l][m].resize(dxyz_increment_max + 1);
           for (n=dxyz_increment_max; n>=0; n--)
             {
               pure_neighbours_to_correct_[l][m][n] = false;
               pure_neighbours_corrected_distance_[l][m][n] = 0.;
+              if (neighbours_colinearity_weighting_)
+                pure_neighbours_corrected_colinearity_[l][m][n] = 0.;
             }
         }
     }
@@ -1030,10 +1044,21 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
             if (indic_neighbour > LIQUID_INDICATOR_TEST)
               {
                 pure_neighbours_to_correct_[l][m][n] = true;
-                pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_
-                                                               + l_dir * normal_vector_compo_[0] * dx
-                                                               + m_dir * normal_vector_compo_[1] * dy
-                                                               + n_dir * normal_vector_compo_[2] * dz;
+                const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
+                const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
+                const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
+                pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+                if (neighbours_colinearity_weighting_)
+                  {
+                    Vecteur3 relative_vector = normal_vector_compo_;
+                    relative_vector *= cell_centre_distance_;
+                    relative_vector[0] += (l * normal_vector_compo_[0] * dx);
+                    relative_vector[1] += (m * normal_vector_compo_[1] * dy);
+                    relative_vector[2] += (n * normal_vector_compo_[2] * dz);
+                    const double relative_vector_norm = relative_vector.length();
+                    relative_vector *= (1 / relative_vector_norm);
+                    pure_neighbours_corrected_colinearity_[l][m][n] = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  }
               }
           }
 }

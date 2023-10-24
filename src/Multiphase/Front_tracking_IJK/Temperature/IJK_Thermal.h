@@ -53,6 +53,7 @@ public :
   inline const IJK_Field_double& get_temperature_cell_neighbours() const { return valeur().get_temperature_cell_neighbours(); }
   inline const IJK_Field_double& get_temperature_cell_neighbours_debug() const { return valeur().get_temperature_cell_neighbours_debug(); }
   inline const IJK_Field_int& get_cell_neighbours_corrected() const { return valeur().get_cell_neighbours_corrected(); }
+  inline const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const { return valeur().get_neighbours_temperature_colinearity_weighting(); }
   inline IJK_Field_double& get_temperature_ft() { return valeur().get_temperature_ft(); }
   inline const IJK_Field_double& get_temperature_ana() const { return valeur().get_temperature_ana(); };
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }

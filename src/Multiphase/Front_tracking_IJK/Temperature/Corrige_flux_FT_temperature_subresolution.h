@@ -59,7 +59,12 @@ public :
   void set_diffusion_negligible(const int& diffusion_negligible) override { diffusion_negligible_ = diffusion_negligible; };
   void set_fluxes_feedback_params(const int discrete_integral, const int levels) override { discrete_integral_ = discrete_integral; levels_ = levels; };
   void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) override { distance_cell_faces_from_lrs_=distance_cell_faces_from_lrs; };
-  void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours) override { correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours; };
+  void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours,
+                                      const int& neighbours_colinearity_weighting) override
+  {
+    correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
+    neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
+  }
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
@@ -92,10 +97,12 @@ public :
   void associate_indices_and_check_subproblems_consistency();
   void compute_temperature_cell_centre(IJK_Field_double& temperature) const override;
   void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
-                                                  IJK_Field_int& neighbours_weighting) const override;
+                                                  IJK_Field_int& neighbours_weighting,
+                                                  IJK_Field_double& neighbours_weighting_colinearity) const override;
   void replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                   IJK_Field_double& temperature_neighbours,
-                                                  IJK_Field_int& neighbours_weighting) const override;
+                                                  IJK_Field_int& neighbours_weighting,
+                                                  IJK_Field_double& neighbours_weighting_colinearity) const override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
   void compute_thermal_diffusive_fluxes() override;
@@ -161,6 +168,7 @@ protected :
 
   int distance_cell_faces_from_lrs_;
   int correct_temperature_cell_neighbours_;
+  int neighbours_colinearity_weighting_;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

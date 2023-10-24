@@ -83,6 +83,10 @@ public :
   {
     return neighbours_temperature_to_correct_;
   }
+  const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const override
+  {
+    return neighbours_temperature_colinearity_weighting_;
+  }
 
 protected :
   void reset_subresolution_distributed_vectors();
@@ -92,6 +96,7 @@ protected :
   void correct_temperature_for_eulerian_fluxes() override;
   void store_temperature_before_extrapolation() override;
   void correct_temperature_for_visu() override;
+  void clip_temperature_values() override;
   void compute_overall_probes_parameters();
   void pre_initialise_thermal_subproblems_matrix();
   void interpolate_project_velocities_on_probes();
@@ -241,12 +246,16 @@ protected :
   double pre_factor_subproblems_number_;
 
   int correct_temperature_cell_neighbours_;
+  int correct_neighbours_using_probe_length_;
+  int neighbours_corrected_rank_;
   int replace_temperature_cell_neighbours_;
   int neighbours_colinearity_weighting_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;
   IJK_Field_int neighbours_temperature_to_correct_;
   IJK_Field_double neighbours_temperature_colinearity_weighting_;
+
+  int clip_temperature_values_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

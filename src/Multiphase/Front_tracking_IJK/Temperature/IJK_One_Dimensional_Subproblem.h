@@ -139,7 +139,10 @@ public :
                                        const int& correct_fluxes,
                                        const int& distance_cell_faces_from_lrs,
                                        const int& pre_initialise_thermal_subproblems_list,
-                                       const int& correct_temperature_cell_neighbours);
+                                       const int& correct_temperature_cell_neighbours,
+                                       const int& correct_neighbours_rank,
+                                       const int& neighbours_corrected_rank,
+                                       const int& neighbours_colinearity_weighting);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -287,6 +290,10 @@ public :
   const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_distance() const
   {
     return pure_neighbours_corrected_distance_;
+  }
+  const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_colinearity() const
+  {
+    return pure_neighbours_corrected_colinearity_;
   }
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -704,9 +711,11 @@ protected :
   int correct_temperature_cell_neighbours_ = 0;
   int correct_neighbours_rank_ = 1;
   int neighbours_corrected_rank_ = 1;
+  int neighbours_colinearity_weighting_ = 0;
   FixedVector<int,3> pure_neighbours_corrected_sign_;
   std::vector<std::vector<std::vector<bool>>> pure_neighbours_to_correct_;
   std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_distance_;
+  std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_colinearity_;
   int dxyz_increment_bool_=0;
 };
 

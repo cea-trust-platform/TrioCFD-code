@@ -177,7 +177,8 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre(
 }
 
 void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
-                                                                                           IJK_Field_int& neighbours_weighting) const
+                                                                                           IJK_Field_int& neighbours_weighting,
+                                                                                           IJK_Field_double& neighbours_weighting_colinearity) const
 {
   if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
     {
@@ -185,6 +186,12 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
       neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
       temperature_neighbours.data() = 0.;
       temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
+      if (neighbours_colinearity_weighting_)
+        {
+          neighbours_weighting_colinearity.data() = 0.;
+          neighbours_weighting_colinearity.echange_espace_virtuel(neighbours_weighting_colinearity.ghost());
+        }
+      std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_colinearity;
       int index_i_problem, index_j_problem, index_k_problem;
       int index_i_neighbour, index_j_neighbour, index_k_neighbour;
       int m,l,n;
@@ -196,6 +203,8 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
               const FixedVector<int,3>& pure_neighbours_corrected_sign = thermal_subproblems_->get_pure_neighbours_corrected_sign(i);
               const std::vector<std::vector<std::vector<bool>>>& pure_neighbours_to_correct = thermal_subproblems_->get_pure_neighbours_to_correct(i);
               const std::vector<std::vector<std::vector<double>>>& pure_neighbours_corrected_distance = thermal_subproblems_->get_pure_neighbours_corrected_distance(i);
+              if (neighbours_colinearity_weighting_)
+                pure_neighbours_corrected_colinearity = thermal_subproblems_->get_pure_neighbours_corrected_colinearity(i);
               const int l_dir_size = (int) pure_neighbours_to_correct.size() -1;
               const int m_dir_size = (int) pure_neighbours_to_correct[0].size() -1;
               const int n_dir_size = (int) pure_neighbours_to_correct[0][0].size() -1;
@@ -209,8 +218,16 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
                         index_i_neighbour = index_i_problem + ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
                         index_j_neighbour = index_j_problem + ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
                         index_k_neighbour = index_k_problem + ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
-                        temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost;
+                        if (neighbours_colinearity_weighting_)
+                          {
+                            neighbours_weighting_colinearity(index_i_neighbour, index_j_neighbour, index_k_neighbour) += pure_neighbours_corrected_colinearity[l][m][n];
+                            temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost * pure_neighbours_corrected_colinearity[l][m][n];
+                          }
+                        else
+                          temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost;
                         neighbours_weighting(index_i_neighbour, index_j_neighbour, index_k_neighbour) += 1;
+
+
                       }
             }
         }
@@ -219,12 +236,15 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
 
 void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                                                            IJK_Field_double& temperature_neighbours,
-                                                                                           IJK_Field_int& neighbours_weighting) const
+                                                                                           IJK_Field_int& neighbours_weighting,
+                                                                                           IJK_Field_double& neighbours_weighting_colinearity) const
 {
   if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
     {
       temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
       neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
+      if (neighbours_colinearity_weighting_)
+        neighbours_weighting_colinearity.echange_espace_virtuel(neighbours_weighting_colinearity.ghost());
       const int ni = temperature.ni();
       const int nj = temperature.nj();
       const int nk = temperature.nk();
@@ -232,7 +252,11 @@ void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
-              const double neighbours_weighting_ijk = (double) neighbours_weighting(i,j,k);
+              double neighbours_weighting_ijk;
+              if (neighbours_colinearity_weighting_)
+                neighbours_weighting_ijk = neighbours_weighting_colinearity(i,j,k);
+              else
+                neighbours_weighting_ijk = (double) neighbours_weighting(i,j,k);
               if (neighbours_weighting(i,j,k))
                 temperature(i,j,k) = temperature_neighbours(i,j,k) / neighbours_weighting_ijk;
             }

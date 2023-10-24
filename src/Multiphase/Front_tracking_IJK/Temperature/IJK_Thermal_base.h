@@ -114,6 +114,10 @@ public:
   {
     return *eulerian_compo_connex_from_interface_ns_int_;
   }
+  virtual const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const
+  {
+    return temperature_;
+  }
   IJK_Field_double& get_temperature_ft()
   {
     return temperature_ft_ ;
@@ -326,6 +330,7 @@ protected:
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
+  virtual void clip_temperature_values() { ; };
   virtual void compute_thermal_subproblems() { ; };
   virtual void compute_convective_fluxes_face_centre() { ; };
   virtual void compute_diffusive_fluxes_face_centre() { ; };

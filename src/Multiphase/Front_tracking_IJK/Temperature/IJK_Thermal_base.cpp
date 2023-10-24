@@ -748,6 +748,7 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
       ref_ijk_ft_->euler_explicit_update(d_temperature_, temperature_, k);
     }
   temperature_.echange_espace_virtuel(temperature_.ghost());
+  clip_temperature_values();
   correct_temperature_for_visu();
   const double ene_post = compute_global_energy();
   Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
