@@ -106,6 +106,8 @@ public :
                                                   IJK_Field_double& temperature_neighbours,
                                                   IJK_Field_int& neighbours_weighting,
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
+  void initialise_cell_neighbours_indices_to_correct();
+  void compute_cell_neighbours_indices_to_correct();
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
   void compute_thermal_diffusive_fluxes() override;
@@ -169,6 +171,13 @@ protected :
   std::vector<ArrOfDouble> diffusive_flux_y_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
   FixedVector<IntVect,4> ijk_faces_to_correct_;
+
+  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_sorted_;
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
   int debug_=0;
@@ -178,6 +187,8 @@ protected :
 
   int distance_cell_faces_from_lrs_;
   int correct_temperature_cell_neighbours_;
+  int find_cell_neighbours_for_fluxes_spherical_correction_;
+  int use_cell_neighbours_for_fluxes_spherical_correction_;
   int neighbours_colinearity_weighting_;
 };
 
