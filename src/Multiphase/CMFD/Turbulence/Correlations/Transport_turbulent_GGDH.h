@@ -45,7 +45,7 @@ public:
   };
   virtual void modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
 private:
-  double C_s = 0.3; //facteur multiplicatif
+  double C_s = -1.; //facteur multiplicatif
 };
 
 #endif

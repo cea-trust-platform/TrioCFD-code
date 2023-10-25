@@ -46,6 +46,10 @@ Entree& Transport_turbulent_GGDH_WIT::readOn(Entree& is)
   param.ajouter("C_s", &C_s);
   param.ajouter("Limiteur_alpha", &limiteur_alpha_, Param::REQUIRED);
   param.lire_avec_accolades_depuis(is);
+
+  if ((C_s <0) && (dimension == 2)) C_s = 1;
+  if ((C_s <0) && (dimension == 3)) C_s = 1.5;
+
   return is;
 }
 

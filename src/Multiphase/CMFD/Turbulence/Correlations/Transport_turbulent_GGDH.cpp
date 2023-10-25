@@ -40,6 +40,10 @@ Entree& Transport_turbulent_GGDH::readOn(Entree& is)
   Param param(que_suis_je());
   param.ajouter("C_s", &C_s);
   param.lire_avec_accolades_depuis(is);
+
+  if ((C_s <0) && (dimension == 2)) C_s = 1;
+  if ((C_s <0) && (dimension == 3)) C_s = 1.5;
+
   return is;
 }
 
