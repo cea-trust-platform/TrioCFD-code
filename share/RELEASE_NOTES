@@ -1,11 +1,12 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
+25/10/23 (TrioCFD) New feature : FT IJK - New algorithm available, based on IJK discretization, to find the nearest neighbouring face of each node of the front mesh. To activate it , add "no_octree_method 1 " in the interfaces bloc
 11/10/23 (TrioCFD) Bug fix     : FT IJK - Fix area calculation in convection scalar operator
 31/08/23 (TrioCFD) New feature : CMFD - Two-phase adiabatic flow with VDF numerical scheme
-07/07/23 (TrioCFD) New feature : Hilber-Hughes-Taylor (HHT) time discretisation for the mechanical model (Beam)
-07/07/23 (TrioCFD) New feature : New feature: possibility to have multiple beams in the partitioned explicit serial coupling between the ALE module and the Beam model
-06/07/23 (TrioCFD) Bug fixed   : Periodic boundary conditions in ALE module
+07/07/23 (TrioCFD) New feature : FSI - Hilber-Hughes-Taylor (HHT) time discretisation for the mechanical model (Beam)
+07/07/23 (TrioCFD) New feature : FSI - possibility to have multiple beams in the partitioned explicit serial coupling between the ALE module and the Beam model
+06/07/23 (TrioCFD) Bug fix     : FSI - Periodic boundary conditions in ALE module
 30/06/23 (TrioCFD) Bug fix     : FT IJK - Fixing valgrind leak (uninitialized pointer)
 30/06/23 (TrioCFD) Portability : Fix some validation reports to use Visit v3.3.3
 15/06/23 (TrioCFD) Bug fix     : FSI - Fix periodic boundary conditions in ALE module
