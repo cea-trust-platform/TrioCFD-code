@@ -30,6 +30,7 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
   has_checked_consistency_ = false;
   distance_cell_faces_from_lrs_= 0;
   correct_temperature_cell_neighbours_ = 0;
+  neighbours_colinearity_weighting_ = 0;
 }
 
 void Corrige_flux_FT_temperature_subresolution::associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems)
@@ -305,7 +306,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_diffusive_fluxes
 void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_centre(DoubleVect& fluxes, const int fluxes_type)
 {
   const int faces_dir[6] = FACES_DIR;
-  const int flux_sign[6] = FLUX_SIGN;
+  int flux_sign[2][6] = FLUX_SIGN;
   const int nb_faces_to_correct = intersection_ijk_cell_->get_nb_faces_to_correct();
   fluxes.reset();
   fluxes.resize(nb_faces_to_correct);
@@ -326,7 +327,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
               for (int c = 0; c < 3; c++)
                 if (c!= faces_dir[l])
                   surf_face *= splitting_->get_grid_geometry().get_constant_delta(c);
-              surf_face *= flux_sign[l];
+              surf_face *= flux_sign[fluxes_type][l];
               const double dist = dist_interf(intersection_ijk_cell_index, l);
               const double dist_sub_res = thermal_subproblems_->get_dist_faces_interface(i)[l];
               double local_flux_face = 0.;
@@ -374,7 +375,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_diffusive_fluxes
 void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_centre_discrete_integral(DoubleVect& fluxes, const int fluxes_type)
 {
   int faces_dir[6] = FACES_DIR;
-  const int flux_sign[6] = FLUX_SIGN;
+  int flux_sign[2][6] = FLUX_SIGN;
   const int nb_faces_to_correct = intersection_ijk_cell_->get_nb_faces_to_correct();
   fluxes.reset();
   fluxes.resize(nb_faces_to_correct);
@@ -404,7 +405,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
               double flux_face = 0;
               for (int val=0; val < discrete_flux_integral.size(); val++)
                 flux_face += discrete_flux_integral[val];
-              flux_face *= flux_sign[l];
+              flux_face *= flux_sign[fluxes_type][l];
               fluxes[counter_faces] = flux_face;
               dist_[counter_faces] = dist;
               counter_faces++;
@@ -633,6 +634,52 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
             }
           break;
         }
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                                                           FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
+                                                                           FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive)
+{
+  int counter = 0;
+  if (!convection_negligible_)
+    {
+      store_any_cell_faces_corrected(cell_faces_corrected_bool,
+                                     cell_faces_corrected_convective,
+                                     convective_fluxes_, counter);
+      counter ++;
+    }
+  if (!diffusion_negligible_)
+    store_any_cell_faces_corrected(cell_faces_corrected_bool,
+                                   cell_faces_corrected_diffusive,
+                                   diffusive_fluxes_, counter);
+}
+
+void Corrige_flux_FT_temperature_subresolution::store_any_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                                                               FixedVector<IJK_Field_double,3>& cell_faces_corrected,
+                                                                               const DoubleVect& fluxes,
+                                                                               const int counter)
+{
+  for (int c=0; c<3; c++)
+    {
+      cell_faces_corrected_bool[c].data() = 0.;
+      cell_faces_corrected[c].data() = 0.;
+    }
+  IntVect& i_pure_face_to_correct = ijk_faces_to_correct_[0];
+  IntVect& j_pure_face_to_correct = ijk_faces_to_correct_[1];
+  IntVect& k_pure_face_to_correct = ijk_faces_to_correct_[2];
+  IntVect& dir_pure_face_to_correct = ijk_faces_to_correct_[3];
+  const int nb_fluxes = ijk_faces_to_correct_[0].size();
+  int i,j,k;
+  for (int i_flux=0; i_flux < nb_fluxes; i_flux++)
+    {
+      i = i_pure_face_to_correct[i_flux];
+      j = j_pure_face_to_correct[i_flux];
+      k = k_pure_face_to_correct[i_flux];
+      const int dir = dir_pure_face_to_correct[i_flux];
+      if (!counter)
+        cell_faces_corrected_bool[dir](i,j,k) += 1;
+      cell_faces_corrected[dir](i,j,k) += fluxes[i_flux];
     }
 }
 

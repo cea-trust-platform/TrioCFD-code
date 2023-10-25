@@ -79,6 +79,7 @@ public :
   void compute_eulerian_distance();
   void compute_eulerian_curvature_from_interface();
   void thermal_subresolution_outputs();
+  int get_disable_post_processing_probes_out_files() const;
 
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;

@@ -379,7 +379,7 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     {
       if (debug_)
         Cerr << "Compute cell and faces distance to the interface" << finl;
-      if (correct_fluxes_)
+      if (correct_fluxes_ || correct_temperature_cell_neighbours_)
         {
           compute_distance_cell_centre();
           compute_distance_faces_centres();

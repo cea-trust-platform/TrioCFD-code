@@ -198,6 +198,8 @@ void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
                                        const IJK_Field_local_double& boundary_flux_kmin,
                                        const IJK_Field_local_double& boundary_flux_kmax)
 {
+  if (diffusion_rank_ == 1)
+    Cerr << "Uniform lambda: " << get_uniform_lambda() << finl;
   return valeur().calculer(field,
                            result,
                            boundary_flux_kmin,

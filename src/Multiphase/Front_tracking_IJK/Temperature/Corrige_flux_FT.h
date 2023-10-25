@@ -92,6 +92,9 @@ public :
   inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
   inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting);
   inline void set_debug(const int& debug);
+  inline void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                         FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
+                                         FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive);
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -244,6 +247,13 @@ inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_t
 inline void Corrige_flux_FT::set_debug(const int& debug)
 {
   valeur().set_debug(debug);
+}
+
+inline void Corrige_flux_FT::store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                                        FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
+                                                        FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive)
+{
+  valeur().store_cell_faces_corrected(cell_faces_corrected_bool, cell_faces_corrected_convective, cell_faces_corrected_diffusive);
 }
 
 #endif /* Corrige_flux_FT_included */

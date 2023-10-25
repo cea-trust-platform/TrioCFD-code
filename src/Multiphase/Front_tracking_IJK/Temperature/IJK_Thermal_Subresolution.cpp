@@ -93,6 +93,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   pre_initialise_thermal_subproblems_list_ = 0;
   pre_factor_subproblems_number_ = 3.;
 
+  correct_temperature_cell_neighbours_first_iter_ = 0;
   correct_temperature_cell_neighbours_ = 0;
   correct_neighbours_using_probe_length_ = 0;
   neighbours_corrected_rank_ = 1;
@@ -100,6 +101,10 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   replace_temperature_cell_neighbours_ = 0;
 
   clip_temperature_values_ = 0;
+  disable_post_processing_probes_out_files_ = 0;
+  enforce_periodic_boundary_value_ = 0;
+
+  store_cell_faces_corrected_ = 0;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -197,6 +202,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("pre_initialise_thermal_subproblems_list", &pre_initialise_thermal_subproblems_list_);
   param.ajouter("pre_factor_subproblems_number", &pre_factor_subproblems_number_);
 
+  param.ajouter_flag("correct_temperature_cell_neighbours_first_iter", &correct_temperature_cell_neighbours_first_iter_);
   param.ajouter_flag("correct_temperature_cell_neighbours", &correct_temperature_cell_neighbours_);
   param.ajouter_flag("correct_neighbours_using_probe_length", &correct_neighbours_using_probe_length_);
   param.ajouter("neighbours_corrected_rank", &neighbours_corrected_rank_);
@@ -205,6 +211,11 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("replace_temperature_cell_neighbours", &replace_temperature_cell_neighbours_);
 
   param.ajouter_flag("clip_temperature_values", &clip_temperature_values_);
+  param.ajouter_flag("disable_post_processing_probes_out_files", &disable_post_processing_probes_out_files_);
+
+  param.ajouter_flag("enforce_periodic_boundary_value", &enforce_periodic_boundary_value_);
+  param.ajouter_flag("store_cell_faces_corrected", &store_cell_faces_corrected_);
+
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
   //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
@@ -264,7 +275,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   //  temperature_diffusion_op_.set_uniform_lambda(uniform_lambda_);
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
-
+  Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
   /*TODO:
    * Change the operators to add fluxes corrections (Maybe not)
    */
@@ -286,7 +297,22 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       temperature_convection_op_.initialize(splitting);
       temperature_convection_op_.set_corrige_flux(corrige_flux_);
     }
-
+  if((convective_flux_correction_ || diffusive_flux_correction_) && store_cell_faces_corrected_)
+    {
+      allocate_cell_vector(cell_faces_corrected_convective_, splitting, 1);
+      allocate_cell_vector(cell_faces_corrected_diffusive_, splitting, 1);
+      allocate_cell_vector(cell_faces_corrected_bool_, splitting, 1);
+      nalloc += 9;
+      for (int c=0; c<3; c++)
+        {
+          cell_faces_corrected_convective_[c].data() = 0.;
+          cell_faces_corrected_diffusive_[c].data() = 0.;
+          cell_faces_corrected_bool_[c].data() = 0;
+        }
+      cell_faces_corrected_convective_.echange_espace_virtuel();
+      cell_faces_corrected_diffusive_.echange_espace_virtuel();
+      cell_faces_corrected_bool_.echange_espace_virtuel();
+    }
   if (approximate_temperature_increment_)
     {
       d_temperature_uncorrected_.allocate(splitting, IJK_Splitting::ELEM, 2);
@@ -380,9 +406,9 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
    * d_temperature_ += div_lambda_grad_T_volume_;
    * It depends on the nature of the properties (one-fluid or single-fluid)
    */
-  const int ni = d_temperature_.ni();
-  const int nj = d_temperature_.nj();
-  const int nk = d_temperature_.nk();
+  const int ni = div_coeff_grad_T_volume_.ni();
+  const int nj = div_coeff_grad_T_volume_.nj();
+  const int nk = div_coeff_grad_T_volume_.nk();
   const double rhocp_l = ref_ijk_ft_->get_rho_l() * cp_liquid_;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -390,9 +416,10 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
         {
           const double rhocpVol = rhocp_l * vol_;
           const double ope = div_coeff_grad_T_volume_(i,j,k);
-          const double resu = ope/rhocpVol;
+          const double resu = ope / rhocpVol;
           d_temperature_(i,j,k) += resu;
         }
+  Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
 }
 
 void IJK_Thermal_Subresolution::correct_temperature_for_eulerian_fluxes()
@@ -1219,27 +1246,135 @@ void IJK_Thermal_Subresolution::compute_diffusive_fluxes_face_centre()
     corrige_flux_->compute_thermal_diffusive_fluxes();
 }
 
-void IJK_Thermal_Subresolution::compute_temperature_cell_centres()
+void IJK_Thermal_Subresolution::compute_temperature_cell_centres(const int first_corr)
+{
+  switch(first_corr)
+    {
+    case 0:
+      compute_temperature_cell_centres_first_correction();
+      break;
+    case 1:
+      compute_temperature_cell_centres_second_correction();
+      break;
+    default:
+      compute_temperature_cell_centres_first_correction();
+      break;
+    }
+}
+
+void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correction()
+{
+  corrige_flux_->compute_temperature_cell_centre(temperature_);
+  corrige_flux_->compute_temperature_cell_centre_neighbours(temperature_cell_neighbours_,
+                                                            neighbours_temperature_to_correct_,
+                                                            neighbours_temperature_colinearity_weighting_);
+  if (debug_)
+    {
+      temperature_cell_neighbours_debug_.data() = 0.;
+      corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_cell_neighbours_debug_,
+                                                                temperature_cell_neighbours_,
+                                                                neighbours_temperature_to_correct_,
+                                                                neighbours_temperature_colinearity_weighting_);
+    }
+  int correct_first_iter = (correct_temperature_cell_neighbours_first_iter_
+                            && ref_ijk_ft_->get_tstep() == 0
+                            && !ref_ijk_ft_->get_reprise() != 0);
+  if (replace_temperature_cell_neighbours_)
+    if (correct_temperature_cell_neighbours_first_iter_ == correct_first_iter)
+      corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_,
+                                                                temperature_cell_neighbours_,
+                                                                neighbours_temperature_to_correct_,
+                                                                neighbours_temperature_colinearity_weighting_);
+}
+
+void IJK_Thermal_Subresolution::compute_temperature_cell_centres_second_correction()
 {
   if (!disable_subresolution_ && disable_mixed_cells_increment_)
     {
       corrige_flux_->compute_temperature_cell_centre(temperature_);
-      corrige_flux_->compute_temperature_cell_centre_neighbours(temperature_cell_neighbours_,
-                                                                neighbours_temperature_to_correct_,
-                                                                neighbours_temperature_colinearity_weighting_);
-      if (debug_)
+    }
+}
+
+void IJK_Thermal_Subresolution::enforce_periodic_temperature_boundary_value()
+{
+  if (!disable_subresolution_ && enforce_periodic_boundary_value_)
+    {
+      const int ni = temperature_.ni();
+      const int nj = temperature_.nj();
+      const int nk = temperature_.nk();
+      std::vector<double> indices_i_to_correct;
+      std::vector<double> indices_j_to_correct;
+      std::vector<double> indices_k_to_correct;
+      int stencil_to_correct = 1;
+      for (int i=0; i<=stencil_to_correct; i++)
         {
-          temperature_cell_neighbours_debug_.data() = 0.;
-          corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_cell_neighbours_debug_,
-                                                                    temperature_cell_neighbours_,
-                                                                    neighbours_temperature_to_correct_,
-                                                                    neighbours_temperature_colinearity_weighting_);
+          indices_i_to_correct.push_back(stencil_to_correct);
+          indices_j_to_correct.push_back(stencil_to_correct);
+          indices_k_to_correct.push_back(stencil_to_correct);
+          indices_i_to_correct.push_back(ni-1-stencil_to_correct);
+          indices_j_to_correct.push_back(nj-1-stencil_to_correct);
+          indices_k_to_correct.push_back(nk-1-stencil_to_correct);
         }
-      if (replace_temperature_cell_neighbours_)
-        corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_,
-                                                                  temperature_cell_neighbours_,
-                                                                  neighbours_temperature_to_correct_,
-                                                                  neighbours_temperature_colinearity_weighting_);
+      int i,j,k;
+      for (k = 0; k < nk; k++)
+        if (std::find(indices_k_to_correct.begin(), indices_k_to_correct.end(), k) != indices_k_to_correct.end())
+          for (j = 0; j < nj; j++)
+            for (i = 0; i < ni; i++)
+              {
+                const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                  { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
+              }
+      for (j = 0; j < nj; j++)
+        if (std::find(indices_j_to_correct.begin(), indices_j_to_correct.end(), j) != indices_j_to_correct.end())
+          for (k = 0; k < nk; k++)
+            for (i = 0; i < ni; i++)
+              {
+                const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                  { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
+              }
+      for (i = 0; i < ni; i++)
+        if (std::find(indices_i_to_correct.begin(), indices_i_to_correct.end(), i) != indices_i_to_correct.end())
+          for (k = 0; k < nk; k++)
+            for (j = 0; j < nj; j++)
+              {
+                const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                  { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
+              }
+    }
+}
+
+void IJK_Thermal_Subresolution::correct_operators_for_visu()
+{
+  if (!diff_temperature_negligible_)
+    {
+      const int ni = div_coeff_grad_T_volume_.ni();
+      const int nj = div_coeff_grad_T_volume_.nj();
+      const int nk = div_coeff_grad_T_volume_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+              if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                { div_coeff_grad_T_volume_(i,j,k) = 0; }
+            }
+    }
+  if (!conv_temperature_negligible_)
+    {
+      const int ni = u_T_convective_volume_.ni();
+      const int nj = u_T_convective_volume_.nj();
+      const int nk = u_T_convective_volume_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+              if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                { u_T_convective_volume_(i,j,k) = 0; }
+            }
     }
 }
 
@@ -1249,6 +1384,10 @@ void IJK_Thermal_Subresolution::prepare_ij_fluxes_k_layers()
     {
       corrige_flux_->compute_ijk_pure_faces_indices();
       corrige_flux_->sort_ijk_intersections_subproblems_indices_by_k_layers();
+      if (store_cell_faces_corrected_)
+        {
+          corrige_flux_->store_cell_faces_corrected(cell_faces_corrected_bool_, cell_faces_corrected_convective_, cell_faces_corrected_diffusive_);
+        }
     }
 }
 

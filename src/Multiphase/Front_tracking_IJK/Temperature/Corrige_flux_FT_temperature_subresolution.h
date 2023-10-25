@@ -36,7 +36,10 @@
 /////////////////////////////////////////////////////////////////////////////
 #define FACES_DIR {0, 0, 1, 1, 2, 2}
 // TODO: Be careful to operators ! (Left - Right) values
-#define FLUX_SIGN {-1, -1, -1, -1, -1, -1}
+#define FLUX_SIGN_DIFF {-1, -1, -1, -1, -1, -1}
+#define FLUX_SIGN_CONV {1, 1, 1, 1, 1, 1}
+#define FLUX_SIGN {FLUX_SIGN_CONV, FLUX_SIGN_DIFF}
+
 
 class Corrige_flux_FT_temperature_subresolution : public Corrige_flux_FT_base
 {
@@ -129,6 +132,13 @@ public :
                                                                      std::vector<ArrOfDouble>& flux_z,
                                                                      const DoubleVect& fluxes_subgrid,
                                                                      const int ini_index);
+  void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                  FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
+                                  FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive) override;
+  void store_any_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                      FixedVector<IJK_Field_double,3>& cell_faces_corrected,
+                                      const DoubleVect& fluxes,
+                                      const int counter);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
 protected :
   enum fluxes_type_ { convection, diffusion };

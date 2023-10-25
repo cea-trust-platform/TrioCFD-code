@@ -53,7 +53,8 @@
 #define LIQUID_INDICATOR_TEST 1.-1.e-12
 #define VAPOUR_INDICATOR_TEST 1.e-12
 #define FACES_DIR {0, 0, 1, 1, 2, 2}
-#define FLUX_SIGN {-1, -1, -1, -1, -1, -1}
+#define FLUX_SIGN_DIFF {-1, -1, -1, -1, -1, -1}
+#define FLUX_SIGN_CONV {1, 1, 1, 1, 1, 1}
 
 /////////////////////////////////////////////////////////////////////////////
 //

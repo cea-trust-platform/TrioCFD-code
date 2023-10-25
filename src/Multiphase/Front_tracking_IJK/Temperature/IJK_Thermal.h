@@ -59,6 +59,7 @@ public :
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
   inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
+  inline const IJK_Field_double& get_u_T_convective() const { return valeur().get_u_T_convective(); }
   inline const IJK_Field_double& get_eulerian_distance_ft() const { return valeur().get_eulerian_distance_ft(); }
   inline const IJK_Field_double& get_eulerian_curvature_ft() const { return valeur().get_eulerian_curvature_ft(); }
   inline const IJK_Field_double& get_interfacial_area_ft() const { return valeur().get_interfacial_area_ft(); }
@@ -75,13 +76,16 @@ public :
   inline const IJK_Field_double& get_interfacial_area_ns() const { return valeur().get_interfacial_area_ns(); }
   inline const IJK_Field_double& get_grad_T_interface_ns() const { return valeur().get_grad_T_interface_ns(); }
   inline const IJK_Field_double& get_eulerian_rising_velocities() const {return valeur().get_eulerian_rising_velocities(); }
-  inline const FixedVector<IJK_Field_double, 3> get_bary() const { return valeur().get_bary(); }
-  inline FixedVector<IJK_Field_double, 3> get_gradient_temperature_elem() { return valeur().get_gradient_temperature_elem(); }
-  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ns() const { return valeur().get_normal_vector_ns(); }
-  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ns_normed() const { return valeur().get_normal_vector_ns_normed();}
-  inline FixedVector<IJK_Field_double, 3> get_normal_vector_ft() const { return valeur().get_normal_vector_ft(); }
-  inline FixedVector<IJK_Field_double, 3> get_hessian_diag_temperature_elem() { return valeur().get_hessian_diag_temperature_elem(); }
-  inline FixedVector<IJK_Field_double, 3> get_hessian_cross_temperature_elem() { return valeur().get_hessian_cross_temperature_elem(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_bary() const { return valeur().get_bary(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_gradient_temperature_elem() { return valeur().get_gradient_temperature_elem(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_normal_vector_ns() const { return valeur().get_normal_vector_ns(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_normal_vector_ns_normed() const { return valeur().get_normal_vector_ns_normed();}
+  inline const FixedVector<IJK_Field_double, 3>& get_normal_vector_ft() const { return valeur().get_normal_vector_ft(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_hessian_diag_temperature_elem() const { return valeur().get_hessian_diag_temperature_elem(); }
+  inline const FixedVector<IJK_Field_double, 3>& get_hessian_cross_temperature_elem() const { return valeur().get_hessian_cross_temperature_elem(); }
+  inline const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const { return valeur().get_cell_faces_corrected_diffusive(); }
+  inline const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const { return valeur().get_cell_faces_corrected_convective(); }
+  inline const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const { return valeur().get_cell_faces_corrected_bool(); }
   inline const double& get_E0() const { return valeur().get_E0(); };
   inline int& get_conserv_energy_global() { return valeur().get_conserv_energy_global(); };
   inline const char * get_fichier_sauvegarde() const { return valeur().get_fichier_sauvegarde(); };
@@ -91,6 +95,8 @@ public :
 
   inline const int& get_debug() { return valeur().get_debug(); };
   inline const IJK_Field_double& get_debug_lrs_cells() { return valeur().get_debug_lrs_cells(); };
+
+  inline int get_disable_post_processing_probes_out_files() const { return valeur().get_disable_post_processing_probes_out_files(); };
   /*
    * Setters
    */

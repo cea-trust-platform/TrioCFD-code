@@ -38,7 +38,7 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
 
   ConstIJK_double_ptr input_field(*input_field_, 0, 0, k_layer);
   Simd_double uniform_lambda(1.);
-  Simd_double avg_lambda;
+  Simd_double avg_lambda(1.);
   if (is_uniform_ and uniform_lambda_!=0)
     {
       uniform_lambda = Simd_double(*uniform_lambda_);
@@ -99,26 +99,32 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
   switch(_DIR_)
     {
     case DIRECTION::X:
-      d0 = channel_data_.get_delta_x() * 0.5;
-      d1 = d0;
       if (!is_hess_)
-        surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+        {
+          d0 = channel_data_.get_delta_x() * 0.5;
+          d1 = d0;
+          surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+        }
       else
         surface = 1 / (channel_data_.get_delta_x() * channel_data_.get_delta_x());
       break;
     case DIRECTION::Y:
-      d0 = channel_data_.get_delta_y() * 0.5;
-      d1 = d0;
       if (!is_hess_)
-        surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+        {
+          d0 = channel_data_.get_delta_y() * 0.5;
+          d1 = d0;
+          surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+        }
       else
         surface = 1 / (channel_data_.get_delta_y() * channel_data_.get_delta_y());
       break;
     case DIRECTION::Z:
-      d0 = channel_data_.get_delta_z()[k_layer-1] * 0.5;
-      d1 = channel_data_.get_delta_z()[k_layer] * 0.5;
       if (!is_hess_)
-        surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+        {
+          d0 = channel_data_.get_delta_z()[k_layer-1] * 0.5;
+          d1 = channel_data_.get_delta_z()[k_layer] * 0.5;
+          surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+        }
       break;
     }
 
@@ -146,17 +152,20 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
               Simd_double oneVec = 1.;
               Simd_double minVec = DMINFLOAT;
               Simd_double d = 1.;
-              // Fetch conductivity on neighbour cells:
-              if (!is_uniform_)
+              if (!is_hess_)
                 {
-                  lambda.get_left_center(_DIR_, i, lambda_m1, lambda_m2);
+                  // Fetch conductivity on neighbour cells:
+                  if (!is_uniform_)
+                    {
+                      lambda.get_left_center(_DIR_, i, lambda_m1, lambda_m2);
+                    }
+                  // geometric avg: (d0+d1) / ( d0 / lambda_m1 + d1 / lambda_m2 ), optimized with only 1 division:
+                  Simd_double dsabs = SimdSelect(zeroVec, d0 * lambda_m2 + d1 * lambda_m1, d0 * lambda_m2 + d1 * lambda_m1, (-1) * (d0 * lambda_m2 + d1 * lambda_m1));
+                  Simd_double ds = SimdSelect(dsabs, minVec, oneVec, d0 * lambda_m2 + d1 * lambda_m1);
+                  if(is_anisotropic_)
+                    d = d0 + d1;
+                  avg_lambda = SimdSelect(dsabs, minVec, zeroVec, SimdDivideMed(d * lambda_m1 * lambda_m2, ds));
                 }
-              // geometric avg: (d0+d1) / ( d0 / lambda_m1 + d1 / lambda_m2 ), optimized with only 1 division:
-              Simd_double dsabs = SimdSelect(zeroVec, d0 * lambda_m2 + d1 * lambda_m1, d0 * lambda_m2 + d1 * lambda_m1, (-1) * (d0 * lambda_m2 + d1 * lambda_m1));
-              Simd_double ds = SimdSelect(dsabs, minVec, oneVec, d0 * lambda_m2 + d1 * lambda_m1);
-              if(is_anisotropic_)
-                d = d0 + d1;
-              avg_lambda = SimdSelect(dsabs, minVec, zeroVec, SimdDivideMed(d * lambda_m1 * lambda_m2, ds));
               // thermal flux is positive if going from left to right => -grad(T)
               flux = (left_val - right_val) * avg_lambda * surface;
             }

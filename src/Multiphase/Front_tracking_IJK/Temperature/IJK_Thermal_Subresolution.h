@@ -87,6 +87,22 @@ public :
   {
     return neighbours_temperature_colinearity_weighting_;
   }
+  int get_disable_post_processing_probes_out_files() const override
+  {
+    return disable_post_processing_probes_out_files_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const override
+  {
+    return cell_faces_corrected_diffusive_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const override
+  {
+    return cell_faces_corrected_convective_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const override
+  {
+    return cell_faces_corrected_bool_;
+  }
 
 protected :
   void reset_subresolution_distributed_vectors();
@@ -133,12 +149,16 @@ protected :
   void update_intersections() override;
   void compute_convective_fluxes_face_centre() override;
   void compute_diffusive_fluxes_face_centre() override;
-  void compute_temperature_cell_centres() override;
+  void compute_temperature_cell_centres(const int first_corr) override;
+  void compute_temperature_cell_centres_first_correction();
+  void compute_temperature_cell_centres_second_correction();
   void prepare_ij_fluxes_k_layers() override;
   void set_zero_temperature_increment() override;
   void clean_thermal_subproblems() override;
   void clean_ijk_intersections() override;
   void clean_add_thermal_subproblems();
+  void enforce_periodic_temperature_boundary_value() override;
+  void correct_operators_for_visu() override;
 
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
@@ -245,6 +265,7 @@ protected :
   int global_probes_characteristics_ = 1;
   double pre_factor_subproblems_number_;
 
+  int correct_temperature_cell_neighbours_first_iter_;
   int correct_temperature_cell_neighbours_;
   int correct_neighbours_using_probe_length_;
   int neighbours_corrected_rank_;
@@ -256,6 +277,14 @@ protected :
   IJK_Field_double neighbours_temperature_colinearity_weighting_;
 
   int clip_temperature_values_;
+  int enforce_periodic_boundary_value_;
+
+  int disable_post_processing_probes_out_files_;
+
+  FixedVector<IJK_Field_double,3> cell_faces_corrected_diffusive_;
+  FixedVector<IJK_Field_double,3> cell_faces_corrected_convective_;
+  FixedVector<IJK_Field_int,3> cell_faces_corrected_bool_;
+  int store_cell_faces_corrected_;
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

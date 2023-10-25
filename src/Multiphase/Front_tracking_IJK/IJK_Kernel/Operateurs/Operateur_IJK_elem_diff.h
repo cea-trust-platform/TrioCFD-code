@@ -77,6 +77,7 @@ public :
                                     IJK_Field_local_double& coeff_field_y,
                                     IJK_Field_local_double& coeff_field_z);
   inline void set_corrige_flux(Corrige_flux_FT& corrige_flux);
+  inline double get_uniform_lambda();
 
 protected:
   Motcles diffusion_op_words_;
@@ -125,6 +126,11 @@ inline void Operateur_IJK_elem_diff::set_coeff_x_y_z(IJK_Field_local_double& coe
 inline void Operateur_IJK_elem_diff::set_corrige_flux(Corrige_flux_FT& corrige_flux)
 {
   valeur().set_corrige_flux(corrige_flux);
+}
+
+inline double Operateur_IJK_elem_diff::get_uniform_lambda()
+{
+  return valeur().get_uniform_lambda();
 }
 
 

@@ -48,6 +48,14 @@ public:
     coeff_field_z_ = &coeff_field_z;
   }
 
+  inline double get_uniform_lambda()
+  {
+    if (uniform_lambda_ == nullptr)
+      return 1.;
+    else
+      return *uniform_lambda_;
+  }
+
   inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
   {
     compute_flux_<DIRECTION::X>(resu,k_layer);

@@ -129,6 +129,10 @@ public:
                                                           IJK_Field_int& neighbours_weighting,
                                                           IJK_Field_double& neighbours_weighting_colinearity) const { ; };
 
+  virtual void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
+                                          FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
+                                          FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive) { ; };
+
 protected:
   const IJK_Interfaces *interfaces_;
   const IJK_Field_double *field_;

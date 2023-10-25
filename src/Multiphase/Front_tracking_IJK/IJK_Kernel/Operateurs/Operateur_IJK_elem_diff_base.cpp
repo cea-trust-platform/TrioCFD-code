@@ -81,16 +81,17 @@ void Operateur_IJK_elem_diff_base_double::calculer(const IJK_Field_double& field
                                                    const IJK_Field_local_double& boundary_flux_kmin,
                                                    const IJK_Field_local_double& boundary_flux_kmax)
 {
+  Cerr << "Uniform lambda: " << get_uniform_lambda() << finl;
   input_field_ = &field;
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_set(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 void Operateur_IJK_elem_diff_base_double::ajouter(const IJK_Field_double& field,
@@ -102,12 +103,12 @@ void Operateur_IJK_elem_diff_base_double::ajouter(const IJK_Field_double& field,
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_add(result);
-  input_field_ = 0;
-  lambda_ = 0;
-  coeff_field_x_ = 0;
-  coeff_field_y_ = 0;
-  coeff_field_z_ = 0;
-  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+  input_field_ = nullptr;
+  lambda_ = nullptr;
+  coeff_field_x_ = nullptr;
+  coeff_field_y_ = nullptr;
+  coeff_field_z_ = nullptr;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = nullptr;
 }
 
 Implemente_instanciable_sans_constructeur(OpDiffUniformIJKScalar_double, "OpDiffUniformIJKScalar_double", Operateur_IJK_elem_diff_base_double);

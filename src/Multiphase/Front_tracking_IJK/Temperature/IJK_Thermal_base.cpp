@@ -305,6 +305,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
     {
       temperature_diffusion_op_.typer_diffusion_op("standard");
     }
+
   /*
    * Convection operator
    * If temperature_convection_op_ is not written in the .data
@@ -335,9 +336,18 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   compute_cell_volume();
   compute_min_cell_delta();
 
-  if (!diff_temperature_negligible_)
+  //if (!diff_temperature_negligible_)
+  {
     div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
-  nalloc += 1;
+    nalloc += 1;
+    div_coeff_grad_T_volume_.data() = 0.;
+  }
+  // if (!conv_temperature_negligible_)
+  {
+    u_T_convective_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
+    nalloc += 1;
+    u_T_convective_volume_.data() = 0.;
+  }
 
   rho_cp_post_ = (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"));
   if (rho_cp_post_)
@@ -748,8 +758,10 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
       ref_ijk_ft_->euler_explicit_update(d_temperature_, temperature_, k);
     }
   temperature_.echange_espace_virtuel(temperature_.ghost());
+  enforce_periodic_temperature_boundary_value();
   clip_temperature_values();
   correct_temperature_for_visu();
+  correct_operators_for_visu();
   const double ene_post = compute_global_energy();
   Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
        << " " << ene_ini
@@ -864,7 +876,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    */
   if (debug_)
     Cerr << "Compute temperature mixed cell centres" << finl;
-  compute_temperature_cell_centres();
+  compute_temperature_cell_centres(0);
 
   /*
    * For post-processing purposes
@@ -892,7 +904,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   /*
    * Erase the temperature increment (second call)
    */
-  compute_temperature_cell_centres();
+  compute_temperature_cell_centres(1);
 
   /*
    * In case of the subresolution or not
@@ -1310,6 +1322,7 @@ void IJK_Thermal_base::compute_temperature_convection(const FixedVector<IJK_Fiel
   if (conv_temperature_negligible_)
     {
       d_temperature_.data()=0;
+      u_T_convective_volume_.data() = 0;
     }
   else
     {
@@ -1320,7 +1333,10 @@ void IJK_Thermal_base::compute_temperature_convection(const FixedVector<IJK_Fiel
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
-            d_temperature_(i,j,k) /= vol_ ;
+            {
+              d_temperature_(i,j,k) /= vol_ ;
+              u_T_convective_volume_(i,j,k) = d_temperature_(i,j,k);
+            }
     }
   statistiques().end_count(cnt_conv_temp);
   DebogIJK::verifier("op_conv(rho)", d_temperature_);

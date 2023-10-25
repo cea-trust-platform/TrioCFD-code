@@ -102,22 +102,6 @@ public:
   {
     return temperature_before_extrapolation_ ;
   }
-  virtual const IJK_Field_double& get_temperature_cell_neighbours_debug() const
-  {
-    return temperature_;
-  }
-  virtual const IJK_Field_double& get_temperature_cell_neighbours() const
-  {
-    return temperature_;
-  }
-  virtual const IJK_Field_int& get_cell_neighbours_corrected() const
-  {
-    return *eulerian_compo_connex_from_interface_ns_int_;
-  }
-  virtual const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const
-  {
-    return temperature_;
-  }
   IJK_Field_double& get_temperature_ft()
   {
     return temperature_ft_ ;
@@ -141,6 +125,14 @@ public:
   const IJK_Field_double& get_div_lambda_grad_T() const
   {
     return div_coeff_grad_T_volume_ ;
+  }
+  const IJK_Field_double& get_u_T_convective() const
+  {
+    return u_T_convective_volume_;
+  }
+  const IJK_Field_double& get_u_T_convective_volume() const
+  {
+    return u_T_convective_volume_;
   }
   const IJK_Field_double& get_eulerian_distance_ft() const
   {
@@ -226,7 +218,6 @@ public:
   {
     return eulerian_normal_vectors_ns_normed_;
   }
-
   const FixedVector<IJK_Field_double, 3>& get_normal_vector_ft() const
   {
     return eulerian_normal_vectors_ft_;
@@ -255,10 +246,42 @@ public:
   {
     return debug_;
   };
+  virtual const IJK_Field_double& get_temperature_cell_neighbours_debug() const
+  {
+    return temperature_; //dummy
+  }
+  virtual const IJK_Field_double& get_temperature_cell_neighbours() const
+  {
+    return temperature_; //dummy
+  }
+  virtual const IJK_Field_int& get_cell_neighbours_corrected() const
+  {
+    return *eulerian_compo_connex_from_interface_ns_int_; //dummy
+  }
+  virtual const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const
+  {
+    return temperature_; //dummy
+  }
   virtual const IJK_Field_double& get_debug_lrs_cells() const
   {
-    return temperature_;
+    return temperature_; //dummy
   };
+  virtual int get_disable_post_processing_probes_out_files() const
+  {
+    return 1;
+  };
+  virtual const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const
+  {
+    return dummy_double_vect_; //dummy
+  }
+  virtual const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const
+  {
+    return dummy_double_vect_; //dummy
+  }
+  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const
+  {
+    return dummy_int_vect_;
+  }
 
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
@@ -330,12 +353,13 @@ protected:
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
   virtual void correct_temperature_for_visu() { ; };
+  virtual void correct_operators_for_visu() { ; };
   virtual void clip_temperature_values() { ; };
   virtual void compute_thermal_subproblems() { ; };
   virtual void compute_convective_fluxes_face_centre() { ; };
   virtual void compute_diffusive_fluxes_face_centre() { ; };
   virtual void prepare_ij_fluxes_k_layers() { ; };
-  virtual void compute_temperature_cell_centres() { ; };
+  virtual void compute_temperature_cell_centres(const int first_corr) { ; };
   virtual void set_zero_temperature_increment() { ; };
   virtual void clean_thermal_subproblems() { ; };
 
@@ -361,6 +385,7 @@ protected:
   void force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
                                   const IJK_Interfaces& interfaces, double nb_diam, int upstream_dir,
                                   int gravity_dir, int upstream_stencil);
+  virtual void enforce_periodic_temperature_boundary_value() { ; } ;
 
   int debug_;
   /*
@@ -454,6 +479,7 @@ protected:
   Operateur_IJK_elem_conv temperature_convection_op_;
   Operateur_IJK_elem_diff temperature_diffusion_op_;
   IJK_Field_double div_coeff_grad_T_volume_;
+  IJK_Field_double u_T_convective_volume_;
   OpGradCentre2IJKScalar_double temperature_grad_op_centre_;
   OpHessCentre2IJKScalar_double temperature_hess_op_centre_;
 
@@ -565,6 +591,10 @@ protected:
   IJK_Field_double eulerian_rising_velocities_;
   DoubleTab bubbles_barycentre_;
 
+  FixedVector<IJK_Field_int,3> dummy_int_vect_;
+  FixedVector<IJK_Field_double,3> dummy_double_vect_;
+  IJK_Field_int dummy_int_field_;
+  IJK_Field_double dummy_double_field_;
 };
 
 #endif /* IJK_Thermal_base_included */
