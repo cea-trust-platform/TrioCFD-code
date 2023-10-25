@@ -32,10 +32,10 @@
 #include <Probleme_base.h>
 #include <Domaine_VF.h>
 
-Implemente_instanciable(Cond_lim_k_complique_transition_flux_nul_demi,"Cond_lim_k_complique_transition_flux_nul_demi",Echange_global_impose);
+Implemente_instanciable(Cond_lim_k_complique_transition_flux_nul_demi,"Cond_lim_k_complique_transition_flux_nul_demi",Echange_global_impose_turbulent);
 // XD Cond_lim_k_complique_transition_flux_nul_demi condlim_base Cond_lim_k_complique_transition_flux_nul_demi 0 Adaptive wall law boundary condition for turbulent kinetic energy
 
-Sortie& Cond_lim_k_complique_transition_flux_nul_demi::printOn(Sortie& s ) const {return Echange_global_impose::printOn(s);}
+Sortie& Cond_lim_k_complique_transition_flux_nul_demi::printOn(Sortie& s ) const {return Echange_global_impose_turbulent::printOn(s);}
 
 Entree& Cond_lim_k_complique_transition_flux_nul_demi::readOn(Entree& s ) {return Echange_global_impose_turbulent::readOn(s);}
 
