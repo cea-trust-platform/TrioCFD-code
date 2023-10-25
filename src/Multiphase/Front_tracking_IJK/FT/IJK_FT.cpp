@@ -2231,7 +2231,7 @@ void IJK_FT_double::run()
 
   if (!disable_diphasique_ && boundary_conditions_.get_correction_interp_monofluide())
     {
-      pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, 1, rho_vapeur_, rho_liquide_);
+      pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3, 0 ,1, false, 1, rho_vapeur_, rho_liquide_, use_inv_rho_in_poisson_solver_);
     }
   else
     pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
@@ -2262,10 +2262,13 @@ void IJK_FT_double::run()
       molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, mu_vapeur_, mu_liquide_);
       rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
       nalloc += 2;
+      IJK_Splitting::rho_vap_ref_for_poisson_=rho_vapeur_;
+      IJK_Splitting::rho_liq_ref_for_poisson_=rho_liquide_;
       if (use_inv_rho_)
         {
           inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
-          nalloc += 1;
+          IJK_Splitting::rho_vap_ref_for_poisson_=1./rho_vapeur_;
+          IJK_Splitting::rho_liq_ref_for_poisson_=1./rho_liquide_;
         }
     }
   else

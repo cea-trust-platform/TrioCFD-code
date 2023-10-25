@@ -609,8 +609,9 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           // laquelle on declanche la duplication des bulles (si une bulle depasse a
           // l'exterieur du domaine, on duplique) Cette domaine tient compte du stencil
           // des forces de tension superficielle et de repulsion
+          //duCluz  : 2 cest mieux pour les echanges espaces virtuels pour la condition de shear-periodicite
           const double duplicate_stencil_width =
-            std::max(1 * delta,
+            std::max(2 * delta,
                      portee_force_repulsion_); // GB2020.12.20 : avant c'etait 2. Est-ce
           // que la precaution etait necessaire? Elle
           // conduit a de plus gros cas tests comme
