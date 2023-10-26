@@ -209,7 +209,7 @@ Lire pb
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width  8
+                stencil_width  9
                 correction_mpoint_diff_conv_energy 3 0 0 0 # diff conv energy #
                 diffusion { }
                 convection { quick }
