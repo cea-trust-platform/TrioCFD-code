@@ -250,7 +250,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& correct_temperature_cell_neighbours,
                                                                      const int& correct_neighbours_rank,
                                                                      const int& neighbours_corrected_rank,
-                                                                     const int& neighbours_colinearity_weighting)
+                                                                     const int& neighbours_colinearity_weighting,
+                                                                     const int& compute_reachable_fluxes)
 {
   debug_ = debug;
   sub_problem_index_ = sub_problem_index;
@@ -258,10 +259,6 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   current_time_ = current_time;
   correct_fluxes_ = correct_fluxes;
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
-  correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
-  correct_neighbours_rank_ = correct_neighbours_rank;
-  neighbours_corrected_rank_ = neighbours_corrected_rank;
-  neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
   associate_cell_ijk(i, j, k);
   associate_compos(compo_connex);
   associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
@@ -275,6 +272,11 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   associate_finite_difference_operators(radial_first_order_operator_raw, radial_second_order_operator_raw,
                                         radial_first_order_operator, radial_second_order_operator, identity_matrix_explicit_implicit_raw,
                                         identity_matrix_subproblems, radial_diffusion_matrix, radial_convection_matrix);
+  associate_flags_neighbours_correction(correct_temperature_cell_neighbours,
+                                        correct_neighbours_rank,
+                                        neighbours_corrected_rank,
+                                        neighbours_colinearity_weighting,
+                                        compute_reachable_fluxes);
   finite_difference_assembler_ = &finite_difference_assembler;
   thermal_subproblems_matrix_assembly_ = &thermal_subproblems_matrix_assembly;
   thermal_subproblems_rhs_assembly_ = &thermal_subproblems_rhs_assembly;
@@ -295,6 +297,19 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
   delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
   max_u_radial_ = max_u_radial;
   max_u_cartesian_ = !max_u_radial_;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_flags_neighbours_correction(const int& correct_temperature_cell_neighbours,
+                                                                           const int& correct_neighbours_rank,
+                                                                           const int& neighbours_corrected_rank,
+                                                                           const int& neighbours_colinearity_weighting,
+                                                                           const int& compute_reachable_fluxes)
+{
+  correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
+  correct_neighbours_rank_ = correct_neighbours_rank;
+  neighbours_corrected_rank_ = neighbours_corrected_rank;
+  neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
+  compute_reachable_fluxes_ = compute_reachable_fluxes;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
@@ -379,12 +394,14 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     {
       if (debug_)
         Cerr << "Compute cell and faces distance to the interface" << finl;
-      if (correct_fluxes_ || correct_temperature_cell_neighbours_)
+      if (correct_fluxes_ || correct_temperature_cell_neighbours_ || compute_reachable_fluxes_)
         {
           compute_distance_cell_centre();
           compute_distance_faces_centres();
           if (correct_temperature_cell_neighbours_)
             compute_distance_cell_centres_neighbours();
+          if (compute_reachable_fluxes_)
+            compute_distance_last_cell_faces_neighbours();
         }
     }
 
@@ -975,18 +992,7 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
   const double dz = geom.get_constant_delta(DIRECTION_K);
   int l, m, n;
 
-  int dxyz_increment_max;
-  if (!correct_neighbours_rank_)
-    {
-      const int dx_increment_max = (int) (probe_length_ / dx);
-      const int dy_increment_max = (int) (probe_length_ / dy);
-      const int dz_increment_max = (int) (probe_length_ / dz);
-      dxyz_increment_max = std::max(std::max(dx_increment_max, dy_increment_max), dz_increment_max);
-    }
-  else
-    {
-      dxyz_increment_max = neighbours_corrected_rank_;
-    }
+  int dxyz_increment_max = get_dxyz_increment_max();
   /*
    * 8-1 values for one neighbour in each dir... (Too much, enhance later)
    * Positive OR Negative dir depending on the normal vector
@@ -1061,6 +1067,210 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
                   }
               }
           }
+}
+
+void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours()
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  const double dx_over_two = dx / 2.;
+  const double dy_over_two = dy / 2.;
+  const double dz_over_two = dz / 2.;
+  int l, m, n;
+  int l_cell, m_cell, n_cell;
+
+  int dxyz_increment_max = get_dxyz_increment_max();
+  int dxyz_over_two_increment_max = get_dxyz_over_two_increment_max();
+  const int first_increment[3] = {dxyz_over_two_increment_max, dxyz_increment_max, dxyz_increment_max};
+  const int second_increment[3] = {dxyz_increment_max, dxyz_over_two_increment_max, dxyz_increment_max};
+  const int third_increment[3] = {dxyz_increment_max, dxyz_increment_max, dxyz_over_two_increment_max};
+  //  dxyz_over_two_increment_max *= 2;
+  //  if (!dxyz_over_two_increment_max%2)
+  //    dxyz_over_two_increment_max -= 1;
+
+  /*
+   * 8-1 values for one neighbour in each dir... (Too much, enhance later)
+   * Positive OR Negative dir depending on the normal vector
+   */
+  pure_neighbours_last_faces_to_correct_.resize(3);
+  pure_neighbours_last_faces_corrected_distance_.resize(3);
+  for (int c=0; c<3; c++)
+    {
+      const int first_incr = first_increment[c];
+      const int second_incr = second_increment[c];
+      const int third_incr = third_increment[c];
+      pure_neighbours_last_faces_to_correct_[c].resize(first_incr + 1);
+      pure_neighbours_last_faces_corrected_distance_[c].resize(first_incr + 1);
+      for (l=first_incr; l>=0; l--)
+        {
+          pure_neighbours_last_faces_to_correct_[c][l].resize(second_incr + 1);
+          pure_neighbours_last_faces_corrected_distance_[c][l].resize(second_incr + 1);
+          for (m=second_incr; m>=0; m--)
+            {
+              pure_neighbours_last_faces_to_correct_[c][l][m].resize(third_incr + 1);
+              pure_neighbours_last_faces_corrected_distance_[c][l][m].resize(third_incr + 1);
+              for (n=third_incr; n>=0; n--)
+                {
+                  pure_neighbours_last_faces_to_correct_[c][l][m][n] = false;
+                  pure_neighbours_last_faces_corrected_distance_[c][l][m][n] = 0.;
+                }
+            }
+        }
+    }
+
+  double remaining_distance_diag = probe_length_ - cell_centre_distance_;
+  Vecteur3 remaining_distance_diag_projected = normal_vector_compo_;
+  remaining_distance_diag_projected *= remaining_distance_diag;
+  for (int i=0; i<3; i++)
+    pure_neighbours_corrected_sign_[i] = signbit(normal_vector_compo_[i]);
+  int dx_over_two_increment = (int) abs(remaining_distance_diag_projected[0] / dx_over_two);
+  int dy_over_two_increment = (int) abs(remaining_distance_diag_projected[1] / dy_over_two);
+  int dz_over_two_increment = (int) abs(remaining_distance_diag_projected[2] / dz_over_two);
+  const int dx_increment = (int) (dx_over_two_increment / 2);
+  const int dy_increment = (int) (dx_over_two_increment / 2);
+  const int dz_increment = (int) (dx_over_two_increment / 2);
+  dx_over_two_increment -= dx_increment;
+  dy_over_two_increment -= dy_increment;
+  dz_over_two_increment -= dz_increment;
+  dxyz_over_two_increment_bool_ = (dx_over_two_increment >0 || dy_over_two_increment>0 || dz_over_two_increment >0 );
+  if (correct_neighbours_rank_)
+    {
+      dx_over_two_increment = std::min(dx_over_two_increment, dxyz_over_two_increment_max);
+      dy_over_two_increment = std::min(dy_over_two_increment, dxyz_over_two_increment_max);
+      dz_over_two_increment = std::min(dz_over_two_increment, dxyz_over_two_increment_max);
+    }
+  if (dz_over_two_increment>0)
+    dz_over_two_increment--;
+  if (dy_over_two_increment>0)
+    dy_over_two_increment--;
+  if (dz_over_two_increment>0)
+    dz_over_two_increment--;
+
+  for (l=dx_over_two_increment; l>=0; l--)
+    for (m_cell=dy_increment; m_cell>=0; m_cell--)
+      for (n_cell=dz_increment; n_cell>=0; n_cell--)
+        {
+          const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) : l + 1;
+          const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
+          const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n_cell * (-1) : n_cell;
+          const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) : l + 1;
+          const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir_elem, index_j_ + m_dir, index_k_ + n_dir);
+          if (indic_neighbour > LIQUID_INDICATOR_TEST)
+            {
+              pure_neighbours_last_faces_to_correct_[0][l_dir_elem][m_dir][n_dir] = true;
+              const double dx_contrib = (pow(2, l_dir) + 1) * normal_vector_compo_[0] * dx_over_two;
+              const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
+              const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
+              pure_neighbours_last_faces_corrected_distance_[0][l_dir_elem][m_dir][n_dir] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              if (neighbours_last_faces_colinearity_weighting_)
+                {
+
+                }
+            }
+        }
+
+  for (l_cell=dx_increment; l_cell>=0; l_cell--)
+    for (m=dy_over_two_increment; m>=0; m--)
+      for (n_cell=dz_increment; n_cell>=0; n_cell--)
+        {
+          const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l_cell * (-1) : l_cell;
+          const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m * (-1) : m + 1;
+          const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n_cell * (-1) : n_cell;
+          const int m_dir_elem = (pure_neighbours_corrected_sign_[1]) ? (m + 1) * (-1) : m + 1;
+          const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir, index_j_ + m_dir_elem, index_k_ + n_dir);
+          if (indic_neighbour > LIQUID_INDICATOR_TEST)
+            {
+              pure_neighbours_last_faces_to_correct_[1][l_dir][m_dir_elem][n_dir] = true;
+              const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
+              const double dy_contrib = (pow(2, m_dir) + 1) * normal_vector_compo_[1] * dy_over_two;
+              const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
+              pure_neighbours_last_faces_corrected_distance_[1][l_dir][m_dir_elem][n_dir] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              if (neighbours_last_faces_colinearity_weighting_)
+                {
+
+                }
+            }
+        }
+
+  for (l_cell=dx_increment; l_cell>=0; l_cell--)
+    for (m_cell=dy_increment; m_cell>=0; m_cell--)
+      for (n=dz_over_two_increment; n>=0; n--)
+        {
+          const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l_cell * (-1) : l_cell;
+          const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
+          const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) : n + 1;
+          const int n_dir_elem = (pure_neighbours_corrected_sign_[2]) ? (n + 1) * (-1) : n + 1;
+          const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir, index_j_ + m_dir, index_k_ + n_dir_elem);
+          if (indic_neighbour > LIQUID_INDICATOR_TEST)
+            {
+              pure_neighbours_last_faces_to_correct_[2][l_dir][m_dir][n_dir_elem] = true;
+              const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
+              const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
+              const double dz_contrib = (pow(2, n_dir) + 1) * normal_vector_compo_[2] * dz_over_two;
+              pure_neighbours_last_faces_corrected_distance_[2][l_dir][m_dir][n_dir_elem] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              if (neighbours_last_faces_colinearity_weighting_)
+                {
+
+                }
+            }
+        }
+//  if (neighbours_last_faces_colinearity_weighting_)
+//    {
+//      Vecteur3 relative_vector = normal_vector_compo_;
+//      relative_vector *= cell_centre_distance_;
+//      relative_vector[0] += ((l + 1) * normal_vector_compo_[0] * dx_over_two);
+//      relative_vector[1] += ((m + 1) * normal_vector_compo_[1] * dy_over_two);
+//      relative_vector[2] += ((n + 1) * normal_vector_compo_[2] * dz_over_two);
+//      const double relative_vector_norm = relative_vector.length();
+//      relative_vector *= (1 / relative_vector_norm);
+//      // pure_neighbours_corrected_colinearity_[l][m][n] = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+//    }
+}
+
+int IJK_One_Dimensional_Subproblem::get_dxyz_increment_max()
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+
+  int dxyz_increment_max;
+  if (!correct_neighbours_rank_)
+    {
+      const int dx_increment_max = (int) (probe_length_ / dx);
+      const int dy_increment_max = (int) (probe_length_ / dy);
+      const int dz_increment_max = (int) (probe_length_ / dz);
+      dxyz_increment_max = std::max(std::max(dx_increment_max, dy_increment_max), dz_increment_max);
+    }
+  else
+    {
+      dxyz_increment_max = neighbours_corrected_rank_;
+    }
+  return dxyz_increment_max;
+}
+
+int IJK_One_Dimensional_Subproblem::get_dxyz_over_two_increment_max()
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+
+  int dxyz_over_two_increment_max;
+  if (!correct_neighbours_rank_)
+    {
+      const int dx_increment_max = (int) (probe_length_ / (dx / 2.));
+      const int dy_increment_max = (int) (probe_length_ / (dy / 2.));
+      const int dz_increment_max = (int) (probe_length_ / (dz / 2.));
+      dxyz_over_two_increment_max = std::max(std::max(dx_increment_max, dy_increment_max), dz_increment_max);
+    }
+  else
+    {
+      dxyz_over_two_increment_max = neighbours_face_corrected_rank_;
+    }
+  return dxyz_over_two_increment_max;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& probe_variations_enabled)

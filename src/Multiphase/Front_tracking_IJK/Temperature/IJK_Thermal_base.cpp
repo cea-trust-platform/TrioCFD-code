@@ -613,6 +613,22 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
        */
     }
 
+  /*
+   * FIXME: Temporary need to rewrite IJK_Thermal.cpp posttraitements
+   */
+  allocate_cell_vector(dummy_int_vect_, splitting, 0); // 1 or 0 ?
+  allocate_cell_vector(dummy_double_vect_, splitting, 0); // 1 or 0 ?
+  dummy_int_field_.allocate(splitting, IJK_Splitting::ELEM, 0);
+  dummy_double_field_.allocate(splitting, IJK_Splitting::ELEM, 0);
+  nalloc += 8;
+  for (int c=0; c<3; c++)
+    {
+      dummy_int_vect_[c].data() = 0;
+      dummy_int_vect_[c].data() = 0.;
+    }
+  dummy_int_field_.data() = 0;
+  dummy_double_field_.data() = 0;
+
   // ref_ijk_ft_->redistrib_from_ft_elem().redistribute(eulerian_grad_T_interface_, eulerian_grad_T_interface_);
   // Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;

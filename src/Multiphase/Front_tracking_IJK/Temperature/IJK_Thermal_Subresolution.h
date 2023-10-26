@@ -103,6 +103,14 @@ public :
   {
     return cell_faces_corrected_bool_;
   }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const override
+  {
+    return cell_faces_neighbours_corrected_bool_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const override
+  {
+    return cell_faces_neighbours_corrected_all_bool_;
+  }
 
 protected :
   void reset_subresolution_distributed_vectors();
@@ -281,10 +289,27 @@ protected :
 
   int disable_post_processing_probes_out_files_;
 
+  /*
+   * Pure cells corrected for visualisation
+   */
   FixedVector<IJK_Field_double,3> cell_faces_corrected_diffusive_;
   FixedVector<IJK_Field_double,3> cell_faces_corrected_convective_;
   FixedVector<IJK_Field_int,3> cell_faces_corrected_bool_;
   int store_cell_faces_corrected_;
+
+  /*
+   * Neighbouring faces in the diagonal
+   */
+  FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_bool_;
+  int find_cell_neighbours_for_fluxes_spherical_correction_;
+  int use_cell_neighbours_for_fluxes_spherical_correction_;
+
+  /*
+   * All reachable faces to correct
+   */
+  int compute_reachable_fluxes_;
+  FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_all_bool_;
+
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

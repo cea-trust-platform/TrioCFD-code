@@ -127,7 +127,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& correct_temperature_cell_neighbours,
                                                                       const int& correct_neighbours_rank,
                                                                       const int& neighbours_corrected_rank,
-                                                                      const int& neighbours_colinearity_weighting)
+                                                                      const int& neighbours_colinearity_weighting,
+                                                                      const int& compute_reachable_fluxes)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -231,7 +232,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     correct_temperature_cell_neighbours,
                                                                     correct_neighbours_rank,
                                                                     neighbours_corrected_rank,
-                                                                    neighbours_colinearity_weighting);
+                                                                    neighbours_colinearity_weighting,
+                                                                    compute_reachable_fluxes);
       subproblems_counter_++;
     }
   else
@@ -348,6 +350,11 @@ const int& IJK_One_Dimensional_Subproblems::get_dxyz_increment_bool(const int& s
   return (*this)[subproblem_index].get_dxyz_increment_bool();
 }
 
+const int& IJK_One_Dimensional_Subproblems::get_dxyz_over_two_increment_bool(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_dxyz_over_two_increment_bool();
+}
+
 const FixedVector<int,3>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_sign(const int& subproblem_index) const
 {
   return (*this)[subproblem_index].get_pure_neighbours_corrected_sign();
@@ -366,6 +373,19 @@ const std::vector<std::vector<std::vector<double>>>& IJK_One_Dimensional_Subprob
 const std::vector<std::vector<std::vector<double>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_colinearity(const int& subproblem_index) const
 {
   return (*this)[subproblem_index].get_pure_neighbours_corrected_colinearity();
+}
+
+const std::vector<std::vector<std::vector<std::vector<bool>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_to_correct(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_last_faces_to_correct();
+}
+const std::vector<std::vector<std::vector<std::vector<double>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_corrected_distance(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_last_faces_corrected_distance();
+}
+const std::vector<std::vector<std::vector<std::vector<double>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_corrected_colinearity(const int& subproblem_index) const
+{
+  return (*this)[subproblem_index].get_pure_neighbours_last_faces_corrected_colinearity();
 }
 
 double IJK_One_Dimensional_Subproblems::get_interfacial_gradient_corrected(int i)

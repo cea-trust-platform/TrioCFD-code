@@ -114,7 +114,8 @@ public :
                                        const int& correct_temperature_cell_neighbours,
                                        const int& correct_neighbours_rank,
                                        const int& neighbours_corrected_rank,
-                                       const int& neighbours_colinearity_weighting);
+                                       const int& neighbours_colinearity_weighting,
+                                       const int& find_cell_neighbours_for_fluxes_spherical_correction);
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);
@@ -134,10 +135,14 @@ public :
   void compute_local_velocity_gradient();
   void get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const;
   const int& get_dxyz_increment_bool(const int& subproblem_index) const;
+  const int& get_dxyz_over_two_increment_bool(const int& subproblem_index) const;
   const FixedVector<int,3>& get_pure_neighbours_corrected_sign(const int& subproblem_index) const;
   const std::vector<std::vector<std::vector<bool>>>& get_pure_neighbours_to_correct(const int& subproblem_index) const;
   const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_distance(const int& subproblem_index) const;
   const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_colinearity(const int& subproblem_index) const;
+  const std::vector<std::vector<std::vector<std::vector<bool>>>> get_pure_neighbours_last_faces_to_correct(const int& subproblem_index) const;
+  const std::vector<std::vector<std::vector<std::vector<double>>>> get_pure_neighbours_last_faces_corrected_distance(const int& subproblem_index) const;
+  const std::vector<std::vector<std::vector<std::vector<double>>>> get_pure_neighbours_last_faces_corrected_colinearity(const int& subproblem_index) const;
   double get_interfacial_gradient_corrected(int i);
   double get_temperature_profile_at_point(const int& i, const double& dist) const;
   const double& get_dist_cell_interface(const int& i) const;

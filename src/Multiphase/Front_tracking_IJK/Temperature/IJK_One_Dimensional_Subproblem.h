@@ -143,13 +143,17 @@ public :
                                        const int& correct_temperature_cell_neighbours,
                                        const int& correct_neighbours_rank,
                                        const int& neighbours_corrected_rank,
-                                       const int& neighbours_colinearity_weighting);
+                                       const int& neighbours_colinearity_weighting,
+                                       const int& compute_reachable_fluxes);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
   void compute_distance_cell_centre();
   void compute_distance_faces_centres();
   void compute_distance_cell_centres_neighbours();
+  void compute_distance_last_cell_faces_neighbours();
+  int get_dxyz_increment_max();
+  int get_dxyz_over_two_increment_max();
   double compute_min_distance_pure_face_centre();
   double compute_min_distance_pure_face_vertices();
   double compute_max_distance_pure_face_centre();
@@ -280,6 +284,10 @@ public :
   {
     return dxyz_increment_bool_;
   }
+  const int& get_dxyz_over_two_increment_bool() const
+  {
+    return dxyz_over_two_increment_bool_;
+  }
   const FixedVector<int,3>& get_pure_neighbours_corrected_sign() const
   {
     return pure_neighbours_corrected_sign_;
@@ -295,6 +303,18 @@ public :
   const std::vector<std::vector<std::vector<double>>>& get_pure_neighbours_corrected_colinearity() const
   {
     return pure_neighbours_corrected_colinearity_;
+  }
+  const std::vector<std::vector<std::vector<std::vector<bool>>>> get_pure_neighbours_last_faces_to_correct() const
+  {
+    return pure_neighbours_last_faces_to_correct_;
+  }
+  const std::vector<std::vector<std::vector<std::vector<double>>>> get_pure_neighbours_last_faces_corrected_distance() const
+  {
+    return pure_neighbours_last_faces_corrected_distance_;
+  }
+  const std::vector<std::vector<std::vector<std::vector<double>>>> get_pure_neighbours_last_faces_corrected_colinearity() const
+  {
+    return pure_neighbours_last_faces_corrected_colinearity_;
   }
 protected :
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
@@ -341,6 +361,11 @@ protected :
                                             const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
+  void associate_flags_neighbours_correction(const int& correct_temperature_cell_neighbours,
+                                             const int& correct_neighbours_rank,
+                                             const int& neighbours_corrected_rank,
+                                             const int& neighbours_colinearity_weighting,
+                                             const int& compute_last_faces_to_correct);
   void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
                                   const double& lambda,
@@ -709,6 +734,9 @@ protected :
   int distance_cell_faces_from_lrs_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;
 
+  /*
+   * Identify neighbours cells centre for temperature correction
+   */
   int correct_temperature_cell_neighbours_ = 0;
   int correct_neighbours_rank_ = 1;
   int neighbours_corrected_rank_ = 1;
@@ -717,7 +745,18 @@ protected :
   std::vector<std::vector<std::vector<bool>>> pure_neighbours_to_correct_;
   std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_distance_;
   std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_colinearity_;
-  int dxyz_increment_bool_=0;
+  int dxyz_increment_bool_ = 0;
+  int dxyz_over_two_increment_bool_ = 0;
+
+  /*
+   * Identify neighbours faces centres for flux correction
+   */
+  int compute_reachable_fluxes_ = 0;
+  int neighbours_last_faces_colinearity_weighting_ = 0;
+  int neighbours_face_corrected_rank_ = 1;
+  std::vector<std::vector<std::vector<std::vector<bool>>>> pure_neighbours_last_faces_to_correct_;
+  std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_distance_;
+  std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_colinearity_;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

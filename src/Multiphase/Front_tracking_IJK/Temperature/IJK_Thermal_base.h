@@ -248,23 +248,23 @@ public:
   };
   virtual const IJK_Field_double& get_temperature_cell_neighbours_debug() const
   {
-    return temperature_; //dummy
+    return dummy_double_field_; //dummy
   }
   virtual const IJK_Field_double& get_temperature_cell_neighbours() const
   {
-    return temperature_; //dummy
+    return dummy_double_field_; //dummy
   }
   virtual const IJK_Field_int& get_cell_neighbours_corrected() const
   {
-    return *eulerian_compo_connex_from_interface_ns_int_; //dummy
+    return dummy_int_field_; //dummy
   }
   virtual const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const
   {
-    return temperature_; //dummy
+    return dummy_double_field_; //dummy
   }
   virtual const IJK_Field_double& get_debug_lrs_cells() const
   {
-    return temperature_; //dummy
+    return dummy_double_field_; //dummy
   };
   virtual int get_disable_post_processing_probes_out_files() const
   {
@@ -279,6 +279,14 @@ public:
     return dummy_double_vect_; //dummy
   }
   virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const
+  {
+    return dummy_int_vect_;
+  }
+  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const
+  {
+    return dummy_int_vect_;
+  }
+  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const
   {
     return dummy_int_vect_;
   }

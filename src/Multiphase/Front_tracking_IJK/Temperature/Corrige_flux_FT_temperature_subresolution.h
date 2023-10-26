@@ -68,6 +68,14 @@ public :
     correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
     neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
   }
+  void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
+                                            const int& use_cell_neighbours_for_fluxes_spherical_correction,
+                                            const int& compute_reachable_fluxes) override
+  {
+    find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
+    use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction;
+    compute_reachable_fluxes_ = compute_reachable_fluxes;
+  }
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
@@ -106,8 +114,9 @@ public :
                                                   IJK_Field_double& temperature_neighbours,
                                                   IJK_Field_int& neighbours_weighting,
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
-  void initialise_cell_neighbours_indices_to_correct();
-  void compute_cell_neighbours_indices_to_correct();
+  void initialise_cell_neighbours_indices_to_correct() override;
+  void compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
+  void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
   void compute_thermal_diffusive_fluxes() override;
@@ -178,6 +187,14 @@ protected :
   std::vector<ArrOfInt> index_face_j_flux_y_neighbours_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_sorted_;
+
+  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_all_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
+
   int convection_negligible_ = 0;
   int diffusion_negligible_ = 0;
   int debug_=0;
@@ -190,6 +207,8 @@ protected :
   int find_cell_neighbours_for_fluxes_spherical_correction_;
   int use_cell_neighbours_for_fluxes_spherical_correction_;
   int neighbours_colinearity_weighting_;
+
+  int compute_reachable_fluxes_;
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */
