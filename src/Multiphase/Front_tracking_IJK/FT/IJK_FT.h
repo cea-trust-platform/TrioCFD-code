@@ -669,6 +669,7 @@ protected :
   // et dans pressure_projection_with_inv_rho :
   int use_inv_rho_for_mass_solver_and_calculer_rho_v_;
   int use_inv_rho_in_poisson_solver_;
+  int use_unity_for_rho_in_poisson_solver_;
   int use_inv_rho_;
 
   int correction_bilan_qdm_;
