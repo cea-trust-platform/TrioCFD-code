@@ -68,7 +68,7 @@ Read pb
 {
 hydraulique
 {
-	modele_turbulence    nul
+	modele_turbulence null
 	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-6 impr }
 	convection           { quick }
 	diffusion            { }
