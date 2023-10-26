@@ -22,7 +22,7 @@
 #include <Parametre_implicite.h>
 #include <Navier_Stokes_FT_Disc.h>
 #include <Probleme_FT_Disc_gen.h>
-#include <Modele_turbulence_hyd_nul.h>
+#include <Modele_turbulence_hyd_null.h>
 #include <Discret_Thyd.h>
 #include <Operateur_Diff_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
@@ -395,7 +395,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
       // Si on a lu le modele de turbulence et qu'il est nul,
       // alors on utilise l'operateur de diffusion standard.
       if (le_modele_turbulence.non_nul() // L'operateur a ete type (donc lu)
-          && sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur()))
+          && sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur()))
         {
           is >> terme_diffusif; // Operateur de diffusion standard (non turbulent)
           if (Process::je_suis_maitre())
