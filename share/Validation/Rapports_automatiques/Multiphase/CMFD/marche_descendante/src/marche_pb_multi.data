@@ -82,7 +82,7 @@ Read sch
     facsec_max 1
     seuil_statio 1e-6
     nb_pas_dt_max $nb_pas_dt_max
-    solveur ice
+    solveur $solveur_temp
     {
         criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5  $diss_conv  }
         iter_min 2

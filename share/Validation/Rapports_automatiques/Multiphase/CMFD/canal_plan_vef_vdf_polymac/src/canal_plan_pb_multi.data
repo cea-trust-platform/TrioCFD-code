@@ -195,7 +195,7 @@ Lire pb
             y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_min_yplus $y_yplus    $x_max_yplus $y_yplus
             pression	pression		periode 1e8 segment 1001	0 0.8	100 0.8
             pression_io	pression		periode 1e8 segment 2    0.75 0    0.75 100
-            pression_i		pression		periode 1e8 segment 100     5 0	5 1
+            pression_i		pression		periode 1e8 segment 100     50 0	50 1
             pression_o		pression		periode 1e8 segment 100     100 0	100 1
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
         }

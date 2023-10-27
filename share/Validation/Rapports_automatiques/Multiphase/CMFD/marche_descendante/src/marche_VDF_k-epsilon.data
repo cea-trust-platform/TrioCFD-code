@@ -105,7 +105,7 @@ Read pb
 		convection { centre4 }
 		diffusion { }
 		conditions_initiales {
-			vitesse Champ_Uniforme 2 0. 0.
+			vitesse Champ_Uniforme 2 0 0.
 					}
 		boundary_conditions {
 			Entree frontiere_ouverte_vitesse_imposee	
