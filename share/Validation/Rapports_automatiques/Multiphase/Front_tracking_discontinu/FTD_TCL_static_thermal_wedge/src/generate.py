@@ -43,6 +43,13 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
    # Write it back out:
    with open(os.path.join(dest,'calc.data'),'w') as f:
       f.write(data)
+
+   with open('postpro_flux.py') as f:
+      fpost = f.read()
+   fpost = re.sub(r'@offset@',str(offset),fpost)
+   with open(os.path.join(dest,'postpro_flux.py'),'w') as f:
+      f.write(fpost)
+   
    #
    # Write it back out:
    file_info = os.path.join(dest,'info.txt')
@@ -63,6 +70,8 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
       os.mkdir(dest2)
       with open(os.path.join(dest2,'calc.data'),'w') as f:
       	f.write(data2)
+      with open(os.path.join(dest2,'postpro_flux.py'),'w') as f:
+      	f.write(fpost)
       shutil.copy(file_info, dest2)
       shutil.copy("post_run", dest2)
       pass

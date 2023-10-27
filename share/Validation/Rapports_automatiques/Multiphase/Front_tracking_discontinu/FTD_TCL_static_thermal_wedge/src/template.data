@@ -79,11 +79,10 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
-  deactivate
   Qtcl @Qi@ # W/m # 
-  ym 5.e-7
+  ym 7.e-7
   # ymeso 5.e-6 #
-  n_extend_meso 1
+  n_extend_meso 4
   sm @sm@ # TestCase at theta_app = @degliq@ degree #
           # sm = ym / tan(theta) #
   inout_method both

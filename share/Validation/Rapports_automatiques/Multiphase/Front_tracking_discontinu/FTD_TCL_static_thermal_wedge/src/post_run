@@ -19,7 +19,7 @@ if [ ${1} != "fake" ] ; then
   echo "[post_run] Running data_extract" && $local_root/data_extract.sh || (echo "data_extract failed" && exit -1)
   [ $(basename $PWD) == "CAS_REFINE8" ] && echo "[post_run] CAS_REFINE8 -> modify lata to remove Champs FACES (due to bug?)" && sed -i.bkp "/Champ FACES/d" lata/post.lata
   echo "[post_run] Running postpro" && visit -nowin -cli -s $local_root/postpro.py&> postpro.log || [ $? == 250 ] || (echo "postpro failed" && exit -1)
-  echo "[post_run] Running postpro_flux" && python $local_root/postpro_flux.py &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
+  echo "[post_run] Running postpro_flux" && python postpro_flux.py &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
   if [ $(basename $PWD) == "CAS_OFFSET-0.5" ] ; then
     echo "[post_run] Running visit_Re_Nu2" &&  visit -nowin -cli -s $local_root/visit_Re_Nu2.py&> visit_Re_Nu2.log || [ $? == 250 ] || (echo "visit_Re_Nu2 failed" && exit -1)
   fi
