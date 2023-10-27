@@ -85,6 +85,8 @@ public:
                                const double rhocpv,
                                const double ldal,
                                const double ldav);
+
+  virtual void set_convection_diffusion_correction(const int& convective_flux_correction, const int& diffusive_flux_correction) { ; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
    * l'interface. On remplace les flux donnes en entree par ces flux la.
@@ -94,6 +96,13 @@ public:
 
   virtual void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                         const int k_layer, const int dir) { ; };
+
+  virtual void correct_flux_spherical(Simd_double& a,
+                                      Simd_double& b,
+                                      const int& i,
+                                      const int& j,
+                                      const int& k_layer,
+                                      const int dir) { ; };
 
   virtual void update_intersections() { ; };
   virtual void update()=0;
@@ -120,11 +129,14 @@ public:
   virtual void set_debug(const int& debug) { ; };
   virtual void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) { ; };
   virtual void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting) { ; };
+  virtual void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) { ; };
+  virtual void set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed) { ; };
+
   virtual void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                     const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                     const int& compute_reachable_fluxes) { ; };
   virtual void initialise_cell_neighbours_indices_to_correct() { ; };
-  virtual void compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) { ; };
+  virtual void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) { ; };
   virtual void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) { ; };
   virtual void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
                                                           IJK_Field_int& neighbours_weighting,

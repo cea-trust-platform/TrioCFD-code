@@ -57,7 +57,11 @@ public :
                                    const IJK_One_Dimensional_Subproblems& thermal_subproblems) override;
 
   void associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems);
-
+  void set_convection_diffusion_correction(const int& convective_flux_correction, const int& diffusive_flux_correction) override
+  {
+    convective_flux_correction_ = convective_flux_correction;
+    diffusive_flux_correction_ = diffusive_flux_correction;
+  }
   void set_convection_negligible(const int& convection_negligible) override { convection_negligible_ = convection_negligible; };
   void set_diffusion_negligible(const int& diffusion_negligible) override { diffusion_negligible_ = diffusion_negligible; };
   void set_fluxes_feedback_params(const int discrete_integral, const int levels) override { discrete_integral_ = discrete_integral; levels_ = levels; };
@@ -65,9 +69,20 @@ public :
   void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours,
                                       const int& neighbours_colinearity_weighting) override
   {
-    correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
+    find_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
     neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
   }
+
+  void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override
+  {
+    cell_faces_neighbours_corrected_bool_ = &cell_faces_neighbours_corrected_bool;
+  }
+
+  void set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed) override
+  {
+    eulerian_normal_vectors_ns_normed_ = &eulerian_normal_vectors_ns_normed;
+  }
+
   void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& compute_reachable_fluxes) override
@@ -97,6 +112,13 @@ public :
   void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                 const int k_layer, const int dir) override;
 
+  void correct_flux_spherical(Simd_double& a,
+                              Simd_double& b,
+                              const int& i,
+                              const int& j,
+                              const int& k_layer,
+                              const int dir) override;
+
   void calcul_temperature_flux_interface(const IJK_Field_double& temperature, const double ldal, const double ldav,
                                          const double dist, const DoubleTab& positions, const DoubleTab& normale,
                                          ArrOfDouble& temperature_interp, ArrOfDouble& flux_normal_interp,
@@ -115,8 +137,9 @@ public :
                                                   IJK_Field_int& neighbours_weighting,
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
   void initialise_cell_neighbours_indices_to_correct() override;
-  void compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
+  void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
   void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
+  // void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
   void compute_thermal_diffusive_fluxes() override;
@@ -195,20 +218,26 @@ protected :
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
 
-  int convection_negligible_ = 0;
-  int diffusion_negligible_ = 0;
-  int debug_=0;
-  int levels_=0;
-  int discrete_integral_=0;
-  bool flux_init_ = 0;
+  int convection_negligible_;
+  int diffusion_negligible_;
+  int debug_;
+  int levels_;
+  int discrete_integral_;
+  bool flux_init_;
 
   int distance_cell_faces_from_lrs_;
-  int correct_temperature_cell_neighbours_;
+  int find_temperature_cell_neighbours_;
   int find_cell_neighbours_for_fluxes_spherical_correction_;
   int use_cell_neighbours_for_fluxes_spherical_correction_;
   int neighbours_colinearity_weighting_;
 
   int compute_reachable_fluxes_;
+  FixedVector<IJK_Field_int, 3>* cell_faces_neighbours_corrected_bool_;
+  FixedVector<IJK_Field_double, 3>* eulerian_normal_vectors_ns_normed_;
+
+  int convective_flux_correction_;
+  int diffusive_flux_correction_;
+
 };
 
 #endif /* Corrige_flux_FT_temperature_subresolution_included */

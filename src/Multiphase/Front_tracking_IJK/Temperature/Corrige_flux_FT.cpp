@@ -40,3 +40,13 @@ void Corrige_flux_FT::corrige_flux_faceIJ(IJK_Field_local_double *const flux,
 {
   valeur().corrige_flux_faceIJ(flux, k_layer, dir);
 }
+
+void Corrige_flux_FT::correct_flux_spherical(Simd_double& a,
+                                             Simd_double& b,
+                                             const int& i,
+                                             const int& j,
+                                             const int& k_layer,
+                                             const int dir)
+{
+  valeur().correct_flux_spherical(a, b, i, j, k_layer, dir);
+}

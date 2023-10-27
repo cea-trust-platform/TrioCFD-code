@@ -128,7 +128,9 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& correct_neighbours_rank,
                                                                       const int& neighbours_corrected_rank,
                                                                       const int& neighbours_colinearity_weighting,
-                                                                      const int& compute_reachable_fluxes)
+                                                                      const int& compute_reachable_fluxes,
+                                                                      const int& find_cell_neighbours_for_fluxes_spherical_correction,
+                                                                      const int& n_iter_distance)
 {
   bool create_subproblems_iteratively = true;
   debug_ = debug;
@@ -233,7 +235,9 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                     correct_neighbours_rank,
                                                                     neighbours_corrected_rank,
                                                                     neighbours_colinearity_weighting,
-                                                                    compute_reachable_fluxes);
+                                                                    compute_reachable_fluxes,
+                                                                    find_cell_neighbours_for_fluxes_spherical_correction,
+                                                                    n_iter_distance);
       subproblems_counter_++;
     }
   else

@@ -57,9 +57,17 @@ public :
                                       const double rhocpv,
                                       const double ldal,
                                       const double ldav);
+  inline void set_convection_diffusion_correction(const int& convective_flux_correction, const int& diffusive_flux_correction);
+
   void corrige_flux_faceIJ(IJK_Field_local_double *const flux,
                            const int k_layer,
                            const int dir);
+  void correct_flux_spherical(Simd_double& a,
+                              Simd_double& b,
+                              const int& i,
+                              const int& j,
+                              const int& k_layer,
+                              const int dir);
   inline void corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                        const int k_layer, const int dir);
   inline void update_intersections();
@@ -91,6 +99,8 @@ public :
 
   inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
   inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting);
+  inline void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
+  inline void set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed);
   inline void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& compute_reachable_fluxes);
@@ -99,7 +109,7 @@ public :
                                          FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
                                          FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive);
   inline void initialise_cell_neighbours_indices_to_correct();
-  inline void compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
+  inline void compute_cell_neighbours_indices_to_correct(const int& n_iter_distance);
   inline void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
 };
 
@@ -250,6 +260,16 @@ inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_t
   valeur().set_correction_cell_neighbours(correct_temperature_cell_neighbours, neighbours_colinearity_weighting);
 }
 
+inline void Corrige_flux_FT::set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
+{
+  valeur().set_cell_faces_neighbours_corrected_bool(cell_faces_neighbours_corrected_bool);
+}
+
+inline void Corrige_flux_FT::set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed)
+{
+  valeur().set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed);
+}
+
 inline void Corrige_flux_FT::set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                                   const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                                   const int& compute_reachable_fluxes)
@@ -276,14 +296,19 @@ inline void Corrige_flux_FT::initialise_cell_neighbours_indices_to_correct()
   valeur().initialise_cell_neighbours_indices_to_correct();
 }
 
-inline void Corrige_flux_FT::compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
+inline void Corrige_flux_FT::compute_cell_neighbours_indices_to_correct(const int& n_iter_distance)
 {
-  valeur().compute_cell_neighbours_indices_to_correct(cell_faces_neighbours_corrected_bool);
+  valeur().compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance);
 }
 
 inline void Corrige_flux_FT::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
 {
   valeur().compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_bool);
+}
+
+inline void Corrige_flux_FT::set_convection_diffusion_correction(const int& convective_flux_correction, const int& diffusive_flux_correction)
+{
+  valeur().set_convection_diffusion_correction(convective_flux_correction, diffusive_flux_correction);
 }
 
 #endif /* Corrige_flux_FT_included */

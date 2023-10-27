@@ -54,6 +54,7 @@ protected:
   // The derived class must implement the computation of fluxes (9 methods)
   // See for example classes OpDiffTurbIJK_double and OpConvCentre4IJK_double.
   virtual void correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir) { ; };
+  virtual void correct_flux_spherical(Simd_double& a, Simd_double& b, const int k_layer , const int dir) { ; };
   virtual void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_x_vy(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_x_vz(IJK_Field_local_double& resu, const int k_layer) = 0;
@@ -92,10 +93,16 @@ public:
   virtual void compute_grad_z(IJK_Field_double& dx);
 protected:
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
+  virtual void Operator_IJK_div_corr(const IJK_Field_local_double& flux_x, const IJK_Field_local_double& flux_y,
+                                     const IJK_Field_local_double& flux_zmin, const IJK_Field_local_double& flux_zmax,
+                                     IJK_Field_local_double& resu, int k_layer, bool add);
   virtual void correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir) { ; };
+  virtual void correct_flux_spherical(Simd_double& a, Simd_double& b, const int& i, const int& j, int k_layer, int dir) { ; };
+
   virtual void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_y(IJK_Field_local_double& resu, const int k_layer) = 0;
   virtual void compute_flux_z(IJK_Field_local_double& resu, const int k_layer) = 0;
+
 private:
   void compute_(IJK_Field_double& dx, bool add);
   virtual void fill_grad_field_x_y_(IJK_Field_local_double& flux, IJK_Field_double& resu, int k, int dir) { ; };

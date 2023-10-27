@@ -274,10 +274,10 @@ protected :
   double pre_factor_subproblems_number_;
 
   int correct_temperature_cell_neighbours_first_iter_;
-  int correct_temperature_cell_neighbours_;
+  int find_temperature_cell_neighbours_;
   int correct_neighbours_using_probe_length_;
   int neighbours_corrected_rank_;
-  int replace_temperature_cell_neighbours_;
+  int use_temperature_cell_neighbours_;
   int neighbours_colinearity_weighting_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;

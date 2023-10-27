@@ -94,11 +94,11 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   pre_factor_subproblems_number_ = 3.;
 
   correct_temperature_cell_neighbours_first_iter_ = 0;
-  correct_temperature_cell_neighbours_ = 0;
+  find_temperature_cell_neighbours_ = 0;
   correct_neighbours_using_probe_length_ = 0;
   neighbours_corrected_rank_ = 1;
   neighbours_colinearity_weighting_ = 0.;
-  replace_temperature_cell_neighbours_ = 0;
+  use_temperature_cell_neighbours_ = 0;
 
   clip_temperature_values_ = 0;
   disable_post_processing_probes_out_files_ = 0;
@@ -207,12 +207,12 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("pre_factor_subproblems_number", &pre_factor_subproblems_number_);
 
   param.ajouter_flag("correct_temperature_cell_neighbours_first_iter", &correct_temperature_cell_neighbours_first_iter_);
-  param.ajouter_flag("correct_temperature_cell_neighbours", &correct_temperature_cell_neighbours_);
+  param.ajouter_flag("find_temperature_cell_neighbours", &find_temperature_cell_neighbours_);
   param.ajouter_flag("correct_neighbours_using_probe_length", &correct_neighbours_using_probe_length_);
   param.ajouter("neighbours_corrected_rank", &neighbours_corrected_rank_);
 
   param.ajouter_flag("neighbours_colinearity_weighting", &neighbours_colinearity_weighting_);
-  param.ajouter_flag("replace_temperature_cell_neighbours", &replace_temperature_cell_neighbours_);
+  param.ajouter_flag("replace_temperature_cell_neighbours", &use_temperature_cell_neighbours_);
 
   param.ajouter_flag("clip_temperature_values", &clip_temperature_values_);
   param.ajouter_flag("disable_post_processing_probes_out_files", &disable_post_processing_probes_out_files_);
@@ -276,12 +276,18 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   nalloc += 1;
   temperature_before_extrapolation_.data() = 0.;
 
-  replace_temperature_cell_neighbours_ = replace_temperature_cell_neighbours_ && correct_temperature_cell_neighbours_;
+  use_temperature_cell_neighbours_ = use_temperature_cell_neighbours_ && find_temperature_cell_neighbours_;
+
   corrige_flux_.typer("Corrige_flux_FT_temperature_subresolution");
+  corrige_flux_.set_convection_diffusion_correction(convective_flux_correction_, diffusive_flux_correction_);
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
   corrige_flux_.set_debug(debug_);
   corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
-  corrige_flux_.set_correction_cell_neighbours(correct_temperature_cell_neighbours_, neighbours_colinearity_weighting_);
+  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_colinearity_weighting_);
+  corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
+
+  use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
+  find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
   if (use_cell_neighbours_for_fluxes_spherical_correction_)
     find_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_;
   corrige_flux_.set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
@@ -298,14 +304,14 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   diffusive_flux_correction_ = diffusive_flux_correction_ && (!diff_temperature_negligible_);
 
   disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
-  if (diffusive_flux_correction_)
+  if (diffusive_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
     {
       // Use an operator that override compute_set() with corrige_flux;
       temperature_diffusion_op_.typer("OpDiffUniformIJKScalarCorrection_double");
       temperature_diffusion_op_.initialize(splitting);
       temperature_diffusion_op_.set_corrige_flux(corrige_flux_);
     }
-  if (convective_flux_correction_)
+  if (convective_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
     {
       // Use an operator that override compute_set() with corrige_flux;
       temperature_convection_op_.typer("OpConvQuickInterfaceIJKScalar_double");
@@ -379,7 +385,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       debug_LRS_cells_.data() = -1.;
     }
 
-  if (correct_temperature_cell_neighbours_)
+  if (find_temperature_cell_neighbours_)
     {
       neighbours_temperature_to_correct_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
       temperature_cell_neighbours_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
@@ -406,16 +412,18 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   if (find_cell_neighbours_for_fluxes_spherical_correction_)
     {
-      allocate_cell_vector(cell_faces_neighbours_corrected_bool_, splitting, 1);
+      allocate_cell_vector(cell_faces_neighbours_corrected_bool_, splitting, ghost_cells_);
       nalloc += 3;
       for (int c=0; c<3; c++)
         cell_faces_neighbours_corrected_bool_[c].data() = 0.;
       cell_faces_neighbours_corrected_bool_.echange_espace_virtuel();
+      corrige_flux_->set_cell_faces_neighbours_corrected_bool(cell_faces_neighbours_corrected_bool_);
     }
+
 
   if (compute_reachable_fluxes_)
     {
-      allocate_cell_vector(cell_faces_neighbours_corrected_all_bool_, splitting, 1);
+      allocate_cell_vector(cell_faces_neighbours_corrected_all_bool_, splitting, ghost_cells_);
       nalloc += 3;
       for (int c=0; c<3; c++)
         cell_faces_neighbours_corrected_all_bool_[c].data() = 0.;
@@ -860,11 +868,13 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            (convective_flux_correction_ || diffusive_flux_correction_),
                                                                            distance_cell_faces_from_lrs_,
                                                                            pre_initialise_thermal_subproblems_list_,
-                                                                           correct_temperature_cell_neighbours_,
+                                                                           find_temperature_cell_neighbours_,
                                                                            !correct_neighbours_using_probe_length_,
                                                                            neighbours_corrected_rank_,
                                                                            neighbours_colinearity_weighting_,
-                                                                           compute_reachable_fluxes_);
+                                                                           compute_reachable_fluxes_,
+                                                                           find_cell_neighbours_for_fluxes_spherical_correction_,
+                                                                           n_iter_distance_);
 
               }
     }
@@ -1304,7 +1314,7 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
                                                             neighbours_temperature_to_correct_,
                                                             neighbours_temperature_colinearity_weighting_);
   corrige_flux_->initialise_cell_neighbours_indices_to_correct();
-  corrige_flux_->compute_cell_neighbours_indices_to_correct(cell_faces_neighbours_corrected_bool_);
+  corrige_flux_->compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance_);
   corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_);
   if (debug_)
     {
@@ -1317,7 +1327,7 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
   int correct_first_iter = (correct_temperature_cell_neighbours_first_iter_
                             && ref_ijk_ft_->get_tstep() == 0
                             && !ref_ijk_ft_->get_reprise() != 0);
-  if (replace_temperature_cell_neighbours_)
+  if (use_temperature_cell_neighbours_)
     if (correct_temperature_cell_neighbours_first_iter_ == correct_first_iter)
       corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_,
                                                                 temperature_cell_neighbours_,

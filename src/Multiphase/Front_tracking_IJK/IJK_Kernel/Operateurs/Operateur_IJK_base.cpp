@@ -319,9 +319,61 @@ void Operateur_IJK_elem_base_double::compute_(IJK_Field_double& dx, bool add)
       correct_flux(flux_x, k, 0);
       correct_flux(flux_y, k, 1);
       correct_flux(flux_zmax, k+1, 2);
-      Operator_IJK_div(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
+      // Operator_IJK_div(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
+      Operator_IJK_div_corr(*flux_x, *flux_y, *flux_zmin, *flux_zmax, dx, k, add);
       swap_data(flux_zmin, flux_zmax); // conserve le flux en z pour la couche z suivante
     }
+}
+
+void Operateur_IJK_elem_base_double::Operator_IJK_div_corr(const IJK_Field_local_double& flux_x, const IJK_Field_local_double& flux_y,
+                                                           const IJK_Field_local_double& flux_zmin, const IJK_Field_local_double& flux_zmax,
+                                                           IJK_Field_local_double& resu, int k_layer, bool add)
+{
+  ConstIJK_double_ptr fx(flux_x, 0, 0, 0);
+  ConstIJK_double_ptr fy(flux_y, 0, 0, 0);
+  ConstIJK_double_ptr fzmin(flux_zmin, 0, 0, 0);
+  ConstIJK_double_ptr fzmax(flux_zmax, 0, 0, 0);
+  IJK_double_ptr resu_ptr(resu, 0, 0, k_layer);
+
+
+  const int imax = resu.ni();
+  const int jmax = resu.nj();
+  const int vsize = Simd_double::size();
+  for (int j = 0; ; j++)
+    {
+      for (int i = 0; i < imax; i += vsize)
+        {
+          Simd_double r, a, b;
+          fx.get_center_right(DIRECTION::X, i, a, b);
+          correct_flux_spherical(a, b, i, j, k_layer, 0);
+          r = a-b;
+
+          fy.get_center_right(DIRECTION::Y,i, a, b);
+          correct_flux_spherical(a, b, i, j, k_layer, 1);
+          r += a-b;
+
+          fzmin.get_center(i, a);
+          fzmax.get_center(i, b);
+          correct_flux_spherical(a, b, i, j, k_layer, 2);
+          r += a-b;
+
+          if(add)
+            {
+              resu_ptr.get_center(i, a);
+              r += a;
+            }
+          resu_ptr.put_val(i, r);
+        }
+      // do not execute end_iloop at last iteration (because of assert on valid j+1)
+      if (j+1==jmax)
+        break;
+      fx.next_j();
+      fy.next_j();
+      fzmin.next_j();
+      fzmax.next_j();
+      resu_ptr.next_j();
+    }
+
 }
 
 void Operateur_IJK_elem_base_double::compute_grad(FixedVector<IJK_Field_double, 3>& dx)

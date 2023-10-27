@@ -144,6 +144,11 @@ void OpDiffUniformIJKScalarCorrection_double::correct_flux(IJK_Field_local_doubl
   corrige_flux_->corrige_flux_diff_faceIJ(flux, k_layer, dir);
 }
 
+void OpDiffUniformIJKScalarCorrection_double::correct_flux_spherical(Simd_double& a, Simd_double& b, const int& i, const int& j, int k_layer, int dir)
+{
+  corrige_flux_->correct_flux_spherical(a, b, i, j, k_layer, dir);
+}
+
 Implemente_instanciable_sans_constructeur(OpDiffIJKScalar_double, "OpDiffIJKScalar_double", Operateur_IJK_elem_diff_base_double);
 
 Sortie& OpDiffIJKScalar_double::printOn(Sortie& os) const

@@ -144,7 +144,9 @@ public :
                                        const int& correct_neighbours_rank,
                                        const int& neighbours_corrected_rank,
                                        const int& neighbours_colinearity_weighting,
-                                       const int& compute_reachable_fluxes);
+                                       const int& compute_reachable_fluxes,
+                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
+                                       const int& n_iter_distance);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -748,6 +750,8 @@ protected :
   int dxyz_increment_bool_ = 0;
   int dxyz_over_two_increment_bool_ = 0;
 
+  int find_cell_neighbours_for_fluxes_spherical_correction_ = 0;
+
   /*
    * Identify neighbours faces centres for flux correction
    */
@@ -757,6 +761,8 @@ protected :
   std::vector<std::vector<std::vector<std::vector<bool>>>> pure_neighbours_last_faces_to_correct_;
   std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_distance_;
   std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_colinearity_;
+
+  int n_iter_distance_ = 0;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

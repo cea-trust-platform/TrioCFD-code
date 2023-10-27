@@ -29,11 +29,22 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
   thermal_subproblems_ = nullptr;
   has_checked_consistency_ = false;
   distance_cell_faces_from_lrs_= 0;
-  correct_temperature_cell_neighbours_ = 0;
+  find_temperature_cell_neighbours_ = 0;
   neighbours_colinearity_weighting_ = 0;
   find_cell_neighbours_for_fluxes_spherical_correction_ = 0;
   use_cell_neighbours_for_fluxes_spherical_correction_ = 0;
   compute_reachable_fluxes_ = 0;
+  cell_faces_neighbours_corrected_bool_ = nullptr;
+  eulerian_normal_vectors_ns_normed_ = nullptr;
+
+  convection_negligible_ = 0;
+  diffusion_negligible_ = 0;
+  debug_=0;
+  levels_=0;
+  discrete_integral_=0;
+  flux_init_ = 0;
+  convective_flux_correction_ = 0;
+  diffusive_flux_correction_ = 0;
 }
 
 void Corrige_flux_FT_temperature_subresolution::associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems)
@@ -184,7 +195,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
                                                                                            IJK_Field_int& neighbours_weighting,
                                                                                            IJK_Field_double& neighbours_weighting_colinearity) const
 {
-  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
+  if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_)
     {
       neighbours_weighting.data() = 0;
       neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
@@ -240,7 +251,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
 
 void Corrige_flux_FT_temperature_subresolution::initialise_cell_neighbours_indices_to_correct()
 {
-  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_ && find_cell_neighbours_for_fluxes_spherical_correction_)
+  if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_ && find_cell_neighbours_for_fluxes_spherical_correction_)
     {
       const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
 
@@ -274,16 +285,16 @@ void Corrige_flux_FT_temperature_subresolution::initialise_cell_neighbours_indic
     }
 }
 
-void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance)
 {
   /*
    * TODO: What to do with duplicates ?
    */
-  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_ && find_cell_neighbours_for_fluxes_spherical_correction_)
+  if (distance_cell_faces_from_lrs_ && find_cell_neighbours_for_fluxes_spherical_correction_)
     {
       for (int c=0; c<3; c++)
-        cell_faces_neighbours_corrected_bool[c].data() = 0;
-      cell_faces_neighbours_corrected_bool.echange_espace_virtuel();
+        (*cell_faces_neighbours_corrected_bool_)[c].data() = 0;
+      (*cell_faces_neighbours_corrected_bool_).echange_espace_virtuel();
       const int nb_i_layer = ref_ijk_ft_->itfce().I().ni();
       const int nb_j_layer = ref_ijk_ft_->itfce().I().nj();
       const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
@@ -310,105 +321,169 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_indices_
               const int l_dir_size = (int) pure_neighbours_to_correct.size() -1;
               const int m_dir_size = (int) pure_neighbours_to_correct[0].size() -1;
               const int n_dir_size = (int) pure_neighbours_to_correct[0][0].size() -1;
+              //if (pure_neighbours_to_correct[l][m][n] && (l!=0 || m!=0 || n!=0))
               for (l=l_dir_size; l>=0; l--)
                 for (m=m_dir_size; m>=0; m--)
                   for (n=n_dir_size; n>=0; n--)
-                    if (pure_neighbours_to_correct[l][m][n] && ((l!=0 && m!=0) || (l!=0 && n!=0) || (m!=0 && n!=0))) // (l!=0 || m!=0 || n!=0) &&
-                      {
-                        const int i_offset = ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
-                        const int j_offset = ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
-                        const int k_offset = ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
-                        const int index_i_neighbour = index_i_problem + i_offset;
-                        const int index_j_neighbour = index_j_problem + j_offset;
-                        const int index_k_neighbour = index_k_problem + k_offset;
-                        const int i_offset_face = ((signbit(i_offset)) ?  (index_i_neighbour + 1) : index_i_neighbour);
-                        const int j_offset_face = ((signbit(j_offset)) ?  (index_j_neighbour + 1) : index_j_neighbour);
-                        const int k_offset_face = ((signbit(k_offset)) ?  (index_k_neighbour + 1) : index_k_neighbour);
-                        if (l !=0 )
-                          {
-                            if (cell_faces_neighbours_corrected_bool[0](i_offset_face, index_j_neighbour, index_k_neighbour))
-                              {
-                                (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(i_offset_face);
-                                (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
-                              }
-                            cell_faces_neighbours_corrected_bool[0](i_offset_face, index_j_neighbour, index_k_neighbour) += 1;
-                            if (i_offset_face == 0)
-                              {
-                                if(cell_faces_neighbours_corrected_bool[0](nb_i_layer, index_j_neighbour, index_k_neighbour))
-                                  {
-                                    (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(nb_i_layer);
-                                    (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
-                                  }
-                                cell_faces_neighbours_corrected_bool[0](nb_i_layer, index_j_neighbour, index_k_neighbour) += 1;
-                              }
-                            if (i_offset_face == nb_i_layer)
-                              {
-                                if (cell_faces_neighbours_corrected_bool[0](0, index_j_neighbour, index_k_neighbour))
-                                  {
-                                    (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(0);
-                                    (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
-                                  }
-                                cell_faces_neighbours_corrected_bool[0](0, index_j_neighbour, index_k_neighbour) += 1;
-                              }
-                          }
-                        if (m != 0)
-                          {
-                            if (cell_faces_neighbours_corrected_bool[1](index_i_neighbour, j_offset_face, index_k_neighbour))
-                              {
-                                (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
-                                (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(j_offset_face);
-                              }
-                            cell_faces_neighbours_corrected_bool[1](index_i_neighbour, j_offset_face, index_k_neighbour) += 1;
-                            if (j_offset_face == 0)
-                              {
-                                if (cell_faces_neighbours_corrected_bool[1](index_i_neighbour, nb_j_layer, index_k_neighbour))
-                                  {
-                                    (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
-                                    (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(nb_j_layer);
-                                  }
-                                cell_faces_neighbours_corrected_bool[1](index_i_neighbour, nb_j_layer, index_k_neighbour) += 1;
-                              }
-                            if (i_offset_face == nb_j_layer)
-                              {
-                                if (cell_faces_neighbours_corrected_bool[1](index_i_neighbour, 0, index_k_neighbour))
-                                  {
-                                    (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
-                                    (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(0);
-                                  }
-                                cell_faces_neighbours_corrected_bool[1](index_i_neighbour, 0, index_k_neighbour) += 1;
-                              }
-                          }
-                        if (n != 0)
-                          {
-                            if (cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, k_offset_face))
-                              {
-                                (*(index_face_i_sorted[2]))[k_offset_face].append_array(index_i_neighbour);
-                                (*(index_face_j_sorted[2]))[k_offset_face].append_array(index_j_neighbour);
-                              }
-                            cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, k_offset_face) += 1;
-                            if (j_offset_face == 0)
-                              {
-                                if (cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, nb_k_layer))
-                                  {
-                                    (*(index_face_i_sorted[2]))[nb_k_layer].append_array(index_i_neighbour);
-                                    (*(index_face_j_sorted[2]))[nb_k_layer].append_array(index_j_neighbour);
-                                  }
-                                cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, nb_k_layer) += 1;
-                              }
-                            if (i_offset_face == nb_k_layer)
-                              {
-                                if (cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, 0))
-                                  {
-                                    (*(index_face_i_sorted[2]))[0].append_array(index_i_neighbour);
-                                    (*(index_face_j_sorted[2]))[0].append_array(index_j_neighbour);
-                                  }
-                                cell_faces_neighbours_corrected_bool[2](index_i_neighbour, index_j_neighbour, 0) += 1;
-                              }
-                          }
-                      }
+                    if (l <= n_iter_distance && m <= n_iter_distance && n <= n_iter_distance) // Need an underlying normal vector for correction
+                      if (pure_neighbours_to_correct[l][m][n] && ((l!=0 && m!=0) || (l!=0 && n!=0) || (m!=0 && n!=0))) // (l!=0 || m!=0 || n!=0) &&
+                        {
+                          const int i_offset = ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
+                          const int j_offset = ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
+                          const int k_offset = ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
+                          const int index_i_neighbour = index_i_problem + i_offset;
+                          const int index_j_neighbour = index_j_problem + j_offset;
+                          const int index_k_neighbour = index_k_problem + k_offset;
+                          const int i_offset_face = ((signbit(i_offset)) ?  (index_i_neighbour + 1) : index_i_neighbour);
+                          const int j_offset_face = ((signbit(j_offset)) ?  (index_j_neighbour + 1) : index_j_neighbour);
+                          const int k_offset_face = ((signbit(k_offset)) ?  (index_k_neighbour + 1) : index_k_neighbour);
+                          if (l !=0 )
+                            {
+                              if (!(*cell_faces_neighbours_corrected_bool_)[0](i_offset_face, index_j_neighbour, index_k_neighbour))
+                                {
+                                  (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(i_offset_face);
+                                  (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
+                                }
+                              (*cell_faces_neighbours_corrected_bool_)[0](i_offset_face, index_j_neighbour, index_k_neighbour) += 1;
+                              if (i_offset_face == 0)
+                                {
+                                  if(!(*cell_faces_neighbours_corrected_bool_)[0](nb_i_layer, index_j_neighbour, index_k_neighbour))
+                                    {
+                                      (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(nb_i_layer);
+                                      (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[0](nb_i_layer, index_j_neighbour, index_k_neighbour) += 1;
+                                }
+                              if (i_offset_face == nb_i_layer)
+                                {
+                                  if (!(*cell_faces_neighbours_corrected_bool_)[0](0, index_j_neighbour, index_k_neighbour))
+                                    {
+                                      (*(index_face_i_sorted[0]))[index_k_neighbour].append_array(0);
+                                      (*(index_face_j_sorted[0]))[index_k_neighbour].append_array(index_j_neighbour);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[0](0, index_j_neighbour, index_k_neighbour) += 1;
+                                }
+                            }
+                          if (m != 0)
+                            {
+                              if (!(*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, j_offset_face, index_k_neighbour))
+                                {
+                                  (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
+                                  (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(j_offset_face);
+                                }
+                              (*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, j_offset_face, index_k_neighbour) += 1;
+                              if (j_offset_face == 0)
+                                {
+                                  if (!(*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, nb_j_layer, index_k_neighbour))
+                                    {
+                                      (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
+                                      (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(nb_j_layer);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, nb_j_layer, index_k_neighbour) += 1;
+                                }
+                              if (i_offset_face == nb_j_layer)
+                                {
+                                  if (!(*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, 0, index_k_neighbour))
+                                    {
+                                      (*(index_face_i_sorted[1]))[index_k_neighbour].append_array(index_i_neighbour);
+                                      (*(index_face_j_sorted[1]))[index_k_neighbour].append_array(0);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[1](index_i_neighbour, 0, index_k_neighbour) += 1;
+                                }
+                            }
+                          if (n != 0)
+                            {
+                              if (!(*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, k_offset_face))
+                                {
+                                  (*(index_face_i_sorted[2]))[k_offset_face].append_array(index_i_neighbour);
+                                  (*(index_face_j_sorted[2]))[k_offset_face].append_array(index_j_neighbour);
+                                }
+                              (*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, k_offset_face) += 1;
+                              if (j_offset_face == 0)
+                                {
+                                  if (!(*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, nb_k_layer))
+                                    {
+                                      (*(index_face_i_sorted[2]))[nb_k_layer].append_array(index_i_neighbour);
+                                      (*(index_face_j_sorted[2]))[nb_k_layer].append_array(index_j_neighbour);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, nb_k_layer) += 1;
+                                }
+                              if (i_offset_face == nb_k_layer)
+                                {
+                                  if (!(*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, 0))
+                                    {
+                                      (*(index_face_i_sorted[2]))[0].append_array(index_i_neighbour);
+                                      (*(index_face_j_sorted[2]))[0].append_array(index_j_neighbour);
+                                    }
+                                  (*cell_faces_neighbours_corrected_bool_)[2](index_i_neighbour, index_j_neighbour, 0) += 1;
+                                }
+                            }
+                        }
             }
         }
+      (*cell_faces_neighbours_corrected_bool_).echange_espace_virtuel();
     }
+}
+
+void Corrige_flux_FT_temperature_subresolution::correct_flux_spherical(Simd_double& a,
+                                                                       Simd_double& b,
+                                                                       const int& i,
+                                                                       const int& j,
+                                                                       const int& k_layer,
+                                                                       const int dir)
+{
+  /*
+   * I wanted to use index_face_i_sorted, index_face_j_sorted to avoid reading cell_faces_neighbours_corrected_bool again
+   */
+  if (use_cell_neighbours_for_fluxes_spherical_correction_)
+    {
+      int bool_a, bool_b;
+//      switch (dir)
+//        {
+//        case DIRECTION_I:
+//          bool_a = (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+//          bool_b = (*cell_faces_neighbours_corrected_bool_)[dir](i+1, j, k_layer);
+//          break;
+//        case DIRECTION_J:
+//          bool_a = (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+//          bool_b = (*cell_faces_neighbours_corrected_bool_)[dir](i, j+1, k_layer);
+//          break;
+//        case DIRECTION_K:
+//          bool_a = (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+//          bool_b = (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer + 1);
+//          break;
+//        default:
+//          bool_a = 0;
+//          bool_b = 0;
+//          break;
+//        }
+      bool_a = (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+      bool_a = bool_a || (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+      bool_a = bool_a || (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer);
+      bool_b = (*cell_faces_neighbours_corrected_bool_)[dir](i+1, j, k_layer);
+      bool_b = bool_b || (*cell_faces_neighbours_corrected_bool_)[dir](i, j+1, k_layer);
+      bool_b = bool_b || (*cell_faces_neighbours_corrected_bool_)[dir](i, j, k_layer + 1);
+      if (bool_a || bool_b)
+        {
+          double n;
+          n = abs((*eulerian_normal_vectors_ns_normed_)[dir](i, j, k_layer));
+          a *= n;
+          b *= n;
+//          if (n > std::cos(1.8 * M_PI/4) && n < std::cos(0.2 * M_PI/4) )
+//            n = 1.;
+//          if (bool_a)
+//            {
+//              //a *= n;
+//              a *= (1. / n);
+//            }
+//          if (bool_b)
+//            {
+//              //b *= n;
+//              b *= (1. / n);
+//            }
+        }
+    }
+
 }
 
 void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
@@ -431,11 +506,13 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
 
       int m,l,n;
       int index_i_problem, index_j_problem, index_k_problem;
+      int l_dir, m_dir, n_dir;
       for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
         {
           if (thermal_subproblems_->get_dxyz_over_two_increment_bool(i))
             {
               thermal_subproblems_->get_subproblem_ijk_indices(index_i_problem, index_j_problem, index_k_problem, i);
+              const FixedVector<int,3>& pure_neighbours_corrected_sign = thermal_subproblems_->get_pure_neighbours_corrected_sign(i);
               const std::vector<std::vector<std::vector<std::vector<bool>>>>& pure_neighbours_to_correct = thermal_subproblems_->get_pure_neighbours_last_faces_to_correct(i);
               for (int c=0; c<3; c++)
                 {
@@ -446,7 +523,27 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
                     for (m=m_dir_size; m>=0; m--)
                       for (n=n_dir_size; n>=0; n--)
                         if (pure_neighbours_to_correct[c][l][m][n])
-                          cell_faces_neighbours_corrected_bool[c](l,m,n) += 1;
+                          {
+                            switch(c)
+                              {
+                              case 0:
+                                l_dir = (pure_neighbours_corrected_sign[0]) ? l * (-1) : l + 1;
+                                m_dir = (pure_neighbours_corrected_sign[1]) ? m * (-1) : m;
+                                n_dir = (pure_neighbours_corrected_sign[2]) ? n * (-1) : n;
+                                break;
+                              case 1:
+                                l_dir = (pure_neighbours_corrected_sign[0]) ? l * (-1) : l;
+                                m_dir = (pure_neighbours_corrected_sign[1]) ? m * (-1) : m + 1;
+                                n_dir = (pure_neighbours_corrected_sign[2]) ? n * (-1) : n;
+                                break;
+                              case 2:
+                                l_dir = (pure_neighbours_corrected_sign[0]) ? l * (-1) : l;
+                                m_dir = (pure_neighbours_corrected_sign[1]) ? m * (-1) : m;
+                                n_dir = (pure_neighbours_corrected_sign[2]) ? n * (-1) : n + 1;
+                                break;
+                              }
+                            cell_faces_neighbours_corrected_bool[c](index_i_problem + l_dir, index_j_problem + m_dir, index_k_problem + n_dir) += 1;
+                          }
                 }
             }
         }
@@ -458,7 +555,7 @@ void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_
                                                                                            IJK_Field_int& neighbours_weighting,
                                                                                            IJK_Field_double& neighbours_weighting_colinearity) const
 {
-  if (distance_cell_faces_from_lrs_ && correct_temperature_cell_neighbours_)
+  if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_)
     {
       temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
       neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
@@ -943,14 +1040,16 @@ void Corrige_flux_FT_temperature_subresolution::corrige_flux_faceIJ(IJK_Field_lo
                                                                     const int k_layer,
                                                                     const int dir)
 {
-  corrige_flux_faceIJ_any_flux(flux, convective_flux_x_sorted_, convective_flux_y_sorted_, convective_flux_z_sorted_, k_layer, dir);
+  if (convective_flux_correction_)
+    corrige_flux_faceIJ_any_flux(flux, convective_flux_x_sorted_, convective_flux_y_sorted_, convective_flux_z_sorted_, k_layer, dir);
 }
 
 void Corrige_flux_FT_temperature_subresolution::corrige_flux_diff_faceIJ(IJK_Field_local_double *const flux,
                                                                          const int k_layer,
                                                                          const int dir)
 {
-  corrige_flux_faceIJ_any_flux(flux, diffusive_flux_x_sorted_, diffusive_flux_y_sorted_, diffusive_flux_z_sorted_, k_layer, dir);
+  if (diffusive_flux_correction_)
+    corrige_flux_faceIJ_any_flux(flux, diffusive_flux_x_sorted_, diffusive_flux_y_sorted_, diffusive_flux_z_sorted_, k_layer, dir);
 }
 
 void Corrige_flux_FT_temperature_subresolution::corrige_flux_faceIJ_any_flux(IJK_Field_local_double *const flux,
