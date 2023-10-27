@@ -1629,6 +1629,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 
           double Q_int = Qmicro*circum_dis; // unit of Q_int is W
 
+          if (std::fabs(Q_int)<DMINFLOAT)
+            continue;
+
           if (first_call_for_this_mesh)
             {
               // We update values and integrals only at the first call
@@ -1794,6 +1797,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
           //  const double value = jump_inv_rho*Q_int/Lvap;
           //  Cerr << "[TCL-meso] Local source in elem=["  << elem << "] with value= " << value << "[m2.s-1]" << finl;
           //  Cerr << "Qint= " << Q_int << finl;
+
+          if (std::fabs(Q_int)<DMINFLOAT)
+            continue;
 
           if (first_call_for_this_mesh)
             {
