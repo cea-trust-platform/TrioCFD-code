@@ -73,7 +73,8 @@ class IJK_One_Dimensional_Subproblem : public Objet_U
 public :
   IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
-  void associate_sub_problem_to_inputs(int debug,
+  void associate_sub_problem_to_inputs(int init,
+                                       int debug,
                                        int sub_problem_index,
                                        int i, int j, int k,
                                        double global_time_step,
@@ -319,18 +320,37 @@ public :
     return pure_neighbours_last_faces_corrected_colinearity_;
   }
 protected :
+  void reinit_variable(DoubleVect& vect);
+  void associate_thermal_subproblem_parameters(int debug,
+                                               const int& n_iter_distance,
+                                               const double& delta_T_subcooled_overheated,
+                                               const int& pre_initialise_thermal_subproblems_list);
+  void associate_flux_correction_parameters(const int& correct_fluxes, const int& distance_cell_faces_from_lrs);
+  void associate_source_terms_parameters(const int& source_terms_type,
+                                         const int& correct_tangential_temperature_gradient,
+                                         const int& correct_tangential_temperature_hessian,
+                                         int advected_frame_of_reference,
+                                         int neglect_frame_of_reference_radial_advection);
+  void associate_finite_difference_solver_solution(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                   Matrice& thermal_subproblems_matrix_assembly,
+                                                   DoubleVect& thermal_subproblems_rhs_assembly,
+                                                   DoubleVect& thermal_subproblems_temperature_solution,
+                                                   DoubleVect& thermal_subproblems_temperature_solution_ini);
+  void associate_temporal_parameters(const double& global_time_step, const double& current_time);
   void associate_cell_ijk(int i, int j, int k) { index_i_ = i; index_j_=j; index_k_=k; };
   void associate_sub_problem_temporal_params(const bool& is_first_time_step,
                                              int& first_time_step_temporal,
                                              const int& first_time_step_explicit,
                                              const double& local_fourier,
                                              const double& local_cfl,
-                                             const double& min_delta_xyz);
+                                             const double& min_delta_xyz,
+                                             int max_u_radial);
   void associate_varying_probes_params(const int& first_time_step_varying_probes,
                                        const int& probe_variations_priority,
                                        const int& disable_interpolation_in_mixed_cells);
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
   void associate_compos(int compo_connex, int compo_group) { compo_connex_ = compo_connex; compo_group_ = compo_group; };
+  void associate_eulerian_field_values(int compo_connex, const double& indicator) { compo_connex_ = compo_connex; indicator_ = indicator; };
   void associate_interface_related_parameters(double distance, double curvature, double interfacial_area, ArrOfDouble facet_barycentre, ArrOfDouble normal_vector)
   {
     distance_ = distance;
@@ -349,7 +369,6 @@ protected :
   };
 
   void associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
-                                            const double& indicator,
                                             const IJK_Field_double& eulerian_distance,
                                             const IJK_Field_double& eulerian_curvature,
                                             const IJK_Field_double& eulerian_interfacial_area,
@@ -367,7 +386,8 @@ protected :
                                              const int& correct_neighbours_rank,
                                              const int& neighbours_corrected_rank,
                                              const int& neighbours_colinearity_weighting,
-                                             const int& compute_last_faces_to_correct);
+                                             const int& compute_last_faces_to_correct,
+                                             const int& find_cell_neighbours_for_fluxes_spherical_correction);
   void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
                                   const double& lambda,
@@ -439,6 +459,7 @@ protected :
   enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
   int debug_;
+  int init_;
   int advected_frame_of_reference_=1;
   int neglect_frame_of_reference_radial_advection_=1;
   /*

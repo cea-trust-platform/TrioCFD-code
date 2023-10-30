@@ -151,6 +151,7 @@ protected :
   void compute_md_vector();
   void retrieve_temperature_solution();
   void check_wrong_values_rhs();
+  void initialise_thermal_subproblems_list();
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
@@ -270,8 +271,8 @@ protected :
   int distance_cell_faces_from_lrs_;
 
   int pre_initialise_thermal_subproblems_list_;
-  int global_probes_characteristics_ = 1;
   double pre_factor_subproblems_number_;
+  int global_probes_characteristics_ = 1;
 
   int correct_temperature_cell_neighbours_first_iter_;
   int find_temperature_cell_neighbours_;

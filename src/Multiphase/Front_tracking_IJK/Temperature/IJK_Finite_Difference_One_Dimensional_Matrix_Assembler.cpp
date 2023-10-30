@@ -1026,6 +1026,14 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reduce_solver_matri
       DoubleVect& coeff_reduced = sparse_matrix_solver_reduced.get_set_coeff();
       const int nb_coeff = coeff_reduced.size();
       const int nb_rows = tab1_reduced.size();
+
+//      tab1_reduced = tab1;
+//      tab2_reduced = tab2;
+//      coeff_reduced = coeff;
+//      tab1_reduced.resize(nb_rows, Array_base::COPY_NOINIT);
+//      tab2_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
+//      coeff_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
+
       int i;
       for (i=0; i<nb_rows; i++)
         tab1_reduced(i) = tab1(i);

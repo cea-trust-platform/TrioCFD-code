@@ -348,6 +348,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   thermal_local_subproblems_.associer(ref_ijk_ft_);
+  initialise_thermal_subproblems_list();
+
 
   is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
   first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
@@ -743,6 +745,12 @@ void IJK_Thermal_Subresolution::compute_second_order_operator(Matrice& radial_se
 {
   const double dr_squared_inv = 1 / pow(dr, 2);
   radial_second_order_operator *= dr_squared_inv;
+}
+
+void IJK_Thermal_Subresolution::initialise_thermal_subproblems_list()
+{
+  thermal_local_subproblems_.initialise_thermal_subproblems_list_params(pre_initialise_thermal_subproblems_list_,
+                                                                        pre_factor_subproblems_number_);
 }
 
 void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
@@ -1293,17 +1301,20 @@ void IJK_Thermal_Subresolution::compute_diffusive_fluxes_face_centre()
 
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres(const int first_corr)
 {
-  switch(first_corr)
+  if (!disable_subresolution_)
     {
-    case 0:
-      compute_temperature_cell_centres_first_correction();
-      break;
-    case 1:
-      compute_temperature_cell_centres_second_correction();
-      break;
-    default:
-      compute_temperature_cell_centres_first_correction();
-      break;
+      switch(first_corr)
+        {
+        case 0:
+          compute_temperature_cell_centres_first_correction();
+          break;
+        case 1:
+          compute_temperature_cell_centres_second_correction();
+          break;
+        default:
+          compute_temperature_cell_centres_first_correction();
+          break;
+        }
     }
 }
 
@@ -1447,7 +1458,7 @@ void IJK_Thermal_Subresolution::set_zero_temperature_increment()
 
 void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ && ref_ijk_ft_->get_tstep() > 0)
     thermal_local_subproblems_.clean();
 }
 

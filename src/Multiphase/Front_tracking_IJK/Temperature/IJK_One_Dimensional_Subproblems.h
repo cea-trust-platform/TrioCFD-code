@@ -47,8 +47,14 @@ class IJK_One_Dimensional_Subproblems : public LIST(IJK_One_Dimensional_Subprobl
 public :
   IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
+  void initialise_thermal_subproblems_list_params(const int& pre_initialise_thermal_subproblems_list,
+                                                  const double& pre_factor_subproblems_number);
+  void set_max_subproblems(const int max_subproblems) { max_subproblems_ = max_subproblems; };
   void clean();
+  void clean(int add);
   void clean_add();
+  void clean_remove();
+  void complete_subproblems();
   void add_subproblems(int n);
   void associate_sub_problem_to_inputs(int debug,
                                        int i, int j, int k,
@@ -184,10 +190,14 @@ public :
 
 
 protected :
+  int init_ = 1;
   int debug_ = 0;
   int max_subproblems_ = 0;
   int subproblems_counter_ = 0;
+  int reallocate_subproblems_ = 1;
   REF(IJK_FT_double) ref_ijk_ft_;
+  int pre_initialise_thermal_subproblems_list_ = 0;
+  double pre_factor_subproblems_number_ = 1.;
 
 };
 

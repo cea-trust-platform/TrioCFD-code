@@ -28,6 +28,7 @@ Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
 {
+  init_ = 1;
   debug_ = 0;
 
   points_per_thermal_subproblem_ = nullptr;
@@ -123,64 +124,14 @@ void IJK_One_Dimensional_Subproblem::get_ijk_indices(int& i, int& j, int& k) con
   k = (int) index_k_;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
-                                                                          const double& indicator,
-                                                                          const IJK_Field_double& eulerian_distance,
-                                                                          const IJK_Field_double& eulerian_curvature,
-                                                                          const IJK_Field_double& eulerian_interfacial_area,
-                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
-                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
-                                                                          const IJK_Field_double& temperature,
-                                                                          const IJK_Field_double& temperature_ft,
-                                                                          const IJK_Field_double& temperature_before_extrapolation,
-                                                                          const FixedVector<IJK_Field_double, 3>& velocity,
-                                                                          const FixedVector<IJK_Field_double, 3>& velocity_ft,
-                                                                          const FixedVector<IJK_Field_double, 3>& grad_T_elem,
-                                                                          const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                                                          const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
+void IJK_One_Dimensional_Subproblem::reinit_variable(DoubleVect& vect)
 {
-  interfaces_ = &interfaces;
-  indicator_ = indicator;
-  eulerian_distance_ = &eulerian_distance;
-  eulerian_curvature_ = &eulerian_curvature;
-  eulerian_interfacial_area_ = &eulerian_interfacial_area;
-  eulerian_normal_vect_ = &eulerian_normal_vect;
-  eulerian_facets_barycentre_ = &eulerian_facets_barycentre;
-  temperature_ = &temperature ;
-  temperature_ft_ = &temperature_ft ;
-  temperature_before_extrapolation_ = &temperature_before_extrapolation;
-  velocity_ = &velocity ;
-  velocity_ft_ = &velocity_ft;
-  grad_T_elem_ = &grad_T_elem ;
-  hess_diag_T_elem_ = &hess_diag_T_elem ;
-  hess_cross_T_elem_ = &hess_cross_T_elem ;
+  vect.resize(*points_per_thermal_subproblem_);
+  vect *= 0.;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const bool& is_first_time_step,
-                                                                           int& first_time_step_temporal,
-                                                                           const int& first_time_step_explicit,
-                                                                           const double& local_fourier,
-                                                                           const double& local_cfl,
-                                                                           const double& min_delta_xyz)
-{
-  is_first_time_step_ = is_first_time_step;
-  first_time_step_temporal_ = &first_time_step_temporal;
-  first_time_step_explicit_ = first_time_step_explicit;
-  local_fourier_ = local_fourier;
-  local_cfl_ = local_cfl;
-  min_delta_xyz_ = min_delta_xyz;
-}
-
-void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& first_time_step_varying_probes,
-                                                                     const int& probe_variations_priority,
-                                                                     const int& disable_interpolation_in_mixed_cells)
-{
-  first_time_step_varying_probes_ = first_time_step_varying_probes;
-  probe_variations_priority_ = probe_variations_priority;
-  disable_interpolation_in_mixed_cells_ = disable_interpolation_in_mixed_cells;
-}
-
-void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
+                                                                     int debug,
                                                                      int sub_problem_index,
                                                                      int i, int j, int k,
                                                                      double global_time_step,
@@ -255,65 +206,217 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int debug,
                                                                      const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                                      const int& n_iter_distance)
 {
-  debug_ = debug;
+  /*
+   * Should not change over iterations
+   */
+  init_ = init;
   sub_problem_index_ = sub_problem_index;
-  global_time_step_ = global_time_step;
-  current_time_ = current_time;
-  correct_fluxes_ = correct_fluxes;
-  pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
+
+  if (init_)
+    {
+      associate_thermal_subproblem_parameters(debug,
+                                              n_iter_distance,
+                                              delta_T_subcooled_overheated,
+                                              pre_initialise_thermal_subproblems_list);
+      associate_eulerian_fields_references(interfaces,
+                                           eulerian_distance,
+                                           eulerian_curvature,
+                                           eulerian_interfacial_area,
+                                           eulerian_normal_vect,
+                                           eulerian_facets_barycentre,
+                                           temperature,
+                                           temperature_ft,
+                                           temperature_before_extrapolation,
+                                           velocity,
+                                           velocity_ft,
+                                           grad_T_elem,
+                                           hess_diag_T_elem,
+                                           hess_cross_T_elem);
+      associate_probe_parameters(points_per_thermal_subproblem,
+                                 alpha,
+                                 lambda,
+                                 coeff_distance_diagonal,
+                                 cell_diagonal,
+                                 dr_base,
+                                 radial_coordinates);
+      associate_finite_difference_operators(radial_first_order_operator_raw,
+                                            radial_second_order_operator_raw,
+                                            radial_first_order_operator,
+                                            radial_second_order_operator,
+                                            identity_matrix_explicit_implicit_raw,
+                                            identity_matrix_subproblems,
+                                            radial_diffusion_matrix,
+                                            radial_convection_matrix);
+      associate_finite_difference_solver_solution(finite_difference_assembler,
+                                                  thermal_subproblems_matrix_assembly,
+                                                  thermal_subproblems_rhs_assembly,
+                                                  thermal_subproblems_temperature_solution,
+                                                  thermal_subproblems_temperature_solution_ini);
+      associate_source_terms_parameters(source_terms_type,
+                                        source_terms_correction,
+                                        source_terms_correction,
+                                        advected_frame_of_reference,
+                                        neglect_frame_of_reference_radial_advection);
+      associate_flux_correction_parameters(correct_fluxes,
+                                           distance_cell_faces_from_lrs);
+      associate_varying_probes_params(first_time_step_varying_probes,
+                                      probe_variations_priority,
+                                      disable_interpolation_in_mixed_cells);
+      associate_flags_neighbours_correction(correct_temperature_cell_neighbours,
+                                            correct_neighbours_rank,
+                                            neighbours_corrected_rank,
+                                            neighbours_colinearity_weighting,
+                                            compute_reachable_fluxes,
+                                            find_cell_neighbours_for_fluxes_spherical_correction);
+      // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
+      associate_sub_problem_temporal_params(is_first_time_step,
+                                            first_time_step_temporal,
+                                            first_time_step_explicit,
+                                            local_fourier,
+                                            local_cfl,
+                                            min_delta_xyz,
+                                            max_u_radial);
+    }
+
+  /*
+   * Should be reinitialised at each time step.
+   */
+  associate_temporal_parameters(global_time_step, current_time);
   associate_cell_ijk(i, j, k);
-  associate_compos(compo_connex);
-  associate_sub_problem_temporal_params(is_first_time_step, first_time_step_temporal, first_time_step_explicit, local_fourier, local_cfl, min_delta_xyz);
-  associate_varying_probes_params(first_time_step_varying_probes, probe_variations_priority, disable_interpolation_in_mixed_cells);
+  associate_eulerian_field_values(compo_connex, indicator);
   associate_interface_related_parameters(distance, curvature, interfacial_area, facet_barycentre, normal_vector);
   associate_rising_velocity(bubble_rising_velocity, bubble_rising_vector, bubble_barycentre);
-  associate_eulerian_fields_references(interfaces, indicator, eulerian_distance, eulerian_curvature, eulerian_interfacial_area, eulerian_normal_vect,
-                                       eulerian_facets_barycentre, temperature, temperature_ft, temperature_before_extrapolation, velocity, velocity_ft,
-                                       grad_T_elem, hess_diag_T_elem, hess_cross_T_elem);
-  associate_probe_parameters(points_per_thermal_subproblem, alpha, lambda, coeff_distance_diagonal, cell_diagonal, dr_base, radial_coordinates);
-  associate_finite_difference_operators(radial_first_order_operator_raw, radial_second_order_operator_raw,
-                                        radial_first_order_operator, radial_second_order_operator, identity_matrix_explicit_implicit_raw,
-                                        identity_matrix_subproblems, radial_diffusion_matrix, radial_convection_matrix);
-  associate_flags_neighbours_correction(correct_temperature_cell_neighbours,
-                                        correct_neighbours_rank,
-                                        neighbours_corrected_rank,
-                                        neighbours_colinearity_weighting,
-                                        compute_reachable_fluxes);
+  initialise_thermal_probe();
+  if (!global_probes_characteristics_)
+    (*first_time_step_temporal_) = 0;
+  recompute_finite_difference_matrices();
+}
+
+void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(int debug,
+                                                                             const int& n_iter_distance,
+                                                                             const double& delta_T_subcooled_overheated,
+                                                                             const int& pre_initialise_thermal_subproblems_list)
+{
+  debug_ = debug;
+  n_iter_distance_ = n_iter_distance;
+  delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
+  pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
+                                                                          const IJK_Field_double& eulerian_distance,
+                                                                          const IJK_Field_double& eulerian_curvature,
+                                                                          const IJK_Field_double& eulerian_interfacial_area,
+                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
+                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+                                                                          const IJK_Field_double& temperature,
+                                                                          const IJK_Field_double& temperature_ft,
+                                                                          const IJK_Field_double& temperature_before_extrapolation,
+                                                                          const FixedVector<IJK_Field_double, 3>& velocity,
+                                                                          const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                                                          const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+                                                                          const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+                                                                          const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
+{
+  interfaces_ = &interfaces;
+  eulerian_distance_ = &eulerian_distance;
+  eulerian_curvature_ = &eulerian_curvature;
+  eulerian_interfacial_area_ = &eulerian_interfacial_area;
+  eulerian_normal_vect_ = &eulerian_normal_vect;
+  eulerian_facets_barycentre_ = &eulerian_facets_barycentre;
+  temperature_ = &temperature ;
+  temperature_ft_ = &temperature_ft ;
+  temperature_before_extrapolation_ = &temperature_before_extrapolation;
+  velocity_ = &velocity ;
+  velocity_ft_ = &velocity_ft;
+  grad_T_elem_ = &grad_T_elem ;
+  hess_diag_T_elem_ = &hess_diag_T_elem ;
+  hess_cross_T_elem_ = &hess_cross_T_elem ;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const bool& is_first_time_step,
+                                                                           int& first_time_step_temporal,
+                                                                           const int& first_time_step_explicit,
+                                                                           const double& local_fourier,
+                                                                           const double& local_cfl,
+                                                                           const double& min_delta_xyz,
+                                                                           int max_u_radial)
+{
+  is_first_time_step_ = is_first_time_step;
+  first_time_step_temporal_ = &first_time_step_temporal;
+  first_time_step_explicit_ = first_time_step_explicit;
+  local_fourier_ = local_fourier;
+  local_cfl_ = local_cfl;
+  min_delta_xyz_ = min_delta_xyz;
+  max_u_radial_ = max_u_radial;
+  max_u_cartesian_ = !max_u_radial_;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& first_time_step_varying_probes,
+                                                                     const int& probe_variations_priority,
+                                                                     const int& disable_interpolation_in_mixed_cells)
+{
+  first_time_step_varying_probes_ = first_time_step_varying_probes;
+  probe_variations_priority_ = probe_variations_priority;
+  disable_interpolation_in_mixed_cells_ = disable_interpolation_in_mixed_cells;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_flux_correction_parameters(const int& correct_fluxes,
+                                                                          const int& distance_cell_faces_from_lrs)
+{
+  correct_fluxes_ = correct_fluxes;
+  distance_cell_faces_from_lrs_ = distance_cell_faces_from_lrs;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_source_terms_parameters(const int& source_terms_type,
+                                                                       const int& correct_tangential_temperature_gradient,
+                                                                       const int& correct_tangential_temperature_hessian,
+                                                                       int advected_frame_of_reference,
+                                                                       int neglect_frame_of_reference_radial_advection)
+{
+  source_terms_type_ = source_terms_type;
+  correct_tangential_temperature_gradient_ = correct_tangential_temperature_gradient;
+  correct_tangential_temperature_hessian_ = correct_tangential_temperature_hessian;
+  advected_frame_of_reference_ = advected_frame_of_reference;
+  neglect_frame_of_reference_radial_advection_ = neglect_frame_of_reference_radial_advection;
+}
+
+void 	IJK_One_Dimensional_Subproblem::associate_finite_difference_solver_solution(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+                                                                                  Matrice& thermal_subproblems_matrix_assembly,
+                                                                                  DoubleVect& thermal_subproblems_rhs_assembly,
+                                                                                  DoubleVect& thermal_subproblems_temperature_solution,
+                                                                                  DoubleVect& thermal_subproblems_temperature_solution_ini)
+{
   finite_difference_assembler_ = &finite_difference_assembler;
   thermal_subproblems_matrix_assembly_ = &thermal_subproblems_matrix_assembly;
   thermal_subproblems_rhs_assembly_ = &thermal_subproblems_rhs_assembly;
   thermal_subproblems_temperature_solution_ = &thermal_subproblems_temperature_solution;
   thermal_subproblems_temperature_solution_ini_ = &thermal_subproblems_temperature_solution_ini;
-  source_terms_type_ = source_terms_type;
-  correct_tangential_temperature_gradient_ = source_terms_correction;
-  correct_tangential_temperature_hessian_ = source_terms_correction;
-  advected_frame_of_reference_ = advected_frame_of_reference;
-  neglect_frame_of_reference_radial_advection_=neglect_frame_of_reference_radial_advection;
-  distance_cell_faces_from_lrs_ = distance_cell_faces_from_lrs;
-  find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
-  n_iter_distance_ = n_iter_distance;
-  // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
-  correct_temperature_cell_neighbours_ = (correct_temperature_cell_neighbours_ && distance_cell_faces_from_lrs_);
-  initialise_thermal_probe();
-  if (!global_probes_characteristics_)
-    (*first_time_step_temporal_) = 0;
-  recompute_finite_difference_matrices();
-  delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
-  max_u_radial_ = max_u_radial;
-  max_u_cartesian_ = !max_u_radial_;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_temporal_parameters(const double& global_time_step, const double& current_time)
+{
+  global_time_step_ = global_time_step;
+  current_time_ = current_time;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_flags_neighbours_correction(const int& correct_temperature_cell_neighbours,
                                                                            const int& correct_neighbours_rank,
                                                                            const int& neighbours_corrected_rank,
                                                                            const int& neighbours_colinearity_weighting,
-                                                                           const int& compute_reachable_fluxes)
+                                                                           const int& compute_reachable_fluxes,
+                                                                           const int& find_cell_neighbours_for_fluxes_spherical_correction)
 {
+  /*
+   * Keep it under IJK_One_Dimensional_Subproblem::associate_flux_correction_parameters()
+   */
   correct_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
   correct_neighbours_rank_ = correct_neighbours_rank;
   neighbours_corrected_rank_ = neighbours_corrected_rank;
   neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
   compute_reachable_fluxes_ = compute_reachable_fluxes;
+  find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
+  correct_temperature_cell_neighbours_ = (correct_temperature_cell_neighbours_ && distance_cell_faces_from_lrs_);
 }
 
 void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
@@ -412,7 +515,10 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     }
 
   surface_ = (*eulerian_interfacial_area_)(index_i_, index_j_, index_k_);
-  rhs_assembly_.resize(*points_per_thermal_subproblem_);
+  // Resize won't change the values if size is not changing...
+  reinit_variable(rhs_assembly_);
+//  rhs_assembly_.resize(*points_per_thermal_subproblem_);
+//  rhs_assembly_ *= 0.;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
@@ -1627,7 +1733,8 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
   const double alpha_inv = - 1 / *alpha_;
   DoubleVect osculating_radial_coefficient = osculating_radial_coordinates_inv_;
   osculating_radial_coefficient *= 2;
-  radial_convection_prefactor_.resize(*points_per_thermal_subproblem_);
+  reinit_variable(radial_convection_prefactor_);
+  // radial_convection_prefactor_.resize(*points_per_thermal_subproblem_);
   // interpolate_project_velocities_on_probes();
   if (source_terms_type_ != linear_diffusion
       && source_terms_type_ != spherical_diffusion

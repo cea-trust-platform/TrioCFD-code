@@ -100,7 +100,7 @@ void Corrige_flux_FT_temperature_subresolution::associate_indices_and_check_subp
   if (!has_checked_consistency_)
     {
       const int nb_diph = intersection_ijk_cell_->get_nb_diph();
-      const int nb_subproblems = thermal_subproblems_->size();
+      const int nb_subproblems = thermal_subproblems_->get_subproblems_counter();
       has_checked_consistency_ = (nb_diph==nb_subproblems);
       assert(has_checked_consistency_);
       ijk_intersections_subproblems_indices_.reset();
