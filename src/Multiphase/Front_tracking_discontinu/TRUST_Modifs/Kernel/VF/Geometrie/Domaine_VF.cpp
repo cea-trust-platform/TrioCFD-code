@@ -25,7 +25,7 @@
 #include <MD_Vector_base.h>
 #include <Analyse_Angle.h>
 #include <Linear_algebra_tools_impl.h>
-
+#include <Device.h>
 #include <medcoupling++.h>
 #ifdef MEDCOUPLING_
 #include <MEDCouplingMemArray.hxx>
@@ -37,6 +37,8 @@ using namespace MEDCoupling;
 #include <Navier.h>
 #include <Symetrie.h>
 #include <Dirichlet_loi_paroi.h>
+
+#include <set>
 
 Implemente_base(Domaine_VF,"Domaine_VF",Domaine_dis_base);
 
@@ -251,11 +253,12 @@ void Domaine_VF::discretiser()
 
   delete les_faces_ptr;
 
-// Fill in the table face_numero_bord
+  // Fill in the table face_numero_bord
   remplir_face_numero_bord();
 
-  faces_perio_.resize_array(nb_faces_tot());
   faces_doubles_.resize_array(nb_faces());
+  est_face_bord_.resize_array(nb_faces_tot());
+
 
   ///////////////////////
   // On imprime des infos
@@ -466,7 +469,7 @@ DoubleTab Domaine_VF::normalized_boundaries_outward_vector(int global_face_numbe
   int neighbor_elem=neighbor_faces(global_face_number,0);
   if( neighbor_elem == -1 )
     neighbor_elem = neighbor_faces(global_face_number,1);
-  DoubleTab vector_face_elem(dimension);
+  //DoubleTab vector_face_elem(dimension);
   double inner_product=0;
   for(int i=0; i<dimension; i++)
     {
@@ -498,18 +501,17 @@ void Domaine_VF::marquer_faces_double_contrib(const Conds_lim& conds_lim)
   Journal() << " Domaine_VF::marquer_faces_double_contrib" << finl;
   // marquage des faces periodiques
   ////////////////////////////////////////////////
+
+  est_face_bord_=0; // init for inner faces.
   for (auto& itr : conds_lim)
     {
       const Cond_lim_base& cl=itr.valeur();
-      if (sub_type(Periodique, cl))
+      int flag = sub_type(Periodique, cl) ? 2 : 1;
+      const Front_VF& le_bord = ref_cast(Front_VF, cl.frontiere_dis());
+      for (int ind_face = 0; ind_face < le_bord.nb_faces_tot(); ind_face++)
         {
-          const Periodique& la_cl_period = ref_cast(Periodique,cl);
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl_period.frontiere_dis());
-          for (int ind_face = 0; ind_face < le_bord.nb_faces_tot(); ind_face++)
-            {
-              int num_face = le_bord.num_face(ind_face);
-              faces_perio_[num_face]=1;
-            }
+          int num_face = le_bord.num_face(ind_face);
+          est_face_bord_[num_face]=flag;
         }
     }
   for (auto& itr : conds_lim)
@@ -609,6 +611,9 @@ void Domaine_VF::info_elem_som()
       Cerr<< nb_boundary_faces << " of them on boundary "<<bords(i).le_nom()<<finl;
     }
   Cerr<<"=============================================="<<finl;
+  int internal_item = std::min(nbelem, nbfaces);
+  internal_item = std::min(internal_item, nbsom);
+  set_exit_on_copy_condition(internal_item);
 }
 
 void Domaine_VF::creer_tableau_faces(Array_base& t, Array_base::Resize_Options opt) const
@@ -630,21 +635,19 @@ void Domaine_VF::creer_tableau_faces_bord(Array_base& t, Array_base::Resize_Opti
 
 void Domaine_VF::remplir_face_numero_bord()
 {
-  Cerr << " Domaine_VF::remplir_face_numero_bord" << finl;
+  Cerr << "Domaine_VF::remplir_face_numero_bord" << finl;
   face_numero_bord_.resize(nb_faces());
   face_numero_bord_=-1; // init for inner faces.
   Domaine& ledomaine=domaine();
-  int ndeb, nfin, num_face;
+  int ndeb, nfin;
   const int nb_bords = ledomaine.nb_bords();
   for (int n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Bord& le_bord = ledomaine.bord(n_bord);
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
-      for (num_face=ndeb; num_face<nfin; num_face++)
-        {
-          face_numero_bord_[num_face] = n_bord;
-        }
+      for (int num_face=ndeb; num_face<nfin; num_face++)
+        face_numero_bord_[num_face] = n_bord;
     }
 
   const int nb_raccords = ledomaine.nb_raccords() ;
@@ -653,10 +656,8 @@ void Domaine_VF::remplir_face_numero_bord()
       const Raccord& le_racc = ledomaine.raccord(n_racc);
       ndeb = le_racc -> num_premiere_face();
       nfin = ndeb + le_racc -> nb_faces();
-      for (num_face=ndeb; num_face<nfin; num_face++)
-        {
-          face_numero_bord_[num_face] = n_racc + nb_bords;
-        }
+      for (int num_face=ndeb; num_face<nfin; num_face++)
+        face_numero_bord_[num_face] = n_racc + nb_bords;
     }
 }
 
@@ -866,10 +867,11 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim) // Methode 
 
         for (int f=num_face_1_cl ; f < nb_faces_cl+num_face_1_cl ; f++)
           {
-            const int ind = face_voisins(f, 0) > -1 ? face_voisins(f, 0) : face_voisins(f, 1);
-            if ( dist_face_elem0(f, ind) < y_elem_(ind) ) // Prise en compte du cas ou l'element a plusieurs faces de bord
+            const int ind = (face_voisins(f,0)>=0) ? face_voisins(f,0) : face_voisins(f,1) ;
+            const double dist_ef_loc = (face_voisins(f,0)>=0) ? dist_face_elem0(f, face_voisins(f,0)) : dist_face_elem1(f, face_voisins(f,1));
+            if ( dist_ef_loc < y_elem_(ind) ) // Prise en compte du cas ou l'element a plusieurs faces de bord
               {
-                y_elem_(ind) = dist_face_elem0(f, ind) ;
+                y_elem_(ind) = dist_ef_loc ;
                 for (int d = 0 ; d < D ; d++)
                   n_y_elem_(ind, d) = -face_normales(f,  d)/face_surfaces(f);
               }
