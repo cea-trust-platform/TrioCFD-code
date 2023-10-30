@@ -1331,28 +1331,14 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
               {
                 if (!is_in_list(list_micro_elems,elemi) && !distri_first_facette())
                   {
-<<<<<<< HEAD
-
                     list_micro_elems.append_array(elemi);
                     list_micro_faces.append_array(num_face);
                     Cerr << "[TCL: MICRO]: elem " << elemi << " | face number at wall " << num_face << finl;
-=======
-                    Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elemi
-                         << finl;
-                    list_micro_elems.append_array(elemi);
-                    list_micro_faces.append_array(num_face);
-                    Cerr << "[TCL: MICRO]: Corresponding face number at wall "
-                         << num_face << finl;
->>>>>>> compute_tcl_flux revised, distri_first_facette should work well
                   }
               }
             else if (hcell_bot <= ym_ + Objet_U::precision_geom)
               {
-<<<<<<< HEAD
                 // Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
-=======
-                Cerr << "[TCL: MICRO+MESO] FOUND cell can contribue both MICRO and MESO #" << elemi << finl;
->>>>>>> compute_tcl_flux revised, distri_first_facette should work well
                 if (!distri_first_facette() && !is_in_list(list_micro_elems,elemi))
                   {
                     list_micro_elems.append_array(elemi);
@@ -1423,7 +1409,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                           {
                             if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
                               {
-<<<<<<< HEAD
                                 // Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
                                 list_micro_elems.append_array(elem_voisin);
                                 // Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
@@ -1434,17 +1419,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                                 Cerr << "[TCL: MICRO]: elem " << elem_voisin << " | face number at wall " << num_face_wall << finl;
                                 future_new_elems.append_array(elem_voisin);
                               }
-=======
-                                Cerr << "[TCL: MICRO] FOUND MICRO cell at #" << elem_voisin <<" among Neighboorhood cells of iElem #" << ielem << finl;
-                                list_micro_elems.append_array(elem_voisin);
-                                Cerr << "[TCL: MICRO]: SERCHING corresponding face number at wall, DIRECTION = " << iface << finl;
-                                Cerr << "[TCL: MICRO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
-                                const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
-                                list_micro_faces.append_array(num_face_wall);
-                                Cerr << "[TCL: MICRO]: Corresponding face number at wall " << num_face_wall << finl;
-                              }
-                            future_new_elems.append_array(elem_voisin);
->>>>>>> compute_tcl_flux revised, distri_first_facette should work well
                           }
                         else if (hcell_dn <= ym_+Objet_U::precision_geom)
                           {
@@ -1453,11 +1427,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                             // Cerr << "[TCL: MICRO+MESO]: (2D case: 0 LEFT; 1 DOWN; 2 Right; 3 UP.)" << finl;
                             const int num_face_wall = wall_face_towards(iface, elem_voisin, num_bord, zvdf);
 
-<<<<<<< HEAD
-
-=======
-                            future_new_elems.append_array(elem_voisin);
->>>>>>> compute_tcl_flux revised, distri_first_facette should work well
                             if (!distri_first_facette() && !is_in_list(list_micro_elems,elem_voisin))
                               {
                                 list_micro_elems.append_array(elem_voisin);
