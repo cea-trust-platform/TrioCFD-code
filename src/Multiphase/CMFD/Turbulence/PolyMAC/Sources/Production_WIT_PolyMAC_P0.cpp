@@ -91,6 +91,6 @@ void Production_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& se
           for (int d = 0; d < D; d++) u_r += (vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l))*(vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l)); // relative speed = gas speed - liquid speed
           u_r = std::sqrt(u_r);
           double Reb = diam(e,k)*u_r/nu(e,n_l);
-          secmem(e, 0) += ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * 0.5 * tab_alp(e, k) *(tab_rho(e, n_l)-tab_rho(e, k))/tab_rho(e, n_l)*g_*u_r*(0.9 - exp(-Reb/Reb_c_));
+          secmem(e, 0) += ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * tab_alp(e, k) *(tab_rho(e, n_l)-tab_rho(e, k))/tab_rho(e, n_l)*g_*u_r*(0.9 - exp(-Reb/Reb_c_));
         }
 }

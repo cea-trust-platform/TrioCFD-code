@@ -55,9 +55,8 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
 
   // Récupère les champs de vitesse - alpha - d_bulles (diamètre des bulles) - grad vitesse
   const Pb_Multiphase* pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr ;
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, pbm->equation_qdm().inconnue().valeur());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, pbm->equation_qdm().domaine_dis().valeur());
-  const DoubleTab& vit = ch.passe();
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, pb_.valeur().domaine_dis().valeur());
+  const DoubleTab& tab_u = pb_->get_champ("vitesse").passe();
   const DoubleTab& d_bulles = pb_->get_champ("diametre_bulles").passe();
   const DoubleTab& alpha = pb_->get_champ("alpha").passe();
   const DoubleTab& tab_grad = pbm->get_champ("gradient_vitesse").passe();
@@ -72,11 +71,25 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
   //double grad_vit_r; // gradient vitesse relative
   double S_ij; // taux de déformation : S = 0.5*(gradV+gradV^T)
   double nu_sato; // viscosité de sato
-  double dv; // norme de la vitesse relative
+  // Calcul de la norme de la vitesse relative
+  ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_P0, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
+  int i_part = -1;
+  for (int i = 0; i < p_u.size(); i++)
+    if (p_u[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
+  if (i_part < 0) Process::exit("Viscosite_turbulente_sato : inconsistency between velocity and Rij!");
+  const DoubleTab& u = p_u[i_part]; //le bon tableau
+  DoubleTrav u_r(u.dimension(0), 1);
+  for (int i = 0; i < Ne; i++)
+    {
+      for (int d = 0; d < D; d++) u_r(i, 0) += (u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse))*(u(i, d, id_phase_disperse) - u(i, d, id_phase_porteuse)); // relative speed = gas speed - liquid speed
+      u_r(i, 0) = std::sqrt(u_r(i, 0));
+    }
+
+  // Tenseur Reynolds de Sato
   for( int e = 0 ; e < Ne ; e++) // elements
     {
-      dv = ch.v_norm(vit, vit, e, -1, id_phase_porteuse, id_phase_disperse, nullptr, nullptr); // Calcul la norme de la vitesse relative
-      nu_sato = coef_sato * alpha(e, id_phase_disperse) * d_bulles(e, id_phase_disperse) * dv; // Calcul viscosité de sato
+      //dv = ch.v_norm(vit, vit, e, -1, id_phase_porteuse, id_phase_disperse, nullptr, nullptr); // Calcul la norme de la vitesse relative
+      nu_sato = coef_sato * alpha(e, id_phase_disperse) * d_bulles(e, id_phase_disperse) * u_r(e,0); // Calcul viscosité de sato
       for (int i = 0; i < D; i++) // dimension i
         for (int j = 0; j < D; j++) // dimension j
           {

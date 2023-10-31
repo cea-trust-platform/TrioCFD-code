@@ -85,8 +85,8 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
 
   // On récupère la tension superficielle sigma
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
-  const DoubleTab& press = ref_cast(Navier_Stokes_std, ref_cast(Pb_Multiphase, equation().probleme()).equation_qdm()).pression().passe();
-  const DoubleTab& temp  = ref_cast(Pb_Multiphase, equation().probleme()).equation_energie().inconnue().passe();
+  const DoubleTab& press = equation().probleme().get_champ("pression").passe();
+  const DoubleTab& temp  = equation().probleme().get_champ("temperature").passe();
   const int nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
   DoubleTrav Sigma_tab(ne,nb_max_sat);
   int Np = press.line_size();
@@ -112,6 +112,6 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
           int ind_trav = (k>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (k-n_l-1) : (k*(N-1)-(k-1)*(k)/2) + (n_l-k-1);
           double Eo = g_ * std::abs(tab_rho(e, n_l)-tab_rho(e, k)) * diam(e, k)*diam(e, k)/Sigma_tab(e, ind_trav);
           double Cd = (u_r!=0) ? std::max( std::min( 16./Reb*(1+0.15*std::pow(Reb, 0.687)) , 48./Reb )   , 8.*Eo/(3.*(Eo+4.))) : 0; // si u_r=0 alors pas de trainée, pas de WIT donc dissipation=0
-          secmem(e, 0) -= ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * 0.5 * 2. * nu(e, n_l) * Cd * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
+          secmem(e, 0) -= ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * 2. * nu(e, n_l) * Cd * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
         }
 }
