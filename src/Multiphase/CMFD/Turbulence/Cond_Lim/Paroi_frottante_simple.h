@@ -12,42 +12,48 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Loi_paroi_adaptative.h
-// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
-// Version:     /main/18
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Loi_paroi_adaptative_included
-#define Loi_paroi_adaptative_included
-#include <TRUSTTab.h>
-#include <TRUSTTab.h>
-#include <Correlation_base.h>
-#include <Loi_paroi_log.h>
-#include <vector>
-#include <map>
-#include <string>
+#ifndef Paroi_frottante_simple_included
+#define Paroi_frottante_simple_included
 
-/*! @brief classe Loi_paroi_adaptative correlation pour une loi de paroi adaptative qui calcule u_tau et du y_plus
+#include <TRUSTTab.h>
+#include <Frottement_global_impose.h>
+#include <Cond_lim_base.h>
+#include <TRUST_Ref.h>
+
+class Correlation;
+
+/*! @brief Classe Paroi_frottante_simple Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
  *
- *     Methodes implementees :
+ *     transport de QDM.
+ *     Le coefficient de frottement est calcule a partir de la correlation de loi de paroi adaptative.
  *
- *
+ * @sa Neumann
  */
-class Loi_paroi_adaptative : public Loi_paroi_log
+class Paroi_frottante_simple : public Frottement_global_impose
 {
-  Declare_instanciable(Loi_paroi_adaptative);
-public:
-  void   calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
-  double u_plus_de_y_plus(double y_p) override ; // Blended Reichardt model
-  double deriv_u_plus_de_y_plus(double y_p) override ;
 
-protected:
+  Declare_instanciable(Paroi_frottante_simple);
 
-  double von_karman_ = 0.41;
-  double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
+public :
+  void completer() override ;
+  virtual int initialiser(double temps) override;
+  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps) override;
+  void me_calculer();
+  virtual double coefficient_frottement(int i) const override {return valeurs_coeff_(i,0);};
+  virtual double coefficient_frottement(int i,int j) const override {return valeurs_coeff_(i,j);};
+  virtual double coefficient_frottement_grad(int i) const override {return valeurs_coeff_grad_(i,0);};
+  virtual double coefficient_frottement_grad(int i,int j) const override {return valeurs_coeff_grad_(i,j);};
+  virtual void liste_faces_loi_paroi(IntTab&) override;
+
+protected :
+
+  virtual double fac_coeff_grad(double y_p) const { return 1.;};
+  REF(Correlation) correlation_loi_paroi_;
+
+  DoubleTab valeurs_coeff_;
+  DoubleTab valeurs_coeff_grad_;
 
 };
 
