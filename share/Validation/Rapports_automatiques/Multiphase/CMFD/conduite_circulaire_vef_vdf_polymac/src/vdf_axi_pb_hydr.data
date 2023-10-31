@@ -52,6 +52,7 @@ Lire sch
 	dt_impr 1e+6
 	facsec 20
 	facsec_max 20
+	nb_pas_dt_max $nb_pas_dt_max
 	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
 	seuil_statio 1e-30
 	tmax $tmax

@@ -1,15 +1,19 @@
 import medcoupling as mc
 from math import radians, sin, cos, ceil
 import numpy as np
+
+
+
 def build_mesh(alpha_d, folder, med_name):
 
     # rayon maillage
     r = 2
     # hauteur maillage
     h = 100
-    # quelque chose
+
     n = 20
     nz = 50
+
 
     theta_mesh_size = 6. # en degres
     nt = ceil(alpha_d / theta_mesh_size) # equivalent axisymetrique (une maille 3D d'epaisseur)
@@ -105,4 +109,4 @@ def build_mesh(alpha_d, folder, med_name):
     mm.write(f"{folder}/{med_name}", 2)
 
 if __name__ == "__main__":
-    build_mesh(2.0, ".", f"polymac_n{n}_nz{nz}.med")
+    build_mesh(2.0, ".", f"polymac_n20_nz50.med")

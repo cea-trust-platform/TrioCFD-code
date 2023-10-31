@@ -99,7 +99,7 @@ for config in available_config:
     param_config[config]["facsec"] = "1"
 # nb_pas_dt_max 
 for config in available_config:
-    param_config[config]["nb_pas_dt_max"] = "1000000"
+    param_config[config]["nb_pas_dt_max"] = "1000"
 # solveur temps
 for config in available_config:
     if "k-tau" in config:
