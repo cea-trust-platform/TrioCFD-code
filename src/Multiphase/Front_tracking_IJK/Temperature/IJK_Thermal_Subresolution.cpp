@@ -286,8 +286,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_colinearity_weighting_);
   corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
 
-  use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
   find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
+  use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
   if (use_cell_neighbours_for_fluxes_spherical_correction_)
     find_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_;
   corrige_flux_.set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
@@ -852,6 +852,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            temperature_before_extrapolation_,
                                                                            ref_ijk_ft_->get_velocity(),
                                                                            ref_ijk_ft_->get_velocity_ft(),
+                                                                           ref_ijk_ft_->get_pressure_ghost_cells(),
                                                                            grad_T_elem_,
                                                                            hess_diag_T_elem_,
                                                                            hess_cross_T_elem_,
@@ -952,11 +953,11 @@ void IJK_Thermal_Subresolution::reset_subresolution_distributed_vectors()
           thermal_subproblems_temperature_solution_ini_for_solver_.reset();
           thermal_subproblems_temperature_solution_ini_for_solver_.set_smart_resize(1);
         }
-      thermal_subproblems_rhs_assembly_for_solver_.reset();
-      thermal_subproblems_rhs_assembly_for_solver_.set_smart_resize(1);
-      thermal_subproblems_temperature_solution_for_solver_.reset();
-      thermal_subproblems_temperature_solution_for_solver_.set_smart_resize(1);
     }
+  thermal_subproblems_rhs_assembly_for_solver_.reset();
+  thermal_subproblems_rhs_assembly_for_solver_.set_smart_resize(1);
+  thermal_subproblems_temperature_solution_for_solver_.reset();
+  thermal_subproblems_temperature_solution_for_solver_.set_smart_resize(1);
 }
 
 
@@ -1459,19 +1460,16 @@ void IJK_Thermal_Subresolution::set_zero_temperature_increment()
 void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
   if (!disable_subresolution_ && ref_ijk_ft_->get_tstep() > 0)
-    thermal_local_subproblems_.clean();
+    {
+      thermal_local_subproblems_.clean();
+      corrige_flux_->clear_vectors();
+    }
 }
 
 void IJK_Thermal_Subresolution::clean_ijk_intersections()
 {
   if (!disable_subresolution_)
     corrige_flux_->clean();
-}
-
-void IJK_Thermal_Subresolution::clean_add_thermal_subproblems()
-{
-  if (!disable_subresolution_)
-    thermal_local_subproblems_.clean_add();
 }
 
 void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(SFichier& fic)

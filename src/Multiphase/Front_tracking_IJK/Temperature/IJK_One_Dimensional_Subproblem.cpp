@@ -50,6 +50,7 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   temperature_before_extrapolation_ = nullptr;
   velocity_ = nullptr;
   velocity_ft_ = nullptr;
+  pressure_ = nullptr;
 
   grad_T_elem_ = nullptr;
   hess_diag_T_elem_ = nullptr;
@@ -174,6 +175,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
                                                                      const IJK_Field_double& temperature_before_extrapolation,
                                                                      const FixedVector<IJK_Field_double, 3>& velocity,
                                                                      const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                                                     const IJK_Field_double& pressure,
                                                                      const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                                                      const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                                                      const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
@@ -229,6 +231,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
                                            temperature_before_extrapolation,
                                            velocity,
                                            velocity_ft,
+                                           pressure,
                                            grad_T_elem,
                                            hess_diag_T_elem,
                                            hess_cross_T_elem);
@@ -281,6 +284,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
   /*
    * Should be reinitialised at each time step.
    */
+  clear_vectors();
+  reset_counters();
   associate_temporal_parameters(global_time_step, current_time);
   associate_cell_ijk(i, j, k);
   associate_eulerian_field_values(compo_connex, indicator);
@@ -290,6 +295,21 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
   if (!global_probes_characteristics_)
     (*first_time_step_temporal_) = 0;
   recompute_finite_difference_matrices();
+}
+
+void IJK_One_Dimensional_Subproblem::clear_vectors()
+{
+  pure_neighbours_to_correct_.clear();
+  pure_neighbours_corrected_distance_.clear();
+  pure_neighbours_corrected_colinearity_.clear();
+  pure_neighbours_last_faces_to_correct_.clear();
+  pure_neighbours_last_faces_corrected_distance_.clear();
+  pure_neighbours_last_faces_corrected_colinearity_.clear();
+}
+
+void IJK_One_Dimensional_Subproblem::reset_counters()
+{
+  velocities_calculation_counter_ = 0;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(int debug,
@@ -314,6 +334,7 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
                                                                           const IJK_Field_double& temperature_before_extrapolation,
                                                                           const FixedVector<IJK_Field_double, 3>& velocity,
                                                                           const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                                                          const IJK_Field_double& pressure,
                                                                           const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                                                           const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                                                           const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
@@ -329,6 +350,7 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   temperature_before_extrapolation_ = &temperature_before_extrapolation;
   velocity_ = &velocity ;
   velocity_ft_ = &velocity_ft;
+  pressure_ = &pressure;
   grad_T_elem_ = &grad_T_elem ;
   hess_diag_T_elem_ = &hess_diag_T_elem ;
   hess_cross_T_elem_ = &hess_cross_T_elem ;
@@ -858,6 +880,8 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
       azymuthal_velocity_corrected_.resize(*points_per_thermal_subproblem_);
       first_tangential_velocity_from_rising_dir_corrected_.resize(*points_per_thermal_subproblem_);
 
+      pressure_interp_.resize(*points_per_thermal_subproblem_);
+
       x_velocity_.resize(*points_per_thermal_subproblem_);
       y_velocity_.resize(*points_per_thermal_subproblem_);
       z_velocity_.resize(*points_per_thermal_subproblem_);
@@ -866,6 +890,7 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
       y_velocity_corrected_.resize(*points_per_thermal_subproblem_);
       z_velocity_corrected_.resize(*points_per_thermal_subproblem_);
 
+      interpolate_pressure_on_probes();
       interpolate_cartesian_velocities_on_probes();
       compute_velocity_magnitude();
       project_velocities_on_probes();
@@ -1405,6 +1430,11 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& pr
     }
 }
 
+void IJK_One_Dimensional_Subproblem::interpolate_pressure_on_probes()
+{
+  ijk_interpolate_skip_unknown_points((*pressure_), coordinates_cartesian_compo_, pressure_interp_, INVALID_INTERP);
+}
+
 void IJK_One_Dimensional_Subproblem::interpolate_cartesian_velocities_on_probes()
 {
   DoubleVect * vel_compo = nullptr;
@@ -1467,6 +1497,9 @@ void IJK_One_Dimensional_Subproblem::project_velocities_on_probes()
       max_u_ = std::max(max_u_, fabs(radial_velocity_corrected_[i]));
   compute_local_time_step();
 
+  reinit_variable(x_velocity_corrected_);
+  reinit_variable(y_velocity_corrected_);
+  reinit_variable(z_velocity_corrected_);
   project_basis_vector_onto_cartesian_dir(0, first_tangential_velocity_, second_tangential_velocity_, radial_velocity_corrected_,
                                           *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
                                           x_velocity_corrected_);
@@ -1564,11 +1597,11 @@ void IJK_One_Dimensional_Subproblem::project_basis_vector_onto_cartesian_dir(con
   for (int i=0; i<projection.size(); i++)
     {
       if (i< size_u)
-        projection[i] += compo_u[i] * basis_u[dir];
+        projection[i] += (compo_u[i] * basis_u[dir]);
       if (i< size_v)
-        projection[i] += compo_v[i] * basis_v[dir];
+        projection[i] += (compo_v[i] * basis_v[dir]);
       if (i< size_w)
-        projection[i] += compo_w[i] * basis_w[dir];
+        projection[i] += (compo_w[i] * basis_w[dir]);
     }
 }
 
@@ -2127,6 +2160,9 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   normal_temperature_double_derivative_solution_.resize(temperature_solution_.size());
   (*finite_difference_assembler_).compute_operator(radial_second_order_operator_, temperature_solution_, normal_temperature_double_derivative_solution_);
 
+  reinit_variable(temperature_x_gradient_solution_);
+  reinit_variable(temperature_y_gradient_solution_);
+  reinit_variable(temperature_z_gradient_solution_);
   if (source_terms_type_ == linear_diffusion
       || source_terms_type_ == spherical_diffusion
       || source_terms_type_ == spherical_diffusion_approx)
@@ -2146,7 +2182,6 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
                                               *first_tangential_vector_compo_solver_, *second_tangential_vector_compo_solver_, normal_vector_compo_,
                                               temperature_z_gradient_solution_);
     }
-
   else
     {
       temperature_x_gradient_solution_.resize(normal_temperature_gradient_solution_.size());
@@ -2628,6 +2663,7 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
           fic << radial_temperature_diffusion_[0] << " ";
           fic << tangential_temperature_diffusion_[0] << " ";
           fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+          fic << pressure_interp_[0] << " ";
           fic << x_velocity_[0] << " " << y_velocity_[0] << " " << z_velocity_[0] << " ";
           fic << radial_velocity_[0] << " " << radial_velocity_corrected_[0] << " ";
           fic << radial_velocity_static_frame_[0] << " " << radial_velocity_advected_frame_[0] << " ";
@@ -2672,6 +2708,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                              "\tradial_temperature_diffusion"
                              "\ttangential_temperature_diffusion"
                              "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                             "\tpressure"
                              "\tu_x\tu_y\tu_z"
                              "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
                              "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
@@ -2698,6 +2735,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
               fic << radial_temperature_diffusion_[i] << " ";
               fic << tangential_temperature_diffusion_[i] << " ";
               fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+              fic << pressure_interp_[i] << " ";
               fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
               fic << radial_velocity_[i] << " " << radial_velocity_corrected_[i] << " ";
               fic << radial_velocity_static_frame_[i] << " " << radial_velocity_advected_frame_[i] << " ";

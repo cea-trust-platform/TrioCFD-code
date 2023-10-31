@@ -93,6 +93,7 @@ public :
                                        const IJK_Field_double& temperature_before_extrapolation,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                       const IJK_Field_double& pressure,
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,

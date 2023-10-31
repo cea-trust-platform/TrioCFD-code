@@ -111,6 +111,8 @@ public :
   inline void initialise_cell_neighbours_indices_to_correct();
   inline void compute_cell_neighbours_indices_to_correct(const int& n_iter_distance);
   inline void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
+
+  inline void clear_vectors() { valeur().clear_vectors(); };
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,

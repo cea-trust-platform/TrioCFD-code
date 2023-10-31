@@ -149,6 +149,7 @@ public:
   virtual void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
                                           FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
                                           FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive) { ; };
+  virtual void clear_vectors() { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

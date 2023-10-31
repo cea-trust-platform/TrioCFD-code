@@ -64,6 +64,40 @@ Entree& Corrige_flux_FT_temperature_subresolution::readOn( Entree& is )
   return is;
 }
 
+void Corrige_flux_FT_temperature_subresolution::clear_vectors()
+{
+  index_face_i_flux_x_sorted_.clear();
+  index_face_j_flux_x_sorted_.clear();
+
+  index_face_i_flux_y_sorted_.clear();
+  index_face_j_flux_y_sorted_.clear();
+
+  index_face_i_flux_z_sorted_.clear();
+  index_face_j_flux_z_sorted_.clear();
+
+  convective_flux_x_sorted_.clear();
+  convective_flux_y_sorted_.clear();
+  convective_flux_z_sorted_.clear();
+
+  diffusive_flux_x_sorted_.clear();
+  diffusive_flux_y_sorted_.clear();
+  diffusive_flux_z_sorted_.clear();
+
+  index_face_i_flux_x_neighbours_sorted_.clear();
+  index_face_j_flux_x_neighbours_sorted_.clear();
+  index_face_i_flux_y_neighbours_sorted_.clear();
+  index_face_j_flux_y_neighbours_sorted_.clear();
+  index_face_i_flux_z_neighbours_sorted_.clear();
+  index_face_j_flux_z_neighbours_sorted_.clear();
+
+  index_face_i_flux_x_neighbours_all_faces_sorted_.clear();
+  index_face_j_flux_x_neighbours_all_faces_sorted_.clear();
+  index_face_i_flux_y_neighbours_all_faces_sorted_.clear();
+  index_face_j_flux_y_neighbours_all_faces_sorted_.clear();
+  index_face_i_flux_z_neighbours_all_faces_sorted_.clear();
+  index_face_j_flux_z_neighbours_all_faces_sorted_.clear();
+}
+
 void Corrige_flux_FT_temperature_subresolution::initialize_with_subproblems(const IJK_Splitting& splitting,
                                                                             const IJK_Field_double& field,
                                                                             const IJK_Interfaces& interfaces,
@@ -628,7 +662,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_fluxes_face_cent
   dist_.reset();
   dist_.resize(nb_faces_to_correct);
   int counter_faces = 0;
-  const DoubleTab dist_interf = intersection_ijk_cell_->dist_pure_faces_interf();
+  const DoubleTab& dist_interf = intersection_ijk_cell_->dist_pure_faces_interf();
   for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
     {
       const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
@@ -1034,6 +1068,7 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
       Cerr << "Thermal Sub-resolutions diffusive fluxes are now sorted" << finl;
       flux_init_ = 1;
     }
+  flux_init_ = 0;
 }
 
 void Corrige_flux_FT_temperature_subresolution::corrige_flux_faceIJ(IJK_Field_local_double *const flux,

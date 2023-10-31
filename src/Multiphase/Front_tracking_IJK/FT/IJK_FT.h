@@ -80,6 +80,14 @@ public :
   {
     return velocity_ft_;
   }
+  const IJK_Field_double& get_pressure() const
+  {
+    return pressure_;
+  }
+  const IJK_Field_double& get_pressure_ghost_cells() const
+  {
+    return pressure_ghost_cells_;
+  }
   const IJK_Field_double& get_rho_field() const
   {
     return rho_field_;
@@ -288,6 +296,7 @@ public :
 
   void redistribute_from_splitting_ft_elem(const IJK_Field_double& input_field,
                                            IJK_Field_double& output_field);
+  void copy_field_values(IJK_Field_double& field, const IJK_Field_double& field_to_copy);
 
 protected :
   // Interdit constructeur par copie et operateur copie
@@ -544,6 +553,7 @@ protected :
 
   // Pressure field
   IJK_Field_double pressure_;
+  IJK_Field_double pressure_ghost_cells_;
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver

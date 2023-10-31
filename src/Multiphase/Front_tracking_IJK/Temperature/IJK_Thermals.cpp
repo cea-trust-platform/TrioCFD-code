@@ -377,6 +377,7 @@ void IJK_Thermals::thermal_subresolution_outputs()
                              "\tradial_temperature_diffusion"
                              "\ttangential_temperature_diffusion"
                              "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                             "\tpressure"
                              "\tu_x\tu_y\tu_z"
                              "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
                              "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"

@@ -174,6 +174,7 @@ public :
                                       const DoubleVect& fluxes,
                                       const int counter);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
+  void clear_vectors() override;
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;

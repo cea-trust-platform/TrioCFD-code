@@ -117,6 +117,7 @@ public :
                                        const IJK_Field_double& temperature_before_extrapolation,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                       const IJK_Field_double& pressure,
                                        const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                        const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
@@ -320,6 +321,8 @@ public :
     return pure_neighbours_last_faces_corrected_colinearity_;
   }
 protected :
+  void clear_vectors();
+  void reset_counters();
   void reinit_variable(DoubleVect& vect);
   void associate_thermal_subproblem_parameters(int debug,
                                                const int& n_iter_distance,
@@ -379,6 +382,7 @@ protected :
                                             const IJK_Field_double& temperature_before_extrapolation,
                                             const FixedVector<IJK_Field_double, 3>& velocity,
                                             const FixedVector<IJK_Field_double, 3>& velocity_ft,
+                                            const IJK_Field_double& pressure,
                                             const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
@@ -419,6 +423,7 @@ protected :
   void initialise_radial_convection_operator_local();
   void initialise_radial_diffusion_operator_local();
   void initialise_identity_operator_local();
+  void interpolate_pressure_on_probes();
   void interpolate_cartesian_velocities_on_probes();
   void compute_velocity_magnitude();
   void project_velocities_on_probes();
@@ -553,6 +558,7 @@ protected :
   const IJK_Field_double * temperature_before_extrapolation_;
   const FixedVector<IJK_Field_double, 3> * velocity_;
   const FixedVector<IJK_Field_double, 3> * velocity_ft_;
+  const IJK_Field_double * pressure_;
 
   const FixedVector<IJK_Field_double, 3> * grad_T_elem_;
   const FixedVector<IJK_Field_double, 3> * hess_diag_T_elem_;
@@ -594,6 +600,7 @@ protected :
   DoubleTab osculating_radial_coordinates_cartesian_compo_;
   DoubleTab coordinates_cartesian_compo_;
 
+  DoubleVect pressure_interp_;
   DoubleVect x_velocity_;
   DoubleVect y_velocity_;
   DoubleVect z_velocity_;

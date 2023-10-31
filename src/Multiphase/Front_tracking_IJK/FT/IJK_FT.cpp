@@ -2152,6 +2152,11 @@ void IJK_FT_double::run()
       nalloc += 36;
     }
   //
+  pressure_ghost_cells_.allocate(splitting_, IJK_Splitting::ELEM, ft_ghost_cells);
+  pressure_ghost_cells_.data() = 0.;
+  pressure_ghost_cells_.echange_espace_virtuel(pressure_ghost_cells_.ghost());
+  nalloc += 2;
+
   pressure_.allocate(splitting_, IJK_Splitting::ELEM, 3);
   nalloc += 1;
 
@@ -2419,6 +2424,7 @@ void IJK_FT_double::run()
                                   pressure_, 1., pressure_rhs_, check_divergence_,
                                   poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
             }
+          copy_field_values(pressure_ghost_cells_, pressure_);
         }
     }
 
@@ -4147,6 +4153,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
       //statistiques().end_count(projection_counter_);
     }
+  copy_field_values(pressure_ghost_cells_, pressure_);
 
   if (Process::je_suis_maitre())
     {
@@ -5022,4 +5029,23 @@ void IJK_FT_double::redistribute_from_splitting_ft_elem(const IJK_Field_double& 
                                                         IJK_Field_double& output_field)
 {
   redistribute_from_splitting_ft_elem_.redistribute(input_field, output_field);
+}
+
+void IJK_FT_double::copy_field_values(IJK_Field_double& field, const IJK_Field_double& field_to_copy)
+{
+  const int ni = field.ni();
+  const int nj = field.nj();
+  const int nk = field.nk();
+  const int ni_to_copy = field_to_copy.ni();
+  const int nj_to_copy = field_to_copy.nj();
+  const int nk_to_copy = field_to_copy.nk();
+  int bool_dim = (ni == ni_to_copy && nj == nj_to_copy && nk == nk_to_copy);
+  assert(bool_dim);
+  if (!bool_dim)
+    Process::exit();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        field(i,j,k) = field_to_copy(i,j,k);
+  field.echange_espace_virtuel(field.ghost());
 }

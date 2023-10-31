@@ -73,43 +73,70 @@ public :
   }
   const IJK_Field_double& get_temperature_cell_neighbours_debug() const override
   {
-    return temperature_cell_neighbours_debug_;
+    if (find_temperature_cell_neighbours_)
+      return temperature_cell_neighbours_debug_;
+    else
+      return dummy_double_field_;
   }
   const IJK_Field_double& get_temperature_cell_neighbours() const override
   {
-    return temperature_cell_neighbours_;
+    if (find_temperature_cell_neighbours_)
+      return temperature_cell_neighbours_;
+    else
+      return dummy_double_field_;
   }
   const IJK_Field_int& get_cell_neighbours_corrected() const override
   {
-    return neighbours_temperature_to_correct_;
+    if (find_temperature_cell_neighbours_)
+      return neighbours_temperature_to_correct_;
+    else
+      return dummy_int_field_;
   }
   const IJK_Field_double& get_neighbours_temperature_colinearity_weighting() const override
   {
-    return neighbours_temperature_colinearity_weighting_;
+    if (find_temperature_cell_neighbours_)
+      return neighbours_temperature_colinearity_weighting_;
+    else
+      return dummy_double_field_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const override
+  {
+    if (diffusive_flux_correction_)
+      return cell_faces_corrected_diffusive_;
+    else
+      return dummy_double_vect_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const override
+  {
+    if (convective_flux_correction_)
+      return cell_faces_corrected_convective_;
+    else
+      return dummy_double_vect_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const override
+  {
+    if (convective_flux_correction_ || diffusive_flux_correction_)
+      return cell_faces_corrected_bool_;
+    else
+      return dummy_int_vect_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const override
+  {
+    if (find_cell_neighbours_for_fluxes_spherical_correction_)
+      return cell_faces_neighbours_corrected_bool_;
+    else
+      return dummy_int_vect_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const override
+  {
+    if (compute_reachable_fluxes_)
+      return cell_faces_neighbours_corrected_all_bool_;
+    else
+      return dummy_int_vect_;
   }
   int get_disable_post_processing_probes_out_files() const override
   {
     return disable_post_processing_probes_out_files_;
-  }
-  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const override
-  {
-    return cell_faces_corrected_diffusive_;
-  }
-  const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const override
-  {
-    return cell_faces_corrected_convective_;
-  }
-  const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const override
-  {
-    return cell_faces_corrected_bool_;
-  }
-  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const override
-  {
-    return cell_faces_neighbours_corrected_bool_;
-  }
-  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const override
-  {
-    return cell_faces_neighbours_corrected_all_bool_;
   }
 
 protected :
