@@ -54,6 +54,7 @@ Entree& Correction_Lubchenko_PolyMAC_P0::readOn(Entree& is)
   param.ajouter("beta_disp", &beta_disp_);
   param.ajouter("portee_disp", &portee_disp_);
   param.ajouter("portee_lift", &portee_lift_);
+  param.ajouter("use_bif", &use_bif_);
   param.lire_avec_accolades_depuis(is);
 
   //identification des phases
@@ -97,11 +98,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
   ajouter_blocs_disp(matrices, secmem, semi_impl);
   ajouter_blocs_lift(matrices, secmem, semi_impl);
   // Le terme source_BIF peut entrainer une mauvaise prédiction des forces normales à la paroi : une correction est mise en place
-  if (sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation().valeur()))
-    {
-      ajouter_blocs_BIF(matrices, secmem, semi_impl);
-    }
-
+  if ((use_bif_) && (sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation().valeur())))
+    ajouter_blocs_BIF(matrices, secmem, semi_impl);
 }
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
