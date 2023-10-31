@@ -89,7 +89,7 @@ CL_k = ["Cond_lim_k_simple_flux_nul ", "Cond_lim_k_simple_flux_nul  "]
 diffusion_sup = [" "] *2+[" , Diffusion_supplementaire_echelle_temp_turb "]+[" "]+[" , Diffusion_supplementaire_echelle_temp_turb "]
 # Autres param de simu
 facsec     = 1
-nb_pas_dt_max = "1000000"
+nb_pas_dt_max = "500"
 options_vdf = ["option_vdf { all_options }", "option_vdf { all_options }", "", "", ""]
 
 params_pb_multi = [equation, diffusion, diss, diss_conv, IC_diss, CL_k, diffusion_sup, facsec, nb_pas_dt_max]
@@ -137,18 +137,19 @@ def substitution(config,mesh_param,fluid_param):
                     "fact_y_step" : growth_rate_y_step[j],
 
                     "tmax" : tmax,
+                    "nb_pas_dt_max" : nb_pas_dt_max,
                     "mu" : mu,
                     "rho" : rho}
                 continue
             diffusion_i, diss_i, diss_ext_i, diss_conv_i, IC_diss_i, CL_diss_i, equation_i = diffusion[0], diss[0], diss_ext[0], diss_conv[0], IC_diss[0], CL_diss[0], equation[0]
-            solveur_temp = 'ice'
+            solveur_temp = 'sets'
             if "k-omega" in config[i]:
                 diffusion_i, diss_i, diss_ext_i, diss_conv_i, IC_diss_i, CL_diss_i, equation_i = diffusion[1], diss[1], diss_ext[1], diss_conv[1], IC_diss[1], CL_diss[1], equation[1]
             if "vdf" in config[i]:
                 options_vdf = "option_vdf { all_options }"
             if "k-tau" in config[i]:
                 diffusion_sup = " , Diffusion_supplementaire_echelle_temp_turb "
-                solveur_temp = 'sets'
+                solveur_temp = 'ice'
             dict = {"Nx_inlet" : int(2*Nx[j]/3)+1, # deux tiers des mailles avant la marche
                     "Ny_inlet" : Ny[j]+1,
                     "Nx_step" : int(Nx[j]/3)+1, # un tiers des mailles après la marche

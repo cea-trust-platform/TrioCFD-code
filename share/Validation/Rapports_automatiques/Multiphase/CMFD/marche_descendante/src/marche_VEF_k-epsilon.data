@@ -78,6 +78,7 @@ Read sch
 {
 	tinit 0.
 	tmax  $tmax
+	nb_pas_dt_max $nb_pas_dt_max
 	dt_min 1.e-15
 	dt_max 1.
 	dt_impr 0.5
