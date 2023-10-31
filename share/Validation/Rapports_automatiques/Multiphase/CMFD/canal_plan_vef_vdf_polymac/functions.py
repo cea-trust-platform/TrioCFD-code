@@ -59,6 +59,7 @@ description_fiche = f"""On simule un écoulement monophasique turbulent en RANS
 
 available_config = ["VEF_k-epsilon", "VEF_k-omega", "VDF_k-epsilon", "VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
 available_config_pb_hydr = ["VEF_k-epsilon", "VDF_k-epsilon", "VEF_k-omega"]
+
 available_config_pb_multi = ["VDF_k-tau", "VDF_k-omega", "PolyMAC_k-tau", "PolyMAC_k-omega"]
 
 """
@@ -102,7 +103,7 @@ for config in available_config:
     param_config[config]["facsec"] = "1"
 # nb_pas_dt_max 
 for config in available_config:
-    param_config[config]["nb_pas_dt_max"] = "1000000"
+    param_config[config]["nb_pas_dt_max"] = "1000"
 # solveur temps
 for config in available_config:
     if "k-tau" in config:
