@@ -205,6 +205,7 @@ protected :
   int disable_subresolution_;
   int diffusive_flux_correction_;
   int convective_flux_correction_;
+  int impose_fo_flux_correction_;
   int subproblem_temperature_extension_; // ghost fluid extension based on the interfacial gradient computed with the subproblem
 
   int override_vapour_mixed_values_; // For debug purposes

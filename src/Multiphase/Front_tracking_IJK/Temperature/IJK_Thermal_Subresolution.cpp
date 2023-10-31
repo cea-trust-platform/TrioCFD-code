@@ -40,6 +40,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   disable_subresolution_=0;
   convective_flux_correction_ = 0;
   diffusive_flux_correction_ = 0;
+  impose_fo_flux_correction_ = 1;
   override_vapour_mixed_values_ = 0;
   compute_eulerian_compo_ = 1;
 
@@ -151,6 +152,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("disable_subresolution", &disable_subresolution_);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
   param.ajouter_flag("diffusive_flux_correction", &diffusive_flux_correction_);
+  param.ajouter_flag("disable_fo_flux_correction", &impose_fo_flux_correction_);
   param.ajouter_flag("override_vapour_mixed_values", &override_vapour_mixed_values_);
   param.ajouter("points_per_thermal_subproblem", &points_per_thermal_subproblem_);
   param.ajouter("coeff_distance_diagonal", &coeff_distance_diagonal_);
@@ -300,6 +302,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   /*TODO:
    * Change the operators to add fluxes corrections (Maybe not)
    */
+  impose_fo_flux_correction_ = !impose_fo_flux_correction_;
   convective_flux_correction_ = convective_flux_correction_ && (!conv_temperature_negligible_);
   diffusive_flux_correction_ = diffusive_flux_correction_ && (!diff_temperature_negligible_);
 
@@ -433,6 +436,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   // double ideal_length_factor = ref_ijk_ft_->get_remaillage_ft_ijk().get_facteur_longueur_ideale();
+  if (diffusive_flux_correction_ && fo_ >= 1.)
+    fo_ = 0.95 * (sqrt(2) / 2);
 
   Cout << "End of " << que_suis_je() << "::initialize()" << finl;
   return nalloc;
