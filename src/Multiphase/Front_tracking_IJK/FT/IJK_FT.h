@@ -210,6 +210,14 @@ public :
   {
     return dt_fo_vap_;
   }
+  const double& get_mu_liquid() const
+  {
+    return mu_liquide_;
+  }
+  const double& get_mu_vapour() const
+  {
+    return mu_vapeur_;
+  }
 //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
 //  {
 //    return intersection_ijk_cell_;

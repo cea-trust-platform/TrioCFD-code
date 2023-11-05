@@ -242,19 +242,19 @@ double IJK_Thermal_Onefluid::compute_rho_cp_u_mean(const IJK_Field_double& vx)
       const double rho_v = ref_ijk_ft_->get_rho_v();
       const bool rho_cp_harmonic_mean = ((rho_cp_moy_harmonic_) and (rho_l*cp_liquid_ > DMINFLOAT) and (rho_v*cp_vapour_ >DMINFLOAT));
       if (rho_cp_harmonic_mean)
-        rho_cp_u_mean = calculer_rho_cp_u_moyen_inv(vx, rho_cp_inv_);
+        rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_inv_, vx, 0., 3);
       else
-        rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_inv_);
+        rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_inv_, vx, 0., 1);
     }
   else
     {
       if (deprecated_rho_cp_)
         {
-          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, cp_, ref_ijk_ft_->get_rho_field());
+          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, cp_, ref_ijk_ft_->get_rho_field(), 0., 0);
         }
       else
         {
-          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_);
+          rho_cp_u_mean = calculer_rho_cp_u_moyen(vx, rho_cp_, vx, 0., 1);
         }
     }
   return rho_cp_u_mean;
@@ -306,19 +306,19 @@ double IJK_Thermal_Onefluid::compute_temperature_dimensionless_theta_mean(const 
       const double rho_v = ref_ijk_ft_->get_rho_v();
       const bool rho_cp_harmonic_mean = ((rho_cp_moy_harmonic_) and (rho_l*cp_liquid_ > DMINFLOAT) and (rho_v*cp_vapour_ >DMINFLOAT));
       if (rho_cp_harmonic_mean)
-        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy_inv(vx, temperature_adimensionnelle_theta_, rho_cp_inv_);
+        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_inv_, vx, 0., 3);
       else
-        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_inv_); //TEST
+        theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_inv_, vx, 0., 1);
     }
   else
     {
       if (deprecated_rho_cp_)
         {
-          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, cp_, ref_ijk_ft_->get_rho_field());
+          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, cp_, ref_ijk_ft_->get_rho_field(), 0., 0);
         }
       else
         {
-          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_);
+          theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, rho_cp_, vx, 0., 1);
         }
     }
   return theta_adim_moy;

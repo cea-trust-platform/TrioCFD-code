@@ -1429,7 +1429,7 @@ double IJK_Thermal_base::compute_rho_cp_u_mean(const IJK_Field_double& vx)
    * Overridden in Onefluid and others
    */
   const double rho_cp = ref_ijk_ft_->get_rho_l() * cp_liquid_;
-  return calculer_rho_cp_u_moyen(vx, rho_cp);
+  return calculer_rho_cp_u_moyen(vx, vx, vx, rho_cp, 2);
 }
 
 double IJK_Thermal_base::get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const
@@ -1891,7 +1891,7 @@ void IJK_Thermal_base::calculer_source_temperature_ana()
 
 double IJK_Thermal_base::compute_variable_wall_temperature(const int kmin, const int kmax)
 {
-  return calculer_variable_wall(temperature_, cp_liquid_ * ref_ijk_ft_->get_rho_l(), kmin, kmax);
+  return calculer_variable_wall(temperature_, temperature_, temperature_, cp_liquid_ * ref_ijk_ft_->get_rho_l(), kmin, kmax, 2);
 }
 
 void IJK_Thermal_base::calculer_temperature_adimensionnelle_theta(const IJK_Field_double& vx, const double wall_flux)
@@ -1953,7 +1953,7 @@ void IJK_Thermal_base::calculer_temperature_adimensionnelle_theta(const IJK_Fiel
 
 double IJK_Thermal_base::compute_temperature_dimensionless_theta_mean(const IJK_Field_double& vx)
 {
-  return calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, ref_ijk_ft_->get_rho_l() * cp_liquid_);
+  return calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_, vx, vx, ref_ijk_ft_->get_rho_l() * cp_liquid_, 2);
 }
 
 void IJK_Thermal_base::calculer_Nusselt(const IJK_Field_double& vx)

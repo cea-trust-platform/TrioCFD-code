@@ -921,7 +921,7 @@ void IJK_Thermique::add_temperature_source()
   if (type_T_source_!="??")
     {
       const IJK_Field_double&  vx = ref_ijk_ft_->velocity_[DIRECTION_I];
-      double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_);
+      double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_, 0., 0);
       // double rho_cp_moy = calculer_rho_cp_moyen(cp_, ref_ijk_ft_->rho_field_);
       const IJK_Splitting& splitting = temperature_.get_splitting();
       const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
@@ -1457,7 +1457,7 @@ void IJK_Thermique::calculer_temperature_adimensionnelle_theta(const IJK_Field_d
       const int ni = temperature_.ni();
       const int nj = temperature_.nj();
       double T_wall = 0;
-      T_wall = calculer_variable_wall(temperature_, cp_, ref_ijk_ft_->rho_field_, kmin, kmax);
+      T_wall = calculer_variable_wall(temperature_, cp_, ref_ijk_ft_->rho_field_, 0., kmin, kmax, 0);
       /*   if (Process::je_suis_maitre())
            {
            T_wall = calculer_variable_wall(temperature_, cp_, ref_ijk_ft_->rho_field_, kmin, kmax);
@@ -1502,11 +1502,11 @@ void IJK_Thermique::calculer_temperature_adimensionnelle_theta(const IJK_Field_d
 void IJK_Thermique::calculer_Nusselt(const IJK_Field_double& vx)
 {
   const double theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_,
-                                                                               cp_,ref_ijk_ft_->rho_field_);
+                                                                               cp_, ref_ijk_ft_->rho_field_, 0., 0);
   double Nu = 0.;
   if (std::fabs(theta_adim_moy)>1.e-10)
     Nu = 2./theta_adim_moy;
-  const double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_);
+  const double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_, 0., 0);
   // Impression dans le fichier source_temperature.out
   if (Process::je_suis_maitre())
     {

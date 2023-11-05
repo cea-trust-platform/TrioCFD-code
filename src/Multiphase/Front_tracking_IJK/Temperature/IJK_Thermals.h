@@ -81,6 +81,7 @@ public :
   void thermal_subresolution_outputs();
   int get_disable_post_processing_probes_out_files() const;
 
+
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
   REF(IJK_FT_Post) ref_ijk_ft_post_;

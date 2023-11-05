@@ -214,7 +214,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("neighbours_corrected_rank", &neighbours_corrected_rank_);
 
   param.ajouter_flag("neighbours_colinearity_weighting", &neighbours_colinearity_weighting_);
-  param.ajouter_flag("replace_temperature_cell_neighbours", &use_temperature_cell_neighbours_);
+  param.ajouter_flag("use_temperature_cell_neighbours", &use_temperature_cell_neighbours_);
 
   param.ajouter_flag("clip_temperature_values", &clip_temperature_values_);
   param.ajouter_flag("disable_post_processing_probes_out_files", &disable_post_processing_probes_out_files_);

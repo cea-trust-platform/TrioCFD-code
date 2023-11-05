@@ -196,6 +196,8 @@ public :
   double get_interfacial_double_derivative_corrected() const;
 
   void compute_local_velocity_gradient();
+  void compute_local_shear_stress();
+  void compute_local_pressure_gradient();
   double get_normal_velocity_normal_gradient() const;
   double get_tangential_velocity_normal_gradient() const;
   double get_second_tangential_velocity_normal_gradient() const;
@@ -319,6 +321,50 @@ public :
   const std::vector<std::vector<std::vector<std::vector<double>>>> get_pure_neighbours_last_faces_corrected_colinearity() const
   {
     return pure_neighbours_last_faces_corrected_colinearity_;
+  }
+  const double& get_radius_spherical_coords() const
+  {
+    return r_sph_;
+  }
+  const double& get_theta_spherical_coords() const
+  {
+    return theta_sph_;
+  }
+  const double& get_phi_spherical_coords() const
+  {
+    return phi_sph_;
+  }
+  void set_post_processing_theta_phi_scope()
+  {
+    is_post_processed_ = true;
+  };
+  const double& get_interfacial_thermal_flux() const
+  {
+    return thermal_flux_[0];
+  }
+  const double& get_local_surface_area() const
+  {
+    return surface_;
+  }
+  const double& get_lambda() const
+  {
+    return (*lambda_);
+  }
+  const int& get_compo() const
+  {
+    return compo_connex_;
+  }
+  const double& get_shear_stress() const
+  {
+    return velocity_shear_stress_;
+  }
+  const double& get_shear_force() const
+  {
+    return velocity_shear_force_;
+  }
+  const double& get_pressure_gradient() const
+  {
+    return pressure_gradient_;
   }
 protected :
   void clear_vectors();
@@ -705,6 +751,13 @@ protected :
   DoubleVect second_tangential_velocity_normal_gradient_;
   DoubleVect azymuthal_velocity_normal_gradient_;
   DoubleVect first_tangential_velocity_gradient_from_rising_dir_;
+  DoubleVect pressure_normal_gradient_;
+
+  DoubleVect shear_stress_;
+  DoubleVect shear_stress_from_rising_dir_;
+  double velocity_shear_stress_ = 0.;
+  double velocity_shear_force_ = 0.;
+  double pressure_gradient_ = 0.;
 
   double delta_T_subcooled_overheated_ = -1.;
 
@@ -713,6 +766,7 @@ protected :
 
   REF(IJK_FT_double) ref_ijk_ft_;
   bool is_updated_ = false;
+  bool is_post_processed_ = false;
 
   /*
    * Some tries to do explicit temporal variations at the beginning

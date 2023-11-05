@@ -23,7 +23,16 @@
 #include <IJK_FT.h>
 #include <IJK_switch_FT.h>
 
-Implemente_instanciable(IJK_One_Dimensional_Subproblems, "IJK_One_Dimensional_Subproblems", LIST(IJK_One_Dimensional_Subproblem));
+Implemente_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems, "IJK_One_Dimensional_Subproblems", LIST(IJK_One_Dimensional_Subproblem));
+
+IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
+{
+  interfacial_thermal_flux_per_bubble_.set_smart_resize(1);
+  total_surface_per_bubble_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_.set_smart_resize(1);
+  overall_shear_stress_per_bubble_.set_smart_resize(1);
+  overall_shear_force_per_bubble_.set_smart_resize(1);
+}
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
 {
@@ -502,6 +511,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(SFichier& fi
 {
   for (int itr=0; itr < subproblems_counter_; itr++)
     (*this)[itr].thermal_subresolution_outputs(fic, rank);
+  post_process_overall_bubbles_quantities(rank);
 }
 
 double IJK_One_Dimensional_Subproblems::get_min_temperature() const
@@ -618,4 +628,202 @@ const int& IJK_One_Dimensional_Subproblems::get_end_index_subproblem(const int i
 {
   return (*this)[index].get_end_index_subproblem();
 }
+
+//static std::vector<int> arg_min(ArrOfDouble theta_phi_scope)
+//{
+//  const int n = theta_phi_scope.size();
+//  // IntVect indices(n);
+//  std::vector<int> indices(n);
+//  for (int j=0; j<n; j++)
+//    indices[j]=j;
+//  std::sort(indices.begin(), indices.end(), [&theta_phi_scope](int i, int j) {return theta_phi_scope[i] < theta_phi_scope[j];});
+//  return indices;
+//}
+
+void IJK_One_Dimensional_Subproblems::post_processed_all_probes()
+{
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    (*this)[itr].set_post_processing_theta_phi_scope();
+}
+
+void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_processing(const int nb_theta, const int nb_phi,
+                                                                                           const int theta_diag_val, const int phi_diag_val)
+{
+  ArrOfDouble r_sph(subproblems_counter_);
+  ArrOfDouble theta_sph(subproblems_counter_);
+  ArrOfDouble phi_sph(subproblems_counter_);
+  ArrOfDouble theta_scope;
+  ArrOfDouble phi_scope;
+  int nb_theta_even = nb_theta;
+  int nb_phi_even = nb_phi;
+  if (nb_theta_even % 2)
+    nb_theta_even += 1;
+  if (nb_phi_even % 2)
+    nb_phi_even += 1;
+  theta_scope.set_smart_resize(1);
+  phi_scope.set_smart_resize(1);
+  int i, j, k;
+  for (i=0; i<subproblems_counter_; i++)
+    {
+      r_sph(i) = (*this)[i].get_radius_spherical_coords();
+      theta_sph(i) = (*this)[i].get_theta_spherical_coords();
+      phi_sph(i) = (*this)[i].get_phi_spherical_coords();
+    }
+  const int nb_outputs = nb_phi_even * nb_theta_even;
+  int theta_incr;
+  int phi_incr;
+  theta_incr = (int) (M_PI / (double) nb_theta_even);
+  phi_incr = (int) ((2 * M_PI) / (double) nb_phi_even);
+  if (theta_diag_val)
+    for (i=0; i<nb_theta_even; i++)
+      theta_scope.append_array(theta_incr * (i + 0.5));
+  else
+    for (i=0; i<nb_theta_even; i++)
+      theta_scope.append_array(theta_incr * i);
+  if (phi_diag_val)
+    for (i=0; i<nb_phi_even; i++)
+      phi_scope.append_array(phi_incr * (i + 0.5));
+  else
+    for (i=0; i<nb_phi_even; i++)
+      phi_scope.append_array(phi_incr * i);
+  /*
+   * Sort by phi and theta simultaneously
+   */
+  ArrOfDouble radius_outputs(nb_outputs);
+  ArrOfDouble theta_outputs(nb_outputs);
+  ArrOfDouble phi_outputs(nb_outputs);
+  int phi_theta_counter = 0;
+  for (j=0; j<nb_phi_even; j++)
+    for (i=0; i<nb_theta_even; i++)
+      {
+        ArrOfDouble theta_diff = theta_sph;
+        ArrOfDouble phi_diff = phi_sph;
+        std::vector<double> sum_errors_theta_phi_scope;
+        theta_diff -= theta_scope(i);
+        phi_diff -= phi_scope(j);
+        for (k=0; k<subproblems_counter_; k++)
+          {
+            theta_diff(k) = abs(theta_diff(k));
+            phi_diff(k) = abs(phi_diff(k));
+            sum_errors_theta_phi_scope.push_back(theta_diff(k));
+            sum_errors_theta_phi_scope[k] += phi_diff(k);
+          }
+        const int theta_phi_scope_index = (int) std::distance(sum_errors_theta_phi_scope.begin(), std::min_element(sum_errors_theta_phi_scope.begin(), sum_errors_theta_phi_scope.end()));
+        (*this)[theta_phi_scope_index].set_post_processing_theta_phi_scope();
+        radius_outputs(phi_theta_counter) = r_sph(theta_phi_scope_index);
+        theta_outputs(phi_theta_counter) = theta_sph(theta_phi_scope_index);
+        phi_outputs(phi_theta_counter) = phi_sph(theta_phi_scope_index);
+        phi_theta_counter ++;
+      }
+}
+
+void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(const double& delta_temperature,
+                                                                             const double& lambda)
+{
+  std::vector<int> compo_found;
+  int local_compo;
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      local_compo = (*this)[itr].get_compo();
+      if (std::find(compo_found.begin(), compo_found.end(), local_compo) == compo_found.end())
+        compo_found.push_back(local_compo);
+    }
+  nb_bubbles_ = (int) compo_found.size();
+
+  interfacial_thermal_flux_per_bubble_.resize(nb_bubbles_);
+  total_surface_per_bubble_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_.resize(nb_bubbles_);
+  overall_shear_stress_per_bubble_.resize(nb_bubbles_);
+  overall_shear_force_per_bubble_.resize(nb_bubbles_);
+  compute_nusselt_numbers_per_bubbles(delta_temperature, lambda);
+  compute_shear_per_bubbles();
+  compo_found.clear();
+}
+
+void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(const double& delta_temperature,
+                                                                         const double& lambda)
+{
+  compute_overall_quantities_per_bubbles(delta_temperature, lambda);
+  compute_overall_nusselt_numbers_bubbles();
+  is_updated_ = true;
+}
+
+void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const double& delta_temperature,
+                                                                          const double& lambda)
+{
+  overall_nusselt_number_ = 0.;
+  interfacial_thermal_flux_ = 0.;
+  total_surface_ = 0.;
+  lambda_ = lambda;
+  delta_temperature_ = delta_temperature;
+  int local_compo;
+  interfacial_thermal_flux_per_bubble_ *= 0.;
+  total_surface_per_bubble_ *= 0.;
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      local_compo = (*this)[itr].get_compo();
+      interfacial_thermal_flux_per_bubble_(local_compo) += (*this)[itr].get_interfacial_thermal_flux();
+      total_surface_per_bubble_(local_compo) += (*this)[itr].get_local_surface_area();
+    }
+  for (int i=0; i < nb_bubbles_; i++)
+    overall_nusselt_number_per_bubble_(i) = (interfacial_thermal_flux_per_bubble_(i) * caracteristic_length_) / (total_surface_per_bubble_(i) * delta_temperature_ * lambda_);
+}
+
+void IJK_One_Dimensional_Subproblems::compute_shear_per_bubbles()
+{
+  int local_compo;
+  overall_shear_force_per_bubble_ *= 0.;
+  overall_shear_force_ = 0.;
+  overall_shear_stress_ = 0.;
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      local_compo = (*this)[itr].get_compo();
+      overall_shear_force_per_bubble_(local_compo) += (*this)[itr].get_shear_force();
+    }
+  overall_shear_stress_per_bubble_ = overall_shear_force_per_bubble_;
+  for (int i=0; i < nb_bubbles_; i++)
+    overall_shear_stress_per_bubble_(i) *= (1 / total_surface_per_bubble_(i));
+  for (int i=0; i < nb_bubbles_; i++)
+    overall_shear_force_ += overall_shear_force_per_bubble_(i);
+  overall_shear_stress_ = overall_shear_force_ / total_surface_;
+
+}
+
+void IJK_One_Dimensional_Subproblems::compute_overall_nusselt_numbers_bubbles()
+{
+  overall_nusselt_number_ = 0.;
+  interfacial_thermal_flux_ = 0.;
+  total_surface_ = 0.;
+  for (int i=0; i < nb_bubbles_; i++)
+    {
+      interfacial_thermal_flux_ += interfacial_thermal_flux_per_bubble_(i);
+      total_surface_ += total_surface_per_bubble_(i);
+      overall_nusselt_number_ += overall_nusselt_number_per_bubble_(i);
+    }
+}
+
+void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(const int rank)
+{
+  if (Process::je_suis_maitre())
+    {
+      const int reset = 1;
+      Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
+                       + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+      Nom probe_header = Nom("tstep\ttime\tthermalrank"
+                             "\tnusseltoverall");
+      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+      if (is_updated_)
+        {
+          for (int i=0; i<subproblems_counter_; i++)
+            {
+              fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+              fic << rank << " ";
+              fic << overall_nusselt_number_ << " ";
+              fic << finl;
+            }
+        }
+      fic.close();
+    }
+}
+
 

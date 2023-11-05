@@ -2140,6 +2140,7 @@ void IJK_One_Dimensional_Subproblem::retrieve_radial_quantities()
   retrieve_temperature_solution();
   compute_local_temperature_gradient_solution();
   compute_local_velocity_gradient();
+  compute_local_pressure_gradient();
   is_updated_ = true;
 }
 
@@ -2263,6 +2264,43 @@ void IJK_One_Dimensional_Subproblem::compute_local_velocity_gradient()
   (*finite_difference_assembler_).compute_operator(radial_first_order_operator_,
                                                    azymuthal_velocity_,
                                                    azymuthal_velocity_normal_gradient_);
+  compute_local_shear_stress();
+}
+
+void IJK_One_Dimensional_Subproblem::compute_local_shear_stress()
+{
+  shear_stress_.resize(*points_per_thermal_subproblem_);
+  shear_stress_from_rising_dir_.resize(*points_per_thermal_subproblem_);
+  for (int i=0; i<(*points_per_thermal_subproblem_); i++)
+    {
+      Vecteur3 local_shear_stress = first_tangential_vector_compo_;
+      Vecteur3 local_shear_stress_second = second_tangential_vector_compo_;
+      local_shear_stress *= first_tangential_velocity_normal_gradient_(i);
+      local_shear_stress_second *= second_tangential_velocity_normal_gradient_(i);
+      local_shear_stress += local_shear_stress_second;
+      shear_stress_(i) = local_shear_stress.length();
+
+      local_shear_stress = first_tangential_vector_compo_from_rising_dir_;
+      local_shear_stress_second = azymuthal_vector_compo_;
+      local_shear_stress *= first_tangential_velocity_gradient_from_rising_dir_(i);
+      local_shear_stress_second *= azymuthal_velocity_normal_gradient_(i);
+      local_shear_stress += local_shear_stress_second;
+      shear_stress_from_rising_dir_(i) = local_shear_stress.length();
+    }
+  const double mu_liquid = ref_ijk_ft_->get_mu_liquid();
+  shear_stress_ *= mu_liquid;
+  shear_stress_from_rising_dir_ *= mu_liquid;
+  velocity_shear_stress_ = shear_stress_[0];
+  velocity_shear_force_ = velocity_shear_stress_ * surface_;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_local_pressure_gradient()
+{
+  pressure_normal_gradient_.resize(*points_per_thermal_subproblem_);
+  (*finite_difference_assembler_).compute_operator(radial_first_order_operator_,
+                                                   pressure_interp_,
+                                                   pressure_normal_gradient_);
+  pressure_gradient_ = pressure_normal_gradient_[0];
 }
 
 double IJK_One_Dimensional_Subproblem::get_normal_velocity_normal_gradient() const
@@ -2647,7 +2685,7 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
 {
   if (Process::je_suis_maitre())
     {
-      if (is_updated_)
+      if (is_updated_ && is_post_processed_)
         {
           fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
           fic << rank << " " << sub_problem_index_ << " ";
@@ -2717,7 +2755,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                              "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
                              "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
       SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
-      if (is_updated_)
+      if (is_updated_ && is_post_processed_)
         {
           for (int i=0; i<(*points_per_thermal_subproblem_); i++)
             {
