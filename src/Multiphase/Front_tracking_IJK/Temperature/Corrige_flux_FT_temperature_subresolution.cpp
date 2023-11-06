@@ -33,7 +33,7 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
   neighbours_colinearity_weighting_ = 0;
   find_cell_neighbours_for_fluxes_spherical_correction_ = 0;
   use_cell_neighbours_for_fluxes_spherical_correction_ = 0;
-  compute_reachable_fluxes_ = 0;
+  find_reachable_fluxes_ = 0;
   cell_faces_neighbours_corrected_bool_ = nullptr;
   eulerian_normal_vectors_ns_normed_ = nullptr;
 
@@ -520,13 +520,24 @@ void Corrige_flux_FT_temperature_subresolution::correct_flux_spherical(Simd_doub
 
 }
 
-void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                                                                 FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                                                                 FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                                                                 FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
+                                                                                                 const int& compute_fluxes_values)
 {
-  if (distance_cell_faces_from_lrs_ && compute_reachable_fluxes_)
+  if (distance_cell_faces_from_lrs_ && find_reachable_fluxes_)
     {
       for (int c=0; c<3; c++)
         cell_faces_neighbours_corrected_bool[c].data() = 0;
       cell_faces_neighbours_corrected_bool.echange_espace_virtuel();
+
+      if (neighbours_colinearity_weighting_ && compute_fluxes_values)
+        {
+          for (int c=0; c<3; c++)
+            neighbours_weighting_colinearity[c].data() = 0;
+          neighbours_weighting_colinearity.echange_espace_virtuel();
+        }
 
       FixedVector<std::vector<ArrOfInt>*,3> index_face_i_sorted;
       index_face_i_sorted[0] = &index_face_i_flux_x_neighbours_all_faces_sorted_;
@@ -538,6 +549,10 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
       index_face_j_sorted[1] = &index_face_j_flux_y_neighbours_all_faces_sorted_;
       index_face_j_sorted[2] = &index_face_j_flux_z_neighbours_all_faces_sorted_;
 
+      const int nb_i_layer = cell_faces_neighbours_corrected_bool[0].ni();
+      const int nb_j_layer = cell_faces_neighbours_corrected_bool[0].nj();
+      const int nb_k_layer = cell_faces_neighbours_corrected_bool[0].nk();
+
       int m,l,n;
       int index_i_problem, index_j_problem, index_k_problem;
       int l_dir, m_dir, n_dir;
@@ -548,6 +563,8 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
               thermal_subproblems_->get_subproblem_ijk_indices(index_i_problem, index_j_problem, index_k_problem, i);
               const FixedVector<int,3>& pure_neighbours_corrected_sign = thermal_subproblems_->get_pure_neighbours_corrected_sign(i);
               const std::vector<std::vector<std::vector<std::vector<bool>>>>& pure_neighbours_to_correct = thermal_subproblems_->get_pure_neighbours_last_faces_to_correct(i);
+              const std::vector<std::vector<std::vector<std::vector<double>>>>& pure_neighbours_distance_to_correct = thermal_subproblems_->get_pure_neighbours_last_faces_corrected_distance(i);
+              const std::vector<std::vector<std::vector<std::vector<double>>>>& pure_neighbours_colinearity_to_correct = thermal_subproblems_->get_pure_neighbours_last_faces_corrected_colinearity(i);
               for (int c=0; c<3; c++)
                 {
                   const int l_dir_size = (int) pure_neighbours_to_correct[c].size() -1;
@@ -575,13 +592,280 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
                                 m_dir = (pure_neighbours_corrected_sign[1]) ? m * (-1) : m;
                                 n_dir = (pure_neighbours_corrected_sign[2]) ? n * (-1) : n + 1;
                                 break;
+                              default:
+                                l_dir = (pure_neighbours_corrected_sign[0]) ? l * (-1) : l + 1;
+                                m_dir = (pure_neighbours_corrected_sign[1]) ? m * (-1) : m;
+                                n_dir = (pure_neighbours_corrected_sign[2]) ? n * (-1) : n;
+                                break;
                               }
-                            cell_faces_neighbours_corrected_bool[c](index_i_problem + l_dir, index_j_problem + m_dir, index_k_problem + n_dir) += 1;
+                            /*
+                             * TODO: Handle the periodicity
+                             */
+                            const int index_i_perio = (index_i_problem + l_dir) % (nb_i_layer + 1);
+                            const int index_j_perio = (index_j_problem + m_dir) % (nb_j_layer + 1);
+                            const int index_k_perio = (index_k_problem + n_dir) % (nb_k_layer + 1);
+                            const double distance = pure_neighbours_distance_to_correct[c][l][m][n];
+                            cell_faces_neighbours_corrected_bool[c](index_i_perio, index_j_perio, index_k_perio) += 1;
+                            double colinearity = 1.;
+                            if (neighbours_colinearity_weighting_ && compute_fluxes_values)
+                              {
+                                colinearity = pure_neighbours_colinearity_to_correct[c][l][m][n];
+                                neighbours_weighting_colinearity[c](index_i_perio, index_j_perio, index_k_perio) += colinearity;
+                              }
+                            // cell_faces_neighbours_corrected_bool[c](index_i_problem + l_dir, index_j_problem + m_dir, index_k_problem + n_dir) += 1;
+                            compute_cell_neighbours_fluxes_to_correct(cell_faces_neighbours_corrected_convective,
+                                                                      cell_faces_neighbours_corrected_diffusive,
+                                                                      i,
+                                                                      index_i_problem, index_j_problem, index_k_problem,
+                                                                      index_i_perio, index_j_perio, index_k_perio,
+                                                                      distance,
+                                                                      c,
+                                                                      colinearity,
+                                                                      compute_fluxes_values);
                           }
                 }
             }
         }
+      complete_neighbours_and_weighting_colinearity(cell_faces_neighbours_corrected_bool,
+                                                    cell_faces_neighbours_corrected_convective,
+                                                    cell_faces_neighbours_corrected_diffusive,
+                                                    neighbours_weighting_colinearity,
+                                                    compute_fluxes_values);
     }
+}
+
+void Corrige_flux_FT_temperature_subresolution::complete_neighbours_and_weighting_colinearity(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                                                              FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                                                              FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                                                              FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
+                                                                                              const int& compute_fluxes_values)
+{
+  cell_faces_neighbours_corrected_bool.echange_espace_virtuel();
+  if (compute_fluxes_values)
+    {
+      if (convective_flux_correction_)
+        cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
+      if (diffusive_flux_correction_)
+        cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
+      // if (neighbours_colinearity_weighting_)
+      {
+        neighbours_weighting_colinearity.echange_espace_virtuel();
+        const int ni = cell_faces_neighbours_corrected_bool[0].ni();
+        const int nj = cell_faces_neighbours_corrected_bool[0].nj();
+        const int nk = cell_faces_neighbours_corrected_bool[0].nk();
+        for (int k = 0; k < nk; k++)
+          for (int j = 0; j < nj; j++)
+            for (int i = 0; i < ni; i++)
+              for (int c=0; c<3; c++)
+                if(cell_faces_neighbours_corrected_bool[c](i,j,k))
+                  {
+                    if (neighbours_colinearity_weighting_)
+                      {
+                        const double colinearity = neighbours_weighting_colinearity[c](i,j,k);
+                        if (colinearity > 1e-12)
+                          {
+                            if (convective_flux_correction_)
+                              cell_faces_neighbours_corrected_convective[c](i,j,k) /= colinearity;
+                            if (diffusive_flux_correction_)
+                              cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= colinearity;
+                          }
+                      }
+                    else
+                      {
+                        const double weighting = (double) (cell_faces_neighbours_corrected_bool[c](i,j,k));
+                        if (convective_flux_correction_)
+                          cell_faces_neighbours_corrected_convective[c](i,j,k) /= weighting;
+                        if (diffusive_flux_correction_)
+                          cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= weighting;
+                      }
+                  }
+      }
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_fluxes_to_correct(FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                                                          FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                                                          const int& subproblem_index,
+                                                                                          const int& index_i, const int& index_j, const int& index_k,
+                                                                                          const int& index_i_perio, const int& index_j_perio, const int& index_k_perio,
+                                                                                          const double& dist,
+                                                                                          const int& dir,
+                                                                                          const double& colinearity,
+                                                                                          const int& compute_fluxes_values)
+{
+  if (compute_fluxes_values)
+    {
+      if (convective_flux_correction_)
+        {
+          double convective_flux = 0.;
+//        compute_cell_neighbours_convective_fluxes_to_correct(cell_faces_neighbours_corrected_convective);
+          compute_cell_neighbours_convective_fluxes_to_correct(convective_flux, subproblem_index, index_i, index_j, index_k, dist, dir, colinearity);
+          cell_faces_neighbours_corrected_convective[dir](index_i_perio, index_j_perio, index_k_perio) += convective_flux;
+        }
+      if (diffusive_flux_correction_)
+        {
+          double diffusive_flux = 0.;
+          compute_cell_neighbours_diffusive_fluxes_to_correct(diffusive_flux, subproblem_index, index_i, index_j, index_k, dist, dir, colinearity);
+          cell_faces_neighbours_corrected_diffusive[dir](index_i_perio, index_j_perio, index_k_perio) += diffusive_flux;
+        }
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_convective_fluxes_to_correct(double& convective_flux,
+                                                                                                     const int& subproblem_index,
+                                                                                                     const int& index_i, const int& index_j, const int& index_k,
+                                                                                                     const double& dist,
+                                                                                                     const int& dir,
+                                                                                                     const double& colinearity)
+{
+  if (!discrete_integral_)
+    compute_cell_neighbours_thermal_convective_fluxes_face_centre(convective_flux,
+                                                                  subproblem_index,
+                                                                  index_i, index_j, index_k,
+                                                                  dist,
+                                                                  dir,
+                                                                  colinearity);
+  else
+    compute_cell_neighbours_thermal_convective_fluxes_face_centre_discrete_integral(convective_flux,
+                                                                                    subproblem_index,
+                                                                                    index_i, index_j, index_k,
+                                                                                    dist,
+                                                                                    dir,
+                                                                                    colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_convective_fluxes_face_centre(double& convective_flux,
+                                                                                                              const int& subproblem_index,
+                                                                                                              const int& index_i, const int& index_j, const int& index_k,
+                                                                                                              const double& dist,
+                                                                                                              const int& dir,
+                                                                                                              const double& colinearity)
+{
+  compute_cell_neighbours_thermal_fluxes_face_centre(convective_flux, convection,
+                                                     subproblem_index,
+                                                     index_i, index_j, index_k,
+                                                     dist,
+                                                     dir,
+                                                     colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_convective_fluxes_face_centre_discrete_integral(double& convective_flux,
+    const int& subproblem_index,
+    const int& index_i,
+    const int& index_j,
+    const int& index_k,
+    const double& dist,
+    const int& dir,
+    const double& colinearity)
+{
+  compute_cell_neighbours_thermal_fluxes_face_centre_discrete_integral(convective_flux, convection,
+                                                                       subproblem_index,
+                                                                       index_i, index_j, index_k,
+                                                                       dist,
+                                                                       dir,
+                                                                       colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_diffusive_fluxes_to_correct(double& diffusive_flux,
+                                                                                                    const int& subproblem_index,
+                                                                                                    const int& index_i,
+                                                                                                    const int& index_j,
+                                                                                                    const int& index_k,
+                                                                                                    const double& dist,
+                                                                                                    const int& dir,
+                                                                                                    const double& colinearity)
+{
+  if (!discrete_integral_)
+    compute_cell_neighbours_thermal_diffusive_fluxes_face_centre(diffusive_flux,
+                                                                 subproblem_index,
+                                                                 index_i, index_j, index_k,
+                                                                 dist,
+                                                                 dir,
+                                                                 colinearity);
+  else
+    compute_cell_neighbours_thermal_diffusive_fluxes_face_centre_discrete_integral(diffusive_flux,
+                                                                                   subproblem_index,
+                                                                                   index_i, index_j, index_k,
+                                                                                   dist,
+                                                                                   dir,
+                                                                                   colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_diffusive_fluxes_face_centre(double& diffusive_flux,
+                                                                                                             const int& subproblem_index,
+                                                                                                             const int& index_i,
+                                                                                                             const int& index_j,
+                                                                                                             const int& index_k,
+                                                                                                             const double& dist,
+                                                                                                             const int& dir,
+                                                                                                             const double& colinearity)
+{
+  compute_cell_neighbours_thermal_fluxes_face_centre(diffusive_flux, diffusion,
+                                                     subproblem_index,
+                                                     index_i, index_j, index_k,
+                                                     dist,
+                                                     dir,
+                                                     colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_diffusive_fluxes_face_centre_discrete_integral(double& diffusive_flux,
+    const int& subproblem_index,
+    const int& index_i,
+    const int& index_j,
+    const int& index_k,
+    const double& dist,
+    const int& dir,
+    const double& colinearity)
+{
+  compute_cell_neighbours_thermal_fluxes_face_centre_discrete_integral(diffusive_flux, diffusion,
+                                                                       subproblem_index,
+                                                                       index_i, index_j, index_k,
+                                                                       dist,
+                                                                       dir,
+                                                                       colinearity);
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_fluxes_face_centre(double& flux,
+                                                                                                   const int fluxes_type,
+                                                                                                   const int& subproblem_index,
+                                                                                                   const int& index_i,
+                                                                                                   const int& index_j,
+                                                                                                   const int& index_k,
+                                                                                                   const double& dist,
+                                                                                                   const int& dir,
+                                                                                                   const double& colinearity)
+{
+  int flux_sign[2][6] = FLUX_SIGN;
+  double surf_face = 1.;
+  for (int c = 0; c < 3; c++)
+    if (c!=dir)
+      surf_face *= splitting_->get_grid_geometry().get_constant_delta(c);
+  surf_face *= flux_sign[fluxes_type][(int) (2*dir)];
+  flux = compute_thermal_flux_face_centre(fluxes_type, subproblem_index, dist, dir);
+  flux *= surf_face;
+  if (neighbours_colinearity_weighting_)
+    flux *= colinearity;
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_fluxes_face_centre_discrete_integral(double& flux,
+                                                                                                                     const int fluxes_type,
+                                                                                                                     const int& subproblem_index,
+                                                                                                                     const int& index_i,
+                                                                                                                     const int& index_j,
+                                                                                                                     const int& index_k,
+                                                                                                                     const double& dist,
+                                                                                                                     const int& dir,
+                                                                                                                     const double& colinearity)
+{
+  int flux_sign[2][6] = FLUX_SIGN;
+  double surf_face = 1.;
+  surf_face *= flux_sign[fluxes_type][(int) (2*dir)];
+  DoubleVect discrete_flux_integral;
+  discrete_flux_integral = compute_thermal_flux_face_centre_discrete_integral(fluxes_type, subproblem_index, dist, dir);
+  for (int val=0; val < discrete_flux_integral.size(); val++)
+    flux += discrete_flux_integral[val];
+  if (neighbours_colinearity_weighting_)
+    flux *= colinearity;
 }
 
 void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
@@ -805,6 +1089,79 @@ void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(co
     }
   surface /= pow(pow(2, level), 2);
 }
+
+void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                                                                     FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool)
+{
+  const int ni = cell_faces_neighbours_corrected_all_bool[0].ni();
+  const int nj = cell_faces_neighbours_corrected_all_bool[0].nj();
+  const int nk = cell_faces_neighbours_corrected_all_bool[0].nk();
+  int i,j,k,c;
+  for (c = 0; c < 3; c++)
+    cell_faces_neighbours_corrected_min_max_bool[c].data() = 0.;
+  /*
+   * i_min, i_max
+   */
+  for (c = 0; c < 3; c++)
+    for (k = 0; k < nk; k++)
+      for (j = 0; j < nj; j++)
+        {
+          for (i = 0; i < ni; i++)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+          for (i = ni - 1; i >=0; i--)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+        }
+  /*
+   * j_min, j_max
+   */
+  for (c = 0; c < 3; c++)
+    for (k = 0; k < nk; k++)
+      for (i = 0; i < ni; i++)
+        {
+          for (j = 0; j < nj; j++)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+          for (j = nj - 1; j >=0; j--)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+        }
+  /*
+   * k_min, k_max
+   */
+  for (c = 0; c < 3; c++)
+    for (i = 0; i < ni; i++)
+      for (j = 0; j < nj; j++)
+        {
+          for (k = 0; k < nk; k++)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+          for (k = nk - 1; k >=0; k--)
+            if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+              {
+                cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                break;
+              }
+        }
+  cell_faces_neighbours_corrected_min_max_bool.echange_espace_virtuel();
+}
+
 
 void Corrige_flux_FT_temperature_subresolution::compute_ijk_pure_faces_indices()
 {

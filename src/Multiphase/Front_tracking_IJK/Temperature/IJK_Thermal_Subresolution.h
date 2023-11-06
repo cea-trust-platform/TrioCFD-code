@@ -120,19 +120,47 @@ public :
     else
       return dummy_int_vect_;
   }
-  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const override
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_diag_bool() const override
   {
     if (find_cell_neighbours_for_fluxes_spherical_correction_)
-      return cell_faces_neighbours_corrected_bool_;
+      return cell_faces_neighbours_corrected_diag_bool_;
     else
       return dummy_int_vect_;
   }
   const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const override
   {
-    if (compute_reachable_fluxes_)
+    if (find_reachable_fluxes_)
       return cell_faces_neighbours_corrected_all_bool_;
     else
       return dummy_int_vect_;
+  }
+  const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_min_max_bool() const override
+  {
+    if (find_reachable_fluxes_)
+      return cell_faces_neighbours_corrected_min_max_bool_;
+    else
+      return dummy_int_vect_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_convective() const override
+  {
+    if (use_reachable_fluxes_)
+      return cell_faces_neighbours_corrected_convective_;
+    else
+      return dummy_double_vect_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_diffusive() const override
+  {
+    if (use_reachable_fluxes_)
+      return cell_faces_neighbours_corrected_diffusive_;
+    else
+      return dummy_double_vect_;
+  }
+  const FixedVector<IJK_Field_double,3>& get_neighbours_faces_weighting_colinearity() const override
+  {
+    if (use_reachable_fluxes_ && neighbours_colinearity_weighting_)
+      return neighbours_faces_weighting_colinearity_;
+    else
+      return dummy_double_vect_;
   }
   int get_disable_post_processing_probes_out_files() const override
   {
@@ -182,6 +210,7 @@ protected :
   void initialise_thermal_subproblems();
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
+  void compute_min_max_reachable_fluxes();
   void update_intersections() override;
   void compute_convective_fluxes_face_centre() override;
   void compute_diffusive_fluxes_face_centre() override;
@@ -304,9 +333,9 @@ protected :
 
   int correct_temperature_cell_neighbours_first_iter_;
   int find_temperature_cell_neighbours_;
+  int use_temperature_cell_neighbours_;
   int correct_neighbours_using_probe_length_;
   int neighbours_corrected_rank_;
-  int use_temperature_cell_neighbours_;
   int neighbours_colinearity_weighting_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;
@@ -329,15 +358,20 @@ protected :
   /*
    * Neighbouring faces in the diagonal
    */
-  FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_bool_;
+  FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_diag_bool_;
   int find_cell_neighbours_for_fluxes_spherical_correction_;
   int use_cell_neighbours_for_fluxes_spherical_correction_;
 
   /*
    * All reachable faces to correct
    */
-  int compute_reachable_fluxes_;
+  int find_reachable_fluxes_;
+  int use_reachable_fluxes_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_all_bool_;
+  FixedVector<IJK_Field_double,3> cell_faces_neighbours_corrected_convective_;
+  FixedVector<IJK_Field_double,3> cell_faces_neighbours_corrected_diffusive_;
+  FixedVector<IJK_Field_double, 3> neighbours_faces_weighting_colinearity_;
+  FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
 
 };
 

@@ -85,11 +85,11 @@ public :
 
   void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& use_cell_neighbours_for_fluxes_spherical_correction,
-                                            const int& compute_reachable_fluxes) override
+                                            const int& find_reachable_fluxes) override
   {
     find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
     use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction;
-    compute_reachable_fluxes_ = compute_reachable_fluxes;
+    find_reachable_fluxes_ = find_reachable_fluxes;
   }
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
@@ -138,7 +138,77 @@ public :
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
   void initialise_cell_neighbours_indices_to_correct() override;
   void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
-  void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
+  void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                        FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                        FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                        FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
+                                                        const int& compute_fluxes_values) override;
+  void complete_neighbours_and_weighting_colinearity(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                     FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                     FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                     FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
+                                                     const int& compute_fluxes_values);
+  void compute_cell_neighbours_fluxes_to_correct(FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                 FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                 const int& subproblem_index,
+                                                 const int& index_i, const int& index_j, const int& index_k,
+                                                 const int& index_i_perio, const int& index_j_perio, const int& index_k_perio,
+                                                 const double& dist,
+                                                 const int& dir,
+                                                 const double& colinearity,
+                                                 const int& compute_fluxes_values);
+  void compute_cell_neighbours_convective_fluxes_to_correct(double& convective_flux,
+                                                            const int& subproblem_index,
+                                                            const int& index_i, const int& index_j, const int& index_k,
+                                                            const double& dist,
+                                                            const int& dir,
+                                                            const double& colinearity);
+  void compute_cell_neighbours_thermal_convective_fluxes_face_centre(double& convective_flux,
+                                                                     const int& subproblem_index,
+                                                                     const int& index_i, const int& index_j, const int& index_k,
+                                                                     const double& dist,
+                                                                     const int& dir,
+                                                                     const double& colinearity);
+  void compute_cell_neighbours_thermal_convective_fluxes_face_centre_discrete_integral(double& convective_flux,
+                                                                                       const int& subproblem_index,
+                                                                                       const int& index_i, const int& index_j, const int& index_k,
+                                                                                       const double& dist,
+                                                                                       const int& dir,
+                                                                                       const double& colinearity);
+  void compute_cell_neighbours_diffusive_fluxes_to_correct(double& diffusive_flux,
+                                                           const int& subproblem_index,
+                                                           const int& index_i,
+                                                           const int& index_j,
+                                                           const int& index_k,
+                                                           const double& dist,
+                                                           const int& dir,
+                                                           const double& colinearity);
+  void compute_cell_neighbours_thermal_diffusive_fluxes_face_centre(double& diffusive_flux,
+                                                                    const int& subproblem_index,
+                                                                    const int& index_i, const int& index_j, const int& index_k,
+                                                                    const double& dist,
+                                                                    const int& dir,
+                                                                    const double& colinearity);
+  void compute_cell_neighbours_thermal_diffusive_fluxes_face_centre_discrete_integral(double& diffusive_flux,
+                                                                                      const int& subproblem_index,
+                                                                                      const int& index_i, const int& index_j, const int& index_k,
+                                                                                      const double& dist,
+                                                                                      const int& dir,
+                                                                                      const double& colinearity);
+  void compute_cell_neighbours_thermal_fluxes_face_centre(double& flux,
+                                                          const int fluxes_type,
+                                                          const int& subproblem_index,
+                                                          const int& index_i, const int& index_j, const int& index_k,
+                                                          const double& dist,
+                                                          const int& dir,
+                                                          const double& colinearity);
+  void compute_cell_neighbours_thermal_fluxes_face_centre_discrete_integral(double& flux,
+                                                                            const int fluxes_type,
+                                                                            const int& subproblem_index,
+                                                                            const int& index_i, const int& index_j, const int& index_k,
+                                                                            const double& dist,
+                                                                            const int& dir,
+                                                                            const double& colinearity);
   // void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
@@ -175,6 +245,8 @@ public :
                                       const int counter);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
   void clear_vectors() override;
+  void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                            FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool) override;
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;
@@ -232,7 +304,7 @@ protected :
   int use_cell_neighbours_for_fluxes_spherical_correction_;
   int neighbours_colinearity_weighting_;
 
-  int compute_reachable_fluxes_;
+  int find_reachable_fluxes_;
   FixedVector<IJK_Field_int, 3>* cell_faces_neighbours_corrected_bool_;
   FixedVector<IJK_Field_double, 3>* eulerian_normal_vectors_ns_normed_;
 

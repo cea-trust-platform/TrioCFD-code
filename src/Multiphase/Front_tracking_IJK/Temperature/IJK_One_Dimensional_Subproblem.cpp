@@ -1233,6 +1233,7 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
    */
   pure_neighbours_last_faces_to_correct_.resize(3);
   pure_neighbours_last_faces_corrected_distance_.resize(3);
+  pure_neighbours_last_faces_corrected_colinearity_.resize(3);
   for (int c=0; c<3; c++)
     {
       const int first_incr = first_increment[c];
@@ -1240,18 +1241,22 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
       const int third_incr = third_increment[c];
       pure_neighbours_last_faces_to_correct_[c].resize(first_incr + 1);
       pure_neighbours_last_faces_corrected_distance_[c].resize(first_incr + 1);
+      pure_neighbours_last_faces_corrected_colinearity_[c].resize(first_incr + 1);
       for (l=first_incr; l>=0; l--)
         {
           pure_neighbours_last_faces_to_correct_[c][l].resize(second_incr + 1);
           pure_neighbours_last_faces_corrected_distance_[c][l].resize(second_incr + 1);
+          pure_neighbours_last_faces_corrected_colinearity_[c][l].resize(second_incr + 1);
           for (m=second_incr; m>=0; m--)
             {
               pure_neighbours_last_faces_to_correct_[c][l][m].resize(third_incr + 1);
               pure_neighbours_last_faces_corrected_distance_[c][l][m].resize(third_incr + 1);
+              pure_neighbours_last_faces_corrected_colinearity_[c][l][m].resize(third_incr + 1);
               for (n=third_incr; n>=0; n--)
                 {
                   pure_neighbours_last_faces_to_correct_[c][l][m][n] = false;
                   pure_neighbours_last_faces_corrected_distance_[c][l][m][n] = 0.;
+                  pure_neighbours_last_faces_corrected_colinearity_[c][l][m][n] = 0.;
                 }
             }
         }
@@ -1307,7 +1312,15 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
               pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
               if (neighbours_last_faces_colinearity_weighting_)
                 {
-
+                  Vecteur3 relative_vector = normal_vector_compo_;
+                  relative_vector *= cell_centre_distance_;
+                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
+                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
+                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
+                  const double relative_vector_norm = relative_vector.length();
+                  relative_vector *= (1 / relative_vector_norm);
+                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  pure_neighbours_last_faces_corrected_colinearity_[0][l][m_cell][n_cell] = colinearity;
                 }
             }
         }
@@ -1330,7 +1343,15 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
               pure_neighbours_last_faces_corrected_distance_[1][l_cell][m][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
               if (neighbours_last_faces_colinearity_weighting_)
                 {
-
+                  Vecteur3 relative_vector = normal_vector_compo_;
+                  relative_vector *= cell_centre_distance_;
+                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
+                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
+                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
+                  const double relative_vector_norm = relative_vector.length();
+                  relative_vector *= (1 / relative_vector_norm);
+                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  pure_neighbours_last_faces_corrected_colinearity_[1][l_cell][m][n_cell] = colinearity;
                 }
             }
         }
@@ -1353,7 +1374,15 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
               pure_neighbours_last_faces_corrected_distance_[2][l_cell][m_cell][n] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
               if (neighbours_last_faces_colinearity_weighting_)
                 {
-
+                  Vecteur3 relative_vector = normal_vector_compo_;
+                  relative_vector *= cell_centre_distance_;
+                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
+                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
+                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
+                  const double relative_vector_norm = relative_vector.length();
+                  relative_vector *= (1 / relative_vector_norm);
+                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  pure_neighbours_last_faces_corrected_colinearity_[2][l_cell][m_cell][n] = colinearity;
                 }
             }
         }
@@ -2326,12 +2355,11 @@ double IJK_One_Dimensional_Subproblem::get_azymuthal_velocity_normal_gradient() 
 double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& dist, const DoubleVect& field, const int temp_bool) const
 {
   double field_value = INVALID_TEMPERATURE;// temperature_solution_;
-  if ((dist < 0 && indicator_>0.5) || (dist > (*radial_coordinates_)[*points_per_thermal_subproblem_-1] && indicator_>0.5))
+  if (debug_ && ((dist < 0 && indicator_>0.5) || (dist > (*radial_coordinates_)[*points_per_thermal_subproblem_-1] && indicator_>0.5)))
     {
       Cerr << "Probe length: " << probe_length_ << finl;
       Cerr << "Distance d: " << dist << finl;
       Cerr << "Indicator I: " << indicator_ << finl;
-      // Process::exit();
     }
   if (debug_ && temp_bool)
     {
@@ -2397,10 +2425,10 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
                 field_value = delta_T_subcooled_overheated_;
             }
           else
-            field_value = 0.;
+            field_value = field[(*points_per_thermal_subproblem_) - 1];
         }
       else
-        field_value = 0.;
+        field_value = field[(*points_per_thermal_subproblem_) - 1];
     }
   return field_value;
 }

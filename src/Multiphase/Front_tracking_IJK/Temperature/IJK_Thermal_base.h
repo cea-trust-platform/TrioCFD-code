@@ -282,13 +282,29 @@ public:
   {
     return dummy_int_vect_;
   }
-  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_bool() const
+  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_diag_bool() const
   {
     return dummy_int_vect_;
   }
   virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_all_bool() const
   {
     return dummy_int_vect_;
+  }
+  virtual const FixedVector<IJK_Field_int,3>& get_cell_faces_neighbours_corrected_min_max_bool() const
+  {
+    return dummy_int_vect_;
+  }
+  virtual const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_convective() const
+  {
+    return dummy_double_vect_;
+  }
+  virtual const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_diffusive() const
+  {
+    return dummy_double_vect_;
+  }
+  virtual const FixedVector<IJK_Field_double,3>& get_neighbours_faces_weighting_colinearity() const
+  {
+    return dummy_double_vect_;
   }
 
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
