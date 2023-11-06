@@ -1110,7 +1110,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const IntTab& facettes = maillage.facettes();
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
   const ArrOfInt& index_facette_elem = intersections.index_facette();
-  // const DoubleTab& sommets = maillage.sommets();
+  const DoubleTab& sommets = maillage.sommets();
   //      REF(Transport_Interfaces_FT_Disc) & refeq_transport =
   //      variables_internes().ref_eq_interf_proprietes_fluide;
   //      const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
@@ -1279,6 +1279,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                             indextmp = datatmp.index_element_suivant_;
                           }
 
+                        if (Objet_U::bidim_axi)
+                          {
+                            int num_som = maillage.sommet_ligne_contact(sommet0) ? sommet0: sommet1;
+                            x_cl_ = sommets(num_som,0);
+                            Cerr << "[TCL: MICRO] position of the CL is set to be " << x_cl_ << finl;
+                          }
                       }
                     index = data.index_facette_suivante_;
                   }
@@ -1315,6 +1321,12 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                               }
                           }
 
+                        if (Objet_U::bidim_axi)
+                          {
+                            int num_som = maillage.sommet_ligne_contact(sommet0) ? sommet0: sommet1;
+                            x_cl_ = sommets(num_som,0);
+                            Cerr << "[TCL: MICRO] position of the CL is set to be " << x_cl_ << finl;
+                          }
                       }
                     index = data.index_facette_suivante_;
 
@@ -1568,12 +1580,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
                      << surface_tot-surface_tot_approx << finl;
               Cerr << "End of comparison" << finl;
             }
-          double factor = surface_tot/pow(volumes[elem], 2./3.);
-          if (factor < 1.e-6)
-            {
-              Cerr << "We are skipping cell " << elem << "because the interface in it has negligible surface!!" << finl;
-              continue; // skip cells crossed by almost no interface.
-            }
+
 
           // The offset distance should be accounted for because the methods in_out counts the origin at the cell
           {
@@ -1595,9 +1602,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             assert(in_out(0,korient) >=-Objet_U::precision_geom);
             assert(in_out(1,korient) >=-Objet_U::precision_geom);
           }
-          const double xl = in_out(0,0);
+          // const double xl = in_out(0,0);
           const double yl = in_out(0,1);
-          const double xr = in_out(1,0);
+          // const double xr = in_out(1,0);
           const double yr = in_out(1,1);
           // Cerr << "xl,yl, xr,yr = " << xl << " " <<  yl << " " <<  xr << " " <<  yr << finl;
 
@@ -1606,10 +1613,9 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
           double circum_dis = 1.;
           if (Objet_U::bidim_axi)
             {
-              double radial_dis = (xr + xl)/2;
               const double angle_bidim_axi = Maillage_FT_Disc::angle_bidim_axi();
-              circum_dis = angle_bidim_axi*radial_dis;
-              Cerr << "[TCL: MICRO:] FILLING LIST MICRO [bidim_axi] circum_dis = " << circum_dis << finl;
+              circum_dis = angle_bidim_axi*x_cl_;
+              Cerr << "[TCL: MICRO] FILLING LIST MICRO [bidim_axi] circum_dis = " << circum_dis << finl;
             }
 
 
