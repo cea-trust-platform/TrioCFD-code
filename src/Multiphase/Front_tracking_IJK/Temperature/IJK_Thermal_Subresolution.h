@@ -143,14 +143,14 @@ public :
   }
   const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_convective() const override
   {
-    if (use_reachable_fluxes_)
+    if (use_reachable_fluxes_ && convective_flux_correction_)
       return cell_faces_neighbours_corrected_convective_;
     else
       return dummy_double_vect_;
   }
   const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_diffusive() const override
   {
-    if (use_reachable_fluxes_)
+    if (use_reachable_fluxes_ && diffusive_flux_correction_)
       return cell_faces_neighbours_corrected_diffusive_;
     else
       return dummy_double_vect_;

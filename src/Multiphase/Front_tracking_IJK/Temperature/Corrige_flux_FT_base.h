@@ -134,14 +134,14 @@ public:
 
   virtual void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                     const int& use_cell_neighbours_for_fluxes_spherical_correction,
-                                                    const int& find_reachable_fluxes) { ; };
+                                                    const int& find_reachable_fluxes,
+                                                    const int& use_reachable_fluxes) { ; };
   virtual void initialise_cell_neighbours_indices_to_correct() { ; };
   virtual void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) { ; };
   virtual void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                                 FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                                 FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
-                                                                FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
-                                                                const int& compute_fluxes_values) { ; };
+                                                                FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity) { ; };
   virtual void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
                                                           IJK_Field_int& neighbours_weighting,
                                                           IJK_Field_double& neighbours_weighting_colinearity) const { ; };
@@ -156,6 +156,8 @@ public:
   virtual void clear_vectors() { ; };
   virtual void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
                                                     FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool) { ; };
+  virtual void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                                                 const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected) { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;

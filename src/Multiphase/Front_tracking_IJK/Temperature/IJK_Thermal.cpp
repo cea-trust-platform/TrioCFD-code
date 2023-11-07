@@ -987,7 +987,7 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   Nom nom_cell_faces_neighbours_corrected_diffusive_z(oss.str().c_str());
   if (liste_post_instantanes.contient_("CELL_FACES_NEIGHBOURS_CORRECTED_DIFFUSIVE_Z") || liste_post_instantanes.contient_(nom_cell_faces_neighbours_corrected_diffusive_z))
     {
-      n++, dumplata_scalar(lata_name, nom_cell_faces_neighbours_corrected_diffusive_z, get_cell_faces_neighbours_corrected_convective()[2], latastep);
+      n++, dumplata_scalar(lata_name, nom_cell_faces_neighbours_corrected_diffusive_z, get_cell_faces_neighbours_corrected_diffusive()[2], latastep);
     }
   oss.str("");
 

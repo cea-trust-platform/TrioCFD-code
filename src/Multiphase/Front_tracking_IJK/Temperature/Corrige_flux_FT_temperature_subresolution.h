@@ -85,11 +85,13 @@ public :
 
   void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& use_cell_neighbours_for_fluxes_spherical_correction,
-                                            const int& find_reachable_fluxes) override
+                                            const int& find_reachable_fluxes,
+                                            const int& use_reachable_fluxes) override
   {
     find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
     use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction;
     find_reachable_fluxes_ = find_reachable_fluxes;
+    use_reachable_fluxes_ = use_reachable_fluxes;
   }
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
@@ -137,12 +139,27 @@ public :
                                                   IJK_Field_int& neighbours_weighting,
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
   void initialise_cell_neighbours_indices_to_correct() override;
+  void initialise_any_cell_neighbours_indices_to_correct(std::vector<ArrOfInt>& index_face_i_flux_x_faces_sorted,
+                                                         std::vector<ArrOfInt>& index_face_j_flux_x_faces_sorted,
+                                                         std::vector<ArrOfInt>& index_face_i_flux_y_faces_sorted,
+                                                         std::vector<ArrOfInt>& index_face_j_flux_y_faces_sorted,
+                                                         std::vector<ArrOfInt>& index_face_i_flux_z_faces_sorted,
+                                                         std::vector<ArrOfInt>& index_face_j_flux_z_faces_sorted);
+  void initialise_any_cell_neighbours_indices_to_correct_with_flux(std::vector<ArrOfInt>& index_face_i_flux_x_faces_sorted,
+                                                                   std::vector<ArrOfInt>& index_face_j_flux_x_faces_sorted,
+                                                                   std::vector<ArrOfInt>& index_face_i_flux_y_faces_sorted,
+                                                                   std::vector<ArrOfInt>& index_face_j_flux_y_faces_sorted,
+                                                                   std::vector<ArrOfInt>& index_face_i_flux_z_faces_sorted,
+                                                                   std::vector<ArrOfInt>& index_face_j_flux_z_faces_sorted,
+                                                                   std::vector<ArrOfDouble>& flux_x,
+                                                                   std::vector<ArrOfDouble>& flux_y,
+                                                                   std::vector<ArrOfDouble>& flux_z,
+                                                                   const bool& ini_index);
   void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
   void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
-                                                        FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity,
-                                                        const int& compute_fluxes_values) override;
+                                                        FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity) override;
   void complete_neighbours_and_weighting_colinearity(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                      FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                      FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
@@ -209,6 +226,13 @@ public :
                                                                             const double& dist,
                                                                             const int& dir,
                                                                             const double& colinearity);
+  void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                                         const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected) override;
+  void replace_cell_neighbours_thermal_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                    const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
+                                                    std::vector<ArrOfDouble>& flux_x,
+                                                    std::vector<ArrOfDouble>& flux_y,
+                                                    std::vector<ArrOfDouble>& flux_z);
   // void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
@@ -277,12 +301,12 @@ protected :
   std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
   FixedVector<IntVect,4> ijk_faces_to_correct_;
 
-  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_diag_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_diag_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_diag_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_diag_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_diag_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_diag_faces_sorted_;
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_sorted_;
@@ -290,6 +314,20 @@ protected :
   std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
+
+  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_min_max_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_min_max_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_min_max_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_min_max_faces_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_min_max_faces_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_min_max_faces_sorted_;
+
+  std::vector<ArrOfDouble> convective_flux_x_min_max_faces_sorted_;
+  std::vector<ArrOfDouble> convective_flux_y_min_max_faces_sorted_;
+  std::vector<ArrOfDouble> convective_flux_z_min_max_faces_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_x_min_max_faces_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_y_min_max_faces_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_z_min_max_faces_sorted_;
 
   int convection_negligible_;
   int diffusion_negligible_;
@@ -305,6 +343,7 @@ protected :
   int neighbours_colinearity_weighting_;
 
   int find_reachable_fluxes_;
+  int use_reachable_fluxes_;
   FixedVector<IJK_Field_int, 3>* cell_faces_neighbours_corrected_bool_;
   FixedVector<IJK_Field_double, 3>* eulerian_normal_vectors_ns_normed_;
 

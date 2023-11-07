@@ -1293,6 +1293,9 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
   if (dz_over_two_increment>0)
     dz_over_two_increment--;
 
+  /*
+   * TODO: Should we look to cells faces that are not in the normal vector direction ?
+   */
   for (l=dx_over_two_increment; l>=0; l--)
     for (m_cell=dy_increment; m_cell>=0; m_cell--)
       for (n_cell=dz_increment; n_cell>=0; n_cell--)
@@ -1306,7 +1309,9 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
             {
               // pure_neighbours_last_faces_to_correct_[0][l_dir_elem][m_dir][n_dir] = true;
               pure_neighbours_last_faces_to_correct_[0][l][m_cell][n_cell] = true;
-              const double dx_contrib = (pow(2, l_dir) + 1) * normal_vector_compo_[0] * dx_over_two;
+              const double lmn_zero = (l > 0) ? 1. : 0.;
+              const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * pow(2, abs(l_dir)) + 1) * (-1) : (lmn_zero * pow(2, l_dir - 1)) + 1;
+              const double dx_contrib = contrib_factor * normal_vector_compo_[0] * dx_over_two;
               const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
               const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
               pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
@@ -1337,8 +1342,10 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
           if (indic_neighbour > LIQUID_INDICATOR_TEST)
             {
               pure_neighbours_last_faces_to_correct_[1][l_cell][m][n_cell] = true;
+              const double lmn_zero = (m > 0) ? 1. : 0.;
+              const double contrib_factor = (pure_neighbours_corrected_sign_[1]) ? (lmn_zero * pow(2, abs(m_dir)) + 1) * (-1) : (lmn_zero * pow(2, m_dir - 1)) + 1;
               const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
-              const double dy_contrib = (pow(2, m_dir) + 1) * normal_vector_compo_[1] * dy_over_two;
+              const double dy_contrib = contrib_factor * normal_vector_compo_[1] * dy_over_two;
               const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
               pure_neighbours_last_faces_corrected_distance_[1][l_cell][m][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
               if (neighbours_last_faces_colinearity_weighting_)
@@ -1362,15 +1369,18 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
         {
           const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l_cell * (-1) : l_cell;
           const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
+          // const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) : n + 1;
           const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) : n + 1;
           const int n_dir_elem = (pure_neighbours_corrected_sign_[2]) ? (n + 1) * (-1) : n + 1;
           const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir, index_j_ + m_dir, index_k_ + n_dir_elem);
           if (indic_neighbour > LIQUID_INDICATOR_TEST)
             {
               pure_neighbours_last_faces_to_correct_[2][l_cell][m_cell][n] = true;
+              const double lmn_zero = (n > 0) ? 1. : 0.;
+              const double contrib_factor = (pure_neighbours_corrected_sign_[2]) ? (lmn_zero * pow(2, abs(n_dir)) + 1) * (-1) : (lmn_zero * pow(2, n_dir - 1)) + 1;
               const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
               const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
-              const double dz_contrib = (pow(2, n_dir) + 1) * normal_vector_compo_[2] * dz_over_two;
+              const double dz_contrib = contrib_factor * normal_vector_compo_[2] * dz_over_two;
               pure_neighbours_last_faces_corrected_distance_[2][l_cell][m_cell][n] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
               if (neighbours_last_faces_colinearity_weighting_)
                 {

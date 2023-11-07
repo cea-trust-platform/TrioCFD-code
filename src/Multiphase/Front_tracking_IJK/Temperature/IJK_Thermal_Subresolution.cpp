@@ -288,7 +288,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     find_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_;
   corrige_flux_.set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
                                                      use_cell_neighbours_for_fluxes_spherical_correction_,
-                                                     find_reachable_fluxes_);
+                                                     find_reachable_fluxes_,
+                                                     use_reachable_fluxes_);
 
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
   Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
@@ -1384,8 +1385,7 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
   corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_,
                                                                   cell_faces_neighbours_corrected_convective_,
                                                                   cell_faces_neighbours_corrected_diffusive_,
-                                                                  neighbours_faces_weighting_colinearity_,
-                                                                  use_reachable_fluxes_);
+                                                                  neighbours_faces_weighting_colinearity_);
   compute_min_max_reachable_fluxes();
   if (debug_)
     {
