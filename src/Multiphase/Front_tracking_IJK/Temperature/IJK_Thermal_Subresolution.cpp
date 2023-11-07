@@ -1337,22 +1337,47 @@ void IJK_Thermal_Subresolution::prepare_thermal_flux_correction()
     corrige_flux_->update();
 }
 
-void IJK_Thermal_Subresolution::compute_min_max_reachable_fluxes()
+void IJK_Thermal_Subresolution::compute_convective_diffusive_fluxes_face_centre()
 {
-  if (!disable_subresolution_ && find_reachable_fluxes_)
-    corrige_flux_->compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool_, cell_faces_neighbours_corrected_min_max_bool_);
+
+  if (!conv_temperature_negligible_)
+    compute_convective_fluxes_face_centre();
+  if (!diff_temperature_negligible_)
+    compute_diffusive_fluxes_face_centre();
+
+  corrige_flux_->initialise_cell_neighbours_indices_to_correct();
+  compute_min_max_reachable_fluxes();
 }
 
 void IJK_Thermal_Subresolution::compute_convective_fluxes_face_centre()
 {
-  if (!disable_subresolution_ && convective_flux_correction_)
+  if (!disable_subresolution_ && convective_flux_correction_ && !use_reachable_fluxes_)
     corrige_flux_->compute_thermal_convective_fluxes();
 }
 
 void IJK_Thermal_Subresolution::compute_diffusive_fluxes_face_centre()
 {
-  if (!disable_subresolution_ && diffusive_flux_correction_)
+  if (!disable_subresolution_ && diffusive_flux_correction_ && !use_reachable_fluxes_)
     corrige_flux_->compute_thermal_diffusive_fluxes();
+}
+
+void IJK_Thermal_Subresolution::compute_min_max_reachable_fluxes()
+{
+  // if (!disable_subresolution_ && find_reachable_fluxes_)
+  corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_,
+                                                                  cell_faces_neighbours_corrected_convective_,
+                                                                  cell_faces_neighbours_corrected_diffusive_,
+                                                                  neighbours_faces_weighting_colinearity_);
+  const int discontinous_min_max_neighbours_faces = 1;
+  corrige_flux_->compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool_,
+                                                      cell_faces_neighbours_corrected_min_max_bool_,
+                                                      discontinous_min_max_neighbours_faces);
+  corrige_flux_->replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(cell_faces_neighbours_corrected_min_max_bool_,
+                                                                                   cell_faces_neighbours_corrected_convective_,
+                                                                                   0);
+  corrige_flux_->replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(cell_faces_neighbours_corrected_min_max_bool_,
+                                                                                   cell_faces_neighbours_corrected_diffusive_,
+                                                                                   1);
 }
 
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres(const int first_corr)
@@ -1380,13 +1405,12 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
   corrige_flux_->compute_temperature_cell_centre_neighbours(temperature_cell_neighbours_,
                                                             neighbours_temperature_to_correct_,
                                                             neighbours_temperature_colinearity_weighting_);
-  corrige_flux_->initialise_cell_neighbours_indices_to_correct();
   corrige_flux_->compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance_);
-  corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_,
-                                                                  cell_faces_neighbours_corrected_convective_,
-                                                                  cell_faces_neighbours_corrected_diffusive_,
-                                                                  neighbours_faces_weighting_colinearity_);
-  compute_min_max_reachable_fluxes();
+//  corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_,
+//                                                                  cell_faces_neighbours_corrected_convective_,
+//                                                                  cell_faces_neighbours_corrected_diffusive_,
+//                                                                  neighbours_faces_weighting_colinearity_);
+//  compute_min_max_reachable_fluxes();
   if (debug_)
     {
       temperature_cell_neighbours_debug_.data() = 0.;
@@ -1395,6 +1419,31 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
                                                                 neighbours_temperature_to_correct_,
                                                                 neighbours_temperature_colinearity_weighting_);
     }
+  replace_temperature_cell_centres_neighbours();
+//  int correct_first_iter = (correct_temperature_cell_neighbours_first_iter_
+//                            && ref_ijk_ft_->get_tstep() == 0
+//                            && !ref_ijk_ft_->get_reprise() != 0);
+//  if (use_temperature_cell_neighbours_)
+//    if (correct_temperature_cell_neighbours_first_iter_ == correct_first_iter)
+//      corrige_flux_->replace_temperature_cell_centre_neighbours(temperature_,
+//                                                                temperature_cell_neighbours_,
+//                                                                neighbours_temperature_to_correct_,
+//                                                                neighbours_temperature_colinearity_weighting_);
+}
+
+void IJK_Thermal_Subresolution::compute_temperature_cell_centres_second_correction()
+{
+  if (disable_mixed_cells_increment_)
+    {
+      if (!use_reachable_fluxes_)
+        corrige_flux_->compute_temperature_cell_centre(temperature_);
+      else
+        replace_temperature_cell_centres_neighbours();
+    }
+}
+
+void IJK_Thermal_Subresolution::replace_temperature_cell_centres_neighbours()
+{
   int correct_first_iter = (correct_temperature_cell_neighbours_first_iter_
                             && ref_ijk_ft_->get_tstep() == 0
                             && !ref_ijk_ft_->get_reprise() != 0);
@@ -1406,13 +1455,6 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
                                                                 neighbours_temperature_colinearity_weighting_);
 }
 
-void IJK_Thermal_Subresolution::compute_temperature_cell_centres_second_correction()
-{
-  if (!disable_subresolution_ && disable_mixed_cells_increment_)
-    {
-      corrige_flux_->compute_temperature_cell_centre(temperature_);
-    }
-}
 
 void IJK_Thermal_Subresolution::enforce_periodic_temperature_boundary_value()
 {
@@ -1499,7 +1541,7 @@ void IJK_Thermal_Subresolution::correct_operators_for_visu()
 
 void IJK_Thermal_Subresolution::prepare_ij_fluxes_k_layers()
 {
-  if ((!disable_subresolution_) && (convective_flux_correction_ || diffusive_flux_correction_))
+  if ((!disable_subresolution_) && (convective_flux_correction_ || diffusive_flux_correction_) && (!use_reachable_fluxes_))
     {
       corrige_flux_->compute_ijk_pure_faces_indices();
       corrige_flux_->sort_ijk_intersections_subproblems_indices_by_k_layers();

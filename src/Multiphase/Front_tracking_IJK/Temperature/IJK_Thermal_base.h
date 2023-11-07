@@ -380,6 +380,7 @@ protected:
   virtual void correct_operators_for_visu() { ; };
   virtual void clip_temperature_values() { ; };
   virtual void compute_thermal_subproblems() { ; };
+  virtual void compute_convective_diffusive_fluxes_face_centre() { ; };
   virtual void compute_convective_fluxes_face_centre() { ; };
   virtual void compute_diffusive_fluxes_face_centre() { ; };
   virtual void prepare_ij_fluxes_k_layers() { ; };

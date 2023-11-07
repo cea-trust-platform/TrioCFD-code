@@ -99,6 +99,12 @@ public :
    * l'interface. On remplace les flux donnes en entree par ces flux la.
    */
   void corrige_flux_faceIJ_any_flux(IJK_Field_local_double *const flux,
+                                    std::vector<ArrOfInt>& index_face_i_flux_x_sorted,
+                                    std::vector<ArrOfInt>& index_face_j_flux_x_sorted,
+                                    std::vector<ArrOfInt>& index_face_i_flux_y_sorted,
+                                    std::vector<ArrOfInt>& index_face_j_flux_y_sorted,
+                                    std::vector<ArrOfInt>& index_face_i_flux_z_sorted,
+                                    std::vector<ArrOfInt>& index_face_j_flux_z_sorted,
                                     std::vector<ArrOfDouble>& subgrid_fluxes_x,
                                     std::vector<ArrOfDouble>& subgrid_fluxes_y,
                                     std::vector<ArrOfDouble>& subgrid_fluxes_z,
@@ -227,7 +233,8 @@ public :
                                                                             const int& dir,
                                                                             const double& colinearity);
   void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                                         const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected) override;
+                                                                         const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
+                                                                         const int& fluxes_type) override;
   void replace_cell_neighbours_thermal_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                     const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                     std::vector<ArrOfDouble>& flux_x,
@@ -270,7 +277,8 @@ public :
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
   void clear_vectors() override;
   void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
-                                            FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool) override;
+                                            FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                            const int& max_flux_per_dir) override;
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;

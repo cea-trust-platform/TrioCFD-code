@@ -212,11 +212,13 @@ protected :
   void prepare_thermal_flux_correction();
   void compute_min_max_reachable_fluxes();
   void update_intersections() override;
+  void compute_convective_diffusive_fluxes_face_centre() override;
   void compute_convective_fluxes_face_centre() override;
   void compute_diffusive_fluxes_face_centre() override;
   void compute_temperature_cell_centres(const int first_corr) override;
   void compute_temperature_cell_centres_first_correction();
   void compute_temperature_cell_centres_second_correction();
+  void replace_temperature_cell_centres_neighbours();
   void prepare_ij_fluxes_k_layers() override;
   void set_zero_temperature_increment() override;
   void clean_thermal_subproblems() override;

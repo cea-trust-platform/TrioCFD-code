@@ -118,9 +118,11 @@ public :
 
   inline void clear_vectors() { valeur().clear_vectors(); };
   inline void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
-                                                   FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool);
+                                                   FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                   const int& max_flux_per_dir);
   inline void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                                                const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected);
+                                                                                const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
+                                                                                const int& fluxes_type);
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -330,16 +332,21 @@ inline void Corrige_flux_FT::set_convection_diffusion_correction(const int& conv
 }
 
 inline void Corrige_flux_FT::compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
-                                                                  FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool)
+                                                                  FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                                  const int& max_flux_per_dir)
 {
-  valeur().compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool, cell_faces_neighbours_corrected_min_max_bool);
+  valeur().compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool,
+                                                cell_faces_neighbours_corrected_min_max_bool,
+                                                max_flux_per_dir);
 }
 
 inline void Corrige_flux_FT::replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                                                               const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected)
+                                                                                               const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
+                                                                                               const int& fluxes_type)
 {
   valeur().replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(cell_faces_neighbours_corrected_min_max_bool,
-                                                                             cell_faces_neighbours_fluxes_corrected);
+                                                                             cell_faces_neighbours_fluxes_corrected,
+                                                                             fluxes_type);
 }
 
 #endif /* Corrige_flux_FT_included */

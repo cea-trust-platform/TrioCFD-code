@@ -773,11 +773,15 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
     {
       ref_ijk_ft_->euler_explicit_update(d_temperature_, temperature_, k);
     }
-  temperature_.echange_espace_virtuel(temperature_.ghost());
+  /*
+   * Erase the temperature increment (second call)
+   */
+  compute_temperature_cell_centres(1);
   enforce_periodic_temperature_boundary_value();
   clip_temperature_values();
   correct_temperature_for_visu();
   correct_operators_for_visu();
+  temperature_.echange_espace_virtuel(temperature_.ghost());
   const double ene_post = compute_global_energy();
   Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
        << " " << ene_ini
@@ -880,10 +884,11 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * Convective and Diffusive fluxes
    */
 
-  if (!conv_temperature_negligible_)
-    compute_convective_fluxes_face_centre();
-  if (!diff_temperature_negligible_)
-    compute_diffusive_fluxes_face_centre();
+  compute_convective_diffusive_fluxes_face_centre();
+//  if (!conv_temperature_negligible_)
+//    compute_convective_fluxes_face_centre();
+//  if (!diff_temperature_negligible_)
+//    compute_diffusive_fluxes_face_centre();
   if (!conv_temperature_negligible_ || !diff_temperature_negligible_)
     prepare_ij_fluxes_k_layers();
 
@@ -916,11 +921,6 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   const double ene_postDiffu = compute_global_energy(d_temperature_);
   add_temperature_source();
   const double ene_postSource = compute_global_energy(d_temperature_);
-
-  /*
-   * Erase the temperature increment (second call)
-   */
-  compute_temperature_cell_centres(1);
 
   /*
    * In case of the subresolution or not
