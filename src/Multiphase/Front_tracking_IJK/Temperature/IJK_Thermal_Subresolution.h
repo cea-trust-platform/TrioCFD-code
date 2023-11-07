@@ -162,6 +162,13 @@ public :
     else
       return dummy_double_vect_;
   }
+  const IJK_Field_int& get_cell_neighbours_corrected_trimmed() const override
+  {
+    if (find_reachable_fluxes_)
+      return neighbours_temperature_to_correct_trimmed_;
+    else
+      return dummy_int_field_;
+  }
   int get_disable_post_processing_probes_out_files() const override
   {
     return disable_post_processing_probes_out_files_;
@@ -218,7 +225,7 @@ protected :
   void compute_temperature_cell_centres(const int first_corr) override;
   void compute_temperature_cell_centres_first_correction();
   void compute_temperature_cell_centres_second_correction();
-  void replace_temperature_cell_centres_neighbours();
+  void replace_temperature_cell_centres_neighbours(const int& use_neighbours_temperature_to_correct_trimmed);
   void prepare_ij_fluxes_k_layers() override;
   void set_zero_temperature_increment() override;
   void clean_thermal_subproblems() override;
@@ -374,6 +381,7 @@ protected :
   FixedVector<IJK_Field_double,3> cell_faces_neighbours_corrected_diffusive_;
   FixedVector<IJK_Field_double, 3> neighbours_faces_weighting_colinearity_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
+  IJK_Field_int neighbours_temperature_to_correct_trimmed_;
 
 };
 

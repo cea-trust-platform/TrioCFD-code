@@ -280,7 +280,9 @@ public :
                                             const IJK_Field_int& neighbours_temperature_to_correct,
                                             FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                             const int& max_flux_per_dir,
-                                            const int& check_cell_center_neighbour) override;
+                                            const int& check_cell_center_neighbour,
+                                            const int& remove_external_neighbour_values,
+                                            IJK_Field_int& neighbours_temperature_to_correct_trimmed) override;
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;

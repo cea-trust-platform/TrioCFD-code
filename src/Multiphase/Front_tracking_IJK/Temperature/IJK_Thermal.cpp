@@ -1015,6 +1015,14 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  oss << "CELL_NEIGHBOURS_CORRECTED_TRIMMED_" << lata_suffix << idx;
+  Nom nom_cell_neighbours_corrected_trimmed(oss.str().c_str());
+  if (liste_post_instantanes.contient_("NEIGHBOURS_CORRECTED_TRIMMED") || liste_post_instantanes.contient_(nom_cell_neighbours_corrected_trimmed))
+    {
+      n++, dumplata_scalar(lata_name, nom_cell_neighbours_corrected_trimmed, get_cell_neighbours_corrected_trimmed(), latastep);
+    }
+  oss.str("");
+
   return n;
 }
 

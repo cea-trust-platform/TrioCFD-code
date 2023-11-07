@@ -247,6 +247,11 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
 {
   if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_)
     {
+
+      const int ni = neighbours_weighting.ni();
+      const int nj = neighbours_weighting.nj();
+      const int nk = neighbours_weighting.nk();
+
       neighbours_weighting.data() = 0;
       neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
       temperature_neighbours.data() = 0.;
@@ -259,6 +264,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
       std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_colinearity;
       int index_i_problem, index_j_problem, index_k_problem;
       int index_i_neighbour, index_j_neighbour, index_k_neighbour;
+      int index_i_perio, index_j_perio, index_k_perio;
       int m,l,n;
       for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
         {
@@ -283,19 +289,28 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
                         index_i_neighbour = index_i_problem + ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
                         index_j_neighbour = index_j_problem + ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
                         index_k_neighbour = index_k_problem + ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
+                        index_i_perio = index_i_neighbour % ni;
+                        index_j_perio = index_j_neighbour % nj;
+                        index_k_perio = index_k_neighbour % nk;
                         if (neighbours_colinearity_weighting_)
                           {
-                            neighbours_weighting_colinearity(index_i_neighbour, index_j_neighbour, index_k_neighbour) += pure_neighbours_corrected_colinearity[l][m][n];
-                            temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost * pure_neighbours_corrected_colinearity[l][m][n];
+                            // neighbours_weighting_colinearity(index_i_neighbour, index_j_neighbour, index_k_neighbour) += pure_neighbours_corrected_colinearity[l][m][n];
+                            // temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost * pure_neighbours_corrected_colinearity[l][m][n];
+                            neighbours_weighting_colinearity(index_i_perio, index_j_perio, index_k_perio) += pure_neighbours_corrected_colinearity[l][m][n];
+                            temperature_neighbours(index_i_perio, index_j_perio, index_k_perio) += temperature_ghost * pure_neighbours_corrected_colinearity[l][m][n];
                           }
                         else
-                          temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost;
-                        neighbours_weighting(index_i_neighbour, index_j_neighbour, index_k_neighbour) += 1;
-
-
+                          temperature_neighbours(index_i_perio, index_j_perio, index_k_perio) += temperature_ghost;
+                        // temperature_neighbours(index_i_neighbour, index_j_neighbour, index_k_neighbour) += temperature_ghost;
+                        // neighbours_weighting(index_i_neighbour, index_j_neighbour, index_k_neighbour) += 1;
+                        neighbours_weighting(index_i_perio, index_j_perio, index_k_perio) += 1;
                       }
             }
         }
+      if (neighbours_colinearity_weighting_)
+        neighbours_weighting_colinearity.echange_espace_virtuel(neighbours_weighting_colinearity.ghost());
+      neighbours_weighting.echange_espace_virtuel(neighbours_weighting.ghost());
+      temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
     }
 }
 
@@ -1328,10 +1343,12 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
                                                                                      const IJK_Field_int& neighbours_temperature_to_correct,
                                                                                      FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                                                      const int& max_flux_per_dir,
-                                                                                     const int& check_cell_center_neighbour)
+                                                                                     const int& check_cell_center_neighbour,
+                                                                                     const int& remove_external_neighbour_values,
+                                                                                     IJK_Field_int& neighbours_temperature_to_correct_trimmed)
 {
   /*
-   * TODO: Start from a given bounding box when we get multiple bubbles
+   * TODO: Work only for static bubbles
    */
   if (distance_cell_faces_from_lrs_ && find_reachable_fluxes_)
     {
@@ -1343,6 +1360,15 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
         cell_faces_neighbours_corrected_min_max_bool[c].data() = 0.;
       int c_ini = 0;
       int c_end = 3;
+
+      if (remove_external_neighbour_values)
+        {
+          for (k = 0; k < nk; k++)
+            for (j = 0; j < nj; j++)
+              for (i = 0; i < ni; i++)
+                neighbours_temperature_to_correct_trimmed(i,j,k) = neighbours_temperature_to_correct(i,j,k);
+          neighbours_temperature_to_correct_trimmed.echange_espace_virtuel(neighbours_temperature_to_correct_trimmed.ghost());
+        }
       /*
        * i_min, i_max
        */
@@ -1351,31 +1377,53 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
           c_ini = 0;
           c_end = 1;
         }
+      int index_neighbour_cell = 0;
+      bool index_found = false;
       bool centre_neighbour_bool = false;
       for (c = c_ini; c < c_end; c++)
         for (k = 0; k < nk; k++)
           for (j = 0; j < nj; j++)
             {
               for (i = 0; i < ni; i++)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i - 1,j,k) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = i;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i - 1,j,k) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int ii = index_neighbour_cell; ii < i; ii++)
+                        neighbours_temperature_to_correct_trimmed(ii,j,k) = 0;
+                      break;
+                    }
+                }
               for (i = ni - 1; i >=0; i--)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = i;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int ii = ni - 1; ii >= i; ii--)
+                        neighbours_temperature_to_correct_trimmed(ii,j,k) = 0;
+                      break;
+                    }
+                }
             }
       /*
        * j_min, j_max
@@ -1390,25 +1438,45 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
           for (i = 0; i < ni; i++)
             {
               for (j = 0; j < nj; j++)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i,j - 1,k) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = j;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i,j - 1,k) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int jj = index_neighbour_cell; jj < j; jj++)
+                        neighbours_temperature_to_correct_trimmed(i,jj,k) = 0;
+                      break;
+                    }
+                }
               for (j = nj - 1; j >=0; j--)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = j;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int jj = nj - 1; jj >= j; jj--)
+                        neighbours_temperature_to_correct_trimmed(i,jj,k) = 0;
+                      break;
+                    }
+                }
             }
       /*
        * k_min, k_max
@@ -1423,25 +1491,45 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
           for (j = 0; j < nj; j++)
             {
               for (k = 0; k < nk; k++)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i,j,k - 1) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = k;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i,j,k - 1) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int kk = index_neighbour_cell; kk < k; kk++)
+                        neighbours_temperature_to_correct_trimmed(i,j,kk) = 0;
+                      break;
+                    }
+                }
               for (k = nk - 1; k >=0; k--)
-                if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
-                  {
-                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
-                      centre_neighbour_bool = true;
-                    if (!centre_neighbour_bool)
-                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
-                    centre_neighbour_bool = false;
-                    break;
-                  }
+                {
+                  if (neighbours_temperature_to_correct(i,j,k) && !index_found)
+                    {
+                      index_neighbour_cell = k;
+                      index_found = true;
+                    }
+                  if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
+                    {
+                      if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour && !remove_external_neighbour_values)
+                        centre_neighbour_bool = true;
+                      if (!centre_neighbour_bool)
+                        cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                      centre_neighbour_bool = false;
+                      index_found = false;
+                      for(int kk = nk - 1; kk >= k; kk--)
+                        neighbours_temperature_to_correct_trimmed(i,j,kk) = 0;
+                      break;
+                    }
+                }
             }
       cell_faces_neighbours_corrected_min_max_bool.echange_espace_virtuel();
     }

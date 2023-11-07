@@ -306,6 +306,10 @@ public:
   {
     return dummy_double_vect_;
   }
+  virtual const IJK_Field_int& get_cell_neighbours_corrected_trimmed() const
+  {
+    return dummy_int_field_;
+  }
 
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };

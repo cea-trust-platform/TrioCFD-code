@@ -158,7 +158,9 @@ public:
                                                     const IJK_Field_int& neighbours_temperature_to_correct,
                                                     FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                     const int& max_flux_per_dir,
-                                                    const int& check_cell_center_neighbour) { ; };
+                                                    const int& check_cell_center_neighbour,
+                                                    const int& remove_external_neighbour_values,
+                                                    IJK_Field_int& neighbours_temperature_to_correct_trimmed) { ; };
   virtual void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                                                  const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                  const int& fluxes_type) { ; };
