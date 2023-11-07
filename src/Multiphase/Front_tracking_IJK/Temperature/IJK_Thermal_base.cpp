@@ -880,10 +880,19 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   if (debug_)
     Cerr << "Compute thermal subproblems" << finl;
   compute_thermal_subproblems();
+
+  /*
+   * Interpolate a value for the QUICK SCHEME (first call)
+   */
+  if (debug_)
+    Cerr << "Compute temperature mixed cell centres" << finl;
+  compute_temperature_cell_centres(0);
+
   /*
    * Convective and Diffusive fluxes
    */
-
+  if (debug_)
+    Cerr << "Compute thermal convective and diffusive fluxes from subproblems" << finl;
   compute_convective_diffusive_fluxes_face_centre();
 //  if (!conv_temperature_negligible_)
 //    compute_convective_fluxes_face_centre();
@@ -892,12 +901,12 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   if (!conv_temperature_negligible_ || !diff_temperature_negligible_)
     prepare_ij_fluxes_k_layers();
 
-  /*
-   * Interpolate a value for the QUICK SCHEME (first call)
-   */
-  if (debug_)
-    Cerr << "Compute temperature mixed cell centres" << finl;
-  compute_temperature_cell_centres(0);
+//  /*
+//   * Interpolate a value for the QUICK SCHEME (first call)
+//   */
+//  if (debug_)
+//    Cerr << "Compute temperature mixed cell centres" << finl;
+//  compute_temperature_cell_centres(0);
 
   /*
    * For post-processing purposes

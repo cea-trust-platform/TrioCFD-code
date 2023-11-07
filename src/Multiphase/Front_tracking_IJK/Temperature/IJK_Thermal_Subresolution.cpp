@@ -1346,6 +1346,8 @@ void IJK_Thermal_Subresolution::compute_convective_diffusive_fluxes_face_centre(
     compute_diffusive_fluxes_face_centre();
 
   corrige_flux_->initialise_cell_neighbours_indices_to_correct();
+  corrige_flux_->compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance_);
+
   compute_min_max_reachable_fluxes();
 }
 
@@ -1368,10 +1370,16 @@ void IJK_Thermal_Subresolution::compute_min_max_reachable_fluxes()
                                                                   cell_faces_neighbours_corrected_convective_,
                                                                   cell_faces_neighbours_corrected_diffusive_,
                                                                   neighbours_faces_weighting_colinearity_);
+  /*
+   * TODO: Should we put this in the jdd
+   */
   const int discontinous_min_max_neighbours_faces = 1;
+  const int check_neighbour_cell_centre = 1;
   corrige_flux_->compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool_,
+                                                      neighbours_temperature_to_correct_,
                                                       cell_faces_neighbours_corrected_min_max_bool_,
-                                                      discontinous_min_max_neighbours_faces);
+                                                      discontinous_min_max_neighbours_faces,
+                                                      check_neighbour_cell_centre);
   corrige_flux_->replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(cell_faces_neighbours_corrected_min_max_bool_,
                                                                                    cell_faces_neighbours_corrected_convective_,
                                                                                    0);
@@ -1405,7 +1413,7 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
   corrige_flux_->compute_temperature_cell_centre_neighbours(temperature_cell_neighbours_,
                                                             neighbours_temperature_to_correct_,
                                                             neighbours_temperature_colinearity_weighting_);
-  corrige_flux_->compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance_);
+//  corrige_flux_->compute_cell_neighbours_faces_indices_for_spherical_correction(n_iter_distance_);
 //  corrige_flux_->compute_cell_neighbours_faces_indices_to_correct(cell_faces_neighbours_corrected_all_bool_,
 //                                                                  cell_faces_neighbours_corrected_convective_,
 //                                                                  cell_faces_neighbours_corrected_diffusive_,

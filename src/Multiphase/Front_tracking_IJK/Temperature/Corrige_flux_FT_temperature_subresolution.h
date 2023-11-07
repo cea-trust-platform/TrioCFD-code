@@ -277,8 +277,10 @@ public :
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
   void clear_vectors() override;
   void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                            const IJK_Field_int& neighbours_temperature_to_correct,
                                             FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                            const int& max_flux_per_dir) override;
+                                            const int& max_flux_per_dir,
+                                            const int& check_cell_center_neighbour) override;
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;

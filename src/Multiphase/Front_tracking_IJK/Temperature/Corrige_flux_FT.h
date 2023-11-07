@@ -118,8 +118,10 @@ public :
 
   inline void clear_vectors() { valeur().clear_vectors(); };
   inline void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                                   const IJK_Field_int& neighbours_temperature_to_correct,
                                                    FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                   const int& max_flux_per_dir);
+                                                   const int& max_flux_per_dir,
+                                                   const int& check_cell_center_neighbour);
   inline void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                                                 const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                 const int& fluxes_type);
@@ -332,12 +334,16 @@ inline void Corrige_flux_FT::set_convection_diffusion_correction(const int& conv
 }
 
 inline void Corrige_flux_FT::compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                                                  const IJK_Field_int& neighbours_temperature_to_correct,
                                                                   FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                                  const int& max_flux_per_dir)
+                                                                  const int& max_flux_per_dir,
+                                                                  const int& check_cell_center_neighbour)
 {
   valeur().compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool,
+                                                neighbours_temperature_to_correct,
                                                 cell_faces_neighbours_corrected_min_max_bool,
-                                                max_flux_per_dir);
+                                                max_flux_per_dir,
+                                                check_cell_center_neighbour);
 }
 
 inline void Corrige_flux_FT::replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,

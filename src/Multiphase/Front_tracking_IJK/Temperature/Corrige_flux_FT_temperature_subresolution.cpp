@@ -1325,9 +1325,14 @@ void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(co
 }
 
 void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                                                                     const IJK_Field_int& neighbours_temperature_to_correct,
                                                                                      FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
-                                                                                     const int& max_flux_per_dir)
+                                                                                     const int& max_flux_per_dir,
+                                                                                     const int& check_cell_center_neighbour)
 {
+  /*
+   * TODO: Start from a given bounding box when we get multiple bubbles
+   */
   if (distance_cell_faces_from_lrs_ && find_reachable_fluxes_)
     {
       const int ni = cell_faces_neighbours_corrected_all_bool[0].ni();
@@ -1346,6 +1351,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
           c_ini = 0;
           c_end = 1;
         }
+      bool centre_neighbour_bool = false;
       for (c = c_ini; c < c_end; c++)
         for (k = 0; k < nk; k++)
           for (j = 0; j < nj; j++)
@@ -1353,13 +1359,21 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
               for (i = 0; i < ni; i++)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i - 1,j,k) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
               for (i = ni - 1; i >=0; i--)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
             }
@@ -1378,13 +1392,21 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
               for (j = 0; j < nj; j++)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i,j - 1,k) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
               for (j = nj - 1; j >=0; j--)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
             }
@@ -1403,13 +1425,21 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
               for (k = 0; k < nk; k++)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i,j,k - 1) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
               for (k = nk - 1; k >=0; k--)
                 if(cell_faces_neighbours_corrected_all_bool[c](i,j,k))
                   {
-                    cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    if (neighbours_temperature_to_correct(i,j,k) && check_cell_center_neighbour)
+                      centre_neighbour_bool = true;
+                    if (!centre_neighbour_bool)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
+                    centre_neighbour_bool = false;
                     break;
                   }
             }
