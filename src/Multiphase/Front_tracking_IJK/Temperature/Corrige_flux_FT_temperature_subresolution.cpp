@@ -1532,7 +1532,97 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
                 }
             }
       cell_faces_neighbours_corrected_min_max_bool.echange_espace_virtuel();
+      remove_min_max_ijk_reachable_fluxes_discontinuous(cell_faces_neighbours_corrected_min_max_bool);
     }
+}
+
+void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_fluxes_discontinuous(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool)
+{
+  const int ni = cell_faces_neighbours_corrected_min_max_bool[0].ni();
+  const int nj = cell_faces_neighbours_corrected_min_max_bool[0].nj();
+  const int nk = cell_faces_neighbours_corrected_min_max_bool[0].nk();
+
+  int i,j,k,c;
+  int ii,jj,kk;
+  const int ini_face = 0;
+  const int end_face = 2;
+  const int ini_elem = -1;
+  const int end_elem = 1;
+  int neighbour_test = 0;
+
+  FixedVector<IJK_Field_local_double,3> cell_faces_neighbours_corrected_min_max_bool_ini;
+  const int nb_ghost = 1;
+  for (c = 0; c < 3; c++)
+    cell_faces_neighbours_corrected_min_max_bool_ini[c].allocate(ni,nj,nk,nb_ghost);
+  for (c = 0; c < 3; c++)
+    for (k = -nb_ghost; k < nk + nb_ghost; k++)
+      for (j = -nb_ghost; j < nj + nb_ghost; j++)
+        for (i = -nb_ghost; i < ni + nb_ghost; i++)
+          cell_faces_neighbours_corrected_min_max_bool_ini[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool[c](i,j,k);
+
+  for (c = 0; c < 3; c++)
+    for (k = 0; k < nk; k++)
+      for (j = 0; j < nj; j++)
+        for (i = 0; i < ni; i++)
+          {
+            if (cell_faces_neighbours_corrected_min_max_bool[c](i,j,k))
+              {
+                switch(c)
+                  {
+                  case 0:
+                    for (kk = ini_face; kk < end_face; kk++)
+                      for (ii = ini_elem; ii < 1; ii++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[2](i+ii,j,k+kk))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    for (jj = ini_face; jj < end_face; jj++)
+                      for (ii = ini_elem; ii < end_elem; ii++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[1](i+ii,j+jj,k))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    break;
+                  case 1:
+                    for (kk = ini_face; kk < end_face; kk++)
+                      for (jj = ini_elem; jj < end_elem; jj++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[2](i,j+jj,k+kk))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    for (ii = ini_face; ii < end_face; ii++)
+                      for (jj = ini_elem; jj < end_elem; jj++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[0](i+ii,j+jj,k))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    break;
+                  case 2:
+                    for (jj = ini_face; jj < end_face; jj++)
+                      for (kk = ini_elem; kk < end_elem; kk++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[1](i,j+jj,k+kk))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    for (ii = ini_face; ii < end_face; ii++)
+                      for (kk = ini_elem; kk < end_elem; kk++)
+                        if(cell_faces_neighbours_corrected_min_max_bool_ini[0](i+ii,j,k+kk))
+                          neighbour_test ++;
+                    if (neighbour_test > 1)
+                      cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = 0;
+                    neighbour_test = 0;
+                    break;
+                  default:
+                    break;
+                  }
+              }
+          }
+  cell_faces_neighbours_corrected_min_max_bool.echange_espace_virtuel();
 }
 
 
