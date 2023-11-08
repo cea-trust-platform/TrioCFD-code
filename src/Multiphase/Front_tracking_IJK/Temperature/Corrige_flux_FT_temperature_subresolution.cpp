@@ -1352,6 +1352,10 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
    */
   if (distance_cell_faces_from_lrs_ && find_reachable_fluxes_)
     {
+
+//      remove_min_max_ijk_reachable_fluxes_discontinuous(cell_faces_neighbours_corrected_all_bool,
+//                                                        cell_faces_neighbours_corrected_min_max_bool);
+
       const int ni = cell_faces_neighbours_corrected_all_bool[0].ni();
       const int nj = cell_faces_neighbours_corrected_all_bool[0].nj();
       const int nk = cell_faces_neighbours_corrected_all_bool[0].nk();
@@ -1536,6 +1540,8 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
     }
 }
 
+//void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_fluxes_discontinuous(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+//                                                                                                  FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool)
 void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_fluxes_discontinuous(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool)
 {
   const int ni = cell_faces_neighbours_corrected_min_max_bool[0].ni();
@@ -1548,8 +1554,11 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
   const int end_face = 2;
   const int ini_elem = -1;
   const int end_elem = 1;
+  // const int end_elem = 2;
   int neighbour_test = 0;
-
+  // ArrOfInt neighbour_left_right(3);
+//  int neighbour_left = 0;
+//  int neighbour_right = 0;
   FixedVector<IJK_Field_local_double,3> cell_faces_neighbours_corrected_min_max_bool_ini;
   const int nb_ghost = 1;
   for (c = 0; c < 3; c++)
@@ -1558,6 +1567,7 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
     for (k = -nb_ghost; k < nk + nb_ghost; k++)
       for (j = -nb_ghost; j < nj + nb_ghost; j++)
         for (i = -nb_ghost; i < ni + nb_ghost; i++)
+          // cell_faces_neighbours_corrected_min_max_bool_ini[c](i,j,k) = cell_faces_neighbours_corrected_all_bool[c](i,j,k);
           cell_faces_neighbours_corrected_min_max_bool_ini[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool[c](i,j,k);
 
   for (c = 0; c < 3; c++)
