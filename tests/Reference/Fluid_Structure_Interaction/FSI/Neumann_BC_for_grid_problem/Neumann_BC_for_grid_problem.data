@@ -1,0 +1,137 @@
+# Hydraulique 3D laminar with ALE : Neumann BC for grid problem validation #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
+
+
+dimension 3
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom
+
+
+# BEGIN MESH #
+Read_MED {
+    domain dom
+    file Mesh.med 
+}
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+ END PARTITION #
+
+# BEGIN SCATTER #
+# Scatter ../ZONES/DOM.Zones dom #
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian (ALE) framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom
+{
+	1 # number of mobile boundaries  #
+	Cyl_int Champ_front_ALE 3  0.0  0.0 1.e-3*2*pi*cos(2*pi*t) # name and speed of the border #
+}
+
+# For the Arbitrary Lagrangian-Eulerian (ALE) framework: block to indicate Neumann-type BCs on certain boundary for the gird problem #
+ALE_Neumann_BC_for_grid_problem dom { 
+
+1 perio # number and name of Neumann boundaries for the gird problem  in the ALE framework #
+
+} 			
+
+
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { PETSC cholesky { } }
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+
+# Time scheme, choice between: explicit or implicit #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0.
+	# Min time step #
+        dt_min 1.e-8
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-6
+	# .sauv files printing period #
+	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+    	facsec 10
+    	facsec_max 100
+	solveur implicite_ALE # #
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax 6.28
+	# Max number of time steps #
+        nb_pas_dt_max 20
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Discretize pb ma_discretisation
+
+Read pb
+{
+       # I define a medium #
+       Fluide_incompressible 
+	{
+	  mu	champ_uniforme 1 1.007e-3
+	  rho	champ_uniforme 1 1000
+	}
+	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			Cyl_int  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3  0.0  0.0 1.e-3*2*pi*cos(2*pi*t) # mobile bord in ALE framework #
+			Cyl_ext  paroi_fixe
+			perio paroi_fixe
+
+
+		}
+	}
+	Post_processing
+	{
+          
+		# Fields #
+		format lata 
+		fields dt_post 5.e-6
+		{
+			pression_pa som
+			vitesse som
+			ALEMeshVelocity som
+		}
+} 
+
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
