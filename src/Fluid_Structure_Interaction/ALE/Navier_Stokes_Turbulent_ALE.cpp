@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 #include <Avanc.h>
-#include <Modele_turbulence_hyd_nul.h>
+#include <Modele_turbulence_hyd_null.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
@@ -83,7 +83,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
       // Si on a lu le modele de turbulence et qu'il est nul,
       // alors on utilise l'operateur de diffusion standard.
       if (le_modele_turbulence.non_nul() // L'operateur a ete type (donc lu)
-          && sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur()))
+          && sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur()))
         is >> terme_diffusif;
       else
         lire_op_diff_turbulent(is);
@@ -98,7 +98,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
       // Si on vient de lire un modele de turbulence nul et que l'operateur
       // de diffusion a deja ete lu, alors on s'est plante d'operateur,
       // stop.
-      if (sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur())
+      if (sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur())
           && terme_diffusif.non_nul())
         {
           Cerr << "Erreur dans Navier_Stokes_Turbulent_ALE::lire:\n"
