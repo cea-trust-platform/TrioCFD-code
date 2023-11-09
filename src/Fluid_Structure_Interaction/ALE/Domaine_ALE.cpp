@@ -352,7 +352,6 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
   //Cerr << "Domaine_ALE::initialiser  " << finl;
-
   deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
@@ -395,6 +394,26 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
   //End of initializing Ch_front_input_ALE
+
+  // check that the Neumann boundaries indicated in the jdd are not moving bounaries
+  bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  if(cl_Neumann)
+    {
+      int nb_cl_Neumann=name_boundary_with_Neumann_BC.size();
+      for(int i=0; i<nb_cl_Neumann; i++)
+        {
+          for (int j=0; j<nb_bords_ALE; j++)
+            {
+              if(les_bords_ALE(j).le_nom()==name_boundary_with_Neumann_BC[i])
+                {
+                  Cerr<<" In the 'ALE_Neumann_BC_for_grid_problem' block, you define a Neumann BC for the boundary "<<name_boundary_with_Neumann_BC[i]<<" \n";
+                  Cerr<<" or this is a moving boundary already define in the 'Imposer_vit_bords_ALE' block "<<finl;
+                  exit();
+                }
+            }
+        }
+    }
+
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
