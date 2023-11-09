@@ -14,33 +14,36 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : ALE_Neumann_CL_boundary_for_grid_problem.cpp
-// Directory : $BEAM_MODEL_ROOT/src
+// File      : ALE_Neumann_BC_for_grid_problem.h
+// Directory : $ALE_MODEL_ROOT/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <ALE_Neumann_CL_boundary_for_grid_problem.h>
-#include <Domaine_ALE.h>
+#ifndef ALE_Neumann_BC_for_grid_problem_included
+#define ALE_Neumann_BC_for_grid_problem_included
 
-Implemente_instanciable(ALE_Neumann_CL_boundary_for_grid_problem, "ALE_Neumann_CL_boundary_for_grid_problem", Interprete_geometrique_base ) ;
-//XD  ALE_Neumann_CL_boundary_for_grid_problem interprete ALE_Neumann_CL_boundary_for_grid_problem 0 block to indicates the names of the boundary with Neumann CL for the grid problem. By default, in the ALE grid problem, we impose a homogeneous Dirichelt-type CL on the fix boundary. This option allows you to impose also Neumann-type CLs on certain boundary.
-//XD  attr dom ref_domaine dom 0 Name of domain.
-//XD attr bloc bloc_lecture bloc 0 between the braces, you must specify the numbers of the mobile borders then list these mobile borders.  NL2 Example:  ALE_Neumann_CL_boundary_for_grid_problem dom_name  { 1  boundary_name }
+#include <Interprete_geometrique_base.h>
 
-Sortie& ALE_Neumann_CL_boundary_for_grid_problem::printOn( Sortie& os ) const
+/////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION : class Projection_ALE_boundary
+//
+// <Description of class Projection_ALE_boundary>
+// This class represents the projection of a function defined on a boundary in case of ALE calculation
+// In general it is the modal deformation
+// The fluid force is project on this function. For the modal deformation it results in the modal fluid force acting on a ALE boundary
+/////////////////////////////////////////////////////////////////////////////
+
+class ALE_Neumann_BC_for_grid_problem : Interprete_geometrique_base
 {
-  return Interprete::printOn( os );
-}
 
-Entree& ALE_Neumann_CL_boundary_for_grid_problem::readOn( Entree& is )
-{
-  return Interprete::readOn( is );
-}
+  Declare_instanciable(ALE_Neumann_BC_for_grid_problem) ;
 
-Entree& ALE_Neumann_CL_boundary_for_grid_problem::interpreter_(Entree& is)
-{
-  associer_domaine(is);
-  Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
-  dom.reading_ALE_Neumann_CL_boundary_for_grid_problem(is);
-  return is;
-}
+public :
+
+protected :
+  Entree& interpreter_(Entree&) override;
+};
+
+
+#endif /* ALE_Neumann_BC_for_grid_problem_included */

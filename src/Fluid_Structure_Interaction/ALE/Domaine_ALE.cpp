@@ -581,8 +581,8 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
 
   int elem;
   int n_bord;
-  //bool cl_Neumann=(name_boundary_with_Neumann_CL.size()>0?1:0); //check for Neumann CLs
-  int nb_cl_Neumann=name_boundary_with_Neumann_CL.size(); // Neumann boundary numbers for the Laplacian
+  //bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  int nb_cl_Neumann=name_boundary_with_Neumann_BC.size(); // Neumann boundary numbers for the Laplacian
 
   {
     int rang;
@@ -641,7 +641,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
 
         bool bord_cl_neumann=false;
         for(int i=0; i<nb_cl_Neumann; i++)
-          if(le_bord.le_nom()==name_boundary_with_Neumann_CL[i])  { bord_cl_neumann=true; }
+          if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
         if(!bord_cl_neumann)
           {
             int num1 = le_bord.num_premiere_face();
@@ -684,7 +684,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           bool bord_cl_neumann=false;
           for(int i=0; i<nb_cl_Neumann; i++)
-            if(le_bord.le_nom()==name_boundary_with_Neumann_CL[i])  { bord_cl_neumann=true; }
+            if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
           if(!bord_cl_neumann)
             {
               int num1 = le_bord.num_premiere_face();
@@ -820,7 +820,7 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
     }
 }
 //Read the boundary with Neumann CL for the grid problem (optional)
-void Domaine_ALE::reading_ALE_Neumann_CL_boundary_for_grid_problem(Entree& is)
+void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -830,7 +830,7 @@ void Domaine_ALE::reading_ALE_Neumann_CL_boundary_for_grid_problem(Entree& is)
   is >> motlu;
   if (motlu != accolade_ouverte)
     {
-      Cerr << "Error when reading the 'ALE_Neumann_CL_boundary_for_grid_problem' \n";
+      Cerr << "Error when reading the 'ALE_Neumann_BC_for_grid_problem' \n";
       Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
            << motlu;
       exit();
@@ -845,12 +845,12 @@ void Domaine_ALE::reading_ALE_Neumann_CL_boundary_for_grid_problem(Entree& is)
       motlu=nomlu;
       if (motlu == accolade_fermee)
         break;
-      name_boundary_with_Neumann_CL.add(nomlu);
+      name_boundary_with_Neumann_BC.add(nomlu);
       compteur++;
     }
-  if(nb_boundary!=name_boundary_with_Neumann_CL.size())
+  if(nb_boundary!=name_boundary_with_Neumann_BC.size())
     {
-      Cerr<<"Error when reading the block ALE_Neumann_CL_boundary_for_grid_problem \n";
+      Cerr<<"Error when reading the block ALE_Neumann_BC_for_grid_problem \n";
       Cerr<<" the indicated number of Neumann boundary and the list of boundary names are different sizes.  "<<finl;
       exit();
     }
