@@ -697,6 +697,20 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
           neighbours_weighting_colinearity.echange_espace_virtuel();
         }
 
+      if (convective_flux_correction_)
+        {
+          for (int c=0; c<3; c++)
+            cell_faces_neighbours_corrected_convective[c].data() = 0;
+          cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
+        }
+
+      if (diffusive_flux_correction_)
+        {
+          for (int c=0; c<3; c++)
+            cell_faces_neighbours_corrected_diffusive[c].data() = 0;
+          cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
+        }
+
 //      FixedVector<std::vector<ArrOfInt>*,3> index_face_i_sorted;
 //      index_face_i_sorted[0] = &index_face_i_flux_x_neighbours_all_faces_sorted_;
 //      index_face_i_sorted[1] = &index_face_i_flux_y_neighbours_all_faces_sorted_;
@@ -1425,7 +1439,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
                         cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool_local[c](i,j,k);
                       centre_neighbour_bool = false;
                       index_found = false;
-                      for(int ii = ni - 1; ii >= i; ii--)
+                      for(int ii = index_neighbour_cell; ii >= i; ii--)
                         neighbours_temperature_to_correct_trimmed(ii,j,k) = 0;
                       break;
                     }
@@ -1478,7 +1492,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
                         cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool_local[c](i,j,k);
                       centre_neighbour_bool = false;
                       index_found = false;
-                      for(int jj = nj - 1; jj >= j; jj--)
+                      for(int jj = index_neighbour_cell; jj >= j; jj--)
                         neighbours_temperature_to_correct_trimmed(i,jj,k) = 0;
                       break;
                     }
@@ -1531,7 +1545,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fl
                         cell_faces_neighbours_corrected_min_max_bool[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool_local[c](i,j,k);
                       centre_neighbour_bool = false;
                       index_found = false;
-                      for(int kk = nk - 1; kk >= k; kk--)
+                      for(int kk = index_neighbour_cell; kk >= k; kk--)
                         neighbours_temperature_to_correct_trimmed(i,j,kk) = 0;
                       break;
                     }
@@ -1574,15 +1588,16 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
   // cell_faces_neighbours_corrected_min_max_bool_ini[c](i,j,k) = cell_faces_neighbours_corrected_min_max_bool[c](i,j,k);
   const int neighbouring_face_index_from_sign[2] = {1, -1};
   const int neighbouring_cell_index_from_sign[2] = {0, -1};
+  const int neighbouring_face_first_second_index_from_sign[2] = {1, 0};
   int neighbouring_face_index;
-  int n_sign_mean;
-  int first_dir, second_dir;
+  int n_sign_mean, n_sign_first_dir, n_sign_second_dir;
+  // int first_dir, second_dir;
   for (c = 0; c < 3; c++)
     for (k = 0; k < nk; k++)
       for (j = 0; j < nj; j++)
         for (i = 0; i < ni; i++)
           {
-            if (cell_faces_neighbours_corrected_min_max_bool[c](i,j,k))
+            if (cell_faces_neighbours_corrected_all_bool[c](i,j,k))
               {
                 switch(c)
                   {
@@ -1600,23 +1615,29 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
                         if(cell_faces_neighbours_corrected_all_bool[1](i+ii,j+jj,k))
                           neighbour_left_right[ii + 1]++;
                     neighbouring_face_index = neighbouring_face_index_from_sign[n_sign_mean];
-                    if (!cell_faces_neighbours_corrected_all_bool[0](i + neighbouring_face_index,j,k))
+                    if (!cell_faces_neighbours_corrected_min_max_bool[0](i + neighbouring_face_index,j,k))
                       {
                         const int neighbouring_cell_index = neighbouring_cell_index_from_sign[n_sign_mean];
-                        first_dir = (cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j,k)
-                                     && cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j + 1,k));
-                        second_dir = (cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k)
-                                      && cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k + 1));
-                        if (first_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j,k) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j + 1,k) = 0;
-                          }
-                        if (second_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k + 1) = 0;
-                          }
+                        n_sign_first_dir = signbit((*eulerian_normal_vectors_ns_normed_)[1](i+neighbouring_cell_index,j,k));
+                        n_sign_second_dir = signbit((*eulerian_normal_vectors_ns_normed_)[2](i+neighbouring_cell_index,j,k));
+//                        first_dir = (cell_faces_neighbours_corrected_all_bool[1](i+neighbouring_cell_index, j, k)
+//                                     && cell_faces_neighbours_corrected_all_bool[1](i+neighbouring_cell_index, j+1, k));
+//                        second_dir = (cell_faces_neighbours_corrected_all_bool[2](i+neighbouring_cell_index, j, k)
+//                                      && cell_faces_neighbours_corrected_all_bool[2](i+neighbouring_cell_index, j, k+1));
+                        // if (first_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j,k) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[1](i + neighbouring_cell_index,j + 1,k) = 0;
+                          const int j_face = neighbouring_face_first_second_index_from_sign[n_sign_first_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[1](i+neighbouring_cell_index, j+j_face, k) = 0;
+                        }
+                        // if (second_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[2](i + neighbouring_cell_index,j,k + 1) = 0;
+                          const int k_face = neighbouring_face_first_second_index_from_sign[n_sign_second_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[2](i+neighbouring_cell_index, j, k+k_face) = 0;
+                        }
                       }
                     break;
                   case 1:
@@ -1633,23 +1654,29 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
                         if(cell_faces_neighbours_corrected_all_bool[0](i+ii,j+jj,k))
                           neighbour_left_right[jj + 1]++;
                     neighbouring_face_index = neighbouring_face_index_from_sign[n_sign_mean];
-                    if (!cell_faces_neighbours_corrected_all_bool[1](i,j + neighbouring_face_index,k))
+                    if (!cell_faces_neighbours_corrected_min_max_bool[1](i,j + neighbouring_face_index,k))
                       {
                         const int neighbouring_cell_index = neighbouring_cell_index_from_sign[n_sign_mean];
-                        first_dir = (cell_faces_neighbours_corrected_min_max_bool[0](i,j + neighbouring_cell_index,k)
-                                     && cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j + neighbouring_cell_index,k));
-                        second_dir = (cell_faces_neighbours_corrected_min_max_bool[2](i, j + neighbouring_cell_index,k)
-                                      && cell_faces_neighbours_corrected_min_max_bool[2](i,j + neighbouring_cell_index,k + 1));
-                        if (first_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[0](i,j + neighbouring_cell_index,k) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j + neighbouring_cell_index,k) = 0;
-                          }
-                        if (second_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[2](i, j + neighbouring_cell_index,k) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[2](i,j + neighbouring_cell_index,k + 1) = 0;
-                          }
+                        n_sign_first_dir = signbit((*eulerian_normal_vectors_ns_normed_)[0](i, j+neighbouring_cell_index, k));
+                        n_sign_second_dir = signbit((*eulerian_normal_vectors_ns_normed_)[2](i, j+neighbouring_cell_index, k));
+//                        first_dir = (cell_faces_neighbours_corrected_all_bool[0](i, j+neighbouring_cell_index, k)
+//                                     && cell_faces_neighbours_corrected_all_bool[0](i+1, j+neighbouring_cell_index, k));
+//                        second_dir = (cell_faces_neighbours_corrected_all_bool[2](i, j+neighbouring_cell_index, k)
+//                                      && cell_faces_neighbours_corrected_all_bool[2](i, j+neighbouring_cell_index, k+1));
+                        // if (first_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[0](i,j + neighbouring_cell_index,k) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j + neighbouring_cell_index,k) = 0;
+                          const int i_face = neighbouring_face_first_second_index_from_sign[n_sign_first_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[0](i+i_face, j+neighbouring_cell_index, k) = 0;
+                        }
+                        // if (second_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[2](i,j + neighbouring_cell_index,k) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[2](i,j + neighbouring_cell_index,k + 1) = 0;
+                          const int k_face = neighbouring_face_first_second_index_from_sign[n_sign_second_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[2](i, j+neighbouring_cell_index, k+k_face) = 0;
+                        }
                       }
                     break;
                   case 2:
@@ -1666,23 +1693,29 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
                         if(cell_faces_neighbours_corrected_all_bool[0](i+ii,j,k+kk))
                           neighbour_left_right[kk + 1]++;
                     neighbouring_face_index = neighbouring_face_index_from_sign[n_sign_mean];
-                    if (!cell_faces_neighbours_corrected_all_bool[2](i,j,k + neighbouring_face_index))
+                    if (!cell_faces_neighbours_corrected_min_max_bool[2](i,j,k + neighbouring_face_index))
                       {
                         const int neighbouring_cell_index = neighbouring_cell_index_from_sign[n_sign_mean];
-                        first_dir = (cell_faces_neighbours_corrected_min_max_bool[0](i,j,k + neighbouring_cell_index)
-                                     && cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j,k + neighbouring_cell_index));
-                        second_dir = (cell_faces_neighbours_corrected_min_max_bool[1](i, j,k + neighbouring_cell_index)
-                                      && cell_faces_neighbours_corrected_min_max_bool[1](i,j + 1,k + neighbouring_cell_index));
-                        if (first_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[0](i,j,k + neighbouring_cell_index) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j,k + neighbouring_cell_index) = 0;
-                          }
-                        if (second_dir)
-                          {
-                            cell_faces_neighbours_corrected_min_max_bool[1](i, j,k + neighbouring_cell_index) = 0;
-                            cell_faces_neighbours_corrected_min_max_bool[1](i,j + 1,k + neighbouring_cell_index) = 0;
-                          }
+                        n_sign_first_dir = signbit((*eulerian_normal_vectors_ns_normed_)[0](i, j, k+neighbouring_cell_index));
+                        n_sign_second_dir = signbit((*eulerian_normal_vectors_ns_normed_)[1](i, j, k+neighbouring_cell_index));
+//                        first_dir = (cell_faces_neighbours_corrected_all_bool[0](i,j,k + neighbouring_cell_index)
+//                                     && cell_faces_neighbours_corrected_all_bool[0](i + 1,j,k + neighbouring_cell_index));
+//                        second_dir = (cell_faces_neighbours_corrected_all_bool[1](i, j,k + neighbouring_cell_index)
+//                                      && cell_faces_neighbours_corrected_all_bool[1](i,j + 1,k + neighbouring_cell_index));
+                        // if (first_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[0](i,j,k + neighbouring_cell_index) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[0](i + 1,j,k + neighbouring_cell_index) = 0;
+                          const int i_face = neighbouring_face_first_second_index_from_sign[n_sign_first_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[0](i+i_face, j, k+neighbouring_cell_index) = 0;
+                        }
+                        // if (second_dir)
+                        {
+                          // cell_faces_neighbours_corrected_min_max_bool[1](i, j,k + neighbouring_cell_index) = 0;
+                          // cell_faces_neighbours_corrected_min_max_bool[1](i,j + 1,k + neighbouring_cell_index) = 0;
+                          const int j_face = neighbouring_face_first_second_index_from_sign[n_sign_second_dir];
+                          cell_faces_neighbours_corrected_min_max_bool[1](i, j+j_face, k+neighbouring_cell_index) = 0;
+                        }
                       }
                     break;
                   default:
