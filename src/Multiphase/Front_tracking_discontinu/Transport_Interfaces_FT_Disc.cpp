@@ -6967,58 +6967,63 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     }
 
   const Probleme_base&  pb = get_probleme_base();
-  Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
-  // injection des interfaces with temperature of activation
-  if (pb_ft.tcl().reinjection_tcl() && pb_ft.tcl().ready_inject_tcl())
+
+  if (sub_type(Probleme_FT_Disc_gen,pb))
     {
-      const double thetac = pb_ft.tcl().thetaC_tcl();
-      const double Rc = pb_ft.tcl().Rc_inject();
 
-      // const Nom expr = "x^2+(y-8e-05*cos(50.0*pi/180.0))^2-8e-05^2";
-      const Nom expr = Nom("x^2+(y-") + Nom(Rc)
-                       + Nom("*cos(") + Nom(thetac)
-                       + Nom("*pi/180.0))^2-") + Nom(Rc)
-                       + Nom("^2");
-
-      // On essaye d'injecter l'interface
-      Maillage_FT_Disc maillage_tmp;
-      maillage_tmp.associer_equation_transport (*this);
-
-      // By default, inject vapeur, phase 0
-      Maillage_FT_Disc::AjoutPhase phase =
-        0 ?
-        Maillage_FT_Disc::AJOUTE_PHASE1 : Maillage_FT_Disc::AJOUTE_PHASE0;
-
-      DoubleTab sauvegarde (
-        variables_internes_->indicatrice_cache.valeur ().valeurs ());
-
-      const int ok = marching_cubes ().construire_iso (
-                       expr, 0., maillage_tmp,
-                       variables_internes_->indicatrice_cache.valeur ().valeurs (), phase,
-                       variables_internes_->distance_interface_sommets);
-
-      Cerr << "Injection_interface time " << temps << " " << expr;
-      if (ok)
+      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+      // injection des interfaces with temperature of activation
+      if (pb_ft.tcl().reinjection_tcl() && pb_ft.tcl().ready_inject_tcl())
         {
-          maillage_interface ().ajouter_maillage (maillage_tmp);
-          get_update_indicatrice ();
-          double unused_vol_phase_0 = 0.;
-          const double volume_phase_1_old = calculer_integrale_indicatrice (
-                                              sauvegarde, unused_vol_phase_0);
-          unused_vol_phase_0 = 0.;
-          const double volume_phase_1 = calculer_integrale_indicatrice (
-                                          variables_internes_->indicatrice_cache.valeur ().valeurs (),
-                                          unused_vol_phase_0);
-          double volume = volume_phase_1 - volume_phase_1_old;
-          // pow(-1,1-phase) ne compile pas avec xlC sur AIX car n'a que pow(double,int)
-          volume *= pow (-1., 1 - phase);
-          Cerr << " volume " << volume << finl;
-        }
-      else
-        {
-          Cerr << " failure: collision" << finl;
-          variables_internes_->indicatrice_cache.valeur ().valeurs () =
-            sauvegarde;
+          const double thetac = pb_ft.tcl().thetaC_tcl();
+          const double Rc = pb_ft.tcl().Rc_inject();
+
+          // const Nom expr = "x^2+(y-8e-05*cos(50.0*pi/180.0))^2-8e-05^2";
+          const Nom expr = Nom("x^2+(y-") + Nom(Rc)
+                           + Nom("*cos(") + Nom(thetac)
+                           + Nom("*pi/180.0))^2-") + Nom(Rc)
+                           + Nom("^2");
+
+          // On essaye d'injecter l'interface
+          Maillage_FT_Disc maillage_tmp;
+          maillage_tmp.associer_equation_transport (*this);
+
+          // By default, inject vapeur, phase 0
+          Maillage_FT_Disc::AjoutPhase phase =
+            0 ?
+            Maillage_FT_Disc::AJOUTE_PHASE1 : Maillage_FT_Disc::AJOUTE_PHASE0;
+
+          DoubleTab sauvegarde (
+            variables_internes_->indicatrice_cache.valeur ().valeurs ());
+
+          const int ok = marching_cubes ().construire_iso (
+                           expr, 0., maillage_tmp,
+                           variables_internes_->indicatrice_cache.valeur ().valeurs (), phase,
+                           variables_internes_->distance_interface_sommets);
+
+          Cerr << "Injection_interface time " << temps << " " << expr;
+          if (ok)
+            {
+              maillage_interface ().ajouter_maillage (maillage_tmp);
+              get_update_indicatrice ();
+              double unused_vol_phase_0 = 0.;
+              const double volume_phase_1_old = calculer_integrale_indicatrice (
+                                                  sauvegarde, unused_vol_phase_0);
+              unused_vol_phase_0 = 0.;
+              const double volume_phase_1 = calculer_integrale_indicatrice (
+                                              variables_internes_->indicatrice_cache.valeur ().valeurs (),
+                                              unused_vol_phase_0);
+              double volume = volume_phase_1 - volume_phase_1_old;
+              // pow(-1,1-phase) ne compile pas avec xlC sur AIX car n'a que pow(double,int)
+              volume *= pow (-1., 1 - phase);
+              Cerr << " volume " << volume << finl;
+            }
+          else
+            {
+              Cerr << " failure: collision" << finl;
+              variables_internes_->indicatrice_cache.valeur ().valeurs () =
+                sauvegarde;
+            }
         }
     }
 
