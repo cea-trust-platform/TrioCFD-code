@@ -99,7 +99,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   side_temperature_ = 0;
   stencil_side_ = 2;
 
-  n_iter_distance_ = 3;
+  n_iter_distance_ = 6;
   compute_grad_T_interface_ = 0;
   compute_curvature_ = 0;
   compute_distance_= 0;
@@ -935,7 +935,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * In case of the subresolution or not
    */
   set_zero_temperature_increment();
-  correct_temperature_increment_for_interface_leaving_cell();
+  // correct_temperature_increment_for_interface_leaving_cell();
 
   // correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
   // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces

@@ -63,7 +63,7 @@ public :
   void set_param(Param& param) override;
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
   // Entree& read_fd_solver(Entree& is);
-  void read_fd_solver(const Motcle& mot, Entree& is);
+  // void read_fd_solver(const Motcle& mot, Entree& is);
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void set_thermal_subresolution_outputs(SFichier& fic) override;
 
@@ -341,6 +341,7 @@ protected :
   int global_probes_characteristics_ = 1;
 
   int correct_temperature_cell_neighbours_first_iter_;
+  int correct_first_iter_deactivate_cell_neighbours_;
   int find_temperature_cell_neighbours_;
   int use_temperature_cell_neighbours_;
   int correct_neighbours_using_probe_length_;
@@ -353,6 +354,7 @@ protected :
 
   int clip_temperature_values_;
   int enforce_periodic_boundary_value_;
+  int stencil_periodic_boundary_value_;
 
   int disable_post_processing_probes_out_files_;
 
