@@ -34,8 +34,7 @@ EOF
 	CasTest GEOM_hemisphere/TRANS_-0.0002 ijkft_stat_diph_AI.data
 	# CasTest GEOM_hemisphere/TRANS_-0.0002/PAR8 ijkft_stat_diph_AI_par8.data 8 #
 	#               #
-	Prerequisite ./analytical.py > analytical.log
-	Prerequisite ./compare.py > compare.log
+	Prerequisite ./postpro.sh
 	Prerequisite visit -nowin -cli -quiet -s ./post_visit.py > post_visit.log
 }
 
