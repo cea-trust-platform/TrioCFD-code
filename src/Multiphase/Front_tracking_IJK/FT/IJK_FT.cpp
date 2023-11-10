@@ -457,7 +457,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   //ab-forcage-control-ecoulement-deb
   expression_derivee_acceleration_ = "0"; // par defaut pas de terme d'acceleration
+  expression_derivee_acceleration_z_ = "0"; // par defaut pas de terme d'acceleration
   terme_source_acceleration_ = 0.; // par defaut, zero
+  terme_source_acceleration_z_ = 0.; // par defaut, zero
   integrated_residu_ = 0.;
   //ab-forcage-control-ecoulement-fin
 
@@ -536,7 +538,11 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("expression_vz_init", &expression_vitesse_initiale_[2]); // XD_ADD_P chaine initial field for z-velocity component (parser of x,y,z)
   param.ajouter("expression_derivee_force", &expression_derivee_acceleration_); // XD_ADD_P chaine expression of the time-derivative of the X-component of a source-term (see terme_force_ini for the initial value). terme_force_ini : initial value of the X-component of the source term (see expression_derivee_force  for time evolution)
   param.ajouter_flag("compute_force_init", &compute_force_init_); // XD_ADD_P chaine not_set
+
+  param.ajouter("expression_derivee_force_z", &expression_derivee_acceleration_z_); // XD_ADD_P chaine expression of the time-derivative of the X-component of a source-term (see terme_force_ini for the initial value). terme_force_ini : initial value of the Z-component of the source term (see expression_derivee_force_z  for time evolution)
+
   param.ajouter("terme_force_init", &terme_source_acceleration_); // XD_ADD_P chaine not_set
+  param.ajouter("terme_force_init_z", &terme_source_acceleration_z_); // XD_ADD_P chaine not_set
   param.ajouter("correction_force", &correction_force_); // XD_ADD_P chaine not_set
   param.ajouter("vol_bulle_monodisperse", &vol_bulle_monodisperse_); // XD_ADD_P chaine not_set
   param.ajouter("vol_bulles", &vol_bulles_); // XD_ADD_P chaine not_set
@@ -881,6 +887,13 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   parser_derivee_acceleration_.addVar("rhov_moyen");
   parser_derivee_acceleration_.addVar("tauw");
   parser_derivee_acceleration_.parseString();
+
+  // Preparation de l'expression derivee de l'acceleration
+  std::string tmpstring3(expression_derivee_acceleration_z_);
+  parser_derivee_acceleration_z_.setString(tmpstring3);
+  parser_derivee_acceleration_z_.setNbVar(1);
+  parser_derivee_acceleration_z_.addVar("v_moyen_z");
+  parser_derivee_acceleration_z_.parseString();
 
   std::string tmpstring2(expression_derivee_facteur_variable_source_);
   parser_derivee_facteur_variable_source_.setString(tmpstring2);
@@ -1383,6 +1396,8 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("tinit", &current_time_);
 
   param.ajouter("terme_acceleration_init", &terme_source_acceleration_);
+  param.ajouter("terme_acceleration_init_z", &terme_source_acceleration_z_);
+  // param.ajouter("force_init", &force_init_);
   param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
   param.ajouter("interfaces", & interfaces_);
@@ -1716,6 +1731,11 @@ int IJK_FT_double::initialise()
           Cerr << "Saving interfacial positions as references." <<finl;
           interfaces_.set_positions_reference();
         }
+      if (interfaces_.get_flag_vitesses_reference() == 0) // (!reprise_)
+        {
+          Cerr << "Saving interfacial velocity as references." <<finl;
+          interfaces_.init_vitesses_reference();
+        }
     }
   // L'indicatrice non-perturbee est remplie (si besoin, cad si post-traitement) par le post.complete()
   post_.complete(reprise_);
@@ -1989,9 +2009,9 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
   statistiques().begin_count(source_counter_);
   double new_time = time;
   double v_moy = calculer_v_moyen(vx);
-
+  double v_moy_z = calculer_v_moyen(velocity_[2]);
   // S'il n'y a pas de derivee, la source est constante donc on peut sortir:
-  if (expression_derivee_acceleration_ == Nom("0"))
+  if (expression_derivee_acceleration_ == Nom("0") && expression_derivee_acceleration_z_ == Nom("0"))
     {
       //    terme_source_acceleration_ = 0.;
       statistiques().end_count(source_counter_);
@@ -2016,6 +2036,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
 
   double tauw = calculer_tau_wall(vx, mu_liquide_);
   double derivee_acceleration = 0.;
+  double derivee_acceleration_z = 0.;
   double derivee_facteur_sv = 0.;
 
   double alv = 0.;
@@ -2047,11 +2068,13 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       parser_derivee_acceleration_.setVar("T", time);
       parser_derivee_acceleration_.setVar("rhov_moyen", rhov_moy);
       parser_derivee_acceleration_.setVar("tauw", tauw);
+
+      parser_derivee_acceleration_z_.setVar("v_moyen_z", v_moy_z);
       // Pour utiliser rho_v il faudrait deplacer cette mise a jour a un endroit ou rho
       // est a jour en fonction de l'indicatrice
       // parser_derivee_acceleration_.setVar("rho_v_moyen", rho_v_moy);
       derivee_acceleration = parser_derivee_acceleration_.eval();
-
+      derivee_acceleration_z = parser_derivee_acceleration_z_.eval();
       // Mise a jour de la source variable
       if (expression_derivee_facteur_variable_source_ != Nom("0"))
         {
@@ -2072,7 +2095,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
               terme_source_acceleration_ += derivee_acceleration * timestep;
-              //terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
+              terme_source_acceleration_z_ += derivee_acceleration_z * timestep;
               facteur_variable_source_ += derivee_facteur_sv * timestep;
               //facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
               new_time += timestep;
@@ -2082,8 +2105,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
               const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep, rk_step);
               runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
                                             terme_source_acceleration_, rk_step, timestep);
-              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
-              //terme_source_acceleration_ += 0;
+              runge_kutta3_update_for_float(derivee_acceleration_z, store_RK3_source_acc_,
+                                            terme_source_acceleration_z_, rk_step, timestep);
               runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
                                             facteur_variable_source_, rk_step, timestep);
               Cout << "facteur_variable_source_" << facteur_variable_source_ << finl;
@@ -2096,13 +2119,15 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
           const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep/*total */, rk_step);
           runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
                                         terme_source_acceleration_, rk_step, timestep/*total */);
-
+          runge_kutta3_update_for_float(derivee_acceleration_z, store_RK3_source_acc_,
+                                        terme_source_acceleration_z_, rk_step, timestep/*total */);
           runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
                                         facteur_variable_source_, rk_step, timestep/*total */);
           new_time += intermediate_dt;
         }
     }
   envoyer_broadcast(terme_source_acceleration_, 0);
+
   // -----------------------------------------------------------
   // Force interface (:"force sigma") seloon x,y,z et u.Force_interface
   double fs0(0),fs1(0),fs2(0),psn(0);
@@ -2135,6 +2160,9 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       ptn = calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
     }
   // -----------------------------------------------------------
+
+  envoyer_broadcast(terme_source_acceleration_z_, 0);
+
   // Impression dans le fichier _acceleration.out
   if (Process::je_suis_maitre())
     {
@@ -2146,7 +2174,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
                                   "1.tstep\t2.time\t3.Vx\t4.rhoVx\t5.tauw\t6.da/dt\t7.NewT\t8.acceleration\t9.fac_var_source\t10.qdm_source\t11.vap_velocity_tmoy_\t12.liq_velocity_tmoy_\t13.qdm_patch_correction_[0]\t14.qdm_patch_correction_[1]\t15.qdm_patch_correction_[2]\t16.F_sigma_moyen[0]\t17.F_sigma_moyen[1]\t18.F_sigma_moyen[2]\t19.y.F_sigma\t20.u.u\t21.F_THI[0]\t22.F_THI[1]\t23.F_THI[2]\t24.A_THI.A_THI\t25.F_THI.F_THI\t26.u.F_THI\t27.u.rho.u",
                                   reset);
       // la derivee_acceleration n'est connue que sur le maitre
-      fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<rhov_moy <<" "<<tauw ;
+      fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<v_moy_z<<" "<<rhov_moy <<" "<<tauw ;
       fic  <<" "<<derivee_acceleration <<" "<<new_time <<" "<<terme_source_acceleration_;
       fic <<" "<< facteur_variable_source_;
       fic <<" "<< 0.; //qdm_source_;
@@ -2283,12 +2311,12 @@ void IJK_FT_double::run()
 
       IJK_Splitting::rho_vap_ref_for_poisson_=rho_vapeur_;
       IJK_Splitting::rho_liq_ref_for_poisson_=rho_liquide_;
-      molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
-      rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+      molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, mu_vapeur_, mu_liquide_);
+      rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
       nalloc += 2;
       if (use_inv_rho_)
         {
-          inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
+          inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
           nalloc += 1;
           IJK_Splitting::rho_vap_ref_for_poisson_=1./rho_vapeur_;
           IJK_Splitting::rho_liq_ref_for_poisson_=1./rho_liquide_;
@@ -2602,7 +2630,16 @@ void IJK_FT_double::run()
       if (post_.get_liste_post_instantanes().contient_("EXTERNAL_FORCE"))
         {
           for (int dir=0; dir<3; dir++)
-            compute_add_external_forces(dir);
+            {
+              if (IJK_Splitting::defilement_ == 1)
+                {
+                  compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(dir);
+                }
+              else
+                {
+                  compute_add_external_forces(dir);
+                }
+            }
         }
     }
 
@@ -3217,6 +3254,10 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
             {
               residu[dir] -= terme_source_acceleration_;
             }
+          else if (dir==2)
+            {
+              residu[dir] -= terme_source_acceleration_z_;
+            }
           if (interfaces_.is_terme_gravite_rhog())
             {
               residu[dir] = -(rho_liquide_-(rho_liquide_-rho_vapeur_)*vol_gaz/vol_NS)*gravite_[dir];
@@ -3688,8 +3729,13 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
       //   }
       // GAB, rotation
       if (dir == direction_gravite_)
-        force_volumique += terme_source_acceleration_;
-
+        {
+          force_volumique += terme_source_acceleration_;
+        }
+      else if (dir==2)
+        {
+          force_volumique += terme_source_acceleration_z_;
+        }
 
 #ifndef VARIABLE_DZ
       double volume = 1.;
@@ -3789,7 +3835,15 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
 
 #endif
       // For the addition of the external forces to d_velocity_
-      compute_add_external_forces(dir);
+      if (IJK_Splitting::defilement_ == 1)
+        {
+          compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(dir);
+        }
+      else
+        {
+          compute_add_external_forces(dir);
+        }
+
     } // end of loop [dir].
   ///////////////////////////////////////////////////////
   // GAB, THI
@@ -3863,9 +3917,25 @@ void IJK_FT_double::compute_add_external_forces(const int dir)
 }
 
 
+void IJK_FT_double::compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(const int dir)
+{
+  interfaces_.compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(force_rappel_ft_, force_rappel_,interfaces_.I(),interfaces_.I_ft(),
+                                                                                    coef_immobilisation_, tstep_, current_time_,
+                                                                                    coef_rayon_force_rappel_);
+
+  const int kmax = d_velocity_[dir].nk();
+  const int ni = d_velocity_[dir].ni();
+  const int nj = d_velocity_[dir].nj();
+  for (int k = 0; k < kmax; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        d_velocity_[dir](i,j,k) += force_rappel_[dir](i,j,k);
+  return;
+}
 
 // -----------------------------------------------------------------------------------
 //  FORCAGE EXTERIEUR, DEFINI DANS L'ESPACE SPECTRAL
+// GAB, THI /!\ REMPLACER PAR compute_add_THI_force_sur_d_velocity
 void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>& vitesse,
                                           const int time_iteration,
                                           const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux

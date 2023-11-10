@@ -102,6 +102,16 @@ public :
 
   void compute_vinterp();
   // methode pour bulles fixes
+
+  void compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(FixedVector<IJK_Field_double, 3>& rappel_ft,
+                                                                             FixedVector<IJK_Field_double, 3>& rappel,
+                                                                             const IJK_Field_double& indic/*_ns*/,
+                                                                             const IJK_Field_double& indic_ft,
+                                                                             const double coef_immo,
+                                                                             const int tstep,
+                                                                             const double current_time,
+                                                                             const double coef_rayon_force_rappel);
+
   void compute_external_forces_(FixedVector<IJK_Field_double, 3>& rappel_ft,
                                 FixedVector<IJK_Field_double, 3>& rappel,
                                 const FixedVector<IJK_Field_double, 3>& vitesse,
@@ -148,6 +158,11 @@ public :
   int get_flag_positions_reference() const
   {
     return flag_positions_reference_;
+  };
+
+  int get_flag_vitesses_reference() const
+  {
+    return flag_vitesses_reference_;
   };
 
   int is_frozen() const
@@ -263,6 +278,15 @@ public :
     flag_positions_reference_ = 1;
     return;
   };
+
+  void init_vitesses_reference()
+  {
+    const int nbulles_reelles = get_nb_bulles_reelles();
+    const int nbulles_ghost = get_nb_bulles_ghost();
+    const int nbulles_tot = nbulles_reelles + nbulles_ghost;
+    vitesses_reference_.resize(nbulles_tot, 3, Array_base::NOCOPY_NOINIT);
+    vitesses_reference_ = 0.;
+  }
 
   const Maillage_FT_IJK& maillage_ft_ijk() const
   {
@@ -770,8 +794,9 @@ protected:
   DoubleTab mean_force_;
   DoubleTab force_time_n_;
   DoubleTab positions_reference_;
+  DoubleTab vitesses_reference_;
   int flag_positions_reference_ = 0; // Pas de position de reference imposee
-
+  int flag_vitesses_reference_ = 0; // Pas de position de reference imposee
   Nom fichier_reprise_interface_;
   int timestep_reprise_interface_;
   Nom lata_interfaces_meshname_;

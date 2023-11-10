@@ -377,6 +377,7 @@ protected :
   void compute_correction_for_momentum_balance(const int rk_step);
   void transfer_ft_to_ns();
   void compute_add_external_forces(const int dir);
+  void compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(const int dir);
   // GAB
   void compute_add_THI_force(const FixedVector<IJK_Field_double, 3>& vitesse,
                              const int time_iteration,
@@ -466,7 +467,9 @@ protected :
   */
   //
   Nom expression_derivee_acceleration_;
+  Nom expression_derivee_acceleration_z_;
   Parser parser_derivee_acceleration_;
+  Parser parser_derivee_acceleration_z_;
   Noms expression_variable_source_; // on attend trois expressions
   Nom expression_potential_phi_; // source variable formulee en gradient
   Vecteur3 store_rhov_moy_;
@@ -474,7 +477,7 @@ protected :
   // terme source qdm pour pousser le fluide dans le canal (en m/s/s)
   double terme_source_acceleration_;
   int compute_force_init_;
-
+  double terme_source_acceleration_z_;
   // Vecteurs de taille 3 a lire dans le jeu de donnees :
   ArrOfDouble terme_source_correction_; // Valeur de la force de correction moyenne a appliquer
   ArrOfInt correction_force_; // 3 flags d'activation de la correction ou non
