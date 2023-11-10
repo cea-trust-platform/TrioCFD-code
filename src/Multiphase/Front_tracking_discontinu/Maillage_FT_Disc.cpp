@@ -5419,12 +5419,13 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
       // in all procs: we locate all facette has at least one sommets
       const int isommet1 = facettes_(facette, 0);
       const int isommet2 = facettes_(facette, 1);
-      bool no_sommts = (sommet_elem_[isommet1]<0) && (sommet_elem_[isommet2]<0));
+      bool no_sommts = (sommet_elem_[isommet1]<0) && (sommet_elem_[isommet2]<0);
 
-      if (dim == 3) {
-	  const int isommet3 = facettes_(facette, 2);
-	  no_sommts = no_sommts && (sommet_elem_[isommet3]<0);
-      }
+      if (dim == 3)
+        {
+          const int isommet3 = facettes_(facette, 2);
+          no_sommts = no_sommts && (sommet_elem_[isommet3]<0);
+        }
 
       if (!no_sommts)
         {
