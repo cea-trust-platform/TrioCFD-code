@@ -42,6 +42,8 @@
 #include <communications.h>
 #include <Faces.h>
 #include <CL_Types_include.h>
+#include <EFichier.h>
+
 
 
 
@@ -265,19 +267,28 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
     }
   mp_sum(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName.txt file
+
+  // Write the result in the Cas_ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      std::string nom="ModalForce_";
-      nom += name_ALE_boundary_projection;
-      nom +="_";
+      int premiere_ecriture = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce_";
+      filename+=name_ALE_boundary_projection;
+      filename +="_";
       std::string index(std::to_string(nb_mode));
-      nom +=index;
-      nom+=".txt";
-      std::ofstream ofs_1;
-      ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-      ofs_1<<temps<<" "<<modalForce;
-      ofs_1<<endl;
-      ofs_1.close();
+      filename+=index;
+      filename+=".out";
+      if (!modalforce_.is_open())
+        {
+          modalforce_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalforce_.setf(ios::scientific);
+        }
+      // comments are added to the file header
+      if (premiere_ecriture)
+        modalforce_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
+
+      modalforce_<< temps<< " "<<modalForce<<" "<<finl;
     }
 }
 //Compute the fluid force projected within the requested boundaries
@@ -329,23 +340,32 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 
   mp_sum_for_each_item(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName_[i].txt file
+
+  // Write the result in the ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      for(int i=0; i<size_projection_boundaries; i++)
+      int premiere_ecriture = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce.out";
+      if (!modalforce_.is_open())
         {
-          std::string nom="ModalForce_";
-          nom += name_ALE_boundary_projection_[i];
-          nom +="_";
-          std::string index(std::to_string(i+1));
-          nom +=index;
-          nom+=".txt";
-          std::ofstream ofs_1;
-          ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-          ofs_1<<temps<<" "<<modalForce[i];
-          ofs_1<<endl;
-          ofs_1.close();
+          modalforce_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalforce_.setf(ios::scientific);
         }
+      // comments are added to the file header
+      if (premiere_ecriture)
+        {
+          modalforce_<< "# Time t  Boundary ";
+          for(int i=0; i<size_projection_boundaries; i++)
+            modalforce_<< name_ALE_boundary_projection_[i]<< " ";
+          modalforce_<<finl;
+        }
+      modalforce_<< temps<< " ";
+      for(int i=0; i<size_projection_boundaries; i++)
+        modalforce_<<modalForce[i]<<" ";
+      modalforce_<<finl;
     }
+
 
 }
 
