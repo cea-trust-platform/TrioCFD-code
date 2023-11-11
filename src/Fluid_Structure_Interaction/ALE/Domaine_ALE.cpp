@@ -271,7 +271,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
   // Write the result in the Cas_ModalForce_BoundaryName.out file
   if (je_suis_maitre())
     {
-      int premiere_ecriture = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
       Nom filename(nom_du_cas());
       filename+="_ModalFluideForce_";
       filename+=name_ALE_boundary_projection;
@@ -281,11 +281,11 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
       filename+=".out";
       if (!modalForceProjectionALE_.is_open())
         {
-          modalForceProjectionALE_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
           modalForceProjectionALE_.setf(ios::scientific);
         }
       // comments are added to the file header
-      if (premiere_ecriture)
+      if (first_writing)
         modalForceProjectionALE_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
 
       modalForceProjectionALE_<< temps<< " "<<modalForce<<" "<<finl;
@@ -344,16 +344,16 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
   // Write the result in the ModalForce_BoundaryName.out file
   if (je_suis_maitre())
     {
-      int premiere_ecriture = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
       Nom filename(nom_du_cas());
       filename+="_ModalFluideForce.out";
       if (!modalForceProjectionALE_.is_open())
         {
-          modalForceProjectionALE_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
           modalForceProjectionALE_.setf(ios::scientific);
         }
       // comments are added to the file header
-      if (premiere_ecriture)
+      if (first_writing)
         {
           modalForceProjectionALE_<< "# Time t  Boundary ";
           for(int i=0; i<size_projection_boundaries; i++)
@@ -1013,32 +1013,14 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
     }
   else
     {
-      Nom beam_name=beam[count].getBeamName();
-      //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
-      std::remove(beam_name+"ModalForceFluide1D.txt");
-      //end delete old files
-
       if(je_suis_maitre())
         {
-          //prepare the headers of the output file ModalForceFluide1D
-          std::ofstream ofs;
-          ofs.open (beam_name+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-          ofs<<"# Printing modal 1D fluid force: time mode  ";
-          for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
-          ofs<<endl;
-          ofs.close();
-          //end prepare the headers of the output file ModalForceFluide1D
-        }
-
-      if(nb_output_points_1D>0 && je_suis_maitre())
-        {
           bool first_writing=true;
-          beam[count].printOutputBeam1D(first_writing);
-        }
-      if(nb_output_points_3D>0 && je_suis_maitre())
-        {
-          bool first_writing=true;
-          beam[count].printOutputBeam3D(first_writing);
+          beam[count].printOutputFluidForceOnBeam(first_writing);
+          if (nb_output_points_1D>0)
+            beam[count].printOutputBeam1D(first_writing);
+          if (nb_output_points_3D>0)
+            beam[count].printOutputBeam3D(first_writing);
         }
     }
 
@@ -1259,13 +1241,6 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   beam[i].setFluidForceOnBeam(fluidForceOnBeam);
   if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
     {
-      std::ofstream ofs_1;
-      ofs_1.precision(32);
-      ofs_1.open (beam[i].getBeamName()+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<beam[i].getTempsComputeForceOnBeam()<<" ";
-      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
-      ofs_1<<endl;
-      ofs_1.close();
+      beam[i].printOutputFluidForceOnBeam();
     }
 }

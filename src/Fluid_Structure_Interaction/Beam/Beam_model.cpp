@@ -252,7 +252,9 @@ void Beam_model::readRestartFile(Nom& Restart_file_name)
     }
   else
     {
-      Cerr<< "ERROR: Unable to open the file." <<Restart_file_name<<finl;
+      Cerr<< "Beam_model::readRestartFile "<<finl;
+      Cerr<< "ERROR: Unable to open the restart file " <<Restart_file_name<<finl;
+      exit();
     }
 }
 
@@ -779,7 +781,27 @@ void Beam_model::printOutputBeam3D(bool first_writing) const
 
 void Beam_model::printOutputFluidForceOnBeam(bool first_writing) const
 {
-
+  if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
+    {
+      Nom filename(beamName_);
+      filename+="_ModalForceFluide1D.out";
+      if (!fluidForceOnBeam_out_.is_open())
+        {
+          fluidForceOnBeam_out_.ouvrir(filename, (first_writing?ios::out:ios::app));
+          fluidForceOnBeam_out_.setf(ios::scientific);
+        }
+      if (first_writing)
+        {
+          fluidForceOnBeam_out_<< "# Printing modal 1D fluid force: time mode ";
+          for(int nbmodes=0; nbmodes<nbModes_; nbmodes++)
+            fluidForceOnBeam_out_<<nbmodes+1<<" ";
+          fluidForceOnBeam_out_<<finl;
+        }
+      fluidForceOnBeam_out_<< temps_<< " ";
+      for(int nbmodes=0; nbmodes<nbModes_; nbmodes++)
+        fluidForceOnBeam_out_<<fluidForceOnBeam_[nbmodes]<<" ";
+      fluidForceOnBeam_out_<<endl;
+    }
 }
 
 void Beam_model::setCenterCoordinates(const double& x0,const double& y0, const double& z0)
