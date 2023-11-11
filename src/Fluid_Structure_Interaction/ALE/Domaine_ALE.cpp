@@ -279,16 +279,16 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
       std::string index(std::to_string(nb_mode));
       filename+=index;
       filename+=".out";
-      if (!modalforce_.is_open())
+      if (!modalForceProjectionALE_.is_open())
         {
-          modalforce_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
-          modalforce_.setf(ios::scientific);
+          modalForceProjectionALE_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
         }
       // comments are added to the file header
       if (premiere_ecriture)
-        modalforce_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
+        modalForceProjectionALE_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
 
-      modalforce_<< temps<< " "<<modalForce<<" "<<finl;
+      modalForceProjectionALE_<< temps<< " "<<modalForce<<" "<<finl;
     }
 }
 //Compute the fluid force projected within the requested boundaries
@@ -347,23 +347,23 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
       int premiere_ecriture = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
       Nom filename(nom_du_cas());
       filename+="_ModalFluideForce.out";
-      if (!modalforce_.is_open())
+      if (!modalForceProjectionALE_.is_open())
         {
-          modalforce_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
-          modalforce_.setf(ios::scientific);
+          modalForceProjectionALE_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
         }
       // comments are added to the file header
       if (premiere_ecriture)
         {
-          modalforce_<< "# Time t  Boundary ";
+          modalForceProjectionALE_<< "# Time t  Boundary ";
           for(int i=0; i<size_projection_boundaries; i++)
-            modalforce_<< name_ALE_boundary_projection_[i]<< " ";
-          modalforce_<<finl;
+            modalForceProjectionALE_<< name_ALE_boundary_projection_[i]<< " ";
+          modalForceProjectionALE_<<finl;
         }
-      modalforce_<< temps<< " ";
+      modalForceProjectionALE_<< temps<< " ";
       for(int i=0; i<size_projection_boundaries; i++)
-        modalforce_<<modalForce[i]<<" ";
-      modalforce_<<finl;
+        modalForceProjectionALE_<<modalForce[i]<<" ";
+      modalForceProjectionALE_<<finl;
     }
 
 
@@ -1015,12 +1015,6 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
     {
       Nom beam_name=beam[count].getBeamName();
       //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
-      std::remove(beam_name+"Displacement1D.txt");
-      std::remove(beam_name+"Velocity1D.txt");
-      std::remove(beam_name+"Acceleration1D.txt");
-      std::remove(beam_name+"Displacement3D.txt");
-      std::remove(beam_name+"Velocity3D.txt");
-      std::remove(beam_name+"Acceleration3D.txt");
       std::remove(beam_name+"ModalForceFluide1D.txt");
       //end delete old files
 
@@ -1038,75 +1032,13 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
 
       if(nb_output_points_1D>0 && je_suis_maitre())
         {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration1D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_1<<output_position_1D[k]<<" ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_2<<output_position_1D[k]<<" ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_3<<output_position_1D[k]<<" ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
+          bool first_writing=true;
+          beam[count].printOutputBeam1D(first_writing);
         }
       if(nb_output_points_3D>0 && je_suis_maitre())
         {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration3D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_1<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 3D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_2<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 3D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_3<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
+          bool first_writing=true;
+          beam[count].printOutputBeam3D(first_writing);
         }
     }
 
