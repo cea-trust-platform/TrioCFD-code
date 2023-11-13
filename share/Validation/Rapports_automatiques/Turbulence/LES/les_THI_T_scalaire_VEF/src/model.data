@@ -72,26 +72,25 @@ Read sch_Impl
 
 } 
 
-Fluide_Incompressible air
-Read air
-{
-	mu  Champ_Uniforme 1 1e-20
- 	rho Champ_Uniforme 1 1.
-  lambda Champ_Uniforme 1 1e-3
-  Cp Champ_Uniforme 1 1.
-  beta_th Champ_Uniforme 1 1.0
-}
 
 Associate pb dom
 Associate pb _SCHTPS_
-Associate pb air
 
 Discretize pb dis
 
 Read pb
 {
-  Navier_Stokes_Turbulent
 
+  Fluide_Incompressible
+  {
+    mu  Champ_Uniforme 1 1e-20
+    rho Champ_Uniforme 1 1.
+    lambda Champ_Uniforme 1 1e-3
+    Cp Champ_Uniforme 1 1.
+    beta_th Champ_Uniforme 1 1.0
+  }
+
+  Navier_Stokes_Turbulent
   {
     solveur_pression Petsc Cholesky { }
     
