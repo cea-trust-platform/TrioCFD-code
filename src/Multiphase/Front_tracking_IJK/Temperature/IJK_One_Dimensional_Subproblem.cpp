@@ -2713,6 +2713,30 @@ double IJK_One_Dimensional_Subproblem::get_discrete_surface_at_level(const int& 
   return surface;
 }
 
+void IJK_One_Dimensional_Subproblem::compute_temperature_integral_subproblem_probe()
+{
+  temperature_integral_ = compute_temperature_integral_subproblem(probe_length_);
+}
+
+double IJK_One_Dimensional_Subproblem::compute_temperature_integral_subproblem(const double& distance)
+{
+  double max_distance = distance;
+  if (distance <= 0 || distance > probe_length_)
+    max_distance = probe_length_;
+  ArrOfDouble discrete_int_eval(*points_per_thermal_subproblem_ - 1);
+  double integral_eval = 0.;
+  const double radial_incr = max_distance / (*points_per_thermal_subproblem_ - 1);
+  for (int i=0; i<(*points_per_thermal_subproblem_) - 1; i++)
+    {
+      discrete_int_eval(i) = get_temperature_profile_at_point(radial_incr * i);
+      discrete_int_eval(i) += get_temperature_profile_at_point(radial_incr * (i + 1));
+      discrete_int_eval(i) *= (radial_incr / 2.);
+      integral_eval += discrete_int_eval(i);
+    }
+  integral_eval *= (1 / (radial_incr + 1e-20));
+  return integral_eval;
+}
+
 void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic, const int rank)
 {
   post_process_interfacial_quantities(fic, rank);

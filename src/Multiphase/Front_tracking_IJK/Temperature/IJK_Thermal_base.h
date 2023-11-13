@@ -323,7 +323,7 @@ public:
   {
     fichier_reprise_temperature_ = lataname;
   }
-  void set_field_T_ana();
+  virtual void set_field_T_ana();
 
   /*
    * Patch from IJK_Thermique

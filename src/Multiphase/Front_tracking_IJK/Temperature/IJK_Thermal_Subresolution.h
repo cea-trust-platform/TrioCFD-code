@@ -62,6 +62,8 @@ public :
   void update_thermal_properties() override;
   void set_param(Param& param) override;
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
+
+  double get_probes_length();
   // Entree& read_fd_solver(Entree& is);
   // void read_fd_solver(const Motcle& mot, Entree& is);
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -234,8 +236,25 @@ protected :
   void enforce_periodic_temperature_boundary_value() override;
   void correct_operators_for_visu() override;
 
+  // void set_field_T_ana() override;
+  void compute_temperature_init() override;
+  void approx_erf_inverse(const double& x, double& res);
+  double compute_spherical_steady_dirichlet_left_right_value(const double& r);
+  double compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r);
+  double compute_spherical_steady_dirichlet_left_right_integral();
+  double find_time_dichotomy_integral(const double& temperature_integral);
+  double find_time_dichotomy_derivative(const double& temperature_derivative);
+
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
+
+  int disable_spherical_diffusion_start_;
+  int single_centred_bubble_;
+  double single_centred_bubble_radius_ini_;
+  double probes_end_value_start_;
+  double probes_end_value_coeff_;
+  int temperature_ini_type_;
+  enum temperature_ini_dict { local_criteria, integral_criteria, derivative_criteria };
 
   int disable_mixed_cells_increment_;
   int enable_mixed_cells_increment_;

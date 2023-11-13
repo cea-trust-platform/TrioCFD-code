@@ -240,7 +240,7 @@ public :
                                                     std::vector<ArrOfDouble>& flux_x,
                                                     std::vector<ArrOfDouble>& flux_y,
                                                     std::vector<ArrOfDouble>& flux_z);
-  // void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override;
+
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
   void compute_thermal_diffusive_fluxes() override;
@@ -283,11 +283,8 @@ public :
                                             const int& check_cell_center_neighbour,
                                             const int& remove_external_neighbour_values,
                                             IJK_Field_int& neighbours_temperature_to_correct_trimmed) override;
-//  void remove_min_max_ijk_reachable_fluxes_discontinuous(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
-//                                                         FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool);
   void remove_min_max_ijk_reachable_fluxes_discontinuous(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
                                                          FixedVector<IJK_Field_local_int, 3>& cell_faces_neighbours_corrected_min_max_bool);
-//  void remove_min_max_ijk_reachable_fluxes_discontinuous(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool);
 protected :
   enum fluxes_type_ { convection, diffusion };
   DoubleVect dist_;

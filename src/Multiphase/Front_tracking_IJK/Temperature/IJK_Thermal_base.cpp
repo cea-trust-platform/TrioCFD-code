@@ -894,19 +894,9 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   if (debug_)
     Cerr << "Compute thermal convective and diffusive fluxes from subproblems" << finl;
   compute_convective_diffusive_fluxes_face_centre();
-//  if (!conv_temperature_negligible_)
-//    compute_convective_fluxes_face_centre();
-//  if (!diff_temperature_negligible_)
-//    compute_diffusive_fluxes_face_centre();
+
   if (!conv_temperature_negligible_ || !diff_temperature_negligible_)
     prepare_ij_fluxes_k_layers();
-
-//  /*
-//   * Interpolate a value for the QUICK SCHEME (first call)
-//   */
-//  if (debug_)
-//    Cerr << "Compute temperature mixed cell centres" << finl;
-//  compute_temperature_cell_centres(0);
 
   /*
    * For post-processing purposes
@@ -935,9 +925,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
    * In case of the subresolution or not
    */
   set_zero_temperature_increment();
-  // correct_temperature_increment_for_interface_leaving_cell();
 
-  // correct_temperature_increment_for_interface_leaving_cell(); // already performed in compute_temperature_cell_centre()
   // calculer_gradient_temperature(temperature_, grad_T_); Routine Aymeric gradient sur faces
 
   Cerr << "[Energy-Budget-T"<<rang_<<"-1-TimeResolution] time t=" << current_time

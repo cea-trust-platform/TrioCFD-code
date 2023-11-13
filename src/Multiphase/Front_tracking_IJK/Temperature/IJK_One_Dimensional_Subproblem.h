@@ -507,6 +507,9 @@ protected :
   void post_process_interfacial_quantities(SFichier& fic, const int rank);
   void post_process_radial_quantities(const int rank);
 
+  void compute_temperature_integral_subproblem_probe();
+  double compute_temperature_integral_subproblem(const double& distance);
+
   enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
   int debug_;
@@ -758,6 +761,7 @@ protected :
   double velocity_shear_stress_ = 0.;
   double velocity_shear_force_ = 0.;
   double pressure_gradient_ = 0.;
+  double temperature_integral_ = 0.;
 
   double delta_T_subcooled_overheated_ = -1.;
 
