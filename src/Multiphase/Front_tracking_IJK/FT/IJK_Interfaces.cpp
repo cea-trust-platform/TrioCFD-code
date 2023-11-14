@@ -5549,14 +5549,19 @@ void IJK_Interfaces::compute_add_external_forces_for_qdm_conservation_in_shear_p
   DoubleTab individual_forces(nb_bulles_reelles_,3);
   for (int idir=0; idir < 3; idir++)
     {
+      std::cout<< "idir = " << idir << std::endl;
       for (int ib=0; ib < nb_bulles_reelles_; ib++)
         {
           if (Process::je_suis_maitre())
             {
               double dx = vitesses_reference_(ib,idir)-vitesses_bulles(ib,idir);
+              std::cout<< "dx = " << dx << std::endl;
+              std::cout<< "vitesses_reference_(ib,idir) = " << vitesses_reference_(ib,idir) << std::endl;
+              std::cout<< "vitesses_bulles(ib,idir) = " << vitesses_bulles(ib,idir) << std::endl;
               individual_forces(ib,idir) = coef_immo*dx;
             }
         }
+      std::cout << std::endl;
     }
   envoyer_broadcast(individual_forces, 0);
 
