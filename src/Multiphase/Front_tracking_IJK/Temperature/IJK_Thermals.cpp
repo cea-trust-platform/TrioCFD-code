@@ -73,6 +73,14 @@ void IJK_Thermals::associer_interface_intersections(const Intersection_Interface
     itr.associer_interface_intersections(intersection_ijk_cell, intersection_ijk_face);
 }
 
+double IJK_Thermals::get_modified_time()
+{
+  double modified_time = 0;
+  for (auto& itr : *this)
+    modified_time = std::max(modified_time, itr.get_modified_time());
+  return modified_time;
+}
+
 void IJK_Thermals::sauvegarder_temperature(Nom& lata_name)
 {
   int idth = 0;
@@ -363,10 +371,8 @@ int IJK_Thermals::get_disable_post_processing_probes_out_files() const
 void IJK_Thermals::thermal_subresolution_outputs()
 {
   const int disable_post_processing_probes_out_files = get_disable_post_processing_probes_out_files();
-  if (!disable_post_processing_probes_out_files)
+  if (!disable_post_processing_probes_out_files && post_pro_first_call_)
     {
-      const int reset = 1;
-      Nom probe_name = Nom("_thermal_subproblems_interfacial_quantities_time_index_") + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
       Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\ttemperature_interp\ttemperature_solution"
                              "\ttemperature_gradient\ttemperature_gradient_sol"
                              "\ttemperature_double_deriv_sol"
@@ -385,11 +391,19 @@ void IJK_Thermals::thermal_subresolution_outputs()
                              "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
                              "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
                              "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
-
-      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+      int rank = 0;
       for (auto& itr : (*this))
-        itr.thermal_subresolution_outputs(fic);
-      fic.close();
+        {
+          const int reset = 1;
+          const int last_time = ref_ijk_ft_->get_tstep();
+          Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
+                           + Nom(last_time) + Nom(".out");
+          SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+          itr.thermal_subresolution_outputs(fic);
+          fic.close();
+          rank++;
+        }
     }
+  post_pro_first_call_++;
 }
 

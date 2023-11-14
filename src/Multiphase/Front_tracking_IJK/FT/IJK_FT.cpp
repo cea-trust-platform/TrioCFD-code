@@ -2503,6 +2503,7 @@ void IJK_FT_double::run()
   post_.compute_extended_pressures(interfaces_.maillage_ft_ijk());
 //post_.compute_phase_pressures_based_on_poisson(0);
 //post_.compute_phase_pressures_based_on_poisson(1);
+  current_time_ = thermals_.get_modified_time();
   if (!first_step_interface_smoothing_)
     {
       Cout << "BF posttraiter_champs_instantanes "

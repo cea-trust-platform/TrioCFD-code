@@ -212,7 +212,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
    */
   oss << "TEMPERATURE_ANA_" << lata_suffix << idx;
   Nom nom_ana(oss.str().c_str());
-  if ((liste_post_instantanes.contient_("TEMPERATURE_ANA")) || (liste_post_instantanes.contient_(nom_ana)))
+  if ((liste_post_instantanes.contient_("TEMPERATURE_ANA")) || (liste_post_instantanes.contient_(nom_ana)) ||
+      (liste_post_instantanes.contient_("ECART_T_ANA")))
     {
       //set_field_data(itr.temperature_ana_, itr.expression_T_ana_, current_time);
       set_field_T_ana();
@@ -223,6 +224,9 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   /*
    * ECART_T_ANA
    */
+  /*
+     * ECART_T_ANA
+     */
   oss << "ECART_T_ANA_" << lata_suffix << idx;
   Nom nom_ecart_ana(oss.str().c_str());
   if ((liste_post_instantanes.contient_("ECART_T_ANA") || liste_post_instantanes.contient_(nom_ecart_ana)))

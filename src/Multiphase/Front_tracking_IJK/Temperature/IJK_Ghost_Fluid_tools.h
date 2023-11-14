@@ -66,7 +66,8 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                                                             const IJK_Field_double& interfacial_area,
                                                             const IJK_Field_double& curvature,
                                                             const	IJK_Field_double& temperature,
-                                                            IJK_Field_double& grad_T_interface);
+                                                            IJK_Field_double& grad_T_interface,
+                                                            const int& spherical_approx);
 
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
                                                               const IJK_Field_double& distance,
@@ -77,4 +78,5 @@ void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
                                            const IJK_Field_double& curvature,
                                            IJK_Field_double& grad_T_interface,
-                                           IJK_Field_double& temperature);
+                                           IJK_Field_double& temperature,
+                                           const int& spherical_approx);

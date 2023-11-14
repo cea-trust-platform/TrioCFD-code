@@ -104,6 +104,9 @@ public :
                                                  const double& alpha);
 
   void pre_initialise_matrix_subproblems(Matrice& matrice, Matrice& fd_operator, const int& max_subproblems_predicted);
+  void pre_initialise_sparse_matrix_subproblems(Matrice& matrix_subproblems,
+                                                Matrice& fd_operator,
+                                                const int& max_subproblems_predicted);
   void complete_empty_matrices_initialisation(Matrice& matrix_subproblems,
                                               Matrice& fd_operator,
                                               const int& empty_problem_start_index,

@@ -114,6 +114,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   fill_rising_velocities_ = 0;
 
   debug_ = 0;
+  spherical_approx_ = 0.;
 
   eulerian_compo_connex_ft_ = nullptr;
   eulerian_compo_connex_ns_ = nullptr;
@@ -278,6 +279,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
   param.ajouter("n_iter_distance", &n_iter_distance_);
   param.ajouter_flag("ghost_fluid", &ghost_fluid_);
+  param.ajouter_flag("spherical_exact", &spherical_approx_);
   param.ajouter_flag("debug", &debug_);
 }
 
@@ -413,6 +415,17 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       nalloc +=1;
     }
 
+  if (liste_post_instantanes_.size() && (liste_post_instantanes_.contient_("TEMPERATURE_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA")))
+    {
+      temperature_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      ecart_t_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc +=2;
+      temperature_ana_.data() = 0.;
+      ecart_t_ana_.data() = 0.;
+      temperature_ana_.echange_espace_virtuel(temperature_ana_.ghost());
+      ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
+    }
+
   /*
    * Resume the calculation
    */
@@ -447,12 +460,6 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   else
     Cerr << "empty";
   Cerr << finl;
-  if (liste_post_instantanes_.size() && (liste_post_instantanes_.contient_("TEMPERATURE_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA")))
-    {
-      temperature_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
-      ecart_t_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
-      nalloc +=2;
-    }
 
   if ((liste_post_instantanes_.contient_("SOURCE_TEMPERATURE_ANA")) || (liste_post_instantanes_.contient_("ECART_SOURCE_TEMPERATURE_ANA")) )
     {
@@ -612,6 +619,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
        * to derive the cross derivatives...
        */
     }
+  spherical_approx_ = !spherical_approx_;
 
   /*
    * FIXME: Temporary need to rewrite IJK_Thermal.cpp posttraitements
@@ -644,6 +652,11 @@ void IJK_Thermal_base::recompute_temperature_init()
 {
   Cout << "Temperature initialization from expression \nTini = " << expression_T_init_ << finl;
   set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->itfce().In(), 0.);
+}
+
+double IJK_Thermal_base::get_modified_time()
+{
+  return ref_ijk_ft_->get_current_time();
 }
 
 void IJK_Thermal_base::compute_cell_volume()
@@ -776,11 +789,8 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
   /*
    * Erase the temperature increment (second call)
    */
-  compute_temperature_cell_centres(1);
-  enforce_periodic_temperature_boundary_value();
-  clip_temperature_values();
-  correct_temperature_for_visu();
-  correct_operators_for_visu();
+  post_process_after_temperature_increment();
+
   temperature_.echange_espace_virtuel(temperature_.ghost());
   const double ene_post = compute_global_energy();
   Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
@@ -956,6 +966,16 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   return;
 }
 
+void IJK_Thermal_base::post_process_after_temperature_increment()
+{
+  compute_temperature_cell_centres(1);
+  enforce_periodic_temperature_boundary_value();
+  clip_temperature_values();
+  correct_temperature_for_visu();
+  set_field_T_ana();
+  correct_operators_for_visu();
+}
+
 void IJK_Thermal_base::compute_eulerian_distance()
 {
   if (compute_distance_)
@@ -1102,7 +1122,8 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
                                                              eulerian_interfacial_area_ft_,
                                                              eulerian_curvature_ft_,
                                                              temperature_ft_,
-                                                             eulerian_grad_T_interface_ft_);
+                                                             eulerian_grad_T_interface_ft_,
+                                                             spherical_approx_);
       /*
        * TODO:
        */
@@ -1111,7 +1132,8 @@ void IJK_Thermal_base::compute_eulerian_grad_T_interface()
                                                              eulerian_interfacial_area_ns_,
                                                              eulerian_curvature_ns_,
                                                              temperature_,
-                                                             eulerian_grad_T_interface_ns_);
+                                                             eulerian_grad_T_interface_ns_,
+                                                             spherical_approx_);
     }
   else
     Cerr << "Don't compute the grad_T_interface field" << finl;
@@ -1157,7 +1179,8 @@ void IJK_Thermal_base::compute_eulerian_temperature_ghost()
                                             eulerian_distance_ft_,
                                             eulerian_curvature_ft_,
                                             eulerian_grad_T_interface_ft_,
-                                            temperature_ft_);
+                                            temperature_ft_,
+                                            spherical_approx_);
       // ref_ijk_ft_->redistribute_from_splitting_ft_elem(temperature_ft_, temperature_);
 
       eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
@@ -1168,7 +1191,8 @@ void IJK_Thermal_base::compute_eulerian_temperature_ghost()
                                             eulerian_distance_ns_,
                                             eulerian_curvature_ns_,
                                             eulerian_grad_T_interface_ns_,
-                                            temperature_);
+                                            temperature_,
+                                            spherical_approx_);
       temperature_.echange_espace_virtuel(temperature_.ghost());
     }
   else

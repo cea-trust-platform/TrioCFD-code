@@ -80,6 +80,7 @@ public :
   void compute_eulerian_curvature_from_interface();
   void thermal_subresolution_outputs();
   int get_disable_post_processing_probes_out_files() const;
+  double get_modified_time();
 
 
 protected :
@@ -88,6 +89,7 @@ protected :
   REF(Switch_FT_double) ref_ijk_ft_switch_;
   REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
   REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+  int post_pro_first_call_ = 0;
 
 };
 

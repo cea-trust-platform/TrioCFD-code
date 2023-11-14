@@ -310,6 +310,7 @@ public:
   {
     return dummy_int_field_;
   }
+  virtual double get_modified_time();
 
   virtual double get_rho_cp_u_ijk(const IJK_Field_double& vx, int i, int j, int k) const;
   virtual double get_div_lambda_ijk(int i, int j, int k) const { return 0; };
@@ -337,7 +338,7 @@ public:
   void compute_dT_rustine(const double dE);
   void compute_T_rust(const FixedVector<IJK_Field_double, 3>& velocity);
 
-  void calculer_ecart_T_ana();
+  virtual void calculer_ecart_T_ana();
   void compute_interfacial_temperature2(
     ArrOfDouble& interfacial_temperature,
     ArrOfDouble& flux_normal_interp); //const ;
@@ -359,6 +360,7 @@ protected:
   void compute_min_cell_delta();
   void compute_cell_diagonal(const IJK_Splitting& splitting);
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
+  virtual void post_process_after_temperature_increment();
   void compute_temperature_convection(const FixedVector<IJK_Field_double, 3>& velocity);
   virtual void add_temperature_diffusion();
   virtual void compute_diffusion_increment()=0;
@@ -604,7 +606,7 @@ protected:
 //  IJK_Field_double eulerian_compo_connex_ns_;
 //  IJK_Field_double eulerian_compo_connex_ghost_ft_;
 //  IJK_Field_double eulerian_compo_connex_ghost_ns_;
-
+  int spherical_approx_;
   const IJK_Field_double * eulerian_compo_connex_ft_;
   const IJK_Field_double * eulerian_compo_connex_ns_;
   const IJK_Field_double * eulerian_compo_connex_ghost_ft_;

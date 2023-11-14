@@ -620,6 +620,22 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::pre_initialise_matr
     }
 }
 
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::pre_initialise_sparse_matrix_subproblems(Matrice& matrix_subproblems,
+                                                                                                      Matrice& fd_operator,
+                                                                                                      const int& max_subproblems)
+{
+  Matrice_Morse& fd_operator_sparse = ref_cast(Matrice_Morse, fd_operator.valeur());
+  const int nb_rows = (fd_operator_sparse.nb_lignes()) * max_subproblems;
+  const int nb_column = (fd_operator_sparse.nb_colonnes()) * max_subproblems;
+  const int nb_coeff = (fd_operator_sparse.nb_coeff()) * max_subproblems;
+
+  matrix_subproblems.typer("Matrice_Morse");
+  Matrice_Morse& sparse_matrix_subproblems  = ref_cast(Matrice_Morse, matrix_subproblems.valeur());
+  sparse_matrix_subproblems.dimensionner(nb_rows, nb_column, nb_coeff);
+}
+
+
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::complete_empty_matrices_initialisation(Matrice& matrix_subproblems,
                                                                                                     Matrice& fd_operator,
                                                                                                     const int& empty_problem_start_index,

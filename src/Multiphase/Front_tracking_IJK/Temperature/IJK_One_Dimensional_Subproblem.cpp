@@ -2747,9 +2747,11 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
 {
   if (Process::je_suis_maitre())
     {
-      if (is_updated_ && is_post_processed_)
+      if (is_updated_)
         {
-          fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+          const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+          const int last_time_index = ref_ijk_ft_->get_tstep();
+          fic << last_time_index << " " << last_time  << " ";
           fic << rank << " " << sub_problem_index_ << " ";
           fic << temperature_interp_[0] << " " << temperature_solution_[0] << " ";
           fic << normal_temperature_gradient_[0] << " " << normal_temperature_gradient_solution_[0] << " ";
@@ -2793,35 +2795,37 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
   //												 "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
   if (Process::je_suis_maitre())
     {
-      // const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
-      const int reset = 1;
-      Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(sub_problem_index_) + ("_radial_quantities_time_index_")
-                       + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
-      Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\tradial_coord"
-                             "\ttemperature_interp\ttemperature_solution"
-                             "\ttemperature_gradient\ttemperature_gradient_sol"
-                             "\ttemperature_double_deriv_sol"
-                             "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
-                             "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
-                             "\ttemperature_diffusion_hessian_cartesian_trace"
-                             "\ttemperature_diffusion_hessian_trace"
-                             "\tradial_temperature_diffusion"
-                             "\ttangential_temperature_diffusion"
-                             "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
-                             "\tpressure"
-                             "\tu_x\tu_y\tu_z"
-                             "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
-                             "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
-                             "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
-                             "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
-                             "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
-                             "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
-      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
-      if (is_updated_ && is_post_processed_)
+      if (is_updated_)
         {
+          // const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+          const int reset = 1;
+          Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(sub_problem_index_) + ("_radial_quantities_time_index_")
+                           + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+          Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\tradial_coord"
+                                 "\ttemperature_interp\ttemperature_solution"
+                                 "\ttemperature_gradient\ttemperature_gradient_sol"
+                                 "\ttemperature_double_deriv_sol"
+                                 "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
+                                 "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
+                                 "\ttemperature_diffusion_hessian_cartesian_trace"
+                                 "\ttemperature_diffusion_hessian_trace"
+                                 "\tradial_temperature_diffusion"
+                                 "\ttangential_temperature_diffusion"
+                                 "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                                 "\tpressure"
+                                 "\tu_x\tu_y\tu_z"
+                                 "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
+                                 "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
+                                 "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
+                                 "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
+                                 "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
+                                 "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
+          SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+          const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+          const int last_time_index = ref_ijk_ft_->get_tstep();
           for (int i=0; i<(*points_per_thermal_subproblem_); i++)
             {
-              fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+              fic << last_time_index << " " << last_time << " ";
               fic << rank << " " << sub_problem_index_ << " ";
               fic << (*radial_coordinates_)[i] << " " << temperature_interp_[i] << " " << temperature_solution_[i] << " ";
               fic << normal_temperature_gradient_[i] << " " << normal_temperature_gradient_solution_[i] << " ";
@@ -2854,8 +2858,8 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
               fic << azymuthal_velocity_normal_gradient_[i] << " ";
               fic << finl;
             }
+          fic.close();
         }
-      fic.close();
     }
 }
 

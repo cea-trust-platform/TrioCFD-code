@@ -191,13 +191,18 @@ public :
   void post_processed_all_probes();
   void sort_limited_probes_spherical_coords_post_processing(const int nb_theta, const int nb_phi,
                                                             const int theta_diag_val, const int phi_diag_val);
-  void compute_overall_quantities_per_bubbles(const double& delta_temperature,
+  void compute_overall_quantities_per_bubbles(const IJK_Field_double& temperature_ghost,
+                                              const double& delta_temperature,
                                               const double& lambda);
-  void compute_nusselt_numbers_per_bubbles(const double& delta_temperature,
+  void compute_nusselt_numbers_per_bubbles(const IJK_Field_double& temperature_gradient_ghost,
+                                           const double& delta_temperature,
                                            const double& lambda);
   void compute_shear_per_bubbles();
-  void compute_overall_bubbles_quantities(const double& delta_temperature,
-                                          const double& lambda);
+  void compute_overall_bubbles_quantities(const IJK_Field_double& temperature_ghost,
+                                          const double& delta_temperature,
+                                          const double& lambda,
+                                          const double& radius,
+                                          const double& spherical_nusselt);
   void compute_overall_nusselt_numbers_bubbles();
   void post_process_overall_bubbles_quantities(const int rank);
 
@@ -209,21 +214,27 @@ protected :
   int reallocate_subproblems_ = 1;
   bool is_updated_ = 0;
   REF(IJK_FT_double) ref_ijk_ft_;
+
   int pre_initialise_thermal_subproblems_list_ = 0;
   double pre_factor_subproblems_number_ = 1.;
 
+  double spherical_nusselt_ = 2.;
   double overall_shear_stress_ = 0.;
   double overall_shear_force_ = 0.;
   double overall_nusselt_number_ = 0.;
+  double overall_nusselt_number_gfm_ = 0.;
   double caracteristic_length_ = 0.;
   double delta_temperature_ = 0.;
   double interfacial_thermal_flux_ = 0.;
+  double interfacial_thermal_flux_gfm_ = 0.;
   double total_surface_ = 0.;
   double lambda_=0.;
 
   ArrOfDouble interfacial_thermal_flux_per_bubble_ ;
+  ArrOfDouble interfacial_thermal_flux_per_bubble_gfm_;
   ArrOfDouble total_surface_per_bubble_;
   ArrOfDouble overall_nusselt_number_per_bubble_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_;
   ArrOfDouble overall_shear_stress_per_bubble_;
   ArrOfDouble overall_shear_force_per_bubble_;
 

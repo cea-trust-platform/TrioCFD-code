@@ -875,7 +875,8 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                                                             const IJK_Field_double& interfacial_area,
                                                             const IJK_Field_double& curvature,
                                                             const	IJK_Field_double& temperature,
-                                                            IJK_Field_double& grad_T_interface)
+                                                            IJK_Field_double& grad_T_interface,
+                                                            const int& spherical_approx)
 {
   /*
    * Compute the normal temperature gradient at the bubble interface
@@ -912,8 +913,15 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
                       const double temperature_liquid = temperature(i+ii,j+jj,k+kk);
                       const double second_order_gradient = temperature_liquid / d;
                       const double kappa = curvature(i+ii,j+jj,k+kk);
+                      double grad_T_modified = 0.;
                       // TODO: Check sign kappa
-                      const double grad_T_modified = second_order_gradient * (1. - 0.5 * kappa * d);
+                      if (spherical_approx)
+                        grad_T_modified = second_order_gradient * (1. - 0.5 * kappa * d);
+                      else
+                        {
+                          const double kappa_non_zero = kappa + 1.e-16;
+                          grad_T_modified = pow((2 / kappa_non_zero + d / 2),2) * second_order_gradient / pow((2 / kappa_non_zero + 0.),2);
+                        }
                       grad_T_interface(i+ii,j+jj,k+kk) = grad_T_modified;
                     }
                 }
@@ -952,7 +960,8 @@ void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
                                            const IJK_Field_double& curvature,
                                            IJK_Field_double& grad_T_interface,
-                                           IJK_Field_double& temperature)
+                                           IJK_Field_double& temperature,
+                                           const int& spherical_approx)
 {
   /*
    * Compute the extended temperature field using prppagated values of the temperature gradient
@@ -972,7 +981,14 @@ void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
           if ((d > invalid_test) && (indicator_vapour > VAPOUR_INDICATOR_TEST) && (grad_T != 0) && (temperature_val == 0))
             {
               const double kappa = curvature(i,j,k);
-              const double temperature_ghost = d * grad_T * (1. + 0.5 * kappa * d + kappa * kappa * d * d / 6.);
+              double temperature_ghost = 0.;
+              if (spherical_approx)
+                temperature_ghost = d * grad_T * (1. + 0.5 * kappa * d + kappa * kappa * d * d / 6.);
+              else
+                {
+                  const double kappa_non_zero = kappa + 1.e-16;
+                  temperature_ghost = grad_T * (2 / kappa_non_zero) * (1 - (2 / kappa_non_zero) / ((2 / kappa_non_zero) + d));
+                }
               temperature(i,j,k) = temperature_ghost;
             }
         }

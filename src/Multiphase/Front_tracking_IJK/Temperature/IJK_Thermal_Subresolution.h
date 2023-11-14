@@ -60,6 +60,7 @@ public :
 
   int initialize(const IJK_Splitting& splitting, const int idx) override;
   void update_thermal_properties() override;
+  void post_process_after_temperature_increment() override;
   void set_param(Param& param) override;
   void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) override;
 
@@ -181,12 +182,18 @@ protected :
   void compute_thermal_subproblems() override;
   void compute_diffusion_increment() override;
   void correct_temperature_increment_for_interface_leaving_cell() override;
+  void correct_any_temperature_fields_for_eulerian_fluxes(IJK_Field_double& temperature);
   void correct_temperature_for_eulerian_fluxes() override;
   void store_temperature_before_extrapolation() override;
+  void compare_temperature_fields(const IJK_Field_double& temperature,
+                                  const IJK_Field_double& temperature_ana,
+                                  IJK_Field_double& error_temperature_ana);
+  void correct_any_temperature_field_for_visu(IJK_Field_double& temperature);
   void correct_temperature_for_visu() override;
   void clip_temperature_values() override;
   void compute_overall_probes_parameters();
-  void pre_initialise_thermal_subproblems_matrix();
+  void pre_initialise_sparse_thermal_subproblems_matrices();
+  void pre_initialise_thermal_subproblems_matrices();
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();
@@ -237,12 +244,17 @@ protected :
   void correct_operators_for_visu() override;
 
   // void set_field_T_ana() override;
+  double get_modified_time() override;
   void compute_temperature_init() override;
+  Nom compute_quasi_static_spherical_diffusion_expression(const double& time_scope);
   void approx_erf_inverse(const double& x, double& res);
+  void set_field_T_ana() override;
+  void calculer_ecart_T_ana() override { ; };
   double compute_spherical_steady_dirichlet_left_right_value(const double& r);
   double compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r);
   double compute_spherical_steady_dirichlet_left_right_integral();
   double find_time_dichotomy_integral(const double& temperature_integral);
+  double compute_Nusselt_spherical_diffusion();
   double find_time_dichotomy_derivative(const double& temperature_derivative);
 
   /* compute_rho_cp_u_mean() May be clearly overridden later */
@@ -254,6 +266,9 @@ protected :
   double probes_end_value_start_;
   double probes_end_value_coeff_;
   int temperature_ini_type_;
+  double modified_time_init_;
+  int spherical_diffusion_;
+  double nusselt_spherical_diffusion_;
   enum temperature_ini_dict { local_criteria, integral_criteria, derivative_criteria };
 
   int disable_mixed_cells_increment_;

@@ -140,6 +140,7 @@ public :
 
   inline void compute_eulerian_curvature_from_interface();
   inline void compute_eulerian_distance();
+  inline double get_modified_time();
 
   void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
   int posttraiter_champs_instantanes_thermal(const Motcles& liste_post_instantanes,
@@ -187,6 +188,11 @@ inline void IJK_Thermal::recompute_temperature_init()
 inline void IJK_Thermal::update_thermal_properties()
 {
   return valeur().update_thermal_properties();
+}
+
+inline double IJK_Thermal::get_modified_time()
+{
+  return valeur().get_modified_time();
 }
 
 inline void IJK_Thermal::euler_time_step(const double timestep)

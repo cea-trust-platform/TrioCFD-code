@@ -28,8 +28,10 @@ Implemente_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems, "IJK_
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
 {
   interfacial_thermal_flux_per_bubble_.set_smart_resize(1);
+  interfacial_thermal_flux_per_bubble_gfm_.set_smart_resize(1);
   total_surface_per_bubble_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_gfm_.set_smart_resize(1);
   overall_shear_stress_per_bubble_.set_smart_resize(1);
   overall_shear_force_per_bubble_.set_smart_resize(1);
 }
@@ -717,7 +719,8 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
       }
 }
 
-void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(const double& delta_temperature,
+void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(const IJK_Field_double& temperature_gradient_ghost,
+                                                                             const double& delta_temperature,
                                                                              const double& lambda)
 {
   std::vector<int> compo_found;
@@ -731,24 +734,32 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(con
   nb_bubbles_ = (int) compo_found.size();
 
   interfacial_thermal_flux_per_bubble_.resize(nb_bubbles_);
+  interfacial_thermal_flux_per_bubble_gfm_.resize(nb_bubbles_);
   total_surface_per_bubble_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_gfm_.resize(nb_bubbles_);
   overall_shear_stress_per_bubble_.resize(nb_bubbles_);
   overall_shear_force_per_bubble_.resize(nb_bubbles_);
-  compute_nusselt_numbers_per_bubbles(delta_temperature, lambda);
+  compute_nusselt_numbers_per_bubbles(temperature_gradient_ghost, delta_temperature, lambda);
   compute_shear_per_bubbles();
   compo_found.clear();
 }
 
-void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(const double& delta_temperature,
-                                                                         const double& lambda)
+void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(const IJK_Field_double& temperature_gradient_ghost,
+                                                                         const double& delta_temperature,
+                                                                         const double& lambda,
+                                                                         const double& radius,
+                                                                         const double& spherical_nusselt)
 {
-  compute_overall_quantities_per_bubbles(delta_temperature, lambda);
+  caracteristic_length_ = radius * 2;
+  spherical_nusselt_ = spherical_nusselt;
+  compute_overall_quantities_per_bubbles(temperature_gradient_ghost, delta_temperature, lambda);
   compute_overall_nusselt_numbers_bubbles();
   is_updated_ = true;
 }
 
-void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const double& delta_temperature,
+void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const IJK_Field_double& temperature_gradient_ghost,
+                                                                          const double& delta_temperature,
                                                                           const double& lambda)
 {
   overall_nusselt_number_ = 0.;
@@ -759,14 +770,24 @@ void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const 
   int local_compo;
   interfacial_thermal_flux_per_bubble_ *= 0.;
   total_surface_per_bubble_ *= 0.;
+  int index_i, index_j, index_k;
   for (int itr=0; itr < subproblems_counter_; itr++)
     {
       local_compo = (*this)[itr].get_compo();
+      (*this)[itr].get_ijk_indices(index_i, index_j, index_k);
+      const double local_temperature_gradient_gfm = temperature_gradient_ghost(index_i, index_j, index_k);
+      const double ai = (*this)[itr].get_local_surface_area();
+      interfacial_thermal_flux_per_bubble_gfm_(local_compo) += local_temperature_gradient_gfm * ai;
       interfacial_thermal_flux_per_bubble_(local_compo) += (*this)[itr].get_interfacial_thermal_flux();
       total_surface_per_bubble_(local_compo) += (*this)[itr].get_local_surface_area();
     }
   for (int i=0; i < nb_bubbles_; i++)
-    overall_nusselt_number_per_bubble_(i) = (interfacial_thermal_flux_per_bubble_(i) * caracteristic_length_) / (total_surface_per_bubble_(i) * delta_temperature_ * lambda_);
+    {
+      overall_nusselt_number_per_bubble_(i) = abs((interfacial_thermal_flux_per_bubble_(i) * caracteristic_length_)
+                                                  / (total_surface_per_bubble_(i) * delta_temperature_ * lambda_));
+      overall_nusselt_number_per_bubble_gfm_(i) = abs((interfacial_thermal_flux_per_bubble_gfm_(i) * caracteristic_length_)
+                                                      / (total_surface_per_bubble_(i) * delta_temperature_ * lambda_));
+    }
 }
 
 void IJK_One_Dimensional_Subproblems::compute_shear_per_bubbles()
@@ -775,6 +796,7 @@ void IJK_One_Dimensional_Subproblems::compute_shear_per_bubbles()
   overall_shear_force_per_bubble_ *= 0.;
   overall_shear_force_ = 0.;
   overall_shear_stress_ = 0.;
+  total_surface_ = 0.;
   for (int itr=0; itr < subproblems_counter_; itr++)
     {
       local_compo = (*this)[itr].get_compo();
@@ -782,9 +804,11 @@ void IJK_One_Dimensional_Subproblems::compute_shear_per_bubbles()
     }
   overall_shear_stress_per_bubble_ = overall_shear_force_per_bubble_;
   for (int i=0; i < nb_bubbles_; i++)
-    overall_shear_stress_per_bubble_(i) *= (1 / total_surface_per_bubble_(i));
-  for (int i=0; i < nb_bubbles_; i++)
-    overall_shear_force_ += overall_shear_force_per_bubble_(i);
+    {
+      overall_shear_stress_per_bubble_(i) *= (1 / total_surface_per_bubble_(i));
+      overall_shear_force_ += overall_shear_force_per_bubble_(i);
+      total_surface_ += total_surface_per_bubble_(i);
+    }
   overall_shear_stress_ = overall_shear_force_ / total_surface_;
 
 }
@@ -792,13 +816,17 @@ void IJK_One_Dimensional_Subproblems::compute_shear_per_bubbles()
 void IJK_One_Dimensional_Subproblems::compute_overall_nusselt_numbers_bubbles()
 {
   overall_nusselt_number_ = 0.;
+  overall_nusselt_number_gfm_ = 0.;
   interfacial_thermal_flux_ = 0.;
+  interfacial_thermal_flux_gfm_ = 0.;
   total_surface_ = 0.;
   for (int i=0; i < nb_bubbles_; i++)
     {
       interfacial_thermal_flux_ += interfacial_thermal_flux_per_bubble_(i);
+      interfacial_thermal_flux_gfm_ += interfacial_thermal_flux_per_bubble_gfm_(i);
       total_surface_ += total_surface_per_bubble_(i);
       overall_nusselt_number_ += overall_nusselt_number_per_bubble_(i);
+      overall_nusselt_number_gfm_ += overall_nusselt_number_per_bubble_gfm_(i);
     }
 }
 
@@ -809,18 +837,37 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
       const int reset = 1;
       Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
                        + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
-      Nom probe_header = Nom("tstep\ttime\tthermalrank"
-                             "\tnusseltoverall");
+      Nom probe_header = Nom("tstep\ttime\tthermalrank\tbubbleindex"
+                             "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical"
+                             "\theatflux\theatfluxgfm"
+                             "\ttotalsurface");
       SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
-      if (is_updated_)
+      int max_counter = nb_bubbles_;
+      for (int i=0; i<max_counter; i++)
         {
-          for (int i=0; i<subproblems_counter_; i++)
-            {
-              fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
-              fic << rank << " ";
-              fic << overall_nusselt_number_ << " ";
-              fic << finl;
-            }
+          fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+          fic << rank << " ";
+          fic << i << " ";
+          fic << overall_nusselt_number_per_bubble_(i) << " ";
+          fic << overall_nusselt_number_per_bubble_gfm_(i) << " ";
+          fic << spherical_nusselt_ << " ";
+          fic << interfacial_thermal_flux_per_bubble_(i) << " ";
+          fic << interfacial_thermal_flux_per_bubble_gfm_(i) << " ";
+          fic << total_surface_per_bubble_(i) << " ";
+          fic << finl;
+        }
+      if(max_counter > 1)
+        {
+          fic << ref_ijk_ft_->get_tstep() << " " << ref_ijk_ft_->get_current_time() << " ";
+          fic << rank << " ";
+          fic << nb_bubbles_ << " ";
+          fic << overall_nusselt_number_ << " ";
+          fic << overall_nusselt_number_gfm_ << " ";
+          fic << spherical_nusselt_ << " ";
+          fic << interfacial_thermal_flux_ << " ";
+          fic << interfacial_thermal_flux_gfm_ << " ";
+          fic << total_surface_ << " ";
+          fic << finl;
         }
       fic.close();
     }
