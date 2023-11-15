@@ -159,7 +159,9 @@ public :
                                                            const double current_time,
                                                            const int idx);
   Entree& typer_thermal( Entree& is );
-  void thermal_subresolution_outputs(SFichier& fic);
+  void thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
+                                     const Nom& overall_bubbles_quantities,
+                                     const Nom& local_quantities_thermal_probes_time_index_folder);
 
 protected:
   int thermal_rank_;

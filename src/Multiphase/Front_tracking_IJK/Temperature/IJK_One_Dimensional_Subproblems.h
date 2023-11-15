@@ -164,7 +164,10 @@ public :
   DoubleVect get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
   double get_temperature_gradient_times_conductivity_profile_at_point(const int& i, const double& dist, const int& dir) const;
-  void thermal_subresolution_outputs(SFichier& fic, const int rank);
+  void thermal_subresolution_outputs(const int& rank,
+                                     const Nom& interfacial_quantities_thermal_probes,
+                                     const Nom& overall_bubbles_quantities,
+                                     const Nom& local_quantities_thermal_probes_time_index_folder);
 
   const int& get_subproblems_counter() const
   {
@@ -189,7 +192,7 @@ public :
   void prepare_temporal_schemes();
   const int& get_end_index_subproblem(const int index) const;
   void post_processed_all_probes();
-  void sort_limited_probes_spherical_coords_post_processing(const int nb_theta, const int nb_phi,
+  void sort_limited_probes_spherical_coords_post_processing(const int& nb_theta, const int& nb_phi,
                                                             const int theta_diag_val, const int phi_diag_val);
   void compute_overall_quantities_per_bubbles(const IJK_Field_double& temperature_ghost,
                                               const double& delta_temperature,
@@ -204,7 +207,7 @@ public :
                                           const double& radius,
                                           const double& spherical_nusselt);
   void compute_overall_nusselt_numbers_bubbles();
-  void post_process_overall_bubbles_quantities(const int rank);
+  void post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities);
 
 protected :
   int init_ = 1;
@@ -229,6 +232,10 @@ protected :
   double interfacial_thermal_flux_gfm_ = 0.;
   double total_surface_ = 0.;
   double lambda_=0.;
+
+  ArrOfDouble radius_outputs_;
+  ArrOfDouble theta_outputs_;
+  ArrOfDouble phi_outputs_;
 
   ArrOfDouble interfacial_thermal_flux_per_bubble_ ;
   ArrOfDouble interfacial_thermal_flux_per_bubble_gfm_;

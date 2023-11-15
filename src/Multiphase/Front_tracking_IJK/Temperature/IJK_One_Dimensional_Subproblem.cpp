@@ -666,14 +666,21 @@ void IJK_One_Dimensional_Subproblem::compute_pure_spherical_basis_vectors()
       Cerr << "r_sph_ = " << r_sph_ << finl;
       Cerr << "theta_sph_ calculation"  << finl;
     }
-  theta_sph_ = atan(sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
-                         + facet_barycentre_relative_[1] * facet_barycentre_relative_[1])/ facet_barycentre_relative_[2]);
+
+//  theta_sph_ = atan(sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
+//                         + facet_barycentre_relative_[1] * facet_barycentre_relative_[1])/ facet_barycentre_relative_[2]);
+  theta_sph_ = atan2(sqrt(facet_barycentre_relative_[0] * facet_barycentre_relative_[0]
+                          + facet_barycentre_relative_[1] * facet_barycentre_relative_[1]), facet_barycentre_relative_[2]);
+  const double atan_theta_incr_ini = M_PI / 2;
+  const double atan_incr_factor = -1;
+  theta_sph_ = (theta_sph_ - atan_theta_incr_ini) * atan_incr_factor;
+
   if (debug_)
     {
       Cerr << "theta_sph_ = " << theta_sph_ << finl;
       Cerr << "phi_sph_ calculation"  << finl;
     }
-  phi_sph_ = atan(facet_barycentre_relative_[1] / facet_barycentre_relative_[0]);
+  phi_sph_ = atan2(facet_barycentre_relative_[1], facet_barycentre_relative_[0]);
 
   if (debug_)
     {
@@ -2737,10 +2744,10 @@ double IJK_One_Dimensional_Subproblem::compute_temperature_integral_subproblem(c
   return integral_eval;
 }
 
-void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic, const int rank)
+void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
 {
   post_process_interfacial_quantities(fic, rank);
-  post_process_radial_quantities(rank);
+  post_process_radial_quantities(rank, local_quantities_thermal_probes_time_index_folder);
 }
 
 void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichier& fic, const int rank) //SFichier& fic)
@@ -2787,7 +2794,7 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
     }
 }
 
-void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int rank)
+void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
 {
   //	Nom probe_header = Nom("tstep\ttime\tthermalproblem\tsubproblem\ttemperature_gradient\ttemperature_double_deriv"
   //												 "ttemperature_gradient_tangential\ttemperature_gradient_tangential2\ttemperature_gradient_azymuthal"
@@ -2820,7 +2827,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                  "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
                                  "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
                                  "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
-          SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+          SFichier fic = Open_file_folder(local_quantities_thermal_probes_time_index_folder, probe_name, probe_header, reset);
           const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
           const int last_time_index = ref_ijk_ft_->get_tstep();
           for (int i=0; i<(*points_per_thermal_subproblem_); i++)

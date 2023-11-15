@@ -68,7 +68,9 @@ public :
   // Entree& read_fd_solver(Entree& is);
   // void read_fd_solver(const Motcle& mot, Entree& is);
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void set_thermal_subresolution_outputs(SFichier& fic) override;
+  void set_thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
+                                         const Nom& overall_bubbles_quantities,
+                                         const Nom& local_quantities_thermal_probes_time_index_folder) override;
 
   const IJK_Field_double& get_debug_lrs_cells() const override
   {
@@ -418,6 +420,10 @@ protected :
   FixedVector<IJK_Field_double, 3> neighbours_faces_weighting_colinearity_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
   IJK_Field_int neighbours_temperature_to_correct_trimmed_;
+
+  int nb_theta_post_pro_;
+  int nb_phi_post_pro_;
+  int nb_probes_post_pro_;
 
 };
 

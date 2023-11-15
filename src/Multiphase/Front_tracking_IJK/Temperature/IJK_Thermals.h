@@ -25,6 +25,7 @@
 #include <IJK_Thermal.h>
 #include <TRUSTList.h>
 #include <TRUST_List.h>
+#include <System.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -82,6 +83,9 @@ public :
   int get_disable_post_processing_probes_out_files() const;
   double get_modified_time();
 
+  void create_folders_for_probes();
+  void create_folders(Nom folder_name_base);
+
 
 protected :
   REF(IJK_FT_double) ref_ijk_ft_;
@@ -90,6 +94,14 @@ protected :
   REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
   REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
   int post_pro_first_call_ = 0;
+
+  System make_dir_for_out_files_;
+  LIST(Nom) thermal_rank_folder_;
+  Nom overall_bubbles_quantities_folder_;
+  Nom interfacial_quantities_thermal_probes_folder_;
+  Nom local_quantities_thermal_probes_folder_;
+  Nom local_quantities_thermal_probes_time_index_folder_;
+  int ini_folder_out_files_ = 0;
 
 };
 

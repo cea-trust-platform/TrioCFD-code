@@ -34,6 +34,9 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   overall_nusselt_number_per_bubble_gfm_.set_smart_resize(1);
   overall_shear_stress_per_bubble_.set_smart_resize(1);
   overall_shear_force_per_bubble_.set_smart_resize(1);
+  radius_outputs_.set_smart_resize(1);
+  theta_outputs_.set_smart_resize(1);
+  phi_outputs_.set_smart_resize(1);
 }
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
@@ -509,11 +512,42 @@ DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_condu
   return (*this)[i].get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(dist, level, dir);
 }
 
-void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(SFichier& fic, const int rank)
+void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& rank,
+                                                                    const Nom& interfacial_quantities_thermal_probes,
+                                                                    const Nom& overall_bubbles_quantities,
+                                                                    const Nom& local_quantities_thermal_probes_time_index_folder)
 {
+  const int reset = 1;
+  const int last_time = ref_ijk_ft_->get_tstep();
+  Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\ttemperature_interp\ttemperature_solution"
+                         "\ttemperature_gradient\ttemperature_gradient_sol"
+                         "\ttemperature_double_deriv_sol"
+                         "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
+                         "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
+                         "\ttemperature_diffusion_hessian_cartesian_trace"
+                         "\ttemperature_diffusion_hessian_trace"
+                         "\tradial_temperature_diffusion"
+                         "\ttangential_temperature_diffusion"
+                         "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                         "\tpressure"
+                         "\tu_x\tu_y\tu_z"
+                         "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
+                         "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
+                         "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
+                         "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
+                         "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
+                         "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
+
+  Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
+                   + Nom(last_time) + Nom(".out");
+
+  SFichier fic = Open_file_folder(interfacial_quantities_thermal_probes, probe_name, probe_header, reset);
+
   for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].thermal_subresolution_outputs(fic, rank);
-  post_process_overall_bubbles_quantities(rank);
+    (*this)[itr].thermal_subresolution_outputs(fic, rank, local_quantities_thermal_probes_time_index_folder);
+  fic.close();
+
+  post_process_overall_bubbles_quantities(rank, overall_bubbles_quantities);
 }
 
 double IJK_One_Dimensional_Subproblems::get_min_temperature() const
@@ -648,7 +682,7 @@ void IJK_One_Dimensional_Subproblems::post_processed_all_probes()
     (*this)[itr].set_post_processing_theta_phi_scope();
 }
 
-void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_processing(const int nb_theta, const int nb_phi,
+void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_processing(const int& nb_theta, const int& nb_phi,
                                                                                            const int theta_diag_val, const int phi_diag_val)
 {
   ArrOfDouble r_sph(subproblems_counter_);
@@ -671,29 +705,35 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
       theta_sph(i) = (*this)[i].get_theta_spherical_coords();
       phi_sph(i) = (*this)[i].get_phi_spherical_coords();
     }
-  const int nb_outputs = nb_phi_even * nb_theta_even;
-  int theta_incr;
-  int phi_incr;
-  theta_incr = (int) (M_PI / (double) nb_theta_even);
-  phi_incr = (int) ((2 * M_PI) / (double) nb_phi_even);
+  int nb_outputs = ((nb_phi_even * nb_theta_even) > subproblems_counter_) ? subproblems_counter_ : (nb_phi_even * nb_theta_even);
+  nb_theta_even = (nb_outputs == subproblems_counter_) ? (int) sqrt(2 * subproblems_counter_) / 2 : nb_theta_even;
+  nb_phi_even = (nb_outputs == subproblems_counter_) ? (int) sqrt(2 * subproblems_counter_) : nb_phi_even;
+  nb_outputs = nb_phi_even * nb_theta_even;
+  double theta_incr, phi_incr;
+  theta_incr = (double) (M_PI / (double) nb_theta_even);
+  phi_incr = (double) ((2 * M_PI) / (double) nb_phi_even);
+  const double atan_theta_incr_ini = M_PI / 2;
+  const double atan_incr_factor = -1;
+  const double atan_phi_incr_ini = M_PI;
+  // PI/2 -> -PI/2
   if (theta_diag_val)
     for (i=0; i<nb_theta_even; i++)
-      theta_scope.append_array(theta_incr * (i + 0.5));
+      theta_scope.append_array((theta_incr * (i + 0.5) - atan_theta_incr_ini) * atan_incr_factor);
   else
     for (i=0; i<nb_theta_even; i++)
-      theta_scope.append_array(theta_incr * i);
+      theta_scope.append_array((theta_incr * i - atan_theta_incr_ini) * atan_incr_factor);
   if (phi_diag_val)
     for (i=0; i<nb_phi_even; i++)
-      phi_scope.append_array(phi_incr * (i + 0.5));
+      phi_scope.append_array(phi_incr * (i + 0.5) - atan_phi_incr_ini);
   else
     for (i=0; i<nb_phi_even; i++)
-      phi_scope.append_array(phi_incr * i);
+      phi_scope.append_array(phi_incr * i - atan_phi_incr_ini);
   /*
    * Sort by phi and theta simultaneously
    */
-  ArrOfDouble radius_outputs(nb_outputs);
-  ArrOfDouble theta_outputs(nb_outputs);
-  ArrOfDouble phi_outputs(nb_outputs);
+  radius_outputs_.resize(nb_outputs);
+  theta_outputs_.resize(nb_outputs);
+  phi_outputs_.resize(nb_outputs);
   int phi_theta_counter = 0;
   for (j=0; j<nb_phi_even; j++)
     for (i=0; i<nb_theta_even; i++)
@@ -712,9 +752,9 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
           }
         const int theta_phi_scope_index = (int) std::distance(sum_errors_theta_phi_scope.begin(), std::min_element(sum_errors_theta_phi_scope.begin(), sum_errors_theta_phi_scope.end()));
         (*this)[theta_phi_scope_index].set_post_processing_theta_phi_scope();
-        radius_outputs(phi_theta_counter) = r_sph(theta_phi_scope_index);
-        theta_outputs(phi_theta_counter) = theta_sph(theta_phi_scope_index);
-        phi_outputs(phi_theta_counter) = phi_sph(theta_phi_scope_index);
+        radius_outputs_(phi_theta_counter) = r_sph(theta_phi_scope_index);
+        theta_outputs_(phi_theta_counter) = theta_sph(theta_phi_scope_index);
+        phi_outputs_(phi_theta_counter) = phi_sph(theta_phi_scope_index);
         phi_theta_counter ++;
       }
 }
@@ -751,6 +791,10 @@ void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(const I
                                                                          const double& radius,
                                                                          const double& spherical_nusselt)
 {
+  /*
+   * TODO: How to do it in parallel ?
+   */
+  // if (Process::je_suis_maitre())
   caracteristic_length_ = radius * 2;
   spherical_nusselt_ = spherical_nusselt;
   compute_overall_quantities_per_bubbles(temperature_gradient_ghost, delta_temperature, lambda);
@@ -769,6 +813,9 @@ void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const 
   delta_temperature_ = delta_temperature;
   int local_compo;
   interfacial_thermal_flux_per_bubble_ *= 0.;
+  interfacial_thermal_flux_per_bubble_gfm_ *= 0.;
+  overall_nusselt_number_per_bubble_ *= 0.;
+  overall_nusselt_number_per_bubble_gfm_ *= 0.;
   total_surface_per_bubble_ *= 0.;
   int index_i, index_j, index_k;
   for (int itr=0; itr < subproblems_counter_; itr++)
@@ -777,7 +824,7 @@ void IJK_One_Dimensional_Subproblems::compute_nusselt_numbers_per_bubbles(const 
       (*this)[itr].get_ijk_indices(index_i, index_j, index_k);
       const double local_temperature_gradient_gfm = temperature_gradient_ghost(index_i, index_j, index_k);
       const double ai = (*this)[itr].get_local_surface_area();
-      interfacial_thermal_flux_per_bubble_gfm_(local_compo) += local_temperature_gradient_gfm * ai;
+      interfacial_thermal_flux_per_bubble_gfm_(local_compo) += (local_temperature_gradient_gfm * ai * lambda_);
       interfacial_thermal_flux_per_bubble_(local_compo) += (*this)[itr].get_interfacial_thermal_flux();
       total_surface_per_bubble_(local_compo) += (*this)[itr].get_local_surface_area();
     }
@@ -830,7 +877,7 @@ void IJK_One_Dimensional_Subproblems::compute_overall_nusselt_numbers_bubbles()
     }
 }
 
-void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(const int rank)
+void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities)
 {
   if (Process::je_suis_maitre())
     {
@@ -841,7 +888,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
                              "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical"
                              "\theatflux\theatfluxgfm"
                              "\ttotalsurface");
-      SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
+      SFichier fic = Open_file_folder(overall_bubbles_quantities, probe_name, probe_header, reset);
       int max_counter = nb_bubbles_;
       for (int i=0; i<max_counter; i++)
         {

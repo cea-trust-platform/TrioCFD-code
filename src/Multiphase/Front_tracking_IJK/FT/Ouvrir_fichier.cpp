@@ -25,10 +25,33 @@
 // msg   : message a imprimer
 // head  : Si (reset=1), ios::out, on cree une entete : "# "+message+\n
 SFichier Ouvrir_fichier(const Nom& suffix,
-                        const Nom& head, const int reset,
-                        const int prec )
+                        const Nom& head,
+                        const int reset,
+                        const int prec)
 {
   Nom s( Objet_U::nom_du_cas());
+  s+= suffix;
+  IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
+  SFichier fic;
+  fic.ouvrir(s,mode);
+  if (reset)
+    fic << "# " << head << finl;
+  fic.setf(ios::scientific);
+  fic.precision(prec);
+  //fic << msg;
+  return fic;
+}
+
+SFichier Open_file_folder(const Nom& folder,
+                          const Nom& suffix,
+                          const Nom& head,
+                          const int reset,
+                          const int prec)
+{
+
+  Nom s(folder);
+  s+= "/";
+  s+= Nom(Objet_U::nom_du_cas());
   s+= suffix;
   IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
   SFichier fic;

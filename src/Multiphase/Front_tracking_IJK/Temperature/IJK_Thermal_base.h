@@ -350,7 +350,9 @@ public:
   void compute_eulerian_curvature_from_interface();
   virtual void update_intersections() { ; };
   virtual void clean_ijk_intersections() { ; };
-  virtual void set_thermal_subresolution_outputs(SFichier& fic) { ; };
+  virtual void set_thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
+                                                 const Nom& overall_bubbles_quantities,
+                                                 const Nom& local_quantities_thermal_probes_time_index_folder) { ; };
   virtual void compute_temperature_init();
   virtual void recompute_temperature_init();
 

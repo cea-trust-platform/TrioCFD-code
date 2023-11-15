@@ -123,13 +123,19 @@ void IJK_Thermals::compute_timestep(double& dt_thermals, const double dxmin)
 void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
 {
   int idth =0;
+  Nom thermal_outputs_rank_base = Nom("thermal_outputs_rank_");
   for (auto& itr : (*this))
     {
       nalloc += itr.initialize(splitting, idth);
       if (!ref_ijk_ft_->disable_diphasique())
         itr.update_thermal_properties();
+      thermal_rank_folder_.add(thermal_outputs_rank_base + Nom(idth));
       idth++;
     }
+  overall_bubbles_quantities_folder_ = Nom("overall_bubbles_quantities");
+  interfacial_quantities_thermal_probes_folder_ = Nom("interfacial_quantities_thermal_probes");
+  local_quantities_thermal_probes_folder_ = Nom("local_quantities_thermal_probes");
+  local_quantities_thermal_probes_time_index_folder_ = Nom("local_quantities_thermal_probes_time_index_");
 }
 
 void IJK_Thermals::recompute_temperature_init()
@@ -373,37 +379,55 @@ void IJK_Thermals::thermal_subresolution_outputs()
   const int disable_post_processing_probes_out_files = get_disable_post_processing_probes_out_files();
   if (!disable_post_processing_probes_out_files && post_pro_first_call_)
     {
-      Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\ttemperature_interp\ttemperature_solution"
-                             "\ttemperature_gradient\ttemperature_gradient_sol"
-                             "\ttemperature_double_deriv_sol"
-                             "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
-                             "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
-                             "\ttemperature_diffusion_hessian_cartesian_trace"
-                             "\ttemperature_diffusion_hessian_trace"
-                             "\tradial_temperature_diffusion"
-                             "\ttangential_temperature_diffusion"
-                             "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
-                             "\tpressure"
-                             "\tu_x\tu_y\tu_z"
-                             "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
-                             "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
-                             "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
-                             "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
-                             "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
-                             "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
-      int rank = 0;
-      for (auto& itr : (*this))
+      if(!ini_folder_out_files_)
         {
-          const int reset = 1;
-          const int last_time = ref_ijk_ft_->get_tstep();
-          Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
-                           + Nom(last_time) + Nom(".out");
-          SFichier fic = Ouvrir_fichier(probe_name, probe_header, reset);
-          itr.thermal_subresolution_outputs(fic);
-          fic.close();
-          rank++;
+          if (Process::je_suis_maitre())
+            create_folders_for_probes();
+          ini_folder_out_files_ = 1;
+        }
+
+      if (Process::je_suis_maitre())
+        {
+          int rank = 0;
+          for (auto& itr : (*this))
+            {
+              const int last_time = ref_ijk_ft_->get_tstep();
+              Nom local_quantities_thermal_probes_time_index_folder = thermal_rank_folder_[rank] + "/"
+                                                                      + local_quantities_thermal_probes_folder_ + "/"
+                                                                      + local_quantities_thermal_probes_time_index_folder_ + Nom(last_time);
+              Nom overall_bubbles_quantities = thermal_rank_folder_[rank] + "/" + overall_bubbles_quantities_folder_;
+              Nom interfacial_quantities_thermal_probes = thermal_rank_folder_[rank] + "/" + interfacial_quantities_thermal_probes_folder_;
+
+              create_folders(local_quantities_thermal_probes_time_index_folder);
+
+              itr.thermal_subresolution_outputs(interfacial_quantities_thermal_probes,
+                                                overall_bubbles_quantities,
+                                                local_quantities_thermal_probes_time_index_folder);
+              rank++;
+            }
         }
     }
   post_pro_first_call_++;
 }
 
+void IJK_Thermals::create_folders_for_probes()
+{
+  for (int idth = 0; idth < (*this).size(); idth++)
+    {
+      create_folders(thermal_rank_folder_[idth]);
+      create_folders(thermal_rank_folder_[idth] + "/" + overall_bubbles_quantities_folder_);
+      create_folders(thermal_rank_folder_[idth] + "/" + interfacial_quantities_thermal_probes_folder_);
+      create_folders(thermal_rank_folder_[idth] + "/" + local_quantities_thermal_probes_folder_);
+    }
+}
+
+void IJK_Thermals::create_folders(Nom folder_name_base)
+{
+  std::string spacing = " ";
+  std::string folder_name = "\"mkdir -p";
+  folder_name = folder_name + spacing + folder_name_base.getString() + spacing + "\" donothing";
+  istringstream folder_name_istringstream(folder_name.c_str());
+  istream& folder_name_istream = folder_name_istringstream;
+  Entree folder_name_entry(folder_name_istream);
+  make_dir_for_out_files_.interpreter(folder_name_entry);
+}

@@ -232,7 +232,7 @@ public :
                                             const double& first_dir, const double& second_dir,
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;
   double get_discrete_surface_at_level(const int& dir, const int& level) const;
-  void thermal_subresolution_outputs(SFichier& fic, const int rank);
+  void thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
 
   double get_min_temperature() const;
   double get_max_temperature() const;
@@ -505,7 +505,7 @@ protected :
   void find_interval(const double& dist, int& left_interval, int& right_interval) const;
 
   void post_process_interfacial_quantities(SFichier& fic, const int rank);
-  void post_process_radial_quantities(const int rank);
+  void post_process_radial_quantities(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
 
   void compute_temperature_integral_subproblem_probe();
   double compute_temperature_integral_subproblem(const double& distance);
