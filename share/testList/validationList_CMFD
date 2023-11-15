@@ -7,6 +7,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/LiuBankoff
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/marche_descendante
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/shock_dodecane
+./share/Validation/Rapports_automatiques/Multiphase/CMFD/Tube_solution_analytique_turbulent
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification1D_drift-flux_models
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification_k_tau_omega_transport_equation
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification_wall_laws
