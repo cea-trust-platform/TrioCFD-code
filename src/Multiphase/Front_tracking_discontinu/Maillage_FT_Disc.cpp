@@ -5413,7 +5413,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
     {
       // Si la facette est reelle, on ajoute la contribution a la differentielle
       // des deux ou trois sommets
-     if (! facette_virtuelle(facette))
+      if (! facette_virtuelle(facette))
         {
           if (!bidim_axi)
             {
