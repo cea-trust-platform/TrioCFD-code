@@ -95,5 +95,12 @@ void OpConvIJKQuickScalar_double::compute_flux_(IJK_Field_local_double& resu, co
       curv_values.next_j();
       resu_ptr.next_j();
     }
+
+  if(_DIR_==DIRECTION::Z)
+    {
+      // store curv and fram for next layer of fluxes in z direction
+      shift_curv_fram(tmp_curv_fram_);
+      stored_curv_fram_layer_z_ = k_layer;
+    }
 }
 #endif
