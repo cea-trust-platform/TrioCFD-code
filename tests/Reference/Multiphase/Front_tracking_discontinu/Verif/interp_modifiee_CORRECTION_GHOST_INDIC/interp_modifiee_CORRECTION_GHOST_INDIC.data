@@ -115,7 +115,7 @@ Associate pb fluide
 Associate pb sch
 VDF dis
 Discretize pb dis
-system "mkdir -p bug"
+system "mkdir -p lata"
 option_vdf { All_options } # To set the BC of pressure on the Boundary, not at the center of ghost cells! #
 Lire pb
 {
@@ -207,7 +207,7 @@ Lire pb
    {
     postraitement_ft_lata post1 { 
      format Lata 
-     fichier bug/interp_modifiee_CORRECTION_GHOST_INDIC 
+     fichier lata/interp_modifiee_CORRECTION_GHOST_INDIC 
      champs dt_post 1.0e-4 # -4 # { 
         VOLUME_MAILLE elem 
         indicatrice_interf elem 
@@ -238,8 +238,8 @@ Lire pb
     }   
    }
 
-sauvegarde binaire bug.sauv
-sauvegarde xyz bug.xyz
+sauvegarde binaire lata.sauv
+sauvegarde xyz lata.xyz
 # Resume_last_time xyz restart.xyz #
 Reprise xyz restart.xyz 
 
