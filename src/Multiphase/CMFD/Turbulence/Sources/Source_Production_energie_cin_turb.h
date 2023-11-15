@@ -39,6 +39,7 @@ class Source_Production_energie_cin_turb: public Sources_Multiphase_base
 public :
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override=0;
+  double omega_min_ = 1;
 };
 
 #endif

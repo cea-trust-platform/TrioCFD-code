@@ -48,7 +48,7 @@ private:
   double delta_ = 1.3 ; // rapport volume perturbe par la bulle / volume de la bulle
   double gamma_ = 1. ; //rapport d'aspect des bulles
   double limiteur_alpha_ = 1e-6;
-  double C_s = 1.;
+  double C_s = -1.;
 };
 
 #endif

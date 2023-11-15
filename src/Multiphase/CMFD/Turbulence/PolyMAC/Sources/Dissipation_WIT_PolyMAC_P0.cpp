@@ -36,7 +36,7 @@
 #include <Viscosite_turbulente_base.h>
 #include <Viscosite_turbulente_multiple.h>
 #include <TRUSTTab_parts.h>
-
+#include <Interface_sigma_constant.h>
 
 Implemente_instanciable(Dissipation_WIT_PolyMAC_P0,"Dissipation_WIT_Elem_PolyMAC_P0", Source_base);
 
@@ -48,7 +48,8 @@ Sortie& Dissipation_WIT_PolyMAC_P0::printOn(Sortie& os) const
 Entree& Dissipation_WIT_PolyMAC_P0::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("C_d_star", &C_d_star_, Param::REQUIRED);
+  param.ajouter("C_d_star", &C_d_star_);
+  param.ajouter("constante_gravitation", &g_);
   param.ajouter("C_lambda", &C_lambda_);
   param.lire_avec_accolades_depuis(is);
 
@@ -71,27 +72,47 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
 {
   const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
-  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
+  //const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();
   const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").valeurs();
   const DoubleTab&                           nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        k_WIT = equation().inconnue().passe();
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
-
   int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
   if (Nk!=1) Process::exit("WIT is only in the liquid phase");
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 
+  // On récupère la tension superficielle sigma
+  const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
+  const DoubleTab& press = equation().probleme().get_champ("pression").passe();
+  const DoubleTab& temp  = equation().probleme().get_champ("temperature").passe();
+  const int nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  DoubleTrav Sigma_tab(ne,nb_max_sat);
+  int Np = press.line_size();
+  for (int k = 0; k < N; k++)
+    {
+      for (int l = k + 1; l < N; l++)
+        {
+          Interface_base& sat = milc.get_interface(k,l);
+          const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+          for (int i = 0 ; i<ne ; i++) Sigma_tab(i,ind_trav) = sat.sigma(temp(i,k),press(i,k * (Np > 1))) ;
+        }
+    }
+
   // On calcule le second membre aux elements (implicite uniquement pour le moment)
   for(int e = 0 ; e < ne ; e++)
     for (int k = 0 ; k<N ; k++)
-      if (k!=n_l)
+      if (k!=n_l) // n_l est l'indice de la phase continue/liquide (n_l=0)
         {
           double u_r = 0;
           for (int d = 0; d < D; d++) u_r += (vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l))*(vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l)); // relative speed = gas speed - liquid speed
           u_r = std::sqrt(u_r);
-          double Reb = diam(e,k)*u_r/nu(e,k);
-          secmem(e, 0) -= ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * 2 * nu(e, n_l) * C_d_star_ * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
+          double Reb = diam(e,k)*u_r/nu(e,n_l);
+          int ind_trav = (k>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (k-n_l-1) : (k*(N-1)-(k-1)*(k)/2) + (n_l-k-1);
+          double Eo = g_ * std::abs(tab_rho(e, n_l)-tab_rho(e, k)) * diam(e, k)*diam(e, k)/Sigma_tab(e, ind_trav);
+          // Tomiyama codé en dur
+          double Cd = (u_r!=0) ? std::max( std::min( 16./Reb*(1+0.15*std::pow(Reb, 0.687)) , 48./Reb )   , 8.*Eo/(3.*(Eo+4.))) : 0; // si u_r=0 alors pas de trainée, pas de WIT donc dissipation=0
+          secmem(e, 0) -= ve(e) * pe(e) * 2. * nu(e, n_l) * Cd * Reb * k_WIT(e, 0) / (C_lambda_*C_lambda_*diam(e,k)*diam(e,k));
         }
 }

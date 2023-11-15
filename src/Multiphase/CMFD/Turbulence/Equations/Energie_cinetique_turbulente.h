@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Energie_cinetique_turbulente.h
-// Directory:   $TRUST_ROOT/src/Turbulence/Equations
-// Version:     /main/20
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #ifndef Energie_cinetique_turbulente_included
 #define Energie_cinetique_turbulente_included
@@ -34,13 +27,12 @@
  */
 class Energie_cinetique_turbulente : public Convection_diffusion_turbulence_multiphase
 {
-  Declare_instanciable_sans_constructeur(Energie_cinetique_turbulente);
-
+  Declare_instanciable(Energie_cinetique_turbulente);
 public :
 
-  Energie_cinetique_turbulente();
-
+  void set_param(Param& titi) override;
   void discretiser() override;
+  void mettre_a_jour(double) override;
 
   const Champ_Don& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
@@ -49,8 +41,12 @@ public :
   static void calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
-    return { "alpha_rho_k", calculer_alpha_rho_k };
+    return { "k", calculer_alpha_rho_k };
   }
+
+protected:
+  double coef_limit_ = -1;
+  int limit_k_ = 0;
 };
 
 #endif
