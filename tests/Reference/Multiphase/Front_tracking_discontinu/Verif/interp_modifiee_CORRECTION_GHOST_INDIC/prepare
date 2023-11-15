@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# To generate the restart.xyz, you have to manually run this prepare.data : 
+sed -e "s/tinit .*/tinit 0./" \
+    -e "s/ tmax .*/ tmax 2.500000e-03/" \
+    -e "/restart.xyz/d" \
+    -e "s/lata.xyz/restart.xyz/" \
+    template.data > prepare.data
+
 for i in "interp_standard" "interp_modifiee" "interp_ai_based" 
 do
   #for j in "CORRECTION_GHOST_INDIC"
