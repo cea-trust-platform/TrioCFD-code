@@ -116,6 +116,8 @@ protected:
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
   Noms name_boundary_with_Neumann_BC; // Names of the boundary with Neumann CL for the grid problem (optional)
+  mutable SFichier modalForceProjectionALE_; //post-processing file
+  mutable SFichier modalForceBeam_; //post-processing file
 };
 
 

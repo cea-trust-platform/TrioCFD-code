@@ -42,6 +42,8 @@
 #include <communications.h>
 #include <Faces.h>
 #include <CL_Types_include.h>
+#include <EFichier.h>
+
 
 
 
@@ -265,19 +267,28 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
     }
   mp_sum(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName.txt file
+
+  // Write the result in the Cas_ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      std::string nom="ModalForce_";
-      nom += name_ALE_boundary_projection;
-      nom +="_";
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce_";
+      filename+=name_ALE_boundary_projection;
+      filename +="_";
       std::string index(std::to_string(nb_mode));
-      nom +=index;
-      nom+=".txt";
-      std::ofstream ofs_1;
-      ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-      ofs_1<<temps<<" "<<modalForce;
-      ofs_1<<endl;
-      ofs_1.close();
+      filename+=index;
+      filename+=".out";
+      if (!modalForceProjectionALE_.is_open())
+        {
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
+        }
+      // comments are added to the file header
+      if (first_writing)
+        modalForceProjectionALE_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
+
+      modalForceProjectionALE_<< temps<< " "<<modalForce<<" "<<finl;
     }
 }
 //Compute the fluid force projected within the requested boundaries
@@ -329,23 +340,32 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 
   mp_sum_for_each_item(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName_[i].txt file
+
+  // Write the result in the ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      for(int i=0; i<size_projection_boundaries; i++)
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce.out";
+      if (!modalForceProjectionALE_.is_open())
         {
-          std::string nom="ModalForce_";
-          nom += name_ALE_boundary_projection_[i];
-          nom +="_";
-          std::string index(std::to_string(i+1));
-          nom +=index;
-          nom+=".txt";
-          std::ofstream ofs_1;
-          ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-          ofs_1<<temps<<" "<<modalForce[i];
-          ofs_1<<endl;
-          ofs_1.close();
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
         }
+      // comments are added to the file header
+      if (first_writing)
+        {
+          modalForceProjectionALE_<< "# Time t  Boundary ";
+          for(int i=0; i<size_projection_boundaries; i++)
+            modalForceProjectionALE_<< name_ALE_boundary_projection_[i]<< " ";
+          modalForceProjectionALE_<<finl;
+        }
+      modalForceProjectionALE_<< temps<< " ";
+      for(int i=0; i<size_projection_boundaries; i++)
+        modalForceProjectionALE_<<modalForce[i]<<" ";
+      modalForceProjectionALE_<<finl;
     }
+
 
 }
 
@@ -1066,100 +1086,14 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
     }
   else
     {
-      Nom beam_name=beam[count].getBeamName();
-      //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
-      std::remove(beam_name+"Displacement1D.txt");
-      std::remove(beam_name+"Velocity1D.txt");
-      std::remove(beam_name+"Acceleration1D.txt");
-      std::remove(beam_name+"Displacement3D.txt");
-      std::remove(beam_name+"Velocity3D.txt");
-      std::remove(beam_name+"Acceleration3D.txt");
-      std::remove(beam_name+"ModalForceFluide1D.txt");
-      //end delete old files
-
       if(je_suis_maitre())
         {
-          //prepare the headers of the output file ModalForceFluide1D
-          std::ofstream ofs;
-          ofs.open (beam_name+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-          ofs<<"# Printing modal 1D fluid force: time mode  ";
-          for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
-          ofs<<endl;
-          ofs.close();
-          //end prepare the headers of the output file ModalForceFluide1D
-        }
-
-      if(nb_output_points_1D>0 && je_suis_maitre())
-        {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration1D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_1<<output_position_1D[k]<<" ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_2<<output_position_1D[k]<<" ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_3<<output_position_1D[k]<<" ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
-        }
-      if(nb_output_points_3D>0 && je_suis_maitre())
-        {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration3D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_1<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 3D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_2<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 3D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_3<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
+          bool first_writing=true;
+          beam[count].printOutputFluidForceOnBeam(first_writing);
+          if (nb_output_points_1D>0)
+            beam[count].printOutputBeam1D(first_writing);
+          if (nb_output_points_3D>0)
+            beam[count].printOutputBeam3D(first_writing);
         }
     }
 
@@ -1380,13 +1314,6 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   beam[i].setFluidForceOnBeam(fluidForceOnBeam);
   if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
     {
-      std::ofstream ofs_1;
-      ofs_1.precision(32);
-      ofs_1.open (beam[i].getBeamName()+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<beam[i].getTempsComputeForceOnBeam()<<" ";
-      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
-      ofs_1<<endl;
-      ofs_1.close();
+      beam[i].printOutputFluidForceOnBeam();
     }
 }

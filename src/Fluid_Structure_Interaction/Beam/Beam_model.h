@@ -27,6 +27,7 @@
 #include <Nom.h>
 #include <Bords.h>
 #include <Motcle.h>
+#include <SFichier.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -85,8 +86,9 @@ public :
   inline  const DoubleTab& getDisplacement(int i) const;
   inline  const DoubleTab& getRotation(int i) const;
   void saveBeamForRestart() const;
-  void printOutputPosition1D() const;
-  void printOutputPosition3D() const;
+  void printOutputBeam1D(bool first_writing=false) const;
+  void printOutputBeam3D(bool first_writing=false) const;
+  void printOutputFluidForceOnBeam(bool first_writing=false) const;
   inline void setFluidForceOnBeam(const DoubleVect&);
   inline void setTempsComputeForceOnBeam(const double&);
   inline const double& getTempsComputeForceOnBeam() const;
@@ -109,8 +111,8 @@ protected :
   Nom timeScheme_; // Time discretization scheme
   //DoubleTab phi3D_;
   double temps_;
-  DoubleVect output_position_1D_; //post-treatment of the 1d position of the points (points on the Beam)
-  DoubleTab output_position_3D_; // post-treatment of the 3d position of the points (points on the 3d surface)
+  DoubleVect output_position_1D_; //post-processing of the 1d position of the points (points on the Beam)
+  DoubleTab output_position_3D_; // post-processing of the 3d position of the points (points on the 3d surface)
   Nom beamName_;
   double alpha_;
   DoubleVect fluidForceOnBeam_; //Fluid force acting on the IFS boundary
@@ -118,7 +120,13 @@ protected :
   double x0_; //x-coordinate of the center of the Beam base
   double y0_; //y-coordinate of the center of the Beam base
   double z0_; //z-coordinate of the center of the Beam base
-
+  mutable SFichier displacement_out_1d_; //output files of the displacement
+  mutable SFichier speed_out_1d_; //output files of the speed
+  mutable SFichier acceleration_out_1d_; //output files of the acceleration
+  mutable SFichier displacement_out_3d_; //output files of the displacement
+  mutable SFichier speed_out_3d_; //output files of the speed
+  mutable SFichier acceleration_out_3d_; //output files of the acceleration
+  mutable SFichier fluidForceOnBeam_out_; //output files of the fluid force acting on the IFS boundary
 };
 inline const int& Beam_model::getNbModes() const
 {
