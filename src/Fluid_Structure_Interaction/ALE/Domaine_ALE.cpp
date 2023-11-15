@@ -352,7 +352,6 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
   //Cerr << "Domaine_ALE::initialiser  " << finl;
-
   deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
@@ -395,6 +394,26 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
   //End of initializing Ch_front_input_ALE
+
+  // check that the Neumann boundaries indicated in the jdd are not moving bounaries
+  bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  if(cl_Neumann)
+    {
+      int nb_cl_Neumann=name_boundary_with_Neumann_BC.size();
+      for(int i=0; i<nb_cl_Neumann; i++)
+        {
+          for (int j=0; j<nb_bords_ALE; j++)
+            {
+              if(les_bords_ALE(j).le_nom()==name_boundary_with_Neumann_BC[i])
+                {
+                  Cerr<<" In the 'ALE_Neumann_BC_for_grid_problem' block, you define a Neumann BC for the boundary "<<name_boundary_with_Neumann_BC[i]<<" \n";
+                  Cerr<<" or this is a moving boundary already define in the 'Imposer_vit_bords_ALE' block "<<finl;
+                  exit();
+                }
+            }
+        }
+    }
+
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
@@ -581,6 +600,9 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
 
   int elem;
   int n_bord;
+  //bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  int nb_cl_Neumann=name_boundary_with_Neumann_BC.size(); // Neumann boundary numbers for the Laplacian
+
   {
     int rang;
     int nnz=0;
@@ -635,16 +657,23 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
         //for n_bord
         const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
         const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-        int num1 = le_bord.num_premiere_face();
-        int num2 = num1 + le_bord.nb_faces();
 
-        for (int face=num1; face<num2; face++)
+        bool bord_cl_neumann=false;
+        for(int i=0; i<nb_cl_Neumann; i++)
+          if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
+        if(!bord_cl_neumann)
           {
-            elem=domaine_VEF.face_voisins(face,0);
-            for(int isom=0; isom<dimension; isom++)
+            int num1 = le_bord.num_premiere_face();
+            int num2 = num1 + le_bord.nb_faces();
+
+            for (int face=num1; face<num2; face++)
               {
-                int som=domaine_VEF.face_sommets(face,isom);
-                diag[som]=1.e14;
+                elem=domaine_VEF.face_voisins(face,0);
+                for(int isom=0; isom<dimension; isom++)
+                  {
+                    int som=domaine_VEF.face_sommets(face,isom);
+                    diag[som]=1.e14;
+                  }
               }
           }
       }
@@ -656,7 +685,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
     //Cerr << "Matrice de filtrage OK" << finl;
     //Cerr << "Matrice de Laplacien P1 : " << finl;
   }
-  //Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
+//Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
   DoubleVect secmem(nb_som());
   const MD_Vector& md = md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, secmem);
@@ -672,14 +701,20 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           //for n_bord
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          int num1 = le_bord.num_premiere_face();
-          int num2 = num1 + le_bord.nb_faces();
-          for (int face=num1; face<num2; face++)
+          bool bord_cl_neumann=false;
+          for(int i=0; i<nb_cl_Neumann; i++)
+            if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
+          if(!bord_cl_neumann)
             {
-              for(int isom=0; isom<dimension; isom++)
+              int num1 = le_bord.num_premiere_face();
+              int num2 = num1 + le_bord.nb_faces();
+              for (int face=num1; face<num2; face++)
                 {
-                  int som=domaine_VEF.face_sommets(face,isom);
-                  secmem(som)=1.e14*vit_bords(som,comp);
+                  for(int isom=0; isom<dimension; isom++)
+                    {
+                      int som=domaine_VEF.face_sommets(face,isom);
+                      secmem(som)=1.e14*vit_bords(som,comp);
+                    }
                 }
             }
         }
@@ -702,8 +737,8 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
     }
 
   ch_som.echange_espace_virtuel();
-  //double x = mp_norme_vect(ch_som);
-  //Cerr << "norme(c) = " << x << finl;
+//double x = mp_norme_vect(ch_som);
+//Cerr << "norme(c) = " << x << finl;
   Debog::verifier("Domaine_ALE::laplacien -ch_som", ch_som);
   return ch_som;
 }
@@ -803,6 +838,44 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
       compteur++;
     }
 }
+//Read the boundary with Neumann CL for the grid problem (optional)
+void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  int nb_boundary;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error when reading the 'ALE_Neumann_BC_for_grid_problem' \n";
+      Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
+           << motlu;
+      exit();
+    }
+  is >> nb_boundary;
+  Cerr << "Number of Neumann CL boundary for grid_problem : " <<  nb_boundary << finl;
+  int compteur=0;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+      name_boundary_with_Neumann_BC.add(nomlu);
+      compteur++;
+    }
+  if(nb_boundary!=name_boundary_with_Neumann_BC.size())
+    {
+      Cerr<<"Error when reading the block ALE_Neumann_BC_for_grid_problem \n";
+      Cerr<<" the indicated number of Neumann boundary and the list of boundary names are different sizes.  "<<finl;
+      exit();
+    }
+
+}
+
 
 //  Read the solver used to solve the system giving the moving mesh velocity
 void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
