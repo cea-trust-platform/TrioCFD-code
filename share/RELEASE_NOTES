@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
+15/11/23 (TrioCFD) Bug fix     : FSI- Compute the y+ for mobile walls
 09/11/23 (TrioCFD) Keyword     : Syntax change for modele_turbulence nul. New syntax is "modele_turbulence null {  }"
 25/10/23 (TrioCFD) New feature : FT IJK - New algorithm available, based on IJK discretization, to find the nearest neighbouring face of each node of the front mesh. To activate it , add "no_octree_method 1 " in the interfaces bloc
 11/10/23 (TrioCFD) Bug fix     : FT IJK - Fix area calculation in convection scalar operator
