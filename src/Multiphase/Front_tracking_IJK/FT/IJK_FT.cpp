@@ -891,8 +891,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   // Preparation de l'expression derivee de l'acceleration
   std::string tmpstring3(expression_derivee_acceleration_z_);
   parser_derivee_acceleration_z_.setString(tmpstring3);
-  parser_derivee_acceleration_z_.setNbVar(1);
+  parser_derivee_acceleration_z_.setNbVar(2);
   parser_derivee_acceleration_z_.addVar("v_moyen_z");
+  parser_derivee_acceleration_z_.addVar("rhov_moyen_z");
   parser_derivee_acceleration_z_.parseString();
 
   std::string tmpstring2(expression_derivee_facteur_variable_source_);
@@ -2013,6 +2014,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
    *               entree. C'est ce qui a ete explore, mais qui n'a pas aboutit.
    *  */
   IJK_Field_double Ivl = velocity_[2];
+  IJK_Field_double Irhovl = rho_v_[2];
   const int ni = Ivl.ni();
   const int nj = Ivl.nj();
   const int nk = Ivl.nk();
@@ -2021,11 +2023,13 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       for (int i = 0; i < ni; i++)
         {
           Ivl(i,j,k)*=interfaces_.I()(i,j,k);
+          Irhovl(i,j,k)*=interfaces_.I()(i,j,k);
         }
   statistiques().begin_count(source_counter_);
   double new_time = time;
   double v_moy = calculer_v_moyen(vx);
   double v_moy_z = calculer_v_moyen(Ivl)/calculer_v_moyen(interfaces_.I());
+  double rhov_moy_z = calculer_v_moyen(Irhovl)/calculer_v_moyen(interfaces_.I());
   // S'il n'y a pas de derivee, la source est constante donc on peut sortir:
   if (expression_derivee_acceleration_ == Nom("0") && expression_derivee_acceleration_z_ == Nom("0"))
     {
@@ -2086,6 +2090,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       parser_derivee_acceleration_.setVar("tauw", tauw);
 
       parser_derivee_acceleration_z_.setVar("v_moyen_z", v_moy_z);
+      parser_derivee_acceleration_z_.setVar("rhov_moyen_z", rhov_moy_z);
       // Pour utiliser rho_v il faudrait deplacer cette mise a jour a un endroit ou rho
       // est a jour en fonction de l'indicatrice
       // parser_derivee_acceleration_.setVar("rho_v_moyen", rho_v_moy);
@@ -2251,7 +2256,18 @@ void IJK_FT_double::run()
   thermal_probes_ghost_cells_ = thermals_.get_probes_ghost_cells(thermal_probes_ghost_cells_);
   if (IJK_Splitting::defilement_ == 1)
   {
-  allocate_velocity(velocity_, splitting_, 2, 0 ,1, false, 3, rho_vapeur_, rho_liquide_, use_inv_rho_in_poisson_solver_, use_unity_for_rho_in_poisson_solver_);
+	  if (!disable_diphasique_ && boundary_conditions_.get_correction_conserv_qdm()==1)
+	    {
+	      allocate_velocity(velocity_, splitting_, 2, 0 ,1, false, 3, rho_vapeur_, rho_liquide_, use_inv_rho_in_poisson_solver_, use_unity_for_rho_in_poisson_solver_);
+	    }
+	  else if (!disable_diphasique_ && boundary_conditions_.get_correction_conserv_qdm()==2)
+	    {
+	      allocate_velocity(velocity_, splitting_, 2);
+	    }
+	  else
+	    {
+	      allocate_velocity(velocity_, splitting_, 2);
+	    }
   }
   else
   {
@@ -3031,6 +3047,99 @@ void IJK_FT_double::run()
       // static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
       // statistiques().begin_count(bilanQdM_counter_);
       // statistiques().end_count(bilanQdM_counter_);
+      static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
+      statistiques().begin_count(bilanQdM_counter_);
+      if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
+        {
+
+#ifndef VARIABLE_DZ
+          double volume = 1.;
+          for (int i = 0; i < 3; i++)
+            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
+#endif
+
+          for (int dir = 0; dir < 3; dir++)
+            {
+              if ((dir == 2) && (correction_bilan_qdm_ == 4))
+                {
+                  // passe, on ne traite pas z...
+                }
+              else
+                {
+#ifndef VARIABLE_DZ
+                  const double x = volume * integrated_residu_[dir];
+                  psi_velocity_[dir].data() = x;
+#endif
+                  const int kmax = psi_velocity_[dir].nk();
+                  for (int k = 0; k < kmax; k++)
+                    {
+#ifdef VARIABLE_DZ
+                      const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
+                      const double x = volume*integrated_residu_[dir];
+                      psi_velocity_[dir].data() = x;
+#endif
+                      if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                        {
+                          Cerr
+                              << "Verifier que inv_rho_field soit valide et a jour ici ... "
+                              << finl;
+                          Process::exit();
+                          mass_solver_with_inv_rho(psi_velocity_[dir],
+                                                   inv_rho_field_, delta_z_local_, k);
+                        }
+                      else
+                        {
+                          mass_solver_with_rho(psi_velocity_[dir], rho_field_,
+                                               delta_z_local_, k);
+                        }
+                      const int imax = velocity_[dir].ni();
+                      const int jmax = velocity_[dir].nj();
+                      for (int j = 0; j < jmax; j++)
+                        {
+                          for (int i = 0; i < imax; i++)
+                            {
+                              velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
+                                                                            j, k);
+                            }
+                        }
+                    }
+
+
+                  if (boundary_conditions_.get_correction_conserv_qdm()==2)
+                    {
+                      update_rho_v();
+                      rho_field_.echange_espace_virtuel(rho_field_.ghost());
+                      update_v_ghost_from_rho_v();
+                    }
+                  else
+                    {
+                      if (dir==0)
+                        {
+
+                          velocity_[dir].echange_espace_virtuel(
+                            velocity_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                        }
+                      else
+                        {
+                          velocity_[dir].echange_espace_virtuel(
+                            velocity_[dir].ghost());
+                        }
+                    }
+
+
+                }
+            }
+          // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
+          for (int dir = 0; dir < 3; dir++)
+            {
+              store_rhov_moy_[dir] -= integrated_residu_[dir];
+            }
+
+          // Remise a zero du residu integre puisqu'il a ete corrige :
+          integrated_residu_ = 0.;
+
+        }
+      statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
@@ -3040,14 +3149,25 @@ void IJK_FT_double::run()
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
-          // FA AT 16/07/2013 pensent que necessaire pour le calcul des derivees dans statistiques_.update_stat_k(...)
-          // Je ne sais pas si c'est utile, mais j'assure...
-          velocity_[0].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-          velocity_[1].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
-          velocity_[2].echange_espace_virtuel(
-            2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/);
+          if (boundary_conditions_.get_correction_conserv_qdm()==2)
+            {
+              update_rho_v();
+              rho_field_.echange_espace_virtuel(rho_field_.ghost());
+              update_v_ghost_from_rho_v();
+            }
+          else
+            {
+              // FA AT 16/07/2013 pensent que necessaire pour le calcul des derivees dans statistiques_.update_stat_k(...)
+              // Je ne sais pas si c'est utile, mais j'assure...
+              velocity_[0].echange_espace_virtuel(
+                2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+              velocity_[1].echange_espace_virtuel(
+                2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
+              velocity_[2].echange_espace_virtuel(
+                2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_K*/);
+            }
+
+
           pressure_.echange_espace_virtuel(1);
 
           // C'est update_stat_ft qui gere s'il y a plusieurs groupes
@@ -3381,10 +3501,18 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
       double dP_nz = 0.;
       double W_0 = 0.;
       double W_nz = 0.;
+      double U_0 = 0.;
+      double U_nz = 0.;
+      double V_0 = 0.;
+      double V_nz = 0.;
       double drho_0 = 0.;
       double drho_nz = 0.;
       double rhoW_0 = 0.;
       double rhoW_nz = 0.;
+      double rhoU_0 = 0.;
+      double rhoU_nz = 0.;
+      double rhoV_0 = 0.;
+      double rhoV_nz = 0.;
       double rho_0 = 0.;
       double rho_nz = 0.;
       const int ni = pressure_.ni();
@@ -3399,10 +3527,18 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
             dP_nz += (pressure_(i,j,nk)-pressure_(i,j,nk-1))/dxk;
             W_0 +=velocity_[2](i,j,0);
             W_nz +=velocity_[2](i,j,nk);
+            U_0 +=velocity_[0](i,j,0);
+            U_nz +=velocity_[0](i,j,nk);
+            V_0 +=velocity_[1](i,j,0);
+            V_nz +=velocity_[1](i,j,nk);
             drho_0 +=(rho_field_(i,j,0)-rho_field_(i,j,-1))/dxk;
             drho_nz +=(rho_field_(i,j,nk)-rho_field_(i,j,nk-1))/dxk;
             rhoW_0 +=(rho_field_(i,j,0)+rho_field_(i,j,-1))*velocity_[2](i,j,0)/2.;
             rhoW_nz +=(rho_field_(i,j,nk)+rho_field_(i,j,nk-1))*velocity_[2](i,j,nk)/2.;
+            rhoU_0 +=(rho_field_(i,j,0)+rho_field_(i-1,j,0))*velocity_[0](i,j,0)/2.;
+            rhoU_nz +=(rho_field_(i,j,nk)+rho_field_(i-1,j,nk))*velocity_[0](i,j,nk)/2.;
+            rhoV_0 +=(rho_field_(i,j,0)+rho_field_(i,j-1,0))*velocity_[1](i,j,0)/2.;
+            rhoV_nz +=(rho_field_(i,j,nk)+rho_field_(i,j-1,nk))*velocity_[1](i,j,nk)/2.;
             rho_0 +=(rho_field_(i,j,0)+rho_field_(i,j,-1))/2.;
             rho_nz +=(rho_field_(i,j,nk)+rho_field_(i,j,nk-1))/2.;
           }
@@ -3412,15 +3548,23 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
       dP_nz /= n_mailles_tot;
       W_0 /= n_mailles_tot;
       W_nz /= n_mailles_tot;
+      U_0 /= n_mailles_tot;
+      U_nz /= n_mailles_tot;
+      V_0 /= n_mailles_tot;
+      V_nz /= n_mailles_tot;
       drho_0 /= n_mailles_tot;
       drho_nz /= n_mailles_tot;
       rhoW_0 /= n_mailles_tot;
       rhoW_nz /= n_mailles_tot;
+      rhoU_0 /= n_mailles_tot;
+      rhoU_nz /= n_mailles_tot;
+      rhoV_0 /= n_mailles_tot;
+      rhoV_nz /= n_mailles_tot;
       rho_0 /= n_mailles_tot;
       rho_nz /= n_mailles_tot;
 
       fic << tstep_<<" "<< current_time_<<" "
-          << dP_0 <<" "<< dP_nz <<" "<< rhoW_0 <<" "<< rhoW_nz <<" "<< W_0 <<" "<< W_nz <<" "<< drho_0<<" "<< drho_nz << " "<< rho_0<<" "<< rho_nz << " ";
+          << dP_0 <<" "<< dP_nz <<" "<< rhoU_0 <<" "<< rhoU_nz <<" "<< rhoV_0 <<" "<< rhoV_nz <<" "<< rhoW_0 <<" "<< rhoW_nz <<" "<< U_0 <<" "<< U_nz<<" "<< V_0 <<" "<< V_nz<<" "<< W_0 <<" "<< W_nz <<" "<< drho_0<<" "<< drho_nz << " "<< rho_0<<" "<< rho_nz << " ";
       fic<< finl;
       fic.close();
     }
@@ -4182,11 +4326,22 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
   statistiques().begin_count(euler_rk3_counter_);
   if (thermals_.size())
     {
-      // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
-      // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-      velocity_[1].echange_espace_virtuel(2);
-      velocity_[2].echange_espace_virtuel(2);
+      if (boundary_conditions_.get_correction_conserv_qdm()==2)
+        {
+          update_rho_v();
+          rho_field_.echange_espace_virtuel(rho_field_.ghost());
+          update_v_ghost_from_rho_v();
+        }
+      else
+        {
+          // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
+          // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
+          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[1].echange_espace_virtuel(2);
+          velocity_[2].echange_espace_virtuel(2);
+        }
+
+
     }
 
   /*
@@ -4202,9 +4357,19 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
   if (!frozen_velocity_)
     {
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-      velocity_[1].echange_espace_virtuel(2);
-      velocity_[2].echange_espace_virtuel(2);
+      if (boundary_conditions_.get_correction_conserv_qdm()==2)
+        {
+          update_rho_v();
+          rho_field_.echange_espace_virtuel(rho_field_.ghost());
+          update_v_ghost_from_rho_v();
+        }
+      else
+        {
+          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[1].echange_espace_virtuel(2);
+          velocity_[2].echange_espace_virtuel(2);
+        }
+
       // GAB, qdm
       if (test_etapes_et_bilan_)
         {
@@ -4429,9 +4594,18 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 
   if (!frozen_velocity_)
     {
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-      velocity_[1].echange_espace_virtuel(2);
-      velocity_[2].echange_espace_virtuel(2);
+      if (boundary_conditions_.get_correction_conserv_qdm()==2)
+        {
+          update_rho_v();
+          rho_field_.echange_espace_virtuel(rho_field_.ghost());
+          update_v_ghost_from_rho_v();
+        }
+      else
+        {
+          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[1].echange_espace_virtuel(2);
+          velocity_[2].echange_espace_virtuel(2);
+        }
       // GAB TODO : voir dans euler_explicite ce qu'on a dit qu'on ferai pour voir
       // si le calculer_dv s'est bien passe
       Cout << "rk3ss: rk_step " << rk_step << finl;
@@ -4874,8 +5048,70 @@ void IJK_FT_double::update_rho_v()
       calculer_rho_harmonic_v(rho_field_, velocity_, rho_v_);
     }
   else
-    calculer_rho_v(rho_field_, velocity_, rho_v_);
+    {
+      calculer_rho_v(rho_field_, velocity_, rho_v_);
+    }
+  rho_v_[0].echange_espace_virtuel(rho_v_[0].ghost());
+  rho_v_[1].echange_espace_virtuel(rho_v_[1].ghost());
+  rho_v_[2].echange_espace_virtuel(rho_v_[2].ghost());
+}
 
+void IJK_FT_double::update_v_ghost_from_rho_v()
+{
+  for (int dir = 0 ; dir < 3 ; dir++)
+    {
+      const int imax = velocity_[dir].ni();
+      const int jmax = velocity_[dir].nj();
+      const int kmax = velocity_[dir].nk();
+      const int ghost = velocity_[dir].ghost();
+      for (int j = 0; j < jmax; j++)
+        {
+          for (int i = 0; i < imax; i++)
+            {
+              for (int k = -ghost; k < 0; k++)
+                {
+                  double rho = 0.;
+                  double DU = 0.;
+                  if (dir==0)
+                    {
+                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
+                      DU = boundary_conditions_.get_dU_perio();
+                    }
+                  else if (dir==1)
+                    {
+                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
+                    }
+                  else if (dir==2)
+                    {
+                      rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
+                    }
+
+                  velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho - DU;
+                }
+              for (int k = kmax; k < kmax + ghost; k++)
+                {
+                  double rho = 0.;
+                  double DU = 0.;
+                  if (dir==0)
+                    {
+                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
+                      DU = boundary_conditions_.get_dU_perio();
+                    }
+                  else if (dir==1)
+                    {
+                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
+                    }
+                  else if (dir==2)
+                    {
+                      rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
+                    }
+
+                  velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho + DU;
+                }
+            }
+        }
+    }
+>>>>>>> premiere traversee non perturbee !
 }
 
 

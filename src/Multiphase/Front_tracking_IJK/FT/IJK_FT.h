@@ -339,6 +339,7 @@ protected :
 
   const IJK_FT_double& operator=(const IJK_FT_double&);
   void update_rho_v();
+  void update_v_ghost_from_rho_v();
   void update_pressure_phase();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
@@ -534,6 +535,7 @@ protected :
   // Inconnues du probleme (a sauvegarder et a reprendre)
   // Velocity field:
   FixedVector<IJK_Field_double, 3> velocity_;
+  FixedVector<IJK_Field_double, 3> rho_velocity_;
 
   // Masse volumique:
   IJK_Field_double rho_field_;
