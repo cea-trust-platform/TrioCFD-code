@@ -42,6 +42,7 @@ Entree& Dispersion_bulles_turbulente_Burns::readOn(Entree& is)
   param.ajouter("a_res", &a_res_);
   param.ajouter("g_", &g_);
   param.ajouter("coefBIA_", &coefBIA_);
+  param.ajouter("Prt", &Prt_);
   param.lire_avec_accolades_depuis(is);
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
