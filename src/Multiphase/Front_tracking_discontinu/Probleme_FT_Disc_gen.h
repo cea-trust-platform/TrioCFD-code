@@ -59,6 +59,7 @@ public:
   void   preparer_calcul(void) override;
   double calculer_pas_de_temps(void) const override;
   void   mettre_a_jour(double temps) override;
+  virtual bool updateGivenFields() override;
   //
   // Methodes nouvelles de Probleme_FT_Disc_gen
   //

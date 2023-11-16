@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# To generate the restart.xyz, you have to manually run this prepare.data : 
+sed -e "s/tinit .*/tinit 0./" \
+    -e "s/ tmax .*/ tmax 2.500000e-03/" \
+    -e "/restart.xyz/d" \
+    -e "s/lata.xyz/restart.xyz/" \
+    template.data > prepare.data
+
 for i in "interp_standard" "interp_modifiee" "interp_ai_based" 
 do
   #for j in "CORRECTION_GHOST_INDIC"
@@ -12,9 +19,11 @@ do
 	-e "s/template/${name}/" \
 	template.data > ${name}.data
     echo "Running calculation ${name}"
-    trust ${name} 1>${name}.out 2>${name}.err
+    time trust ${name} 1>${name}.out 2>${name}.err &
     [ $? != 0 ] && echo "Failure in ${name}"
     grep "Volume_phase_0" ${name}.err | awk '{print $4, $2/(0.001*0.001*3.141592653589793/2)}' > ${name}.txt
   done
 done
+# Wait for all jobs to finish.
+wait
 echo "$0 finished in $PWD"

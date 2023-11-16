@@ -1,22 +1,32 @@
 #!/bin/bash
 echo "Begin post_run with $1"
+[ -z "$1" ] && echo "Error, $0 requires 'jdd' as argument"
 err=$1.err
 cwd=$PWD
-[ -f PAR_source.err ] && cd .. && cat $(ls -rt R*/PAR_source.err | awk '{print $NF}') > PAR_source_Multirun.err && err=../PAR_source_Multirun.err && cd - >/dev/null
-[ ! -f $err ] && echo "Error in post_run. $err is missing" && exit -1
 
-grep "instant-Q" $err | awk '{print $5, $6, $7}' > instant_Qmic_meso.txt
-grep "Volume_phase_0" $err | awk '{print $4, $2}' > vap_vol.txt
+[ ! -f $err ] && echo "Error in post_run. $err is missing" && exit -1
+if [ $1 == "PAR_steady" ] ; then
+  end_time=$(tail -n20 $err | grep "Backup of the field INDICATRICE_CACHE" | awk '{print $10}')
+  echo "$end_time" > end_time.txt
+  echo "End of post_run for $1"
+  exit
+fi
+grep -E "instant-Q|Volume_phase_0|vevap_int|v_cl_test=|instantaneous meso-evaporation =|Instantaneous tcl-evaporation =|theta_app_degree=" \
+   $err > short_$err
+
+
+grep "instant-Q" short_$err | awk '{print $5, $6, $7}' > instant_Qmic_meso.txt
+grep "Volume_phase_0" short_$err | awk '{print $4, $2}' > vap_vol.txt
 [ $(wc -l vap_vol.txt| awk '{print $1}') != 0 ] && v0=$(head -n1 vap_vol.txt | awk '{print $2}') || v0=0.
 d0=$(python3 -c 'from math import pi; v='$v0'; d=(6*v/pi)**(1./3.); print(d)')
 awk '{print $1*1000, '$d0'*($2/'$v0')^(1/3)}' vap_vol.txt > dia_full.txt ; awk 'NR % 100 == 0' dia_full.txt > dia.txt
-grep "vevap_int" $err | awk '{print $6, $3}' > micro_vap.txt                # What is it? 
-awk '{print $1*1000, '$d0'*($2/'$v0')^(1/3)}' micro_vap.txt > dia_micro.txt # What is it? 
-grep "v_cl_test=" $err | awk '{print $6, $4}' > CL_vel.txt
-grep "instantaneous meso-evaporation =" $err | awk '{print $3, -$7}' > meso.txt
-grep "Instantaneous tcl-evaporation =" $err | awk '{print $3, $7}' > tcl.txt
+grep "vevap_int" short_$err | awk '{print $6, $3}' > micro_vap.txt                # What is it?
+awk '{print $1*1000, 'short_$d0'*($2/'$v0')^(1/3)}' micro_vap.txt > dia_micro.txt # What is it?
+grep "v_cl_test=" short_$err | awk '{print $6, $4}' > CL_vel.txt
+grep "instantaneous meso-evaporation =" short_$err | awk '{print $3, -$7}' > meso.txt
+grep "Instantaneous tcl-evaporation =" short_$err | awk '{print $3, $7}' > tcl.txt
 awk '{print $1*1000, '$d0'*($2/'$v0')^(1/3)}' tcl.txt > dia_tcl.txt
-grep "theta_app_degree=" $err | awk '{print $9, $11}' > theta_app.txt
+grep "theta_app_degree=" short_$err | awk '{print $9, $11}' > theta_app.txt
 
 
 \rm -rf lata/post-ascii.lata*
@@ -37,4 +47,21 @@ if [ -f lata/post-interf-ascii.lata ] ; then
    awk '{print $1*1000, $7}' interface-position.txt > base_dia.txt 
 fi
 
+echo "Visit generating resultat*dat"
+[ -f /home/trust_trio-public/env_TrioCFD-1.9.2.sh ] && source \
+   /home/trust_trio-public/env_TrioCFD-1.9.2.sh > /dev/null && echo \
+   "Source TRUST network for issues with wisit on local"
+
+[ -f /ccc/work/cont002/triocfd/triou/irene-ccrt/TRUST/TRUST-1.9.2-amd-gpu/env_TRUST.sh ] && source \
+   /ccc/work/cont002/triocfd/triou/irene-ccrt/TRUST/TRUST-1.9.2-amd-gpu/env_TRUST.sh &> /dev/null && echo \
+   "Source TRUST network for issues with wisit on node otherwise"
+# Fonctionne pas sur le noeud:
+# [ -n "$(module avail visit)" ] && module load visit && echo "Visit Module Loaded"
+#
+[ -f lata/post.lata ] && sed -i "/^??/d" lata/post.lata # Delete weird lines if any.
+visit -nowin -cli -s ./visit_Re_Nu2.py  -val ts_start=0 -val nb_ts=1 &> visit-resultats.log
+echo "Done."
+
+echo "Launching Cleaning"
+./clean && echo "Cleaning ok" || echo "Cleaning failed"
 echo "End of post_run for $1"
