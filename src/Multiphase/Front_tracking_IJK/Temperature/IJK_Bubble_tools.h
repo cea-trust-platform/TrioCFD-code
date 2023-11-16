@@ -41,6 +41,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // Fill compo using a dummy bounding box
+std::vector<int> arg_sort_array(const ArrOfDouble& array_to_sort);
+
 void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                                      DoubleTab& bounding_box,
                                      DoubleTab& min_max_larger_box,

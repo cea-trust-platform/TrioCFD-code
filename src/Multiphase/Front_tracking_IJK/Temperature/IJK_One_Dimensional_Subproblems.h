@@ -56,6 +56,8 @@ public :
   void clean_remove();
   void complete_subproblems();
   void add_subproblems(int n);
+  void compute_global_indices();
+  void set_global_index();
   void associate_sub_problem_to_inputs(int debug,
                                        int i, int j, int k,
                                        double global_time_step,
@@ -164,6 +166,17 @@ public :
   DoubleVect get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const;
   double get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const;
   double get_temperature_gradient_times_conductivity_profile_at_point(const int& i, const double& dist, const int& dir) const;
+
+  Nom get_header_from_string_lists(const std::vector<std::string>& key_results_int,
+                                   const std::vector<std::string>& key_results_double);
+  void set_results_probes_size(const std::vector<std::string>& key_results_int,
+                               const std::vector<std::string>& key_results_double,
+                               std::map<std::string, ArrOfInt>& results_probes_int,
+                               std::map<std::string, ArrOfDouble>& results_probes_double);
+  void thermal_subresolution_outputs_parallel(const int& rank,
+                                              const Nom& interfacial_quantities_thermal_probes,
+                                              const Nom& overall_bubbles_quantities,
+                                              const Nom& local_quantities_thermal_probes_time_index_folder);
   void thermal_subresolution_outputs(const int& rank,
                                      const Nom& interfacial_quantities_thermal_probes,
                                      const Nom& overall_bubbles_quantities,
@@ -192,7 +205,8 @@ public :
   void prepare_temporal_schemes();
   const int& get_end_index_subproblem(const int index) const;
   void post_processed_all_probes();
-  void sort_limited_probes_spherical_coords_post_processing(const int& nb_theta, const int& nb_phi,
+  void sort_limited_probes_spherical_coords_post_processing(const int& post_process_all_probes,
+                                                            const int& nb_theta, const int& nb_phi,
                                                             const int theta_diag_val, const int phi_diag_val);
   void compute_overall_quantities_per_bubbles(const IJK_Field_double& temperature_ghost,
                                               const double& delta_temperature,
@@ -206,7 +220,7 @@ public :
                                           const double& lambda,
                                           const double& radius,
                                           const double& spherical_nusselt);
-  void compute_overall_nusselt_numbers_bubbles();
+  void compute_overall_quantities();
   void post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities);
 
 protected :
@@ -214,6 +228,9 @@ protected :
   int debug_ = 0;
   int max_subproblems_ = 0;
   int subproblems_counter_ = 0;
+  int global_subproblems_counter_ = 0;
+  int index_ini_=0;
+  int index_end_=0;
   int reallocate_subproblems_ = 1;
   bool is_updated_ = 0;
   REF(IJK_FT_double) ref_ijk_ft_;
@@ -236,6 +253,7 @@ protected :
   ArrOfDouble radius_outputs_;
   ArrOfDouble theta_outputs_;
   ArrOfDouble phi_outputs_;
+  ArrOfInt global_indices_post_processed_;
 
   ArrOfDouble interfacial_thermal_flux_per_bubble_ ;
   ArrOfDouble interfacial_thermal_flux_per_bubble_gfm_;

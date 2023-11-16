@@ -233,11 +233,20 @@ public :
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;
   double get_discrete_surface_at_level(const int& dir, const int& level) const;
   void thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
+  void retrieve_interfacial_quantities(const int rank,
+                                       std::vector<std::string> key_results_int,
+                                       std::vector<std::string> key_results_double,
+                                       std::map<std::string, ArrOfInt>& results_probes_int,
+                                       std::map<std::string, ArrOfDouble>& results_probes_double);
 
   double get_min_temperature() const;
   double get_max_temperature() const;
   double get_min_temperature_domain_ends() const;
   double get_max_temperature_domain_ends() const;
+  void set_global_index(const int& global_subproblem_index)
+  {
+    global_subproblem_index_ = global_subproblem_index;
+  }
   const double& get_local_time_step_round() const
   {
     return local_time_step_round_;
@@ -334,9 +343,10 @@ public :
   {
     return phi_sph_;
   }
-  void set_post_processing_theta_phi_scope()
+  void set_post_processing_theta_phi_scope(const int index)
   {
     is_post_processed_ = true;
+    index_post_processing_ = index;
   };
   const double& get_interfacial_thermal_flux() const
   {
@@ -520,7 +530,10 @@ protected :
    * FIXME: Should I use only references or just for IJK_Field_double ?
    * Should I use IJK_Field_local_double or IJK_Field_double as pointers ?
    */
+  int global_subproblem_index_ = 0;
   int sub_problem_index_ = 0;
+  int index_post_processing_ = 0;
+
   int index_i_ = 0, index_j_ = 0, index_k_ = 0;
   int compo_connex_ = -1;
   int compo_group_ = -1;

@@ -381,31 +381,27 @@ void IJK_Thermals::thermal_subresolution_outputs()
     {
       if(!ini_folder_out_files_)
         {
-          if (Process::je_suis_maitre())
-            create_folders_for_probes();
+          create_folders_for_probes();
           ini_folder_out_files_ = 1;
         }
-
-      if (Process::je_suis_maitre())
+      int rank = 0;
+      for (auto& itr : (*this))
         {
-          int rank = 0;
-          for (auto& itr : (*this))
-            {
-              const int last_time = ref_ijk_ft_->get_tstep();
-              Nom local_quantities_thermal_probes_time_index_folder = thermal_rank_folder_[rank] + "/"
-                                                                      + local_quantities_thermal_probes_folder_ + "/"
-                                                                      + local_quantities_thermal_probes_time_index_folder_ + Nom(last_time);
-              Nom overall_bubbles_quantities = thermal_rank_folder_[rank] + "/" + overall_bubbles_quantities_folder_;
-              Nom interfacial_quantities_thermal_probes = thermal_rank_folder_[rank] + "/" + interfacial_quantities_thermal_probes_folder_;
+          const int last_time = ref_ijk_ft_->get_tstep();
+          Nom local_quantities_thermal_probes_time_index_folder = thermal_rank_folder_[rank] + "/"
+                                                                  + local_quantities_thermal_probes_folder_ + "/"
+                                                                  + local_quantities_thermal_probes_time_index_folder_ + Nom(last_time);
+          Nom overall_bubbles_quantities = thermal_rank_folder_[rank] + "/" + overall_bubbles_quantities_folder_;
+          Nom interfacial_quantities_thermal_probes = thermal_rank_folder_[rank] + "/" + interfacial_quantities_thermal_probes_folder_;
 
-              create_folders(local_quantities_thermal_probes_time_index_folder);
+          create_folders(local_quantities_thermal_probes_time_index_folder);
 
-              itr.thermal_subresolution_outputs(interfacial_quantities_thermal_probes,
-                                                overall_bubbles_quantities,
-                                                local_quantities_thermal_probes_time_index_folder);
-              rank++;
-            }
+          itr.thermal_subresolution_outputs(interfacial_quantities_thermal_probes,
+                                            overall_bubbles_quantities,
+                                            local_quantities_thermal_probes_time_index_folder);
+          rank++;
         }
+
     }
   post_pro_first_call_++;
 }
@@ -423,11 +419,19 @@ void IJK_Thermals::create_folders_for_probes()
 
 void IJK_Thermals::create_folders(Nom folder_name_base)
 {
-  std::string spacing = " ";
-  std::string folder_name = "\"mkdir -p";
-  folder_name = folder_name + spacing + folder_name_base.getString() + spacing + "\" donothing";
-  istringstream folder_name_istringstream(folder_name.c_str());
-  istream& folder_name_istream = folder_name_istringstream;
-  Entree folder_name_entry(folder_name_istream);
-  make_dir_for_out_files_.interpreter(folder_name_entry);
+  if (Process::je_suis_maitre())
+    {
+      Nom spacing = " ";
+      Nom folder_name = "\"mkdir -p";
+      folder_name = folder_name + spacing + folder_name_base.getString() + spacing + "\""; // donothing";
+      Cerr << "Shell command executed: " << folder_name << finl;
+      int error = system(folder_name);
+      assert(error);
+      if (error)
+        Process::exit();
+      //  istringstream folder_name_istringstream(folder_name.c_str());
+      //  istream& folder_name_istream = folder_name_istringstream;
+      //  Entree folder_name_entry(folder_name_istream);
+      // make_dir_for_out_files_.interpreter(folder_name_entry);
+    }
 }

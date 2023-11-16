@@ -131,6 +131,15 @@ void IJK_One_Dimensional_Subproblem::reinit_variable(DoubleVect& vect)
   vect *= 0.;
 }
 
+/*
+ * TODO: Remplacer cette methode pour eviter de fournir tous les attributs
+ */
+//void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(const IJK_Thermal_Subresolution& thermal_problem)
+//{
+//	IJK_Thermal_Subresolution* thermal_problem_ = &thermal_problem
+// 	thermal_problem_->get_attributes();
+//}
+
 void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
                                                                      int debug,
                                                                      int sub_problem_index,
@@ -547,7 +556,7 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
 {
   /*
    * TODO: Associate a basis to each subproblem
-   * Use Rodrigues' rotation formula to determine ephi
+   * Use Rodrigues' rotation formula to determine ephi ?
    * Needs an axis of (rotation gravity_dir x relative_vectors)
    * and an angle (gravity_dir dot relative_vectors) / (norm(gravity_dir)*norm(relative_vectors))
    * ephi is determined in the gravity_align rising direction
@@ -654,7 +663,7 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
 void IJK_One_Dimensional_Subproblem::compute_pure_spherical_basis_vectors()
 {
   /*
-   * FIXME: It is align with gravity z but it should be modified to be align with the gravity dir
+   * FIXME: It is align with gravity z but it should be modified to be align with the gravity dir ?
    */
   if (debug_)
     Cerr << "r_sph_ calculation"  << finl;
@@ -968,7 +977,9 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
  * and avoid redundancy...
  * Compare Calculation with mean_over_compo()
  * not weighted by the surface
+ * Separate geometric attributes and physical attributes -> in the future
  */
+
 void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
 {
   Vecteur3 centre = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
@@ -978,12 +989,6 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
   cell_centre_distance_ = Vecteur3::produit_scalaire(facet_to_cell_centre, normal_vector_compo_);
 }
 
-/*
- * TODO: Use ijk_intersections_interface instead !
- * and avoid redundancy...
- * Compare Calculation with mean_over_compo()
- * not weighted by the surface
- */
 void IJK_One_Dimensional_Subproblem::compute_distance_faces_centres()
 {
   Vecteur3 bary_face {0., 0., .0};
@@ -2744,54 +2749,114 @@ double IJK_One_Dimensional_Subproblem::compute_temperature_integral_subproblem(c
   return integral_eval;
 }
 
+
 void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
 {
   post_process_interfacial_quantities(fic, rank);
   post_process_radial_quantities(rank, local_quantities_thermal_probes_time_index_folder);
 }
 
+void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int rank,
+                                                                     std::vector<std::string> key_results_int,
+                                                                     std::vector<std::string> key_results_double,
+                                                                     std::map<std::string, ArrOfInt>& results_probes_int,
+                                                                     std::map<std::string, ArrOfDouble>& results_probes_double)
+{
+  const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+  const int last_time_index = ref_ijk_ft_->get_tstep();
+  std::vector<int> results_int =
+  {
+    last_time_index, rank, global_subproblem_index_, sub_problem_index_
+  };
+
+  std::vector<double> results_double =
+  {
+    last_time,
+    temperature_interp_[0], temperature_solution_[0],
+    normal_temperature_gradient_[0], normal_temperature_gradient_solution_[0],
+    normal_temperature_double_derivative_solution_[0],
+    tangential_temperature_gradient_first_[0],
+    tangential_temperature_gradient_second_[0],
+    tangential_temperature_gradient_first_from_rising_dir_[0],
+    azymuthal_temperature_gradient_[0],
+    temperature_diffusion_hessian_cartesian_trace_[0],
+    temperature_diffusion_hessian_trace_[0],
+    radial_temperature_diffusion_[0],
+    tangential_temperature_diffusion_[0],
+    surface_, thermal_flux_[0], (*lambda_), (*alpha_), Pr_l_,
+    pressure_interp_[0],
+    x_velocity_[0], y_velocity_[0], z_velocity_[0],
+    radial_velocity_[0], radial_velocity_corrected_[0],
+    radial_velocity_static_frame_[0], radial_velocity_advected_frame_[0],
+    first_tangential_velocity_[0], first_tangential_velocity_corrected_[0],
+    first_tangential_velocity_static_frame_[0], first_tangential_velocity_advected_frame_[0],
+    second_tangential_velocity_[0], second_tangential_velocity_corrected_[0],
+    second_tangential_velocity_static_frame_[0], second_tangential_velocity_advected_frame_[0],
+    first_tangential_velocity_from_rising_dir_[0], first_tangential_velocity_from_rising_dir_corrected_[0],
+    first_tangential_velocity_from_rising_dir_static_frame_[0], first_tangential_velocity_from_rising_dir_advected_frame_[0],
+    azymuthal_velocity_[0], azymuthal_velocity_corrected_[0],
+    azymuthal_velocity_static_frame_[0], azymuthal_velocity_advected_frame_[0],
+    normal_velocity_normal_gradient_[0],
+    first_tangential_velocity_normal_gradient_[0],
+    second_tangential_velocity_normal_gradient_[0],
+    first_tangential_velocity_gradient_from_rising_dir_[0],
+    azymuthal_velocity_normal_gradient_[0]
+  };
+  int i;
+  assert(key_results_int.size() == results_int.size());
+  int size_int = (int) key_results_int.size();
+  for (i=0; i<size_int; i++)
+    results_probes_int[key_results_int[i]](index_post_processing_) = results_int[i];
+  assert(key_results_double.size() == results_double.size());
+  int size_double = (int) key_results_double.size();
+  for (i=0; i<size_double; i++)
+    results_probes_double[key_results_double[i]](index_post_processing_) = results_double[i];
+
+}
+
 void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichier& fic, const int rank) //SFichier& fic)
 {
-  if (Process::je_suis_maitre())
-    {
-      if (is_updated_)
-        {
-          const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
-          const int last_time_index = ref_ijk_ft_->get_tstep();
-          fic << last_time_index << " " << last_time  << " ";
-          fic << rank << " " << sub_problem_index_ << " ";
-          fic << temperature_interp_[0] << " " << temperature_solution_[0] << " ";
-          fic << normal_temperature_gradient_[0] << " " << normal_temperature_gradient_solution_[0] << " ";
-          fic << normal_temperature_double_derivative_solution_[0] << " ";
-          fic << tangential_temperature_gradient_first_[0] << " ";
-          fic << tangential_temperature_gradient_second_[0] << " ";
-          fic << tangential_temperature_gradient_first_from_rising_dir_[0] << " ";
-          fic << azymuthal_temperature_gradient_[0] << " ";
-          fic << temperature_diffusion_hessian_cartesian_trace_[0] << " ";
-          fic << temperature_diffusion_hessian_trace_[0] << " ";
-          fic << radial_temperature_diffusion_[0] << " ";
-          fic << tangential_temperature_diffusion_[0] << " ";
-          fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
-          fic << pressure_interp_[0] << " ";
-          fic << x_velocity_[0] << " " << y_velocity_[0] << " " << z_velocity_[0] << " ";
-          fic << radial_velocity_[0] << " " << radial_velocity_corrected_[0] << " ";
-          fic << radial_velocity_static_frame_[0] << " " << radial_velocity_advected_frame_[0] << " ";
-          fic << first_tangential_velocity_[0] << " " << first_tangential_velocity_corrected_[0] << " ";
-          fic << first_tangential_velocity_static_frame_[0] << " " << first_tangential_velocity_advected_frame_[0] << " ";
-          fic << second_tangential_velocity_[0] << " " << second_tangential_velocity_corrected_[0] << " ";
-          fic << second_tangential_velocity_static_frame_[0] << " " << second_tangential_velocity_advected_frame_[0] << " ";
-          fic << first_tangential_velocity_from_rising_dir_[0] << " " << first_tangential_velocity_from_rising_dir_corrected_[0] << " ";
-          fic << first_tangential_velocity_from_rising_dir_static_frame_[0] << " " << first_tangential_velocity_from_rising_dir_advected_frame_[0] << " ";
-          fic << azymuthal_velocity_[0] << " " << azymuthal_velocity_corrected_[0] << " ";
-          fic << azymuthal_velocity_static_frame_[0] << " " << azymuthal_velocity_advected_frame_[0] << " ";
-          fic << normal_velocity_normal_gradient_[0] << " ";
-          fic << first_tangential_velocity_normal_gradient_[0] << " ";
-          fic << second_tangential_velocity_normal_gradient_[0] << " ";
-          fic << first_tangential_velocity_gradient_from_rising_dir_[0] << " ";
-          fic << azymuthal_velocity_normal_gradient_[0] << " ";
-          fic << finl;
-        }
-    }
+  // if (Process::je_suis_maitre())
+  {
+    if (is_updated_ && is_post_processed_)
+      {
+        const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+        const int last_time_index = ref_ijk_ft_->get_tstep();
+        fic << last_time_index << " ";
+        fic << rank << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
+        fic << last_time << " ";
+        fic << temperature_interp_[0] << " " << temperature_solution_[0] << " ";
+        fic << normal_temperature_gradient_[0] << " " << normal_temperature_gradient_solution_[0] << " ";
+        fic << normal_temperature_double_derivative_solution_[0] << " ";
+        fic << tangential_temperature_gradient_first_[0] << " ";
+        fic << tangential_temperature_gradient_second_[0] << " ";
+        fic << tangential_temperature_gradient_first_from_rising_dir_[0] << " ";
+        fic << azymuthal_temperature_gradient_[0] << " ";
+        fic << temperature_diffusion_hessian_cartesian_trace_[0] << " ";
+        fic << temperature_diffusion_hessian_trace_[0] << " ";
+        fic << radial_temperature_diffusion_[0] << " ";
+        fic << tangential_temperature_diffusion_[0] << " ";
+        fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+        fic << pressure_interp_[0] << " ";
+        fic << x_velocity_[0] << " " << y_velocity_[0] << " " << z_velocity_[0] << " ";
+        fic << radial_velocity_[0] << " " << radial_velocity_corrected_[0] << " ";
+        fic << radial_velocity_static_frame_[0] << " " << radial_velocity_advected_frame_[0] << " ";
+        fic << first_tangential_velocity_[0] << " " << first_tangential_velocity_corrected_[0] << " ";
+        fic << first_tangential_velocity_static_frame_[0] << " " << first_tangential_velocity_advected_frame_[0] << " ";
+        fic << second_tangential_velocity_[0] << " " << second_tangential_velocity_corrected_[0] << " ";
+        fic << second_tangential_velocity_static_frame_[0] << " " << second_tangential_velocity_advected_frame_[0] << " ";
+        fic << first_tangential_velocity_from_rising_dir_[0] << " " << first_tangential_velocity_from_rising_dir_corrected_[0] << " ";
+        fic << first_tangential_velocity_from_rising_dir_static_frame_[0] << " " << first_tangential_velocity_from_rising_dir_advected_frame_[0] << " ";
+        fic << azymuthal_velocity_[0] << " " << azymuthal_velocity_corrected_[0] << " ";
+        fic << azymuthal_velocity_static_frame_[0] << " " << azymuthal_velocity_advected_frame_[0] << " ";
+        fic << normal_velocity_normal_gradient_[0] << " ";
+        fic << first_tangential_velocity_normal_gradient_[0] << " ";
+        fic << second_tangential_velocity_normal_gradient_[0] << " ";
+        fic << first_tangential_velocity_gradient_from_rising_dir_[0] << " ";
+        fic << azymuthal_velocity_normal_gradient_[0] << " ";
+        fic << finl;
+      }
+  }
 }
 
 void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
@@ -2800,74 +2865,76 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
   //												 "ttemperature_gradient_tangential\ttemperature_gradient_tangential2\ttemperature_gradient_azymuthal"
   //												 "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
   //												 "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
-  if (Process::je_suis_maitre())
-    {
-      if (is_updated_)
-        {
-          // const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
-          const int reset = 1;
-          Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(sub_problem_index_) + ("_radial_quantities_time_index_")
-                           + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
-          Nom probe_header = Nom("tstep\ttime\tthermalrank\tsubproblem\tradial_coord"
-                                 "\ttemperature_interp\ttemperature_solution"
-                                 "\ttemperature_gradient\ttemperature_gradient_sol"
-                                 "\ttemperature_double_deriv_sol"
-                                 "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
-                                 "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
-                                 "\ttemperature_diffusion_hessian_cartesian_trace"
-                                 "\ttemperature_diffusion_hessian_trace"
-                                 "\tradial_temperature_diffusion"
-                                 "\ttangential_temperature_diffusion"
-                                 "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
-                                 "\tpressure"
-                                 "\tu_x\tu_y\tu_z"
-                                 "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
-                                 "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
-                                 "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
-                                 "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
-                                 "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
-                                 "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
-          SFichier fic = Open_file_folder(local_quantities_thermal_probes_time_index_folder, probe_name, probe_header, reset);
-          const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
-          const int last_time_index = ref_ijk_ft_->get_tstep();
-          for (int i=0; i<(*points_per_thermal_subproblem_); i++)
-            {
-              fic << last_time_index << " " << last_time << " ";
-              fic << rank << " " << sub_problem_index_ << " ";
-              fic << (*radial_coordinates_)[i] << " " << temperature_interp_[i] << " " << temperature_solution_[i] << " ";
-              fic << normal_temperature_gradient_[i] << " " << normal_temperature_gradient_solution_[i] << " ";
-              fic << normal_temperature_double_derivative_solution_[i] << " ";
-              fic << tangential_temperature_gradient_first_[i] << " ";
-              fic << tangential_temperature_gradient_second_[i] << " ";
-              fic << tangential_temperature_gradient_first_from_rising_dir_[i] << " ";
-              fic << azymuthal_temperature_gradient_[i] << " ";
-              fic << temperature_diffusion_hessian_cartesian_trace_[i] << " ";
-              fic << temperature_diffusion_hessian_trace_[i] << " ";
-              fic << radial_temperature_diffusion_[i] << " ";
-              fic << tangential_temperature_diffusion_[i] << " ";
-              fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
-              fic << pressure_interp_[i] << " ";
-              fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
-              fic << radial_velocity_[i] << " " << radial_velocity_corrected_[i] << " ";
-              fic << radial_velocity_static_frame_[i] << " " << radial_velocity_advected_frame_[i] << " ";
-              fic << first_tangential_velocity_[i] << " " << first_tangential_velocity_corrected_[i] << " ";
-              fic << first_tangential_velocity_static_frame_[i] << " " << first_tangential_velocity_advected_frame_[i] << " ";
-              fic << second_tangential_velocity_[i] << " " << second_tangential_velocity_corrected_[i] << " ";
-              fic << second_tangential_velocity_static_frame_[i] << " " << second_tangential_velocity_advected_frame_[i] << " ";
-              fic << first_tangential_velocity_from_rising_dir_[i] << " " << first_tangential_velocity_from_rising_dir_corrected_[i] << " ";
-              fic << first_tangential_velocity_from_rising_dir_static_frame_[i] << " " << first_tangential_velocity_from_rising_dir_advected_frame_[i] << " ";
-              fic << azymuthal_velocity_[i] << " " << azymuthal_velocity_corrected_[i] << " ";
-              fic << azymuthal_velocity_static_frame_[i] << " " << azymuthal_velocity_advected_frame_[i] << " ";
-              fic << normal_velocity_normal_gradient_[i] << " ";
-              fic << first_tangential_velocity_normal_gradient_[i] << " ";
-              fic << second_tangential_velocity_normal_gradient_[i] << " ";
-              fic << first_tangential_velocity_gradient_from_rising_dir_[i] << " ";
-              fic << azymuthal_velocity_normal_gradient_[i] << " ";
-              fic << finl;
-            }
-          fic.close();
-        }
-    }
+  // if (Process::je_suis_maitre())
+  {
+    if (is_updated_ && is_post_processed_)
+      {
+        // const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+        const int reset = 1;
+
+        Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(global_subproblem_index_) + ("_radial_quantities_time_index_")
+                         + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+        Nom probe_header = Nom("tstep\tthermalrank\tsubproblem\tlocalsubproblem\ttime"
+                               "\tradial_coord\ttemperature_interp\ttemperature_solution"
+                               "\ttemperature_gradient\ttemperature_gradient_sol"
+                               "\ttemperature_double_deriv_sol"
+                               "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
+                               "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
+                               "\ttemperature_diffusion_hessian_cartesian_trace"
+                               "\ttemperature_diffusion_hessian_trace"
+                               "\tradial_temperature_diffusion"
+                               "\ttangential_temperature_diffusion"
+                               "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                               "\tpressure"
+                               "\tu_x\tu_y\tu_z"
+                               "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
+                               "\tu_theta\tu_theta_corr\tu_theta_static\tu_theta_advected"
+                               "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
+                               "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
+                               "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
+                               "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
+        SFichier fic = Open_file_folder(local_quantities_thermal_probes_time_index_folder, probe_name, probe_header, reset);
+        const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+        const int last_time_index = ref_ijk_ft_->get_tstep();
+        for (int i=0; i<(*points_per_thermal_subproblem_); i++)
+          {
+            fic << last_time_index << " ";
+            fic << rank << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
+            fic << last_time << " ";
+            fic << (*radial_coordinates_)[i] << " " << temperature_interp_[i] << " " << temperature_solution_[i] << " ";
+            fic << normal_temperature_gradient_[i] << " " << normal_temperature_gradient_solution_[i] << " ";
+            fic << normal_temperature_double_derivative_solution_[i] << " ";
+            fic << tangential_temperature_gradient_first_[i] << " ";
+            fic << tangential_temperature_gradient_second_[i] << " ";
+            fic << tangential_temperature_gradient_first_from_rising_dir_[i] << " ";
+            fic << azymuthal_temperature_gradient_[i] << " ";
+            fic << temperature_diffusion_hessian_cartesian_trace_[i] << " ";
+            fic << temperature_diffusion_hessian_trace_[i] << " ";
+            fic << radial_temperature_diffusion_[i] << " ";
+            fic << tangential_temperature_diffusion_[i] << " ";
+            fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+            fic << pressure_interp_[i] << " ";
+            fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
+            fic << radial_velocity_[i] << " " << radial_velocity_corrected_[i] << " ";
+            fic << radial_velocity_static_frame_[i] << " " << radial_velocity_advected_frame_[i] << " ";
+            fic << first_tangential_velocity_[i] << " " << first_tangential_velocity_corrected_[i] << " ";
+            fic << first_tangential_velocity_static_frame_[i] << " " << first_tangential_velocity_advected_frame_[i] << " ";
+            fic << second_tangential_velocity_[i] << " " << second_tangential_velocity_corrected_[i] << " ";
+            fic << second_tangential_velocity_static_frame_[i] << " " << second_tangential_velocity_advected_frame_[i] << " ";
+            fic << first_tangential_velocity_from_rising_dir_[i] << " " << first_tangential_velocity_from_rising_dir_corrected_[i] << " ";
+            fic << first_tangential_velocity_from_rising_dir_static_frame_[i] << " " << first_tangential_velocity_from_rising_dir_advected_frame_[i] << " ";
+            fic << azymuthal_velocity_[i] << " " << azymuthal_velocity_corrected_[i] << " ";
+            fic << azymuthal_velocity_static_frame_[i] << " " << azymuthal_velocity_advected_frame_[i] << " ";
+            fic << normal_velocity_normal_gradient_[i] << " ";
+            fic << first_tangential_velocity_normal_gradient_[i] << " ";
+            fic << second_tangential_velocity_normal_gradient_[i] << " ";
+            fic << first_tangential_velocity_gradient_from_rising_dir_[i] << " ";
+            fic << azymuthal_velocity_normal_gradient_[i] << " ";
+            fic << finl;
+          }
+        fic.close();
+      }
+  }
 }
 
 double IJK_One_Dimensional_Subproblem::get_min_temperature() const
@@ -2894,8 +2961,8 @@ double IJK_One_Dimensional_Subproblem::get_min_temperature_domain_ends() const
 
 double IJK_One_Dimensional_Subproblem::get_max_temperature_domain_ends() const
 {
-  double min_temperature_value = std::max(temperature_solution_[0], temperature_solution_[temperature_solution_.size()-1]);
-  return min_temperature_value;
+  double max_temperature_value = std::max(temperature_solution_[0], temperature_solution_[temperature_solution_.size()-1]);
+  return max_temperature_value;
 }
 
 //  double temperature_cell_centre = INVALID_TEMPERATURE;// temperature_solution_;

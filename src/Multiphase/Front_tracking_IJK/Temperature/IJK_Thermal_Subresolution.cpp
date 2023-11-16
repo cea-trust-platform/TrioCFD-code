@@ -126,6 +126,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   modified_time_init_ = 0.;
   spherical_diffusion_ = 1;
 
+  post_process_all_probes_ = 0;
   nb_theta_post_pro_ = 10;
   nb_phi_post_pro_ = 4;
   nb_probes_post_pro_ = 40;
@@ -251,6 +252,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("probes_end_value_coeff", &probes_end_value_coeff_);
   param.ajouter("temperature_ini_type", &temperature_ini_type_);
 
+  param.ajouter_flag("post_process_all_probes", &post_process_all_probes_);
   param.ajouter("nb_theta_post_pro", &nb_theta_post_pro_);
   param.ajouter("nb_phi_post_pro", &nb_phi_post_pro_);
   param.ajouter("nb_probes_post_pro", &nb_probes_post_pro_);
@@ -310,7 +312,6 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   uniform_lambda_ = lambda_liquid_;
   uniform_alpha_ =	lambda_liquid_ / (ref_ijk_ft_->get_rho_l() * cp_liquid_);
   //  calulate_grad_T_ = 1;
-  // TODO: Reused grad T calculation
   calulate_grad_T_=0;
   /*
    * Be careful, it plays a role for allocating the fields in
@@ -988,9 +989,7 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
   is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
   if (is_first_time_step_)
     first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
-  /*
-   * FIXME: Do the first step only at the first iteration
-   */
+
   if (debug_)
     debug_LRS_cells_.data() = -1.;
 
@@ -1119,7 +1118,7 @@ void IJK_Thermal_Subresolution::compute_radial_first_second_order_operators(Matr
 }
 
 /*
- * FIXME : Should be moved to a class of tools
+ * TODO : Should be moved to a class of tools ?
  */
 
 void IJK_Thermal_Subresolution::compute_first_order_operator_raw(Matrice& radial_first_order_operator)
@@ -1127,7 +1126,7 @@ void IJK_Thermal_Subresolution::compute_first_order_operator_raw(Matrice& radial
   /*
    * Compute the first-order matrix for Finite-Differences
    */
-  // TODO:
+  // TODO: Replace with matrice morse
   int check_nb_elem;
   check_nb_elem = finite_difference_assembler_.build(radial_first_order_operator, points_per_thermal_subproblem_, 0);
   Cerr << "Check_nb_elem: " << check_nb_elem << finl;
@@ -1145,7 +1144,7 @@ void IJK_Thermal_Subresolution::compute_second_order_operator_raw(Matrice& radia
   /*
    * Compute the second-order matrix for Finite-Differences
    */
-  // TODO:
+  // TODO: Replace with matrice morse
   int check_nb_elem;
   check_nb_elem = finite_difference_assembler_.build(radial_second_order_operator, points_per_thermal_subproblem_, 1);
   Cerr << "Check_nb_elem: " << check_nb_elem << finl;
@@ -1269,6 +1268,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            n_iter_distance_);
 
               }
+      thermal_local_subproblems_.compute_global_indices();
     }
 }
 
@@ -1520,9 +1520,6 @@ void IJK_Thermal_Subresolution::approximate_temperature_increment_material_deriv
     }
 }
 
-/*
- * TODO: DEBUG
- */
 void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
   if (!disable_subresolution_)
@@ -1662,10 +1659,6 @@ void IJK_Thermal_Subresolution::check_wrong_values_rhs()
     }
 }
 
-/*
- * TODO:
- */
-
 void IJK_Thermal_Subresolution::update_intersections()
 {
   if (!disable_subresolution_)
@@ -1711,7 +1704,7 @@ void IJK_Thermal_Subresolution::compute_min_max_reachable_fluxes()
                                                                   cell_faces_neighbours_corrected_diffusive_,
                                                                   neighbours_faces_weighting_colinearity_);
   /*
-   * TODO: Should we put this in the jdd
+   * TODO: Should we put this in the jdd (just for test)
    */
   const int discontinous_min_max_neighbours_faces = 1;
   const int remove_external_neighbour_values = 1;
@@ -1948,7 +1941,9 @@ void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(const Nom& int
                                                                     uniform_lambda_,
                                                                     single_centred_bubble_radius_ini_,
                                                                     nusselt_spherical_diffusion_);
-      thermal_local_subproblems_.sort_limited_probes_spherical_coords_post_processing(nb_theta_post_pro_, nb_phi_post_pro_, 1, 1);
+      thermal_local_subproblems_.sort_limited_probes_spherical_coords_post_processing(post_process_all_probes_,
+                                                                                      nb_theta_post_pro_, nb_phi_post_pro_,
+                                                                                      1, 1);
       thermal_local_subproblems_.thermal_subresolution_outputs(rang_,
                                                                interfacial_quantities_thermal_probes,
                                                                overall_bubbles_quantities,

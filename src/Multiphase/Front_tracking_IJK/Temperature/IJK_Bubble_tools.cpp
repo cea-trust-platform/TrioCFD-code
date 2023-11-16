@@ -28,6 +28,17 @@ static int decoder_numero_bulle(const int code)
   return num_bulle;
 }
 
+std::vector<int> arg_sort_array(const ArrOfDouble& array_to_sort)
+{
+  const int n = array_to_sort.size_array();
+  // IntVect indices(n);
+  std::vector<int> indices(n);
+  for (int j=0; j<n; j++)
+    indices[j]=j;
+  std::sort(indices.begin(), indices.end(), [&array_to_sort](int i, int j) {return array_to_sort[i] < array_to_sort[j];});
+  return indices;
+}
+
 /* FROM void IJK_Interfaces::calculer_volume_bulles
  * L'index de la bulle ghost est (entre -1 et -nbulles_ghost):
  * const int idx_ghost = get_ghost_number_from_compo(compo);

@@ -308,6 +308,9 @@ protected :
   DoubleVect thermal_subproblems_rhs_assembly_;
   DoubleVect thermal_subproblems_temperature_solution_;
 
+  /*
+   * TODO: Cast the matrice with Matrice Morse directly (not Matrice Bloc)
+   */
   Matrice thermal_subproblems_matrix_assembly_for_solver_;
   Matrice thermal_subproblems_matrix_assembly_for_solver_reduced_;
 
@@ -421,6 +424,7 @@ protected :
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
   IJK_Field_int neighbours_temperature_to_correct_trimmed_;
 
+  int post_process_all_probes_;
   int nb_theta_post_pro_;
   int nb_phi_post_pro_;
   int nb_probes_post_pro_;
