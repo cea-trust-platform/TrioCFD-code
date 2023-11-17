@@ -108,9 +108,9 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			Poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3     0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
-			in_poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
-			Out_poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE 3 0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			Poutre  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 3     0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			in_poutre  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 3  0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
+			Out_poutre  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 3 0.0  0.5*1000.9*cos(1000.9*t)*1.e-4 0.0
 
 
 			Wall  paroi_fixe

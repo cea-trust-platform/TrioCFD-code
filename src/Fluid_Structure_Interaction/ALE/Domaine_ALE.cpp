@@ -434,6 +434,18 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
 
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  for (int j=0; j<nb_bords_ALE; j++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(j).le_nom();
+      int rang=rang_frontiere(le_nom_bord_ALE);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(rang);
+      if ((la_cl.valeur().que_suis_je() != "Frontiere_ouverte_vitesse_imposee_ALE"))
+        {
+          Cerr <<"Bord mobile ALE:  replace  " <<la_cl.valeur().que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
+          exit();
+        }
+    }
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)

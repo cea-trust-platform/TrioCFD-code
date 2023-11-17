@@ -126,7 +126,7 @@ Read pb
         }
         # Boundary conditions #
         boundary_conditions {
-            Poutre  frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3  0.   0.  0.
+            Poutre  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE_Beam 3  0.   0.  0.
             Wall  paroi_fixe
             In    frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0. 0. 0.
             Out   frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.

@@ -103,7 +103,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*0.06327167604329844*cos(0.06327167604329844*t) 0.0 # mobile bord in ALE framework # 
+			CircleA  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.01*0.06327167604329844*cos(0.06327167604329844*t) 0.0 # mobile bord in ALE framework # 
 			CircleB  paroi_fixe
 		}
 	}
