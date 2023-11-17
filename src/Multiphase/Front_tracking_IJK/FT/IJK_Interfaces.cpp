@@ -303,10 +303,6 @@ Sortie& IJK_Interfaces::printOn(Sortie& os) const
     {
       os << "  positions_reference " << positions_reference_;
     }
-  if (flag_vitesses_reference_)
-    {
-      os << "  vitesses_reference " << vitesses_reference_;
-    }
   if (parcours_.get_correction_parcours_thomas())
     {
       os << "  parcours_interface { correction_parcours_thomas } " << "\n";
@@ -374,7 +370,6 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   //frozen_ = 0;                    // By default, we want the motion of the interfaces.
   //flag_positions_reference_ = 0;  // Pas de position de reference imposee
   positions_reference_.resize(0); // Par defaut, a dimensionner ensuite
-  vitesses_reference_.resize(0); // Par defaut, a dimensionner ensuite
   mean_force_.resize(0);          // Par defaut, a dimensionner ensuite
 
   Param param(que_suis_je());
@@ -399,7 +394,6 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   param.ajouter("ncells_deleted", &ncells_deleted_);
   param.ajouter_flag("frozen", &frozen_);
   param.ajouter("positions_reference", &positions_reference_);
-  param.ajouter("vitesses_reference", &vitesses_reference_);
   param.ajouter("mean_force", &mean_force_);
   param.ajouter("parcours_interface",&parcours_);
 
@@ -426,12 +420,6 @@ Entree& IJK_Interfaces::readOn(Entree& is)
     {
       flag_positions_reference_ = 1;
       Cout << "IJK_Interfaces::readOn : " << positions_reference_.dimension(0)
-           << " bulles reelles reprises avec une position de reference. " << finl;
-    }
-  if (vitesses_reference_.size_array() != 0)
-    {
-      flag_vitesses_reference_ = 1;
-      Cout << "IJK_Interfaces::readOn : " << vitesses_reference_.dimension(0)
            << " bulles reelles reprises avec une position de reference. " << finl;
     }
   if (mean_force_.size_array() != 0)
@@ -1017,8 +1005,6 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
                     through_yminus_[inew] = through_yminus_[icompo];
                   if (positions_reference_.size_array())
                     positions_reference_[inew] = positions_reference_[icompo];
-                  if (vitesses_reference_.size_array())
-                    vitesses_reference_[inew] = vitesses_reference_[icompo];
                 }
             }
           compo_to_group_.resize_array(nb_bulles_reelles_futur);
@@ -1026,8 +1012,6 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
             through_yminus_.resize_array(nb_bulles_reelles_futur);
           if (positions_reference_.size_array())
             positions_reference_.resize_array(nb_bulles_reelles_futur);
-          if (vitesses_reference_.size_array())
-            vitesses_reference_.resize_array(nb_bulles_reelles_futur);
           Cerr << "The table of bubbles groups (compo_to_group_), "
                << " (as well as possibly through_yminus_ and positions_reference_ "
                << "if needed)"  << " have been updated in accordance." << finl;
@@ -1035,7 +1019,6 @@ void IJK_Interfaces::supprimer_certaines_bulles_reelles()
       envoyer_broadcast(compo_to_group_, 0);
       envoyer_broadcast(through_yminus_, 0);
       envoyer_broadcast(positions_reference_, 0);
-      envoyer_broadcast(vitesses_reference_, 0);
       nb_bulles_reelles_ = nb_bulles_reelles_futur;
     }
 }
@@ -5471,153 +5454,6 @@ void IJK_Interfaces::detecter_et_supprimer_rejeton(bool duplicatas_etaient_prese
 
 // Rempli le champ de force de rappel pour les bulles fixes.
 // coef_rayon_force_rappel : coef de taille du domaine de rappel const (attention aux superposition de bulles)
-void IJK_Interfaces::compute_add_external_forces_for_qdm_conservation_in_shear_periodicity(FixedVector<IJK_Field_double, 3>& rappel_ft,
-                                                                                           FixedVector<IJK_Field_double, 3>& rappel,
-                                                                                           const IJK_Field_double& indic/*_ns*/,
-                                                                                           const IJK_Field_double& indic_ft,
-                                                                                           const double coef_immo,
-                                                                                           const int tstep,
-                                                                                           const double current_time,
-                                                                                           const double coef_rayon_force_rappel)
-{
-  //////////////////////////////////// CALCUL DES VITESSE MOYENNE PAR BULLES ///////////////////////////////////////
-  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
-  const DoubleTab& sommets = mesh.sommets() ; // Tableau des coordonnees des marqueurs.
-  int nbsom = sommets.dimension(0);
-  DoubleTab deplacement(nbsom,3);
-
-  compute_vinterp(); // to resize and fill vinterp_
-
-  // Les sommets virtuels sont peut-etre trop loin pour pouvoir interpoler leur vitesse,
-  // il faut faire un echange espace virtuel pour avoir leur vitesse.
-  mesh.desc_sommets().echange_espace_virtuel(vinterp_);
-
-  // Calcul d'un deplacement preservant la distribution des noeuds sur les bulles:
-  // Inspiree de : Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local
-
-  const int nbulles_reelles = get_nb_bulles_reelles();
-  const int nbulles_ghost = get_nb_bulles_ghost();
-  const int nbulles_tot = nbulles_reelles + nbulles_ghost;
-  const ArrOfInt& compo_connex = mesh.compo_connexe_facettes();
-  //  assert(compo_connex.size_array() == 0 || min_array(compo_connex) >=0); // Les duplicatas ne sont pas presents pendant le transport.
-  // Nouveau depuis le 13/03/2014 : Les bulles ghost sont autorisees lors du transport...
-  ArrOfDouble surface_par_bulle;
-  calculer_surface_bulles(surface_par_bulle);
-  const ArrOfDouble& surface_facette = mesh.get_update_surface_facettes();
-  ArrOfIntFT compo_connex_som;
-  mesh.calculer_compo_connexe_sommets(compo_connex_som);
-
-  DoubleTab vitesses_bulles(nbulles_tot,3);
-  calculer_vmoy_composantes_connexes(mesh,
-                                     surface_facette,
-                                     surface_par_bulle,
-                                     compo_connex,
-                                     nbulles_reelles,
-                                     nbulles_ghost,
-                                     vinterp_,
-                                     vitesses_bulles);
-
-
-  // on stocke dans la vitesses_reference_ la vitesses_bulles instantanne au moment ou ca nous interesse, cest a dire quand la bulle
-  // n'est pas dans la zone de cisaillement periodique
-  ArrOfDouble volume_reel;
-  DoubleTab position;
-  calculer_volume_bulles(volume_reel, position);
-  DoubleTab bounding_box;
-  calculer_bounding_box_bulles(bounding_box);
-  double Lz =  rappel.get_splitting().get_grid_geometry().get_domain_length(2);
-  // bounding_box(b,dir,m) :
-  //      b -> Numero de la composante connexe de la bulle.
-  //      dir -> Direction i,j ou k.
-  //      m   -> min (0) ou max (1)
-  for (int idir=0; idir < 3; idir++)
-    {
-      for (int ib=0; ib < nb_bulles_reelles_; ib++)
-        {
-          if (bounding_box(ib,2,0)>0. && bounding_box(ib,2,1)<Lz)
-            {
-              vitesses_reference_(ib,idir)=vitesses_bulles(ib,idir);
-            }
-        }
-    }
-
-  //////////////////////////////////// FIN CALCUL DES VITESSE MOYENNE PAR BULLES ///////////////////////////////////////
-
-  //////////////////////////////// CALCUL DES FORCES (algo inspired by Thomas & Bolotnov) ///////////////////////////////////
-
-
-  DoubleTab individual_forces(nb_bulles_reelles_,3);
-  for (int idir=0; idir < 3; idir++)
-    {
-      std::cout<< "idir = " << idir << std::endl;
-      for (int ib=0; ib < nb_bulles_reelles_; ib++)
-        {
-          if (Process::je_suis_maitre())
-            {
-              double dx = vitesses_reference_(ib,idir)-vitesses_bulles(ib,idir);
-              std::cout<< "dx = " << dx << std::endl;
-              std::cout<< "vitesses_reference_(ib,idir) = " << vitesses_reference_(ib,idir) << std::endl;
-              std::cout<< "vitesses_bulles(ib,idir) = " << vitesses_bulles(ib,idir) << std::endl;
-              individual_forces(ib,idir) = coef_immo*dx;
-            }
-        }
-      std::cout << std::endl;
-    }
-  envoyer_broadcast(individual_forces, 0);
-
-
-  ////////////////////////////// FIN CALCUL DES FORCES (algo inspired by Thomas & Bolotnov) ////////////////////////////////
-
-  // Choix de la methode implementee :
-  const int parser = parser_;
-  if (parser)
-    {
-      compute_external_forces_parser(rappel, indic, individual_forces, volume_reel, position, coef_rayon_force_rappel);
-    }
-  else
-    {
-      // The table "individual_forces" enters with the value for each force and is modified to contain
-      // the integral of F over the volume where the bubble force is applied. And is finally divided by that volume.
-      // Then, the value (that would be applied over the whole volume) is in the table
-      compute_external_forces_color_function(rappel_ft,indic/*_ns*/, indic_ft,individual_forces, volume_reel, position);
-      //Cerr << "t= "<< current_time << " Max-abs(individual_forces)= "<< max_abs_array(individual_forces) << finl;
-    }
-
-  // In the current state, every time-step is post-processed.
-  if (Process::je_suis_maitre())
-    {
-      char s[1000];
-      const char *nomcas = nom_du_cas();
-      SFichier fic;
-      int reset = (!reprise_) && (tstep==0);
-      IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
-      for (True_int idir=0; idir < 3; idir++)
-        {
-          snprintf(s, 1000, "%s_bulles_external_force_every_%d.out", nomcas, idir);
-          // Cerr << "Ecriture des donnees par bulles: fichier " << s << finl;
-          fic.ouvrir(s, mode);
-          if (reset)
-            {
-              // Header in the file:
-              snprintf(s, 1000, "# Individual forces applied inside chiv[bubble_i]=1.\n# value=1./Vol_bubble \\int F_j(bubble_i) dv");
-              fic << s;
-              fic << finl;
-            }
-          snprintf(s, 1000, "%.16e ", current_time);
-          fic << s;
-          for (int ib = 0; ib < nb_bulles_reelles_; ib++)
-            {
-              snprintf(s, 1000, "%.16e ", individual_forces(ib,idir));
-              fic << s;
-            }
-          fic << finl;
-          fic.close();
-        }
-    }
-}
-
-// Rempli le champ de force de rappel pour les bulles fixes.
-// coef_rayon_force_rappel : coef de taille du domaine de rappel const (attention aux superposition de bulles)
 void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& rappel_ft,
                                               FixedVector<IJK_Field_double, 3>& rappel,
                                               const FixedVector<IJK_Field_double, 3>& vitesse,
@@ -5769,8 +5605,6 @@ void IJK_Interfaces::compute_external_forces_(FixedVector<IJK_Field_double, 3>& 
         }
     }
 }
-
-
 
 // The method is based on an eulerian color function refering to each bubble
 // BEWARE : individual_forces should contain the value of each force in inlet and
