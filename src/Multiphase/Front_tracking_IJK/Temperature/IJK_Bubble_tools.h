@@ -42,6 +42,7 @@
 
 // Fill compo using a dummy bounding box
 std::vector<int> arg_sort_array(const ArrOfDouble& array_to_sort);
+std::vector<int> arg_sort_array_phi(const ArrOfDouble& angle_incr, const ArrOfDouble& first_angle, const ArrOfDouble& array_to_sort);
 
 void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                                      DoubleTab& bounding_box,

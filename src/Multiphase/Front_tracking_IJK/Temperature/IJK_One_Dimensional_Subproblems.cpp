@@ -129,7 +129,7 @@ void IJK_One_Dimensional_Subproblems::compute_global_indices()
   ArrOfInt indices_ini(proc_number);
   ArrOfInt indices_max(proc_number);
   indices_ini(0) = 0;
-  indices_max(0) = indices_ini(0);
+  indices_max(0) = indices(0);
   for (int i=1; i<proc_number; i++)
     {
       indices_ini(i) = indices_ini(i-1) + indices(i-1);
@@ -587,8 +587,12 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
   std::map<std::string, ArrOfDouble> results_probes_double;
   std::map<std::string, ArrOfInt> results_probes_int;
 
-  std::vector<std::string> key_results_int = {"tstep", "thermalrank", "tsubproblem" "localsubproblem"};
+  std::vector<std::string> key_results_int = {"tstep", "thermalrank", "postproindex", "globalsubproblem", "localsubproblem"};
   std::vector<std::string> key_results_double = {"time",
+                                                 "nx", "ny", "nz",
+                                                 "t1x", "t1y", "t2z", "t2x", "t2y", "t2z",
+                                                 "s1x", "s1y", "s2z", "s2x", "s2y", "s2z",
+                                                 "rsph", "thetasph", "phisph",
                                                  "temperature_interp","temperature_solution","temperature_gradient","temperature_gradient_sol"
                                                  "temperature_double_deriv_sol",
                                                  "temperature_gradient_tangential","temperature_gradient_tangential2",
@@ -598,6 +602,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                  "radial_temperature_diffusion",
                                                  "tangential_temperature_diffusion",
                                                  "surface","thermal_flux","lambda","alpha","prandtl_liq",
+                                                 "shear","force",
                                                  "pressure",
                                                  "u_x","u_y","u_z",
                                                  "u_r","u_r_corr","u_r_static","u_r_advected",
@@ -654,8 +659,10 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   //if (Process::je_suis_maitre())
   // {
   const int reset = 1;
-  const int last_time = ref_ijk_ft_->get_tstep();
-  Nom probe_header = Nom("tstep\tthermalrank\tsubproblem\tlocalsubproblem\ttime"
+  const int last_time_index = ref_ijk_ft_->get_tstep();
+  Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
+                         "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
+                         "\trsph\tthetasph\tphisph"
                          "\ttemperature_interp\ttemperature_solution"
                          "\ttemperature_gradient\ttemperature_gradient_sol"
                          "\ttemperature_double_deriv_sol"
@@ -666,6 +673,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
                          "\tradial_temperature_diffusion"
                          "\ttangential_temperature_diffusion"
                          "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                         "\tshear\tforce"
                          "\tpressure"
                          "\tu_x\tu_y\tu_z"
                          "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
@@ -675,17 +683,26 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
                          "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
                          "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
 
-  Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
-                   + Nom(last_time) + Nom("_processor_") +  + Nom(".out");
+  const int max_digit = 3;
+  const int max_digit_time = 8;
+  const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
+  const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
+
+  Nom probe_name = Nom("_thermal_rank_") +  Nom(std::string(max_digit - max_rank_digit, '0'))  + Nom(rank)
+                   + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
+                   + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
 
   const int proc_number = Process::nproc();
-  if (proc_number != 0)
+  if (proc_number != 1)
     {
       const int my_process_number = Process::me();
       Nom my_process_string = Nom(".processor_") + Nom(my_process_number);
       probe_name += my_process_string;
     }
 
+  /*
+   * Post-process all probes for interfacial quantities
+   */
   SFichier fic = Open_file_folder(interfacial_quantities_thermal_probes, probe_name, probe_header, reset);
 
   for (int itr=0; itr < subproblems_counter_; itr++)
@@ -939,12 +956,14 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
                 sum_errors_theta_phi_scope.push_back(theta_diff(k));
                 sum_errors_theta_phi_scope[k] += phi_diff(k);
               }
+
+
             const int theta_phi_scope_index = (int) std::distance(sum_errors_theta_phi_scope.begin(),
                                                                   std::min_element(sum_errors_theta_phi_scope.begin(),
                                                                                    sum_errors_theta_phi_scope.end()));
 
-            if (theta_phi_scope_index >= index_ini_ && theta_phi_scope_index < index_end_)
-              (*this)[theta_phi_scope_index - index_ini_].set_post_processing_theta_phi_scope(phi_theta_counter);
+//            if (theta_phi_scope_index >= index_ini_ && theta_phi_scope_index < index_end_)
+//              (*this)[theta_phi_scope_index - index_ini_].set_post_processing_theta_phi_scope(phi_theta_counter);
             radius_outputs_(phi_theta_counter) = r_sph(theta_phi_scope_index);
             theta_outputs_(phi_theta_counter) = theta_sph(theta_phi_scope_index);
             phi_outputs_(phi_theta_counter) = phi_sph(theta_phi_scope_index);
@@ -954,17 +973,42 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
       mp_sum_for_each_item(radius_outputs_);
       mp_sum_for_each_item(theta_outputs_);
       mp_sum_for_each_item(phi_outputs_);
-      std::vector<int> indices_theta_sorted = arg_sort_array(theta_outputs_);
+
       ArrOfDouble radius_outputs_tmp = radius_outputs_;
       ArrOfDouble theta_outputs_tmp = theta_outputs_;
       ArrOfDouble phi_outputs_tmp = phi_outputs_;
       ArrOfInt global_indices_post_processed_tmp = global_indices_post_processed_;
-      for (int ii=0; ii<nb_subproblems_total; ii++)
+
+      int ii;
+      std::vector<int> indices_theta_sorted = arg_sort_array(theta_outputs_);
+      for (ii=0; ii<nb_outputs; ii++)
         {
-          radius_outputs_(ii) = theta_outputs_tmp(indices_theta_sorted[ii]);
+          radius_outputs_(ii) = radius_outputs_tmp(indices_theta_sorted[ii]);
           theta_outputs_(ii) = theta_outputs_tmp(indices_theta_sorted[ii]);
           phi_outputs_(ii) = phi_outputs_tmp(indices_theta_sorted[ii]);
           global_indices_post_processed_(ii) = global_indices_post_processed_tmp(indices_theta_sorted[ii]);
+        }
+
+      std::vector<int> indices_phi_sorted = arg_sort_array_phi(theta_scope, theta_outputs_, phi_outputs_);
+      radius_outputs_tmp = radius_outputs_;
+      theta_outputs_tmp = theta_outputs_;
+      phi_outputs_tmp = phi_outputs_;
+      global_indices_post_processed_tmp = global_indices_post_processed_;
+      for (ii=0; ii<nb_outputs; ii++)
+        {
+          radius_outputs_(ii) = radius_outputs_tmp(indices_phi_sorted[ii]);
+          theta_outputs_(ii) = theta_outputs_tmp(indices_phi_sorted[ii]);
+          phi_outputs_(ii) = phi_outputs_tmp(indices_phi_sorted[ii]);
+          global_indices_post_processed_(ii) = global_indices_post_processed_tmp(indices_phi_sorted[ii]);
+        }
+
+      phi_theta_counter = 0;
+      for (ii=0; ii<nb_outputs; ii++)
+        {
+          const int global_index = global_indices_post_processed_(ii);
+          if (global_index >= index_ini_ && global_index < index_end_)
+            (*this)[global_index - index_ini_].set_post_processing_theta_phi_scope(phi_theta_counter);
+          phi_theta_counter++;
         }
     }
 }

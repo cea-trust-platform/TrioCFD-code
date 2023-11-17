@@ -345,7 +345,8 @@ public :
   }
   void set_post_processing_theta_phi_scope(const int index)
   {
-    is_post_processed_ = true;
+    is_post_processed_local_ = true;
+
     index_post_processing_ = index;
   };
   const double& get_interfacial_thermal_flux() const
@@ -783,7 +784,7 @@ protected :
 
   REF(IJK_FT_double) ref_ijk_ft_;
   bool is_updated_ = false;
-  bool is_post_processed_ = false;
+  bool is_post_processed_local_ = false;
 
   /*
    * Some tries to do explicit temporal variations at the beginning

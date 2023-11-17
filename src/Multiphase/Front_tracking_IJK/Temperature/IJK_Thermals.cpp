@@ -124,12 +124,15 @@ void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
 {
   int idth =0;
   Nom thermal_outputs_rank_base = Nom("thermal_outputs_rank_");
+  const int max_digit = 3;
   for (auto& itr : (*this))
     {
       nalloc += itr.initialize(splitting, idth);
       if (!ref_ijk_ft_->disable_diphasique())
         itr.update_thermal_properties();
-      thermal_rank_folder_.add(thermal_outputs_rank_base + Nom(idth));
+      const int max_rank_digit = idth < 1 ? 1 : (int) (log10(idth) + 1);
+      thermal_rank_folder_.add(thermal_outputs_rank_base
+                               + Nom(std::string(max_digit - max_rank_digit, '0')) + Nom(idth));
       idth++;
     }
   overall_bubbles_quantities_folder_ = Nom("overall_bubbles_quantities");
@@ -388,9 +391,12 @@ void IJK_Thermals::thermal_subresolution_outputs()
       for (auto& itr : (*this))
         {
           const int last_time = ref_ijk_ft_->get_tstep();
+          const int max_digit_time = 8;
+          const int nb_digit_tstep = last_time < 1 ? 1 : (int) (log10(last_time) + 1);
           Nom local_quantities_thermal_probes_time_index_folder = thermal_rank_folder_[rank] + "/"
                                                                   + local_quantities_thermal_probes_folder_ + "/"
-                                                                  + local_quantities_thermal_probes_time_index_folder_ + Nom(last_time);
+                                                                  + local_quantities_thermal_probes_time_index_folder_
+                                                                  + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time);
           Nom overall_bubbles_quantities = thermal_rank_folder_[rank] + "/" + overall_bubbles_quantities_folder_;
           Nom interfacial_quantities_thermal_probes = thermal_rank_folder_[rank] + "/" + interfacial_quantities_thermal_probes_folder_;
 
@@ -422,11 +428,11 @@ void IJK_Thermals::create_folders(Nom folder_name_base)
   if (Process::je_suis_maitre())
     {
       Nom spacing = " ";
-      Nom folder_name = "\"mkdir -p";
-      folder_name = folder_name + spacing + folder_name_base.getString() + spacing + "\""; // donothing";
+      Nom folder_name = "mkdir -p";
+      folder_name = folder_name + spacing + folder_name_base.getString(); // donothing";
       Cerr << "Shell command executed: " << folder_name << finl;
       int error = system(folder_name);
-      assert(error);
+      assert(!error);
       if (error)
         Process::exit();
       //  istringstream folder_name_istringstream(folder_name.c_str());

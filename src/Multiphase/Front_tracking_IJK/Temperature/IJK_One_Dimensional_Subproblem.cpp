@@ -2766,7 +2766,7 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
   const int last_time_index = ref_ijk_ft_->get_tstep();
   std::vector<int> results_int =
   {
-    last_time_index, rank, global_subproblem_index_, sub_problem_index_
+    last_time_index, rank, index_post_processing_, global_subproblem_index_, sub_problem_index_
   };
 
   std::vector<double> results_double =
@@ -2818,13 +2818,19 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
 {
   // if (Process::je_suis_maitre())
   {
-    if (is_updated_ && is_post_processed_)
+    if (is_updated_)
       {
         const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
         const int last_time_index = ref_ijk_ft_->get_tstep();
         fic << last_time_index << " ";
-        fic << rank << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
+        fic << rank << " " << index_post_processing_ << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
         fic << last_time << " ";
+        fic << normal_vector_compo_[0] << " " << normal_vector_compo_[1] << " " << normal_vector_compo_[2] << " ";
+        fic << first_tangential_vector_compo_[0] << " " << first_tangential_vector_compo_[1] << " " << first_tangential_vector_compo_[2] << " ";
+        fic << second_tangential_vector_compo_[0] << " " << second_tangential_vector_compo_[1] << " " << second_tangential_vector_compo_[2] << " ";
+        fic << first_tangential_vector_compo_from_rising_dir_[0] << " " << first_tangential_vector_compo_from_rising_dir_[1] << " " << first_tangential_vector_compo_from_rising_dir_[2] << " ";
+        fic << azymuthal_vector_compo_[0] << " " << azymuthal_vector_compo_[1] << " " << azymuthal_vector_compo_[2] << " ";
+        fic << r_sph_ << " " << theta_sph_ << " " << phi_sph_ << " ";
         fic << temperature_interp_[0] << " " << temperature_solution_[0] << " ";
         fic << normal_temperature_gradient_[0] << " " << normal_temperature_gradient_solution_[0] << " ";
         fic << normal_temperature_double_derivative_solution_[0] << " ";
@@ -2837,6 +2843,7 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
         fic << radial_temperature_diffusion_[0] << " ";
         fic << tangential_temperature_diffusion_[0] << " ";
         fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+        fic << velocity_shear_force_ << " " << velocity_shear_stress_ << " ";
         fic << pressure_interp_[0] << " ";
         fic << x_velocity_[0] << " " << y_velocity_[0] << " " << z_velocity_[0] << " ";
         fic << radial_velocity_[0] << " " << radial_velocity_corrected_[0] << " ";
@@ -2867,14 +2874,23 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
   //												 "\tu_x\tu_y\tu_z\tu_r\tu_r_corr\tu_theta\tu_theta2\tu_phi\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_phi_dr");
   // if (Process::je_suis_maitre())
   {
-    if (is_updated_ && is_post_processed_)
+    if (is_updated_ && is_post_processed_local_)
       {
         // const int reset = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
         const int reset = 1;
+        const int max_digit = 8;
+        const int last_time_index = ref_ijk_ft_->get_tstep();
+        const int nb_digit_index_post_pro = index_post_processing_ < 1 ? 1 : (int) (log10(index_post_processing_) + 1);
+        const int nb_digit_index_global = global_subproblem_index_ < 1 ? 1 : (int) (log10(global_subproblem_index_) + 1);
+        const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
 
-        Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(global_subproblem_index_) + ("_radial_quantities_time_index_")
-                         + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
-        Nom probe_header = Nom("tstep\tthermalrank\tsubproblem\tlocalsubproblem\ttime"
+        Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(std::string(max_digit - nb_digit_index_post_pro, '0'))
+                         + Nom(index_post_processing_)
+                         + Nom("_global_") + Nom(std::string(max_digit - nb_digit_index_global, '0')) + Nom(global_subproblem_index_)
+                         + Nom("_radial_quantities_time_index_") +
+                         + Nom(std::string(max_digit - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
+        Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
+                               "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
                                "\tradial_coord\ttemperature_interp\ttemperature_solution"
                                "\ttemperature_gradient\ttemperature_gradient_sol"
                                "\ttemperature_double_deriv_sol"
@@ -2885,6 +2901,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tradial_temperature_diffusion"
                                "\ttangential_temperature_diffusion"
                                "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                               "\tshear"
                                "\tpressure"
                                "\tu_x\tu_y\tu_z"
                                "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
@@ -2895,12 +2912,17 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
         SFichier fic = Open_file_folder(local_quantities_thermal_probes_time_index_folder, probe_name, probe_header, reset);
         const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
-        const int last_time_index = ref_ijk_ft_->get_tstep();
         for (int i=0; i<(*points_per_thermal_subproblem_); i++)
           {
             fic << last_time_index << " ";
-            fic << rank << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
+            fic << rank << " " << index_post_processing_ << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
             fic << last_time << " ";
+            fic << normal_vector_compo_[0] << " " << normal_vector_compo_[1] << " " << normal_vector_compo_[2] << " ";
+            fic << first_tangential_vector_compo_[0] << " " << first_tangential_vector_compo_[1] << " " << first_tangential_vector_compo_[2] << " ";
+            fic << second_tangential_vector_compo_[0] << " " << second_tangential_vector_compo_[1] << " " << second_tangential_vector_compo_[2] << " ";
+            fic << first_tangential_vector_compo_from_rising_dir_[0] << " " << first_tangential_vector_compo_from_rising_dir_[1] << " " << first_tangential_vector_compo_from_rising_dir_[2] << " ";
+            fic << azymuthal_vector_compo_[0] << " " << azymuthal_vector_compo_[1] << " " << azymuthal_vector_compo_[2] << " ";
+            fic << r_sph_ << " " << theta_sph_ << " " << phi_sph_ << " ";
             fic << (*radial_coordinates_)[i] << " " << temperature_interp_[i] << " " << temperature_solution_[i] << " ";
             fic << normal_temperature_gradient_[i] << " " << normal_temperature_gradient_solution_[i] << " ";
             fic << normal_temperature_double_derivative_solution_[i] << " ";
@@ -2913,6 +2935,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
             fic << radial_temperature_diffusion_[i] << " ";
             fic << tangential_temperature_diffusion_[i] << " ";
             fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+            fic << shear_stress_[i] << " ";
             fic << pressure_interp_[i] << " ";
             fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
             fic << radial_velocity_[i] << " " << radial_velocity_corrected_[i] << " ";

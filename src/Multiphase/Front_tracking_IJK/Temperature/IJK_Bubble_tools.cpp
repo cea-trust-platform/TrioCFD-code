@@ -39,6 +39,42 @@ std::vector<int> arg_sort_array(const ArrOfDouble& array_to_sort)
   return indices;
 }
 
+std::vector<int> arg_sort_array_phi(const ArrOfDouble& angle_incr, const ArrOfDouble& first_angle, const ArrOfDouble& array_to_sort)
+{
+  const int n = array_to_sort.size_array();
+  const double constant_angle_incr = abs(angle_incr[1] - angle_incr[0]);
+  std::vector<int> indices;
+  std::vector<int> indices_subarray;
+  ArrOfDouble sub_array;
+  for (int i=0; i<angle_incr.size_array(); i++)
+    {
+      sub_array.set_smart_resize(1);
+      const double angle_min = angle_incr(i) - constant_angle_incr / 2;
+      const double angle_max = angle_incr(i) + constant_angle_incr / 2;
+      for (int j=0; j<first_angle.size_array(); j++)
+        if (first_angle(j) >= angle_min && first_angle(j) < angle_max)
+          {
+            indices_subarray.push_back(j);
+            sub_array.append_array(array_to_sort(j));
+          }
+      std::vector<int> indices_subarray_sorted = arg_sort_array(sub_array);
+      const int size_subarray_sorted = (int) indices_subarray_sorted.size();
+      for (int k=0; k<size_subarray_sorted; k++)
+        {
+          const int index = indices_subarray_sorted[k];
+          indices.push_back((int) indices_subarray[index]);
+        }
+      indices_subarray.clear();
+      sub_array.reset();
+    }
+
+  assert((int) indices.size() == n);
+  if (!((int) indices.size() == n))
+    Process::exit();
+
+  return indices;
+}
+
 /* FROM void IJK_Interfaces::calculer_volume_bulles
  * L'index de la bulle ghost est (entre -1 et -nbulles_ghost):
  * const int idx_ghost = get_ghost_number_from_compo(compo);
