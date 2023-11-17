@@ -43,6 +43,8 @@
 #include <Faces.h>
 #include <CL_Types_include.h>
 #include <EFichier.h>
+#include <Entree_fluide_vitesse_imposee_ALE.h>
+#include <Navier_Stokes_std_ALE.h>
 
 
 
@@ -371,7 +373,7 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
-  //Cerr << "Domaine_ALE::initialiser  " << finl;
+  Cerr << "Domaine_ALE::initialize " << finl;
   deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
@@ -434,18 +436,36 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
 
+  //checking correct type of BC on the moving boundary
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
   for (int j=0; j<nb_bords_ALE; j++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(j).le_nom();
       int rang=rang_frontiere(le_nom_bord_ALE);
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(rang);
-      if ((la_cl.valeur().que_suis_je() != "Frontiere_ouverte_vitesse_imposee_ALE"))
+      if (!sub_type(Entree_fluide_vitesse_imposee_ALE,la_cl.valeur()))
         {
           Cerr <<"Bord mobile ALE:  replace  " <<la_cl.valeur().que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
           exit();
         }
     }
+
+  // check that Problem is well defined when we the domain is mobile (domaine_ALE)
+  Nom pbb = pb.que_suis_je();
+  if (!pbb.contient("ALE"))
+    {
+      Cerr <<"Domaine_ALE:  replace  " <<pb.que_suis_je()<<" with "<< pb.que_suis_je() <<"_ALE and restart!"<< finl;
+      exit();
+    }
+
+  // check that the equation is Navier_Stokes_std_ALE when we the domain is mobile (domaine_ALE)
+  /* const Navier_Stokes_std_ALE& eqn_hydr = ref_cast(Navier_Stokes_std_ALE,eq);
+     Nom eqnom = eqn_hydr.que_suis_je();
+      if (!eqnom.contient("ALE")){
+      Cout<<"replace "<<eqn_hydr.que_suis_je()<<"  with "<<eqn_hydr.que_suis_je()<<"_ALE and restart   "<<finl;
+      exit();}
+      */
+
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
@@ -717,7 +737,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
     //Cerr << "Matrice de filtrage OK" << finl;
     //Cerr << "Matrice de Laplacien P1 : " << finl;
   }
-//Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
+  //Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
   DoubleVect secmem(nb_som());
   const MD_Vector& md = md_vector_sommets();
   MD_Vector_tools::creer_tableau_distribue(md, secmem);
@@ -769,8 +789,8 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
     }
 
   ch_som.echange_espace_virtuel();
-//double x = mp_norme_vect(ch_som);
-//Cerr << "norme(c) = " << x << finl;
+  //double x = mp_norme_vect(ch_som);
+  //Cerr << "norme(c) = " << x << finl;
   Debog::verifier("Domaine_ALE::laplacien -ch_som", ch_som);
   return ch_som;
 }
@@ -1202,16 +1222,16 @@ DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const int& i, const double& 
 /*double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
 {
 
-  double dt = 0.;
-  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
-  const DoubleVect& surfaces = domaine_VEF.face_surfaces();
-  double minSurf = mp_min_vect(surfaces);
-  minSurf = Process::mp_min(minSurf);
-  //Cerr << " Surface min: "<< minSurf << endl;
-  double soundSpeed=beam->soundSpeed();
-  //Cerr << "soundSpeed: "<< soundSpeed << endl;
-  dt = 0.5*(minSurf/soundSpeed);
-  return dt;
+double dt = 0.;
+const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+const DoubleVect& surfaces = domaine_VEF.face_surfaces();
+double minSurf = mp_min_vect(surfaces);
+minSurf = Process::mp_min(minSurf);
+//Cerr << " Surface min: "<< minSurf << endl;
+double soundSpeed=beam->soundSpeed();
+//Cerr << "soundSpeed: "<< soundSpeed << endl;
+dt = 0.5*(minSurf/soundSpeed);
+return dt;
 }*/
 
 const Nom& Domaine_ALE::getBeamName(const int& i) const

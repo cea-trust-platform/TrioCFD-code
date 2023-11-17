@@ -43,6 +43,7 @@ Sortie& Navier_Stokes_std_ALE::printOn(Sortie& os ) const
 Entree& Navier_Stokes_std_ALE::readOn(Entree& is )
 {
   Navier_Stokes_std::readOn(is);
+  Nom pbb = probleme().que_suis_je();
   return is;
 }
 
