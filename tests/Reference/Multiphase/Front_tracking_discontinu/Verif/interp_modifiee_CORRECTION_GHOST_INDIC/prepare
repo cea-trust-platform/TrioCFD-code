@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # To generate the restart.xyz, you have to manually run this prepare.data : 
+# WARNING TEMPORARY!!!! timestep 2.5E-7 dans le prepare est un contournement d'un bug sournois!!!!!
+# SUPPRIMER LE DERNIER -e du sed quand le BUGFIX est TROUVE...
+# DIFFERENCE sauv/reprise constate...
 sed -e "s/tinit .*/tinit 0./" \
     -e "s/ tmax .*/ tmax 2.500000e-03/" \
     -e "/restart.xyz/d" \
     -e "s/lata.xyz/restart.xyz/" \
+    -e "s/dt_max 5.E-7/dt_max 2.5E-7/" \
     template.data > prepare.data
 
 for i in "interp_standard" "interp_modifiee" "interp_ai_based" 
