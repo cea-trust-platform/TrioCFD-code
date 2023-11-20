@@ -56,8 +56,8 @@ Entree& Energie_cinetique_turbulente::readOn(Entree& is)
 void Energie_cinetique_turbulente::set_param(Param& param)
 {
   Convection_diffusion_turbulence_multiphase::set_param(param);
-  param.ajouter("limit_coef",&coef_limit_); // XD attr limit_coef flottant limit_coef 1 Coefficient of the limiter (min (K, coef * v^2)). Default value of coef is set to 0.1
-  param.ajouter_flag("limit_K",&limit_k_); // XD attr limit_K entier limit_K 1 Flag to activate the limiter on K. Default value is 0 (deactivated)
+  param.ajouter("limit_coef",&coef_limit_); // X_D attr limit_coef flottant limit_coef 1 Coefficient of the limiter (min (K, coef * v^2)). Default value of coef is set to 0.1
+  param.ajouter_flag("limit_K",&limit_k_); // X_D attr limit_K entier limit_K 1 Flag to activate the limiter on K. Default value is 0 (deactivated)
 }
 
 const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport() const

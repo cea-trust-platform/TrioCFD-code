@@ -41,6 +41,9 @@
 #include <Champ_Elem_PolyMAC_P0.h>
 
 Implemente_instanciable(Correction_Lubchenko_PolyMAC_P0, "Correction_Lubchenko_Face_PolyMAC_P0", Source_base);
+// XD Correction_Lubchenko source_base Correction_Lubchenko 1 not_set
+// XD attr beta_lift floattant beta_lift 1 not_set
+// XD attr beta_disp floattant beta_disp 1 not_set
 
 Sortie& Correction_Lubchenko_PolyMAC_P0::printOn(Sortie& os) const
 {

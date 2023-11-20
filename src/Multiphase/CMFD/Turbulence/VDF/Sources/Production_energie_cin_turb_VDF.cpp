@@ -32,8 +32,6 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable(Production_energie_cin_turb_VDF,"Production_energie_cin_turb_VDF_P0_VDF", Source_Production_energie_cin_turb);
-// XD Production_energie_cin_turb source_base Production_energie_cin_turb 1 Production source term for the TKE equation
-
 
 Sortie& Production_energie_cin_turb_VDF::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
 Entree& Production_energie_cin_turb_VDF::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
