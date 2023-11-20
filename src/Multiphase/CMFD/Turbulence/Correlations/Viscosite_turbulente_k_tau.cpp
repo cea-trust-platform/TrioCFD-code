@@ -27,7 +27,7 @@
 #include <TRUSTTab_parts.h>
 
 Implemente_instanciable(Viscosite_turbulente_k_tau, "Viscosite_turbulente_k_tau", Viscosite_turbulente_base);
-
+// XD type_diffusion_turbulente_multiphase_k_tau type_diffusion_turbulente_multiphase_deriv k_tau 1 not_set
 Sortie& Viscosite_turbulente_k_tau::printOn(Sortie& os) const
 {
   return os;
@@ -36,9 +36,9 @@ Sortie& Viscosite_turbulente_k_tau::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_k_tau::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("limiter|limiteur", &limiter_);
-  param.ajouter("sigma", &sigma_);
-  param.ajouter("beta_k", &beta_k_);
+  param.ajouter("limiter|limiteur", &limiter_); // XD_ADD_P chaine not_set
+  param.ajouter("sigma", &sigma_); // XD_ADD_P floattant not_set
+  param.ajouter("beta_k", &beta_k_); // XD_ADD_P floattant not_set
   param.lire_avec_accolades_depuis(is);
   return is;
 }

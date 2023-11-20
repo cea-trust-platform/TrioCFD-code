@@ -11,7 +11,7 @@ Lire_MED { domaine dom fichier Mesh.med }
 
 imposer_vit_bords_ale dom
 {
-	1 # number of mobile boundaries  #
+	1 # number of mobile boundaries #
 	Wall Champ_front_ALE 3  sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5 sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5  ((pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*y-1.*(pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*x)*90*2*pi*cos(90*2*pi*t)*1.e-5 
 	 
 }
@@ -44,7 +44,7 @@ Discretiser pb dis
 
 Lire pb
 {
-	# eau a 20°C et 1.244 bar #
+	# eau a 20 degres C et 1.244 bar #
 	Fluide_incompressible
 	{
 		mu	champ_uniforme 1 1.0016e-3

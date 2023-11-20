@@ -126,7 +126,7 @@ Read pb
     }     
 
     Traitement_particulier { THI { longueur_boite 6.283185307 init_Ec 0 
-                                   calc_spectre 1 periode_calc_spectre 0.25 3D 1 1D 0 } }		
+                                   calc_spectre 1 periode_calc_spectre 0.25 Spectre_3D 1 Spectre_1D 0 } }
 
 
   }
