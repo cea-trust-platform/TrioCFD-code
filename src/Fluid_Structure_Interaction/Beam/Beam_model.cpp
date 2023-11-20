@@ -62,22 +62,40 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model
 //     [ Restart_file_name file ]
 //
 //  }
-//XD  Beam_model interprete Beam_model 1 Reduced mechanical model: a beam model. Resolution based on a modal analysis. Temporal discretization: Newmark or Hilber-Hughes-Taylor (HHT)
-//XD attr nb_beam entier nb 0 Number of beams
-//XD attr Name chaine BeamName 0 Name of the beam (the name must match with the name of the edge in the fluid domain)
-//XD attr nb_modes entier n 0 Number of modes
-//XD attr direction entier dir 0 x=0, y=1, z=2
-//XD attr NewmarkTimeScheme chaine NewmarkTimeScheme 0 Solve the beam dynamics. Time integration scheme: choice between MA (Newmark mean acceleration),  FD (Newmark finite differences), and HHT alpha (Hilber-Hughes-Taylor, alpha usually -0.1 )
-//XD attr Mass_and_stiffness_file_name chaine  Mass_and_stiffness_file_name 0 Name of the file containing the diagonal modal mass, stiffness, and damping matrices.
-//XD attr Absc_file_name chaine Absc_file_name 0 Name of the file containing the coordinates of the Beam
-//XD attr  Modal_deformation_file_name chaine  Modal_deformation_file_name 0 Name of the file containing the modal deformation of the Beam (mandatory if different from 0. 0. 0.)
-//XD attr Young_Module floattant young 1 Young Module
-//XD attr Rho_beam floattant rho 1 Beam density
-//XD attr BaseCenterCoordinates floattant pos_center 1 position of the base center coordinates on the Beam
-//XD attr CI_file_name chaine CI_file_name 1 Name of the file containing the initial condition of the Beam
-//XD attr Restart_file_name chaine Restart_file_name 1 SaveBeamForRestart.txt file to restart the calculation
-//XD attr Output_position_1D floattant pt1d 1 nb_points  position Post-traitement of specific points on the Beam
-//XD attr Output_position_3D floattant pt3d 1 nb_points  position Post-traitement of specific points on the 3d FSI boundary
+// XD Beam_model interprete Beam_model 0 Reduced mechanical model: a beam model. Resolution based on a modal analysis. Temporal discretization: Newmark or Hilber-Hughes-Taylor (HHT)
+// XD  attr dom ref_domaine dom 0 domain name
+// XD  attr bloc bloc_lecture_beam_model bloc 0 not_set
+
+// XD bloc_lecture_beam_model objet_lecture nul 0 bloc
+// XD  attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
+// XD  attr nb_beam chaine(into=["nb_beam"]) nb_beam 0 Keyword to specify the number of beams
+// XD  attr nb_beam_val entier nb_beam_val 0 Number of beams
+// XD  attr Name chaine(into=["name"]) BeamName 0 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
+// XD  attr Name_of_beam chaine Name_of_beam 0 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
+// XD  attr bloc bloc_poutre nul 0 not_set
+// XD  attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+
+// XD NewmarkTimeScheme_deriv objet_lecture NewmarkTimeScheme_deriv -1 Solve the beam dynamics. Selection of time integration scheme.
+// XD NewmarkTimeScheme_HHR NewmarkTimeScheme_deriv HHT 0 HHT alpha (Hilber-Hughes-Taylor, alpha usually -0.1 ) time integration scheme.
+// XD  attr alpha floattant alpha 1 usually, alpha is set to -0.1
+// XD NewmarkTimeScheme_MA NewmarkTimeScheme_deriv MA 0  MA (Newmark mean acceleration) time integration scheme.
+// XD NewmarkTimeScheme_FD NewmarkTimeScheme_deriv FD 0 FD (Newmark finite differences) time integration scheme.
+
+// XD bloc_poutre objet_lecture nul 1 Read poutre bloc
+// XD  attr nb_modes entier n 0 Number of modes
+// XD  attr direction entier dir 0 x=0, y=1, z=2
+// XD  attr NewmarkTimeScheme NewmarkTimeScheme_deriv NewmarkTimeScheme 0 Solve the beam dynamics. Time integration scheme: choice between MA (Newmark mean acceleration),  FD (Newmark finite differences), and HHT alpha (Hilber-Hughes-Taylor, alpha usually -0.1 )
+// XD  attr Mass_and_stiffness_file_name chaine  Mass_and_stiffness_file_name 0 Name of the file containing the diagonal modal mass, stiffness, and damping matrices.
+// XD  attr Absc_file_name chaine Absc_file_name 0 Name of the file containing the coordinates of the Beam
+// XD  attr  Modal_deformation_file_name listchaine  Modal_deformation_file_name 0 Name of the file containing the modal deformation of the Beam (mandatory if different from 0. 0. 0.)
+// XD  attr Young_Module floattant young 1 Young Module
+// XD  attr Rho_beam floattant rho 1 Beam density
+// XD  attr BaseCenterCoordinates listf pos_center 1 position of the base center coordinates on the Beam
+// XD  attr CI_file_name chaine CI_file_name 1 Name of the file containing the initial condition of the Beam
+// XD  attr Restart_file_name chaine Restart_file_name 1 SaveBeamForRestart.txt file to restart the calculation
+// XD  attr Output_position_1D list pt1d 1 nb_points  position Post-traitement of specific points on the Beam
+// XD  attr Output_position_3D listpoints pt3d 1 nb_points  position Post-traitement of specific points on the 3d FSI boundary
+
 Beam_model::Beam_model()
 {
 
