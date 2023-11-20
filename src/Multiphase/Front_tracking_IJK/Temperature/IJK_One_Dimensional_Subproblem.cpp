@@ -1232,7 +1232,8 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
 
   int dxyz_increment_max = get_dxyz_increment_max();
   int dxyz_over_two_increment_max = get_dxyz_over_two_increment_max();
-  const int first_increment[3] = {dxyz_over_two_increment_max, dxyz_increment_max, dxyz_increment_max};
+  // const int first_increment[3] = {dxyz_over_two_increment_max, dxyz_increment_max, dxyz_increment_max};
+  const int first_increment[3] = {dxyz_over_two_increment_max + 1, dxyz_increment_max, dxyz_increment_max};
   const int second_increment[3] = {dxyz_increment_max, dxyz_over_two_increment_max, dxyz_increment_max};
   const int third_increment[3] = {dxyz_increment_max, dxyz_increment_max, dxyz_over_two_increment_max};
   //  dxyz_over_two_increment_max *= 2;
@@ -1308,25 +1309,34 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
   /*
    * TODO: Should we look to cells faces that are not in the normal vector direction ?
    */
-  for (l=dx_over_two_increment; l>=0; l--)
+  // for (l=dx_over_two_increment; l>=0; l--)
+  for (l=dx_over_two_increment + 1; l>=0; l--)
     for (m_cell=dy_increment; m_cell>=0; m_cell--)
       for (n_cell=dz_increment; n_cell>=0; n_cell--)
         {
-          const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) : l + 1;
+          // const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) : l + 1;
+          const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) + 1 : l;
           const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
           const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n_cell * (-1) : n_cell;
-          const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) : l + 1;
+          // const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) : l + 1;
+          const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) + 1 : l;
           const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir_elem, index_j_ + m_dir, index_k_ + n_dir);
           if (indic_neighbour > LIQUID_INDICATOR_TEST)
             {
               // pure_neighbours_last_faces_to_correct_[0][l_dir_elem][m_dir][n_dir] = true;
+
               pure_neighbours_last_faces_to_correct_[0][l][m_cell][n_cell] = true;
               const double lmn_zero = (l > 0) ? 1. : 0.;
-              const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * pow(2, abs(l_dir)) + 1) * (-1) : (lmn_zero * pow(2, l_dir - 1)) + 1;
+              // const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * pow(2, abs(l_dir)) + 1) * (-1) :
+              // 																																			(lmn_zero * pow(2, l_dir - 1)) + 1;
+              const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * (2 * abs(l_dir) + 1) - (1. - lmn_zero)) * (-1):
+                                            lmn_zero * (2 * (l_dir - 1) + 1) - (1. - lmn_zero);
               const double dx_contrib = contrib_factor * normal_vector_compo_[0] * dx_over_two;
               const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
               const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
               pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              if (pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] < 0)
+                pure_neighbours_last_faces_to_correct_[0][l][m_cell][n_cell] = false;
               if (neighbours_last_faces_colinearity_weighting_)
                 {
                   Vecteur3 relative_vector = normal_vector_compo_;

@@ -363,6 +363,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       find_temperature_cell_neighbours_ = 1;
       use_temperature_cell_neighbours_ = 1;
     }
+  if(find_reachable_fluxes_)
+    find_temperature_cell_neighbours_ = 1;
 
   disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
 
