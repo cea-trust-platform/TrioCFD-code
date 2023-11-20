@@ -222,6 +222,12 @@ convection_diffusion_temperature_ft_disc convection_diffusion_temperature convec
   attr maintien_temperature objet_lecture_maintien_temperature maintien_temperature 1 maintien_temperature SOUS_ZONE_NAME VALUE : experimental, this acts as a dynamic source term that heats or cools the fluid to maintain the average temperature to VALUE within the specified region. At this time, this is done by multiplying the temperature within the SOUS_ZONE by an appropriate uniform value at each timestep. This feature might be implemented in a separate source term in the future.
   attr prescribed_mpoint floattant prescribed_mpoint 1 User defined value of the phase-change rate (override the value computed based on the temperature field)
 interpolation_champ_face_deriv objet_lecture interpolation_champ_face_deriv -1 not_set
+type_indic_faces_deriv objet_lecture type_indic_faces_deriv -1 not_set
+type_indic_faces_standard type_indic_faces_deriv standard 0 not_set
+type_indic_faces_modifiee type_indic_faces_deriv modifiee 1 not_set
+  attr position floattant position 1 not_set
+  attr thickness floattant thickness 1 not_set
+type_indic_faces_ai_based type_indic_faces_deriv ai_based 0 not_set
 interpolation_champ_facebase interpolation_champ_face_deriv base 0 not_set
 interpolation_champ_face_lineaire interpolation_champ_face_deriv lineaire 1 not_set
   attr vitesse_fluide_explicite rien vitesse_fluide_explicite 1 not_set
@@ -252,7 +258,7 @@ transport_interfaces_ft_disc eqn_base transport_interfaces_ft_disc -1 Interface 
   attr voflike_correction_volume entier voflike_correction_volume 1 not_set
   attr nb_lissage_correction_volume entier nb_lissage_correction_volume 1 not_set
   attr nb_iterations_correction_volume entier nb_iterations_correction_volume 1 not_set
-  attr type_indic_faces chaine(into=["STANDARD","MODIFIEE","AI_BASED"]) type_indic_faces 1 kind of interpolation to compute the face value of the phase indicator function (advanced option)
+  attr type_indic_faces type_indic_faces_deriv type_indic_faces 1 kind of interpolation to compute the face value of the phase indicator function (advanced option). Could be STANDARD, MODIFIEE or AI_BASED
 sortie_libre_rho_variable condlim_base sortie_libre_rho_variable 0 Class to define an outlet boundary condition at which the pressure is defined through the given field, whereas the density of the two-phase flow may varies (value of P/rho given in Pa/kg.m-3).
   attr ch front_field_base ch 0 Boundary field type.
 injection_marqueur objet_lecture nul -1 not_set
@@ -286,7 +292,8 @@ navier_stokes_ft_disc navier_stokes_turbulent navier_stokes_ft_disc -1 Two-phase
   attr mpoint_inactif_sur_qdm rien mpoint_inactif_sur_qdm 1 not_set
   attr mpoint_vapeur_inactif_sur_qdm rien mpoint_vapeur_inactif_sur_qdm 1 not_set
   attr new_mass_source rien new_mass_source 1 Flag for localised computation of velocity jump based on interfacial area AI (advanced option)
-  attr interpol_indic_pour_dI_dt chaine(into=["interp_ai_based","interp_standard"]) interpol_indic_pour_dI_dt 1 Specific interpolation of phase indicator function in VoF mass-preserving method (advanced option)
+  attr interpol_indic_pour_dI_dt chaine(into=["interp_ai_based","interp_standard","interp_modifiee"]) interpol_indic_pour_dI_dt 1 Specific interpolation of phase indicator function in VoF mass-preserving method (advanced option)
+  attr OutletCorrection_pour_dI_dt chaine(into=["CORRECTION_GHOST_INDIC"]) OutletCorrection_pour_dI_dt 1 not_set
 source_trainee source_base trainee 0 drag effect
 source_flottabilite source_base flottabilite 0 buoyancy effect
 source_masse_ajoutee source_base masse_ajoutee 0 weight added effect

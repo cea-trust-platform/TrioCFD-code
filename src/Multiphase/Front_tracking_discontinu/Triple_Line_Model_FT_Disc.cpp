@@ -110,7 +110,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
   p.ajouter("n_extend_meso", &n_ext_meso_); // X_D_ADD_P entier Meso region extension in number of cells [-]
-  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // X_D_ADD_P floattant Initial interface position (unused)
+  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
   p.ajouter_flag("deactivate", &deactivate_);
