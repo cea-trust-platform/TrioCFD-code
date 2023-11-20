@@ -50,6 +50,8 @@ public :
   inline const Champ_Fonc& viscosite_turbulente() const;
   void associer_milieu_base(const Milieu_base& ) override;
   int verifier() override;
+  void associer_sch_tps_base(const Schema_Temps_base&) override;
+
 
 protected :
 

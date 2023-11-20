@@ -39,7 +39,6 @@ Entree& Implicite_ALE::readOn(Entree& is )
   return is;
 }
 
-
 void Implicite_ALE::first_special_treatment(Equation_base& eqn, Navier_Stokes_std& eqnNS, DoubleTab& current, double dt, DoubleTrav& resu)
 {
   //Renewing ALE Jacobians

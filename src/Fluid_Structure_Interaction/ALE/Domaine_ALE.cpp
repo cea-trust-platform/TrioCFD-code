@@ -124,13 +124,13 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       ::calculer_centres_gravite(xv, type_face,
                                  sommets_, face_sommets);
 
-      if(sub_type(Domaine_VDF, le_dom_VF))
-        {
-          Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
-          le_dom_VF.volumes_entrelaces()=0;
-          le_dom_VDF.calculer_volumes_entrelaces();
-        }
-      else if(sub_type(Domaine_VEF, le_dom_VF))
+      /* if(sub_type(Domaine_VDF, le_dom_VF))
+         {
+           Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
+           le_dom_VF.volumes_entrelaces()=0;
+           le_dom_VDF.calculer_volumes_entrelaces();
+         }*/
+      if(sub_type(Domaine_VEF, le_dom_VF))
         {
           Domaine_VEF& le_dom_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
           DoubleTab& normales=le_dom_VEF.face_normales();
@@ -218,8 +218,9 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
         }
       else
         {
-          Cerr << "Discretisation non reconnue par ALE!" << finl;
-          exit();
+          Cerr << "Discretization not recognized by ALE!" << finl;
+          Cerr << "Change with finite element volume discretization: VEFPreP1B and restart" << finl;
+          Process::exit();
         }
 
     }
@@ -430,10 +431,17 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
                 {
                   Cerr<<" In the 'ALE_Neumann_BC_for_grid_problem' block, you define a Neumann BC for the boundary "<<name_boundary_with_Neumann_BC[i]<<" \n";
                   Cerr<<" or this is a moving boundary already define in the 'Imposer_vit_bords_ALE' block "<<finl;
-                  exit();
+                  Process::exit();
                 }
             }
         }
+    }
+  //checking the Discretization (only VEF supported)
+  if(!sub_type(Domaine_VEF, le_dom_VF))
+    {
+      Cerr << "Discretization not recognized by ALE!" << finl;
+      Cerr << "Change with finite element volume discretization: VEFPreP1B and restart" << finl;
+      Process::exit();
     }
 
   //checking correct type of BC on the moving boundary
@@ -446,7 +454,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
       if (!sub_type(Entree_fluide_vitesse_imposee_ALE,la_cl.valeur()))
         {
           Cerr <<"Bord mobile ALE:  replace  " <<la_cl.valeur().que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
-          exit();
+          Process::exit();
         }
     }
 
@@ -455,7 +463,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   if (!pbb.contient("ALE"))
     {
       Cerr <<"Domaine_ALE:  replace  " <<pb.que_suis_je()<<" with "<< pb.que_suis_je() <<"_ALE and restart!"<< finl;
-      exit();
+      Process:: exit();
     }
 
   // check that the equation is Navier_Stokes_std_ALE when we the domain is mobile (domaine_ALE)
@@ -465,6 +473,14 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
       Cout<<"replace "<<eqn_hydr.que_suis_je()<<"  with "<<eqn_hydr.que_suis_je()<<"_ALE and restart   "<<finl;
       exit();}
       */
+
+  // check that at least one boundary is mobile
+  if(nb_bords_ALE==0)
+    {
+      Cerr <<"Error: for Mobile domain (Domaine_ALE), at least one mobile boundary must be defined!"<< finl;
+      Cerr <<"Fill the Imposer_vit_bords_ALE block in the dataset and restart!"<< finl;
+      Process::exit();
+    }
 
 }
 
@@ -582,7 +598,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                << les_champs_front[n].valeur().le_nom()
                << " ne peut etre utilise pour un probleme ALE pour le moment...."
                << finl;
-          exit();
+          Process::exit();
         }
     }
   vit_bords.echange_espace_virtuel();
@@ -837,7 +853,7 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
       Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nb_bords_ALE;
   Cerr << "nombre de bords ALE : " <<  nb_bords_ALE << finl;
@@ -872,7 +888,7 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
       Cerr << "Error when reading the 'Projection_ALE_boundary' \n";
       Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nb_projection;
   Cerr << "Number of ALE projection boundary : " <<  nb_projection << finl;
@@ -904,7 +920,7 @@ void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
       Cerr << "Error when reading the 'ALE_Neumann_BC_for_grid_problem' \n";
       Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nb_boundary;
   Cerr << "Number of Neumann CL boundary for grid_problem : " <<  nb_boundary << finl;
@@ -923,7 +939,7 @@ void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
     {
       Cerr<<"Error when reading the block ALE_Neumann_BC_for_grid_problem \n";
       Cerr<<" the indicated number of Neumann boundary and the list of boundary names are different sizes.  "<<finl;
-      exit();
+      Process::exit();
     }
 
 }
@@ -942,7 +958,7 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
       Cerr << "Error while reading the solveur_moving_mesh_ALE \n";
       Cerr << "We were waiting for a " << accolade_ouverte << " instead of \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >>  solv;
   solv.nommer("ALE_solver");
@@ -983,7 +999,7 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
       Cerr << "Erreur a la lecture du Beam\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   while(1)
     {
@@ -1146,7 +1162,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nomlu;
   motlu=nomlu;
@@ -1162,7 +1178,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       Cerr << "Erreur a la lecture du Beam model\n";
       Cerr << "On attendait en premier le nombre de Beam dans le domaine a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   int count_read_beam=0;
   while(1)
@@ -1186,7 +1202,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           else
             {
               Cerr << "The name of the beam must be the name of the CL for which the mechanical beam model applies, not " << beam_name;
-              exit();
+              Process::exit();
             }
           read_beam(is, count_read_beam);
           count_read_beam++;
@@ -1197,7 +1213,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
             {
               Cerr << "We read  "<<count_read_beam <<" model and not "<<nbBeam;
               Cerr << "Please indicate the right number of beam in the domain";
-              exit();
+              Process::exit();
             }
 
           break;
@@ -1207,7 +1223,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           Cerr << "Erreur a la lecture du Beam model\n";
           Cerr << "On attendait le nom du bord a la place de \n"
                << motlu;
-          exit();
+          Process::exit();
         }
 
     }
