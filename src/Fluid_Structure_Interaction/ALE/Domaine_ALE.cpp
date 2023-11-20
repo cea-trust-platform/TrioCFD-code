@@ -52,11 +52,11 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_AL
 Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), nbBeam(0), associate_eq(false)
 {
 
-  beam = new Beam_model[nbBeam];
+//  beam = new Beam_model[nbBeam];
 }
 Domaine_ALE::~Domaine_ALE()
 {
-  delete[] beam;
+//  delete[] beam;
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -1122,7 +1122,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
     {
       is>>nbBeam;
       if(nbBeam>0)
-        beam = new Beam_model[nbBeam];
+        beam = std::vector<Beam_model>(nbBeam);
       Cerr << "Beam number : " <<  nbBeam << finl;
     }
   else

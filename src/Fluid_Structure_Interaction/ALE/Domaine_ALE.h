@@ -110,7 +110,8 @@ protected:
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
   int nbBeam;
-  Beam_model *beam; // Mechanical model: a beam model
+//  Beam_model *beam; // Mechanical model: a beam model
+  std::vector<Beam_model> beam;
   REF(Equation_base) eq;
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
