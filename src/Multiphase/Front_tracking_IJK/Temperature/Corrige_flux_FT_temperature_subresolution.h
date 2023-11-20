@@ -24,6 +24,9 @@
 
 #include <Corrige_flux_FT_base.h>
 #include <IJK_One_Dimensional_Subproblems.h>
+#define NEIGHBOURS_I {-1, 1, 0, 0, 0, 0}
+#define NEIGHBOURS_J {0, 0, -1, 1, 0, 0}
+#define NEIGHBOURS_K {0, 0, 0, 0, -1, 1}
 #define NEIGHBOURS_FACES_I {0, 1, 0, 0, 0, 0}
 #define NEIGHBOURS_FACES_J {0, 0, 0, 1, 0, 0}
 #define NEIGHBOURS_FACES_K {0, 0, 0, 0, 0, 1}
@@ -86,12 +89,14 @@ public :
   void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                             const int& find_reachable_fluxes,
-                                            const int& use_reachable_fluxes) override
+                                            const int& use_reachable_fluxes,
+                                            const int& keep_first_reachable_fluxes) override
   {
     find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
     use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction;
     find_reachable_fluxes_ = find_reachable_fluxes;
     use_reachable_fluxes_ = use_reachable_fluxes;
+    keep_first_reachable_fluxes_ = keep_first_reachable_fluxes;
   }
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
@@ -162,6 +167,13 @@ public :
                                                                    std::vector<ArrOfDouble>& flux_z,
                                                                    const bool& ini_index);
   void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
+  void compute_cell_neighbours_mixed_cell_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool_mixed_cell,
+                                                                   FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective_mixed_cell,
+                                                                   FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive_mixed_cell,
+                                                                   FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity_mixed_cell);
+  void compute_cell_neighbours_mixed_cell_faces_any_field(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                          IJK_Field_local_double& cell_faces_neighbours_corrected_field,
+                                                          FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_field_mixed_cell);
   void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
@@ -358,6 +370,7 @@ protected :
 
   int find_reachable_fluxes_;
   int use_reachable_fluxes_;
+  int keep_first_reachable_fluxes_;
   FixedVector<IJK_Field_int, 3>* cell_faces_neighbours_corrected_bool_;
   FixedVector<IJK_Field_double, 3>* eulerian_normal_vectors_ns_normed_;
 

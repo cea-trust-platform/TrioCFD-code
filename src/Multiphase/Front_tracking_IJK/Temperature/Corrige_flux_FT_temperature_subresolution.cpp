@@ -613,6 +613,108 @@ void Corrige_flux_FT_temperature_subresolution::correct_flux_spherical(Simd_doub
     }
 }
 
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_mixed_cell_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool_mixed_cell,
+                                                                                                            FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective_mixed_cell,
+                                                                                                            FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive_mixed_cell,
+                                                                                                            FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity_mixed_cell)
+{
+
+  if (distance_cell_faces_from_lrs_ && find_reachable_fluxes_ && keep_first_reachable_fluxes_)
+    {
+
+      const int ni = ref_ijk_ft_->itfce().I().ni();
+      const int nj = ref_ijk_ft_->itfce().I().nj();
+      const int nk = ref_ijk_ft_->itfce().I().nk();
+
+      IJK_Field_local_int cell_faces_neighbours_corrected_bool_tmp;
+      cell_faces_neighbours_corrected_bool_tmp.allocate(ni, nj, nk, 0);
+
+      const int neighbours_i[6] = NEIGHBOURS_I;
+      const int neighbours_j[6] = NEIGHBOURS_J;
+      const int neighbours_k[6] = NEIGHBOURS_K;
+      const int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
+      const int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
+      const int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
+
+      for (int c=0; c<3; c++)
+        {
+          const int index_ini = 2*c;
+          cell_faces_neighbours_corrected_bool_tmp.data() = 0;
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
+                {
+                  const double indic = ref_ijk_ft_->itfce().I()(i,j,k);
+                  if (indic < LIQUID_INDICATOR_TEST && indic > VAPOUR_INDICATOR_TEST)
+                    {
+                      for (int l=index_ini; l<index_ini + 2; l++)
+                        {
+                          const int i_neighbour = neighbours_i[l];
+                          const int j_neighbour = neighbours_j[l];
+                          const int k_neighbour = neighbours_k[l];
+                          const int ii = neighbours_faces_i[l];
+                          const int jj = neighbours_faces_j[l];
+                          const int kk = neighbours_faces_k[l];
+                          const int cell_faces_neighbours_ijk = cell_faces_neighbours_corrected_bool_mixed_cell[c](i+ii,j+jj,k+kk);
+                          const double indic_neighbour = ref_ijk_ft_->itfce().I()(i+i_neighbour,j+j_neighbour,k+k_neighbour);
+                          if (cell_faces_neighbours_ijk && indic_neighbour > LIQUID_INDICATOR_TEST)
+                            cell_faces_neighbours_corrected_bool_tmp(i+ii,j+jj,k+kk) = cell_faces_neighbours_ijk;
+                        }
+                    }
+                }
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
+                cell_faces_neighbours_corrected_bool_mixed_cell[c](i,j,k) = cell_faces_neighbours_corrected_bool_tmp(i,j,k);
+        }
+      // cell_faces_neighbours_corrected_bool_tmp.~IJK_Field_local_int();
+
+      IJK_Field_local_double cell_faces_neighbours_corrected_field_tmp;
+      if (convective_flux_correction_ || diffusive_flux_correction_ || neighbours_colinearity_weighting_)
+        cell_faces_neighbours_corrected_field_tmp.allocate(ni, nj, nk, 0);
+
+      if (convective_flux_correction_)
+        compute_cell_neighbours_mixed_cell_faces_any_field(cell_faces_neighbours_corrected_bool_mixed_cell,
+                                                           cell_faces_neighbours_corrected_field_tmp,
+                                                           cell_faces_neighbours_corrected_convective_mixed_cell);
+
+
+      if (diffusive_flux_correction_)
+        compute_cell_neighbours_mixed_cell_faces_any_field(cell_faces_neighbours_corrected_bool_mixed_cell,
+                                                           cell_faces_neighbours_corrected_field_tmp,
+                                                           cell_faces_neighbours_corrected_diffusive_mixed_cell);
+
+      if (neighbours_colinearity_weighting_)
+        compute_cell_neighbours_mixed_cell_faces_any_field(cell_faces_neighbours_corrected_bool_mixed_cell,
+                                                           cell_faces_neighbours_corrected_field_tmp,
+                                                           neighbours_weighting_colinearity_mixed_cell);
+    }
+}
+
+void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_mixed_cell_faces_any_field(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                                                                   IJK_Field_local_double& cell_faces_neighbours_corrected_field,
+                                                                                                   FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_field_mixed_cell)
+{
+  const int ni = cell_faces_neighbours_corrected_field_mixed_cell[0].ni();
+  const int nj = cell_faces_neighbours_corrected_field_mixed_cell[1].nj();
+  const int nk = cell_faces_neighbours_corrected_field_mixed_cell[2].nk();
+
+  for (int c=0; c<3; c++)
+    {
+      cell_faces_neighbours_corrected_field.data() = 0;
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            if (cell_faces_neighbours_corrected_bool[c](i,j,k))
+              cell_faces_neighbours_corrected_field(i,j,k) = cell_faces_neighbours_corrected_field_mixed_cell[c](i,j,k);
+      cell_faces_neighbours_corrected_field_mixed_cell[c].data() = 0.;
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            cell_faces_neighbours_corrected_field_mixed_cell[c](i,j,k) = cell_faces_neighbours_corrected_field(i,j,k);
+    }
+}
+
 void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                                                                  FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                                                                  FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
@@ -703,7 +805,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
                             const double distance = pure_neighbours_distance_to_correct[c][l][m][n];
                             cell_faces_neighbours_corrected_bool[c](index_i_perio, index_j_perio, index_k_perio) += 1;
                             double colinearity = 1.;
-                            if (neighbours_colinearity_weighting_ && use_reachable_fluxes_)
+                            if (neighbours_colinearity_weighting_)
                               {
                                 colinearity = pure_neighbours_colinearity_to_correct[c][l][m][n];
                                 neighbours_weighting_colinearity[c](index_i_perio, index_j_perio, index_k_perio) += colinearity;
@@ -727,6 +829,11 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_in
                                                     cell_faces_neighbours_corrected_diffusive,
                                                     neighbours_weighting_colinearity,
                                                     use_reachable_fluxes_);
+
+      compute_cell_neighbours_mixed_cell_faces_indices_to_correct(cell_faces_neighbours_corrected_bool,
+                                                                  cell_faces_neighbours_corrected_convective,
+                                                                  cell_faces_neighbours_corrected_diffusive,
+                                                                  neighbours_weighting_colinearity);
     }
 }
 

@@ -122,6 +122,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   use_cell_neighbours_for_fluxes_spherical_correction_ = 0;
   find_reachable_fluxes_ = 0;
   use_reachable_fluxes_ = 0;
+  keep_first_reachable_fluxes_ = 0;
 
   modified_time_init_ = 0.;
   spherical_diffusion_ = 1;
@@ -248,6 +249,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 
   param.ajouter_flag("find_reachable_fluxes", &find_reachable_fluxes_);
   param.ajouter_flag("use_reachable_fluxes", &use_reachable_fluxes_);
+  param.ajouter_flag("keep_first_reachable_fluxes", &keep_first_reachable_fluxes_);
 
   param.ajouter("probes_end_value_coeff", &probes_end_value_coeff_);
   param.ajouter("temperature_ini_type", &temperature_ini_type_);
@@ -345,7 +347,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   corrige_flux_.set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
                                                      use_cell_neighbours_for_fluxes_spherical_correction_,
                                                      find_reachable_fluxes_,
-                                                     use_reachable_fluxes_);
+                                                     use_reachable_fluxes_,
+                                                     keep_first_reachable_fluxes_);
 
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
   Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;

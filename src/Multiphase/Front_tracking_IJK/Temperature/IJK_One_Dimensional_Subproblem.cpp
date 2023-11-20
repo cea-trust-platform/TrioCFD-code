@@ -2901,7 +2901,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tradial_temperature_diffusion"
                                "\ttangential_temperature_diffusion"
                                "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
-                               "\tshear"
+                               "\tshear\tforce"
                                "\tpressure"
                                "\tu_x\tu_y\tu_z"
                                "\tu_r\tu_r_corr\tu_r_static\tu_r_advected"
@@ -2935,7 +2935,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
             fic << radial_temperature_diffusion_[i] << " ";
             fic << tangential_temperature_diffusion_[i] << " ";
             fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
-            fic << shear_stress_[i] << " ";
+            fic << shear_stress_[i] << " " << (shear_stress_[i] * surface_) << " ";
             fic << pressure_interp_[i] << " ";
             fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
             fic << radial_velocity_[i] << " " << radial_velocity_corrected_[i] << " ";

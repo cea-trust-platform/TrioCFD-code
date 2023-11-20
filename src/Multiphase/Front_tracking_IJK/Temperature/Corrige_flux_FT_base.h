@@ -135,7 +135,8 @@ public:
   virtual void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                     const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                     const int& find_reachable_fluxes,
-                                                    const int& use_reachable_fluxes) { ; };
+                                                    const int& use_reachable_fluxes,
+                                                    const int& keep_first_reachable_fluxes) { ; };
   virtual void initialise_cell_neighbours_indices_to_correct() { ; };
   virtual void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) { ; };
   virtual void compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,

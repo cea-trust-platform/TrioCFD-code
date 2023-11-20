@@ -417,6 +417,7 @@ protected :
    */
   int find_reachable_fluxes_;
   int use_reachable_fluxes_;
+  int keep_first_reachable_fluxes_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_all_bool_;
   FixedVector<IJK_Field_double,3> cell_faces_neighbours_corrected_convective_;
   FixedVector<IJK_Field_double,3> cell_faces_neighbours_corrected_diffusive_;

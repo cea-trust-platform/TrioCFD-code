@@ -104,7 +104,8 @@ public :
   inline void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& compute_reachable_fluxes,
-                                                   const int& use_reachable_fluxes);
+                                                   const int& use_reachable_fluxes,
+                                                   const int& keep_first_reachable_fluxes);
   inline void set_debug(const int& debug);
   inline void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
                                          FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
@@ -289,12 +290,14 @@ inline void Corrige_flux_FT::set_eulerian_normal_vectors_ns_normed(FixedVector<I
 inline void Corrige_flux_FT::set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                                   const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                                   const int& find_reachable_fluxes,
-                                                                  const int& use_reachable_fluxes)
+                                                                  const int& use_reachable_fluxes,
+                                                                  const int& keep_first_reachable_fluxes)
 {
   valeur().set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction,
                                                 use_cell_neighbours_for_fluxes_spherical_correction,
                                                 find_reachable_fluxes,
-                                                use_reachable_fluxes);
+                                                use_reachable_fluxes,
+                                                keep_first_reachable_fluxes);
 }
 
 inline void Corrige_flux_FT::set_debug(const int& debug)
