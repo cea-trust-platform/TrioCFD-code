@@ -27,6 +27,7 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Milieu_base.h>
+#include <VEF_discretisation.h>
 #include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Omega_VEF_Face,
@@ -38,7 +39,24 @@ Sortie& Source_Transport_K_Omega_VEF_Face::printOn(Sortie& s) const { return s <
 Entree& Source_Transport_K_Omega_VEF_Face::readOn(Entree& is)
 {
   Source_Transport_K_Omega_VEF_Face_base::verifier_pb_komega(mon_equation->probleme(),que_suis_je());
-  return Source_Transport_K_Omega_VEF_Face_base::readOn(is);
+  Source_Transport_K_Omega_VEF_Face_base::readOn(is);
+
+  champs_compris_.ajoute_nom_compris(Nom("grad_k_grad_omega"));
+  return (is);
+}
+
+void Source_Transport_K_Omega_VEF_Face::creer_champ(const Motcle& nom )
+{
+  Source_Transport_K_Omega_VEF_Face_base::creer_champ(nom);
+
+  if (grad_k_omega_.est_nul())
+    {
+      const VEF_discretisation& disc = ref_cast(VEF_discretisation, equation().discretisation());
+      Noms noms(1), unites(1);
+      noms[0] = "grad_k_grad_omega";
+      disc.discretiser_champ("champ_elem", equation().domaine_dis(), scalaire, noms , unites, 1, 0, grad_k_omega_);
+      champs_compris_.ajoute_champ(grad_k_omega_);
+    }
 }
 
 void Source_Transport_K_Omega_VEF_Face::associer_pb(const Probleme_base& pb)
@@ -69,23 +87,27 @@ const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
 
 void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega) const
 {
-
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   const DoubleTab& kinematic_viscosity = get_visc_turb();
   const DoubleTab& distmin = le_dom_VEF->y_faces(); // Minimum distance to the edge
+
   DoubleTab& tmpF1 = ref_cast_non_const(DoubleTab, turbulence_model->get_blenderF1());
   DoubleTab& tmpF2 = ref_cast_non_const(DoubleTab, turbulence_model->get_fieldF2());
+
+  DoubleTab visc_face( le_dom_VEF->nb_faces());
+  elem_to_face(le_dom_VEF.valeur(), kinematic_viscosity, visc_face);
 
   // Loop on faces
   for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
     {
-      double const dmin = distmin(face);
+      double const dmin = std::max(distmin(face), 1e-20);
       double const enerK = K_Omega(face, 0);
       double const omega = K_Omega(face, 1);
 
       double const tmp1 = sqrt(enerK)/(BETA_K*omega*dmin);
-      double const tmp2 = 500.0*kinematic_viscosity(face)/(omega*dmin*dmin);
-      double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(gradKgradOmega(face)*dmin);
+      double const tmp2 = 500.0*visc_face(face)/(omega*dmin*dmin);
+      double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(std::max(2*SIGMA_OMEGA2*gradKgradOmega(face)/omega, 10e-20)*dmin*dmin);
+
       double const arg1 = std::min(std::max(tmp1, tmp2), tmp3); // Common name of the variable
       tmpF1(face) = std::tanh(arg1*arg1*arg1*arg1);
 
@@ -111,8 +133,8 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   DoubleTab enerK; // field on faces
   DoubleTab omega; // field on faces
-  enerK.resize(K_Omega.dimension_tot(0));
-  omega.resize(K_Omega.dimension_tot(0));
+  enerK.resize(K_Omega.dimension(0));
+  omega.resize(K_Omega.dimension(0));
   for (int num_face = 0; num_face < le_dom_VEF->nb_faces(); ++num_face)
     {
       enerK(num_face) = K_Omega(num_face, 0);
@@ -133,11 +155,10 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
                                                   ref_cast(Pb_Hydraulique_Turbulent,
                                                            mon_equation->probleme()).equation(0));
   const DoubleTab& velocity_field_face = eqHyd.vitesse().valeurs(); // Velocity on faces
+  // const int ncompovelocity = eq_hydraulique->inconnue().valeurs().dimension(1);
   const int nbr_velocity_components = velocity_field_face.dimension(1);
-  const DoubleTab& pressure = eqHyd.pression().valeurs();
-  const int total_number_of_faces = pressure.size_totale(); // find a better name than nb_tot
-  gradK_elem.resize(total_number_of_faces, nbr_velocity_components);
-  gradOmega_elem.resize(total_number_of_faces, nbr_velocity_components);
+  gradK_elem.resize(le_dom_VEF->nb_elem(), nbr_velocity_components);
+  gradOmega_elem.resize(le_dom_VEF->nb_elem(), nbr_velocity_components);
   // resize_gradient_tab(gradK);
   // resize_gradient_tab(gradOmega);
 
@@ -145,6 +166,11 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   const Operateur_Grad& Op_Grad_komega = eqn_K_Omega->gradient_operator_komega();
   Op_Grad_komega.calculer(enerK, gradK_elem);
   Op_Grad_komega.calculer(omega, gradOmega_elem);
+
+  DoubleTab& chmp_post = ref_cast_non_const(DoubleTab, grad_k_omega_->valeurs());
+  for (int num_elem = 0; num_elem < le_dom_VEF->nb_elem(); ++num_elem)
+    for (int ncompo = 0; ncompo < nbr_velocity_components; ++ncompo)
+      chmp_post(num_elem) += gradK_elem(num_elem, ncompo) * gradOmega_elem(num_elem, ncompo);
 
   // Correction on the boundaries? Elie put the pressure at zero.
 

@@ -19,6 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <Navier_Stokes_std.h>
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Modele_turbulence_scal_base.h>
@@ -57,17 +58,28 @@ Sortie& Modele_turbulence_hyd_K_Omega::printOn(Sortie& s ) const
  */
 Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
-  return Mod_turb_hyd_RANS_komega::readOn(s);
+  Mod_turb_hyd_RANS_komega::readOn(s);
+
+  if (model_variant == "SST")
+    {
+      Cerr << "SST model: initialize les distances paroi" << "\n";
+      // equation().probleme().equation(0).creer_champ("distance_paroi_globale");
+      // equation().creer_champ("distance_paroi_globale");
+
+      Navier_Stokes_std moneq = ref_cast(Navier_Stokes_std, equation());
+      moneq.creer_champ("distance_paroi_globale");
+    }
+
+  return s;
 }
 
 void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
   Mod_turb_hyd_RANS_komega::set_param(param);
-  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P Nom Model variant for k-omega (default value SST)
-  Cout << "model_variant " << model_variant << "\n";
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
+  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P Nom Model variant for k-omega (default value STD)
 }
 
 int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)

@@ -69,18 +69,35 @@ void Source_Transport_K_Omega_VEF_Face_base::elem_to_face(const Domaine_VF& doma
   assert (grad_elems.line_size() == nb_comp);
 
   grad_faces = 0.;
-  for (int elem = 0; elem < nb_elem_tot; ++elem)
-    for (int s = 0; s < nb_face_elem; ++s)
-      {
-        const int face = elem_faces(elem, s);
-        for (int comp = 0; comp < nb_comp; ++comp)
-          grad_faces(face, comp) += grad_elems(elem, comp) * vol(elem);
-      }
+  if (nb_comp == 1)
+    {
+      for (int elem = 0; elem < nb_elem_tot; ++elem)
+        for (int s = 0; s < nb_face_elem; ++s)
+          {
+            const int face = elem_faces(elem, s);
+            grad_faces(face) += grad_elems(elem) * vol(elem);
+          }
+    }
+  else
+    for (int elem = 0; elem < nb_elem_tot; ++elem)
+      for (int s = 0; s < nb_face_elem; ++s)
+        {
+          const int face = elem_faces(elem, s);
+          for (int comp = 0; comp < nb_comp; ++comp)
+            grad_faces(face, comp) += grad_elems(elem, comp)
+                                      * vol(elem);
+        }
 
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
-  for (int f = 0; f < domaine.nb_faces_tot(); ++f)
-    for (int comp = 0; comp < nb_comp; ++comp)
-      grad_faces(f, comp) /= volumes_entrelaces(f)*nb_face_elem;
+  if (nb_comp == 1)
+    {
+      for (int f = 0; f < domaine.nb_faces_tot(); ++f)
+        grad_faces(f) /= volumes_entrelaces(f)*nb_face_elem;
+    }
+  else
+    for (int f = 0; f < domaine.nb_faces_tot(); ++f)
+      for (int comp = 0; comp < nb_comp; ++comp)
+        grad_faces(f, comp) /= volumes_entrelaces(f)*nb_face_elem;
 }
 
 DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& resu) const

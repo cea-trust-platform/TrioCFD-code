@@ -45,11 +45,13 @@ public:
   void compute_blending_F1(DoubleTab& gradKgradOmega) const override;
   double blender(double const val1, double const val2, int const face) const;
 
+  void creer_champ(const Motcle&) override;
 protected:
   void associer_pb(const Probleme_base& pb) override;
   REF(Transport_K_Omega) eqn_K_Omega;
 
 private:
+  Champ_Fonc grad_k_omega_; /* produit : grad (K) * grad (omega)*/
   const DoubleTab& get_visc_turb() const override;
   const DoubleTab& get_cisaillement_paroi() const override;
   const DoubleTab& get_K_pour_production() const override;
