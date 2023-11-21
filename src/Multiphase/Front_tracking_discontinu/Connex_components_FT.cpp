@@ -39,8 +39,10 @@
  * @param (elem_faces)
  * @param (faces_elem)
  * @param (num_compo)
+ * @param (include_virtual) -> set to zero by default.
  */
-int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo)
+int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo,
+                                      const int       include_virtual)
 {
 
   const int dimension=mesh.dimension;
@@ -56,7 +58,7 @@ int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& nu
     for (j=0; j < dimension; j++)
       elems(i,j) = facettes(i,j);
 
-  construire_connectivite_som_elem(mesh.nb_sommets(), elems, som_elem, 0 /* include_virtual=0 */);
+  construire_connectivite_som_elem(mesh.nb_sommets(), elems, som_elem, include_virtual);
   assert(som_elem.get_nb_lists ()==mesh.nb_sommets());
 
   for (i = 0; i < nbelem; i++)

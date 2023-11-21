@@ -1,14 +1,10 @@
 #!/bin/bash
 
 # To generate the restart.xyz, you have to manually run this prepare.data : 
-# WARNING TEMPORARY!!!! timestep 2.5E-7 dans le prepare est un contournement d'un bug sournois!!!!!
-# SUPPRIMER LE DERNIER -e du sed quand le BUGFIX est TROUVE...
-# DIFFERENCE sauv/reprise constate...
 sed -e "s/tinit .*/tinit 0./" \
     -e "s/ tmax .*/ tmax 2.500000e-03/" \
     -e "/restart.xyz/d" \
     -e "s/lata.xyz/restart.xyz/" \
-    -e "s/dt_max 5.E-7/dt_max 2.5E-7/" \
     template.data > prepare.data
 
 for i in "interp_standard" "interp_modifiee" "interp_ai_based" 
@@ -24,8 +20,8 @@ do
 	template.data > ${name}.data
     echo "Running calculation ${name}"
     time trust ${name} 1>${name}.out 2>${name}.err &
-    [ $? != 0 ] && echo "Failure in ${name}"
-    grep "Volume_phase_0" ${name}.err | awk '{print $4, $2/(0.001*0.001*3.141592653589793/2)}' > ${name}.txt
+    # [ $? != 0 ] && echo "Failure in ${name}"
+    # grep "Volume_phase_0" ${name}.err | awk '{print $4, $2/(0.001*0.001*3.141592653589793/2)}' > ${name}.txt
   done
 done
 # Wait for all jobs to finish.

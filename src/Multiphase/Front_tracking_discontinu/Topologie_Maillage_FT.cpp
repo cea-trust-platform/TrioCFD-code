@@ -612,6 +612,7 @@ int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const 
  *   positive or negative)
  *
  */
+//#include <Connex_components_FT.h>
 double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
                                                      const ArrOfInt& flags_compo_a_supprimer,
                                                      Maillage_FT_Disc& maillage,
@@ -631,15 +632,22 @@ double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
   ArrOfBit flags(nb_facettes);
   flags = 0;
 
-  double variation_indicatrice = 0.;
+  //ArrOfInt compo_connexe_facettes(nb_facettes); // Init a zero
+  //int nb_compo_local = search_connex_components_local_FT(maillage, compo_connexe_facettes, 1 /* include_virtual */);
+  //int nb_front_components = compute_global_connex_components_FT(maillage, compo_connexe_facettes, nb_compo_local);
+  //ArrOfBit flags_compo_front_a_supprimer(nb_front_components);
+  //flags_compo_front_a_supprimer = 0;
 
+  double variation_indicatrice = 0.;
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, maillage.refdomaine_dis_.valeur().valeur());
+  const DoubleVect& volumes = domaine_vf.volumes();
   for (int i = 0; i < n; i++)
     {
       const int compo_connexe = num_compo[i];
       if (compo_connexe >= 0 && flags_compo_a_supprimer[compo_connexe])
         {
           // On vide la maille i:
-          variation_indicatrice += phase_cont - indicatrice[i];
+          variation_indicatrice += (phase_cont - indicatrice[i])*volumes(i);
           indicatrice[i] = phase_cont;
           // Parcours des facettes traversant l'element i:
           int index = index_elem[i];
@@ -647,12 +655,27 @@ double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
             {
               const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
               const int i_facette = data.numero_facette_;
+              //const int compo_front = compo_connexe_facettes[i_facette];
+              //flags_compo_front_a_supprimer.setbit(compo_front);
               if (!flags.testsetbit(i_facette))
                 liste_facettes_a_supprimer.append_array(i_facette);
               index = data.index_facette_suivante_;
             }
         }
     }
+
+  // On a potentiellement rate des facettes qui sont maintenant hors du domaine:
+  // On les reparcourt toutes (en fait, on pourrait ne creer et remplir la liste
+  // que maintenant, mais bon)
+  //for (int iface = 0; iface < nb_facettes; iface++)
+  //  {
+  //    const int compo = compo_connexe_facettes[iface];
+  //    if (flags_compo_front_a_supprimer[compo])
+  //      if (!flags.testsetbit(iface))
+  //        // la, on n'ajoute que les facettes ratees au premier tour...
+  //        liste_facettes_a_supprimer.append_array(iface);
+  //  }
+
   maillage.supprimer_facettes(liste_facettes_a_supprimer);
   variation_indicatrice = mp_sum(variation_indicatrice);
   declare_espace_virtuel_invalide(indicatrice);
