@@ -295,6 +295,31 @@ public :
                                             const int& check_cell_center_neighbour,
                                             const int& remove_external_neighbour_values,
                                             IJK_Field_int& neighbours_temperature_to_correct_trimmed) override;
+
+  void compute_min_max_ijk_any_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
+                                                const IJK_Field_int& neighbours_temperature_to_correct,
+                                                FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
+                                                const int& max_flux_per_dir,
+                                                const int& check_cell_center_neighbour,
+                                                const int& remove_external_neighbour_values,
+                                                IJK_Field_int& neighbours_temperature_to_correct_trimmed) override;
+  void sort_ini_end_arrays(ArrOfInt& indices_found_transition_ini,
+                           ArrOfInt& indices_found_transition_end,
+                           ArrOfInt& indices_found_ini,
+                           ArrOfInt& indices_found_end,
+                           FixedVector<ArrOfInt,2>& indices_sorted,
+                           const int& max_n_layer);
+  void sort_ini_end_arrays(ArrOfInt& indices_found_ini,
+                           ArrOfInt& indices_found_end,
+                           FixedVector<ArrOfInt,2>& indices_sorted,
+                           const int& max_n_layer);
+  void remove_non_overlapping_fluxes_values(const FixedVector<ArrOfInt,2>& indices_sorted,
+                                            const FixedVector<ArrOfInt,2>& indices_fluxes_sorted,
+                                            ArrOfInt& indices_to_remove,
+                                            ArrOfInt& indices_fluxes_to_remove,
+                                            int& index_bis,
+                                            int& index_ter,
+                                            const int& dir);
   void remove_min_max_ijk_reachable_fluxes_discontinuous(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
                                                          FixedVector<IJK_Field_local_int, 3>& cell_faces_neighbours_corrected_min_max_bool);
 protected :
