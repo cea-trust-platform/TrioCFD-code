@@ -19,9 +19,9 @@ IJK_Splitting grid_splitting
 Lire grid_splitting
 {
   ijk_grid_geometry DOM
-  # pas de decoupage possible en i #
+  # pas de decoupage possible en i pour le shear perio #
   nproc_i 1
-  # decoupage en n proc sur y et z avec n>=3 #
+  # decoupage en n proc sur y et z avec n>=3 || n=2 a debuger #
   nproc_j 3
   nproc_k 3
 }
@@ -53,12 +53,12 @@ IJK_FT_double
     # type d interpolation souhaitee pour P, rho, mu #
     # 0 --> interpolation naive de toutes les grandeurs #
     # 2 --> reconstruction des proprietes physique (rho, mu) dans les mailles fantome via I_FT #
-    # 1 --> 2 + reconstruction pression monofluide via Loi de Laplace
+    # 1 --> 2 + reconstruction pression monofluide via Loi de Laplace #
     interp_monofluide 2
     # type d interpolation souhaitee pour la vitesse #
     # 0 --> interpolation naive de U #
     # 2 --> conservation de la qdm : U_interp = interp(rhoU)/rho_interp #
-    conserv_qdm 2
+    conserv_qdm 0
   }
   timestep_facsec 1.0
   cfl 1.0

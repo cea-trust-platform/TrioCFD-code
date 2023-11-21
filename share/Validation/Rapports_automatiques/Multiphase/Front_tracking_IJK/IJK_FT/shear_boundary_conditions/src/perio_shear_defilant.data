@@ -10,14 +10,17 @@ Lire DOM
   uniform_domain_size_k 0.003
   perio_i
   perio_j
-  perio_k # need perio_k for mixte shear condition, only DU at z=0(z=Lz) is imposed #
+  # Shear periodicity is a periodicity #
+  perio_k 
 }
 
 IJK_Splitting grid_splitting
 Lire grid_splitting
 {
   ijk_grid_geometry DOM
+  # pas de decoupage possible en i pour le shear perio #
   nproc_i 1
+  # decoupage en n proc sur y et z avec n>=3 || n=2 a debuger #
   nproc_j 1
   nproc_k 1
 }
@@ -27,15 +30,28 @@ IJK_FT_double
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 0 # To be checked.. #
   timestep 1.e-1
-  time_scheme euler_explicit  # RK3_FT #
-  velocity_convection_op Centre 
+  time_scheme RK3_FT  # RK3_FT #
+  type_velocity_convection_op Centre 
   Boundary_Conditions {
+    # BC de type Mixte_shear #
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear
     dU_perio 0.625 
     t0_shear 0.0
     defilement 1
-    resolution_u_prime 0
+    # exclu du calcul de residu du solveur de poisson n mailles en z autour de la frontiere shear perio #
+    nb_maille_bord_a_exclure_pour_residu_solverP 1
+    # ordre de l'interpolation shear-perio : 2 4 6 #
+    order_interpolation_poisson_solver 2
+    # type d interpolation souhaitee pour P, rho, mu #
+    # 0 --> interpolation naive de toutes les grandeurs #
+    # 2 --> reconstruction des proprietes physique (rho, mu) dans les mailles fantome via I_FT #
+    # 1 --> 2 + reconstruction pression monofluide via Loi de Laplace #
+    interp_monofluide 2
+    # type d interpolation souhaitee pour la vitesse #
+    # 0 --> interpolation naive de U #
+    # 2 --> conservation de la qdm : U_interp = interp(rhoU)/rho_interp #
+    conserv_qdm 2
   }
 
   timestep_facsec 0.1

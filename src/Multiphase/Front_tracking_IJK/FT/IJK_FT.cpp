@@ -1729,12 +1729,12 @@ int IJK_FT_double::initialise()
         {
           calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
           pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-          pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
         }
 
       rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
       if (use_inv_rho_)
         inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
     }
   else
     kappa_ft_.data() =0.;
@@ -1805,12 +1805,12 @@ int IJK_FT_double::initialise()
         {
           calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
           pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-          pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
         }
 
       rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
       if (use_inv_rho_)
         inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
     }
   else
     kappa_ft_.data() = 0.;
@@ -4651,12 +4651,12 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     {
       calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
       pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
     }
 
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
     inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+  rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
 
   statistiques().end_count(deplacement_interf_counter_);
 }
@@ -4710,12 +4710,12 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
     {
       calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
       pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      pressure_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
     }
 
   rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
   if (use_inv_rho_)
     inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+  rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
 }
 
 //  Parcourir_maillage cree des noeuds et facettes virtuelles.

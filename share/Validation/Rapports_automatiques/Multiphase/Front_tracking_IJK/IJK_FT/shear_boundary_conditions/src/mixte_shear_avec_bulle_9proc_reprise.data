@@ -19,15 +19,16 @@ IJK_Splitting grid_splitting
 Lire grid_splitting
 {
   ijk_grid_geometry DOM
-  # pas de decoupage possible en i #
+  # pas de decoupage possible en i pour le shear perio #
   nproc_i 1
-  # decoupage en n proc sur y et z avec n>=3 #
+  # decoupage en n proc sur y et z avec n>=3 || n=2 a debuger #
   nproc_j 3
   nproc_k 3
 }
 
 IJK_FT_double
 {
+  vol_bulle_monodisperse 2.5132e-11
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 15 # To be checked.. #
   timestep 0.9e-4
@@ -45,9 +46,19 @@ IJK_FT_double
     # si defilement = 0 On obtient seulement une condition de saut de la vitesse en z #
     # sans desynchronisation des parois #
     defilement 1
-    # active le traitement particulier pour l interpolation des grandeurs monofluides #
-    # Toujours a activer dans le cas shear-perio #
-    interp_monofluide 1
+    # exclu du calcul de residu du solveur de poisson n mailles en z autour de la frontiere shear perio #
+    nb_maille_bord_a_exclure_pour_residu_solverP 1
+    # ordre de l'interpolation shear-perio : 2 4 6 #
+    order_interpolation_poisson_solver 2
+    # type d interpolation souhaitee pour P, rho, mu #
+    # 0 --> interpolation naive de toutes les grandeurs #
+    # 2 --> reconstruction des proprietes physique (rho, mu) dans les mailles fantome via I_FT #
+    # 1 --> 2 + reconstruction pression monofluide via Loi de Laplace #
+    interp_monofluide 2
+    # type d interpolation souhaitee pour la vitesse #
+    # 0 --> interpolation naive de U #
+    # 2 --> conservation de la qdm : U_interp = interp(rhoU)/rho_interp #
+    conserv_qdm 0
   }
   timestep_facsec 1.0
   cfl 1.0
@@ -74,13 +85,13 @@ IJK_FT_double
     pre_smooth_steps 1 7
     smooth_steps 1 7
     relax_jacobi 1 0.7
-    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 }  }
-    seuil 1e-8
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 }  }
+    seuil 1e-6
     nb_full_mg_steps 2 20 1
   }
   # LECTURE DES INTERFACES DANS UN FICHIER LATA #
   check_divergence
-  gravite 3 -20. 0.0 0.0
+  gravite 3 -40.81 0.0 0.0
   interfaces {
    fichier_reprise_interface diph_fixe.sauv.lata
    timestep_reprise_interface       1
@@ -100,17 +111,50 @@ IJK_FT_double
    }
   # follow_colors #
   }
-  rho_liquide 1171.3
-  rho_vapeur 100.
+  # terme pour maintenir le champ de vitesse liquide et le cisaillement a peu pres constant #
+  terme_force_init 47112.242935604
+
+  # check_divergence #
+  # refuse_patch_conservation_QdM_RK3_source_interf #
+  rho_liquide 1171.3	
+  rho_vapeur 500.	
   mu_liquide 0.001578
   mu_vapeur 1.3493e-05
-  sigma 0.01 
+  sigma 0.010 # 0.05 0.018055 #
   # Pour Creer le fichier de Reprise #
   nom_sauvegarde diph_fixe.sauv
   sauvegarder_xyz
   # REPRISE #
   nom_reprise diph_fixe.sauv
   timestep_reprise_vitesse 1
+
+   corrections_qdm {
+   type gr
+   correction_x {
+       type_correction cible_constante
+           parametres_cible_constante {
+           vitesse_cible 0.45
+           }
+           parametres_moyenne_par_morceaux {  }
+           parametres_moyenne_glissante {  }
+   }
+   correction_y {
+       type_correction cible_constante
+           parametres_cible_constante {
+           vitesse_cible -0.
+           }
+       parametres_moyenne_par_morceaux {  }
+       parametres_moyenne_glissante {  }
+   }
+   correction_z {
+       type_correction cible_constante
+           parametres_cible_constante {
+           vitesse_cible -0.
+           }
+       parametres_moyenne_par_morceaux {  }
+       parametres_moyenne_glissante {  }
+   }
+}
 
 }
 Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
