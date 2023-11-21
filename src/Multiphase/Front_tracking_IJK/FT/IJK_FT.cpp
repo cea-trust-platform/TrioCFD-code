@@ -4848,49 +4848,56 @@ void IJK_FT_double::update_v_ghost_from_rho_v()
       const int jmax = velocity_[dir].nj();
       const int kmax = velocity_[dir].nk();
       const int ghost = velocity_[dir].ghost();
+      int last_global_k = splitting_.get_nb_items_global(IJK_Splitting::ELEM, 2);
       for (int j = 0; j < jmax; j++)
         {
           for (int i = 0; i < imax; i++)
             {
-              for (int k = -ghost; k < 0; k++)
+              if(splitting_.get_offset_local(2)==0)
                 {
-                  double rho = 0.;
-                  double DU = 0.;
-                  if (dir==0)
+                  for (int k = -ghost; k < 0; k++)
                     {
-                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
-                      DU = boundary_conditions_.get_dU_perio();
-                    }
-                  else if (dir==1)
-                    {
-                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
-                    }
-                  else if (dir==2)
-                    {
-                      rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
-                    }
+                      double rho = 0.;
+                      double DU = 0.;
+                      if (dir==0)
+                        {
+                          rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
+                          DU = boundary_conditions_.get_dU_perio();
+                        }
+                      else if (dir==1)
+                        {
+                          rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
+                        }
+                      else if (dir==2)
+                        {
+                          rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
+                        }
 
-                  velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho - DU;
+                      velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho - DU;
+                    }
                 }
-              for (int k = kmax; k < kmax + ghost; k++)
+              if(splitting_.get_offset_local(2)+kmax==last_global_k)
                 {
-                  double rho = 0.;
-                  double DU = 0.;
-                  if (dir==0)
+                  for (int k = kmax; k < kmax + ghost; k++)
                     {
-                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
-                      DU = boundary_conditions_.get_dU_perio();
-                    }
-                  else if (dir==1)
-                    {
-                      rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
-                    }
-                  else if (dir==2)
-                    {
-                      rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
-                    }
+                      double rho = 0.;
+                      double DU = 0.;
+                      if (dir==0)
+                        {
+                          rho = 0.5*(rho_field_(i, j, k) + rho_field_(i-1, j, k));
+                          DU = boundary_conditions_.get_dU_perio();
+                        }
+                      else if (dir==1)
+                        {
+                          rho = 0.5*(rho_field_(i, j, k) + rho_field_(i, j-1, k));
+                        }
+                      else if (dir==2)
+                        {
+                          rho= 0.5*(rho_field_(i, j, k) + rho_field_(i, j, k-1));
+                        }
 
-                  velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho + DU;
+                      velocity_[dir](i, j, k) = rho_v_[dir](i, j, k)/rho + DU;
+                    }
                 }
             }
         }
