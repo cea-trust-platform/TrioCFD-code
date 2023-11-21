@@ -70,7 +70,7 @@ do
       #echo "$index ${meshes[index]}"
       M=${meshes[index]}
       Nx=$(python3 -c "print(int($r/3./($M*1e-6))+1)")
-      Nz=$(python3 -c "print(int($z//3.($M*1e-6))+1)")
+      Nz=$(python3 -c "print(int($z/3./($M*1e-6))+1)")
       Ntot=$(python3 -c "print(($Nx-1)*($Nz-1))")
       if [ 10 == 10 ] ; then 
          for i in "${!deltas[@]}" 

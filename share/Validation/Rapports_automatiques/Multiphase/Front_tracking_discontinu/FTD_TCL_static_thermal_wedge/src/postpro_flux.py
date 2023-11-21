@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from numpy import *
 from pylab import *
@@ -16,7 +17,11 @@ nx=ibl
 nt=int(nb_lines/ibl)
 
 x_start = 5.e-6
-x_shift = @offset@*1.e-6
+if (len(sys.argv) != 2):
+   raise Exception("One argument is compulsory to set offset")
+
+print(f"Offset set to {sys.argv[1]} µm")
+x_shift = float(sys.argv[1])*1.e-6
 
 mat = zeros((nt,nx,5))
 it = -1

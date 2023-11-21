@@ -58,6 +58,7 @@ def makeCase(dest="TEST", Nx=refNx, Ny=refNy,degliq=refdegliq,offset=refoffset, 
       f.write("DT=%s\n"%str(dT))
       f.write("theta=%s\n"%str(degliq))
       f.write("Lvap=%s\n"%str(-2.2574e6))
+      f.write("offset=%s\n"%str(offset))
    #
    n=1
    print("\tCasTest %s calc %d"%(dest,1))
