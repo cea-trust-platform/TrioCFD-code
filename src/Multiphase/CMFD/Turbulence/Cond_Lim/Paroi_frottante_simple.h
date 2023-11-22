@@ -17,7 +17,7 @@
 #define Paroi_frottante_simple_included
 
 #include <TRUSTTab.h>
-#include <Frottement_global_impose.h>
+#include <Frottement_impose_base.h>
 #include <Cond_lim_base.h>
 #include <Correlation_base.h>
 #include <TRUST_Ref.h>
@@ -30,7 +30,7 @@
  *
  * @sa Neumann
  */
-class Paroi_frottante_simple : public Frottement_global_impose
+class Paroi_frottante_simple : public Frottement_impose_base
 {
 
   Declare_instanciable(Paroi_frottante_simple);
