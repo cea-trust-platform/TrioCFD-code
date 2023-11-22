@@ -148,7 +148,8 @@ public :
                                        const int& neighbours_colinearity_weighting,
                                        const int& compute_reachable_fluxes,
                                        const int& find_cell_neighbours_for_fluxes_spherical_correction,
-                                       const int& n_iter_distance);
+                                       const int& n_iter_distance,
+                                       const int& interp_eulerian);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -205,11 +206,31 @@ public :
 
   void get_ijk_indices(int& i, int& j, int& k) const;
   double get_field_profile_at_point(const double& dist, const DoubleVect& field, const int temp_bool) const;
+  double get_field_profile_at_point(const double& dist,
+                                    const DoubleVect& field,
+                                    const IJK_Field_double& eulerian_field,
+                                    const int temp_bool,
+                                    const int interp_eulerian) const;
   double get_temperature_profile_at_point(const double& dist) const;
   double get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const;
-  DoubleVect get_field_discrete_integral_velocity_weighting_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field, const int vel) const;
-  DoubleVect get_field_times_velocity_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const;
-  DoubleVect get_field_discrete_integral_at_point(const double& dist, const int& levels, const int& dir, const DoubleVect& field) const;
+  DoubleVect get_field_discrete_integral_velocity_weighting_at_point(const double& dist,
+                                                                     const int& levels,
+                                                                     const int& dir,
+                                                                     const DoubleVect& field,
+                                                                     const IJK_Field_double& eulerian_field,
+                                                                     const int temp_bool,
+                                                                     const int vel) const;
+  DoubleVect get_field_times_velocity_discrete_integral_at_point(const double& dist,
+                                                                 const int& levels,
+                                                                 const int& dir,
+                                                                 const DoubleVect& field,
+                                                                 const IJK_Field_double& eulerian_field) const;
+  DoubleVect get_field_discrete_integral_at_point(const double& dist,
+                                                  const int& levels,
+                                                  const int& dir,
+                                                  const DoubleVect& field,
+                                                  const IJK_Field_double& eulerian_field,
+                                                  const int temp_bool) const;
   double get_velocity_weighting(const double& dist, const int& dir, const int vel) const;
   DoubleVect get_temperature_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
   DoubleVect get_temperature_times_velocity_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const;
@@ -385,7 +406,9 @@ protected :
                                                const int& n_iter_distance,
                                                const double& delta_T_subcooled_overheated,
                                                const int& pre_initialise_thermal_subproblems_list);
-  void associate_flux_correction_parameters(const int& correct_fluxes, const int& distance_cell_faces_from_lrs);
+  void associate_flux_correction_parameters(const int& correct_fluxes,
+                                            const int& distance_cell_faces_from_lrs,
+                                            const int& interp_eulerian);
   void associate_source_terms_parameters(const int& source_terms_type,
                                          const int& correct_tangential_temperature_gradient,
                                          const int& correct_tangential_temperature_hessian,
@@ -862,6 +885,7 @@ protected :
   std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_distance_;
   std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_colinearity_;
 
+  int interp_eulerian_= 0;
   int n_iter_distance_ = 0;
 };
 

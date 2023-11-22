@@ -430,6 +430,8 @@ protected :
   int nb_phi_post_pro_;
   int nb_probes_post_pro_;
 
+  int interp_eulerian_;
+
 };
 
 #endif /* IJK_Thermal_Subresolution_included */

@@ -199,9 +199,9 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
-  oss << "NEIGHBOURS_COLINEARITY_" << lata_suffix << idx;
+  oss << "CELL_NEIGHBOURS_COLINEARITY_" << lata_suffix << idx;
   Nom nom_temp_cell_neighbours_colinearity(oss.str().c_str());
-  if ((liste_post_instantanes.contient_("NEIGHBOURS_COLINEARITY")) || (liste_post_instantanes.contient_(nom_temp_cell_neighbours_colinearity)))
+  if ((liste_post_instantanes.contient_("CELL_NEIGHBOURS_COLINEARITY")) || (liste_post_instantanes.contient_(nom_temp_cell_neighbours_colinearity)))
     {
       n++, dumplata_scalar(lata_name, nom_temp_cell_neighbours_colinearity, get_neighbours_temperature_colinearity_weighting(), latastep);
     }

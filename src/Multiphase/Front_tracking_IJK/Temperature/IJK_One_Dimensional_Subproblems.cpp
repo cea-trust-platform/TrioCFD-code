@@ -219,7 +219,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       const int& neighbours_colinearity_weighting,
                                                                       const int& compute_reachable_fluxes,
                                                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
-                                                                      const int& n_iter_distance)
+                                                                      const int& n_iter_distance,
+                                                                      const int& interp_eulerian)
 {
   if (!init_ && subproblems_counter_ > max_subproblems_)
     {
@@ -337,7 +338,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                 neighbours_colinearity_weighting,
                                                                 compute_reachable_fluxes,
                                                                 find_cell_neighbours_for_fluxes_spherical_correction,
-                                                                n_iter_distance);
+                                                                n_iter_distance,
+                                                                interp_eulerian);
 
   subproblems_counter_++;
 }
@@ -1152,8 +1154,15 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
   if (Process::je_suis_maitre())
     {
       const int reset = 1;
-      Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
-                       + Nom(ref_ijk_ft_->get_tstep()) + Nom(".out");
+      const int last_time_index = ref_ijk_ft_->get_tstep();
+      const int max_digit = 3;
+      const int max_digit_time = 8;
+      const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
+      const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
+
+      Nom probe_name = Nom("_thermal_rank_") + Nom(std::string(max_digit - max_rank_digit,'0')) + Nom(rank)
+                       + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
+                       + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
       Nom probe_header = Nom("tstep\ttime\tthermalrank\tbubbleindex"
                              "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical"
                              "\theatflux\theatfluxgfm"

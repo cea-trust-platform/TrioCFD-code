@@ -1072,6 +1072,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_thermal_
   discrete_flux_integral = compute_thermal_flux_face_centre_discrete_integral(fluxes_type, subproblem_index, dist, dir);
   for (int val=0; val < discrete_flux_integral.size(); val++)
     flux += discrete_flux_integral[val];
+  flux *= surf_face;
   if (neighbours_colinearity_weighting_)
     flux *= colinearity;
 }
