@@ -18,6 +18,7 @@
 #include <Op_Dift_Multiphase_VDF_Face.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
 #include <Loi_paroi_adaptative.h>
+#include <Discretisation_base.h>
 #include <Frontiere_dis_base.h>
 #include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
@@ -27,7 +28,7 @@
 
 #include <math.h>
 
-Implemente_instanciable(Paroi_frottante_simple,"Paroi_frottante_simple", Frottement_global_impose);
+Implemente_instanciable(Paroi_frottante_simple,"Paroi_frottante_simple", Frottement_impose_base);
 // XD Paroi_frottante_simple condlim_base Paroi_frottante_simple 1 Adaptive wall-law boundary condition for velocity
 
 Sortie& Paroi_frottante_simple::printOn(Sortie& s ) const
@@ -55,6 +56,11 @@ void Paroi_frottante_simple::liste_faces_loi_paroi(IntTab& tab)
   for (int f =0 ; f < nf ; f++)
     for (int n = 0 ; n<N ; n++)
       tab(f + f1, n) |= 1;
+
+  if (domaine_Cl_dis().equation().discretisation().is_polyvef_p0()) is_externe_ = 1;
+  else if (domaine_Cl_dis().equation().discretisation().is_polymac_family()) is_externe_ = 0;
+  else if (domaine_Cl_dis().equation().discretisation().is_vdf()) is_externe_ = 0;
+  else Process::exit(que_suis_je() + " : the numerical scheme isn't supported !");
 }
 
 int Paroi_frottante_simple::initialiser(double temps)
@@ -133,7 +139,7 @@ void Paroi_frottante_simple::me_calculer()
       double y_loc = f_e(f_domaine,0) >=0  ? domaine.dist_face_elem0(f_domaine,e) : domaine.dist_face_elem1(f_domaine,e);
       double y_plus_loc = y_loc * u_tau(f_domaine, n)/ nu_visc(!cnu * e, n) ;
       double fac_coeff_grad_ = fac_coeff_grad(y_plus_loc);
-      double mu_tot_loc = (mu_poly) ? ((alp ? 1.0 : rho(!cr * e, n)) * (*mu_poly)(e,n)) : (mu_vdf) ? (*mu_vdf)(e,n) + mu_visc(!cmu * e,n) : -1;
+      double mu_tot_loc = (mu_poly) ? (alp ? 1.0 : rho(!cr * e, n)) * (*mu_poly)(e,n) : (*mu_vdf)(e,n) + mu_visc(!cmu * e,n) ;
       if (y_plus_loc>1)
         {
           valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) * rho(!cr * e, n) : 1) * u_tau(f_domaine, n)*u_tau(f_domaine, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
