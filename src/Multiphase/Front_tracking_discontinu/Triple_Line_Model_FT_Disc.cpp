@@ -167,14 +167,14 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
-  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entire Meso region extension in number of cells [-]
+  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entier Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position
   p.ajouter("read_via_file", &read_via_file_);
   p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // XD_ADD_P floattant Radiate of nucleate site; [in number of grids]
   // p.ajouter("Rc_inject", &Rc_inject_);
   p.ajouter("thetaC_tcl", &thetaC_tcl_); // XD_ADD_P floattant imposed contact angle [in degree] to force bubble pinching / necking once TCL entre nucleate site
-  p.ajouter_flag("reinjection_tcl", &reinjection_tcl_); // see in _.h file
-  p.ajouter_flag("distri_first_facette", &distri_first_facette_); // see in _.h file
+  p.ajouter_flag("reinjection_tcl", &reinjection_tcl_); // XD_ADD_P flag not_set
+  p.ajouter_flag("distri_first_facette", &distri_first_facette_); // XD_ADD_P flag Flag to distribute or not the Qtcl into the first facette (default value 0)
   p.ajouter("tempC_tcl", &tempC_tcl_); // see in _.h file
   p.ajouter("file_name", &Nom_ficher_tcl_); // XD_ADD_P floattant Input file to set TCL model
   p.ajouter("nb_colon", &nb_colon_tab_);
@@ -184,7 +184,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("num_colon_qtcl", &num_colon_qtcl_);
   p.ajouter_flag("enable_energy_correction", &TCL_energy_correction_);
   p.ajouter_flag("capillary_effect_on_theta", &capillary_effect_on_theta_activated_);
-  p.ajouter_flag("deactivate", &deactivate_);
+  p.ajouter_flag("deactivate", &deactivate_); // XD_ADD_P flag not_set
   p.ajouter("inout_method", &inout_method_); // XD_ADD_P chaine(into=["exact","approx","both"]) Type of method for in out calc. By defautl, exact method is used
   p.dictionnaire("exact", EXACT);
   p.dictionnaire("approx", APPROX);
