@@ -167,7 +167,7 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
-  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entire Meso region extension in number of cells [-]
+  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entier Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position
   p.ajouter("read_via_file", &read_via_file_);
   p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // XD_ADD_P floattant Radiate of nucleate site; [in number of grids]
