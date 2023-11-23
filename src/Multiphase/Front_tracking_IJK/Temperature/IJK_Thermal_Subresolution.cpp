@@ -757,9 +757,9 @@ double IJK_Thermal_Subresolution::compute_Nusselt_spherical_diffusion()
   const double rho_l = ref_ijk_ft_->get_rho_l();
   const double alpha_liq = lambda_liquid_ / (rho_l * cp_liquid_);
   auto glambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
-  { return Tinfty * R / pow(r,2) * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
+  { return Tinfty * R / pow(r,2) * (1- erf( (r - R)/(2 * sqrt(alpha * (t + 1e-16))))) ; };
   auto hlambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
-  { return Tinfty * R / r / (2 * sqrt(alpha * t)) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * t)),2))) ; };
+  { return Tinfty * R / r / (2 * sqrt(alpha * (t + 1e-16))) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * (t + 1e-16))),2))) ; };
   const double temperature_derivative_interface = glambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), T1)
                                                   + hlambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), T1);
   double Nusselt = abs(temperature_derivative_interface * (2 * single_centred_bubble_radius_ini_) / T1);

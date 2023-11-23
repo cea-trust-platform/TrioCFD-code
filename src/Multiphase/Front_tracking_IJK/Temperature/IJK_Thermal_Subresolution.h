@@ -286,7 +286,7 @@ protected :
 
   IJK_One_Dimensional_Subproblems thermal_local_subproblems_;
   int points_per_thermal_subproblem_;
-  double coeff_distance_diagonal_ = 3.;
+  double coeff_distance_diagonal_ = 2.;
   double probe_length_;
   double dr_;
   DoubleVect radial_coordinates_;

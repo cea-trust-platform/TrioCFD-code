@@ -156,6 +156,8 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
               const int ii = neighours_i[l];
               const int jj = neighours_j[l];
               const int kk = neighours_k[l];
+              if(i + ii < 0 || j + jj < 0 || k + kk < 0)
+                break;
               const int num = eulerian_compo_connex_from_interface_int_ns_(i + ii,j + jj,k + kk);
               const double indic_neighbour =  interfaces_->In()(i + ii,j + jj,k + kk);
               if (num == -1 && indic_neighbour < VAPOUR_INDICATOR_TEST)

@@ -297,6 +297,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
    */
   clear_vectors();
   reset_counters();
+  set_global_index(0);
+  reset_post_processing_theta_phi_scope();
   associate_temporal_parameters(global_time_step, current_time);
   associate_cell_ijk(i, j, k);
   associate_eulerian_field_values(compo_connex, indicator);
@@ -2996,8 +2998,9 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
         const int nb_digit_index_post_pro = index_post_processing_ < 1 ? 1 : (int) (log10(index_post_processing_) + 1);
         const int nb_digit_index_global = global_subproblem_index_ < 1 ? 1 : (int) (log10(global_subproblem_index_) + 1);
         const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
-
-        Nom probe_name = Nom("_thermal_rank_") + Nom(rank) + Nom("_thermal_subproblem_") + Nom(std::string(max_digit - nb_digit_index_post_pro, '0'))
+        const int max_digit_rank = 3;
+        const int nb_digit_rank = rank < 1 ? 1 : (int) (log10(rank) + 1);
+        Nom probe_name = Nom("_thermal_rank_") + Nom(std::string(max_digit_rank - nb_digit_rank, '0')) + Nom(rank) + Nom("_thermal_subproblem_") + Nom(std::string(max_digit - nb_digit_index_post_pro, '0'))
                          + Nom(index_post_processing_)
                          + Nom("_global_") + Nom(std::string(max_digit - nb_digit_index_global, '0')) + Nom(global_subproblem_index_)
                          + Nom("_radial_quantities_time_index_") +

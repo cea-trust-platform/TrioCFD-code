@@ -370,6 +370,11 @@ public :
 
     index_post_processing_ = index;
   };
+  void reset_post_processing_theta_phi_scope()
+  {
+    is_post_processed_local_ = false;
+    index_post_processing_ = 0;
+  };
   const double& get_interfacial_thermal_flux() const
   {
     return thermal_flux_[0];
