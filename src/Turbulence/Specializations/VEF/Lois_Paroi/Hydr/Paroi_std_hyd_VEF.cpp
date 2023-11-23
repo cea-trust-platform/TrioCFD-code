@@ -165,7 +165,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
           const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-              (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+              (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               int ndeb = 0;
@@ -231,7 +231,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
               const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
               if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
                   (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-                  (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+                  (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
                 {
                   const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
                   const IntTab& elem_faces = domaine_VEF.elem_faces();
@@ -401,7 +401,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
           int nfin = le_bord.nb_faces_tot();
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-              (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+              (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
               for (int ind_face=ndeb; ind_face<nfin; ind_face++)
                 {
@@ -473,7 +473,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
           const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-              (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+              (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
               const IntTab& elem_faces = domaine_VEF.elem_faces();
@@ -655,7 +655,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
           int nfin = le_bord.nb_faces_tot();
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-              (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+              (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
               for (int ind_face=ndeb; ind_face<nfin; ind_face++)
                 {
@@ -734,15 +734,17 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
+      //if (sub_type(Dirichlet,la_cl.valeur()) ||
+      //    (sub_type(Dirichlet,la_cl.valeur())) ||
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
           (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
-          (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE") )
+          (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE") )
         {
           int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
 
-          if(la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
+          if(la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE")
             {
-              is_defilante = (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE");
+              is_defilante = (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE");
             }
 
           // Recuperation de la valeur Erugu
@@ -870,7 +872,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 
             } // End loop on real faces
 
-        } // End Dirichlet conditions
+        } // End hlet conditions
 
       // Robin condition:
       else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
@@ -1131,13 +1133,13 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       // Only Dirichlet conditions:
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
           (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
-          (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE") )
+          (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE") )
         {
           int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
 
-          if(la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
+          if(la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE")
             {
-              is_defilante = (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE");
+              is_defilante = (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE");
             }
 
           // Recuperation de la valeur Erugu
@@ -1550,7 +1552,8 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
-      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
+          (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
           // Recuperation de la valeur Erugu
           double erugu=Erugu;
@@ -1823,7 +1826,7 @@ void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||
-           (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+           (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           if(je_suis_maitre())
