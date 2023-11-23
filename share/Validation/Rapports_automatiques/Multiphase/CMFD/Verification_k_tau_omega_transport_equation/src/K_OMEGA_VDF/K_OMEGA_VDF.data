@@ -40,9 +40,8 @@ END SCATTER #
 VDF  dis
 option_VDF 
 {
-traitement_coins oui
-traitement_gradients oui
-p_imposee_aux_faces oui
+
+all_options
 }
 
 Schema_euler_implicite sch
@@ -145,7 +144,7 @@ Lire pb
         }
         sources
         {
-            Production_energie_cin_turb  ,
+            Production_energie_cin_turb  { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }

@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from numpy import *
 from pylab import *
@@ -14,6 +15,13 @@ for ibl, line in enumerate(lines):
 
 nx=ibl
 nt=int(nb_lines/ibl)
+
+x_start = 5.e-6
+if (len(sys.argv) != 2):
+   raise Exception("One argument is compulsory to set offset")
+
+print(f"Offset set to {sys.argv[1]} µm")
+x_shift = float(sys.argv[1])*1.e-6
 
 mat = zeros((nt,nx,5))
 it = -1
@@ -36,8 +44,8 @@ for line in lines:
        mat[it,ix,0] = x
        mat[it,ix,1] = y
        mat[it,ix,2] = s
-       mat[it,ix,3] = phi
-       mat[it,ix,4] = pui
+       mat[it,ix,3] = phi if ( x_start+x_shift < float(x)+float(s)/2.) else 0.
+       mat[it,ix,4] = pui if ( x_start+x_shift < float(x)+float(s)/2.) else 0.
        ix +=1
        pass
    pass

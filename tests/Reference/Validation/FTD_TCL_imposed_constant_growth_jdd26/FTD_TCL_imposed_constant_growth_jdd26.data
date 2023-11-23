@@ -85,6 +85,7 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
+  deactivate
   Qtcl 0.0 # W/m # 
   lv 10.e-9
   ym 5.e-6

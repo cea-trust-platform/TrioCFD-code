@@ -53,9 +53,11 @@ public :
 protected:
   void ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
   void ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
+  void ajouter_blocs_BIF(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const ;
 
   int n_l = -1; //phase liquide
   int is_turb = 0;
+  int use_bif_ = 0;
   REF(Correlation) correlation_lift_;
   REF(Correlation) correlation_dispersion_;
   double beta_lift_ =  1. ; // To adjust the force in .data

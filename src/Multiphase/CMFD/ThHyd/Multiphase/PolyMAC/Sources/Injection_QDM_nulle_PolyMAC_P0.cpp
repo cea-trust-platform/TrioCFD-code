@@ -37,6 +37,8 @@
 #include <math.h>
 
 Implemente_instanciable(Injection_QDM_nulle_PolyMAC_P0, "Injection_QDM_nulle_Face_PolyMAC_P0", Source_base);
+// XD Injection_QDM_nulle source_base Injection_QDM_nulle 1 not_set
+
 
 Sortie& Injection_QDM_nulle_PolyMAC_P0::printOn(Sortie& os) const
 {
