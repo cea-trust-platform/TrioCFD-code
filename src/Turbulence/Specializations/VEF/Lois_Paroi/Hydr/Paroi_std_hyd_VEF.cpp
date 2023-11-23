@@ -734,8 +734,10 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
-      if (sub_type(Dirichlet,la_cl.valeur()) ||
-          (sub_type(Dirichlet,la_cl.valeur())) ||
+      //if (sub_type(Dirichlet,la_cl.valeur()) ||
+      //    (sub_type(Dirichlet,la_cl.valeur())) ||
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
+          (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
           (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE") )
         {
           int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
