@@ -50,7 +50,7 @@ Read sch
     solveur ice
     {
         criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e8  }
-        iter_min 5
+        iter_min 1 
         solveur petsc cli { }
         seuil_convergence_implicite 1e30
     }
@@ -120,7 +120,7 @@ Lire pb
         initial_conditions { temperature Champ_Uniforme 1 1 }
         boundary_conditions
         {
-            wall scalaire_impose_paroi champ_front_uniforme 1 5.8
+            wall $CL_T 
             symm symetrie
             entree	frontiere_ouverte T_ext Champ_Front_Uniforme 1 1
             sortie	frontiere_ouverte T_ext Champ_Front_Uniforme 1 1
@@ -164,6 +164,7 @@ Lire pb
     {
         Definition_champs	{
             yp refChamp { Pb_champ pb y_plus }
+            $temp_p_post1
             diff_vit	       operateur_eqn	{
                 numero_op 0
                 sources { refChamp { pb_champ pb vitesse } }
@@ -195,8 +196,9 @@ Lire pb
             k	 	k	 		periode 1 position_like vitesse
             $diss	 	$diss	 		periode 1 position_like vitesse
             yp  yp  periode 1 position_like vitesse
+            $temp_p_post2
         }
-        format lml
+        format lata
         champs binaire dt_post 1e6
         {
             vitesse elem
@@ -205,6 +207,7 @@ Lire pb
             diff_diss elem
             diff_vit elem
             yp elem
+	    $temp_p_post3
         }
     }
 }
