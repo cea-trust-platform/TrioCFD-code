@@ -1,9 +1,16 @@
 #!/bin/bash
 
 # If [NUM_PROC] is given to make_PAR.data, it will decoup only in x with Tranche NUM_PROC 1 1 ...
-[ -f COA_source.data ] && make_PAR.data COA_source.data
-[ -f source.data ] && make_PAR.data source.data
-[ ! -d ../MESH ] && mkdir ../MESH && \cp -f DOM_[0-9]*.Zones ../MESH && echo "Mesh files copied into $PWD/../MESH"
+for f in "COA_source" "source" "steady" "COA_steady"
+do
+   [ -f $f.data ] && make_PAR.data $f.data
+done
+
+[ ! -d ../MESH ] && [ $(basename $PWD) != "R0" ] && mkdir ../MESH \
+ && \cp -f DOM_[0-9]*.Zones ../MESH && echo "Mesh files copied into $PWD/../MESH"
 #DEACTIVATE [ -f sub_file ] && [ -f /usr/bin/ccc_msub ] && ccc_msub -A gen7712 sub_file && echo "Run via sub_file." && sed -i "1iEnd" SEQ_source.data && echo "SEQ_source disabled by End"
+
+dir=$(basename $PWD)
+[ ${dir:0:1} == "R" ] && \rm DOM* DEC*
 echo "End of pre_run"
 

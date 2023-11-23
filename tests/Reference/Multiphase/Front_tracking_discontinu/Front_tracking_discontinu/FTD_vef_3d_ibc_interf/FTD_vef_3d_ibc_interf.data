@@ -206,7 +206,7 @@ liste_postraitements {
 }
 }
 
-Reprise xyz prepare.xyz
+Resume_last_time xyz prepare.xyz
 Sauvegarde xyz bidon.xyz
 }
 

@@ -3,33 +3,57 @@
 # PARALLEL RUNS #
 dimension 2 
 PrecisionGeom 1e-18
-bidim_axi 
+
+
+# bidim_axi #
 
 domaine dom
 
 # BEGIN MESH #
 Mailler dom
-{  
-    pave pave1
+{
+
+   Pave pave1
    { 
    origine 0. 0.
-   longueurs 1. 1. 
-   nombre_de_noeuds @Nx@ @Nz@
+   longueurs 1. 0.5 
+   nombre_de_noeuds 121 91
+   Facteurs 1. 1.0
    }
    {
-   bord left     X = 0.          0. <= Y <= 1.
-   bord right    X = 1.         0. <= Y <= 1.
-   bord bot      Y = 0.          0. <= X <= 1.
-   bord up       Y = 1.        0. <= X <= 1.
+   bord bot       Y = 0.          0. <= X <= 1
+   bord left1     X = 0.          0. <= Y <= 0.5
+   bord right1    X = 1.          0. <= Y <= 0.5
+   } ,
+   
+   Pave pave2
+   { 
+   origine 0. 0.5
+   longueurs 1. 0.5 
+   nombre_de_noeuds 121 40   Facteurs 1. 1.05
+   }
+   {
+   bord left2      X = 0.          0.5 <= Y <= 1.
+   bord right2     X = 1.          0.5 <= Y <= 1.
+   bord up         Y = 1.          0. <= X <= 1.
    }
 }
-transformer dom x*@rmax@ y*@zmax@
+RegroupeBord dom left { left1 left2 } 
+RegroupeBord dom right { right1 right2 } 
+transformer dom x*0.002 y*0.003
 # END MESH #
+
+#
+discretiser_domaine dom
+postraiter_domaine { domaine dom fichier file format lata }
+End
+#
+
 
 # BEGIN PARTITION
 Partition dom
 {
-   Partitionneur tranche { tranches 3 18 }
+   Partitionneur tranche { tranches 2 2 }
    Larg_joint 2
    Nom_Zones DOM
 }
@@ -48,13 +72,6 @@ Lire liquid_water
   rho champ_uniforme      1 958.37
   lambda champ_uniforme   1 0.679
   cp champ_uniforme       1 4.21e3
-  # import CoolProp.CoolProp as CP
-  P,Q -> (pression, fraction de vapeur)
-  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 0, "Water")                                                     0.0007504815417629351
-  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 1, "Water")                                                     0.002902383982248589
-  Ou pas a saturation:
-  PropsSI('ISOBARIC_EXPANSION_COEFFICIENT','P',101325,'T',373.124,'Water')  #
-  beta_th Champ_Uniforme  1 0.0007504815417629351
 }
 
 Fluide_Incompressible vapour
@@ -64,7 +81,6 @@ Lire vapour
   rho champ_uniforme      1 0.597 
   lambda champ_uniforme   1 0.025
   cp champ_uniforme       1 2.077e3 
-  beta_th Champ_Uniforme  1 0.002902383982248589
 }
 
 Fluide_diphasique fluide
@@ -81,21 +97,25 @@ Lire sch
 {
    nb_pas_dt_max 1000000000
    tinit 0.0
-   tmax 5. 
+   tmax 50e-3
    tcpumax 23.75
-   dt_start dt_min
-   dt_min 1.e-12
-   dt_max 1.e-4 
+   dt_min 1.e-18
+   dt_max 1.E-7
+               # 1e-7 is necessary on coa test otherwise it is unstable at 89.4e-4 with remesh BEST #
    dt_impr 2.e-6
    dt_sauv 500
    facsec 1.
-   seuil_statio 1e-12
-   diffusion_implicite 1
-   dt_start dt_min
-   seuil_diffusion_implicite 1e-6
+   seuil_statio -1
    periode_sauvegarde_securite_en_heures 0.5
 }
 
+Triple_Line_Model_FT_Disc TCL 
+Read TCL 
+{ # TCL #
+  Qtcl 30.5
+  ym 3.7999999999999996e-06
+  sm 4.9000000000000005e-06
+} # TCL #
 
 Champ_Uniforme gravite
 Lire gravite 2 0. -9.81
@@ -110,22 +130,21 @@ Associate pb thermique
 Associate pb interf
 Associate pb fluide
 
+Associate TCL hydraulique
+Associate TCL thermique
+Associate TCL interf
+Associate pb TCL
 
 Associate pb sch
 VDF dis
 Discretize pb dis
-system "mkdir -p lata-steady"
-option_vdf { All_options } # To set the BC of pressure on the Boundary, not at the center of ghost cells! #
+system "mkdir -p lata"
 Lire pb
 {
    
    hydraulique
    {
-        parametre_equation parametre_diffusion_implicite
-        {
-            solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
-        }
-      modele_turbulence null {  }
+      modele_turbulence nul
       solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
       convection { quick }
       diffusion { }
@@ -137,16 +156,12 @@ Lire pb
       new_mass_source   # -> it's a flag, when not activated, the variable is 0 #
       # when new_mass_source is used, it forces the use of the new jump(1/rho)*ai*mp as a source term in the RHS of Poisson instead of the historical div(delta_u) #
       interpol_indic_pour_dI_dt interp_ai_based
-      terme_gravite rho_g  # grad_I or rho_g : Boussinesq only works with rho_g! #
-      boussinesq_approximation
+      terme_gravite grad_I  # grad_I or rho_g #
       boundary_conditions 
       {
-      # right   sortie_libre_rho_variable champ_front_fonc_xyz 1 -958.37*9.81*(Y-0.003) cela depend de l'option terme_gravite #
-      right Symetrie
+      right   sortie_libre_rho_variable champ_front_uniforme 1 0.
       bot     paroi_fixe 
-      up      sortie_libre_rho_variable champ_front_uniforme 1 0. 
-      # up     paroi_fixe #
-      # up      sortie_libre_rho_variable champ_front_fonc_xyz 1 -958.37*9.81*(3.1e-3-0.003) #
+      up      sortie_libre_rho_variable champ_front_uniforme 1 0.
       left    Symetrie
       }
    }
@@ -156,7 +171,7 @@ Lire pb
       # interpolation_repere_local #
       methode_interpolation_v vdf_lineaire
       methode_transport vitesse_interpolee hydraulique
-      conditions_initiales { fonction 1. } 
+      conditions_initiales { fonction x^2+(y-0.0001*cos(50.0*pi/180.0))^2-0.0001^2 } 
       VOFlike_correction_volume 1 # Flag to activate the VOF-like volume conservation (dI/dt) #
       nb_iterations_correction_volume 1 # to get the correct dI/dt #
       nb_lissage_correction_volume 1 # To smooth the dI/dt correction to avoid pikes on the interface #
@@ -178,23 +193,6 @@ Lire pb
                     lissage_courbure_iterations_si_remaillage 5
       }
       # End Remesh Best #
-      # Bloc Remesh Vinod 
-      remaillage { 
-                pas 1e-11
-                nb_iter_remaillage 5
-                critere_arete 0.35
-                critere_remaillage 0.35
-                pas_lissage 1e-11
-                relax_barycentrage 1
-                facteur_longueur_ideale 1.0
-                nb_iter_barycentrage 2
-                nb_iter_correction_volume 3
-                seuil_dvolume_residuel 1e-15
-                lissage_courbure_coeff -0.02
-                lissage_courbure_iterations_systematique 3
-                lissage_courbure_iterations_si_remaillage 5
-      }
-      End Remesh Vinod #
       collisions
       {
                 active
@@ -205,7 +203,7 @@ Lire pb
       parcours_interface { Correction_Parcours_Thomas }
       boundary_conditions
       {
-      bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 @theta@ # +90*(x_lt_3.e-5) to pinch contact line #
+      bot    Paroi_FT_disc constant champ_front_fonc_xyz 1 50.0 # +90*(x_lt_3.e-5) to pinch contact line #
       right  Paroi_FT_disc Symetrie
       up     Paroi_FT_disc Symetrie
       left   Paroi_FT_disc Symetrie
@@ -214,27 +212,22 @@ Lire pb
    
    thermique
    {
-        parametre_equation parametre_diffusion_implicite
-        {
-            solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
-        }
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width 9
+                stencil_width  8
                 correction_mpoint_diff_conv_energy 3 0 0 0 # diff conv energy #
                 diffusion { }
                 convection { quick }
                 boundary_conditions
                 {
-                bot   paroi_temperature_imposee champ_front_Uniforme 1 @dT@
+                bot   paroi_temperature_imposee champ_front_Uniforme 1 8.5
                 up    frontiere_ouverte T_ext Champ_front_Uniforme 1 0.0
                 # paroi paroi_adiabatique #
-                right   symetrie
-                # right   frontiere_ouverte T_ext Champ_front_Fonc_xyz 1 (@dT@*(1-erf(y/@delta_th@))) #
+                right   frontiere_ouverte T_ext Champ_front_Fonc_xyz 1 (8.5*(1-erf(y/0.0001)))
                 left    Symetrie
                 }
-              conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 (@dT@*(1-erf(y/@delta_th@))+0.1*sin(6.2831*x/@rmax@)) }
+              conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 (8.5*(1-erf(y/0.0001))) }
    }
    postraitement 
    {
@@ -248,8 +241,7 @@ Lire pb
       }
                 Probes 
                {
-                  T_points grav temperature_thermique Periode 1.e-4 point 3 0.25e-3 0.125e-3 0.25e-3 0.25e-3 0.25e-3 0.5e-3 
-                  T_seg grav temperature_thermique Periode 1.e-4 segment 400 1.8e-3 0 1.8e-3 1.0e-3
+                  T_y5e-6 grav temperature_thermique Periode 1.e-4 segment 400 0. 5.0e-6 0.004 5.0e-6
                   T_x10 grav temperature_thermique Periode 1.e-4 segment 400 10.e-4 0 10.e-4 1.e-3
                   T_x15 grav temperature_thermique Periode 1.e-4 segment 400 15.e-4 0 15.e-4 1.e-3
                   T_x20 grav temperature_thermique Periode 1.e-4 segment 400 20.e-4 0 20.e-4 1.e-3
@@ -264,18 +256,36 @@ Lire pb
    {
     postraitement_ft_lata post1 { 
      format Lata 
-     fichier lata-steady/post 
-     champs dt_post 5.0e-2 { 
+     fichier lata/post 
+     champs dt_post 1.0e-4 { 
         VOLUME_MAILLE elem 
         indicatrice_interf elem 
         temperature_thermique elem 
         vitesse faces 
         pression elem 
-     }
+        mpoint_thermique elem 
+        interfacial_area elem 
+        distance_interface_elem_interf elem
+        # pression_laplacien_d elem 
+        second_membre_projection elem 
+        vitesse_conv_thermique faces 
+        vitesse_delta_interface faces 
+        terme_convection_vitesse faces 
+        terme_diffusion_vitesse faces #
+        # flux_tmp_interf faces  #
+     } 
+     interfaces interf { 
+        courbure som 
+        vitesse som 
+        vitesse_repere_local som 
+        COMPO_CONNEXE elem 
+        PE elem 
+        PE_LOCAL elem 
+     } 
     }   
    }
 
-sauvegarde binaire steady.sauv
+sauvegarde binaire source.sauv
 # resume_last_time binaire ../R0/source.sauv #
 
 }

@@ -1,0 +1,49 @@
+#!/bin/bash
+
+tmp=$(module avail pigz)
+if [ -z "$tmp" ] && [ -d lata ] ; then
+  tar czf lata.tgz lata
+else
+  tar -I pigz -cf lata.tgz lata
+fi
+
+# If next run exists, we move the lata there:
+dir=$(basename $PWD)
+err=$(ls PAR*err)
+jdd=$(basename $err .err)
+list=$(ls $jdd.dt_ev $jdd.sons $jdd*son)
+listrm=$(ls ${jdd}*.out ${jdd}.err ${jdd}*.face ${jdd}.lml ${jdd}*.TU)
+[ -f $jdd.dt_ev ] && tar czf reste.tgz $list $listrm
+[ -n "$(ls *txt *dat)" ] && tar czf txt-dat.tgz *txt *dat && \rm *txt *dat
+if [ ${dir:0:1} == "R" ] ; then
+    n=${dir:1}
+    let n++
+    next=../R$n
+    if [ -d $next ] ; then
+      if [ -f lata/post.lata ] ; then
+        line=$(grep -n TEMPS lata/post.lata | tail -n1 | awk -F: '{print $1}')
+        time=$(grep -n TEMPS lata/post.lata | tail -n1 | awk '{print $2}')
+        echo "Deleting last time", $time, " from lata/post.lata"
+        cp lata/post.lata lata/post.lata.bkp
+        sed -i ''$line',$d' lata/post.lata
+      fi
+      mv lata $list ${next}/
+      if [ -f slata/post.lata ] ; then
+        line=$(grep -n TEMPS slata/post.lata | tail -n1 | awk -F: '{print $1}')
+        time=$(grep -n TEMPS slata/post.lata | tail -n1 | awk '{print $2}')
+        echo "Deleting last time", $time, " from slata/post.lata"
+        cp slata/post.lata slata/post.lata.bkp
+        sed -i ''$line',$d' slata/post.lata
+      fi
+      mv slata $list ${next}/
+      [ -n "$listrm" ] && \rm $listrm ${jdd}.dump ${jdd}.stop ${jdd}*.log ${jdd}.progress
+      tar xzf txt-dat.tgz injection.txt
+      [ -f short_$err ] && [ ! -f ${next}/$err ] && cp short_$err ${next}/$err
+    else
+      rm -rf lata slata
+    fi
+else
+    rm -rf lata slata
+fi
+echo "Cleaning ok"
+exit 0

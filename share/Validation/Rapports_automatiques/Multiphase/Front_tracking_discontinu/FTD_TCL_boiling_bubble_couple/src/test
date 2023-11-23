@@ -1,0 +1,18 @@
+#!/bin/bash
+submission ()
+{
+  #waitpid ($1)
+  echo "Begin submission"
+  sleep 2
+  while [ -e /proc/$1 ] ; do sleep 1; done
+  echo $2
+  echo "End submission"
+}
+
+pid=$$
+submission $pid "jojo" &
+#bash a $pid "jojo" &
+echo "pid of submission: " $!
+echo "pid of $0: ", $$
+sleep 3
+echo "End $0"

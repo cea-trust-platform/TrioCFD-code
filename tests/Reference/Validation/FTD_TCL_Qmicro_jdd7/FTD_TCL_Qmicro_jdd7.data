@@ -85,6 +85,7 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
+  distri_first_facette
   Qtcl 50.0 # W/m # 
   lv 10.e-9
   # coeffa -1.9291 #
