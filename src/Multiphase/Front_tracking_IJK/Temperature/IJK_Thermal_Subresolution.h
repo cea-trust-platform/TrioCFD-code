@@ -178,6 +178,7 @@ public :
   {
     return disable_post_processing_probes_out_files_;
   }
+  int get_first_step_thermals_post() override { return first_step_thermals_post_; }
 
 protected :
   void reset_subresolution_distributed_vectors();
@@ -189,7 +190,8 @@ protected :
   void store_temperature_before_extrapolation() override;
   void compare_temperature_fields(const IJK_Field_double& temperature,
                                   const IJK_Field_double& temperature_ana,
-                                  IJK_Field_double& error_temperature_ana);
+                                  IJK_Field_double& error_temperature_ana,
+                                  IJK_Field_double& error_temperature_ana_rel);
   void correct_any_temperature_field_for_visu(IJK_Field_double& temperature);
   void correct_temperature_for_visu() override;
   void clip_temperature_values() override;
@@ -431,6 +433,7 @@ protected :
   int nb_probes_post_pro_;
 
   int interp_eulerian_;
+  int first_step_thermals_post_;
 
 };
 

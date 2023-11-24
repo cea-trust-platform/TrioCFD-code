@@ -57,6 +57,7 @@ public :
   inline IJK_Field_double& get_temperature_ft() { return valeur().get_temperature_ft(); }
   inline const IJK_Field_double& get_temperature_ana() const { return valeur().get_temperature_ana(); };
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
+  inline const IJK_Field_double& get_ecart_t_ana_rel() const { return valeur().get_ecart_t_ana_rel(); }
   inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
   inline const IJK_Field_double& get_u_T_convective() const { return valeur().get_u_T_convective(); }
@@ -162,6 +163,7 @@ public :
   void thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
                                      const Nom& overall_bubbles_quantities,
                                      const Nom& local_quantities_thermal_probes_time_index_folder);
+  int get_first_step_thermals_post() { return valeur().get_first_step_thermals_post(); };
 
 protected:
   int thermal_rank_;

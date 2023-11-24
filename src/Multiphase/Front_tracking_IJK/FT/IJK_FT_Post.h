@@ -324,6 +324,7 @@ protected:
   LIST(IJK_Thermique)& thermique_;
   LIST(IJK_Energie)& energie_;
   IJK_Thermals& thermals_;
+  int first_step_thermals_post_=0;
 
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;

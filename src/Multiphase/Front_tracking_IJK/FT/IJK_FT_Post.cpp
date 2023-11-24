@@ -1976,7 +1976,8 @@ void IJK_FT_Post::postraiter_ci(const Nom& lata_name, const double current_time)
 
 void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, double timestep, const Nom& lata_name, const ArrOfDouble& gravite, const Nom& nom_cas)
 {
-  if (tstep % dt_post_ == dt_post_ - 1 || stop)
+  thermals_.set_first_step_thermals_post(first_step_thermals_post_);
+  if (tstep % dt_post_ == dt_post_ - 1 || stop || first_step_thermals_post_)
     {
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);

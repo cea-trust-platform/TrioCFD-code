@@ -415,15 +415,19 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       nalloc +=1;
     }
 
-  if (liste_post_instantanes_.size() && (liste_post_instantanes_.contient_("TEMPERATURE_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA")))
+  if (liste_post_instantanes_.size() && (liste_post_instantanes_.contient_("TEMPERATURE_ANA")
+                                         || liste_post_instantanes_.contient_("ECART_T_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA_REL")))
     {
       temperature_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
       ecart_t_ana_.allocate(splitting, IJK_Splitting::ELEM, 1);
-      nalloc +=2;
+      ecart_t_ana_rel_.allocate(splitting, IJK_Splitting::ELEM, 1);
+      nalloc +=3;
       temperature_ana_.data() = 0.;
       ecart_t_ana_.data() = 0.;
+      ecart_t_ana_rel_.data() = 0.;
       temperature_ana_.echange_espace_virtuel(temperature_ana_.ghost());
       ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
+      ecart_t_ana_rel_.echange_espace_virtuel(ecart_t_ana_rel_.ghost());
     }
 
   /*

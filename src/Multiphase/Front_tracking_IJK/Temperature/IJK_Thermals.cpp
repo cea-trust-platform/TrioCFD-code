@@ -441,3 +441,10 @@ void IJK_Thermals::create_folders(Nom folder_name_base)
       // make_dir_for_out_files_.interpreter(folder_name_entry);
     }
 }
+
+void IJK_Thermals::set_first_step_thermals_post(int& first_step_thermals_post)
+{
+  first_step_thermals_post = 0;
+  for (int idth = 0; idth < (*this).size(); idth++)
+    first_step_thermals_post = (first_step_thermals_post || (*this)[idth].get_first_step_thermals_post());
+}

@@ -133,6 +133,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   nb_probes_post_pro_ = 40;
 
   interp_eulerian_ = 0;
+  first_step_thermals_post_=1;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -263,6 +264,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 
   param.ajouter_flag("interp_eulerian", &interp_eulerian_);
 
+  param.ajouter_flag("disable_first_step_thermals_post", &first_step_thermals_post_);
+
   // param.ajouter_flag("enforce_periodic_boundary_value", &enforce_periodic_boundary_value_);
   // param.ajouter_non_std("enforce_periodic_boundary_value",(this));
   //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
@@ -331,6 +334,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     }
 
   distance_cell_faces_from_lrs_ = !distance_cell_faces_from_lrs_;
+  first_step_thermals_post_ = !first_step_thermals_post_;
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);
@@ -644,7 +648,7 @@ Nom IJK_Thermal_Subresolution::compute_quasi_static_spherical_diffusion_expressi
   expression_T += streamObj.str().c_str();
   expression_T += "/sqrt((x-1e-16)^2+(y-1e-16)^2+(z-1e-16)^2)*(1-erf((sqrt(x^2+y^2+z^2)-";
   expression_T += streamObj.str().c_str();
-  expression_T += ")/(2.*sqrt(2.*";
+  expression_T += ")/(2.*sqrt(";
   streamObj.str("");
   streamObj.clear();
   streamObj << ((alpha_liq * time_scope) + 1e-16);
@@ -821,7 +825,7 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
           set_field_data(temperature_ana_, expression_T_ana);
           correct_any_temperature_field_for_visu(temperature_ana_);
           if (liste_post_instantanes_.contient_("ECART_T_ANA"))
-            compare_temperature_fields(temperature_, temperature_ana_, ecart_t_ana_);
+            compare_temperature_fields(temperature_, temperature_ana_, ecart_t_ana_, ecart_t_ana_rel_);
           correct_any_temperature_fields_for_eulerian_fluxes(ecart_t_ana_);
         }
     }
@@ -936,7 +940,8 @@ void IJK_Thermal_Subresolution::correct_temperature_increment_for_interface_leav
 
 void IJK_Thermal_Subresolution::compare_temperature_fields(const IJK_Field_double& temperature,
                                                            const IJK_Field_double& temperature_ana,
-                                                           IJK_Field_double& error_temperature_ana)
+                                                           IJK_Field_double& error_temperature_ana,
+                                                           IJK_Field_double& error_temperature_ana_rel)
 {
   const int ni = temperature.ni();
   const int nj = temperature.nj();
@@ -945,7 +950,10 @@ void IJK_Thermal_Subresolution::compare_temperature_fields(const IJK_Field_doubl
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-        error_temperature_ana(i,j,k) = (temperature(i,j,k) - temperature_ana(i,j,k)) / (temperature_ana(i,j,k) + 1.e-16) * 100.;
+        {
+          error_temperature_ana(i,j,k) = (temperature(i,j,k) - temperature_ana(i,j,k));
+          error_temperature_ana_rel(i,j,k) = error_temperature_ana(i,j,k) / (temperature_ana(i,j,k) + 1.e-16) * 100.;
+        }
 }
 
 void IJK_Thermal_Subresolution::correct_any_temperature_field_for_visu(IJK_Field_double& temperature)
@@ -999,6 +1007,7 @@ void IJK_Thermal_Subresolution::clip_temperature_values()
 void IJK_Thermal_Subresolution::compute_thermal_subproblems()
 {
   is_first_time_step_ = (!ref_ijk_ft_->get_reprise()) && (ref_ijk_ft_->get_tstep()==0);
+  first_step_thermals_post_ = (first_step_thermals_post_ && !ref_ijk_ft_->get_tstep());
   if (is_first_time_step_)
     first_time_step_temporal_ = first_time_step_temporal_ && is_first_time_step_;
 

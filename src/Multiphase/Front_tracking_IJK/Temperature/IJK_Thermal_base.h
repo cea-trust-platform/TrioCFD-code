@@ -88,6 +88,7 @@ public:
                                   const double flux_paroi_impose,
                                   IJK_Field_local_double& flux_bord,
                                   const bool bord_kmax);
+  virtual int get_first_step_thermals_post() { return 0; };
   /*
    * Getters and setters
    */
@@ -121,6 +122,10 @@ public:
   const IJK_Field_double& get_ecart_t_ana() const
   {
     return ecart_t_ana_ ;
+  }
+  const IJK_Field_double& get_ecart_t_ana_rel() const
+  {
+    return ecart_t_ana_rel_;
   }
   const IJK_Field_double& get_div_lambda_grad_T() const
   {
@@ -545,7 +550,7 @@ protected:
    */
   Nom expression_T_ana_;
   Motcles liste_post_instantanes_; // liste des champs instantanes a postraiter
-  IJK_Field_double temperature_ana_, ecart_t_ana_;
+  IJK_Field_double temperature_ana_, ecart_t_ana_, ecart_t_ana_rel_;
   FixedVector<IJK_Field_double, 3> grad_T_;
   double global_energy_;
   int calulate_grad_T_;

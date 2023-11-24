@@ -236,6 +236,15 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
+  oss << "ECART_T_ANA_REL_" << lata_suffix << idx;
+  Nom nom_ecart_ana_rel(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("ECART_T_ANA_REL") || liste_post_instantanes.contient_(nom_ecart_ana_rel)))
+    {
+      // calculer_ecart_T_ana();
+      n++, dumplata_scalar(lata_name, nom_ecart_ana_rel, get_ecart_t_ana_rel(), latastep);
+    }
+  oss.str("");
+
   /*
    * DIV_LAMBDA_GRAD_T_VOLUME
    */
