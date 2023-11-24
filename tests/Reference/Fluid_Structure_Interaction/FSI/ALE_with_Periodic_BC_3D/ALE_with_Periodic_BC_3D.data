@@ -47,10 +47,9 @@ Domaine Slice_tot_ALE
 Extraire_surface_ALE { domaine Slice_tot_ALE Probleme pb Condition_faces (y^2+x^2-2.25e-5)*z*(0.1-z)>0 avec_certains_bords 1 Wall }
 # Postraiter_domaine { domaine Slice_tot_ALE format lata fichier Slice_tot_ALE } #
 
-
 Domaine Slice_1_ALE
 Extraire_surface_ALE { Domaine Slice_1_ALE Probleme pb Condition_faces z*(0.001-z)*(y^2+x^2-2.25e-5)>0 avec_certains_bords 1 Wall }
-# Postraiter_domaine { domaine Slice_1_ALE format lata fichier Slice_1 } #
+# Postraiter_domaine { domaine Slice_1_ALE format lata fichier Slice_1_ALE } #
 
 
 Lire pb

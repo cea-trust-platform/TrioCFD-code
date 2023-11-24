@@ -95,9 +95,11 @@ Entree& Extraire_surface_ALE::interpreter_(Entree& is)
   Extraire_surface::extraire_surface_without_cleaning(domaine_surfacique,domaine_volumique,nom_domaine_surfacique,domaine_vf,expr_elements,expr_faces,avec_les_bords,noms_des_bords);
 
   IntTab les_elems_ref= domaine_surfacique.les_elems();
+  //We save the elements belonging to the surface; it contains the global numerations of the faces.
+  //Because after cleaning the global numerations of the faces will be lost.
   domaine_surfacique.setLes_elems_extrait_surf_ref(les_elems_ref);
   NettoieNoeuds::nettoie(domaine_surfacique);
-  domaine_surfacique.setExtrait_surf_dom_deformable(true);
+  domaine_surfacique.setExtrait_surf_dom_deformable(true); //we indicate that the domain was extracted on a moving boundary
 
   return is;
 }

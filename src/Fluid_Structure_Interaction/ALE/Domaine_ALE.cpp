@@ -110,7 +110,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       int nb_som_face=le_dom_VF.nb_som_face();
       IntTab& face_sommets=le_dom_VF.face_sommets();
       creer_mes_domaines_frontieres(le_dom_VF);//update the boundary surface domain
-      update_coord_dom_extrait_surface();//update coord for dom extrait_surface
+      update_coord_dom_extrait_surface();//update coord for dom extrait_surface_ale
 
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
@@ -1331,18 +1331,17 @@ void Domaine_ALE::update_coord_dom_extrait_surface()
   Interprete_bloc& interp = Interprete_bloc::interprete_courant();
   Noms noms=interp.getListeNoms();
   for(int i=0; i<noms.size(); i++)
-    if(strcmp(interprete().objet(noms[i]).le_type(), "Domaine" ) == 0)
+    if(strcmp(interprete().objet(noms[i]).le_type(), "Domaine" ) == 0) //we only look for objet of type domaine
       {
-        Nom nom_domaine_ext= noms[i];
+        Nom nom_domaine_ext= noms[i]; // give the name of domaine
         //if (interp.objet_global_existant(nom_domaine_ext))
         Domaine& dom_new = ref_cast(Domaine, interprete().objet(nom_domaine_ext));
-        if(dom_new.getExtrait_surf_dom_deformable())
+        if(dom_new.getExtrait_surf_dom_deformable()) //test if domain was defined with extrait_surface_ALE
           {
-            Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
-            //mise à jours
-            dom_new.les_sommets()=coord_sommets();
-            dom_new.les_elems()=dom_new.getLes_elems_extrait_surf_ref();
-            NettoieNoeuds::nettoie(dom_new);
+            //Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
+            Scatter::uninit_sequential_domain(dom_new);
+            dom_new.les_sommets()=les_sommets();             //coordinated updates
+            dom_new.les_elems()=dom_new.getLes_elems_extrait_surf_ref(); //only the coordinate are update, exactly the same elements will belong to the domain
           }
       }
 
