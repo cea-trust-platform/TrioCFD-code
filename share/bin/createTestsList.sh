@@ -75,7 +75,7 @@ do
     [[ -f ${VALIDLIST} ]] && rm ${VALIDLIST}
     touch ./${VALIDLIST}
     
-    for r in $(find "./share/Validation/Rapports_automatiques/${MOD}" -iname "*.prm" -o -iname "*.ipynb" -not -path "*/.ipynb_checkpoints*" | sort -duf)
+    for r in $(find "./share/Validation/Rapports_automatiques/${MOD}" -iname "*.prm"  -not -path "*/build/*" -o -iname "*.ipynb" -not -path "*/.ipynb_checkpoints*" | sort -duf)
     do
       echo -e "Rapport de validation : ${r}"
       REPVAL=$(dirname ${r})
