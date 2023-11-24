@@ -1,0 +1,4 @@
+#!/bin/bash
+#OPTION
+python ../propertiesGeometry.py
+python ../tableauCourbes.py muscl 0.05
