@@ -42,6 +42,17 @@ Associer pb dom
 Associer pb sch
 Discretiser pb dis
 
+# Section definition for force calculation #
+Domaine Slice_tot_ALE
+Extraire_surface_ALE { domaine Slice_tot_ALE Probleme pb Condition_faces (y^2+x^2-2.25e-5)*z*(0.1-z)>0 avec_certains_bords 1 Wall }
+# Postraiter_domaine { domaine Slice_tot_ALE format lata fichier Slice_tot_ALE } #
+
+
+Domaine Slice_1_ALE
+Extraire_surface_ALE { Domaine Slice_1_ALE Probleme pb Condition_faces z*(0.001-z)*(y^2+x^2-2.25e-5)>0 avec_certains_bords 1 Wall }
+# Postraiter_domaine { domaine Slice_1_ALE format lata fichier Slice_1 } #
+
+
 Lire pb
 {
 	# eau a 20 degres C et 1.244 bar #
@@ -75,6 +86,24 @@ Lire pb
 	}
 	Post_processing
 	{
+			Definition_champs	{			
+					       Force_Slice_tot_ALE Reduction_0D {
+							       methode sum source Interpolation {
+								 domaine Slice_tot_ALE localisation elem source Predefini { pb_champ pb pressure_force }
+							    }
+							}
+						Force_Slice_1_ALE Reduction_0D {
+							       methode sum source Interpolation {
+								 domaine Slice_1_ALE localisation elem source Predefini { pb_champ pb pressure_force }
+							    }
+							}										
+						}
+
+			Sondes			{
+						Force_Slice_tot_ALE Force_Slice_tot_ALE periode 1e-6 numero_elem_sur_maitre 0
+						Force_Slice_1_ALE Force_Slice_1_ALE periode 1e-6 numero_elem_sur_maitre 0
+						}
+
 			Format lml
 			Champs binaire dt_post 1e-3
 						{
