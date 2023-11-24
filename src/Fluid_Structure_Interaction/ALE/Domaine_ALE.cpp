@@ -876,7 +876,6 @@ void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
     }
   is >> nb_boundary;
   Cerr << "Number of Neumann CL boundary for grid_problem : " <<  nb_boundary << finl;
-  int compteur=0;
   while(1)
     {
       // lecture d'un nom de bord ou de }
@@ -885,7 +884,6 @@ void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
       if (motlu == accolade_fermee)
         break;
       name_boundary_with_Neumann_BC.add(nomlu);
-      compteur++;
     }
   if(nb_boundary!=name_boundary_with_Neumann_BC.size())
     {
