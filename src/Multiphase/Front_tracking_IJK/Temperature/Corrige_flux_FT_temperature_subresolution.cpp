@@ -1843,12 +1843,12 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_any_reachabl
                       n_first = &nk;
                       n_bis = &nj;
                       n_ter = &ni;
-                      j_ref = &index_first;
-                      k_ref = &index_bis;
+                      j_ref = &index_bis;
+                      k_ref = &index_first;
                       i_ref = &index_ter;
                       i_ref_remove = &val;
-                      j_ref_remove = &index_first;
-                      k_ref_remove = &index_bis;
+                      j_ref_remove = &index_bis;
+                      k_ref_remove = &index_first;
                       break;
                     case 1:
                       n_first = &nk;
@@ -1873,15 +1873,15 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_any_reachabl
                       k_ref_remove = &val;
                       break;
                     default:
-                      n_first =&nk;
+                      n_first = &nk;
                       n_bis = &nj;
                       n_ter = &ni;
-                      j_ref = &index_first;
-                      k_ref = &index_bis;
+                      j_ref = &index_bis;
+                      k_ref = &index_first;
                       i_ref = &index_ter;
                       i_ref_remove = &val;
-                      j_ref_remove = &index_first;
-                      k_ref_remove = &index_bis;
+                      j_ref_remove = &index_bis;
+                      k_ref_remove = &index_first;
                     }
                   for (index_first = 0; index_first < *n_first; index_first++)
                     for (index_bis = 0; index_bis < *n_bis; index_bis++)
@@ -2060,13 +2060,13 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
   switch(dir)
     {
     case 0:
-      j = &index_bis;
-      k = &index_ter;
+      j = &index_ter;
+      k = &index_bis;
       i = &val;
       break;
     case 1:
-      i = &index_bis;
-      k = &index_ter;
+      i = &index_ter;
+      k = &index_bis;
       j = &val;
       break;
     case 2:
@@ -2075,11 +2075,12 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
       k = &val;
       break;
     default:
-      j = &index_bis;
-      k = &index_ter;
+      j = &index_ter;
+      k = &index_bis;
       i = &val;
       break;
     }
+  const int factor_pos[3][3] = {{1, 0, 0},{0, 1, 0},{0, 0, 1}};
   std::vector<int> is_in_interval = {0, 0};
   indices_to_remove.set_smart_resize(1);
   indices_fluxes_to_remove.set_smart_resize(1);
@@ -2093,7 +2094,7 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
               // use indicator
               val = indices_fluxes_sorted[n][m];
               const double indic = ref_ijk_ft_->itfce().I()(*i,*j,*k);
-              const double indic_prev = ref_ijk_ft_->itfce().I()(*i-1,*j,*k);
+              const double indic_prev = ref_ijk_ft_->itfce().I()(*i-factor_pos[dir][0],*j-factor_pos[dir][1],*k-factor_pos[dir][2]);
               const int indic_test = (indic > LIQUID_INDICATOR_TEST && indic_prev > LIQUID_INDICATOR_TEST);
               if (indic_test)
                 switch(n)
