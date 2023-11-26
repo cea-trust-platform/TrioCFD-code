@@ -1340,10 +1340,14 @@ void Domaine_ALE::update_coord_dom_extrait_surface()
           {
             //Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
             Scatter::uninit_sequential_domain(dom_new);
-            dom_new.les_sommets()=les_sommets();             //coordinated updates
+            dom_new.les_sommets()=coord_sommets();             //coordinated updates
             dom_new.les_elems()=dom_new.getLes_elems_extrait_surf_ref(); //only the coordinate are update, exactly the same elements will belong to the domain
+            NettoieNoeuds::nettoie(dom_new);
           }
       }
 
 }
+
+
+
 
