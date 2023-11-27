@@ -23,7 +23,7 @@
 #ifndef Mod_turb_hyd_RANS_2eq_included
 #define Mod_turb_hyd_RANS_2eq_included
 
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 class Equation_base;
 class Transport_2eq_base;
@@ -31,9 +31,9 @@ class Transport_2eq_base;
 
 /*! @brief Classe Mod_turb_hyd_RANS_2eq Classe de base des modeles de type RANS à deux equations
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS_2eq: public Mod_turb_hyd_base
+class Mod_turb_hyd_RANS_2eq: public Modele_turbulence_hyd_base
 {
 
   Declare_base_sans_constructeur(Mod_turb_hyd_RANS_2eq);

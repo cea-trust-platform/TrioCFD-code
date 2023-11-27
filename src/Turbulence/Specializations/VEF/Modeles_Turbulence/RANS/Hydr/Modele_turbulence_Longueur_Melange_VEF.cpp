@@ -416,7 +416,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
 int Modele_turbulence_Longueur_Melange_VEF::preparer_calcul( )
 {
   // On ne doit pas lire_distance_paroi dans le cas ou on post-traite le champs Distance_paroi
-  // car c'est deja fait dans la classe mere Mod_turb_hyd_base
+  // car c'est deja fait dans la classe mere Modele_turbulence_hyd_base
   bool contient_distance_paroi = false;
   for (auto& itr : equation().probleme().postraitements())
     if (!contient_distance_paroi)
@@ -436,7 +436,7 @@ int Modele_turbulence_Longueur_Melange_VEF::preparer_calcul( )
       }
   if (!contient_distance_paroi && cas == 4)
     lire_distance_paroi();
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   mettre_a_jour(0.);
 
   return 1;

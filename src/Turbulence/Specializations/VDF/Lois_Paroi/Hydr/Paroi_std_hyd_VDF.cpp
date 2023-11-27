@@ -26,7 +26,7 @@
 #include <TRUSTTabs_forward.h>
 #include <Paroi_std_hyd_VDF.h>
 #include <Schema_Temps_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Champ_Uniforme.h>
 #include <Domaine_Cl_VDF.h>
 #include <communications.h>

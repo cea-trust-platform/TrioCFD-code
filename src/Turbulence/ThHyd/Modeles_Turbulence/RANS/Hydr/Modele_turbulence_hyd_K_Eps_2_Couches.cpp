@@ -135,7 +135,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
   calculer_viscosite_turbulente(equation().schema_temps().temps_courant());
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   calculer_viscosite_turbulente(K_Eps().temps());
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   return 1;

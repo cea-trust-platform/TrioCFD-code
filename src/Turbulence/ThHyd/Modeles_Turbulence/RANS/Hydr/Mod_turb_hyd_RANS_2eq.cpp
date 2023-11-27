@@ -24,7 +24,7 @@
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_2eq, "Mod_turb_hyd_RANS_2eq", Mod_turb_hyd_base);
+Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_2eq, "Mod_turb_hyd_RANS_2eq", Modele_turbulence_hyd_base);
 // XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Mod_turb_hyd_RANS_2eq::Mod_turb_hyd_RANS_2eq()
@@ -32,23 +32,23 @@ Mod_turb_hyd_RANS_2eq::Mod_turb_hyd_RANS_2eq()
 
 }
 
-/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Mod_turb_hyd_RANS_2eq::printOn(Sortie& is) const
 {
-  return Mod_turb_hyd_base::printOn(is);
+  return Modele_turbulence_hyd_base::printOn(is);
 }
 
-/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Mod_turb_hyd_RANS_2eq::readOn(Entree& is)
 {
-  Mod_turb_hyd_base::readOn(is);
+  Modele_turbulence_hyd_base::readOn(is);
   return is;
 }

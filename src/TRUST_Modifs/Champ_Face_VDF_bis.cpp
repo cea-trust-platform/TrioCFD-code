@@ -74,9 +74,9 @@ void Champ_Face_VDF::calcul_y_plus_diphasique(DoubleTab& y_plus, const Domaine_C
   int yplus_already_computed = 0; // flag
 
   const RefObjU& modele_turbulence = eqn_hydr.get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Mod_turb_hyd_base, modele_turbulence.valeur()))
+  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
     {
-      const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base, modele_turbulence.valeur());
+      const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
       yplus_faces.resize(domaine_VDF.nb_faces_tot());
       yplus_faces.ref(loipar.tab_d_plus());

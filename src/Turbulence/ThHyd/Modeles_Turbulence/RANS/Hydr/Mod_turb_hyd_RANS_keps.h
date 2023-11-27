@@ -31,7 +31,7 @@ class Transport_K_Eps_base;
 
 /*! @brief Classe Mod_turb_hyd_RANS_keps Classe de base des modeles de type RANS_keps
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
 class Mod_turb_hyd_RANS_keps : public Mod_turb_hyd_RANS_2eq
 {

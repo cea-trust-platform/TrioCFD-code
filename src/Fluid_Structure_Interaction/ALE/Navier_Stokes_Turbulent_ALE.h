@@ -25,7 +25,7 @@
 
 #include <Mod_turb_hyd_RANS_keps.h>
 #include <Navier_Stokes_std_ALE.h>
-#include <Mod_turb_hyd.h>
+#include <Modele_turbulence_hyd.h>
 #include <Les_mod_turb.h>
 
 class Champ_Fonc;
@@ -34,9 +34,9 @@ class Champ_Fonc;
  *
  *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
  *      modelisation de la turbulence pour un maillage mobile (ALE).
- *      Un membre de type Mod_turb_hyd representera le modele de turbulence.
+ *      Un membre de type Modele_turbulence_hyd representera le modele de turbulence.
  *
- * @sa Navier_Stokes_std_ALE Mod_turb_hyd Pb_Hydraulique_Turbulent, Pb_Thermohydraulique_Turbulent
+ * @sa Navier_Stokes_std_ALE Modele_turbulence_hyd Pb_Hydraulique_Turbulent, Pb_Thermohydraulique_Turbulent
  */
 class Navier_Stokes_Turbulent_ALE : public Navier_Stokes_std_ALE
 {
@@ -47,7 +47,7 @@ public :
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline const Champ_Fonc& viscosite_turbulente() const;
-  inline const Mod_turb_hyd& modele_turbulence() const;
+  inline const Modele_turbulence_hyd& modele_turbulence() const;
   int sauvegarder(Sortie&) const override;
   int reprendre(Entree&) override;
   int preparer_calcul() override;
@@ -72,7 +72,7 @@ public :
 protected:
   Entree& lire_op_diff_turbulent(Entree& is);
 
-  Mod_turb_hyd le_modele_turbulence;
+  Modele_turbulence_hyd le_modele_turbulence;
 
 
 };
@@ -91,9 +91,9 @@ inline const Champ_Fonc& Navier_Stokes_Turbulent_ALE::viscosite_turbulente() con
 
 /*! @brief Renvoie le modele de turbulence (Hydraulique) associe a l'equation.
  *
- * @return (Mod_turb_hyd&) le modele de turbulence (Hydraulique) associe a l'equation
+ * @return (Modele_turbulence_hyd&) le modele de turbulence (Hydraulique) associe a l'equation
  */
-inline const Mod_turb_hyd& Navier_Stokes_Turbulent_ALE::modele_turbulence() const
+inline const Modele_turbulence_hyd& Navier_Stokes_Turbulent_ALE::modele_turbulence() const
 {
   return le_modele_turbulence;
 }

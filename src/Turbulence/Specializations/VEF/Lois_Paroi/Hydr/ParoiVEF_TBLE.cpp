@@ -36,7 +36,7 @@
 #include <Terme_Boussinesq_VEFPreP1B_Face.h>
 #include <Terme_Source_Qdm_lambdaup_VEF_Face.h>
 #include <SFichier.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Navier_Stokes_std.h>
 #include <Param.h>
 

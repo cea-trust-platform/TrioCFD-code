@@ -160,7 +160,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   Op_VDF_Elem::modifier_pour_Cl(iter->domaine(), iter->domaine_Cl(), matrice, secmem);
 
   const Navier_Stokes_Turbulent& eqn_hydr = ref_cast(Navier_Stokes_Turbulent,equation().probleme().equation(0) ) ;
-  const Mod_turb_hyd& mod_turb = eqn_hydr.modele_turbulence();
+  const Modele_turbulence_hyd& mod_turb = eqn_hydr.modele_turbulence();
   const Turbulence_paroi& loipar = mod_turb.loi_paroi();
 
   Nom type_loi = loipar.valeur().que_suis_je();

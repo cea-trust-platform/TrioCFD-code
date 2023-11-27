@@ -31,7 +31,7 @@ class Transport_K_Omega_base;
 
 /*! @brief Classe Mod_turb_hyd_RANS_komega Classe de base des modeles de type RANS_komega
  *
- * @sa Mod_turb_hyd_base
+ * @sa Modele_turbulence_hyd_base
  */
 class Mod_turb_hyd_RANS_komega: public Mod_turb_hyd_RANS_2eq
 {

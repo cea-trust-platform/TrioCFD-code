@@ -39,7 +39,7 @@ Mod_turb_hyd_RANS_komega::Mod_turb_hyd_RANS_komega()
   model_variant = "SST";
   lquiet = 0;
 }
-/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
@@ -50,7 +50,7 @@ Sortie& Mod_turb_hyd_RANS_komega::printOn(Sortie& is) const
 }
 
 
-/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
@@ -63,7 +63,7 @@ Entree& Mod_turb_hyd_RANS_komega::readOn(Entree& is)
 
 void Mod_turb_hyd_RANS_komega::set_param(Param& param)
 {
-  Mod_turb_hyd_base::set_param(param);
+  Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("omega_min", &OMEGA_MIN); // XD_ADD_P double Lower limitation of omega (default value 1.e-10).
   param.ajouter("omega_max", &OMEGA_MAX); // XD_ADD_P double Upper limitation of omega (default value 1.e+10).
   param.ajouter("k_min", &K_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
@@ -95,7 +95,7 @@ const Champ_base& Mod_turb_hyd_RANS_komega::get_champ(const Motcle& nom) const
 {
   try
     {
-      return Mod_turb_hyd_base::get_champ(nom);
+      return Modele_turbulence_hyd_base::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -118,7 +118,7 @@ const Champ_base& Mod_turb_hyd_RANS_komega::get_champ(const Motcle& nom) const
 
 void Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Mod_turb_hyd_base::get_noms_champs_postraitables(nom, opt);
+  Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom, opt);
 
   for (int i = 0; i < nombre_d_equations(); i++)
     equation_k_omega(i).get_noms_champs_postraitables(nom, opt);
@@ -135,7 +135,7 @@ void Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(Noms& nom, Option o
  */
 int Mod_turb_hyd_RANS_komega::sauvegarder(Sortie& os) const
 {
-  Mod_turb_hyd_base::sauvegarder(os);
+  Modele_turbulence_hyd_base::sauvegarder(os);
   return eqn_transp_K_Omega().sauvegarder(os);
 }
 
@@ -149,7 +149,7 @@ int Mod_turb_hyd_RANS_komega::sauvegarder(Sortie& os) const
  */
 int Mod_turb_hyd_RANS_komega::reprendre(Entree& is)
 {
-  Mod_turb_hyd_base::reprendre(is);
+  Modele_turbulence_hyd_base::reprendre(is);
   if (mon_equation.non_nul())
     {
       return eqn_transp_K_Omega().reprendre(is);

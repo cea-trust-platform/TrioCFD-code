@@ -223,7 +223,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
 
 /*! @brief Prepare le calcul.
  *
- * Simple appe a Mod_turb_hyd::preparer_caclul() sur
+ * Simple appe a Modele_turbulence_hyd::preparer_caclul() sur
  *     le membre reprresentant la turbulence.
  *
  * @return (int) renvoie toujours 1
@@ -358,7 +358,7 @@ const RefObjU& Navier_Stokes_Turbulent_ALE::get_modele(Type_modele type) const
     {
       const RefObjU&  mod = itr;
       if (mod.non_nul())
-        if ((sub_type(Mod_turb_hyd_base,mod.valeur())) && (type==TURBULENCE))
+        if ((sub_type(Modele_turbulence_hyd_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
     }
   return Equation_base::get_modele(type);
