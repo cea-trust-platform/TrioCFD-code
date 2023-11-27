@@ -1222,7 +1222,8 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            i, j, k,
                                                                            ref_ijk_ft_->get_timestep(),
                                                                            ref_ijk_ft_->get_current_time(),
-                                                                           *eulerian_compo_connex_ns_,
+                                                                           *eulerian_compo_connex_from_interface_int_ns_,
+                                                                           *eulerian_compo_connex_from_interface_ghost_int_ns_,
                                                                            eulerian_distance_ns_,
                                                                            eulerian_curvature_ns_,
                                                                            eulerian_interfacial_area_ns_,
@@ -1980,18 +1981,25 @@ void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(const Nom& int
 {
   if (!disable_subresolution_)
     {
+      Cerr << "Compute bubbles quantities" << finl;
       thermal_local_subproblems_.compute_overall_bubbles_quantities(eulerian_grad_T_interface_ns_,
                                                                     delta_T_subcooled_overheated_,
                                                                     uniform_lambda_,
                                                                     single_centred_bubble_radius_ini_,
                                                                     nusselt_spherical_diffusion_);
+      Cerr << "Sort spherical coords" << finl;
       thermal_local_subproblems_.sort_limited_probes_spherical_coords_post_processing(post_process_all_probes_,
                                                                                       nb_theta_post_pro_, nb_phi_post_pro_,
                                                                                       1, 1);
-      thermal_local_subproblems_.thermal_subresolution_outputs(rang_,
-                                                               interfacial_quantities_thermal_probes,
-                                                               overall_bubbles_quantities,
-                                                               local_quantities_thermal_probes_time_index_folder);
+      Cerr << "Write post-processings" << finl;
+      thermal_local_subproblems_.thermal_subresolution_outputs_parallel(rang_,
+                                                                        interfacial_quantities_thermal_probes,
+                                                                        overall_bubbles_quantities,
+                                                                        local_quantities_thermal_probes_time_index_folder);
+//      thermal_local_subproblems_.thermal_subresolution_outputs(rang_,
+//                                                               interfacial_quantities_thermal_probes,
+//                                                               overall_bubbles_quantities,
+//                                                               local_quantities_thermal_probes_time_index_folder);
     }
 }
 

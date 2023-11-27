@@ -2871,7 +2871,13 @@ void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic
   post_process_radial_quantities(rank, local_quantities_thermal_probes_time_index_folder);
 }
 
+void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs_parallel(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
+{
+  post_process_radial_quantities(rank, local_quantities_thermal_probes_time_index_folder);
+}
+
 void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int rank,
+                                                                     const int& itr,
                                                                      std::vector<std::string> key_results_int,
                                                                      std::vector<std::string> key_results_double,
                                                                      std::map<std::string, ArrOfInt>& results_probes_int,
@@ -2887,6 +2893,12 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
   std::vector<double> results_double =
   {
     last_time,
+    normal_vector_compo_[0], normal_vector_compo_[1], normal_vector_compo_[2],
+    first_tangential_vector_compo_[0], first_tangential_vector_compo_[1], first_tangential_vector_compo_[2],
+    second_tangential_vector_compo_[0], second_tangential_vector_compo_[1], second_tangential_vector_compo_[2],
+    first_tangential_vector_compo_from_rising_dir_[0], first_tangential_vector_compo_from_rising_dir_[1], first_tangential_vector_compo_from_rising_dir_[2],
+    azymuthal_vector_compo_[0], azymuthal_vector_compo_[1], azymuthal_vector_compo_[2],
+    r_sph_, theta_sph_, phi_sph_,
     temperature_interp_[0], temperature_solution_[0],
     normal_temperature_gradient_[0], normal_temperature_gradient_solution_[0],
     normal_temperature_double_derivative_solution_[0],
@@ -2899,6 +2911,7 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
     radial_temperature_diffusion_[0],
     tangential_temperature_diffusion_[0],
     surface_, thermal_flux_[0], (*lambda_), (*alpha_), Pr_l_,
+    velocity_shear_force_, velocity_shear_stress_,
     pressure_interp_[0],
     x_velocity_[0], y_velocity_[0], z_velocity_[0],
     radial_velocity_[0], radial_velocity_corrected_[0],
@@ -2921,11 +2934,11 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
   assert(key_results_int.size() == results_int.size());
   int size_int = (int) key_results_int.size();
   for (i=0; i<size_int; i++)
-    results_probes_int[key_results_int[i]](index_post_processing_) = results_int[i];
+    results_probes_int[key_results_int[i]](itr) = results_int[i];
   assert(key_results_double.size() == results_double.size());
   int size_double = (int) key_results_double.size();
   for (i=0; i<size_double; i++)
-    results_probes_double[key_results_double[i]](index_post_processing_) = results_double[i];
+    results_probes_double[key_results_double[i]](itr) = results_double[i];
 
 }
 

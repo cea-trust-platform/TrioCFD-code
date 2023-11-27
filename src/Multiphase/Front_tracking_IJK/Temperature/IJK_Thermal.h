@@ -68,10 +68,13 @@ public :
   inline const IJK_Field_double& get_eulerian_compo_connex_ft() const { return valeur().get_eulerian_compo_connex_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const { return valeur().get_eulerian_compo_connex_ghost_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ft() const { return valeur().get_eulerian_compo_connex_from_interface_ft(); }
+  inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ghost_ft() const { return valeur().get_eulerian_compo_connex_from_interface_ghost_ft(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ns() const { return valeur().get_eulerian_compo_connex_ns(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const { return valeur().get_eulerian_compo_connex_ghost_ns(); }
   inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const { return valeur().get_eulerian_compo_connex_from_interface_ns(); }
+  inline const IJK_Field_double& get_eulerian_compo_connex_from_interface_ghost_ns() const { return valeur().get_eulerian_compo_connex_from_interface_ghost_ns(); }
   inline const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ns() const { return valeur().get_eulerian_compo_connex_int_from_interface_ns(); }
+  inline const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ghost_ns() const { return valeur().get_eulerian_compo_connex_int_from_interface_ghost_ns(); }
   inline const IJK_Field_double& get_eulerian_distance_ns() const { return valeur().get_eulerian_distance_ns(); }
   inline const IJK_Field_double& get_eulerian_curvature_ns() const { return valeur().get_eulerian_curvature_ns(); }
   inline const IJK_Field_double& get_interfacial_area_ns() const { return valeur().get_interfacial_area_ns(); }

@@ -254,7 +254,9 @@ public :
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;
   double get_discrete_surface_at_level(const int& dir, const int& level) const;
   void thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
+  void thermal_subresolution_outputs_parallel(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
   void retrieve_interfacial_quantities(const int rank,
+                                       const int& itr,
                                        std::vector<std::string> key_results_int,
                                        std::vector<std::string> key_results_double,
                                        std::map<std::string, ArrOfInt>& results_probes_int,

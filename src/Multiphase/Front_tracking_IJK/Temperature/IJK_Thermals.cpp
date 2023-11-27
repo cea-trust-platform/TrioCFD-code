@@ -402,6 +402,7 @@ void IJK_Thermals::thermal_subresolution_outputs()
 
           create_folders(local_quantities_thermal_probes_time_index_folder);
 
+
           itr.thermal_subresolution_outputs(interfacial_quantities_thermal_probes,
                                             overall_bubbles_quantities,
                                             local_quantities_thermal_probes_time_index_folder);

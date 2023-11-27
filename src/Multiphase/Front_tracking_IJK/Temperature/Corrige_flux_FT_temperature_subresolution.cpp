@@ -1823,15 +1823,15 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_any_reachabl
 //                  c_ini = 0;
 //                  c_end = 1;
 //                }
-              int * i_ref;
-              int * j_ref;
-              int * k_ref;
-              int * i_ref_remove;
-              int * j_ref_remove;
-              int * k_ref_remove;
-              const int * n_first;
-              const int * n_bis;
-              const int * n_ter;
+              int * i_ref = nullptr;
+              int * j_ref = nullptr;
+              int * k_ref = nullptr;
+              int * i_ref_remove = nullptr;
+              int * j_ref_remove = nullptr;
+              int * k_ref_remove = nullptr;
+              const int * n_first = nullptr;
+              const int * n_bis = nullptr;
+              const int * n_ter = nullptr;
               int index_first = 0, index_bis = 0, index_ter = 0;
               int val = 0;
               const int factor_pos[3][3] = {{1, 0, 0},{0, 1, 0},{0, 0, 1}};

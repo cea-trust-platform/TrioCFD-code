@@ -133,7 +133,7 @@ void IJK_One_Dimensional_Subproblems::compute_global_indices()
   for (int i=1; i<proc_number; i++)
     {
       indices_ini(i) = indices_ini(i-1) + indices(i-1);
-      indices_max(i) = indices_max(i-1) + indices(i-1);
+      indices_max(i) = indices_max(i-1) + indices(i);
     }
   assert(indices_max(proc_number - 1) == global_subproblems_counter_);
   index_ini_ = indices_ini(my_process_number);
@@ -155,7 +155,8 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
                                                                       int i, int j, int k,
                                                                       double global_time_step,
                                                                       double current_time,
-                                                                      const IJK_Field_double& eulerian_compo_connex,
+                                                                      const IJK_Field_int& eulerian_compo_connex,
+                                                                      const IJK_Field_int& eulerian_compo_connex_ghost,
                                                                       const IJK_Field_double& eulerian_distance,
                                                                       const IJK_Field_double& eulerian_curvature,
                                                                       const IJK_Field_double& eulerian_interfacial_area,
@@ -236,10 +237,12 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
 
   if (debug_)
     Cerr << "Mixed cell indices (i,j,k) : (" << i << ";" << j << ";" << k << ")" << finl;
-  const int compo_connex = int(eulerian_compo_connex(i, j, k));
+  const int compo_connex = eulerian_compo_connex(i, j, k);
+  const int compo_connex_ghost = eulerian_compo_connex_ghost(i,j,k);
   if (debug_)
     {
       Cerr << "compo_connex : " << compo_connex << finl;
+      Cerr << "compo_connex_ghost : " << compo_connex_ghost << finl;
       Cerr << "bubbles_barycentre : " << bubbles_barycentre << finl;
     }
 
@@ -250,12 +253,13 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(int debug,
 
   IJK_Splitting splitting = eulerian_compo_connex.get_splitting();
   const double bubble_rising_velocity = rising_velocities(compo_connex);
+  //  const double bubble_rising_velocity = rising_velocities(compo_connex);
   for (int dir=0; dir < 3; dir++)
     {
       facet_barycentre(dir) = eulerian_facets_barycentre[dir](i, j, k);
       normal_vector(dir) = eulerian_normal_vectors[dir](i, j, k);
       bubble_rising_vector(dir) = rising_vectors(compo_connex, dir);
-      bubble_barycentre(dir) = bubbles_barycentre(compo_connex, dir);
+      bubble_barycentre(dir) = bubbles_barycentre(compo_connex_ghost, dir);
     }
 
   if (init_)
@@ -555,7 +559,7 @@ Nom IJK_One_Dimensional_Subproblems::get_header_from_string_lists(const std::vec
 {
   Nom probe_header;
   int i;
-  probe_header += key_results_int[0];
+  probe_header = key_results_int[0];
   const int size_int = (int) key_results_int.size();
   const int size_double = (int) key_results_double.size();
   for (i=1; i<size_int; i++)
@@ -571,13 +575,34 @@ void IJK_One_Dimensional_Subproblems::set_results_probes_size(const std::vector<
                                                               std::map<std::string, ArrOfDouble>& results_probes_double)
 {
   // Below 1000 per simu ? * nb_procs ? Is it a problem ?
-  const int size_outputs = radius_outputs_.size_array();
+  const int size_outputs = global_subproblems_counter_;
   const int size_int = (int) key_results_int.size();
   const int size_double = (int) key_results_double.size();
-  for (int i=0; i<size_int; i++)
+  int i;
+  for (i=0; i<size_int; i++)
     results_probes_int[key_results_int[i]] = ArrOfInt(size_outputs);
-  for (int i=0; i<size_double; i++)
+  for (i=0; i<size_double; i++)
     results_probes_double[key_results_double[i]] = ArrOfDouble(size_outputs);
+}
+
+void IJK_One_Dimensional_Subproblems::set_results_probes_fic(SFichier& fic,
+                                                             const std::vector<std::string>& key_results_int,
+                                                             const std::vector<std::string>& key_results_double,
+                                                             std::map<std::string, ArrOfInt>& results_probes_int,
+                                                             std::map<std::string, ArrOfDouble>& results_probes_double)
+{
+  const int size_outputs = global_subproblems_counter_;
+  const int size_int = (int) results_probes_int.size();
+  const int size_double = (int) results_probes_double.size();
+  int i,j;
+  for (j=0; j<size_outputs; j++)
+    {
+      for (i=0; i<size_int; i++)
+        fic << results_probes_int[key_results_int[i]](j) << " ";
+      for (i=0; i<size_double-1; i++)
+        fic << results_probes_double[key_results_double[i]](j) << " ";
+      fic << results_probes_double[key_results_double[size_double-1]](j) << finl;
+    }
 }
 
 void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(const int& rank,
@@ -592,10 +617,10 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
   std::vector<std::string> key_results_int = {"tstep", "thermalrank", "postproindex", "globalsubproblem", "localsubproblem"};
   std::vector<std::string> key_results_double = {"time",
                                                  "nx", "ny", "nz",
-                                                 "t1x", "t1y", "t2z", "t2x", "t2y", "t2z",
-                                                 "s1x", "s1y", "s2z", "s2x", "s2y", "s2z",
+                                                 "t1x", "t1y", "t1z", "t2x", "t2y", "t2z",
+                                                 "s1x", "s1y", "s1z", "s2x", "s2y", "s2z",
                                                  "rsph", "thetasph", "phisph",
-                                                 "temperature_interp","temperature_solution","temperature_gradient","temperature_gradient_sol"
+                                                 "temperature_interp","temperature_solution","temperature_gradient", "temperature_gradient_sol",
                                                  "temperature_double_deriv_sol",
                                                  "temperature_gradient_tangential","temperature_gradient_tangential2",
                                                  "temperature_gradient_tangential_rise","temperature_gradient_azymuthal",
@@ -616,37 +641,71 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                 };
 
   Nom probe_header = get_header_from_string_lists(key_results_int, key_results_double);
-
-
+  set_results_probes_size(key_results_int,
+                          key_results_double,
+                          results_probes_int,
+                          results_probes_double);
   // Common to all procs
-  const int size_outputs = radius_outputs_.size_array();
+  int i;
+  const int size_outputs = global_subproblems_counter_;
+  const int size_int = (int) key_results_int.size();
+  const int size_double = (int) key_results_double.size();
+
+
   for (int itr=0; itr < size_outputs; itr++)
     {
-      const int global_index_post_processed = global_indices_post_processed_(itr);
-      if (global_index_post_processed >= index_ini_ && global_index_post_processed < index_end_)
+      // const int global_index_post_processed = global_indices_post_processed_(itr);
+      if (itr >= index_ini_ && itr < index_end_)
         {
 
           Cerr << "Post-process this probe on proc:" << Process::me() << finl;
-          (*this)[global_index_post_processed - index_ini_].retrieve_interfacial_quantities(rank,
-                                                                                            key_results_int,
-                                                                                            key_results_double,
-                                                                                            results_probes_int,
-                                                                                            results_probes_double);
+          (*this)[itr - index_ini_].retrieve_interfacial_quantities(rank,
+                                                                    itr,
+                                                                    key_results_int,
+                                                                    key_results_double,
+                                                                    results_probes_int,
+                                                                    results_probes_double);
         }
     }
-  int i;
-  int size_int = (int) key_results_int.size();
   for (i=0; i<size_int; i++)
     {
       ArrOfInt& array_int_tmp = results_probes_int[key_results_int[i]];
       mp_sum_for_each_item(array_int_tmp);
     }
-  int size_double = (int) key_results_double.size();
   for (i=0; i<size_double; i++)
     {
       ArrOfDouble& array_double_tmp = results_probes_double[key_results_double[i]];
       mp_sum_for_each_item(array_double_tmp);
     }
+  /*
+   * Post-process all probes for interfacial quantities
+   */
+  const int reset = 1;
+  const int last_time_index = ref_ijk_ft_->get_tstep();
+  const int max_digit = 3;
+  const int max_digit_time = 8;
+  const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
+  const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
+
+  Nom probe_name = Nom("_thermal_rank_") +  Nom(std::string(max_digit - max_rank_digit, '0'))  + Nom(rank)
+                   + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
+                   + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
+
+  if (Process::je_suis_maitre())
+    {
+      SFichier fic = Open_file_folder(interfacial_quantities_thermal_probes, probe_name, probe_header, reset);
+      set_results_probes_fic(fic,
+                             key_results_int,
+                             key_results_double,
+                             results_probes_int,
+                             results_probes_double);
+      fic.close();
+    }
+
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    (*this)[itr].thermal_subresolution_outputs_parallel(rank, local_quantities_thermal_probes_time_index_folder);
+
+  post_process_overall_bubbles_quantities(rank, overall_bubbles_quantities);
 }
 
 void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& rank,
@@ -657,7 +716,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   /*
    * Replace routines for parallel calculation
    */
-
+  Cerr << "Post-processing on the probes" << finl;
   //if (Process::je_suis_maitre())
   // {
   const int reset = 1;
@@ -710,7 +769,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   for (int itr=0; itr < subproblems_counter_; itr++)
     (*this)[itr].thermal_subresolution_outputs(fic, rank, local_quantities_thermal_probes_time_index_folder);
   fic.close();
-  // }
+
   post_process_overall_bubbles_quantities(rank, overall_bubbles_quantities);
 }
 
@@ -887,6 +946,7 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
   else
     {
       const int nb_subproblems_total = global_subproblems_counter_;
+      Cerr << global_subproblems_counter_ << finl;
 
       ArrOfDouble r_sph(nb_subproblems_total);
       ArrOfDouble theta_sph(nb_subproblems_total);
@@ -908,6 +968,7 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
           theta_sph(i + index_ini_) = (*this)[i].get_theta_spherical_coords();
           phi_sph(i + index_ini_) = (*this)[i].get_phi_spherical_coords();
         }
+
       mp_sum_for_each_item(r_sph);
       mp_sum_for_each_item(theta_sph);
       mp_sum_for_each_item(phi_sph);
@@ -972,9 +1033,17 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
             global_indices_post_processed_(phi_theta_counter) = theta_phi_scope_index;
             phi_theta_counter ++;
           }
-      mp_sum_for_each_item(radius_outputs_);
-      mp_sum_for_each_item(theta_outputs_);
-      mp_sum_for_each_item(phi_outputs_);
+
+      // Cerr << "test" << finl;
+      //      mp_sum_for_each_item(radius_outputs_);
+      //      mp_sum_for_each_item(theta_outputs_);
+      //      mp_sum_for_each_item(phi_outputs_);
+      //      mp_sum_for_each_item(global_indices_post_processed_);
+
+      Cerr << radius_outputs_ << finl;
+      Cerr << theta_outputs_ << finl;
+      Cerr << phi_outputs_ << finl;
+      Cerr << global_indices_post_processed_ << finl;
 
       ArrOfDouble radius_outputs_tmp = radius_outputs_;
       ArrOfDouble theta_outputs_tmp = theta_outputs_;

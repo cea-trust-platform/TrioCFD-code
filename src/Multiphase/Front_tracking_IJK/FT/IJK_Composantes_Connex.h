@@ -74,13 +74,25 @@ public :
   {
     return eulerian_compo_connex_from_interface_ft_;
   }
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ghost_ft() const
+  {
+    return eulerian_compo_connex_from_interface_ghost_ft_;
+  }
   const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const
   {
     return eulerian_compo_connex_from_interface_ns_;
   }
+  const IJK_Field_double& get_eulerian_compo_connex_from_interface_ghost_ns() const
+  {
+    return eulerian_compo_connex_from_interface_ghost_ns_;
+  }
   const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ns() const
   {
     return eulerian_compo_connex_from_interface_int_ns_;
+  }
+  const IJK_Field_int& get_eulerian_compo_connex_int_from_interface_ghost_ns() const
+  {
+    return eulerian_compo_connex_from_interface_ghost_int_ns_;
   }
   const DoubleTab& get_bounding_box() const
   {
@@ -110,7 +122,10 @@ protected :
    */
   IJK_Field_double eulerian_compo_connex_from_interface_ft_;
   IJK_Field_double eulerian_compo_connex_from_interface_ns_;
+  IJK_Field_double eulerian_compo_connex_from_interface_ghost_ft_;
+  IJK_Field_double eulerian_compo_connex_from_interface_ghost_ns_;
   IJK_Field_int eulerian_compo_connex_from_interface_int_ns_;
+  IJK_Field_int eulerian_compo_connex_from_interface_ghost_int_ns_;
   IJK_Field_int eulerian_compo_connex_valid_compo_field_;
 
   DoubleTab bounding_box_;

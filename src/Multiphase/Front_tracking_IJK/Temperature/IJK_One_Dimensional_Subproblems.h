@@ -62,7 +62,8 @@ public :
                                        int i, int j, int k,
                                        double global_time_step,
                                        double current_time,
-                                       const IJK_Field_double& eulerian_compo_connex,
+                                       const IJK_Field_int& eulerian_compo_connex,
+                                       const IJK_Field_int& eulerian_compo_connex_ghost,
                                        const IJK_Field_double& eulerian_distance,
                                        const IJK_Field_double& eulerian_curvature,
                                        const IJK_Field_double& eulerian_interfacial_area,
@@ -174,6 +175,11 @@ public :
                                const std::vector<std::string>& key_results_double,
                                std::map<std::string, ArrOfInt>& results_probes_int,
                                std::map<std::string, ArrOfDouble>& results_probes_double);
+  void set_results_probes_fic(SFichier& fic,
+                              const std::vector<std::string>& key_results_int,
+                              const std::vector<std::string>& key_results_double,
+                              std::map<std::string, ArrOfInt>& results_probes_int,
+                              std::map<std::string, ArrOfDouble>& results_probes_double);
   void thermal_subresolution_outputs_parallel(const int& rank,
                                               const Nom& interfacial_quantities_thermal_probes,
                                               const Nom& overall_bubbles_quantities,

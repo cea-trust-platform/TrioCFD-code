@@ -122,7 +122,10 @@ IJK_Thermal_base::IJK_Thermal_base()
   eulerian_compo_connex_ghost_ns_ = nullptr;
   eulerian_compo_connex_from_interface_ns_ = nullptr;
   eulerian_compo_connex_from_interface_ft_ = nullptr;
-  eulerian_compo_connex_from_interface_ns_int_ = nullptr;
+  eulerian_compo_connex_from_interface_ghost_ft_ = nullptr;
+  eulerian_compo_connex_from_interface_ghost_ns_ = nullptr;
+  eulerian_compo_connex_from_interface_int_ns_ = nullptr;
+  eulerian_compo_connex_from_interface_ghost_int_ns_= nullptr;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -564,7 +567,10 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_compo_connex_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_ghost());
       eulerian_compo_connex_from_interface_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ft());
       eulerian_compo_connex_from_interface_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ns());
-      eulerian_compo_connex_from_interface_ns_int_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_int_from_interface_ns());
+      eulerian_compo_connex_from_interface_ghost_ft_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ghost_ft());
+      eulerian_compo_connex_from_interface_ghost_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_from_interface_ghost_ns());
+      eulerian_compo_connex_from_interface_int_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_int_from_interface_ns());
+      eulerian_compo_connex_from_interface_ghost_int_ns_ = &(ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex_int_from_interface_ghost_ns());
     }
 
   compute_rising_velocities_ = compute_rising_velocities_ ||
@@ -1223,7 +1229,7 @@ void IJK_Thermal_base::compute_rising_velocities()
       rising_velocities_ = ArrOfDouble(nb_bubbles);
       rising_vectors_ = DoubleTab(nb_bubbles, 3);
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
-                              eulerian_compo_connex_from_interface_ns_int_, ref_ijk_ft_->get_direction_gravite(),
+                              eulerian_compo_connex_from_interface_int_ns_, ref_ijk_ft_->get_direction_gravite(),
                               rising_velocities_, rising_vectors_);
 //      compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
 //                              ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex(),
