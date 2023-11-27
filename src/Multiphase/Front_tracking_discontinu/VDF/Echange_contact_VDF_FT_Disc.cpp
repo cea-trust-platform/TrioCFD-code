@@ -259,7 +259,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
           ready_inject = (sum_T >= pbft->tcl ().tempC_tcl ()) ? true : false;
         }
 
-      ready_inject = Process::mp_sum (ready_inject);
+      ready_inject = Process::mp_max ((int)ready_inject);
     }
 
 }
