@@ -12,12 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Navier_Stokes_Turbulent.cpp
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Equations/BASIC
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Navier_Stokes_Turbulent.h>
 #include <Op_Diff_Turbulent_base.h>
@@ -31,10 +25,6 @@
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <Discret_Thyd.h>
-#include <Modele_turbulence_hyd_K_Eps.h>
-#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
-#include <Modele_turbulence_hyd_K_Omega.h>
 #include <Param.h>
 
 Implemente_instanciable(Navier_Stokes_Turbulent,"Navier_Stokes_Turbulent",Navier_Stokes_std);
@@ -324,28 +314,6 @@ void Navier_Stokes_Turbulent::mettre_a_jour(double temps)
   le_modele_turbulence.mettre_a_jour(temps);
 }
 
-void Navier_Stokes_Turbulent::creer_champ(const Motcle& motlu)
-{
-  Navier_Stokes_std::creer_champ(motlu);
-
-  if (le_modele_turbulence.non_nul())
-    le_modele_turbulence->creer_champ(motlu);
-
-  // to create k_eps_residu field
-  if(le_modele_turbulence.non_nul())
-    {
-      if (sub_type(Modele_turbulence_hyd_K_Eps, le_modele_turbulence.valeur()))
-        ref_cast(Modele_turbulence_hyd_K_Eps,
-                 le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
-      else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable, le_modele_turbulence.valeur()))
-        ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,
-                 le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
-      else if (sub_type(Modele_turbulence_hyd_K_Omega, le_modele_turbulence.valeur()))
-        ref_cast(Modele_turbulence_hyd_K_Omega,
-                 le_modele_turbulence.valeur()).eqn_transp_K_Omega().creer_champ(motlu);
-    }
-}
-
 const Champ_base& Navier_Stokes_Turbulent::get_champ(const Motcle& nom) const
 {
   try
@@ -392,42 +360,4 @@ const RefObjU& Navier_Stokes_Turbulent::get_modele(Type_modele type) const
           return mod;
     }
   return Equation_base::get_modele(type);
-}
-
-// Impression du residu dans fic (generalement dt_ev)
-// Cette methode peut etre surchargee par des equations
-// imprimant des residus particuliers (K-Eps, Concentrations,...)
-void Navier_Stokes_Turbulent::imprime_residu(SFichier& fic)
-{
-  Equation_base::imprime_residu(fic);
-  // Si K-Eps, on imprime
-  if (sub_type(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()))
-    ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().imprime_residu(fic);
-  else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
-    ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().imprime_residu(fic);
-  else if (sub_type(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()))
-    {
-      ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().imprime_residu(fic);
-      ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_Eps().imprime_residu(fic);
-    }
-  else if (sub_type(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()))
-    ref_cast(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()).eqn_transp_K_Omega().imprime_residu(fic);
-}
-
-// Retourne l'expression du residu (de meme peut etre surcharge)
-Nom Navier_Stokes_Turbulent::expression_residu()
-{
-  Nom tmp=Equation_base::expression_residu();
-  if (sub_type(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()))
-    tmp+=ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
-  else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
-    tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
-  else if (sub_type(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()))
-    tmp+=ref_cast(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()).eqn_transp_K_Omega().expression_residu();
-  else if (sub_type(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()))
-    {
-      tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().expression_residu();
-      tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_Eps().expression_residu();
-    }
-  return tmp;
 }
