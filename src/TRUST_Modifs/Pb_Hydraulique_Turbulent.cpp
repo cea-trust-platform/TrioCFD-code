@@ -94,8 +94,6 @@ Equation_base& Pb_Hydraulique_Turbulent::equation(int i)
   return eq_hydraulique;
 }
 
-
-
 /*! @brief Associe le milieu au probleme.
  *
  * Le milieu doit etre de type fluide incompressible.
