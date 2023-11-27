@@ -93,7 +93,7 @@ Fluide_Incompressible
 		# sources { Canal_perio { bord RectangleV } }	#
 		# Boundary conditions #
 		boundary_conditions {
-			Cylinder2  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0  # name and speed of the border #
+			Cylinder2  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0  # name and speed of the border #
 			# Cylinder2 paroi_fixe #
 			Cylinder1  paroi_fixe
 			RectangleH periodique

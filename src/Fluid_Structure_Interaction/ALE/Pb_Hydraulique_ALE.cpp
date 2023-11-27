@@ -21,6 +21,13 @@
 
 #include <Pb_Hydraulique_ALE.h>
 #include <Fluide_Ostwald.h>
+#include <Schema_Implicite_base.h>
+#include <Implicite_ALE.h>
+#include <Schema_Euler_explicite.h>
+#include <Schema_Euler_explicite_ALE.h>
+#include <Schema_Euler_Implicite.h>
+
+
 
 Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_Fluide_base);
 // XD pb_hydraulique_ALE Pb_base pb_hydraulique_ALE -1 Resolution of hydraulic problems for ALE
@@ -114,7 +121,34 @@ void Pb_Hydraulique_ALE::associer_milieu_base(const Milieu_base& mil)
       Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a "
            << finl;
       Cerr << "un probleme de type Pb_Hydraulique_ALE " << finl;
-      exit();
+      Process::exit();
+    }
+}
+
+
+void Pb_Hydraulique_ALE::associer_sch_tps_base(const Schema_Temps_base& sch)
+{
+  Probleme_base::associer_sch_tps_base(sch);
+
+  // Verify that user choosed adapted time scheme/solver
+  if (sub_type(Schema_Euler_explicite,le_schema_en_temps.valeur()))
+    {
+      if(!sub_type(Schema_Euler_explicite_ALE,le_schema_en_temps.valeur()))
+        {
+          Cerr <<"Error: for Mobile domain (Domaine_ALE):  replace  " <<sch.que_suis_je()<<" with "<< sch.que_suis_je() <<"_ALE and restart!"<< finl;
+          Process::exit();
+        }
+    }
+  else if (sub_type(Schema_Euler_Implicite,le_schema_en_temps.valeur()))
+    {
+      Schema_Euler_Implicite& sch_imp = ref_cast(Schema_Euler_Implicite,le_schema_en_temps.valeur());
+      if (!sub_type(Implicite_ALE,sch_imp.solveur().valeur()))
+        {
+          Cerr <<"Error: for Mobile domain (Domaine_ALE), you can only use Scheme_euler_implicit time scheme with solveur implicite_ALE "<<finl;
+          Cerr <<"Replace  solveur implicite with solveur implicite_ALE and restart!"<< finl;
+          Process::exit();
+        }
+
     }
 }
 

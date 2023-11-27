@@ -66,7 +66,7 @@ Lire pb
 					
 					}
 		Conditions_limites	{
-					Wall	frontiere_ouverte_vitesse_imposee Champ_front_ALE 3  sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5 sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5  ((pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*y-1.*(pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*x)*90*2*pi*cos(90*2*pi*t)*1.e-5
+					Wall	frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 3  sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5 sin(pi*z/0.1)*90*2*pi*cos(90*2*pi*t)*1.e-5  ((pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*y-1.*(pi/0.1)*(pi*z/0.1)*cos(pi*z/0.1)*x)*90*2*pi*cos(90*2*pi*t)*1.e-5
 					Box_x	periodique
 					Box_y	periodique
 					perio periodique
