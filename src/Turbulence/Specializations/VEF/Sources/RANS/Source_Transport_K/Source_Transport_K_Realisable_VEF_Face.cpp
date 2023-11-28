@@ -56,7 +56,7 @@ DoubleTab& Source_Transport_K_Realisable_VEF_Face::ajouter(DoubleTab& resu) cons
   const int nb_faces = le_dom_VEF->nb_faces();
   DoubleTrav P(nb_faces);
 
-  calculer_terme_production_K_BiK(le_dom_VEF.valeur(), le_dom_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb, _interpolation_viscosite_turbulente);
+  calculer_terme_production_K_BiK(le_dom_VEF.valeur(), le_dom_Cl_VEF.valeur(), P, K_Rea, eps_Rea, vitesse_filtree, visco_turb, _interpolation_viscosite_turbulente, _coefficient_limiteur);
 
   Debog::verifier("Source_Transport_K_Realisable_VEF_Face::ajouter P 0", P);
 

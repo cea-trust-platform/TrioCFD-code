@@ -1,0 +1,268 @@
+# PARALLEL OK #
+
+Dimension 3
+
+pb_multiphase pbm
+pb_conduction pbc
+domaine dom_fluide
+domaine dom_solide
+domaine dom
+
+# BEGIN MESH #
+read_med { domain dom mesh mesh file Debora_20_mailles_solide.med }
+Read_file dom_ssz.geo ;
+Create_domain_from_sous_zone
+{
+    domaine_final dom_fluide
+    par_sous_zone fluide
+    domaine_init dom
+}
+Create_domain_from_sous_zone
+{
+    domaine_final dom_solide
+    par_sous_zone solide
+    domaine_init dom
+}
+Modif_bord_to_raccord dom_solide Couture_0
+Modif_bord_to_raccord dom_fluide Couture_0
+# END MESH #
+
+# BEGIN PARTITION
+Decouper_multi
+{
+    domaine dom_fluide
+    {
+        partitionneur metis { nb_parts 2 }
+        nb_parts_tot 2
+        Larg_joint 2
+        Nom_Zones dom_fluide
+        ecrire_decoupage dom_fluide.txt
+    }
+    domaine dom_solide
+    {
+        partitionneur metis { nb_parts 2 }
+        nb_parts_tot 2
+        Larg_joint 1
+        Nom_Zones dom_solide
+        ecrire_decoupage dom_solide.txt
+    }
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter dom_fluide.Zones dom_fluide
+Scatter dom_solide.Zones dom_solide
+END SCATTER #
+
+PolyMAC_P0  dis
+option_PolyMAC_P0 { traitement_axi }
+
+
+Schema_euler_implicite sch_fluide
+Read sch_fluide
+{
+    tinit 0
+    tmax 15
+    dt_impr 1e-8
+    facsec 20
+    facsec_max 20
+    nb_pas_dt_max $nb_pas_dt_max
+    seuil_statio 1.e-3
+    solveur sets
+    {
+        criteres_convergence { alpha 1e-5 pression 1. vitesse 1e-5 temperature 1e-4 k 1e-5 omega 1.  }
+        iter_min 2
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Schema_euler_implicite sch_solide
+Read sch_solide
+{
+    tinit 0
+    dt_max  1
+    facsec 1e8
+    seuil_statio 1e-8
+    solveur implicite
+    {
+	seuil_convergence_implicite  1.e-4 
+        solveur petsc cli { }
+    }
+}
+
+associate pbm dom_fluide
+associate pbc dom_solide
+
+probleme_couple pb
+Associate pb pbm
+Associate pb pbc
+
+Associate pbm sch_fluide
+Associate pbc sch_solide
+Discretize pbc dis
+Discretize pbm dis
+
+Lire pbm
+{
+	Milieu_composite
+	{
+	$fluids
+	}
+
+    correlations
+    {
+    	loi_paroi adaptative { }
+    	flux_parietal  adaptatif
+    }
+    QDM_Multiphase
+    {
+        evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+        convection { amont }
+        diffusion  { turbulente k_omega { }  }
+        initial_conditions
+        {
+            vitesse  champ_fonc_t 3 0. 0. $u_0 
+            pression Champ_uniforme 1 $P0
+        }
+        conditions_limites	
+        {
+            Couture_0  paroi_frottante_loi { } 
+            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_t 3 0 0 $u_0
+            top frontiere_ouverte_pression_imposee champ_front_uniforme 1 $P0
+            symetrie symetrie
+        }
+	    sources { }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom_fluide 1 1 }
+        convection { amont }
+        conditions_limites	
+        {
+            Couture_0  paroi
+            bottom	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            top	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+            symetrie paroi
+        }
+        sources { }
+    }
+    Energie_Multiphase
+    {
+        diffusion { turbulente SGDH { Pr_t 0.9 } }
+        convection { amont }
+        initial_conditions { temperature Champ_fonc_xyz dom_fluide 1 $Tl0  }
+        boundary_conditions
+        {
+            Couture_0 paroi_contact pbc Couture_0
+            bottom	frontiere_ouverte T_ext Champ_front_fonc_xyz 1 $Tl0
+            top	frontiere_ouverte T_ext Champ_front_fonc_xyz 1 $Tl0
+            symetrie paroi_adiabatique
+        }
+        sources { }
+    }
+
+    taux_dissipation_turbulent
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { omega Champ_Fonc_xyz dom_fluide 1 $om0 }
+        boundary_conditions
+        {
+            Couture_0  Cond_lim_omega_demi {  }
+            bottom	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 $om0
+            top	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 $om0
+            symetrie paroi_adiabatique
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 } 
+        }
+    }
+
+
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom_fluide 1 $k0 }
+        boundary_conditions
+        {
+            Couture_0  Cond_lim_k_complique_transition_flux_nul_demi
+            bottom	frontiere_ouverte k_ext Champ_Front_Uniforme 1 $k0
+            top	frontiere_ouverte k_ext Champ_Front_Uniforme 1 $k0
+            symetrie paroi_adiabatique
+        }
+        sources
+        {
+            Production_energie_cin_turb ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+    Postraitement
+	{
+		sondes		{
+					temperature temperature_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
+					temperature_liq_paroi temperature_liquide_r134a periode 1e8 segment 200 0.00935857442666382 0.00016335452425297366 .001 0.00935857442666382 0.00016335452425297366  4.999 
+					vitesse vitesse_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
+					}
+		format lata
+		champs binaire dt_post 1.e8
+					{
+					temperature elem
+					vitesse elem
+					pression elem
+                    k elem
+                    omega elem
+                    viscosite_turbulente_liquide_r134a elem
+                    omega_residu elem
+                    k_residu elem
+                    vitesse_residu elem
+                    temperature_residu elem
+					}
+	}
+}
+
+Read pbc
+{
+    solide
+    {
+        rho      champ_uniforme 1 7700.0
+        cp         champ_fonc_t 1 500
+        lambda   champ_uniforme 1 25
+    }
+
+    conduction
+    {
+        diffusion   { }
+        initial_conditions  { temperature  champ_fonc_xyz dom_solide  1  $Tl0 }
+        boundary_conditions
+        {
+            outside          paroi_adiabatique
+            Couture_0 paroi_contact pbm Couture_0
+        }
+        sources 
+        { 
+            puissance_thermique Champ_fonc_txyz dom_solide 1 1.e3*2*9.6/20.2*(Z>1.)*(Z<4.5)*$P_surf
+        }
+    }
+
+    Post_processing
+    {
+        format lata
+        champs binaire dt_post 1.e8 { temperature elem }
+   		sondes		{
+					temperature_sol_sortie temperature periode 1e8 segment 10 0.009648530258259175  0.00016841572211978586 4.485 0.010548393183899926 0.00018412288791334102  4.485 
+					temperature_sol_paroi temperature periode 1e8 segment 200 0.010548393183899926 0.00018412288791334102 .001 0.010548393183899926 0.00018412288791334102  4.999 
+					}
+
+    }
+}
+
+Resoudre pb
+
+Fin

@@ -120,7 +120,8 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
   const DoubleTab& TKE = get_K_pour_production(); // voir les classes filles
   calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, production_TKE,
                               TKE, velocity, visco_turb,
-                              _interpolation_viscosite_turbulente);
+                              _interpolation_viscosite_turbulente,
+                              _coefficient_limiteur);
 
   fill_resu(volumes_entrelaces, production_TKE, gradKgradOmega, resu); // voir les classes filles
 

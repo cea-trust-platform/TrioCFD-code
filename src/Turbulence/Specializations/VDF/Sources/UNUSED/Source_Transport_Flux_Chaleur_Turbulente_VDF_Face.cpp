@@ -453,19 +453,19 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
   //
 
   int nb_elem = domaine_VDF.nb_elem();
-  int nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  //int nb_faces= domaine_VDF.nb_faces();
+  //DoubleTrav u_teta(nb_faces);
   //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Domaine& le_dom=domaine_VDF.domaine();
-  int nb_faces_elem = le_dom.nb_faces_elem();
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //int nb_faces_elem = le_dom.nb_faces_elem();
 
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
   //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
@@ -480,19 +480,19 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::calculer_gteta2(co
   //
 
   int nb_elem = domaine_VDF.nb_elem();
-  int nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  //int nb_faces= domaine_VDF.nb_faces();
+  //DoubleTrav u_teta(nb_faces);
   //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Domaine& le_dom=domaine_VDF.domaine();
-  int nb_faces_elem = le_dom.nb_faces_elem();
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //int nb_faces_elem = le_dom.nb_faces_elem();
 
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
   //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)

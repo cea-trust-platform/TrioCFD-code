@@ -100,7 +100,7 @@ void Loi_paroi_adaptative::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu
 double Loi_paroi_adaptative::calc_y_plus_loc(double u_par, double nu, double y, double y_p_0)
 {
   double eps = eps_y_p_;
-  int step = 1, iter_max = 20;
+  int step = 1, iter_max = 30;
 
   double y_p = y_p_0 ;
   double u_tau = nu*y_p/y;

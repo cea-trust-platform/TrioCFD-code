@@ -23,6 +23,20 @@ mailler  dom
 polyedriser dom
 # END MESH #
 
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool metis { nb_parts 2 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
 polymac_p0  dis option_polymac_p0 {  }
 
 

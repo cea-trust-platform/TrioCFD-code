@@ -117,7 +117,7 @@ Read pb
 {
 eq_hydraulique
 {
-	modele_turbulence nul
+	modele_turbulence nul {  }
         solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-18 impr }
 #	solveur_pression Petsc GCP { precond boomerAMG { } seuil 5.e-18 impr } #
 #	solveur_pression Petsc CLI { -ksp_type cg -pc_type hypre -pc_hypre_type boomerAMG -ksp_atol 5.e-18 -ksp_divtol 5.e+18 seuil 5.e-18 impr } #

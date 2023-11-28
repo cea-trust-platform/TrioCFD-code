@@ -63,8 +63,8 @@ void SurfaceVapeurIJKComputation::get_maillage_MED_from_IJK_FT(
     }
   mc_conn_idx_ptr[nbFacettes] = 4 * nbFacettes;
   maillage_bulles_mcu->setConnectivity(mcu_connectivity, mc_conn_idx, true);
-  MCT no_use3 = maillage_bulles_mcu->zipConnectivityTraducer(0);
-  MCT do_not_use5 = maillage_bulles_mcu->zipCoordsTraducer();
+  /* MCT no_use3 =*/ maillage_bulles_mcu->zipConnectivityTraducer(0);
+  /*MCT do_not_use5 =*/ maillage_bulles_mcu->zipCoordsTraducer();
 }
 
 void SurfaceVapeurIJKComputation::set_maillage_MED(const Maillage_FT_IJK& maillage_ft_ijk)
@@ -89,7 +89,7 @@ void SurfaceVapeurIJKComputation::set_maillage_MED(const Maillage_FT_IJK& mailla
       Cout << "coord min dans la direction " << x << " : " << mini << finl;
       Cout << "coord max dans la direction " << x << " : " << maxi << finl;
     }
-  MCT do_not_use = maillage_bulles_med_->convertDegeneratedCellsAndRemoveFlatOnes();
+  /* MCT do_not_use = */ maillage_bulles_med_->convertDegeneratedCellsAndRemoveFlatOnes();
   auto connectivity = maillage_bulles_med_->getNodalConnectivity();
   const int nb_compo = static_cast<int>(connectivity->getNumberOfComponents());
   Cerr << "Connectivity mesh bulles : " << finl;
@@ -125,7 +125,7 @@ void SurfaceVapeurIJKComputation::slice_bubble(
   get_coo_to_keep(dim, COO2KEEP);
 
   // Création du maillage filaire coupé
-  std::vector<int> selected_dims {dim};
+  //std::vector<int> selected_dims {dim};
   // MEDCouplingUMesh * mesh1dfil;
   try
     {
@@ -159,7 +159,7 @@ void SurfaceVapeurIJKComputation::slice_bubble(
       print_umesh_conn(connectivity);
       Cout << "Youpi la coupe marche" << finl;
     }
-  catch (INTERP_KERNEL::Exception& e)
+  catch (INTERP_KERNEL::Exception&)
     {
       mesh1dfil = MEDCouplingUMesh::New();
       plan_cut_some_bubble = false;
@@ -168,9 +168,9 @@ void SurfaceVapeurIJKComputation::slice_bubble(
     {
       mcIdType nbOfNodes;
       bool areNodesMerged;
-      MCT oldNodes = mesh1dfil->mergeNodes(EPS_, areNodesMerged, nbOfNodes);
-      MCT do_not_use = mesh1dfil->zipCoordsTraducer();
-      MCT do_not_use2 = mesh1dfil->zipConnectivityTraducer(0);
+      /* MCT oldNodes = */ mesh1dfil->mergeNodes(EPS_, areNodesMerged, nbOfNodes);
+      /* MCT do_not_use = */ mesh1dfil->zipCoordsTraducer();
+      /* MCT do_not_use2 = */ mesh1dfil->zipConnectivityTraducer(0);
       DataArrayDouble *coord = mesh1dfil->getCoords();
       std::vector<unsigned long> COO2KEEPLONG(begin(COO2KEEP), end(COO2KEEP));
       DAD coords = coord->keepSelectedComponents(COO2KEEPLONG);
@@ -550,7 +550,7 @@ void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vap
       const double vect[3] = {0., 0., -1.};
       mesh->orientCorrectly2DCells(vect, false);
       mesh->changeSpaceDimension(2);
-      MCT do_not_use3 = mesh->zipCoordsTraducer();
+      /* MCT do_not_use3 = */ mesh->zipCoordsTraducer();
       const int n_cell_tot = mesh->getNumberOfCells();
       if (Process::je_suis_maitre())
         MEDCoupling::WriteUMesh("mesh.med", mesh, true);
@@ -605,8 +605,8 @@ void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vap
               //   }
               //   Cerr << "]" << finl;
               // }
-              MCT do_not_use4 = mesh1D->zipCoordsTraducer();
-              MCT no_use1 = mesh1D->zipConnectivityTraducer(2);
+              /* MCT do_not_use4 =*/ mesh1D->zipCoordsTraducer();
+              /* MCT no_use1 =*/ mesh1D->zipConnectivityTraducer(2);
               if (Process::je_suis_maitre())
                 MEDCoupling::WriteUMesh("mesh1d.med", mesh1D, true);
               // récupérer le bon champ
@@ -624,8 +624,8 @@ void SurfaceVapeurIJKComputation::calculer_surfaces_et_barys_faces_mouillees_vap
               // fin debug
 
               MCU mesh1D_ordered = mesh1D->buildPartOfMySelf(cellOrder->begin(), cellOrder->end(), false);
-              MCT no_use2 = mesh1D_ordered->zipConnectivityTraducer(2);
-              MCT do_not_use6 = mesh1D_ordered->zipCoordsTraducer();
+              /* MCT no_use2 =*/ mesh1D_ordered->zipConnectivityTraducer(2);
+              /* MCT do_not_use6 =*/ mesh1D_ordered->zipCoordsTraducer();
               Cerr << "Mesh 1D connectivity cell ordered" << finl;
               print_umesh_conn(mesh1D_ordered->getNodalConnectivity());
               // Cerr << "Mesh 1D connectivity index ordered" << finl;

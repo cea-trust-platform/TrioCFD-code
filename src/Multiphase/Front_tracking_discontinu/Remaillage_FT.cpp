@@ -1659,7 +1659,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
   const Parcours_interface& parcours = maillage.refparcours_interface_.valeur();
 #endif
 
-  DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
+  //DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
   int fa7, isom, som =0, nb_bord;
   for (fa7=0 ; fa7<nb_facettes ; fa7++)
     {

@@ -1225,12 +1225,12 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
   Ec_spectre = 0;
   double Df_spectre = 0;
 
-  int nb_points_1D_max = local_max_vect(nb_points_1D);
+  //int nb_points_1D_max = local_max_vect(nb_points_1D);
 
-  DoubleVect Ec_moy(nb_points_1D_max),
+  /* DoubleVect Ec_moy(nb_points_1D_max),
              Ec_moy_u(nb_points_1D_max),
              Ec_moy_v(nb_points_1D_max),
-             Ec_moy_w(nb_points_1D_max);
+             Ec_moy_w(nb_points_1D_max); */
 
   for (int dir=0; dir<dimension; dir++)
     {
@@ -1261,7 +1261,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
       //      fic_data_direction << "# coordonnee selon la direction" << dim << " ; vit_u ; vit_v ; vit_w" << finl;
 
 
-      DoubleTab Ec_comp(nb_points_1D(dir), dimension); // energie par composante (u,v,w) par bande spectrale
+      //DoubleTab Ec_comp(nb_points_1D(dir), dimension); // energie par composante (u,v,w) par bande spectrale
       DoubleTab Ec_comp_min(nb_points_1D(dir), dimension);
       DoubleTab Ec_comp_max(nb_points_1D(dir), dimension);
       DoubleTab Ec_comp_moy(nb_points_1D(dir), dimension);

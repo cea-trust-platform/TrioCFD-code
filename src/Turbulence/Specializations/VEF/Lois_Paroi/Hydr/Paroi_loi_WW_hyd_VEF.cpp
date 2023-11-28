@@ -520,7 +520,7 @@ double distance_2D_som(int fac,int elem,const Domaine_VEF& domaine ) //distance 
   const DoubleTab& face_normale = domaine.face_normales();
 
   int i,num0,sommet;
-  IntVect num(2),som(2);
+  //IntVect num(2),som(2);
   // On cherche les faces autres que fac
   for (i=0; i<nfac; i++)
     {
