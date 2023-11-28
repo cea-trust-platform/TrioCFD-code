@@ -94,6 +94,8 @@ public :
   void computeFluidForceOnBeam(const int&);
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
+  void update_coord_dom_extrait_surface();
+
 protected:
 
   double dt_;
