@@ -43,7 +43,6 @@ Entree& Source_Production_energie_cin_turb::readOn(Entree& is)
   Param param(que_suis_je());
   param.ajouter("omega_min_", &omega_min_);
   param.lire_avec_accolades_depuis(is);
-  return is;
 
   equation().probleme().creer_champ("gradient_vitesse"); // Besoin du gradient de vitesse
   return is;
