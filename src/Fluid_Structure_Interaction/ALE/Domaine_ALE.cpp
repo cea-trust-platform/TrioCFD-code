@@ -42,7 +42,18 @@
 #include <communications.h>
 #include <Faces.h>
 #include <CL_Types_include.h>
+#include <EFichier.h>
+#include <Entree_fluide_vitesse_imposee_ALE.h>
+#include <Navier_Stokes_std_ALE.h>
 
+
+
+
+
+
+#include <Interprete_bloc.h>
+#include <NettoieNoeuds.h>
+#include <trust_med_utils.h>
 
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
@@ -50,11 +61,11 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_AL
 Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), nbBeam(0), associate_eq(false)
 {
 
-  beam = new Beam_model[nbBeam];
+//  beam = new Beam_model[nbBeam];
 }
 Domaine_ALE::~Domaine_ALE()
 {
-  delete[] beam;
+//  delete[] beam;
 }
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -101,6 +112,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       int nb_som_face=le_dom_VF.nb_som_face();
       IntTab& face_sommets=le_dom_VF.face_sommets();
       creer_mes_domaines_frontieres(le_dom_VF);//update the boundary surface domain
+      update_coord_dom_extrait_surface();//update coord for dom extrait_surface_ale
 
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
@@ -120,13 +132,13 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       ::calculer_centres_gravite(xv, type_face,
                                  sommets_, face_sommets);
 
-      if(sub_type(Domaine_VDF, le_dom_VF))
-        {
-          Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
-          le_dom_VF.volumes_entrelaces()=0;
-          le_dom_VDF.calculer_volumes_entrelaces();
-        }
-      else if(sub_type(Domaine_VEF, le_dom_VF))
+      /* if(sub_type(Domaine_VDF, le_dom_VF))
+         {
+           Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
+           le_dom_VF.volumes_entrelaces()=0;
+           le_dom_VDF.calculer_volumes_entrelaces();
+         }*/
+      if(sub_type(Domaine_VEF, le_dom_VF))
         {
           Domaine_VEF& le_dom_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
           DoubleTab& normales=le_dom_VEF.face_normales();
@@ -214,8 +226,9 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
         }
       else
         {
-          Cerr << "Discretisation non reconnue par ALE!" << finl;
-          exit();
+          Cerr << "Discretization not recognized by ALE!" << finl;
+          Cerr << "Change with finite element volume discretization: VEFPreP1B and restart" << finl;
+          Process::exit();
         }
 
     }
@@ -265,19 +278,28 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
     }
   mp_sum(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName.txt file
+
+  // Write the result in the Cas_ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      std::string nom="ModalForce_";
-      nom += name_ALE_boundary_projection;
-      nom +="_";
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce_";
+      filename+=name_ALE_boundary_projection;
+      filename +="_";
       std::string index(std::to_string(nb_mode));
-      nom +=index;
-      nom+=".txt";
-      std::ofstream ofs_1;
-      ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-      ofs_1<<temps<<" "<<modalForce;
-      ofs_1<<endl;
-      ofs_1.close();
+      filename+=index;
+      filename+=".out";
+      if (!modalForceProjectionALE_.is_open())
+        {
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
+        }
+      // comments are added to the file header
+      if (first_writing)
+        modalForceProjectionALE_<< "# Time t  Boundary "<< name_ALE_boundary_projection<<finl;
+
+      modalForceProjectionALE_<< temps<< " "<<modalForce<<" "<<finl;
     }
 }
 //Compute the fluid force projected within the requested boundaries
@@ -329,30 +351,38 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 
   mp_sum_for_each_item(modalForce);
-  if (je_suis_maitre()) //Write the result in the ModalForce_BoundaryName_[i].txt file
+
+  // Write the result in the ModalForce_BoundaryName.out file
+  if (je_suis_maitre())
     {
-      for(int i=0; i<size_projection_boundaries; i++)
+      int first_writing = (!eqn_hydr.probleme().reprise_effectuee() && eqn_hydr.probleme().schema_temps().nb_pas_dt() == 0);
+      Nom filename(nom_du_cas());
+      filename+="_ModalFluideForce.out";
+      if (!modalForceProjectionALE_.is_open())
         {
-          std::string nom="ModalForce_";
-          nom += name_ALE_boundary_projection_[i];
-          nom +="_";
-          std::string index(std::to_string(i+1));
-          nom +=index;
-          nom+=".txt";
-          std::ofstream ofs_1;
-          ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-          ofs_1<<temps<<" "<<modalForce[i];
-          ofs_1<<endl;
-          ofs_1.close();
+          modalForceProjectionALE_.ouvrir(filename, (first_writing?ios::out:ios::app));
+          modalForceProjectionALE_.setf(ios::scientific);
         }
+      // comments are added to the file header
+      if (first_writing)
+        {
+          modalForceProjectionALE_<< "# Time t  Boundary ";
+          for(int i=0; i<size_projection_boundaries; i++)
+            modalForceProjectionALE_<< name_ALE_boundary_projection_[i]<< " ";
+          modalForceProjectionALE_<<finl;
+        }
+      modalForceProjectionALE_<< temps<< " ";
+      for(int i=0; i<size_projection_boundaries; i++)
+        modalForceProjectionALE_<<modalForce[i]<<" ";
+      modalForceProjectionALE_<<finl;
     }
+
 
 }
 
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
-  //Cerr << "Domaine_ALE::initialiser  " << finl;
-
+  Cerr << "Domaine_ALE::initialize " << finl;
   deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
@@ -395,6 +425,71 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
   //End of initializing Ch_front_input_ALE
+
+  // check that the Neumann boundaries indicated in the jdd are not moving bounaries
+  bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  if(cl_Neumann)
+    {
+      int nb_cl_Neumann=name_boundary_with_Neumann_BC.size();
+      for(int i=0; i<nb_cl_Neumann; i++)
+        {
+          for (int j=0; j<nb_bords_ALE; j++)
+            {
+              if(les_bords_ALE(j).le_nom()==name_boundary_with_Neumann_BC[i])
+                {
+                  Cerr<<" In the 'ALE_Neumann_BC_for_grid_problem' block, you define a Neumann BC for the boundary "<<name_boundary_with_Neumann_BC[i]<<" \n";
+                  Cerr<<" or this is a moving boundary already define in the 'Imposer_vit_bords_ALE' block "<<finl;
+                  Process::exit();
+                }
+            }
+        }
+    }
+  //checking the Discretization (only VEF supported)
+  if(!sub_type(Domaine_VEF, le_dom_VF))
+    {
+      Cerr << "Discretization not recognized by ALE!" << finl;
+      Cerr << "Change with finite element volume discretization: VEFPreP1B and restart" << finl;
+      Process::exit();
+    }
+
+  //checking correct type of BC on the moving boundary
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  for (int j=0; j<nb_bords_ALE; j++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(j).le_nom();
+      int rang=rang_frontiere(le_nom_bord_ALE);
+      const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(rang);
+      if (!sub_type(Entree_fluide_vitesse_imposee_ALE,la_cl.valeur()))
+        {
+          Cerr <<"Bord mobile ALE:  replace  " <<la_cl.valeur().que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
+          Process::exit();
+        }
+    }
+
+  // check that Problem is well defined when we the domain is mobile (domaine_ALE)
+  Nom pbb = pb.que_suis_je();
+  if (!pbb.contient("ALE"))
+    {
+      Cerr <<"Domaine_ALE:  replace  " <<pb.que_suis_je()<<" with "<< pb.que_suis_je() <<"_ALE and restart!"<< finl;
+      Process:: exit();
+    }
+
+  // check that the equation is Navier_Stokes_std_ALE when we the domain is mobile (domaine_ALE)
+  /* const Navier_Stokes_std_ALE& eqn_hydr = ref_cast(Navier_Stokes_std_ALE,eq);
+     Nom eqnom = eqn_hydr.que_suis_je();
+      if (!eqnom.contient("ALE")){
+      Cout<<"replace "<<eqn_hydr.que_suis_je()<<"  with "<<eqn_hydr.que_suis_je()<<"_ALE and restart   "<<finl;
+      exit();}
+      */
+
+  // check that at least one boundary is mobile
+  if(nb_bords_ALE==0)
+    {
+      Cerr <<"Error: for Mobile domain (Domaine_ALE), at least one mobile boundary must be defined!"<< finl;
+      Cerr <<"Fill the Imposer_vit_bords_ALE block in the dataset and restart!"<< finl;
+      Process::exit();
+    }
+
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
@@ -511,7 +606,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                << les_champs_front[n].valeur().le_nom()
                << " ne peut etre utilise pour un probleme ALE pour le moment...."
                << finl;
-          exit();
+          Process::exit();
         }
     }
   vit_bords.echange_espace_virtuel();
@@ -581,6 +676,9 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
 
   int elem;
   int n_bord;
+  //bool cl_Neumann=(name_boundary_with_Neumann_BC.size()>0?1:0); //check for Neumann CLs
+  int nb_cl_Neumann=name_boundary_with_Neumann_BC.size(); // Neumann boundary numbers for the Laplacian
+
   {
     int rang;
     int nnz=0;
@@ -635,16 +733,23 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
         //for n_bord
         const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
         const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-        int num1 = le_bord.num_premiere_face();
-        int num2 = num1 + le_bord.nb_faces();
 
-        for (int face=num1; face<num2; face++)
+        bool bord_cl_neumann=false;
+        for(int i=0; i<nb_cl_Neumann; i++)
+          if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
+        if(!bord_cl_neumann)
           {
-            elem=domaine_VEF.face_voisins(face,0);
-            for(int isom=0; isom<dimension; isom++)
+            int num1 = le_bord.num_premiere_face();
+            int num2 = num1 + le_bord.nb_faces();
+
+            for (int face=num1; face<num2; face++)
               {
-                int som=domaine_VEF.face_sommets(face,isom);
-                diag[som]=1.e14;
+                elem=domaine_VEF.face_voisins(face,0);
+                for(int isom=0; isom<dimension; isom++)
+                  {
+                    int som=domaine_VEF.face_sommets(face,isom);
+                    diag[som]=1.e14;
+                  }
               }
           }
       }
@@ -672,14 +777,20 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
           //for n_bord
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          int num1 = le_bord.num_premiere_face();
-          int num2 = num1 + le_bord.nb_faces();
-          for (int face=num1; face<num2; face++)
+          bool bord_cl_neumann=false;
+          for(int i=0; i<nb_cl_Neumann; i++)
+            if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
+          if(!bord_cl_neumann)
             {
-              for(int isom=0; isom<dimension; isom++)
+              int num1 = le_bord.num_premiere_face();
+              int num2 = num1 + le_bord.nb_faces();
+              for (int face=num1; face<num2; face++)
                 {
-                  int som=domaine_VEF.face_sommets(face,isom);
-                  secmem(som)=1.e14*vit_bords(som,comp);
+                  for(int isom=0; isom<dimension; isom++)
+                    {
+                      int som=domaine_VEF.face_sommets(face,isom);
+                      secmem(som)=1.e14*vit_bords(som,comp);
+                    }
                 }
             }
         }
@@ -750,7 +861,7 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
       Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nb_bords_ALE;
   Cerr << "nombre de bords ALE : " <<  nb_bords_ALE << finl;
@@ -785,7 +896,7 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
       Cerr << "Error when reading the 'Projection_ALE_boundary' \n";
       Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nb_projection;
   Cerr << "Number of ALE projection boundary : " <<  nb_projection << finl;
@@ -803,6 +914,42 @@ void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
       compteur++;
     }
 }
+//Read the boundary with Neumann CL for the grid problem (optional)
+void Domaine_ALE::reading_ALE_Neumann_BC_for_grid_problem(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  int nb_boundary;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error when reading the 'ALE_Neumann_BC_for_grid_problem' \n";
+      Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
+           << motlu;
+      Process::exit();
+    }
+  is >> nb_boundary;
+  Cerr << "Number of Neumann CL boundary for grid_problem : " <<  nb_boundary << finl;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+      name_boundary_with_Neumann_BC.add(nomlu);
+    }
+  if(nb_boundary!=name_boundary_with_Neumann_BC.size())
+    {
+      Cerr<<"Error when reading the block ALE_Neumann_BC_for_grid_problem \n";
+      Cerr<<" the indicated number of Neumann boundary and the list of boundary names are different sizes.  "<<finl;
+      Process::exit();
+    }
+
+}
+
 
 //  Read the solver used to solve the system giving the moving mesh velocity
 void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
@@ -817,7 +964,7 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
       Cerr << "Error while reading the solveur_moving_mesh_ALE \n";
       Cerr << "We were waiting for a " << accolade_ouverte << " instead of \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >>  solv;
   solv.nommer("ALE_solver");
@@ -858,7 +1005,7 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
       Cerr << "Erreur a la lecture du Beam\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   while(1)
     {
@@ -993,100 +1140,14 @@ void Domaine_ALE::read_beam(Entree& is, int& count)
     }
   else
     {
-      Nom beam_name=beam[count].getBeamName();
-      //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
-      std::remove(beam_name+"Displacement1D.txt");
-      std::remove(beam_name+"Velocity1D.txt");
-      std::remove(beam_name+"Acceleration1D.txt");
-      std::remove(beam_name+"Displacement3D.txt");
-      std::remove(beam_name+"Velocity3D.txt");
-      std::remove(beam_name+"Acceleration3D.txt");
-      std::remove(beam_name+"ModalForceFluide1D.txt");
-      //end delete old files
-
       if(je_suis_maitre())
         {
-          //prepare the headers of the output file ModalForceFluide1D
-          std::ofstream ofs;
-          ofs.open (beam_name+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-          ofs<<"# Printing modal 1D fluid force: time mode  ";
-          for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
-          ofs<<endl;
-          ofs.close();
-          //end prepare the headers of the output file ModalForceFluide1D
-        }
-
-      if(nb_output_points_1D>0 && je_suis_maitre())
-        {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity1D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration1D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_1<<output_position_1D[k]<<" ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_2<<output_position_1D[k]<<" ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_1D; k++)
-            {
-              ofs_3<<output_position_1D[k]<<" ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
-        }
-      if(nb_output_points_3D>0 && je_suis_maitre())
-        {
-          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
-          std::ofstream ofs_1;
-          ofs_1.open (beam_name+"Displacement3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_2;
-          ofs_2.open (beam_name+"Velocity3D.txt", std::ofstream::out | std::ofstream::app);
-          std::ofstream ofs_3;
-          ofs_3.open (beam_name+"Acceleration3D.txt", std::ofstream::out | std::ofstream::app);
-
-          ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_1<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_1<<endl;
-          ofs_1.close();
-
-          ofs_2<<"# Printing Beam 3D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_2<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_2<<endl;
-          ofs_2.close();
-
-
-          ofs_3<<"# Printing Beam 3D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points_3D; k++)
-            {
-              ofs_3<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
-            }
-          ofs_3<<endl;
-          ofs_3.close();
-          //end prepare the headers
+          bool first_writing=true;
+          beam[count].printOutputFluidForceOnBeam(first_writing);
+          if (nb_output_points_1D>0)
+            beam[count].printOutputBeam1D(first_writing);
+          if (nb_output_points_3D>0)
+            beam[count].printOutputBeam3D(first_writing);
         }
     }
 
@@ -1107,7 +1168,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
       Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   is >> nomlu;
   motlu=nomlu;
@@ -1115,7 +1176,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
     {
       is>>nbBeam;
       if(nbBeam>0)
-        beam = new Beam_model[nbBeam];
+        beam = std::vector<Beam_model>(nbBeam);
       Cerr << "Beam number : " <<  nbBeam << finl;
     }
   else
@@ -1123,7 +1184,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       Cerr << "Erreur a la lecture du Beam model\n";
       Cerr << "On attendait en premier le nombre de Beam dans le domaine a la place de \n"
            << motlu;
-      exit();
+      Process::exit();
     }
   int count_read_beam=0;
   while(1)
@@ -1147,7 +1208,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           else
             {
               Cerr << "The name of the beam must be the name of the CL for which the mechanical beam model applies, not " << beam_name;
-              exit();
+              Process::exit();
             }
           read_beam(is, count_read_beam);
           count_read_beam++;
@@ -1158,7 +1219,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
             {
               Cerr << "We read  "<<count_read_beam <<" model and not "<<nbBeam;
               Cerr << "Please indicate the right number of beam in the domain";
-              exit();
+              Process::exit();
             }
 
           break;
@@ -1168,7 +1229,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           Cerr << "Erreur a la lecture du Beam model\n";
           Cerr << "On attendait le nom du bord a la place de \n"
                << motlu;
-          exit();
+          Process::exit();
         }
 
     }
@@ -1183,16 +1244,16 @@ DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const int& i, const double& 
 /*double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
 {
 
-  double dt = 0.;
-  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
-  const DoubleVect& surfaces = domaine_VEF.face_surfaces();
-  double minSurf = mp_min_vect(surfaces);
-  minSurf = Process::mp_min(minSurf);
-  //Cerr << " Surface min: "<< minSurf << endl;
-  double soundSpeed=beam->soundSpeed();
-  //Cerr << "soundSpeed: "<< soundSpeed << endl;
-  dt = 0.5*(minSurf/soundSpeed);
-  return dt;
+double dt = 0.;
+const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+const DoubleVect& surfaces = domaine_VEF.face_surfaces();
+double minSurf = mp_min_vect(surfaces);
+minSurf = Process::mp_min(minSurf);
+//Cerr << " Surface min: "<< minSurf << endl;
+double soundSpeed=beam->soundSpeed();
+//Cerr << "soundSpeed: "<< soundSpeed << endl;
+dt = 0.5*(minSurf/soundSpeed);
+return dt;
 }*/
 
 const Nom& Domaine_ALE::getBeamName(const int& i) const
@@ -1307,13 +1368,32 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   beam[i].setFluidForceOnBeam(fluidForceOnBeam);
   if (je_suis_maitre()) // Write the result in the ModalForceFluide1D.txt file
     {
-      std::ofstream ofs_1;
-      ofs_1.precision(32);
-      ofs_1.open (beam[i].getBeamName()+"ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<beam[i].getTempsComputeForceOnBeam()<<" ";
-      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
-      ofs_1<<endl;
-      ofs_1.close();
+      beam[i].printOutputFluidForceOnBeam();
     }
 }
+
+void Domaine_ALE::update_coord_dom_extrait_surface()
+{
+  Interprete_bloc& interp = Interprete_bloc::interprete_courant();
+  Noms noms=interp.getListeNoms();
+  for(int i=0; i<noms.size(); i++)
+    if(strcmp(interprete().objet(noms[i]).le_type(), "Domaine" ) == 0) //we only look for objet of type domaine
+      {
+        Nom nom_domaine_ext= noms[i]; // give the name of domaine
+        //if (interp.objet_global_existant(nom_domaine_ext))
+        Domaine& dom_new = ref_cast(Domaine, interprete().objet(nom_domaine_ext));
+        if(dom_new.getExtrait_surf_dom_deformable()) //test if domain was defined with extrait_surface_ALE
+          {
+            //Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
+            Scatter::uninit_sequential_domain(dom_new);
+            dom_new.les_sommets()=coord_sommets();             //coordinated updates
+            dom_new.les_elems()=dom_new.getLes_elems_extrait_surf_ref(); //only the coordinate are update, exactly the same elements will belong to the domain
+            NettoieNoeuds::nettoie(dom_new);
+          }
+      }
+
+}
+
+
+
+

@@ -81,16 +81,8 @@ Lire sch
 	nb_pas_dt_max 10
 }
 
-Fluide_Incompressible air
-Lire air
-{
-	mu Champ_fonc_xyz dom 1 5.e-4
-	rho Champ_Uniforme 1 500
-}
-
 Associer pb dom
 Associer pb sch
-Associer pb air
 
 Discretiser pb dis
 
@@ -136,6 +128,13 @@ Lire grid_splitting
 
 Lire pb
 {
+
+  Fluide_Incompressible
+  {
+    mu Champ_fonc_xyz dom 1 5.e-4
+    rho Champ_Uniforme 1 500
+  }
+
 	Navier_Stokes_turbulent
 
 	{

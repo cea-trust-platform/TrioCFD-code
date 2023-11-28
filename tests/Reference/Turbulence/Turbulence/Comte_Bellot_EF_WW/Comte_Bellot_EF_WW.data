@@ -153,6 +153,8 @@ Read pb
             		pression elem
             		Divergence_U elem
             		vitesse som
+			u_star elem
+			y_plus elem
         	}
 	}
     }

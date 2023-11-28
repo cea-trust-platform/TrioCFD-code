@@ -378,7 +378,7 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||
-           (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+           (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           if(je_suis_maitre())

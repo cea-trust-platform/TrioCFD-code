@@ -115,8 +115,8 @@ Lire pb
 		conditions_limites	{
 					entree			frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0 0 0 
 					sortie			frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
-					cylindre1		frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3  0. 0.  0.
-					cylindre2		frontiere_ouverte_vitesse_imposee Champ_front_ALE_Beam 3  0. 0.  0.
+					cylindre1		frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE_Beam 3  0. 0.  0.
+					cylindre2		frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE_Beam 3  0. 0.  0.
 					parois_laterales	paroi_fixe
 					paroi_haut		paroi_fixe
 					paroi_bas		paroi_fixe

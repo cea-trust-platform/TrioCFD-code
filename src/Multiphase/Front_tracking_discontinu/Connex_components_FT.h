@@ -28,7 +28,8 @@
 #include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc;
 
-int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo);
+int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo,
+                                      const int include_virtual=0);
 
 int compute_global_connex_components_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo, int nb_local_components);
 #endif

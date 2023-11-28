@@ -101,7 +101,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			CylinderRight  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # mobile bord in ALE framework # 
+			CylinderRight  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # mobile bord in ALE framework # 
 			CylinderLeft  paroi_fixe
 			RectangularBox paroi_fixe
 		}

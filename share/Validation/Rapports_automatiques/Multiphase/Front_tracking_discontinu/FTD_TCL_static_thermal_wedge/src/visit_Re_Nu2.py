@@ -37,14 +37,15 @@ DIR="./"
 #DIR="/work/gb218285/Calculs/v154-pch/"+name_case+"/mmWe7.5-Reb150-"+subname_case+"-Pr1.474-n400-nitd25-dt1e-6-RelaxBary0.06-liss0-pas1.e-4/"
 DIM="2D_axi"
 
-print argv
+print (argv)
 
 # Quelques variables globales :
 
-print "variables modifiables :" ,
+print ("variables modifiables :" , end=" ")
 for k in  dir():
    if k not in lo:
-      print k,
+      # print k,
+      print(k, end=" ")
       pass
    pass
 print
@@ -56,23 +57,23 @@ for i in range(len(argv)):
       pass
    pass
 
-print "ts_start = ",ts_start
-print "ts_end = ",ts_end
-print "nb_ts = ",nb_ts
-print "ts_im = ",ts_im
-print "p_filtre = ", p_filtre
-print "name_case = ", name_case
-print "subname_case = ", subname_case
-print "DIR = ", DIR
-print "nu_l = ", nu_l
-print "k_l = ", k_l
-print "L_vap = ", L_vap
-print "T_sat = ", T_sat
-print "T_inf = ", T_inf
-print "PAR = ", PAR
-print "GRADT = ", GRADT
-print "Vinlet = ", Vinlet
-print "DIM = ", DIM
+print ("ts_start = ",ts_start)
+print ("ts_end = ",ts_end)
+print ("nb_ts = ",nb_ts)
+print ("ts_im = ",ts_im)
+print ("p_filtre = ", p_filtre)
+print ("name_case = ", name_case)
+print ("subname_case = ", subname_case)
+print ("DIR = ", DIR)
+print ("nu_l = ", nu_l)
+print ("k_l = ", k_l)
+print ("L_vap = ", L_vap)
+print ("T_sat = ", T_sat)
+print ("T_inf = ", T_inf)
+print ("PAR = ", PAR)
+print ("GRADT = ", GRADT)
+print ("Vinlet = ", Vinlet)
+print ("DIM = ", DIM)
 if (DIM != "2D_axi") and (DIM != "3D"):
    raise Exception("variable DIM is not matching a predefined value")
    
@@ -104,7 +105,7 @@ if (ts_end>TimeSliderGetNStates()):
    pass
 
 list_ts = range(ts_start,int(ts_end),nb_ts) # On centralise ici la liste des timestep e traiter.
-print list_ts
+print (list_ts)
 pi = math.pi
 
 DefineScalarExpression("xinterf", "coord(INTERFACES)[0]")
@@ -241,17 +242,17 @@ for state in list_ts:
    ib,jb=int(ib),int(jb)
    nbulles = jb+1-ib
    lbulles =  range(ib,jb+1)
-   print "*"*60, "\n", "At timestep ", state, " there is/are ", nbulles, " bubbles : ", lbulles
+   print ("*"*60, "\n", "At timestep ", state, " there is/are ", nbulles, " bubbles : ", lbulles)
    if (nbulles > nb_max_authorized_bubbles): raise Exception("There are more bubbles than expected at most")
    for bulle in lbulles:
       reset()
-      print "Dealing with bubble ", bulle,
+      print ("Dealing with bubble ", bulle,)
       SetActivePlots(1)
       ChangeActivePlotsVar("yinterf")
       mod_ThresholdAtts(ThresholdAttributes(),compo_min=bulle, compo_max=bulle) 
       Query("MinMax", use_actual_data=1)
       ymin, ymax = GetQueryOutputValue()
-      print " located between", ymin, " and ", ymax
+      print (" located between", ymin, " and ", ymax)
       mod_BoxAtts(BoxAttributes(), y_min=ymin-dy_tol, y_max=ymax+dy_tol)
       SetActivePlots(0)
       ChangeActivePlotsVar("vol_vap")
@@ -281,7 +282,7 @@ for state in list_ts:
          vitesse_bulle_z=GetQueryOutputValue()/volume_bulle - Vinlet
       else:
          pass
-      print "La vitesse de la bulle est de %g, %g ,%g" % (vitesse_bulle_x,vitesse_bulle_y,vitesse_bulle_z)
+      print ("La vitesse de la bulle est de %g, %g ,%g" % (vitesse_bulle_x,vitesse_bulle_y,vitesse_bulle_z))
       # On en deduit la norme de la vitesse
       vitesse_bulle_norme=(vitesse_bulle_x**2.+vitesse_bulle_y**2+vitesse_bulle_z**2)**(1./2.)
       # On en deduit le nombre de Reynolds
@@ -302,7 +303,7 @@ for state in list_ts:
          pos_bulle.append(toto)
       #if PAR==1 :
       #   RemoveLastOperator()
-      print "Barycentre : ", m
+      print ("Barycentre : ", m)
       try:
          ChangeActivePlotsVar("sinterf")
          Query("Variable Sum")
@@ -313,10 +314,10 @@ for state in list_ts:
          surface=surface_init
       else :
          surface=GetQueryOutputValue()
-      print "La surface de la bulle est de %g " % surface
+      print ("La surface de la bulle est de %g " % surface)
       # On calcul la surface d'une sphere equivalente ayant le volume precedement obtenu : 
       surface_equiv = (volume_bulle*6.)**(2./3.)*(math.pi)**(1./3.)
-      print "Le volume (resp. surf) de la bulle est de %g m^3 (resp m^2), la surf equiv (resp. perimetre) est %g et le diametre equivalent est de %g m" % (volume_bulle,surface_equiv,diam_bulle_equiv)
+      print ("Le volume (resp. surf) de la bulle est de %g m^3 (resp m^2), la surf equiv (resp. perimetre) est %g et le diametre equivalent est de %g m" % (volume_bulle,surface_equiv,diam_bulle_equiv))
       #------------------------------------
       #         Pour la thermique
       #------------------------------------

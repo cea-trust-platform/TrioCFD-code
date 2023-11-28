@@ -41,11 +41,8 @@
 
 Implemente_instanciable(Source_Con_Phase_field,"Source_Con_Phase_field_VDF_P0_VDF",Source_Con_Phase_field_base);
 // XD source_con_phase_field source_base source_con_phase_field 1 Keyword to define the source term of the Cahn-Hilliard equation.
+// XD attr systeme_naire systeme_naire_deriv systeme_naire 1 not_set
 // XD attr temps_d_affichage entier temps_d_affichage 0 Time during the caracteristics of the problem are shown before calculation.
-// XD attr alpha floattant alpha 0 Internal capillary coefficient alfa.
-// XD attr beta floattant beta 0 Parameter beta of the model.
-// XD attr kappa floattant kappa 0 Mobility coefficient kappa0.
-// XD attr kappa_variable bloc_kappa_variable kappa_variable 0 To define a mobility which depends on concentration C.
 // XD attr moyenne_de_kappa chaine moyenne_de_kappa 0 To define how mobility kappa is calculated on faces of the mesh according to cell-centered values (chaine is arithmetique/harmonique/geometrique).
 // XD attr multiplicateur_de_kappa floattant multiplicateur_de_kappa 0 To define the parameter of the mobility expression when mobility depends on C.
 // XD attr couplage_NS_CH chaine couplage_NS_CH 0 Evaluating time choosen for the term source calculation into the Navier Stokes equation (chaine is mutilde(n+1/2)/mutilde(n), in order to be conservative, the first choice seems better).
@@ -58,11 +55,21 @@ Implemente_instanciable(Source_Con_Phase_field,"Source_Con_Phase_field_VDF_P0_VD
 // XD attr nb_iterations_gmresnl entier nb_iterations_gmresnl 0 Maximal iteration (an option of the Newton-Krylov method).
 // XD attr residu_min_gmresnl floattant residu_min_gmresnl 0 Minimal convergence threshold (an option of the Newton-Krylov method).
 // XD attr residu_max_gmresnl floattant residu_max_gmresnl 0 Maximal convergence threshold (an option of the Newton-Krylov method).
-// XD attr potentiel_chimique bloc_potentiel_chim potentiel_chimique 1 chemical potential function
+
 // XD bloc_kappa_variable objet_lecture nul 0 if the parameter of the mobility, kappa, depends on C
 // XD attr expr bloc_lecture expr 0 choice for kappa_variable
+
 // XD bloc_potentiel_chim objet_lecture nul 0 if the chemical potential function is an univariate function
 // XD attr expr bloc_lecture expr 0 choice for potentiel_chimique
+
+// XD systeme_naire_deriv objet_lecture systeme_naire_deriv -1 not_set
+// XD systeme_naire_non systeme_naire_deriv non 1 not_set
+// XD attr alpha floattant alpha 0 Internal capillary coefficient alfa.
+// XD attr beta floattant beta 0 Parameter beta of the model.
+// XD attr kappa floattant kappa 0 Mobility coefficient kappa0.
+// XD attr kappa_variable bloc_kappa_variable kappa_variable 0 To define a mobility which depends on concentration C.
+// XD attr potentiel_chimique bloc_potentiel_chim potentiel_chimique 1 chemical potential function
+
 
 Sortie& Source_Con_Phase_field::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 
